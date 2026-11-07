@@ -3448,6 +3448,7 @@ export type Query = {
   approvalTasks?: Maybe<Array<Maybe<ApprovalTask>>>;
   approvalTasksByIds?: Maybe<Array<Maybe<ApprovalTask>>>;
   assetFile?: Maybe<AssetFile>;
+  assetFileSignedDownloadUrl: Scalars['String']['output'];
   assetFileTags: Array<Tag>;
   assetFileTextContent?: Maybe<Scalars['String']['output']>;
   assetFileVersions: Array<AssetFileVersion>;
@@ -3772,6 +3773,11 @@ export type QueryApprovalTasksByIdsArgs = {
 
 
 export type QueryAssetFileArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAssetFileSignedDownloadUrlArgs = {
   id: Scalars['ID']['input'];
 };
 

@@ -454,6 +454,13 @@ export type GetAssetFileQueryVariables = Exact<{
 
 export type GetAssetFileQuery = { assetFile: { createdBy: string | null, createdDate: any, description: string | null, downloadUrl: string, environmentId: any, format: string | null, generatedByAgentSource: number | null, generatedFromPrompt: string | null, id: string, lastModifiedBy: string | null, lastModifiedDate: any, metadataJson: string | null, mimeType: string, name: string, publicLinkUrl: string | null, sizeBytes: any, source: Types.AssetFileSource, tags: Array<{ id: string, name: string }> } | null };
 
+export type GetAssetFileSignedDownloadUrlQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetAssetFileSignedDownloadUrlQuery = { assetFileSignedDownloadUrl: string };
+
 export type GetAssetFileTagsQueryVariables = Exact<{
   workspaceId: string | number;
 }>;
@@ -4213,6 +4220,28 @@ export const useGetAssetFileQuery = <
       {
     queryKey: ['GetAssetFile', variables],
     queryFn: fetcher<GetAssetFileQuery, GetAssetFileQueryVariables>(GetAssetFileDocument, variables),
+    ...options
+  }
+    )};
+
+export const GetAssetFileSignedDownloadUrlDocument = new TypedDocumentString(`
+    query GetAssetFileSignedDownloadUrl($id: ID!) {
+  assetFileSignedDownloadUrl(id: $id)
+}
+    `);
+
+export const useGetAssetFileSignedDownloadUrlQuery = <
+      TData = GetAssetFileSignedDownloadUrlQuery,
+      TError = unknown
+    >(
+      variables: GetAssetFileSignedDownloadUrlQueryVariables,
+      options?: Omit<UseQueryOptions<GetAssetFileSignedDownloadUrlQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GetAssetFileSignedDownloadUrlQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<GetAssetFileSignedDownloadUrlQuery, TError, TData>(
+      {
+    queryKey: ['GetAssetFileSignedDownloadUrl', variables],
+    queryFn: fetcher<GetAssetFileSignedDownloadUrlQuery, GetAssetFileSignedDownloadUrlQueryVariables>(GetAssetFileSignedDownloadUrlDocument, variables),
     ...options
   }
     )};
