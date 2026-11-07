@@ -93,6 +93,77 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Page"
+  /workflow-executions/any:
+    get:
+      description: "Get the integration and automation workflow executions of connected users together, newest first."
+      summary: "Get integration and automation workflow executions"
+      tags:
+        - "workflow-execution"
+      operationId: "getAnyWorkflowExecutionsPage"
+      parameters:
+        - name: "workspaceId"
+          description: "The id of the workspace whose automation workflow executions are returned."
+          in: "query"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "environmentId"
+          description: "The id of an environment."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "jobStatus"
+          description: "The status of an executed job"
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            enum:
+              - "CREATED"
+              - "STARTED"
+              - "STOPPED"
+              - "FAILED"
+              - "COMPLETED"
+              - "PAYMENT_REQUIRED"
+        - name: "jobStartDate"
+          description: "The start date of a job."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "jobEndDate"
+          description: "The end date of a job."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "connectedUserId"
+          description: "The id of a connected user."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "pageNumber"
+          description: "The number of the page to return."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: 0
+      responses:
+        "200":
+          description: "The page of embedded workflow executions."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
   /workflow-executions/{id}:
     get:
       description: "Get workflow execution by id."
@@ -201,6 +272,23 @@ paths:
                 $ref: "../../../../../../libs/platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest/platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TaskExecutionChildrenPage"
 components:
   schemas:
+    EmbeddedWorkflowExecution:
+      description: "An integration or an automation workflow execution of a connected user."
+      type: "object"
+      required:
+        - "source"
+      properties:
+        automationWorkflowExecution:
+          description: "The automation workflow execution, set when the source is AUTOMATION."
+          type: "object"
+        integrationWorkflowExecution:
+          $ref: "#/components/schemas/WorkflowExecutionBasic"
+        source:
+          description: "Whether the execution ran an integration workflow or an automation workflow."
+          type: "string"
+          enum:
+            - "AUTOMATION"
+            - "INTEGRATION"
     Page:
       $ref: "../../../../../../libs/platform/platform-rest/openapi/components/schemas/objects/page.yaml"
     WorkflowExecution:
