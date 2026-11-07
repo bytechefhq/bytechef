@@ -8,7 +8,10 @@
 package com.bytechef.ee.ai.hub.toolsearch;
 
 import com.agui.spring.ai.TurnEndingToolCallingManager;
+import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ai.copilot.tool.WorkspaceCopilotConnectionLister;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.commons.util.MemoizationUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
@@ -16,6 +19,10 @@ import com.bytechef.ee.ai.hub.agent.AiHubToolCallbackWrappers;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.config.AiHubPgVectorConfiguration;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
+import com.bytechef.ee.ai.hub.util.Mode;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import io.micrometer.observation.ObservationRegistry;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -58,19 +65,24 @@ public class ToolSearchAdvisorConfiguration {
     @Bean
     @Nullable
     ToolSearchCatalogFeeder toolSearchCatalogFeeder(
+        ObjectProvider<ClusterElementDefinitionService> clusterElementDefinitionServiceProvider,
         @Qualifier("toolSearchPgVectorStore") ObjectProvider<VectorStore> toolSearchPgVectorStoreProvider,
         @Qualifier("pgVectorJdbcTemplate") ObjectProvider<JdbcTemplate> pgVectorJdbcTemplateProvider,
         PgVectorStoreProperties properties, ObjectProvider<ApplicationProperties> applicationPropertiesProvider) {
 
+        ClusterElementDefinitionService clusterElementDefinitionService =
+            clusterElementDefinitionServiceProvider.getIfAvailable();
         VectorStore toolSearchPgVectorStore = toolSearchPgVectorStoreProvider.getIfAvailable();
         JdbcTemplate pgVectorJdbcTemplate = pgVectorJdbcTemplateProvider.getIfAvailable();
 
-        if (toolSearchPgVectorStore == null || pgVectorJdbcTemplate == null) {
+        if (clusterElementDefinitionService == null || toolSearchPgVectorStore == null ||
+            pgVectorJdbcTemplate == null) {
+
             return null;
         }
 
         return new ToolSearchCatalogFeeder(
-            new VectorToolIndex(toolSearchPgVectorStore),
+            clusterElementDefinitionService, new VectorToolIndex(toolSearchPgVectorStore),
             embeddingModelIdentity(applicationPropertiesProvider.getIfAvailable(), properties), pgVectorJdbcTemplate,
             properties.getSchemaName(), AiHubPgVectorConfiguration.vectorTableName(properties));
     }
@@ -86,6 +98,37 @@ public class ToolSearchAdvisorConfiguration {
                 .toList());
     }
 
+    @Bean
+    @Nullable
+    AiHubClusterElementToolCallbacks aiHubClusterElementToolCallbacks(
+        ObjectProvider<ClusterElementDefinitionService> clusterElementDefinitionServiceProvider,
+        ObjectProvider<ClusterElementDefinitionFacade> clusterElementDefinitionFacadeProvider,
+        ObjectProvider<ConnectionDefinitionService> connectionDefinitionServiceProvider,
+        ObjectProvider<WorkspaceConnectionFacade> workspaceConnectionFacadeProvider,
+        ObjectProvider<PropertyOptionsResolver> propertyOptionsResolverProvider) {
+
+        ClusterElementDefinitionService clusterElementDefinitionService =
+            clusterElementDefinitionServiceProvider.getIfAvailable();
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade =
+            clusterElementDefinitionFacadeProvider.getIfAvailable();
+        ConnectionDefinitionService connectionDefinitionService = connectionDefinitionServiceProvider.getIfAvailable();
+        WorkspaceConnectionFacade workspaceConnectionFacade = workspaceConnectionFacadeProvider.getIfAvailable();
+        PropertyOptionsResolver propertyOptionsResolver = propertyOptionsResolverProvider.getIfAvailable();
+
+        if (clusterElementDefinitionService == null || clusterElementDefinitionFacade == null ||
+            connectionDefinitionService == null || workspaceConnectionFacade == null ||
+            propertyOptionsResolver == null) {
+
+            log.warn("AI Hub cluster element tools are unavailable: the component and connection services are missing");
+
+            return null;
+        }
+
+        return AiHubClusterElementToolCallbacks.of(
+            clusterElementDefinitionService, clusterElementDefinitionFacade, connectionDefinitionService,
+            new WorkspaceCopilotConnectionLister(workspaceConnectionFacade, propertyOptionsResolver));
+    }
+
     @Bean(defaultCandidate = false)
     @Nullable
     ToolSearchToolCallingAdvisor aiHubAskToolSearchToolCallAdvisor(
@@ -93,14 +136,15 @@ public class ToolSearchAdvisorConfiguration {
         ObjectProvider<ObservationRegistry> observationRegistryProvider,
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
         ObjectProvider<SecurityContextRehydrator> securityContextRehydratorProvider,
-        ToolSearchCatalogWarmup toolSearchCatalogWarmup, ObjectProvider<AiHubApprovalGate> approvalGateProvider) {
+        ToolSearchCatalogWarmup toolSearchCatalogWarmup, ObjectProvider<AiHubApprovalGate> approvalGateProvider,
+        ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider) {
 
         return buildModeAdvisor(
-            toolSearchPgVectorStoreProvider.getIfAvailable(),
+            Mode.ASK, toolSearchPgVectorStoreProvider.getIfAvailable(),
             observationRegistryProvider.getIfUnique(() -> ObservationRegistry.NOOP),
             findCatalog(globalToolCatalogProvider, ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID),
-            securityContextRehydratorProvider.getIfAvailable(), toolSearchCatalogWarmup,
-            approvalGateProvider.getIfAvailable());
+            clusterElementToolCallbacksProvider.getIfAvailable(), securityContextRehydratorProvider.getIfAvailable(),
+            toolSearchCatalogWarmup, approvalGateProvider.getIfAvailable());
     }
 
     @Bean(defaultCandidate = false)
@@ -110,14 +154,15 @@ public class ToolSearchAdvisorConfiguration {
         ObjectProvider<ObservationRegistry> observationRegistryProvider,
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
         ObjectProvider<SecurityContextRehydrator> securityContextRehydratorProvider,
-        ToolSearchCatalogWarmup toolSearchCatalogWarmup, ObjectProvider<AiHubApprovalGate> approvalGateProvider) {
+        ToolSearchCatalogWarmup toolSearchCatalogWarmup, ObjectProvider<AiHubApprovalGate> approvalGateProvider,
+        ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider) {
 
         return buildModeAdvisor(
-            toolSearchPgVectorStoreProvider.getIfAvailable(),
+            Mode.BUILD, toolSearchPgVectorStoreProvider.getIfAvailable(),
             observationRegistryProvider.getIfUnique(() -> ObservationRegistry.NOOP),
             findCatalog(globalToolCatalogProvider, ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID),
-            securityContextRehydratorProvider.getIfAvailable(), toolSearchCatalogWarmup,
-            approvalGateProvider.getIfAvailable());
+            clusterElementToolCallbacksProvider.getIfAvailable(), securityContextRehydratorProvider.getIfAvailable(),
+            toolSearchCatalogWarmup, approvalGateProvider.getIfAvailable());
     }
 
     @Bean
@@ -139,8 +184,9 @@ public class ToolSearchAdvisorConfiguration {
     }
 
     static @Nullable ToolSearchToolCallingAdvisor buildModeAdvisor(
-        @Nullable VectorStore toolSearchPgVectorStore, ObservationRegistry observationRegistry,
+        Mode mode, @Nullable VectorStore toolSearchPgVectorStore, ObservationRegistry observationRegistry,
         @Nullable AiHubGlobalToolCatalog globalToolCatalog,
+        @Nullable AiHubClusterElementToolCallbacks clusterElementToolCallbacks,
         @Nullable SecurityContextRehydrator securityContextRehydrator,
         ToolSearchCatalogWarmup toolSearchCatalogWarmup, @Nullable AiHubApprovalGate approvalGate) {
 
@@ -150,8 +196,8 @@ public class ToolSearchAdvisorConfiguration {
 
         if (toolSearchPgVectorStore == null) {
             log.warn(
-                "AI Hub tool search is unavailable, so the {} catalog tools of session {} cannot be reached and the " +
-                    "agent runs with its pinned tools only",
+                "AI Hub tool search is unavailable, so the {} catalog tools of session {} and the cluster element " +
+                    "tools cannot be reached and the agent runs with its pinned tools only",
                 globalToolCatalog.toolCallbacks()
                     .size(),
                 globalToolCatalog.sessionId());
@@ -159,14 +205,57 @@ public class ToolSearchAdvisorConfiguration {
             return null;
         }
 
-        ToolIndex searcher = new CatalogToolIndex(toolSearchPgVectorStore, Set.of(globalToolCatalog.sessionId()));
+        ToolIndex searcher = new CatalogToolIndex(
+            toolSearchPgVectorStore, searchSessionIds(mode, globalToolCatalog, clusterElementToolCallbacks));
 
         Supplier<Map<String, ToolCallback>> callbackMapSupplier = MemoizationUtils.memoize(
-            () -> wrapCatalogToolCallbacks(globalToolCatalog.toolCallbacks(), securityContextRehydrator, approvalGate));
+            () -> catalogCallbackMap(
+                mode, globalToolCatalog, clusterElementToolCallbacks, securityContextRehydrator, approvalGate));
 
         return new PinnedToolSearchToolCallingAdvisor(
             buildToolCallingManager(observationRegistry, callbackMapSupplier), searcher, MAX_SEARCH_RESULTS,
             ChatMemory.CONVERSATION_ID, callbackMapSupplier, toolSearchCatalogWarmup::warmUp);
+    }
+
+    static Map<String, ToolCallback> catalogCallbackMap(
+        Mode mode, AiHubGlobalToolCatalog globalToolCatalog,
+        @Nullable AiHubClusterElementToolCallbacks clusterElementToolCallbacks,
+        @Nullable SecurityContextRehydrator securityContextRehydrator, @Nullable AiHubApprovalGate approvalGate) {
+
+        Map<String, ToolCallback> callbackMap = wrapCatalogToolCallbacks(
+            globalToolCatalog.toolCallbacks(), securityContextRehydrator, approvalGate);
+
+        if (clusterElementToolCallbacks == null) {
+            return callbackMap;
+        }
+
+        Map<String, ClusterElementToolCallback> modeClusterElementToolCallbacks =
+            clusterElementToolCallbacks.toolCallbacks(mode);
+
+        for (Map.Entry<String, ClusterElementToolCallback> entry : modeClusterElementToolCallbacks.entrySet()) {
+            callbackMap.putIfAbsent(
+                entry.getKey(),
+                AiHubToolCallbackWrappers.wrap(entry.getValue(), securityContextRehydrator, approvalGate));
+        }
+
+        return callbackMap;
+    }
+
+    static Set<String> searchSessionIds(
+        Mode mode, AiHubGlobalToolCatalog globalToolCatalog,
+        @Nullable AiHubClusterElementToolCallbacks clusterElementToolCallbacks) {
+
+        if (clusterElementToolCallbacks == null) {
+            return Set.of(globalToolCatalog.sessionId());
+        }
+
+        if (mode == Mode.BUILD) {
+            return Set.of(
+                globalToolCatalog.sessionId(), ToolSearchCatalogFeeder.CLUSTER_ELEMENT_READ_SESSION_ID,
+                ToolSearchCatalogFeeder.CLUSTER_ELEMENT_WRITE_SESSION_ID);
+        }
+
+        return Set.of(globalToolCatalog.sessionId(), ToolSearchCatalogFeeder.CLUSTER_ELEMENT_READ_SESSION_ID);
     }
 
     static String embeddingModelIdentity(

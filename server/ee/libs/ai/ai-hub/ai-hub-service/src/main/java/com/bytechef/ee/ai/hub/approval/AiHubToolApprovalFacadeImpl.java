@@ -19,6 +19,7 @@ import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.ForbiddenException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubClusterElementToolCallbacks;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
@@ -69,6 +70,7 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
     private final UserService userService;
     private final ObjectProvider<AiHubPinnedToolCallbacks> pinnedToolCallbacksProvider;
     private final ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider;
+    private final ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider;
     private final ObjectProvider<AiHubContinuationStarter> continuationStarterProvider;
     private final @Nullable SecurityContextRehydrator securityContextRehydrator;
     private final TransactionTemplate transactionTemplate;
@@ -80,12 +82,14 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
         AiHubToolApprovalService approvalService, AiHubChatService chatService, UserService userService,
         ObjectProvider<AiHubPinnedToolCallbacks> pinnedToolCallbacksProvider,
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
+        ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider,
         ObjectProvider<AiHubContinuationStarter> continuationStarterProvider,
         @Nullable SecurityContextRehydrator securityContextRehydrator, PlatformTransactionManager transactionManager) {
 
         this(
             approvalService, chatService, userService, pinnedToolCallbacksProvider, globalToolCatalogProvider,
-            continuationStarterProvider, securityContextRehydrator, transactionManager, Clock.systemUTC());
+            clusterElementToolCallbacksProvider, continuationStarterProvider, securityContextRehydrator,
+            transactionManager, Clock.systemUTC());
     }
 
     @SuppressFBWarnings("EI")
@@ -93,6 +97,7 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
         AiHubToolApprovalService approvalService, AiHubChatService chatService, UserService userService,
         ObjectProvider<AiHubPinnedToolCallbacks> pinnedToolCallbacksProvider,
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
+        ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider,
         ObjectProvider<AiHubContinuationStarter> continuationStarterProvider,
         @Nullable SecurityContextRehydrator securityContextRehydrator, PlatformTransactionManager transactionManager,
         Clock clock) {
@@ -102,6 +107,7 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
         this.userService = userService;
         this.pinnedToolCallbacksProvider = pinnedToolCallbacksProvider;
         this.globalToolCatalogProvider = globalToolCatalogProvider;
+        this.clusterElementToolCallbacksProvider = clusterElementToolCallbacksProvider;
         this.continuationStarterProvider = continuationStarterProvider;
         this.securityContextRehydrator = securityContextRehydrator;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
@@ -286,12 +292,26 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
             ? ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID
             : ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID;
 
-        return globalToolCatalogProvider.orderedStream()
+        Optional<ToolCallback> catalogCallback = globalToolCatalogProvider.orderedStream()
             .filter(globalToolCatalog -> catalogSessionId.equals(globalToolCatalog.sessionId()))
             .flatMap(globalToolCatalog -> globalToolCatalog.toolCallbacks()
                 .stream())
             .filter(callback -> hasName(callback, approval.getToolName()))
             .findFirst();
+
+        if (catalogCallback.isPresent()) {
+            return catalogCallback;
+        }
+
+        AiHubClusterElementToolCallbacks clusterElementToolCallbacks =
+            clusterElementToolCallbacksProvider.getIfAvailable();
+
+        if (clusterElementToolCallbacks == null) {
+            return Optional.empty();
+        }
+
+        return clusterElementToolCallbacks.findToolCallback(mode, approval.getToolName())
+            .map(ToolCallback.class::cast);
     }
 
     private static boolean hasName(ToolCallback callback, String toolName) {
