@@ -40,6 +40,7 @@ import {getDisabledNodeReferences} from '../utils/getDisabledNodeReferences';
 import {getTask} from '../utils/getTask';
 import {getContextFromTaskNodeData} from '../utils/getTaskDispatcherContext';
 import getTestNodeStateBorderClassName from '../utils/getTestNodeStateBorderClassName';
+import {GRAPH_MEMBER_BOX_WIDTH} from '../utils/graph/graphFrameGeometry';
 import handleDeleteTask from '../utils/handleDeleteTask';
 import handleDeleteTrigger from '../utils/handleDeleteTrigger';
 import isTriggerEnabled from '../utils/isTriggerEnabled';
@@ -52,6 +53,7 @@ import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import {toggleNodeDisabled} from '../utils/toggleNodeDisabled';
 import ClusterFrameShell from './ClusterFrameShell';
 import DisabledNodeBadge from './DisabledNodeBadge';
+import GraphTransitionHandles from './GraphTransitionHandles';
 import styles from './NodeTypes.module.css';
 import WorkflowTestNodeStatus from './WorkflowTestNodeStatus';
 
@@ -175,6 +177,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                 (data.trigger || isMainRootClusterElement) && 'nodrag',
                 isClusterElement && !isNestedClusterRoot && 'w-[72px] min-w-[72px] flex-col items-center',
                 isHorizontal && isRegularNode && 'min-w-0',
+                data.graphData && isRegularNode && 'min-w-0',
                 isEffectivelyDisabled && 'opacity-50 grayscale',
                 rest.className
             )}
@@ -238,9 +241,6 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                             className={twMerge(
                                 'h-auto min-h-18 rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary [&_svg]:size-9',
                                 !isMainRootClusterElement && !isNestedClusterRoot && 'w-18',
-                                isSelected &&
-                                    workflowNodeDetailsPanelOpen &&
-                                    'border-stroke-brand-primary shadow-none hover:border-stroke-brand-primary',
                                 isMainRootClusterElement && 'nodrag',
                                 isNestedClusterRoot && 'overflow-hidden rounded-2xl px-6',
                                 isClusterElement && !isMainRootClusterElement && !isNestedClusterRoot && 'rounded-full',
@@ -269,7 +269,11 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                             {testNodeState && (
                                 <WorkflowTestNodeStatus
                                     durationPlacement={
-                                        isMainRootClusterElement || isNestedClusterRoot ? 'top' : 'bottom'
+                                        isMainRootClusterElement || isNestedClusterRoot
+                                            ? 'top'
+                                            : data.graphData
+                                              ? 'bottomEnd'
+                                              : 'bottom'
                                     }
                                     testNodeState={testNodeState}
                                 />
@@ -543,21 +547,14 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                         />
                     )}
 
-                    <Handle
-                        className={styles.handle}
-                        id={`${id}-graph-transition-target`}
-                        isConnectable={false}
-                        position={Position.Top}
-                        type="target"
-                    />
-
-                    <Handle
-                        className={styles.handle}
-                        id={`${id}-graph-transition-source`}
-                        isConnectable={false}
-                        position={Position.Bottom}
-                        type="source"
-                    />
+                    {data.graphData && (
+                        <GraphTransitionHandles
+                            boxWidth={GRAPH_MEMBER_BOX_WIDTH}
+                            connectable
+                            direction={effectiveDirection}
+                            nodeId={id}
+                        />
+                    )}
                 </>
             )}
 
@@ -672,7 +669,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const parentClusterRootId = data.parentClusterRootId;
     const hasSavedClusterElementPosition = data.metadata?.ui?.nodePosition;
     const hasSavedNodePosition =
-        (isRegularNode || !!data.clusterFrame) && !data.trigger && data.metadata?.ui?.nodePosition;
+        (isRegularNode || !!data.clusterFrame) && !data.trigger && !data.graphData && data.metadata?.ui?.nodePosition;
     const isTriggerDropzone = isRegularNode && !!data.trigger;
 
     const isEffectivelyDisabled = Boolean(data.disabled) || disabledTaskNames.has(data.workflowNodeName);

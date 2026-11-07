@@ -66,7 +66,7 @@ describe('handleCanvasDragOver', () => {
     it('allows a task drag over a placeholder', () => {
         const event = createDragEvent(renderNode('final-placeholder'), '', [CANVAS_DRAG_DATA_TYPE]);
 
-        handleCanvasDragOver(event, edges, nodes);
+        handleCanvasDragOver({edges, event, nodes});
 
         expect(event.preventDefault).toHaveBeenCalled();
         expect(event.dataTransfer.dropEffect).toBe('move');
@@ -78,7 +78,7 @@ describe('handleCanvasDragOver', () => {
             TRIGGER_DRAG_DATA_TYPE,
         ]);
 
-        handleCanvasDragOver(event, edges, nodes);
+        handleCanvasDragOver({edges, event, nodes});
 
         expect(event.preventDefault).not.toHaveBeenCalled();
         expect(event.dataTransfer.dropEffect).toBe('none');
@@ -87,7 +87,7 @@ describe('handleCanvasDragOver', () => {
     it('leaves drags that did not start in the components panel alone', () => {
         const event = createDragEvent(document.body, '', ['text/plain']);
 
-        handleCanvasDragOver(event, edges, nodes);
+        handleCanvasDragOver({edges, event, nodes});
 
         expect(event.preventDefault).toHaveBeenCalled();
         expect(event.dataTransfer.dropEffect).toBe('move');
@@ -100,7 +100,7 @@ describe('handleCanvasDragOver', () => {
 
         const event = createDragEvent(button, '', [CANVAS_DRAG_DATA_TYPE]);
 
-        handleCanvasDragOver(event, edges, nodes);
+        handleCanvasDragOver({edges, event, nodes});
 
         expect(event.preventDefault).not.toHaveBeenCalled();
     });
@@ -245,7 +245,7 @@ describe('handleCanvasDrop inside an inline cluster frame', () => {
             getClusterElementTypeDragDataType('MODEL'),
         ]);
 
-        handleCanvasDragOver(event, edges, [...nodes, clusterElementPlaceholderNode]);
+        handleCanvasDragOver({edges, event, nodes: [...nodes, clusterElementPlaceholderNode]});
 
         expect(event.preventDefault).toHaveBeenCalled();
         expect(event.dataTransfer.dropEffect).toBe('move');
@@ -257,7 +257,7 @@ describe('handleCanvasDrop inside an inline cluster frame', () => {
             getClusterElementTypeDragDataType('TOOLS'),
         ]);
 
-        handleCanvasDragOver(event, edges, [...nodes, clusterElementPlaceholderNode]);
+        handleCanvasDragOver({edges, event, nodes: [...nodes, clusterElementPlaceholderNode]});
 
         expect(event.preventDefault).not.toHaveBeenCalled();
         expect(event.dataTransfer.dropEffect).toBe('none');
@@ -266,7 +266,7 @@ describe('handleCanvasDrop inside an inline cluster frame', () => {
     it('refuses a drag over an edge between a cluster root and its elements', () => {
         const event = createDragEvent(renderEdgeDropzone(clusterElementEdge.id), '', [CANVAS_DRAG_DATA_TYPE]);
 
-        handleCanvasDragOver(event, [...edges, clusterElementEdge], nodes);
+        handleCanvasDragOver({edges: [...edges, clusterElementEdge], event, nodes});
 
         expect(event.preventDefault).not.toHaveBeenCalled();
         expect(event.dataTransfer.dropEffect).toBe('none');

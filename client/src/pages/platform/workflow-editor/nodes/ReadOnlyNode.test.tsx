@@ -28,6 +28,7 @@ const renderReadOnlyNode = (data: Partial<NodeDataType>) =>
                         ...data,
                     } as NodeDataType
                 }
+                id="aiAgent_1"
             />
         </ReactFlowProvider>
     );
@@ -45,7 +46,7 @@ const BASE_DATA = {
 function renderNode(data: NodeDataType) {
     return render(
         <ReactFlowProvider>
-            <ReadOnlyNode data={data} />
+            <ReadOnlyNode data={data} id="approval_1" />
         </ReactFlowProvider>
     );
 }
@@ -54,7 +55,7 @@ function renderNodeWithExecution(data: NodeDataType, nodeStates: WorkflowExecuti
     return render(
         <ReactFlowProvider>
             <WorkflowExecutionOverlayContext.Provider value={{isRunning: false, nodeStates, taskExecutions: []}}>
-                <ReadOnlyNode data={data} />
+                <ReadOnlyNode data={data} id="approval_1" />
             </WorkflowExecutionOverlayContext.Provider>
         </ReactFlowProvider>
     );
@@ -189,7 +190,7 @@ describe('ReadOnlyNode', () => {
                     }}
                 >
                     <WorkflowChangeHighlightContext.Provider value={{approval_1: WorkflowNodeChangeKind.Modified}}>
-                        <ReadOnlyNode data={BASE_DATA} />
+                        <ReadOnlyNode data={BASE_DATA} id="approval_1" />
                     </WorkflowChangeHighlightContext.Provider>
                 </WorkflowExecutionOverlayContext.Provider>
             </ReactFlowProvider>

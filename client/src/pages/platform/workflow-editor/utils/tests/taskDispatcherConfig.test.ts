@@ -274,6 +274,7 @@ describe('TASK_DISPATCHER_CONFIG', () => {
                 condition: 'conditionData',
                 each: 'eachData',
                 'fork-join': 'forkJoinData',
+                graph: 'graphData',
                 loop: 'loopData',
                 loopBreak: 'loopBreakData',
                 map: 'mapData',

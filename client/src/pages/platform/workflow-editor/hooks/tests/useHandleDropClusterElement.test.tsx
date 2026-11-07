@@ -95,7 +95,7 @@ describe('useHandleDrop for a cluster element placeholder', () => {
     it('adds the dropped component to the cluster root as an element of the placeholder type', async () => {
         const {result} = renderHook(() => useHandleDrop({taskDispatcherDefinitions: []}));
 
-        const handleDropOnClusterElementPlaceholder = result.current[4];
+        const handleDropOnClusterElementPlaceholder = result.current[5];
 
         handleDropOnClusterElementPlaceholder(MODEL_PLACEHOLDER_NODE, droppedOpenAi);
 
@@ -123,7 +123,7 @@ describe('useHandleDrop for a cluster element placeholder', () => {
 
         const {result} = renderHook(() => useHandleDrop({taskDispatcherDefinitions: []}));
 
-        await result.current[4](MODEL_PLACEHOLDER_NODE, droppedOpenAi);
+        await result.current[5](MODEL_PLACEHOLDER_NODE, droppedOpenAi);
 
         expect(saveWorkflowDefinition).not.toHaveBeenCalled();
         expect(useWorkflowEditorStore.getState().pendingClusterElementDrop).toBeUndefined();
@@ -142,7 +142,7 @@ describe('useHandleDrop for a cluster element placeholder', () => {
 
         const {result} = renderHook(() => useHandleDrop({taskDispatcherDefinitions: []}));
 
-        await result.current[4](MODEL_PLACEHOLDER_NODE, droppedOpenAi);
+        await result.current[5](MODEL_PLACEHOLDER_NODE, droppedOpenAi);
 
         expect(saveWorkflowDefinition).not.toHaveBeenCalled();
         expect(useWorkflowEditorStore.getState().pendingClusterElementDrop).toEqual({

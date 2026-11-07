@@ -1,5 +1,7 @@
 import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 
+import {getGraphFrameId} from './graph/graphFrameGeometry';
+
 export function toWorkflowNodeNamePrefix(componentName: string): string {
     return componentName.replace(/-+([a-zA-Z0-9])/g, (_match, character: string) => character.toUpperCase());
 }
@@ -18,5 +20,11 @@ export function getWorkflowNodeComponentName(workflowNodeName: string): string {
 }
 
 export function getNestedBottomGhostId(taskNodeId: string): string {
-    return `${taskNodeId}-${toWorkflowNodeNamePrefix(getWorkflowNodeComponentName(taskNodeId))}-bottom-ghost`;
+    const componentName = getWorkflowNodeComponentName(taskNodeId);
+
+    if (componentName === 'graph') {
+        return getGraphFrameId(taskNodeId);
+    }
+
+    return `${taskNodeId}-${toWorkflowNodeNamePrefix(componentName)}-bottom-ghost`;
 }

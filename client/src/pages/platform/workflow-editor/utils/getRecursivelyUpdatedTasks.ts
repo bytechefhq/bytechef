@@ -106,6 +106,14 @@ export default function getRecursivelyUpdatedTasks(
             return updateTaskParameter(task, 'branches', updatedBranches);
         }
 
+        if (task.parameters?.nodes) {
+            return updateTaskParameter(
+                task,
+                'nodes',
+                getRecursivelyUpdatedTasks(task.parameters.nodes as WorkflowTask[], taskToReplace)
+            );
+        }
+
         return task;
     });
 }

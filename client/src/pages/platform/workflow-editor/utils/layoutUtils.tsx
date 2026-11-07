@@ -31,6 +31,7 @@ import {
     ConditionChildTasksType,
     EachChildTasksType,
     ForkJoinChildTasksType,
+    GraphChildTasksType,
     LoopChildTasksType,
     MapChildTasksType,
     NodeDataType,
@@ -47,6 +48,8 @@ import {getConditionBranchSide} from './createConditionEdges';
 import {getForkJoinBranchSide} from './createForkJoinEdges';
 import {getOnErrorBranchSide} from './createOnErrorEdges';
 import {getCrossAxis, getCrossAxisNodeSize} from './directionUtils';
+import {GRAPH_MEMBER_BOX_WIDTH} from './graph/graphFrameGeometry';
+import isGraphRouteEdge from './graph/isGraphRouteEdge';
 import {
     adjustBottomGhostForMovedChildren,
     alignBranchCaseChildren,
@@ -162,6 +165,12 @@ export const calculateNodeHeight = (node: Node) => {
  * top-left position that ReactFlow expects.
  */
 function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): number {
+    const graphFrame = (node.data as NodeDataType)?.graphFrame;
+
+    if (graphFrame) {
+        return direction === 'LR' ? graphFrame.width : graphFrame.height;
+    }
+
     const clusterFrame = (node.data as NodeDataType)?.clusterFrame;
 
     if (direction !== 'LR') {
@@ -192,6 +201,12 @@ export function getDagreNodeSize(
     direction: LayoutDirectionType,
     triggerRowWidth: number = TRIGGER_NODE_DAGRE_WIDTH
 ): {height: number; width: number} {
+    const graphFrame = (node.data as NodeDataType)?.graphFrame;
+
+    if (graphFrame) {
+        return {height: graphFrame.height, width: graphFrame.width};
+    }
+
     const clusterFrame = (node.data as NodeDataType)?.clusterFrame;
 
     if (clusterFrame) {
@@ -888,10 +903,13 @@ export const getClusterElementsLayoutElements = ({
  * edges referencing nodes that no longer exist.
  */
 export function filterAndDedupeLayoutEdges(allNodes: Node[], edges: Edge[]): Edge[] {
+    const graphFrameRouteEdges = edges.filter(isGraphRouteEdge);
+    const structuralEdges = edges.filter((edge) => !isGraphRouteEdge(edge));
+
     const sourceEdgeMap = new Map<string, Edge[]>();
 
     // Sort edges to prioritize task connections over ghost connections
-    const sortedEdges = [...edges].sort((firstEdge, secondEdge) => {
+    const sortedEdges = [...structuralEdges].sort((firstEdge, secondEdge) => {
         const isFirstEdgeToAuxiliaryNode =
             firstEdge.target.includes('ghost') || firstEdge.target.includes('placeholder');
 
@@ -918,7 +936,7 @@ export function filterAndDedupeLayoutEdges(allNodes: Node[], edges: Edge[]): Edg
         sourceEdgeMap.get(edge.source)?.push(edge);
     });
 
-    const filteredEdges: Edge[] = [];
+    const filteredEdges: Edge[] = [...graphFrameRouteEdges];
 
     // Filter edges so that only one edge is kept for each source node
     sourceEdgeMap.forEach((sourceEdges, source) => {
@@ -992,6 +1010,8 @@ export const getLayoutElements = async ({
     nodes,
     savedPositionCrossAxisShift = 0,
 }: GetLayoutElementsProps) => {
+    edges = edges.filter((edge) => !isGraphRouteEdge(edge));
+
     const dagreModule = await loadDagre();
 
     const dagreGraph = new dagreModule.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
@@ -1072,6 +1092,14 @@ export const getLayoutElements = async ({
             crossAxisPosition -= (frameCrossSize - TRIGGER_NODE_BOX_SIZE) / 2;
         } else if (hasValidClusterElements && node.data.clusterRoot && direction === 'TB') {
             crossAxisPosition -= 85;
+        }
+
+        const graphFrame = (node.data as NodeDataType).graphFrame;
+
+        if (graphFrame) {
+            const frameCrossSize = direction === 'TB' ? graphFrame.width : graphFrame.height;
+
+            crossAxisPosition -= frameCrossSize / 2 - GRAPH_MEMBER_BOX_WIDTH / 2;
         }
 
         const mainAxis = direction === 'TB' ? 'y' : 'x';
@@ -1238,6 +1266,8 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
 
                 break;
             }
+            case 'graph':
+                return null;
             default: {
                 parentSubtasks = TASK_DISPATCHER_CONFIG[
                     componentName as keyof typeof TASK_DISPATCHER_CONFIG
@@ -1329,6 +1359,8 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
         } else if (subsequentNodeData.eachData && subsequentNodeData.eachData.eachId === taskDispatcherId) {
             return false;
         } else if (subsequentNodeData.forkJoinData && subsequentNodeData.forkJoinData.forkJoinId === taskDispatcherId) {
+            return false;
+        } else if (subsequentNodeData.graphData && subsequentNodeData.graphData.graphId === taskDispatcherId) {
             return false;
         } else if (
             subsequentNodeData.terminateData &&
@@ -1437,20 +1469,34 @@ export function branchCaseKeysMatch(left: string | number, right: string | numbe
     return left === right || String(left) === String(right);
 }
 
+interface CollectTaskDispatcherDataProps {
+    branchChildTasks: BranchChildTasksType;
+    conditionChildTasks: ConditionChildTasksType;
+    eachChildTasks: EachChildTasksType;
+    forkJoinChildTasks: ForkJoinChildTasksType;
+    graphChildTasks: GraphChildTasksType;
+    loopChildTasks: LoopChildTasksType;
+    mapChildTasks: MapChildTasksType;
+    onErrorChildTasks: OnErrorChildTasksType;
+    parallelChildTasks: ParallelChildTasksType;
+    task: WorkflowTask;
+}
+
 /**
  * Collects nested tasks for all task dispatchers in the workflow
  */
-export function collectTaskDispatcherData(
-    task: WorkflowTask,
-    branchChildTasks: BranchChildTasksType,
-    conditionChildTasks: ConditionChildTasksType,
-    eachChildTasks: EachChildTasksType,
-    forkJoinChildTasks: ForkJoinChildTasksType,
-    loopChildTasks: LoopChildTasksType,
-    mapChildTasks: MapChildTasksType,
-    onErrorChildTasks: OnErrorChildTasksType,
-    parallelChildTasks: ParallelChildTasksType
-): void {
+export function collectTaskDispatcherData({
+    branchChildTasks,
+    conditionChildTasks,
+    eachChildTasks,
+    forkJoinChildTasks,
+    graphChildTasks,
+    loopChildTasks,
+    mapChildTasks,
+    onErrorChildTasks,
+    parallelChildTasks,
+    task,
+}: CollectTaskDispatcherDataProps): void {
     const {name, parameters, type} = task;
     const componentName = type.split('/')[0];
 
@@ -1522,6 +1568,10 @@ export function collectTaskDispatcherData(
                   )
                 : [],
         };
+    } else if (componentName === 'graph') {
+        graphChildTasks[name] = {
+            nodes: Array.isArray(parameters?.nodes) ? parameters.nodes.map((task: WorkflowTask) => task.name) : [],
+        };
     }
 }
 
@@ -1533,6 +1583,7 @@ interface GetTaskAncestryProps {
     conditionChildTasks: ConditionChildTasksType;
     eachChildTasks: EachChildTasksType;
     forkJoinChildTasks: ForkJoinChildTasksType;
+    graphChildTasks: GraphChildTasksType;
     loopChildTasks: LoopChildTasksType;
     mapChildTasks: MapChildTasksType;
     onErrorChildTasks: OnErrorChildTasksType;
@@ -1545,6 +1596,7 @@ export function getTaskAncestry({
     conditionChildTasks,
     eachChildTasks,
     forkJoinChildTasks,
+    graphChildTasks,
     loopChildTasks,
     mapChildTasks,
     onErrorChildTasks,
@@ -1735,6 +1787,19 @@ export function getTaskAncestry({
             });
 
             if (isNested) {
+                break;
+            }
+        }
+    }
+
+    if (!isNested) {
+        for (const [graphId, graphData] of Object.entries(graphChildTasks)) {
+            const taskIndex = graphData.nodes.indexOf(taskName);
+
+            if (taskIndex !== -1) {
+                nestingData = {graphData: {graphId, index: taskIndex}};
+                isNested = true;
+
                 break;
             }
         }

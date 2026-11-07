@@ -141,6 +141,11 @@ type ForkJoinDataType = {
     index: number;
 };
 
+type GraphDataType = {
+    graphId: string;
+    index: number;
+};
+
 export type TaskDispatcherDataType = BranchDataType &
     EachDataType &
     LoopDataType &
@@ -151,7 +156,8 @@ export type TaskDispatcherDataType = BranchDataType &
     TerminateDataType &
     ConditionDataType &
     ParallelDataType &
-    ForkJoinDataType;
+    ForkJoinDataType &
+    GraphDataType;
 
 export type NestedClusterRootComponentDefinitionType = {
     actionClusterElementTypes: {[key: string]: Array<string>};
@@ -200,6 +206,7 @@ export type NodeDataType = {
     connections?: Array<ComponentConnection>;
     conditionId?: string;
     connectionId?: number;
+    dataPillAnchorNodeName?: string;
     description?: string;
     disabled?: boolean;
     displayConditions?: {
@@ -210,12 +217,16 @@ export type NodeDataType = {
     eachData?: EachDataType;
     forkJoinId?: string;
     forkJoinData?: ForkJoinDataType;
+    graphData?: GraphDataType;
+    graphFrame?: {graphId: string; height: number; width: number};
     clusterFrame?: {
         clusterRootId: string;
         contentOrigin: {x: number; y: number};
         height: number;
         width: number;
     };
+    graphId?: string;
+    graphStart?: {graphId: string};
     icon?: ReactNode;
     isEffectivelyDisabled?: boolean;
     isNestedClusterRoot?: boolean;
@@ -241,6 +252,7 @@ export type NodeDataType = {
     };
     multipleClusterElementsNode?: boolean;
     name: string;
+    nodeIndex?: number;
     operationName?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters?: {[key: string]: any};
@@ -266,6 +278,18 @@ export type NodeDataType = {
 export type BranchCaseType = {
     key: string | number;
     tasks: Array<WorkflowTask>;
+};
+
+export type GraphTransitionType = {
+    condition?: string;
+    from: string;
+    to: string;
+};
+
+export type GraphPendingConnectionType = {
+    dropPosition: {x: number; y: number};
+    from: string;
+    graphId: string;
 };
 
 export type SubPropertyType = PropertyAllType & {custom: boolean};
@@ -389,10 +413,12 @@ export type TaskDispatcherContextType = {
     conditionId?: string;
     eachId?: string;
     forkJoinId?: string;
+    graphId?: string;
     index?: number;
     loopBreakId?: string;
     loopId?: string;
     mapId?: string;
+    nodeIndex?: number;
     onErrorCase?: 'mainBranch' | 'onErrorBranch';
     onErrorId?: string;
     parallelId?: string;
@@ -425,6 +451,7 @@ export type LoopChildTasksType = {[loopId: string]: {iteratee: string[]}};
 export type MapChildTasksType = {[mapId: string]: {iteratee: string[]}};
 export type ParallelChildTasksType = {[parallelId: string]: {tasks: string[]}};
 export type ForkJoinChildTasksType = {[forkJoinId: string]: {branches: string[][]}};
+export type GraphChildTasksType = {[graphId: string]: {nodes: string[]}};
 
 export type WorkflowInputType = WorkflowInput & {
     testValue?: string;

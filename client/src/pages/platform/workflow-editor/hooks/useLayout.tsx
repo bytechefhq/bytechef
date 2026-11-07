@@ -1,6 +1,8 @@
 import {
     COPILOT_PANEL_WIDTH,
     FINAL_PLACEHOLDER_NODE_ID,
+    GRAPH_START_EDGE_TYPE,
+    GRAPH_TRANSITION_EDGE_TYPE,
     LayoutDirectionType,
     PROJECT_LEFT_SIDEBAR_WIDTH,
     TRIGGER_PLACEHOLDER_NODE_ID,
@@ -11,7 +13,7 @@ import {
     Workflow,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
-import {NodeDataType} from '@/shared/types';
+import {GraphTransitionType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -30,7 +32,8 @@ import {layoutClusterFrames} from '../utils/clusterFrame/layoutClusterFrames';
 import {getElkLayoutElements} from '../utils/elkLayoutUtils';
 import extractDefinitionPositions from '../utils/extractDefinitionPositions';
 import {getEffectivelyDisabledTaskNames} from '../utils/getEffectivelyDisabledTaskNames';
-import isElkLayoutSupported from '../utils/isElkLayoutSupported';
+import {LayoutGraphFramesResultI, layoutGraphFrames} from '../utils/graph/layoutGraphFrames';
+import {isElkLayoutActive} from '../utils/isElkLayoutSupported';
 import {createLayoutRetryState, onLayoutFailure, onLayoutSuccess} from '../utils/layoutRetryController';
 import {getLayoutElements} from '../utils/layoutUtils';
 import {containsNodePosition} from '../utils/postDagreConstraints';
@@ -80,6 +83,64 @@ function getClusterElementsFingerprint(clusterElements: unknown): string {
         .join(';');
 }
 
+export function toReadOnlyLayoutEdges(edges: Edge[]): Edge[] {
+    return edges.map((edge) => {
+        if (edge.type === GRAPH_TRANSITION_EDGE_TYPE) {
+            return {...edge, data: {...edge.data, readOnly: true}};
+        }
+
+        if (edge.type === GRAPH_START_EDGE_TYPE) {
+            return {...edge, reconnectable: false};
+        }
+
+        return {...edge, type: 'smoothstep'};
+    });
+}
+
+export function toReadOnlyLayoutNodes(nodes: Node[]): Node[] {
+    return nodes.map((node) => (node.draggable ? {...node, draggable: false} : node));
+}
+
+function collectGraphLayoutSignature(value: unknown, sink: string[]): void {
+    if (Array.isArray(value)) {
+        value.forEach((item) => collectGraphLayoutSignature(item, sink));
+
+        return;
+    }
+
+    if (!value || typeof value !== 'object') {
+        return;
+    }
+
+    const record = value as Record<string, unknown>;
+
+    if (Array.isArray(record.nodes)) {
+        const recordTransitions = Array.isArray(record.transitions) ? record.transitions : [];
+
+        const transitions = recordTransitions
+            .map((transition) => {
+                const {condition, from, to} = (transition ?? {}) as GraphTransitionType;
+
+                return `${from}->${to}[${condition ?? ''}]`;
+            })
+            .join(';');
+
+        const positions = (record.nodes as Array<{metadata?: NodeDataType['metadata']; name?: string}>)
+            .map((graphNode) => {
+                const nodePosition = graphNode?.metadata?.ui?.nodePosition;
+
+                return `${graphNode?.name ?? ''}@${nodePosition ? `${nodePosition.x},${nodePosition.y}` : ''}`;
+            })
+            .join(';');
+
+        const graphLayoutSignature = `start:${record.startNode ?? ''}|transitions:${transitions}|positions:${positions}`;
+
+        sink.push(graphLayoutSignature);
+    }
+
+    Object.values(record).forEach((nested) => collectGraphLayoutSignature(nested, sink));
+}
+
 /**
  * Builds a string key that changes only when the task graph structure changes
  * (task names, types, nested task counts, cluster element names and types) but NOT when parameter values change.
@@ -109,6 +170,16 @@ export function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
                 for (const [key, counts] of keyCounts) {
                     parts.push(counts.length === 1 ? `${key}${counts[0]}` : `${key}${counts.join('-')}`);
                 }
+
+                const graphLayoutSignatures: string[] = [];
+
+                collectGraphLayoutSignature(task.parameters, graphLayoutSignatures);
+
+                if (graphLayoutSignatures.length > 0) {
+                    const graphLayoutPart = `graph:${graphLayoutSignatures.join('&')}`;
+
+                    parts.push(graphLayoutPart);
+                }
             }
 
             return parts.join('|');
@@ -125,6 +196,67 @@ interface UseLayoutProps {
     leftSidebarOpen?: boolean;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionBasic>;
+}
+
+interface WithPreservedEdgeSelectionProps {
+    nextEdges: Edge[];
+    previousEdges: Edge[];
+}
+
+function toTransitionIdentityKey(transitionEdge: Edge): string {
+    const {condition, graphId, to} = (transitionEdge.data ?? {}) as {
+        condition?: string;
+        graphId?: string;
+        to?: string;
+    };
+
+    return JSON.stringify([graphId, transitionEdge.source, to, condition || '']);
+}
+
+export function withPreservedEdgeSelection({nextEdges, previousEdges}: WithPreservedEdgeSelectionProps): Edge[] {
+    const selectedPreviousEdges = previousEdges.filter((previousEdge) => previousEdge.selected);
+
+    if (selectedPreviousEdges.length === 0) {
+        return nextEdges;
+    }
+
+    const nextTransitionEdges = nextEdges.filter((nextEdge) => nextEdge.type === GRAPH_TRANSITION_EDGE_TYPE);
+
+    const previousTransitionEdgeCount = previousEdges.filter(
+        (previousEdge) => previousEdge.type === GRAPH_TRANSITION_EDGE_TYPE
+    ).length;
+
+    const transitionRemoved = nextTransitionEdges.length < previousTransitionEdgeCount;
+
+    const selectedNextEdgeIds = new Set<string>();
+
+    for (const selectedPreviousEdge of selectedPreviousEdges) {
+        if (selectedPreviousEdge.type !== GRAPH_TRANSITION_EDGE_TYPE) {
+            selectedNextEdgeIds.add(selectedPreviousEdge.id);
+
+            continue;
+        }
+
+        const identityKey = toTransitionIdentityKey(selectedPreviousEdge);
+
+        const matchingNextEdges = nextTransitionEdges.filter(
+            (nextTransitionEdge) => toTransitionIdentityKey(nextTransitionEdge) === identityKey
+        );
+
+        const followedEdge =
+            matchingNextEdges.find((matchingNextEdge) => matchingNextEdge.id === selectedPreviousEdge.id) ||
+            matchingNextEdges[0];
+
+        if (followedEdge) {
+            selectedNextEdgeIds.add(followedEdge.id);
+        } else if (!transitionRemoved) {
+            selectedNextEdgeIds.add(selectedPreviousEdge.id);
+        }
+    }
+
+    return nextEdges.map((nextEdge) =>
+        selectedNextEdgeIds.has(nextEdge.id) ? {...nextEdge, selected: true} : nextEdge
+    );
 }
 
 export default function useLayout({
@@ -243,6 +375,7 @@ export default function useLayout({
     const canvasHeightRef = useRef(canvasHeight);
     const previousCopilotPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
+    const autoPlacedGraphPositionsRef = useRef<LayoutGraphFramesResultI['autoPlaced']>({});
 
     canvasWidthRef.current = canvasWidth;
     canvasHeightRef.current = canvasHeight;
@@ -404,10 +537,7 @@ export default function useLayout({
 
             layoutNodes.pop();
 
-            edges = taskEdges.map((edge) => ({
-                ...edge,
-                type: 'smoothstep',
-            }));
+            edges = toReadOnlyLayoutEdges(taskEdges);
 
             const lastEdge = edges[edges.length - 1];
             if (lastEdge && lastEdge.target === FINAL_PLACEHOLDER_NODE_ID) {
@@ -529,6 +659,8 @@ export default function useLayout({
             setEdges(currentEdges.filter((edge) => newNodeIds.has(edge.source) && newNodeIds.has(edge.target)));
         }
 
+        const layoutFunction = isElkLayoutActive(layoutEngine, layoutNodes) ? getElkLayoutElements : getLayoutElements;
+
         const framedClusters = layoutClusterFrames(
             layoutNodes,
             edges,
@@ -536,17 +668,34 @@ export default function useLayout({
             clusterFrameLockedByRootId
         );
 
-        const layoutFunction =
-            layoutEngine === 'elk' && isElkLayoutSupported(layoutNodes) ? getElkLayoutElements : getLayoutElements;
-
-        layoutFunction({
-            canvasHeight: canvasHeightRef.current,
-            canvasWidth: canvasWidthRef.current,
+        layoutGraphFrames({
             direction: layoutDirection,
             edges: framedClusters.outerEdges,
+            layoutFunction,
             nodes: framedClusters.outerNodes,
-            savedPositionCrossAxisShift,
         })
+            .then((framedGraphs) =>
+                layoutFunction({
+                    canvasHeight: canvasHeightRef.current,
+                    canvasWidth: canvasWidthRef.current,
+                    direction: layoutDirection,
+                    edges: framedGraphs.outerEdges,
+                    nodes: framedGraphs.outerNodes,
+                    savedPositionCrossAxisShift,
+                }).then((elements) => {
+                    autoPlacedGraphPositionsRef.current = framedGraphs.autoPlaced;
+
+                    const layoutElementNodes = [...elements.nodes, ...framedGraphs.memberNodes];
+
+                    const layoutElementEdges = [...elements.edges, ...framedGraphs.memberEdges];
+
+                    return {
+                        ...elements,
+                        edges: layoutElementEdges,
+                        nodes: readOnlyWorkflow ? toReadOnlyLayoutNodes(layoutElementNodes) : layoutElementNodes,
+                    };
+                })
+            )
             .then((layoutElements) => {
                 if (isCancelled) {
                     return;
@@ -572,7 +721,15 @@ export default function useLayout({
 
                 if (isInitialLayoutRef.current || readOnlyWorkflow) {
                     setNodes(targetNodes);
-                    setEdges(elements.edges);
+
+                    const {edges: previousEdges} = useWorkflowDataStore.getState();
+
+                    const selectionPreservedEdges = withPreservedEdgeSelection({
+                        nextEdges: elements.edges,
+                        previousEdges,
+                    });
+
+                    setEdges(selectionPreservedEdges);
                     isInitialLayoutRef.current = false;
                 } else {
                     const structureChanged = frozenNodes.length !== targetNodes.length;
@@ -581,7 +738,15 @@ export default function useLayout({
                         // Snap immediately when nodes are added or removed — animating
                         // a large centering shift looks like a visual jump
                         setNodes(targetNodes);
-                        setEdges(elements.edges);
+
+                        const {edges: previousEdges} = useWorkflowDataStore.getState();
+
+                        const selectionPreservedEdges = withPreservedEdgeSelection({
+                            nextEdges: elements.edges,
+                            previousEdges,
+                        });
+
+                        setEdges(selectionPreservedEdges);
                     } else {
                         const previousPositionMap = new Map(frozenNodes.map((node) => [node.id, node.position]));
 
@@ -594,7 +759,15 @@ export default function useLayout({
 
                         // Set final nodes (at frozen positions) and final edges immediately
                         setNodes(nodesWithCurrentPositions);
-                        setEdges(elements.edges);
+
+                        const {edges: previousEdges} = useWorkflowDataStore.getState();
+
+                        const selectionPreservedEdges = withPreservedEdgeSelection({
+                            nextEdges: elements.edges,
+                            previousEdges,
+                        });
+
+                        setEdges(selectionPreservedEdges);
 
                         // Each tween frame re-renders the whole canvas, so big
                         // workflows manage only a few frames per second — scale the
@@ -659,4 +832,6 @@ export default function useLayout({
             clearCanvas();
         }
     }, [clearCanvas, editorCanvasSuspended, isWorkflowLoaded, readOnlyWorkflow]);
+
+    return {autoPlacedGraphPositionsRef};
 }

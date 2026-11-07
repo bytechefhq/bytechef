@@ -9,6 +9,14 @@
         @apply invisible;
     }
 
+    .handleConnectable {
+        @apply size-2.5!;
+        @apply rounded-full!;
+        @apply border!;
+        @apply border-stroke-neutral-secondary!;
+        @apply bg-surface-neutral-primary!;
+    }
+
     .handleVisible {
         @apply -z-10;
         @apply h-1.5!;

@@ -53,12 +53,12 @@ export default function resolveGhostBarSideStatuses({
                 {disabledTaskNames, edges, nodes}
             );
 
-            const edgeStatus = getExecutedEdgeStatus(
-                edgeEndpoints.sourceNode,
-                edgeEndpoints.targetNode,
+            const edgeStatus = getExecutedEdgeStatus({
+                sourceNode: edgeEndpoints.sourceNode,
+                takenEmptyConditionCases,
+                targetNode: edgeEndpoints.targetNode,
                 workflowTestNodeStates,
-                takenEmptyConditionCases
-            );
+            });
 
             if (edgeStatus === 'COMPLETED') {
                 return 'COMPLETED';

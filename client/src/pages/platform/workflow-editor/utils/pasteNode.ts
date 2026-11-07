@@ -8,10 +8,13 @@ import {
     BranchCaseType,
     ClusterElementItemType,
     ClusterElementsType,
+    GraphTransitionType,
     NodeDataType,
     TaskDispatcherContextType,
     UpdateWorkflowMutationType,
 } from '@/shared/types';
+
+import {isDynamicTransitionTarget} from './graph/graphTransitionMutations';
 
 type TaskParametersType = NonNullable<WorkflowTask['parameters']>;
 
@@ -127,6 +130,8 @@ function renameNestedTasks({
     componentName: string;
     reservedNames: Set<string>;
 }): TaskParametersType {
+    const renamedTaskNames = new Map<string, string>();
+
     const renameTask = (task: WorkflowTask) => {
         const subtaskComponentName = task.type?.split('/')?.[0];
 
@@ -141,6 +146,8 @@ function renameNestedTasks({
         const newName = getFormattedName(subtaskComponentName, reservedNames);
 
         reservedNames.add(newName);
+
+        renamedTaskNames.set(task.name, newName);
 
         task.name = newName;
 
@@ -196,6 +203,26 @@ function renameNestedTasks({
         case 'fork-join':
             if (Array.isArray(parameters.branches)) {
                 (parameters.branches as WorkflowTask[][]).forEach((branch) => branch.forEach(renameTask));
+            }
+
+            break;
+        case 'graph':
+            if (Array.isArray(parameters.nodes)) {
+                (parameters.nodes as WorkflowTask[]).forEach(renameTask);
+            }
+
+            if (Array.isArray(parameters.transitions)) {
+                parameters.transitions = (parameters.transitions as GraphTransitionType[]).map((transition) => ({
+                    ...transition,
+                    from: renamedTaskNames.get(transition.from) ?? transition.from,
+                    to: isDynamicTransitionTarget(transition.to)
+                        ? transition.to
+                        : (renamedTaskNames.get(transition.to) ?? transition.to),
+                }));
+            }
+
+            if (typeof parameters.startNode === 'string') {
+                parameters.startNode = renamedTaskNames.get(parameters.startNode) ?? parameters.startNode;
             }
 
             break;

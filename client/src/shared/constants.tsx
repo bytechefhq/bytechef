@@ -121,6 +121,16 @@ export const EDGE_STYLES = {
     strokeWidth: 2,
 };
 
+export const GRAPH_TRANSITION_EDGE_COLOR = '#8B7FE8';
+export const GRAPH_TRANSITION_EDGE_SELECTED_COLOR = '#5B4FC7';
+export const GRAPH_TRANSITION_EDGE_DANGLING_COLOR = '#D97706';
+
+export const GRAPH_FRAME_NODE_TYPE = 'graphFrame';
+export const GRAPH_START_NODE_TYPE = 'graphStart';
+
+export const GRAPH_TRANSITION_EDGE_TYPE = 'graphTransition';
+export const GRAPH_START_EDGE_TYPE = 'graphStart';
+
 export const PATH_SPACE_REPLACEMENT = '_SPACE_';
 export const PATH_DIGIT_PREFIX = '_DIGIT_';
 export const PATH_DASH_REPLACEMENT = '_DASH_';
@@ -133,6 +143,8 @@ export const PATH_COLON_REPLACEMENT = '_COLON_';
 
 export const NODE_WIDTH = 240;
 export const NODE_HEIGHT = 100;
+
+export const LR_NODE_LABEL_BLOCK_HEIGHT = 64;
 export const PLACEHOLDER_NODE_HEIGHT = 28;
 export const PLACEHOLDER_NODE_WIDTH = 28;
 export const CLUSTER_ELEMENT_TYPE_TOOLS = 'tools';
@@ -157,6 +169,7 @@ export const TASK_DISPATCHER_NAMES = [
     'condition',
     'each',
     'fork-join',
+    'graph',
     'loop',
     'loopBreak',
     'map',
@@ -195,6 +208,7 @@ export const TASK_DISPATCHER_SUBTASK_COLLECTIONS = {
     condition: ['caseTrue', 'caseFalse'],
     each: ['iteratee'],
     'fork-join': ['branches'],
+    graph: ['nodes'],
     loop: ['iteratee'],
     'on-error': ['main-branch', 'on-error-branch'],
     parallel: ['tasks'],
@@ -227,6 +241,7 @@ export const TASK_DISPATCHER_DATA_KEY_MAP = {
     condition: 'conditionData',
     each: 'eachData',
     'fork-join': 'forkJoinData',
+    graph: 'graphData',
     loop: 'loopData',
     loopBreak: 'loopBreakData',
     map: 'mapData',

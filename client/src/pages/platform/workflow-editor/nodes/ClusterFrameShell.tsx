@@ -37,6 +37,7 @@ import {
 import {mapHandlePosition} from '../utils/directionUtils';
 import {getTask} from '../utils/getTask';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
+import GraphTransitionHandles from './GraphTransitionHandles';
 import styles from './NodeTypes.module.css';
 
 const HEADER_BUTTON_CLASSNAME =
@@ -300,6 +301,8 @@ const ClusterFrameShell = ({children, data, nodeId, nodeMenu}: ClusterFrameShell
                 position={mapHandlePosition(Position.Bottom, layoutDirection)}
                 type="source"
             />
+
+            {data.graphData && <GraphTransitionHandles connectable direction={layoutDirection} nodeId={nodeId} />}
 
             <div
                 style={{

@@ -119,12 +119,85 @@ function hasOnlyEmptyConditionCases(node: Node | undefined): boolean {
     );
 }
 
-export default function getExecutedEdgeStatus(
-    sourceNode: Node | undefined,
-    targetNode: Node | undefined,
-    workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>,
-    takenEmptyConditionCases?: Set<string>
-): 'COMPLETED' | 'FAILED' | undefined {
+export interface GraphNodeExecutionI {
+    nodeName: string;
+    startDate?: Date;
+    status?: string;
+}
+
+export interface GraphTransitionExecutionI {
+    dynamic?: boolean;
+    from: string;
+    nodeExecutionRuns: GraphNodeExecutionI[][];
+    staticTargetNames?: string[];
+    to: string;
+}
+
+export function getExecutedGraphTransitionStatus({
+    dynamic,
+    from,
+    nodeExecutionRuns,
+    staticTargetNames = [],
+    to,
+}: GraphTransitionExecutionI): 'COMPLETED' | 'FAILED' | undefined {
+    if (!from || !to) {
+        return undefined;
+    }
+
+    let status: 'COMPLETED' | 'FAILED' | undefined;
+
+    for (const nodeExecutions of nodeExecutionRuns) {
+        const orderedExecutions = [...nodeExecutions].sort(
+            (left, right) => (left.startDate?.getTime() ?? 0) - (right.startDate?.getTime() ?? 0)
+        );
+
+        for (let index = 0; index < orderedExecutions.length - 1; index += 1) {
+            const followingExecution = orderedExecutions[index + 1];
+
+            if (orderedExecutions[index].nodeName !== from) {
+                continue;
+            }
+
+            const followsTransition = dynamic
+                ? !staticTargetNames.includes(followingExecution.nodeName)
+                : followingExecution.nodeName === to;
+
+            if (!followsTransition) {
+                continue;
+            }
+
+            if (followingExecution.status === 'FAILED') {
+                return 'FAILED';
+            }
+
+            if (followingExecution.status === 'COMPLETED') {
+                status = 'COMPLETED';
+            }
+        }
+    }
+
+    return status;
+}
+
+interface GetExecutedEdgeStatusProps {
+    graphTransition?: GraphTransitionExecutionI;
+    sourceNode?: Node;
+    takenEmptyConditionCases?: Set<string>;
+    targetNode?: Node;
+    workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>;
+}
+
+export default function getExecutedEdgeStatus({
+    graphTransition,
+    sourceNode,
+    takenEmptyConditionCases,
+    targetNode,
+    workflowTestNodeStates,
+}: GetExecutedEdgeStatusProps): 'COMPLETED' | 'FAILED' | undefined {
+    if (graphTransition) {
+        return getExecutedGraphTransitionStatus(graphTransition);
+    }
+
     if (isPlaceholderNode(sourceNode) || isPlaceholderNode(targetNode)) {
         const placeholderNode = isPlaceholderNode(sourceNode) ? sourceNode : targetNode;
 

@@ -60,8 +60,16 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
 
     let taskDispatcherContext: TaskDispatcherContextType | undefined = undefined;
     let taskDispatcherComponentName:
-        'branch' | 'condition' | 'each' | 'fork-join' | 'loop' | 'on-error' | 'parallel' | 'terminate' | undefined =
-        undefined;
+        | 'branch'
+        | 'condition'
+        | 'each'
+        | 'fork-join'
+        | 'graph'
+        | 'loop'
+        | 'on-error'
+        | 'parallel'
+        | 'terminate'
+        | undefined = undefined;
 
     switch (taskDispatcherDataKey) {
         case 'branchData': {
@@ -164,6 +172,20 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
             };
 
             taskDispatcherComponentName = 'fork-join';
+
+            break;
+        }
+        case 'graphData': {
+            if (!currentNode.graphData) {
+                break;
+            }
+
+            taskDispatcherContext = {
+                index: currentNodeIndex,
+                taskDispatcherId: currentNode.graphData.graphId,
+            };
+
+            taskDispatcherComponentName = 'graph';
 
             break;
         }

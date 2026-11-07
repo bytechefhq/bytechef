@@ -26,7 +26,7 @@ const OUTCOME_TITLES: Partial<Record<WorkflowTestNodeStateI['status'], string>> 
 };
 
 interface WorkflowTestNodeStatusProps {
-    durationPlacement?: 'bottom' | 'top';
+    durationPlacement?: 'bottom' | 'bottomEnd' | 'top';
     hideStatusBadge?: boolean;
     testNodeState: WorkflowTestNodeStateI;
 }
@@ -73,7 +73,9 @@ const WorkflowTestNodeStatus = ({
                 <span
                     className={twMerge(
                         'absolute z-10 rounded-full border border-stroke-neutral-tertiary bg-surface-neutral-primary px-1.5 text-xs leading-4 text-content-neutral-secondary',
-                        durationPlacement === 'bottom' ? '-bottom-2.5 left-1/2 -translate-x-1/2' : '-top-2.5 right-5'
+                        durationPlacement === 'bottom' && '-bottom-2.5 left-1/2 -translate-x-1/2',
+                        durationPlacement === 'bottomEnd' && '-bottom-2.5 left-1/2 ml-2.5',
+                        durationPlacement === 'top' && '-top-2.5 right-5'
                     )}
                 >
                     {formatTestNodeDuration(testNodeState.durationMillis)}

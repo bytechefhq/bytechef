@@ -491,4 +491,87 @@ describe('collectChainSuccessorNodes', () => {
 
         expect(successors.size).toBe(0);
     });
+
+    it('should not follow a graphTransition edge as a chain successor, even for a cyclic graph', () => {
+        const nodes: Node[] = [
+            makeNode('graph_1', undefined, {taskDispatcher: true, taskDispatcherId: 'graph_1'}),
+            makeGhostNode('graph_1', 'bottom-ghost'),
+            makeNode('n0'),
+            makeNode('n1'),
+            makeNode('decoyTransitionTarget'),
+        ];
+
+        const edgesWithTransitions: Edge[] = [
+            makeEdge('graph_1-condition-bottom-ghost', 'n0'),
+            makeEdge('n0', 'n1'),
+            {id: 'graph_1-transition-0-1', source: 'n0', target: 'decoyTransitionTarget', type: 'graphTransition'},
+            {id: 'graph_1-transition-1-0', source: 'n1', target: 'n0', type: 'graphTransition'},
+        ];
+
+        const edgesWithoutTransitions = edgesWithTransitions.filter((edge) => edge.type !== 'graphTransition');
+
+        const descendantIds = new Set(['graph_1-condition-bottom-ghost', 'n0']);
+
+        const successorsWithTransitions = collectChainSuccessorNodes(
+            'graph_1',
+            nodes,
+            edgesWithTransitions,
+            descendantIds
+        );
+        const successorsWithoutTransitions = collectChainSuccessorNodes(
+            'graph_1',
+            nodes,
+            edgesWithoutTransitions,
+            descendantIds
+        );
+
+        expect([...successorsWithTransitions.keys()].sort()).toEqual([...successorsWithoutTransitions.keys()].sort());
+        expect(successorsWithTransitions.has('n1')).toBe(true);
+        expect(successorsWithTransitions.has('decoyTransitionTarget')).toBe(false);
+    });
+
+    it('should not follow a graphStart edge as a chain successor', () => {
+        const nodes: Node[] = [
+            makeNode('graph_1', undefined, {taskDispatcher: true, taskDispatcherId: 'graph_1'}),
+            makeGhostNode('graph_1', 'bottom-ghost'),
+            makeNode('n0'),
+            makeNode('decoyStartTarget'),
+        ];
+
+        const edges: Edge[] = [
+            makeEdge('graph_1-condition-bottom-ghost', 'n0'),
+            {id: 'graph_1-graph-start=>decoyStartTarget', source: 'n0', target: 'decoyStartTarget', type: 'graphStart'},
+        ];
+
+        const descendantIds = new Set(['graph_1-condition-bottom-ghost']);
+
+        const successors = collectChainSuccessorNodes('graph_1', nodes, edges, descendantIds);
+
+        expect(successors.has('n0')).toBe(true);
+        expect(successors.has('decoyStartTarget')).toBe(false);
+    });
+
+    it('should follow the chain that leaves a graph from its frame, not from a nested member bottom ghost', () => {
+        const nodes: Node[] = [
+            makeNode('graph_1', undefined, {taskDispatcher: true, taskDispatcherId: 'graph_1'}),
+            makeNode('graph_1-graph-frame', undefined, {taskDispatcherId: 'graph_1'}),
+            makeNode('loop_1', {graphData: {graphId: 'graph_1'}}, {taskDispatcher: true}),
+            makeGhostNode('loop_1', 'bottom-ghost'),
+            makeNode('afterGraph'),
+            makeNode('insideGraph'),
+        ];
+
+        const edges: Edge[] = [
+            makeEdge('graph_1', 'graph_1-graph-frame'),
+            makeEdge('graph_1-graph-frame', 'afterGraph'),
+            makeEdge('loop_1-condition-bottom-ghost', 'insideGraph'),
+        ];
+
+        const descendantIds = new Set(['graph_1-graph-frame', 'loop_1', 'loop_1-condition-bottom-ghost']);
+
+        const successors = collectChainSuccessorNodes('graph_1', nodes, edges, descendantIds);
+
+        expect(successors.has('afterGraph')).toBe(true);
+        expect(successors.has('insideGraph')).toBe(false);
+    });
 });

@@ -22,6 +22,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
 import {createEditorPillTarget} from '@/pages/platform/workflow-editor/components/datapills/pillTarget';
+import {useCanvasPropertyEditorContext} from '@/pages/platform/workflow-editor/components/properties/CanvasPropertyEditorContext';
 import PropertyFormulaSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyFormulaSwitch';
 import ExpressionHelpNote from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/ExpressionHelpNote';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
@@ -151,6 +152,8 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
         const openDataPillPanel = useOpenDataPillPanel();
 
+        const canvasPropertyEditor = useCanvasPropertyEditorContext();
+
         const registerPillTarget = useCallback(
             (editor: Editor) =>
                 setPillTarget(
@@ -166,7 +169,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         const onFocus = (editor: Editor) => {
             registerPillTarget(editor);
 
-            if (workflowNodeDetailsPanelOpen && expressionEnabled !== false) {
+            if (workflowNodeDetailsPanelOpen && !canvasPropertyEditor && expressionEnabled !== false) {
                 openDataPillPanel();
             }
         };

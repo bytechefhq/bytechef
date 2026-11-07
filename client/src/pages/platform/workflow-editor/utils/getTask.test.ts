@@ -93,4 +93,31 @@ describe('getTask', () => {
 
         expect(getTask({tasks: [forkJoinTask], workflowNodeName: 'forked_action'})).toBe(nested);
     });
+
+    it('finds a task via direct match within a graph node list', () => {
+        const nested = task({name: 'node_action'});
+        const graphTask = task({
+            name: 'graph_1',
+            parameters: {maxTransitions: 100, nodes: [nested], transitions: []},
+            type: 'graph/v1',
+        });
+
+        expect(getTask({tasks: [graphTask], workflowNodeName: 'node_action'})).toBe(nested);
+    });
+
+    it('finds a task nested inside a task dispatcher that is itself a graph node', () => {
+        const nested = task({name: 'nested_condition_action'});
+        const conditionNode = task({
+            name: 'condition_1',
+            parameters: {caseTrue: [nested]},
+            type: 'condition/v1',
+        });
+        const graphTask = task({
+            name: 'graph_1',
+            parameters: {maxTransitions: 100, nodes: [conditionNode], transitions: []},
+            type: 'graph/v1',
+        });
+
+        expect(getTask({tasks: [graphTask], workflowNodeName: 'nested_condition_action'})).toBe(nested);
+    });
 });

@@ -1,4 +1,5 @@
 import '@xyflow/react/dist/base.css';
+import GraphTransitionEditorLayer from '@/pages/platform/workflow-editor/components/properties/graph/GraphTransitionEditorLayer';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {CANVAS_BACKGROUND_COLOR, CANVAS_TOP_OFFSET, LayoutDirectionType} from '@/shared/constants';
 import {
@@ -6,11 +7,20 @@ import {
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
-import {Background, BackgroundVariant, ReactFlow, useNodesInitialized, useReactFlow, useStore} from '@xyflow/react';
+import {
+    Background,
+    BackgroundVariant,
+    ConnectionMode,
+    ReactFlow,
+    useNodesInitialized,
+    useReactFlow,
+    useStore,
+} from '@xyflow/react';
 import {useEffect, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
+import GraphConnectionLine from '../edges/GraphConnectionLine';
 import orderExecutedTriggerFanInEdgesLast from '../edges/orderExecutedTriggerFanInEdgesLast';
 import useDisabledTaskNames from '../hooks/useDisabledTaskNames';
 import useWorkflowEditorCanvas from '../hooks/useWorkflowEditorCanvas';
@@ -91,9 +101,14 @@ const WorkflowEditor = ({
     const {
         edgeTypes,
         handleAddStickyNote,
+        handleConnect,
+        handleConnectEnd,
         handleNodeDragStart,
         handleNodeDragStop,
         handleNodesChange,
+        handleReconnect,
+        handleTransitionDeleteKeyDown,
+        isValidConnection,
         nodeTypes,
         onDragOver,
         onDrop,
@@ -155,26 +170,38 @@ const WorkflowEditor = ({
         setNodesLocked(true);
     }, [setNodesLocked]);
 
+    useEffect(() => {
+        document.addEventListener('keydown', handleTransitionDeleteKeyDown);
+
+        return () => document.removeEventListener('keydown', handleTransitionDeleteKeyDown);
+    }, [handleTransitionDeleteKeyDown]);
+
     return (
         <WorkflowEditorReadOnlyContext.Provider value={!!readOnlyWorkflow}>
             <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-background', className)}>
                 <ReactFlow
+                    connectionMode={ConnectionMode.Strict}
                     defaultViewport={CANVAS_DEFAULT_VIEWPORT}
                     deleteKeyCode={null}
                     edgeTypes={edgeTypes}
                     edges={renderedEdges}
+                    edgesReconnectable={false}
+                    isValidConnection={isValidConnection}
                     maxZoom={1.5}
                     minZoom={0.001}
                     nodeTypes={nodeTypes}
                     nodes={nodes}
                     nodesConnectable={false}
                     nodesDraggable={!readOnlyWorkflow && !nodesLocked}
+                    onConnect={handleConnect}
+                    onConnectEnd={handleConnectEnd}
                     onDragOver={onDragOver}
                     onDrop={onDrop}
                     onEdgesChange={onEdgesChange}
                     onNodeDragStart={handleNodeDragStart}
                     onNodeDragStop={handleNodeDragStop}
                     onNodesChange={handleNodesChange}
+                    onReconnect={handleReconnect}
                     panActivationKeyCode={null}
                     panOnDrag={!preview}
                     panOnScroll={!preview}
@@ -184,6 +211,10 @@ const WorkflowEditor = ({
                     zoomOnScroll={false}
                 >
                     <Background color={CANVAS_BACKGROUND_COLOR} size={2} variant={BackgroundVariant.Dots} />
+
+                    <GraphTransitionEditorLayer />
+
+                    <GraphConnectionLine />
 
                     {!readOnlyWorkflow && nodes.length > 0 && <WorkflowIssuesNote fallback={<NodeActionsHint />} />}
 

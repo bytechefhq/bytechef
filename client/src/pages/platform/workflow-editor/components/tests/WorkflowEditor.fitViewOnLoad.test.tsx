@@ -30,13 +30,25 @@ vi.mock('@xyflow/react', async (importOriginal) => ({
 vi.mock('../../hooks/useWorkflowEditorCanvas', () => ({
     default: () => ({
         edgeTypes: {},
+        handleAddStickyNote: vi.fn(),
+        handleConnect: vi.fn(),
+        handleConnectEnd: vi.fn(),
         handleNodeDragStart: vi.fn(),
         handleNodeDragStop: vi.fn(),
         handleNodesChange: vi.fn(),
+        handleReconnect: vi.fn(),
+        handleTransitionDeleteKeyDown: vi.fn(),
+        isValidConnection: vi.fn(),
         nodeTypes: {},
         onDragOver: vi.fn(),
         onDrop: vi.fn(),
     }),
+}));
+
+vi.mock('../../edges/GraphConnectionLine', () => ({default: () => null}));
+
+vi.mock('@/pages/platform/workflow-editor/components/properties/graph/GraphTransitionEditorLayer', () => ({
+    default: () => null,
 }));
 
 vi.mock('../WorkflowEditorToolbar', () => ({default: () => null}));

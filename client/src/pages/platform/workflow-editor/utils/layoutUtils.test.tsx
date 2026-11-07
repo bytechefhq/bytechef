@@ -1,6 +1,10 @@
 import {
     CLUSTER_ELEMENT_NODE_WIDTH,
     CLUSTER_ROOT_NODE_WIDTH,
+    GRAPH_FRAME_NODE_TYPE,
+    GRAPH_START_EDGE_TYPE,
+    GRAPH_START_NODE_TYPE,
+    GRAPH_TRANSITION_EDGE_TYPE,
     NODE_HEIGHT,
     NODE_WIDTH,
     PLACEHOLDER_NODE_HEIGHT,
@@ -12,15 +16,17 @@ import {
     ConditionChildTasksType,
     EachChildTasksType,
     ForkJoinChildTasksType,
+    GraphChildTasksType,
     LoopChildTasksType,
     MapChildTasksType,
     OnErrorChildTasksType,
     ParallelChildTasksType,
 } from '@/shared/types';
-import {Node} from '@xyflow/react';
+import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
 import {calculateNodeWidth} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import createGraphEdges from './createGraphEdges';
 import {
     CLUSTER_ELEMENT_GAP,
     CLUSTER_ELEMENT_LABEL_PADDING,
@@ -28,8 +34,10 @@ import {
     CLUSTER_ROOT_GAP,
     calculateNodeHeight,
     collectTaskDispatcherData,
+    filterAndDedupeLayoutEdges,
     getClusterElementsLayoutElements,
     getDagreNodeSize,
+    getLayoutElements,
 } from './layoutUtils';
 
 // Type for test tasks with potentially malformed parameters
@@ -146,6 +154,7 @@ describe('collectTaskDispatcherData', () => {
         const conditionChildTasks: ConditionChildTasksType = {};
         const eachChildTasks: EachChildTasksType = {};
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
+        const graphChildTasks: GraphChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
         const onErrorChildTasks: OnErrorChildTasksType = {};
@@ -153,17 +162,18 @@ describe('collectTaskDispatcherData', () => {
 
         // This should not throw an error
         expect(() => {
-            collectTaskDispatcherData(
-                task,
+            collectTaskDispatcherData({
                 branchChildTasks,
                 conditionChildTasks,
                 eachChildTasks,
                 forkJoinChildTasks,
+                graphChildTasks,
                 loopChildTasks,
                 mapChildTasks,
                 onErrorChildTasks,
-                parallelChildTasks
-            );
+                parallelChildTasks,
+                task,
+            });
         }).not.toThrow();
 
         // Should create empty array for caseFalse since it's not an array
@@ -185,6 +195,7 @@ describe('collectTaskDispatcherData', () => {
         const conditionChildTasks: ConditionChildTasksType = {};
         const eachChildTasks: EachChildTasksType = {};
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
+        const graphChildTasks: GraphChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
         const onErrorChildTasks: OnErrorChildTasksType = {};
@@ -192,17 +203,18 @@ describe('collectTaskDispatcherData', () => {
 
         // This should not throw an error
         expect(() => {
-            collectTaskDispatcherData(
-                task,
+            collectTaskDispatcherData({
                 branchChildTasks,
                 conditionChildTasks,
                 eachChildTasks,
                 forkJoinChildTasks,
+                graphChildTasks,
                 loopChildTasks,
                 mapChildTasks,
                 onErrorChildTasks,
-                parallelChildTasks
-            );
+                parallelChildTasks,
+                task,
+            });
         }).not.toThrow();
 
         // Should create empty array for caseTrue since it's not an array
@@ -224,22 +236,24 @@ describe('collectTaskDispatcherData', () => {
         const conditionChildTasks: ConditionChildTasksType = {};
         const eachChildTasks: EachChildTasksType = {};
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
+        const graphChildTasks: GraphChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
         const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
-        collectTaskDispatcherData(
-            task,
+        collectTaskDispatcherData({
             branchChildTasks,
             conditionChildTasks,
             eachChildTasks,
             forkJoinChildTasks,
+            graphChildTasks,
             loopChildTasks,
             mapChildTasks,
             onErrorChildTasks,
-            parallelChildTasks
-        );
+            parallelChildTasks,
+            task,
+        });
 
         expect(conditionChildTasks['test-condition'].caseFalse).toEqual(['task1', 'task2']);
         expect(conditionChildTasks['test-condition'].caseTrue).toEqual(['task3', 'task4']);
@@ -270,22 +284,24 @@ describe('collectTaskDispatcherData', () => {
         const conditionChildTasks: ConditionChildTasksType = {};
         const eachChildTasks: EachChildTasksType = {};
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
+        const graphChildTasks: GraphChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
         const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
-        collectTaskDispatcherData(
-            task,
+        collectTaskDispatcherData({
             branchChildTasks,
             conditionChildTasks,
             eachChildTasks,
             forkJoinChildTasks,
+            graphChildTasks,
             loopChildTasks,
             mapChildTasks,
             onErrorChildTasks,
-            parallelChildTasks
-        );
+            parallelChildTasks,
+            task,
+        });
 
         // Should preserve the array-of-arrays structure (each branch is separate)
         expect(forkJoinChildTasks['test-fork-join'].branches).toEqual([
@@ -307,22 +323,24 @@ describe('collectTaskDispatcherData', () => {
         const conditionChildTasks: ConditionChildTasksType = {};
         const eachChildTasks: EachChildTasksType = {};
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
+        const graphChildTasks: GraphChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
         const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
-        collectTaskDispatcherData(
-            task,
+        collectTaskDispatcherData({
             branchChildTasks,
             conditionChildTasks,
             eachChildTasks,
             forkJoinChildTasks,
+            graphChildTasks,
             loopChildTasks,
             mapChildTasks,
             onErrorChildTasks,
-            parallelChildTasks
-        );
+            parallelChildTasks,
+            task,
+        });
 
         expect(forkJoinChildTasks['test-fork-join-empty'].branches).toEqual([]);
     });
@@ -340,22 +358,24 @@ describe('collectTaskDispatcherData', () => {
         const conditionChildTasks: ConditionChildTasksType = {};
         const eachChildTasks: EachChildTasksType = {};
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
+        const graphChildTasks: GraphChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
         const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
-        collectTaskDispatcherData(
-            task,
+        collectTaskDispatcherData({
             branchChildTasks,
             conditionChildTasks,
             eachChildTasks,
             forkJoinChildTasks,
+            graphChildTasks,
             loopChildTasks,
             mapChildTasks,
             onErrorChildTasks,
-            parallelChildTasks
-        );
+            parallelChildTasks,
+            task,
+        });
 
         expect(forkJoinChildTasks['test-fork-join-single-empty'].branches).toEqual([[]]);
     });
@@ -377,22 +397,24 @@ describe('collectTaskDispatcherData', () => {
         const conditionChildTasks: ConditionChildTasksType = {};
         const eachChildTasks: EachChildTasksType = {};
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
+        const graphChildTasks: GraphChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
         const onErrorChildTasks: OnErrorChildTasksType = {};
         const parallelChildTasks: ParallelChildTasksType = {};
 
-        collectTaskDispatcherData(
-            task,
+        collectTaskDispatcherData({
             branchChildTasks,
             conditionChildTasks,
             eachChildTasks,
             forkJoinChildTasks,
+            graphChildTasks,
             loopChildTasks,
             mapChildTasks,
             onErrorChildTasks,
-            parallelChildTasks
-        );
+            parallelChildTasks,
+            task,
+        });
 
         // Should handle malformed branches gracefully
         expect(forkJoinChildTasks['test-fork-join-malformed'].branches).toEqual([['task1', 'task2'], [], ['task3']]);
@@ -427,6 +449,7 @@ describe('collectTaskDispatcherData', () => {
         const conditionChildTasks: ConditionChildTasksType = {};
         const eachChildTasks: EachChildTasksType = {};
         const forkJoinChildTasks: ForkJoinChildTasksType = {};
+        const graphChildTasks: GraphChildTasksType = {};
         const loopChildTasks: LoopChildTasksType = {};
         const mapChildTasks: MapChildTasksType = {};
         const onErrorChildTasks: OnErrorChildTasksType = {};
@@ -434,45 +457,48 @@ describe('collectTaskDispatcherData', () => {
 
         // These should not throw errors
         expect(() => {
-            collectTaskDispatcherData(
-                loopTask,
+            collectTaskDispatcherData({
                 branchChildTasks,
                 conditionChildTasks,
                 eachChildTasks,
                 forkJoinChildTasks,
+                graphChildTasks,
                 loopChildTasks,
                 mapChildTasks,
                 onErrorChildTasks,
-                parallelChildTasks
-            );
+                parallelChildTasks,
+                task: loopTask,
+            });
         }).not.toThrow();
 
         expect(() => {
-            collectTaskDispatcherData(
-                parallelTask,
+            collectTaskDispatcherData({
                 branchChildTasks,
                 conditionChildTasks,
                 eachChildTasks,
                 forkJoinChildTasks,
+                graphChildTasks,
                 loopChildTasks,
                 mapChildTasks,
                 onErrorChildTasks,
-                parallelChildTasks
-            );
+                parallelChildTasks,
+                task: parallelTask,
+            });
         }).not.toThrow();
 
         expect(() => {
-            collectTaskDispatcherData(
-                forkJoinTask,
+            collectTaskDispatcherData({
                 branchChildTasks,
                 conditionChildTasks,
                 eachChildTasks,
                 forkJoinChildTasks,
+                graphChildTasks,
                 loopChildTasks,
                 mapChildTasks,
                 onErrorChildTasks,
-                parallelChildTasks
-            );
+                parallelChildTasks,
+                task: forkJoinTask,
+            });
         }).not.toThrow();
 
         // Should create empty arrays for non-array parameters
@@ -965,5 +991,241 @@ describe('getClusterElementsLayoutElements rows of user-positioned elements', ()
         });
 
         expect(absolutePoint('thirdToolChild').x).toBe(absolutePoint('firstToolChild').x);
+    });
+});
+
+describe('filterAndDedupeLayoutEdges', () => {
+    const makeWorkflowNode = (id: string): Node => ({
+        data: {componentName: 'mailchimp'},
+        id,
+        position: {x: 0, y: 0},
+        type: 'workflow',
+    });
+
+    it('should keep a graphTransition edge alongside its source member structural edge', () => {
+        const nodes: Node[] = [makeWorkflowNode('taskA'), makeWorkflowNode('taskB'), makeWorkflowNode('taskC')];
+
+        const edges: Edge[] = [
+            {id: 'taskA=>taskB', source: 'taskA', target: 'taskB', type: 'workflow'},
+            {
+                id: 'graph_1-transition-0-1',
+                source: 'taskA',
+                sourceHandle: 'taskA-graph-transition-source',
+                target: 'taskC',
+                targetHandle: 'taskC-graph-transition-target',
+                type: GRAPH_TRANSITION_EDGE_TYPE,
+            },
+        ];
+
+        const result = filterAndDedupeLayoutEdges(nodes, edges);
+
+        const structuralEdge = result.find((edge) => edge.type === 'workflow');
+        const transitionEdge = result.find((edge) => edge.type === GRAPH_TRANSITION_EDGE_TYPE);
+
+        expect(structuralEdge).toBeDefined();
+        expect(structuralEdge!.target).toBe('taskB');
+        expect(transitionEdge).toBeDefined();
+        expect(transitionEdge!.target).toBe('taskC');
+    });
+
+    it('should still dedupe an exact-duplicate graphTransition edge by endpoint+handle key', () => {
+        const nodes: Node[] = [makeWorkflowNode('taskA'), makeWorkflowNode('taskC')];
+
+        const duplicateTransitionEdge: Edge = {
+            id: 'graph_1-transition-0-1',
+            source: 'taskA',
+            sourceHandle: 'taskA-graph-transition-source',
+            target: 'taskC',
+            targetHandle: 'taskC-graph-transition-target',
+            type: GRAPH_TRANSITION_EDGE_TYPE,
+        };
+
+        const result = filterAndDedupeLayoutEdges(nodes, [duplicateTransitionEdge, {...duplicateTransitionEdge}]);
+
+        expect(result.filter((edge) => edge.type === GRAPH_TRANSITION_EDGE_TYPE)).toHaveLength(1);
+    });
+
+    it('should still drop a graphTransition edge that references a node no longer in the layout', () => {
+        const nodes: Node[] = [makeWorkflowNode('taskA')];
+
+        const edges: Edge[] = [
+            {
+                id: 'graph_1-transition-0-1',
+                source: 'taskA',
+                target: 'deletedTask',
+                type: GRAPH_TRANSITION_EDGE_TYPE,
+            },
+        ];
+
+        expect(filterAndDedupeLayoutEdges(nodes, edges)).toEqual([]);
+    });
+});
+
+describe('getLayoutElements (dagre) with graphTransition edges', () => {
+    const makeWorkflowNode = (id: string): Node => ({
+        data: {componentName: 'mailchimp', workflowNodeName: id},
+        id,
+        position: {x: 0, y: 0},
+        type: 'workflow',
+    });
+
+    const nodes: Node[] = [makeWorkflowNode('n0'), makeWorkflowNode('n1')];
+
+    const cyclicTransitionEdges: Edge[] = [
+        {id: 'graph_1-transition-0-1', source: 'n0', target: 'n1', type: GRAPH_TRANSITION_EDGE_TYPE},
+        {id: 'graph_1-transition-1-0', source: 'n1', target: 'n0', type: GRAPH_TRANSITION_EDGE_TYPE},
+    ];
+
+    it('does not throw and lays out identically with a cyclic pair of graphTransition edges present', async () => {
+        const withoutTransitions = await getLayoutElements({canvasWidth: 1000, direction: 'TB', edges: [], nodes});
+
+        const withTransitions = await getLayoutElements({
+            canvasWidth: 1000,
+            direction: 'TB',
+            edges: cyclicTransitionEdges,
+            nodes,
+        });
+
+        expect(withTransitions.nodes.find((node) => node.id === 'n0')?.position).toEqual(
+            withoutTransitions.nodes.find((node) => node.id === 'n0')?.position
+        );
+        expect(withTransitions.nodes.find((node) => node.id === 'n1')?.position).toEqual(
+            withoutTransitions.nodes.find((node) => node.id === 'n1')?.position
+        );
+    });
+
+    it('never returns a graphTransition edge (dagre keeps phase-2 badges as its sole transition visualization)', async () => {
+        const result = await getLayoutElements({
+            canvasWidth: 1000,
+            direction: 'TB',
+            edges: cyclicTransitionEdges,
+            nodes,
+        });
+
+        expect(result.edges.some((edge) => edge.type === GRAPH_TRANSITION_EDGE_TYPE)).toBe(false);
+    });
+});
+
+describe('getLayoutElements (dagre) with graph edges', () => {
+    const members = [
+        {name: 'task_0', type: 'task/v1'},
+        {name: 'task_1', type: 'task/v1'},
+    ];
+
+    const graphDispatcherNode: Node = {
+        data: {
+            componentName: 'graph',
+            parameters: {nodes: members, startNode: 'task_0', transitions: [{from: 'task_0', to: 'task_1'}]},
+            taskDispatcher: true,
+        },
+        id: 'graph_1',
+        position: {x: 0, y: 0},
+        type: 'workflow',
+    };
+
+    const graphNodes: Node[] = [
+        graphDispatcherNode,
+        {
+            data: {graphFrame: {graphId: 'graph_1', height: 200, width: 320}, taskDispatcherId: 'graph_1'},
+            id: 'graph_1-graph-frame',
+            position: {x: 0, y: 0},
+            type: GRAPH_FRAME_NODE_TYPE,
+        },
+        {
+            data: {graphStart: {graphId: 'graph_1'}, taskDispatcherId: 'graph_1'},
+            id: 'graph_1-graph-start',
+            position: {x: 0, y: 0},
+            type: GRAPH_START_NODE_TYPE,
+        },
+        {
+            data: {componentName: 'mailchimp', workflowNodeName: 'task_0'},
+            id: 'task_0',
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        },
+        {
+            data: {componentName: 'mailchimp', workflowNodeName: 'task_1'},
+            id: 'task_1',
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        },
+    ];
+
+    const graphEdges = createGraphEdges(graphDispatcherNode);
+
+    it('drops graphTransition edges and keeps the container chain end to end via getLayoutElements', async () => {
+        expect(graphEdges.some((edge) => edge.type === GRAPH_TRANSITION_EDGE_TYPE)).toBe(true);
+
+        const result = await getLayoutElements({
+            canvasWidth: 1600,
+            direction: 'TB',
+            edges: graphEdges,
+            nodes: graphNodes,
+        });
+
+        const graphToFrame = result.edges.find(
+            (edge) => edge.source === 'graph_1' && edge.target === 'graph_1-graph-frame'
+        );
+
+        expect(graphToFrame?.targetHandle).toBe('graph_1-graph-frame-top');
+        expect(result.edges.some((edge) => edge.type === GRAPH_TRANSITION_EDGE_TYPE)).toBe(false);
+        expect(result.edges.some((edge) => edge.type === GRAPH_START_EDGE_TYPE)).toBe(false);
+    });
+
+    it('lays the frame out inside the container chain at its own size', async () => {
+        const framedNodes = graphNodes.map((node) =>
+            node.id === 'graph_1-graph-frame'
+                ? {
+                      ...node,
+                      data: {...node.data, graphFrame: {graphId: 'graph_1', height: 400, width: 560}},
+                      height: 400,
+                      width: 560,
+                  }
+                : node
+        );
+
+        const result = await getLayoutElements({
+            canvasWidth: 1600,
+            direction: 'TB',
+            edges: graphEdges,
+            nodes: framedNodes,
+        });
+
+        const positionOf = (id: string) => result.nodes.find((node) => node.id === id)!.position;
+
+        const framePosition = positionOf('graph_1-graph-frame');
+
+        expect(Math.abs(framePosition.x + 560 / 2 - (positionOf('graph_1').x + 36))).toBeLessThanOrEqual(1);
+
+        expect(framePosition.y).toBeGreaterThan(positionOf('graph_1').y);
+    });
+
+    it('places the frame the same way with the axes swapped in LR', async () => {
+        const framedNodes = graphNodes.map((node) =>
+            node.id === 'graph_1-graph-frame'
+                ? {
+                      ...node,
+                      data: {...node.data, graphFrame: {graphId: 'graph_1', height: 400, width: 560}},
+                      height: 400,
+                      width: 560,
+                  }
+                : node
+        );
+
+        const result = await getLayoutElements({
+            canvasHeight: 900,
+            canvasWidth: 1600,
+            direction: 'LR',
+            edges: graphEdges,
+            nodes: framedNodes,
+        });
+
+        const positionOf = (id: string) => result.nodes.find((node) => node.id === id)!.position;
+
+        const framePosition = positionOf('graph_1-graph-frame');
+
+        expect(Math.abs(framePosition.y + 400 / 2 - (positionOf('graph_1').y + 36))).toBeLessThanOrEqual(1);
+
+        expect(framePosition.x).toBeGreaterThan(positionOf('graph_1').x);
     });
 });

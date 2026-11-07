@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys */
 import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
 import {ClusterElementCallRecord, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
-import {NestedClusterRootComponentDefinitionType, NodeDataType} from '@/shared/types';
+import {GraphPendingConnectionType, NestedClusterRootComponentDefinitionType, NodeDataType} from '@/shared/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
@@ -34,6 +34,12 @@ export interface WorkflowEditorI {
 
     copiedWorkflowId: string | undefined;
     setCopiedWorkflowId: (copiedWorkflowId: string | undefined) => void;
+
+    graphPendingConnection: GraphPendingConnectionType | undefined;
+    setGraphPendingConnection: (graphPendingConnection: GraphPendingConnectionType | undefined) => void;
+
+    graphTransitionLabelPositions: Record<string, {labelX: number; labelY: number}>;
+    setGraphTransitionLabelPosition: (edgeId: string, position: {labelX: number; labelY: number}) => void;
 
     clusterRootComponentDefinitions: Record<string, ComponentDefinition>;
     setClusterRootComponentDefinition: (clusterRootId: string, definition: ComponentDefinition) => void;
@@ -130,6 +136,29 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                 set(() => ({
                     copiedWorkflowId,
                 })),
+
+            graphPendingConnection: undefined,
+            setGraphPendingConnection: (graphPendingConnection) =>
+                set(() => ({
+                    graphPendingConnection,
+                })),
+
+            graphTransitionLabelPositions: {},
+            setGraphTransitionLabelPosition: (edgeId, position) =>
+                set((state) => {
+                    const currentPosition = state.graphTransitionLabelPositions[edgeId];
+
+                    if (currentPosition?.labelX === position.labelX && currentPosition?.labelY === position.labelY) {
+                        return state;
+                    }
+
+                    return {
+                        graphTransitionLabelPositions: {
+                            ...state.graphTransitionLabelPositions,
+                            [edgeId]: position,
+                        },
+                    };
+                }),
 
             clusterRootComponentDefinitions: {},
 

@@ -55,6 +55,7 @@ import {
     BranchCaseType,
     ComponentPropertiesType,
     DataPillType,
+    GraphTransitionType,
     TabNameType,
     UpdateWorkflowMutationType,
     WorkflowNodeType,
@@ -81,6 +82,7 @@ import getDataPillsFromProperties from '../../utils/getDataPillsFromProperties';
 import getNodeIssues from '../../utils/getNodeIssues';
 import getOutputSchemaFromWorkflowNodeOutput from '../../utils/getOutputSchemaFromWorkflowNodeOutput';
 import {getClusterElementRootNames} from '../../utils/getWorkflowIssueOwnerName';
+import {findGraphMembersPrecedingMember} from '../../utils/graph/graphReachability';
 import hasDataPillPanelContent from '../../utils/hasDataPillPanelContent';
 import {resolveClusterRootId, resolveMainClusterRootName} from '../../utils/resolveClusterRootId';
 import {getTaskDispatcherTask} from '../../utils/taskDispatcherConfig';
@@ -979,6 +981,41 @@ export default function useWorkflowNodeDetailsPanel({
         [workflow.tasks]
     );
 
+    const filterNodeNamesForGraph = useCallback(
+        (nodeNames: string[], graphId: string, memberName: string) => {
+            const graphTask = getTaskDispatcherTask({taskDispatcherId: graphId, tasks: workflow.tasks || []});
+
+            if (!graphTask?.parameters) {
+                return nodeNames;
+            }
+
+            const memberNames: string[] = (
+                Array.isArray(graphTask.parameters.nodes) ? graphTask.parameters.nodes : []
+            ).map((member: WorkflowTask) => member.name);
+
+            const transitions: GraphTransitionType[] = Array.isArray(graphTask.parameters.transitions)
+                ? graphTask.parameters.transitions
+                : [];
+
+            const precedingMemberNames = findGraphMembersPrecedingMember(memberName, transitions, memberNames);
+
+            return nodeNames.filter(
+                (nodeName) => !memberNames.includes(nodeName) || precedingMemberNames.has(nodeName)
+            );
+        },
+        [workflow.tasks]
+    );
+
+    const graphPillContext = useMemo(() => {
+        const currentNodeName = currentNode?.workflowNodeName ?? currentNode?.name;
+
+        if (!currentNodeName || currentNode?.dataPillAnchorNodeName || !currentNode?.graphData) {
+            return undefined;
+        }
+
+        return {graphId: currentNode.graphData.graphId, memberName: currentNodeName};
+    }, [currentNode?.dataPillAnchorNodeName, currentNode?.graphData, currentNode?.name, currentNode?.workflowNodeName]);
+
     const calculatedDataPills = useMemo(() => {
         if (!previousComponentDefinitions || !workflowNodeOutputs) {
             return [];
@@ -998,6 +1035,14 @@ export default function useWorkflowNodeDetailsPanel({
             const filtered = filterNodeNamesForOnError(filteredNodeNames, currentNode.onErrorData);
             if (filtered === null) return [];
             filteredNodeNames = filtered;
+        }
+
+        if (graphPillContext) {
+            filteredNodeNames = filterNodeNamesForGraph(
+                filteredNodeNames,
+                graphPillContext.graphId,
+                graphPillContext.memberName
+            );
         }
 
         const componentProperties: Array<ComponentPropertiesType> = previousComponentDefinitions.map(
@@ -1032,7 +1077,9 @@ export default function useWorkflowNodeDetailsPanel({
         currentNode?.onErrorData,
         filterNodeNamesForBranch,
         filterNodeNamesForCondition,
+        filterNodeNamesForGraph,
         filterNodeNamesForOnError,
+        graphPillContext,
         previousComponentDefinitions,
         workflow.inputs,
         workflowNodeOutputs,

@@ -1,4 +1,4 @@
-import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, OutputResponse, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {describe, expect, it} from 'vitest';
 
 import filterWorkflowNodeOutputs from './filterWorkflowNodeOutputs';
@@ -32,18 +32,36 @@ function makeTriggerOutput(componentName: string, workflowNodeName: string): Wor
     };
 }
 
-function makeTaskDispatcherOutput(
-    name: string,
-    workflowNodeName: string,
-    options: {outputDefined?: boolean; variablePropertiesDefined?: boolean} = {}
-): WorkflowNodeOutput {
+function makeOutputResponse(): OutputResponse {
+    return {outputSchema: {type: 'OBJECT'}} as OutputResponse;
+}
+
+interface MakeTaskDispatcherOutputProps {
+    name: string;
+    outputDefined?: boolean;
+    outputSchema?: boolean;
+    variableOutputSchema?: boolean;
+    variablePropertiesDefined?: boolean;
+    workflowNodeName: string;
+}
+
+function makeTaskDispatcherOutput({
+    name,
+    outputDefined = false,
+    outputSchema,
+    variableOutputSchema,
+    variablePropertiesDefined = false,
+    workflowNodeName,
+}: MakeTaskDispatcherOutputProps): WorkflowNodeOutput {
     return {
+        outputResponse: outputSchema ? makeOutputResponse() : undefined,
         taskDispatcherDefinition: {
             name,
-            outputDefined: options.outputDefined ?? false,
-            variablePropertiesDefined: options.variablePropertiesDefined ?? false,
+            outputDefined,
+            variablePropertiesDefined,
             version: 1,
         },
+        variableOutputResponse: variableOutputSchema ? makeOutputResponse() : undefined,
         workflowNodeName,
     };
 }
@@ -79,8 +97,15 @@ describe('filterWorkflowNodeOutputs', () => {
         expect(result.definitions[0].name).toBe('webhook');
     });
 
-    it('should include loop task dispatcher with variablePropertiesDefined', () => {
-        const outputs = [makeTaskDispatcherOutput('loop', 'loop_1', {variablePropertiesDefined: true})];
+    it('should include loop task dispatcher whose variable properties resolved to a schema', () => {
+        const outputs = [
+            makeTaskDispatcherOutput({
+                name: 'loop',
+                variableOutputSchema: true,
+                variablePropertiesDefined: true,
+                workflowNodeName: 'loop_1',
+            }),
+        ];
 
         const result = filterWorkflowNodeOutputs(outputs, componentDefinitions, taskDispatcherDefinitions);
 
@@ -89,8 +114,15 @@ describe('filterWorkflowNodeOutputs', () => {
         expect(result.definitions[0].name).toBe('loop');
     });
 
-    it('should include each task dispatcher with variablePropertiesDefined', () => {
-        const outputs = [makeTaskDispatcherOutput('each', 'each_1', {variablePropertiesDefined: true})];
+    it('should include each task dispatcher whose variable properties resolved to a schema', () => {
+        const outputs = [
+            makeTaskDispatcherOutput({
+                name: 'each',
+                variableOutputSchema: true,
+                variablePropertiesDefined: true,
+                workflowNodeName: 'each_1',
+            }),
+        ];
 
         const result = filterWorkflowNodeOutputs(outputs, componentDefinitions, taskDispatcherDefinitions);
 
@@ -99,8 +131,10 @@ describe('filterWorkflowNodeOutputs', () => {
         expect(result.definitions[0].name).toBe('each');
     });
 
-    it('should include task dispatchers with outputDefined', () => {
-        const outputs = [makeTaskDispatcherOutput('map', 'map_1', {outputDefined: true})];
+    it('should include task dispatchers whose output resolved to a schema', () => {
+        const outputs = [
+            makeTaskDispatcherOutput({name: 'map', outputDefined: true, outputSchema: true, workflowNodeName: 'map_1'}),
+        ];
 
         const result = filterWorkflowNodeOutputs(outputs, componentDefinitions, taskDispatcherDefinitions);
 
@@ -109,13 +143,29 @@ describe('filterWorkflowNodeOutputs', () => {
         expect(result.definitions[0].name).toBe('map');
     });
 
-    it('should exclude task dispatchers without outputDefined or variablePropertiesDefined', () => {
-        const outputs = [makeTaskDispatcherOutput('condition', 'condition_1')];
+    it('should exclude task dispatchers that resolved to neither an output nor a variable schema', () => {
+        const outputs = [makeTaskDispatcherOutput({name: 'condition', workflowNodeName: 'condition_1'})];
 
         const result = filterWorkflowNodeOutputs(outputs, componentDefinitions, [
             ...taskDispatcherDefinitions,
             makeComponentDef('condition'),
         ]);
+
+        expect(result.outputs).toHaveLength(0);
+        expect(result.definitions).toHaveLength(0);
+    });
+
+    it('should exclude an enclosing task dispatcher that declares an output but resolved to none', () => {
+        const outputs = [
+            makeTaskDispatcherOutput({
+                name: 'map',
+                outputDefined: true,
+                variablePropertiesDefined: true,
+                workflowNodeName: 'map_1',
+            }),
+        ];
+
+        const result = filterWorkflowNodeOutputs(outputs, componentDefinitions, taskDispatcherDefinitions);
 
         expect(result.outputs).toHaveLength(0);
         expect(result.definitions).toHaveLength(0);
@@ -133,9 +183,19 @@ describe('filterWorkflowNodeOutputs', () => {
     it('should handle mixed output types and filter correctly', () => {
         const outputs = [
             makeActionOutput('httpClient', 'httpClient_1'),
-            makeTaskDispatcherOutput('each', 'each_1', {variablePropertiesDefined: true}),
-            makeTaskDispatcherOutput('loop', 'loop_1', {variablePropertiesDefined: true}),
-            makeTaskDispatcherOutput('condition', 'condition_1'),
+            makeTaskDispatcherOutput({
+                name: 'each',
+                variableOutputSchema: true,
+                variablePropertiesDefined: true,
+                workflowNodeName: 'each_1',
+            }),
+            makeTaskDispatcherOutput({
+                name: 'loop',
+                variableOutputSchema: true,
+                variablePropertiesDefined: true,
+                workflowNodeName: 'loop_1',
+            }),
+            makeTaskDispatcherOutput({name: 'condition', workflowNodeName: 'condition_1'}),
             makeTriggerOutput('webhook', 'webhook_trigger'),
         ];
 

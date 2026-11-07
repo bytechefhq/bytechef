@@ -74,6 +74,10 @@ const GHOST_AND_PLACEHOLDER_TYPES = new Set([
  * Ghost/placeholder nodes use taskDispatcherId; workflow nodes use their nesting data.
  */
 function getDirectParentDispatcherId(node: Node): string | null {
+    if (node.parentId) {
+        return null;
+    }
+
     const data = node.data as NodeDataType;
 
     if (GHOST_AND_PLACEHOLDER_TYPES.has(node.type || '')) {
@@ -102,6 +106,10 @@ function getDirectParentDispatcherId(node: Node): string | null {
 
     if (data.forkJoinData?.forkJoinId) {
         return data.forkJoinData.forkJoinId;
+    }
+
+    if (data.graphData?.graphId) {
+        return data.graphData.graphId;
     }
 
     return null;

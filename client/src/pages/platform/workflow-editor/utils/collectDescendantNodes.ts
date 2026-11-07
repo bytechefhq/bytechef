@@ -2,6 +2,9 @@ import {FINAL_PLACEHOLDER_NODE_ID} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node, XYPosition} from '@xyflow/react';
 
+import {getGraphFrameId} from './graph/graphFrameGeometry';
+import isGraphRouteEdge from './graph/isGraphRouteEdge';
+
 /**
  * Checks whether a node is a direct child of a given task dispatcher.
  * Matches against all supported nesting data properties.
@@ -19,6 +22,7 @@ export function isChildNodeOfDispatcher(node: Node, dispatcherId: string): boole
             nodeData.eachData?.eachId === dispatcherId ||
             nodeData.parallelData?.parallelId === dispatcherId ||
             nodeData.forkJoinData?.forkJoinId === dispatcherId ||
+            nodeData.graphData?.graphId === dispatcherId ||
             nodeData.onErrorData?.onErrorId === dispatcherId)
     );
 }
@@ -73,10 +77,13 @@ export function collectChainSuccessorNodes(
     const successorPositions = new Map<string, XYPosition>();
     const nodeMap = new Map(allNodes.map((node) => [node.id, node]));
 
-    // Build edge lookup: source → target IDs
     const edgesBySource = new Map<string, string[]>();
 
     for (const edge of allEdges) {
+        if (isGraphRouteEdge(edge)) {
+            continue;
+        }
+
         if (!edgesBySource.has(edge.source)) {
             edgesBySource.set(edge.source, []);
         }
@@ -84,16 +91,18 @@ export function collectChainSuccessorNodes(
         edgesBySource.get(edge.source)!.push(edge.target);
     }
 
-    // Find the bottom ghost node for this dispatcher
-    const bottomGhostId = [...descendantIds].find((nodeId) => nodeId.includes('bottom-ghost'));
+    const graphFrameId = getGraphFrameId(dispatcherId);
 
-    if (!bottomGhostId) {
+    const continuationSourceId = descendantIds.has(graphFrameId)
+        ? graphFrameId
+        : [...descendantIds].find((nodeId) => nodeId.includes('bottom-ghost'));
+
+    if (!continuationSourceId) {
         return successorPositions;
     }
 
-    // Walk the chain from the bottom ghost's outgoing edges
     const visited = new Set<string>();
-    const queue = edgesBySource.get(bottomGhostId) || [];
+    const queue = edgesBySource.get(continuationSourceId) || [];
 
     while (queue.length > 0) {
         const targetId = queue.shift()!;

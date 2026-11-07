@@ -2,7 +2,10 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {TaskDispatcherContextType} from '@/shared/types';
 
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
+import {applyGraphMemberInsertion} from './graph/graphMemberInsertion';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 import {getWorkflowNodeComponentName} from './workflowNodeNameUtils';
 
@@ -99,7 +102,11 @@ export default function insertTaskDispatcherSubtask({
         const mainAxis = direction === 'TB' ? 'y' : 'x';
         const crossAxis = direction === 'TB' ? 'x' : 'y';
 
-        for (let subtaskIndex = context.index + 1; subtaskIndex < updatedSubtasks.length; subtaskIndex++) {
+        for (
+            let subtaskIndex = context.index + 1;
+            componentName !== 'graph' && subtaskIndex < updatedSubtasks.length;
+            subtaskIndex++
+        ) {
             const subtask = updatedSubtasks[subtaskIndex];
 
             if (subtask.metadata?.ui?.nodePosition) {
@@ -122,7 +129,29 @@ export default function insertTaskDispatcherSubtask({
         }
     }
 
-    const updatedTaskDispatcherTask = updateTaskParameters({context, task: targetTaskDispatcher, updatedSubtasks});
+    let updatedTaskDispatcherTask = updateTaskParameters({context, task: targetTaskDispatcher, updatedSubtasks});
+
+    if (componentName === 'graph') {
+        updatedTaskDispatcherTask = applyGraphMemberInsertion({
+            direction: useLayoutDirectionStore.getState().layoutDirection,
+            nodes: useWorkflowDataStore.getState().nodes,
+            pendingConnection: consumeGraphPendingConnection(targetTaskDispatcher.name),
+            previousGraphTask: targetTaskDispatcher,
+            updatedGraphTask: updatedTaskDispatcherTask,
+        });
+    }
 
     return getRecursivelyUpdatedTasks(tasks, updatedTaskDispatcherTask);
+}
+
+function consumeGraphPendingConnection(graphId: string) {
+    const {graphPendingConnection, setGraphPendingConnection} = useWorkflowEditorStore.getState();
+
+    if (graphPendingConnection?.graphId !== graphId) {
+        return undefined;
+    }
+
+    setGraphPendingConnection(undefined);
+
+    return graphPendingConnection;
 }

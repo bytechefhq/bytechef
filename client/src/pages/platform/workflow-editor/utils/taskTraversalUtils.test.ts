@@ -100,6 +100,32 @@ describe('forEachNestedTaskGroup', () => {
         ]);
     });
 
+    it('should visit the graph nodes list as a single flat group', () => {
+        const visited: Array<{key: string; names: string[]}> = [];
+        const parameters = {
+            maxTransitions: 100,
+            nodes: [makeTask('node_0'), makeTask('node_1')],
+            transitions: [{from: 'node_0', to: 'node_1'}],
+        };
+
+        forEachNestedTaskGroup(parameters, (tasks, key) => {
+            visited.push({key, names: tasks.map((task) => task.name)});
+        });
+
+        expect(visited).toEqual([{key: 'nodes', names: ['node_0', 'node_1']}]);
+    });
+
+    it('should still visit an empty graph nodes array (survives every node being removed)', () => {
+        const visited: Array<{key: string; names: string[]}> = [];
+        const parameters = {nodes: [], transitions: []};
+
+        forEachNestedTaskGroup(parameters, (tasks, key) => {
+            visited.push({key, names: tasks.map((task) => task.name)});
+        });
+
+        expect(visited).toEqual([{key: 'nodes', names: []}]);
+    });
+
     it('should skip empty arrays and non-task arrays', () => {
         const visited: string[] = [];
         const parameters = {

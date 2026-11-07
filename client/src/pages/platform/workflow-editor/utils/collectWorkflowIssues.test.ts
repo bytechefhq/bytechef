@@ -239,6 +239,27 @@ describe('collectWorkflowIssues', () => {
 
             expect(issues).toEqual([]);
         });
+
+        it('follows the transitions inside a graph rather than the declaration order', () => {
+            const issues = collectWorkflowIssues({
+                tasks: [
+                    task('graph_1', {
+                        nodes: [
+                            task('start_1'),
+                            task('left_1'),
+                            task('right_1', {text: '${start_1.value} ${left_1.value}'}),
+                        ],
+                        transitions: [
+                            {condition: '${start_1.value} > 0', from: 'start_1', to: 'left_1'},
+                            {from: 'start_1', to: 'right_1'},
+                        ],
+                    }),
+                ],
+                triggers: [trigger('trigger_1')],
+            });
+
+            expect(orderIssues(issues)).toEqual([['right_1', 'left_1.value']]);
+        });
     });
 
     it('warns about each disabled node a task references', () => {

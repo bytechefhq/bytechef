@@ -376,6 +376,44 @@ describe('handleDeleteTask', () => {
         expect(updatedDefinition.tasks[0].parameters.branches[0][0].name).toBe('branch_b_1');
     });
 
+    it('removes a graph node task together with every transition naming it and clears startNode', () => {
+        const graphTask = makeTask('graph_1', {
+            maxTransitions: 100,
+            nodes: [makeTask('a'), makeTask('b'), makeTask('c')],
+            startNode: 'b',
+            transitions: [
+                {from: 'a', to: 'b'},
+                {from: 'b', to: 'c'},
+                {from: 'c', to: 'a'},
+            ],
+        });
+        const workflow = makeWorkflow([graphTask]);
+        const mutation = makeMockMutation();
+
+        handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
+            data: {
+                componentName: 'test',
+                graphData: {graphId: 'graph_1', index: 1},
+                name: 'b',
+            } as unknown as NodeDataType,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            updateWorkflowMutation: mutation,
+            workflow,
+        });
+
+        expect(mutation.mutate).toHaveBeenCalledOnce();
+
+        const mutationArgs = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0];
+        const updatedDefinition = JSON.parse(mutationArgs.workflow.definition);
+        const updatedParameters = updatedDefinition.tasks[0].parameters;
+
+        expect(updatedParameters.nodes.map((node: WorkflowTask) => node.name)).toEqual(['a', 'c']);
+        expect(updatedParameters.transitions).toEqual([{from: 'c', to: 'a'}]);
+        expect(updatedParameters.startNode).toBeUndefined();
+    });
+
     it('should delete a task from map iteratee', () => {
         const mapTask = makeTask('map_1', {
             iteratee: [makeTask('child_1'), makeTask('child_2'), makeTask('child_3')],
