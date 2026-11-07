@@ -1,11 +1,11 @@
 import Badge, {type BadgeStyleType} from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
 import {
     EXECUTIONS_TABLE_CELL_CLASS_NAME,
     EXECUTIONS_TABLE_HEADER_CLASS_NAME,
     EXECUTIONS_TABLE_HEAD_CLASS_NAME,
+    EXECUTIONS_TABLE_ROW_CLASS_NAME,
     EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME,
     PINNED_CELL_CLASS_NAME,
     PINNED_HEAD_CLASS_NAME,
@@ -25,6 +25,9 @@ interface ExternalInvocationsTableProps {
     showSurface?: boolean;
     externalInvocationLogs: Array<ExternalInvocationLogItemType>;
 }
+
+const PINNED_IDLE_CELL_CLASS_NAME =
+    'sticky right-0 z-10 bg-surface-neutral-primary [tr:nth-child(even)>&]:bg-surface-neutral-secondary';
 
 const SURFACE_LABELS: Record<string, string> = {
     A2A: 'A2A',
@@ -111,76 +114,79 @@ const ExternalInvocationsTable = ({
         </TableHeader>
 
         <TableBody>
-            {externalInvocationLogs.map((externalInvocationLog) => (
-                <TableRow
-                    className={twMerge('group border-0', EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME)}
-                    key={externalInvocationLog.id}
-                >
-                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                        <Badge
-                            className="border-transparent uppercase"
-                            label={externalInvocationLog.outcome}
-                            styleType={OUTCOME_STYLE_TYPES[externalInvocationLog.outcome] || 'secondary-filled'}
-                            weight="semibold"
-                        />
-                    </TableCell>
+            {externalInvocationLogs.map((externalInvocationLog) => {
+                const jobId = externalInvocationLog.jobId;
+                const viewable = onViewJob != null && jobId != null;
 
-                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                        {externalInvocationLog.toolName || '—'}
-                    </TableCell>
-
-                    {showSurface && (
-                        <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                            {SURFACE_LABELS[externalInvocationLog.surface] || externalInvocationLog.surface}
-                        </TableCell>
-                    )}
-
-                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                        {serverLabel(externalInvocationLog, mcpServerNames, a2aServerNames)}
-                    </TableCell>
-
-                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                        {onViewJob &&
-                        externalInvocationLog.kind === 'WORKFLOW' &&
-                        externalInvocationLog.jobId != null ? (
-                            <Button
-                                className="h-auto p-0 font-normal"
-                                label={sourceLabel(externalInvocationLog)}
-                                onClick={() => onViewJob(Number(externalInvocationLog.jobId))}
-                                variant="link"
-                            />
-                        ) : (
-                            sourceLabel(externalInvocationLog)
+                return (
+                    <TableRow
+                        className={twMerge(
+                            viewable ? EXECUTIONS_TABLE_ROW_CLASS_NAME : 'border-0',
+                            EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME
                         )}
-                    </TableCell>
-
-                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                        {externalInvocationLog.durationMs}ms
-                    </TableCell>
-
-                    <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                        {formatCreatedDate(externalInvocationLog.createdDate)}
-                    </TableCell>
-
-                    {onViewJob && (
-                        <TableCell
-                            className={twMerge(
-                                EXECUTIONS_TABLE_CELL_CLASS_NAME,
-                                PINNED_CELL_CLASS_NAME,
-                                PINNED_STRIPED_CELL_CLASS_NAME
-                            )}
-                        >
-                            {externalInvocationLog.jobId != null && (
-                                <ExternalInvocationsDropdownMenu
-                                    jobId={externalInvocationLog.jobId}
-                                    onViewJob={onViewJob}
-                                    outcome={externalInvocationLog.outcome}
-                                />
-                            )}
+                        key={externalInvocationLog.id}
+                        onClick={viewable ? () => onViewJob(Number(jobId)) : undefined}
+                    >
+                        <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                            <Badge
+                                className="border-transparent uppercase"
+                                label={externalInvocationLog.outcome}
+                                styleType={OUTCOME_STYLE_TYPES[externalInvocationLog.outcome] || 'secondary-filled'}
+                                weight="semibold"
+                            />
                         </TableCell>
-                    )}
-                </TableRow>
-            ))}
+
+                        <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                            {externalInvocationLog.toolName || '—'}
+                        </TableCell>
+
+                        {showSurface && (
+                            <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                                {SURFACE_LABELS[externalInvocationLog.surface] || externalInvocationLog.surface}
+                            </TableCell>
+                        )}
+
+                        <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                            {serverLabel(externalInvocationLog, mcpServerNames, a2aServerNames)}
+                        </TableCell>
+
+                        <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                            {sourceLabel(externalInvocationLog)}
+                        </TableCell>
+
+                        <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                            {externalInvocationLog.durationMs}ms
+                        </TableCell>
+
+                        <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                            {formatCreatedDate(externalInvocationLog.createdDate)}
+                        </TableCell>
+
+                        {onViewJob && (
+                            <TableCell
+                                className={
+                                    viewable
+                                        ? twMerge(
+                                              EXECUTIONS_TABLE_CELL_CLASS_NAME,
+                                              PINNED_CELL_CLASS_NAME,
+                                              PINNED_STRIPED_CELL_CLASS_NAME
+                                          )
+                                        : twMerge(EXECUTIONS_TABLE_CELL_CLASS_NAME, PINNED_IDLE_CELL_CLASS_NAME)
+                                }
+                                onClick={(event) => event.stopPropagation()}
+                            >
+                                {viewable && (
+                                    <ExternalInvocationsDropdownMenu
+                                        jobId={jobId}
+                                        onViewJob={onViewJob}
+                                        outcome={externalInvocationLog.outcome}
+                                    />
+                                )}
+                            </TableCell>
+                        )}
+                    </TableRow>
+                );
+            })}
         </TableBody>
     </Table>
 );
