@@ -28,6 +28,13 @@ const bottomGhostNode = (taskDispatcherId: string, suffix: string): Node => ({
     type: 'taskDispatcherBottomGhostNode',
 });
 
+const leftGhostNode = (taskDispatcherId: string): Node => ({
+    data: {taskDispatcherId},
+    id: `${taskDispatcherId}-taskDispatcher-left-ghost`,
+    position: {x: 0, y: 0},
+    type: 'taskDispatcherLeftGhostNode',
+});
+
 const dispatcherNode = (workflowNodeName: string): Node => ({
     data: {taskDispatcher: true, workflowNodeName},
     id: workflowNodeName,
@@ -263,6 +270,24 @@ describe('getExecutedEdgeStatus', () => {
                 states
             )
         ).toBeUndefined();
+    });
+
+    it('colors the left rail of a running loop', () => {
+        const states = {loop_2: {status: 'RUNNING' as const}};
+
+        const leftGhost = leftGhostNode('loop_2');
+
+        expect(getExecutedEdgeStatus(ghostNode('loop_2', 'loop-top-ghost'), leftGhost, states)).toBe('COMPLETED');
+        expect(getExecutedEdgeStatus(leftGhost, bottomGhostNode('loop_2', 'loop-bottom-ghost'), states)).toBe(
+            'COMPLETED'
+        );
+    });
+
+    it('keeps the left rail of a loop the run has not reached neutral', () => {
+        const leftGhost = leftGhostNode('loop_2');
+
+        expect(getExecutedEdgeStatus(ghostNode('loop_2', 'loop-top-ghost'), leftGhost, {})).toBeUndefined();
+        expect(getExecutedEdgeStatus(leftGhost, bottomGhostNode('loop_2', 'loop-bottom-ghost'), {})).toBeUndefined();
     });
 
     it('colors the way into a running dispatcher nested in a running loop', () => {
