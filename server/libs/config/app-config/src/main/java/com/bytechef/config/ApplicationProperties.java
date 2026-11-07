@@ -842,6 +842,7 @@ public class ApplicationProperties {
         private Mcp mcp = new Mcp();
         private Memory memory = new Memory();
         private Provider provider = new Provider();
+        private Stt stt = new Stt();
         private Vectorstore vectorstore = new Vectorstore();
 
         public AgentUtils getAgentUtils() {
@@ -882,6 +883,10 @@ public class ApplicationProperties {
 
         public Provider getProvider() {
             return provider;
+        }
+
+        public Stt getStt() {
+            return stt;
         }
 
         public Vectorstore getVectorstore() {
@@ -926,6 +931,10 @@ public class ApplicationProperties {
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+
+        public void setStt(Stt stt) {
+            this.stt = stt;
         }
 
         public void setVectorstore(Vectorstore vectorstore) {
@@ -1476,6 +1485,94 @@ public class ApplicationProperties {
             }
         }
 
+        public static class Stt {
+
+            public enum Provider {
+                OPENAI,
+                DEEPGRAM,
+                ELEVENLABS
+            }
+
+            private Provider provider = Provider.OPENAI;
+
+            private Openai openai = new Openai();
+
+            private Deepgram deepgram = new Deepgram();
+
+            private Elevenlabs elevenlabs = new Elevenlabs();
+
+            public Provider getProvider() {
+                return provider;
+            }
+
+            public void setProvider(Provider provider) {
+                this.provider = provider;
+            }
+
+            public Openai getOpenai() {
+                return openai;
+            }
+
+            public void setOpenai(Openai openai) {
+                this.openai = openai;
+            }
+
+            public Deepgram getDeepgram() {
+                return deepgram;
+            }
+
+            public void setDeepgram(Deepgram deepgram) {
+                this.deepgram = deepgram;
+            }
+
+            public Elevenlabs getElevenlabs() {
+                return elevenlabs;
+            }
+
+            public void setElevenlabs(Elevenlabs elevenlabs) {
+                this.elevenlabs = elevenlabs;
+            }
+
+            public static class Openai {
+
+                private String baseUrl = "https://api.openai.com";
+
+                public String getBaseUrl() {
+                    return baseUrl;
+                }
+
+                public void setBaseUrl(String baseUrl) {
+                    this.baseUrl = baseUrl;
+                }
+            }
+
+            public static class Deepgram {
+
+                private String baseUrl = "https://api.deepgram.com";
+
+                public String getBaseUrl() {
+                    return baseUrl;
+                }
+
+                public void setBaseUrl(String baseUrl) {
+                    this.baseUrl = baseUrl;
+                }
+            }
+
+            public static class Elevenlabs {
+
+                private String baseUrl = "https://api.elevenlabs.io";
+
+                public String getBaseUrl() {
+                    return baseUrl;
+                }
+
+                public void setBaseUrl(String baseUrl) {
+                    this.baseUrl = baseUrl;
+                }
+            }
+        }
+
         /**
          * Brave Search API configuration.
          */
@@ -1835,6 +1932,8 @@ public class ApplicationProperties {
              */
             private Stability stability = new Stability();
 
+            private Stt stt = new Stt();
+
             /**
              * Google Vertex AI Gemini configuration
              */
@@ -1916,6 +2015,10 @@ public class ApplicationProperties {
                 return stability;
             }
 
+            public Stt getStt() {
+                return stt;
+            }
+
             public VertexGemini getVertexGemini() {
                 return vertexGemini;
             }
@@ -1994,6 +2097,10 @@ public class ApplicationProperties {
 
             public void setStability(Stability stability) {
                 this.stability = stability;
+            }
+
+            public void setStt(Stt stt) {
+                this.stt = stt;
             }
 
             public void setVertexGemini(VertexGemini vertexGemini) {
@@ -3106,6 +3213,117 @@ public class ApplicationProperties {
                         /**
                          * Image model name (e.g., dall-e-3)
                          */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+            }
+
+            public static class Stt {
+
+                private Deepgram deepgram = new Deepgram();
+
+                private Elevenlabs elevenlabs = new Elevenlabs();
+
+                private OpenAi openAi = new OpenAi();
+
+                public Deepgram getDeepgram() {
+                    return deepgram;
+                }
+
+                public void setDeepgram(Deepgram deepgram) {
+                    this.deepgram = deepgram;
+                }
+
+                public Elevenlabs getElevenlabs() {
+                    return elevenlabs;
+                }
+
+                public void setElevenlabs(Elevenlabs elevenlabs) {
+                    this.elevenlabs = elevenlabs;
+                }
+
+                public OpenAi getOpenAi() {
+                    return openAi;
+                }
+
+                public void setOpenAi(OpenAi openAi) {
+                    this.openAi = openAi;
+                }
+
+                public static class Deepgram {
+
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    public static class Options {
+
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+
+                public static class Elevenlabs {
+
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    public static class Options {
+
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+
+                public static class OpenAi {
+
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    public static class Options {
+
                         private String model;
 
                         public String getModel() {
