@@ -28,6 +28,8 @@ public class AssetFileAuthorizeHttpRequestContributor implements AuthorizeHttpRe
 
     @Override
     public List<String> getApiPermitAllRequestMatcherPaths() {
-        return List.of("/api/automation/asset-files/public/**");
+        return List.of(
+            "/api/automation/asset-files/public/**",
+            "/api/automation/asset-files/signed/**");
     }
 }

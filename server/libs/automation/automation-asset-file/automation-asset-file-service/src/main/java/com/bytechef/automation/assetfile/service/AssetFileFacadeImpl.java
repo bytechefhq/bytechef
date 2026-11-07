@@ -31,6 +31,7 @@ import com.bytechef.automation.assetfile.util.AssetFileNameSanitizer;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
@@ -48,6 +49,7 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +72,7 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
     private final AssetFileVersionRepository versionRepository;
     private final AssetFileSystemFacade assetFileSystemFacade;
     private final AssetFileWriteSupport writeSupport;
+    private final ObjectProvider<FileEntryTokens> fileEntryTokensObjectProvider;
     private final AutomationAssetFileQuotaProperties quota;
     private final AutomationAssetFileSharingProperties sharingProperties;
     private final UserService userService;
@@ -83,6 +86,7 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
         AssetFileVersionRepository versionRepository,
         AssetFileSystemFacade assetFileSystemFacade,
         AssetFileWriteSupport writeSupport,
+        ObjectProvider<FileEntryTokens> fileEntryTokensObjectProvider,
         AutomationAssetFileQuotaProperties quota,
         AutomationAssetFileSharingProperties sharingProperties,
         UserService userService,
@@ -94,6 +98,7 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
         this.versionRepository = versionRepository;
         this.assetFileSystemFacade = assetFileSystemFacade;
         this.writeSupport = writeSupport;
+        this.fileEntryTokensObjectProvider = fileEntryTokensObjectProvider;
         this.quota = quota;
         this.sharingProperties = sharingProperties;
         this.userService = userService;
@@ -476,6 +481,23 @@ public class AssetFileFacadeImpl implements AssetFileFacade {
         assetFile.setPublicLinkToken(null);
 
         service.update(assetFile);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String createSignedDownloadToken(Long id) {
+        FileEntryTokens fileEntryTokens = fileEntryTokensObjectProvider.getIfAvailable();
+
+        if (fileEntryTokens == null) {
+            throw new IllegalStateException(
+                "Signed download URLs are unavailable: no FileEntryTokens bean is configured");
+        }
+
+        checkMembershipOfOwner(id);
+
+        AssetFile assetFile = service.findById(id);
+
+        return fileEntryTokens.toSignedToken(assetFile.getFile());
     }
 
     private void enforceSingleFileQuota(long bytes) {

@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,6 +49,7 @@ import com.bytechef.automation.assetfile.repository.AssetFileVersionRepository;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.io.ByteArrayInputStream;
@@ -61,6 +63,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -85,6 +88,9 @@ class AssetFileFacadeTest {
 
     @Mock
     private AssetFileSystemFacade assetFileSystemFacade;
+
+    @Mock
+    private ObjectProvider<FileEntryTokens> fileEntryTokensObjectProvider;
 
     @Mock
     private UserService userService;
@@ -123,7 +129,7 @@ class AssetFileFacadeTest {
 
         return new AssetFileFacadeImpl(
             service, fileStorage, metrics, versionRepository, assetFileSystemFacade, writeSupport,
-            quota, sharingProperties, userService, workspaceFacade);
+            fileEntryTokensObjectProvider, quota, sharingProperties, userService, workspaceFacade);
     }
 
     @Test
@@ -577,5 +583,31 @@ class AssetFileFacadeTest {
         assertThatThrownBy(() -> facade.enablePublicLink(5L))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("disabled");
+    }
+
+    @Test
+    void testCreateSignedDownloadTokenDelegatesToFileEntryTokens() {
+        FileEntry fileEntry = new FileEntry("x.txt", "asset-files/x.txt");
+        AssetFile existing = new AssetFile();
+
+        existing.setId(5L);
+        existing.setFile(fileEntry);
+        existing.setWorkspaceId(1L);
+
+        FileEntryTokens fileEntryTokens = mock(FileEntryTokens.class);
+
+        when(fileEntryTokensObjectProvider.getIfAvailable()).thenReturn(fileEntryTokens);
+        when(service.findById(5L)).thenReturn(existing);
+        when(fileEntryTokens.toSignedToken(fileEntry)).thenReturn("v1.123.payload.sig");
+
+        assertThat(facade.createSignedDownloadToken(5L)).isEqualTo("v1.123.payload.sig");
+    }
+
+    @Test
+    void testCreateSignedDownloadTokenThrowsWithoutBean() {
+        when(fileEntryTokensObjectProvider.getIfAvailable()).thenReturn(null);
+
+        assertThatThrownBy(() -> facade.createSignedDownloadToken(5L))
+            .isInstanceOf(IllegalStateException.class);
     }
 }

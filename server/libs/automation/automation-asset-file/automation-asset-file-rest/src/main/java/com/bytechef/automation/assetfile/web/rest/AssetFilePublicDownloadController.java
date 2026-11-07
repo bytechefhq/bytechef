@@ -21,12 +21,14 @@ import com.bytechef.automation.assetfile.file.storage.AssetFileFileStorage;
 import com.bytechef.automation.assetfile.service.AssetFileSystemFacade;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,13 +50,16 @@ public class AssetFilePublicDownloadController {
 
     private final AssetFileSystemFacade assetFileSystemFacade;
     private final AssetFileFileStorage assetFileFileStorage;
+    private final ObjectProvider<FileEntryTokens> fileEntryTokensObjectProvider;
 
     @SuppressFBWarnings("EI2")
     public AssetFilePublicDownloadController(
-        AssetFileSystemFacade assetFileSystemFacade, AssetFileFileStorage assetFileFileStorage) {
+        AssetFileSystemFacade assetFileSystemFacade, AssetFileFileStorage assetFileFileStorage,
+        ObjectProvider<FileEntryTokens> fileEntryTokensObjectProvider) {
 
         this.assetFileSystemFacade = assetFileSystemFacade;
         this.assetFileFileStorage = assetFileFileStorage;
+        this.fileEntryTokensObjectProvider = fileEntryTokensObjectProvider;
     }
 
     @GetMapping("/public/{token}")
@@ -69,6 +74,23 @@ public class AssetFilePublicDownloadController {
         AssetFile resolved = assetFile.get();
 
         return streamResponse(resolved.getFile(), resolved.getName(), resolved.getMimeType());
+    }
+
+    @GetMapping("/signed/{token}")
+    public ResponseEntity<StreamingResponseBody> downloadSigned(@PathVariable String token) {
+        FileEntryTokens fileEntryTokens = fileEntryTokensObjectProvider.getIfAvailable();
+
+        if (fileEntryTokens == null) {
+            return ResponseEntity.notFound()
+                .build();
+        }
+
+        Optional<FileEntry> fileEntry = fileEntryTokens.parseSignedToken(token);
+
+        return fileEntry
+            .map(resolved -> streamResponse(resolved, resolved.getName(), resolved.getMimeType()))
+            .orElseGet(() -> ResponseEntity.notFound()
+                .build());
     }
 
     private ResponseEntity<StreamingResponseBody> streamResponse(

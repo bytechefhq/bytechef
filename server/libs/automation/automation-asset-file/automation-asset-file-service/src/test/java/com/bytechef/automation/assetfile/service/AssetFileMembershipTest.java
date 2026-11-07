@@ -18,6 +18,7 @@ package com.bytechef.automation.assetfile.service;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -33,6 +34,7 @@ import com.bytechef.automation.assetfile.metric.AssetFileMetrics;
 import com.bytechef.automation.assetfile.repository.AssetFileVersionRepository;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.io.InputStream;
@@ -43,6 +45,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
@@ -76,6 +79,9 @@ class AssetFileMembershipTest {
     private AssetFileSystemFacade assetFileSystemFacade;
 
     @Mock
+    private ObjectProvider<FileEntryTokens> fileEntryTokensObjectProvider;
+
+    @Mock
     private UserService userService;
 
     @Mock
@@ -94,7 +100,7 @@ class AssetFileMembershipTest {
 
         assetFileFacade = new AssetFileFacadeImpl(
             service, fileStorage, metrics, versionRepository, assetFileSystemFacade, writeSupport,
-            quota, sharingProperties, userService, workspaceFacade);
+            fileEntryTokensObjectProvider, quota, sharingProperties, userService, workspaceFacade);
     }
 
     @Test
@@ -355,6 +361,26 @@ class AssetFileMembershipTest {
             .isThrownBy(() -> assetFileFacade.disablePublicLink(ASSET_FILE_ID));
 
         verify(service, never()).update(any());
+    }
+
+    @Test
+    void testCreateSignedDownloadTokenRefusesAFileInAWorkspaceTheUserIsNotAMemberOf() {
+        AssetFile assetFile = new AssetFile();
+
+        assetFile.setId(ASSET_FILE_ID);
+        assetFile.setWorkspaceId(OTHER_WORKSPACE_ID);
+
+        FileEntryTokens fileEntryTokens = mock(FileEntryTokens.class);
+
+        when(fileEntryTokensObjectProvider.getIfAvailable()).thenReturn(fileEntryTokens);
+        when(service.findById(ASSET_FILE_ID)).thenReturn(assetFile);
+        when(userService.fetchCurrentUser()).thenReturn(Optional.of(user(USER_ID)));
+        when(workspaceFacade.getUserWorkspaces(USER_ID)).thenReturn(List.of(workspace(WORKSPACE_ID)));
+
+        assertThatExceptionOfType(AssetFileNotFoundException.class)
+            .isThrownBy(() -> assetFileFacade.createSignedDownloadToken(ASSET_FILE_ID));
+
+        verify(fileEntryTokens, never()).toSignedToken(any());
     }
 
     @Test

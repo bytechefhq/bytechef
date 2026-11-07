@@ -121,4 +121,9 @@ public class RemoteAssetFileFacadeClient implements AssetFileFacade {
     public void disablePublicLink(Long id) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public String createSignedDownloadToken(Long id) {
+        throw new UnsupportedOperationException();
+    }
 }

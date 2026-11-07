@@ -39,6 +39,7 @@ extend type Query {
     assetFileTags(workspaceId: ID!): [Tag!]!
     assetFileTextContent(id: ID!): String
     assetFileVersions(id: ID!): [AssetFileVersion!]!
+    assetFileSignedDownloadUrl(id: ID!): String!
 }
 
 extend type Mutation {

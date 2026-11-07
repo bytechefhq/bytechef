@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.assetfile.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -93,5 +94,22 @@ class AssetFileGraphQlControllerTest {
                 ASSET_FILE_ID, List.of(new AssetFileGraphQlController.TagInput(null, "reviewed"))));
 
         verify(assetFileTagService).updateTags(anyLong(), anyList());
+    }
+
+    @Test
+    void testAssetFileSignedDownloadUrlPointsAtTheSignedDownloadEndpoint() {
+        when(assetFileFacade.createSignedDownloadToken(ASSET_FILE_ID)).thenReturn("v1.123.payload.sig");
+
+        assertThat(assetFileGraphQlController.assetFileSignedDownloadUrl(ASSET_FILE_ID))
+            .isEqualTo("/api/automation/asset-files/signed/v1.123.payload.sig");
+    }
+
+    @Test
+    void testAssetFileSignedDownloadUrlPropagatesTheFacadeRefusal() {
+        when(assetFileFacade.createSignedDownloadToken(ASSET_FILE_ID))
+            .thenThrow(new AssetFileNotFoundException("Asset file %d not found".formatted(ASSET_FILE_ID)));
+
+        assertThatExceptionOfType(AssetFileNotFoundException.class)
+            .isThrownBy(() -> assetFileGraphQlController.assetFileSignedDownloadUrl(ASSET_FILE_ID));
     }
 }

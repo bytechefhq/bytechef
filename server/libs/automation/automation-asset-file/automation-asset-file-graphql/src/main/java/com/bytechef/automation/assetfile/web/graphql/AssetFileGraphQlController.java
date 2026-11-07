@@ -140,6 +140,11 @@ public class AssetFileGraphQlController {
         return assetFileFacade.getVersions(id);
     }
 
+    @QueryMapping
+    public String assetFileSignedDownloadUrl(@Argument Long id) {
+        return "/api/automation/asset-files/signed/%s".formatted(assetFileFacade.createSignedDownloadToken(id));
+    }
+
     @MutationMapping
     public AssetFile restoreAssetFileVersion(@Argument Long id, @Argument Long versionId) {
         return assetFileFacade.restoreVersion(id, versionId);

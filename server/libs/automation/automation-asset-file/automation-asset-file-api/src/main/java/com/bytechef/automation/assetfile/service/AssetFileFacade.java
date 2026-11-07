@@ -65,6 +65,8 @@ public interface AssetFileFacade {
 
     void disablePublicLink(Long id);
 
+    String createSignedDownloadToken(Long id);
+
     AssetFile updateContent(Long id, String contentType, InputStream data);
 
     AssetFile cloneToEnvironment(Long id, Long workspaceId, int targetEnvironmentId, @Nullable String newName);
