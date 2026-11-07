@@ -93,4 +93,6 @@ public interface TriggerDefinitionFacade {
     WebhookValidateResponse executeWebhookValidateOnEnable(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         WebhookRequest webhookRequest, @Nullable Long connectionId);
+
+    Object executeDryRunTrigger(String componentName, int componentVersion, String triggerName);
 }

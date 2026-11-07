@@ -56,4 +56,6 @@ public interface ActionDefinitionFacade {
         Map<String, ?> extensions, @Nullable Long environmentId, @Nullable PlatformType type,
         boolean editorEnvironment, @Nullable Map<String, ?> continueParameters,
         @Nullable Map<String, ?> resumeData, @Nullable Instant suspendExpiresAt);
+
+    Object executeDryRunPerform(String componentName, int componentVersion, String actionName);
 }
