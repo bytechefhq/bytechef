@@ -65,7 +65,8 @@ class WorkflowValidatorNodeTypeTest {
     private final WorkflowValidatorFacadeImpl workflowValidatorFacade = new WorkflowValidatorFacadeImpl(
         mock(ActionDefinitionFacade.class), actionDefinitionService, mock(ClusterElementDefinitionService.class),
         componentDefinitionService, mock(ConnectionService.class), SpelEvaluator.create(),
-        taskDispatcherDefinitionService, mock(TriggerDefinitionFacade.class), mock(TriggerDefinitionService.class),
+        taskDispatcherDefinitionService,
+        mock(TriggerDefinitionFacade.class), mock(TriggerDefinitionService.class),
         mock(WorkflowNodeTestOutputService.class), mock(WorkflowService.class),
         mock(WorkflowTestConfigurationService.class), List.of());
 
@@ -80,8 +81,8 @@ class WorkflowValidatorNodeTypeTest {
             .thenReturn(searchEmailActionDefinition);
         when(actionDefinitionService.getActionDefinition("googleMail", 1, "unknownAction"))
             .thenThrow(new IllegalArgumentException("The component 'googleMail' does not contain the action."));
-        when(componentDefinitionService.hasComponentDefinition(any(), any()))
-            .thenThrow(new UnsupportedOperationException());
+        when(componentDefinitionService.hasComponentDefinition(any(), any())).thenReturn(false);
+        when(componentDefinitionService.hasComponentDefinition("googleMail", 1)).thenReturn(true);
         when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("condition", 1))
             .thenReturn(new TaskDispatcherDefinition("condition"));
     }
@@ -92,8 +93,6 @@ class WorkflowValidatorNodeTypeTest {
             singleTaskWorkflow("googleMail/v1/searchEmail"));
 
         assertEquals(List.of(), result.errors());
-
-        verify(componentDefinitionService, never()).hasComponentDefinition(any(), any());
     }
 
     @Test
@@ -112,8 +111,7 @@ class WorkflowValidatorNodeTypeTest {
 
         assertEquals(
             List.of(
-                "[task_1] Field 'type' must name an existing action or task dispatcher; nonexistent/v1/x does not " +
-                    "exist"),
+                "[task_1] Component 'nonexistent' (version 1) is not available"),
             result.errors());
     }
 
@@ -124,8 +122,7 @@ class WorkflowValidatorNodeTypeTest {
 
         assertEquals(
             List.of(
-                "[task_1] Field 'type' must name an existing action or task dispatcher; googleMail/v9/searchEmail " +
-                    "does not exist"),
+                "[task_1] Component 'googleMail' (version 9) is not available"),
             result.errors());
     }
 
@@ -136,8 +133,7 @@ class WorkflowValidatorNodeTypeTest {
 
         assertEquals(
             List.of(
-                "[task_1] Field 'type' must name an existing action or task dispatcher; googleMail/v1/unknownAction " +
-                    "does not exist"),
+                "[task_1] Action 'unknownAction' does not exist in component 'googleMail' (version 1)"),
             result.errors());
     }
 
