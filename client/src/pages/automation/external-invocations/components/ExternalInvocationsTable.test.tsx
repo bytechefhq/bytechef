@@ -1,9 +1,16 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
-import {render as renderWithProviders} from '@/shared/util/test-utils';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {render as renderWithQueryClient} from '@/shared/util/test-utils';
+import {fireEvent, render as renderWithoutProviders, screen, within} from '@testing-library/react';
+import {ReactElement} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
 import ExternalInvocationsTable from './ExternalInvocationsTable';
+
+const render = (element: ReactElement) => renderWithoutProviders(<TooltipProvider>{element}</TooltipProvider>);
+
+const renderWithProviders = (element: ReactElement) =>
+    renderWithQueryClient(<TooltipProvider>{element}</TooltipProvider>);
 
 const baseLog = {
     a2aServerId: null,
@@ -60,8 +67,16 @@ describe('ExternalInvocationsTable', () => {
     ])('renders a %s %s call as %s in the Type column', (surface, kind, expectedLabel) => {
         render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, kind, surface}]} />);
 
+        expect(screen.getAllByRole('columnheader')[1]).toHaveTextContent('Tool');
         expect(screen.getAllByRole('columnheader')[2]).toHaveTextContent('Type');
-        expect(screen.getAllByRole('cell')[2]).toHaveTextContent(new RegExp(`^${expectedLabel}$`));
+
+        const typeCell = screen.getAllByRole('cell')[2];
+
+        if (kind === 'UNKNOWN_KIND') {
+            expect(typeCell).toHaveTextContent(/^UNKNOWN_KIND$/);
+        } else {
+            expect(within(typeCell).getByRole('img', {name: expectedLabel})).toBeInTheDocument();
+        }
     });
 
     it('renders an em dash when the tool name is missing', () => {

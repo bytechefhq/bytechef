@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import ConnectedUserSheetPanelExternalInvocationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelExternalInvocationList';
 import {fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -41,7 +42,11 @@ describe('ConnectedUserSheetPanelExternalInvocationList', () => {
     it("reads the connected user's embedded external invocations", () => {
         hoisted.externalInvocationLogsQuery.mockReturnValue({data: undefined, isLoading: true});
 
-        render(<ConnectedUserSheetPanelExternalInvocationList connectedUserId={7} />);
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetPanelExternalInvocationList connectedUserId={7} />
+            </TooltipProvider>
+        );
 
         expect(hoisted.externalInvocationLogsQuery).toHaveBeenCalledWith({connectedUserId: 7, type: 'EMBEDDED'});
         expect(screen.getByText('Loading...')).toBeInTheDocument();
@@ -61,7 +66,11 @@ describe('ConnectedUserSheetPanelExternalInvocationList', () => {
             isLoading: false,
         });
 
-        render(<ConnectedUserSheetPanelExternalInvocationList connectedUserId={7} />);
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetPanelExternalInvocationList connectedUserId={7} />
+            </TooltipProvider>
+        );
 
         expect(screen.getByText('SLACK_SEND_MESSAGE')).toBeInTheDocument();
         expect(screen.getByText('Embedded MCP')).toBeInTheDocument();
@@ -81,7 +90,11 @@ describe('ConnectedUserSheetPanelExternalInvocationList', () => {
             refetch,
         });
 
-        render(<ConnectedUserSheetPanelExternalInvocationList connectedUserId={7} />);
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetPanelExternalInvocationList connectedUserId={7} />
+            </TooltipProvider>
+        );
 
         expect(screen.getByText('External invocations could not be loaded.')).toBeInTheDocument();
         expect(
@@ -99,7 +112,11 @@ describe('ConnectedUserSheetPanelExternalInvocationList', () => {
             isLoading: false,
         });
 
-        render(<ConnectedUserSheetPanelExternalInvocationList connectedUserId={7} />);
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetPanelExternalInvocationList connectedUserId={7} />
+            </TooltipProvider>
+        );
 
         expect(screen.getByText('No external invocations have been recorded for this user yet.')).toBeInTheDocument();
         expect(screen.queryByRole('table')).not.toBeInTheDocument();
