@@ -21,6 +21,7 @@ import static com.bytechef.platform.workflow.test.config.TestWorkflowExecutorInt
 import static com.bytechef.platform.workflow.test.config.TestWorkflowExecutorIntTestConfiguration.FAILED_TASK_MESSAGE;
 import static com.bytechef.platform.workflow.test.config.TestWorkflowExecutorIntTestConfiguration.STREAMED_CHUNK;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -37,6 +38,7 @@ import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
@@ -154,7 +156,7 @@ class TestWorkflowExecutorIntTest {
 
         inputs.put("inKey", "inValue");
 
-        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(workflowId, inputs, ENVIRONMENT_ID);
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(workflowId, inputs, null, ENVIRONMENT_ID);
 
         JobDTO jobDTO = result.job();
 
@@ -207,7 +209,7 @@ class TestWorkflowExecutorIntTest {
         workflowTestConfigurationService.saveWorkflowTestConfiguration(
             new WorkflowTestConfiguration(ENVIRONMENT_ID, Map.of("foo", "bar"), workflowId, List.of()));
 
-        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(workflowId, Map.of(), ENVIRONMENT_ID);
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(workflowId, Map.of(), null, ENVIRONMENT_ID);
 
         JobDTO jobDTO = result.job();
 
@@ -227,6 +229,81 @@ class TestWorkflowExecutorIntTest {
     }
 
     @Test
+    void executeSyncWithTriggerNameUsesSampleOutputOfNamedTrigger() {
+        String workflowId = createWorkflow(getTwoTriggerWorkflowDefinition());
+
+        saveTriggerSampleOutput(workflowId, "firstTrigger", Map.of("x", "first"));
+        saveTriggerSampleOutput(workflowId, "secondTrigger", Map.of("x", "second"));
+
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(
+            workflowId, Map.of(), "secondTrigger", ENVIRONMENT_ID);
+
+        JobDTO jobDTO = result.job();
+
+        assertThat(jobDTO.status()).isEqualTo(Job.Status.COMPLETED);
+        assertThat(toObjectMap(jobDTO.inputs()))
+            .containsEntry("secondTrigger", Map.of("x", "second"))
+            .doesNotContainKey("firstTrigger");
+
+        TriggerExecutionDTO triggerExecutionDTO = result.triggerExecution();
+
+        assertThat(triggerExecutionDTO).isNotNull();
+
+        WorkflowTrigger workflowTrigger = triggerExecutionDTO.workflowTrigger();
+
+        assertThat(workflowTrigger.getName()).isEqualTo("secondTrigger");
+    }
+
+    @Test
+    void executeSyncWithoutTriggerNameUsesFirstTrigger() {
+        String workflowId = createWorkflow(getTwoTriggerWorkflowDefinition());
+
+        saveTriggerSampleOutput(workflowId, "firstTrigger", Map.of("x", "first"));
+        saveTriggerSampleOutput(workflowId, "secondTrigger", Map.of("x", "second"));
+
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(workflowId, Map.of(), null, ENVIRONMENT_ID);
+
+        JobDTO jobDTO = result.job();
+
+        assertThat(toObjectMap(jobDTO.inputs()))
+            .containsEntry("firstTrigger", Map.of("x", "first"))
+            .doesNotContainKey("secondTrigger");
+    }
+
+    @Test
+    void executeSyncWithUnknownTriggerNameThrows() {
+        String workflowId = createWorkflow(getTwoTriggerWorkflowDefinition());
+
+        assertThatThrownBy(
+            () -> testWorkflowExecutor.executeSync(workflowId, Map.of(), "missingTrigger", ENVIRONMENT_ID))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("missingTrigger");
+    }
+
+    @Test
+    void executeAsyncWithTriggerNameSendsTriggerNameInStartEvent() {
+        String workflowId = createWorkflow(getTwoTriggerWorkflowDefinition());
+
+        saveTriggerSampleOutput(workflowId, "secondTrigger", Map.of("x", "second"));
+
+        RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
+
+        testWorkflowExecutor.executeAsync(
+            workflowId, Map.of(), "secondTrigger", ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+            (key, future) -> future.join(), key -> {});
+
+        List<Map<String, Object>> startEvents = sseStreamBridge.getEvents("start");
+
+        assertThat(startEvents).hasSize(1);
+
+        Map<String, Object> startEvent = startEvents.getFirst();
+
+        assertThat(startEvent.get("payload"))
+            .isInstanceOfSatisfying(Map.class, payload -> assertThat(payload.get("triggerName")).isEqualTo(
+                "secondTrigger"));
+    }
+
+    @Test
     void executeAsyncSuccessfulExecutionFlow() {
         String workflowId = createWorkflow(getEchoWorkflowDefinition());
 
@@ -236,7 +313,7 @@ class TestWorkflowExecutorIntTest {
         RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
 
         testWorkflowExecutor.executeAsync(
-            workflowId, Map.of("key", "value"), ENVIRONMENT_ID, afterStartKey::set, key -> sseStreamBridge,
+            workflowId, Map.of("key", "value"), null, ENVIRONMENT_ID, afterStartKey::set, key -> sseStreamBridge,
             (key, future) -> {
                 afterFutureKey.set(key);
 
@@ -277,7 +354,7 @@ class TestWorkflowExecutorIntTest {
         RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
 
         testWorkflowExecutor.executeAsync(
-            workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge, (key, future) -> {}, key -> {
+            workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge, (key, future) -> {}, key -> {
                 whenCompleteKey.set(key);
 
                 whenCompleteLatch.countDown();
@@ -313,7 +390,7 @@ class TestWorkflowExecutorIntTest {
         List<String> callbackOrder = new CopyOnWriteArrayList<>();
 
         testWorkflowExecutor.executeAsync(
-            workflowId, Map.of(), ENVIRONMENT_ID, key -> callbackOrder.add("afterStart"),
+            workflowId, Map.of(), null, ENVIRONMENT_ID, key -> callbackOrder.add("afterStart"),
             key -> {
                 callbackOrder.add("sseStreamBridgeFactory");
 
@@ -349,7 +426,8 @@ class TestWorkflowExecutorIntTest {
         RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
 
         testWorkflowExecutor.executeAsync(
-            workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge, (key, future) -> future.join(),
+            workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+            (key, future) -> future.join(),
             key -> whenCompleteLatch.countDown());
 
         assertThat(whenCompleteLatch.await(TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
@@ -405,7 +483,7 @@ class TestWorkflowExecutorIntTest {
 
         CompletableFuture<Void> executeAsyncFuture = CompletableFuture.runAsync(
             () -> testWorkflowExecutor.executeAsync(
-                workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+                workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
                 (key, future) -> future.join(), key -> {}));
 
         TaskGate taskGate = taskGates.get("agent");
@@ -484,7 +562,7 @@ class TestWorkflowExecutorIntTest {
 
         CompletableFuture<Void> executeAsyncFuture = CompletableFuture.runAsync(
             () -> testWorkflowExecutor.executeAsync(
-                workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+                workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
                 (key, future) -> future.join(), key -> {}));
 
         TaskGate taskGate = taskGates.get("agent");
@@ -553,7 +631,7 @@ class TestWorkflowExecutorIntTest {
 
         CompletableFuture<Void> executeAsyncFuture = CompletableFuture.runAsync(
             () -> testWorkflowExecutor.executeAsync(
-                workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+                workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
                 (key, future) -> future.join(), key -> {}));
 
         TaskGate taskGate = taskGates.get("agent");
@@ -634,7 +712,7 @@ class TestWorkflowExecutorIntTest {
 
         CompletableFuture<Void> executeAsyncFuture = CompletableFuture.runAsync(
             () -> testWorkflowExecutor.executeAsync(
-                workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+                workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
                 (key, future) -> future.join(), key -> {}));
 
         TaskGate taskGate = taskGates.get("agent");
@@ -703,7 +781,8 @@ class TestWorkflowExecutorIntTest {
         RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
 
         testWorkflowExecutor.executeAsync(
-            workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge, (key, future) -> future.join(),
+            workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+            (key, future) -> future.join(),
             key -> {});
 
         List<Map<String, Object>> startEvents = sseStreamBridge.getEvents("start");
@@ -743,7 +822,7 @@ class TestWorkflowExecutorIntTest {
         RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
 
         testWorkflowExecutor.executeAsync(
-            workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge, (key, future) -> {},
+            workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge, (key, future) -> {},
             key -> whenCompleteLatch.countDown());
 
         TaskGate taskGate = taskGates.get("second");
@@ -800,7 +879,7 @@ class TestWorkflowExecutorIntTest {
         RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
 
         testWorkflowExecutor.executeAsync(
-            workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge, (key, future) -> {},
+            workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge, (key, future) -> {},
             key -> whenCompleteLatch.countDown());
 
         TaskGate firstTaskGate = taskGates.get("first");
@@ -845,7 +924,7 @@ class TestWorkflowExecutorIntTest {
         RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
 
         testWorkflowExecutor.executeAsync(
-            workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge, (key, future) -> {},
+            workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge, (key, future) -> {},
             key -> whenCompleteLatch.countDown());
 
         TaskGate taskGate = taskGates.get("first");
@@ -884,7 +963,7 @@ class TestWorkflowExecutorIntTest {
         RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
 
         testWorkflowExecutor.executeAsync(
-            workflowId, Map.of(), ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+            workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
             (key, future) -> futureReference.set(future), key -> whenCompleteLatch.countDown());
 
         TaskGate taskGate = taskGates.get("first");
@@ -912,7 +991,8 @@ class TestWorkflowExecutorIntTest {
         inputs.put("targetBank", "Podravska");
 
         for (int run = 1; run <= 4; run++) {
-            WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(workflowId, inputs, ENVIRONMENT_ID);
+            WorkflowTestExecutionDTO result =
+                testWorkflowExecutor.executeSync(workflowId, inputs, null, ENVIRONMENT_ID);
 
             JobDTO jobDTO = result.job();
 
@@ -931,7 +1011,7 @@ class TestWorkflowExecutorIntTest {
         inputs.put("records", getDepositRecords(400));
         inputs.put("targetBank", "Podravska");
 
-        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(workflowId, inputs, ENVIRONMENT_ID);
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(workflowId, inputs, null, ENVIRONMENT_ID);
 
         JobDTO jobDTO = result.job();
 
@@ -1077,6 +1157,27 @@ class TestWorkflowExecutorIntTest {
         assertThat(payload).isInstanceOf(WorkflowTestExecutionDTO.class);
 
         return (WorkflowTestExecutionDTO) payload;
+    }
+
+    private static String getTwoTriggerWorkflowDefinition() {
+        return """
+            {
+                "triggers": [
+                    {"name": "firstTrigger", "type": "testComponent/v1/start"},
+                    {"name": "secondTrigger", "type": "testComponent/v1/start"}
+                ],
+                "tasks": [
+                    {"name": "echo", "type": "testComponent/v1/echo", "parameters": {"x": "value"}}
+                ]
+            }
+            """;
+    }
+
+    private void saveTriggerSampleOutput(String workflowId, String triggerName, Map<String, Object> sampleOutput) {
+        workflowNodeTestOutputService.save(
+            workflowId, triggerName, WorkflowNodeType.ofType(COMPONENT_NAME + "/v1/start"),
+            new OutputResponse(new StringProperty(ComponentDsl.string("sample")), sampleOutput), false,
+            ENVIRONMENT_ID);
     }
 
     private static long getStartedJobId(RecordingSseStreamBridge sseStreamBridge) {

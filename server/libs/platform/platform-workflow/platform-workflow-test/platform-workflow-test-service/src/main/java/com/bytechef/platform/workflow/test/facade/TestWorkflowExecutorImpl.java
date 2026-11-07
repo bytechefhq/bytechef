@@ -84,6 +84,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.core.type.TypeReference;
@@ -133,12 +134,13 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
     @Override
     public void executeAsync(
-        String workflowId, Map<String, Object> inputs, long environmentId, Consumer<String> afterStartCallback,
-        Function<String, SseStreamBridge> sseStreamBridgeFactory,
+        String workflowId, Map<String, Object> inputs, @Nullable String triggerName, long environmentId,
+        Consumer<String> afterStartCallback, Function<String, SseStreamBridge> sseStreamBridgeFactory,
         BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback,
         Consumer<String> whenCompleteCallback) {
 
-        WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
+        WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(
+            workflowId, inputs, triggerName, environmentId);
 
         long jobId = jobSyncExecutor.startJob(workflowTestParameters.jobParametersDTO());
 
@@ -156,7 +158,8 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
         CompletableFuture<WorkflowTestExecutionDTO> future = CompletableFuture.supplyAsync(
             () -> TenantContext.callWithTenantId(currentTenantId, () -> {
-                sseStreamBridge.onEvent(Map.of("event", "start", "payload", Map.of("jobId", String.valueOf(jobId))));
+                sseStreamBridge.onEvent(
+                    Map.of("event", "start", "payload", getStartPayload(jobId, workflowTestParameters.triggerName())));
 
                 JobDTO jobDTO = await(jobId);
 
@@ -190,8 +193,11 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     }
 
     @Override
-    public WorkflowTestExecutionDTO executeSync(String workflowId, Map<String, Object> inputs, long environmentId) {
-        WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
+    public WorkflowTestExecutionDTO executeSync(
+        String workflowId, Map<String, Object> inputs, @Nullable String triggerName, long environmentId) {
+
+        WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(
+            workflowId, inputs, triggerName, environmentId);
 
         return new WorkflowTestExecutionDTO(
             execute(workflowTestParameters.jobParametersDTO()), workflowTestParameters.triggerExecutionDTO());
@@ -372,7 +378,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     @SuppressFBWarnings("PREDICTABLE_RANDOM")
     @SuppressWarnings("unchecked")
     private WorkflowTestParameters getWorkflowTestParameters(
-        String workflowId, Map<String, Object> inputs, long environmentId) {
+        String workflowId, Map<String, Object> inputs, @Nullable String triggerName, long environmentId) {
 
         Optional<WorkflowTestConfiguration> workflowTestConfigurationOptional =
             workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId);
@@ -394,6 +400,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         TriggerExecutionDTO triggerExecutionDTO = null;
+        String testTriggerName = null;
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
@@ -404,7 +411,9 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
             inputs = MapUtils.concat(inputs, (Map<String, Object>) workflowTestConfigurationInputs);
         } else {
-            WorkflowTrigger workflowTrigger = workflowTriggers.getFirst();
+            WorkflowTrigger workflowTrigger = getTestWorkflowTrigger(workflowTriggers, triggerName);
+
+            testTriggerName = workflowTrigger.getName();
 
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
@@ -462,7 +471,28 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
                 Map.of(
                     MetadataConstants.CONNECTION_IDS, connectionIdsMap,
                     MetadataConstants.EDITOR_ENVIRONMENT, true)),
-            triggerExecutionDTO);
+            triggerExecutionDTO, testTriggerName);
+    }
+
+    private static Map<String, String> getStartPayload(long jobId, @Nullable String triggerName) {
+        if (triggerName == null) {
+            return Map.of("jobId", String.valueOf(jobId));
+        }
+
+        return Map.of("jobId", String.valueOf(jobId), "triggerName", triggerName);
+    }
+
+    private static WorkflowTrigger getTestWorkflowTrigger(
+        List<WorkflowTrigger> workflowTriggers, @Nullable String triggerName) {
+
+        if (triggerName == null) {
+            return workflowTriggers.getFirst();
+        }
+
+        return workflowTriggers.stream()
+            .filter(workflowTrigger -> Objects.equals(workflowTrigger.getName(), triggerName))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Workflow trigger not found: " + triggerName));
     }
 
     private List<AutoCloseable> registerListeners(
@@ -748,6 +778,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     }
 
     private record WorkflowTestParameters(
-        JobParametersDTO jobParametersDTO, TriggerExecutionDTO triggerExecutionDTO) {
+        JobParametersDTO jobParametersDTO, @Nullable TriggerExecutionDTO triggerExecutionDTO,
+        @Nullable String triggerName) {
     }
 }

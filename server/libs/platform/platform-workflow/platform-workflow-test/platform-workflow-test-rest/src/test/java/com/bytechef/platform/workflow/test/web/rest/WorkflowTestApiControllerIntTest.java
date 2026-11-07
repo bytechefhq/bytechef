@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -114,12 +115,42 @@ class WorkflowTestApiControllerIntTest {
     }
 
     @Test
+    void testStartStreamPassesTriggerNameToExecutor() throws Exception {
+        mockMvc.perform(
+            post("/internal/workflows/{id}/tests", "wf-trigger")
+                .queryParam("environmentId", "1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .content("{\"triggerName\": \"trigger_2\"}"))
+            .andExpect(status().isOk())
+            .andExpect(request().asyncStarted());
+
+        verify(testWorkflowExecutor).executeAsync(
+            eq("wf-trigger"), any(), eq("trigger_2"), eq(1L), any(), any(), any(), any());
+    }
+
+    @Test
+    void testStartStreamWithoutTriggerNamePassesNullToExecutor() throws Exception {
+        mockMvc.perform(
+            post("/internal/workflows/{id}/tests", "wf-no-trigger")
+                .queryParam("environmentId", "1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .content("{}"))
+            .andExpect(status().isOk())
+            .andExpect(request().asyncStarted());
+
+        verify(testWorkflowExecutor).executeAsync(
+            eq("wf-no-trigger"), any(), isNull(), eq(1L), any(), any(), any(), any());
+    }
+
+    @Test
     void testStartStreamEmitsStartAndResult() throws Exception {
         doAnswer(inv -> {
-            Consumer<String> afterStartCallback = inv.getArgument(3);
-            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(4);
-            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(5);
-            Consumer<String> whenCompleteCallback = inv.getArgument(6);
+            Consumer<String> afterStartCallback = inv.getArgument(4);
+            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(5);
+            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(6);
+            Consumer<String> whenCompleteCallback = inv.getArgument(7);
 
             String key = "test-key";
 
@@ -138,7 +169,7 @@ class WorkflowTestApiControllerIntTest {
 
             return null;
         }).when(testWorkflowExecutor)
-            .executeAsync(eq("wf-1"), any(), eq(1L), any(), any(), any(), any());
+            .executeAsync(eq("wf-1"), any(), any(), eq(1L), any(), any(), any(), any());
 
         var mvcResult = mockMvc.perform(
             post("/internal/workflows/{id}/tests", "wf-1")
@@ -168,10 +199,10 @@ class WorkflowTestApiControllerIntTest {
     @Test
     void testStartStreamSendsEventTypeAsNamedEventWithoutDiscriminator() throws Exception {
         doAnswer(inv -> {
-            Consumer<String> afterStartCallback = inv.getArgument(3);
-            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(4);
-            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(5);
-            Consumer<String> whenCompleteCallback = inv.getArgument(6);
+            Consumer<String> afterStartCallback = inv.getArgument(4);
+            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(5);
+            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(6);
+            Consumer<String> whenCompleteCallback = inv.getArgument(7);
 
             String key = "test-key-event-type";
 
@@ -193,7 +224,7 @@ class WorkflowTestApiControllerIntTest {
 
             return null;
         }).when(testWorkflowExecutor)
-            .executeAsync(eq("wf-event-type"), any(), eq(1L), any(), any(), any(), any());
+            .executeAsync(eq("wf-event-type"), any(), any(), eq(1L), any(), any(), any(), any());
 
         MvcResult mvcResult = mockMvc.perform(
             post("/internal/workflows/{id}/tests", "wf-event-type")
@@ -229,10 +260,10 @@ class WorkflowTestApiControllerIntTest {
         AtomicReference<String> keyRef = new AtomicReference<>();
 
         doAnswer(inv -> {
-            Consumer<String> afterStartCallback = inv.getArgument(3);
-            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(4);
-            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(5);
-            Consumer<String> whenCompleteCallback = inv.getArgument(6);
+            Consumer<String> afterStartCallback = inv.getArgument(4);
+            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(5);
+            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(6);
+            Consumer<String> whenCompleteCallback = inv.getArgument(7);
 
             String key = "test-key-" + jobId;
 
@@ -257,7 +288,7 @@ class WorkflowTestApiControllerIntTest {
 
             return null;
         }).when(testWorkflowExecutor)
-            .executeAsync(eq("wf-2"), any(), eq(1L), any(), any(), any(), any());
+            .executeAsync(eq("wf-2"), any(), any(), eq(1L), any(), any(), any(), any());
 
         // Fire the start request asynchronously (so the controller creates the run)
         CompletableFuture<MvcResult> startFuture = CompletableFuture.supplyAsync(() -> {
@@ -337,10 +368,10 @@ class WorkflowTestApiControllerIntTest {
         AtomicReference<SseStreamBridge> bridgeRef = new AtomicReference<>();
 
         doAnswer(inv -> {
-            Consumer<String> afterStartCallback = inv.getArgument(3);
-            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(4);
-            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(5);
-            Consumer<String> whenCompleteCallback = inv.getArgument(6);
+            Consumer<String> afterStartCallback = inv.getArgument(4);
+            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(5);
+            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(6);
+            Consumer<String> whenCompleteCallback = inv.getArgument(7);
 
             String key = "test-key-" + jobId;
 
@@ -365,7 +396,7 @@ class WorkflowTestApiControllerIntTest {
 
             return null;
         }).when(testWorkflowExecutor)
-            .executeAsync(eq("wf-3"), any(), eq(1L), any(), any(), any(), any());
+            .executeAsync(eq("wf-3"), any(), any(), eq(1L), any(), any(), any(), any());
 
         CompletableFuture<MvcResult> startFuture = CompletableFuture.supplyAsync(() -> {
             try {
@@ -436,10 +467,10 @@ class WorkflowTestApiControllerIntTest {
         AtomicReference<String> actualKeyRef = new AtomicReference<>();
 
         doAnswer(inv -> {
-            Consumer<String> afterStartCallback = inv.getArgument(3);
-            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(4);
-            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(5);
-            Consumer<String> whenCompleteCallback = inv.getArgument(6);
+            Consumer<String> afterStartCallback = inv.getArgument(4);
+            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(5);
+            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(6);
+            Consumer<String> whenCompleteCallback = inv.getArgument(7);
 
             String key = String.valueOf(jobId);
 
@@ -464,7 +495,7 @@ class WorkflowTestApiControllerIntTest {
 
             return null;
         }).when(testWorkflowExecutor)
-            .executeAsync(eq("wf-4"), any(), eq(1L), any(), any(), any(), any());
+            .executeAsync(eq("wf-4"), any(), any(), eq(1L), any(), any(), any(), any());
 
         CompletableFuture<Void> startFuture = CompletableFuture.runAsync(() -> {
             try {
@@ -556,10 +587,10 @@ class WorkflowTestApiControllerIntTest {
         CountDownLatch latch = new CountDownLatch(1);
 
         doAnswer(inv -> {
-            Consumer<String> afterStartCallback = inv.getArgument(3);
-            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(4);
-            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(5);
-            Consumer<String> whenCompleteCallback = inv.getArgument(6);
+            Consumer<String> afterStartCallback = inv.getArgument(4);
+            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(5);
+            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(6);
+            Consumer<String> whenCompleteCallback = inv.getArgument(7);
 
             String key = "test-key-" + jobId;
 
@@ -582,7 +613,7 @@ class WorkflowTestApiControllerIntTest {
 
             return null;
         }).when(testWorkflowExecutor)
-            .executeAsync(eq("wf-5"), any(), eq(1L), any(), any(), any(), any());
+            .executeAsync(eq("wf-5"), any(), any(), eq(1L), any(), any(), any(), any());
 
         CompletableFuture<Void> startFuture = CompletableFuture.runAsync(() -> {
             try {
@@ -724,10 +755,10 @@ class WorkflowTestApiControllerIntTest {
         AtomicReference<CompletableFuture<WorkflowTestExecutionDTO>> futureRef = new AtomicReference<>();
 
         doAnswer(inv -> {
-            Consumer<String> afterStartCallback = inv.getArgument(3);
-            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(4);
-            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(5);
-            Consumer<String> whenCompleteCallback = inv.getArgument(6);
+            Consumer<String> afterStartCallback = inv.getArgument(4);
+            Function<String, SseStreamBridge> sseStreamBridgeFactory = inv.getArgument(5);
+            BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(6);
+            Consumer<String> whenCompleteCallback = inv.getArgument(7);
 
             String key = "test-key-" + jobId;
 
@@ -763,7 +794,7 @@ class WorkflowTestApiControllerIntTest {
 
             return null;
         }).when(testWorkflowExecutor)
-            .executeAsync(eq("wf-cancel-test"), any(), eq(1L), any(), any(), any(), any());
+            .executeAsync(eq("wf-cancel-test"), any(), any(), eq(1L), any(), any(), any(), any());
 
         // Start the async execution
         CompletableFuture<MvcResult> startFuture = CompletableFuture.supplyAsync(() -> {
