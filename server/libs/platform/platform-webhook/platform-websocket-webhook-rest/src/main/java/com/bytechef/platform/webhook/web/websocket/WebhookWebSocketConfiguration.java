@@ -18,17 +18,14 @@ package com.bytechef.platform.webhook.web.websocket;
 
 import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 /**
- * WebSocket configuration registering the webhook WebSocket handler at {@code /webhooks/{id}/wss}.
- *
- * <p>
- * This keeps the exact relative endpoint the same as REST (/webhooks/{id}).
- *
  * @author ByteChef
  */
 @Configuration
@@ -37,9 +34,15 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebhookWebSocketConfiguration implements WebSocketConfigurer {
 
     private final WebhookWebSocketHandler webhookWebSocketHandler;
+    private final WorkflowTestWebSocketHandler workflowTestWebSocketHandler;
 
-    public WebhookWebSocketConfiguration(WebhookWebSocketHandler webhookWebSocketHandler) {
+    @SuppressFBWarnings("EI")
+    public WebhookWebSocketConfiguration(
+        WebhookWebSocketHandler webhookWebSocketHandler,
+        WorkflowTestWebSocketHandler workflowTestWebSocketHandler) {
+
         this.webhookWebSocketHandler = webhookWebSocketHandler;
+        this.workflowTestWebSocketHandler = workflowTestWebSocketHandler;
     }
 
     /**
@@ -55,5 +58,20 @@ public class WebhookWebSocketConfiguration implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(webhookWebSocketHandler, "/webhooks/*/wss")
             .setAllowedOriginPatterns("*");
+
+        registry.addHandler(workflowTestWebSocketHandler, "/internal/workflow-tests/*/wss")
+            .setAllowedOriginPatterns("*");
+    }
+
+    @Bean
+    public ServletServerContainerFactoryBean voiceWebSocketContainerFactoryBean() {
+        ServletServerContainerFactoryBean container = new VoiceServletServerContainerFactoryBean();
+
+        container.setMaxBinaryMessageBufferSize(65536);
+        container.setMaxTextMessageBufferSize(65536);
+        container.setMaxSessionIdleTimeout(300_000L);
+        container.setAsyncSendTimeout(10_000L);
+
+        return container;
     }
 }

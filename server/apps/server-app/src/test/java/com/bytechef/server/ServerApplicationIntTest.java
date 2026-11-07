@@ -86,8 +86,7 @@ class ServerApplicationIntTest {
 
     private static final Class<?>[] WEBHOOK_ENDPOINT_TYPES = {
         WebhookTriggerController.class, CallbackController.class, ApprovalController.class,
-        JobResumeController.class, FileEntryController.class, WebhookWebSocketConfiguration.class,
-        twilioCallbackControllerType()
+        JobResumeController.class, FileEntryController.class, WebhookWebSocketConfiguration.class
     };
 
     @Autowired
@@ -158,14 +157,6 @@ class ServerApplicationIntTest {
             assertThat(tableExists(databaseMetaData, "batch_job_instance")).isTrue();
             assertThat(tableExists(databaseMetaData, "batch_job_execution")).isTrue();
             assertThat(tableExists(databaseMetaData, "batch_step_execution")).isTrue();
-        }
-    }
-
-    private static Class<?> twilioCallbackControllerType() {
-        try {
-            return Class.forName("com.bytechef.platform.webhook.web.rest.TwilioCallbackController");
-        } catch (ClassNotFoundException classNotFoundException) {
-            throw new IllegalStateException(classNotFoundException);
         }
     }
 
