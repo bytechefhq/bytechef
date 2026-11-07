@@ -7,8 +7,10 @@
 
 package com.bytechef.ee.ai.hub.config;
 
+import com.bytechef.ee.ai.hub.usage.CostEstimationProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
@@ -19,6 +21,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  */
 @AutoConfiguration(afterName = "org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration")
 @ConditionalOnBean(AbstractJdbcConfiguration.class)
+@EnableConfigurationProperties(CostEstimationProperties.class)
 @EnableJdbcRepositories(
     basePackages = {
         "com.bytechef.ee.ai.hub.chat.repository", "com.bytechef.ee.ai.hub.approval.repository"
