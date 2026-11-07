@@ -29,9 +29,11 @@ import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.mcp.McpEndpoint;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import io.grpc.BindableService;
@@ -185,6 +187,15 @@ public class ConfigurationApplicationIntTest {
     @Test
     void testAuditEventsQueryIsServed() {
         assertThat(applicationContext.containsBean("auditEventGraphQlController")).isTrue();
+    }
+
+    @Test
+    void testDataTableTriggersCanReadTheStateOfAutomationAndEmbeddedWorkflows() {
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry = applicationContext.getBean(
+            JobPrincipalAccessorRegistry.class);
+
+        assertThat(jobPrincipalAccessorRegistry.fetchJobPrincipalAccessor(PlatformType.AUTOMATION)).isPresent();
+        assertThat(jobPrincipalAccessorRegistry.fetchJobPrincipalAccessor(PlatformType.EMBEDDED)).isPresent();
     }
 
     @Test

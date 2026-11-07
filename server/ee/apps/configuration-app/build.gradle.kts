@@ -35,6 +35,7 @@ dependencies {
     implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-configuration:ai-mcp-server-configuration-graphql"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-graphql"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-impl"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-instance-impl"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-graphql"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-service"))
