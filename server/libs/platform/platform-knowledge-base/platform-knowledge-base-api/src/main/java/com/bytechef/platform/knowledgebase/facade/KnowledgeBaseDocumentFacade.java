@@ -53,4 +53,6 @@ public interface KnowledgeBaseDocumentFacade {
      * @param tagNames                the new list of tag name strings
      */
     void updateKnowledgeBaseDocumentTags(long knowledgeBaseDocumentId, List<String> tagNames);
+
+    int sweepTombstonedDocumentChunks(long sourceId);
 }

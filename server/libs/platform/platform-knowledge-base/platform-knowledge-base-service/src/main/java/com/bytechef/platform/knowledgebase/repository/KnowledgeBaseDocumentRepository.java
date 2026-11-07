@@ -17,9 +17,15 @@
 package com.bytechef.platform.knowledgebase.repository;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
+import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Modifying;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -27,4 +33,21 @@ public interface KnowledgeBaseDocumentRepository
     extends PagingAndSortingRepository<KnowledgeBaseDocument, Long>, ListCrudRepository<KnowledgeBaseDocument, Long> {
 
     List<KnowledgeBaseDocument> findAllByKnowledgeBaseId(Long knowledgeBaseId);
+
+    List<KnowledgeBaseDocument> findAllBySourceIdAndDeletedAtIsNotNull(Long sourceId);
+
+    Optional<KnowledgeBaseDocument> findBySourceIdAndSourceRecordId(Long sourceId, String sourceRecordId);
+
+    @Modifying
+    @Query("""
+        UPDATE knowledge_base_document
+        SET deleted_at = :deletedAt, last_modified_date = :deletedAt
+        WHERE source_id = :sourceId
+          AND source_record_id NOT IN (:seenIds)
+          AND deleted_at IS NULL
+        """)
+    int tombstoneUnseen(
+        @Param("sourceId") Long sourceId,
+        @Param("seenIds") Collection<String> seenIds,
+        @Param("deletedAt") Instant deletedAt);
 }

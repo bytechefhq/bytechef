@@ -63,6 +63,8 @@ public interface KnowledgeBaseDocumentChunkService {
      */
     List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunksByDocumentId(Long documentId);
 
+    List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunksByDocumentIds(List<Long> documentIds);
+
     /**
      * Persists the given {@code KnowledgeBaseDocumentChunk} into the storage system.
      *

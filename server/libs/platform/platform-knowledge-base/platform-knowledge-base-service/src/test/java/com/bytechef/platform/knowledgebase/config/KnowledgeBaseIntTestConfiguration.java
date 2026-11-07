@@ -21,7 +21,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
@@ -124,6 +126,8 @@ public class KnowledgeBaseIntTestConfiguration {
         protected List<?> userConverters() {
             return Arrays.asList(
                 new FileEntryToStringConverter(objectMapper),
+                new MapWrapperToStringConverter(objectMapper),
+                new StringToMapWrapperConverter(objectMapper),
                 new StringToFileEntryConverter(objectMapper));
         }
     }

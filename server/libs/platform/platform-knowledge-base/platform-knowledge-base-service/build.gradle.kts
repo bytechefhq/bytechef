@@ -1,10 +1,13 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.slf4j:slf4j-api")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.ai:spring-ai-autoconfigure-vector-store-pgvector")
     implementation("org.springframework.ai:spring-ai-openai")
     implementation("org.springframework.ai:spring-ai-pgvector-store")
+    implementation("org.springframework.batch:spring-batch-core")
+    implementation("org.springframework.batch:spring-batch-infrastructure")
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:core:message:message-broker:message-broker-api"))
@@ -33,4 +36,5 @@ dependencies {
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

@@ -29,5 +29,7 @@ public interface KnowledgeBaseDocumentChunkRepository extends
 
     List<KnowledgeBaseDocumentChunk> findAllByKnowledgeBaseDocumentId(Long knowledgeBaseDocumentId);
 
+    List<KnowledgeBaseDocumentChunk> findAllByKnowledgeBaseDocumentIdIn(List<Long> knowledgeBaseDocumentIds);
+
     Optional<KnowledgeBaseDocumentChunk> findByVectorStoreId(String vectorStoreId);
 }

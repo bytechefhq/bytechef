@@ -18,7 +18,12 @@ package com.bytechef.platform.knowledgebase.service;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.dto.DocumentStatusUpdate;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 public interface KnowledgeBaseDocumentService {
 
@@ -64,4 +69,20 @@ public interface KnowledgeBaseDocumentService {
      *         save operation (e.g., generated IDs, timestamps)
      */
     KnowledgeBaseDocument saveKnowledgeBaseDocument(KnowledgeBaseDocument knowledgeBaseDocument);
+
+    KnowledgeBaseDocument createSyncedDocument(
+        long kbId, long sourceId, String sourceRecordId, String name, String text, Map<String, ?> metadata,
+        @Nullable Map<String, ?> metadataFieldsWhitelist, String payloadHash, Instant now);
+
+    KnowledgeBaseDocument replaceSyncedDocument(
+        long documentId, String name, String text, Map<String, ?> metadata,
+        @Nullable Map<String, ?> metadataFieldsWhitelist, String payloadHash, Instant now);
+
+    int tombstoneUnseen(long sourceId, Set<String> seenSourceRecordIds, Instant now);
+
+    List<KnowledgeBaseDocument> getTombstonedDocuments(long sourceId);
+
+    Optional<KnowledgeBaseDocument> findSyncedDocument(long sourceId, String sourceRecordId);
+
+    KnowledgeBaseDocument bumpLastSeenAt(KnowledgeBaseDocument document, Instant now);
 }
