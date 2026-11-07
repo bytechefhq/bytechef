@@ -73,7 +73,7 @@ public class WebhookTaskStartedApplicationEventListener implements ApplicationEv
 
                     WebhookDelivery webhookDelivery = WebhookDelivery.builder("job_status", webhook.url())
                         .description("job " + jobId + " task started webhook")
-                        .validateUrl(false)
+                        .validateUrl(true)
                         .payload(
                             jobId + "/" + taskStartedApplicationEvent.getTaskExecutionId(),
                             JsonUtils.write(webhookEvent))

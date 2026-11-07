@@ -97,7 +97,7 @@ class WebhookJobStatusApplicationEventListenerIntTest {
         assertThat(webhookDelivery.url()).isEqualTo("https://example.com/status");
         assertThat(webhookDelivery.eventType()).isNull();
         assertThat(webhookDelivery.secret()).isNull();
-        assertThat(webhookDelivery.validateUrl()).isFalse();
+        assertThat(webhookDelivery.validateUrl()).isTrue();
         assertThat(webhookDelivery.retry()).isEqualTo(new WebhookRetry(7, Duration.ofSeconds(3), 4.0));
         assertThat(webhookDelivery.payloads()).hasSize(1);
 

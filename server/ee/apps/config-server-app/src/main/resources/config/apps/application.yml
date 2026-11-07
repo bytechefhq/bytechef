@@ -357,8 +357,8 @@ bytechef:
   tenant:
     mode: SINGLE
   webhook-delivery:
-    # Hosts that notification webhook and Slack URLs may use even when they resolve to a private or loopback address
-    # (comma-separated, matched exactly). Empty blocks every private address.
+    # Hosts that job status, task started and notification webhook and Slack URLs may use even when they resolve to a
+    # private or loopback address (comma-separated, matched exactly). Empty blocks every private address.
     allowed-hosts:
     # Outbound webhook POSTs (job status and task started webhooks, notification webhooks, Slack)
     # in flight at once across all endpoints; each endpoint receives one delivery at a time.

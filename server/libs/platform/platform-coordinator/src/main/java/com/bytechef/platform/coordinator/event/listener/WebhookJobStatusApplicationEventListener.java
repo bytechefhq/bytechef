@@ -67,7 +67,7 @@ public class WebhookJobStatusApplicationEventListener implements ApplicationEven
 
                     WebhookDelivery webhookDelivery = WebhookDelivery.builder("job_status", webhook.url())
                         .description("job " + jobId + " status webhook")
-                        .validateUrl(false)
+                        .validateUrl(true)
                         .payload(String.valueOf(jobId), JsonUtils.write(webhookEvent))
                         .retry(JobWebhookRetries.toWebhookRetry(webhook))
                         .build();
