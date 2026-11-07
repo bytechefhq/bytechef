@@ -1142,6 +1142,41 @@ export type CreateEmbeddedMcpServerInput = {
   name: Scalars['String']['input'];
 };
 
+export type CreateKnowledgeBaseSourceInput = {
+  cadence: Scalars['String']['input'];
+  connectionId?: InputMaybe<Scalars['ID']['input']>;
+  environmentId?: InputMaybe<Scalars['ID']['input']>;
+  /**
+   * Optional rare full-replace cadence paired with the regular incremental cadence
+   * (e.g., '@daily' alongside an '@hourly' cadence). Null keeps a single trigger.
+   */
+  fullReplaceCadence?: InputMaybe<Scalars['String']['input']>;
+  knowledgeBaseId: Scalars['ID']['input'];
+  /**
+   * Optional metadata-tag whitelist shaped as {fields: ["fieldA", "fieldB"]}. Narrows which
+   * incoming metadata keys become KB document tags at sync time. Omit (or null) to keep the default
+   * behavior — every field becomes a tag.
+   */
+  metadataFields?: InputMaybe<Scalars['Map']['input']>;
+  name: Scalars['String']['input'];
+  /**
+   * Optional. Input parameters for the SOURCE cluster element captured by the create wizard
+   * (e.g., Airtable BASE_ID/TABLE_ID, HubSpot OBJECT_TYPE). Threaded through to the auto-generated
+   * workflow's SOURCE cluster element. Omit for readers with no input properties.
+   */
+  parameters?: InputMaybe<Scalars['Map']['input']>;
+  /**
+   * Optional. When omitted, the server picks the first ItemReader cluster element on the
+   * source component. Supply a name only when the component defines more than one ItemReader.
+   */
+  sourceClusterElementName?: InputMaybe<Scalars['String']['input']>;
+  sourceComponentName: Scalars['String']['input'];
+  sourceComponentVersion: Scalars['Int']['input'];
+  /** Tombstone-derivation strategy. Defaults to PERIODIC_FULL_REPLACE when omitted. */
+  tombstoneStrategy?: InputMaybe<TombstoneStrategy>;
+  workspaceId: Scalars['ID']['input'];
+};
+
 export type CreateMcpIntegrationInstanceConfigurationInput = {
   integrationInstanceConfigurationId: Scalars['ID']['input'];
   mcpServerId: Scalars['ID']['input'];
@@ -1668,9 +1703,13 @@ export type KnowledgeBaseDocument = {
   __typename?: 'KnowledgeBaseDocument';
   chunks?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
   createdDate?: Maybe<Scalars['Long']['output']>;
+  deletedAt?: Maybe<Scalars['Long']['output']>;
   document?: Maybe<FileEntry>;
   id: Scalars['ID']['output'];
+  lastSeenAt?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
+  sourceId?: Maybe<Scalars['ID']['output']>;
+  sourceRecordId?: Maybe<Scalars['String']['output']>;
   status: Scalars['Int']['output'];
   tags?: Maybe<Array<Scalars['String']['output']>>;
 };
@@ -1718,6 +1757,53 @@ export type KnowledgeBaseSearchResult = SearchResult & {
   name: Scalars['String']['output'];
   type: SearchAssetType;
 };
+
+export type KnowledgeBaseSource = {
+  __typename?: 'KnowledgeBaseSource';
+  cadence: Scalars['String']['output'];
+  connectionId?: Maybe<Scalars['ID']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  /**
+   * Optional rare full-replace cadence paired with the regular incremental cadence.
+   * Null keeps a single trigger.
+   */
+  fullReplaceCadence?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  knowledgeBaseId: Scalars['ID']['output'];
+  lastSyncJobExecutionId?: Maybe<Scalars['ID']['output']>;
+  lastSyncRunAt?: Maybe<Scalars['Long']['output']>;
+  /**
+   * Optional metadata-tag whitelist controlling which incoming metadata fields are flattened
+   * into KB document tags. {fields: [...]} narrows; null keeps the default behavior (every field
+   * becomes a tag). Mirrors ContextStoreEntity.storedFields.
+   */
+  metadataFields?: Maybe<Scalars['Map']['output']>;
+  name: Scalars['String']['output'];
+  sourceClusterElementName?: Maybe<Scalars['String']['output']>;
+  sourceComponentName: Scalars['String']['output'];
+  sourceComponentVersion: Scalars['Int']['output'];
+  status: KnowledgeBaseSourceStatus;
+  /**
+   * Tombstone-derivation strategy. PERIODIC_FULL_REPLACE pairs with fullReplaceCadence,
+   * UPSTREAM_CHANGE_FEED is reserved for components that emit deletion events, NONE makes the source
+   * append-only.
+   */
+  tombstoneStrategy: TombstoneStrategy;
+  workflowId?: Maybe<Scalars['String']['output']>;
+  workspaceId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type KnowledgeBaseSourceFilter = {
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export enum KnowledgeBaseSourceStatus {
+  BuildingPreview = 'BUILDING_PREVIEW',
+  Disabled = 'DISABLED',
+  Failed = 'FAILED',
+  Preview = 'PREVIEW',
+  Ready = 'READY'
+}
 
 export type KnowledgeBaseTagsEntry = {
   __typename?: 'KnowledgeBaseTagsEntry';
@@ -1975,6 +2061,7 @@ export type Mutation = {
   createEmbeddedMcpServer?: Maybe<McpServer>;
   createIdentityProvider: IdentityProviderType;
   createKnowledgeBase?: Maybe<KnowledgeBase>;
+  createKnowledgeBaseSource: KnowledgeBaseSource;
   createMcpComponent?: Maybe<McpComponent>;
   createMcpComponentWithTools?: Maybe<McpComponent>;
   createMcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;
@@ -2019,6 +2106,7 @@ export type Mutation = {
   deleteKnowledgeBase?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocument?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocumentChunk?: Maybe<Scalars['Boolean']['output']>;
+  deleteKnowledgeBaseSource: Scalars['Boolean']['output'];
   deleteMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpIntegrationInstanceConfiguration?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpIntegrationInstanceConfigurationWorkflow?: Maybe<Scalars['Boolean']['output']>;
@@ -2059,6 +2147,7 @@ export type Mutation = {
   provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
   refreshContextStoreSource: Scalars['ID']['output'];
+  refreshKnowledgeBaseSource: Scalars['ID']['output'];
   removeDataTableColumn: Scalars['Boolean']['output'];
   removeFileInSkill: AiSkill;
   renameDataTable: Scalars['Boolean']['output'];
@@ -2069,6 +2158,7 @@ export type Mutation = {
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   setContextStoreSourceEnabled: ContextStoreSource;
+  setKnowledgeBaseSourceEnabled: KnowledgeBaseSource;
   startAiAgentEvalRun: AiAgentEvalRun;
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
@@ -2126,6 +2216,7 @@ export type Mutation = {
   updateKnowledgeBase?: Maybe<KnowledgeBase>;
   updateKnowledgeBaseDocumentChunk?: Maybe<KnowledgeBaseDocumentChunk>;
   updateKnowledgeBaseDocumentTags: Scalars['Boolean']['output'];
+  updateKnowledgeBaseSource: KnowledgeBaseSource;
   updateKnowledgeBaseTags: Scalars['Boolean']['output'];
   updateManagementMcpServerUrl: Scalars['String']['output'];
   updateMcpComponentWithTools?: Maybe<McpComponent>;
@@ -2317,6 +2408,11 @@ export type MutationCreateKnowledgeBaseArgs = {
   environmentId: Scalars['ID']['input'];
   knowledgeBase: KnowledgeBaseInput;
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateKnowledgeBaseSourceArgs = {
+  input: CreateKnowledgeBaseSourceInput;
 };
 
 
@@ -2513,6 +2609,11 @@ export type MutationDeleteKnowledgeBaseDocumentArgs = {
 
 
 export type MutationDeleteKnowledgeBaseDocumentChunkArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteKnowledgeBaseSourceArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -2739,6 +2840,11 @@ export type MutationRefreshContextStoreSourceArgs = {
 };
 
 
+export type MutationRefreshKnowledgeBaseSourceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationRemoveDataTableColumnArgs = {
   input: RemoveColumnInput;
 };
@@ -2802,6 +2908,12 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
 
 
 export type MutationSetContextStoreSourceEnabledArgs = {
+  enabled: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationSetKnowledgeBaseSourceEnabledArgs = {
   enabled: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
 };
@@ -3094,6 +3206,12 @@ export type MutationUpdateKnowledgeBaseDocumentChunkArgs = {
 
 export type MutationUpdateKnowledgeBaseDocumentTagsArgs = {
   input: UpdateKnowledgeBaseDocumentTagsInput;
+};
+
+
+export type MutationUpdateKnowledgeBaseSourceArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateKnowledgeBaseSourceInput;
 };
 
 
@@ -3657,6 +3775,8 @@ export type Query = {
   knowledgeBaseDocumentTags?: Maybe<Array<Scalars['String']['output']>>;
   knowledgeBaseDocumentTagsByDocument?: Maybe<Array<KnowledgeBaseDocumentTagsEntry>>;
   knowledgeBaseEmbeddingActive: Scalars['Boolean']['output'];
+  knowledgeBaseSource?: Maybe<KnowledgeBaseSource>;
+  knowledgeBaseSources: Array<KnowledgeBaseSource>;
   knowledgeBaseTags?: Maybe<Array<Tag>>;
   knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
@@ -4351,6 +4471,18 @@ export type QueryKnowledgeBaseEmbeddingActiveArgs = {
 };
 
 
+export type QueryKnowledgeBaseSourceArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryKnowledgeBaseSourcesArgs = {
+  environmentId: Scalars['ID']['input'];
+  filter?: InputMaybe<KnowledgeBaseSourceFilter>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryKnowledgeBasesArgs = {
   environmentId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
@@ -4883,6 +5015,12 @@ export type TimeProperty = Property & {
   type: PropertyType;
 };
 
+export enum TombstoneStrategy {
+  None = 'NONE',
+  PeriodicFullReplace = 'PERIODIC_FULL_REPLACE',
+  UpstreamChangeFeed = 'UPSTREAM_CHANGE_FEED'
+}
+
 export type ToolInvocationLogPageType = {
   __typename?: 'ToolInvocationLogPageType';
   content: Array<ToolInvocationLogType>;
@@ -5019,6 +5157,24 @@ export type UpdateDataTableTagsInput = {
 export type UpdateKnowledgeBaseDocumentTagsInput = {
   knowledgeBaseDocumentId: Scalars['ID']['input'];
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type UpdateKnowledgeBaseSourceInput = {
+  cadence?: InputMaybe<Scalars['String']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  /**
+   * Optional full-replace cadence update. Null leaves the current value unchanged.
+   * Empty string \"\" clears it (drops back to single-trigger). Any other value replaces it.
+   */
+  fullReplaceCadence?: InputMaybe<Scalars['String']['input']>;
+  /**
+   * Optional metadata-tag whitelist update. Null leaves the current whitelist unchanged;
+   * {} clears it (revert to full-flatten); {fields: [...]} replaces it.
+   */
+  metadataFields?: InputMaybe<Scalars['Map']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  /** Optional tombstone strategy update. Null leaves the current value unchanged. */
+  tombstoneStrategy?: InputMaybe<TombstoneStrategy>;
 };
 
 export type UpdateKnowledgeBaseTagsInput = {

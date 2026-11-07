@@ -1096,6 +1096,13 @@ export type CreateKnowledgeBaseMutationVariables = Exact<{
 
 export type CreateKnowledgeBaseMutation = { createKnowledgeBase: { id: string, name: string } | null };
 
+export type CreateKnowledgeBaseSourceMutationVariables = Exact<{
+  input: Types.CreateKnowledgeBaseSourceInput;
+}>;
+
+
+export type CreateKnowledgeBaseSourceMutation = { createKnowledgeBaseSource: { id: string, name: string, status: Types.KnowledgeBaseSourceStatus, enabled: boolean, cadence: string } };
+
 export type DeleteKnowledgeBaseMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -1117,12 +1124,19 @@ export type DeleteKnowledgeBaseDocumentChunkMutationVariables = Exact<{
 
 export type DeleteKnowledgeBaseDocumentChunkMutation = { deleteKnowledgeBaseDocumentChunk: boolean | null };
 
+export type DeleteKnowledgeBaseSourceMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteKnowledgeBaseSourceMutation = { deleteKnowledgeBaseSource: boolean };
+
 export type KnowledgeBaseQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type KnowledgeBaseQuery = { knowledgeBase: { id: string, name: string, description: string | null, maxChunkSize: number | null, minChunkSizeChars: number | null, overlap: number | null, createdDate: any, lastModifiedDate: any, documents: Array<{ id: string, name: string, status: number, tags: Array<string> | null, createdDate: any, document: { name: string, extension: string | null, mimeType: string | null, url: string } | null, chunks: Array<{ id: string, knowledgeBaseDocumentId: string } | null> | null } | null> | null } | null };
+export type KnowledgeBaseQuery = { knowledgeBase: { id: string, name: string, description: string | null, maxChunkSize: number | null, minChunkSizeChars: number | null, overlap: number | null, createdDate: any, lastModifiedDate: any, documents: Array<{ id: string, name: string, status: number, tags: Array<string> | null, createdDate: any, sourceId: string | null, sourceRecordId: string | null, document: { name: string, extension: string | null, mimeType: string | null, url: string } | null, chunks: Array<{ id: string, knowledgeBaseDocumentId: string } | null> | null } | null> | null } | null };
 
 export type KnowledgeBaseDocumentChunksQueryVariables = Exact<{
   id: string | number;
@@ -1159,6 +1173,22 @@ export type KnowledgeBaseEmbeddingActiveQueryVariables = Exact<{
 
 export type KnowledgeBaseEmbeddingActiveQuery = { knowledgeBaseEmbeddingActive: boolean };
 
+export type KnowledgeBaseSourceQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type KnowledgeBaseSourceQuery = { knowledgeBaseSource: { id: string, name: string, knowledgeBaseId: string, sourceComponentName: string, sourceComponentVersion: number, sourceClusterElementName: string | null, connectionId: string | null, cadence: string, status: Types.KnowledgeBaseSourceStatus, enabled: boolean, lastSyncRunAt: any, lastSyncJobExecutionId: string | null, workflowId: string | null } | null };
+
+export type KnowledgeBaseSourcesQueryVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+  filter?: Types.KnowledgeBaseSourceFilter | null | undefined;
+}>;
+
+
+export type KnowledgeBaseSourcesQuery = { knowledgeBaseSources: Array<{ id: string, name: string, knowledgeBaseId: string, sourceComponentName: string, sourceComponentVersion: number, sourceClusterElementName: string | null, connectionId: string | null, cadence: string, status: Types.KnowledgeBaseSourceStatus, enabled: boolean, lastSyncRunAt: any, lastSyncJobExecutionId: string | null, workflowId: string | null }> };
+
 export type KnowledgeBaseTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1177,6 +1207,13 @@ export type KnowledgeBasesQueryVariables = Exact<{
 
 export type KnowledgeBasesQuery = { knowledgeBases: Array<{ id: string, name: string, description: string | null, maxChunkSize: number | null, minChunkSizeChars: number | null, overlap: number | null, createdDate: any, lastModifiedDate: any } | null> | null };
 
+export type RefreshKnowledgeBaseSourceMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type RefreshKnowledgeBaseSourceMutation = { refreshKnowledgeBaseSource: string };
+
 export type SearchKnowledgeBaseQueryVariables = Exact<{
   id: string | number;
   query: string;
@@ -1185,6 +1222,14 @@ export type SearchKnowledgeBaseQueryVariables = Exact<{
 
 
 export type SearchKnowledgeBaseQuery = { searchKnowledgeBase: Array<{ id: string, knowledgeBaseDocumentId: string, content: string | null, metadata: any, score: number | null } | null> | null };
+
+export type SetKnowledgeBaseSourceEnabledMutationVariables = Exact<{
+  id: string | number;
+  enabled: boolean;
+}>;
+
+
+export type SetKnowledgeBaseSourceEnabledMutation = { setKnowledgeBaseSourceEnabled: { id: string, enabled: boolean, status: Types.KnowledgeBaseSourceStatus } };
 
 export type UpdateKnowledgeBaseMutationVariables = Exact<{
   id: string | number;
@@ -1208,6 +1253,14 @@ export type UpdateKnowledgeBaseDocumentTagsMutationVariables = Exact<{
 
 
 export type UpdateKnowledgeBaseDocumentTagsMutation = { updateKnowledgeBaseDocumentTags: boolean };
+
+export type UpdateKnowledgeBaseSourceMutationVariables = Exact<{
+  id: string | number;
+  input: Types.UpdateKnowledgeBaseSourceInput;
+}>;
+
+
+export type UpdateKnowledgeBaseSourceMutation = { updateKnowledgeBaseSource: { id: string, name: string, cadence: string, enabled: boolean, status: Types.KnowledgeBaseSourceStatus } };
 
 export type UpdateKnowledgeBaseTagsMutationVariables = Exact<{
   input: Types.UpdateKnowledgeBaseTagsInput;
@@ -6469,6 +6522,31 @@ export const useCreateKnowledgeBaseMutation = <
   }
     )};
 
+export const CreateKnowledgeBaseSourceDocument = new TypedDocumentString(`
+    mutation createKnowledgeBaseSource($input: CreateKnowledgeBaseSourceInput!) {
+  createKnowledgeBaseSource(input: $input) {
+    id
+    name
+    status
+    enabled
+    cadence
+  }
+}
+    `);
+
+export const useCreateKnowledgeBaseSourceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateKnowledgeBaseSourceMutation, TError, CreateKnowledgeBaseSourceMutationVariables, TContext>) => {
+    
+    return useMutation<CreateKnowledgeBaseSourceMutation, TError, CreateKnowledgeBaseSourceMutationVariables, TContext>(
+      {
+    mutationKey: ['createKnowledgeBaseSource'],
+    mutationFn: (variables?: CreateKnowledgeBaseSourceMutationVariables) => fetcher<CreateKnowledgeBaseSourceMutation, CreateKnowledgeBaseSourceMutationVariables>(CreateKnowledgeBaseSourceDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const DeleteKnowledgeBaseDocument = new TypedDocumentString(`
     mutation deleteKnowledgeBase($id: ID!) {
   deleteKnowledgeBase(id: $id)
@@ -6526,6 +6604,25 @@ export const useDeleteKnowledgeBaseDocumentChunkMutation = <
   }
     )};
 
+export const DeleteKnowledgeBaseSourceDocument = new TypedDocumentString(`
+    mutation deleteKnowledgeBaseSource($id: ID!) {
+  deleteKnowledgeBaseSource(id: $id)
+}
+    `);
+
+export const useDeleteKnowledgeBaseSourceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteKnowledgeBaseSourceMutation, TError, DeleteKnowledgeBaseSourceMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteKnowledgeBaseSourceMutation, TError, DeleteKnowledgeBaseSourceMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteKnowledgeBaseSource'],
+    mutationFn: (variables?: DeleteKnowledgeBaseSourceMutationVariables) => fetcher<DeleteKnowledgeBaseSourceMutation, DeleteKnowledgeBaseSourceMutationVariables>(DeleteKnowledgeBaseSourceDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const KnowledgeBaseDocument = new TypedDocumentString(`
     query knowledgeBase($id: ID!) {
   knowledgeBase(id: $id) {
@@ -6547,6 +6644,8 @@ export const KnowledgeBaseDocument = new TypedDocumentString(`
       status
       tags
       createdDate
+      sourceId
+      sourceRecordId
       chunks {
         id
         knowledgeBaseDocumentId
@@ -6697,6 +6796,82 @@ export const useKnowledgeBaseEmbeddingActiveQuery = <
   }
     )};
 
+export const KnowledgeBaseSourceDocument = new TypedDocumentString(`
+    query knowledgeBaseSource($id: ID!) {
+  knowledgeBaseSource(id: $id) {
+    id
+    name
+    knowledgeBaseId
+    sourceComponentName
+    sourceComponentVersion
+    sourceClusterElementName
+    connectionId
+    cadence
+    status
+    enabled
+    lastSyncRunAt
+    lastSyncJobExecutionId
+    workflowId
+  }
+}
+    `);
+
+export const useKnowledgeBaseSourceQuery = <
+      TData = KnowledgeBaseSourceQuery,
+      TError = unknown
+    >(
+      variables: KnowledgeBaseSourceQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseSourceQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseSourceQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseSourceQuery, TError, TData>(
+      {
+    queryKey: ['knowledgeBaseSource', variables],
+    queryFn: fetcher<KnowledgeBaseSourceQuery, KnowledgeBaseSourceQueryVariables>(KnowledgeBaseSourceDocument, variables),
+    ...options
+  }
+    )};
+
+export const KnowledgeBaseSourcesDocument = new TypedDocumentString(`
+    query knowledgeBaseSources($workspaceId: ID!, $environmentId: ID!, $filter: KnowledgeBaseSourceFilter) {
+  knowledgeBaseSources(
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    filter: $filter
+  ) {
+    id
+    name
+    knowledgeBaseId
+    sourceComponentName
+    sourceComponentVersion
+    sourceClusterElementName
+    connectionId
+    cadence
+    status
+    enabled
+    lastSyncRunAt
+    lastSyncJobExecutionId
+    workflowId
+  }
+}
+    `);
+
+export const useKnowledgeBaseSourcesQuery = <
+      TData = KnowledgeBaseSourcesQuery,
+      TError = unknown
+    >(
+      variables: KnowledgeBaseSourcesQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseSourcesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseSourcesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseSourcesQuery, TError, TData>(
+      {
+    queryKey: ['knowledgeBaseSources', variables],
+    queryFn: fetcher<KnowledgeBaseSourcesQuery, KnowledgeBaseSourcesQueryVariables>(KnowledgeBaseSourcesDocument, variables),
+    ...options
+  }
+    )};
+
 export const KnowledgeBaseTagsDocument = new TypedDocumentString(`
     query knowledgeBaseTags {
   knowledgeBaseTags {
@@ -6781,6 +6956,25 @@ export const useKnowledgeBasesQuery = <
   }
     )};
 
+export const RefreshKnowledgeBaseSourceDocument = new TypedDocumentString(`
+    mutation refreshKnowledgeBaseSource($id: ID!) {
+  refreshKnowledgeBaseSource(id: $id)
+}
+    `);
+
+export const useRefreshKnowledgeBaseSourceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RefreshKnowledgeBaseSourceMutation, TError, RefreshKnowledgeBaseSourceMutationVariables, TContext>) => {
+    
+    return useMutation<RefreshKnowledgeBaseSourceMutation, TError, RefreshKnowledgeBaseSourceMutationVariables, TContext>(
+      {
+    mutationKey: ['refreshKnowledgeBaseSource'],
+    mutationFn: (variables?: RefreshKnowledgeBaseSourceMutationVariables) => fetcher<RefreshKnowledgeBaseSourceMutation, RefreshKnowledgeBaseSourceMutationVariables>(RefreshKnowledgeBaseSourceDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const SearchKnowledgeBaseDocument = new TypedDocumentString(`
     query searchKnowledgeBase($id: ID!, $query: String!, $metadataFilters: String) {
   searchKnowledgeBase(id: $id, query: $query, metadataFilters: $metadataFilters) {
@@ -6805,6 +6999,29 @@ export const useSearchKnowledgeBaseQuery = <
       {
     queryKey: ['searchKnowledgeBase', variables],
     queryFn: fetcher<SearchKnowledgeBaseQuery, SearchKnowledgeBaseQueryVariables>(SearchKnowledgeBaseDocument, variables),
+    ...options
+  }
+    )};
+
+export const SetKnowledgeBaseSourceEnabledDocument = new TypedDocumentString(`
+    mutation setKnowledgeBaseSourceEnabled($id: ID!, $enabled: Boolean!) {
+  setKnowledgeBaseSourceEnabled(id: $id, enabled: $enabled) {
+    id
+    enabled
+    status
+  }
+}
+    `);
+
+export const useSetKnowledgeBaseSourceEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetKnowledgeBaseSourceEnabledMutation, TError, SetKnowledgeBaseSourceEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<SetKnowledgeBaseSourceEnabledMutation, TError, SetKnowledgeBaseSourceEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['setKnowledgeBaseSourceEnabled'],
+    mutationFn: (variables?: SetKnowledgeBaseSourceEnabledMutationVariables) => fetcher<SetKnowledgeBaseSourceEnabledMutation, SetKnowledgeBaseSourceEnabledMutationVariables>(SetKnowledgeBaseSourceEnabledDocument, variables)(),
     ...options
   }
     )};
@@ -6877,6 +7094,31 @@ export const useUpdateKnowledgeBaseDocumentTagsMutation = <
       {
     mutationKey: ['updateKnowledgeBaseDocumentTags'],
     mutationFn: (variables?: UpdateKnowledgeBaseDocumentTagsMutationVariables) => fetcher<UpdateKnowledgeBaseDocumentTagsMutation, UpdateKnowledgeBaseDocumentTagsMutationVariables>(UpdateKnowledgeBaseDocumentTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateKnowledgeBaseSourceDocument = new TypedDocumentString(`
+    mutation updateKnowledgeBaseSource($id: ID!, $input: UpdateKnowledgeBaseSourceInput!) {
+  updateKnowledgeBaseSource(id: $id, input: $input) {
+    id
+    name
+    cadence
+    enabled
+    status
+  }
+}
+    `);
+
+export const useUpdateKnowledgeBaseSourceMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateKnowledgeBaseSourceMutation, TError, UpdateKnowledgeBaseSourceMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateKnowledgeBaseSourceMutation, TError, UpdateKnowledgeBaseSourceMutationVariables, TContext>(
+      {
+    mutationKey: ['updateKnowledgeBaseSource'],
+    mutationFn: (variables?: UpdateKnowledgeBaseSourceMutationVariables) => fetcher<UpdateKnowledgeBaseSourceMutation, UpdateKnowledgeBaseSourceMutationVariables>(UpdateKnowledgeBaseSourceDocument, variables)(),
     ...options
   }
     )};
