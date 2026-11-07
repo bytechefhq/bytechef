@@ -4,12 +4,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {usePermissionStore} from '@/shared/stores/usePermissionStore';
 
 export type WorkspaceScopeType =
-    | 'A2A_VIEW'
-    | 'API_KEY_CREATE'
-    | 'API_KEY_DELETE'
-    | 'API_KEY_VIEW'
-    | 'MCP_VIEW'
-    | 'WORKFLOW_VIEW';
+    'A2A_VIEW' | 'API_KEY_CREATE' | 'API_KEY_DELETE' | 'API_KEY_VIEW' | 'MCP_VIEW' | 'WORKFLOW_VIEW';
 
 export const useHasWorkspaceScope = (
     workspaceId: number | undefined,
