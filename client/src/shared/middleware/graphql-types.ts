@@ -1335,7 +1335,7 @@ export type ExternalInvocationLogType = {
   mcpServerId?: Maybe<Scalars['Long']['output']>;
   operationName?: Maybe<Scalars['String']['output']>;
   outcome: Scalars['String']['output'];
-  surface: Scalars['String']['output'];
+  source: Scalars['String']['output'];
   toolName?: Maybe<Scalars['String']['output']>;
   workflowName?: Maybe<Scalars['String']['output']>;
   workspaceId?: Maybe<Scalars['Long']['output']>;
@@ -4046,7 +4046,7 @@ export type QueryExternalInvocationLogsArgs = {
   mcpServerId?: InputMaybe<Scalars['Long']['input']>;
   outcome?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
-  surface?: InputMaybe<Scalars['String']['input']>;
+  source?: InputMaybe<Scalars['String']['input']>;
   toDate?: InputMaybe<Scalars['Long']['input']>;
   type: PlatformType;
 };
@@ -4443,7 +4443,7 @@ export type QueryWorkspaceExternalInvocationLogsArgs = {
   mcpServerId?: InputMaybe<Scalars['Long']['input']>;
   outcome?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
-  surface?: InputMaybe<Scalars['String']['input']>;
+  source?: InputMaybe<Scalars['String']['input']>;
   toDate?: InputMaybe<Scalars['Long']['input']>;
   type: PlatformType;
   workspaceId: Scalars['ID']['input'];
