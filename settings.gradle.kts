@@ -744,6 +744,7 @@ include("server:ee:libs:platform:platform-component:platform-component-remote-re
 include("server:ee:libs:platform:platform-component:platform-component-runner-aws-batch")
 include("server:ee:libs:platform:platform-component:platform-component-runner-kubernetes")
 include("server:ee:libs:platform:platform-component-rule:platform-component-rule-api")
+include("server:ee:libs:platform:platform-component-rule:platform-component-rule-graphql")
 include("server:ee:libs:platform:platform-component-rule:platform-component-rule-service")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-api")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-client")
