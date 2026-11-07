@@ -276,6 +276,7 @@ const ComponentConfigDialog = ({
                                                                             string,
                                                                             unknown
                                                                         >) ?? {},
+                                                                    mcpComponentId: '',
                                                                 }}
                                                             >
                                                                 <Properties
