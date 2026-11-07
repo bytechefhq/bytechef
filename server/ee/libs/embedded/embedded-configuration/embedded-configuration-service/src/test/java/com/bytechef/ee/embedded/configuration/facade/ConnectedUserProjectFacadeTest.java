@@ -58,7 +58,7 @@ class ConnectedUserProjectFacadeTest {
     private final WorkflowService workflowService = mock(WorkflowService.class);
 
     private final ConnectedUserProjectFacadeImpl connectedUserProjectFacade = new ConnectedUserProjectFacadeImpl(
-        automationWorkflowProjectConfigurationResolver, null, automationWorkflowProjectFacade, null,
+        automationWorkflowProjectConfigurationResolver, null, automationWorkflowProjectFacade, null, null,
         connectedUserProjectService, null,
         connectedUserProjectWorkflowManager, null, connectedUserProjectWorkflowService, null, null,
         connectedUserService,

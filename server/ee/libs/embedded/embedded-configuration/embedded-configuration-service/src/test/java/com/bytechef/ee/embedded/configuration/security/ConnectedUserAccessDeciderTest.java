@@ -494,7 +494,7 @@ class ConnectedUserAccessDeciderTest {
 
         return new AutomationWorkflowProjectDTO(
             projectId, "Templates", null, null, List.of(), true, lastPublishedVersion + 1, lastPublishedVersion,
-            List.of(workflowTemplate), null, false, 0, null);
+            List.of(workflowTemplate), null, false, false, 0, null);
     }
 
     private static final class TestConnectedUserAuthentication extends AbstractAuthenticationToken

@@ -200,6 +200,7 @@ class ProjectFacadeVisibilityTest {
         return facade(edition, new ResourceVisibilityPolicyRegistry(List.of(new ProjectVisibilityPolicy())));
     }
 
+    @SuppressWarnings("unchecked")
     private ProjectFacadeImpl facade(
         String edition, ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry) {
 
@@ -208,7 +209,8 @@ class ProjectFacadeVisibilityTest {
 
         return new ProjectFacadeImpl(
             edition, mock(ApplicationProperties.class), mock(CategoryService.class),
-            mock(ComponentDefinitionHelper.class), mock(PreBuiltTemplateService.class), projectWorkflowService,
+            mock(ComponentDefinitionHelper.class), mock(PreBuiltTemplateService.class),
+            mock(ObjectProvider.class), projectWorkflowService,
             mock(ProjectDeploymentService.class), mock(ProjectOwnershipService.class), projectService,
             new ProjectVisibilityFilter(objectProvider(resourceVisibilityResolver)),
             resourceVisibilityPolicyRegistry,

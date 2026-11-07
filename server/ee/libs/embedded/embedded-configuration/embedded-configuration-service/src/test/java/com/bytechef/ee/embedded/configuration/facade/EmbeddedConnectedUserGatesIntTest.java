@@ -135,6 +135,7 @@ import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefi
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -412,7 +413,7 @@ class EmbeddedConnectedUserGatesIntTest {
         assertThat(connectedUserFacade.getConnectedUserDTO(productionConnectedUser.getId())).isNotNull();
         assertThat(connectedUserConnectionFacade.getConnectedUserConnections(
             productionConnectedUser.getId(), null, List.of())).isEmpty();
-        assertThat(connectedUserWorkflowReferenceAdminFacade.getReferences(Set.of("workflow-uuid"))).isEmpty();
+        assertThat(connectedUserWorkflowReferenceAdminFacade.getReferences(Set.of("workflow-uuid"), Environment.PRODUCTION)).isEmpty();
         assertThat(connectionAdminFacade.getConnectionTags()).isEmpty();
         assertThat(connectionAdminFacade.getConnections(null, null, productionEnvironmentId, null)).isEmpty();
 
@@ -516,7 +517,7 @@ class EmbeddedConnectedUserGatesIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectionAdminFacade.getSharedConnectionIds())
             .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> connectedUserWorkflowReferenceAdminFacade.getReferences(Set.of("workflow-uuid")))
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceAdminFacade.getReferences(Set.of("workflow-uuid"), Environment.PRODUCTION))
             .isInstanceOf(AccessDeniedException.class);
     }
 
@@ -623,7 +624,7 @@ class EmbeddedConnectedUserGatesIntTest {
                 .extracting(ConnectedUser::getId)
                 .contains(productionConnectedUser.getId(), developmentConnectedUser.getId());
         assertThat(connectedUserProjectAdminFacade.getConnectedUserProjects(null, null)).isEmpty();
-        assertThat(connectedUserWorkflowReferenceAdminFacade.getReferences(Set.of("workflow-uuid"))).isEmpty();
+        assertThat(connectedUserWorkflowReferenceAdminFacade.getReferences(Set.of("workflow-uuid"), Environment.PRODUCTION)).isEmpty();
         assertThat(connectionAdminFacade.getConnections(null, null, null, null)).isEmpty();
         assertThat(connectionAdminFacade.getConnectionTags()).isEmpty();
         assertThat(connectionAdminFacade.getSharedConnectionIds()).isEmpty();
@@ -671,7 +672,7 @@ class EmbeddedConnectedUserGatesIntTest {
             () -> connectedUserProjectAdminFacade.getConnectedUserProjects(
                 productionConnectedUserId, Environment.PRODUCTION))
                     .isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> connectedUserWorkflowReferenceAdminFacade.getReferences(Set.of("workflow-uuid")))
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceAdminFacade.getReferences(Set.of("workflow-uuid"), Environment.PRODUCTION))
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(
             () -> connectedUserConnectionFacade.createConnectedUserConnection(
@@ -776,21 +777,29 @@ class EmbeddedConnectedUserGatesIntTest {
 
         authenticate(VIEWER_IN_PRODUCTION, false);
 
-        assertThat(connectedUserWorkflowReferenceAdminFacade.getReferences(automationWorkflowUuids))
-            .extracting(ConnectedUserWorkflowReferenceDTO::environment)
-            .containsExactly(Environment.PRODUCTION.name());
+        assertReferenceEnvironments(automationWorkflowUuids, Environment.PRODUCTION, Environment.PRODUCTION);
+        assertReferenceEnvironments(automationWorkflowUuids, Environment.DEVELOPMENT);
 
         authenticate(EDITOR_IN_DEVELOPMENT, false);
 
-        assertThat(connectedUserWorkflowReferenceAdminFacade.getReferences(automationWorkflowUuids))
-            .extracting(ConnectedUserWorkflowReferenceDTO::environment)
-            .containsExactlyInAnyOrder(Environment.PRODUCTION.name(), Environment.DEVELOPMENT.name());
+        assertReferenceEnvironments(automationWorkflowUuids, Environment.PRODUCTION, Environment.PRODUCTION);
+        assertReferenceEnvironments(automationWorkflowUuids, Environment.DEVELOPMENT, Environment.DEVELOPMENT);
 
         authenticate(TENANT_ADMIN, true);
 
-        assertThat(connectedUserWorkflowReferenceAdminFacade.getReferences(automationWorkflowUuids))
+        assertReferenceEnvironments(automationWorkflowUuids, Environment.PRODUCTION, Environment.PRODUCTION);
+        assertReferenceEnvironments(automationWorkflowUuids, Environment.DEVELOPMENT, Environment.DEVELOPMENT);
+    }
+
+    private void assertReferenceEnvironments(
+        Set<String> automationWorkflowUuids, Environment environment, Environment... expectedEnvironments) {
+
+        assertThat(connectedUserWorkflowReferenceAdminFacade.getReferences(automationWorkflowUuids, environment))
             .extracting(ConnectedUserWorkflowReferenceDTO::environment)
-            .containsExactlyInAnyOrder(Environment.PRODUCTION.name(), Environment.DEVELOPMENT.name());
+            .containsExactly(
+                Arrays.stream(expectedEnvironments)
+                    .map(Environment::name)
+                    .toArray(String[]::new));
     }
 
     @Test

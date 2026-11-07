@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent.Language;
 import com.bytechef.ee.platform.customcomponent.configuration.service.CustomComponentService;
 import com.bytechef.ee.platform.customcomponent.file.storage.CustomComponentFileStorage;
@@ -111,6 +112,43 @@ class CustomComponentFacadeTest {
         assertGuard(() -> customComponentFacade.enableCustomComponent(1L, true), admin);
     }
 
+    @ParameterizedTest(name = "admin={0}")
+    @ValueSource(booleans = {
+        false, true
+    })
+    void testGetCustomComponentSourceRequiresTheAdminAuthority(boolean admin) {
+        CustomComponentFacade customComponentFacade = createSecuredCustomComponentFacade(admin);
+
+        when(customComponentService.getCustomComponent(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertGuard(() -> customComponentFacade.getCustomComponentSource(1L), admin);
+    }
+
+    @ParameterizedTest(name = "admin={0}")
+    @ValueSource(booleans = {
+        false, true
+    })
+    void testUpdateCustomComponentSourceRequiresTheAdminAuthority(boolean admin) {
+        CustomComponentFacade customComponentFacade = createSecuredCustomComponentFacade(admin);
+
+        when(customComponentService.getCustomComponent(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertGuard(() -> customComponentFacade.updateCustomComponentSource(1L, "source"), admin);
+    }
+
+    @ParameterizedTest(name = "admin={0}")
+    @ValueSource(booleans = {
+        false, true
+    })
+    void testPublishCustomComponentRequiresTheAdminAuthority(boolean admin) {
+        CustomComponentFacade customComponentFacade = createSecuredCustomComponentFacade(admin);
+
+        when(customComponentService.publishCustomComponent(anyLong()))
+            .thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertGuard(() -> customComponentFacade.publishCustomComponent(1L), admin);
+    }
+
     private void assertGuard(ThrowingCallable callable, boolean admin) {
         if (admin) {
             assertThatThrownBy(callable)
@@ -148,11 +186,23 @@ class CustomComponentFacadeTest {
 
         ProxyFactory proxyFactory = new ProxyFactory(
             new CustomComponentFacadeImpl(
-                mock(CacheManager.class), customComponentService, customComponentFileStorage));
+                javaEnabledApplicationProperties(), mock(CacheManager.class), customComponentService,
+                customComponentFileStorage));
 
         proxyFactory.addAdvisor(
             AuthorizationManagerBeforeMethodInterceptor.preAuthorize(preAuthorizeAuthorizationManager));
 
         return (CustomComponentFacade) proxyFactory.getProxy();
+    }
+
+    private static ApplicationProperties javaEnabledApplicationProperties() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        ApplicationProperties.Component component = applicationProperties.getComponent();
+
+        component.getCustomComponent()
+            .setJavaEnabled(true);
+
+        return applicationProperties;
     }
 }

@@ -28,6 +28,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
+import com.bytechef.automation.configuration.security.ProjectVisibilityPolicy;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier;
 import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowInfo;
@@ -43,6 +45,7 @@ import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.ByteArrayOutputStream;
@@ -99,9 +102,12 @@ class ProjectFacadeImplCodeWorkflowFlagTest {
     @BeforeEach
     void setUp() {
         projectFacade = new ProjectFacadeImpl(
-            applicationProperties, mock(CategoryService.class), componentDefinitionHelper, preBuiltTemplateService,
-            projectCodeWorkflowInfoSupplierProvider, projectWorkflowService, mock(ProjectDeploymentService.class),
-            mock(ProjectOwnershipService.class), projectService, mock(ProjectDeploymentFacade.class),
+            "CE", applicationProperties, mock(CategoryService.class), componentDefinitionHelper,
+            preBuiltTemplateService, projectCodeWorkflowInfoSupplierProvider, projectWorkflowService,
+            mock(ProjectDeploymentService.class), mock(ProjectOwnershipService.class), projectService,
+            mock(ProjectVisibilityFilter.class),
+            new ResourceVisibilityPolicyRegistry(List.of(new ProjectVisibilityPolicy())),
+            mock(ProjectDeploymentFacade.class),
             mock(ProjectWorkflowFacade.class),
             mock(SharedTemplateFileStorage.class), mock(SharedTemplateService.class), tagService,
             mock(WorkflowService.class), mock(WorkflowTestConfigurationService.class),

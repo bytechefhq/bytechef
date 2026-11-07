@@ -462,7 +462,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
             automationComponentInputOptionsRequestModel.getLookupDependsOnValues();
 
         List<Option> options = connectedUserComponentInputFacade.getComponentInputOptions(
-            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), getEnvironment(xEnvironment),
+            ConnectedUserAuthentications.getCurrentExternalUserId(), getEnvironment(xEnvironment),
             automationComponentInputOptionsRequestModel.getComponentName(),
             automationComponentInputOptionsRequestModel.getComponentVersion(),
             automationComponentInputOptionsRequestModel.getGroupName(),
