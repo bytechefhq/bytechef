@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.ai:spring-ai-client-chat")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework.ai:spring-ai-model")
