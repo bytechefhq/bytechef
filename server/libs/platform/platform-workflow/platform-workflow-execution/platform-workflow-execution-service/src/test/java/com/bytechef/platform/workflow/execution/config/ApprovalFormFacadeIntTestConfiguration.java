@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
 import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -34,6 +35,7 @@ import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +54,7 @@ import tools.jackson.databind.ObjectMapper;
         "com.bytechef.atlas.execution.repository.jdbc.config.AtlasExecutionJdbcRepositoryConfiguration",
         "com.bytechef.platform.workflow.execution.config.PlatformWorkflowExecutionJdbcRepositoryConfiguration"
     })
+@EnableConfigurationProperties(ApplicationProperties.class)
 @EnableJdbcRepositories(
     basePackageClasses = TaskStateRepository.class,
     includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = TaskStateRepository.class))

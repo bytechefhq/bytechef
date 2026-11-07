@@ -80,6 +80,27 @@ class ApprovalTokensTest {
     }
 
     @Test
+    void testSignedTokenIfConfiguredHonoursTheGivenTtl() {
+        String token = approvalTokens.toSignedTokenIfConfigured(INNER, Duration.ofSeconds(10))
+            .orElseThrow();
+
+        ApprovalTokens later = new ApprovalTokensImpl(
+            Clock.fixed(Instant.parse("2026-06-20T01:00:00Z"), ZoneOffset.UTC), SECRET, List.of(), Duration.ofDays(30),
+            Duration.ofSeconds(60), false);
+
+        assertThat(approvalTokens.parseSignedToken(token)).contains(INNER);
+        assertThat(later.parseSignedToken(token)).isEmpty();
+    }
+
+    @Test
+    void testSignedTokenIfConfiguredIsEmptyWithoutASecret() {
+        ApprovalTokens unconfigured = new ApprovalTokensImpl(
+            clock, null, List.of(), Duration.ofDays(30), Duration.ofSeconds(60), false);
+
+        assertThat(unconfigured.toSignedTokenIfConfigured(INNER, Duration.ofSeconds(10))).isEmpty();
+    }
+
+    @Test
     void testLegacyOrMalformedNotASignedToken() {
         assertThat(approvalTokens.looksLikeSignedToken(INNER)).isFalse();
         assertThat(approvalTokens.parseSignedToken(INNER)).isEmpty();

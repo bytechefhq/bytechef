@@ -28,6 +28,7 @@ import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToTypedValueConverter;
 import com.bytechef.commons.data.jdbc.converter.TypedValueToStringConverter;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -47,6 +48,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.TypeExcludeFilter;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
@@ -63,6 +65,7 @@ import tools.jackson.databind.ObjectMapper;
     },
     excludeFilters = @ComponentScan.Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class))
 @EnableAutoConfiguration
+@EnableConfigurationProperties(ApplicationProperties.class)
 @Import({
     JacksonConfiguration.class, JobPrincipalAccessorRegistry.class, LiquibaseConfiguration.class,
     PostgreSQLContainerConfiguration.class, StateValueDataStorage.class, TaskStateFacadeImpl.class,

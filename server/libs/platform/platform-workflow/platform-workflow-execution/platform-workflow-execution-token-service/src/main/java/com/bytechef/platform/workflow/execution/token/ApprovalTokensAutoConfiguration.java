@@ -23,6 +23,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
+import java.time.Duration;
+import java.util.Objects;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
@@ -30,25 +32,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 /**
  * @author Ivica Cardic
  */
 @AutoConfiguration
-@EnableConfigurationProperties(ApplicationProperties.class)
 public class ApprovalTokensAutoConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(ApprovalTokensAutoConfiguration.class);
 
     static final String DERIVATION_LABEL = "bytechef-approval-token-signed-v1";
 
+    static final Duration DEFAULT_CLOCK_SKEW = Duration.ofSeconds(60);
+    static final Duration DEFAULT_TTL = Duration.ofDays(30);
+
     @Bean
     @ConditionalOnMissingBean
     public ApprovalTokens approvalTokens(
-        ApplicationProperties applicationProperties, ObjectProvider<Clock> clockProvider,
+        ObjectProvider<ApplicationProperties> applicationPropertiesProvider, ObjectProvider<Clock> clockProvider,
         ObjectProvider<EncryptionKey> encryptionKeyProvider) {
+
+        ApplicationProperties applicationProperties = applicationPropertiesProvider.getIfAvailable(
+            ApplicationProperties::new);
 
         ApplicationProperties.Approval approval = applicationProperties.getApproval();
 
@@ -85,8 +91,9 @@ public class ApprovalTokensAutoConfiguration {
         Clock clock = clockProvider.getIfAvailable(Clock::systemUTC);
 
         return new ApprovalTokensImpl(
-            clock, effectiveSecret, signedToken.getPreviousSecrets(), signedToken.getDefaultTtl(),
-            signedToken.getClockSkew(), signedToken.isRequired());
+            clock, effectiveSecret, signedToken.getPreviousSecrets(),
+            Objects.requireNonNullElse(signedToken.getDefaultTtl(), DEFAULT_TTL),
+            Objects.requireNonNullElse(signedToken.getClockSkew(), DEFAULT_CLOCK_SKEW), signedToken.isRequired());
     }
 
     private static String deriveSecretFromEncryptionKey(EncryptionKey encryptionKey) {
