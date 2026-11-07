@@ -1,7 +1,7 @@
 query ExternalInvocationLogs(
     $type: PlatformType!
     $environmentId: ID
-    $surface: String
+    $source: String
     $outcome: String
     $mcpServerId: Long
     $a2aServerId: Long
@@ -14,7 +14,7 @@ query ExternalInvocationLogs(
     externalInvocationLogs(
         type: $type
         environmentId: $environmentId
-        surface: $surface
+        source: $source
         outcome: $outcome
         mcpServerId: $mcpServerId
         a2aServerId: $a2aServerId
@@ -26,7 +26,7 @@ query ExternalInvocationLogs(
     ) {
         content {
             id
-            surface
+            source
             kind
             toolName
             componentName
