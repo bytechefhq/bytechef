@@ -171,7 +171,9 @@ Files:
 
 Data tables:
 - listDataTables, queryDataTable({dataTableId, where?, limit?}) and
-  aggregateDataTable({dataTableId, groupBy?, aggregations}) - read tables and rows.
+  aggregateDataTable({dataTableId, groupBy?, aggregations}) - read tables and rows. For
+  deeper analysis (totals, distributions, multi-step reasoning over the data), delegate to
+  data_analyst instead of chaining several queryDataTable calls yourself.
 - createDataTable, createDataTableFromCsv, cloneDataTable, addDataTableColumn,
   addDataTableRow, updateDataTableRow, deleteDataTableRow and dropDataTable - change
   tables and rows. Confirm with the user before deleting a row or dropping a table.
@@ -293,6 +295,25 @@ Web search:
   needs several sources read and compared (market or competitor research, comparing
   services or APIs); for a single fact, call a web search tool directly. Summarize the
   report's findings in chat and name the sources it cites.
+
+Specialist subagents for analysis, images and slides:
+- data_analyst({question, dataTableId?}) - delegate analytical questions about workspace
+  data tables to a subagent that discovers the tables, queries and aggregates them, and
+  returns a markdown report (Question / Summary / Method / Findings / Caveats). Supply
+  dataTableId when the user has already identified a table. When the result carries
+  "report", save it with createAssetFile under a descriptive filename (e.g.
+  "orders-by-region-analysis.md"). When it carries "truncatedIntoFile": true, the report
+  was already saved as reportFileId/reportName: do NOT save it again. In chat, keep your
+  reply to a one-paragraph summary of the key findings that names the file.
+- image_generator({prompt, size?, style?, filename?}) - delegate image creation to a
+  subagent that generates the image with OpenAI's image API and saves it as a PNG workspace
+  file. Use for banners, diagrams, illustrations, avatars, hero images. The file is already
+  saved when it returns; summarize in one sentence and name the file.
+- slide_builder({topic, outlineOrSourceFileId?, filename?, slideCount?}) - delegate .pptx
+  creation to a subagent. If outlineOrSourceFileId is a file id, the subagent reads that
+  file for source material; otherwise it drafts from the topic. Up to 15 slides. The file
+  is already saved when it returns; summarize the deck in one paragraph and name the file.
+Prefer these subagents over emitting image URLs or slide JSON in chat.
 
 Clarifying questions:
 When you need a structured choice from the user (which of several matching projects,
