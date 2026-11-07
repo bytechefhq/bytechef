@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package bytechef.platform.knowledgebase.remote.v1;
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.knowledgebase.remote.grpc.proto";
+
+service KnowledgeBaseRemoteService {
+  rpc GetKnowledgeBase(IdRequest) returns (KnowledgeBaseResponse);
+  rpc GetKnowledgeBases(Empty) returns (KnowledgeBasesResponse);
+  rpc GetKnowledgeBaseDocuments(IdRequest) returns (KnowledgeBaseDocumentsResponse);
+  rpc GetAllTagNames(Empty) returns (TagNamesResponse);
+  rpc GetTagNamesByKnowledgeBaseId(IdRequest) returns (TagNamesResponse);
+  rpc GetKnowledgeBaseDocumentChunksByDocumentId(IdRequest) returns (KnowledgeBaseDocumentChunksResponse);
+  rpc LoadDocument(LoadDocumentRequest) returns (DocumentIdResponse);
+  rpc UpdateDocument(UpdateDocumentRequest) returns (DocumentIdResponse);
+  rpc AddDocuments(DocumentsRequest) returns (Empty);
+  rpc DeleteDocumentsByIds(DeleteDocumentsByIdsRequest) returns (Empty);
+  rpc DeleteDocumentsByFilter(FilterRequest) returns (Empty);
+  rpc SimilaritySearch(SimilaritySearchRequest) returns (DocumentsResponse);
+}
+
+message Empty {
+}
+
+message IdRequest {
+  int64 id = 1;
+}
+
+message KnowledgeBaseResponse {
+  bytes knowledge_base = 1;
+}
+
+message KnowledgeBasesResponse {
+  bytes knowledge_bases = 1;
+}
+
+message KnowledgeBaseDocumentsResponse {
+  bytes knowledge_base_documents = 1;
+}
+
+message KnowledgeBaseDocumentChunksResponse {
+  bytes knowledge_base_document_chunks = 1;
+}
+
+message TagNamesResponse {
+  repeated string tag_names = 1;
+}
+
+message LoadDocumentRequest {
+  int64 knowledge_base_id = 1;
+  optional int64 knowledge_base_document_id = 2;
+  string document_name = 3;
+  bytes chunks = 4;
+  bytes additional_metadata = 5;
+}
+
+message UpdateDocumentRequest {
+  int64 knowledge_base_id = 1;
+  optional int64 knowledge_base_document_id = 2;
+  optional int64 knowledge_base_document_chunk_id = 3;
+  bytes chunks = 4;
+  bytes additional_metadata = 5;
+}
+
+message DocumentIdResponse {
+  int64 knowledge_base_document_id = 1;
+}
+
+message DocumentsRequest {
+  bytes documents = 1;
+}
+
+message DocumentsResponse {
+  bytes documents = 1;
+}
+
+message DeleteDocumentsByIdsRequest {
+  repeated string ids = 1;
+}
+
+message FilterRequest {
+  bytes filter = 1;
+}
+
+message SimilaritySearchRequest {
+  string query = 1;
+  int32 top_k = 2;
+  double similarity_threshold = 3;
+  optional bytes filter = 4;
+}

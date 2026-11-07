@@ -117,7 +117,7 @@ public class KnowledgeBaseDocumentChunk {
     }
 
     public void setMetadata(Map<String, ?> metadata) {
-        this.metadata = Collections.unmodifiableMap(metadata);
+        this.metadata = metadata == null ? null : Collections.unmodifiableMap(metadata);
     }
 
     public Float getScore() {
