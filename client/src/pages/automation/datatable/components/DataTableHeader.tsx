@@ -1,4 +1,6 @@
 import Button from '@/components/Button/Button';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import {Trash2} from 'lucide-react';
 
@@ -25,6 +27,11 @@ const DataTableHeader = () => {
                             <Trash2 className="size-4" /> Delete ({selectedRowsCount})
                         </Button>
                     )}
+
+                    <CopilotButton
+                        parameters={dataTable?.id ? {dataTableId: String(dataTable.id)} : {}}
+                        source={Source.DATA_TABLE}
+                    />
 
                     <DataTableActionsMenu
                         onDeleteTable={handleOpenDeleteDialog}
