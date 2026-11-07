@@ -260,7 +260,7 @@ public class WorkflowTestConfiguration {
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage));
     }
 
-    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
+    List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         ContextService contextService, CounterService counterService, Evaluator evaluator,
         ApplicationEventPublisher eventPublisher, JobService jobService, SubflowResolver subflowResolver,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {

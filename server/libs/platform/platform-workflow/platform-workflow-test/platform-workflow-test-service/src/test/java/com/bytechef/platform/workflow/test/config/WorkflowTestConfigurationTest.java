@@ -31,7 +31,14 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.CounterService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.worker.exception.TaskExecutionException;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
@@ -70,10 +77,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -144,6 +155,38 @@ class WorkflowTestConfigurationTest {
             any(), anyInt(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), anyBoolean(),
             any(), any(), any());
         verifyNoInteractions(connectionService);
+    }
+
+    @Test
+    void testGetTaskDispatcherResolverFactoriesCoversEveryTaskDispatcherOnTheClasspath() {
+        ClassPathScanningCandidateComponentProvider classPathScanningCandidateComponentProvider =
+            new ClassPathScanningCandidateComponentProvider(false);
+
+        classPathScanningCandidateComponentProvider.addIncludeFilter(
+            new AssignableTypeFilter(TaskDispatcherResolver.class));
+
+        List<String> taskDispatcherClassNames = classPathScanningCandidateComponentProvider
+            .findCandidateComponents("com.bytechef.task.dispatcher")
+            .stream()
+            .map(BeanDefinition::getBeanClassName)
+            .toList();
+
+        List<String> resolvedTaskDispatcherClassNames = new WorkflowTestConfiguration()
+            .getTaskDispatcherResolverFactories(
+                mock(ContextService.class), mock(CounterService.class), SpelEvaluator.create(),
+                mock(ApplicationEventPublisher.class), mock(JobService.class), mock(SubflowResolver.class),
+                mock(TaskExecutionService.class), mock(TaskFileStorage.class), workflowService)
+            .stream()
+            .map(taskDispatcherResolverFactory -> taskDispatcherResolverFactory.createTaskDispatcherResolver(
+                mock(TaskDispatcher.class)))
+            .map(taskDispatcherResolver -> taskDispatcherResolver.getClass()
+                .getName())
+            .toList();
+
+        assertThat(taskDispatcherClassNames).contains(
+            "com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher",
+            "com.bytechef.task.dispatcher.approval.WaitForApprovalTaskDispatcher");
+        assertThat(resolvedTaskDispatcherClassNames).containsAll(taskDispatcherClassNames);
     }
 
     @Test
