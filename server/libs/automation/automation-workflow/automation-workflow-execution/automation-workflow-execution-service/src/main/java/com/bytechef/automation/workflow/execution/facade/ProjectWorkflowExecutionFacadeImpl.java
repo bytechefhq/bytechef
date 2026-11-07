@@ -88,6 +88,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,6 +99,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecutionFacade {
 
+    private static final String ACCESS_DENIED_MESSAGE = "Access is denied";
     private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowExecutionFacadeImpl.class);
 
     private final ComponentDefinitionService componentDefinitionService;
@@ -358,6 +361,82 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
         return getWorkflowExecutionPage(
             jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, workflowIds, projectId, pageNumber);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public WorkflowExecutionDTO getWorkspaceWorkflowExecution(long workspaceId, long environmentId, long id) {
+        Job job = jobService.fetchJob(id)
+            .orElseThrow(() -> new AccessDeniedException(ACCESS_DENIED_MESSAGE));
+
+        ProjectDeployment projectDeployment = principalJobService
+            .fetchJobPrincipalId(getRootJobId(job), PlatformType.AUTOMATION)
+            .flatMap(projectDeploymentService::fetchProjectDeployment)
+            .orElseThrow(() -> new AccessDeniedException(ACCESS_DENIED_MESSAGE));
+
+        checkProjectDeployment(projectDeployment, workspaceId, environmentId);
+
+        WorkflowExecutionDTO workflowExecutionDTO = getWorkflowExecution(id, false);
+
+        Project project = workflowExecutionDTO.project();
+
+        if (project == null || !Objects.equals(project.getWorkspaceId(), workspaceId)) {
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE);
+        }
+
+        return workflowExecutionDTO;
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public Page<WorkflowExecutionDTO> getWorkspaceWorkflowExecutions(
+        long workspaceId, long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long projectId, Long projectDeploymentId, String workflowId, int pageNumber) {
+
+        if (projectId != null) {
+            checkProjectWorkspace(projectId, workspaceId);
+        }
+
+        if (projectDeploymentId != null) {
+            ProjectDeployment projectDeployment = projectDeploymentService.fetchProjectDeployment(projectDeploymentId)
+                .orElseThrow(() -> new AccessDeniedException(ACCESS_DENIED_MESSAGE));
+
+            checkProjectDeployment(projectDeployment, workspaceId, environmentId);
+        }
+
+        if (workflowId != null) {
+            ProjectWorkflow projectWorkflow = CollectionUtils.findFirst(
+                projectWorkflowService.getWorkflowProjectWorkflows(List.of(workflowId)),
+                curProjectWorkflow -> Objects.equals(curProjectWorkflow.getWorkflowId(), workflowId))
+                .orElseThrow(() -> new AccessDeniedException(ACCESS_DENIED_MESSAGE));
+
+            checkProjectWorkspace(projectWorkflow.getProjectId(), workspaceId);
+        }
+
+        return getWorkflowExecutions(
+            false, environmentId, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId, null,
+            workflowId, null, workspaceId, pageNumber);
+    }
+
+    private void checkProjectDeployment(ProjectDeployment projectDeployment, long workspaceId, long environmentId) {
+        Environment environment = projectDeployment.getEnvironment();
+
+        if (environment == null || environment.ordinal() != environmentId) {
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE);
+        }
+
+        checkProjectWorkspace(Validate.notNull(projectDeployment.getProjectId(), "projectId"), workspaceId);
+    }
+
+    private void checkProjectWorkspace(long projectId, long workspaceId) {
+        Project project = projectService.fetchProject(projectId)
+            .orElseThrow(() -> new AccessDeniedException(ACCESS_DENIED_MESSAGE));
+
+        if (!Objects.equals(project.getWorkspaceId(), workspaceId)) {
+            throw new AccessDeniedException(ACCESS_DENIED_MESSAGE);
+        }
     }
 
     private Page<WorkflowExecutionDTO> getConnectedUserWorkflowExecutions(

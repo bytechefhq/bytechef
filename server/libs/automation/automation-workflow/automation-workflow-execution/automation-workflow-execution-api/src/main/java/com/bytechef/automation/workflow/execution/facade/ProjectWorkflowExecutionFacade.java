@@ -59,4 +59,10 @@ public interface ProjectWorkflowExecutionFacade {
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
         Long projectId, Long projectDeploymentId, Long connectedUserId, String workflowId, Integer projectVersion,
         long workspaceId, int pageNumber);
+
+    WorkflowExecutionDTO getWorkspaceWorkflowExecution(long workspaceId, long environmentId, long id);
+
+    Page<WorkflowExecutionDTO> getWorkspaceWorkflowExecutions(
+        long workspaceId, long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long projectId, Long projectDeploymentId, String workflowId, int pageNumber);
 }

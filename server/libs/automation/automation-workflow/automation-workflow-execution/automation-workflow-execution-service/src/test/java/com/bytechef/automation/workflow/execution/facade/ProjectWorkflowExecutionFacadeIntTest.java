@@ -60,6 +60,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
@@ -138,6 +139,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.util.AopTestUtils;
@@ -1011,6 +1013,156 @@ class ProjectWorkflowExecutionFacadeIntTest {
         }
     }
 
+    @Nested
+    class WorkspaceScopedIntTest {
+
+        private Job job;
+        private Job otherEnvironmentJob;
+        private Job otherWorkspaceJob;
+        private Project otherWorkspaceProject;
+        private ProjectDeployment otherWorkspaceProjectDeployment;
+        private String otherWorkspaceWorkflowId;
+        private Project project;
+        private ProjectDeployment productionProjectDeployment;
+        private ProjectDeployment projectDeployment;
+        private String workflowId;
+
+        @BeforeEach
+        void beforeEach() {
+            project = createProject(workspace);
+            workflowId = createWorkflowId(project);
+            projectDeployment = createProjectDeployment(project, "development");
+            productionProjectDeployment = createProjectDeployment(project, "production", Environment.PRODUCTION);
+
+            Workspace otherWorkspace = workspaceRepository.save(new Workspace("other-execution-workspace"));
+
+            otherWorkspaceProject = createProject(otherWorkspace);
+            otherWorkspaceWorkflowId = createWorkflowId(otherWorkspaceProject);
+            otherWorkspaceProjectDeployment = createProjectDeployment(otherWorkspaceProject, "other-workspace");
+
+            job = saveDeployedJob(workflowId, projectDeployment);
+            otherEnvironmentJob = saveDeployedJob(workflowId, productionProjectDeployment);
+            otherWorkspaceJob = saveDeployedJob(otherWorkspaceWorkflowId, otherWorkspaceProjectDeployment);
+
+            ProjectWorkflowDTO projectWorkflowDTO = mock(ProjectWorkflowDTO.class);
+
+            when(projectWorkflowDTO.getId()).thenReturn(workflowId);
+            when(projectFacade.getWorkspaceProjectWorkflows(getId(workspace))).thenReturn(List.of(projectWorkflowDTO));
+        }
+
+        @Test
+        void testGetWorkspaceWorkflowExecutionReturnsAnExecutionOfTheWorkspaceAndEnvironment() {
+            WorkflowExecutionDTO workflowExecutionDTO = facade.getWorkspaceWorkflowExecution(
+                getId(workspace), Environment.DEVELOPMENT.ordinal(), getId(job));
+
+            assertThat(workflowExecutionDTO.id()).isEqualTo(job.getId());
+        }
+
+        @Test
+        void testGetWorkspaceWorkflowExecutionDeniesAnExecutionOfAnotherWorkspace() {
+            assertThatThrownBy(
+                () -> facade.getWorkspaceWorkflowExecution(
+                    getId(workspace), Environment.DEVELOPMENT.ordinal(), getId(otherWorkspaceJob)))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkspaceWorkflowExecutionDeniesAnExecutionOfAnotherEnvironment() {
+            assertThatThrownBy(
+                () -> facade.getWorkspaceWorkflowExecution(
+                    getId(workspace), Environment.DEVELOPMENT.ordinal(), getId(otherEnvironmentJob)))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkspaceWorkflowExecutionDeniesAnExecutionWithoutADeployment() {
+            Job testRunJob = saveJob(workflowId, null);
+
+            assertThatThrownBy(
+                () -> facade.getWorkspaceWorkflowExecution(
+                    getId(workspace), Environment.DEVELOPMENT.ordinal(), getId(testRunJob)))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkspaceWorkflowExecutionDeniesAnUnknownExecution() {
+            assertThatThrownBy(
+                () -> facade.getWorkspaceWorkflowExecution(
+                    getId(workspace), Environment.DEVELOPMENT.ordinal(), Long.MAX_VALUE))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkspaceWorkflowExecutionsListsOnlyExecutionsOfTheWorkspaceAndEnvironment() {
+            Page<WorkflowExecutionDTO> page = facade.getWorkspaceWorkflowExecutions(
+                getId(workspace), Environment.DEVELOPMENT.ordinal(), null, null, null, null, null, null, 0);
+
+            assertThat(page.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactly(job.getId());
+        }
+
+        @Test
+        void testGetWorkspaceWorkflowExecutionsFilteredByAProjectOfTheWorkspace() {
+            Page<WorkflowExecutionDTO> page = facade.getWorkspaceWorkflowExecutions(
+                getId(workspace), Environment.DEVELOPMENT.ordinal(), null, null, null, getId(project), null, null,
+                0);
+
+            assertThat(page.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactly(job.getId());
+        }
+
+        @Test
+        void testGetWorkspaceWorkflowExecutionsDeniesAProjectOfAnotherWorkspace() {
+            assertThatThrownBy(
+                () -> facade.getWorkspaceWorkflowExecutions(
+                    getId(workspace), Environment.DEVELOPMENT.ordinal(), null, null, null,
+                    getId(otherWorkspaceProject), null, null, 0))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkspaceWorkflowExecutionsDeniesADeploymentOfAnotherWorkspace() {
+            assertThatThrownBy(
+                () -> facade.getWorkspaceWorkflowExecutions(
+                    getId(workspace), Environment.DEVELOPMENT.ordinal(), null, null, null, null,
+                    getId(otherWorkspaceProjectDeployment), null, 0))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkspaceWorkflowExecutionsDeniesADeploymentOfAnotherEnvironment() {
+            assertThatThrownBy(
+                () -> facade.getWorkspaceWorkflowExecutions(
+                    getId(workspace), Environment.DEVELOPMENT.ordinal(), null, null, null, null,
+                    getId(productionProjectDeployment), null, 0))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetWorkspaceWorkflowExecutionsDeniesAWorkflowOfAnotherWorkspace() {
+            assertThatThrownBy(
+                () -> facade.getWorkspaceWorkflowExecutions(
+                    getId(workspace), Environment.DEVELOPMENT.ordinal(), null, null, null, null, null,
+                    otherWorkspaceWorkflowId, 0))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        private Job saveDeployedJob(String jobWorkflowId, ProjectDeployment jobProjectDeployment) {
+            Job deployedJob = new Job();
+
+            deployedJob.setStatus(Job.Status.COMPLETED);
+            deployedJob.setWorkflowId(jobWorkflowId);
+
+            deployedJob = jobRepository.save(deployedJob);
+
+            principalJobService.create(getId(deployedJob), getId(jobProjectDeployment), PlatformType.AUTOMATION);
+
+            return deployedJob;
+        }
+    }
+
     private Project createProject(Workspace projectWorkspace) {
         Project project = Project.builder()
             .name("project-" + UUID.randomUUID())
@@ -1022,6 +1174,17 @@ class ProjectWorkflowExecutionFacadeIntTest {
 
     private ProjectDeployment createProjectDeployment(Project project, String name) {
         return createProjectDeployment(project, name, 1);
+    }
+
+    private ProjectDeployment createProjectDeployment(Project project, String name, Environment environment) {
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setEnvironment(environment);
+        projectDeployment.setName(name);
+        projectDeployment.setProjectId(project.getId());
+        projectDeployment.setProjectVersion(1);
+
+        return projectDeploymentService.create(projectDeployment);
     }
 
     private ProjectDeployment createProjectDeployment(Project project, String name, int projectVersion) {
