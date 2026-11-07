@@ -205,7 +205,8 @@ public final class AiHubAgentFixtures {
             deploymentToolCallbacksFactoryProvider(), interactivePickerToolCallbacks, projectWorkflowFacade,
             chatService, chatAccessPolicy, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider(),
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
+            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
+            availableProvider(aiGuardrails), availableProvider(meterRegistry));
     }
 
     private AiHubSpringAIAgent buildAgent(
