@@ -48,6 +48,7 @@ import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.compaction.CompactionPlan;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -83,6 +84,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     private final AiHubChatAccessPolicy accessPolicy;
     private final AiHubToolApprovalService approvalService;
     private final Clock clock;
+    private final ApplicationEventPublisher eventPublisher;
     private final ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider;
     private final InFlightAiHubRunRegistry inFlightRunRegistry;
     private final TransactionTemplate requiresNewTransactionTemplate;
@@ -93,13 +95,15 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         AiHubChatRepository chatRepository, AiHubChatAccessPolicy accessPolicy,
         AiHubToolApprovalService approvalService, ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider,
         InFlightAiHubRunRegistry inFlightRunRegistry, PlatformTransactionManager transactionManager,
-        ObjectProvider<WebhookResumeRegistry> webhookResumeRegistryProvider) {
+        ObjectProvider<WebhookResumeRegistry> webhookResumeRegistryProvider,
+        ApplicationEventPublisher eventPublisher) {
 
         this.requiresNewTransactionTemplate = requiresNewTransactionTemplate(transactionManager);
         this.chatRepository = chatRepository;
         this.accessPolicy = accessPolicy;
         this.approvalService = approvalService;
         this.clock = Clock.systemUTC();
+        this.eventPublisher = eventPublisher;
         this.aiHubSessionMemoryProvider = aiHubSessionMemoryProvider;
         this.inFlightRunRegistry = inFlightRunRegistry;
         this.webhookResumeRegistryProvider = webhookResumeRegistryProvider;
@@ -658,6 +662,8 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         approvalService.deleteByChat(chatId);
 
         chatRepository.delete(chat);
+
+        eventPublisher.publishEvent(new AiHubChatDeletedEvent(chatId, threadId));
 
         if (!cleanupScheduled) {
             deleteSessionMessages(threadId);

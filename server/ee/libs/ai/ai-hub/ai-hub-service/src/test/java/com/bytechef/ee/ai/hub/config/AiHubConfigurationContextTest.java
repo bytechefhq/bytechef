@@ -77,6 +77,8 @@ import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.MemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.ToolAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.embedding.BatchingStrategy;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
@@ -84,6 +86,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import tools.jackson.databind.json.JsonMapper;
@@ -216,6 +219,28 @@ class AiHubConfigurationContextTest {
                 assertThat(context).hasNotFailed();
                 assertThat(context.getBeansOfType(AiHubGlobalToolCatalog.class)).containsOnlyKeys(
                     "aiHubAskGlobalToolCatalog", "aiHubBuildGlobalToolCatalog");
+                assertThat(context.getBeanProvider(ToolSearchCatalogFeeder.class)
+                    .getIfAvailable()).isNull();
+
+                for (String agentBeanName : List.of("aiHubAskSpringAIAgent", "aiHubBuildSpringAIAgent")) {
+                    assertThat(toolAdvisors(context, agentBeanName)).as(agentBeanName)
+                        .isEmpty();
+                }
+            });
+    }
+
+    @Test
+    void testToolSearchStaysOffWithoutTheCopilotEmbeddingModel() {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        contextRunner(fixtures)
+            .withUserConfiguration(AiHubPgVectorConfiguration.class, ToolSearchAdvisorConfiguration.class)
+            .withBean(EmbeddingModel.class, () -> mock(EmbeddingModel.class))
+            .withBean("pgVectorJdbcTemplate", JdbcTemplate.class, () -> mock(JdbcTemplate.class))
+            .withBean(BatchingStrategy.class, () -> mock(BatchingStrategy.class))
+            .withPropertyValues("bytechef.ai.hub.enabled=true", "bytechef.ai.copilot.enabled=true")
+            .run(context -> {
+                assertThat(context).hasNotFailed();
                 assertThat(context.getBeanProvider(ToolSearchCatalogFeeder.class)
                     .getIfAvailable()).isNull();
 
