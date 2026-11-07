@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.agent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +24,7 @@ import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGateToolCallback;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.progress.SubagentProgressEmitter;
+import com.bytechef.ee.ai.hub.skill.AiHubSkillsToolProvider;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
@@ -166,6 +168,67 @@ class AiHubSpringAIAgentTest {
     }
 
     @Test
+    void testOffersTheSkillsToolOfTheChatOwner() throws AGUIException {
+        AiHubSkillsToolProvider skillsToolProvider = mock(AiHubSkillsToolProvider.class);
+        ToolCallback skillToolCallback = stubToolCallback("Skill");
+
+        when(skillsToolProvider.resolve(10L)).thenReturn(List.of(skillToolCallback));
+
+        AiHubSpringAIAgent agent = newAgentBuilder()
+            .skillsToolProvider(skillsToolProvider)
+            .build();
+
+        State state = verifiedState();
+
+        state.set(AiHubStateKeys.VERIFIED_OWNER_USER_ID, 10L);
+
+        assertThat(agent.additionalToolCallbacks(newInput(state)))
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .containsExactly("Skill");
+        assertThat(agent.pinnedToolCallbacks())
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .doesNotContain("Skill");
+
+        verify(skillsToolProvider).resolve(10L);
+    }
+
+    @Test
+    void testOffersNoSkillsToolToAParticipantOfAnotherUsersChat() throws AGUIException {
+        AiHubSkillsToolProvider skillsToolProvider = mock(AiHubSkillsToolProvider.class);
+
+        AiHubSpringAIAgent agent = newAgentBuilder()
+            .skillsToolProvider(skillsToolProvider)
+            .build();
+
+        State state = verifiedState();
+
+        state.set(AiHubStateKeys.VERIFIED_OWNER_USER_ID, 11L);
+
+        assertThat(agent.additionalToolCallbacks(newInput(state))).isEmpty();
+
+        verifyNoInteractions(skillsToolProvider);
+    }
+
+    @Test
+    void testContinuesWithoutTheSkillsToolWhenResolutionFails() throws AGUIException {
+        AiHubSkillsToolProvider skillsToolProvider = mock(AiHubSkillsToolProvider.class);
+
+        when(skillsToolProvider.resolve(10L)).thenThrow(new IllegalStateException("broken archive"));
+
+        AiHubSpringAIAgent agent = newAgentBuilder()
+            .skillsToolProvider(skillsToolProvider)
+            .build();
+
+        State state = verifiedState();
+
+        state.set(AiHubStateKeys.VERIFIED_OWNER_USER_ID, 10L);
+
+        assertThat(agent.additionalToolCallbacks(newInput(state))).isEmpty();
+    }
+
+    @Test
     void testAdvisorParamsCarryOnlyTheConversationIdWithoutAUserMessage() throws AGUIException {
         RunAgentInput input = new RunAgentInput(
             "thread", "run", verifiedState(), List.of(), List.of(), List.of(), null);
@@ -293,6 +356,19 @@ class AiHubSpringAIAgentTest {
 
     private static ToolResponseMessage.ToolResponse toolResponse(String responseData) {
         return new ToolResponseMessage.ToolResponse("call-1", "someTool", responseData);
+    }
+
+    private static ToolCallback stubToolCallback(String name) {
+        ToolCallback toolCallback = mock(ToolCallback.class);
+
+        when(toolCallback.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name(name)
+                .description(name)
+                .inputSchema("{}")
+                .build());
+
+        return toolCallback;
     }
 
     private static AiHubSpringAIAgent newAgent() throws AGUIException {

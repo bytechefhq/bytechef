@@ -41,7 +41,8 @@ class AiHubGlobalToolCatalogTest {
     private final TaskDispatcherTools taskDispatcherTools = new TaskDispatcherTools(null);
     private final TaskTools taskTools = new TaskTools(componentTools, taskDispatcherTools);
     private final AiHubConfiguration configuration = new AiHubConfiguration(
-        new ByteArrayResource(new byte[0]), new ByteArrayResource(new byte[0]));
+        new ByteArrayResource(new byte[0]), new ByteArrayResource(new byte[0]), new ByteArrayResource(new byte[0]),
+        new ByteArrayResource(new byte[0]));
 
     @Test
     void testCatalogHoldsTheComponentTaskAndTaskDispatcherTools() {

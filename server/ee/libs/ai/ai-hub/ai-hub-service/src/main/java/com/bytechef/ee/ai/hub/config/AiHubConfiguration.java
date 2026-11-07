@@ -37,6 +37,7 @@ import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRe
 import com.bytechef.component.ai.agent.chat.memory.builtin.util.BuiltInSessionRepositoryFactory.BuiltInSessionStore;
 import com.bytechef.ee.ai.hub.agent.AiHubRoutingAgent;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
+import com.bytechef.ee.ai.hub.agent.AiHubToolCallbackWrappers;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.agent.RunStopAdvisor;
 import com.bytechef.ee.ai.hub.agent.WebhookBridgeAgent;
@@ -52,6 +53,7 @@ import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.progress.SubagentProgressToolCallback;
 import com.bytechef.ee.ai.hub.progress.SubagentStepAdvisor;
+import com.bytechef.ee.ai.hub.skill.AiHubSkillsToolProvider;
 import com.bytechef.ee.ai.hub.subagent.SubAgentAdvisorContributor;
 import com.bytechef.ee.ai.hub.subagent.SubAgentContributingChatClient;
 import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
@@ -69,6 +71,7 @@ import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
 import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
+import com.bytechef.ee.ai.hub.tool.memory.AiHubAutoMemoryToolsAdvisor;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubChatBindingToolCallbackResolver;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
@@ -83,6 +86,7 @@ import com.bytechef.ee.automation.promotion.facade.EnvironmentPromotionFacade;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
+import com.bytechef.platform.ai.auto.memory.AiAutoMemoryService;
 import com.bytechef.platform.ai.guardrails.GuardrailSurface;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
@@ -171,15 +175,22 @@ public class AiHubConfiguration {
     private static final String UPDATE_WORKFLOW_TOOL_NAME = "updateWorkflow";
 
     private final Resource promptAiHubAskResource;
+    private final Resource promptAiHubAutoMemoryToolsReadOnlyResource;
+    private final Resource promptAiHubAutoMemoryToolsResource;
     private final Resource promptAiHubBuildResource;
     private final State state = new State();
 
     @SuppressFBWarnings("EI")
     public AiHubConfiguration(
         @Value("classpath:prompt_ai_hub_ask.txt") Resource promptAiHubAskResource,
+        @Value("classpath:prompt/ai_hub_auto_memory_tools_read_only_system_prompt.md") //
+        Resource promptAiHubAutoMemoryToolsReadOnlyResource,
+        @Value("classpath:prompt/ai_hub_auto_memory_tools_system_prompt.md") Resource promptAiHubAutoMemoryToolsResource,
         @Value("classpath:prompt_ai_hub_build.txt") Resource promptAiHubBuildResource) {
 
         this.promptAiHubAskResource = promptAiHubAskResource;
+        this.promptAiHubAutoMemoryToolsReadOnlyResource = promptAiHubAutoMemoryToolsReadOnlyResource;
+        this.promptAiHubAutoMemoryToolsResource = promptAiHubAutoMemoryToolsResource;
         this.promptAiHubBuildResource = promptAiHubBuildResource;
     }
 
@@ -336,7 +347,9 @@ public class AiHubConfiguration {
         @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
-        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider)
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider,
+        ObjectProvider<AiAutoMemoryService> aiAutoMemoryServiceProvider,
+        ObjectProvider<AiHubSkillsToolProvider> skillsToolProviderProvider)
         throws AGUIException {
 
         AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
@@ -346,7 +359,8 @@ public class AiHubConfiguration {
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
             toolSearchToolCallAdvisorProvider, aiGuardrails, aiGuardrailMetrics(aiGuardrails, meterRegistryProvider),
-            chatBindingToolCallbackResolverProvider);
+            chatBindingToolCallbackResolverProvider, aiAutoMemoryServiceProvider,
+            skillsToolProviderProvider);
     }
 
     @Bean(defaultCandidate = false)
@@ -360,7 +374,9 @@ public class AiHubConfiguration {
         @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
-        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider)
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider,
+        ObjectProvider<AiAutoMemoryService> aiAutoMemoryServiceProvider,
+        ObjectProvider<AiHubSkillsToolProvider> skillsToolProviderProvider)
         throws AGUIException {
 
         AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
@@ -370,7 +386,8 @@ public class AiHubConfiguration {
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
             toolSearchToolCallAdvisorProvider, aiGuardrails, aiGuardrailMetrics(aiGuardrails, meterRegistryProvider),
-            chatBindingToolCallbackResolverProvider);
+            chatBindingToolCallbackResolverProvider, aiAutoMemoryServiceProvider,
+            skillsToolProviderProvider);
     }
 
     /**
@@ -798,7 +815,9 @@ public class AiHubConfiguration {
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
         ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
         @Nullable AiGuardrails aiGuardrails, @Nullable AiGuardrailMetrics aiGuardrailMetrics,
-        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider)
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider,
+        ObjectProvider<AiAutoMemoryService> aiAutoMemoryServiceProvider,
+        ObjectProvider<AiHubSkillsToolProvider> skillsToolProviderProvider)
         throws AGUIException {
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
@@ -817,6 +836,9 @@ public class AiHubConfiguration {
         builder.advisor(aiHubSessionMemory.createSessionMemoryAdvisor());
         builder.advisor(aiHubSessionMemory.createTurnEndingToolResultAdvisor(approvalGate::recordToolCallId));
         toolSearchToolCallAdvisorProvider.ifAvailable(builder::advisor);
+        aiAutoMemoryServiceProvider.ifAvailable(
+            aiAutoMemoryService -> builder.advisor(
+                autoMemoryToolsAdvisor(aiAutoMemoryService, mode, securityContextRehydrator)));
 
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
         webSearchToolCallbackProviderProvider.ifAvailable(builder::webSearchToolCallbackProvider);
@@ -825,6 +847,8 @@ public class AiHubConfiguration {
         if (aiGuardrails != null) {
             builder.aiGuardrails(aiGuardrails, aiGuardrailMetrics);
         }
+
+        skillsToolProviderProvider.ifAvailable(builder::skillsToolProvider);
 
         return builder.build();
     }
@@ -837,6 +861,21 @@ public class AiHubConfiguration {
         }
 
         return new AiGuardrailMetrics(meterRegistryProvider.getIfAvailable(), GuardrailSurface.AI_HUB);
+    }
+
+    private AiHubAutoMemoryToolsAdvisor autoMemoryToolsAdvisor(
+        AiAutoMemoryService aiAutoMemoryService, Mode mode, SecurityContextRehydrator securityContextRehydrator) {
+
+        boolean readOnly = mode != Mode.BUILD;
+
+        return AiHubAutoMemoryToolsAdvisor.builder()
+            .aiAutoMemoryService(aiAutoMemoryService)
+            .memorySystemPrompt(
+                readOnly ? promptAiHubAutoMemoryToolsReadOnlyResource : promptAiHubAutoMemoryToolsResource)
+            .readOnly(readOnly)
+            .toolCallbackWrapper(
+                toolCallback -> AiHubToolCallbackWrappers.wrap(toolCallback, securityContextRehydrator))
+            .build();
     }
 
     private static String readSystemPrompt(Resource systemPromptResource) {

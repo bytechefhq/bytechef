@@ -30,6 +30,7 @@ import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGateToolCallback;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.progress.SubagentProgressEmitter;
+import com.bytechef.ee.ai.hub.skill.AiHubSkillsToolProvider;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.ee.ai.hub.toolsearch.ClusterElementToolCallback;
 import com.bytechef.ee.ai.hub.toolsearch.PinnedToolSearchToolCallingAdvisor;
@@ -120,6 +121,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     private final @Nullable Mode mode;
     private final List<ToolCallback> pinnedToolCallbacks;
     private final @Nullable SecurityContextRehydrator securityContextRehydrator;
+    private final @Nullable AiHubSkillsToolProvider skillsToolProvider;
     private final List<ToolCallback> toolCallbacks;
     private final @Nullable WebSearchToolCallbackProvider webSearchToolCallbackProvider;
 
@@ -134,6 +136,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         this.mode = builder.mode;
         this.pinnedToolCallbacks = List.copyOf(builder.pendingToolCallbacks);
         this.securityContextRehydrator = builder.securityContextRehydrator;
+        this.skillsToolProvider = builder.skillsToolProvider;
         this.toolCallbacks = List.copyOf(builder.wrappedToolCallbacks);
         this.webSearchToolCallbackProvider = builder.webSearchToolCallbackProvider;
     }
@@ -162,16 +165,50 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
      */
     @Override
     protected List<ToolCallback> additionalToolCallbacks(RunAgentInput input) {
-        Integer environmentOrdinal = environmentOrdinal(input);
+        List<ToolCallback> additionalToolCallbacks = new ArrayList<>(webSearchToolCallbacks(input));
 
-        if (webSearchToolCallbackProvider == null || environmentOrdinal == null) {
+        additionalToolCallbacks.addAll(skillToolCallbacks(input));
+
+        if (additionalToolCallbacks.isEmpty()) {
             return super.additionalToolCallbacks(input);
         }
 
-        return webSearchToolCallbackProvider.getToolCallbacks(environmentOrdinal)
-            .stream()
+        return additionalToolCallbacks.stream()
             .map(toolCallback -> AiHubToolCallbackWrappers.wrap(toolCallback, securityContextRehydrator))
             .toList();
+    }
+
+    private List<ToolCallback> webSearchToolCallbacks(RunAgentInput input) {
+        Integer environmentOrdinal = environmentOrdinal(input);
+
+        if (webSearchToolCallbackProvider == null || environmentOrdinal == null) {
+            return List.of();
+        }
+
+        return webSearchToolCallbackProvider.getToolCallbacks(environmentOrdinal);
+    }
+
+    private List<ToolCallback> skillToolCallbacks(RunAgentInput input) {
+        if (skillsToolProvider == null) {
+            return List.of();
+        }
+
+        State state = input.state();
+
+        Long userId = state == null ? null : NumberUtils.asLong(state.get(AiHubStateKeys.AUTHENTICATED_USER_ID));
+        Long ownerUserId = state == null ? null : NumberUtils.asLong(state.get(AiHubStateKeys.VERIFIED_OWNER_USER_ID));
+
+        if (userId == null || !Objects.equals(userId, ownerUserId)) {
+            return List.of();
+        }
+
+        try {
+            return skillsToolProvider.resolve(userId);
+        } catch (RuntimeException exception) {
+            log.warn("Skill tool resolution failed for user={}; continuing without skill tools", userId, exception);
+
+            return List.of();
+        }
     }
 
     @Override
@@ -610,6 +647,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         private @Nullable ChatToolBindingResolver chatToolBindingResolver;
         private @Nullable Mode mode;
         private @Nullable WebSearchToolCallbackProvider webSearchToolCallbackProvider;
+        private @Nullable AiHubSkillsToolProvider skillsToolProvider;
         private final List<ToolCallback> pendingToolCallbacks = new ArrayList<>();
         private final List<ToolCallback> wrappedToolCallbacks = new ArrayList<>();
 
@@ -635,6 +673,13 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
             this.aiGuardrails = aiGuardrails;
             this.aiGuardrailMetrics = aiGuardrailMetrics;
+
+            return this;
+        }
+
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
+        public Builder skillsToolProvider(@Nullable AiHubSkillsToolProvider skillsToolProvider) {
+            this.skillsToolProvider = skillsToolProvider;
 
             return this;
         }

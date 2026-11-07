@@ -179,7 +179,10 @@ public final class AiHubAgentFixtures {
     private @Nullable AiGuardrails aiGuardrails;
 
     private final AiHubConfiguration configuration = new AiHubConfiguration(
-        new ClassPathResource("prompt_ai_hub_ask.txt"), new ClassPathResource("prompt_ai_hub_build.txt"));
+        new ClassPathResource("prompt_ai_hub_ask.txt"),
+        new ClassPathResource("prompt/ai_hub_auto_memory_tools_read_only_system_prompt.md"),
+        new ClassPathResource("prompt/ai_hub_auto_memory_tools_system_prompt.md"),
+        new ClassPathResource("prompt_ai_hub_build.txt"));
 
     @SuppressWarnings("unchecked")
     public AiHubAgentFixtures(Set<String> catalogToolNames) {
@@ -263,6 +266,7 @@ public final class AiHubAgentFixtures {
             sessionMemory, defaultChatModel, askToolCallbacks(), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
             toolSearchAdvisorProvider(), availableProvider(aiGuardrails), availableProvider(meterRegistry),
+            availableProvider(null), availableProvider(null),
             availableProvider(null));
     }
 
@@ -284,6 +288,7 @@ public final class AiHubAgentFixtures {
             sessionMemory, defaultChatModel, buildToolCallbacks(catalog), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
             toolSearchAdvisorProvider(), availableProvider(aiGuardrails), availableProvider(meterRegistry),
+            availableProvider(null), availableProvider(null),
             availableProvider(null));
     }
 
