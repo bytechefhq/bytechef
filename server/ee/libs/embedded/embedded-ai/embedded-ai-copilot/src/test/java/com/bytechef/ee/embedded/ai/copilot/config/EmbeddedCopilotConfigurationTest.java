@@ -17,10 +17,14 @@ import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.embedded.ai.copilot.agent.EmbeddedCodeWorkflowSpringAIAgent;
+import com.bytechef.ee.embedded.ai.tool.IntegrationCodeWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.IntegrationTools;
 import com.bytechef.ee.embedded.ai.tool.IntegrationWorkflowTools;
+import com.bytechef.ee.embedded.ai.tool.ReadIntegrationCodeWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationWorkflowTools;
+import com.bytechef.ee.embedded.configuration.facade.IntegrationCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.platform.ai.tool.ComponentTools;
@@ -51,10 +55,30 @@ class EmbeddedCopilotConfigurationTest {
     private static final Resource PROMPT_RESOURCE = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
 
     private final EmbeddedCopilotConfiguration embeddedCopilotConfiguration = new EmbeddedCopilotConfiguration(
-        PROMPT_RESOURCE, PROMPT_RESOURCE, mock(WorkflowInstructionTools.class), mock(WorkflowValidatorTools.class));
+        PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, mock(WorkflowInstructionTools.class),
+        mock(WorkflowValidatorTools.class));
     private final IntegrationTools integrationTools = new IntegrationTools(mock(IntegrationFacade.class));
     private final IntegrationWorkflowTools integrationWorkflowTools =
         new IntegrationWorkflowTools(mock(IntegrationWorkflowFacade.class), mock(ObjectProvider.class));
+
+    @Test
+    void testCodeWorkflowEmbeddedAgentsAreRegisteredUnderTheirAgentIds() throws AGUIException {
+        IntegrationCodeWorkflowFacade integrationCodeWorkflowFacade = mock(IntegrationCodeWorkflowFacade.class);
+
+        EmbeddedCodeWorkflowSpringAIAgent askAgent = embeddedCopilotConfiguration.codeWorkflowEmbeddedAskSpringAIAgent(
+            mock(ChatMemory.class), mock(ChatModel.class),
+            new ReadIntegrationCodeWorkflowTools(integrationCodeWorkflowFacade), mock(SecurityContextRehydrator.class));
+
+        EmbeddedCodeWorkflowSpringAIAgent buildAgent =
+            embeddedCopilotConfiguration.codeWorkflowEmbeddedBuildSpringAIAgent(
+                mock(ChatMemory.class), mock(ChatModel.class),
+                new IntegrationCodeWorkflowTools(integrationCodeWorkflowFacade),
+                new ReadIntegrationCodeWorkflowTools(integrationCodeWorkflowFacade),
+                mock(SecurityContextRehydrator.class));
+
+        assertThat(askAgent.getAgentId()).isEqualTo("code_workflow_embedded_ask");
+        assertThat(buildAgent.getAgentId()).isEqualTo("code_workflow_embedded_build");
+    }
 
     @Test
     void testWorkflowEditorEmbeddedAskAgentIsRegisteredUnderTheAskAgentId() throws AGUIException {
