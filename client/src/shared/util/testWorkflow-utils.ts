@@ -2,6 +2,7 @@ import {BASE_PATH} from '@/shared/middleware/platform/workflow/test';
 
 export interface TestWorkflowRequestProps {
     inputs?: {[key: string]: object};
+    triggerName?: string;
 }
 
 export interface GetTestWorkflowAttachRequestProps {

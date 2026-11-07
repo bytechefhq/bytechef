@@ -1,6 +1,7 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import getSelectedTestRunTriggerName from '@/pages/platform/workflow-editor/utils/getSelectedTestRunTriggerName';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {
@@ -118,6 +119,7 @@ export const useAutomationWorkflowEditorHeader = ({
             const request = getTestWorkflowStreamPostRequest({
                 environmentId: currentEnvironmentId,
                 id: workflow.id,
+                testWorkflowRequest: {triggerName: getSelectedTestRunTriggerName(workflow)},
             });
 
             setStreamRequest(request);
@@ -131,7 +133,7 @@ export const useAutomationWorkflowEditorHeader = ({
         setStreamRequest,
         setWorkflowIsRunning,
         setWorkflowTestExecution,
-        workflow.id,
+        workflow,
     ]);
 
     const handleShowOutputClick = () => {

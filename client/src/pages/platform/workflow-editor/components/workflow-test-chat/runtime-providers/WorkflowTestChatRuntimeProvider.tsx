@@ -135,6 +135,7 @@ export function WorkflowTestChatRuntimeProvider({
                             message: input,
                         },
                     },
+                    triggerName: getChatTriggerName(workflow),
                 },
             });
 

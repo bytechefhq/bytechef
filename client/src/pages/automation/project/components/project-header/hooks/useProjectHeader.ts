@@ -4,6 +4,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import getSelectedTestRunTriggerName from '@/pages/platform/workflow-editor/utils/getSelectedTestRunTriggerName';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {Project} from '@/shared/middleware/automation/configuration';
@@ -219,6 +220,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
                 const request = getTestWorkflowStreamPostRequest({
                     environmentId: currentEnvironmentId,
                     id: workflow.id,
+                    testWorkflowRequest: {triggerName: getSelectedTestRunTriggerName(workflow)},
                 });
                 setStreamRequest(request);
             }
@@ -237,7 +239,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         setWorkflowNodeDetailsPanelOpen,
         setWorkflowTestExecution,
         setWorkflowTestChatPanelOpen,
-        workflow.id,
+        workflow,
     ]);
 
     const handleShowOutputClick = () => {

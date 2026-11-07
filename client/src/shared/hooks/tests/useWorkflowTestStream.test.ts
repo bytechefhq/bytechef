@@ -451,6 +451,32 @@ describe('useWorkflowTestStream', () => {
         useWorkflowDataStore.getState().reset();
     });
 
+    it('should mark the trigger named in the start event as completed', () => {
+        useWorkflowDataStore.setState({
+            workflow: {
+                ...useWorkflowDataStore.getState().workflow,
+                triggers: [
+                    {name: 'trigger_2', type: 'webhook/v1/autoRespondWithHTTP200'},
+                    {name: 'trigger_3', type: 'schedule/v1/interval'},
+                ],
+            },
+        });
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.start({jobId: 'job-123', triggerName: 'trigger_3'});
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('trigger_3', {status: 'COMPLETED'});
+        expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalledWith('trigger_2', expect.anything());
+
+        useWorkflowDataStore.getState().reset();
+    });
+
     it('should handle task_started event', () => {
         renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
 
