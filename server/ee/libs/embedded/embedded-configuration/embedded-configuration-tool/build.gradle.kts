@@ -8,6 +8,7 @@ dependencies {
     implementation("org.springframework:spring-tx")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
+    implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
     implementation(project(":server:libs:ai:ai-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-agent-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
