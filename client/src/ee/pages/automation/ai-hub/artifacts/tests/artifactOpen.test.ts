@@ -126,7 +126,6 @@ describe('artifactOpen', () => {
     });
 
     it('is not removable for the reference kinds the server refuses to delete', () => {
-        expect(isArtifactRemovable(buildArtifact({kind: 'FILE_REFERENCED'}))).toBe(false);
         expect(isArtifactRemovable(buildArtifact({kind: 'SKILL_REFERENCED'}))).toBe(false);
     });
 
@@ -158,6 +157,25 @@ describe('artifactOpen', () => {
 
         expect(isArtifactClickable(aiAgentArtifact)).toBe(true);
         expect(isArtifactRemovable(aiAgentArtifact)).toBe(true);
+    });
+
+    it('opens a file tab for a FILE_REFERENCED artifact', () => {
+        handleArtifactQuickOpen(
+            buildArtifact({artifactId: '7', artifactName: 'notes.md', kind: 'FILE_REFERENCED', metadataJson: null})
+        );
+
+        const state = aiHubTabsStore.getState();
+
+        expect(state.openTabs).toHaveLength(1);
+        expect(state.openTabs[0]).toMatchObject({fileId: '7', kind: 'file', name: 'notes.md', viewMode: 'preview'});
+        expect(state.rightPanelOpen).toBe(true);
+    });
+
+    it('is clickable and removable for FILE_REFERENCED', () => {
+        const fileArtifact = buildArtifact({artifactId: '7', kind: 'FILE_REFERENCED', metadataJson: null});
+
+        expect(isArtifactClickable(fileArtifact)).toBe(true);
+        expect(isArtifactRemovable(fileArtifact)).toBe(true);
     });
 
     it('is removable for WORKFLOW_REFERENCED but not for the created and updated workflow kinds', () => {

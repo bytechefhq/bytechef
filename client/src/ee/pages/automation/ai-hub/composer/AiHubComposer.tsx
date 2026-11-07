@@ -49,9 +49,21 @@ const AiHubComposer = () => {
         aiHubComposerStore.getState().addReference({id, kind: 'aiAgent', name, ownsTab, tabId});
     };
 
+    const handleSelectFile = (id: string, name: string) => {
+        const {ownsTab, tabId} = attachTab(() => aiHubTabsStore.getState().openFileTab(id, name));
+
+        aiHubComposerStore.getState().addReference({id, kind: 'file', name, ownsTab, tabId});
+    };
+
     const handleResourceSelect = (selection: ResourcePickerSelectionI) => {
         if (selection.kind === 'aiAgent') {
             handleSelectAiAgent(selection.id, selection.name);
+
+            return;
+        }
+
+        if (selection.kind === 'file') {
+            handleSelectFile(selection.id, selection.name);
 
             return;
         }

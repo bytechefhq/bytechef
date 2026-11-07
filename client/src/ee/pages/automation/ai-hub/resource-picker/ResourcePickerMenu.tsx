@@ -2,10 +2,11 @@ import {Command, CommandGroup, CommandInput, CommandItem, CommandList} from '@/c
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {ReferencedResourceKindType} from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
-import {useAiAgentsQuery} from '@/shared/middleware/graphql';
+import {useAiAgentsQuery, useGetAssetFilesQuery} from '@/shared/middleware/graphql';
 import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
-import {BotIcon, ChevronLeftIcon, ChevronRightIcon, WorkflowIcon} from 'lucide-react';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {BotIcon, ChevronLeftIcon, ChevronRightIcon, FileTextIcon, WorkflowIcon} from 'lucide-react';
 import {Fragment, ReactNode, useMemo, useState} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -43,7 +44,7 @@ interface WorkflowItemI {
 const SECTION_INITIAL_CAP = 20;
 const SECTION_EXPAND_INCREMENT = 50;
 
-type MenuPathType = [] | ['aiAgents'] | ['workflows'] | ['workflows', string] | ['custom', string];
+type MenuPathType = [] | ['aiAgents'] | ['files'] | ['workflows'] | ['workflows', string] | ['custom', string];
 
 const EmptyMessage = ({children}: {children: ReactNode}) => (
     <div className="py-6 text-center text-sm text-muted-foreground">{children}</div>
@@ -62,7 +63,10 @@ const ResourcePickerMenu = ({
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [menuPath, setMenuPath] = useState<MenuPathType>([]);
     const [aiAgentsShowCount, setAiAgentsShowCount] = useState(SECTION_INITIAL_CAP);
+    const [filesShowCount, setFilesShowCount] = useState(SECTION_INITIAL_CAP);
     const [workflowsShowCount, setWorkflowsShowCount] = useState(SECTION_INITIAL_CAP);
+
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const open = controlledOpen ?? uncontrolledOpen;
     const selectedProjectId = menuPath.length === 2 && menuPath[0] === 'workflows' ? menuPath[1] : undefined;
@@ -74,6 +78,11 @@ const ResourcePickerMenu = ({
 
     const {data: aiAgentsData, isLoading: aiAgentsLoading} = useAiAgentsQuery(
         {workspaceId: String(workspaceId)},
+        {enabled: open && isWorkspaceIdKnown(workspaceId)}
+    );
+
+    const {data: assetFilesData, isLoading: assetFilesLoading} = useGetAssetFilesQuery(
+        {environment: currentEnvironmentId, workspaceId: String(workspaceId)},
         {enabled: open && isWorkspaceIdKnown(workspaceId)}
     );
 
@@ -105,6 +114,11 @@ const ResourcePickerMenu = ({
                 (aiAgent) => aiAgent != null && aiAgent.title.toLowerCase().includes(lowerSearch)
             ),
         [aiAgentsData, lowerSearch]
+    );
+
+    const filteredFiles = useMemo(
+        () => (assetFilesData?.assetFiles ?? []).filter((file) => file.name.toLowerCase().includes(lowerSearch)),
+        [assetFilesData, lowerSearch]
     );
 
     const selectedWorkflowProject = useMemo(() => {
@@ -144,12 +158,15 @@ const ResourcePickerMenu = ({
 
     const showsAiAgents = menuPath[0] === 'aiAgents' || (menuPath.length === 0 && debouncedSearch !== '');
 
+    const showsFiles = menuPath[0] === 'files' || (menuPath.length === 0 && debouncedSearch !== '');
+
     const isRootMenu = menuPath.length === 0 && debouncedSearch === '';
 
     const resetSearch = () => {
         setSearch('');
         setDebouncedSearch('');
         setAiAgentsShowCount(SECTION_INITIAL_CAP);
+        setFilesShowCount(SECTION_INITIAL_CAP);
         setWorkflowsShowCount(SECTION_INITIAL_CAP);
     };
 
@@ -173,6 +190,12 @@ const ResourcePickerMenu = ({
 
     const handleSelectAiAgent = (aiAgentId: string, title: string) => {
         onSelect({id: aiAgentId, kind: 'aiAgent', name: title});
+
+        handleOpenChange(false);
+    };
+
+    const handleSelectFile = (fileId: string, name: string) => {
+        onSelect({id: fileId, kind: 'file', name});
 
         handleOpenChange(false);
     };
@@ -222,6 +245,14 @@ const ResourcePickerMenu = ({
                                     <BotIcon className="mr-2 size-3.5" />
 
                                     <span className="flex-1">AI Agents</span>
+
+                                    <ChevronRightIcon className="size-3.5 text-muted-foreground" />
+                                </CommandItem>
+
+                                <CommandItem onSelect={() => navigateTo(['files'])} value="root-files">
+                                    <FileTextIcon className="mr-2 size-3.5" />
+
+                                    <span className="flex-1">Files</span>
 
                                     <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                                 </CommandItem>
@@ -282,6 +313,40 @@ const ResourcePickerMenu = ({
                                             >
                                                 <span className="text-xs text-muted-foreground">
                                                     {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredAiAgents.length - aiAgentsShowCount)} more…`}
+                                                </span>
+                                            </CommandItem>
+                                        )}
+                                    </CommandGroup>
+                                )}
+
+                                {showsFiles && (
+                                    <CommandGroup heading="Files">
+                                        {filteredFiles.length === 0 && (
+                                            <EmptyMessage>{assetFilesLoading ? 'Loading…' : 'No files.'}</EmptyMessage>
+                                        )}
+
+                                        {filteredFiles.slice(0, filesShowCount).map((file) => (
+                                            <CommandItem
+                                                key={`file-${file.id}`}
+                                                onSelect={() => handleSelectFile(file.id, file.name)}
+                                                value={`file-${file.id}-${file.name}`}
+                                            >
+                                                <FileTextIcon className="mr-2 size-3.5" />
+
+                                                <span className="truncate">{file.name}</span>
+                                            </CommandItem>
+                                        ))}
+
+                                        {filteredFiles.length > filesShowCount && (
+                                            <CommandItem
+                                                key="files-show-more"
+                                                onSelect={() =>
+                                                    setFilesShowCount((count) => count + SECTION_EXPAND_INCREMENT)
+                                                }
+                                                value="files-show-more"
+                                            >
+                                                <span className="text-xs text-muted-foreground">
+                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredFiles.length - filesShowCount)} more…`}
                                                 </span>
                                             </CommandItem>
                                         )}

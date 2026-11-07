@@ -560,6 +560,34 @@ describe('buildAiHubSubscriber', () => {
         });
     });
 
+    describe('openFileTab', () => {
+        it('opens a file tab when the openFileTab tool result arrives', () => {
+            deliverToolResult(
+                createSubscriber(),
+                'call-file',
+                'openFileTab',
+                JSON.stringify({fileId: '7', name: 'notes.md', opened: true})
+            );
+
+            const state = aiHubTabsStore.getState();
+
+            expect(state.openTabs).toHaveLength(1);
+            expect(state.openTabs[0]).toMatchObject({fileId: '7', kind: 'file', name: 'notes.md'});
+            expect(state.activeTabId).toBe(state.openTabs[0]!.id);
+        });
+
+        it('opens no tab when the tool reports opened:false', () => {
+            deliverToolResult(
+                createSubscriber(),
+                'call-file',
+                'openFileTab',
+                JSON.stringify({error: 'File 7 was not found. Check the file id.', opened: false})
+            );
+
+            expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
+        });
+    });
+
     describe('AI Agent-mutating tools', () => {
         it('notifies onAiAgentMutated for the agent builder mutations only', () => {
             const onAiAgentMutated = vi.fn();

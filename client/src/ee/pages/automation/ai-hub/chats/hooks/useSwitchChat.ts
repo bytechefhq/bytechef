@@ -2,6 +2,7 @@ import {
     isAiAgentArtifactKind,
     isCodeWorkflowArtifactKind,
     isCustomComponentArtifactKind,
+    isFileArtifactKind,
     isWorkflowArtifactKind,
     parseArtifactMetadata,
 } from '@/ee/pages/automation/ai-hub/artifacts/artifactOpen';
@@ -419,6 +420,10 @@ function applyToolApprovalStatuses(
 function artifactToOpenToolCall(artifact: AiHubChatArtifactI): OpenToolCallI | null {
     if (isAiAgentArtifactKind(artifact.kind)) {
         return {args: {aiAgentId: artifact.artifactId, name: artifact.artifactName}, toolName: 'openAiAgentTab'};
+    }
+
+    if (isFileArtifactKind(artifact.kind)) {
+        return {args: {fileId: artifact.artifactId, name: artifact.artifactName}, toolName: 'openFileTab'};
     }
 
     if (isCustomComponentArtifactKind(artifact.kind)) {

@@ -91,6 +91,8 @@ function toArtifactKind(tab: AiHubTabType): AiHubChatArtifactKind {
             return AiHubChatArtifactKind.CodeWorkflowReferenced;
         case 'customComponent':
             return AiHubChatArtifactKind.CustomComponentReferenced;
+        case 'file':
+            return AiHubChatArtifactKind.FileReferenced;
         case 'workflow':
             return AiHubChatArtifactKind.WorkflowReferenced;
     }

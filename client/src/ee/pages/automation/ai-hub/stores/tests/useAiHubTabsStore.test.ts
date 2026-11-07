@@ -1,7 +1,7 @@
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it} from 'vitest';
 
-import {aiHubTabsStore, getTabGenericId, useAiHubTabsStore} from '../useAiHubTabsStore';
+import {aiHubTabsStore, getTabGenericId, inferDefaultViewMode, useAiHubTabsStore} from '../useAiHubTabsStore';
 
 const AI_AGENT_ONE = {aiAgentId: '42', name: 'Support Agent'};
 
@@ -393,6 +393,57 @@ describe('useAiHubTabsStore', () => {
             });
 
             expect(result.current.chatsSidebarCollapsed).toBe(true);
+        });
+    });
+
+    describe('file tabs', () => {
+        it('opens a file tab with a view mode inferred from its name', () => {
+            const tabId = aiHubTabsStore.getState().openFileTab('7', 'report.pdf');
+
+            const state = aiHubTabsStore.getState();
+
+            expect(state.openTabs).toEqual([
+                {fileId: '7', id: tabId, kind: 'file', name: 'report.pdf', viewMode: 'preview'},
+            ]);
+            expect(state.activeTabId).toBe(tabId);
+            expect(state.rightPanelOpen).toBe(true);
+            expect(getTabGenericId(state.openTabs[0]!)).toBe('7');
+        });
+
+        it('focuses the existing tab when the same file is opened again', () => {
+            const firstTabId = aiHubTabsStore.getState().openFileTab('7', 'notes.md');
+
+            aiHubTabsStore.getState().openWorkflowTab(WORKFLOW_ONE);
+
+            const secondTabId = aiHubTabsStore.getState().openFileTab('7', 'notes.md');
+
+            expect(secondTabId).toBe(firstTabId);
+            expect(aiHubTabsStore.getState().openTabs).toHaveLength(2);
+            expect(aiHubTabsStore.getState().activeTabId).toBe(firstTabId);
+        });
+
+        it('changes the view mode of a file tab only', () => {
+            const fileTabId = aiHubTabsStore.getState().openFileTab('7', 'notes.md');
+            const workflowTabId = aiHubTabsStore.getState().openWorkflowTab(WORKFLOW_ONE);
+
+            aiHubTabsStore.getState().setViewMode(fileTabId, 'split');
+            aiHubTabsStore.getState().setViewMode(workflowTabId, 'split');
+
+            const [fileTab, workflowTab] = aiHubTabsStore.getState().openTabs;
+
+            expect(fileTab).toMatchObject({kind: 'file', viewMode: 'split'});
+            expect(workflowTab).not.toHaveProperty('viewMode');
+        });
+
+        it.each([
+            ['config.json', 'editor'],
+            ['script.py', 'editor'],
+            ['README', 'editor'],
+            ['notes.md', 'preview'],
+            ['page.html', 'preview'],
+            ['photo.png', 'preview'],
+        ] as const)('infers %s as %s', (name, viewMode) => {
+            expect(inferDefaultViewMode(name)).toBe(viewMode);
         });
     });
 });

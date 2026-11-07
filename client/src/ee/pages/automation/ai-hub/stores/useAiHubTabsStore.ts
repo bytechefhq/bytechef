@@ -1,3 +1,4 @@
+import {AssetFileViewerModeType} from '@/shared/components/asset-file-viewer/AssetFileViewer';
 import {getRandomId} from '@/shared/util/random-utils';
 import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
@@ -24,6 +25,16 @@ export interface AiHubCustomComponentTabI {
     name: string;
 }
 
+export type AiHubViewModeType = AssetFileViewerModeType;
+
+export interface AiHubFileTabI {
+    fileId: string;
+    id: string;
+    kind: 'file';
+    name: string;
+    viewMode: AiHubViewModeType;
+}
+
 export interface AiHubWorkflowTabI {
     id: string;
     kind: 'workflow';
@@ -33,7 +44,8 @@ export interface AiHubWorkflowTabI {
     workflowId: string;
 }
 
-export type AiHubTabType = AiHubAiAgentTabI | AiHubCodeWorkflowTabI | AiHubCustomComponentTabI | AiHubWorkflowTabI;
+export type AiHubTabType =
+    AiHubAiAgentTabI | AiHubCodeWorkflowTabI | AiHubCustomComponentTabI | AiHubFileTabI | AiHubWorkflowTabI;
 
 export interface OpenAiAgentTabArgsI {
     aiAgentId: string;
@@ -79,6 +91,7 @@ interface AiHubTabsStateI {
     openAiAgentTab: (aiAgent: OpenAiAgentTabArgsI) => string;
     openCodeWorkflowTab: (codeWorkflow: OpenCodeWorkflowTabArgsI) => string;
     openCustomComponentTab: (customComponent: OpenCustomComponentTabArgsI) => string;
+    openFileTab: (fileId: string, name: string) => string;
     openTabs: AiHubTabType[];
     /**
      * Opens a workflow tab, or focuses the existing one. A workflow tab is project-scoped: opening another workflow of
@@ -92,8 +105,46 @@ interface AiHubTabsStateI {
     setActiveTab: (tabId: string) => void;
     setChatsSidebarCollapsed: (collapsed: boolean) => void;
     setRightPanelOpen: (open: boolean) => void;
+    setViewMode: (tabId: string, viewMode: AiHubViewModeType) => void;
     snapshotsByChatId: Record<number, ChatTabsSnapshotI>;
 }
+
+const EDITOR_EXTENSIONS = new Set([
+    'css',
+    'csv',
+    'env',
+    'go',
+    'ini',
+    'java',
+    'js',
+    'json',
+    'jsx',
+    'py',
+    'rb',
+    'rs',
+    'scss',
+    'sh',
+    'sql',
+    'toml',
+    'ts',
+    'tsx',
+    'txt',
+    'xml',
+    'yaml',
+    'yml',
+]);
+
+export const inferDefaultViewMode = (name: string): AiHubViewModeType => {
+    const dotIndex = name.lastIndexOf('.');
+
+    if (dotIndex < 0) {
+        return 'editor';
+    }
+
+    const extension = name.slice(dotIndex + 1).toLowerCase();
+
+    return EDITOR_EXTENSIONS.has(extension) ? 'editor' : 'preview';
+};
 
 export const getTabGenericId = (tab: AiHubTabType): string => {
     switch (tab.kind) {
@@ -103,6 +154,8 @@ export const getTabGenericId = (tab: AiHubTabType): string => {
             return tab.projectId;
         case 'customComponent':
             return tab.customComponentId;
+        case 'file':
+            return tab.fileId;
         case 'workflow':
             return tab.workflowId;
     }
@@ -272,6 +325,42 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
 
                     return tabIdToReturn;
                 },
+                openFileTab: (fileId, name) => {
+                    let tabIdToReturn = '';
+
+                    set((state) => {
+                        const existing = state.openTabs.find((tab) => tab.kind === 'file' && tab.fileId === fileId);
+
+                        if (existing) {
+                            tabIdToReturn = existing.id;
+
+                            return {
+                                ...state,
+                                activeTabId: existing.id,
+                                rightPanelOpen: true,
+                            };
+                        }
+
+                        const newTab: AiHubFileTabI = {
+                            fileId,
+                            id: getRandomId(),
+                            kind: 'file',
+                            name,
+                            viewMode: inferDefaultViewMode(name),
+                        };
+
+                        tabIdToReturn = newTab.id;
+
+                        return {
+                            ...state,
+                            activeTabId: newTab.id,
+                            openTabs: [...state.openTabs, newTab],
+                            rightPanelOpen: true,
+                        };
+                    });
+
+                    return tabIdToReturn;
+                },
                 openTabs: [],
                 openWorkflowTab: ({name, projectId, projectWorkflowId, workflowId}) => {
                     let tabIdToReturn = '';
@@ -375,6 +464,13 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
                     }),
                 setChatsSidebarCollapsed: (collapsed) => set((state) => ({...state, chatsSidebarCollapsed: collapsed})),
                 setRightPanelOpen: (open) => set((state) => ({...state, rightPanelOpen: open})),
+                setViewMode: (tabId, viewMode) =>
+                    set((state) => ({
+                        ...state,
+                        openTabs: state.openTabs.map((tab) =>
+                            tab.id === tabId && tab.kind === 'file' ? {...tab, viewMode} : tab
+                        ),
+                    })),
                 snapshotsByChatId: {},
             }),
             {
