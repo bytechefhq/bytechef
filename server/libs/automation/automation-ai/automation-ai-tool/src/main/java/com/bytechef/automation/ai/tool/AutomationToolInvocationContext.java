@@ -32,7 +32,9 @@ import org.springframework.ai.chat.model.ToolContext;
 /**
  * @author Ivica Cardic
  */
-public record AutomationToolInvocationContext(@Nullable Long workspaceId, @Nullable Long environmentId) {
+public record AutomationToolInvocationContext(
+    @Nullable Long workspaceId, @Nullable Long environmentId, @Nullable Long userId, @Nullable Short sourceOrdinal,
+    @Nullable String lastUserPrompt, @Nullable String threadId) {
 
     private static final Logger log = LoggerFactory.getLogger(AutomationToolInvocationContext.class);
 
@@ -44,9 +46,15 @@ public record AutomationToolInvocationContext(@Nullable Long workspaceId, @Nulla
     public static final String TOOL_CONTEXT_LAST_USER_PROMPT_KEY = "bytechef.automationTool.lastUserPrompt";
     public static final String TOOL_CONTEXT_THREAD_ID_KEY = "bytechef.automationTool.threadId";
 
+    public static final short SOURCE_ORDINAL_FILES = 3;
+
     public static final String WORKSPACE_ID_DESCRIPTION =
         "The workspace ID. Optional inside a Copilot chat, which defaults to the chat's workspace; otherwise " +
             "required - call listWorkspaces to find it.";
+
+    public AutomationToolInvocationContext(@Nullable Long workspaceId, @Nullable Long environmentId) {
+        this(workspaceId, environmentId, null, null, null, null);
+    }
 
     public static @Nullable AutomationToolInvocationContext fromToolContext(@Nullable ToolContext toolContext) {
         if (toolContext == null) {
@@ -66,7 +74,13 @@ public record AutomationToolInvocationContext(@Nullable Long workspaceId, @Nulla
             return null;
         }
 
-        return new AutomationToolInvocationContext(workspaceId, environmentId);
+        Long userId = asLong(map.get(TOOL_CONTEXT_USER_ID_KEY));
+        Short sourceOrdinal = asShort(map.get(TOOL_CONTEXT_SOURCE_ORDINAL_KEY));
+        String lastUserPrompt = asString(map.get(TOOL_CONTEXT_LAST_USER_PROMPT_KEY));
+        String threadId = asString(map.get(TOOL_CONTEXT_THREAD_ID_KEY));
+
+        return new AutomationToolInvocationContext(
+            workspaceId, environmentId, userId, sourceOrdinal, lastUserPrompt, threadId);
     }
 
     public static int resolveEnvironmentOrDefault(@Nullable AutomationToolInvocationContext context) {
@@ -200,6 +214,32 @@ public record AutomationToolInvocationContext(@Nullable Long workspaceId, @Nulla
         log.warn("Ignoring tool context value of unsupported type {}", valueClass.getName());
 
         return null;
+    }
+
+    private static @Nullable Short asShort(@Nullable Object value) {
+        if (value == null) {
+            return null;
+        }
+
+        if (value instanceof Number numberValue) {
+            return numberValue.shortValue();
+        }
+
+        if (value instanceof String stringValue && !stringValue.isBlank()) {
+            try {
+                return Short.parseShort(stringValue);
+            } catch (NumberFormatException exception) {
+                log.warn("Ignoring malformed numeric tool context value '{}'", stringValue);
+
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    private static @Nullable String asString(@Nullable Object value) {
+        return value == null ? null : value.toString();
     }
 
     private static @Nullable Object getContextValue(@Nullable ToolContext toolContext, String key) {
