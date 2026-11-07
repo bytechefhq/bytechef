@@ -11,8 +11,10 @@ import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploym
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +36,19 @@ public class RemoteConnectedUserProjectDeploymentResolverController {
         ConnectedUserProjectDeploymentResolver connectedUserProjectDeploymentResolver) {
 
         this.connectedUserProjectDeploymentResolver = connectedUserProjectDeploymentResolver;
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/get-connected-user-ids",
+        consumes = {
+            "application/json"
+        },
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Map<Long, Long>> getConnectedUserIds(@RequestBody List<Long> projectDeploymentIds) {
+        return ResponseEntity.ok(connectedUserProjectDeploymentResolver.getConnectedUserIds(projectDeploymentIds));
     }
 
     @RequestMapping(

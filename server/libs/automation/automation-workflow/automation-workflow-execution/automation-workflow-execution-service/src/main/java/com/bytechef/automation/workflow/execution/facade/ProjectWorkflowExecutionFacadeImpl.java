@@ -327,15 +327,19 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             workflowExecutionScopeDTO.workflowIds(), true,
             workflowExecutionScopeDTO.failedTriggerWorkflowExecutionIds(), pageNumber);
 
-        return new PageImpl<>(
-            toWorkflowExecutionDTOs(rowsPage.getContent(), projectId), rowsPage.getPageable(),
-            rowsPage.getTotalElements());
+        List<WorkflowExecutionDTO> workflowExecutionDTOs = toWorkflowExecutionDTOs(rowsPage.getContent(), projectId);
+
+        if (Boolean.TRUE.equals(embedded)) {
+            workflowExecutionDTOs = withConnectedUserIds(workflowExecutionDTOs);
+        }
+
+        return new PageImpl<>(workflowExecutionDTOs, rowsPage.getPageable(), rowsPage.getTotalElements());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<WorkflowExecutionDTO> getWorkflowExecutions(List<WorkflowExecutionRowDTO> workflowExecutionRowDTOs) {
-        return toWorkflowExecutionDTOs(workflowExecutionRowDTOs, null);
+        return withConnectedUserIds(toWorkflowExecutionDTOs(workflowExecutionRowDTOs, null));
     }
 
     @Override
@@ -520,6 +524,41 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         return projectDeploymentService.getProjectDeployments(embedded, environment, null, null, null)
             .stream()
             .map(ProjectDeployment::getId)
+            .toList();
+    }
+
+    private List<WorkflowExecutionDTO> withConnectedUserIds(List<WorkflowExecutionDTO> workflowExecutionDTOs) {
+        ConnectedUserProjectDeploymentResolver connectedUserProjectDeploymentResolver =
+            connectedUserProjectDeploymentResolverProvider.getIfAvailable();
+
+        if (connectedUserProjectDeploymentResolver == null || workflowExecutionDTOs.isEmpty()) {
+            return workflowExecutionDTOs;
+        }
+
+        Set<Long> projectDeploymentIds = workflowExecutionDTOs.stream()
+            .map(WorkflowExecutionDTO::projectDeployment)
+            .filter(Objects::nonNull)
+            .map(ProjectDeployment::getId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+        if (projectDeploymentIds.isEmpty()) {
+            return workflowExecutionDTOs;
+        }
+
+        Map<Long, Long> connectedUserIds = connectedUserProjectDeploymentResolver.getConnectedUserIds(
+            projectDeploymentIds);
+
+        return workflowExecutionDTOs.stream()
+            .map(workflowExecutionDTO -> {
+                ProjectDeployment projectDeployment = workflowExecutionDTO.projectDeployment();
+
+                if (projectDeployment == null) {
+                    return workflowExecutionDTO;
+                }
+
+                return workflowExecutionDTO.withConnectedUserId(connectedUserIds.get(projectDeployment.getId()));
+            })
             .toList();
     }
 
