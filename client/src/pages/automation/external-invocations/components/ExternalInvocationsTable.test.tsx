@@ -214,10 +214,27 @@ describe('ExternalInvocationsTable', () => {
 
         unmount();
 
-        renderWithProviders(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} onViewJob={() => {}} />);
+        renderWithProviders(
+            <ExternalInvocationsTable externalInvocationLogs={[{...baseLog, jobId: '7'}]} onViewJob={() => {}} />
+        );
 
         expect(screen.getAllByRole('columnheader').at(-1)).toHaveTextContent('Actions');
         expect(screen.getByRole('button', {name: 'External invocation actions'})).toBeInTheDocument();
+    });
+
+    it('leaves the Actions cell empty for an invocation without a workflow run', () => {
+        renderWithProviders(
+            <ExternalInvocationsTable
+                externalInvocationLogs={[baseLog, {...baseLog, id: '2', jobId: '7', toolName: 'run_workflow'}]}
+                onViewJob={() => {}}
+            />
+        );
+
+        const rows = screen.getAllByRole('row');
+
+        expect(rows[1].querySelectorAll('td')).toHaveLength(8);
+        expect(screen.getAllByRole('button', {name: 'External invocation actions'})).toHaveLength(1);
+        expect(rows[2]).toContainElement(screen.getByRole('button', {name: 'External invocation actions'}));
     });
     it('opens the workflow run when the workflow name in the source column is clicked', () => {
         const onViewJob = vi.fn();

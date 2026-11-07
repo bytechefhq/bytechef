@@ -170,11 +170,13 @@ const ExternalInvocationsTable = ({
                                 PINNED_STRIPED_CELL_CLASS_NAME
                             )}
                         >
-                            <ExternalInvocationsDropdownMenu
-                                jobId={externalInvocationLog.jobId}
-                                onViewJob={onViewJob}
-                                outcome={externalInvocationLog.outcome}
-                            />
+                            {externalInvocationLog.jobId != null && (
+                                <ExternalInvocationsDropdownMenu
+                                    jobId={externalInvocationLog.jobId}
+                                    onViewJob={onViewJob}
+                                    outcome={externalInvocationLog.outcome}
+                                />
+                            )}
                         </TableCell>
                     )}
                 </TableRow>
