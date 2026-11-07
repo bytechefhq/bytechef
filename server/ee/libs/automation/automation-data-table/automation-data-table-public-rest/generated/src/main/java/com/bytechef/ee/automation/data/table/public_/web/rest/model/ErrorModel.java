@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Error", description = "An RFC 7807 problem detail. Branch on errorKey, never on detail.")
 @JsonTypeName("Error")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T23:45:55.666695+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T20:30:35.254301+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ErrorModel {
 
   private @Nullable String type;
@@ -127,11 +127,11 @@ public class ErrorModel {
   }
 
   /**
-   * The stable machine-readable key. 100 DATA_TABLE_NOT_FOUND, 103 DATA_TABLE_NAME_INVALID, 104 DATA_TABLE_ALREADY_EXISTS, 105 COLUMN_NOT_FOUND, 106 COLUMN_ALREADY_EXISTS, 107 COLUMN_NAME_INVALID, 108 ROW_NOT_FOUND, 109 ROW_VALUE_INVALID, 110 ROW_EXTERNAL_ID_CONFLICT, 111 ROW_EXTERNAL_ID_REQUIRED, 112 FILTER_INVALID, 113 SORT_INVALID, 114 BATCH_TOO_LARGE, 115 CSV_INVALID. Absent on schema-validation failures.
+   * The stable machine-readable key. 100 DATA_TABLE_NOT_FOUND, 103 DATA_TABLE_NAME_INVALID, 104 DATA_TABLE_ALREADY_EXISTS, 105 COLUMN_NOT_FOUND, 106 COLUMN_ALREADY_EXISTS, 107 COLUMN_NAME_INVALID, 108 ROW_NOT_FOUND, 109 ROW_VALUE_INVALID, 110 ROW_EXTERNAL_ID_CONFLICT, 111 ROW_EXTERNAL_ID_REQUIRED, 112 FILTER_INVALID, 113 SORT_INVALID, 114 BATCH_TOO_LARGE, 115 CSV_INVALID, 116 STORAGE_LIMIT_EXCEEDED. Absent on schema-validation failures.
    * @return errorKey
    */
   
-  @Schema(name = "errorKey", description = "The stable machine-readable key. 100 DATA_TABLE_NOT_FOUND, 103 DATA_TABLE_NAME_INVALID, 104 DATA_TABLE_ALREADY_EXISTS, 105 COLUMN_NOT_FOUND, 106 COLUMN_ALREADY_EXISTS, 107 COLUMN_NAME_INVALID, 108 ROW_NOT_FOUND, 109 ROW_VALUE_INVALID, 110 ROW_EXTERNAL_ID_CONFLICT, 111 ROW_EXTERNAL_ID_REQUIRED, 112 FILTER_INVALID, 113 SORT_INVALID, 114 BATCH_TOO_LARGE, 115 CSV_INVALID. Absent on schema-validation failures.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "errorKey", description = "The stable machine-readable key. 100 DATA_TABLE_NOT_FOUND, 103 DATA_TABLE_NAME_INVALID, 104 DATA_TABLE_ALREADY_EXISTS, 105 COLUMN_NOT_FOUND, 106 COLUMN_ALREADY_EXISTS, 107 COLUMN_NAME_INVALID, 108 ROW_NOT_FOUND, 109 ROW_VALUE_INVALID, 110 ROW_EXTERNAL_ID_CONFLICT, 111 ROW_EXTERNAL_ID_REQUIRED, 112 FILTER_INVALID, 113 SORT_INVALID, 114 BATCH_TOO_LARGE, 115 CSV_INVALID, 116 STORAGE_LIMIT_EXCEEDED. Absent on schema-validation failures.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("errorKey")
   public @Nullable Integer getErrorKey() {
     return errorKey;

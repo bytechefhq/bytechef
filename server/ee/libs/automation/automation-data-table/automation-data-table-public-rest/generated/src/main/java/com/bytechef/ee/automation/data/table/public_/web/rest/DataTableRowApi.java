@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T23:45:55.666695+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T20:30:35.254301+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "data-table-row", description = "Data table rows.")
 public interface DataTableRowApi {
@@ -65,6 +65,7 @@ public interface DataTableRowApi {
      *         or The problem. (status code 400)
      *         or The problem. (status code 404)
      *         or The problem. (status code 409)
+     *         or The problem. (status code 507)
      */
     @Operation(
         operationId = "batchRows",
@@ -87,6 +88,10 @@ public interface DataTableRowApi {
             @ApiResponse(responseCode = "409", description = "The problem.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
+            }),
+            @ApiResponse(responseCode = "507", description = "The problem.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
+                @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             })
         }
     )
@@ -106,6 +111,11 @@ public interface DataTableRowApi {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"rows\" : [ { \"id\" : 2, \"externalId\" : \"externalId\", \"values\" : { \"key\" : \"\" } }, { \"id\" : 2, \"externalId\" : \"externalId\", \"values\" : { \"key\" : \"\" } } ] }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
+                    String exampleString = "Custom MIME type example not yet supported: application/problem+json";
+                    ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
                     break;
                 }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
@@ -196,6 +206,7 @@ public interface DataTableRowApi {
      *         or The problem. (status code 400)
      *         or The problem. (status code 404)
      *         or The problem. (status code 409)
+     *         or The problem. (status code 507)
      */
     @Operation(
         operationId = "createRow",
@@ -218,6 +229,10 @@ public interface DataTableRowApi {
             @ApiResponse(responseCode = "409", description = "The problem.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
+            }),
+            @ApiResponse(responseCode = "507", description = "The problem.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
+                @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             })
         }
     )
@@ -237,6 +252,11 @@ public interface DataTableRowApi {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"id\" : 2, \"externalId\" : \"externalId\", \"values\" : { \"key\" : \"\" } }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
+                    String exampleString = "Custom MIME type example not yet supported: application/problem+json";
+                    ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
                     break;
                 }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
@@ -586,6 +606,7 @@ public interface DataTableRowApi {
      *         or The problem. (status code 400)
      *         or The problem. (status code 404)
      *         or The problem. (status code 409)
+     *         or The problem. (status code 507)
      */
     @Operation(
         operationId = "importRows",
@@ -608,6 +629,10 @@ public interface DataTableRowApi {
             @ApiResponse(responseCode = "409", description = "The problem.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
+            }),
+            @ApiResponse(responseCode = "507", description = "The problem.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
+                @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             })
         }
     )
@@ -627,6 +652,11 @@ public interface DataTableRowApi {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"importedCount\" : 0 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
+                    String exampleString = "Custom MIME type example not yet supported: application/problem+json";
+                    ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
                     break;
                 }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
@@ -815,6 +845,7 @@ public interface DataTableRowApi {
      *         or The row was created. (status code 201)
      *         or The problem. (status code 400)
      *         or The problem. (status code 404)
+     *         or The problem. (status code 507)
      */
     @Operation(
         operationId = "upsertRowByExternalId",
@@ -835,6 +866,10 @@ public interface DataTableRowApi {
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             }),
             @ApiResponse(responseCode = "404", description = "The problem.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
+                @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
+            }),
+            @ApiResponse(responseCode = "507", description = "The problem.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorModel.class)),
                 @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ErrorModel.class))
             })
@@ -862,6 +897,11 @@ public interface DataTableRowApi {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"id\" : 2, \"externalId\" : \"externalId\", \"values\" : { \"key\" : \"\" } }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
+                    String exampleString = "Custom MIME type example not yet supported: application/problem+json";
+                    ApiUtil.setExampleResponse(request, "application/problem+json", exampleString);
                     break;
                 }
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/problem+json"))) {
