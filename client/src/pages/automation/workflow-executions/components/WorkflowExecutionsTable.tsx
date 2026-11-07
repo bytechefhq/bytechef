@@ -30,7 +30,7 @@ import WorkflowExecutionsDropdownMenu from './WorkflowExecutionsDropdownMenu';
 interface ExecutionColumnI {
     cell: (execution: WorkflowExecution) => ReactNode;
     cellClassName?: string;
-    header: (depth: number) => string;
+    header: (depth: number, deploymentHeader: string) => string;
     headerClassName?: string;
     id: string;
     pinned?: boolean;
@@ -60,7 +60,7 @@ const columns: ExecutionColumnI[] = [
     {
         cell: (execution) => execution.projectDeployment?.name,
         cellClassName: 'max-w-40 truncate',
-        header: () => 'Deployment',
+        header: (depth, deploymentHeader) => deploymentHeader,
         id: 'deployment',
     },
     {
@@ -114,7 +114,13 @@ const columns: ExecutionColumnI[] = [
     },
 ];
 
-const ExecutionTableHeader = ({className, depth = 0}: {className?: string; depth?: number}) => (
+interface ExecutionTableHeaderProps {
+    className?: string;
+    deploymentHeader: string;
+    depth?: number;
+}
+
+const ExecutionTableHeader = ({className, deploymentHeader, depth = 0}: ExecutionTableHeaderProps) => (
     <TableHeader className={twMerge(EXECUTIONS_TABLE_HEADER_CLASS_NAME, className)}>
         <TableRow>
             <TableHead className="w-9" />
@@ -129,7 +135,7 @@ const ExecutionTableHeader = ({className, depth = 0}: {className?: string; depth
                     )}
                     key={column.id}
                 >
-                    {column.header(depth)}
+                    {column.header(depth, deploymentHeader)}
                 </TableHead>
             ))}
         </TableRow>
@@ -137,6 +143,7 @@ const ExecutionTableHeader = ({className, depth = 0}: {className?: string; depth
 );
 
 interface ExecutionRowsProps {
+    deploymentHeader: string;
     depth: number;
     executions: WorkflowExecution[];
     expandedJobIds: Set<string>;
@@ -146,6 +153,7 @@ interface ExecutionRowsProps {
 }
 
 const ExecutionRows = ({
+    deploymentHeader,
     depth,
     executions,
     expandedJobIds,
@@ -236,11 +244,13 @@ const ExecutionRows = ({
                                             isDeepestExpandedSubflow && 'text-content-brand-primary',
                                             expanded && 'border-r-0'
                                         )}
+                                        deploymentHeader={deploymentHeader}
                                         depth={depth + 1}
                                     />
 
                                     <TableBody>
                                         <ExecutionRows
+                                            deploymentHeader={deploymentHeader}
                                             depth={depth + 1}
                                             executions={childJobs.map((childJob) => wrapChildJob(childJob, execution))}
                                             expandedJobIds={expandedJobIds}
@@ -261,10 +271,15 @@ const ExecutionRows = ({
 
 interface WorkflowExecutionsTableProps {
     className?: string;
+    deploymentHeader?: string;
     workflowExecutions: WorkflowExecution[];
 }
 
-const WorkflowExecutionsTable = ({className, workflowExecutions}: WorkflowExecutionsTableProps) => {
+const WorkflowExecutionsTable = ({
+    className,
+    deploymentHeader = 'Deployment',
+    workflowExecutions,
+}: WorkflowExecutionsTableProps) => {
     const {expandedJobIds, handleRowClick, handleToggleExpand} = useWorkflowExecutionsTable();
 
     return (
@@ -273,10 +288,11 @@ const WorkflowExecutionsTable = ({className, workflowExecutions}: WorkflowExecut
             data-testid="workflow-executions-table"
         >
             <Table>
-                <ExecutionTableHeader />
+                <ExecutionTableHeader deploymentHeader={deploymentHeader} />
 
                 <TableBody>
                     <ExecutionRows
+                        deploymentHeader={deploymentHeader}
                         depth={0}
                         executions={workflowExecutions}
                         expandedJobIds={expandedJobIds}

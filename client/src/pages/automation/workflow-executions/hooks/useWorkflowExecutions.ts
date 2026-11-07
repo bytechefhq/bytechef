@@ -5,6 +5,7 @@ import {getWorkflowsProjectVersion} from '@/pages/automation/workflow-executions
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
+    GetWorkflowExecutionsPageSourceEnum,
     WorkflowExecutionFromJSON,
 } from '@/shared/middleware/automation/workflow/execution';
 import {
@@ -17,6 +18,10 @@ import {useGetWorkspaceProjectWorkflowExecutionsQuery} from '@/shared/queries/au
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useEffect, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
+
+const getSourceSearchParameter = (source: string | null): GetWorkflowExecutionsPageSourceEnum =>
+    Object.values(GetWorkflowExecutionsPageSourceEnum).find((sourceValue) => sourceValue === source) ||
+    GetWorkflowExecutionsPageSourceEnum.Project;
 
 export const useWorkflowExecutions = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -31,6 +36,9 @@ export const useWorkflowExecutions = () => {
     );
     const [filterProjectId, setFilterProjectId] = useState<number | undefined>(
         searchParams.get('projectId') ? +searchParams.get('projectId')! : undefined
+    );
+    const [filterSource, setFilterSource] = useState<GetWorkflowExecutionsPageSourceEnum>(
+        getSourceSearchParameter(searchParams.get('source'))
     );
     const [filterProjectDeploymentId, setFilterProjectDeploymentId] = useState<number | undefined>(
         searchParams.get('projectDeploymentId') ? +searchParams.get('projectDeploymentId')! : undefined
@@ -90,6 +98,7 @@ export const useWorkflowExecutions = () => {
         pageNumber: filterPageNumber,
         projectDeploymentId: filterProjectDeploymentId,
         projectId: filterProjectId,
+        source: filterSource,
         workflowId: filterWorkflowId,
     });
 
@@ -107,6 +116,7 @@ export const useWorkflowExecutions = () => {
     );
 
     const hasActiveFilters =
+        filterSource !== GetWorkflowExecutionsPageSourceEnum.Project ||
         !!filterStatus ||
         !!filterStartDate ||
         !!filterEndDate ||
@@ -125,10 +135,11 @@ export const useWorkflowExecutions = () => {
         projectId?: number,
         projectDeploymentId?: number,
         workflowId?: string,
-        pageNumber?: number
+        pageNumber?: number,
+        source: GetWorkflowExecutionsPageSourceEnum = filterSource
     ) {
         navigate(
-            `/automation/workflow-executions?status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&projectId=${projectId ? projectId : ''}&projectDeploymentId=${projectDeploymentId ? projectDeploymentId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
+            `/automation/workflow-executions?source=${source}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&projectId=${projectId ? projectId : ''}&projectDeploymentId=${projectDeploymentId ? projectDeploymentId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
 
@@ -139,9 +150,19 @@ export const useWorkflowExecutions = () => {
         setFilterProjectId(undefined);
         setFilterStartDate(undefined);
         setFilterStatus(undefined);
+        setFilterSource(GetWorkflowExecutionsPageSourceEnum.Project);
         setFilterWorkflowId(undefined);
 
-        filter();
+        filter(
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            GetWorkflowExecutionsPageSourceEnum.Project
+        );
     };
 
     const handleEndDateChange = (date?: Date) => {
@@ -240,6 +261,23 @@ export const useWorkflowExecutions = () => {
         );
     };
 
+    const handleSourceChange = (source: GetWorkflowExecutionsPageSourceEnum) => {
+        setFilterSource(source);
+        setFilterPageNumber(undefined);
+        setFilterProjectDeploymentId(undefined);
+
+        filter(
+            filterStatus,
+            filterStartDate,
+            filterEndDate,
+            filterProjectId,
+            undefined,
+            filterWorkflowId,
+            undefined,
+            source
+        );
+    };
+
     const handleStartDateChange = (date?: Date) => {
         const normalizedDate = date
             ? new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0))
@@ -305,6 +343,7 @@ export const useWorkflowExecutions = () => {
         filterPageNumber,
         filterProjectDeploymentId,
         filterProjectId,
+        filterSource,
         filterStartDate,
         filterStatus,
         filterWorkflowId,
@@ -313,6 +352,7 @@ export const useWorkflowExecutions = () => {
         handlePaginationClick,
         handleProjectChange,
         handleProjectDeploymentChange,
+        handleSourceChange,
         handleStartDateChange,
         handleStatusChange,
         handleWorkflowChange,
