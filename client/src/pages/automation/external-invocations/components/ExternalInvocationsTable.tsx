@@ -102,7 +102,7 @@ const ExternalInvocationsTable = ({
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Date</TableHead>
 
                 {onViewJob && (
-                    <TableHead className={twMerge(EXECUTIONS_TABLE_HEAD_CLASS_NAME, PINNED_HEAD_CLASS_NAME)}>
+                    <TableHead className={twMerge(EXECUTIONS_TABLE_HEAD_CLASS_NAME, PINNED_HEAD_CLASS_NAME, 'w-px')}>
                         Actions
                     </TableHead>
                 )}
