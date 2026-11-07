@@ -64,11 +64,10 @@ public class CodeWorkflowTools {
             }
 
             return "Created code workflow project " + project.getId() + " (" + project.getName() + ").";
-        } catch (Exception e) {
-            log.error("createCodeWorkflow({}): Failed to create code workflow project", name, e);
-
-            throw new ExecutionException(
-                "Failed to create code workflow project: " + e.getMessage(), e, CodeWorkflowToolErrorType.CREATE);
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "createCodeWorkflow(" + name + ")", "Failed to create code workflow project", exception,
+                CodeWorkflowToolErrorType.CREATE);
         }
     }
 
@@ -86,11 +85,9 @@ public class CodeWorkflowTools {
             }
 
             return "Updated code workflow project " + projectId + ".";
-        } catch (Exception e) {
-            log.error("updateCodeWorkflowSource({}): Failed to update code workflow source", projectId, e);
-
-            throw new ExecutionException(
-                "Failed to update code workflow source: " + e.getMessage(), e,
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "updateCodeWorkflowSource(" + projectId + ")", "Failed to update code workflow source", exception,
                 CodeWorkflowToolErrorType.UPDATE_SOURCE);
         }
     }

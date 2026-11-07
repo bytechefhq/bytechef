@@ -10,7 +10,6 @@ package com.bytechef.ee.automation.ai.tool;
 import com.bytechef.ee.automation.ai.tool.exception.CustomComponentToolErrorType;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
 import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
-import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
@@ -53,11 +52,10 @@ public class CustomComponentTools {
             }
 
             return "Created custom component " + customComponent.getId() + " (" + name + ").";
-        } catch (Exception e) {
-            log.error("createCustomComponent({}): Failed to create custom component", name, e);
-
-            throw new ExecutionException(
-                "Failed to create custom component: " + e.getMessage(), e, CustomComponentToolErrorType.CREATE);
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "createCustomComponent(" + name + ")", "Failed to create custom component", exception,
+                CustomComponentToolErrorType.CREATE);
         }
     }
 
@@ -79,11 +77,9 @@ public class CustomComponentTools {
 
             return "Updated custom component source; resulting row id " + customComponent.getId() + ", version " +
                 customComponent.getComponentVersion() + ", status " + customComponent.getStatus() + ".";
-        } catch (Exception e) {
-            log.error("updateCustomComponentSource({}): Failed to update custom component source", id, e);
-
-            throw new ExecutionException(
-                "Failed to update custom component source: " + e.getMessage(), e,
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "updateCustomComponentSource(" + id + ")", "Failed to update custom component source", exception,
                 CustomComponentToolErrorType.UPDATE_SOURCE);
         }
     }
@@ -103,11 +99,10 @@ public class CustomComponentTools {
 
             return "Published custom component " + customComponent.getId() + " (" + customComponent.getName() +
                 ", version " + customComponent.getComponentVersion() + ").";
-        } catch (Exception e) {
-            log.error("publishCustomComponent({}): Failed to publish custom component", id, e);
-
-            throw new ExecutionException(
-                "Failed to publish custom component: " + e.getMessage(), e, CustomComponentToolErrorType.PUBLISH);
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "publishCustomComponent(" + id + ")", "Failed to publish custom component", exception,
+                CustomComponentToolErrorType.PUBLISH);
         }
     }
 
@@ -123,11 +118,10 @@ public class CustomComponentTools {
             }
 
             return "Deleted custom component " + id + ".";
-        } catch (Exception e) {
-            log.error("deleteCustomComponent({}): Failed to delete custom component", id, e);
-
-            throw new ExecutionException(
-                "Failed to delete custom component: " + e.getMessage(), e, CustomComponentToolErrorType.DELETE);
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "deleteCustomComponent(" + id + ")", "Failed to delete custom component", exception,
+                CustomComponentToolErrorType.DELETE);
         }
     }
 }
