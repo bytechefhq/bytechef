@@ -5,12 +5,13 @@ import JsonView from '@/shared/components/JsonView';
 import {type LazyTaskExecutionChildrenOptionsI} from '@/shared/components/workflow-executions/LazyTaskExecutionChildren';
 import WorkflowExecutionsAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
+import {isGraphTaskExecution, toGraphNodeVisits} from '@/shared/components/workflow-executions/util/toGraphNodeVisits';
 import {
     TaskExecution,
     TaskExecutionFromJSON,
     TriggerExecution,
 } from '@/shared/middleware/automation/workflow/execution';
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 const ON_ERROR_BRANCH_LABELS = ['Try branch', 'Error branch'];
 
@@ -58,6 +59,11 @@ const TaskExecutionChildrenList = ({
     const hasIterations = iterations !== undefined && iterations.length > 0;
     const hasChildren = children !== undefined && children.length > 0;
     const loadedCount = hasIterations ? iterations.length : children?.length || 0;
+
+    const graphNodeVisits = useMemo(
+        () => (isGraphTaskExecution(parentTaskExecution) && children ? toGraphNodeVisits(children) : undefined),
+        [children, parentTaskExecution]
+    );
 
     useEffect(() => {
         if (!loadMoreElement || !hasMore) {
@@ -189,19 +195,35 @@ const TaskExecutionChildrenList = ({
 
     return (
         <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
-            {children.map((childTaskExecution) => (
-                <WorkflowExecutionsAccordionItem
-                    defaultValue={defaultValue}
-                    execution={childTaskExecution}
-                    jobEnded={jobEnded}
-                    key={childTaskExecution.id}
-                    lazy={lazy}
-                    onExecutionClick={onExecutionClick}
-                    selectedExecutionKey={selectedExecutionKey}
-                >
-                    <WorkflowTaskExecutionItem jobEnded={jobEnded} taskExecution={childTaskExecution} />
-                </WorkflowExecutionsAccordionItem>
-            ))}
+            {children.map((childTaskExecution, childIndex) => {
+                const graphNodeVisit = graphNodeVisits?.[childIndex];
+
+                return (
+                    <WorkflowExecutionsAccordionItem
+                        defaultValue={defaultValue}
+                        execution={childTaskExecution}
+                        jobEnded={jobEnded}
+                        key={childTaskExecution.id || `${parentTaskExecution.id}-${indexOffset + childIndex}`}
+                        lazy={lazy}
+                        onExecutionClick={onExecutionClick}
+                        selectedExecutionKey={selectedExecutionKey}
+                    >
+                        {graphNodeVisit ? (
+                            <div className="flex w-full min-w-0 items-center justify-between gap-x-2">
+                                <WorkflowTaskExecutionItem jobEnded={jobEnded} taskExecution={childTaskExecution} />
+
+                                <span className="mr-2 shrink-0 text-xs text-content-neutral-secondary">
+                                    {indexOffset > 0
+                                        ? graphNodeVisit.nodeName
+                                        : `${graphNodeVisit.nodeName} (visit ${graphNodeVisit.visitNumber})`}
+                                </span>
+                            </div>
+                        ) : (
+                            <WorkflowTaskExecutionItem jobEnded={jobEnded} taskExecution={childTaskExecution} />
+                        )}
+                    </WorkflowExecutionsAccordionItem>
+                );
+            })}
 
             {hasMore && (
                 <div

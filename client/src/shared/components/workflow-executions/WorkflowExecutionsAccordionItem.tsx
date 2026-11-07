@@ -7,6 +7,7 @@ import TaskExecutionChildrenList from '@/shared/components/workflow-executions/T
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import {getExecutionSelectionKey} from '@/shared/components/workflow-executions/util/executionSelectionKey';
 import toClusterElementCallTaskExecutions from '@/shared/components/workflow-executions/util/toClusterElementCallTaskExecutions';
+import {isGraphTaskExecution} from '@/shared/components/workflow-executions/util/toGraphNodeVisits';
 import {TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TaskExecution as PlatformTaskExecution} from '@/shared/middleware/platform/workflow/execution';
 import {type ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -78,6 +79,11 @@ const WorkflowExecutionsAccordionItem = ({
     const remainingIterationCount = (taskExecution?.iterations?.length ?? 0) - visibleIterationCount;
     const hasMoreIterations = remainingIterationCount > 0;
     const hasPreviousTaskExecutions = previousTaskExecutions.length > 0;
+
+    const isGraphExecution = !!taskExecution && !hasIterations && isGraphTaskExecution(taskExecution);
+    const graphNodeVisitCount = lazy ? (taskExecution?.childCount ?? 0) : (taskExecution?.children?.length ?? 0);
+    const hasGraphNodeVisits = isGraphExecution && graphNodeVisitCount > 0;
+    const graphNodeVisitLabel = graphNodeVisitCount === 1 ? 'visit' : 'visits';
 
     const hasLazyChildren = (taskExecution?.childCount ?? 0) > 0;
     const hasClusterElementCallChildren = !hasLazyChildren && hasChildren;
@@ -171,6 +177,14 @@ const WorkflowExecutionsAccordionItem = ({
                 className="border-l border-stroke-neutral-secondary p-0 pl-4"
                 onClick={(event) => event.stopPropagation()}
             >
+                {hasGraphNodeVisits && (
+                    <div className="flex items-center gap-x-1 p-2 text-xs text-content-neutral-secondary">
+                        <span>
+                            {graphNodeVisitCount} node {graphNodeVisitLabel}
+                        </span>
+                    </div>
+                )}
+
                 {lazy && !hasClusterElementCallChildren ? (
                     hasLazyChildren && (
                         <LazyTaskExecutionChildren
