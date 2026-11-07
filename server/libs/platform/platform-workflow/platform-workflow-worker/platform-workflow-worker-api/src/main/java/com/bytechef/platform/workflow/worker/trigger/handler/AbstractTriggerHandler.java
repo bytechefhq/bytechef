@@ -52,6 +52,12 @@ public abstract class AbstractTriggerHandler implements TriggerHandler {
 
     @Override
     public TriggerOutput handle(TriggerExecution triggerExecution) throws TriggerExecutionException {
+        if (MapUtils.getBoolean(triggerExecution.getMetadata(), MetadataConstants.DRY_RUN, false)) {
+            return new TriggerOutput(
+                triggerDefinitionFacade.executeDryRunTrigger(componentName, componentVersion, triggerName), null,
+                false);
+        }
+
         Map<String, Long> connectIdMap = MapUtils.getMap(
             triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
 

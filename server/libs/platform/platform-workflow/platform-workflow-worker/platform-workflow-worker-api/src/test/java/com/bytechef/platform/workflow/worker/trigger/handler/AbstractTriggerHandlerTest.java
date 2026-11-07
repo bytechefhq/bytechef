@@ -16,25 +16,56 @@
 
 package com.bytechef.platform.workflow.worker.trigger.handler;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class AbstractTriggerHandlerTest {
+
+    @Test
+    void testHandleReturnsTheDeclaredOutputWithoutExecutingTheTriggerInDryRun() throws Exception {
+        TriggerDefinitionFacade triggerDefinitionFacade = mock(TriggerDefinitionFacade.class);
+
+        when(triggerDefinitionFacade.executeDryRunTrigger("slack", 1, "newMessage"))
+            .thenReturn(Map.of("ok", true));
+
+        AbstractTriggerHandler triggerHandler = new AbstractTriggerHandler(
+            "slack", 1, "newMessage", triggerDefinitionFacade) {};
+
+        TriggerExecution triggerExecution = TriggerExecution.builder()
+            .metadata(Map.of(MetadataConstants.DRY_RUN, true))
+            .build();
+
+        TriggerOutput triggerOutput = triggerHandler.handle(triggerExecution);
+
+        assertThat(triggerOutput.value()).isEqualTo(Map.of("ok", true));
+        assertThat(triggerOutput.state()).isNull();
+        assertThat(triggerOutput.batch()).isFalse();
+
+        verify(triggerDefinitionFacade).executeDryRunTrigger("slack", 1, "newMessage");
+        verifyNoMoreInteractions(triggerDefinitionFacade);
+    }
 
     @Test
     void testHandleForwardsTheTriggerExecutionIdSoItsLogsCanBeStored() throws Exception {
