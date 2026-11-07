@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.tool.AssetFileToolCallbacksFactory;
 import com.bytechef.automation.assetfile.service.AssetFileFacade;
+import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,22 @@ class AiHubConfigurationAssetFileFlatCrudToolCallbacksTest {
     void testAbsentFactoryReturnsEmptyListForBothModes() {
         assertThat(AiHubConfiguration.assetFileFlatCrudToolCallbacks(absent(), false)).isEmpty();
         assertThat(AiHubConfiguration.assetFileFlatCrudToolCallbacks(absent(), true)).isEmpty();
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testOpenFileTabIsOfferedOnlyWhenTheAssetFileFacadeIsPresent() {
+        ObjectProvider<AssetFileFacade> assetFileFacadeProvider = mock(ObjectProvider.class);
+
+        when(assetFileFacadeProvider.getIfAvailable()).thenReturn(mock(AssetFileFacade.class));
+
+        assertThat(
+            AiHubConfiguration.openFileTabToolCallbacks(
+                assetFileFacadeProvider, mock(AiHubChatArtifactRecorder.class)))
+                    .extracting(toolCallback -> toolCallback.getToolDefinition()
+                        .name())
+                    .containsExactly("openFileTab");
+        assertThat(AiHubConfiguration.openFileTabToolCallbacks(mock(ObjectProvider.class), null)).isEmpty();
     }
 
     @SuppressWarnings("unchecked")

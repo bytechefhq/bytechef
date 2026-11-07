@@ -27,6 +27,7 @@ import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.ai.tool.aiagent.AiAgentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.datatable.DataTableToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
+import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -54,6 +55,7 @@ import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenAiAgentTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.OpenFileTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
@@ -129,8 +131,8 @@ public class AiHubConfiguration {
     static final Set<String> ASK_PINNED_TOOL_NAMES = Set.of(
         "aggregateDataTable", "askUserQuestion", "checkWorkflow", "getAiAgent", "getAssetFileContent", "getWorkflow",
         "listAiAgents", "listAssetFiles", "listDataTables", "listKnowledgeBases", "listProjects", "listWorkflows",
-        "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "queryDataTable", "queryKnowledgeBase",
-        "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows");
+        "openAiAgentTab", "openFileTab", "openWorkflowChatTab", "openWorkflowTab", "queryDataTable",
+        "queryKnowledgeBase", "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows");
 
     static final Set<String> BUILD_PINNED_TOOL_NAMES = Set.of(
         "addAiAgentChannel", "addAiAgentElement", "addDataTableColumn", "addDataTableRow", "addKnowledgeBaseDocument",
@@ -139,7 +141,7 @@ public class AiHubConfiguration {
         "createConnection", "createDataTable", "createDataTableFromCsv", "createKnowledgeBase", "createProject",
         "createProjectWorkflow", "getAiAgent", "getAssetFileContent", "getWorkflow", "importWorkflow", "listAiAgents",
         "listAssetFiles", "listConnectionsForComponent", "listDataTables", "listKnowledgeBases", "listProjects",
-        "listWorkflows", "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "queryDataTable",
+        "listWorkflows", "openAiAgentTab", "openFileTab", "openWorkflowChatTab", "openWorkflowTab", "queryDataTable",
         "queryKnowledgeBase", "saveWorkflowTestConnection", "searchAiAgentReferences", "searchAiAgentTools",
         "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
         "selectPropertyOption", "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement",
@@ -172,7 +174,7 @@ public class AiHubConfiguration {
         ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider,
         ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
         ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
-        ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
+        ObjectProvider<AiAgentFacade> aiAgentFacadeProvider, ObjectProvider<AssetFileFacade> assetFileFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
         AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
@@ -192,6 +194,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(dataTableFlatCrudToolCallbacks(dataTableToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(knowledgeBaseFlatCrudToolCallbacks(knowledgeBaseToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, null));
+        toolCallbacks.addAll(openFileTabToolCallbacks(assetFileFacadeProvider, null));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, null));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
@@ -210,7 +213,7 @@ public class AiHubConfiguration {
         ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider,
         ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
         ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
-        ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
+        ObjectProvider<AiAgentFacade> aiAgentFacadeProvider, ObjectProvider<AssetFileFacade> assetFileFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectDeploymentFacade projectDeploymentFacade, AiHubChatService chatService,
@@ -233,6 +236,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(dataTableFlatCrudToolCallbacks(dataTableToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(knowledgeBaseFlatCrudToolCallbacks(knowledgeBaseToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, aiHubChatArtifactRecorder));
+        toolCallbacks.addAll(openFileTabToolCallbacks(assetFileFacadeProvider, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
@@ -564,6 +568,19 @@ public class AiHubConfiguration {
         }
 
         return List.of(new OpenAiAgentTabToolCallback(aiAgentFacade, aiHubChatArtifactRecorder));
+    }
+
+    static List<ToolCallback> openFileTabToolCallbacks(
+        ObjectProvider<AssetFileFacade> assetFileFacadeProvider,
+        @Nullable AiHubChatArtifactRecorder aiHubChatArtifactRecorder) {
+
+        AssetFileFacade assetFileFacade = assetFileFacadeProvider.getIfAvailable();
+
+        if (assetFileFacade == null) {
+            return List.of();
+        }
+
+        return List.of(new OpenFileTabToolCallback(assetFileFacade, aiHubChatArtifactRecorder));
     }
 
     private static void requireBuildWorkflow(List<ToolCallback> toolCallbacks) {

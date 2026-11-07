@@ -98,8 +98,9 @@ public final class AiHubAgentFixtures {
     public final AiHubChatService chatService = mock(AiHubChatService.class);
     public final AiHubChatAccessPolicy chatAccessPolicy = mock(AiHubChatAccessPolicy.class);
     public final AiAgentFacade aiAgentFacade = mock(AiAgentFacade.class);
+    public final AssetFileFacade assetFileFacade = mock(AssetFileFacade.class);
     public final AssetFileToolCallbacksFactory assetFileToolCallbacksFactory = new AssetFileToolCallbacksFactory(
-        mock(AssetFileFacade.class), null);
+        assetFileFacade, null);
     public final DataTableToolCallbacksFactory dataTableToolCallbacksFactory = new DataTableToolCallbacksFactory(
         mock(WorkspaceDataTableFacade.class));
     public final KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory =
@@ -229,7 +230,8 @@ public final class AiHubAgentFixtures {
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
             aiAgentToolCallbacksFactoryProvider(), availableProvider(assetFileToolCallbacksFactory),
             availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
-            availableProvider(aiAgentFacade), interactivePickerToolCallbacks, projectWorkflowFacade, chatService,
+            availableProvider(aiAgentFacade), availableProvider(assetFileFacade), interactivePickerToolCallbacks,
+            projectWorkflowFacade, chatService,
             chatAccessPolicy,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
@@ -250,7 +252,8 @@ public final class AiHubAgentFixtures {
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
             aiAgentToolCallbacksFactoryProvider(), availableProvider(assetFileToolCallbacksFactory),
             availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
-            availableProvider(aiAgentFacade), interactivePickerToolCallbacks, intelligentToolCatalog, workspaceFacade,
+            availableProvider(aiAgentFacade), availableProvider(assetFileFacade), interactivePickerToolCallbacks,
+            intelligentToolCatalog, workspaceFacade,
             projectWorkflowFacade,
             projectDeploymentFacade, chatService, chatAccessPolicy, artifactRecorder, policy,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));

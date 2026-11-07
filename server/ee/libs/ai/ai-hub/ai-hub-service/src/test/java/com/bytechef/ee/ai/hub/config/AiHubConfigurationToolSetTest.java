@@ -37,8 +37,9 @@ class AiHubConfigurationToolSetTest {
         assertThat(toolNames(askAgent)).containsExactlyInAnyOrder(
             "aggregateDataTable", "askUserQuestion", "checkWorkflow", "getAiAgent", "getAssetFileContent",
             "getWorkflow", "listAiAgents", "listAssetFiles", "listDataTables", "listKnowledgeBases", "listProjects",
-            "listWorkflows", "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "queryDataTable",
-            "queryKnowledgeBase", "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows");
+            "listWorkflows", "openAiAgentTab", "openFileTab", "openWorkflowChatTab", "openWorkflowTab",
+            "queryDataTable", "queryKnowledgeBase", "searchAiAgentReferences", "searchAiAgentTools", "searchProjects",
+            "searchWorkflows");
     }
 
     @Test
@@ -76,8 +77,9 @@ class AiHubConfigurationToolSetTest {
             "createDataTableFromCsv", "createKnowledgeBase", "createProject", "createProjectWorkflow", "getAiAgent",
             "getAssetFileContent", "getWorkflow", "importWorkflow", "listAiAgents", "listAssetFiles",
             "listConnectionsForComponent", "listDataTables", "listKnowledgeBases", "listProjects", "listWorkflows",
-            "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "queryDataTable", "queryKnowledgeBase",
-            "saveWorkflowTestConnection", "searchAiAgentReferences", "searchAiAgentTools", "searchProjects",
+            "openAiAgentTab", "openFileTab", "openWorkflowChatTab", "openWorkflowTab", "queryDataTable",
+            "queryKnowledgeBase", "saveWorkflowTestConnection", "searchAiAgentReferences", "searchAiAgentTools",
+            "searchProjects",
             "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
             "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement", "updateAiAgentSettings",
             "updateAssetFileContent", "updateDataTableRow");
