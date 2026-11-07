@@ -59,7 +59,7 @@ import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.external.invocation.config.ExternalInvocationConfiguration;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -743,7 +743,7 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThat(getExternalInvocationEvents()).singleElement()
             .satisfies(externalInvocationEvent -> {
                 assertThat(externalInvocationEvent.type()).isEqualTo(PlatformType.EMBEDDED);
-                assertThat(externalInvocationEvent.surface()).isEqualTo(ExternalInvocationSurface.MCP_EMBEDDED);
+                assertThat(externalInvocationEvent.source()).isEqualTo(ExternalInvocationSource.MCP_SERVER);
                 assertThat(externalInvocationEvent.kind()).isEqualTo(ExternalInvocationKind.COMPONENT);
                 assertThat(externalInvocationEvent.toolName()).isEqualTo("HTTPCLIENT_POST");
                 assertThat(externalInvocationEvent.componentName()).isEqualTo("httpClient");
@@ -832,7 +832,7 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThat(getExternalInvocationEvents()).singleElement()
             .satisfies(externalInvocationEvent -> {
                 assertThat(externalInvocationEvent.type()).isEqualTo(PlatformType.EMBEDDED);
-                assertThat(externalInvocationEvent.surface()).isEqualTo(ExternalInvocationSurface.MCP_EMBEDDED);
+                assertThat(externalInvocationEvent.source()).isEqualTo(ExternalInvocationSource.MCP_SERVER);
                 assertThat(externalInvocationEvent.kind()).isEqualTo(ExternalInvocationKind.WORKFLOW);
                 assertThat(externalInvocationEvent.toolName()).isEqualTo("mappedTool");
                 assertThat(externalInvocationEvent.componentName()).isEqualTo("myComponent");

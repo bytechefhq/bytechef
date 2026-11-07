@@ -2,7 +2,7 @@ extend type Query {
     externalInvocationLogs(
         type: PlatformType!
         environmentId: ID
-        surface: String
+        source: String
         outcome: String
         mcpServerId: Long
         a2aServerId: Long
@@ -16,7 +16,7 @@ extend type Query {
         type: PlatformType!
         workspaceId: ID!
         environmentId: ID!
-        surface: String
+        source: String
         outcome: String
         mcpServerId: Long
         a2aServerId: Long
@@ -30,7 +30,7 @@ extend type Query {
 
 type ExternalInvocationLogType {
     id: ID!
-    surface: String!
+    source: String!
     kind: String!
     toolName: String
     componentName: String

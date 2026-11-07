@@ -54,7 +54,7 @@ import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -188,7 +188,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
 
         ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
             .builder(
-                PlatformType.AUTOMATION, ExternalInvocationSurface.A2A, ExternalInvocationKind.WORKFLOW,
+                PlatformType.AUTOMATION, ExternalInvocationSource.A2A_SERVER, ExternalInvocationKind.WORKFLOW,
                 getSkillName(exposedWorkflow))
             .environment(environment.ordinal())
             .a2aServerId(a2aServer.getId())

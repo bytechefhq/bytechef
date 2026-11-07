@@ -11,7 +11,7 @@ import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocatio
 import com.bytechef.ee.platform.external.invocation.log.repository.ExternalInvocationLogRepository;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -54,14 +54,14 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
     @Override
     @Transactional(readOnly = true)
     public Page<ExternalInvocationLog> getExternalInvocationLogs(
-        PlatformType type, @Nullable Integer environment, @Nullable ExternalInvocationSurface surface,
+        PlatformType type, @Nullable Integer environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationOutcome outcome,
         @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId,
         @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber) {
 
         return findPage(
-            type, null, environment, surface, outcome, mcpServerId, a2aServerId, connectedUserId, integrationInstanceId,
+            type, null, environment, source, outcome, mcpServerId, a2aServerId, connectedUserId, integrationInstanceId,
             startDate,
             endDate, pageNumber);
     }
@@ -69,38 +69,38 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
     @Override
     @Transactional(readOnly = true)
     public Page<ExternalInvocationLog> getWorkspaceExternalInvocationLogs(
-        PlatformType type, long workspaceId, int environment, @Nullable ExternalInvocationSurface surface,
+        PlatformType type, long workspaceId, int environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
 
         return findPage(
-            type, workspaceId, environment, surface, outcome, mcpServerId, a2aServerId, connectedUserId,
+            type, workspaceId, environment, source, outcome, mcpServerId, a2aServerId, connectedUserId,
             integrationInstanceId,
             startDate, endDate, pageNumber);
     }
 
     private Page<ExternalInvocationLog> findPage(
         PlatformType type, @Nullable Long workspaceId, @Nullable Integer environment,
-        @Nullable ExternalInvocationSurface surface,
+        @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
 
-        Integer surfaceOrdinal = surface == null ? null : surface.ordinal();
+        Integer sourceOrdinal = source == null ? null : source.ordinal();
         Integer outcomeOrdinal = outcome == null ? null : outcome.ordinal();
 
         PageRequest pageRequest = PageRequest.of(pageNumber, DEFAULT_PAGE_SIZE);
 
         List<ExternalInvocationLog> content = externalInvocationLogRepository.findFiltered(
-            type.ordinal(), workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, a2aServerId,
+            type.ordinal(), workspaceId, environment, sourceOrdinal, outcomeOrdinal, mcpServerId, a2aServerId,
             connectedUserId,
             integrationInstanceId, startDate, endDate, pageRequest.getPageSize(), pageRequest.getOffset());
 
         long total = externalInvocationLogRepository.countFiltered(
-            type.ordinal(), workspaceId, environment, surfaceOrdinal, outcomeOrdinal, mcpServerId, a2aServerId,
+            type.ordinal(), workspaceId, environment, sourceOrdinal, outcomeOrdinal, mcpServerId, a2aServerId,
             connectedUserId,
             integrationInstanceId, startDate, endDate);
 

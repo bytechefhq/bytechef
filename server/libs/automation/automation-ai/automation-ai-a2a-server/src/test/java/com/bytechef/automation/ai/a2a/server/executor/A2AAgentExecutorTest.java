@@ -64,7 +64,7 @@ import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -734,7 +734,7 @@ class A2AAgentExecutorTest {
         ExternalInvocationEvent externalInvocationEvent = getRecordedExternalInvocationEvent();
 
         assertThat(externalInvocationEvent.type()).isEqualTo(PlatformType.AUTOMATION);
-        assertThat(externalInvocationEvent.surface()).isEqualTo(ExternalInvocationSurface.A2A);
+        assertThat(externalInvocationEvent.source()).isEqualTo(ExternalInvocationSource.A2A_SERVER);
         assertThat(externalInvocationEvent.kind()).isEqualTo(ExternalInvocationKind.WORKFLOW);
         assertThat(externalInvocationEvent.toolName()).isEqualTo("Label wf1");
         assertThat(externalInvocationEvent.a2aServerId()).isEqualTo(1L);

@@ -47,7 +47,7 @@ public class ExternalInvocationLogEventListener {
             externalInvocationLogService.create(toExternalInvocationLog(event));
         } catch (RuntimeException exception) {
             log.warn(
-                "Failed to persist external invocation log for surface={} tool={}: {}", event.surface(),
+                "Failed to persist external invocation log for source={} tool={}: {}", event.source(),
                 event.toolName(),
                 exception.getMessage());
         }
@@ -57,7 +57,7 @@ public class ExternalInvocationLogEventListener {
         ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
 
         externalInvocationLog.setType(event.type());
-        externalInvocationLog.setSurface(event.surface());
+        externalInvocationLog.setSource(event.source());
         externalInvocationLog.setKind(event.kind());
         externalInvocationLog.setToolName(truncate(event.toolName(), MAX_NAME_LENGTH));
         externalInvocationLog.setComponentName(truncate(event.componentName(), MAX_NAME_LENGTH));

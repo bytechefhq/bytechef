@@ -28,7 +28,7 @@ public interface ExternalInvocationLogRepository extends ListCrudRepository<Exte
         WHERE type = :type
             AND (:workspaceId IS NULL OR workspace_id = :workspaceId)
             AND (:environment IS NULL OR environment = :environment)
-            AND (:surface IS NULL OR surface = :surface)
+            AND (:source IS NULL OR source = :source)
             AND (:outcome IS NULL OR outcome = :outcome)
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
             AND (:a2aServerId IS NULL OR a2a_server_id = :a2aServerId)
@@ -42,7 +42,7 @@ public interface ExternalInvocationLogRepository extends ListCrudRepository<Exte
     List<ExternalInvocationLog> findFiltered(
         @Param("type") int type, @Param("workspaceId") @Nullable Long workspaceId,
         @Param("environment") @Nullable Integer environment,
-        @Param("surface") @Nullable Integer surface, @Param("outcome") @Nullable Integer outcome,
+        @Param("source") @Nullable Integer source, @Param("outcome") @Nullable Integer outcome,
         @Param("mcpServerId") @Nullable Long mcpServerId, @Param("a2aServerId") @Nullable Long a2aServerId,
         @Param("connectedUserId") @Nullable Long connectedUserId,
         @Param("integrationInstanceId") @Nullable Long integrationInstanceId,
@@ -54,7 +54,7 @@ public interface ExternalInvocationLogRepository extends ListCrudRepository<Exte
         WHERE type = :type
             AND (:workspaceId IS NULL OR workspace_id = :workspaceId)
             AND (:environment IS NULL OR environment = :environment)
-            AND (:surface IS NULL OR surface = :surface)
+            AND (:source IS NULL OR source = :source)
             AND (:outcome IS NULL OR outcome = :outcome)
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
             AND (:a2aServerId IS NULL OR a2a_server_id = :a2aServerId)
@@ -66,7 +66,7 @@ public interface ExternalInvocationLogRepository extends ListCrudRepository<Exte
     long countFiltered(
         @Param("type") int type, @Param("workspaceId") @Nullable Long workspaceId,
         @Param("environment") @Nullable Integer environment,
-        @Param("surface") @Nullable Integer surface, @Param("outcome") @Nullable Integer outcome,
+        @Param("source") @Nullable Integer source, @Param("outcome") @Nullable Integer outcome,
         @Param("mcpServerId") @Nullable Long mcpServerId, @Param("a2aServerId") @Nullable Long a2aServerId,
         @Param("connectedUserId") @Nullable Long connectedUserId,
         @Param("integrationInstanceId") @Nullable Long integrationInstanceId,

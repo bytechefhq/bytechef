@@ -24,14 +24,14 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-class ExternalInvocationSurfaceTest {
+class ExternalInvocationSourceTest {
 
     @Test
-    void testSurfaceOrdinals() {
-        assertThat(Arrays.stream(ExternalInvocationSurface.values())
+    void testSourceOrdinals() {
+        assertThat(Arrays.stream(ExternalInvocationSource.values())
             .map(Enum::name)
             .toList())
                 .containsExactly(
-                    "MCP_AUTOMATION", "MCP_EMBEDDED", "EMBEDDED_API_ACTION", "EMBEDDED_API_TOOL", "A2A");
+                    "MCP_SERVER", "API_ACTION", "API_TOOL", "A2A_SERVER");
     }
 }

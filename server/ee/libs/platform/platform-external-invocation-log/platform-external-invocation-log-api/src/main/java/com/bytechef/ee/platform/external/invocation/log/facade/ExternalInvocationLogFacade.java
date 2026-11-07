@@ -10,7 +10,7 @@ package com.bytechef.ee.platform.external.invocation.log.facade;
 import com.bytechef.ee.platform.external.invocation.log.dto.ExternalInvocationLogDTO;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import java.time.Instant;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
@@ -23,14 +23,14 @@ import org.springframework.data.domain.Page;
 public interface ExternalInvocationLogFacade {
 
     Page<ExternalInvocationLogDTO> getExternalInvocationLogs(
-        PlatformType type, @Nullable Long environmentId, @Nullable ExternalInvocationSurface surface,
+        PlatformType type, @Nullable Long environmentId, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationOutcome outcome,
         @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId,
         @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber);
 
     Page<ExternalInvocationLogDTO> getWorkspaceExternalInvocationLogs(
-        PlatformType type, long workspaceId, long environmentId, @Nullable ExternalInvocationSurface surface,
+        PlatformType type, long workspaceId, long environmentId, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,

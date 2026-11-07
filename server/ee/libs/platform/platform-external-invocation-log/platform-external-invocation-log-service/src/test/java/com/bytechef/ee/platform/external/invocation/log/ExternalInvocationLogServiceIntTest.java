@@ -16,7 +16,7 @@ import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocati
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.AfterEach;
@@ -45,19 +45,19 @@ class ExternalInvocationLogServiceIntTest {
     }
 
     @Test
-    void testCreateAndGetFilteredBySurface() {
-        create(ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationOutcome.SUCCESS, 10L, Instant.now());
-        create(ExternalInvocationSurface.MCP_EMBEDDED, ExternalInvocationOutcome.ERROR, 20L, Instant.now());
+    void testCreateAndGetFilteredBySource() {
+        create(PlatformType.AUTOMATION, ExternalInvocationOutcome.SUCCESS, 10L, Instant.now());
+        create(PlatformType.EMBEDDED, ExternalInvocationOutcome.ERROR, 20L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
-            PlatformType.EMBEDDED, null, ExternalInvocationSurface.MCP_EMBEDDED, null, null, null, null, null, null,
+            PlatformType.EMBEDDED, null, ExternalInvocationSource.MCP_SERVER, null, null, null, null, null, null,
             null,
             0);
 
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getContent()
             .getFirst()
-            .getSurface()).isEqualTo(ExternalInvocationSurface.MCP_EMBEDDED);
+            .getSource()).isEqualTo(ExternalInvocationSource.MCP_SERVER);
         assertThat(page.getContent()
             .getFirst()
             .getMcpServerId()).isEqualTo(20L);
@@ -65,9 +65,9 @@ class ExternalInvocationLogServiceIntTest {
 
     @Test
     void testGetFilteredByOutcomeAndMcpServer() {
-        create(ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationOutcome.SUCCESS, 10L, Instant.now());
-        create(ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationOutcome.ERROR, 10L, Instant.now());
-        create(ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationOutcome.ERROR, 99L, Instant.now());
+        create(PlatformType.AUTOMATION, ExternalInvocationOutcome.SUCCESS, 10L, Instant.now());
+        create(PlatformType.AUTOMATION, ExternalInvocationOutcome.ERROR, 10L, Instant.now());
+        create(PlatformType.AUTOMATION, ExternalInvocationOutcome.ERROR, 99L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
             PlatformType.AUTOMATION, null, null, ExternalInvocationOutcome.ERROR, 10L, null, null, null, null, null, 0);
@@ -82,14 +82,14 @@ class ExternalInvocationLogServiceIntTest {
     void testGetFilteredByA2aServer() {
         createA2aSkillCall(5L);
         createA2aSkillCall(6L);
-        create(ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationOutcome.SUCCESS, 5L, Instant.now());
+        create(PlatformType.AUTOMATION, ExternalInvocationOutcome.SUCCESS, 5L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
             PlatformType.AUTOMATION, null, null, null, null, 5L, null, null, null, null, 0);
 
         assertThat(page.getContent()).singleElement()
             .satisfies(externalInvocationLog -> {
-                assertThat(externalInvocationLog.getSurface()).isEqualTo(ExternalInvocationSurface.A2A);
+                assertThat(externalInvocationLog.getSource()).isEqualTo(ExternalInvocationSource.A2A_SERVER);
                 assertThat(externalInvocationLog.getA2aServerId()).isEqualTo(5L);
                 assertThat(externalInvocationLog.getMcpServerId()).isNull();
             });
@@ -97,10 +97,10 @@ class ExternalInvocationLogServiceIntTest {
 
     @Test
     void testGetFilteredByEnvironmentExcludesRowsOfOtherEnvironments() {
-        createInEnvironment(ExternalInvocationSurface.MCP_EMBEDDED, 2);
-        createInEnvironment(ExternalInvocationSurface.EMBEDDED_API_ACTION, 2);
-        createInEnvironment(ExternalInvocationSurface.MCP_EMBEDDED, 0);
-        create(ExternalInvocationSurface.MCP_EMBEDDED, ExternalInvocationOutcome.SUCCESS, 10L, Instant.now());
+        createInEnvironment(ExternalInvocationSource.MCP_SERVER, 2);
+        createInEnvironment(ExternalInvocationSource.API_ACTION, 2);
+        createInEnvironment(ExternalInvocationSource.MCP_SERVER, 0);
+        create(PlatformType.EMBEDDED, ExternalInvocationOutcome.SUCCESS, 10L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
             PlatformType.EMBEDDED, 2, null, null, null, null, null, null, null, null, 0);
@@ -120,7 +120,7 @@ class ExternalInvocationLogServiceIntTest {
         createInWorkspace(7L, 2, 5L);
         createInWorkspace(7L, 0, 5L);
         createInWorkspace(8L, 2, 6L);
-        create(ExternalInvocationSurface.MCP_EMBEDDED, ExternalInvocationOutcome.SUCCESS, 5L, Instant.now());
+        create(PlatformType.EMBEDDED, ExternalInvocationOutcome.SUCCESS, 5L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getWorkspaceExternalInvocationLogs(
             PlatformType.AUTOMATION, 7L, 2, null, null, null, null, null, null, null, null, 0);
@@ -145,8 +145,8 @@ class ExternalInvocationLogServiceIntTest {
 
     @Test
     void testTenantWideQueryForAutomationExcludesEmbeddedRows() {
-        create(ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationOutcome.SUCCESS, 10L, Instant.now());
-        create(ExternalInvocationSurface.MCP_EMBEDDED, ExternalInvocationOutcome.SUCCESS, 20L, Instant.now());
+        create(PlatformType.AUTOMATION, ExternalInvocationOutcome.SUCCESS, 10L, Instant.now());
+        create(PlatformType.EMBEDDED, ExternalInvocationOutcome.SUCCESS, 20L, Instant.now());
 
         Page<ExternalInvocationLog> page = externalInvocationLogService.getExternalInvocationLogs(
             PlatformType.AUTOMATION, null, null, null, null, null, null, null, null, null, 0);
@@ -165,7 +165,7 @@ class ExternalInvocationLogServiceIntTest {
         ExternalInvocationLog embeddedExternalInvocationLog = new ExternalInvocationLog();
 
         embeddedExternalInvocationLog.setType(PlatformType.EMBEDDED);
-        embeddedExternalInvocationLog.setSurface(ExternalInvocationSurface.MCP_EMBEDDED);
+        embeddedExternalInvocationLog.setSource(ExternalInvocationSource.MCP_SERVER);
         embeddedExternalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
         embeddedExternalInvocationLog.setWorkspaceId(7L);
         embeddedExternalInvocationLog.setEnvironment(2);
@@ -185,10 +185,10 @@ class ExternalInvocationLogServiceIntTest {
 
     @Test
     void testRetentionDeletesOldRows() {
-        create(ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationOutcome.SUCCESS, 1L,
+        create(PlatformType.AUTOMATION, ExternalInvocationOutcome.SUCCESS, 1L,
             Instant.now()
                 .minus(120, ChronoUnit.DAYS));
-        create(ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationOutcome.SUCCESS, 2L, Instant.now());
+        create(PlatformType.AUTOMATION, ExternalInvocationOutcome.SUCCESS, 2L, Instant.now());
 
         int deleted = externalInvocationLogService.deleteExternalInvocationLogsCreatedBefore(
             Instant.now()
@@ -198,11 +198,11 @@ class ExternalInvocationLogServiceIntTest {
         assertThat(externalInvocationLogRepository.count()).isEqualTo(1);
     }
 
-    private void createInEnvironment(ExternalInvocationSurface surface, int environment) {
+    private void createInEnvironment(ExternalInvocationSource source, int environment) {
         ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
 
         externalInvocationLog.setType(PlatformType.EMBEDDED);
-        externalInvocationLog.setSurface(surface);
+        externalInvocationLog.setSource(source);
         externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
         externalInvocationLog.setToolName("slack_sendMessage");
         externalInvocationLog.setEnvironment(environment);
@@ -217,7 +217,7 @@ class ExternalInvocationLogServiceIntTest {
         ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
 
         externalInvocationLog.setType(PlatformType.AUTOMATION);
-        externalInvocationLog.setSurface(ExternalInvocationSurface.A2A);
+        externalInvocationLog.setSource(ExternalInvocationSource.A2A_SERVER);
         externalInvocationLog.setKind(ExternalInvocationKind.WORKFLOW);
         externalInvocationLog.setToolName("Summarize");
         externalInvocationLog.setA2aServerId(a2aServerId);
@@ -232,7 +232,7 @@ class ExternalInvocationLogServiceIntTest {
         ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
 
         externalInvocationLog.setType(PlatformType.AUTOMATION);
-        externalInvocationLog.setSurface(ExternalInvocationSurface.MCP_AUTOMATION);
+        externalInvocationLog.setSource(ExternalInvocationSource.MCP_SERVER);
         externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
         externalInvocationLog.setToolName("slack_sendMessage");
         externalInvocationLog.setWorkspaceId(workspaceId);
@@ -246,13 +246,12 @@ class ExternalInvocationLogServiceIntTest {
     }
 
     private void create(
-        ExternalInvocationSurface surface, ExternalInvocationOutcome outcome, long mcpServerId, Instant createdDate) {
+        PlatformType type, ExternalInvocationOutcome outcome, long mcpServerId, Instant createdDate) {
 
         ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
 
-        externalInvocationLog.setType(
-            surface == ExternalInvocationSurface.MCP_AUTOMATION ? PlatformType.AUTOMATION : PlatformType.EMBEDDED);
-        externalInvocationLog.setSurface(surface);
+        externalInvocationLog.setType(type);
+        externalInvocationLog.setSource(ExternalInvocationSource.MCP_SERVER);
         externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
         externalInvocationLog.setToolName("slack_sendMessage");
         externalInvocationLog.setMcpServerId(mcpServerId);

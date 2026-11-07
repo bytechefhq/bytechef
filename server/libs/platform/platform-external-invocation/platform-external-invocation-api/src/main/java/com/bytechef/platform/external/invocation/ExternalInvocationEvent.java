@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public record ExternalInvocationEvent(
-    PlatformType type, ExternalInvocationSurface surface, ExternalInvocationKind kind, String toolName,
+    PlatformType type, ExternalInvocationSource source, ExternalInvocationKind kind, String toolName,
     @Nullable String componentName, @Nullable Integer componentVersion, @Nullable String operationName,
     @Nullable Long connectionId, @Nullable Integer environment, @Nullable Long workspaceId,
     @Nullable String externalUserId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
@@ -33,15 +33,15 @@ public record ExternalInvocationEvent(
     public static final int ERROR_MESSAGE_MAX_LENGTH = 512;
 
     public static Builder builder(
-        PlatformType type, ExternalInvocationSurface surface, ExternalInvocationKind kind, String toolName) {
+        PlatformType type, ExternalInvocationSource source, ExternalInvocationKind kind, String toolName) {
 
-        return new Builder(type, surface, kind, toolName);
+        return new Builder(type, source, kind, toolName);
     }
 
     public static final class Builder {
 
         private final PlatformType type;
-        private final ExternalInvocationSurface surface;
+        private final ExternalInvocationSource source;
         private final ExternalInvocationKind kind;
         private final String toolName;
 
@@ -62,10 +62,10 @@ public record ExternalInvocationEvent(
         private @Nullable String errorMessage;
         private long durationMs;
 
-        private Builder(PlatformType type, ExternalInvocationSurface surface, ExternalInvocationKind kind,
+        private Builder(PlatformType type, ExternalInvocationSource source, ExternalInvocationKind kind,
             String toolName) {
             this.type = type;
-            this.surface = surface;
+            this.source = source;
             this.kind = kind;
             this.toolName = toolName;
         }
@@ -172,7 +172,7 @@ public record ExternalInvocationEvent(
 
         public ExternalInvocationEvent build() {
             return new ExternalInvocationEvent(
-                type, surface, kind, toolName, componentName, componentVersion, operationName, connectionId,
+                type, source, kind, toolName, componentName, componentVersion, operationName, connectionId,
                 environment, workspaceId, externalUserId, connectedUserId, integrationInstanceId, mcpServerId,
                 a2aServerId, jobId, outcome, errorType, errorMessage, durationMs);
         }

@@ -26,7 +26,7 @@ import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocatio
 import com.bytechef.ee.platform.external.invocation.log.dto.ExternalInvocationLogDTO;
 import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.security.web.authentication.TestNonPlatformUserAuthentication;
 import java.util.List;
 import java.util.Optional;
@@ -108,14 +108,14 @@ class ExternalInvocationLogFacadeIntTest {
         when(permissionService.isTenantAdmin()).thenReturn(true);
         when(
             externalInvocationLogService.getExternalInvocationLogs(
-                PlatformType.AUTOMATION, 2, ExternalInvocationSurface.MCP_EMBEDDED, null, null, null, null, null, null,
+                PlatformType.AUTOMATION, 2, ExternalInvocationSource.MCP_SERVER, null, null, null, null, null, null,
                 null,
                 0))
                     .thenReturn(page);
 
         assertThat(
             externalInvocationLogFacade.getExternalInvocationLogs(
-                PlatformType.AUTOMATION, 2L, ExternalInvocationSurface.MCP_EMBEDDED, null, null, null, null, null, null,
+                PlatformType.AUTOMATION, 2L, ExternalInvocationSource.MCP_SERVER, null, null, null, null, null, null,
                 null, 0))
                     .isEmpty();
     }
@@ -200,7 +200,7 @@ class ExternalInvocationLogFacadeIntTest {
         when(permissionService.hasResourceScope(7L, "Workspace", "WORKFLOW_VIEW")).thenReturn(true);
         when(
             externalInvocationLogService.getWorkspaceExternalInvocationLogs(
-                PlatformType.AUTOMATION, 7L, 2, ExternalInvocationSurface.MCP_AUTOMATION, null, 5L, null, null, null,
+                PlatformType.AUTOMATION, 7L, 2, ExternalInvocationSource.MCP_SERVER, null, 5L, null, null, null,
                 null,
                 null,
                 1))
@@ -208,7 +208,7 @@ class ExternalInvocationLogFacadeIntTest {
 
         assertThat(
             externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
-                PlatformType.AUTOMATION, 7L, 2L, ExternalInvocationSurface.MCP_AUTOMATION, null, 5L, null, null, null,
+                PlatformType.AUTOMATION, 7L, 2L, ExternalInvocationSource.MCP_SERVER, null, 5L, null, null, null,
                 null,
                 null,
                 1))

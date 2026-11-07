@@ -36,7 +36,7 @@ import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -145,7 +145,7 @@ public class ToolFacadeImpl implements ToolFacade {
             inputParameters, externalUserId, environment);
 
         ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
-            .builder(PlatformType.EMBEDDED, ExternalInvocationSurface.EMBEDDED_API_TOOL,
+            .builder(PlatformType.EMBEDDED, ExternalInvocationSource.API_TOOL,
                 ExternalInvocationKind.COMPONENT,
                 toolName)
             .componentName(result.componentName())

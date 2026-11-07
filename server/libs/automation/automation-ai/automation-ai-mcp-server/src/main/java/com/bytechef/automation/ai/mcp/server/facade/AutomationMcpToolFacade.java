@@ -52,7 +52,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.external.invocation.WorkflowToolRunResult;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -283,7 +283,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
             return externalInvocationRecorder.record(
                 ExternalInvocationEvent
-                    .builder(PlatformType.AUTOMATION, ExternalInvocationSurface.MCP_AUTOMATION,
+                    .builder(PlatformType.AUTOMATION, ExternalInvocationSource.MCP_SERVER,
                         ExternalInvocationKind.COMPONENT,
                         toolName)
                     .componentName(componentName)
@@ -335,7 +335,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
             inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, triggerName);
 
             ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
-                .builder(PlatformType.AUTOMATION, ExternalInvocationSurface.MCP_AUTOMATION,
+                .builder(PlatformType.AUTOMATION, ExternalInvocationSource.MCP_SERVER,
                     ExternalInvocationKind.WORKFLOW,
                     toolName)
                 .environment(Math.toIntExact(mcpServer.getEnvironmentId()))

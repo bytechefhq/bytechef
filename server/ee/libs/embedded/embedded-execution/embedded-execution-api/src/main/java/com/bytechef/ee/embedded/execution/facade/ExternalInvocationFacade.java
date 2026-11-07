@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.execution.facade;
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import java.time.Instant;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
@@ -23,7 +23,7 @@ import org.springframework.data.domain.Page;
 public interface ExternalInvocationFacade {
 
     Page<ExternalInvocationLog> getExternalInvocations(
-        String externalUserId, Environment environment, @Nullable ExternalInvocationSurface surface,
+        String externalUserId, Environment environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationOutcome outcome, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber);
 }
