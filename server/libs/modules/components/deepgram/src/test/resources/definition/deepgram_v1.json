@@ -1,0 +1,1138 @@
+{
+  "actions": [ {
+    "batch": false,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": false,
+    "description": "Transcribe audio in real-time using Deepgram's streaming speech-to-text API. Receives audio via WebSocket, forwards to Deepgram for transcription, and streams transcription results back.",
+    "help": null,
+    "metadata": { },
+    "name": "realtimeListen",
+    "outputDefinition": null,
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "nova-3",
+      "description": "The AI model to use for transcription.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Model",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "model",
+      "options": [ {
+        "description": null,
+        "label": "Nova 3",
+        "value": "nova-3"
+      }, {
+        "description": null,
+        "label": "Nova 2",
+        "value": "nova-2"
+      }, {
+        "description": null,
+        "label": "Nova 2 General",
+        "value": "nova-2-general"
+      }, {
+        "description": null,
+        "label": "Nova 2 Meeting",
+        "value": "nova-2-meeting"
+      }, {
+        "description": null,
+        "label": "Nova 2 Phonecall",
+        "value": "nova-2-phonecall"
+      }, {
+        "description": null,
+        "label": "Enhanced",
+        "value": "enhanced"
+      }, {
+        "description": null,
+        "label": "Base",
+        "value": "base"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": "en",
+      "description": "The language code for transcription (e.g., 'en' for English).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Language",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "language",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "linear16",
+      "description": "The encoding of the audio data.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Encoding",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "encoding",
+      "options": [ {
+        "description": null,
+        "label": "Linear16",
+        "value": "linear16"
+      }, {
+        "description": null,
+        "label": "FLAC",
+        "value": "flac"
+      }, {
+        "description": null,
+        "label": "μ-law",
+        "value": "mulaw"
+      }, {
+        "description": null,
+        "label": "A-law",
+        "value": "alaw"
+      }, {
+        "description": null,
+        "label": "Opus",
+        "value": "opus"
+      }, {
+        "description": null,
+        "label": "AMR NB",
+        "value": "amr-nb"
+      }, {
+        "description": null,
+        "label": "AMR WB",
+        "value": "amr-wb"
+      }, {
+        "description": null,
+        "label": "Speex",
+        "value": "speex"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": "16000",
+      "description": "The sample rate of the audio in Hz.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Sample Rate",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "sampleRate",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Whether to receive interim (non-final) transcription results.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Interim Results",
+      "metadata": { },
+      "name": "interimResults",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Add punctuation and capitalization to the transcript.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Punctuate",
+      "metadata": { },
+      "name": "punctuate",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Apply formatting to improve transcript readability.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Smart Format",
+      "metadata": { },
+      "name": "smartFormat",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Receive voice activity detection events.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "VAD Events",
+      "metadata": { },
+      "name": "vadEvents",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    } ],
+    "resumePerform": null,
+    "title": "Realtime Listen",
+    "workflowNodeDescription": null
+  }, {
+    "batch": false,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": false,
+    "description": "Generate speech in real-time using Deepgram's streaming text-to-speech API. Receives text via WebSocket, forwards to Deepgram for speech synthesis, and streams generated audio chunks back.",
+    "help": null,
+    "metadata": { },
+    "name": "realtimeSpeak",
+    "outputDefinition": null,
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "aura-asteria-en",
+      "description": "The voice model to use for speech synthesis.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Voice Model",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "model",
+      "options": [ {
+        "description": null,
+        "label": "Aura Asteria (English)",
+        "value": "aura-asteria-en"
+      }, {
+        "description": null,
+        "label": "Aura Luna (English)",
+        "value": "aura-luna-en"
+      }, {
+        "description": null,
+        "label": "Aura Stella (English)",
+        "value": "aura-stella-en"
+      }, {
+        "description": null,
+        "label": "Aura Athena (English)",
+        "value": "aura-athena-en"
+      }, {
+        "description": null,
+        "label": "Aura Hera (English)",
+        "value": "aura-hera-en"
+      }, {
+        "description": null,
+        "label": "Aura Orion (English)",
+        "value": "aura-orion-en"
+      }, {
+        "description": null,
+        "label": "Aura Arcas (English)",
+        "value": "aura-arcas-en"
+      }, {
+        "description": null,
+        "label": "Aura Perseus (English)",
+        "value": "aura-perseus-en"
+      }, {
+        "description": null,
+        "label": "Aura Angus (English)",
+        "value": "aura-angus-en"
+      }, {
+        "description": null,
+        "label": "Aura Orpheus (English)",
+        "value": "aura-orpheus-en"
+      }, {
+        "description": null,
+        "label": "Aura Helios (English)",
+        "value": "aura-helios-en"
+      }, {
+        "description": null,
+        "label": "Aura Zeus (English)",
+        "value": "aura-zeus-en"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "linear16",
+      "description": "The encoding of the output audio.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Encoding",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "encoding",
+      "options": [ {
+        "description": null,
+        "label": "Linear16",
+        "value": "linear16"
+      }, {
+        "description": null,
+        "label": "μ-law",
+        "value": "mulaw"
+      }, {
+        "description": null,
+        "label": "A-law",
+        "value": "alaw"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "24000",
+      "description": "The sample rate of the output audio in Hz.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Sample Rate",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "sampleRate",
+      "options": [ {
+        "description": null,
+        "label": "8000 Hz",
+        "value": "8000"
+      }, {
+        "description": null,
+        "label": "16000 Hz",
+        "value": "16000"
+      }, {
+        "description": null,
+        "label": "24000 Hz",
+        "value": "24000"
+      }, {
+        "description": null,
+        "label": "32000 Hz",
+        "value": "32000"
+      }, {
+        "description": null,
+        "label": "48000 Hz",
+        "value": "48000"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "title": "Realtime Speak",
+    "workflowNodeDescription": null
+  }, {
+    "batch": false,
+    "beforeResume": null,
+    "beforeSuspend": null,
+    "beforeTimeoutResume": null,
+    "deprecated": false,
+    "description": "Start a real-time voice agent conversation using Deepgram's conversational AI API. Handles end-to-end voice interaction with integrated speech-to-text, LLM reasoning, and text-to-speech in a single WebSocket connection.",
+    "help": null,
+    "metadata": { },
+    "name": "voiceAgent",
+    "outputDefinition": null,
+    "perform": { },
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": "en",
+      "description": "The language for the voice agent conversation.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Language",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "language",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The system prompt that defines the agent's behavior and personality.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "System Prompt",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "prompt",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The initial greeting the agent speaks when the conversation starts.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Greeting",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "greeting",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "open_ai",
+      "description": "The LLM provider for the agent's reasoning.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "LLM Provider",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "llmProvider",
+      "options": [ {
+        "description": null,
+        "label": "OpenAI",
+        "value": "open_ai"
+      }, {
+        "description": null,
+        "label": "Anthropic",
+        "value": "anthropic"
+      }, {
+        "description": null,
+        "label": "Google",
+        "value": "google"
+      }, {
+        "description": null,
+        "label": "Groq",
+        "value": "groq"
+      }, {
+        "description": null,
+        "label": "AWS Bedrock",
+        "value": "aws_bedrock"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": "gpt-4o-mini",
+      "description": "The LLM model to use for reasoning.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "LLM Model",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "llmModel",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "deepgram",
+      "description": "The text-to-speech provider for the agent's voice.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "TTS Provider",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "ttsProvider",
+      "options": [ {
+        "description": null,
+        "label": "Deepgram",
+        "value": "deepgram"
+      }, {
+        "description": null,
+        "label": "ElevenLabs",
+        "value": "eleven_labs"
+      }, {
+        "description": null,
+        "label": "OpenAI",
+        "value": "open_ai"
+      }, {
+        "description": null,
+        "label": "Cartesia",
+        "value": "cartesia"
+      }, {
+        "description": null,
+        "label": "AWS Polly",
+        "value": "aws_polly"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": "aura-asteria-en",
+      "description": "The voice model for text-to-speech.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "TTS Voice",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "ttsModel",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "linear16",
+      "description": "The encoding of the input audio.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Audio Input Encoding",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "audioInputEncoding",
+      "options": [ {
+        "description": null,
+        "label": "Linear16",
+        "value": "linear16"
+      }, {
+        "description": null,
+        "label": "μ-law",
+        "value": "mulaw"
+      }, {
+        "description": null,
+        "label": "A-law",
+        "value": "alaw"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": "16000",
+      "description": "The sample rate of the input audio in Hz.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Audio Input Sample Rate",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "audioInputSampleRate",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "linear16",
+      "description": "The encoding of the output audio.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Audio Output Encoding",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "audioOutputEncoding",
+      "options": [ {
+        "description": null,
+        "label": "Linear16",
+        "value": "linear16"
+      }, {
+        "description": null,
+        "label": "μ-law",
+        "value": "mulaw"
+      }, {
+        "description": null,
+        "label": "A-law",
+        "value": "alaw"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": "24000",
+      "description": "The sample rate of the output audio in Hz.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Audio Output Sample Rate",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "audioOutputSampleRate",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "resumePerform": null,
+    "title": "Voice Agent",
+    "workflowNodeDescription": null
+  } ],
+  "clusterElements": [ {
+    "name": "voiceAgent",
+    "description": "Start a real-time voice agent conversation using Deepgram's conversational AI API. Handles end-to-end voice interaction with integrated speech-to-text, LLM reasoning, and text-to-speech in a single WebSocket connection.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": "en",
+      "description": "The language for the voice agent conversation.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Language",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "language",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The system prompt that defines the agent's behavior and personality.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "System Prompt",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "prompt",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The initial greeting the agent speaks when the conversation starts.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Greeting",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "greeting",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "open_ai",
+      "description": "The LLM provider for the agent's reasoning.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "LLM Provider",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "llmProvider",
+      "options": [ {
+        "description": null,
+        "label": "OpenAI",
+        "value": "open_ai"
+      }, {
+        "description": null,
+        "label": "Anthropic",
+        "value": "anthropic"
+      }, {
+        "description": null,
+        "label": "Google",
+        "value": "google"
+      }, {
+        "description": null,
+        "label": "Groq",
+        "value": "groq"
+      }, {
+        "description": null,
+        "label": "AWS Bedrock",
+        "value": "aws_bedrock"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": "gpt-4o-mini",
+      "description": "The LLM model to use for reasoning.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "LLM Model",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "llmModel",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "deepgram",
+      "description": "The text-to-speech provider for the agent's voice.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "TTS Provider",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "ttsProvider",
+      "options": [ {
+        "description": null,
+        "label": "Deepgram",
+        "value": "deepgram"
+      }, {
+        "description": null,
+        "label": "ElevenLabs",
+        "value": "eleven_labs"
+      }, {
+        "description": null,
+        "label": "OpenAI",
+        "value": "open_ai"
+      }, {
+        "description": null,
+        "label": "Cartesia",
+        "value": "cartesia"
+      }, {
+        "description": null,
+        "label": "AWS Polly",
+        "value": "aws_polly"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": "aura-asteria-en",
+      "description": "The voice model for text-to-speech.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "TTS Voice",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "ttsModel",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "linear16",
+      "description": "The encoding of the input audio.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Audio Input Encoding",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "audioInputEncoding",
+      "options": [ {
+        "description": null,
+        "label": "Linear16",
+        "value": "linear16"
+      }, {
+        "description": null,
+        "label": "μ-law",
+        "value": "mulaw"
+      }, {
+        "description": null,
+        "label": "A-law",
+        "value": "alaw"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "INTEGER",
+      "defaultValue": 16000,
+      "description": "The sample rate of the input audio in Hz.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Audio Input Sample Rate",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "audioInputSampleRate",
+      "options": [ ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "linear16",
+      "description": "The encoding of the output audio.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Audio Output Encoding",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "audioOutputEncoding",
+      "options": [ {
+        "description": null,
+        "label": "Linear16",
+        "value": "linear16"
+      }, {
+        "description": null,
+        "label": "μ-law",
+        "value": "mulaw"
+      }, {
+        "description": null,
+        "label": "A-law",
+        "value": "alaw"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "INTEGER",
+      "defaultValue": 24000,
+      "description": "The sample rate of the output audio in Hz.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Audio Output Sample Rate",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "outputSampleRate",
+      "options": [ ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    } ],
+    "title": "Deepgram Voice Agent",
+    "type": {
+      "name": "VOICE_AGENT",
+      "key": "voiceAgent",
+      "label": "Voice Agent",
+      "multipleElements": false,
+      "required": true
+    },
+    "workflowNodeDescription": null
+  } ],
+  "componentCategories": [ {
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
+  } ],
+  "connection": {
+    "authorizationRequired": true,
+    "authorizations": [ {
+      "acquire": null,
+      "apply": null,
+      "authorizationCallback": null,
+      "authorizationUrl": null,
+      "clientId": null,
+      "clientSecret": null,
+      "description": null,
+      "detectOn": [ ],
+      "name": "bearer_token",
+      "oauth2AuthorizationExtraQueryParameters": null,
+      "pkce": null,
+      "properties": [ {
+        "advancedOption": false,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": true,
+        "hidden": false,
+        "label": "API Key",
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": "token",
+        "options": [ ],
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": false,
+        "placeholder": null,
+        "regex": null,
+        "required": true,
+        "type": "STRING"
+      } ],
+      "refresh": null,
+      "refreshOn": [ 401 ],
+      "refreshToken": null,
+      "refreshUrl": null,
+      "scopes": null,
+      "title": "API Key",
+      "tokenUrl": null,
+      "type": "BEARER_TOKEN"
+    } ],
+    "baseUri": { },
+    "help": null,
+    "processErrorResponse": null,
+    "properties": [ ],
+    "test": null,
+    "version": 1
+  },
+  "customAction": false,
+  "customActionHelp": null,
+  "description": "Deepgram is an AI speech platform providing real-time speech-to-text, text-to-speech, and voice agent capabilities.",
+  "icon": "path:assets/deepgram.svg",
+  "inputs": [ ],
+  "metadata": { },
+  "name": "deepgram",
+  "resources": null,
+  "tags": [ ],
+  "title": "Deepgram",
+  "triggers": [ ],
+  "unifiedApi": null,
+  "version": 1
+}
