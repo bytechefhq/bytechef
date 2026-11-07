@@ -11,9 +11,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
@@ -76,7 +78,7 @@ class AiHubDelegateGatedToolFilterTest {
             .defaultTools(subAgentToolCallbacks.toArray())
             .build();
 
-        ChatClient hubSubAgentChatClient = chatClientDecorator.apply(subAgentChatClient, null);
+        ChatClient hubSubAgentChatClient = chatClientDecorator.apply(subAgentChatClient, buildWorkflowDefinition());
 
         hubSubAgentChatClient.prompt("Remove the Orders workflow")
             .call()
@@ -111,7 +113,7 @@ class AiHubDelegateGatedToolFilterTest {
                 toolCallback("createWorkflow", new AtomicInteger()))
             .build();
 
-        ChatClient hubSubAgentChatClient = chatClientDecorator.apply(subAgentChatClient, null);
+        ChatClient hubSubAgentChatClient = chatClientDecorator.apply(subAgentChatClient, buildWorkflowDefinition());
 
         Map<String, Object> toolContext = AgentToolInvocationContext.builder()
             .workspaceId(WORKSPACE_ID)
@@ -141,6 +143,14 @@ class AiHubDelegateGatedToolFilterTest {
             .getByNames(anySet(), eq(IntelligentToolVariant.BUILD), chatClientDecoratorCaptor.capture(), any());
 
         return chatClientDecoratorCaptor.getValue();
+    }
+
+    private static IntelligentToolDefinition buildWorkflowDefinition() {
+        IntelligentToolDefinition definition = mock(IntelligentToolDefinition.class);
+
+        when(definition.agentType()).thenReturn(CopilotAgentType.BUILD_WORKFLOW);
+
+        return definition;
     }
 
     private static List<ToolCallback> subAgentToolCallbacks(AtomicInteger gatedToolInvocations) {

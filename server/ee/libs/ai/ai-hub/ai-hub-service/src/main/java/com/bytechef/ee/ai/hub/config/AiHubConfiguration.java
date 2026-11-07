@@ -9,10 +9,12 @@ package com.bytechef.ee.ai.hub.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
+import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.copilot.config.InteractivePickerToolCallbacks;
 import com.bytechef.ai.copilot.tool.PersistedWorkflowChecker;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
@@ -48,6 +50,8 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
+import com.bytechef.ee.ai.hub.subagent.SubAgentContributingChatClient;
+import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
@@ -89,6 +93,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
@@ -188,6 +193,7 @@ public class AiHubConfiguration {
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade, AiHubChatService chatService,
         AiHubChatAccessPolicy chatAccessPolicy, AiHubToolApprovalPolicy toolApprovalPolicy,
+        AiHubSessionMemory aiHubSessionMemory,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
         @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
 
@@ -216,7 +222,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(
             intelligentToolCallbacks(
                 intelligentToolCatalog, ASK_INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.ASK, toolApprovalPolicy,
-                workspaceFacade));
+                workspaceFacade, aiHubSessionMemory));
 
         return new AiHubModeToolCallbacks(toolCallbacks, ASK_PINNED_TOOL_NAMES);
     }
@@ -244,7 +250,7 @@ public class AiHubConfiguration {
         ObjectProvider<EnvironmentPromotionFacade> environmentPromotionFacadeProvider,
         ObjectProvider<EnvironmentService> environmentServiceProvider, AiHubChatService chatService,
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
-        AiHubToolApprovalPolicy toolApprovalPolicy,
+        AiHubToolApprovalPolicy toolApprovalPolicy, AiHubSessionMemory aiHubSessionMemory,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
         @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
 
@@ -279,7 +285,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(
             intelligentToolCallbacks(
                 intelligentToolCatalog, INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, toolApprovalPolicy,
-                workspaceFacade));
+                workspaceFacade, aiHubSessionMemory));
 
         requireBuildWorkflow(toolCallbacks);
 
@@ -666,11 +672,13 @@ public class AiHubConfiguration {
 
     static List<ToolCallback> intelligentToolCallbacks(
         IntelligentToolCatalog intelligentToolCatalog, Set<String> toolNames, IntelligentToolVariant variant,
-        AiHubToolApprovalPolicy toolApprovalPolicy, WorkspaceFacade workspaceFacade) {
+        AiHubToolApprovalPolicy toolApprovalPolicy, WorkspaceFacade workspaceFacade,
+        AiHubSessionMemory aiHubSessionMemory) {
 
         return intelligentToolCatalog.getByNames(
             toolNames, variant,
-            (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy),
+            (chatClient, definition) -> wrapDelegate(
+                AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy), definition, aiHubSessionMemory),
             (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
                 new UserRequestForwardingToolCallback(toolCallback), workspaceFacade));
     }
@@ -713,6 +721,15 @@ public class AiHubConfiguration {
                     "bytechef.ai.copilot.enabled=true must also be set and the Copilot's sub-agent chat clients " +
                     "must be available. Set bytechef.ai.hub.enabled=false to run without the AI Hub.");
         }
+    }
+
+    private static ChatClient wrapDelegate(
+        ChatClient chatClient, IntelligentToolDefinition definition, AiHubSessionMemory aiHubSessionMemory) {
+
+        AgentType agentType = definition.agentType();
+
+        return SubAgentContributingChatClient.wrap(
+            chatClient, List.of(new SubAgentSessionMemoryContributor(aiHubSessionMemory, agentType.key())));
     }
 
     private AiHubSpringAIAgent buildAgent(
