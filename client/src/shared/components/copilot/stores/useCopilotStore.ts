@@ -61,6 +61,11 @@ export interface ClusterElementCopilotParametersI {
     taskName?: string;
 }
 
+export interface ComponentRuleCopilotParametersI {
+    componentName?: string;
+    toolName?: string;
+}
+
 export interface DataTableCopilotParametersI {
     dataTableId?: string;
 }
@@ -105,6 +110,7 @@ export type CopilotContextParametersType =
     | AiAgentCopilotParametersI
     | CodeEditorCopilotParametersI
     | ClusterElementCopilotParametersI
+    | ComponentRuleCopilotParametersI
     | DataTableCopilotParametersI
     | IntentCopilotParametersI
     | KnowledgeBaseCopilotParametersI
