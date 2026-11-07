@@ -64,6 +64,8 @@ import com.bytechef.task.dispatcher.each.EachTaskDispatcher;
 import com.bytechef.task.dispatcher.each.completion.EachTaskCompletionHandler;
 import com.bytechef.task.dispatcher.fork.join.ForkJoinTaskDispatcher;
 import com.bytechef.task.dispatcher.fork.join.completion.ForkJoinTaskCompletionHandler;
+import com.bytechef.task.dispatcher.graph.GraphTaskDispatcher;
+import com.bytechef.task.dispatcher.graph.completion.GraphTaskCompletionHandler;
 import com.bytechef.task.dispatcher.loop.LoopBreakTaskDispatcher;
 import com.bytechef.task.dispatcher.loop.LoopTaskDispatcher;
 import com.bytechef.task.dispatcher.loop.completion.LoopTaskCompletionHandler;
@@ -273,6 +275,9 @@ public class WorkflowSubflowSyncExecutorConfiguration {
             (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
                 contextService, counterService, evaluator, taskExecutionService, taskCompletionHandler, taskDispatcher,
                 taskFileStorage),
+            (taskCompletionHandler, taskDispatcher) -> new GraphTaskCompletionHandler(
+                contextService, counterService, evaluator, eventPublisher, taskCompletionHandler, taskDispatcher,
+                taskExecutionService, taskFileStorage),
             (taskCompletionHandler, taskDispatcher) -> new LoopTaskCompletionHandler(
                 contextService, evaluator, taskCompletionHandler, taskDispatcher, taskExecutionService,
                 taskFileStorage),
@@ -299,7 +304,7 @@ public class WorkflowSubflowSyncExecutorConfiguration {
             });
     }
 
-    private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
+    List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(
         ChildJobPrincipalFactory childJobPrincipalFactory, ContextService contextService, CounterService counterService,
         ApplicationEventPublisher eventPublisher, Evaluator evaluator, JobService jobService,
         SubflowResolver subflowResolver, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
@@ -316,6 +321,9 @@ public class WorkflowSubflowSyncExecutorConfiguration {
                 contextService, counterService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskDispatcher) -> new ForkJoinTaskDispatcher(
+                contextService, counterService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
+                taskFileStorage),
+            (taskDispatcher) -> new GraphTaskDispatcher(
                 contextService, counterService, evaluator, eventPublisher, taskDispatcher, taskExecutionService,
                 taskFileStorage),
             (taskDispatcher) -> new LoopBreakTaskDispatcher(eventPublisher, taskExecutionService),

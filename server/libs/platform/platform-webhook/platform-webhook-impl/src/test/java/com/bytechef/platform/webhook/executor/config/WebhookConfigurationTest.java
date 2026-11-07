@@ -19,8 +19,11 @@ package com.bytechef.platform.webhook.executor.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
@@ -30,19 +33,46 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.job.sync.executor.SyncExecutionSuspendRejectingTaskCompletionHandler;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 
 /**
  * @author Ivica Cardic
  */
 class WebhookConfigurationTest {
 
+    private static final String TASK_DISPATCHER_PACKAGE = "com.bytechef.task.dispatcher";
+
+    private final WebhookConfiguration webhookConfiguration = new WebhookConfiguration();
+
+    @Test
+    void testEveryTaskCompletionHandlerOnClasspathIsRegistered() {
+        Set<String> registeredClassNames = webhookConfiguration
+            .getTaskCompletionHandlerFactories(
+                mock(ContextService.class), mock(CounterService.class), mock(Evaluator.class),
+                mock(ApplicationEventPublisher.class), mock(TaskExecutionService.class),
+                mock(TaskFileStorage.class))
+            .stream()
+            .map(
+                taskCompletionHandlerFactory -> taskCompletionHandlerFactory.createTaskCompletionHandler(
+                    mock(TaskCompletionHandler.class), mockTaskDispatcher()))
+            .map(taskCompletionHandler -> taskCompletionHandler.getClass()
+                .getName())
+            .collect(Collectors.toSet());
+
+        assertThat(registeredClassNames).containsAll(findClassNames(TaskCompletionHandler.class));
+    }
+
     @Test
     void testTheFirstSyncTaskCompletionHandlerRejectsASuspendingStep() {
-        WebhookConfiguration webhookConfiguration = new WebhookConfiguration();
-
         List<TaskCompletionHandlerFactory> taskCompletionHandlerFactories =
             webhookConfiguration.getSyncTaskCompletionHandlerFactories(
                 mock(ContextService.class), mock(ApplicationEventPublisher.class), mock(CounterService.class),
@@ -61,5 +91,44 @@ class WebhookConfigurationTest {
         suspendedTaskExecution.putMetadata(MetadataConstants.JOB_RESUME_ID, "resume-id");
 
         assertThat(taskCompletionHandler.canHandle(suspendedTaskExecution)).isTrue();
+    }
+
+    @Test
+    void testEveryTaskDispatcherOnClasspathIsRegistered() {
+        Set<String> registeredClassNames = webhookConfiguration
+            .getTaskDispatcherResolverFactories(
+                mock(ChildJobPrincipalFactory.class), mock(ContextService.class), mock(CounterService.class),
+                mock(ApplicationEventPublisher.class), mock(Evaluator.class), mock(JobService.class),
+                mock(SubflowResolver.class), mock(TaskExecutionService.class), mock(TaskFileStorage.class))
+            .stream()
+            .map(
+                taskDispatcherResolverFactory -> taskDispatcherResolverFactory.createTaskDispatcherResolver(
+                    mockTaskDispatcher()))
+            .map(taskDispatcherResolver -> taskDispatcherResolver.getClass()
+                .getName())
+            .collect(Collectors.toSet());
+
+        assertThat(registeredClassNames).containsAll(findClassNames(TaskDispatcherResolver.class));
+    }
+
+    private static Set<String> findClassNames(Class<?> type) {
+        ClassPathScanningCandidateComponentProvider provider =
+            new ClassPathScanningCandidateComponentProvider(false);
+
+        provider.addIncludeFilter(new AssignableTypeFilter(type));
+
+        Set<String> classNames = provider.findCandidateComponents(TASK_DISPATCHER_PACKAGE)
+            .stream()
+            .map(BeanDefinition::getBeanClassName)
+            .collect(Collectors.toSet());
+
+        assertThat(classNames).isNotEmpty();
+
+        return classNames;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static TaskDispatcher<? super Task> mockTaskDispatcher() {
+        return mock(TaskDispatcher.class);
     }
 }
