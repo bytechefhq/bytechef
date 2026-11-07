@@ -49,6 +49,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -60,12 +61,15 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.tool.ToolCallback;
@@ -120,6 +124,10 @@ public final class AiHubAgentFixtures {
             .build(),
         null);
 
+    public final MeterRegistry meterRegistry = new SimpleMeterRegistry();
+
+    private @Nullable AiGuardrails aiGuardrails;
+
     private final AiHubConfiguration configuration = new AiHubConfiguration(
         new ClassPathResource("prompt_ai_hub_ask.txt"), new ClassPathResource("prompt_ai_hub_build.txt"));
 
@@ -156,6 +164,12 @@ public final class AiHubAgentFixtures {
 
     public static AiHubAgentFixtures withBuildWorkflow() {
         return new AiHubAgentFixtures(Set.of("buildWorkflow", "importWorkflow"));
+    }
+
+    public AiHubAgentFixtures withAiGuardrails(AiGuardrails aiGuardrails) {
+        this.aiGuardrails = aiGuardrails;
+
+        return this;
     }
 
     public AiHubSpringAIAgent askAgent() throws AGUIException {
@@ -207,7 +221,8 @@ public final class AiHubAgentFixtures {
             artifactRecorder,
             securityContextRehydrator, approvalGate, policy, inFlightRunRegistryProvider(),
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
+            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
+            availableProvider(aiGuardrails), availableProvider(meterRegistry));
     }
 
     @SuppressWarnings("unchecked")
@@ -278,7 +293,7 @@ public final class AiHubAgentFixtures {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> ObjectProvider<T> availableProvider(T bean) {
+    private static <T> ObjectProvider<T> availableProvider(@Nullable T bean) {
         ObjectProvider<T> provider = mock(ObjectProvider.class);
 
         when(provider.getIfAvailable()).thenReturn(bean);

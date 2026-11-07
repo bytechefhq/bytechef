@@ -37,6 +37,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-service"))
 
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.assertj:assertj-core")
