@@ -248,6 +248,12 @@ public final class AiHubAgentFixtures {
         return buildAgent(defaultChatModel, providerOf(overrideChatClientResolver));
     }
 
+    public AiHubSpringAIAgent buildAgent(ChatModel defaultChatModel, IntelligentToolCatalog catalog)
+        throws AGUIException {
+
+        return buildAgent(defaultChatModel, emptyProvider(), catalog);
+    }
+
     private AiHubSpringAIAgent askAgent(
         ChatModel defaultChatModel,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
@@ -264,8 +270,17 @@ public final class AiHubAgentFixtures {
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
+        return buildAgent(defaultChatModel, overrideChatClientResolverProvider, intelligentToolCatalog);
+    }
+
+    private AiHubSpringAIAgent buildAgent(
+        ChatModel defaultChatModel,
+        ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
+        IntelligentToolCatalog catalog)
+        throws AGUIException {
+
         return configuration.aiHubBuildSpringAIAgent(
-            sessionMemory, defaultChatModel, buildToolCallbacks(), securityContextRehydrator, approvalGate,
+            sessionMemory, defaultChatModel, buildToolCallbacks(catalog), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
             toolSearchAdvisorProvider(), availableProvider(aiGuardrails), availableProvider(meterRegistry));
     }
@@ -296,6 +311,10 @@ public final class AiHubAgentFixtures {
     }
 
     public AiHubModeToolCallbacks buildToolCallbacks() {
+        return buildToolCallbacks(intelligentToolCatalog);
+    }
+
+    private AiHubModeToolCallbacks buildToolCallbacks(IntelligentToolCatalog catalog) {
         return configuration.aiHubBuildToolCallbacks(
             projectTools, projectWorkflowLifecycleTools, workflowExecutionTools, componentToolsProvider(),
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
@@ -304,7 +323,7 @@ public final class AiHubAgentFixtures {
             availableProvider(contextStoreToolCallbacksFactory), availableProvider(apiCollectionToolCallbacksFactory),
             availableProvider(componentRuleToolCallbacksFactory),
             availableProvider(aiAgentFacade), availableProvider(customComponentFacade),
-            availableProvider(projectCodeWorkflowFacade), interactivePickerToolCallbacks, intelligentToolCatalog,
+            availableProvider(projectCodeWorkflowFacade), interactivePickerToolCallbacks, catalog,
             workspaceFacade,
             projectWorkflowFacade,
             projectDeploymentFacade, availableProvider(environmentPromotionFacade),

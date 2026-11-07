@@ -50,6 +50,8 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
+import com.bytechef.ee.ai.hub.progress.SubagentProgressToolCallback;
+import com.bytechef.ee.ai.hub.progress.SubagentStepAdvisor;
 import com.bytechef.ee.ai.hub.subagent.SubAgentAdvisorContributor;
 import com.bytechef.ee.ai.hub.subagent.SubAgentContributingChatClient;
 import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
@@ -701,10 +703,11 @@ public class AiHubConfiguration {
         return intelligentToolCatalog.getByNames(
             toolNames, variant,
             (chatClient, definition) -> wrapDelegate(
-                AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy), definition, aiHubSessionMemory,
-                aiGuardrails, aiGuardrailMetrics),
+                SubagentStepAdvisor.attach(AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy)),
+                definition, aiHubSessionMemory, aiGuardrails, aiGuardrailMetrics),
             (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
-                new UserRequestForwardingToolCallback(toolCallback), workspaceFacade));
+                SubagentProgressToolCallback.wrap(new UserRequestForwardingToolCallback(toolCallback)),
+                workspaceFacade));
     }
 
     static List<ToolCallback> openCustomComponentTabToolCallbacks(

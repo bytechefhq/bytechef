@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.RunAgentInput;
 import com.agui.core.exception.AGUIException;
 import com.agui.core.message.BaseMessage;
@@ -21,6 +22,7 @@ import com.agui.core.state.State;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGateToolCallback;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
+import com.bytechef.ee.ai.hub.progress.SubagentProgressEmitter;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
@@ -100,6 +102,19 @@ class AiHubSpringAIAgentTest {
         assertThat(invocationContext.tenantId()).isEqualTo("acme");
         assertThat(toolContext).containsEntry(AiHubApprovalGateToolCallback.TOOL_CONTEXT_MODE_KEY, "BUILD");
         assertThat(toolContext).containsEntry(AiHubToolInvocationContext.TOOL_CONTEXT_THREAD_ID_KEY, "thread-1");
+    }
+
+    @Test
+    void testToolContextOfARunCarriesAProgressEmitterOnTopOfTheInputKeys() throws AGUIException {
+        AiHubSpringAIAgent agent = newAgent();
+
+        RunAgentInput input = newInput(verifiedState());
+
+        Map<String, Object> toolContext = agent.toolContext(input, new AgentSubscriber() {});
+
+        assertThat(toolContext).containsAllEntriesOf(agent.toolContext(input));
+        assertThat(SubagentProgressEmitter.fetch(new ToolContext(toolContext))).isNotNull();
+        assertThat(SubagentProgressEmitter.fetch(new ToolContext(agent.toolContext(input)))).isNull();
     }
 
     @Test
