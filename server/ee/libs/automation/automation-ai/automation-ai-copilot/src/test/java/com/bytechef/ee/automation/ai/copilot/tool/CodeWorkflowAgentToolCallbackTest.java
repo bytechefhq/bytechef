@@ -14,10 +14,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.agent.tool.AgentType;
+import com.bytechef.ai.agent.tool.CurrentAgentContext;
+import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
+import com.bytechef.ai.copilot.tool.CopilotAgentType;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -225,6 +234,59 @@ class CodeWorkflowAgentToolCallbackTest {
             .isTrue();
         assertThat(node.get("error")
             .asText()).contains("buildCodeWorkflow failed");
+    }
+
+    @Test
+    void testReadOnlyToolDefinitionHasANonWritingNameAndDescription() {
+        CodeWorkflowAgentToolCallback callback =
+            CodeWorkflowAgentToolCallback.readOnly(chatModel -> mock(ChatClient.class), null);
+
+        assertThat(callback.getToolDefinition()
+            .name()).isEqualTo("explainCodeWorkflow");
+        assertThat(callback.getToolDefinition()
+            .description()).contains("read-only")
+                .doesNotContain("in build mode");
+        assertThat(callback.getToolDefinition()
+            .inputSchema()).contains("\"request\"");
+    }
+
+    @Test
+    void testReadOnlyCallbackRunsTheSubagentAsTheExplainAgent() {
+        assertSubagentRunsAs(
+            CodeWorkflowAgentToolCallback::readOnly, CopilotAgentType.EXPLAIN_CODE_WORKFLOW);
+    }
+
+    @Test
+    void testBuildCallbackRunsTheSubagentAsTheBuildAgent() {
+        assertSubagentRunsAs(CodeWorkflowAgentToolCallback::new, CopilotAgentType.BUILD_CODE_WORKFLOW);
+    }
+
+    private static void assertSubagentRunsAs(
+        BiFunction<IntelligentToolChatClientFactory, SubAgentChatModelResolver, CodeWorkflowAgentToolCallback> constructor,
+        CopilotAgentType expectedAgentType) {
+
+        List<AgentType> agentTypes = new ArrayList<>();
+
+        ChatClient chatClient = mock(ChatClient.class);
+        ChatClientRequestSpec requestSpec = mock(ChatClientRequestSpec.class);
+        CallResponseSpec responseSpec = mock(CallResponseSpec.class);
+
+        when(chatClient.prompt(anyString())).thenReturn(requestSpec);
+        stubToolContext(requestSpec);
+        when(requestSpec.call()).thenReturn(responseSpec);
+        when(responseSpec.content()).thenAnswer(invocation -> {
+            AgentBinding agentBinding = CurrentAgentContext.current();
+
+            agentTypes.add(agentBinding.agentName());
+
+            return "report";
+        });
+
+        CodeWorkflowAgentToolCallback callback = constructor.apply(chatModel -> chatClient, null);
+
+        callback.call("{\"request\":\"what does it do\"}");
+
+        assertThat(agentTypes).containsExactly(expectedAgentType);
     }
 
     private static void stubToolContext(ChatClientRequestSpec requestSpec) {

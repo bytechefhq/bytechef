@@ -50,9 +50,24 @@ class AutomationIntelligentToolContributorConfiguration {
             new SimpleIntelligentToolDefinition(
                 "buildCodeWorkflow", CopilotAgentType.BUILD_CODE_WORKFLOW, Set.of(),
                 variant -> factoryForVariant(variant, codeWorkflowAskFactoryProvider, codeWorkflowBuildFactoryProvider),
-                chatClientFactory -> new CodeWorkflowAgentToolCallback(chatClientFactory, chatModelResolver)));
+                chatClientFactory -> new CodeWorkflowAgentToolCallback(chatClientFactory, chatModelResolver)),
+            new SimpleIntelligentToolDefinition(
+                "explainCustomComponent", CopilotAgentType.EXPLAIN_CUSTOM_COMPONENT, Set.of(),
+                variant -> askFactory(variant, customComponentAskFactoryProvider),
+                chatClientFactory -> CustomComponentAgentToolCallback.readOnly(chatClientFactory, chatModelResolver)),
+            new SimpleIntelligentToolDefinition(
+                "explainCodeWorkflow", CopilotAgentType.EXPLAIN_CODE_WORKFLOW, Set.of(),
+                variant -> askFactory(variant, codeWorkflowAskFactoryProvider),
+                chatClientFactory -> CodeWorkflowAgentToolCallback.readOnly(chatClientFactory, chatModelResolver)));
 
         return () -> definitions;
+    }
+
+    @Nullable
+    private static IntelligentToolChatClientFactory askFactory(
+        IntelligentToolVariant variant, ObjectProvider<IntelligentToolChatClientFactory> askProvider) {
+
+        return variant == IntelligentToolVariant.ASK ? askProvider.getIfAvailable() : null;
     }
 
     @Nullable
