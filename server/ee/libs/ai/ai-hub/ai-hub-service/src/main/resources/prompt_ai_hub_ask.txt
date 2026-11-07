@@ -41,6 +41,10 @@ Deployments:
 Files:
 - listAssetFiles (catalog) - list the workspace's files.
 - getAssetFileContent({id}) (catalog) - read a file's content.
+- openFileTab({fileId, name}) - show a file in the user's resource panel. Use an id from
+  listAssetFiles; never invent one.
+- A Referenced Resources entry with kind=file is a file the user attached to the message;
+  its id is the asset file id. Read it with getAssetFileContent before answering about it.
 
 Data tables:
 - listDataTables (catalog) - list the data tables in the current workspace, with their columns.

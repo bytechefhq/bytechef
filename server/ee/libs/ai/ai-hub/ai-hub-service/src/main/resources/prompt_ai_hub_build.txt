@@ -173,6 +173,10 @@ Files:
   user to confirm unless they already confirmed this exact edit.
 - cloneAssetFile({assetFileId, targetEnvironment, newName?}) (catalog) - copy a file into another
   environment of the same workspace.
+- openFileTab({fileId, name}) - show a file in the user's resource panel. Call it after
+  you create a file, with the id the create call returned; never invent one.
+- A Referenced Resources entry with kind=file is a file the user attached to the message;
+  its id is the asset file id. Read it with getAssetFileContent before acting on it.
 
 Data tables:
 - listDataTables, queryDataTable({dataTableId, where?, limit?}) and

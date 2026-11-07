@@ -29,6 +29,7 @@ import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.automation.ai.tool.aiagent.AiAgentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.datatable.DataTableToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
+import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -68,6 +69,7 @@ import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenAiAgentTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenCodeWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenCustomComponentTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.OpenFileTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.ResearchToolCallbackFactory;
@@ -165,13 +167,13 @@ public class AiHubConfiguration {
     static final Set<String> ASK_PINNED_TOOL_NAMES = Set.of(
         "askUserQuestion", "checkWorkflow", "explainCodeWorkflow", "explainCustomComponent", "getWorkflow",
         "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab", "openCustomComponentTab",
-        "openWorkflowChatTab", "openWorkflowTab", "searchProjects", "searchWorkflows");
+        "openFileTab", "openWorkflowChatTab", "openWorkflowTab", "searchProjects", "searchWorkflows");
 
     static final Set<String> BUILD_PINNED_TOOL_NAMES = Set.of(
         "askUserQuestion", "buildCodeWorkflow", "buildCustomComponent", "buildWorkflow", "checkWorkflow",
         "createConnection", "createProject", "createProjectWorkflow", "data_analyst", "getWorkflow", "image_generator",
         "importWorkflow", "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab",
-        "openCodeWorkflowTab", "openCustomComponentTab", "openWorkflowChatTab", "openWorkflowTab",
+        "openCodeWorkflowTab", "openCustomComponentTab", "openFileTab", "openWorkflowChatTab", "openWorkflowTab",
         "saveWorkflowTestConnection", "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption",
         "selectConnection", "selectPropertyOption", "selectTriggerPropertyOption", "slide_builder");
 
@@ -212,7 +214,7 @@ public class AiHubConfiguration {
         ObjectProvider<ContextStoreToolCallbacksFactory> contextStoreToolCallbacksFactoryProvider,
         ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider,
         ObjectProvider<ComponentRuleToolCallbacksFactory> componentRuleToolCallbacksFactoryProvider,
-        ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
+        ObjectProvider<AiAgentFacade> aiAgentFacadeProvider, ObjectProvider<AssetFileFacade> assetFileFacadeProvider,
         ObjectProvider<CustomComponentFacade> customComponentFacadeProvider,
         ObjectProvider<ProjectCodeWorkflowFacade> projectCodeWorkflowFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
@@ -241,6 +243,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(apiCollectionFlatCrudToolCallbacks(apiCollectionToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(componentRuleFlatCrudToolCallbacks(componentRuleToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, null));
+        toolCallbacks.addAll(openFileTabToolCallbacks(assetFileFacadeProvider, null));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, null));
         toolCallbacks.addAll(openCustomComponentTabToolCallbacks(customComponentFacadeProvider, null));
@@ -275,7 +278,7 @@ public class AiHubConfiguration {
         ObjectProvider<ContextStoreToolCallbacksFactory> contextStoreToolCallbacksFactoryProvider,
         ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider,
         ObjectProvider<ComponentRuleToolCallbacksFactory> componentRuleToolCallbacksFactoryProvider,
-        ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
+        ObjectProvider<AiAgentFacade> aiAgentFacadeProvider, ObjectProvider<AssetFileFacade> assetFileFacadeProvider,
         ObjectProvider<CustomComponentFacade> customComponentFacadeProvider,
         ObjectProvider<ProjectCodeWorkflowFacade> projectCodeWorkflowFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
@@ -311,6 +314,7 @@ public class AiHubConfiguration {
         toolCallbacks
             .addAll(promoteToEnvironmentToolCallbacks(environmentPromotionFacadeProvider, environmentServiceProvider));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, aiHubChatArtifactRecorder));
+        toolCallbacks.addAll(openFileTabToolCallbacks(assetFileFacadeProvider, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(
@@ -786,6 +790,19 @@ public class AiHubConfiguration {
         }
 
         return List.of(new OpenCodeWorkflowTabToolCallback(projectCodeWorkflowFacade, aiHubChatArtifactRecorder));
+    }
+
+    static List<ToolCallback> openFileTabToolCallbacks(
+        ObjectProvider<AssetFileFacade> assetFileFacadeProvider,
+        @Nullable AiHubChatArtifactRecorder aiHubChatArtifactRecorder) {
+
+        AssetFileFacade assetFileFacade = assetFileFacadeProvider.getIfAvailable();
+
+        if (assetFileFacade == null) {
+            return List.of();
+        }
+
+        return List.of(new OpenFileTabToolCallback(assetFileFacade, aiHubChatArtifactRecorder));
     }
 
     private static void requireBuildWorkflow(List<ToolCallback> toolCallbacks) {

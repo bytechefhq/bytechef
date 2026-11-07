@@ -131,8 +131,9 @@ public final class AiHubAgentFixtures {
         new ComponentRuleToolCallbacksFactory(
             mock(ComponentRuleService.class), mock(ComponentDefinitionService.class),
             mock(ClusterElementDefinitionService.class), mock(Evaluator.class));
+    public final AssetFileFacade assetFileFacade = mock(AssetFileFacade.class);
     public final AssetFileToolCallbacksFactory assetFileToolCallbacksFactory = new AssetFileToolCallbacksFactory(
-        mock(AssetFileFacade.class), null);
+        assetFileFacade, null);
     public final DataTableToolCallbacksFactory dataTableToolCallbacksFactory = new DataTableToolCallbacksFactory(
         mock(WorkspaceDataTableFacade.class));
     public final KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory =
@@ -313,7 +314,8 @@ public final class AiHubAgentFixtures {
             availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
             availableProvider(contextStoreToolCallbacksFactory), availableProvider(apiCollectionToolCallbacksFactory),
             availableProvider(componentRuleToolCallbacksFactory),
-            availableProvider(aiAgentFacade), availableProvider(customComponentFacade),
+            availableProvider(aiAgentFacade), availableProvider(assetFileFacade),
+            availableProvider(customComponentFacade),
             availableProvider(projectCodeWorkflowFacade), interactivePickerToolCallbacks, intelligentToolCatalog,
             workspaceFacade, projectWorkflowFacade, chatService, chatAccessPolicy, policy, sessionMemory,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
@@ -343,7 +345,8 @@ public final class AiHubAgentFixtures {
             availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
             availableProvider(contextStoreToolCallbacksFactory), availableProvider(apiCollectionToolCallbacksFactory),
             availableProvider(componentRuleToolCallbacksFactory),
-            availableProvider(aiAgentFacade), availableProvider(customComponentFacade),
+            availableProvider(aiAgentFacade), availableProvider(assetFileFacade),
+            availableProvider(customComponentFacade),
             availableProvider(projectCodeWorkflowFacade), interactivePickerToolCallbacks, catalog,
             workspaceFacade,
             projectWorkflowFacade,
