@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T14:37:43.769977+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T15:21:13.860543+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "workflow-execution", description = "The Embedded Workflow Execution Internal API")
 public interface WorkflowExecutionApi {
@@ -44,6 +44,59 @@ public interface WorkflowExecutionApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    String PATH_GET_ANY_WORKFLOW_EXECUTIONS_PAGE = "/workflow-executions/any";
+    /**
+     * GET /workflow-executions/any : Get integration and automation workflow executions
+     * Get the integration and automation workflow executions of connected users together, newest first.
+     *
+     * @param workspaceId The id of the workspace whose automation workflow executions are returned. (required)
+     * @param environmentId The id of an environment. (optional)
+     * @param jobStatus The status of an executed job (optional)
+     * @param jobStartDate The start date of a job. (optional)
+     * @param jobEndDate The end date of a job. (optional)
+     * @param connectedUserId The id of a connected user. (optional)
+     * @param pageNumber The number of the page to return. (optional, default to 0)
+     * @return The page of embedded workflow executions. (status code 200)
+     */
+    @Operation(
+        operationId = "getAnyWorkflowExecutionsPage",
+        summary = "Get integration and automation workflow executions",
+        description = "Get the integration and automation workflow executions of connected users together, newest first.",
+        tags = { "workflow-execution" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The page of embedded workflow executions.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = org.springframework.data.domain.Page.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = WorkflowExecutionApi.PATH_GET_ANY_WORKFLOW_EXECUTIONS_PAGE,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<org.springframework.data.domain.Page> getAnyWorkflowExecutionsPage(
+        @NotNull @Parameter(name = "workspaceId", description = "The id of the workspace whose automation workflow executions are returned.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "workspaceId", required = true) Long workspaceId,
+        @Parameter(name = "environmentId", description = "The id of an environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = false) @Nullable Long environmentId,
+        @Parameter(name = "jobStatus", description = "The status of an executed job", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStatus", required = false) @Nullable String jobStatus,
+        @Parameter(name = "jobStartDate", description = "The start date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStartDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Nullable OffsetDateTime jobStartDate,
+        @Parameter(name = "jobEndDate", description = "The end date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobEndDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Nullable OffsetDateTime jobEndDate,
+        @Parameter(name = "connectedUserId", description = "The id of a connected user.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectedUserId", required = false) @Nullable Long connectedUserId,
+        @Parameter(name = "pageNumber", description = "The number of the page to return.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "pageNumber", required = false, defaultValue = "0") Integer pageNumber
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"number\" : 0, \"size\" : 6, \"numberOfElements\" : 1, \"totalPages\" : 5, \"totalElements\" : 5, \"content\" : [ \"{}\", \"{}\" ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     String PATH_GET_WORKFLOW_EXECUTION = "/workflow-executions/{id}";
     /**
