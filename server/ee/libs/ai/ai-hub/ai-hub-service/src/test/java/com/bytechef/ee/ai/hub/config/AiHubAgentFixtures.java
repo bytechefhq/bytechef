@@ -187,7 +187,8 @@ public final class AiHubAgentFixtures {
     }
 
     public static AiHubAgentFixtures withBuildWorkflow() {
-        return new AiHubAgentFixtures(Set.of("buildWorkflow", "importWorkflow"));
+        return new AiHubAgentFixtures(
+            Set.of("buildWorkflow", "importWorkflow", "buildCustomComponent", "buildCodeWorkflow"));
     }
 
     public AiHubSpringAIAgent askAgent() throws AGUIException {

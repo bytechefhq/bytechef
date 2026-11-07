@@ -54,6 +54,8 @@ import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenAiAgentTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.OpenCodeWorkflowTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.OpenCustomComponentTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
@@ -126,7 +128,8 @@ import tools.jackson.databind.json.JsonMapper;
 public class AiHubConfiguration {
 
     static final Set<String> COMPONENT_DEFINITION_TOOL_NAMES = Set.of("getAction", "getClusterElement", "getTrigger");
-    static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of("buildWorkflow", "importWorkflow");
+    static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of(
+        "buildWorkflow", "importWorkflow", "buildCustomComponent", "buildCodeWorkflow");
 
     static final Set<String> ASK_PINNED_TOOL_NAMES = Set.of(
         "aggregateDataTable", "askUserQuestion", "checkWorkflow", "describeComponentToolParameters", "getAiAgent",
@@ -137,18 +140,19 @@ public class AiHubConfiguration {
 
     static final Set<String> BUILD_PINNED_TOOL_NAMES = Set.of(
         "addAiAgentChannel", "addAiAgentElement", "addDataTableColumn", "addDataTableRow", "addKnowledgeBaseDocument",
-        "aggregateDataTable", "askUserQuestion", "buildWorkflow", "checkWorkflow", "cloneAssetFile", "cloneDataTable",
-        "cloneKnowledgeBase", "createAiAgent", "createApiCollection", "createAssetFile", "createAssetFileFromUrl",
-        "createBinaryAssetFile", "createComponentRule", "createConnection", "createDataTable", "createDataTableFromCsv",
-        "createKnowledgeBase", "createProject", "createProjectWorkflow", "describeComponentToolParameters",
-        "getAiAgent", "getAssetFileContent", "getWorkflow", "importWorkflow", "listAiAgents", "listApiCollections",
-        "listAssetFiles", "listComponentRules", "listConnectionsForComponent", "listDataTables", "listKnowledgeBases",
-        "listProjects", "listWorkflows", "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab",
-        "proposeComponentRuleCondition", "queryDataTable", "queryKnowledgeBase", "saveWorkflowTestConnection",
-        "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows",
-        "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption", "selectTriggerPropertyOption",
-        "updateAiAgent", "updateAiAgentElement", "updateAiAgentSettings", "updateAssetFileContent",
-        "updateDataTableRow");
+        "aggregateDataTable", "askUserQuestion", "buildCodeWorkflow", "buildCustomComponent", "buildWorkflow",
+        "checkWorkflow", "cloneAssetFile", "cloneDataTable", "cloneKnowledgeBase", "createAiAgent",
+        "createApiCollection", "createAssetFile", "createAssetFileFromUrl", "createBinaryAssetFile",
+        "createComponentRule", "createConnection", "createDataTable", "createDataTableFromCsv", "createKnowledgeBase",
+        "createProject", "createProjectWorkflow", "describeComponentToolParameters", "getAiAgent",
+        "getAssetFileContent", "getWorkflow", "importWorkflow", "listAiAgents", "listApiCollections", "listAssetFiles",
+        "listComponentRules", "listConnectionsForComponent", "listDataTables", "listKnowledgeBases", "listProjects",
+        "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab", "openCustomComponentTab", "openWorkflowChatTab",
+        "openWorkflowTab", "proposeComponentRuleCondition", "queryDataTable", "queryKnowledgeBase",
+        "saveWorkflowTestConnection", "searchAiAgentReferences", "searchAiAgentTools", "searchProjects",
+        "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
+        "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement", "updateAiAgentSettings",
+        "updateAssetFileContent", "updateDataTableRow");
 
     private static final String BUILD_WORKFLOW_TOOL_NAME = "buildWorkflow";
     private static final String UPDATE_WORKFLOW_TOOL_NAME = "updateWorkflow";
@@ -248,6 +252,8 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
+        toolCallbacks.add(new OpenCustomComponentTabToolCallback(aiHubChatArtifactRecorder));
+        toolCallbacks.add(new OpenCodeWorkflowTabToolCallback(aiHubChatArtifactRecorder));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
         toolCallbacks.add(new ListChatWorkflowsToolCallback(projectDeploymentFacade));
         toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService, projectDeploymentFacade));
