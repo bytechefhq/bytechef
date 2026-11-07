@@ -99,6 +99,19 @@ bytechef:
         openai:
           options:
             model: dall-e-3
+      stt:
+        deepgram:
+          options:
+            model: nova-3
+        elevenlabs:
+          options:
+            model: scribe_v1
+        openai:
+          options:
+            model: gpt-4o-mini-transcribe
+    stt:
+      # Active speech-to-text provider (openai | deepgram | elevenlabs)
+      provider: openai
     vectorstore:
       provider: PGVECTOR
       pgvector:
