@@ -103,8 +103,14 @@ public class User {
     @Column("reset_key")
     private String resetKey;
 
+    @Column("failed_totp_attempts")
+    private int failedTotpAttempts;
+
     @Column("totp_enabled")
     private boolean totpEnabled;
+
+    @Column("totp_lockout_until")
+    private Instant totpLockoutUntil;
 
     @Column("totp_secret")
     private String totpSecret;
@@ -157,6 +163,10 @@ public class User {
         return email;
     }
 
+    public int getFailedTotpAttempts() {
+        return failedTotpAttempts;
+    }
+
     public Long getId() {
         return id;
     }
@@ -203,6 +213,10 @@ public class User {
 
     public String getResetKey() {
         return resetKey;
+    }
+
+    public Instant getTotpLockoutUntil() {
+        return totpLockoutUntil;
     }
 
     public String getTotpSecret() {
@@ -269,6 +283,10 @@ public class User {
         this.email = email;
     }
 
+    public void setFailedTotpAttempts(int failedTotpAttempts) {
+        this.failedTotpAttempts = failedTotpAttempts;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -311,6 +329,10 @@ public class User {
 
     public void setTotpEnabled(boolean totpEnabled) {
         this.totpEnabled = totpEnabled;
+    }
+
+    public void setTotpLockoutUntil(Instant totpLockoutUntil) {
+        this.totpLockoutUntil = totpLockoutUntil;
     }
 
     public void setTotpSecret(String totpSecret) {

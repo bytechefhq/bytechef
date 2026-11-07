@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.config.EmbeddedOwnerContributorsTestConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.user.callback.UserCallback;
@@ -130,7 +131,9 @@ class CurrentUserResolverIntTest {
             PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
 
             return new UserServiceImpl(
-                authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository, userRepository);
+                new ApplicationProperties(), authorityRepository, cacheManager, passwordEncoder,
+                persistentTokenRepository,
+                userRepository);
         }
 
         @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

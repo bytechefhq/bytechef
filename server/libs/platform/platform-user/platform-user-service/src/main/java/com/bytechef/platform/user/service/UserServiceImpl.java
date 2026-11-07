@@ -18,6 +18,7 @@ package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.commons.util.RandomUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.constant.UserConstants;
@@ -29,6 +30,7 @@ import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.InvalidEmailException;
 import com.bytechef.platform.user.exception.InvalidPasswordException;
 import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
+import com.bytechef.platform.user.exception.TotpLockedException;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
@@ -40,6 +42,7 @@ import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.secret.SecretGenerator;
 import dev.samstevens.totp.time.SystemTimeProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -72,6 +75,7 @@ public class UserServiceImpl implements UserService {
 
     private final AuthorityRepository authorityRepository;
     private final CacheManager cacheManager;
+    private final ApplicationProperties.Security.TwoFactorAuthentication twoFactorAuthentication;
     private final PasswordEncoder passwordEncoder;
     private final PersistentTokenRepository persistentTokenRepository;
     private final SecretGenerator totpSecretGenerator = new DefaultSecretGenerator();
@@ -80,11 +84,13 @@ public class UserServiceImpl implements UserService {
 
     @SuppressFBWarnings("EI")
     public UserServiceImpl(
-        AuthorityRepository authorityRepository, CacheManager cacheManager, PasswordEncoder passwordEncoder,
-        PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
+        ApplicationProperties applicationProperties, AuthorityRepository authorityRepository,
+        CacheManager cacheManager, PasswordEncoder passwordEncoder, PersistentTokenRepository persistentTokenRepository,
+        UserRepository userRepository) {
 
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.twoFactorAuthentication = getTwoFactorAuthentication(applicationProperties);
         this.passwordEncoder = passwordEncoder;
         this.persistentTokenRepository = persistentTokenRepository;
         this.userRepository = userRepository;
@@ -655,23 +661,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean verifyTotpCode(String login, String code) {
-        if (code == null || code.isBlank()) {
+        User user = userRepository.findByLogin(login)
+            .orElse(null);
+
+        if (user == null || user.getTotpSecret() == null) {
             return false;
         }
 
-        return userRepository.findByLogin(login)
-            .map(user -> {
-                String secret = user.getTotpSecret();
+        Instant totpLockoutUntil = user.getTotpLockoutUntil();
 
-                if (secret == null) {
-                    return false;
-                }
+        if (totpLockoutUntil != null && Instant.now()
+            .isBefore(totpLockoutUntil)) {
 
-                return totpCodeVerifier.isValidCode(secret, code);
-            })
-            .orElse(false);
+            throw new TotpLockedException();
+        }
+
+        if (code == null || code.isBlank() || !totpCodeVerifier.isValidCode(user.getTotpSecret(), code)) {
+            recordFailedTotpAttempt(user);
+
+            return false;
+        }
+
+        if (user.getFailedTotpAttempts() > 0 || totpLockoutUntil != null) {
+            user.setFailedTotpAttempts(0);
+            user.setTotpLockoutUntil(null);
+
+            saveTotpAttemptState(user);
+        }
+
+        return true;
     }
 
     @Override
@@ -690,6 +709,18 @@ public class UserServiceImpl implements UserService {
             });
     }
 
+    private static ApplicationProperties.Security.TwoFactorAuthentication getTwoFactorAuthentication(
+        ApplicationProperties applicationProperties) {
+
+        ApplicationProperties.Security security = applicationProperties.getSecurity();
+
+        if (security == null) {
+            return new ApplicationProperties.Security.TwoFactorAuthentication();
+        }
+
+        return security.getTwoFactorAuthentication();
+    }
+
     private void clearUserCaches(User user) {
         Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE))
             .evict(TenantCacheKeyUtils.getKey(user.getLogin()));
@@ -698,6 +729,23 @@ public class UserServiceImpl implements UserService {
             Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE))
                 .evict(TenantCacheKeyUtils.getKey(user.getEmail()));
         }
+    }
+
+    private void recordFailedTotpAttempt(User user) {
+        int failedTotpAttempts = user.getFailedTotpAttempts() + 1;
+
+        user.setFailedTotpAttempts(failedTotpAttempts);
+
+        int maxFailedAttempts = twoFactorAuthentication.getMaxFailedAttempts();
+        Duration lockoutDuration = twoFactorAuthentication.getLockoutDuration();
+
+        if (maxFailedAttempts > 0 && lockoutDuration != null && failedTotpAttempts >= maxFailedAttempts) {
+            user.setTotpLockoutUntil(
+                Instant.now()
+                    .plus(lockoutDuration));
+        }
+
+        saveTotpAttemptState(user);
     }
 
     private boolean removeNonActivatedUser(User existingUser) {
@@ -710,5 +758,11 @@ public class UserServiceImpl implements UserService {
         this.clearUserCaches(existingUser);
 
         return true;
+    }
+
+    private void saveTotpAttemptState(User user) {
+        userRepository.save(user);
+
+        clearUserCaches(user);
     }
 }

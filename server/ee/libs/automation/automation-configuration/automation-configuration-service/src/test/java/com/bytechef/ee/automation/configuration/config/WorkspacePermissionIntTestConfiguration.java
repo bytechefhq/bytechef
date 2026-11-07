@@ -12,6 +12,7 @@ import com.bytechef.automation.configuration.callback.ProjectWorkflowCallback;
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditMapper;
 import com.bytechef.ee.automation.configuration.security.scope.A2aPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionScopeProvider;
@@ -91,7 +92,8 @@ public class WorkspacePermissionIntTestConfiguration {
         PersistentTokenRepository persistentTokenRepository, UserRepository userRepository) {
 
         return new UserServiceImpl(
-            authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository, userRepository);
+            new ApplicationProperties(), authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository,
+            userRepository);
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

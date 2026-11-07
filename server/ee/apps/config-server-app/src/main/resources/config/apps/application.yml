@@ -337,6 +337,11 @@ bytechef:
     provider: QUARTZ
   security:
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:; script-src: https://*.command.ai; frame-src: https://*.command.ai; img-src: https://*.command.ai; media-src: https://*.command.ai; connect-src: https://*.command.ai; style-src: https://*.command.ai;"
+    two-factor-authentication:
+      # How long TOTP verification stays locked after max-failed-attempts consecutive wrong codes
+      lockout-duration: 15m
+      # Consecutive wrong TOTP codes that lock verification for lockout-duration; 0 disables the lockout
+      max-failed-attempts: 5
   sign-up:
     activation-required: false
     enabled: true

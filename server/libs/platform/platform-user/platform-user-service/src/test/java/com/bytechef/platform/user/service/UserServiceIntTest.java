@@ -17,6 +17,7 @@
 package com.bytechef.platform.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -27,8 +28,12 @@ import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.platform.user.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.exception.TotpLockedException;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
+import dev.samstevens.totp.code.DefaultCodeGenerator;
+import dev.samstevens.totp.exceptions.CodeGenerationException;
+import dev.samstevens.totp.time.SystemTimeProvider;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,6 +47,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -51,7 +57,12 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Integration tests for {@link UserService}.
  */
-@SpringBootTest(classes = UserIntTestConfiguration.class)
+@SpringBootTest(
+    classes = UserIntTestConfiguration.class,
+    properties = {
+        "bytechef.security.two-factor-authentication.lockout-duration=15m",
+        "bytechef.security.two-factor-authentication.max-failed-attempts=3"
+    })
 @Transactional
 class UserServiceIntTest {
 
@@ -62,7 +73,12 @@ class UserServiceIntTest {
     private static final String DEFAULT_LASTNAME = "doe";
     private static final String DEFAULT_IMAGEURL = "http://placehold.it/50x50";
     private static final String DEFAULT_LANGKEY = "dummy";
+    private static final String INVALID_TOTP_CODE = "invalid";
     private static final String NEW_PASSWORD = "new-password";
+    private static final String TOTP_SECRET = "ABCDEFGHIJKLMNOP";
+
+    @Autowired
+    private CacheManager cacheManager;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -83,6 +99,9 @@ class UserServiceIntTest {
 
     @BeforeEach
     public void init() {
+        Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE))
+            .clear();
+
         persistentTokenRepository.deleteAll();
 
         user = new User();
@@ -446,6 +465,87 @@ class UserServiceIntTest {
             .orElseThrow();
 
         assertThat(passwordEncoder.matches(NEW_PASSWORD, resetUser.getPassword())).isTrue();
+    }
+
+    @Test
+    void testVerifyTotpCodeLocksAfterMaxFailedAttempts() throws CodeGenerationException {
+        long userId = saveTotpUser(0, null);
+
+        for (int attempt = 0; attempt < 3; attempt++) {
+            assertThat(userService.verifyTotpCode(DEFAULT_LOGIN, INVALID_TOTP_CODE)).isFalse();
+        }
+
+        User lockedUser = userRepository.findById(userId)
+            .orElseThrow();
+
+        assertThat(lockedUser.getFailedTotpAttempts()).isEqualTo(3);
+        assertThat(lockedUser.getTotpLockoutUntil()).isAfter(Instant.now());
+
+        String validTotpCode = generateValidTotpCode();
+
+        assertThatThrownBy(() -> userService.verifyTotpCode(DEFAULT_LOGIN, validTotpCode))
+            .isInstanceOf(TotpLockedException.class);
+    }
+
+    @Test
+    void testVerifyTotpCodeBelowMaxFailedAttemptsDoesNotLock() {
+        long userId = saveTotpUser(0, null);
+
+        for (int attempt = 0; attempt < 2; attempt++) {
+            assertThat(userService.verifyTotpCode(DEFAULT_LOGIN, INVALID_TOTP_CODE)).isFalse();
+        }
+
+        User unlockedUser = userRepository.findById(userId)
+            .orElseThrow();
+
+        assertThat(unlockedUser.getFailedTotpAttempts()).isEqualTo(2);
+        assertThat(unlockedUser.getTotpLockoutUntil()).isNull();
+    }
+
+    @Test
+    void testVerifyTotpCodeWithValidCodeResetsFailedAttempts() throws CodeGenerationException {
+        long userId = saveTotpUser(2, null);
+
+        assertThat(userService.verifyTotpCode(DEFAULT_LOGIN, generateValidTotpCode())).isTrue();
+
+        User verifiedUser = userRepository.findById(userId)
+            .orElseThrow();
+
+        assertThat(verifiedUser.getFailedTotpAttempts()).isZero();
+        assertThat(verifiedUser.getTotpLockoutUntil()).isNull();
+    }
+
+    @Test
+    void testVerifyTotpCodeAfterLockoutExpiresAcceptsValidCode() throws CodeGenerationException {
+        long userId = saveTotpUser(
+            3, Instant.now()
+                .minus(1, ChronoUnit.MINUTES));
+
+        assertThat(userService.verifyTotpCode(DEFAULT_LOGIN, generateValidTotpCode())).isTrue();
+
+        User verifiedUser = userRepository.findById(userId)
+            .orElseThrow();
+
+        assertThat(verifiedUser.getFailedTotpAttempts()).isZero();
+        assertThat(verifiedUser.getTotpLockoutUntil()).isNull();
+    }
+
+    private static String generateValidTotpCode() throws CodeGenerationException {
+        SystemTimeProvider systemTimeProvider = new SystemTimeProvider();
+        DefaultCodeGenerator defaultCodeGenerator = new DefaultCodeGenerator();
+
+        return defaultCodeGenerator.generate(TOTP_SECRET, systemTimeProvider.getTime() / 30);
+    }
+
+    private long saveTotpUser(int failedTotpAttempts, Instant totpLockoutUntil) {
+        user.setFailedTotpAttempts(failedTotpAttempts);
+        user.setTotpEnabled(true);
+        user.setTotpLockoutUntil(totpLockoutUntil);
+        user.setTotpSecret(TOTP_SECRET);
+
+        User savedUser = userRepository.save(user);
+
+        return Objects.requireNonNull(savedUser.getId());
     }
 
     private long saveInvitee(Instant createdDate, boolean invited) {

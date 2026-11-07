@@ -1085,6 +1085,33 @@ class AccountControllerIntTest {
 
     @Test
     @Transactional
+    @WithMockUser("mfa-locked-user")
+    void testEnableMfaWhileTotpIsLockedIsTooManyRequests() throws Exception {
+        User user = new User();
+
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(true);
+        user.setLogin("mfa-locked-user");
+        user.setEmail("mfa-locked-user@example.com");
+        user.setLangKey("en");
+        user.setTotpSecret("ABCDEFGHIJKLMNOP");
+        user.setTotpLockoutUntil(
+            Instant.now()
+                .plusSeconds(600));
+
+        userRepository.save(user);
+
+        restAccountMockMvc
+            .perform(
+                post("/api/account/mfa/enable")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"code\":\"123456\"}")
+                    .with(csrf()))
+            .andExpect(status().isTooManyRequests());
+    }
+
+    @Test
+    @Transactional
     void testRequestPasswordReset() throws Exception {
         User user = new User();
 

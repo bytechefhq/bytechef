@@ -5089,12 +5089,32 @@ public class ApplicationProperties {
              */
             private boolean enabled;
 
+            private Duration lockoutDuration;
+
+            private int maxFailedAttempts;
+
             public boolean isEnabled() {
                 return enabled;
             }
 
+            public Duration getLockoutDuration() {
+                return lockoutDuration;
+            }
+
+            public int getMaxFailedAttempts() {
+                return maxFailedAttempts;
+            }
+
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+
+            public void setLockoutDuration(Duration lockoutDuration) {
+                this.lockoutDuration = lockoutDuration;
+            }
+
+            public void setMaxFailedAttempts(int maxFailedAttempts) {
+                this.maxFailedAttempts = maxFailedAttempts;
             }
         }
     }
