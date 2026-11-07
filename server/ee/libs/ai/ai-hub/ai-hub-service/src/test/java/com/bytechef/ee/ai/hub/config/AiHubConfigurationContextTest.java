@@ -20,11 +20,14 @@ import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
+import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.ai.hub.agent.AiHubChatStreamer;
 import com.bytechef.ee.ai.hub.agent.AiHubContinuationStarterImpl;
 import com.bytechef.ee.ai.hub.agent.AiHubRoutingAgent;
@@ -58,6 +61,7 @@ import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.AiHubSubAgentToolCallbackFactory;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.PinnedToolSearchToolCallingAdvisor;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchAdvisorConfiguration;
@@ -67,6 +71,7 @@ import com.bytechef.ee.ai.hub.web.graphql.AiHubChatArtifactGraphQlController;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubChatGraphQlController;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubToolApprovalGraphQlController;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubToolApprovalRuleGraphQlController;
+import com.bytechef.ee.platform.ai.tool.usage.ToolUsageRecorder;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import java.util.List;
@@ -80,6 +85,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -275,12 +281,48 @@ class AiHubConfigurationContextTest {
     }
 
     @Test
+    void testRegistersTheSubAgentsOnTheBuildAgentOnly() {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        contextRunner(fixtures)
+            .withUserConfiguration(
+                DataAnalystConfiguration.class, ImageGeneratorConfiguration.class, SlideBuilderConfiguration.class)
+            .withBean(WorkspaceDataTableFacade.class, () -> mock(WorkspaceDataTableFacade.class))
+            .withBean(AssetFileFacade.class, () -> mock(AssetFileFacade.class))
+            .withBean(ApplicationProperties.class)
+            .withBean(ToolUsageRecorder.class, () -> fixtures.toolUsageRecorder)
+            .withPropertyValues("bytechef.ai.hub.enabled=true", "bytechef.ai.copilot.enabled=true")
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+                assertThat(context.getBeansOfType(AiHubSubAgentToolCallbackFactory.class)).containsOnlyKeys(
+                    "dataAnalystToolCallbackFactory", "imageGeneratorToolCallbackFactory",
+                    "slideBuilderToolCallbackFactory");
+                assertThat(context.getBeansOfType(ToolCallback.class)).isEmpty();
+
+                List<String> subAgentToolNames = List.of("data_analyst", "image_generator", "slide_builder");
+
+                assertThat(toolNames(context.getBean("aiHubBuildSpringAIAgent", AiHubSpringAIAgent.class)))
+                    .containsAll(subAgentToolNames);
+                assertThat(toolNames(context.getBean("aiHubAskSpringAIAgent", AiHubSpringAIAgent.class)))
+                    .doesNotContainAnyElementsOf(subAgentToolNames);
+            });
+    }
+
+    @Test
     void testSessionMemorySitsInsideTheToolCallingLoop() {
         SessionMemoryAdvisor sessionMemoryAdvisor = AiHubAgentFixtures.withBuildWorkflow().sessionMemory
             .createSessionMemoryAdvisor();
 
         assertThat(sessionMemoryAdvisor).isInstanceOf(MemoryAdvisor.class);
         assertThat(sessionMemoryAdvisor.getOrder()).isGreaterThan(ToolCallingAdvisor.DEFAULT_ORDER);
+    }
+
+    private static List<String> toolNames(AiHubSpringAIAgent agent) {
+        return agent.pinnedToolCallbacks()
+            .stream()
+            .map(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .toList();
     }
 
     private static List<Object> toolAdvisors(ApplicationContext context, String agentBeanName) {
