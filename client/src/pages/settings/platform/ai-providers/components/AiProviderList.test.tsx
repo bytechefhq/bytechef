@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {AiProvider} from '@/shared/middleware/platform/configuration';
 import {createTestQueryClientWrapper} from '@/shared/util/test-utils';
 import {fireEvent, render, screen} from '@testing-library/react';
@@ -29,7 +30,11 @@ vi.mock('react-inlinesvg', () => ({
 const renderWithProviders = (ui: React.ReactElement) => {
     const QueryClientWrapper = createTestQueryClientWrapper();
 
-    const wrapper = ({children}: {children: ReactNode}) => <QueryClientWrapper>{children}</QueryClientWrapper>;
+    const wrapper = ({children}: {children: ReactNode}) => (
+        <QueryClientWrapper>
+            <TooltipProvider>{children}</TooltipProvider>
+        </QueryClientWrapper>
+    );
 
     return render(ui, {wrapper});
 };
