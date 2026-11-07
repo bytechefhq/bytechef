@@ -37,6 +37,16 @@ const SURFACE_LABELS: Record<string, string> = {
     MCP_EMBEDDED: 'Embedded MCP',
 };
 
+const KIND_LABELS: Record<string, string> = {
+    COMPONENT: 'Component tool',
+    WORKFLOW: 'Workflow tool',
+};
+
+const SURFACE_TYPE_LABELS: Record<string, string> = {
+    A2A: 'Skill',
+    EMBEDDED_API_ACTION: 'Action',
+};
+
 const OUTCOME_STYLE_TYPES: Record<string, BadgeStyleType> = {
     APPROVAL_DENIED: 'warning-outline',
     ERROR: 'destructive-outline',
@@ -73,6 +83,11 @@ const sourceLabel = (externalInvocationLog: ExternalInvocationLogItemType): stri
         : componentName;
 };
 
+const typeLabel = (externalInvocationLog: ExternalInvocationLogItemType): string =>
+    SURFACE_TYPE_LABELS[externalInvocationLog.surface] ||
+    KIND_LABELS[externalInvocationLog.kind] ||
+    externalInvocationLog.kind;
+
 const formatCreatedDate = (createdDate: unknown): string => {
     if (createdDate == null) {
         return '';
@@ -94,6 +109,8 @@ const ExternalInvocationsTable = ({
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Status</TableHead>
 
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Tool</TableHead>
+
+                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Type</TableHead>
 
                 {showSurface && <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Surface</TableHead>}
 
@@ -138,6 +155,10 @@ const ExternalInvocationsTable = ({
 
                         <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
                             {externalInvocationLog.toolName || '—'}
+                        </TableCell>
+
+                        <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                            {typeLabel(externalInvocationLog)}
                         </TableCell>
 
                         {showSurface && (
