@@ -61,6 +61,8 @@ import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
+import com.bytechef.ee.automation.ai.tool.ApiCollectionToolCallbacksFactory;
+import com.bytechef.ee.automation.ai.tool.componentrule.ComponentRuleToolCallbacksFactory;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -172,6 +174,8 @@ public class AiHubConfiguration {
         ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider,
         ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
         ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
+        ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider,
+        ObjectProvider<ComponentRuleToolCallbacksFactory> componentRuleToolCallbacksFactoryProvider,
         ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
         AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
@@ -191,6 +195,8 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(assetFileFlatCrudToolCallbacks(assetFileToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(dataTableFlatCrudToolCallbacks(dataTableToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(knowledgeBaseFlatCrudToolCallbacks(knowledgeBaseToolCallbacksFactoryProvider, false));
+        toolCallbacks.addAll(apiCollectionFlatCrudToolCallbacks(apiCollectionToolCallbacksFactoryProvider, false));
+        toolCallbacks.addAll(componentRuleFlatCrudToolCallbacks(componentRuleToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, null));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, null));
@@ -210,6 +216,8 @@ public class AiHubConfiguration {
         ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider,
         ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
         ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
+        ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider,
+        ObjectProvider<ComponentRuleToolCallbacksFactory> componentRuleToolCallbacksFactoryProvider,
         ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
@@ -232,6 +240,8 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(assetFileFlatCrudToolCallbacks(assetFileToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(dataTableFlatCrudToolCallbacks(dataTableToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(knowledgeBaseFlatCrudToolCallbacks(knowledgeBaseToolCallbacksFactoryProvider, true));
+        toolCallbacks.addAll(apiCollectionFlatCrudToolCallbacks(apiCollectionToolCallbacksFactoryProvider, true));
+        toolCallbacks.addAll(componentRuleFlatCrudToolCallbacks(componentRuleToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
@@ -551,6 +561,36 @@ public class AiHubConfiguration {
         return writable
             ? knowledgeBaseToolCallbacksFactory.writeToolCallbacks()
             : knowledgeBaseToolCallbacksFactory.readToolCallbacks();
+    }
+
+    static List<ToolCallback> apiCollectionFlatCrudToolCallbacks(
+        ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider, boolean writable) {
+
+        ApiCollectionToolCallbacksFactory apiCollectionToolCallbacksFactory = apiCollectionToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (apiCollectionToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return writable
+            ? apiCollectionToolCallbacksFactory.writeToolCallbacks()
+            : apiCollectionToolCallbacksFactory.readToolCallbacks();
+    }
+
+    static List<ToolCallback> componentRuleFlatCrudToolCallbacks(
+        ObjectProvider<ComponentRuleToolCallbacksFactory> componentRuleToolCallbacksFactoryProvider, boolean writable) {
+
+        ComponentRuleToolCallbacksFactory componentRuleToolCallbacksFactory = componentRuleToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (componentRuleToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return writable
+            ? componentRuleToolCallbacksFactory.writeToolCallbacks()
+            : componentRuleToolCallbacksFactory.readToolCallbacks();
     }
 
     static List<ToolCallback> openAiAgentTabToolCallbacks(

@@ -229,6 +229,7 @@ public final class AiHubAgentFixtures {
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
             aiAgentToolCallbacksFactoryProvider(), availableProvider(assetFileToolCallbacksFactory),
             availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
+            absentProvider(), absentProvider(),
             availableProvider(aiAgentFacade), interactivePickerToolCallbacks, projectWorkflowFacade, chatService,
             chatAccessPolicy,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
@@ -250,6 +251,7 @@ public final class AiHubAgentFixtures {
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
             aiAgentToolCallbacksFactoryProvider(), availableProvider(assetFileToolCallbacksFactory),
             availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
+            absentProvider(), absentProvider(),
             availableProvider(aiAgentFacade), interactivePickerToolCallbacks, intelligentToolCatalog, workspaceFacade,
             projectWorkflowFacade,
             projectDeploymentFacade, chatService, chatAccessPolicy, artifactRecorder, policy,
@@ -339,6 +341,11 @@ public final class AiHubAgentFixtures {
 
     @SuppressWarnings("unchecked")
     private static ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchAdvisorProvider() {
+        return mock(ObjectProvider.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ObjectProvider<T> absentProvider() {
         return mock(ObjectProvider.class);
     }
 
