@@ -32,6 +32,10 @@ public enum AutomationConfigurationAgentType implements AgentType {
     CONVERTER_BUILD(Source.CONVERTER, Mode.BUILD),
     PROJECT_ASK(Source.PROJECT, Mode.ASK),
     PROJECT_BUILD(Source.PROJECT, Mode.BUILD),
+    DEPLOYMENT_ASK(Source.DEPLOYMENT, Mode.ASK),
+    DEPLOYMENT_BUILD(Source.DEPLOYMENT, Mode.BUILD),
+    PROJECT_DEPLOYMENT_ASK(Source.PROJECT_DEPLOYMENT, Mode.ASK),
+    PROJECT_DEPLOYMENT_BUILD(Source.PROJECT_DEPLOYMENT, Mode.BUILD),
     BUILD_WORKFLOW("buildWorkflow"),
     IMPORT_WORKFLOW("importWorkflow");
 
