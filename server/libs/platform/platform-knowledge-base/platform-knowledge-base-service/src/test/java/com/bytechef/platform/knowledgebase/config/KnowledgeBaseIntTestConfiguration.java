@@ -53,7 +53,9 @@ import tools.jackson.databind.json.JsonMapper;
         "com.bytechef.jackson.config",
         "com.bytechef.platform.tag"
     },
-    excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE, classes = KnowledgeBasePgVectorConfiguration.class))
+    excludeFilters = @Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
+        KnowledgeBaseDocumentLoaderIntTestConfiguration.class, KnowledgeBasePgVectorConfiguration.class
+    }))
 @EnableAutoConfiguration(excludeName = {
     "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechAutoConfiguration",
     "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionAutoConfiguration",

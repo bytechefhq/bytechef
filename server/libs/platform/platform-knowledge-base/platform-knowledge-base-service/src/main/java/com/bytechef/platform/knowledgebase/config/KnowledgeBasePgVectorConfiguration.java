@@ -17,6 +17,12 @@
 package com.bytechef.platform.knowledgebase.config;
 
 import com.bytechef.pgvector.util.PgVectorSchemaUtils;
+import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentLoader;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentLoaderImpl;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseVectorStoreMetadataService;
 import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import io.micrometer.observation.ObservationRegistry;
@@ -58,6 +64,18 @@ class KnowledgeBasePgVectorConfiguration {
         return buildVectorStore(
             pgVectorJdbcTemplate, embeddingModel, properties, observationRegistry, customObservationConvention,
             batchingStrategy, false);
+    }
+
+    @Bean
+    public KnowledgeBaseDocumentLoader knowledgeBaseDocumentLoader(
+        KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFileStorage knowledgeBaseFileStorage,
+        KnowledgeBaseService knowledgeBaseService,
+        @Qualifier("knowledgeBasePgVectorStore") VectorStore knowledgeBasePgVectorStore) {
+
+        return new KnowledgeBaseDocumentLoaderImpl(
+            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
+            knowledgeBaseService, knowledgeBasePgVectorStore);
     }
 
     @Bean

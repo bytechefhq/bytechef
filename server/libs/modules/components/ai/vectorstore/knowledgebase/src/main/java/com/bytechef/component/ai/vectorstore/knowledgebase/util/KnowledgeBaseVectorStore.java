@@ -27,10 +27,6 @@ import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.Knowl
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.VECTOR_STORE;
-import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_ENVIRONMENT_ID;
-import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
-import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_DOCUMENT_ID;
-import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -38,30 +34,20 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.definition.BaseProperty.ResourceType;
-import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
-import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
-import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
-import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
-import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentLoader;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentLoader.Chunk;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
-import java.nio.charset.StandardCharsets;
+import com.bytechef.platform.knowledgebase.vectorstore.KnowledgeBaseVectorStoreWrapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import org.jspecify.annotations.Nullable;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.document.DocumentTransformer;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.filter.Filter;
-import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 
 /**
  * Knowledge Base VectorStore cluster element for AI agent integration.
@@ -75,14 +61,10 @@ public final class KnowledgeBaseVectorStore {
 
     public static ClusterElementDefinition<VectorStoreFunction> of(
         org.springframework.ai.vectorstore.VectorStore vectorStore,
-        KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage,
-        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
+        KnowledgeBaseDocumentLoader knowledgeBaseDocumentLoader, KnowledgeBaseService knowledgeBaseService,
+        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
 
-        VectorStore kbVectorStore = createVectorStore(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
-            knowledgeBaseService, vectorStore);
+        VectorStore kbVectorStore = createVectorStore(knowledgeBaseDocumentLoader, vectorStore);
 
         return ComponentDsl.<VectorStoreFunction>clusterElement(VECTOR_STORE)
             .title("Knowledge Base VectorStore")
@@ -110,78 +92,40 @@ public final class KnowledgeBaseVectorStore {
     }
 
     public static VectorStore createVectorStore(org.springframework.ai.vectorstore.VectorStore vectorStore) {
-        return new VectorStoreImpl(null, null, null, null, vectorStore);
+        return new VectorStoreImpl(null, vectorStore);
     }
 
     public static VectorStore createVectorStore(
-        KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFileStorage knowledgeBaseFileStorage,
-        KnowledgeBaseService knowledgeBaseService, org.springframework.ai.vectorstore.VectorStore vectorStore) {
+        KnowledgeBaseDocumentLoader knowledgeBaseDocumentLoader,
+        org.springframework.ai.vectorstore.VectorStore vectorStore) {
 
-        return new VectorStoreImpl(
-            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
-            knowledgeBaseService, vectorStore);
+        return new VectorStoreImpl(knowledgeBaseDocumentLoader, vectorStore);
     }
 
-    private static long getContentBytes(List<Document> documents) {
-        long contentBytes = 0;
+    private static List<Chunk> readChunks(
+        DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
 
-        for (Document document : documents) {
-            String text = document.getText();
+        List<Document> documents = documentReader.read();
 
-            if (text != null) {
-                contentBytes += text.replace("\0", "")
-                    .getBytes(StandardCharsets.UTF_8).length;
-            }
+        for (DocumentTransformer documentTransformer : documentTransformers) {
+            documents = documentTransformer.transform(documents);
         }
 
-        return contentBytes;
-    }
-
-    private static String deriveDocumentName(List<Document> documents, Parameters inputParameters) {
-        if (!documents.isEmpty()) {
-            Document document = documents.getLast();
-
-            Map<String, Object> metadata = document.getMetadata();
-
-            Object filename = metadata.get("filename");
-
-            if (filename != null) {
-                return filename.toString();
-            }
-        }
-
-        Map<String, Object> additionalMetadata = inputParameters.getMap(ADDITIONAL_METADATA, new TypeReference<>() {});
-
-        if (additionalMetadata != null) {
-            Object filename = additionalMetadata.get("filename");
-
-            if (filename != null) {
-                return filename.toString();
-            }
-        }
-
-        return "Workflow Import";
+        return documents.stream()
+            .map(document -> new Chunk(document.getId(), document.getText(), document.getMetadata()))
+            .toList();
     }
 
     private static class VectorStoreImpl implements VectorStore {
 
+        private final KnowledgeBaseDocumentLoader knowledgeBaseDocumentLoader;
         private final org.springframework.ai.vectorstore.VectorStore vectorStore;
-        private final KnowledgeBaseService knowledgeBaseService;
-        private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
-        private final KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService;
-        private final KnowledgeBaseFileStorage knowledgeBaseFileStorage;
 
         public VectorStoreImpl(
-            KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-            KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-            KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
+            KnowledgeBaseDocumentLoader knowledgeBaseDocumentLoader,
             org.springframework.ai.vectorstore.VectorStore vectorStore) {
 
-            this.knowledgeBaseDocumentChunkService = knowledgeBaseDocumentChunkService;
-            this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
-            this.knowledgeBaseFileStorage = knowledgeBaseFileStorage;
-            this.knowledgeBaseService = knowledgeBaseService;
+            this.knowledgeBaseDocumentLoader = knowledgeBaseDocumentLoader;
             this.vectorStore = vectorStore;
         }
 
@@ -200,116 +144,13 @@ public final class KnowledgeBaseVectorStore {
             Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
             DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
 
-            load(inputParameters, documentReader, documentTransformers, null);
-        }
+            List<Chunk> chunks = readChunks(documentReader, documentTransformers);
 
-        /**
-         * @param replacedChunkBytes the size of the single chunk being replaced in an existing document, or
-         *                           {@code null} when the whole document content is replaced
-         */
-        private void load(
-            Parameters inputParameters, DocumentReader documentReader, List<DocumentTransformer> documentTransformers,
-            @Nullable Long replacedChunkBytes) {
+            Map<String, Object> additionalMetadata = getAdditionalMetadata(inputParameters);
 
-            Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
-
-            KnowledgeBase knowledgeBase = knowledgeBaseService.getKnowledgeBase(knowledgeBaseId);
-
-            org.springframework.ai.vectorstore.VectorStore wrappedVectorStore =
-                new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId);
-
-            List<Document> documents = documentReader.read();
-
-            for (DocumentTransformer documentTransformer : documentTransformers) {
-                documents = documentTransformer.transform(documents);
-            }
-
-            Long existingDocumentId = inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_ID);
-
-            long contentBytes = getContentBytes(documents);
-
-            KnowledgeBaseDocument knowledgeBaseDocument;
-
-            if (existingDocumentId != null) {
-                knowledgeBaseDocument = knowledgeBaseDocumentService.getKnowledgeBaseDocument(existingDocumentId);
-
-                long documentSize = contentBytes;
-
-                if (replacedChunkBytes != null) {
-                    long previousDocumentSize = Objects.requireNonNullElse(knowledgeBaseDocument.getDocumentSize(), 0L);
-
-                    documentSize += Math.max(0, previousDocumentSize - replacedChunkBytes);
-                }
-
-                knowledgeBaseDocument.setDocumentSize(documentSize);
-                knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
-            } else {
-                knowledgeBaseDocument = new KnowledgeBaseDocument();
-                knowledgeBaseDocument.setKnowledgeBaseId(knowledgeBaseId);
-                knowledgeBaseDocument.setName(deriveDocumentName(documents, inputParameters));
-                knowledgeBaseDocument.setDocumentSize(contentBytes);
-                knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
-            }
-
-            knowledgeBaseDocument = knowledgeBaseDocumentService.saveKnowledgeBaseDocument(knowledgeBaseDocument);
-
-            long knowledgeBaseDocumentId = knowledgeBaseDocument.getId();
-
-            try {
-                for (Document document : documents) {
-                    KnowledgeBaseDocumentChunk knowledgeBaseDocumentChunk = new KnowledgeBaseDocumentChunk();
-
-                    knowledgeBaseDocumentChunk.setKnowledgeBaseDocumentId(knowledgeBaseDocumentId);
-
-                    knowledgeBaseDocumentChunk = knowledgeBaseDocumentChunkService.saveKnowledgeBaseDocumentChunk(
-                        knowledgeBaseDocumentChunk);
-
-                    long knowledgeBaseDocumentChunkId = knowledgeBaseDocumentChunk.getId();
-
-                    Map<String, Object> metadata = new HashMap<>(document.getMetadata());
-
-                    metadata.put(METADATA_ENVIRONMENT_ID, knowledgeBase.getEnvironmentId());
-                    metadata.put(METADATA_KNOWLEDGE_BASE_ID, knowledgeBaseId);
-                    metadata.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_ID, knowledgeBaseDocumentId);
-                    metadata.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID, knowledgeBaseDocumentChunkId);
-
-                    Map<String, Object> userMetadata = inputParameters.getMap(
-                        ADDITIONAL_METADATA, new TypeReference<>() {});
-
-                    if (userMetadata != null) {
-                        metadata.putAll(userMetadata);
-                    }
-
-                    String text = document.getText();
-
-                    if (text != null) {
-                        text = text.replace("\0", "");
-                    }
-
-                    Document enrichedDocument = new Document(document.getId(), text, metadata);
-
-                    wrappedVectorStore.add(List.of(enrichedDocument));
-
-                    knowledgeBaseDocumentChunk.setVectorStoreId(enrichedDocument.getId());
-
-                    FileEntry chunkContent =
-                        knowledgeBaseFileStorage.storeChunkContent(knowledgeBaseDocumentChunkId, text);
-
-                    knowledgeBaseDocumentChunk.setContent(chunkContent);
-
-                    knowledgeBaseDocumentChunkService.saveKnowledgeBaseDocumentChunk(knowledgeBaseDocumentChunk);
-                }
-
-                knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_READY);
-
-                knowledgeBaseDocumentService.saveKnowledgeBaseDocument(knowledgeBaseDocument);
-            } catch (RuntimeException exception) {
-                knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_ERROR);
-
-                knowledgeBaseDocumentService.saveKnowledgeBaseDocument(knowledgeBaseDocument);
-
-                throw exception;
-            }
+            knowledgeBaseDocumentLoader.load(
+                inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID), inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_ID),
+                KnowledgeBaseDocumentLoader.deriveDocumentName(chunks, additionalMetadata), chunks, additionalMetadata);
         }
 
         @Override
@@ -324,10 +165,18 @@ public final class KnowledgeBaseVectorStore {
                     inputParameters, connectionParameters, embeddingModel, knowledgeBaseId, documentReader,
                     documentTransformers);
             } else {
-                updateSingle(
-                    inputParameters, connectionParameters, embeddingModel, knowledgeBaseId, documentReader,
-                    documentTransformers);
+                knowledgeBaseDocumentLoader.update(
+                    knowledgeBaseId, inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_ID),
+                    inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID),
+                    readChunks(documentReader, documentTransformers), getAdditionalMetadata(inputParameters));
             }
+        }
+
+        private static Map<String, Object> getAdditionalMetadata(Parameters inputParameters) {
+            Map<String, Object> additionalMetadata = inputParameters.getMap(
+                ADDITIONAL_METADATA, new TypeReference<>() {});
+
+            return additionalMetadata == null ? Map.of() : additionalMetadata;
         }
 
         private void updateMultiple(
@@ -346,91 +195,6 @@ public final class KnowledgeBaseVectorStore {
             load(
                 ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel, documentReader,
                 documentTransformers);
-        }
-
-        private void updateSingle(
-            Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
-            Long knowledgeBaseId, DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
-
-            Long knowledgeBaseDocumentId = inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_ID);
-            Long knowledgeBaseDocumentChunkId = inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID);
-
-            Map<String, Object> loadMetadata = new HashMap<>();
-
-            Long replacedChunkBytes = null;
-
-            if (knowledgeBaseDocumentChunkId != null) {
-                FilterExpressionBuilder filterBuilder = new FilterExpressionBuilder();
-
-                Filter.Expression chunkFilter = filterBuilder
-                    .eq(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID, knowledgeBaseDocumentChunkId)
-                    .build();
-
-                List<Document> existingDocuments = new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId)
-                    .similaritySearch(SearchRequest.builder()
-                        .query(" ")
-                        .topK(1)
-                        .similarityThreshold(0.0)
-                        .filterExpression(chunkFilter)
-                        .build());
-
-                replacedChunkBytes = getContentBytes(existingDocuments);
-
-                if (!existingDocuments.isEmpty()) {
-                    Map<String, Object> inheritedMetadata = new HashMap<>(existingDocuments.getFirst()
-                        .getMetadata());
-
-                    inheritedMetadata.remove(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID);
-
-                    if (!inheritedMetadata.isEmpty()) {
-                        loadMetadata.putAll(inheritedMetadata);
-                    }
-                }
-            }
-
-            Map<String, Object> additionalMetadata = inputParameters.getMap(ADDITIONAL_METADATA, Object.class);
-
-            if (additionalMetadata != null && !additionalMetadata.isEmpty()) {
-                loadMetadata.putAll(additionalMetadata);
-            }
-
-            if (knowledgeBaseDocumentChunkId != null) {
-                knowledgeBaseDocumentChunkService.deleteKnowledgeBaseDocumentChunk(knowledgeBaseDocumentChunkId);
-            } else if (knowledgeBaseDocumentId != null) {
-                List<KnowledgeBaseDocumentChunk> existingChunks =
-                    knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunksByDocumentId(
-                        knowledgeBaseDocumentId);
-
-                knowledgeBaseDocumentChunkService.deleteKnowledgeBaseDocumentChunks(existingChunks);
-            }
-
-            Map<String, Object> deleteFilter = new HashMap<>();
-
-            if (knowledgeBaseDocumentChunkId != null) {
-                deleteFilter.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID, knowledgeBaseDocumentChunkId);
-            } else if (knowledgeBaseDocumentId != null) {
-                deleteFilter.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_ID, knowledgeBaseDocumentId);
-            }
-
-            List<Map<String, Object>> metadataFilters = deleteFilter.isEmpty() ? List.of() : List.of(deleteFilter);
-
-            Map<String, Object> deleteParametersMap = new HashMap<>();
-
-            deleteParametersMap.put(KNOWLEDGE_BASE_ID, knowledgeBaseId);
-            deleteParametersMap.put(METADATA_FILTER, metadataFilters);
-
-            delete(ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel);
-
-            Map<String, Object> loadParametersMap = new HashMap<>();
-
-            loadParametersMap.put(KNOWLEDGE_BASE_ID, knowledgeBaseId);
-            loadParametersMap.put(ADDITIONAL_METADATA, loadMetadata);
-
-            if (knowledgeBaseDocumentId != null) {
-                loadParametersMap.put(KNOWLEDGE_BASE_DOCUMENT_ID, knowledgeBaseDocumentId);
-            }
-
-            load(ParametersFactory.create(loadParametersMap), documentReader, documentTransformers, replacedChunkBytes);
         }
 
         @Override
