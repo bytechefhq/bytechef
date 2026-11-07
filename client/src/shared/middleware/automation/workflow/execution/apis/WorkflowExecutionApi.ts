@@ -96,7 +96,7 @@ export interface GetWorkflowExecutionsPageRequest {
      */
     environmentId?: number;
     /**
-     * Where the executed workflows are exposed. PROJECT returns executions of project deployments; MCP_SERVER, A2A_SERVER and API_COLLECTION return executions of the deployments an MCP server, an A2A server or an API collection created for its project.
+     * Where the executed workflows are exposed. PROJECT_DEPLOYMENT returns executions of project deployments; MCP_SERVER, A2A_SERVER and API_COLLECTION return executions of the deployments an MCP server, an A2A server or an API collection created for its project; ANY returns all of them.
      */
     source?: GetWorkflowExecutionsPageSourceEnum;
     /**
@@ -459,7 +459,8 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
  * @export
  */
 export const GetWorkflowExecutionsPageSourceEnum = {
-    Project: 'PROJECT',
+    Any: 'ANY',
+    ProjectDeployment: 'PROJECT_DEPLOYMENT',
     McpServer: 'MCP_SERVER',
     A2AServer: 'A2A_SERVER',
     ApiCollection: 'API_COLLECTION',

@@ -87,6 +87,14 @@ export interface WorkflowExecution {
      */
     readonly projectVersion?: number;
     /**
+     * Where the executed workflow is exposed: PROJECT_DEPLOYMENT for a plain project deployment, or MCP_SERVER, A2A_SERVER or API_COLLECTION for a deployment one of them created for its project.
+     */
+    readonly source?: WorkflowExecutionSourceEnum;
+    /**
+     * The name of the MCP server, A2A server or API collection that exposes the executed workflow; empty for a plain project deployment.
+     */
+    readonly sourceName?: string;
+    /**
      * The number of task executions of this job, counting only the latest attempt of each task, including the task executions of every loop iteration and branch and excluding subflow jobs; set when the execution is loaded lazily.
      */
     readonly taskExecutionCount?: number;
@@ -99,6 +107,19 @@ export interface WorkflowExecution {
      */
     workflow: WorkflowBasic;
 }
+
+
+/**
+ * @export
+ */
+export const WorkflowExecutionSourceEnum = {
+    ProjectDeployment: 'PROJECT_DEPLOYMENT',
+    McpServer: 'MCP_SERVER',
+    A2AServer: 'A2A_SERVER',
+    ApiCollection: 'API_COLLECTION',
+} as const;
+export type WorkflowExecutionSourceEnum = typeof WorkflowExecutionSourceEnum[keyof typeof WorkflowExecutionSourceEnum];
+
 
 /**
  * Check if a given object implements the WorkflowExecution interface.
@@ -127,6 +148,8 @@ export function WorkflowExecutionFromJSONTyped(json: any, ignoreDiscriminator: b
         'project': ProjectBasicFromJSON(json['project']),
         'projectDeployment': ProjectDeploymentBasicFromJSON(json['projectDeployment']),
         'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],
+        'source': json['source'] == null ? undefined : json['source'],
+        'sourceName': json['sourceName'] == null ? undefined : json['sourceName'],
         'taskExecutionCount': json['taskExecutionCount'] == null ? undefined : json['taskExecutionCount'],
         'triggerExecution': json['triggerExecution'] == null ? undefined : TriggerExecutionFromJSON(json['triggerExecution']),
         'workflow': WorkflowBasicFromJSON(json['workflow']),
@@ -137,7 +160,7 @@ export function WorkflowExecutionToJSON(json: any): WorkflowExecution {
     return WorkflowExecutionToJSONTyped(json, false);
 }
 
-export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id'|'projectVersion'|'taskExecutionCount'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id'|'projectVersion'|'source'|'sourceName'|'taskExecutionCount'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
