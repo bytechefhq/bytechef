@@ -236,7 +236,8 @@ describe('ExternalInvocationsTable', () => {
         expect(screen.getAllByRole('button', {name: 'External invocation actions'})).toHaveLength(1);
         expect(rows[2]).toContainElement(screen.getByRole('button', {name: 'External invocation actions'}));
     });
-    it('opens the workflow run when the workflow name in the source column is clicked', () => {
+
+    it('opens the workflow run when a row with a workflow run is clicked', () => {
         const onViewJob = vi.fn();
 
         renderWithProviders(
@@ -248,23 +249,33 @@ describe('ExternalInvocationsTable', () => {
             />
         );
 
-        fireEvent.click(screen.getByRole('button', {name: 'Send Message'}));
+        fireEvent.click(screen.getByText('Send Message'));
 
         expect(onViewJob).toHaveBeenCalledWith(10464);
+        expect(screen.getAllByRole('row')[1]).toHaveClass('cursor-pointer');
     });
 
-    it('shows the source as plain text when the invocation has no workflow run', () => {
+    it('does not open anything when a row without a workflow run is clicked', () => {
+        const onViewJob = vi.fn();
+
+        renderWithProviders(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} onViewJob={onViewJob} />);
+
+        fireEvent.click(screen.getByText('slack / sendMessage'));
+
+        expect(onViewJob).not.toHaveBeenCalled();
+        expect(screen.getAllByRole('row')[1]).not.toHaveClass('cursor-pointer');
+        expect(screen.queryByRole('button', {name: 'Send Message'})).not.toBeInTheDocument();
+    });
+
+    it('does not open the workflow run when the actions menu is clicked', () => {
+        const onViewJob = vi.fn();
+
         renderWithProviders(
-            <ExternalInvocationsTable
-                externalInvocationLogs={[
-                    {...baseLog, kind: 'WORKFLOW', operationName: null, workflowName: 'Send Message'},
-                    {...baseLog, id: '2', jobId: '10464'},
-                ]}
-                onViewJob={() => {}}
-            />
+            <ExternalInvocationsTable externalInvocationLogs={[{...baseLog, jobId: '7'}]} onViewJob={onViewJob} />
         );
 
-        expect(screen.getByText('Send Message').closest('button')).toBeNull();
-        expect(screen.getByText('slack / sendMessage').closest('button')).toBeNull();
+        fireEvent.click(screen.getByRole('button', {name: 'External invocation actions'}));
+
+        expect(onViewJob).not.toHaveBeenCalled();
     });
 });
