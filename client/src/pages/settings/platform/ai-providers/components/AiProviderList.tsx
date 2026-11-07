@@ -1,17 +1,53 @@
-import Badge from '@/components/Badge/Badge';
+import Badge, {BadgeStyleType} from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiProviderForm from '@/pages/settings/platform/ai-providers/components/AiProviderForm';
 import {AiProvider} from '@/shared/middleware/platform/configuration';
 import {useEnableAiProviderMutation} from '@/shared/mutations/platform/aiProvider.mutations';
 import {AiProviderKeys} from '@/shared/queries/platform/aiProviders.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {useQueryClient} from '@tanstack/react-query';
+import {EditIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
 import './AiProviderList.css';
+
+interface AiProviderBadgeI {
+    description: string;
+    isShown: (aiProvider: AiProvider) => boolean;
+    label: string;
+    styleType: BadgeStyleType;
+}
+
+const AI_PROVIDER_BADGES: AiProviderBadgeI[] = [
+    {
+        description: 'Provides chat models for text generation, used by AI components, agents and Copilot.',
+        isShown: (aiProvider) => !!aiProvider.supportsText,
+        label: 'Text',
+        styleType: 'secondary-outline',
+    },
+    {
+        description: 'Provides models that generate images from text prompts.',
+        isShown: (aiProvider) => !!aiProvider.supportsImage,
+        label: 'Image',
+        styleType: 'secondary-outline',
+    },
+    {
+        description: 'Provides embedding models that turn text into vectors for knowledge bases and semantic search.',
+        isShown: (aiProvider) => !!aiProvider.supportsEmbeddings,
+        label: 'Embeddings',
+        styleType: 'secondary-outline',
+    },
+    {
+        description: "Copilot uses this provider's embeddings to search the ByteChef documentation.",
+        isShown: (aiProvider) => !!aiProvider.copilotDocsProvider,
+        label: 'Copilot Docs',
+        styleType: 'primary-outline',
+    },
+];
 
 const isOllamaProvider = (aiProvider: AiProvider) => aiProvider.name?.toLowerCase() === 'ollama';
 
@@ -95,28 +131,20 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
                                         <span className="flex items-center gap-2">
                                             <span className="text-sm font-semibold">{aiProvider.name}</span>
 
-                                            {aiProvider.supportsText && (
-                                                <Badge label="Text" styleType="secondary-outline" weight="semibold" />
-                                            )}
+                                            {AI_PROVIDER_BADGES.filter((badge) => badge.isShown(aiProvider)).map(
+                                                (badge) => (
+                                                    <Tooltip delayDuration={500} key={badge.label}>
+                                                        <TooltipTrigger asChild>
+                                                            <Badge
+                                                                label={badge.label}
+                                                                styleType={badge.styleType}
+                                                                weight="semibold"
+                                                            />
+                                                        </TooltipTrigger>
 
-                                            {aiProvider.supportsImage && (
-                                                <Badge label="Image" styleType="secondary-outline" weight="semibold" />
-                                            )}
-
-                                            {aiProvider.supportsEmbeddings && (
-                                                <Badge
-                                                    label="Embeddings"
-                                                    styleType="secondary-outline"
-                                                    weight="semibold"
-                                                />
-                                            )}
-
-                                            {aiProvider.copilotDocsProvider && (
-                                                <Badge
-                                                    label="Copilot Docs"
-                                                    styleType="primary-outline"
-                                                    weight="semibold"
-                                                />
+                                                        <TooltipContent>{badge.description}</TooltipContent>
+                                                    </Tooltip>
+                                                )
                                             )}
                                         </span>
 
@@ -158,16 +186,18 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
                                         </span>
 
                                         <Button
+                                            className="ml-2"
+                                            icon={<EditIcon />}
+                                            label="Edit"
                                             onClick={() =>
                                                 setShowForm((prev) => ({
                                                     ...prev,
                                                     [aiProvider.id!]: true,
                                                 }))
                                             }
-                                            variant="link"
-                                        >
-                                            Edit
-                                        </Button>
+                                            size="sm"
+                                            variant="outline"
+                                        />
                                     </div>
                                 )}
                             </AccordionContent>
