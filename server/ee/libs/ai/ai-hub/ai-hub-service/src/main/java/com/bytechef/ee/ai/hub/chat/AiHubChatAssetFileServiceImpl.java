@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.chat;
 
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatAssetFileRepository;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +30,7 @@ public class AiHubChatAssetFileServiceImpl implements AiHubChatAssetFileService 
     private final AiHubChatAssetFileRepository chatAssetFileRepository;
     private final Clock clock;
 
+    @SuppressFBWarnings("EI")
     public AiHubChatAssetFileServiceImpl(AiHubChatAssetFileRepository chatAssetFileRepository) {
         this.chatAssetFileRepository = chatAssetFileRepository;
         this.clock = Clock.systemUTC();
