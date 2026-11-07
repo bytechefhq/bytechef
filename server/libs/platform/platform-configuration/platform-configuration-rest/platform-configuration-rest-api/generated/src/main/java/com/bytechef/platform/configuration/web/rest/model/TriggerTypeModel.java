@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets TriggerType
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T07:54:45.094067+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public enum TriggerTypeModel {
   
   CALLABLE("CALLABLE"),
@@ -33,7 +33,9 @@ public enum TriggerTypeModel {
   
   POLLING("POLLING"),
   
-  DYNAMIC_WEBHOOK("DYNAMIC_WEBHOOK");
+  DYNAMIC_WEBHOOK("DYNAMIC_WEBHOOK"),
+  
+  WEBSOCKET("WEBSOCKET");
 
   private final String value;
 
