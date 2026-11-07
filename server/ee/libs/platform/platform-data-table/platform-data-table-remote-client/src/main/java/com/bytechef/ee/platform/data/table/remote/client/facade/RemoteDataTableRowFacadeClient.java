@@ -7,6 +7,9 @@
 
 package com.bytechef.ee.platform.data.table.remote.client.facade;
 
+import com.bytechef.ee.platform.data.table.remote.client.service.AbstractRemoteDataTableClient;
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.UpdateRowRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
@@ -18,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -26,7 +30,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class RemoteDataTableRowFacadeClient implements DataTableRowFacade {
+public class RemoteDataTableRowFacadeClient extends AbstractRemoteDataTableClient implements DataTableRowFacade {
+
+    public RemoteDataTableRowFacadeClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        super(grpcChannels, objectMapper);
+    }
 
     @Override
     public int importCsv(long dataTableId, String csv, long environmentId) {
@@ -40,7 +48,16 @@ public class RemoteDataTableRowFacadeClient implements DataTableRowFacade {
 
     @Override
     public DataTableRow updateRow(long dataTableId, long id, Map<String, Object> values, long environmentId) {
-        throw new UnsupportedOperationException();
+        return dataTableProtoMapper.toDataTableRow(
+            call(
+                () -> getStub().updateRow(
+                    UpdateRowRequest.newBuilder()
+                        .setDataTableId(dataTableId)
+                        .setId(id)
+                        .setValues(dataTableProtoMapper.write(values))
+                        .setEnvironmentId(environmentId)
+                        .build()))
+                            .getRow());
     }
 
     @Override

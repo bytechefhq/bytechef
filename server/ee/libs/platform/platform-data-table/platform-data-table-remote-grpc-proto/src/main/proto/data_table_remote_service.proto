@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+package bytechef.platform.data.table.remote.v1;
+
+option java_multiple_files = true;
+option java_package = "com.bytechef.ee.platform.data.table.remote.grpc.proto";
+
+service DataTableRemoteService {
+  rpc FetchDataTable(FetchDataTableRequest) returns (DataTableResponse);
+  rpc FetchDataTableInfo(TableRequest) returns (DataTableInfoResponse);
+  rpc ListTables(ListTablesRequest) returns (DataTableInfosResponse);
+  rpc ListRows(ListRowsRequest) returns (DataTableRowsResponse);
+  rpc FindRows(FindRowsRequest) returns (DataTableRowsResponse);
+  rpc GetRow(RowIdRequest) returns (DataTableRowResponse);
+  rpc InsertRows(InsertRowsRequest) returns (DataTableRowsResponse);
+  rpc UpdateRow(UpdateRowRequest) returns (DataTableRowResponse);
+  rpc UpdateRows(UpdateRowsRequest) returns (DataTableRowsResponse);
+  rpc DeleteRows(DeleteRowsRequest) returns (DataTableRowsResponse);
+  rpc DeleteAllRows(TableRequest) returns (DataTableRowsResponse);
+  rpc AddWebhook(AddWebhookRequest) returns (AddWebhookResponse);
+  rpc RemoveWebhook(RemoveWebhookRequest) returns (RemoveWebhookResponse);
+  rpc ResolveWorkspaceByWorkflowId(ResolveWorkspaceByWorkflowIdRequest) returns (WorkspaceIdResponse);
+  rpc ResolveWorkspaceByJobPrincipalId(ResolveWorkspaceByJobPrincipalIdRequest) returns (WorkspaceIdResponse);
+  rpc ResolveWorkspaceByWorkflowUuid(ResolveWorkspaceByWorkflowUuidRequest) returns (WorkspaceIdResponse);
+}
+
+message FetchDataTableRequest {
+  optional int64 workspace_id = 1;
+  string name = 2;
+}
+
+message DataTableResponse {
+  optional bytes data_table = 1;
+}
+
+message TableRequest {
+  int64 data_table_id = 1;
+  int64 environment_id = 2;
+}
+
+message DataTableInfoResponse {
+  optional bytes data_table_info = 1;
+}
+
+message ListTablesRequest {
+  optional int64 workspace_id = 1;
+  int64 environment_id = 2;
+}
+
+message DataTableInfosResponse {
+  bytes data_table_infos = 1;
+}
+
+message ListRowsRequest {
+  int64 data_table_id = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+  int64 environment_id = 4;
+}
+
+message FindRowsRequest {
+  int64 data_table_id = 1;
+  bytes condition_groups = 2;
+  bytes sorts = 3;
+  int32 limit = 4;
+  int32 offset = 5;
+  repeated string expand = 6;
+  int64 environment_id = 7;
+}
+
+message RowIdRequest {
+  int64 data_table_id = 1;
+  int64 id = 2;
+  repeated string expand = 3;
+  int64 environment_id = 4;
+}
+
+message InsertRowsRequest {
+  int64 data_table_id = 1;
+  bytes row_values = 2;
+  int64 environment_id = 3;
+}
+
+message UpdateRowRequest {
+  int64 data_table_id = 1;
+  int64 id = 2;
+  bytes values = 3;
+  int64 environment_id = 4;
+}
+
+message UpdateRowsRequest {
+  int64 data_table_id = 1;
+  bytes condition_groups = 2;
+  bytes values = 3;
+  int64 environment_id = 4;
+}
+
+message DeleteRowsRequest {
+  int64 data_table_id = 1;
+  bytes condition_groups = 2;
+  int64 environment_id = 3;
+}
+
+message DataTableRowResponse {
+  optional bytes row = 1;
+}
+
+message DataTableRowsResponse {
+  bytes rows = 1;
+}
+
+message AddWebhookRequest {
+  int64 data_table_id = 1;
+  string workflow_execution_id = 2;
+  string url = 3;
+  string type = 4;
+  int64 environment_id = 5;
+}
+
+message AddWebhookResponse {
+  int64 id = 1;
+}
+
+message RemoveWebhookRequest {
+  int64 id = 1;
+}
+
+message RemoveWebhookResponse {
+}
+
+message ResolveWorkspaceByWorkflowIdRequest {
+  string workflow_id = 1;
+}
+
+message ResolveWorkspaceByJobPrincipalIdRequest {
+  int64 job_principal_id = 1;
+  string platform_type = 2;
+}
+
+message ResolveWorkspaceByWorkflowUuidRequest {
+  string workflow_uuid = 1;
+}
+
+message WorkspaceIdResponse {
+  optional int64 workspace_id = 1;
+}

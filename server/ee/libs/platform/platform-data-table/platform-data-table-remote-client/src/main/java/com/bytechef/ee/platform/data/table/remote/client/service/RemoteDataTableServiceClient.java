@@ -7,6 +7,12 @@
 
 package com.bytechef.ee.platform.data.table.remote.client.service;
 
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.DataTableInfoResponse;
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.DataTableResponse;
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.FetchDataTableRequest;
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.ListTablesRequest;
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.TableRequest;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
@@ -17,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -25,7 +32,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class RemoteDataTableServiceClient implements DataTableService {
+public class RemoteDataTableServiceClient extends AbstractRemoteDataTableClient implements DataTableService {
+
+    public RemoteDataTableServiceClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        super(grpcChannels, objectMapper);
+    }
 
     @Override
     public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
@@ -52,12 +63,36 @@ public class RemoteDataTableServiceClient implements DataTableService {
 
     @Override
     public Optional<DataTable> fetchDataTable(@Nullable Long workspaceId, String name) {
-        throw new UnsupportedOperationException();
+        FetchDataTableRequest.Builder builder = FetchDataTableRequest.newBuilder()
+            .setName(name);
+
+        if (workspaceId != null) {
+            builder.setWorkspaceId(workspaceId);
+        }
+
+        DataTableResponse dataTableResponse = call(() -> getStub().fetchDataTable(builder.build()));
+
+        if (!dataTableResponse.hasDataTable()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(dataTableProtoMapper.toDataTable(dataTableResponse.getDataTable()));
     }
 
     @Override
     public Optional<DataTableInfo> fetchDataTableInfo(long dataTableId, long environmentId) {
-        throw new UnsupportedOperationException();
+        DataTableInfoResponse dataTableInfoResponse = call(
+            () -> getStub().fetchDataTableInfo(
+                TableRequest.newBuilder()
+                    .setDataTableId(dataTableId)
+                    .setEnvironmentId(environmentId)
+                    .build()));
+
+        if (!dataTableInfoResponse.hasDataTableInfo()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(dataTableProtoMapper.toDataTableInfo(dataTableInfoResponse.getDataTableInfo()));
     }
 
     @Override
@@ -82,7 +117,16 @@ public class RemoteDataTableServiceClient implements DataTableService {
 
     @Override
     public List<DataTableInfo> listTables(@Nullable Long workspaceId, long environmentId) {
-        throw new UnsupportedOperationException();
+        ListTablesRequest.Builder builder = ListTablesRequest.newBuilder()
+            .setEnvironmentId(environmentId);
+
+        if (workspaceId != null) {
+            builder.setWorkspaceId(workspaceId);
+        }
+
+        return dataTableProtoMapper.toDataTableInfos(
+            call(() -> getStub().listTables(builder.build()))
+                .getDataTableInfos());
     }
 
     @Override

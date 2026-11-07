@@ -7,11 +7,17 @@
 
 package com.bytechef.ee.platform.data.table.remote.client.service;
 
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.ResolveWorkspaceByJobPrincipalIdRequest;
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.ResolveWorkspaceByWorkflowIdRequest;
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.ResolveWorkspaceByWorkflowUuidRequest;
+import com.bytechef.ee.platform.data.table.remote.grpc.proto.WorkspaceIdResponse;
+import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import java.util.OptionalLong;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -20,20 +26,49 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class RemoteDataTableWorkspaceResolverClient implements DataTableWorkspaceResolver {
+public class RemoteDataTableWorkspaceResolverClient extends AbstractRemoteDataTableClient
+    implements DataTableWorkspaceResolver {
+
+    public RemoteDataTableWorkspaceResolverClient(GrpcChannels grpcChannels, ObjectMapper objectMapper) {
+        super(grpcChannels, objectMapper);
+    }
 
     @Override
     public OptionalLong resolveByWorkflowId(String workflowId) {
-        throw new UnsupportedOperationException();
+        return toOptionalLong(
+            call(
+                () -> getStub().resolveWorkspaceByWorkflowId(
+                    ResolveWorkspaceByWorkflowIdRequest.newBuilder()
+                        .setWorkflowId(workflowId)
+                        .build())));
     }
 
     @Override
     public OptionalLong resolveByJobPrincipalId(long jobPrincipalId, PlatformType platformType) {
-        throw new UnsupportedOperationException();
+        return toOptionalLong(
+            call(
+                () -> getStub().resolveWorkspaceByJobPrincipalId(
+                    ResolveWorkspaceByJobPrincipalIdRequest.newBuilder()
+                        .setJobPrincipalId(jobPrincipalId)
+                        .setPlatformType(platformType.name())
+                        .build())));
     }
 
     @Override
     public OptionalLong resolveByWorkflowUuid(String workflowUuid) {
-        throw new UnsupportedOperationException();
+        return toOptionalLong(
+            call(
+                () -> getStub().resolveWorkspaceByWorkflowUuid(
+                    ResolveWorkspaceByWorkflowUuidRequest.newBuilder()
+                        .setWorkflowUuid(workflowUuid)
+                        .build())));
+    }
+
+    private static OptionalLong toOptionalLong(WorkspaceIdResponse workspaceIdResponse) {
+        if (!workspaceIdResponse.hasWorkspaceId()) {
+            return OptionalLong.empty();
+        }
+
+        return OptionalLong.of(workspaceIdResponse.getWorkspaceId());
     }
 }
