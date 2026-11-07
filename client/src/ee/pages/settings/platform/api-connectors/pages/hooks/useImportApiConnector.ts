@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom';
 
 import {useApiConnectorWizardStore} from '../../stores/useApiConnectorWizardStore';
 
-export const API_CONNECTORS_PATH = '/automation/settings/api-connectors';
+export const API_CONNECTORS_PATH = '/automation/settings/components/api-connectors';
 
 interface UseImportApiConnectorI {
     handleCancel: () => void;

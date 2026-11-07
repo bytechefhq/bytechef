@@ -30,10 +30,11 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {EnvironmentKeys} from '@/shared/queries/platform/environments.queries';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import redirectOutsideDevelopmentEnvironment from '@/shared/util/redirectOutsideDevelopmentEnvironment';
 import {QueryClient} from '@tanstack/react-query';
 import {Suspense, lazy} from 'react';
-import {createBrowserRouter, redirect} from 'react-router-dom';
+import {Navigate, createBrowserRouter, redirect, useLocation} from 'react-router-dom';
 
 const App = lazy(() => import('@/App'));
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
@@ -77,7 +78,6 @@ const WorkflowTemplates = lazy(() => import('@/pages/automation/templates/workfl
 const AiProviders = lazy(() => import('@/pages/settings/platform/ai-providers/AiProviders'));
 const ApiClients = lazy(() => import('@/ee/pages/automation/api-platform/api-clients/ApiClients'));
 const ApiCollections = lazy(() => import('@/ee/pages/automation/api-platform/api-collections/ApiCollections'));
-const ApiConnectors = lazy(() => import('@/ee/pages/settings/platform/api-connectors/ApiConnectors'));
 const ApiConnectorManualPage = lazy(
     () => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorManualPage')
 );
@@ -100,7 +100,7 @@ const AutomationWorkflowConfigurations = lazy(
 const AutomationWorkflows = lazy(() => import('@/ee/pages/embedded/automation-workflows/AutomationWorkflows'));
 const AutomationWorkflow = lazy(() => import('@/ee/pages/embedded/automation-workflow/AutomationWorkflow'));
 const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
-const CustomComponents = lazy(() => import('@/ee/pages/settings/platform/custom-components/CustomComponents'));
+const Components = lazy(() => import('@/ee/pages/settings/platform/components/Components'));
 const EmbeddedConnections = lazy(() =>
     import('@/ee/pages/embedded/connections/Connections').then((module) => ({default: module.Connections}))
 );
@@ -222,6 +222,29 @@ const currentWorkspaceSettingsRoutes = {
     ],
 };
 
+const ComponentsIndexRedirect = () => {
+    const isFeatureFlagEnabled = useFeatureFlagsStore();
+
+    return (
+        <Navigate
+            replace
+            to={isFeatureFlagEnabled('ff-1024') || !isFeatureFlagEnabled('ff-207') ? 'custom' : 'api-connectors'}
+        />
+    );
+};
+
+const LegacyCustomComponentsRedirect = () => {
+    const location = useLocation();
+
+    return <Navigate replace to={location.pathname.replace('/custom-components', '/components/custom')} />;
+};
+
+const LegacyApiConnectorsRedirect = () => {
+    const location = useLocation();
+
+    return <Navigate replace to={location.pathname.replace('/api-connectors', '/components/api-connectors')} />;
+};
+
 const organizationSettingsNavItem = {
     title: 'Organization',
 };
@@ -300,30 +323,34 @@ const platformSettingsRoutes = {
             path: 'mcp-server',
         },
         {
-            element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                    <EEVersion>
-                        <LazyLoadWrapper>
-                            <CustomComponents />
-                        </LazyLoadWrapper>
-                    </EEVersion>
-                </PrivateRoute>
-            ),
-            path: 'custom-components',
-        },
-        {
             children: [
+                {
+                    element: <ComponentsIndexRedirect />,
+                    index: true,
+                },
                 {
                     element: (
                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                             <EEVersion>
                                 <LazyLoadWrapper>
-                                    <ApiConnectors />
+                                    <Components tab="custom" />
                                 </LazyLoadWrapper>
                             </EEVersion>
                         </PrivateRoute>
                     ),
-                    index: true,
+                    path: 'custom',
+                },
+                {
+                    element: (
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                            <EEVersion>
+                                <LazyLoadWrapper>
+                                    <Components tab="api-connectors" />
+                                </LazyLoadWrapper>
+                            </EEVersion>
+                        </PrivateRoute>
+                    ),
+                    path: 'api-connectors',
                 },
                 {
                     element: (
@@ -335,7 +362,7 @@ const platformSettingsRoutes = {
                             </EEVersion>
                         </PrivateRoute>
                     ),
-                    path: 'new/manual',
+                    path: 'api-connectors/new/manual',
                 },
                 {
                     element: (
@@ -347,7 +374,7 @@ const platformSettingsRoutes = {
                             </EEVersion>
                         </PrivateRoute>
                     ),
-                    path: 'new/import',
+                    path: 'api-connectors/new/import',
                 },
                 {
                     element: (
@@ -359,10 +386,18 @@ const platformSettingsRoutes = {
                             </EEVersion>
                         </PrivateRoute>
                     ),
-                    path: 'new/ai',
+                    path: 'api-connectors/new/ai',
                 },
             ],
-            path: 'api-connectors',
+            path: 'components',
+        },
+        {
+            element: <LegacyCustomComponentsRedirect />,
+            path: 'custom-components/*',
+        },
+        {
+            element: <LegacyApiConnectorsRedirect />,
+            path: 'api-connectors/*',
         },
         {
             element: (
@@ -454,12 +489,8 @@ const platformSettingsRoutes = {
             title: 'MCP Server',
         },
         {
-            href: 'custom-components',
-            title: 'Custom Components',
-        },
-        {
-            href: `api-connectors`,
-            title: 'API Connectors',
+            href: 'components',
+            title: 'Components',
         },
         {
             href: 'notifications',
