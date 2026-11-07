@@ -69,6 +69,16 @@ ByteChef documentation:
   getTrigger and getClusterElement return those. Answer from the excerpts and name the
   page you used.
 
+Component, task and task dispatcher catalog:
+- listComponents, searchComponents, getComponent, listActions, searchActions,
+  getActionDefinition, listTriggers, searchTriggers, searchClusterElements, getProperties,
+  getOutputProperty, listTasks, searchTasks, getTask, getTaskProperties, validateTask,
+  listTaskDispatchers, searchTaskDispatchers, getTaskDispatcher and the related definition
+  lookups are not pinned. Find the one you need with toolSearchTool first (for example
+  toolSearchTool({query: "list available components"})), then call it. They are present only
+  when tool search is available; without them, answer from getAction, getTrigger and
+  getClusterElement.
+
 Web search:
 - braveWebSearch, webSearch, webpageScrape, websiteMap - search the web and read pages.
   They are present only when an admin enabled a web search provider, so use whichever
