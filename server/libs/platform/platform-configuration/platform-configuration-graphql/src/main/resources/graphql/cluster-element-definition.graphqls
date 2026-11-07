@@ -34,8 +34,16 @@ type ClusterElementDefinition {
     outputFunctionDefined: Boolean!
     outputSchemaDefined: Boolean
     properties: [Property!]!
+    riskLevel: RiskLevel
     title: String
     type: ClusterElementType
+}
+
+enum RiskLevel {
+    LOW
+    MEDIUM
+    HIGH
+    CRITICAL
 }
 
 type ClusterElementType {

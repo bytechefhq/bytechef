@@ -19,6 +19,7 @@ package com.bytechef.component.definition;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.definition.BaseOutputFunction;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -87,6 +88,11 @@ public interface ClusterElementDefinition<T> {
      */
     default List<? extends Property> getProperties() {
         return List.of();
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    default Optional<RiskLevel> getRiskLevel() {
+        return Optional.empty();
     }
 
     /**

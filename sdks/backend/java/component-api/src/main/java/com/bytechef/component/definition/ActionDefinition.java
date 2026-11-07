@@ -186,6 +186,11 @@ public interface ActionDefinition {
         return Optional.empty();
     }
 
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    default Optional<RiskLevel> getRiskLevel() {
+        return Optional.empty();
+    }
+
     /**
      * Returns the human-readable title of the action displayed in the user interface.
      *

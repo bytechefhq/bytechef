@@ -2201,6 +2201,14 @@ components:
               type: "array"
               items:
                 $ref: "#/components/schemas/Property"
+            riskLevel:
+              type: "string"
+              enum:
+                - "LOW"
+                - "MEDIUM"
+                - "HIGH"
+                - "CRITICAL"
+              description: "How much damage one call of this tool can do."
             testable:
               description: "Can the cluster element be run on its own to test it."
               type: "boolean"
@@ -2240,6 +2248,14 @@ components:
         outputSchemaDefined:
           description: "Does action defines output schema."
           type: "boolean"
+        riskLevel:
+          type: "string"
+          enum:
+            - "LOW"
+            - "MEDIUM"
+            - "HIGH"
+            - "CRITICAL"
+          description: "How much damage one call of this tool can do."
         title:
           description: "The cluster element title."
           type: "string"
