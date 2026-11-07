@@ -283,6 +283,14 @@ describe('AiHubToolCallFallback', () => {
             expect(screen.getByRole('status')).toHaveTextContent('Importing workflow...');
         });
 
+        it('shows a researching row for a running research call', () => {
+            aiChatToolCallStore.getState().startToolCall('call-1', 'research', 0);
+
+            renderInFlight('research');
+
+            expect(screen.getByRole('status')).toHaveTextContent('Researching the web...');
+        });
+
         it('shows a generic running row for any other running call', () => {
             aiChatToolCallStore.getState().startToolCall('call-1', 'listWorkflows', 0);
 
