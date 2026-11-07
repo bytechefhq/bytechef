@@ -1,11 +1,24 @@
 import {AiHubArtifactKindType} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
-import {BotIcon, WorkflowIcon, WrenchIcon} from 'lucide-react';
+import {BlocksIcon, BotIcon, CodeIcon, WorkflowIcon, WrenchIcon} from 'lucide-react';
 
-import {isAiAgentArtifactKind, isWorkflowArtifactKind} from './artifactOpen';
+import {
+    isAiAgentArtifactKind,
+    isCodeWorkflowArtifactKind,
+    isCustomComponentArtifactKind,
+    isWorkflowArtifactKind,
+} from './artifactOpen';
 
 export function getArtifactIcon(kind: AiHubArtifactKindType) {
     if (isAiAgentArtifactKind(kind)) {
         return <BotIcon className="size-3.5 shrink-0 text-muted-foreground" />;
+    }
+
+    if (isCustomComponentArtifactKind(kind)) {
+        return <BlocksIcon className="size-3.5 shrink-0 text-muted-foreground" />;
+    }
+
+    if (isCodeWorkflowArtifactKind(kind)) {
+        return <CodeIcon className="size-3.5 shrink-0 text-muted-foreground" />;
     }
 
     if (isWorkflowArtifactKind(kind)) {

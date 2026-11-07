@@ -1,12 +1,15 @@
+import {openCodeWorkflowArtifactTab} from '@/ee/pages/automation/ai-hub/artifacts/artifactOpen';
 import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {ToolCallEntryI, useAiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
 import {
     AlertCircleIcon,
+    BlocksIcon,
     BotIcon,
     CheckCircle2Icon,
     ChevronDownIcon,
     ChevronRightIcon,
+    CodeIcon,
     Loader2Icon,
     WorkflowIcon,
     WrenchIcon,
@@ -136,6 +139,8 @@ const DefaultBody = ({entry}: ToolCallBodyProps) => {
 
 const ARTIFACT_OPEN_META: Record<string, {icon: ComponentType<{className?: string}>; kind: string}> = {
     openAiAgentTab: {icon: BotIcon, kind: 'AI Agent'},
+    openCodeWorkflowTab: {icon: CodeIcon, kind: 'Code Workflow'},
+    openCustomComponentTab: {icon: BlocksIcon, kind: 'Custom Component'},
     openWorkflowTab: {icon: WorkflowIcon, kind: 'Workflow'},
 };
 
@@ -146,6 +151,18 @@ const openArtifactTab = (toolName: string, args: Record<string, unknown> | undef
 
     if (toolName === 'openAiAgentTab' && typeof args?.aiAgentId === 'string' && args.aiAgentId) {
         aiHubTabsStore.getState().openAiAgentTab({aiAgentId: args.aiAgentId, name});
+    } else if (
+        toolName === 'openCustomComponentTab' &&
+        args?.customComponentId != null &&
+        args.customComponentId !== ''
+    ) {
+        aiHubTabsStore.getState().openCustomComponentTab({customComponentId: String(args.customComponentId), name});
+    } else if (toolName === 'openCodeWorkflowTab' && args?.projectId != null && args.projectId !== '') {
+        void openCodeWorkflowArtifactTab(
+            String(args.projectId),
+            name,
+            typeof args.language === 'string' ? args.language : undefined
+        );
     } else if (
         toolName === 'openWorkflowTab' &&
         typeof args?.workflowId === 'string' &&

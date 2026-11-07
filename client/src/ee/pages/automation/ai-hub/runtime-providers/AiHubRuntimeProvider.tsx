@@ -77,6 +77,12 @@ type OpenChatTabResultType =
 
 type OpenAiAgentTabResultType = {aiAgentId: string; name: string; opened: true} | {error: string; opened: false};
 
+type OpenCodeWorkflowTabResultType =
+    {language: string; name: string; opened: true; projectId: string} | {error: string; opened: false};
+
+type OpenCustomComponentTabResultType =
+    {customComponentId: string; name: string; opened: true} | {error: string; opened: false};
+
 type OpenWorkflowTabResultType =
     | {name: string; opened: true; projectId: string; projectWorkflowId: number; workflowId: string}
     | {error: string; opened: false};
@@ -84,6 +90,39 @@ type OpenWorkflowTabResultType =
 interface ToolCallErrorResultI {
     error: string;
 }
+
+const validateOpenCodeWorkflowTabResult = (raw: unknown): OpenCodeWorkflowTabResultType | null => {
+    if (typeof raw !== 'object' || raw === null) {
+        return null;
+    }
+
+    const record = raw as Record<string, unknown>;
+
+    if (
+        record.opened === true &&
+        typeof record.projectId === 'string' &&
+        typeof record.language === 'string' &&
+        typeof record.name === 'string'
+    ) {
+        return {language: record.language, name: record.name, opened: true, projectId: record.projectId};
+    }
+
+    return {error: typeof record.error === 'string' ? record.error : 'tool reported opened:false', opened: false};
+};
+
+const validateOpenCustomComponentTabResult = (raw: unknown): OpenCustomComponentTabResultType | null => {
+    if (typeof raw !== 'object' || raw === null) {
+        return null;
+    }
+
+    const record = raw as Record<string, unknown>;
+
+    if (record.opened === true && typeof record.customComponentId === 'string' && typeof record.name === 'string') {
+        return {customComponentId: record.customComponentId, name: record.name, opened: true};
+    }
+
+    return {error: typeof record.error === 'string' ? record.error : 'tool reported opened:false', opened: false};
+};
 
 const validateOpenAiAgentTabResult = (raw: unknown): OpenAiAgentTabResultType | null => {
     if (typeof raw !== 'object' || raw === null) {
@@ -604,6 +643,54 @@ export const buildAiHubSubscriber = ({
         aiHubTabsStore.getState().openAiAgentTab({aiAgentId: parsed.aiAgentId, name: parsed.name});
     };
 
+    const openCodeWorkflowTab = (toolCallName: string, toolResultContent: string) => {
+        const parsed = validateOpenCodeWorkflowTabResult(
+            parseJson<unknown>(toolResultContent, 'openCodeWorkflowTab result')
+        );
+
+        if (parsed === null) {
+            console.warn(`[AiHub] ${toolCallName}: unparseable result`, toolResultContent);
+
+            recordToolFailure(toolCallName, 'unparseable result');
+
+            return;
+        }
+
+        if (!parsed.opened) {
+            recordToolFailure(toolCallName, parsed.error);
+
+            return;
+        }
+
+        aiHubTabsStore
+            .getState()
+            .openCodeWorkflowTab({language: parsed.language, name: parsed.name, projectId: parsed.projectId});
+    };
+
+    const openCustomComponentTab = (toolCallName: string, toolResultContent: string) => {
+        const parsed = validateOpenCustomComponentTabResult(
+            parseJson<unknown>(toolResultContent, 'openCustomComponentTab result')
+        );
+
+        if (parsed === null) {
+            console.warn(`[AiHub] ${toolCallName}: unparseable result`, toolResultContent);
+
+            recordToolFailure(toolCallName, 'unparseable result');
+
+            return;
+        }
+
+        if (!parsed.opened) {
+            recordToolFailure(toolCallName, parsed.error);
+
+            return;
+        }
+
+        aiHubTabsStore
+            .getState()
+            .openCustomComponentTab({customComponentId: parsed.customComponentId, name: parsed.name});
+    };
+
     const openChat = (toolCallName: string, toolResultContent: string) => {
         const parsed = validateOpenChatTabResult(parseJson<unknown>(toolResultContent, `${toolCallName} result`));
 
@@ -814,6 +901,10 @@ export const buildAiHubSubscriber = ({
                 openWorkflowTab(toolCallName, toolResultContent);
             } else if (toolCallName === 'openAiAgentTab') {
                 openAiAgentTab(toolCallName, toolResultContent);
+            } else if (toolCallName === 'openCodeWorkflowTab') {
+                openCodeWorkflowTab(toolCallName, toolResultContent);
+            } else if (toolCallName === 'openCustomComponentTab') {
+                openCustomComponentTab(toolCallName, toolResultContent);
             } else if (toolCallName === 'openWorkflowChatTab') {
                 openChat(toolCallName, toolResultContent);
             } else {

@@ -1,5 +1,7 @@
 import {AiHubArtifactKindType, AiHubChatArtifactI} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
+import {ProjectApi} from '@/shared/middleware/automation/configuration';
+import {toast} from 'sonner';
 
 const WORKFLOW_ARTIFACT_KINDS: ReadonlySet<AiHubArtifactKindType> = new Set([
     'WORKFLOW_CREATED',
@@ -9,6 +11,38 @@ const WORKFLOW_ARTIFACT_KINDS: ReadonlySet<AiHubArtifactKindType> = new Set([
 
 export function isAiAgentArtifactKind(kind: AiHubArtifactKindType): boolean {
     return kind === 'AI_AGENT_REFERENCED';
+}
+
+export function isCodeWorkflowArtifactKind(kind: AiHubArtifactKindType): boolean {
+    return kind === 'CODE_WORKFLOW_REFERENCED';
+}
+
+export function isCustomComponentArtifactKind(kind: AiHubArtifactKindType): boolean {
+    return kind === 'CUSTOM_COMPONENT_REFERENCED';
+}
+
+export async function openCodeWorkflowArtifactTab(projectId: string, name: string, language?: string): Promise<void> {
+    if (language) {
+        aiHubTabsStore.getState().openCodeWorkflowTab({language, name, projectId});
+
+        return;
+    }
+
+    try {
+        const project = await new ProjectApi().getProject({id: Number(projectId)});
+
+        if (!project.codeWorkflowLanguage) {
+            toast.error(`"${name}" is no longer a code workflow.`);
+
+            return;
+        }
+
+        aiHubTabsStore.getState().openCodeWorkflowTab({language: project.codeWorkflowLanguage, name, projectId});
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        toast.error(`Failed to open "${name}": ${message}`);
+    }
 }
 
 export function isWorkflowArtifactKind(kind: AiHubArtifactKindType): boolean {
@@ -41,6 +75,20 @@ export function handleArtifactQuickOpen(artifact: AiHubChatArtifactI): void {
         return;
     }
 
+    if (isCustomComponentArtifactKind(artifact.kind)) {
+        aiHubTabsStore
+            .getState()
+            .openCustomComponentTab({customComponentId: artifact.artifactId, name: artifact.artifactName});
+
+        return;
+    }
+
+    if (isCodeWorkflowArtifactKind(artifact.kind)) {
+        void openCodeWorkflowArtifactTab(artifact.artifactId, artifact.artifactName);
+
+        return;
+    }
+
     if (!isWorkflowArtifactKind(artifact.kind)) {
         return;
     }
@@ -66,7 +114,11 @@ export function isArtifactRemovable(artifact: AiHubChatArtifactI): boolean {
 }
 
 export function isArtifactClickable(artifact: AiHubChatArtifactI): boolean {
-    if (isAiAgentArtifactKind(artifact.kind)) {
+    if (
+        isAiAgentArtifactKind(artifact.kind) ||
+        isCodeWorkflowArtifactKind(artifact.kind) ||
+        isCustomComponentArtifactKind(artifact.kind)
+    ) {
         return true;
     }
 

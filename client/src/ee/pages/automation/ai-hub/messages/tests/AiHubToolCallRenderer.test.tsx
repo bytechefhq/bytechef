@@ -90,8 +90,13 @@ describe('AiHubToolCallRenderer', () => {
     });
 
     describe('openWorkflowTab', () => {
-        it('is one of the two artifact-open tool names', () => {
-            expect([...ARTIFACT_OPEN_TOOL_NAMES]).toEqual(['openAiAgentTab', 'openWorkflowTab']);
+        it('is one of the artifact-open tool names', () => {
+            expect([...ARTIFACT_OPEN_TOOL_NAMES]).toEqual([
+                'openAiAgentTab',
+                'openCodeWorkflowTab',
+                'openCustomComponentTab',
+                'openWorkflowTab',
+            ]);
         });
 
         it('renders as a clickable workflow link instead of a JSON card', () => {
@@ -165,6 +170,55 @@ describe('AiHubToolCallRenderer', () => {
                 kind: 'aiAgent',
                 name: 'Support Agent',
             });
+        });
+    });
+});
+
+describe('AiHubToolCallRenderer code resources', () => {
+    beforeEach(() => {
+        aiHubTabsStore.setState({openTabs: []});
+    });
+
+    it('renders openCustomComponentTab as a link that opens the custom component tab', () => {
+        render(
+            <AiHubToolCallRenderer
+                args={{customComponentId: 'cc-1', name: 'My Component'}}
+                result={{opened: true}}
+                toolCallId="call-cc"
+                toolName="openCustomComponentTab"
+            />
+        );
+
+        expect(screen.getByText('Custom Component')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button'));
+
+        expect(aiHubTabsStore.getState().openTabs[0]).toMatchObject({
+            customComponentId: 'cc-1',
+            kind: 'customComponent',
+            name: 'My Component',
+        });
+    });
+
+    it('renders openCodeWorkflowTab as a link that opens the code workflow tab', () => {
+        render(
+            <AiHubToolCallRenderer
+                args={{language: 'PYTHON', name: 'My Code Workflow', projectId: '11'}}
+                result={{opened: true}}
+                toolCallId="call-cw"
+                toolName="openCodeWorkflowTab"
+            />
+        );
+
+        expect(screen.getByText('Code Workflow')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button'));
+
+        expect(aiHubTabsStore.getState().openTabs[0]).toMatchObject({
+            kind: 'codeWorkflow',
+            language: 'PYTHON',
+            name: 'My Code Workflow',
+            projectId: '11',
         });
     });
 });

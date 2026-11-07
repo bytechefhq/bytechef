@@ -1,8 +1,18 @@
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import {beforeEach, describe, expect, it} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AiHubChatArtifactI} from '../../chats/api/chats.api';
 import {handleArtifactQuickOpen, isArtifactClickable, isArtifactRemovable} from '../artifactOpen';
+
+const hoisted = vi.hoisted(() => ({
+    getProject: vi.fn(),
+}));
+
+vi.mock('@/shared/middleware/automation/configuration', () => ({
+    ProjectApi: class {
+        getProject = hoisted.getProject;
+    },
+}));
 
 function buildArtifact(overrides: Partial<AiHubChatArtifactI> = {}): AiHubChatArtifactI {
     return {
@@ -63,6 +73,56 @@ describe('artifactOpen', () => {
 
         expect(state.openTabs).toHaveLength(1);
         expect(state.openTabs[0]).toMatchObject({aiAgentId: '42', kind: 'aiAgent', name: 'Support Agent'});
+    });
+
+    it('opens a custom component tab for a CUSTOM_COMPONENT_REFERENCED artifact', () => {
+        handleArtifactQuickOpen(
+            buildArtifact({
+                artifactId: '9',
+                artifactName: 'My Component',
+                kind: 'CUSTOM_COMPONENT_REFERENCED',
+                metadataJson: null,
+            })
+        );
+
+        expect(aiHubTabsStore.getState().openTabs[0]).toMatchObject({
+            customComponentId: '9',
+            kind: 'customComponent',
+            name: 'My Component',
+        });
+    });
+
+    it('opens a code workflow tab with the project language for a CODE_WORKFLOW_REFERENCED artifact', async () => {
+        hoisted.getProject.mockResolvedValue({codeWorkflowLanguage: 'PYTHON'});
+
+        handleArtifactQuickOpen(
+            buildArtifact({
+                artifactId: '11',
+                artifactName: 'My Code Workflow',
+                kind: 'CODE_WORKFLOW_REFERENCED',
+                metadataJson: null,
+            })
+        );
+
+        await vi.waitFor(() => expect(aiHubTabsStore.getState().openTabs).toHaveLength(1));
+
+        expect(hoisted.getProject).toHaveBeenCalledWith({id: 11});
+        expect(aiHubTabsStore.getState().openTabs[0]).toMatchObject({
+            kind: 'codeWorkflow',
+            language: 'PYTHON',
+            name: 'My Code Workflow',
+            projectId: '11',
+        });
+    });
+
+    it('is clickable but not removable for the custom component and code workflow references', () => {
+        const customComponentArtifact = buildArtifact({kind: 'CUSTOM_COMPONENT_REFERENCED', metadataJson: null});
+        const codeWorkflowArtifact = buildArtifact({kind: 'CODE_WORKFLOW_REFERENCED', metadataJson: null});
+
+        expect(isArtifactClickable(customComponentArtifact)).toBe(true);
+        expect(isArtifactRemovable(customComponentArtifact)).toBe(false);
+        expect(isArtifactClickable(codeWorkflowArtifact)).toBe(true);
+        expect(isArtifactRemovable(codeWorkflowArtifact)).toBe(false);
     });
 
     it('does nothing for a workflow artifact without a projectId', () => {
