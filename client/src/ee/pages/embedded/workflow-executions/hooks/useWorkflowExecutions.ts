@@ -1,4 +1,8 @@
 import {
+    WorkflowExecutionsSource,
+    WorkflowExecutionsSourceType,
+} from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsSources';
+import {
     GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecutionApi as EmbeddedWorkflowExecutionApi,
 } from '@/ee/shared/middleware/embedded/workflow/execution';
@@ -10,8 +14,26 @@ import {WorkflowExecutionKeys as AutomationWorkflowExecutionKeys} from '@/shared
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useState} from 'react';
 
+const getAnyWorkflowExecutionsPageRequest = (request: {
+    connectedUserId?: number;
+    environmentId?: number;
+    id: number;
+    jobEndDate?: Date;
+    jobStartDate?: Date;
+    jobStatus?: GetWorkflowExecutionsPageJobStatusEnum;
+    pageNumber?: number;
+}) => ({
+    connectedUserId: request.connectedUserId,
+    environmentId: request.environmentId,
+    jobEndDate: request.jobEndDate,
+    jobStartDate: request.jobStartDate,
+    jobStatus: request.jobStatus,
+    pageNumber: request.pageNumber,
+    workspaceId: request.id,
+});
+
 export const useWorkflowExecutions = (
-    automations: number,
+    source: WorkflowExecutionsSourceType,
     request: {
         connectedUserId?: number;
         environmentId?: number;
@@ -42,17 +64,26 @@ export const useWorkflowExecutions = (
     useEffect(() => {
         setWorkflowExecutionsIsFetching(true);
 
-        const queryKey = automations
-            ? AutomationWorkflowExecutionKeys.filteredWorkflowExecutions({...request, embedded: true})
-            : EmbeddedWorkflowExecutionKeys.filteredWorkflowExecutions(request);
+        let queryKey;
+        let queryFn: () => Promise<Page>;
+
+        if (source === WorkflowExecutionsSource.Any) {
+            const anyRequest = getAnyWorkflowExecutionsPageRequest(request);
+
+            queryKey = EmbeddedWorkflowExecutionKeys.filteredAnyWorkflowExecutions(anyRequest);
+            queryFn = () => new EmbeddedWorkflowExecutionApi().getAnyWorkflowExecutionsPage(anyRequest);
+        } else if (source === WorkflowExecutionsSource.Automations) {
+            queryKey = AutomationWorkflowExecutionKeys.filteredWorkflowExecutions({...request, embedded: true});
+            queryFn = () =>
+                new AutomationWorkflowExecutionApi().getWorkflowExecutionsPage({...request, embedded: true});
+        } else {
+            queryKey = EmbeddedWorkflowExecutionKeys.filteredWorkflowExecutions(request);
+            queryFn = () => new EmbeddedWorkflowExecutionApi().getWorkflowExecutionsPage(request);
+        }
 
         if (refetchToken > 0) {
             queryClient.removeQueries({queryKey});
         }
-
-        const queryFn = automations
-            ? () => new AutomationWorkflowExecutionApi().getWorkflowExecutionsPage({...request, embedded: true})
-            : () => new EmbeddedWorkflowExecutionApi().getWorkflowExecutionsPage(request);
 
         queryClient
             .fetchQuery({queryFn, queryKey})
@@ -67,7 +98,6 @@ export const useWorkflowExecutions = (
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        automations,
         queryClient,
         refetchToken,
         request.connectedUserId,
@@ -79,6 +109,7 @@ export const useWorkflowExecutions = (
         request.jobStatus,
         request.pageNumber,
         request.workflowId,
+        source,
     ]);
 
     return {

@@ -71,6 +71,28 @@ vi.mock('@/ee/pages/embedded/workflow-executions/components/workflow-execution-s
     default: () => null,
 }));
 
+vi.mock('@/ee/pages/embedded/workflow-executions/components/AnyWorkflowExecutionsTable', () => ({
+    default: ({
+        data,
+    }: {
+        data: Array<{automationWorkflowExecution?: {id: number}; integrationWorkflowExecution?: {id: number}}>;
+    }) => (
+        <ul aria-label="Any workflow executions">
+            {data.map((row) =>
+                row.automationWorkflowExecution ? (
+                    <li key={`automation-${row.automationWorkflowExecution.id}`}>
+                        automation {row.automationWorkflowExecution.id}
+                    </li>
+                ) : (
+                    <li key={`integration-${row.integrationWorkflowExecution?.id}`}>
+                        integration {row.integrationWorkflowExecution?.id}
+                    </li>
+                )
+            )}
+        </ul>
+    ),
+}));
+
 const integrations = [
     {componentName: 'googleMail', id: 2, name: 'Gmail Sync', tags: []},
     {componentName: 'googleMail', id: 3, name: 'Gmail Archive', tags: []},
@@ -189,8 +211,8 @@ describe('WorkflowExecutions', () => {
         expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
     });
 
-    it('opens the automation execution sheet when automations is 1', () => {
-        renderWorkflowExecutions('automations=1&id=42');
+    it('opens the automation execution sheet when the source is automations', () => {
+        renderWorkflowExecutions('source=AUTOMATIONS&id=42');
 
         expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(42);
         expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionKind).toBe('JOB');
@@ -218,12 +240,72 @@ describe('WorkflowExecutions', () => {
         expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
 
         await act(async () => {
-            await router.navigate('/embedded/workflow-executions?automations=1&id=43');
+            await router.navigate('/embedded/workflow-executions?source=AUTOMATIONS&id=43');
         });
 
         expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(43);
         expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
         expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+    });
+
+    it('lists the executions of every source by default', () => {
+        renderWorkflowExecutions('');
+
+        expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith('ANY', expect.anything());
+        expect(getFilterComboBox('Source')).toHaveTextContent('Any');
+        expect(screen.getByText('Connected User', {selector: 'label'})).toBeInTheDocument();
+        expect(screen.queryByText('Integration', {selector: 'label'})).not.toBeInTheDocument();
+        expect(screen.queryByText('Instance Configuration', {selector: 'label'})).not.toBeInTheDocument();
+        expect(screen.queryByText('Workflow', {selector: 'label'})).not.toBeInTheDocument();
+    });
+
+    it.each([
+        ['source=AUTOMATIONS', 'AUTOMATIONS'],
+        ['source=INTEGRATIONS', 'INTEGRATIONS'],
+        ['source=unknown', 'ANY'],
+    ])('reads the source of %s from the URL', (search, source) => {
+        renderWorkflowExecutions(search);
+
+        expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith(source, expect.anything());
+    });
+
+    it('lists automation and integration runs together in one table for the any source', () => {
+        useWorkflowExecutionsMock.mockReturnValue({
+            connectedUserProjects: [],
+            refetchWorkflowExecutions: vi.fn(),
+            workflowExecutionPage: {
+                content: [
+                    {automationWorkflowExecution: {id: 3}, source: 'AUTOMATION'},
+                    {integrationWorkflowExecution: {id: 1}, source: 'INTEGRATION'},
+                ],
+                size: 20,
+                totalElements: 2,
+                totalPages: 1,
+            },
+            workflowExecutionsError: null,
+            workflowExecutionsIsFetching: false,
+            workflowExecutionsIsLoading: false,
+        });
+
+        renderWorkflowExecutions('');
+
+        const rows = within(screen.getByRole('list', {name: 'Any workflow executions'})).getAllByRole('listitem');
+
+        expect(rows.map((row) => row.textContent)).toEqual(['automation 3', 'integration 1']);
+    });
+
+    it('switches to the any source from the source filter', async () => {
+        renderWorkflowExecutions('source=INTEGRATIONS&integrationId=2');
+
+        await userEvent.click(getFilterComboBox('Source'));
+        await userEvent.click(await screen.findByRole('option', {name: 'Any'}));
+
+        await waitFor(() => {
+            expect(new URLSearchParams(currentSearch).get('source')).toBe('ANY');
+        });
+
+        expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith('ANY', expect.anything());
+        expect(screen.queryByText('Integration', {selector: 'label'})).not.toBeInTheDocument();
     });
 
     it('ignores a non-numeric id query param', () => {
@@ -234,14 +316,14 @@ describe('WorkflowExecutions', () => {
     });
 
     it('requests the executions of the connected user named in the URL', () => {
-        renderWorkflowExecutions('automations=1&connectedUserId=7');
+        renderWorkflowExecutions('source=AUTOMATIONS&connectedUserId=7');
 
         expect(lastWorkflowExecutionsRequest()).toEqual(expect.objectContaining({connectedUserId: 7}));
         expect(getConnectedUsersComboBox()).toHaveTextContent('User user-7');
     });
 
     it('requests the executions of the picked connected user by their id, not their project', async () => {
-        renderWorkflowExecutions('automations=1');
+        renderWorkflowExecutions('source=AUTOMATIONS');
 
         await userEvent.click(getConnectedUsersComboBox());
         await userEvent.click(await screen.findByRole('option', {name: 'User user-8'}));
@@ -254,7 +336,7 @@ describe('WorkflowExecutions', () => {
     });
 
     it('clears the connected user filter when Any is picked', async () => {
-        renderWorkflowExecutions('automations=1&connectedUserId=7');
+        renderWorkflowExecutions('source=AUTOMATIONS&connectedUserId=7');
 
         await userEvent.click(getConnectedUsersComboBox());
         await userEvent.click(await screen.findByRole('option', {name: 'Any'}));
@@ -265,7 +347,7 @@ describe('WorkflowExecutions', () => {
     });
 
     it('keeps the connected user when the status filter changes', async () => {
-        renderWorkflowExecutions('automations=1&connectedUserId=7');
+        renderWorkflowExecutions('source=AUTOMATIONS&connectedUserId=7');
 
         await pickFilterOption('Status', 'COMPLETED');
 
@@ -275,7 +357,7 @@ describe('WorkflowExecutions', () => {
     });
 
     it('keeps the connected user when the integration filters change', async () => {
-        renderWorkflowExecutions('automations=0&connectedUserId=7');
+        renderWorkflowExecutions('source=INTEGRATIONS&connectedUserId=7');
 
         await pickFilterOption('Integration', 'Gmail Sync');
         await expectConnectedUserKeptInTheUrl();
@@ -289,30 +371,30 @@ describe('WorkflowExecutions', () => {
         expect(new URLSearchParams(currentSearch).get('workflowId')).toBe('workflow-1');
     });
 
-    it('keeps the connected user when the type changes', async () => {
-        renderWorkflowExecutions('automations=1&connectedUserId=7');
+    it('keeps the connected user when the source changes', async () => {
+        renderWorkflowExecutions('source=AUTOMATIONS&connectedUserId=7');
 
-        await userEvent.click(getFilterComboBox('Type'));
+        await userEvent.click(getFilterComboBox('Source'));
         await userEvent.click(await screen.findByRole('option', {name: 'Integrations'}));
 
         await waitFor(() => {
-            expect(new URLSearchParams(currentSearch).get('automations')).toBe('0');
+            expect(new URLSearchParams(currentSearch).get('source')).toBe('INTEGRATIONS');
         });
 
         expect(new URLSearchParams(currentSearch).get('connectedUserId')).toBe('7');
     });
 
     it.each([
-        ['automations', '1'],
-        ['integrations', '0'],
-    ])('clears the connected user of the %s when the environment changes', async (_type, automations) => {
+        ['automations', 'AUTOMATIONS'],
+        ['integrations', 'INTEGRATIONS'],
+    ])('clears the connected user of the %s when the environment changes', async (_type, source) => {
         let environmentChangeCallback: (() => void) | undefined;
 
         useOnEnvironmentChangeMock.mockImplementation((callback: () => void) => {
             environmentChangeCallback = callback;
         });
 
-        renderWorkflowExecutions(`automations=${automations}&connectedUserId=7`);
+        renderWorkflowExecutions(`source=${source}&connectedUserId=7`);
 
         act(() => environmentChangeCallback?.());
 
@@ -324,7 +406,7 @@ describe('WorkflowExecutions', () => {
     });
 
     it('lists the connected users workflows once each in the automations workflow filter', async () => {
-        renderWorkflowExecutions('automations=1');
+        renderWorkflowExecutions('source=AUTOMATIONS');
 
         await userEvent.click(getFilterComboBox('Workflow'));
 
@@ -333,7 +415,7 @@ describe('WorkflowExecutions', () => {
     });
 
     it('lists only the workflows of the picked connected user in the automations workflow filter', async () => {
-        renderWorkflowExecutions('automations=1&connectedUserId=8');
+        renderWorkflowExecutions('source=AUTOMATIONS&connectedUserId=8');
 
         await userEvent.click(getFilterComboBox('Workflow'));
 
@@ -342,7 +424,7 @@ describe('WorkflowExecutions', () => {
     });
 
     it('sends the picked workflow to the automation executions query', async () => {
-        renderWorkflowExecutions('automations=1');
+        renderWorkflowExecutions('source=AUTOMATIONS');
 
         await pickFilterOption('Workflow', 'Referenced workflow');
 
@@ -352,7 +434,7 @@ describe('WorkflowExecutions', () => {
     });
 
     it('does not offer the automation workflows for integrations', async () => {
-        renderWorkflowExecutions('automations=0');
+        renderWorkflowExecutions('source=INTEGRATIONS');
 
         await userEvent.click(getFilterComboBox('Workflow'));
 
@@ -360,7 +442,7 @@ describe('WorkflowExecutions', () => {
     });
 
     it('labels integrations with their name instead of their component name', async () => {
-        renderWorkflowExecutions('integrationId=2');
+        renderWorkflowExecutions('source=INTEGRATIONS&integrationId=2');
 
         expect(getFilterComboBox('Integration')).toHaveTextContent('Gmail Sync');
 
@@ -372,7 +454,7 @@ describe('WorkflowExecutions', () => {
     });
 
     it('labels the instance configurations of the picked integration with the integration name', async () => {
-        renderWorkflowExecutions('integrationId=2');
+        renderWorkflowExecutions('source=INTEGRATIONS&integrationId=2');
 
         await userEvent.click(getFilterComboBox('Instance Configuration'));
 
@@ -382,7 +464,7 @@ describe('WorkflowExecutions', () => {
     });
 
     it('lists the workflows of the last published integration version when only an integration is picked', async () => {
-        renderWorkflowExecutions('integrationId=2');
+        renderWorkflowExecutions('source=INTEGRATIONS&integrationId=2');
 
         expect(useGetIntegrationVersionWorkflowsQueryMock).toHaveBeenLastCalledWith(2, 2, false, true);
 
@@ -396,19 +478,19 @@ describe('WorkflowExecutions', () => {
             data: {id: 4, integrationId: 2, integrationVersion: 3},
         });
 
-        renderWorkflowExecutions('integrationId=2&integrationInstanceConfigurationId=4');
+        renderWorkflowExecutions('source=INTEGRATIONS&integrationId=2&integrationInstanceConfigurationId=4');
 
         expect(useGetIntegrationVersionWorkflowsQueryMock).toHaveBeenLastCalledWith(2, 3, false, true);
     });
 
     it('does not list workflows when the picked integration has no published version', () => {
-        renderWorkflowExecutions('integrationId=3');
+        renderWorkflowExecutions('source=INTEGRATIONS&integrationId=3');
 
         expect(useGetIntegrationVersionWorkflowsQueryMock).toHaveBeenLastCalledWith(3, undefined, false, false);
     });
 
     it('sends the picked connected user to the integration executions query', async () => {
-        renderWorkflowExecutions('integrationId=2');
+        renderWorkflowExecutions('source=INTEGRATIONS&integrationId=2');
 
         expect(useGetConnectedUsersQueryMock).toHaveBeenLastCalledWith({environmentId: 0, integrationId: 2}, true);
 
@@ -418,7 +500,7 @@ describe('WorkflowExecutions', () => {
 
         await waitFor(() => {
             expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith(
-                0,
+                'INTEGRATIONS',
                 expect.objectContaining({connectedUserId: 7, integrationId: 2})
             );
         });
@@ -427,9 +509,12 @@ describe('WorkflowExecutions', () => {
     it('reads the connected user filter from the URL', async () => {
         useGetConnectedUserQueryMock.mockReturnValue({data: {externalId: 'user-7', id: 7}});
 
-        renderWorkflowExecutions('connectedUserId=7');
+        renderWorkflowExecutions('source=INTEGRATIONS&connectedUserId=7');
 
-        expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith(0, expect.objectContaining({connectedUserId: 7}));
+        expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith(
+            'INTEGRATIONS',
+            expect.objectContaining({connectedUserId: 7})
+        );
         expect(getFilterComboBox('Connected User')).toHaveTextContent('User user-7');
 
         await userEvent.click(getFilterComboBox('Connected User'));
@@ -449,7 +534,7 @@ describe('WorkflowExecutions', () => {
             },
         }));
 
-        renderWorkflowExecutions('integrationId=2');
+        renderWorkflowExecutions('source=INTEGRATIONS&integrationId=2');
 
         await userEvent.click(getFilterComboBox('Connected User'));
 
@@ -464,7 +549,7 @@ describe('WorkflowExecutions', () => {
 
         await waitFor(() => {
             expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith(
-                0,
+                'INTEGRATIONS',
                 expect.objectContaining({connectedUserId: 42, integrationId: 2})
             );
         });
@@ -486,7 +571,7 @@ describe('WorkflowExecutions', () => {
             workflowExecutionsIsLoading: false,
         });
 
-        renderWorkflowExecutions('connectedUserId=42');
+        renderWorkflowExecutions('source=INTEGRATIONS&connectedUserId=42');
 
         expect(useGetConnectedUserQueryMock).toHaveBeenLastCalledWith(42, true);
         expect(getFilterComboBox('Connected User')).toHaveTextContent('User user-42');
@@ -500,7 +585,7 @@ describe('WorkflowExecutions', () => {
     });
 
     it('does not load a connected user when none is picked', () => {
-        renderWorkflowExecutions('integrationId=2');
+        renderWorkflowExecutions('source=INTEGRATIONS&integrationId=2');
 
         expect(useGetConnectedUserQueryMock).toHaveBeenLastCalledWith(undefined, false);
     });

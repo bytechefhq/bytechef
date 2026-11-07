@@ -1,4 +1,5 @@
 import {
+    GetAnyWorkflowExecutionsPageRequest,
     GetWorkflowExecutionRequest,
     GetWorkflowExecutionTaskExecutionRequest,
     GetWorkflowExecutionsPageRequest,
@@ -18,6 +19,11 @@ import {
 import {useInfiniteQuery, useQuery} from '@tanstack/react-query';
 
 export const WorkflowExecutionKeys = {
+    filteredAnyWorkflowExecutions: (request: GetAnyWorkflowExecutionsPageRequest) => [
+        ...WorkflowExecutionKeys.workflowExecutions,
+        'any',
+        request,
+    ],
     filteredWorkflowExecutions: (request: GetWorkflowExecutionsPageRequest) => [
         ...WorkflowExecutionKeys.workflowExecutions,
         request,

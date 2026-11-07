@@ -27,6 +27,11 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
 
     const columns = getWorkflowExecutionColumns<WorkflowExecution>({
         middleColumns: [
+            columnHelper.accessor((row) => row.project, {
+                cell: (info) => info.getValue()?.name,
+                header: 'Project',
+                id: 'project',
+            }),
             columnHelper.accessor((row) => row.projectDeployment, {
                 cell: (info) => info.getValue()?.name,
                 header: 'Connected user',

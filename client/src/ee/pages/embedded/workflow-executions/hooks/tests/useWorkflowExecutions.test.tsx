@@ -1,11 +1,19 @@
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
+import {WorkflowExecutionsSource} from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsSources';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {renderHook, waitFor} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {automationGetWorkflowExecutionsPageMock, embeddedGetWorkflowExecutionsPageMock} = vi.hoisted(() => ({
+import type {GetWorkflowExecutionsPageJobStatusEnum} from '@/ee/shared/middleware/embedded/workflow/execution';
+
+const {
+    automationGetWorkflowExecutionsPageMock,
+    embeddedGetAnyWorkflowExecutionsPageMock,
+    embeddedGetWorkflowExecutionsPageMock,
+} = vi.hoisted(() => ({
     automationGetWorkflowExecutionsPageMock: vi.fn(),
+    embeddedGetAnyWorkflowExecutionsPageMock: vi.fn(),
     embeddedGetWorkflowExecutionsPageMock: vi.fn(),
 }));
 
@@ -17,6 +25,7 @@ vi.mock('@/shared/middleware/automation/workflow/execution', () => ({
 
 vi.mock('@/ee/shared/middleware/embedded/workflow/execution', () => ({
     WorkflowExecutionApi: class {
+        getAnyWorkflowExecutionsPage = embeddedGetAnyWorkflowExecutionsPageMock;
         getWorkflowExecutionsPage = embeddedGetWorkflowExecutionsPageMock;
     },
 }));
@@ -39,6 +48,8 @@ describe('useWorkflowExecutions', () => {
     beforeEach(() => {
         automationGetWorkflowExecutionsPageMock.mockReset();
         automationGetWorkflowExecutionsPageMock.mockResolvedValue({content: []});
+        embeddedGetAnyWorkflowExecutionsPageMock.mockReset();
+        embeddedGetAnyWorkflowExecutionsPageMock.mockResolvedValue({content: []});
         embeddedGetWorkflowExecutionsPageMock.mockReset();
         embeddedGetWorkflowExecutionsPageMock.mockResolvedValue({content: []});
     });
@@ -48,7 +59,7 @@ describe('useWorkflowExecutions', () => {
 
         const {rerender, result} = renderHook(
             ({connectedUserId}: {connectedUserId?: number}) =>
-                useWorkflowExecutions(1, {connectedUserId, environmentId: 0, id: 1}),
+                useWorkflowExecutions(WorkflowExecutionsSource.Automations, {connectedUserId, environmentId: 0, id: 1}),
             {initialProps, wrapper: createWrapper()}
         );
 
@@ -68,6 +79,42 @@ describe('useWorkflowExecutions', () => {
             expect(result.current.workflowExecutionsIsFetching).toBe(false);
         });
 
+        expect(embeddedGetWorkflowExecutionsPageMock).not.toHaveBeenCalled();
+        expect(embeddedGetAnyWorkflowExecutionsPageMock).not.toHaveBeenCalled();
+    });
+
+    it('reads the executions of every source from one page for the any source', async () => {
+        const jobStartDate = new Date(2026, 10, 1);
+
+        const {result} = renderHook(
+            () =>
+                useWorkflowExecutions(WorkflowExecutionsSource.Any, {
+                    connectedUserId: 7,
+                    environmentId: 2,
+                    id: 5,
+                    integrationId: 3,
+                    jobStartDate,
+                    jobStatus: 'FAILED' as GetWorkflowExecutionsPageJobStatusEnum,
+                    pageNumber: 1,
+                    workflowId: 'workflow-uuid',
+                }),
+            {wrapper: createWrapper()}
+        );
+
+        await waitFor(() => {
+            expect(result.current.workflowExecutionsIsFetching).toBe(false);
+        });
+
+        expect(embeddedGetAnyWorkflowExecutionsPageMock).toHaveBeenCalledWith({
+            connectedUserId: 7,
+            environmentId: 2,
+            jobEndDate: undefined,
+            jobStartDate,
+            jobStatus: 'FAILED',
+            pageNumber: 1,
+            workspaceId: 5,
+        });
+        expect(automationGetWorkflowExecutionsPageMock).not.toHaveBeenCalled();
         expect(embeddedGetWorkflowExecutionsPageMock).not.toHaveBeenCalled();
     });
 });
