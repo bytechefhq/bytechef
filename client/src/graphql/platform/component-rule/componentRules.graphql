@@ -1,0 +1,17 @@
+query ComponentRules($componentName: String, $workspaceId: ID) {
+    componentRules(componentName: $componentName, workspaceId: $workspaceId) {
+        id
+        componentName
+        componentTitle
+        componentIcon
+        toolName
+        toolRiskLevel
+        phase
+        ruleAction
+        condition
+        description
+        enabled
+        strict
+        workspaceId
+    }
+}

@@ -1,0 +1,10 @@
+mutation UpdateComponentRuleSettings($observeMode: Boolean!, $approvalExpiresInHours: Int!, $workspaceId: ID) {
+    updateComponentRuleSettings(
+        observeMode: $observeMode
+        approvalExpiresInHours: $approvalExpiresInHours
+        workspaceId: $workspaceId
+    ) {
+        observeMode
+        approvalExpiresInHours
+    }
+}

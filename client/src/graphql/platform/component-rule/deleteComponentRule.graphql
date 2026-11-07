@@ -1,0 +1,3 @@
+mutation DeleteComponentRule($id: ID!) {
+    deleteComponentRule(id: $id)
+}

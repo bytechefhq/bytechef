@@ -1,0 +1,39 @@
+mutation SaveComponentRule(
+    $id: ID
+    $componentName: String!
+    $toolName: String
+    $phase: ComponentRulePhase!
+    $ruleAction: ComponentRuleActionType!
+    $condition: String!
+    $description: String
+    $enabled: Boolean!
+    $strict: Boolean!
+    $workspaceId: ID
+) {
+    saveComponentRule(
+        id: $id
+        componentName: $componentName
+        toolName: $toolName
+        phase: $phase
+        ruleAction: $ruleAction
+        condition: $condition
+        description: $description
+        enabled: $enabled
+        strict: $strict
+        workspaceId: $workspaceId
+    ) {
+        id
+        componentName
+        componentTitle
+        componentIcon
+        toolName
+        toolRiskLevel
+        phase
+        ruleAction
+        condition
+        description
+        enabled
+        strict
+        workspaceId
+    }
+}
