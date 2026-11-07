@@ -21,5 +21,6 @@ package com.bytechef.component.workflow.constant;
  */
 public class WorkflowConstants {
 
+    public static final String NEW_WORKFLOW_ERROR = "newWorkflowError";
     public static final String RESPONSE = "response";
 }
