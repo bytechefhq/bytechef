@@ -35,6 +35,8 @@ public interface TaskExecutionService {
 
     TaskExecution create(TaskExecution taskExecution);
 
+    boolean failIfUnfinished(long id, String errorMessage);
+
     void delete(long id);
 
     void deleteJobTaskExecutions(long jobId);

@@ -74,6 +74,7 @@ class DefaultTaskCompletionHandlerTest {
     void beforeEach() {
         job.setWorkflowId("workflow1");
         job.setCurrentTask(0);
+        job.setStatus(Job.Status.STARTED);
 
         taskExecution.setId(100L);
 
@@ -82,6 +83,7 @@ class DefaultTaskCompletionHandlerTest {
         when(workflow.getTasks()).thenReturn(List.of(mock(WorkflowTask.class)));
 
         when(jobService.getTaskExecutionJob(100L)).thenReturn(job);
+        when(jobService.update(any())).thenReturn(job);
         when(taskExecutionService.update(any())).thenReturn(taskExecution);
         when(workflowService.getWorkflow("workflow1")).thenReturn(workflow);
         when(contextService.peek(anyLong(), any())).thenReturn(new FileEntry("context", "/tmp/context.json"));
@@ -128,11 +130,26 @@ class DefaultTaskCompletionHandlerTest {
         verify(transactionManager, never()).getTransaction(any());
     }
 
+    @Test
+    void testHandleDropsCompletionForJobThatIsNoLongerStarted() {
+        job.setStatus(Job.Status.FAILED);
+
+        DefaultTaskCompletionHandler taskCompletionHandler = getTaskCompletionHandler(null);
+
+        taskCompletionHandler.handle(taskExecution);
+
+        verify(taskExecutionService, never()).update(any());
+        verify(jobService, never()).update(any());
+        verify(jobExecutor, never()).execute(any());
+        verify(jobExecutor, never()).completeJob(any());
+        verify(contextService, never()).push(anyLong(), any(), any());
+    }
+
     private DefaultTaskCompletionHandler getTaskCompletionHandler(
         @Nullable TransactionTemplate transactionTemplate) {
 
         return new DefaultTaskCompletionHandler(
-            contextService, jobExecutor, jobService, taskExecutionService, taskFileStorage,
-            transactionTemplate, workflowService);
+            contextService, jobExecutor, jobService, taskExecutionService, taskFileStorage, transactionTemplate,
+            workflowService);
     }
 }

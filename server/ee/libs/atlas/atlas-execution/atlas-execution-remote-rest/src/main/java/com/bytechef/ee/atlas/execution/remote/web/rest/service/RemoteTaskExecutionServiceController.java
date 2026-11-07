@@ -13,6 +13,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +47,21 @@ public class RemoteTaskExecutionServiceController {
         })
     public ResponseEntity<Boolean> cancelIfUnfinished(@PathVariable long id) {
         return ResponseEntity.ok(taskExecutionService.cancelIfUnfinished(id));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/fail-if-unfinished/{id}",
+        consumes = {
+            "application/json"
+        },
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Boolean> failIfUnfinished(
+        @PathVariable long id, @RequestBody Map<String, String> failure) {
+
+        return ResponseEntity.ok(taskExecutionService.failIfUnfinished(id, failure.get("errorMessage")));
     }
 
     @RequestMapping(

@@ -84,6 +84,8 @@ public class TaskExecutionErrorEventListenerTest {
         erroredTaskExecution.setError(new ExecutionError("something bad happened", List.of()));
         erroredTaskExecution.setId(1234L);
 
+        when(taskExecutionService.getTaskExecution(1234L))
+            .thenReturn(createTaskExecution(1234L, null, "firecrawl/v1/scrape", TaskExecution.Status.STARTED));
         when(taskExecutionService.update(any()))
             .thenReturn(erroredTaskExecution);
 
@@ -113,6 +115,8 @@ public class TaskExecutionErrorEventListenerTest {
                     "name", "workflowTaskName",
                     "type", "workflowTaskType")));
 
+        when(taskExecutionService.getTaskExecution(1234L))
+            .thenReturn(createTaskExecution(1234L, null, "workflowTaskType", TaskExecution.Status.STARTED));
         when(taskExecutionService.update(any(TaskExecution.class))).thenReturn(erroredTaskExecution);
         when(taskExecutionService.create(any(TaskExecution.class))).thenReturn(erroredTaskExecution);
 
@@ -144,6 +148,8 @@ public class TaskExecutionErrorEventListenerTest {
             .thenAnswer(invocation -> invocation.getArgument(0));
         when(taskExecutionService.getTaskExecution(10L))
             .thenReturn(forkJoinTaskExecution);
+        when(taskExecutionService.getTaskExecution(11L))
+            .thenReturn(createTaskExecution(11L, 10L, "firecrawl/v1/scrape", TaskExecution.Status.STARTED));
         when(jobService.getTaskExecutionJob(10L))
             .thenReturn(new Job(4567L));
         when(taskExecutionService.getJobUnfinishedTaskExecutions(4567L))
@@ -194,6 +200,8 @@ public class TaskExecutionErrorEventListenerTest {
 
         when(taskExecutionService.update(any(TaskExecution.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
+        when(taskExecutionService.getTaskExecution(11L))
+            .thenReturn(createTaskExecution(11L, null, "firecrawl/v1/scrape", TaskExecution.Status.STARTED));
         when(jobService.getTaskExecutionJob(11L))
             .thenReturn(new Job(4567L));
         when(taskExecutionService.getJobUnfinishedTaskExecutions(4567L))
@@ -204,6 +212,52 @@ public class TaskExecutionErrorEventListenerTest {
         taskExecutionErrorEventListener.onErrorEvent(new TaskExecutionErrorEvent(erroredTaskExecution));
 
         verify(taskDispatcher, never()).dispatch(any());
+    }
+
+    @Test
+    public void testErrorOfTaskExecutionFailedByMonitorIsDropped() {
+        TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
+            eventPublisher, contextService, jobService, taskDispatcher, taskExecutionService, taskFileStorage);
+
+        TaskExecution failedTaskExecution = createTaskExecution(
+            11L, null, "firecrawl/v1/scrape", TaskExecution.Status.FAILED);
+
+        when(taskExecutionService.getTaskExecution(11L))
+            .thenReturn(failedTaskExecution);
+
+        TaskExecution workerTaskExecution = createTaskExecution(
+            11L, null, "firecrawl/v1/scrape", TaskExecution.Status.FAILED);
+
+        workerTaskExecution.setError(new ExecutionError("worker failed after the timeout", List.of()));
+        workerTaskExecution.setMaxRetries(3);
+
+        taskExecutionErrorEventListener.onErrorEvent(new TaskExecutionErrorEvent(workerTaskExecution));
+
+        verify(taskExecutionService, never()).update(any());
+        verify(taskExecutionService, never()).create(any());
+        verify(taskDispatcher, never()).dispatch(any());
+        verify(jobService, never()).update(any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    public void testErrorOfCancelledTaskExecutionIsDropped() {
+        TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
+            eventPublisher, contextService, jobService, taskDispatcher, taskExecutionService, taskFileStorage);
+
+        when(taskExecutionService.getTaskExecution(11L))
+            .thenReturn(createTaskExecution(11L, null, "firecrawl/v1/scrape", TaskExecution.Status.CANCELLED));
+
+        TaskExecution workerTaskExecution = createTaskExecution(
+            11L, null, "firecrawl/v1/scrape", TaskExecution.Status.FAILED);
+
+        workerTaskExecution.setError(new ExecutionError("cancelled", List.of()));
+
+        taskExecutionErrorEventListener.onErrorEvent(new TaskExecutionErrorEvent(workerTaskExecution));
+
+        verify(taskExecutionService, never()).update(any());
+        verify(jobService, never()).update(any());
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     private static TaskExecution createTaskExecution(

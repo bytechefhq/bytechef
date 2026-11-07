@@ -18,6 +18,7 @@ package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
+import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
@@ -78,7 +79,9 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
             .orElseThrow(() -> new IllegalStateException(String.format("TaskExecution with id '%s' not found", id)));
 
         try {
-            if (taskExecution.getStatus() == TaskExecution.Status.CANCELLED) {
+            TaskExecution.Status status = taskExecution.getStatus();
+
+            if (status == TaskExecution.Status.CANCELLED || status == TaskExecution.Status.FAILED) {
                 return false;
             }
 
@@ -96,6 +99,30 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     @Transactional(readOnly = true)
     public long countJobTaskExecutions(long jobId, List<Long> supersededTaskExecutionIds) {
         return taskExecutionRepository.countLatestAttemptsByJobId(jobId, supersededTaskExecutionIds);
+    }
+
+    @Override
+    public boolean failIfUnfinished(long id, String errorMessage) {
+        TaskExecution taskExecution = taskExecutionRepository.findByIdForUpdate(id)
+            .orElseThrow(() -> new IllegalStateException(String.format("TaskExecution with id '%s' not found", id)));
+
+        try {
+            TaskExecution.Status status = taskExecution.getStatus();
+
+            if (status.isTerminated()) {
+                return false;
+            }
+
+            taskExecution.setEndDate(Instant.now());
+            taskExecution.setError(new ExecutionError(errorMessage, List.of()));
+            taskExecution.setStatus(TaskExecution.Status.FAILED);
+
+            taskExecutionRepository.save(taskExecution);
+
+            return true;
+        } finally {
+            taskExecutionRepository.unlockForUpdate(id);
+        }
     }
 
     @Override

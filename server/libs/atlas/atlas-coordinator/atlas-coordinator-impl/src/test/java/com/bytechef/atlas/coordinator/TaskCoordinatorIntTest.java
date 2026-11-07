@@ -76,9 +76,11 @@ import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
+import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
@@ -256,6 +258,41 @@ public class TaskCoordinatorIntTest {
     }
 
     @Test
+    public void testCompletionOfTaskExecutionFailedByMonitorIsDropped() {
+        long jobId = saveJob(Job.Status.STARTED, "aGVsbG8x", 0);
+
+        TaskExecution failedTaskExecution = saveTaskExecution(jobId, null, TaskExecution.Status.FAILED);
+
+        TaskCompletionHandler taskCompletionHandler = mock(TaskCompletionHandler.class);
+        TaskDispatcher<? super Task> taskDispatcher = newTaskDispatcher();
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+        TaskCoordinator taskCoordinator = createTaskCoordinator(
+            List.of(), List.of(), eventPublisher, mock(JobExecutor.class), taskCompletionHandler, taskDispatcher);
+
+        TaskExecution workerTaskExecution = taskExecutionService.getTaskExecution(
+            Objects.requireNonNull(failedTaskExecution.getId()));
+
+        workerTaskExecution.setStatus(TaskExecution.Status.COMPLETED);
+        workerTaskExecution.setOutput(new FileEntry("output.json", "base64:///output.json"));
+
+        taskCoordinator.onTaskExecutionCompleteEvent(new TaskExecutionCompleteEvent(workerTaskExecution));
+
+        TaskExecution persistedTaskExecution = taskExecutionRepository.findById(
+            Objects.requireNonNull(failedTaskExecution.getId()))
+            .orElseThrow();
+
+        assertThat(persistedTaskExecution.getStatus()).isEqualTo(TaskExecution.Status.FAILED);
+        assertThat(persistedTaskExecution.getOutput()).isNull();
+
+        verify(taskCompletionHandler, never()).handle(any());
+        verify(taskDispatcher, never()).dispatch(any());
+        verify(eventPublisher, never()).publishEvent(any());
+
+        assertThat(getJob(jobId).getStatus()).isEqualTo(Job.Status.STARTED);
+    }
+
+    @Test
     public void testCompletionOfStartedTaskExecutionIsHandled() {
         long jobId = saveJob(Job.Status.STARTED, "aGVsbG8x", 0);
 
@@ -369,6 +406,40 @@ public class TaskCoordinatorIntTest {
 
         assertThat(jobStatusApplicationEvent.getStatus()).isEqualTo(Job.Status.STARTED);
         assertThat(getJob(jobId).getStatus()).isEqualTo(Job.Status.STARTED);
+    }
+
+    @Test
+    public void testResumeFailureOfJobWhoseLastTaskExecutionFailedFailsJobDirectly() {
+        long jobId = saveJob(Job.Status.FAILED, "aGVsbG8x", 1);
+
+        saveTaskExecution(jobId, null, TaskExecution.Status.FAILED);
+
+        JobExecutor jobExecutor = mock(JobExecutor.class);
+
+        doThrow(new IllegalStateException("cannot evaluate"))
+            .when(jobExecutor)
+            .execute(any());
+
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+        TaskCoordinator taskCoordinator = createTaskCoordinator(
+            List.of(), List.of(), eventPublisher, jobExecutor, mock(TaskCompletionHandler.class),
+            newTaskDispatcher());
+
+        taskCoordinator.onResumeJobEvent(new ResumeJobEvent(jobId));
+
+        Job failedJob = getJob(jobId);
+
+        assertThat(failedJob.getStatus()).isEqualTo(Job.Status.FAILED);
+        assertThat(failedJob.getEndDate()).isNotNull();
+
+        ExecutionError executionError = failedJob.getError();
+
+        assertThat(executionError).isNotNull();
+        assertThat(executionError.getMessage()).isEqualTo("cannot evaluate");
+
+        verify(eventPublisher, never()).publishEvent(isA(TaskExecutionErrorEvent.class));
+        verify(eventPublisher).publishEvent(isA(JobStatusApplicationEvent.class));
     }
 
     @Test

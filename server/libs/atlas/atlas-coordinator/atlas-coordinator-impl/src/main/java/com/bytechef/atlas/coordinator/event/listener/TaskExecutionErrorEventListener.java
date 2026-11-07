@@ -79,6 +79,12 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
         if (errorEvent instanceof TaskExecutionErrorEvent taskExecutionErrorEvent) {
             TaskExecution taskExecution = taskExecutionErrorEvent.getTaskExecution();
 
+            if (isAlreadyFailedOrCancelled(taskExecution)) {
+                log.debug("Task id={} is already failed or cancelled, dropping its error", taskExecution.getId());
+
+                return;
+            }
+
             ExecutionError error = taskExecution.getError();
 
             Assert.notNull(error, "'error' must not be null");
@@ -159,5 +165,19 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
                     new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
             }
         }
+    }
+
+    private boolean isAlreadyFailedOrCancelled(TaskExecution taskExecution) {
+        Long id = taskExecution.getId();
+
+        if (id == null) {
+            return false;
+        }
+
+        TaskExecution currentTaskExecution = taskExecutionService.getTaskExecution(id);
+
+        TaskExecution.Status status = currentTaskExecution.getStatus();
+
+        return status == TaskExecution.Status.FAILED || status == TaskExecution.Status.CANCELLED;
     }
 }

@@ -61,6 +61,18 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
+    public boolean failIfUnfinished(long id, String errorMessage) {
+        Boolean failed = loadBalancedRestClient.put(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(TASK_EXECUTION_SERVICE + "/fail-if-unfinished/{id}")
+                .build(id),
+            Map.of("errorMessage", errorMessage), Boolean.class);
+
+        return Boolean.TRUE.equals(failed);
+    }
+
+    @Override
     public TaskExecution create(TaskExecution taskExecution) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder

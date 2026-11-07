@@ -266,7 +266,7 @@ public class TaskCoordinator {
         long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
 
         if (!taskExecutionService.completeIfNotCancelled(taskExecutionId)) {
-            log.debug("Task id={} was cancelled, dropping its completion", taskExecutionId);
+            log.debug("Task id={} was already failed or cancelled, dropping its completion", taskExecutionId);
 
             return;
         }
@@ -287,7 +287,8 @@ public class TaskCoordinator {
 
         String errorMessage = resolveErrorMessage(exception);
 
-        Optional<TaskExecution> taskExecutionOptional = taskExecutionService.fetchLastJobTaskExecution(jobId);
+        Optional<TaskExecution> taskExecutionOptional = taskExecutionService.fetchLastJobTaskExecution(jobId)
+            .filter(taskExecution -> !isFailedOrCancelled(taskExecution));
 
         if (taskExecutionOptional.isPresent()) {
             TaskExecution taskExecution = taskExecutionOptional.get();
@@ -315,6 +316,12 @@ public class TaskCoordinator {
         log.info("Job id={} was not started: payment required", jobId);
 
         eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, Job.Status.PAYMENT_REQUIRED));
+    }
+
+    private static boolean isFailedOrCancelled(TaskExecution taskExecution) {
+        TaskExecution.Status status = taskExecution.getStatus();
+
+        return status == TaskExecution.Status.FAILED || status == TaskExecution.Status.CANCELLED;
     }
 
     private static String resolveErrorMessage(Exception exception) {

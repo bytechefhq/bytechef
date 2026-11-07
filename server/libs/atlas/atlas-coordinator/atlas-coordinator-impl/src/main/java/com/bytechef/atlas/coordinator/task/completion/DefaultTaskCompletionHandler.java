@@ -105,6 +105,10 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         if (job == null) {
             log.error("Unknown job id={}", taskExecution.getJobId());
+        } else if (job.getStatus() != Job.Status.STARTED) {
+            log.info(
+                "Dropping completion of task id={} because job id={} is {}", taskExecution.getId(), job.getId(),
+                job.getStatus());
         } else {
             taskExecution.setStatus(Status.COMPLETED);
 
