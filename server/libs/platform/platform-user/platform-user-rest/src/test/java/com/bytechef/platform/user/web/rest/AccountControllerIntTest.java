@@ -20,7 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -1081,6 +1084,41 @@ class AccountControllerIntTest {
             .andExpect(status().isOk());
 
         assertThat(persistentTokenRepository.findAllByUserId(user.getId())).isEmpty();
+    }
+
+    @Test
+    @Transactional
+    @WithUnauthenticatedMockUser
+    void testSendActivationEmailToKnownEmail() throws Exception {
+        User user = new User();
+
+        user.setPassword(RandomStringUtils.randomAlphanumeric(60));
+        user.setActivated(false);
+        user.setLogin("activation-email-user");
+        user.setEmail("activation-email-user@example.com");
+        user.setLangKey("en");
+
+        userRepository.save(user);
+
+        restAccountMockMvc
+            .perform(
+                post("/api/send-activation-email").content("activation-email-user@example.com")
+                    .with(csrf()))
+            .andExpect(status().isNoContent());
+
+        verify(mailService).sendActivationEmail(any(User.class));
+    }
+
+    @Test
+    @WithUnauthenticatedMockUser
+    void testSendActivationEmailToUnknownEmailAnswersLikeAKnownOne() throws Exception {
+        restAccountMockMvc
+            .perform(
+                post("/api/send-activation-email").content("activation-email-unknown@example.com")
+                    .with(csrf()))
+            .andExpect(status().isNoContent());
+
+        verify(mailService, never()).sendActivationEmail(any(User.class));
     }
 
     @Test
