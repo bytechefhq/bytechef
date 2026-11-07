@@ -63,7 +63,9 @@ import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.automation.apiplatform.configuration.tool.ApiCollectionToolCallbacksFactory;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
 import com.bytechef.ee.platform.component.rule.tool.componentrule.ComponentRuleToolCallbacksFactory;
+import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.component.tool.ComponentTools;
@@ -227,6 +229,8 @@ public class AiHubConfiguration {
         ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider,
         ObjectProvider<ComponentRuleToolCallbacksFactory> componentRuleToolCallbacksFactoryProvider,
         ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
+        ObjectProvider<CustomComponentFacade> customComponentFacadeProvider,
+        ObjectProvider<ProjectCodeWorkflowFacade> projectCodeWorkflowFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectDeploymentFacade projectDeploymentFacade, AiHubChatService chatService,
@@ -254,8 +258,10 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
-        toolCallbacks.add(new OpenCustomComponentTabToolCallback(aiHubChatArtifactRecorder));
-        toolCallbacks.add(new OpenCodeWorkflowTabToolCallback(aiHubChatArtifactRecorder));
+        toolCallbacks.addAll(
+            openCustomComponentTabToolCallbacks(customComponentFacadeProvider, aiHubChatArtifactRecorder));
+        toolCallbacks.addAll(
+            openCodeWorkflowTabToolCallbacks(projectCodeWorkflowFacadeProvider, aiHubChatArtifactRecorder));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
         toolCallbacks.add(new ListChatWorkflowsToolCallback(projectDeploymentFacade));
         toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService, projectDeploymentFacade));
@@ -615,6 +621,32 @@ public class AiHubConfiguration {
         }
 
         return List.of(new OpenAiAgentTabToolCallback(aiAgentFacade, aiHubChatArtifactRecorder));
+    }
+
+    static List<ToolCallback> openCustomComponentTabToolCallbacks(
+        ObjectProvider<CustomComponentFacade> customComponentFacadeProvider,
+        @Nullable AiHubChatArtifactRecorder aiHubChatArtifactRecorder) {
+
+        CustomComponentFacade customComponentFacade = customComponentFacadeProvider.getIfAvailable();
+
+        if (customComponentFacade == null) {
+            return List.of();
+        }
+
+        return List.of(new OpenCustomComponentTabToolCallback(customComponentFacade, aiHubChatArtifactRecorder));
+    }
+
+    static List<ToolCallback> openCodeWorkflowTabToolCallbacks(
+        ObjectProvider<ProjectCodeWorkflowFacade> projectCodeWorkflowFacadeProvider,
+        @Nullable AiHubChatArtifactRecorder aiHubChatArtifactRecorder) {
+
+        ProjectCodeWorkflowFacade projectCodeWorkflowFacade = projectCodeWorkflowFacadeProvider.getIfAvailable();
+
+        if (projectCodeWorkflowFacade == null) {
+            return List.of();
+        }
+
+        return List.of(new OpenCodeWorkflowTabToolCallback(projectCodeWorkflowFacade, aiHubChatArtifactRecorder));
     }
 
     private static void requireBuildWorkflow(List<ToolCallback> toolCallbacks) {

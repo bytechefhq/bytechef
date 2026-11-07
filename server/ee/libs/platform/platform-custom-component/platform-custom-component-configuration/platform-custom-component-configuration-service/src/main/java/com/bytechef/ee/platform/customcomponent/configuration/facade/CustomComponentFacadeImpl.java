@@ -139,6 +139,13 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
 
     @Transactional(readOnly = true)
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public CustomComponent getCustomComponent(long id) {
+        return customComponentService.getCustomComponent(id);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public CustomComponentDefinitionRecord getCustomComponentDefinition(Long id) {
         CustomComponent customComponent = customComponentService.getCustomComponent(id);
 

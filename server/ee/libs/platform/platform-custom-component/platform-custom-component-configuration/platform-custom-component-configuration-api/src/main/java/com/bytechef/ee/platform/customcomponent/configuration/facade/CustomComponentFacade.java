@@ -22,6 +22,8 @@ public interface CustomComponentFacade {
 
     void delete(Long id);
 
+    CustomComponent getCustomComponent(long id);
+
     CustomComponentDefinitionRecord getCustomComponentDefinition(Long id);
 
     List<CustomComponent> getCustomComponents();
