@@ -13,6 +13,7 @@ import com.bytechef.ee.automation.ai.tool.exception.CodeWorkflowToolErrorType;
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Locale;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class CodeWorkflowTools {
 
     private static final Logger log = LoggerFactory.getLogger(CodeWorkflowTools.class);
