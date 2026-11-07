@@ -128,6 +128,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
     implementation(project(":server:libs:config:app-config"))
