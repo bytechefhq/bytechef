@@ -21,6 +21,7 @@ import com.bytechef.ai.copilot.tool.ScopedConnectionGuard;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
 import com.bytechef.automation.ai.tool.AssetFileToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
@@ -47,6 +48,7 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
@@ -56,6 +58,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatAccessPolicy;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.AiHubSubAgentToolCallbackFactory;
 import com.bytechef.ee.ai.hub.tool.ResearchToolCallbackFactory;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.automation.ai.tool.ApiCollectionToolCallbacksFactory;
@@ -68,6 +71,7 @@ import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
 import com.bytechef.ee.automation.promotion.facade.EnvironmentPromotionFacade;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
+import com.bytechef.ee.platform.ai.tool.usage.ToolUsageRecorder;
 import com.bytechef.ee.platform.component.rule.ComponentRuleService;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreQueryService;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreSemanticSearchService;
@@ -105,6 +109,7 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.ClassPathResource;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -172,6 +177,9 @@ public final class AiHubAgentFixtures {
         mock(WebSearchToolCallbackProvider.class);
     public final WorkflowExecutionTools workflowExecutionTools = new WorkflowExecutionTools(
         mock(ProjectWorkflowExecutionFacade.class), mock(ScopedProjectGuard.class));
+    public final ToolUsageRecorder toolUsageRecorder = mock(ToolUsageRecorder.class);
+    public final List<AiHubSubAgentToolCallbackFactory> subAgentToolCallbackFactories =
+        createSubAgentToolCallbackFactories();
     public final AiHubSessionMemory sessionMemory = new AiHubSessionMemory(
         InMemorySessionRepository.builder()
             .build(),
@@ -344,7 +352,41 @@ public final class AiHubAgentFixtures {
             chatService, chatAccessPolicy, artifactRecorder, policy, sessionMemory, workflowFacade,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
             availableProvider(aiGuardrails), availableProvider(meterRegistry),
-            availableProvider(null));
+            availableProvider(null),
+            subAgentToolCallbackFactoriesProvider());
+    }
+
+    @SuppressWarnings("unchecked")
+    public ObjectProvider<AiHubSubAgentToolCallbackFactory> subAgentToolCallbackFactoriesProvider() {
+        ObjectProvider<AiHubSubAgentToolCallbackFactory> provider = mock(ObjectProvider.class);
+
+        when(provider.orderedStream()).thenAnswer(invocation -> subAgentToolCallbackFactories.stream());
+
+        return provider;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<AiHubSubAgentToolCallbackFactory> createSubAgentToolCallbackFactories() {
+        ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider = mock(ObjectProvider.class);
+        AssetFileFacade assetFileFacade = mock(AssetFileFacade.class);
+        JsonMapper jsonMapper = new JsonMapper();
+
+        DataAnalystConfiguration dataAnalystConfiguration = new DataAnalystConfiguration();
+        ImageGeneratorConfiguration imageGeneratorConfiguration = new ImageGeneratorConfiguration();
+        SlideBuilderConfiguration slideBuilderConfiguration = new SlideBuilderConfiguration();
+
+        return List.of(
+            dataAnalystConfiguration.dataAnalystToolCallbackFactory(
+                chatModel, chatModelResolverProvider, mock(WorkspaceDataTableFacade.class), assetFileFacade,
+                artifactRecorder, new ClassPathResource("prompt_data_analyst.txt")),
+            imageGeneratorConfiguration.imageGeneratorToolCallbackFactory(
+                chatModel, chatModelResolverProvider, new ApplicationProperties(), assetFileFacade, artifactRecorder,
+                availableProvider(toolUsageRecorder), chatService, jsonMapper,
+                new ClassPathResource("prompt_image_generator.txt")),
+            slideBuilderConfiguration.slideBuilderToolCallbackFactory(
+                chatModel, chatModelResolverProvider, assetFileFacade, artifactRecorder,
+                availableProvider(toolUsageRecorder), chatService, jsonMapper,
+                new ClassPathResource("prompt_slide_builder.txt")));
     }
 
     @SuppressWarnings("unchecked")

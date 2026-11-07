@@ -61,6 +61,7 @@ import com.bytechef.ee.ai.hub.subagent.WorkspaceAdvisorContributor;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.AiHubChatToolToolCallbacks;
+import com.bytechef.ee.ai.hub.tool.AiHubSubAgentToolCallbackFactory;
 import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
@@ -168,11 +169,11 @@ public class AiHubConfiguration {
 
     static final Set<String> BUILD_PINNED_TOOL_NAMES = Set.of(
         "askUserQuestion", "buildCodeWorkflow", "buildCustomComponent", "buildWorkflow", "checkWorkflow",
-        "createConnection", "createProject", "createProjectWorkflow", "getWorkflow", "importWorkflow",
-        "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab",
-        "openCustomComponentTab", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection",
-        "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
-        "selectPropertyOption", "selectTriggerPropertyOption");
+        "createConnection", "createProject", "createProjectWorkflow", "data_analyst", "getWorkflow", "image_generator",
+        "importWorkflow", "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab",
+        "openCodeWorkflowTab", "openCustomComponentTab", "openWorkflowChatTab", "openWorkflowTab",
+        "saveWorkflowTestConnection", "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption",
+        "selectConnection", "selectPropertyOption", "selectTriggerPropertyOption", "slide_builder");
 
     private static final String BUILD_WORKFLOW_TOOL_NAME = "buildWorkflow";
     private static final String UPDATE_WORKFLOW_TOOL_NAME = "updateWorkflow";
@@ -288,7 +289,8 @@ public class AiHubConfiguration {
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
         @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider,
         ObjectProvider<AiGuardrails> aiGuardrailsProvider, ObjectProvider<MeterRegistry> meterRegistryProvider,
-        ObjectProvider<AiHubChatToolToolCallbacks> chatToolToolCallbacksProvider) {
+        ObjectProvider<AiHubChatToolToolCallbacks> chatToolToolCallbacksProvider,
+        ObjectProvider<AiHubSubAgentToolCallbackFactory> subAgentToolCallbackFactoriesProvider) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
             buildProjectToolCallbacks(projectTools, projectWorkflowLifecycleTools, workflowExecutionTools));
@@ -328,6 +330,7 @@ public class AiHubConfiguration {
             intelligentToolCallbacks(
                 intelligentToolCatalog, INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, toolApprovalPolicy,
                 workspaceFacade, aiHubSessionMemory, aiGuardrails, aiGuardrailMetrics));
+        toolCallbacks.addAll(subAgentToolCallbacks(subAgentToolCallbackFactoriesProvider));
 
         chatToolToolCallbacksProvider.ifAvailable(
             chatToolToolCallbacks -> toolCallbacks.addAll(chatToolToolCallbacks.write()));
@@ -720,6 +723,14 @@ public class AiHubConfiguration {
         return writable
             ? componentRuleToolCallbacksFactory.writeToolCallbacks()
             : componentRuleToolCallbacksFactory.readToolCallbacks();
+    }
+
+    static List<ToolCallback> subAgentToolCallbacks(
+        ObjectProvider<AiHubSubAgentToolCallbackFactory> subAgentToolCallbackFactoriesProvider) {
+
+        return subAgentToolCallbackFactoriesProvider.orderedStream()
+            .map(AiHubSubAgentToolCallbackFactory::create)
+            .toList();
     }
 
     static List<ToolCallback> openAiAgentTabToolCallbacks(

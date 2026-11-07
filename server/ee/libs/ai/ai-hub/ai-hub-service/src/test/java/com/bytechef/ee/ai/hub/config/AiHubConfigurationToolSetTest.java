@@ -77,7 +77,8 @@ class AiHubConfigurationToolSetTest {
             "buildCodeWorkflow", "createAssetFile", "updateAssetFileContent", "createDataTable", "addDataTableRow",
             "dropDataTable", "createKnowledgeBase", "deleteKnowledgeBase", "createApiCollection",
             "createComponentRule", "createContextStoreSource", "deleteContextStoreSource", "deleteContextStore",
-            "promoteApiCollection", "promoteMcpServer", "promoteA2aServer", "promoteProjectDeployment");
+            "promoteApiCollection", "promoteMcpServer", "promoteA2aServer", "promoteProjectDeployment",
+            "data_analyst", "image_generator", "slide_builder", "generateImage", "createSlideDeck");
     }
 
     @Test
@@ -109,17 +110,36 @@ class AiHubConfigurationToolSetTest {
     }
 
     @Test
+    void testWritingSubAgentsAreBuildOnly() throws AGUIException {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        List<String> subAgentToolNames = List.of("data_analyst", "image_generator", "slide_builder");
+
+        assertThat(toolNames(fixtures.askAgent())).doesNotContainAnyElementsOf(subAgentToolNames);
+        assertThat(toolNames(fixtures.askToolCallbacks()
+            .toolCallbacks())).doesNotContainAnyElementsOf(subAgentToolNames);
+        assertThat(toolNames(fixtures.askGlobalToolCatalog()
+            .toolCallbacks())).doesNotContainAnyElementsOf(subAgentToolNames);
+        assertThat(AiHubConfiguration.ASK_PINNED_TOOL_NAMES).doesNotContainAnyElementsOf(subAgentToolNames);
+
+        assertThat(toolNames(fixtures.buildAgent())).containsAll(subAgentToolNames);
+        assertThat(toolNames(fixtures.buildGlobalToolCatalog()
+            .toolCallbacks())).doesNotContainAnyElementsOf(subAgentToolNames);
+    }
+
+    @Test
     void testBuildPinsOnlyItsCoreTools() throws AGUIException {
         AiHubSpringAIAgent buildAgent = AiHubAgentFixtures.withBuildWorkflow()
             .buildAgent();
 
         assertThat(toolNames(buildAgent)).containsExactlyInAnyOrder(
             "askUserQuestion", "buildCodeWorkflow", "buildCustomComponent", "buildWorkflow", "checkWorkflow",
-            "createConnection", "createProject", "createProjectWorkflow", "getWorkflow", "importWorkflow",
+            "createConnection", "createProject", "createProjectWorkflow", "data_analyst", "getWorkflow",
+            "image_generator", "importWorkflow",
             "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab",
             "openCustomComponentTab", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection",
             "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
-            "selectPropertyOption", "selectTriggerPropertyOption");
+            "selectPropertyOption", "selectTriggerPropertyOption", "slide_builder");
     }
 
     @Test
