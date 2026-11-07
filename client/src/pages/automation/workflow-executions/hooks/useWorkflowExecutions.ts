@@ -2,6 +2,7 @@ import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {getWorkflowsProjectVersion} from '@/pages/automation/workflow-executions/utils/workflowExecutionsFilters';
+import {DEFAULT_WORKFLOW_EXECUTIONS_SOURCE} from '@/pages/automation/workflow-executions/utils/workflowExecutionsSources';
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
@@ -21,7 +22,7 @@ import {useNavigate, useSearchParams} from 'react-router-dom';
 
 const getSourceSearchParameter = (source: string | null): GetWorkflowExecutionsPageSourceEnum =>
     Object.values(GetWorkflowExecutionsPageSourceEnum).find((sourceValue) => sourceValue === source) ||
-    GetWorkflowExecutionsPageSourceEnum.Project;
+    DEFAULT_WORKFLOW_EXECUTIONS_SOURCE;
 
 export const useWorkflowExecutions = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -116,7 +117,7 @@ export const useWorkflowExecutions = () => {
     );
 
     const hasActiveFilters =
-        filterSource !== GetWorkflowExecutionsPageSourceEnum.Project ||
+        filterSource !== DEFAULT_WORKFLOW_EXECUTIONS_SOURCE ||
         !!filterStatus ||
         !!filterStartDate ||
         !!filterEndDate ||
@@ -150,7 +151,7 @@ export const useWorkflowExecutions = () => {
         setFilterProjectId(undefined);
         setFilterStartDate(undefined);
         setFilterStatus(undefined);
-        setFilterSource(GetWorkflowExecutionsPageSourceEnum.Project);
+        setFilterSource(DEFAULT_WORKFLOW_EXECUTIONS_SOURCE);
         setFilterWorkflowId(undefined);
 
         filter(
@@ -161,7 +162,7 @@ export const useWorkflowExecutions = () => {
             undefined,
             undefined,
             undefined,
-            GetWorkflowExecutionsPageSourceEnum.Project
+            DEFAULT_WORKFLOW_EXECUTIONS_SOURCE
         );
     };
 

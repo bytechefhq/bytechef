@@ -25,9 +25,12 @@ import {
     hasExpandedSubflow,
     wrapChildJob,
 } from '../utils/workflowExecutionsTable';
+import WorkflowExecutionSourceCell from './WorkflowExecutionSourceCell';
 import WorkflowExecutionsDropdownMenu from './WorkflowExecutionsDropdownMenu';
 
 interface ExecutionColumnI {
+    anySourceOnly?: boolean;
+    singleSourceOnly?: boolean;
     cell: (execution: WorkflowExecution) => ReactNode;
     cellClassName?: string;
     header: (depth: number, deploymentHeader: string) => string;
@@ -52,16 +55,24 @@ const columns: ExecutionColumnI[] = [
         id: 'workflow',
     },
     {
+        anySourceOnly: true,
+        cell: (execution) => <WorkflowExecutionSourceCell execution={execution} />,
+        cellClassName: 'max-w-48',
+        header: () => 'Source',
+        id: 'source',
+    },
+    {
         cell: (execution) => execution.project?.name,
         cellClassName: 'max-w-40 truncate',
         header: () => 'Project',
         id: 'project',
     },
     {
-        cell: (execution) => execution.projectDeployment?.name,
-        cellClassName: 'max-w-40 truncate',
+        cell: (execution) => execution.sourceName || execution.projectDeployment?.name,
+        cellClassName: 'max-w-48 truncate',
         header: (depth, deploymentHeader) => deploymentHeader,
         id: 'deployment',
+        singleSourceOnly: true,
     },
     {
         cell: (execution) => {
@@ -114,18 +125,22 @@ const columns: ExecutionColumnI[] = [
     },
 ];
 
+const getColumns = (showSourceIcon: boolean) =>
+    columns.filter((column) => (showSourceIcon ? !column.singleSourceOnly : !column.anySourceOnly));
+
 interface ExecutionTableHeaderProps {
     className?: string;
     deploymentHeader: string;
     depth?: number;
+    showSourceIcon: boolean;
 }
 
-const ExecutionTableHeader = ({className, deploymentHeader, depth = 0}: ExecutionTableHeaderProps) => (
+const ExecutionTableHeader = ({className, deploymentHeader, depth = 0, showSourceIcon}: ExecutionTableHeaderProps) => (
     <TableHeader className={twMerge(EXECUTIONS_TABLE_HEADER_CLASS_NAME, className)}>
         <TableRow>
             <TableHead className="w-9" />
 
-            {columns.map((column) => (
+            {getColumns(showSourceIcon).map((column) => (
                 <TableHead
                     className={twMerge(
                         'w-4',
@@ -150,6 +165,7 @@ interface ExecutionRowsProps {
     onRowClick: (execution: WorkflowExecution) => void;
     onToggleExpand: (jobId: string) => void;
     seenJobIds: Set<string>;
+    showSourceIcon: boolean;
 }
 
 const ExecutionRows = ({
@@ -160,6 +176,7 @@ const ExecutionRows = ({
     onRowClick,
     onToggleExpand,
     seenJobIds,
+    showSourceIcon,
 }: ExecutionRowsProps) => (
     <>
         {executions.map((execution, index) => {
@@ -214,7 +231,7 @@ const ExecutionRows = ({
                             )}
                         </TableCell>
 
-                        {columns.map((column) => (
+                        {getColumns(showSourceIcon).map((column) => (
                             <TableCell
                                 className={twMerge(
                                     EXECUTIONS_TABLE_CELL_CLASS_NAME,
@@ -231,7 +248,7 @@ const ExecutionRows = ({
 
                     {expandable && expanded && (
                         <TableRow className="border-0 even:bg-surface-neutral-primary">
-                            <TableCell className="py-0 pr-0 pl-9" colSpan={columns.length + 1}>
+                            <TableCell className="py-0 pr-0 pl-9" colSpan={getColumns(showSourceIcon).length + 1}>
                                 <Table
                                     className={twMerge(
                                         'border border-stroke-brand-secondary',
@@ -246,6 +263,7 @@ const ExecutionRows = ({
                                         )}
                                         deploymentHeader={deploymentHeader}
                                         depth={depth + 1}
+                                        showSourceIcon={showSourceIcon}
                                     />
 
                                     <TableBody>
@@ -257,6 +275,7 @@ const ExecutionRows = ({
                                             onRowClick={onRowClick}
                                             onToggleExpand={onToggleExpand}
                                             seenJobIds={nextSeenJobIds}
+                                            showSourceIcon={showSourceIcon}
                                         />
                                     </TableBody>
                                 </Table>
@@ -272,12 +291,14 @@ const ExecutionRows = ({
 interface WorkflowExecutionsTableProps {
     className?: string;
     deploymentHeader?: string;
+    showSourceIcon?: boolean;
     workflowExecutions: WorkflowExecution[];
 }
 
 const WorkflowExecutionsTable = ({
     className,
     deploymentHeader = 'Deployment',
+    showSourceIcon = false,
     workflowExecutions,
 }: WorkflowExecutionsTableProps) => {
     const {expandedJobIds, handleRowClick, handleToggleExpand} = useWorkflowExecutionsTable();
@@ -288,7 +309,7 @@ const WorkflowExecutionsTable = ({
             data-testid="workflow-executions-table"
         >
             <Table>
-                <ExecutionTableHeader deploymentHeader={deploymentHeader} />
+                <ExecutionTableHeader deploymentHeader={deploymentHeader} showSourceIcon={showSourceIcon} />
 
                 <TableBody>
                     <ExecutionRows
@@ -299,6 +320,7 @@ const WorkflowExecutionsTable = ({
                         onRowClick={handleRowClick}
                         onToggleExpand={handleToggleExpand}
                         seenJobIds={new Set()}
+                        showSourceIcon={showSourceIcon}
                     />
                 </TableBody>
             </Table>

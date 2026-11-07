@@ -218,13 +218,13 @@ export const WorkflowExecutions = () => {
             leftSidebarBody={
                 <div className="space-y-4 px-2">
                     <div className="flex flex-col space-y-2">
-                        <Label>Type</Label>
+                        <Label>Source</Label>
 
                         <Select
                             onValueChange={(value) => handleSourceChange(value as GetWorkflowExecutionsPageSourceEnum)}
                             value={filterSource}
                         >
-                            <SelectTrigger aria-label="Type" className="w-full bg-background">
+                            <SelectTrigger aria-label="Source" className="w-full bg-background">
                                 <SelectValue placeholder="Select type" />
                             </SelectTrigger>
 
@@ -274,7 +274,8 @@ export const WorkflowExecutions = () => {
                         />
                     </div>
 
-                    {filterSource === GetWorkflowExecutionsPageSourceEnum.Project && (
+                    {(filterSource === GetWorkflowExecutionsPageSourceEnum.Any ||
+                        filterSource === GetWorkflowExecutionsPageSourceEnum.ProjectDeployment) && (
                         <div className="flex flex-col space-y-2">
                             <Label>Deployment</Label>
 
@@ -329,6 +330,7 @@ export const WorkflowExecutions = () => {
                 {workflowExecutions && workflowExecutions.length > 0 ? (
                     <WorkflowExecutionsTable
                         deploymentHeader={deploymentHeader}
+                        showSourceIcon={filterSource === GetWorkflowExecutionsPageSourceEnum.Any}
                         workflowExecutions={workflowExecutions}
                     />
                 ) : (
