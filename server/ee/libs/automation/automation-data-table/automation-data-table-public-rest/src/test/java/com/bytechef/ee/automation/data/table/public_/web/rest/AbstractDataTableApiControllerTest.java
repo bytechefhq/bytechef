@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
+import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.Objects;
@@ -64,6 +65,20 @@ class AbstractDataTableApiControllerTest {
         assertEquals(HttpStatus.NOT_FOUND, controller.handleDataTableException(
             new ExecutionException("x", DataTableErrorType.DATA_TABLE_NOT_FOUND), request("/x"))
             .getStatusCode());
+    }
+
+    @Test
+    void testStorageLimitIs507WithTheStorageLimitKey() {
+        ResponseEntity<ProblemDetail> responseEntity = controller.handleStorageLimit(
+            new DataTableStorageLimitExceededException(10, 5), request("/x"));
+
+        assertEquals(HttpStatus.INSUFFICIENT_STORAGE, responseEntity.getStatusCode());
+
+        ProblemDetail problemDetail = Objects.requireNonNull(responseEntity.getBody());
+
+        Map<String, Object> properties = Objects.requireNonNull(problemDetail.getProperties());
+
+        assertEquals(116, properties.get("errorKey"));
     }
 
     @Test

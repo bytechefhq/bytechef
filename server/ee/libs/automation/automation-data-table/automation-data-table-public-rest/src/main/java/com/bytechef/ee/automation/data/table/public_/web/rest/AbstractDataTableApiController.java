@@ -11,6 +11,7 @@ import com.bytechef.exception.AbstractException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
+import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
 import com.bytechef.web.rest.error.constant.ErrorConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -62,6 +63,19 @@ public abstract class AbstractDataTableApiController {
                 problemDetail(
                     status, exception.getMessage(), exception.getErrorKey(), exception.getErrorMessageCode(),
                     DataTableErrorType.class));
+    }
+
+    @ExceptionHandler(DataTableStorageLimitExceededException.class)
+    public ResponseEntity<ProblemDetail> handleStorageLimit(
+        DataTableStorageLimitExceededException exception, HttpServletRequest request) {
+
+        DataTableErrorType errorType = DataTableErrorType.STORAGE_LIMIT_EXCEEDED;
+
+        return ResponseEntity.status(HttpStatus.INSUFFICIENT_STORAGE)
+            .body(
+                problemDetail(
+                    HttpStatus.INSUFFICIENT_STORAGE, exception.getMessage(), errorType.getErrorKey(),
+                    "error.dataTableErrorType." + errorType.getErrorKey(), DataTableErrorType.class));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
