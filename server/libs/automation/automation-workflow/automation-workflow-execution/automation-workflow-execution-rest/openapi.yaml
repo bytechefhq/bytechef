@@ -60,6 +60,18 @@ paths:
         schema:
           type: "integer"
           format: "int64"
+      - name: "source"
+        description: "Where the executed workflows are exposed. PROJECT returns executions of project deployments; MCP_SERVER, A2A_SERVER and API_COLLECTION return executions of the deployments an MCP server, an A2A server or an API collection created for its project."
+        in: "query"
+        required: false
+        schema:
+          type: "string"
+          enum:
+          - "PROJECT"
+          - "MCP_SERVER"
+          - "A2A_SERVER"
+          - "API_COLLECTION"
+          default: "PROJECT"
       - name: "jobStatus"
         description: "The status of an executed job"
         in: "query"
