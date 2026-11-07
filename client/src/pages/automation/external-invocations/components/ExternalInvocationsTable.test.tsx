@@ -202,6 +202,29 @@ describe('ExternalInvocationsTable', () => {
         expect(screen.getByText('Server')).toBeInTheDocument();
     });
 
+    it('hides the connected user column unless the page asks for it', () => {
+        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, externalUserId: '1234567890'}]} />);
+
+        expect(screen.queryByRole('columnheader', {name: 'Connected User'})).not.toBeInTheDocument();
+        expect(screen.queryByText('1234567890')).not.toBeInTheDocument();
+    });
+
+    it.each([
+        ['the external id', {connectedUserId: '1050', externalUserId: '1234567890'}, '1234567890'],
+        ['the connected user id without an external id', {connectedUserId: '1050', externalUserId: null}, '1050'],
+        ['an em dash without a connected user', {connectedUserId: null, externalUserId: null}, '—'],
+    ])('shows %s in the connected user column after the server', (_description, connectedUser, expectedText) => {
+        render(
+            <ExternalInvocationsTable externalInvocationLogs={[{...baseLog, ...connectedUser}]} showConnectedUser />
+        );
+
+        const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
+        const connectedUserColumnIndex = headers.indexOf('Connected User');
+
+        expect(connectedUserColumnIndex).toBe(headers.indexOf('Server') + 1);
+        expect(screen.getAllByRole('cell')[connectedUserColumnIndex]).toHaveTextContent(expectedText);
+    });
+
     it('formats the created date and leaves the cell empty when it is missing', () => {
         const createdDate = Date.UTC(2026, 9, 31, 12, 0, 0);
 
