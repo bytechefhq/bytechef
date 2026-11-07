@@ -3087,6 +3087,7 @@ components:
       - "LISTENER"
       - "POLLING"
       - "DYNAMIC_WEBHOOK"
+      - "WEBSOCKET"
     UnifiedApiCategory:
       description: "A category of unified API."
       type: "string"

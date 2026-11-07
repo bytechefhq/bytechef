@@ -45,7 +45,8 @@ public interface TriggerDefinition {
         HYBRID,
         LISTENER,
         POLLING,
-        STATIC_WEBHOOK
+        STATIC_WEBHOOK,
+        WEBSOCKET
     }
 
     /**
