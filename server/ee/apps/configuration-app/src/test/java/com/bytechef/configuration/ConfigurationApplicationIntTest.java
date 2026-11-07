@@ -188,6 +188,20 @@ public class ConfigurationApplicationIntTest {
     }
 
     @Test
+    void testKnowledgeBaseGrpcServiceIsNotServedWhileKnowledgeBaseIsDisabled() {
+        List<String> serviceNames = applicationContext.getBeansOfType(BindableService.class)
+            .values()
+            .stream()
+            .map(bindableService -> bindableService.bindService()
+                .getServiceDescriptor()
+                .getName())
+            .toList();
+
+        assertThat(serviceNames).doesNotContain(
+            "bytechef.platform.knowledgebase.remote.v1.KnowledgeBaseRemoteService");
+    }
+
+    @Test
     void testDataTablesQueryIsServed() {
         assertThat(applicationContext.containsBean("dataTableGraphQlController")).isTrue();
     }
