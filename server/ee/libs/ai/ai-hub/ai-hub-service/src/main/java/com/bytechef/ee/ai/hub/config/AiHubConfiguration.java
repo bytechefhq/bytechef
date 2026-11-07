@@ -132,13 +132,16 @@ public class AiHubConfiguration {
     static final Set<String> COMPONENT_DEFINITION_TOOL_NAMES = Set.of("getAction", "getClusterElement", "getTrigger");
     static final Set<String> INTELLIGENT_TOOL_NAMES = Set.of(
         "buildWorkflow", "importWorkflow", "buildCustomComponent", "buildCodeWorkflow");
+    static final Set<String> ASK_INTELLIGENT_TOOL_NAMES = Set.of("explainCodeWorkflow", "explainCustomComponent");
 
     static final Set<String> ASK_PINNED_TOOL_NAMES = Set.of(
-        "aggregateDataTable", "askUserQuestion", "checkWorkflow", "describeComponentToolParameters", "getAiAgent",
-        "getAssetFileContent", "getWorkflow", "listAiAgents", "listApiCollections", "listAssetFiles",
-        "listComponentRules", "listDataTables", "listKnowledgeBases", "listProjects", "listWorkflows", "openAiAgentTab",
-        "openWorkflowChatTab", "openWorkflowTab", "proposeComponentRuleCondition", "queryDataTable",
-        "queryKnowledgeBase", "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows");
+        "aggregateDataTable", "askUserQuestion", "checkWorkflow", "describeComponentToolParameters",
+        "explainCodeWorkflow", "explainCustomComponent", "getAiAgent", "getAssetFileContent", "getWorkflow",
+        "listAiAgents", "listApiCollections", "listAssetFiles", "listComponentRules", "listDataTables",
+        "listKnowledgeBases", "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab",
+        "openCustomComponentTab", "openWorkflowChatTab", "openWorkflowTab", "proposeComponentRuleCondition",
+        "queryDataTable", "queryKnowledgeBase", "searchAiAgentReferences", "searchAiAgentTools", "searchProjects",
+        "searchWorkflows");
 
     static final Set<String> BUILD_PINNED_TOOL_NAMES = Set.of(
         "addAiAgentChannel", "addAiAgentElement", "addDataTableColumn", "addDataTableRow", "addKnowledgeBaseDocument",
@@ -186,8 +189,11 @@ public class AiHubConfiguration {
         ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider,
         ObjectProvider<ComponentRuleToolCallbacksFactory> componentRuleToolCallbacksFactoryProvider,
         ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
-        InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
-        AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
+        ObjectProvider<CustomComponentFacade> customComponentFacadeProvider,
+        ObjectProvider<ProjectCodeWorkflowFacade> projectCodeWorkflowFacadeProvider,
+        InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
+        WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade, AiHubChatService chatService,
+        AiHubChatAccessPolicy chatAccessPolicy, AiHubToolApprovalPolicy toolApprovalPolicy,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
         @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
 
@@ -209,7 +215,13 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, null));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, null));
+        toolCallbacks.addAll(openCustomComponentTabToolCallbacks(customComponentFacadeProvider, null));
+        toolCallbacks.addAll(openCodeWorkflowTabToolCallbacks(projectCodeWorkflowFacadeProvider, null));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
+        toolCallbacks.addAll(
+            intelligentToolCallbacks(
+                intelligentToolCatalog, ASK_INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.ASK, toolApprovalPolicy,
+                workspaceFacade));
 
         return new AiHubModeToolCallbacks(toolCallbacks, ASK_PINNED_TOOL_NAMES);
     }
@@ -264,11 +276,9 @@ public class AiHubConfiguration {
         toolCallbacks.add(new ListChatWorkflowsToolCallback(projectDeploymentFacade));
         toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService, projectDeploymentFacade));
         toolCallbacks.addAll(
-            intelligentToolCatalog.getByNames(
-                INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD,
-                (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy),
-                (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
-                    new UserRequestForwardingToolCallback(toolCallback), workspaceFacade)));
+            intelligentToolCallbacks(
+                intelligentToolCatalog, INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD, toolApprovalPolicy,
+                workspaceFacade));
 
         requireBuildWorkflow(toolCallbacks);
 
@@ -619,6 +629,17 @@ public class AiHubConfiguration {
         }
 
         return List.of(new OpenAiAgentTabToolCallback(aiAgentFacade, aiHubChatArtifactRecorder));
+    }
+
+    static List<ToolCallback> intelligentToolCallbacks(
+        IntelligentToolCatalog intelligentToolCatalog, Set<String> toolNames, IntelligentToolVariant variant,
+        AiHubToolApprovalPolicy toolApprovalPolicy, WorkspaceFacade workspaceFacade) {
+
+        return intelligentToolCatalog.getByNames(
+            toolNames, variant,
+            (chatClient, definition) -> AiHubGatedToolFilterAdvisor.filter(chatClient, toolApprovalPolicy),
+            (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
+                new UserRequestForwardingToolCallback(toolCallback), workspaceFacade));
     }
 
     static List<ToolCallback> openCustomComponentTabToolCallbacks(
