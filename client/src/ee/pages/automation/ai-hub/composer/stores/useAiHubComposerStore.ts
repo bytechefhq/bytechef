@@ -11,13 +11,21 @@ export interface ReferencedResourceI {
     tabId?: string;
 }
 
+export interface SelectedSkillI {
+    id: string;
+    name: string;
+}
+
 interface AiHubComposerStateI {
     referencedResources: ReferencedResourceI[];
     resourcePickerOpen: boolean;
+    selectedSkills: SelectedSkillI[];
 
     addReference: (resource: ReferencedResourceI) => void;
+    addSkill: (skill: SelectedSkillI) => void;
     clear: () => void;
     removeReference: (id: string, kind: ReferencedResourceKindType) => void;
+    removeSkill: (id: string) => void;
     setResourcePickerOpen: (open: boolean) => void;
 }
 
@@ -26,6 +34,7 @@ export const aiHubComposerStore = create<AiHubComposerStateI>()(
     devtools((set) => ({
         referencedResources: [],
         resourcePickerOpen: false,
+        selectedSkills: [],
 
         addReference: (resource) =>
             set((state) => {
@@ -40,7 +49,19 @@ export const aiHubComposerStore = create<AiHubComposerStateI>()(
                 return {...state, referencedResources: [...state.referencedResources, resource]};
             }),
 
-        clear: () => set((state) => ({...state, referencedResources: [], resourcePickerOpen: false})),
+        addSkill: (skill) =>
+            set((state) => {
+                const alreadyAdded = state.selectedSkills.some((existingSkill) => existingSkill.id === skill.id);
+
+                if (alreadyAdded) {
+                    return state;
+                }
+
+                return {...state, selectedSkills: [...state.selectedSkills, skill]};
+            }),
+
+        clear: () =>
+            set((state) => ({...state, referencedResources: [], resourcePickerOpen: false, selectedSkills: []})),
 
         removeReference: (id, kind) =>
             set((state) => ({
@@ -48,6 +69,12 @@ export const aiHubComposerStore = create<AiHubComposerStateI>()(
                 referencedResources: state.referencedResources.filter(
                     (resource) => !(resource.id === id && resource.kind === kind)
                 ),
+            })),
+
+        removeSkill: (id) =>
+            set((state) => ({
+                ...state,
+                selectedSkills: state.selectedSkills.filter((skill) => skill.id !== id),
             })),
 
         setResourcePickerOpen: (open) => set((state) => ({...state, resourcePickerOpen: open})),

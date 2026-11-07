@@ -1544,12 +1544,12 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
             throw new Error('Only text messages are supported');
         }
 
-        const input = message.content[0].text;
+        const composerText = message.content[0].text;
 
         if (!isWorkspaceIdKnown(currentWorkspaceId)) {
             toast.info(WORKSPACE_NOT_READY_MESSAGE);
 
-            runtime.thread.composer.setText(input);
+            runtime.thread.composer.setText(composerText);
 
             return;
         }
@@ -1561,6 +1561,12 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
 
             return;
         }
+
+        const selectedSkills = aiHubComposerStore.getState().selectedSkills;
+        const input =
+            selectedSkills.length > 0
+                ? `${selectedSkills.map((skill) => `/${skill.name}`).join(' ')} ${composerText}`
+                : composerText;
 
         aiChatRetryableErrorStore.getState().clearError();
 
@@ -1630,7 +1636,7 @@ export function AiHubRuntimeProvider({children}: Readonly<{children: ReactNode}>
                     useAiHubStore.getState().generateChatId();
                 }
 
-                runtime.thread.composer.setText(input);
+                runtime.thread.composer.setText(composerText);
             },
         });
 

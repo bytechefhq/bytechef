@@ -6,6 +6,7 @@ import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspace
 import {hasPendingToolApproval} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubComposer from '@/ee/pages/automation/ai-hub/composer/AiHubComposer';
+import AiHubSkillsMenu from '@/ee/pages/automation/ai-hub/composer/AiHubSkillsMenu';
 import {
     ReferencedResourceKindType,
     aiHubComposerStore,
@@ -23,7 +24,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
 import {useCancelAiHubRunMutation} from '@/shared/middleware/graphql';
 import {ComposerPrimitive, useAui} from '@assistant-ui/react';
-import {ArrowUpIcon, SquareIcon, XIcon} from 'lucide-react';
+import {ArrowUpIcon, HexagonIcon, SquareIcon, XIcon} from 'lucide-react';
 import {KeyboardEvent, ReactNode, useCallback, useEffect, useRef} from 'react';
 
 const KIND_LABELS: Record<ReferencedResourceKindType, string> = {
@@ -51,6 +52,7 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
 
     const referencedResources = useAiHubComposerStore((state) => state.referencedResources);
     const resourcePickerOpen = useAiHubComposerStore((state) => state.resourcePickerOpen);
+    const selectedSkills = useAiHubComposerStore((state) => state.selectedSkills);
     const chatId = useAiHubStore((state) => state.chatId);
     const mode = useAiHubStore((state) => state.mode);
     const pendingToolApproval = useAiHubStore((state) => hasPendingToolApproval(state.messages));
@@ -105,6 +107,10 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
         }
     };
 
+    const handleRemoveSkill = (id: string) => {
+        aiHubComposerStore.getState().removeSkill(id);
+    };
+
     const handleKeyDown = useCallback(
         (event: KeyboardEvent<HTMLTextAreaElement>) => {
             if (event.key === '@' && !isWorkflowChat) {
@@ -155,6 +161,8 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
 
     const isWorkspaceReady = isWorkspaceIdKnown(currentWorkspaceId);
 
+    const hasChips = referencedResources.length > 0 || selectedSkills.length > 0;
+
     const placeholder = pendingToolApproval
         ? 'Approve or reject the tool call above, or send a message to withdraw it...'
         : 'Send a message...';
@@ -194,8 +202,30 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                     <ChatToolChips chatId={chatId} workspaceId={currentWorkspaceId} />
                 )}
 
-                {referencedResources.length > 0 && (
+                {hasChips && (
                     <div className="flex flex-wrap gap-1.5 px-3 pt-2" data-testid="reference-chips">
+                        {selectedSkills.map((skill) => (
+                            <Badge
+                                className="flex items-center gap-1 bg-lime-100 px-2 py-0.5 text-xs font-normal text-lime-700 dark:bg-lime-950 dark:text-lime-300"
+                                data-testid="skill-chip"
+                                key={`skill-${skill.id}`}
+                                styleType="outline-outline"
+                            >
+                                <HexagonIcon className="size-3" />
+
+                                <span>{skill.name}</span>
+
+                                <button
+                                    aria-label={`Remove ${skill.name}`}
+                                    className="ml-0.5 rounded hover:opacity-75"
+                                    onClick={() => handleRemoveSkill(skill.id)}
+                                    type="button"
+                                >
+                                    <XIcon className="size-3" />
+                                </button>
+                            </Badge>
+                        ))}
+
                         {referencedResources.map((resource) => (
                             <Badge
                                 className={`flex items-center gap-1 px-2 py-0.5 text-xs font-normal ${KIND_BADGE_CLASSES[resource.kind]}`}
@@ -233,7 +263,13 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                     <div className="flex min-w-0 items-center gap-1">
                         {modelPicker}
 
-                        {!isWorkflowChat && <AiHubComposer />}
+                        {!isWorkflowChat && (
+                            <>
+                                <AiHubComposer />
+
+                                <AiHubSkillsMenu />
+                            </>
+                        )}
                     </div>
 
                     <div className="flex shrink-0 items-center gap-2">

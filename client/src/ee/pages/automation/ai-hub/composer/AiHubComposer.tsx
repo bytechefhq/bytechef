@@ -1,6 +1,7 @@
 import {CommandItem} from '@/components/ui/command';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiHubConnectorsBranch from '@/ee/pages/automation/ai-hub/composer/AiHubConnectorsBranch';
+import AiHubSkillsBranch from '@/ee/pages/automation/ai-hub/composer/AiHubSkillsBranch';
 import {
     aiHubComposerStore,
     useAiHubComposerStore,
@@ -11,7 +12,7 @@ import ResourcePickerMenu, {
 } from '@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu';
 import {aiHubTabsStore, attachTab} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {ChevronRightIcon, PlugIcon, PlusIcon} from 'lucide-react';
+import {ChevronRightIcon, HexagonIcon, PlugIcon, PlusIcon} from 'lucide-react';
 
 const AiHubComposer = () => {
     const referencedResources = useAiHubComposerStore((state) => state.referencedResources);
@@ -71,6 +72,19 @@ const AiHubComposer = () => {
                     <PlugIcon className="mr-2 size-3.5" />
 
                     <span className="flex-1">Connectors</span>
+
+                    <ChevronRightIcon className="size-3.5 text-muted-foreground" />
+                </CommandItem>
+            ),
+        },
+        {
+            key: 'skills',
+            renderBranch: (onBack, onClose) => <AiHubSkillsBranch onBack={onBack} onClose={onClose} />,
+            renderRootItem: (onEnter) => (
+                <CommandItem onSelect={onEnter} value="root-skills">
+                    <HexagonIcon className="mr-2 size-3.5" />
+
+                    <span className="flex-1">Skills</span>
 
                     <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                 </CommandItem>

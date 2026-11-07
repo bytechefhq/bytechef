@@ -302,6 +302,40 @@ describe('ResourcePickerMenu', () => {
         });
     });
 
+    describe('custom branches', () => {
+        it('drills into a caller-supplied branch and back to the root menu', async () => {
+            const {CommandItem} = await import('@/components/ui/command');
+
+            await renderMenu({
+                customBranches: [
+                    {
+                        key: 'skills',
+                        renderBranch: (onBack: () => void) => (
+                            <CommandItem onSelect={onBack} value="skills-back">
+                                Skills branch body
+                            </CommandItem>
+                        ),
+                        renderRootItem: (onEnter: () => void) => (
+                            <CommandItem onSelect={onEnter} value="root-skills">
+                                Skills
+                            </CommandItem>
+                        ),
+                    },
+                ],
+            });
+            await openMenu();
+
+            await userEvent.click(await screen.findByText('Skills'));
+
+            expect(await screen.findByText('Skills branch body')).toBeInTheDocument();
+            expect(screen.queryByText('Workflows')).not.toBeInTheDocument();
+
+            await userEvent.click(screen.getByText('Skills branch body'));
+
+            expect(await screen.findByText('Workflows')).toBeInTheDocument();
+        });
+    });
+
     describe('Show-more pagination', () => {
         it('caps the workflow list and reveals more on demand', async () => {
             const manyWorkflows = Array.from({length: 25}, (_, index) => ({
