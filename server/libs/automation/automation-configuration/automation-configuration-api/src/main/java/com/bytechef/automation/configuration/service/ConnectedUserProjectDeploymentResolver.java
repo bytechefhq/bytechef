@@ -16,12 +16,16 @@
 
 package com.bytechef.automation.configuration.service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public interface ConnectedUserProjectDeploymentResolver {
+
+    Map<Long, Long> getConnectedUserIds(Collection<Long> projectDeploymentIds);
 
     List<Long> getProjectDeploymentIds(long connectedUserId);
 }

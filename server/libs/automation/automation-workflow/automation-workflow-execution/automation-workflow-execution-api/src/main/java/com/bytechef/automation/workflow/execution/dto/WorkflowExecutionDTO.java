@@ -34,13 +34,26 @@ public record WorkflowExecutionDTO(
     long id, Project project, ProjectDeployment projectDeployment, @Nullable Integer projectVersion,
     @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution,
     @Nullable List<FocusPathElementDTO> focusPath, @Nullable Long taskExecutionCount,
-    @Nullable WorkflowExecutionSource source, @Nullable String sourceName) {
+    @Nullable WorkflowExecutionSource source, @Nullable String sourceName, @Nullable Long connectedUserId) {
 
     public WorkflowExecutionDTO(
         long id, Project project, ProjectDeployment projectDeployment, @Nullable Integer projectVersion,
         @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution) {
 
-        this(id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, null, null, null, null);
+        this(
+            id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, null, null, null, null,
+            null);
+    }
+
+    public WorkflowExecutionDTO(
+        long id, Project project, ProjectDeployment projectDeployment, @Nullable Integer projectVersion,
+        @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution,
+        @Nullable List<FocusPathElementDTO> focusPath, @Nullable Long taskExecutionCount,
+        @Nullable WorkflowExecutionSource source, @Nullable String sourceName) {
+
+        this(
+            id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, focusPath,
+            taskExecutionCount, source, sourceName, null);
     }
 
     public WorkflowExecutionDTO(
@@ -50,7 +63,7 @@ public record WorkflowExecutionDTO(
 
         this(
             id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, focusPath,
-            taskExecutionCount, null, null);
+            taskExecutionCount, null, null, null);
     }
 
     public WorkflowExecutionDTO(
@@ -60,7 +73,13 @@ public record WorkflowExecutionDTO(
 
         this(
             id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, null, null, source,
-            sourceName);
+            sourceName, null);
+    }
+
+    public WorkflowExecutionDTO withConnectedUserId(@Nullable Long connectedUserId) {
+        return new WorkflowExecutionDTO(
+            id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, focusPath,
+            taskExecutionCount, source, sourceName, connectedUserId);
     }
 
     public boolean isTriggerOnly() {

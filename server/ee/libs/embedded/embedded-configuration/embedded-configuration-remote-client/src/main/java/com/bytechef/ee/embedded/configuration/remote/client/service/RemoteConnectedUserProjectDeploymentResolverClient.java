@@ -11,7 +11,9 @@ import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploym
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +35,22 @@ public class RemoteConnectedUserProjectDeploymentResolverClient implements Conne
     @SuppressFBWarnings("EI")
     public RemoteConnectedUserProjectDeploymentResolverClient(LoadBalancedRestClient loadBalancedRestClient) {
         this.loadBalancedRestClient = loadBalancedRestClient;
+    }
+
+    @Override
+    public Map<Long, Long> getConnectedUserIds(Collection<Long> projectDeploymentIds) {
+        if (projectDeploymentIds.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<Long, Long> connectedUserIds = loadBalancedRestClient.post(
+            uriBuilder -> uriBuilder
+                .host(CONFIGURATION_APP)
+                .path(CONNECTED_USER_PROJECT_DEPLOYMENT_RESOLVER + "/get-connected-user-ids")
+                .build(),
+            List.copyOf(projectDeploymentIds), new ParameterizedTypeReference<>() {});
+
+        return connectedUserIds == null ? Map.of() : connectedUserIds;
     }
 
     @Override

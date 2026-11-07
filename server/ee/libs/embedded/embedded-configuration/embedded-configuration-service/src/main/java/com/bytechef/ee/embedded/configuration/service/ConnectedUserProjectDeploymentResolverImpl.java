@@ -14,8 +14,12 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +47,23 @@ public class ConnectedUserProjectDeploymentResolverImpl implements ConnectedUser
         this.connectedUserProjectService = connectedUserProjectService;
         this.connectedUserReferenceDeploymentService = connectedUserReferenceDeploymentService;
         this.projectDeploymentService = projectDeploymentService;
+    }
+
+    @Override
+    public Map<Long, Long> getConnectedUserIds(Collection<Long> projectDeploymentIds) {
+        Map<Long, Long> connectedUserIds = new HashMap<>();
+
+        for (Long projectDeploymentId : new LinkedHashSet<>(projectDeploymentIds)) {
+            Optional<Long> connectedUserIdOptional = connectedUserReferenceDeploymentService
+                .fetchByProjectDeploymentId(projectDeploymentId)
+                .map(ConnectedUserReferenceDeployment::getConnectedUserId)
+                .or(() -> connectedUserProjectService.fetchConnectedUserId(projectDeploymentId));
+
+            connectedUserIdOptional.ifPresent(
+                connectedUserId -> connectedUserIds.put(projectDeploymentId, connectedUserId));
+        }
+
+        return connectedUserIds;
     }
 
     @Override

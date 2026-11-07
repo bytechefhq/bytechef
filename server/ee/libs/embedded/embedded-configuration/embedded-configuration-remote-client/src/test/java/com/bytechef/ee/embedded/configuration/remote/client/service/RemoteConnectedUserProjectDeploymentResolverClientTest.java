@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -17,6 +18,7 @@ import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
@@ -31,6 +33,8 @@ import org.springframework.web.client.RestClient;
  */
 class RemoteConnectedUserProjectDeploymentResolverClientTest {
 
+    private static final String CONNECTED_USER_IDS_URL =
+        "http://configuration-app/remote/connected-user-project-deployment-resolver/get-connected-user-ids";
     private static final String PROJECT_DEPLOYMENT_IDS_URL =
         "http://configuration-app/remote/connected-user-project-deployment-resolver/get-project-deployment-ids/7";
 
@@ -47,6 +51,29 @@ class RemoteConnectedUserProjectDeploymentResolverClientTest {
 
         remoteConnectedUserProjectDeploymentResolverClient = new RemoteConnectedUserProjectDeploymentResolverClient(
             new LoadBalancedRestClient(restClientBuilder));
+    }
+
+    @Test
+    void testGetConnectedUserIds() {
+        mockRestServiceServer.expect(requestTo(CONNECTED_USER_IDS_URL))
+            .andExpect(method(HttpMethod.POST))
+            .andExpect(header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId()))
+            .andExpect(content().json("[3,5]"))
+            .andRespond(withSuccess("{\"3\":7,\"5\":9}", MediaType.APPLICATION_JSON));
+
+        Map<Long, Long> connectedUserIds =
+            remoteConnectedUserProjectDeploymentResolverClient.getConnectedUserIds(List.of(3L, 5L));
+
+        assertThat(connectedUserIds).containsExactlyInAnyOrderEntriesOf(Map.of(3L, 7L, 5L, 9L));
+
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    void testGetConnectedUserIdsOfNoDeploymentsSkipsTheRemoteCall() {
+        assertThat(remoteConnectedUserProjectDeploymentResolverClient.getConnectedUserIds(List.of())).isEmpty();
+
+        mockRestServiceServer.verify();
     }
 
     @Test

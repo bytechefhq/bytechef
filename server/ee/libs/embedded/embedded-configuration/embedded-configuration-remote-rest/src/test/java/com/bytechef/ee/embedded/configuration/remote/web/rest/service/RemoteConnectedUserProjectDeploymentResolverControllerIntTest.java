@@ -9,11 +9,13 @@ package com.bytechef.ee.embedded.configuration.remote.web.rest.service;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -40,6 +42,21 @@ class RemoteConnectedUserProjectDeploymentResolverControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Test
+    void testGetConnectedUserIds() throws Exception {
+        when(connectedUserProjectDeploymentResolver.getConnectedUserIds(List.of(3L, 5L)))
+            .thenReturn(Map.of(3L, 7L, 5L, 9L));
+
+        mockMvc
+            .perform(
+                post("/remote/connected-user-project-deployment-resolver/get-connected-user-ids")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("[3,5]"))
+            .andExpect(status().isOk())
+            .andExpect(content().json("{\"3\":7,\"5\":9}", JsonCompareMode.STRICT));
+    }
 
     @Test
     void testGetProjectDeploymentIds() throws Exception {
