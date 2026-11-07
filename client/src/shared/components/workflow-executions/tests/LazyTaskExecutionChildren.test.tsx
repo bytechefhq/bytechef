@@ -208,6 +208,61 @@ describe('LazyTaskExecutionChildren', () => {
         expect(screen.queryByText(/more iterations\.\.\./)).not.toBeInTheDocument();
     });
 
+    it('labels each lazily loaded graph child with its node name and visit number', () => {
+        const graphTaskExecution = {
+            id: '8',
+            jobId: '7',
+            priority: 0,
+            status: 'COMPLETED',
+            title: 'Graph',
+            type: 'graph/v1',
+        } as TaskExecution;
+
+        const visitedNodeNames = ['node_a', 'node_b', 'node_a'];
+
+        hoisted.useGetWorkflowExecutionTaskExecutionChildrenInfiniteQuery.mockReturnValue({
+            data: {
+                pages: [
+                    TaskExecutionChildrenPageFromJSON({
+                        children: visitedNodeNames.map((visitedNodeName, index) => ({
+                            childCount: 0,
+                            id: `${300 + index}`,
+                            jobId: '7',
+                            priority: 0,
+                            status: 'COMPLETED',
+                            title: `Visit task ${index + 1}`,
+                            workflowTask: {name: visitedNodeName, type: 'var/v1/set'},
+                        })),
+                        iterations: [],
+                        number: 0,
+                        numberOfElements: 3,
+                        size: 50,
+                        totalElements: 3,
+                        totalPages: 1,
+                    }),
+                ],
+            },
+            fetchNextPage: vi.fn(),
+            hasNextPage: false,
+            isFetchNextPageError: false,
+            isFetchingNextPage: false,
+            isLoading: false,
+        });
+
+        render(
+            <LazyTaskExecutionChildren
+                lazy={{workflowExecutionId: 9}}
+                onExecutionClick={vi.fn()}
+                parentTaskExecution={graphTaskExecution}
+                selectedExecutionKey=""
+            />
+        );
+
+        expect(screen.getByText('node_a (visit 1)')).toBeInTheDocument();
+        expect(screen.getByText('node_b (visit 1)')).toBeInTheDocument();
+        expect(screen.getByText('node_a (visit 2)')).toBeInTheDocument();
+    });
+
     it('loadsNextPageWhenSentinelIsVisible', () => {
         const fetchNextPage = mockQueryResult({hasNextPage: true, iterationCount: 50, totalElements: 60});
 
