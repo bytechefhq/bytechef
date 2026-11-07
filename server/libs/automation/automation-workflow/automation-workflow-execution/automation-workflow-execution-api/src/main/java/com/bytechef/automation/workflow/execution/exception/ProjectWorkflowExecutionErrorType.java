@@ -28,6 +28,8 @@ public class ProjectWorkflowExecutionErrorType extends AbstractErrorType {
         new ProjectWorkflowExecutionErrorType(100);
     public static final ProjectWorkflowExecutionErrorType LIST_WORKFLOW_EXECUTIONS =
         new ProjectWorkflowExecutionErrorType(101);
+    public static final ProjectWorkflowExecutionErrorType SIMULATE_WORKFLOW =
+        new ProjectWorkflowExecutionErrorType(102);
 
     private ProjectWorkflowExecutionErrorType(int errorKey) {
         super(WorkflowExecutionDTO.class, errorKey);
