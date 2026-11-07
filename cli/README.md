@@ -23,6 +23,13 @@ Every value can be overridden per command, in this precedence:
 ## Automation commands
 
 ```bash
+# List workflow executions (uses the profile's workspace-id unless overridden)
+# Filters: --status --project-id --project-deployment-id --workflow-id --start-date --end-date --page
+bytechef automation execution list --status COMPLETED --start-date 2026-01-01T00:00:00Z --output table
+
+# Fetch a single execution with full inputs/outputs/task detail
+bytechef automation execution get --id 42
+
 # Deploy a code-based project archive
 bytechef automation project deploy --workspace-id 1 --project-file ./project.zip
 
@@ -32,6 +39,10 @@ bytechef automation project pull --id 5
 
 Requests are sent to `<host>/api/automation/v1` with `Authorization: Bearer <token>` and
 `X-Environment: <environment>` headers.
+
+The execution commands need an automation API key. `execution list` returns only executions of the API key's own
+workspace (`--workspace-id` must be that workspace), and both commands return only executions of the environment
+the API key was created in.
 
 ## API collection commands
 
@@ -151,7 +162,9 @@ bytechef embedded workflow update-from-prompt --external-user-id user-42 --workf
 bytechef embedded workflow copy-template --external-user-id user-42 --workflow-uuid tmpl-1
 bytechef embedded workflow set-connection --external-user-id user-42 --workflow-uuid wf-1 --node-name n1 --connection-key c1 --data @conn.json
 
-# Tools and actions
+# Executions, tools and actions
+bytechef embedded execution list --external-user-id user-42
+bytechef embedded execution get --external-user-id user-42 --id 12
 bytechef embedded tool list --external-user-id user-42
 bytechef embedded tool execute --external-user-id user-42 --data '{"name":"my_tool"}'
 bytechef embedded action execute --external-user-id user-42 --component-name slack \
@@ -164,8 +177,15 @@ bytechef embedded connection list --external-user-id user-42 --component-name sl
 
 Commands that take a request body accept `--data` as either literal JSON or `@path/to/file.json`.
 List commands accept `--output table` for a compact summary (JSON is the default), plus the API's
-filter flags: `tool list` takes `--categories/--components/--tools`, and `connection list` takes
-`--connection-ids` (comma-separated).
+filter flags: `execution list` takes `--status/--start-date/--end-date/--integration-instance-configuration-id`,
+`tool list` takes `--categories/--components/--tools`, and `connection list` takes `--connection-ids`
+(comma-separated). The execution commands return only executions of the connected user's own integration
+instances.
+
+`cli/clients/embedded-execution/openapi.yaml` is a copy of
+`server/ee/libs/embedded/embedded-execution/embedded-execution-public-rest/openapi.yaml` with the `Environment`
+schema inlined. When the server spec changes, copy it again, inline `Environment`, and run
+`./gradlew :cli:clients:embedded-execution:generateClient`.
 
 The **frontend** variants of the embedded API (connected-user session token, for the browser SDK) and
 the AI Gateway and webhook endpoints are intentionally not exposed as CLI commands — their auth or
