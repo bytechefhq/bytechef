@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import java.util.List;
 
 /**
@@ -26,4 +27,7 @@ public interface CustomProjectDeploymentRepository {
 
     List<ProjectDeployment> findAllProjectDeployments(
         Boolean embedded, Integer environment, Long projectId, Long tagId, Long workspaceId);
+
+    List<Long> findAllOwnedProjectDeploymentIds(
+        ProjectDeploymentOwner projectDeploymentOwner, Integer environment, long workspaceId);
 }

@@ -18,6 +18,7 @@ package com.bytechef.automation.workflow.execution.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.domain.Job.Status;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionChildrenPageModel;
@@ -25,6 +26,7 @@ import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionMode
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.ConstraintViolationException;
 import java.time.OffsetDateTime;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -90,17 +92,26 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
 
     @Override
     public ResponseEntity<Page> getWorkflowExecutionsPage(
-        Long workspaceId, Boolean embedded, Long environmentId, String jobStatus, OffsetDateTime jobStartDate,
-        OffsetDateTime jobEndDate, Long projectId, Long projectDeploymentId, Long connectedUserId, String workflowId,
-        Integer projectVersion, Integer pageNumber) {
+        Long workspaceId, Boolean embedded, Long environmentId, String source, String jobStatus,
+        OffsetDateTime jobStartDate, OffsetDateTime jobEndDate, Long projectId, Long projectDeploymentId,
+        Long connectedUserId, String workflowId, Integer projectVersion, Integer pageNumber) {
 
         return ResponseEntity.ok(
             projectWorkflowExecutionFacade
                 .getWorkflowExecutions(
-                    embedded, environmentId, jobStatus == null ? null : Status.valueOf(jobStatus),
+                    embedded, environmentId, toProjectDeploymentOwner(source),
+                    jobStatus == null ? null : Status.valueOf(jobStatus),
                     jobStartDate == null ? null : jobStartDate.toInstant(),
                     jobEndDate == null ? null : jobEndDate.toInstant(), projectId, projectDeploymentId,
                     connectedUserId, workflowId, projectVersion, workspaceId, pageNumber));
+    }
+
+    private static @Nullable ProjectDeploymentOwner toProjectDeploymentOwner(@Nullable String source) {
+        if (source == null || source.equals("PROJECT")) {
+            return null;
+        }
+
+        return ProjectDeploymentOwner.valueOf(source);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

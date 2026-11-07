@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
@@ -242,7 +243,7 @@ class WorkflowExecutionApiControllerIntTest {
             33L, null, null, null, null, null, null, List.of(), 0L);
 
         when(projectWorkflowExecutionFacade.getWorkflowExecutions(
-            null, null, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L, 0))
+            null, null, null, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L, 0))
                 .thenReturn(new PageImpl<>(List.of(workflowExecutionDTO), PageRequest.of(0, 20), 1));
 
         mockMvc.perform(
@@ -257,7 +258,39 @@ class WorkflowExecutionApiControllerIntTest {
             .andExpect(jsonPath("$.content[0].id").value(33));
 
         verify(projectWorkflowExecutionFacade).getWorkflowExecutions(
-            null, null, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L, 0);
+            null, null, null, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L, 0);
+    }
+
+    @Test
+    void getWorkflowExecutionsPagePassesTheSourceAsTheProjectDeploymentOwner() throws Exception {
+        when(projectWorkflowExecutionFacade.getWorkflowExecutions(
+            null, null, ProjectDeploymentOwner.MCP_SERVER, null, null, null, null, null, null, null, null, 1L, 0))
+                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
+
+        mockMvc.perform(
+            get("/internal/workspaces/1/workflow-executions")
+                .queryParam("source", "MCP_SERVER")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        verify(projectWorkflowExecutionFacade).getWorkflowExecutions(
+            null, null, ProjectDeploymentOwner.MCP_SERVER, null, null, null, null, null, null, null, null, 1L, 0);
+    }
+
+    @Test
+    void getWorkflowExecutionsPageTreatsTheProjectSourceAsNoProjectDeploymentOwner() throws Exception {
+        when(projectWorkflowExecutionFacade.getWorkflowExecutions(
+            null, null, null, null, null, null, null, null, null, null, null, 1L, 0))
+                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
+
+        mockMvc.perform(
+            get("/internal/workspaces/1/workflow-executions")
+                .queryParam("source", "PROJECT")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        verify(projectWorkflowExecutionFacade).getWorkflowExecutions(
+            null, null, null, null, null, null, null, null, null, null, null, 1L, 0);
     }
 
     @Configuration
