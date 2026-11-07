@@ -212,8 +212,9 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskToolCallbacks(
             readProjectTools, readProjectWorkflowTools, workflowExecutionTools, componentToolsProvider(),
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
-            aiAgentToolCallbacksFactoryProvider(), availableProvider(aiAgentFacade), interactivePickerToolCallbacks,
-            projectWorkflowFacade, chatService, chatAccessPolicy,
+            aiAgentToolCallbacksFactoryProvider(), absentProvider(), absentProvider(), absentProvider(),
+            availableProvider(aiAgentFacade), interactivePickerToolCallbacks, projectWorkflowFacade, chatService,
+            chatAccessPolicy,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
 
@@ -231,8 +232,9 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubBuildToolCallbacks(
             projectTools, projectWorkflowLifecycleTools, workflowExecutionTools, componentToolsProvider(),
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
-            aiAgentToolCallbacksFactoryProvider(), availableProvider(aiAgentFacade), interactivePickerToolCallbacks,
-            intelligentToolCatalog, workspaceFacade, projectWorkflowFacade,
+            aiAgentToolCallbacksFactoryProvider(), absentProvider(), absentProvider(), absentProvider(),
+            availableProvider(aiAgentFacade), interactivePickerToolCallbacks, intelligentToolCatalog, workspaceFacade,
+            projectWorkflowFacade,
             projectDeploymentFacade, chatService, chatAccessPolicy, artifactRecorder, policy,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
@@ -320,6 +322,11 @@ public final class AiHubAgentFixtures {
 
     @SuppressWarnings("unchecked")
     private static ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchAdvisorProvider() {
+        return mock(ObjectProvider.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ObjectProvider<T> absentProvider() {
         return mock(ObjectProvider.class);
     }
 
