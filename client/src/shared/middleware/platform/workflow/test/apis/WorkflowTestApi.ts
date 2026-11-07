@@ -13,6 +13,22 @@
  */
 
 import * as runtime from '../runtime';
+import {
+    type WorkflowTestVoiceSessionToken,
+    WorkflowTestVoiceSessionTokenFromJSON,
+    WorkflowTestVoiceSessionTokenToJSON,
+} from '../models/WorkflowTestVoiceSessionToken';
+
+export interface IssueWorkflowTestVoiceSessionTokenRequest {
+    /**
+     * Id of the workflow to test.
+     */
+    workflowId: string;
+    /**
+     * Id of the environment the test session runs in. The token is bound to it.
+     */
+    environmentId: number;
+}
 
 export interface StopWorkflowTestRequest {
     /**
@@ -25,6 +41,64 @@ export interface StopWorkflowTestRequest {
  * 
  */
 export class WorkflowTestApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for issueWorkflowTestVoiceSessionToken without sending the request
+     */
+    async issueWorkflowTestVoiceSessionTokenRequestOpts(requestParameters: IssueWorkflowTestVoiceSessionTokenRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['workflowId'] == null) {
+            throw new runtime.RequiredError(
+                'workflowId',
+                'Required parameter "workflowId" was null or undefined when calling issueWorkflowTestVoiceSessionToken().'
+            );
+        }
+
+        if (requestParameters['environmentId'] == null) {
+            throw new runtime.RequiredError(
+                'environmentId',
+                'Required parameter "environmentId" was null or undefined when calling issueWorkflowTestVoiceSessionToken().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/workflow-tests/{workflowId}/voice-session-token`;
+        urlPath = urlPath.replace('{workflowId}', encodeURIComponent(String(requestParameters['workflowId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Mint a single-use, short-lived token authorizing a browser to open a workflow-test voice WebSocket at /internal/workflow-tests/{workflowId}/wss. The token is keyed to the user\'s session cookie at mint time; the WS upgrade validates the token and discards it. TTL is 60 seconds.
+     * Issue workflow-test voice session token
+     */
+    async issueWorkflowTestVoiceSessionTokenRaw(requestParameters: IssueWorkflowTestVoiceSessionTokenRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestVoiceSessionToken>> {
+        const requestOptions = await this.issueWorkflowTestVoiceSessionTokenRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestVoiceSessionTokenFromJSON(jsonValue));
+    }
+
+    /**
+     * Mint a single-use, short-lived token authorizing a browser to open a workflow-test voice WebSocket at /internal/workflow-tests/{workflowId}/wss. The token is keyed to the user\'s session cookie at mint time; the WS upgrade validates the token and discards it. TTL is 60 seconds.
+     * Issue workflow-test voice session token
+     */
+    async issueWorkflowTestVoiceSessionToken(requestParameters: IssueWorkflowTestVoiceSessionTokenRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestVoiceSessionToken> {
+        const response = await this.issueWorkflowTestVoiceSessionTokenRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for stopWorkflowTest without sending the request

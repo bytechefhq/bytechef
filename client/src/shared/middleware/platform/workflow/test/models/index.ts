@@ -11,4 +11,5 @@ export * from './Webhook';
 export * from './WebhookRetry';
 export * from './WorkflowTask';
 export * from './WorkflowTestExecution';
+export * from './WorkflowTestVoiceSessionToken';
 export * from './WorkflowTrigger';

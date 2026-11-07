@@ -30,6 +30,14 @@ export interface WorkflowTrigger {
     /**
      * 
      */
+    readonly clusterRoot?: boolean;
+    /**
+     * 
+     */
+    readonly clusterElements?: { [key: string]: any; };
+    /**
+     * 
+     */
     readonly connections?: Array<ComponentConnection>;
     /**
      * The description of the task.
@@ -80,6 +88,8 @@ export function WorkflowTriggerFromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
+        'clusterRoot': json['clusterRoot'] == null ? undefined : json['clusterRoot'],
+        'clusterElements': json['clusterElements'] == null ? undefined : json['clusterElements'],
         'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(ComponentConnectionFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
         'label': json['label'] == null ? undefined : json['label'],
@@ -95,7 +105,7 @@ export function WorkflowTriggerToJSON(json: any): WorkflowTrigger {
     return WorkflowTriggerToJSONTyped(json, false);
 }
 
-export function WorkflowTriggerToJSONTyped(value?: Omit<WorkflowTrigger, 'connections'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowTriggerToJSONTyped(value?: Omit<WorkflowTrigger, 'clusterRoot'|'clusterElements'|'connections'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
