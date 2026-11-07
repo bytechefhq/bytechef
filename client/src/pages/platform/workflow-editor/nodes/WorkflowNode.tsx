@@ -8,7 +8,7 @@ import {getDataPillIconSource} from '@/pages/platform/workflow-editor/components
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {getNodeLabel} from '@/pages/platform/workflow-editor/utils/getNodeLabel';
 import renderDataPillsInNodeDescription from '@/pages/platform/workflow-editor/utils/renderDataPillsInNodeDescription';
-import {NODE_WIDTH} from '@/shared/constants';
+import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, NODE_WIDTH} from '@/shared/constants';
 import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -26,6 +26,7 @@ import {
     getFilteredClusterElementTypes,
     getHandlePosition,
 } from '../../cluster-element-editor/utils/clusterElementsUtils';
+import ConditionCaseRunCount from '../edges/ConditionCaseRunCount';
 import useCanvasDropzone from '../hooks/useCanvasDropzone';
 import useDisabledTaskNames from '../hooks/useDisabledTaskNames';
 import useNodeClickHandler from '../hooks/useNodeClick';
@@ -550,9 +551,21 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
 
             {data.name.includes('condition') && effectiveDirection === 'TB' && (
                 <div className="absolute bottom-0 left-0 font-bold text-muted-foreground">
-                    <span className="absolute -bottom-7 -left-16">TRUE</span>
+                    <span className="absolute -bottom-7 -left-16 whitespace-nowrap">
+                        TRUE
+                        <ConditionCaseRunCount
+                            conditionCase={CONDITION_CASE_TRUE}
+                            conditionName={data.workflowNodeName}
+                        />
+                    </span>
 
-                    <span className="absolute -bottom-7 left-24">FALSE</span>
+                    <span className="absolute -bottom-7 left-24 whitespace-nowrap">
+                        FALSE
+                        <ConditionCaseRunCount
+                            conditionCase={CONDITION_CASE_FALSE}
+                            conditionName={data.workflowNodeName}
+                        />
+                    </span>
                 </div>
             )}
 

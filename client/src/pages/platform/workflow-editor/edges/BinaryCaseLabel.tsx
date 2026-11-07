@@ -1,5 +1,6 @@
 import {EdgeLabelRenderer} from '@xyflow/react';
 
+import ConditionCaseRunCount from './ConditionCaseRunCount';
 import {BinaryCaseLabelAnchorType, BinaryCaseLabelI} from './computeBinaryCaseLabel';
 
 const SELF_ANCHOR_BY_ANCHOR: Record<BinaryCaseLabelAnchorType, string> = {
@@ -20,6 +21,13 @@ export default function BinaryCaseLabel({edgeId, label}: BinaryCaseLabelProps) {
                 style={{transform: `translate(${label.x}px, ${label.y}px) ${SELF_ANCHOR_BY_ANCHOR[label.anchor]}`}}
             >
                 {label.text}
+
+                {label.conditionCase && (
+                    <ConditionCaseRunCount
+                        conditionCase={label.conditionCase.caseName}
+                        conditionName={label.conditionCase.conditionName}
+                    />
+                )}
             </span>
         </EdgeLabelRenderer>
     );

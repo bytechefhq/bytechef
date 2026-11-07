@@ -17,7 +17,13 @@ describe('computeBinaryCaseLabel', () => {
                 sourceHandleId: `${CONDITION_TOP_GHOST}-left`,
             });
 
-            expect(result).toEqual({anchor: 'bottomCenter', text: 'TRUE', x: 100, y: 384});
+            expect(result).toEqual({
+                anchor: 'bottomCenter',
+                conditionCase: {caseName: 'caseTrue', conditionName: 'condition_1'},
+                text: 'TRUE',
+                x: 100,
+                y: 384,
+            });
         });
 
         it('puts FALSE below the lower arm, centered on the bar and clear of the "+" button', () => {
@@ -28,7 +34,13 @@ describe('computeBinaryCaseLabel', () => {
                 sourceHandleId: `${CONDITION_TOP_GHOST}-right`,
             });
 
-            expect(result).toEqual({anchor: 'topCenter', text: 'FALSE', x: 100, y: 416});
+            expect(result).toEqual({
+                anchor: 'topCenter',
+                conditionCase: {caseName: 'caseFalse', conditionName: 'condition_1'},
+                text: 'FALSE',
+                x: 100,
+                y: 416,
+            });
         });
     });
 
@@ -58,6 +70,8 @@ describe('computeBinaryCaseLabel', () => {
         });
 
         expect(tryLabel?.text).toBe('TRY');
+        expect(tryLabel?.conditionCase).toBeUndefined();
+        expect(catchLabel?.conditionCase).toBeUndefined();
         expect(catchLabel?.text).toBe('CATCH');
     });
 

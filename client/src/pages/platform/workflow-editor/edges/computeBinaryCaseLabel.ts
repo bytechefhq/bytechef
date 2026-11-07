@@ -1,4 +1,4 @@
-import {LayoutDirectionType} from '@/shared/constants';
+import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, LayoutDirectionType} from '@/shared/constants';
 
 interface ComputeBinaryCaseLabelProps {
     layoutDirection: LayoutDirectionType;
@@ -10,8 +10,14 @@ interface ComputeBinaryCaseLabelProps {
 
 export type BinaryCaseLabelAnchorType = 'bottomCenter' | 'topCenter';
 
+export interface BinaryCaseLabelConditionCaseI {
+    caseName: string;
+    conditionName: string;
+}
+
 export interface BinaryCaseLabelI {
     anchor: BinaryCaseLabelAnchorType;
+    conditionCase?: BinaryCaseLabelConditionCaseI;
     text: string;
     x: number;
     y: number;
@@ -20,9 +26,11 @@ export interface BinaryCaseLabelI {
 // Case names of the two-armed dispatchers, keyed by the top-bar id suffix.
 // The bar's `-left` handle feeds the first case (TRUE / TRY) — the left arm
 // in TB, the upper arm in LR — and `-right` feeds the second.
+const CONDITION_TOP_GHOST_SUFFIX = '-condition-top-ghost';
+
 const CASE_TEXTS_BY_TOP_GHOST_SUFFIX: Record<string, [string, string]> = {
-    '-condition-top-ghost': ['TRUE', 'FALSE'],
     '-onError-top-ghost': ['TRY', 'CATCH'],
+    [CONDITION_TOP_GHOST_SUFFIX]: ['TRUE', 'FALSE'],
 };
 
 // The arm's "+" button (24px, centered on the line midway along the 94px
@@ -57,11 +65,20 @@ export default function computeBinaryCaseLabel({
         return undefined;
     }
 
-    const [firstCaseText, secondCaseText] = caseTextsEntry[1];
+    const [topGhostSuffix, [firstCaseText, secondCaseText]] = caseTextsEntry;
     const text = isFirstCase ? firstCaseText : secondCaseText;
+
+    const conditionCase =
+        topGhostSuffix === CONDITION_TOP_GHOST_SUFFIX
+            ? {
+                  caseName: isFirstCase ? CONDITION_CASE_TRUE : CONDITION_CASE_FALSE,
+                  conditionName: source.slice(0, -CONDITION_TOP_GHOST_SUFFIX.length),
+              }
+            : undefined;
 
     return {
         anchor: isFirstCase ? 'bottomCenter' : 'topCenter',
+        ...(conditionCase && {conditionCase}),
         text,
         x: sourceX,
         y: isFirstCase ? targetY - BUTTON_CLEARANCE : targetY + BUTTON_CLEARANCE,
