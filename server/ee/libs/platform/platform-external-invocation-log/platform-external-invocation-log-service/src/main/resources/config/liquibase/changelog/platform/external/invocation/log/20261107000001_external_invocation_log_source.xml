@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20261107000001-1" author="Ivica Cardic">
+        <renameColumn tableName="external_invocation_log" oldColumnName="surface" newColumnName="source"
+                      columnDataType="INT"/>
+    </changeSet>
+
+    <changeSet id="20261107000001-2" author="Ivica Cardic">
+        <update tableName="external_invocation_log">
+            <column name="source" valueComputed="source - 1"/>
+            <where>source &gt;= 1</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>
