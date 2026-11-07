@@ -11,7 +11,10 @@ import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.ee.embedded.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
+import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionScopeDTO;
 import java.time.Instant;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 
 /**
@@ -38,4 +41,9 @@ public interface IntegrationWorkflowExecutionFacade {
     Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate, Long integrationId,
         Long integrationInstanceConfigurationId, Long connectedUserId, String workflowId, int pageNumber);
+
+    List<WorkflowExecutionDTO> getWorkflowExecutions(List<Long> jobIds);
+
+    @Nullable
+    WorkflowExecutionScopeDTO getWorkflowExecutionScope(@Nullable Long environmentId, @Nullable Long connectedUserId);
 }
