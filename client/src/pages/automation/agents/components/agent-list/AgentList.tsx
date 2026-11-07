@@ -114,7 +114,6 @@ const AgentProjectGroup = ({projectGroup}: {projectGroup: AgentProjectGroupI}) =
                                     </Badge>
 
                                     <ProjectDeploymentDialog
-                                        environmentEditable={true}
                                         onOpenChange={setIsProjectDeploymentDialogOpen}
                                         projectDeployment={{
                                             name: project.name,
