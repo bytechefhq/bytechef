@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,11 +43,19 @@ public class CatalogToolIndex implements ToolIndex {
 
     private final VectorStore vectorStore;
     private final Set<String> catalogSessionIds;
+    private final @Nullable UnaryOperator<String> userSessionIdFunction;
+
+    public CatalogToolIndex(VectorStore vectorStore, Set<String> catalogSessionIds) {
+        this(vectorStore, catalogSessionIds, null);
+    }
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public CatalogToolIndex(VectorStore vectorStore, Set<String> catalogSessionIds) {
+    public CatalogToolIndex(
+        VectorStore vectorStore, Set<String> catalogSessionIds, @Nullable UnaryOperator<String> userSessionIdFunction) {
+
         this.vectorStore = vectorStore;
         this.catalogSessionIds = Set.copyOf(catalogSessionIds);
+        this.userSessionIdFunction = userSessionIdFunction;
     }
 
     @Override
@@ -76,6 +85,12 @@ public class CatalogToolIndex implements ToolIndex {
     @Override
     public ToolSearchResponse search(ToolSearchRequest toolSearchRequest) {
         List<String> sessionIds = new ArrayList<>(catalogSessionIds);
+
+        String requestSessionId = toolSearchRequest.sessionId();
+
+        if (userSessionIdFunction != null && requestSessionId != null && !requestSessionId.isBlank()) {
+            sessionIds.add(userSessionIdFunction.apply(requestSessionId));
+        }
 
         Integer maxResults = toolSearchRequest.maxResults();
         int perSessionTopK = maxResults != null ? maxResults : 10;

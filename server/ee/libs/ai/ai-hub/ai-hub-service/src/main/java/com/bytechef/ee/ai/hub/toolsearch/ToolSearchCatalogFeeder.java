@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.hub.toolsearch;
 
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
+import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.ToolNameNormalizer;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -20,6 +21,7 @@ import java.util.Comparator;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -118,6 +120,47 @@ public class ToolSearchCatalogFeeder {
         populateSession(
             CLUSTER_ELEMENT_READ_SESSION_ID, List.copyOf(readOnlyEntries.values()), readOnlyEntries.size());
         populateSession(CLUSTER_ELEMENT_WRITE_SESSION_ID, List.copyOf(writeEntries.values()), writeEntries.size());
+    }
+
+    public static String userSessionId(Mode mode, String threadId) {
+        return CATALOG_SESSION_ID + ":user:" + mode.name()
+            .toLowerCase(Locale.ROOT) + ":" + threadId;
+    }
+
+    public void populateUserTools(String sessionId, List<ToolCallback> toolCallbacks) {
+        List<CatalogEntry> entries = new ArrayList<>();
+
+        for (ToolCallback toolCallback : toolCallbacks) {
+            ToolDefinition toolDefinition = toolCallback.getToolDefinition();
+            String summary = toolDefinition.description();
+
+            entries.add(
+                new CatalogEntry(
+                    toolDefinition.name(), summary == null || summary.isBlank() ? toolDefinition.name() : summary));
+        }
+
+        if (entries.isEmpty()) {
+            ensureMetaTable();
+
+            if (readStoredHash(sessionId).isEmpty()) {
+                return;
+            }
+        }
+
+        populateSession(sessionId, entries, toolCallbacks.size());
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public void clearUserSessions(String threadId) {
+        ensureMetaTable();
+
+        for (Mode mode : Mode.values()) {
+            String sessionId = userSessionId(mode, threadId);
+
+            clearSession(sessionId);
+
+            pgVectorJdbcTemplate.update("DELETE FROM " + qualifiedMetaTableName + " WHERE session_id = ?", sessionId);
+        }
     }
 
     static @Nullable String buildSummary(ClusterElementDefinition clusterElementDefinition) {

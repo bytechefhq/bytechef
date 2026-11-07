@@ -20,6 +20,8 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.util.JsonSchemaGeneratorUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,9 @@ public class ClusterElementToolCallback implements ToolCallback {
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final CopilotConnectionLister connectionLister;
+    private final @Nullable Long pinnedConnectionId;
+    private final Map<String, ?> pinnedParameters;
+    private final boolean requiresApproval;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ClusterElementToolCallback(
@@ -61,6 +66,24 @@ public class ClusterElementToolCallback implements ToolCallback {
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ConnectionDefinitionService connectionDefinitionService, CopilotConnectionLister connectionLister) {
 
+        this(
+            toolName, description, componentName, componentVersion, clusterElementName,
+            clusterElementDefinitionService, clusterElementDefinitionFacade, connectionDefinitionService,
+            connectionLister, null, Map.of(), false);
+    }
+
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public ClusterElementToolCallback(
+        String toolName, String description, String componentName, int componentVersion, String clusterElementName,
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade,
+        ConnectionDefinitionService connectionDefinitionService, CopilotConnectionLister connectionLister,
+        @Nullable Long pinnedConnectionId, @Nullable Map<String, ?> pinnedParameters, boolean requiresApproval) {
+
+        this.pinnedConnectionId = pinnedConnectionId;
+        this.pinnedParameters =
+            pinnedParameters == null ? Map.of() : Collections.unmodifiableMap(new HashMap<>(pinnedParameters));
+        this.requiresApproval = requiresApproval;
         this.toolName = toolName;
         this.description = description;
         this.componentName = componentName;
@@ -99,6 +122,14 @@ public class ClusterElementToolCallback implements ToolCallback {
         return clusterElementName;
     }
 
+    public @Nullable Long getPinnedConnectionId() {
+        return pinnedConnectionId;
+    }
+
+    public boolean isRequiresApproval() {
+        return requiresApproval;
+    }
+
     @Override
     public String call(String toolInput) {
         return call(toolInput, null);
@@ -108,9 +139,13 @@ public class ClusterElementToolCallback implements ToolCallback {
     @SuppressWarnings("unchecked")
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            Map<String, Object> inputParameters = toolInput == null || toolInput.isBlank()
+            Map<String, Object> llmParameters = toolInput == null || toolInput.isBlank()
                 ? Map.of()
                 : JsonUtils.read(toolInput, Map.class);
+
+            Map<String, Object> inputParameters = new HashMap<>(pinnedParameters);
+
+            inputParameters.putAll(llmParameters);
 
             AgentToolInvocationContext invocationContext = AgentToolInvocationContext.fromToolContext(toolContext);
 
@@ -150,6 +185,10 @@ public class ClusterElementToolCallback implements ToolCallback {
 
         List<CopilotConnection> connections = connectionLister.listConnections(request);
 
+        if (pinnedConnectionId != null) {
+            return resolvePinnedConnection(connections);
+        }
+
         if (connections.isEmpty()) {
             Map<String, Object> envelope = new LinkedHashMap<>();
 
@@ -185,6 +224,26 @@ public class ClusterElementToolCallback implements ToolCallback {
         CopilotConnection connection = connections.getFirst();
 
         return new ConnectionResolution(connection.id(), null);
+    }
+
+    private ConnectionResolution resolvePinnedConnection(List<CopilotConnection> connections) {
+        for (CopilotConnection connection : connections) {
+            if (pinnedConnectionId.equals(connection.id())) {
+                return new ConnectionResolution(connection.id(), null);
+            }
+        }
+
+        Map<String, Object> envelope = new LinkedHashMap<>();
+
+        envelope.put("connectionRequired", true);
+        envelope.put("componentName", componentName);
+        envelope.put("componentVersion", componentVersion);
+        envelope.put(
+            "message",
+            "The connection configured for " + toolName + " is not available in this workspace and environment. " +
+                "Ask the user to reconnect the '" + componentName + "' connector.");
+
+        return new ConnectionResolution(null, JsonUtils.write(envelope));
     }
 
     private boolean definesConnection() {

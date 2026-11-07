@@ -30,6 +30,9 @@ import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGateToolCallback;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
+import com.bytechef.ee.ai.hub.toolsearch.ClusterElementToolCallback;
+import com.bytechef.ee.ai.hub.toolsearch.PinnedToolSearchToolCallingAdvisor;
+import com.bytechef.ee.ai.hub.toolsearch.PinnedToolSearchToolCallingAdvisor.UserToolCallbacks;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
@@ -39,6 +42,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -94,6 +98,14 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         ChatClient resolve(State state);
     }
 
+    @FunctionalInterface
+    public interface ChatToolBindingResolver {
+
+        List<ToolCallback> resolve(String threadId, long senderUserId, Mode mode);
+    }
+
+    private final @Nullable AiHubApprovalGate approvalGate;
+    private final @Nullable ChatToolBindingResolver chatToolBindingResolver;
     private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
     private final @Nullable Mode mode;
     private final List<ToolCallback> pinnedToolCallbacks;
@@ -104,6 +116,8 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
     protected AiHubSpringAIAgent(final Builder builder) throws AGUIException {
         super(builder);
 
+        this.approvalGate = builder.approvalGate;
+        this.chatToolBindingResolver = builder.chatToolBindingResolver;
         this.overrideChatClientResolver = builder.overrideChatClientResolver;
         this.mode = builder.mode;
         this.pinnedToolCallbacks = List.copyOf(builder.pendingToolCallbacks);
@@ -223,7 +237,74 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
             advisorParams.put(AiHubStateKeys.ENVIRONMENT_ID, environmentOrdinal.longValue());
         }
 
+        UserToolCallbacks userToolCallbacks = resolveUserToolCallbacks(input);
+
+        if (userToolCallbacks != null) {
+            advisorParams.put(PinnedToolSearchToolCallingAdvisor.USER_TOOL_CALLBACKS_KEY, userToolCallbacks);
+        }
+
         return advisorParams;
+    }
+
+    public @Nullable ChatToolBindingResolver chatToolBindingResolver() {
+        return chatToolBindingResolver;
+    }
+
+    private @Nullable UserToolCallbacks resolveUserToolCallbacks(RunAgentInput input) {
+        State state = input.state();
+
+        String threadId = state == null ? null : asString(state.get(AiHubStateKeys.VERIFIED_THREAD_ID));
+        Long userId = state == null ? null : NumberUtils.asLong(state.get(AiHubStateKeys.AUTHENTICATED_USER_ID));
+        Mode resolvedMode = resolveModeEnum(state);
+
+        if (chatToolBindingResolver == null || threadId == null || userId == null || resolvedMode == null) {
+            return null;
+        }
+
+        List<ToolCallback> toolCallbacks;
+
+        try {
+            toolCallbacks = chatToolBindingResolver.resolve(threadId, userId, resolvedMode);
+        } catch (RuntimeException exception) {
+            log.warn(
+                "{}: resolving the chat tools of thread {} failed, so the turn runs without them", getAgentId(),
+                threadId, exception);
+
+            return null;
+        }
+
+        Map<String, ToolCallback> componentToolCallbacks = new LinkedHashMap<>();
+        Map<String, ToolCallback> additionalToolCallbacks = new LinkedHashMap<>();
+
+        for (ToolCallback toolCallback : toolCallbacks) {
+            ToolCallback wrapped =
+                AiHubToolCallbackWrappers.wrap(toolCallback, securityContextRehydrator, approvalGate);
+
+            String toolName = wrapped.getToolDefinition()
+                .name();
+
+            if (toolCallback instanceof ClusterElementToolCallback) {
+                componentToolCallbacks.putIfAbsent(toolName, wrapped);
+            } else {
+                additionalToolCallbacks.putIfAbsent(toolName, wrapped);
+            }
+        }
+
+        return new UserToolCallbacks(threadId, componentToolCallbacks, additionalToolCallbacks);
+    }
+
+    private @Nullable Mode resolveModeEnum(@Nullable State state) {
+        String resolvedMode = resolveMode(state);
+
+        if (resolvedMode == null) {
+            return null;
+        }
+
+        try {
+            return Mode.valueOf(resolvedMode);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 
     /**
@@ -478,6 +559,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         private @Nullable OverrideChatClientResolver overrideChatClientResolver;
         private @Nullable SecurityContextRehydrator securityContextRehydrator;
         private @Nullable AiHubApprovalGate approvalGate;
+        private @Nullable ChatToolBindingResolver chatToolBindingResolver;
         private @Nullable Mode mode;
         private @Nullable WebSearchToolCallbackProvider webSearchToolCallbackProvider;
         private final List<ToolCallback> pendingToolCallbacks = new ArrayList<>();
@@ -508,6 +590,13 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
         @SuppressFBWarnings("EI_EXPOSE_REP2")
         public Builder approvalGate(@Nullable AiHubApprovalGate approvalGate) {
             this.approvalGate = approvalGate;
+
+            return this;
+        }
+
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
+        public Builder chatToolBindingResolver(@Nullable ChatToolBindingResolver chatToolBindingResolver) {
+            this.chatToolBindingResolver = chatToolBindingResolver;
 
             return this;
         }

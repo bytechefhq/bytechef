@@ -50,6 +50,9 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
 
     private static final Logger log = LoggerFactory.getLogger(PinnedToolSearchToolCallingAdvisor.class);
 
+    public static final String USER_TOOL_CALLBACKS_KEY =
+        PinnedToolSearchToolCallingAdvisor.class.getName() + ".userToolCallbacks";
+
     private static final String PINNED_TOOL_CALLBACKS_KEY =
         PinnedToolSearchToolCallingAdvisor.class.getName() + ".pinnedToolCallbacks";
 
@@ -64,12 +67,24 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
 
     private final Supplier<Map<String, ToolCallback>> catalogToolCallbacksSupplier;
     private final Runnable catalogWarmUp;
+    private final UserToolIndexer userToolIndexer;
     private final AtomicBoolean toolSearchUnavailableLogged = new AtomicBoolean();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public PinnedToolSearchToolCallingAdvisor(
         ToolCallingManager toolCallingManager, ToolIndex toolIndex, int maxResults, String sessionIdKeyName,
         Supplier<Map<String, ToolCallback>> catalogToolCallbacksSupplier, Runnable catalogWarmUp) {
+
+        this(
+            toolCallingManager, toolIndex, maxResults, sessionIdKeyName, catalogToolCallbacksSupplier, catalogWarmUp,
+            (threadId, toolCallbacks) -> {});
+    }
+
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public PinnedToolSearchToolCallingAdvisor(
+        ToolCallingManager toolCallingManager, ToolIndex toolIndex, int maxResults, String sessionIdKeyName,
+        Supplier<Map<String, ToolCallback>> catalogToolCallbacksSupplier, Runnable catalogWarmUp,
+        UserToolIndexer userToolIndexer) {
 
         super(
             toolCallingManager, DEFAULT_ORDER, DEFAULT_TOOL_EXECUTION_ELIGIBILITY_CHECKER, toolIndex,
@@ -78,6 +93,19 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
 
         this.catalogToolCallbacksSupplier = catalogToolCallbacksSupplier;
         this.catalogWarmUp = catalogWarmUp;
+        this.userToolIndexer = userToolIndexer;
+    }
+
+    @FunctionalInterface
+    public interface UserToolIndexer {
+
+        void index(String threadId, List<ToolCallback> toolCallbacks);
+    }
+
+    @SuppressFBWarnings("EI")
+    public record UserToolCallbacks(
+        String threadId, Map<String, ToolCallback> componentToolCallbacks,
+        Map<String, ToolCallback> additionalToolCallbacks) {
     }
 
     @Override
@@ -230,7 +258,9 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
     private void captureRunCatalogToolCallbacks(ChatClientRequest chatClientRequest) {
         Map<String, ToolCallback> catalogToolCallbacks = catalogToolCallbacksSupplier.get();
 
-        if (catalogToolCallbacks.isEmpty()) {
+        UserToolCallbacks userToolCallbacks = userToolCallbacks(chatClientRequest);
+
+        if (catalogToolCallbacks.isEmpty() && userToolCallbacks == null) {
             return;
         }
 
@@ -242,8 +272,51 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
             runCatalogToolCallbacks.put(entry.getKey(), toolCallbackDecorator.apply(entry.getValue()));
         }
 
+        if (userToolCallbacks != null) {
+            List<ToolCallback> unindexedToolCallbacks = new ArrayList<>();
+
+            for (Map.Entry<String, ToolCallback> entry : userToolCallbacks.componentToolCallbacks()
+                .entrySet()) {
+
+                if (!catalogToolCallbacks.containsKey(entry.getKey())) {
+                    unindexedToolCallbacks.add(entry.getValue());
+                }
+
+                runCatalogToolCallbacks.put(entry.getKey(), toolCallbackDecorator.apply(entry.getValue()));
+            }
+
+            for (Map.Entry<String, ToolCallback> entry : userToolCallbacks.additionalToolCallbacks()
+                .entrySet()) {
+
+                if (!runCatalogToolCallbacks.containsKey(entry.getKey())) {
+                    unindexedToolCallbacks.add(entry.getValue());
+
+                    runCatalogToolCallbacks.put(entry.getKey(), toolCallbackDecorator.apply(entry.getValue()));
+                }
+            }
+
+            indexUserToolCallbacks(userToolCallbacks.threadId(), unindexedToolCallbacks);
+        }
+
         chatClientRequest.context()
             .put(RUN_CATALOG_TOOL_CALLBACKS_KEY, runCatalogToolCallbacks);
+    }
+
+    private void indexUserToolCallbacks(String threadId, List<ToolCallback> toolCallbacks) {
+        try {
+            userToolIndexer.index(threadId, toolCallbacks);
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Indexing the {} chat tools of thread {} failed, so tool search cannot find them this turn",
+                toolCallbacks.size(), threadId, exception);
+        }
+    }
+
+    private static @Nullable UserToolCallbacks userToolCallbacks(ChatClientRequest chatClientRequest) {
+        Object userToolCallbacks = chatClientRequest.context()
+            .get(USER_TOOL_CALLBACKS_KEY);
+
+        return userToolCallbacks instanceof UserToolCallbacks callbacks ? callbacks : null;
     }
 
     @SuppressWarnings("unchecked")

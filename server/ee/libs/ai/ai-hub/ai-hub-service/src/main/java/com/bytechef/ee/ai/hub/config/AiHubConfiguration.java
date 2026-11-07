@@ -45,6 +45,7 @@ import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.metric.WorkflowChatMetrics;
 import com.bytechef.ee.ai.hub.tool.AiHubAgentType;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
+import com.bytechef.ee.ai.hub.tool.AiHubChatToolToolCallbacks;
 import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
@@ -52,6 +53,7 @@ import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
 import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubChatBindingToolCallbackResolver;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
@@ -157,7 +159,8 @@ public class AiHubConfiguration {
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ProjectWorkflowFacade projectWorkflowFacade,
         AiHubChatService chatService, AiHubChatAccessPolicy chatAccessPolicy,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
-        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
+        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider,
+        ObjectProvider<AiHubChatToolToolCallbacks> chatToolToolCallbacksProvider) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
             List.of(ToolCallbacks.from(readProjectTools, readProjectWorkflowTools, workflowExecutionTools)));
@@ -171,6 +174,9 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, null));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
+
+        chatToolToolCallbacksProvider.ifAvailable(
+            chatToolToolCallbacks -> toolCallbacks.addAll(chatToolToolCallbacks.read()));
 
         return new AiHubModeToolCallbacks(toolCallbacks, ASK_PINNED_TOOL_NAMES);
     }
@@ -188,7 +194,8 @@ public class AiHubConfiguration {
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
         AiHubToolApprovalPolicy toolApprovalPolicy,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
-        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
+        @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider,
+        ObjectProvider<AiHubChatToolToolCallbacks> chatToolToolCallbacksProvider) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>(
             buildProjectToolCallbacks(projectTools, projectWorkflowLifecycleTools, workflowExecutionTools));
@@ -211,6 +218,9 @@ public class AiHubConfiguration {
                 (toolCallback, definition) -> new WorkspaceScopedSubAgentToolCallback(
                     new UserRequestForwardingToolCallback(toolCallback), workspaceFacade)));
 
+        chatToolToolCallbacksProvider.ifAvailable(
+            chatToolToolCallbacks -> toolCallbacks.addAll(chatToolToolCallbacks.write()));
+
         requireBuildWorkflow(toolCallbacks);
 
         return new AiHubModeToolCallbacks(toolCallbacks, BUILD_PINNED_TOOL_NAMES);
@@ -230,14 +240,15 @@ public class AiHubConfiguration {
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
         @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
-        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider)
         throws AGUIException {
 
         return buildAgent(
             AiHubAgentType.AI_HUB_ASK, Mode.ASK, promptAiHubAskResource, aiHubAskToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider);
+            toolSearchToolCallAdvisorProvider, chatBindingToolCallbackResolverProvider);
     }
 
     @Bean(defaultCandidate = false)
@@ -249,14 +260,15 @@ public class AiHubConfiguration {
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
         @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
-        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider)
         throws AGUIException {
 
         return buildAgent(
             AiHubAgentType.AI_HUB_BUILD, Mode.BUILD, promptAiHubBuildResource, aiHubBuildToolCallbacks.pinned(),
             aiHubSessionMemory, chatModel, securityContextRehydrator, approvalGate, inFlightRunRegistryProvider,
             overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider,
-            toolSearchToolCallAdvisorProvider);
+            toolSearchToolCallAdvisorProvider, chatBindingToolCallbackResolverProvider);
     }
 
     /**
@@ -480,7 +492,8 @@ public class AiHubConfiguration {
         ObjectProvider<InFlightAiHubRunRegistry> inFlightRunRegistryProvider,
         ObjectProvider<AiHubSpringAIAgent.OverrideChatClientResolver> overrideChatClientResolverProvider,
         ObjectProvider<WebSearchToolCallbackProvider> webSearchToolCallbackProviderProvider,
-        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider)
+        ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchToolCallAdvisorProvider,
+        ObjectProvider<AiHubChatBindingToolCallbackResolver> chatBindingToolCallbackResolverProvider)
         throws AGUIException {
 
         AiHubSpringAIAgent.Builder builder = AiHubSpringAIAgent.builder()
@@ -502,6 +515,7 @@ public class AiHubConfiguration {
 
         overrideChatClientResolverProvider.ifAvailable(builder::overrideChatClientResolver);
         webSearchToolCallbackProviderProvider.ifAvailable(builder::webSearchToolCallbackProvider);
+        chatBindingToolCallbackResolverProvider.ifAvailable(builder::chatToolBindingResolver);
 
         return builder.build();
     }

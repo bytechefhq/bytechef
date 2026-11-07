@@ -6,6 +6,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:platform:platform-api"))
 
     testImplementation(project(":server:libs:test:test-support"))
