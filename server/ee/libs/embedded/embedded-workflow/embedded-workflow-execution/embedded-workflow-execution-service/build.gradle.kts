@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
 
+    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-api"))
 
     testImplementation("org.springframework.data:spring-data-jdbc")

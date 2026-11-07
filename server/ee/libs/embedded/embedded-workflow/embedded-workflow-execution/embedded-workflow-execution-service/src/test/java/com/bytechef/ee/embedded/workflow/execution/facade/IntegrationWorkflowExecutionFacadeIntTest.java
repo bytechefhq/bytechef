@@ -103,8 +103,9 @@ class IntegrationWorkflowExecutionFacadeIntTest {
         classes = MethodSecurityIntTest.Config.class,
         properties = "bytechef.edition=ee")
     @MockitoBean(types = {
-        ComponentDefinitionService.class, ContextService.class, EnvironmentService.class,
-        Evaluator.class, IntegrationInstanceConfigurationService.class, IntegrationInstanceService.class,
+        ComponentDefinitionService.class, ConnectedUserService.class, ContextService.class,
+        EnvironmentService.class, Evaluator.class, IntegrationInstanceConfigurationService.class,
+        IntegrationInstanceService.class,
         IntegrationService.class, IntegrationWorkflowFacade.class, IntegrationWorkflowService.class,
         TaskDispatcherDefinitionService.class, TaskFileStorage.class, TriggerExecutionService.class,
         TriggerFileStorage.class, WorkflowService.class
@@ -160,6 +161,16 @@ class IntegrationWorkflowExecutionFacadeIntTest {
                         .isInstanceOf(AccessDeniedException.class);
 
             verifyNoInteractions(jobService, principalJobService, taskExecutionService);
+        }
+
+        @Test
+        void testConnectedUserReadsAreNotGatedOnTenantAdmin() {
+            when(permissionService.isTenantAdmin()).thenReturn(false);
+
+            assertThat(
+                integrationWorkflowExecutionFacade.getConnectedUserWorkflowExecutions(
+                    "user-1", Environment.DEVELOPMENT.ordinal(), null, null, null, null, 0))
+                        .isEmpty();
         }
 
         @Test
@@ -707,6 +718,140 @@ class IntegrationWorkflowExecutionFacadeIntTest {
 
             assertThat(taskExecutionDTO.input()).isNull();
             assertThat(taskExecutionDTO.output()).isNull();
+        }
+
+        @Test
+        void testGetConnectedUserWorkflowExecutionReturnsTheConnectedUsersOwnExecution() {
+            Job job = createConnectedUserJob("user-1");
+
+            WorkflowExecutionDTO workflowExecutionDTO = integrationWorkflowExecutionFacade
+                .getConnectedUserWorkflowExecution("user-1", Environment.DEVELOPMENT.ordinal(), getJobId(job));
+
+            assertThat(workflowExecutionDTO.id()).isEqualTo(job.getId());
+        }
+
+        @Test
+        void testGetConnectedUserWorkflowExecutionDeniesAnotherConnectedUsersExecution() {
+            createConnectedUserJob("user-1");
+
+            Job otherUserJob = createConnectedUserJob("user-2");
+
+            assertThatThrownBy(
+                () -> integrationWorkflowExecutionFacade.getConnectedUserWorkflowExecution(
+                    "user-1", Environment.DEVELOPMENT.ordinal(), getJobId(otherUserJob)))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetConnectedUserWorkflowExecutionDeniesTheSameExternalUserIdInAnotherEnvironment() {
+            Job job = createConnectedUserJob("user-1");
+
+            assertThatThrownBy(
+                () -> integrationWorkflowExecutionFacade.getConnectedUserWorkflowExecution(
+                    "user-1", Environment.PRODUCTION.ordinal(), getJobId(job)))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetConnectedUserWorkflowExecutionDeniesAnUnknownExecution() {
+            createConnectedUserJob("user-1");
+
+            assertThatThrownBy(
+                () -> integrationWorkflowExecutionFacade.getConnectedUserWorkflowExecution(
+                    "user-1", Environment.DEVELOPMENT.ordinal(), Long.MAX_VALUE))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetConnectedUserWorkflowExecutionDeniesAJobWithoutAnEmbeddedPrincipal() {
+            createConnectedUserJob("user-1");
+
+            Job job = createJob(createWorkflowId(), null);
+
+            assertThatThrownBy(
+                () -> integrationWorkflowExecutionFacade.getConnectedUserWorkflowExecution(
+                    "user-1", Environment.DEVELOPMENT.ordinal(), getJobId(job)))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetConnectedUserWorkflowExecutionsReturnsOnlyTheConnectedUsersOwnExecutions() {
+            Integration integration = createIntegration();
+
+            String workflowId = createWorkflowId();
+
+            addIntegrationWorkflow(integration, 1, workflowId, UUID.randomUUID());
+
+            IntegrationInstanceConfiguration integrationInstanceConfiguration = createIntegrationInstanceConfiguration(
+                integration);
+
+            Job job = createPrincipalJob(
+                workflowId, createIntegrationInstance("user-1", integrationInstanceConfiguration));
+
+            createPrincipalJob(workflowId, createIntegrationInstance("user-2", integrationInstanceConfiguration));
+
+            Page<WorkflowExecutionDTO> workflowExecutionPage = integrationWorkflowExecutionFacade
+                .getConnectedUserWorkflowExecutions(
+                    "user-1", Environment.DEVELOPMENT.ordinal(), null, null, null, null, 0);
+
+            assertThat(workflowExecutionPage.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactly(job.getId());
+        }
+
+        @Test
+        void testGetConnectedUserWorkflowExecutionsFiltersByTheConnectedUsersConfiguration() {
+            Integration integration = createIntegration();
+
+            String workflowId = createWorkflowId();
+
+            addIntegrationWorkflow(integration, 1, workflowId, UUID.randomUUID());
+
+            IntegrationInstanceConfiguration integrationInstanceConfiguration = createIntegrationInstanceConfiguration(
+                integration);
+            IntegrationInstanceConfiguration otherIntegrationInstanceConfiguration =
+                createIntegrationInstanceConfiguration(integration);
+
+            Job job = createPrincipalJob(
+                workflowId, createIntegrationInstance("user-1", integrationInstanceConfiguration));
+
+            createPrincipalJob(workflowId, createIntegrationInstance("user-1", otherIntegrationInstanceConfiguration));
+
+            Page<WorkflowExecutionDTO> workflowExecutionPage = integrationWorkflowExecutionFacade
+                .getConnectedUserWorkflowExecutions(
+                    "user-1", Environment.DEVELOPMENT.ordinal(), null, null, null,
+                    integrationInstanceConfiguration.getId(), 0);
+
+            assertThat(workflowExecutionPage.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactly(job.getId());
+        }
+
+        @Test
+        void testGetConnectedUserWorkflowExecutionsReturnsAnEmptyPageForAnUnknownConnectedUser() {
+            createConnectedUserJob("user-2");
+
+            Page<WorkflowExecutionDTO> workflowExecutionPage = integrationWorkflowExecutionFacade
+                .getConnectedUserWorkflowExecutions(
+                    "user-1", Environment.DEVELOPMENT.ordinal(), null, null, null, null, 0);
+
+            assertThat(workflowExecutionPage.getContent()).isEmpty();
+        }
+
+        private Job createConnectedUserJob(String externalUserId) {
+            Integration integration = createIntegration();
+
+            String workflowId = createWorkflowId();
+
+            addIntegrationWorkflow(integration, 1, workflowId, UUID.randomUUID());
+
+            return createPrincipalJob(
+                workflowId,
+                createIntegrationInstance(externalUserId, createIntegrationInstanceConfiguration(integration)));
+        }
+
+        private static long getJobId(Job job) {
+            return Objects.requireNonNull(job.getId());
         }
 
         private void addIntegrationWorkflow(

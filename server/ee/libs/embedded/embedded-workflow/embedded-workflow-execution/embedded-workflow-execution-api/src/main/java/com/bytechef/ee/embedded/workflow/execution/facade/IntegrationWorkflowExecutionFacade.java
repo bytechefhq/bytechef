@@ -21,6 +21,12 @@ import org.springframework.data.domain.Page;
  */
 public interface IntegrationWorkflowExecutionFacade {
 
+    WorkflowExecutionDTO getConnectedUserWorkflowExecution(String externalUserId, long environmentId, long id);
+
+    Page<WorkflowExecutionDTO> getConnectedUserWorkflowExecutions(
+        String externalUserId, long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long integrationInstanceConfigurationId, int pageNumber);
+
     WorkflowExecutionDTO getWorkflowExecution(long id);
 
     /**
