@@ -13,6 +13,7 @@ bytechef component init --name my-component --open-api-path ./openapi.yaml --out
 # Public API commands (store a profile first)
 bytechef configure --host https://app.bytechef.io --token <public-api-token> --environment PRODUCTION --workspace-id 1
 bytechef automation project pull --id 5
+bytechef automation execution list --output table
 bytechef embedded integration list --external-user-id user-42
 ```
 For a quick dev invocation without building the distribution, use the `run` task — but note its
