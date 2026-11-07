@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260708000001-1" author="Ivica Cardic">
+        <addColumn tableName="identity_provider">
+            <column name="mcp_automation" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mcp_management" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260708000001-2" author="Ivica Cardic">
+        <createTable tableName="identity_provider_authority_mapping">
+            <column name="identity_provider_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_group" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority" type="VARCHAR(256)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="identity_provider_authority_mapping"
+                       columnNames="identity_provider_id,external_group"/>
+
+        <addForeignKeyConstraint
+            baseTableName="identity_provider_authority_mapping"
+            baseColumnNames="identity_provider_id"
+            constraintName="fk_identity_provider_authority_mapping_identity_provider"
+            referencedTableName="identity_provider"
+            referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20260708000001-3" author="Ivica Cardic">
+        <addColumn tableName="identity_provider">
+            <column name="authorities_claim" type="VARCHAR(256)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
