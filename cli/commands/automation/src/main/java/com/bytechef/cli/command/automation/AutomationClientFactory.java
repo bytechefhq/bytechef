@@ -20,13 +20,17 @@ import com.bytechef.cli.client.automation.ApiClient;
 import com.bytechef.cli.client.automation.ApiException;
 import com.bytechef.cli.client.automation.api.ProjectCodeWorkflowApi;
 import com.bytechef.cli.client.automation.api.ProjectGitApi;
+import com.bytechef.cli.client.automation.api.WorkflowExecutionApi;
 import com.bytechef.cli.client.automationapiplatform.api.ApiCollectionApi;
 import com.bytechef.cli.client.automationapiplatform.api.ApiCollectionEndpointApi;
 import com.bytechef.cli.client.automationapp.api.AppApi;
 import com.bytechef.cli.client.automationapp.api.AppApiCollectionBindingApi;
+import com.bytechef.cli.client.automationapp.api.AppDeploymentApi;
+import com.bytechef.cli.client.automationapp.api.AppInstanceApi;
 import com.bytechef.cli.client.automationapp.api.AppWorkflowBindingApi;
 import com.bytechef.cli.client.automationapp.api.WorkspaceConnectionApi;
 import com.bytechef.cli.core.config.CliConfig;
+import com.bytechef.cli.core.config.Environment;
 import com.bytechef.cli.core.error.CliException;
 import com.bytechef.cli.core.http.AuthInterceptor;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -64,6 +68,10 @@ final class AutomationClientFactory {
         return apiClient;
     }
 
+    static WorkflowExecutionApi workflowExecutionApi(CliConfig config) {
+        return new WorkflowExecutionApi(apiClient(config));
+    }
+
     static ProjectCodeWorkflowApi projectCodeWorkflowApi(CliConfig config) {
         return new ProjectCodeWorkflowApi(apiClient(config));
     }
@@ -87,6 +95,14 @@ final class AutomationClientFactory {
 
     static AppApi appApi(CliConfig config) {
         return new AppApi(appApiClient(config));
+    }
+
+    static AppDeploymentApi appDeploymentApi(CliConfig config) {
+        return new AppDeploymentApi(appApiClient(config));
+    }
+
+    static AppInstanceApi appInstanceApi(CliConfig config) {
+        return new AppInstanceApi(appApiClient(config));
     }
 
     static AppApiCollectionBindingApi appApiCollectionBindingApi(CliConfig config) {
@@ -143,7 +159,23 @@ final class AutomationClientFactory {
         com.bytechef.cli.client.automationapp.ApiException exception, String forbiddenHint) {
 
         return toCliException(
-            exception.getCode(), exception.getMessage(), exception.getResponseBody(), forbiddenHint);
+            exception.getCode(), exception.getMessage(), exception.getResponseBody(),
+            unauthorizedHint(Environment.DEVELOPMENT), forbiddenHint);
+    }
+
+    /**
+     * Like {@link #toCliException(com.bytechef.cli.client.automationapp.ApiException)}, for a command allowed in every
+     * environment: both remedies name the profile's environment, and the one for HTTP 403 names the permission the
+     * command needs there.
+     */
+    static CliException toCliException(
+        com.bytechef.cli.client.automationapp.ApiException exception, Environment environment,
+        String requiredPermission) {
+
+        return toCliException(
+            exception.getCode(), exception.getMessage(), exception.getResponseBody(), unauthorizedHint(environment),
+            "Your role in " + environment.name() + " does not allow this; it needs the " + requiredPermission
+                + " permission. Ask a workspace admin.");
     }
 
     /**
@@ -152,11 +184,12 @@ final class AutomationClientFactory {
      */
     static CliException toCliException(com.bytechef.cli.client.automationapiplatform.ApiException exception) {
         return toCliException(
-            exception.getCode(), exception.getMessage(), exception.getResponseBody(), NEUTRAL_FORBIDDEN_HINT);
+            exception.getCode(), exception.getMessage(), exception.getResponseBody(),
+            unauthorizedHint(Environment.DEVELOPMENT), NEUTRAL_FORBIDDEN_HINT);
     }
 
     private static CliException toCliException(
-        int status, String exceptionMessage, String responseBody, String forbiddenHint) {
+        int status, String exceptionMessage, String responseBody, String unauthorizedHint, String forbiddenHint) {
 
         if (status == 0) {
             return new CliException(
@@ -167,9 +200,7 @@ final class AutomationClientFactory {
         String detail = appErrorDetail(responseBody);
 
         if (status == 401) {
-            return new CliException(
-                2, "Authentication failed (HTTP 401)" + detail + ". Use an automation API key created in DEVELOPMENT "
-                    + "(bytechef configure --environment DEVELOPMENT --token <key>).");
+            return new CliException(2, "Authentication failed (HTTP 401)" + detail + ". " + unauthorizedHint);
         }
 
         if (status == 403) {
@@ -219,6 +250,13 @@ final class AutomationClientFactory {
         }
 
         return ": " + code + ": " + message;
+    }
+
+    private static String unauthorizedHint(Environment environment) {
+        String environmentName = environment.name();
+
+        return "Use an automation API key created in " + environmentName + " (bytechef configure --environment "
+            + environmentName + " --token <key>).";
     }
 
     static CliException toCliException(int status) {
