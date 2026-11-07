@@ -831,6 +831,8 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testCreateProjectDeploymentRejectsConnectionFromAnotherEnvironment() {
+        authenticate(AuthorityConstants.ADMIN);
+
         stubScheduleConnection(Environment.PRODUCTION);
 
         assertThatThrownBy(() -> createCronInputProjectDeployment(
@@ -841,6 +843,8 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Test
     public void testUpdateProjectDeploymentWorkflowRejectsConnectionFromAnotherEnvironment() {
+        authenticate(AuthorityConstants.ADMIN);
+
         stubScheduleConnection(Environment.DEVELOPMENT);
 
         long projectDeploymentId = createCronInputProjectDeployment(
