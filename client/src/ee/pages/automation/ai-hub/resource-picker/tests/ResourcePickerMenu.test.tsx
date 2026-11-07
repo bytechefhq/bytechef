@@ -26,6 +26,7 @@ vi.mock('@/shared/queries/automation/projectWorkflows.queries', () => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useAiAgentsQuery: vi.fn(),
+    useGetAssetFilesQuery: vi.fn(),
 }));
 
 vi.mock('use-debounce', () => ({
@@ -35,15 +36,21 @@ vi.mock('use-debounce', () => ({
 const {useGetWorkspaceProjectsQuery} = await import('@/shared/queries/automation/projects.queries');
 const {useGetProjectWorkflowsQuery} = await import('@/shared/queries/automation/projectWorkflows.queries');
 
-const {useAiAgentsQuery} = await import('@/shared/middleware/graphql');
+const {useAiAgentsQuery, useGetAssetFilesQuery} = await import('@/shared/middleware/graphql');
 
 const mockUseAiAgentsQuery = vi.mocked(useAiAgentsQuery);
+const mockUseGetAssetFilesQuery = vi.mocked(useGetAssetFilesQuery);
 const mockUseGetWorkspaceProjectsQuery = vi.mocked(useGetWorkspaceProjectsQuery);
 const mockUseGetProjectWorkflowsQuery = vi.mocked(useGetProjectWorkflowsQuery);
 
 const AI_AGENTS = [
     {id: '42', title: 'Support Agent'},
     {id: '43', title: 'Sales Agent'},
+];
+
+const ASSET_FILES = [
+    {id: '7', name: 'notes.md'},
+    {id: '8', name: 'report.pdf'},
 ];
 
 const PROJECTS = [
@@ -62,6 +69,7 @@ const WORKFLOWS_BY_PROJECT: Record<number, Array<{id: string; label: string; pro
 
 const setupMocks = () => {
     mockUseAiAgentsQuery.mockReturnValue(mockQuerySuccess({aiAgents: AI_AGENTS}) as never);
+    mockUseGetAssetFilesQuery.mockReturnValue(mockQuerySuccess({assetFiles: ASSET_FILES}) as never);
     mockUseGetWorkspaceProjectsQuery.mockReturnValue(mockQuerySuccess(PROJECTS) as never);
     mockUseGetProjectWorkflowsQuery.mockImplementation(
         (projectId: number) => mockQuerySuccess(WORKFLOWS_BY_PROJECT[projectId]) as never
@@ -100,7 +108,7 @@ describe('ResourcePickerMenu', () => {
         setupMocks();
     });
 
-    it('shows the Workflows and AI Agents entries in the root menu', async () => {
+    it('shows the Workflows, AI Agents and Files entries in the root menu', async () => {
         await renderMenu();
         await openMenu();
 
@@ -109,8 +117,8 @@ describe('ResourcePickerMenu', () => {
         });
 
         expect(screen.getByText('AI Agents')).toBeInTheDocument();
+        expect(screen.getByText('Files')).toBeInTheDocument();
 
-        expect(screen.queryByText('Files')).not.toBeInTheDocument();
         expect(screen.queryByText('Data Tables')).not.toBeInTheDocument();
     });
 
@@ -128,6 +136,46 @@ describe('ResourcePickerMenu', () => {
         await openMenu();
 
         expect(mockUseAiAgentsQuery).toHaveBeenLastCalledWith({workspaceId: '1'}, {enabled: true});
+    });
+
+    describe('Files', () => {
+        it('fetches files only once the picker is open', async () => {
+            await renderMenu();
+
+            expect(mockUseGetAssetFilesQuery).toHaveBeenLastCalledWith(expect.objectContaining({workspaceId: '1'}), {
+                enabled: false,
+            });
+
+            await openMenu();
+
+            expect(mockUseGetAssetFilesQuery).toHaveBeenLastCalledWith(expect.objectContaining({workspaceId: '1'}), {
+                enabled: true,
+            });
+        });
+
+        it('fires onSelect with kind=file after picking a file from the Files list', async () => {
+            const {onSelect} = await renderMenu();
+
+            await openMenu();
+
+            await userEvent.click(screen.getByText('Files'));
+            await userEvent.click(await screen.findByText('report.pdf'));
+
+            expect(onSelect).toHaveBeenCalledWith({id: '8', kind: 'file', name: 'report.pdf'});
+        });
+
+        it('lists matching files when searching from the root menu', async () => {
+            await renderMenu();
+            await openMenu();
+
+            await userEvent.type(screen.getByPlaceholderText('Search resources…'), 'notes');
+
+            await waitFor(() => {
+                expect(screen.getByText('notes.md')).toBeInTheDocument();
+            });
+
+            expect(screen.queryByText('report.pdf')).not.toBeInTheDocument();
+        });
     });
 
     describe('AI Agents', () => {

@@ -94,6 +94,26 @@ describe('useRecordReferencedArtifacts', () => {
         });
     });
 
+    it('records an open file tab as FILE_REFERENCED without metadata', () => {
+        aiHubTabsStore.setState({
+            activeChatId: 10,
+            openTabs: [{fileId: '7', id: 'tab-file', kind: 'file', name: 'notes.md', viewMode: 'preview'}],
+        });
+
+        renderHook(() => useRecordReferencedArtifacts(10, 1), {wrapper: wrap(new QueryClient())});
+
+        expect(mutateSpy).toHaveBeenCalledWith({
+            input: {
+                artifactId: '7',
+                artifactName: 'notes.md',
+                chatId: '10',
+                kind: 'FILE_REFERENCED',
+                metadataJson: undefined,
+                workspaceId: '1',
+            },
+        });
+    });
+
     it('records a tab once across re-renders', () => {
         aiHubTabsStore.setState({activeChatId: 10, openTabs: [workflowTab]});
 

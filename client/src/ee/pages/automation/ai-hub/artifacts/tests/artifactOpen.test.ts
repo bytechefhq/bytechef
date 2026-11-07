@@ -95,6 +95,25 @@ describe('artifactOpen', () => {
         expect(isArtifactRemovable(aiAgentArtifact)).toBe(true);
     });
 
+    it('opens a file tab for a FILE_REFERENCED artifact', () => {
+        handleArtifactQuickOpen(
+            buildArtifact({artifactId: '7', artifactName: 'notes.md', kind: 'FILE_REFERENCED', metadataJson: null})
+        );
+
+        const state = aiHubTabsStore.getState();
+
+        expect(state.openTabs).toHaveLength(1);
+        expect(state.openTabs[0]).toMatchObject({fileId: '7', kind: 'file', name: 'notes.md', viewMode: 'preview'});
+        expect(state.rightPanelOpen).toBe(true);
+    });
+
+    it('is clickable and removable for FILE_REFERENCED', () => {
+        const fileArtifact = buildArtifact({artifactId: '7', kind: 'FILE_REFERENCED', metadataJson: null});
+
+        expect(isArtifactClickable(fileArtifact)).toBe(true);
+        expect(isArtifactRemovable(fileArtifact)).toBe(true);
+    });
+
     it('is removable for WORKFLOW_REFERENCED but not for the created and updated workflow kinds', () => {
         expect(isArtifactRemovable(buildArtifact({kind: 'WORKFLOW_REFERENCED'}))).toBe(true);
         expect(isArtifactRemovable(buildArtifact({kind: 'WORKFLOW_CREATED'}))).toBe(false);

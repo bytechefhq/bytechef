@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-export type ReferencedResourceKindType = 'aiAgent' | 'workflow';
+export type ReferencedResourceKindType = 'aiAgent' | 'file' | 'workflow';
 
 export interface ReferencedResourceI {
     id: string;

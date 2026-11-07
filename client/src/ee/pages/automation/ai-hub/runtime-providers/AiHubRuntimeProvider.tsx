@@ -77,6 +77,8 @@ type OpenChatTabResultType =
 
 type OpenAiAgentTabResultType = {aiAgentId: string; name: string; opened: true} | {error: string; opened: false};
 
+type OpenFileTabResultType = {fileId: string; name: string; opened: true} | {error: string; opened: false};
+
 type OpenWorkflowTabResultType =
     | {name: string; opened: true; projectId: string; projectWorkflowId: number; workflowId: string}
     | {error: string; opened: false};
@@ -94,6 +96,20 @@ const validateOpenAiAgentTabResult = (raw: unknown): OpenAiAgentTabResultType | 
 
     if (record.opened === true && typeof record.aiAgentId === 'string' && typeof record.name === 'string') {
         return {aiAgentId: record.aiAgentId, name: record.name, opened: true};
+    }
+
+    return {error: typeof record.error === 'string' ? record.error : 'tool reported opened:false', opened: false};
+};
+
+const validateOpenFileTabResult = (raw: unknown): OpenFileTabResultType | null => {
+    if (typeof raw !== 'object' || raw === null) {
+        return null;
+    }
+
+    const record = raw as Record<string, unknown>;
+
+    if (record.opened === true && typeof record.fileId === 'string' && typeof record.name === 'string') {
+        return {fileId: record.fileId, name: record.name, opened: true};
     }
 
     return {error: typeof record.error === 'string' ? record.error : 'tool reported opened:false', opened: false};
@@ -604,6 +620,26 @@ export const buildAiHubSubscriber = ({
         aiHubTabsStore.getState().openAiAgentTab({aiAgentId: parsed.aiAgentId, name: parsed.name});
     };
 
+    const openFileTab = (toolCallName: string, toolResultContent: string) => {
+        const parsed = validateOpenFileTabResult(parseJson<unknown>(toolResultContent, 'openFileTab result'));
+
+        if (parsed === null) {
+            console.warn(`[AiHub] ${toolCallName}: unparseable result`, toolResultContent);
+
+            recordToolFailure(toolCallName, 'unparseable result');
+
+            return;
+        }
+
+        if (!parsed.opened) {
+            recordToolFailure(toolCallName, parsed.error);
+
+            return;
+        }
+
+        aiHubTabsStore.getState().openFileTab(parsed.fileId, parsed.name);
+    };
+
     const openChat = (toolCallName: string, toolResultContent: string) => {
         const parsed = validateOpenChatTabResult(parseJson<unknown>(toolResultContent, `${toolCallName} result`));
 
@@ -814,6 +850,8 @@ export const buildAiHubSubscriber = ({
                 openWorkflowTab(toolCallName, toolResultContent);
             } else if (toolCallName === 'openAiAgentTab') {
                 openAiAgentTab(toolCallName, toolResultContent);
+            } else if (toolCallName === 'openFileTab') {
+                openFileTab(toolCallName, toolResultContent);
             } else if (toolCallName === 'openWorkflowChatTab') {
                 openChat(toolCallName, toolResultContent);
             } else {

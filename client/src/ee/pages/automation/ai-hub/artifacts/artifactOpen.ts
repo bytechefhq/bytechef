@@ -11,6 +11,10 @@ export function isAiAgentArtifactKind(kind: AiHubArtifactKindType): boolean {
     return kind === 'AI_AGENT_REFERENCED';
 }
 
+export function isFileArtifactKind(kind: AiHubArtifactKindType): boolean {
+    return kind === 'FILE_REFERENCED';
+}
+
 export function isWorkflowArtifactKind(kind: AiHubArtifactKindType): boolean {
     return WORKFLOW_ARTIFACT_KINDS.has(kind);
 }
@@ -41,6 +45,12 @@ export function handleArtifactQuickOpen(artifact: AiHubChatArtifactI): void {
         return;
     }
 
+    if (isFileArtifactKind(artifact.kind)) {
+        aiHubTabsStore.getState().openFileTab(artifact.artifactId, artifact.artifactName);
+
+        return;
+    }
+
     if (!isWorkflowArtifactKind(artifact.kind)) {
         return;
     }
@@ -62,11 +72,15 @@ export function handleArtifactQuickOpen(artifact: AiHubChatArtifactI): void {
 }
 
 export function isArtifactRemovable(artifact: AiHubChatArtifactI): boolean {
-    return artifact.kind === 'WORKFLOW_REFERENCED' || artifact.kind === 'AI_AGENT_REFERENCED';
+    return (
+        artifact.kind === 'WORKFLOW_REFERENCED' ||
+        artifact.kind === 'AI_AGENT_REFERENCED' ||
+        artifact.kind === 'FILE_REFERENCED'
+    );
 }
 
 export function isArtifactClickable(artifact: AiHubChatArtifactI): boolean {
-    if (isAiAgentArtifactKind(artifact.kind)) {
+    if (isAiAgentArtifactKind(artifact.kind) || isFileArtifactKind(artifact.kind)) {
         return true;
     }
 

@@ -90,8 +90,8 @@ describe('AiHubToolCallRenderer', () => {
     });
 
     describe('openWorkflowTab', () => {
-        it('is one of the two artifact-open tool names', () => {
-            expect([...ARTIFACT_OPEN_TOOL_NAMES]).toEqual(['openAiAgentTab', 'openWorkflowTab']);
+        it('is one of the artifact-open tool names', () => {
+            expect([...ARTIFACT_OPEN_TOOL_NAMES]).toEqual(['openAiAgentTab', 'openFileTab', 'openWorkflowTab']);
         });
 
         it('renders as a clickable workflow link instead of a JSON card', () => {

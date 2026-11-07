@@ -2,12 +2,23 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import AiHubResourcePanel from '@/ee/pages/automation/ai-hub/AiHubResourcePanel';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {fireEvent, render, screen} from '@testing-library/react';
+import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('@/ee/pages/automation/ai-hub/AiHubWorkflowViewer', () => ({
     default: ({projectWorkflowId}: {projectWorkflowId: number}) => (
         <div data-testid="workflow-viewer">{`workflow:${projectWorkflowId}`}</div>
     ),
+}));
+
+vi.mock('@/ee/pages/automation/ai-hub/AiHubFileViewer', () => ({
+    default: ({fileId, viewMode}: {fileId: string; viewMode: string}) => (
+        <div data-testid="file-viewer">{`file:${fileId}:${viewMode}`}</div>
+    ),
+}));
+
+vi.mock('@/ee/pages/automation/ai-hub/AiHubFilePicker', () => ({
+    default: () => <button type="button">Open file</button>,
 }));
 
 vi.mock('@/shared/queries/automation/projects.queries', () => ({
@@ -23,11 +34,21 @@ const workflowTab = (projectId: string, name: string, projectWorkflowId: number)
     workflowId: `wf-${projectId}`,
 });
 
+const fileTab = (fileId: string, name: string, viewMode: 'editor' | 'preview' | 'split') => ({
+    fileId,
+    id: `file-tab-${fileId}`,
+    kind: 'file' as const,
+    name,
+    viewMode,
+});
+
 const renderPanel = () =>
     render(
-        <TooltipProvider>
-            <AiHubResourcePanel />
-        </TooltipProvider>
+        <MemoryRouter>
+            <TooltipProvider>
+                <AiHubResourcePanel />
+            </TooltipProvider>
+        </MemoryRouter>
     );
 
 describe('AiHubResourcePanel', () => {
@@ -74,7 +95,47 @@ describe('AiHubResourcePanel', () => {
         fireEvent.click(screen.getByRole('button', {name: 'Close Invoices'}));
 
         expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
-        expect(screen.getByText('Workflows and AI Agents you or the assistant open appear here.')).toBeInTheDocument();
+        expect(
+            screen.getByText('Workflows, AI Agents and files you or the assistant open appear here.')
+        ).toBeInTheDocument();
+    });
+
+    it('renders a file tab with its view mode, Asset Files link and download link', () => {
+        aiHubTabsStore.setState({activeTabId: 'file-tab-7', openTabs: [fileTab('7', 'notes.md', 'preview')]});
+
+        renderPanel();
+
+        expect(screen.getByTestId('file-viewer')).toHaveTextContent('file:7:preview');
+        expect(screen.getByRole('link', {name: 'Open in Asset Files'})).toHaveAttribute(
+            'href',
+            '/automation/asset-files/7'
+        );
+        expect(screen.getByRole('link', {name: 'Download file'})).toHaveAttribute(
+            'href',
+            '/api/automation/internal/asset-files/7/content'
+        );
+    });
+
+    it('switches a text file tab between view modes', () => {
+        aiHubTabsStore.setState({activeTabId: 'file-tab-7', openTabs: [fileTab('7', 'notes.md', 'preview')]});
+
+        renderPanel();
+
+        fireEvent.click(screen.getByRole('radio', {name: 'Split'}));
+
+        const [tab] = aiHubTabsStore.getState().openTabs;
+
+        expect(tab).toMatchObject({kind: 'file', viewMode: 'split'});
+    });
+
+    it('offers only Preview for a binary file tab', () => {
+        aiHubTabsStore.setState({activeTabId: 'file-tab-8', openTabs: [fileTab('8', 'report.pdf', 'preview')]});
+
+        renderPanel();
+
+        expect(screen.getByRole('radio', {name: 'Preview'})).toBeInTheDocument();
+        expect(screen.queryByRole('radio', {name: 'Editor'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('radio', {name: 'Split'})).not.toBeInTheDocument();
     });
 
     it('hides the panel from its close control', () => {

@@ -1,11 +1,18 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import useCurrentAiHubChat from '@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {hasPendingToolApproval} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubComposer from '@/ee/pages/automation/ai-hub/composer/AiHubComposer';
+import AiHubComposerDropZone from '@/ee/pages/automation/ai-hub/composer/AiHubComposerDropZone';
+import {
+    ALLOWED_MIME_TYPES,
+    buildFileKey,
+    useAiHubAttachmentUpload,
+} from '@/ee/pages/automation/ai-hub/composer/hooks/useAiHubAttachmentUpload';
 import {
     ReferencedResourceKindType,
     aiHubComposerStore,
@@ -21,17 +28,20 @@ import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stor
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
 import {useCancelAiHubRunMutation} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ComposerPrimitive, useAui} from '@assistant-ui/react';
-import {ArrowUpIcon, SquareIcon, XIcon} from 'lucide-react';
-import {KeyboardEvent, ReactNode, useCallback, useEffect, useRef} from 'react';
+import {ArrowUpIcon, Loader2Icon, PaperclipIcon, RotateCcwIcon, SquareIcon, XIcon} from 'lucide-react';
+import {ChangeEvent, KeyboardEvent, ReactNode, useCallback, useEffect, useRef} from 'react';
 
 const KIND_LABELS: Record<ReferencedResourceKindType, string> = {
     aiAgent: 'AI Agent',
+    file: 'File',
     workflow: 'Workflow',
 };
 
 const KIND_BADGE_CLASSES: Record<ReferencedResourceKindType, string> = {
     aiAgent: 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300',
+    file: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300',
     workflow: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
 };
 
@@ -46,6 +56,7 @@ interface AiHubChatComposerPropsI {
 
 const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
     const atMentionTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const previousChatIdRef = useRef<string | undefined>(undefined);
 
     const referencedResources = useAiHubComposerStore((state) => state.referencedResources);
@@ -57,6 +68,9 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
     const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
     const isRunning = useAiHubRunStateStore((state) => isChatRunning(state, chatId));
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const {dismiss, retry, upload, uploads} = useAiHubAttachmentUpload(currentWorkspaceId, currentEnvironmentId);
 
     const currentChat = useCurrentAiHubChat();
 
@@ -81,6 +95,20 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
             workspaceId: String(currentWorkspaceId),
         });
     }, [aui, cancelAiHubRunMutation, chatId, currentChatId, currentWorkspaceId]);
+
+    const handleAttachClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const selectedFiles = event.target.files;
+
+        if (selectedFiles && selectedFiles.length > 0) {
+            upload(Array.from(selectedFiles));
+        }
+
+        event.target.value = '';
+    };
 
     const handleRemoveReference = (id: string, kind: ReferencedResourceKindType) => {
         const composerState = aiHubComposerStore.getState();
@@ -175,6 +203,30 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
     }, [aui, chatId]);
 
     useEffect(() => {
+        if (isWorkflowChat) {
+            return;
+        }
+
+        const handlePaste = (event: ClipboardEvent) => {
+            const clipboardFiles = event.clipboardData?.files;
+
+            if (!clipboardFiles || clipboardFiles.length === 0) {
+                return;
+            }
+
+            event.preventDefault();
+
+            upload(Array.from(clipboardFiles));
+        };
+
+        document.addEventListener('paste', handlePaste);
+
+        return () => {
+            document.removeEventListener('paste', handlePaste);
+        };
+    }, [isWorkflowChat, upload]);
+
+    useEffect(() => {
         if (resourcePickerOpen || atMentionTextareaRef.current == null) {
             return;
         }
@@ -187,9 +239,13 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
     }, [resourcePickerOpen]);
 
     return (
-        <div className="mx-auto flex w-full max-w-[var(--thread-max-width,44rem)] flex-col gap-2 px-3 pb-2">
+        <AiHubComposerDropZone
+            className="mx-auto flex w-full max-w-[var(--thread-max-width,44rem)] flex-col gap-2 px-3 pb-2"
+            disabled={isWorkflowChat}
+            onFilesDropped={upload}
+        >
             <ComposerPrimitive.Root className="flex w-full flex-col rounded-2xl border border-border bg-muted/40 shadow-sm focus-within:border-foreground/20">
-                {referencedResources.length > 0 && (
+                {(referencedResources.length > 0 || uploads.length > 0) && (
                     <div className="flex flex-wrap gap-1.5 px-3 pt-2" data-testid="reference-chips">
                         {referencedResources.map((resource) => (
                             <Badge
@@ -211,6 +267,60 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                                 </button>
                             </Badge>
                         ))}
+
+                        {uploads.map((uploadState) => {
+                            const fileKey = buildFileKey(uploadState.file);
+
+                            if (uploadState.status === 'error') {
+                                return (
+                                    <Badge
+                                        className="flex items-center gap-1 bg-surface-destructive-secondary px-2 py-0.5 text-xs font-normal text-content-destructive"
+                                        data-testid="upload-chip-error"
+                                        key={`upload-error-${fileKey}`}
+                                        styleType="outline-outline"
+                                    >
+                                        <span className="font-medium">Failed:</span>
+
+                                        <span>{uploadState.file.name}</span>
+
+                                        <button
+                                            aria-label={`Retry upload ${uploadState.file.name}`}
+                                            className="ml-0.5 rounded hover:opacity-75"
+                                            onClick={() => retry(uploadState.file)}
+                                            type="button"
+                                        >
+                                            <RotateCcwIcon className="size-3" />
+                                        </button>
+
+                                        <button
+                                            aria-label={`Dismiss upload ${uploadState.file.name}`}
+                                            className="ml-0.5 rounded hover:opacity-75"
+                                            onClick={() => dismiss(uploadState.file)}
+                                            type="button"
+                                        >
+                                            <XIcon className="size-3" />
+                                        </button>
+                                    </Badge>
+                                );
+                            }
+
+                            if (uploadState.status === 'success') {
+                                return null;
+                            }
+
+                            return (
+                                <Badge
+                                    className="flex items-center gap-1 bg-surface-brand-secondary px-2 py-0.5 text-xs font-normal text-content-brand-primary"
+                                    data-testid="upload-chip-uploading"
+                                    key={`upload-${fileKey}`}
+                                    styleType="outline-outline"
+                                >
+                                    <Loader2Icon className="size-3 animate-spin" />
+
+                                    <span>{uploadState.file.name}</span>
+                                </Badge>
+                            );
+                        })}
                     </div>
                 )}
 
@@ -228,7 +338,37 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                     <div className="flex min-w-0 items-center gap-1">
                         {modelPicker}
 
-                        {!isWorkflowChat && <AiHubComposer />}
+                        {!isWorkflowChat && (
+                            <>
+                                <AiHubComposer />
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <button
+                                            aria-label="Attach file"
+                                            className="flex size-7 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
+                                            disabled={!isWorkspaceReady}
+                                            onClick={handleAttachClick}
+                                            type="button"
+                                        >
+                                            <PaperclipIcon className="size-4" />
+                                        </button>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Attach file</TooltipContent>
+                                </Tooltip>
+
+                                <input
+                                    accept={ALLOWED_MIME_TYPES.join(',')}
+                                    aria-label="File upload input"
+                                    className="hidden"
+                                    multiple
+                                    onChange={handleFileInputChange}
+                                    ref={fileInputRef}
+                                    type="file"
+                                />
+                            </>
+                        )}
                     </div>
 
                     <div className="flex shrink-0 items-center gap-2">
@@ -263,7 +403,7 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
                     </div>
                 </div>
             </ComposerPrimitive.Root>
-        </div>
+        </AiHubComposerDropZone>
     );
 };
 

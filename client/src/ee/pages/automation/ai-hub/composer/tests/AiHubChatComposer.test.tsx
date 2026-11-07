@@ -10,15 +10,44 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiHubChatComposer from '../AiHubChatComposer';
 
-const {cancelAiHubRunMock, cancelRunMock, composerTextRef, currentChatKindRef, currentWorkspaceIdRef, setTextMock} =
-    vi.hoisted(() => ({
-        cancelAiHubRunMock: vi.fn(),
-        cancelRunMock: vi.fn(),
-        composerTextRef: {current: ''},
-        currentChatKindRef: {current: 'STANDARD' as 'STANDARD' | 'WORKFLOW_CHAT'},
-        currentWorkspaceIdRef: {current: 3 as number | undefined},
-        setTextMock: vi.fn(),
-    }));
+const {
+    cancelAiHubRunMock,
+    cancelRunMock,
+    composerTextRef,
+    currentChatKindRef,
+    currentWorkspaceIdRef,
+    dismissMock,
+    retryMock,
+    setTextMock,
+    uploadMock,
+    uploadsRef,
+} = vi.hoisted(() => ({
+    cancelAiHubRunMock: vi.fn(),
+    cancelRunMock: vi.fn(),
+    composerTextRef: {current: ''},
+    currentChatKindRef: {current: 'STANDARD' as 'STANDARD' | 'WORKFLOW_CHAT'},
+    currentWorkspaceIdRef: {current: 3 as number | undefined},
+    dismissMock: vi.fn(),
+    retryMock: vi.fn(),
+    setTextMock: vi.fn(),
+    uploadMock: vi.fn(),
+    uploadsRef: {current: [] as Array<{error?: string; file: File; status: 'error' | 'success' | 'uploading'}>},
+}));
+
+vi.mock('@/ee/pages/automation/ai-hub/composer/hooks/useAiHubAttachmentUpload', async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import('@/ee/pages/automation/ai-hub/composer/hooks/useAiHubAttachmentUpload')>();
+
+    return {
+        ...actual,
+        useAiHubAttachmentUpload: () => ({
+            dismiss: dismissMock,
+            retry: retryMock,
+            upload: uploadMock,
+            uploads: uploadsRef.current,
+        }),
+    };
+});
 
 vi.mock('@assistant-ui/react', () => ({
     ComposerPrimitive: {
@@ -82,6 +111,7 @@ describe('AiHubChatComposer', () => {
         composerTextRef.current = '';
         currentChatKindRef.current = 'STANDARD';
         currentWorkspaceIdRef.current = 3;
+        uploadsRef.current = [];
 
         aiHubStore.setState({chatId: 'thread-7', messages: [], mode: MODE.BUILD});
         aiHubChatsStore.setState({currentChatId: 7});
@@ -331,6 +361,83 @@ describe('AiHubChatComposer', () => {
         });
     });
 
+    describe('file attachments', () => {
+        const pngFile = () => new File(['data'], 'screenshot.png', {type: 'image/png'});
+
+        it('uploads the files picked through the paperclip button', () => {
+            renderComposer();
+
+            const fileInput = screen.getByLabelText('File upload input') as HTMLInputElement;
+            const clickSpy = vi.spyOn(fileInput, 'click');
+
+            fireEvent.click(screen.getByRole('button', {name: 'Attach file'}));
+
+            expect(clickSpy).toHaveBeenCalledTimes(1);
+
+            const file = pngFile();
+
+            fireEvent.change(fileInput, {target: {files: [file]}});
+
+            expect(uploadMock).toHaveBeenCalledWith([file]);
+        });
+
+        it('uploads files pasted anywhere on the page', () => {
+            renderComposer();
+
+            const file = pngFile();
+            const pasteEvent = new Event('paste', {bubbles: true}) as Event & {clipboardData: unknown};
+
+            pasteEvent.clipboardData = {files: [file]};
+
+            act(() => {
+                document.dispatchEvent(pasteEvent);
+            });
+
+            expect(uploadMock).toHaveBeenCalledWith([file]);
+        });
+
+        it('uploads files dropped on the composer', () => {
+            renderComposer();
+
+            const file = pngFile();
+
+            fireEvent.drop(screen.getByTestId('ai-hub-composer-drop-zone'), {
+                dataTransfer: {files: [file], types: ['Files']},
+            });
+
+            expect(uploadMock).toHaveBeenCalledWith([file]);
+        });
+
+        it('shows an uploading chip and a failed chip that can be retried or dismissed', () => {
+            const uploadingFile = new File(['data'], 'pending.png', {type: 'image/png'});
+            const failedFile = new File(['data'], 'failed.pdf', {type: 'application/pdf'});
+
+            uploadsRef.current = [
+                {file: uploadingFile, status: 'uploading'},
+                {error: 'Quota exceeded', file: failedFile, status: 'error'},
+            ];
+
+            renderComposer();
+
+            expect(screen.getByTestId('upload-chip-uploading')).toHaveTextContent('pending.png');
+            expect(screen.getByTestId('upload-chip-error')).toHaveTextContent('failed.pdf');
+
+            fireEvent.click(screen.getByRole('button', {name: 'Retry upload failed.pdf'}));
+            fireEvent.click(screen.getByRole('button', {name: 'Dismiss upload failed.pdf'}));
+
+            expect(retryMock).toHaveBeenCalledWith(failedFile);
+            expect(dismissMock).toHaveBeenCalledWith(failedFile);
+        });
+
+        it('labels a file reference chip as a file', () => {
+            aiHubComposerStore.setState({referencedResources: [{id: '7', kind: 'file', name: 'notes.md'}]});
+
+            renderComposer();
+
+            expect(screen.getByTestId('reference-chips')).toHaveTextContent('File:notes.md');
+        });
+    });
+
     describe('workflow chat', () => {
         beforeEach(() => {
             currentChatKindRef.current = 'WORKFLOW_CHAT';
@@ -346,6 +453,28 @@ describe('AiHubChatComposer', () => {
             fireEvent.keyDown(screen.getByRole('textbox', {name: 'Message input'}), {key: '@'});
 
             expect(aiHubComposerStore.getState().resourcePickerOpen).toBe(false);
+        });
+
+        it('offers no file attachment and ignores pasted or dropped files', () => {
+            renderComposer();
+
+            expect(screen.queryByRole('button', {name: 'Attach file'})).toBeNull();
+            expect(screen.queryByLabelText('File upload input')).toBeNull();
+
+            const file = new File(['data'], 'screenshot.png', {type: 'image/png'});
+            const pasteEvent = new Event('paste', {bubbles: true}) as Event & {clipboardData: unknown};
+
+            pasteEvent.clipboardData = {files: [file]};
+
+            act(() => {
+                document.dispatchEvent(pasteEvent);
+            });
+
+            fireEvent.drop(screen.getByTestId('ai-hub-composer-drop-zone'), {
+                dataTransfer: {files: [file], types: ['Files']},
+            });
+
+            expect(uploadMock).not.toHaveBeenCalled();
         });
 
         it('sends one cancelAiHubRun on Stop', () => {

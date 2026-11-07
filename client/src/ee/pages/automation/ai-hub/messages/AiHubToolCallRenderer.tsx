@@ -7,6 +7,7 @@ import {
     CheckCircle2Icon,
     ChevronDownIcon,
     ChevronRightIcon,
+    FileTextIcon,
     Loader2Icon,
     WorkflowIcon,
     WrenchIcon,
@@ -136,6 +137,7 @@ const DefaultBody = ({entry}: ToolCallBodyProps) => {
 
 const ARTIFACT_OPEN_META: Record<string, {icon: ComponentType<{className?: string}>; kind: string}> = {
     openAiAgentTab: {icon: BotIcon, kind: 'AI Agent'},
+    openFileTab: {icon: FileTextIcon, kind: 'File'},
     openWorkflowTab: {icon: WorkflowIcon, kind: 'Workflow'},
 };
 
@@ -146,6 +148,8 @@ const openArtifactTab = (toolName: string, args: Record<string, unknown> | undef
 
     if (toolName === 'openAiAgentTab' && typeof args?.aiAgentId === 'string' && args.aiAgentId) {
         aiHubTabsStore.getState().openAiAgentTab({aiAgentId: args.aiAgentId, name});
+    } else if (toolName === 'openFileTab' && typeof args?.fileId === 'string' && args.fileId) {
+        aiHubTabsStore.getState().openFileTab(args.fileId, name);
     } else if (
         toolName === 'openWorkflowTab' &&
         typeof args?.workflowId === 'string' &&

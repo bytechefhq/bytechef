@@ -1,24 +1,76 @@
 import Button from '@/components/Button/Button';
+import {ToggleGroup, ToggleGroupItem} from '@/components/ui/toggle-group';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiHubAiAgentViewer from '@/ee/pages/automation/ai-hub/AiHubAiAgentViewer';
+import AiHubFilePicker from '@/ee/pages/automation/ai-hub/AiHubFilePicker';
+import AiHubFileViewer from '@/ee/pages/automation/ai-hub/AiHubFileViewer';
 import AiHubWorkflowViewer from '@/ee/pages/automation/ai-hub/AiHubWorkflowViewer';
 import WorkflowTabLabel from '@/ee/pages/automation/ai-hub/WorkflowTabLabel';
-import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import {BotIcon, PanelRightIcon, XIcon} from 'lucide-react';
+import {
+    AiHubTabType,
+    AiHubViewModeType,
+    useAiHubTabsStore,
+} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
+import {BotIcon, DownloadIcon, ExternalLinkIcon, FileTextIcon, PanelRightIcon, XIcon} from 'lucide-react';
 import {useEffect, useRef} from 'react';
+import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
+
+const TEXTUAL_FILE_EXTENSIONS = new Set([
+    'css',
+    'csv',
+    'htm',
+    'html',
+    'java',
+    'js',
+    'json',
+    'jsx',
+    'markdown',
+    'md',
+    'py',
+    'sql',
+    'ts',
+    'tsx',
+    'txt',
+    'xml',
+    'yaml',
+    'yml',
+]);
+
+const isTextualFileName = (name: string): boolean => {
+    const dotIndex = name.lastIndexOf('.');
+
+    if (dotIndex < 0) {
+        return false;
+    }
+
+    return TEXTUAL_FILE_EXTENSIONS.has(name.slice(dotIndex + 1).toLowerCase());
+};
+
+const renderTabBody = (tab: AiHubTabType) => {
+    if (tab.kind === 'workflow') {
+        return <AiHubWorkflowViewer projectId={tab.projectId} projectWorkflowId={tab.projectWorkflowId} />;
+    }
+
+    if (tab.kind === 'file') {
+        return <AiHubFileViewer fileId={tab.fileId} key={tab.fileId} name={tab.name} viewMode={tab.viewMode} />;
+    }
+
+    return <AiHubAiAgentViewer aiAgentId={tab.aiAgentId} key={tab.aiAgentId} name={tab.name} />;
+};
 
 const AiHubResourcePanel = () => {
     const activeTabRef = useRef<HTMLDivElement | null>(null);
 
-    const {activeTabId, closeTab, openTabs, setActiveTab, setRightPanelOpen} = useAiHubTabsStore(
+    const {activeTabId, closeTab, openTabs, setActiveTab, setRightPanelOpen, setViewMode} = useAiHubTabsStore(
         useShallow((state) => ({
             activeTabId: state.activeTabId,
             closeTab: state.closeTab,
             openTabs: state.openTabs,
             setActiveTab: state.setActiveTab,
             setRightPanelOpen: state.setRightPanelOpen,
+            setViewMode: state.setViewMode,
         }))
     );
 
@@ -58,7 +110,11 @@ const AiHubResourcePanel = () => {
                                             onClick={() => setActiveTab(tab.id)}
                                             type="button"
                                         >
-                                            <BotIcon className="size-3.5 shrink-0" />
+                                            {tab.kind === 'file' ? (
+                                                <FileTextIcon className="size-3.5 shrink-0" />
+                                            ) : (
+                                                <BotIcon className="size-3.5 shrink-0" />
+                                            )}
 
                                             <span className="truncate">{tab.name}</span>
                                         </button>
@@ -78,6 +134,8 @@ const AiHubResourcePanel = () => {
                     </div>
 
                     <div className="flex shrink-0 items-center gap-1 px-2">
+                        <AiHubFilePicker />
+
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
@@ -95,23 +153,66 @@ const AiHubResourcePanel = () => {
                 </div>
 
                 {activeTab ? (
-                    <div className="min-h-0 flex-1">
-                        {activeTab.kind === 'workflow' ? (
-                            <AiHubWorkflowViewer
-                                projectId={activeTab.projectId}
-                                projectWorkflowId={activeTab.projectWorkflowId}
-                            />
-                        ) : (
-                            <AiHubAiAgentViewer
-                                aiAgentId={activeTab.aiAgentId}
-                                key={activeTab.aiAgentId}
-                                name={activeTab.name}
-                            />
+                    <>
+                        {activeTab.kind === 'file' && (
+                            <div className="flex items-center justify-end gap-2 border-b px-2 py-1">
+                                <ToggleGroup
+                                    onValueChange={(value) => {
+                                        if (value) {
+                                            setViewMode(activeTab.id, value as AiHubViewModeType);
+                                        }
+                                    }}
+                                    size="sm"
+                                    type="single"
+                                    value={activeTab.viewMode}
+                                >
+                                    {isTextualFileName(activeTab.name) && (
+                                        <ToggleGroupItem value="editor">Editor</ToggleGroupItem>
+                                    )}
+
+                                    <ToggleGroupItem value="preview">Preview</ToggleGroupItem>
+
+                                    {isTextualFileName(activeTab.name) && (
+                                        <ToggleGroupItem value="split">Split</ToggleGroupItem>
+                                    )}
+                                </ToggleGroup>
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Link
+                                            aria-label="Open in Asset Files"
+                                            className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                            to={`/automation/asset-files/${activeTab.fileId}`}
+                                        >
+                                            <ExternalLinkIcon className="size-4" />
+                                        </Link>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Open in Asset Files</TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <a
+                                            aria-label="Download file"
+                                            className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                            download={activeTab.name}
+                                            href={`/api/automation/internal/asset-files/${activeTab.fileId}/content`}
+                                        >
+                                            <DownloadIcon className="size-4" />
+                                        </a>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Download</TooltipContent>
+                                </Tooltip>
+                            </div>
                         )}
-                    </div>
+
+                        <div className="min-h-0 flex-1">{renderTabBody(activeTab)}</div>
+                    </>
                 ) : (
                     <div className="flex flex-1 items-center justify-center px-4 text-center text-sm text-muted-foreground">
-                        Workflows and AI Agents you or the assistant open appear here.
+                        Workflows, AI Agents and files you or the assistant open appear here.
                     </div>
                 )}
             </div>

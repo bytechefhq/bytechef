@@ -84,7 +84,15 @@ export default function useRecordReferencedArtifacts(
 }
 
 function toArtifactKind(tab: AiHubTabType): AiHubChatArtifactKind {
-    return tab.kind === 'aiAgent' ? AiHubChatArtifactKind.AiAgentReferenced : AiHubChatArtifactKind.WorkflowReferenced;
+    if (tab.kind === 'aiAgent') {
+        return AiHubChatArtifactKind.AiAgentReferenced;
+    }
+
+    if (tab.kind === 'file') {
+        return AiHubChatArtifactKind.FileReferenced;
+    }
+
+    return AiHubChatArtifactKind.WorkflowReferenced;
 }
 
 function toWorkflowMetadata(tab: AiHubWorkflowTabI): {projectId: string; projectWorkflowId: number} {

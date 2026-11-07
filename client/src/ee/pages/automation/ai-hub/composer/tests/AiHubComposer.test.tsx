@@ -17,6 +17,10 @@ vi.mock('@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu', () =>
             <button onClick={() => onSelect({id: '42', kind: 'aiAgent', name: 'Support Agent'})} type="button">
                 Pick agent
             </button>
+
+            <button onClick={() => onSelect({id: '7', kind: 'file', name: 'notes.md'})} type="button">
+                Pick file
+            </button>
         </div>
     ),
 }));
@@ -49,6 +53,20 @@ describe('AiHubComposer', () => {
         expect(openTabs[0]).toMatchObject({aiAgentId: '42', kind: 'aiAgent', name: 'Support Agent'});
         expect(aiHubComposerStore.getState().referencedResources).toEqual([
             {id: '42', kind: 'aiAgent', name: 'Support Agent', ownsTab: true, tabId: activeTabId},
+        ]);
+    });
+
+    it('opens the file tab and adds a file reference when a file is picked', () => {
+        renderComposer();
+
+        fireEvent.click(screen.getByText('Pick file'));
+
+        const {activeTabId, openTabs} = aiHubTabsStore.getState();
+
+        expect(openTabs).toHaveLength(1);
+        expect(openTabs[0]).toMatchObject({fileId: '7', kind: 'file', name: 'notes.md'});
+        expect(aiHubComposerStore.getState().referencedResources).toEqual([
+            {id: '7', kind: 'file', name: 'notes.md', ownsTab: true, tabId: activeTabId},
         ]);
     });
 
