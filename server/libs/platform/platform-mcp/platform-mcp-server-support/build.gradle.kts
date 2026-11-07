@@ -13,6 +13,10 @@ val mcpAppWidgets =
         ),
         "data-table-viewer" to McpAppWidget(
             listOf("run", "build"), "dist/index.html", "mcp-apps/data-table-viewer"),
+        "code-workflow-viewer" to McpAppWidget(
+            listOf("run", "build"), "dist/index.html", "mcp-apps/code-workflow-viewer"),
+        "custom-component-viewer" to McpAppWidget(
+            listOf("run", "build"), "dist/index.html", "mcp-apps/custom-component-viewer"),
         "file-viewer" to McpAppWidget(listOf("run", "build"), "dist/index.html", "mcp-apps/file-viewer"),
     )
 

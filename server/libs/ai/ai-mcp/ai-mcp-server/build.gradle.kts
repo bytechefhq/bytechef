@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.ai:spring-ai-model")
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
     implementation("org.slf4j:slf4j-api")

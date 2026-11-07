@@ -43,7 +43,7 @@ final class ManagementMcpInstructions {
         "updateWorkflow", "createProjectWorkflow", "getWorkflowBuildInstructions");
 
     private static final List<String> VIEWER_TOOL_NAMES = List.of(
-        "getWorkflow", "queryDataTable", "getAssetFileContent");
+        "getWorkflow", "queryDataTable", "getAssetFileContent", "getCodeWorkflowSource", "getCustomComponentSource");
 
     private ManagementMcpInstructions() {
     }
@@ -251,6 +251,18 @@ final class ManagementMcpInstructions {
 
         if (names.contains("getAssetFileContent")) {
             viewers.add("getAssetFileContent shows the content of a text file by its id");
+        }
+
+        if (names.contains("getCodeWorkflowSource")) {
+            viewers.add(
+                "getCodeWorkflowSource shows the source of a code workflow project" +
+                    findHint(names, "listCodeWorkflows"));
+        }
+
+        if (names.contains("getCustomComponentSource")) {
+            viewers.add(
+                "getCustomComponentSource shows the source of a custom component" +
+                    findHint(names, "listCustomComponents"));
         }
 
         StringBuilder text = new StringBuilder("In clients that support MCP Apps these read-only tools render as a ")

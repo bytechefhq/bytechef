@@ -52,7 +52,8 @@ class ManagementMcpInstructionsTest {
         "listMcpServers", "updateMcpProjectWorkflowParameters", "lookupPropertyOptions", "buildAiAgent",
         "listAiAgents", "getAiAgent", "createAiAgent", "updateAiAgent", "addAiAgentElement", "updateAiAgentElement",
         "deleteAiAgentElement", "addAiAgentChannel", "deleteAiAgentChannel", "updateAiAgentSettings",
-        "searchAiAgentTools", "searchAiAgentReferences", "queryDataTable", "getAssetFileContent");
+        "searchAiAgentTools", "searchAiAgentReferences", "queryDataTable", "getAssetFileContent",
+        "getCodeWorkflowSource", "listCodeWorkflows", "getCustomComponentSource", "listCustomComponents");
 
     @Test
     void testDescribesTheViewerReadToolsWhenRegistered() {
@@ -82,6 +83,35 @@ class ManagementMcpInstructionsTest {
             .doesNotContain("queryDataTable");
 
         assertNoAbsentToolNamed(toolNames);
+    }
+
+    @Test
+    void testDescribesTheCodeViewersWithTheirListTools() {
+        Set<String> toolNames = deterministicToolNames();
+
+        toolNames.addAll(
+            List.of("getCodeWorkflowSource", "listCodeWorkflows", "getCustomComponentSource", "listCustomComponents"));
+
+        assertThat(ManagementMcpInstructions.build(toolNames))
+            .contains(
+                "getCodeWorkflowSource shows the source of a code workflow project (find its id by name with "
+                    + "listCodeWorkflows)",
+                "getCustomComponentSource shows the source of a custom component (find its id by name with "
+                    + "listCustomComponents)")
+            .doesNotContain("ask the user for it");
+
+        assertNoAbsentToolNamed(toolNames);
+    }
+
+    @Test
+    void testOmitsTheFindHintWhenTheListToolIsAbsent() {
+        Set<String> toolNames = deterministicToolNames();
+
+        toolNames.add("getCodeWorkflowSource");
+
+        assertThat(ManagementMcpInstructions.build(toolNames))
+            .contains("getCodeWorkflowSource shows the source of a code workflow project. ")
+            .doesNotContain("listCodeWorkflows");
     }
 
     @Test
