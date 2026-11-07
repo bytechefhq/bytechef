@@ -10,7 +10,6 @@ package com.bytechef.ee.ai.hub.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -174,8 +173,9 @@ class AiHubTurnToolDispatchTest {
         List<BaseEvent> events = runTurn("BUILD", null);
 
         assertThat(events).noneMatch(RunErrorEvent.class::isInstance);
-        assertThat(sentToolNames()).contains(
-            "createProject", "createProjectWorkflow", "buildWorkflow", "openWorkflowTab", "deleteProject");
+        assertThat(sentToolNames())
+            .contains("createProject", "createProjectWorkflow", "buildWorkflow", "openWorkflowTab")
+            .doesNotContain("deleteProject");
         verify(catalogChatModelFactory).createChatModel(Provider.ANTHROPIC, DEFAULT_MODEL, "anthropic-key", null);
     }
 
@@ -198,8 +198,9 @@ class AiHubTurnToolDispatchTest {
         List<BaseEvent> events = runTurn("BUILD", SELECTED_MODEL);
 
         assertThat(events).noneMatch(RunErrorEvent.class::isInstance);
-        assertThat(sentToolNames()).contains(
-            "createProject", "createProjectWorkflow", "buildWorkflow", "openWorkflowTab", "deleteProject");
+        assertThat(sentToolNames())
+            .contains("createProject", "createProjectWorkflow", "buildWorkflow", "openWorkflowTab")
+            .doesNotContain("deleteProject");
         verify(catalogChatModelFactory).createChatModel(Provider.OPEN_AI, SELECTED_MODEL, "open-ai-key", null);
     }
 
@@ -312,7 +313,8 @@ class AiHubTurnToolDispatchTest {
         chat.setWorkspaceId(WORKSPACE_ID);
 
         when(fixtures.chatService.findNotDeletedByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
-        when(fixtures.policy.decide(WORKSPACE_ID)).thenReturn(new AiHubToolApprovalPolicy.Decision(Set.of(), Set.of()));
+        when(fixtures.policy.decide(WORKSPACE_ID))
+            .thenReturn(new AiHubToolApprovalPolicy.Decision(Set.of("createProject"), Set.of()));
         when(fixtures.approvalService.findPending(CHAT_ID)).thenReturn(Optional.empty());
         when(fixtures.approvalService.createPending(any())).thenAnswer(invocation -> {
             AiHubToolApproval approval = invocation.getArgument(0);
@@ -324,16 +326,16 @@ class AiHubTurnToolDispatchTest {
 
         AssistantMessage toolCallMessage = AssistantMessage.builder()
             .content("")
-            .toolCalls(List.of(new AssistantMessage.ToolCall("call-delete", "function", "deleteProject",
-                "{\"projectId\":42}")))
+            .toolCalls(List.of(new AssistantMessage.ToolCall("call-create", "function", "createProject",
+                "{\"name\":\"Leads\"}")))
             .build();
 
         providerChatModel.streamOverride = Flux.just(new ChatResponse(List.of(new Generation(toolCallMessage))));
 
         runTurn("BUILD", null);
 
-        verify(fixtures.approvalService).recordToolCallId(THREAD_ID, 99L, "call-delete");
-        verify(fixtures.projectFacade, never()).deleteProject(anyLong());
+        verify(fixtures.approvalService).recordToolCallId(THREAD_ID, 99L, "call-create");
+        verify(fixtures.projectFacade, never()).createProject(any());
     }
 
     private static ChatResponse textChunk(String text) {
