@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.hub.toolsearch;
 
+import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
@@ -17,11 +18,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +52,9 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
 
     private static final String PINNED_TOOL_CALLBACKS_KEY =
         PinnedToolSearchToolCallingAdvisor.class.getName() + ".pinnedToolCallbacks";
+
+    private static final String RUN_CATALOG_TOOL_CALLBACKS_KEY =
+        PinnedToolSearchToolCallingAdvisor.class.getName() + ".runCatalogToolCallbacks";
 
     private static final String TOOL_SEARCH_UNAVAILABLE_KEY =
         PinnedToolSearchToolCallingAdvisor.class.getName() + ".toolSearchUnavailable";
@@ -81,6 +87,8 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
 
         catalogWarmUp.run();
 
+        captureRunCatalogToolCallbacks(chatClientRequest);
+
         ChatClientRequest initialized;
 
         try {
@@ -100,6 +108,8 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
         StreamAdvisorChain streamAdvisorChain) {
 
         catalogWarmUp.run();
+
+        captureRunCatalogToolCallbacks(chatClientRequest);
 
         ChatClientRequest initialized;
 
@@ -173,10 +183,11 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
     @Override
     protected ChatClientRequest doBeforeCall(ChatClientRequest chatClientRequest, CallAdvisorChain callAdvisorChain) {
         if (isToolSearchUnavailable(chatClientRequest)) {
-            return chatClientRequest;
+            return withRunCatalogToolCallbacks(chatClientRequest);
         }
 
-        return injectPinnedToolCallbacks(super.doBeforeCall(chatClientRequest, callAdvisorChain));
+        return withRunCatalogToolCallbacks(
+            injectPinnedToolCallbacks(super.doBeforeCall(chatClientRequest, callAdvisorChain)));
     }
 
     @Override
@@ -185,10 +196,11 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
         StreamAdvisorChain streamAdvisorChain) {
 
         if (isToolSearchUnavailable(chatClientRequest)) {
-            return chatClientRequest;
+            return withRunCatalogToolCallbacks(chatClientRequest);
         }
 
-        return injectPinnedToolCallbacks(super.doBeforeStream(chatClientRequest, streamAdvisorChain));
+        return withRunCatalogToolCallbacks(
+            injectPinnedToolCallbacks(super.doBeforeStream(chatClientRequest, streamAdvisorChain)));
     }
 
     private ChatClientRequest markToolSearchUnavailable(
@@ -196,7 +208,8 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
 
         if (toolSearchUnavailableLogged.compareAndSet(false, true)) {
             log.warn(
-                "AI Hub tool search is unavailable, continuing the turn with the pinned tools only: {}",
+                "AI Hub tool search is unavailable, so the catalog tools cannot be found and the turn continues " +
+                    "with the pinned tools only: {}",
                 exception.getMessage(), exception);
         } else if (log.isDebugEnabled()) {
             log.debug("AI Hub tool search is unavailable: {}", exception.getMessage());
@@ -214,10 +227,49 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
                 .get(TOOL_SEARCH_UNAVAILABLE_KEY));
     }
 
-    private void seedCatalogToolCallbacks(ChatClientRequest chatClientRequest) {
+    private void captureRunCatalogToolCallbacks(ChatClientRequest chatClientRequest) {
         Map<String, ToolCallback> catalogToolCallbacks = catalogToolCallbacksSupplier.get();
 
         if (catalogToolCallbacks.isEmpty()) {
+            return;
+        }
+
+        UnaryOperator<ToolCallback> toolCallbackDecorator = toolCallbackDecorator(chatClientRequest);
+
+        Map<String, ToolCallback> runCatalogToolCallbacks = new LinkedHashMap<>();
+
+        for (Map.Entry<String, ToolCallback> entry : catalogToolCallbacks.entrySet()) {
+            runCatalogToolCallbacks.put(entry.getKey(), toolCallbackDecorator.apply(entry.getValue()));
+        }
+
+        chatClientRequest.context()
+            .put(RUN_CATALOG_TOOL_CALLBACKS_KEY, runCatalogToolCallbacks);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static UnaryOperator<ToolCallback> toolCallbackDecorator(ChatClientRequest chatClientRequest) {
+        Object toolCallbackDecorator = chatClientRequest.context()
+            .get(SpringAIAgent.TOOL_CALLBACK_DECORATOR_KEY);
+
+        if (toolCallbackDecorator instanceof UnaryOperator<?> unaryOperator) {
+            return (UnaryOperator<ToolCallback>) unaryOperator;
+        }
+
+        return UnaryOperator.identity();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static @Nullable Map<String, ToolCallback> runCatalogToolCallbacks(ChatClientRequest chatClientRequest) {
+        Object runCatalogToolCallbacks = chatClientRequest.context()
+            .get(RUN_CATALOG_TOOL_CALLBACKS_KEY);
+
+        return runCatalogToolCallbacks instanceof Map<?, ?> map ? (Map<String, ToolCallback>) map : null;
+    }
+
+    private void seedCatalogToolCallbacks(ChatClientRequest chatClientRequest) {
+        Map<String, ToolCallback> runCatalogToolCallbacks = runCatalogToolCallbacks(chatClientRequest);
+
+        if (runCatalogToolCallbacks == null) {
             return;
         }
 
@@ -231,9 +283,31 @@ public final class PinnedToolSearchToolCallingAdvisor extends ToolSearchToolCall
         @SuppressWarnings("unchecked")
         Map<String, ToolCallback> cachedToolCallbacks = (Map<String, ToolCallback>) cached;
 
-        for (Map.Entry<String, ToolCallback> entry : catalogToolCallbacks.entrySet()) {
+        for (Map.Entry<String, ToolCallback> entry : runCatalogToolCallbacks.entrySet()) {
             cachedToolCallbacks.putIfAbsent(entry.getKey(), entry.getValue());
         }
+    }
+
+    private static ChatClientRequest withRunCatalogToolCallbacks(ChatClientRequest chatClientRequest) {
+        Map<String, ToolCallback> runCatalogToolCallbacks = runCatalogToolCallbacks(chatClientRequest);
+
+        if (runCatalogToolCallbacks == null ||
+            !(chatClientRequest.prompt()
+                .getOptions() instanceof ToolCallingChatOptions toolOptions)) {
+
+            return chatClientRequest;
+        }
+
+        ToolCallingChatOptions toolOptionsCopy = ((ToolCallingChatOptions.Builder<?>) toolOptions.mutate())
+            .toolContext(RunCatalogToolCallingManager.RUN_CATALOG_TOOL_CALLBACKS_KEY, runCatalogToolCallbacks)
+            .build();
+
+        return chatClientRequest.mutate()
+            .prompt(chatClientRequest.prompt()
+                .mutate()
+                .chatOptions(toolOptionsCopy)
+                .build())
+            .build();
     }
 
     private ChatClientRequest capturePinnedToolCallbacks(ChatClientRequest chatClientRequest) {
