@@ -3,8 +3,9 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpComponentListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItemDropdownMenu';
 import useMcpComponentListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentListItem';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import {McpComponent, McpServer} from '@/shared/middleware/graphql';
-import {ChevronDownIcon, ChevronRightIcon, ComponentIcon} from 'lucide-react';
+import {ComponentIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
@@ -22,15 +23,10 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
     return (
         <Collapsible className="group rounded-md border border-border/50" onOpenChange={setExpanded} open={expanded}>
             <div className="relative flex items-center gap-2.5 rounded-md px-3 py-2.5 hover:bg-surface-neutral-primary-hover">
-                <CollapsibleTrigger asChild>
-                    <button
-                        aria-label={expanded ? 'Hide tools' : 'Show tools'}
-                        className="shrink-0 text-muted-foreground after:absolute after:inset-0 hover:text-foreground"
-                        type="button"
-                    >
-                        {expanded ? <ChevronDownIcon className="size-4" /> : <ChevronRightIcon className="size-4" />}
-                    </button>
-                </CollapsibleTrigger>
+                <ListItemExpandButton
+                    className="mr-0 after:absolute after:inset-0"
+                    label={expanded ? 'Hide tools' : 'Show tools'}
+                />
 
                 {componentDefinition?.icon ? (
                     <InlineSVG className="size-6 shrink-0" src={componentDefinition.icon} />

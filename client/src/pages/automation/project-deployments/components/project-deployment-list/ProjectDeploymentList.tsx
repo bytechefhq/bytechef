@@ -87,7 +87,7 @@ const ProjectDeploymentList = ({
                         />
 
                         {!!projectDeployment.projectDeploymentWorkflows?.length && (
-                            <CollapsibleContent>
+                            <CollapsibleContent className="pl-8">
                                 <ProjectDeploymentWorkflowList
                                     componentDefinitions={componentDefinitions}
                                     environmentId={projectDeployment.environmentId!}

@@ -23,11 +23,12 @@ import {
 } from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, Settings2Icon} from 'lucide-react';
+import {Settings2Icon} from 'lucide-react';
 import {useCallback, useMemo, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
@@ -190,6 +191,8 @@ const IntegrationInstanceConfigurationListItem = ({
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleIntegrationInstanceConfigurationListItemClick(event)}
             >
+                <ListItemExpandButton disabled={workflowCount === 0} label="Toggle instance configuration" />
+
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex min-h-8 items-center justify-between">
@@ -225,10 +228,6 @@ const IntegrationInstanceConfigurationListItem = ({
                                         <span className="mr-1">
                                             {workflowCount === 1 ? `1 workflow` : `${workflowCount} workflows`}
                                         </span>
-
-                                        {workflowCount > 1 && (
-                                            <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
-                                        )}
                                     </CollapsibleTrigger>
                                 )}
 

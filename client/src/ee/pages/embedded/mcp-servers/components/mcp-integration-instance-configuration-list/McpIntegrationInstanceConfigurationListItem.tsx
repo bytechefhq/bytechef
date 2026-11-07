@@ -1,9 +1,10 @@
 import Badge from '@/components/Badge/Badge';
-import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
+import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
-import {ChevronDownIcon, ChevronRightIcon, ComponentIcon} from 'lucide-react';
+import {ComponentIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
@@ -48,19 +49,10 @@ const McpIntegrationInstanceConfigurationListItem = ({
                 open={expanded}
             >
                 <div className="relative flex items-center gap-2.5 rounded-md px-3 py-2.5 hover:bg-surface-neutral-primary-hover">
-                    <CollapsibleTrigger asChild>
-                        <button
-                            aria-label={expanded ? 'Collapse integration' : 'Expand integration'}
-                            className="shrink-0 text-muted-foreground after:absolute after:inset-0 hover:text-foreground"
-                            type="button"
-                        >
-                            {expanded ? (
-                                <ChevronDownIcon className="size-4" />
-                            ) : (
-                                <ChevronRightIcon className="size-4" />
-                            )}
-                        </button>
-                    </CollapsibleTrigger>
+                    <ListItemExpandButton
+                        className="mr-0 after:absolute after:inset-0"
+                        label={expanded ? 'Collapse integration' : 'Expand integration'}
+                    />
 
                     {componentDefinition?.icon ? (
                         <InlineSVG className="size-6 shrink-0" src={componentDefinition.icon} />

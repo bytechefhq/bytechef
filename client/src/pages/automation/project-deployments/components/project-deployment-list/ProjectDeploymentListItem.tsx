@@ -7,6 +7,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentListItemDropdownMenu';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-deployments/stores/useProjectDeploymentsEnabledStore';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ProjectDeployment, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentTagsMutation} from '@/shared/mutations/automation/projectDeploymentTags.mutations';
@@ -18,7 +19,7 @@ import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeplo
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, Layers3Icon} from 'lucide-react';
+import {Layers3Icon} from 'lucide-react';
 import {useCallback, useRef, useState} from 'react';
 
 import TagList from '../../../../../shared/components/TagList';
@@ -137,6 +138,8 @@ const ProjectDeploymentListItem = ({
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleProjectDeploymentListItemClick(event)}
             >
+                <ListItemExpandButton label="Toggle deployment" />
+
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
@@ -171,8 +174,6 @@ const ProjectDeploymentListItem = ({
                                             ? `1 workflow`
                                             : `${projectDeployment.projectDeploymentWorkflows?.length} workflows`}
                                     </span>
-
-                                    <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
                                 <div onClick={(event) => event.stopPropagation()}>

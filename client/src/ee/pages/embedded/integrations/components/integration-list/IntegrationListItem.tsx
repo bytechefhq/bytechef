@@ -27,6 +27,7 @@ import {useCreateIntegrationWorkflowMutation} from '@/ee/shared/mutations/embedd
 import {IntegrationCategoryKeys} from '@/ee/shared/queries/embedded/integrationCategories.queries';
 import {IntegrationTagKeys} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
@@ -191,6 +192,8 @@ const IntegrationListItem = ({
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleIntegrationListItemClick(event)}
             >
+                <ListItemExpandButton label="Toggle integration" />
+
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']/integration:border-none">
                     <div className="flex-1">
                         <div className="flex min-h-8 items-center justify-between">
@@ -258,8 +261,6 @@ const IntegrationListItem = ({
                                               ? '1 configuration'
                                               : `${configurationCount} configurations`}
                                     </span>
-
-                                    <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
                                 <div onClick={(event) => event.preventDefault()}>
@@ -412,7 +413,7 @@ const IntegrationListItem = ({
                 </div>
             </div>
 
-            <CollapsibleContent className="mx-3 mt-1 mb-3">
+            <CollapsibleContent className="mt-1 mr-3 mb-3 ml-11">
                 <IntegrationListItemTabs
                     actions={
                         activeTab === 'workflows' && workflowCount > 0 ? (
