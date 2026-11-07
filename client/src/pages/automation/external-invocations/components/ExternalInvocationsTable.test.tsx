@@ -48,6 +48,22 @@ describe('ExternalInvocationsTable', () => {
         expect(screen.getAllByRole('cell')[0]).toHaveTextContent('SUCCESS');
     });
 
+    it.each([
+        ['MCP_AUTOMATION', 'COMPONENT', 'Component tool'],
+        ['MCP_AUTOMATION', 'WORKFLOW', 'Workflow tool'],
+        ['MCP_EMBEDDED', 'COMPONENT', 'Component tool'],
+        ['MCP_EMBEDDED', 'WORKFLOW', 'Workflow tool'],
+        ['EMBEDDED_API_TOOL', 'COMPONENT', 'Component tool'],
+        ['EMBEDDED_API_ACTION', 'COMPONENT', 'Action'],
+        ['A2A', 'WORKFLOW', 'Skill'],
+        ['MCP_AUTOMATION', 'UNKNOWN_KIND', 'UNKNOWN_KIND'],
+    ])('renders a %s %s call as %s in the Type column', (surface, kind, expectedLabel) => {
+        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, kind, surface}]} />);
+
+        expect(screen.getAllByRole('columnheader')[2]).toHaveTextContent('Type');
+        expect(screen.getAllByRole('cell')[2]).toHaveTextContent(new RegExp(`^${expectedLabel}$`));
+    });
+
     it('renders an em dash when the tool name is missing', () => {
         render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, id: '2', toolName: null}]} />);
 
@@ -121,7 +137,7 @@ describe('ExternalInvocationsTable', () => {
             />
         );
 
-        expect(screen.getByText('Workflow')).toBeInTheDocument();
+        expect(screen.getAllByRole('cell')[5]).toHaveTextContent(/^Workflow$/);
     });
 
     it('shows the MCP server name and a dash when the server is missing or unknown', () => {
@@ -232,7 +248,7 @@ describe('ExternalInvocationsTable', () => {
 
         const rows = screen.getAllByRole('row');
 
-        expect(rows[1].querySelectorAll('td')).toHaveLength(8);
+        expect(rows[1].querySelectorAll('td')).toHaveLength(9);
         expect(screen.getAllByRole('button', {name: 'External invocation actions'})).toHaveLength(1);
         expect(rows[2]).toContainElement(screen.getByRole('button', {name: 'External invocation actions'}));
     });
