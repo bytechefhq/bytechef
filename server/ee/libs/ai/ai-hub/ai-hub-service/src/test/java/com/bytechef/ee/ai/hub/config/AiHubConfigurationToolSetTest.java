@@ -69,13 +69,12 @@ class AiHubConfigurationToolSetTest {
 
         assertThat(toolNames(buildAgent)).containsExactlyInAnyOrder(
             "addAiAgentChannel", "addAiAgentElement", "askUserQuestion", "buildWorkflow", "checkWorkflow",
-            "createAiAgent", "createConnection", "createProject", "createProjectWorkflow", "deleteAiAgentChannel",
-            "deleteAiAgentElement", "getAiAgent", "getWorkflow", "importWorkflow", "listAiAgents",
-            "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab", "openWorkflowChatTab",
-            "openWorkflowTab", "saveWorkflowTestConnection", "searchAiAgentReferences", "searchAiAgentTools",
-            "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
-            "selectPropertyOption", "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement",
-            "updateAiAgentSettings");
+            "createAiAgent", "createConnection", "createProject", "createProjectWorkflow", "getAiAgent", "getWorkflow",
+            "importWorkflow", "listAiAgents", "listConnectionsForComponent", "listProjects", "listWorkflows",
+            "openAiAgentTab", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection",
+            "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows",
+            "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
+            "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement", "updateAiAgentSettings");
     }
 
     @Test
@@ -89,7 +88,7 @@ class AiHubConfigurationToolSetTest {
             "searchDocs", "listProjectDeployments", "createProjectDeployment", "updateProjectDeployment",
             "deleteProjectDeployment", "rollbackProjectDeployment", "toggleProjectDeployment", "promoteWorkflow",
             "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions",
-            "listChatWorkflows", "createWorkflowChat");
+            "listChatWorkflows", "createWorkflowChat", "deleteAiAgentChannel", "deleteAiAgentElement");
     }
 
     @Test
