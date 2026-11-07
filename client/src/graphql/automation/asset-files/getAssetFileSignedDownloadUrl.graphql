@@ -1,0 +1,3 @@
+query GetAssetFileSignedDownloadUrl($id: ID!) {
+    assetFileSignedDownloadUrl(id: $id)
+}
