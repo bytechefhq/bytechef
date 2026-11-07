@@ -34,6 +34,37 @@ import {
     WorkflowExecutionToJSON,
 } from '../models/WorkflowExecution';
 
+export interface GetAnyWorkflowExecutionsPageRequest {
+    /**
+     * The id of the workspace whose automation workflow executions are returned.
+     */
+    workspaceId: number;
+    /**
+     * The id of an environment.
+     */
+    environmentId?: number;
+    /**
+     * The status of an executed job
+     */
+    jobStatus?: GetAnyWorkflowExecutionsPageJobStatusEnum;
+    /**
+     * The start date of a job.
+     */
+    jobStartDate?: Date;
+    /**
+     * The end date of a job.
+     */
+    jobEndDate?: Date;
+    /**
+     * The id of a connected user.
+     */
+    connectedUserId?: number;
+    /**
+     * The number of the page to return.
+     */
+    pageNumber?: number;
+}
+
 export interface GetWorkflowExecutionRequest {
     /**
      * The id of an execution.
@@ -118,6 +149,80 @@ export interface GetWorkflowExecutionsPageRequest {
  * 
  */
 export class WorkflowExecutionApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for getAnyWorkflowExecutionsPage without sending the request
+     */
+    async getAnyWorkflowExecutionsPageRequestOpts(requestParameters: GetAnyWorkflowExecutionsPageRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['workspaceId'] == null) {
+            throw new runtime.RequiredError(
+                'workspaceId',
+                'Required parameter "workspaceId" was null or undefined when calling getAnyWorkflowExecutionsPage().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['workspaceId'] != null) {
+            queryParameters['workspaceId'] = requestParameters['workspaceId'];
+        }
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
+
+        if (requestParameters['jobStatus'] != null) {
+            queryParameters['jobStatus'] = requestParameters['jobStatus'];
+        }
+
+        if (requestParameters['jobStartDate'] != null) {
+            queryParameters['jobStartDate'] = runtime.serializeDateTime(requestParameters['jobStartDate'] as any);
+        }
+
+        if (requestParameters['jobEndDate'] != null) {
+            queryParameters['jobEndDate'] = runtime.serializeDateTime(requestParameters['jobEndDate'] as any);
+        }
+
+        if (requestParameters['connectedUserId'] != null) {
+            queryParameters['connectedUserId'] = requestParameters['connectedUserId'];
+        }
+
+        if (requestParameters['pageNumber'] != null) {
+            queryParameters['pageNumber'] = requestParameters['pageNumber'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/workflow-executions/any`;
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get the integration and automation workflow executions of connected users together, newest first.
+     * Get integration and automation workflow executions
+     */
+    async getAnyWorkflowExecutionsPageRaw(requestParameters: GetAnyWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Page>> {
+        const requestOptions = await this.getAnyWorkflowExecutionsPageRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PageFromJSON(jsonValue));
+    }
+
+    /**
+     * Get the integration and automation workflow executions of connected users together, newest first.
+     * Get integration and automation workflow executions
+     */
+    async getAnyWorkflowExecutionsPage(requestParameters: GetAnyWorkflowExecutionsPageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Page> {
+        const response = await this.getAnyWorkflowExecutionsPageRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for getWorkflowExecution without sending the request
@@ -365,6 +470,18 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
 
 }
 
+/**
+ * @export
+ */
+export const GetAnyWorkflowExecutionsPageJobStatusEnum = {
+    Created: 'CREATED',
+    Started: 'STARTED',
+    Stopped: 'STOPPED',
+    Failed: 'FAILED',
+    Completed: 'COMPLETED',
+    PaymentRequired: 'PAYMENT_REQUIRED',
+} as const;
+export type GetAnyWorkflowExecutionsPageJobStatusEnum = typeof GetAnyWorkflowExecutionsPageJobStatusEnum[keyof typeof GetAnyWorkflowExecutionsPageJobStatusEnum];
 /**
  * @export
  */

@@ -4,6 +4,7 @@ docs/AuthorizationType.md
 docs/ClusterElementCall.md
 docs/ClusterElementCallRecord.md
 docs/ComponentConnection.md
+docs/EmbeddedWorkflowExecution.md
 docs/ExecutionError.md
 docs/FocusPathElement.md
 docs/IntegrationBasic.md
@@ -34,6 +35,7 @@ models/AuthorizationType.ts
 models/ClusterElementCall.ts
 models/ClusterElementCallRecord.ts
 models/ComponentConnection.ts
+models/EmbeddedWorkflowExecution.ts
 models/ExecutionError.ts
 models/FocusPathElement.ts
 models/IntegrationBasic.ts
