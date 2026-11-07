@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.server.spi;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.ai.tool.ToolCallback;
 
 /**
@@ -29,4 +30,8 @@ import org.springframework.ai.tool.ToolCallback;
 public interface McpServerToolCallbackContributor {
 
     List<ToolCallback> getToolCallbacks();
+
+    default Map<String, McpAppUiDescriptor> getMcpAppUiDescriptors() {
+        return Map.of();
+    }
 }
