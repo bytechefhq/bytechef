@@ -29,7 +29,7 @@ const Tag = ({onDeleteTag, tag}: TagProps) => (
             <TooltipTrigger asChild>
                 <Button
                     aria-label="Remove tag"
-                    className="pointer-events-none absolute top-1/2 right-0.5 size-4 -translate-y-1/2 rounded-full bg-surface-neutral-secondary p-0.5 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-surface-neutral-secondary-hover focus-visible:pointer-events-auto focus-visible:opacity-100 [&_svg]:size-2.5"
+                    className="pointer-events-none absolute top-1/2 right-0.5 size-4 -translate-y-1/2 rounded-full bg-surface-neutral-tertiary p-0.5 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 hover:bg-surface-destructive-secondary-hover focus-visible:pointer-events-auto focus-visible:opacity-100 dark:bg-surface-neutral-tertiary-hover dark:hover:bg-surface-destructive-secondary-hover [&_svg]:size-2.5"
                     icon={<XIcon />}
                     onClick={() => onDeleteTag(tag)}
                     size="iconXxs"
