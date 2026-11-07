@@ -22,7 +22,7 @@ interface TagProps {
 }
 
 const Tag = ({onDeleteTag, tag}: TagProps) => (
-    <div className="group relative flex max-h-8 items-center rounded-full border border-border/50 px-2 text-xs text-content-neutral-primary">
+    <div className="group relative flex max-h-8 items-center rounded-full border border-stroke-neutral-tertiary px-2 text-xs text-content-neutral-primary">
         <span className="py-0.5">{tag.name}</span>
 
         <Tooltip>
@@ -159,7 +159,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                 </>
             ) : (
                 <Button
-                    className="rounded-full border border-dashed border-border text-content-neutral-secondary hover:border-solid hover:text-content-neutral-primary"
+                    className="rounded-full border border-dashed border-stroke-neutral-tertiary text-content-neutral-secondary hover:border-solid hover:text-content-neutral-primary"
                     label="Add tag"
                     onClick={(event) => {
                         event.preventDefault();
