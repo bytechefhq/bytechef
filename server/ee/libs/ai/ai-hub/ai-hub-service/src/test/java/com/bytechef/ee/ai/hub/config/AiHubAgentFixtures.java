@@ -61,7 +61,9 @@ import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.automation.ai.tool.ApiCollectionToolCallbacksFactory;
 import com.bytechef.ee.automation.ai.tool.componentrule.ComponentRuleToolCallbacksFactory;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
+import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
 import com.bytechef.ee.platform.component.rule.ComponentRuleService;
+import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
@@ -103,6 +105,8 @@ public final class AiHubAgentFixtures {
     public final AiHubChatService chatService = mock(AiHubChatService.class);
     public final AiHubChatAccessPolicy chatAccessPolicy = mock(AiHubChatAccessPolicy.class);
     public final AiAgentFacade aiAgentFacade = mock(AiAgentFacade.class);
+    public final CustomComponentFacade customComponentFacade = mock(CustomComponentFacade.class);
+    public final ProjectCodeWorkflowFacade projectCodeWorkflowFacade = mock(ProjectCodeWorkflowFacade.class);
     public final ApiCollectionToolCallbacksFactory apiCollectionToolCallbacksFactory =
         new ApiCollectionToolCallbacksFactory(mock(ApiCollectionFacade.class));
     public final ComponentRuleToolCallbacksFactory componentRuleToolCallbacksFactory =
@@ -264,7 +268,9 @@ public final class AiHubAgentFixtures {
             aiAgentToolCallbacksFactoryProvider(), availableProvider(assetFileToolCallbacksFactory),
             availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
             availableProvider(apiCollectionToolCallbacksFactory), availableProvider(componentRuleToolCallbacksFactory),
-            availableProvider(aiAgentFacade), interactivePickerToolCallbacks, intelligentToolCatalog, workspaceFacade,
+            availableProvider(aiAgentFacade), availableProvider(customComponentFacade),
+            availableProvider(projectCodeWorkflowFacade), interactivePickerToolCallbacks, intelligentToolCatalog,
+            workspaceFacade,
             projectWorkflowFacade,
             projectDeploymentFacade, chatService, chatAccessPolicy, artifactRecorder, policy,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
