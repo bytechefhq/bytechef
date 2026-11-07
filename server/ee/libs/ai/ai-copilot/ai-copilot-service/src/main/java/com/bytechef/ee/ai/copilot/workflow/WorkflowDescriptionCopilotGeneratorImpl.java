@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.workflow;
 
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -22,7 +23,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -38,15 +38,18 @@ import org.springframework.stereotype.Service;
 public class WorkflowDescriptionCopilotGeneratorImpl implements WorkflowDescriptionCopilotGenerator {
 
     private final OverrideChatClientResolver overrideChatClientResolver;
+    private final CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory;
     private final WorkflowService workflowService;
     private final WorkflowDescriptionPromptBuilder promptBuilder;
     private final ObjectProvider<MeterRegistry> meterRegistryProvider;
 
     public WorkflowDescriptionCopilotGeneratorImpl(
         OverrideChatClientResolver overrideChatClientResolver, WorkflowService workflowService,
-        WorkflowDescriptionPromptBuilder promptBuilder, ObjectProvider<MeterRegistry> meterRegistryProvider) {
+        WorkflowDescriptionPromptBuilder promptBuilder, ObjectProvider<MeterRegistry> meterRegistryProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory) {
 
         this.overrideChatClientResolver = overrideChatClientResolver;
+        this.copilotGuardrailsAdvisorFactory = copilotGuardrailsAdvisorFactory;
         this.workflowService = workflowService;
         this.promptBuilder = promptBuilder;
         this.meterRegistryProvider = meterRegistryProvider;
@@ -93,8 +96,15 @@ public class WorkflowDescriptionCopilotGeneratorImpl implements WorkflowDescript
         return chatModel;
     }
 
-    private static String call(ChatModel chatModel, String promptText) {
-        ChatResponse chatResponse = chatModel.call(new Prompt(promptText));
+    private String call(ChatModel chatModel, String promptText) {
+        ChatResponse chatResponse = copilotGuardrailsAdvisorFactory.guardedChatClient(chatModel)
+            .prompt(promptText)
+            .call()
+            .chatResponse();
+
+        if (chatResponse == null) {
+            return "";
+        }
 
         Generation generation = Objects.requireNonNull(chatResponse.getResult(), "generation is required");
 

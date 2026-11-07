@@ -13,10 +13,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.evaluator.Evaluator;
@@ -41,6 +43,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -57,7 +60,7 @@ class PropertyCopilotGeneratorTest {
     private static final long DEVELOPMENT_ORDINAL = 0L;
     private static final long PRODUCTION_ORDINAL = 2L;
 
-    private final ChatModel chatModel = mock(ChatModel.class);
+    private final ChatModel chatModel = newChatModel();
     private final Evaluator evaluator = mock(Evaluator.class);
     private final MeterRegistry meterRegistry = new SimpleMeterRegistry();
     private final OverrideChatClientResolver overrideChatClientResolver = mock(OverrideChatClientResolver.class);
@@ -82,7 +85,7 @@ class PropertyCopilotGeneratorTest {
 
         generator = new PropertyCopilotGeneratorImpl(
             evaluator, new PropertyCopilotPromptBuilder(), List.of(), workflowNodeOutputFacade, meterRegistryProvider,
-            overrideChatClientResolver);
+            overrideChatClientResolver, new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
     }
 
     @AfterEach
@@ -348,5 +351,15 @@ class PropertyCopilotGeneratorTest {
         public @Nullable PlatformType getPlatformType() {
             return null;
         }
+    }
+
+    private static ChatModel newChatModel() {
+        ChatModel chatModel = mock(ChatModel.class);
+
+        lenient().when(chatModel.getOptions())
+            .thenReturn(ChatOptions.builder()
+                .build());
+
+        return chatModel;
     }
 }

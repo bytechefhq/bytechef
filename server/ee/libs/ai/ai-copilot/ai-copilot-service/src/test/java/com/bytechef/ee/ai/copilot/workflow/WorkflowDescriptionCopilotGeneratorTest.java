@@ -11,10 +11,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -33,6 +35,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,7 +47,7 @@ import org.springframework.security.core.userdetails.User;
  */
 class WorkflowDescriptionCopilotGeneratorTest {
 
-    private final ChatModel chatModel = mock(ChatModel.class);
+    private final ChatModel chatModel = newChatModel();
     private final MeterRegistry meterRegistry = new SimpleMeterRegistry();
     private final OverrideChatClientResolver overrideChatClientResolver = mock(OverrideChatClientResolver.class);
     private final WorkflowService workflowService = mock(WorkflowService.class);
@@ -148,7 +151,7 @@ class WorkflowDescriptionCopilotGeneratorTest {
 
         return new WorkflowDescriptionCopilotGeneratorImpl(
             overrideChatClientResolver, workflowService, new WorkflowDescriptionPromptBuilder(),
-            meterRegistryProvider);
+            meterRegistryProvider, new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
     }
 
     private static final class TestApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
@@ -166,5 +169,15 @@ class WorkflowDescriptionCopilotGeneratorTest {
         public @Nullable PlatformType getPlatformType() {
             return null;
         }
+    }
+
+    private static ChatModel newChatModel() {
+        ChatModel chatModel = mock(ChatModel.class);
+
+        lenient().when(chatModel.getOptions())
+            .thenReturn(ChatOptions.builder()
+                .build());
+
+        return chatModel;
     }
 }

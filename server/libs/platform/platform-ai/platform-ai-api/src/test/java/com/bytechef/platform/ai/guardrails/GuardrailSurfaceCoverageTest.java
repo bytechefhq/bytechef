@@ -48,8 +48,7 @@ class GuardrailSurfaceCoverageTest {
 
     private static final String DIRECT_MODEL_CALL_HINT = ".call(";
 
-    private static final Set<String> EXEMPT_DIRECT_MODEL_CALLERS = Set.of(
-        "ApiConnectorAiServiceImpl", "PropertyCopilotGeneratorImpl", "WorkflowDescriptionCopilotGeneratorImpl");
+    private static final Set<String> EXEMPT_DIRECT_MODEL_CALLERS = Set.of("ApiConnectorAiServiceImpl");
 
     @Test
     @Timeout(value = 5, unit = TimeUnit.MINUTES)
@@ -102,12 +101,13 @@ class GuardrailSurfaceCoverageTest {
     @Test
     void testEverySurfaceNameIsRegistered() {
         assertTrue(
-            GuardrailSurface.ALL.containsAll(Set.of(GuardrailSurface.AI_AGENT, GuardrailSurface.AI_HUB)),
+            GuardrailSurface.ALL.containsAll(
+                Set.of(GuardrailSurface.AI_AGENT, GuardrailSurface.AI_HUB, GuardrailSurface.COPILOT)),
             "GuardrailSurface.ALL must list every declared surface; a surface missing from it resolves its own "
                 + "policy and reports its own metrics under a name nothing else uses.");
 
         assertTrue(
-            GuardrailSurface.ALL.size() == 2,
+            GuardrailSurface.ALL.size() == 3,
             "A surface was added or removed without updating this test. Adding one is a real change: it introduces a "
                 + "place where workspace data reaches a model, so the addition should be reviewed rather than "
                 + "absorbed. Found: " + GuardrailSurface.ALL);

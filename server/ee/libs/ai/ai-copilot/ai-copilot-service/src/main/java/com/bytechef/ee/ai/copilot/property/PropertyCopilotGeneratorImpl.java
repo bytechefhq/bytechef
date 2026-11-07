@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.property;
 
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.evaluator.Evaluator;
@@ -32,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.expression.ExpressionException;
@@ -60,12 +60,14 @@ public class PropertyCopilotGeneratorImpl implements PropertyCopilotGenerator {
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final ObjectProvider<MeterRegistry> meterRegistryProvider;
     private final OverrideChatClientResolver overrideChatClientResolver;
+    private final CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory;
 
     public PropertyCopilotGeneratorImpl(
         Evaluator evaluator, PropertyCopilotPromptBuilder promptBuilder,
         List<EvaluatorFunctionDefinitionFactory> evaluatorFunctionDefinitionFactories,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, ObjectProvider<MeterRegistry> meterRegistryProvider,
-        OverrideChatClientResolver overrideChatClientResolver) {
+        OverrideChatClientResolver overrideChatClientResolver,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory) {
 
         this.evaluator = evaluator;
         this.promptBuilder = promptBuilder;
@@ -73,6 +75,7 @@ public class PropertyCopilotGeneratorImpl implements PropertyCopilotGenerator {
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.meterRegistryProvider = meterRegistryProvider;
         this.overrideChatClientResolver = overrideChatClientResolver;
+        this.copilotGuardrailsAdvisorFactory = copilotGuardrailsAdvisorFactory;
     }
 
     @Override
@@ -235,8 +238,15 @@ public class PropertyCopilotGeneratorImpl implements PropertyCopilotGenerator {
         return chatModel;
     }
 
-    private static String call(ChatModel chatModel, String promptText) {
-        ChatResponse chatResponse = chatModel.call(new Prompt(promptText));
+    private String call(ChatModel chatModel, String promptText) {
+        ChatResponse chatResponse = copilotGuardrailsAdvisorFactory.guardedChatClient(chatModel)
+            .prompt(promptText)
+            .call()
+            .chatResponse();
+
+        if (chatResponse == null) {
+            return "";
+        }
 
         Generation generation = Objects.requireNonNull(chatResponse.getResult(), "generation is required");
 
