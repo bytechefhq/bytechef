@@ -534,12 +534,12 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "surface"
-          description: "Return only invocations made through this surface."
+        - name: "source"
+          description: "Return only invocations made through this source."
           in: "query"
           required: false
           schema:
-            $ref: "#/components/schemas/ExternalInvocationSurface"
+            $ref: "#/components/schemas/ExternalInvocationSource"
         - name: "outcome"
           description: "Return only invocations with this outcome."
           in: "query"
@@ -1208,8 +1208,8 @@ components:
           type: "string"
         outcome:
           $ref: "#/components/schemas/ExternalInvocationOutcome"
-        surface:
-          $ref: "#/components/schemas/ExternalInvocationSurface"
+        source:
+          $ref: "#/components/schemas/ExternalInvocationSource"
         toolName:
           description: "The name of the tool."
           type: "string"
@@ -1255,13 +1255,13 @@ components:
         totalPages:
           description: "The total number of pages."
           type: "integer"
-    ExternalInvocationSurface:
-      description: "The surface a external invocation was made through."
+    ExternalInvocationSource:
+      description: "The source a external invocation was made through."
       type: "string"
       enum:
-        - "MCP_EMBEDDED"
-        - "EMBEDDED_API_ACTION"
-        - "EMBEDDED_API_TOOL"
+        - "MCP_SERVER"
+        - "API_ACTION"
+        - "API_TOOL"
 #    Trigger:
 #      type: "object"
 #      required:
