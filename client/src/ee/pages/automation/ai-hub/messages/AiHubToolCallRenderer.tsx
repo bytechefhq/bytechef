@@ -290,8 +290,11 @@ const AiHubToolCallRenderer = ({args, argsText, isError, result, toolCallId, too
 
 const RUNNING_TOOL_CALL_LABELS: Record<string, string> = {
     buildWorkflow: 'Building workflow...',
+    data_analyst: 'Analyzing data...',
+    image_generator: 'Generating image...',
     importWorkflow: 'Importing workflow...',
     research: 'Researching the web...',
+    slide_builder: 'Building slides...',
 };
 
 interface RunningToolCallRowProps {
