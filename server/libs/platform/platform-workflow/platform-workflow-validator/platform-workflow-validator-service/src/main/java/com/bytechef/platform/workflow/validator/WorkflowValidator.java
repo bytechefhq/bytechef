@@ -37,7 +37,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class WorkflowValidator {
 
     private static final String[] NESTED_TASK_ARRAY_PROPERTIES = new String[] {
-        "caseTrue", "caseFalse", "default", "main-branch", "on-error-branch", "tasks"
+        "caseTrue", "caseFalse", "default", "main-branch", "nodes", "on-error-branch", "tasks"
     };
 
     static final List<String> VALID_INPUT_TYPES = List.of(

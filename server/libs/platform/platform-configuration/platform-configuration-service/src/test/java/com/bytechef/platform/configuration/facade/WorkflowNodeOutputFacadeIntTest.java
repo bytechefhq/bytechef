@@ -861,7 +861,7 @@ class WorkflowNodeOutputFacadeIntTest {
                 }
                 """);
 
-        assertDispatcherAggregateOutputExcludedForNestedTask(workflowId, "branch1", "branch");
+        assertDispatcherAggregateOutputExcludedForNestedTask(workflowId, "branch1", "branch", "branch1");
     }
 
     @Test
@@ -875,7 +875,7 @@ class WorkflowNodeOutputFacadeIntTest {
                 }
                 """);
 
-        assertDispatcherAggregateOutputExcludedForNestedTask(workflowId, "condition1", "condition");
+        assertDispatcherAggregateOutputExcludedForNestedTask(workflowId, "condition1", "condition", "condition1");
     }
 
     @Test
@@ -889,11 +889,196 @@ class WorkflowNodeOutputFacadeIntTest {
                 }
                 """);
 
-        assertDispatcherAggregateOutputExcludedForNestedTask(workflowId, "forkJoin1", "fork-join");
+        assertDispatcherAggregateOutputExcludedForNestedTask(workflowId, "forkJoin1", "fork-join", "forkJoin1");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesGraphAggregateOutputForNestedTask() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "graph1", "type": "graph/v1", "parameters": {"nodes": [{"name": "nested1", "type": "component/v1/action1", "parameters": {}}]}}
+                    ]
+                }
+                """);
+
+        stubStaticActionOutput("action1", new OutputResponse(null, Map.of("key", "value"), null));
+
+        assertDispatcherAggregateOutputExcludedForNestedTask(workflowId, "graph1", "graph", "graph1");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsIncludesGraphMembersThatLoopBackToTheNode() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "action1", "type": "component/v1/action1", "parameters": {}},
+                        {"name": "graph1", "type": "graph/v1", "parameters": {
+                            "startNode": "action2",
+                            "nodes": [
+                                {"name": "action2", "type": "component/v1/action2", "parameters": {}},
+                                {"name": "action3", "type": "component/v1/action3", "parameters": {}}
+                            ],
+                            "transitions": [
+                                {"from": "action2", "to": "action3"},
+                                {"from": "action3", "to": "action2"}
+                            ]
+                        }}
+                    ]
+                }
+                """);
+
+        stubStaticActionOutput("action1", new OutputResponse(null, Map.of("key", "value1"), null));
+        stubStaticActionOutput("action2", new OutputResponse(null, Map.of("key", "value2"), null));
+        stubStaticActionOutput("action3", new OutputResponse(null, Map.of("key", "value3"), null));
+
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("graph", 1))
+            .thenReturn(mock(TaskDispatcherDefinition.class));
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "action2", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly("action1", "graph1", "action3", "action2");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsIncludesAGraphMemberDeclaredLaterThatRunsFirst() {
+        String workflowId = createWorkflow(graphDefinition("action3", """
+            [{"from": "action3", "to": "action2"}]"""));
+
+        stubGraphMemberOutputs();
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "action2", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly("action1", "graph1", "action3");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsExcludesAGraphMemberThatRunsAfterTheNode() {
+        String workflowId = createWorkflow(graphDefinition("action3", """
+            [{"from": "action3", "to": "action2"}]"""));
+
+        stubGraphMemberOutputs();
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "action3", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly("action1", "graph1");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsIncludesEveryGraphMemberWhenATransitionTargetIsDynamic() {
+        String workflowId = createWorkflow(graphDefinition("action2", """
+            [{"from": "action2", "to": "=${action2.key}"}]"""));
+
+        stubGraphMemberOutputs();
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "action2", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly("action1", "graph1", "action3", "action2");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsIncludesEveryMemberForTheGraphItself() {
+        String workflowId = createWorkflow(graphDefinition("action3", """
+            [{"from": "action3", "to": "action2"}]"""));
+
+        stubGraphMemberOutputs();
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "graph1", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly("action1", "action2", "action3");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeSampleOutputsIncludesAGraphMemberDeclaredLaterThatRunsFirst() {
+        String workflowId = createWorkflow(graphDefinition("action3", """
+            [{"from": "action3", "to": "action2"}]"""));
+
+        stubGraphMemberOutputs();
+
+        Map<String, ?> sampleOutputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+            workflowId, "action2", ENVIRONMENT_ID);
+
+        assertThat(sampleOutputs).containsOnlyKeys("action1", "action3");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsTerminatesForALoopGraphWithDynamicMembers() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "graph1", "type": "graph/v1", "parameters": {
+                            "startNode": "action2",
+                            "nodes": [
+                                {"name": "action2", "type": "component/v1/action2", "parameters": {}},
+                                {"name": "action3", "type": "component/v1/action3", "parameters": {}}
+                            ],
+                            "transitions": [
+                                {"from": "action2", "to": "action3"},
+                                {"from": "action3", "to": "action2"}
+                            ]
+                        }}
+                    ]
+                }
+                """);
+
+        stubDynamicAction("action2");
+        stubDynamicAction("action3");
+
+        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), any(), anyMap(), anyMap()))
+            .thenReturn(new OutputResponse(null, Map.of("key", "value"), null));
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("graph", 1))
+            .thenReturn(mock(TaskDispatcherDefinition.class));
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "action3", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly("graph1", "action2", "action3");
+    }
+
+    private static String graphDefinition(String startNode, String transitions) {
+        return """
+            {
+                "tasks": [
+                    {"name": "action1", "type": "component/v1/action1", "parameters": {}},
+                    {"name": "graph1", "type": "graph/v1", "parameters": {
+                        "startNode": "%s",
+                        "nodes": [
+                            {"name": "action2", "type": "component/v1/action2", "parameters": {}},
+                            {"name": "action3", "type": "component/v1/action3", "parameters": {}}
+                        ],
+                        "transitions": %s
+                    }}
+                ]
+            }
+            """.formatted(startNode, transitions);
+    }
+
+    private void stubGraphMemberOutputs() {
+        stubStaticActionOutput("action1", new OutputResponse(null, Map.of("key", "value1"), null));
+        stubStaticActionOutput("action2", new OutputResponse(null, Map.of("key", "value2"), null));
+        stubStaticActionOutput("action3", new OutputResponse(null, Map.of("key", "value3"), null));
+
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("graph", 1))
+            .thenReturn(mock(TaskDispatcherDefinition.class));
     }
 
     private void assertDispatcherAggregateOutputExcludedForNestedTask(
-        String workflowId, String dispatcherWorkflowNodeName, String dispatcherName) {
+        String workflowId, String dispatcherWorkflowNodeName, String dispatcherName,
+        String... expectedWorkflowNodeNames) {
 
         when(taskDispatcherDefinitionService.getTaskDispatcherDefinition(dispatcherName, 1))
             .thenReturn(mock(TaskDispatcherDefinition.class));
@@ -907,7 +1092,8 @@ class WorkflowNodeOutputFacadeIntTest {
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
             workflowId, "nested1", ENVIRONMENT_ID);
 
-        assertThat(workflowNodeOutputDTOs).hasSize(1);
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly(expectedWorkflowNodeNames);
 
         WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputDTOs.getFirst();
 
