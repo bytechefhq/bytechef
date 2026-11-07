@@ -18,7 +18,10 @@ package com.bytechef.automation.data.table.configuration.facade;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import java.util.List;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Coordinates the platform {@code DataTableService} with the workspace relation, exposing the workspace-scoped
@@ -28,10 +31,27 @@ import java.util.List;
  */
 public interface WorkspaceDataTableFacade {
 
+    void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId);
+
     void createTable(
         String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId);
 
+    boolean deleteRow(long dataTableId, long rowId, long environmentId);
+
+    boolean dropTable(long dataTableId, long environmentId);
+
     void duplicateTable(long tableId, String newBaseName, long environmentId);
 
+    long getDataTableId(String baseName);
+
+    @Nullable
+    DataTableRow getRow(long dataTableId, long rowId, long environmentId);
+
+    DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId);
+
+    List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId);
+
     List<DataTableInfo> listTables(long workspaceId, long environmentId);
+
+    DataTableRow updateRow(long dataTableId, long rowId, Map<String, Object> values, long environmentId);
 }
