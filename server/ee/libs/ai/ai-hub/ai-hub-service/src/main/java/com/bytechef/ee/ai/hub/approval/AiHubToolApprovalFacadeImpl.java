@@ -19,6 +19,8 @@ import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.ForbiddenException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
+import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
 import com.bytechef.platform.audit.AuditData;
@@ -66,6 +68,7 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
     private final AiHubChatService chatService;
     private final UserService userService;
     private final ObjectProvider<AiHubPinnedToolCallbacks> pinnedToolCallbacksProvider;
+    private final ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider;
     private final ObjectProvider<AiHubContinuationStarter> continuationStarterProvider;
     private final @Nullable SecurityContextRehydrator securityContextRehydrator;
     private final TransactionTemplate transactionTemplate;
@@ -76,18 +79,20 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
     public AiHubToolApprovalFacadeImpl(
         AiHubToolApprovalService approvalService, AiHubChatService chatService, UserService userService,
         ObjectProvider<AiHubPinnedToolCallbacks> pinnedToolCallbacksProvider,
+        ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
         ObjectProvider<AiHubContinuationStarter> continuationStarterProvider,
         @Nullable SecurityContextRehydrator securityContextRehydrator, PlatformTransactionManager transactionManager) {
 
         this(
-            approvalService, chatService, userService, pinnedToolCallbacksProvider, continuationStarterProvider,
-            securityContextRehydrator, transactionManager, Clock.systemUTC());
+            approvalService, chatService, userService, pinnedToolCallbacksProvider, globalToolCatalogProvider,
+            continuationStarterProvider, securityContextRehydrator, transactionManager, Clock.systemUTC());
     }
 
     @SuppressFBWarnings("EI")
     AiHubToolApprovalFacadeImpl(
         AiHubToolApprovalService approvalService, AiHubChatService chatService, UserService userService,
         ObjectProvider<AiHubPinnedToolCallbacks> pinnedToolCallbacksProvider,
+        ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
         ObjectProvider<AiHubContinuationStarter> continuationStarterProvider,
         @Nullable SecurityContextRehydrator securityContextRehydrator, PlatformTransactionManager transactionManager,
         Clock clock) {
@@ -96,6 +101,7 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
         this.chatService = chatService;
         this.userService = userService;
         this.pinnedToolCallbacksProvider = pinnedToolCallbacksProvider;
+        this.globalToolCatalogProvider = globalToolCatalogProvider;
         this.continuationStarterProvider = continuationStarterProvider;
         this.securityContextRehydrator = securityContextRehydrator;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
@@ -261,16 +267,29 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
     }
 
     private Optional<ToolCallback> findCallback(AiHubToolApproval approval) {
-        AiHubPinnedToolCallbacks pinnedToolCallbacks = pinnedToolCallbacksProvider.getIfAvailable();
-
-        if (pinnedToolCallbacks == null) {
-            return Optional.empty();
-        }
-
         Mode mode = BUILD_MODE.equals(approval.getMode()) ? Mode.BUILD : Mode.ASK;
 
-        return pinnedToolCallbacks.pinnedToolCallbacks(mode)
-            .stream()
+        AiHubPinnedToolCallbacks pinnedToolCallbacks = pinnedToolCallbacksProvider.getIfAvailable();
+
+        if (pinnedToolCallbacks != null) {
+            Optional<ToolCallback> pinnedCallback = pinnedToolCallbacks.pinnedToolCallbacks(mode)
+                .stream()
+                .filter(callback -> hasName(callback, approval.getToolName()))
+                .findFirst();
+
+            if (pinnedCallback.isPresent()) {
+                return pinnedCallback;
+            }
+        }
+
+        String catalogSessionId = mode == Mode.BUILD
+            ? ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID
+            : ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID;
+
+        return globalToolCatalogProvider.orderedStream()
+            .filter(globalToolCatalog -> catalogSessionId.equals(globalToolCatalog.sessionId()))
+            .flatMap(globalToolCatalog -> globalToolCatalog.toolCallbacks()
+                .stream())
             .filter(callback -> hasName(callback, approval.getToolName()))
             .findFirst();
     }
