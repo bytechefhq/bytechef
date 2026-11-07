@@ -19,7 +19,7 @@ import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -63,7 +63,7 @@ public class ActionFacadeImpl implements ActionFacade {
 
         ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
             .builder(
-                PlatformType.EMBEDDED, ExternalInvocationSurface.EMBEDDED_API_ACTION, ExternalInvocationKind.COMPONENT,
+                PlatformType.EMBEDDED, ExternalInvocationSource.API_ACTION, ExternalInvocationKind.COMPONENT,
                 actionName)
             .componentName(componentName)
             .componentVersion(componentVersion)

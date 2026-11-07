@@ -10,7 +10,7 @@ package com.bytechef.ee.platform.external.invocation.log.service;
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import java.time.Instant;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
@@ -27,14 +27,14 @@ public interface ExternalInvocationLogService {
     int deleteExternalInvocationLogsCreatedBefore(Instant instant);
 
     Page<ExternalInvocationLog> getExternalInvocationLogs(
-        PlatformType type, @Nullable Integer environment, @Nullable ExternalInvocationSurface surface,
+        PlatformType type, @Nullable Integer environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationOutcome outcome,
         @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId,
         @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber);
 
     Page<ExternalInvocationLog> getWorkspaceExternalInvocationLogs(
-        PlatformType type, long workspaceId, int environment, @Nullable ExternalInvocationSurface surface,
+        PlatformType type, long workspaceId, int environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,

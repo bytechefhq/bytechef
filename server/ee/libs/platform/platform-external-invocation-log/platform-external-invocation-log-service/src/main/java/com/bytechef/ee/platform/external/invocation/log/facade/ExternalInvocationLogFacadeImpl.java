@@ -17,7 +17,7 @@ import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocati
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
@@ -59,7 +59,7 @@ public class ExternalInvocationLogFacadeImpl implements ExternalInvocationLogFac
     @Override
     @PreAuthorize("isTenantAdmin()")
     public Page<ExternalInvocationLogDTO> getExternalInvocationLogs(
-        PlatformType type, @Nullable Long environmentId, @Nullable ExternalInvocationSurface surface,
+        PlatformType type, @Nullable Long environmentId, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationOutcome outcome,
         @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId,
@@ -67,7 +67,7 @@ public class ExternalInvocationLogFacadeImpl implements ExternalInvocationLogFac
 
         return toExternalInvocationLogDTOPage(
             externalInvocationLogService.getExternalInvocationLogs(
-                type, environmentId == null ? null : Math.toIntExact(environmentId), surface, outcome, mcpServerId,
+                type, environmentId == null ? null : Math.toIntExact(environmentId), source, outcome, mcpServerId,
                 a2aServerId,
                 connectedUserId, integrationInstanceId, startDate, endDate, pageNumber));
     }
@@ -75,7 +75,7 @@ public class ExternalInvocationLogFacadeImpl implements ExternalInvocationLogFac
     @Override
     @PreAuthorize(IS_PLATFORM_USER + " and hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
     public Page<ExternalInvocationLogDTO> getWorkspaceExternalInvocationLogs(
-        PlatformType type, long workspaceId, long environmentId, @Nullable ExternalInvocationSurface surface,
+        PlatformType type, long workspaceId, long environmentId, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
@@ -83,7 +83,7 @@ public class ExternalInvocationLogFacadeImpl implements ExternalInvocationLogFac
 
         return toExternalInvocationLogDTOPage(
             externalInvocationLogService.getWorkspaceExternalInvocationLogs(
-                type, workspaceId, Math.toIntExact(environmentId), surface, outcome, mcpServerId, a2aServerId,
+                type, workspaceId, Math.toIntExact(environmentId), source, outcome, mcpServerId, a2aServerId,
                 connectedUserId,
                 integrationInstanceId, startDate, endDate, pageNumber));
     }

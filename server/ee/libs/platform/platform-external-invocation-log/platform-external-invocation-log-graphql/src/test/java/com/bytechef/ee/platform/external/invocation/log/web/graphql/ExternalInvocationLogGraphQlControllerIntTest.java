@@ -24,7 +24,7 @@ import com.bytechef.ee.platform.external.invocation.log.web.graphql.config.Exter
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.Arrays;
@@ -67,7 +67,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
     void testWorkspaceExternalInvocationLogsPassesTheWorkspaceAndEnvironmentToTheFacade() {
         when(
             externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
-                eq(PlatformType.AUTOMATION), eq(7L), eq(2L), eq(ExternalInvocationSurface.MCP_AUTOMATION), isNull(),
+                eq(PlatformType.AUTOMATION), eq(7L), eq(2L), eq(ExternalInvocationSource.MCP_SERVER), isNull(),
                 eq(5L),
                 isNull(),
                 isNull(), isNull(),
@@ -78,11 +78,11 @@ class ExternalInvocationLogGraphQlControllerIntTest {
             .document("""
                 query {
                     workspaceExternalInvocationLogs(
-                        type: AUTOMATION, workspaceId: "7", environmentId: "2", surface: "MCP_AUTOMATION",
+                        type: AUTOMATION, workspaceId: "7", environmentId: "2", source: "MCP_SERVER",
                         mcpServerId: 5
                     ) {
                         content {
-                            surface
+                            source
                             kind
                             outcome
                             mcpServerId
@@ -95,9 +95,9 @@ class ExternalInvocationLogGraphQlControllerIntTest {
                 }
                 """)
             .execute()
-            .path("workspaceExternalInvocationLogs.content[0].surface")
+            .path("workspaceExternalInvocationLogs.content[0].source")
             .entity(String.class)
-            .isEqualTo("MCP_AUTOMATION")
+            .isEqualTo("MCP_SERVER")
             .path("workspaceExternalInvocationLogs.content[0].mcpServerId")
             .entity(Long.class)
             .isEqualTo(5L)
@@ -148,7 +148,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
     void testExternalInvocationLogsPassesTheEnvironmentToTheFacade() {
         when(
             externalInvocationLogFacade.getExternalInvocationLogs(
-                eq(PlatformType.AUTOMATION), eq(2L), eq(ExternalInvocationSurface.MCP_AUTOMATION), isNull(), isNull(),
+                eq(PlatformType.AUTOMATION), eq(2L), eq(ExternalInvocationSource.MCP_SERVER), isNull(), isNull(),
                 isNull(),
                 isNull(), isNull(), isNull(),
                 isNull(), eq(0)))
@@ -157,7 +157,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
         graphQlTester
             .document("""
                 query {
-                    externalInvocationLogs(type: AUTOMATION, environmentId: "2", surface: "MCP_AUTOMATION") {
+                    externalInvocationLogs(type: AUTOMATION, environmentId: "2", source: "MCP_SERVER") {
                         content {
                             environment
                         }
@@ -179,7 +179,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
         ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
 
         externalInvocationLog.setId(2L);
-        externalInvocationLog.setSurface(ExternalInvocationSurface.A2A);
+        externalInvocationLog.setSource(ExternalInvocationSource.A2A_SERVER);
         externalInvocationLog.setKind(ExternalInvocationKind.WORKFLOW);
         externalInvocationLog.setToolName("Summarize");
         externalInvocationLog.setA2aServerId(4L);
@@ -188,7 +188,8 @@ class ExternalInvocationLogGraphQlControllerIntTest {
 
         when(
             externalInvocationLogFacade.getExternalInvocationLogs(
-                eq(PlatformType.AUTOMATION), isNull(), eq(ExternalInvocationSurface.A2A), isNull(), isNull(), eq(4L),
+                eq(PlatformType.AUTOMATION), isNull(), eq(ExternalInvocationSource.A2A_SERVER), isNull(), isNull(),
+                eq(4L),
                 isNull(), isNull(), isNull(), isNull(), eq(0)))
                     .thenReturn(
                         new PageImpl<>(
@@ -198,9 +199,9 @@ class ExternalInvocationLogGraphQlControllerIntTest {
         graphQlTester
             .document("""
                 query {
-                    externalInvocationLogs(type: AUTOMATION, surface: "A2A", a2aServerId: 4) {
+                    externalInvocationLogs(type: AUTOMATION, source: "A2A_SERVER", a2aServerId: 4) {
                         content {
-                            surface
+                            source
                             a2aServerId
                             mcpServerId
                         }
@@ -208,9 +209,9 @@ class ExternalInvocationLogGraphQlControllerIntTest {
                 }
                 """)
             .execute()
-            .path("externalInvocationLogs.content[0].surface")
+            .path("externalInvocationLogs.content[0].source")
             .entity(String.class)
-            .isEqualTo("A2A")
+            .isEqualTo("A2A_SERVER")
             .path("externalInvocationLogs.content[0].a2aServerId")
             .entity(Long.class)
             .isEqualTo(4L)
@@ -231,7 +232,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
         ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
 
         externalInvocationLog.setId(1L);
-        externalInvocationLog.setSurface(ExternalInvocationSurface.MCP_AUTOMATION);
+        externalInvocationLog.setSource(ExternalInvocationSource.MCP_SERVER);
         externalInvocationLog.setKind(ExternalInvocationKind.WORKFLOW);
         externalInvocationLog.setJobId(11L);
         externalInvocationLog.setOutcome(ExternalInvocationOutcome.SUCCESS);

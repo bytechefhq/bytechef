@@ -10,7 +10,7 @@ package com.bytechef.ee.platform.external.invocation.log.domain;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import java.time.Instant;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
@@ -32,8 +32,8 @@ public class ExternalInvocationLog {
     @Column("type")
     private int type;
 
-    @Column("surface")
-    private int surface;
+    @Column("source")
+    private int source;
 
     @Column("kind")
     private int kind;
@@ -103,8 +103,8 @@ public class ExternalInvocationLog {
         return PlatformType.values()[type];
     }
 
-    public ExternalInvocationSurface getSurface() {
-        return ExternalInvocationSurface.values()[surface];
+    public ExternalInvocationSource getSource() {
+        return ExternalInvocationSource.values()[source];
     }
 
     public ExternalInvocationKind getKind() {
@@ -191,8 +191,8 @@ public class ExternalInvocationLog {
         this.type = type.ordinal();
     }
 
-    public void setSurface(ExternalInvocationSurface surface) {
-        this.surface = surface.ordinal();
+    public void setSource(ExternalInvocationSource source) {
+        this.source = source.ordinal();
     }
 
     public void setKind(ExternalInvocationKind kind) {
@@ -294,7 +294,7 @@ public class ExternalInvocationLog {
         return "ExternalInvocationLog{" +
             "id=" + id +
             ", type=" + type +
-            ", surface=" + surface +
+            ", source=" + source +
             ", kind=" + kind +
             ", toolName='" + toolName + '\'' +
             ", outcome=" + outcome +

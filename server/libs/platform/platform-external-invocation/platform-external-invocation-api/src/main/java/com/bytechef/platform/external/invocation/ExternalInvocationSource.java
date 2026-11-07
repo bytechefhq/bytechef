@@ -19,11 +19,10 @@ package com.bytechef.platform.external.invocation;
 /**
  * @author Ivica Cardic
  */
-public enum ExternalInvocationSurface {
+public enum ExternalInvocationSource {
 
-    MCP_AUTOMATION,
-    MCP_EMBEDDED,
-    EMBEDDED_API_ACTION,
-    EMBEDDED_API_TOOL,
-    A2A
+    MCP_SERVER,
+    API_ACTION,
+    API_TOOL,
+    A2A_SERVER
 }

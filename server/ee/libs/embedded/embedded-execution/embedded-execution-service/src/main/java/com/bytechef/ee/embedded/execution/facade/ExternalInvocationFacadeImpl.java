@@ -15,7 +15,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import org.jspecify.annotations.Nullable;
@@ -46,14 +46,14 @@ public class ExternalInvocationFacadeImpl implements ExternalInvocationFacade {
     @Override
     @PreAuthorize("#externalUserId == authentication.name")
     public Page<ExternalInvocationLog> getExternalInvocations(
-        String externalUserId, Environment environment, @Nullable ExternalInvocationSurface surface,
+        String externalUserId, Environment environment, @Nullable ExternalInvocationSource source,
         @Nullable ExternalInvocationOutcome outcome, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
         return externalInvocationLogService.getExternalInvocationLogs(
-            PlatformType.EMBEDDED, environment.ordinal(), surface, outcome, null, null, connectedUser.getId(), null,
+            PlatformType.EMBEDDED, environment.ordinal(), source, outcome, null, null, connectedUser.getId(), null,
             startDate, endDate, pageNumber);
     }
 }

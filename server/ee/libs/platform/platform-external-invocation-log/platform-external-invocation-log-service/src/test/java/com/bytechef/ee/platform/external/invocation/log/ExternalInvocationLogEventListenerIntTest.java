@@ -17,7 +17,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -71,7 +71,7 @@ class ExternalInvocationLogEventListenerIntTest {
     void testPublishedEventIsPersistedOnTheWorkerExecutor() {
         ExternalInvocationEvent externalInvocationEvent = ExternalInvocationEvent
             .builder(
-                PlatformType.EMBEDDED, ExternalInvocationSurface.MCP_EMBEDDED, ExternalInvocationKind.COMPONENT,
+                PlatformType.EMBEDDED, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.COMPONENT,
                 "slack_sendMessage")
             .componentName("slack")
             .componentVersion(1)
@@ -101,7 +101,7 @@ class ExternalInvocationLogEventListenerIntTest {
         ExternalInvocationLog externalInvocationLog = externalInvocationLogs.getFirst();
 
         assertThat(externalInvocationLog.getType()).isEqualTo(PlatformType.EMBEDDED);
-        assertThat(externalInvocationLog.getSurface()).isEqualTo(ExternalInvocationSurface.MCP_EMBEDDED);
+        assertThat(externalInvocationLog.getSource()).isEqualTo(ExternalInvocationSource.MCP_SERVER);
         assertThat(externalInvocationLog.getKind()).isEqualTo(ExternalInvocationKind.COMPONENT);
         assertThat(externalInvocationLog.getToolName()).isEqualTo("slack_sendMessage");
         assertThat(externalInvocationLog.getComponentName()).isEqualTo("slack");
@@ -129,7 +129,7 @@ class ExternalInvocationLogEventListenerIntTest {
     @Test
     void testOverlongNamesAndErrorMessageAreTruncatedToTheirColumnSizes() {
         ExternalInvocationEvent externalInvocationEvent = ExternalInvocationEvent
-            .builder(PlatformType.AUTOMATION, ExternalInvocationSurface.A2A, ExternalInvocationKind.WORKFLOW,
+            .builder(PlatformType.AUTOMATION, ExternalInvocationSource.A2A_SERVER, ExternalInvocationKind.WORKFLOW,
                 "s".repeat(300))
             .componentName("c".repeat(300))
             .operationName("o".repeat(300))
@@ -157,7 +157,7 @@ class ExternalInvocationLogEventListenerIntTest {
     void testPersistenceFailureIsSwallowed() {
         ExternalInvocationEvent externalInvocationEvent = ExternalInvocationEvent
             .builder(
-                PlatformType.EMBEDDED, ExternalInvocationSurface.EMBEDDED_API_ACTION, ExternalInvocationKind.COMPONENT,
+                PlatformType.EMBEDDED, ExternalInvocationSource.API_ACTION, ExternalInvocationKind.COMPONENT,
                 "slack_sendMessage")
             .externalUserId("x".repeat(300))
             .outcome(ExternalInvocationOutcome.SUCCESS)

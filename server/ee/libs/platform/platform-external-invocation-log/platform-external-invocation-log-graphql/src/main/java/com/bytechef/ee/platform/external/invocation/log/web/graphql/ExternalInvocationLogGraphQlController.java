@@ -14,7 +14,7 @@ import com.bytechef.ee.platform.external.invocation.log.facade.ExternalInvocatio
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -43,7 +43,7 @@ public class ExternalInvocationLogGraphQlController {
 
     @QueryMapping(name = "externalInvocationLogs")
     public ExternalInvocationLogPage externalInvocationLogs(
-        @Argument PlatformType type, @Argument @Nullable Long environmentId, @Argument @Nullable String surface,
+        @Argument PlatformType type, @Argument @Nullable Long environmentId, @Argument @Nullable String source,
         @Argument @Nullable String outcome,
         @Argument @Nullable Long mcpServerId, @Argument @Nullable Long a2aServerId,
         @Argument @Nullable Long connectedUserId,
@@ -52,21 +52,21 @@ public class ExternalInvocationLogGraphQlController {
 
         return toPage(
             externalInvocationLogFacade.getExternalInvocationLogs(
-                type, environmentId, toSurface(surface), toOutcome(outcome), mcpServerId, a2aServerId, connectedUserId,
+                type, environmentId, toSource(source), toOutcome(outcome), mcpServerId, a2aServerId, connectedUserId,
                 integrationInstanceId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
     }
 
     @QueryMapping(name = "workspaceExternalInvocationLogs")
     public ExternalInvocationLogPage workspaceExternalInvocationLogs(
         @Argument PlatformType type, @Argument long workspaceId, @Argument long environmentId,
-        @Argument @Nullable String surface,
+        @Argument @Nullable String source,
         @Argument @Nullable String outcome, @Argument @Nullable Long mcpServerId, @Argument @Nullable Long a2aServerId,
         @Argument @Nullable Long connectedUserId, @Argument @Nullable Long integrationInstanceId,
         @Argument @Nullable Long fromDate, @Argument @Nullable Long toDate, @Argument @Nullable Integer page) {
 
         return toPage(
             externalInvocationLogFacade.getWorkspaceExternalInvocationLogs(
-                type, workspaceId, environmentId, toSurface(surface), toOutcome(outcome), mcpServerId, a2aServerId,
+                type, workspaceId, environmentId, toSource(source), toOutcome(outcome), mcpServerId, a2aServerId,
                 connectedUserId,
                 integrationInstanceId, toInstant(fromDate), toInstant(toDate), page == null ? 0 : page));
     }
@@ -82,8 +82,8 @@ public class ExternalInvocationLogGraphQlController {
             externalInvocationLogPage.getTotalElements(), externalInvocationLogPage.getTotalPages());
     }
 
-    private static @Nullable ExternalInvocationSurface toSurface(@Nullable String surface) {
-        return surface == null ? null : ExternalInvocationSurface.valueOf(surface);
+    private static @Nullable ExternalInvocationSource toSource(@Nullable String source) {
+        return source == null ? null : ExternalInvocationSource.valueOf(source);
     }
 
     private static @Nullable ExternalInvocationOutcome toOutcome(@Nullable String outcome) {
@@ -100,7 +100,7 @@ public class ExternalInvocationLogGraphQlController {
 
         return new ExternalInvocationLogItem(
             externalInvocationLog.getId(),
-            externalInvocationLog.getSurface()
+            externalInvocationLog.getSource()
                 .name(),
             externalInvocationLog.getKind()
                 .name(),
@@ -120,7 +120,7 @@ public class ExternalInvocationLogGraphQlController {
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     record ExternalInvocationLogItem(
-        Long id, String surface, String kind, String toolName, String componentName, Integer componentVersion,
+        Long id, String source, String kind, String toolName, String componentName, Integer componentVersion,
         String operationName, Long connectionId, Integer environment, Long workspaceId, String externalUserId,
         Long connectedUserId, Long integrationInstanceId, Long mcpServerId, Long a2aServerId, Long jobId,
         String workflowName, String outcome, String errorType, String errorMessage, int durationMs, Long createdDate) {

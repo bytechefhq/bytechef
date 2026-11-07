@@ -68,7 +68,7 @@ class ExternalInvocationRecorderIntTest {
 
         Object result = externalInvocationRecorder.record(
             ExternalInvocationEvent.builder(
-                PlatformType.AUTOMATION, ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationKind.COMPONENT,
+                PlatformType.AUTOMATION, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.COMPONENT,
                 "slack_sendMessage"),
             () -> output);
 
@@ -77,7 +77,7 @@ class ExternalInvocationRecorderIntTest {
         ExternalInvocationEvent event = getPublishedEvent();
 
         assertThat(event.outcome()).isEqualTo(ExternalInvocationOutcome.SUCCESS);
-        assertThat(event.surface()).isEqualTo(ExternalInvocationSurface.MCP_AUTOMATION);
+        assertThat(event.source()).isEqualTo(ExternalInvocationSource.MCP_SERVER);
         assertThat(event.kind()).isEqualTo(ExternalInvocationKind.COMPONENT);
         assertThat(event.toolName()).isEqualTo("slack_sendMessage");
         assertThat(event.type()).isEqualTo(PlatformType.AUTOMATION);
@@ -89,7 +89,7 @@ class ExternalInvocationRecorderIntTest {
         IllegalStateException failure = new IllegalStateException("boom");
 
         ExternalInvocationEvent.Builder externalInvocationEventBuilder = ExternalInvocationEvent.builder(
-            PlatformType.AUTOMATION, ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationKind.COMPONENT,
+            PlatformType.AUTOMATION, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.COMPONENT,
             "slack_sendMessage");
 
         assertThatExceptionOfType(IllegalStateException.class)
@@ -110,7 +110,7 @@ class ExternalInvocationRecorderIntTest {
     @Test
     void testRecordTimeoutIsClassifiedFromCauseChain() {
         ExternalInvocationEvent.Builder externalInvocationEventBuilder = ExternalInvocationEvent.builder(
-            PlatformType.AUTOMATION, ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationKind.WORKFLOW,
+            PlatformType.AUTOMATION, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.WORKFLOW,
             "runWorkflow");
 
         assertThatExceptionOfType(CompletionException.class)
@@ -127,7 +127,7 @@ class ExternalInvocationRecorderIntTest {
     @Test
     void testRecordEventPublishesDirectly() {
         ExternalInvocationEvent connectionRequired = ExternalInvocationEvent.builder(
-            PlatformType.EMBEDDED, ExternalInvocationSurface.MCP_EMBEDDED, ExternalInvocationKind.COMPONENT,
+            PlatformType.EMBEDDED, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.COMPONENT,
             "slack_sendMessage")
             .outcome(ExternalInvocationOutcome.CONNECTION_REQUIRED)
             .build();
@@ -142,7 +142,7 @@ class ExternalInvocationRecorderIntTest {
         String longMessage = "x".repeat(ExternalInvocationEvent.ERROR_MESSAGE_MAX_LENGTH + 100);
 
         ExternalInvocationEvent.Builder externalInvocationEventBuilder = ExternalInvocationEvent.builder(
-            PlatformType.AUTOMATION, ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationKind.COMPONENT,
+            PlatformType.AUTOMATION, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.COMPONENT,
             "slack_sendMessage");
 
         assertThatExceptionOfType(RuntimeException.class)
@@ -160,7 +160,7 @@ class ExternalInvocationRecorderIntTest {
     void testRecordResolvesTheOutcomeFromTheResult() {
         Object result = externalInvocationRecorder.record(
             ExternalInvocationEvent.builder(
-                PlatformType.EMBEDDED, ExternalInvocationSurface.MCP_EMBEDDED, ExternalInvocationKind.WORKFLOW,
+                PlatformType.EMBEDDED, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.WORKFLOW,
                 "runWorkflow"),
             () -> "paused",
             output -> "paused".equals(output) ? ExternalInvocationOutcome.APPROVAL_REQUIRED
@@ -173,7 +173,7 @@ class ExternalInvocationRecorderIntTest {
     @Test
     void testRecordKeepsWhatTheExecutionSetsOnTheBuilder() {
         ExternalInvocationEvent.Builder externalInvocationEventBuilder = ExternalInvocationEvent.builder(
-            PlatformType.EMBEDDED, ExternalInvocationSurface.MCP_EMBEDDED, ExternalInvocationKind.WORKFLOW,
+            PlatformType.EMBEDDED, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.WORKFLOW,
             "runWorkflow");
 
         assertThatExceptionOfType(IllegalStateException.class)
@@ -193,21 +193,21 @@ class ExternalInvocationRecorderIntTest {
     }
 
     @Test
-    void testRecordIncrementsTheInvocationCounterTaggedWithSurfaceAndOutcome() {
+    void testRecordIncrementsTheInvocationCounterTaggedWithSourceAndOutcome() {
         externalInvocationRecorder.record(
             ExternalInvocationEvent.builder(
-                PlatformType.EMBEDDED, ExternalInvocationSurface.EMBEDDED_API_TOOL, ExternalInvocationKind.COMPONENT,
+                PlatformType.EMBEDDED, ExternalInvocationSource.API_TOOL, ExternalInvocationKind.COMPONENT,
                 "slack_sendMessage"),
             () -> "ok");
 
         externalInvocationRecorder.record(
             ExternalInvocationEvent.builder(
-                PlatformType.EMBEDDED, ExternalInvocationSurface.EMBEDDED_API_TOOL, ExternalInvocationKind.COMPONENT,
+                PlatformType.EMBEDDED, ExternalInvocationSource.API_TOOL, ExternalInvocationKind.COMPONENT,
                 "slack_sendMessage"),
             () -> "ok");
 
         Counter counter = meterRegistry.find(ExternalInvocationRecorderImpl.INVOCATION_COUNTER)
-            .tag("surface", "EMBEDDED_API_TOOL")
+            .tag("source", "API_TOOL")
             .tag("outcome", "SUCCESS")
             .counter();
 
@@ -221,7 +221,7 @@ class ExternalInvocationRecorderIntTest {
 
         Object result = externalInvocationRecorder.record(
             ExternalInvocationEvent.builder(
-                PlatformType.AUTOMATION, ExternalInvocationSurface.MCP_AUTOMATION, ExternalInvocationKind.COMPONENT,
+                PlatformType.AUTOMATION, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.COMPONENT,
                 "slack_sendMessage"),
             () -> "ok");
 

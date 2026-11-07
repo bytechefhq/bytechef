@@ -89,7 +89,7 @@ public class ExternalInvocationRecorderImpl implements ExternalInvocationRecorde
 
             if (meterRegistry != null) {
                 Counter.builder(INVOCATION_COUNTER)
-                    .tag("surface", event.surface()
+                    .tag("source", event.source()
                         .name())
                     .tag("outcome", event.outcome()
                         .name())
@@ -99,8 +99,8 @@ public class ExternalInvocationRecorderImpl implements ExternalInvocationRecorde
 
             if (log.isDebugEnabled()) {
                 log.debug(
-                    "External invocation type={} surface={} kind={} tool={} outcome={} durationMs={}",
-                    event.type(), event.surface(), event.kind(), event.toolName(), event.outcome(),
+                    "External invocation type={} source={} kind={} tool={} outcome={} durationMs={}",
+                    event.type(), event.source(), event.kind(), event.toolName(), event.outcome(),
                     event.durationMs());
             }
 

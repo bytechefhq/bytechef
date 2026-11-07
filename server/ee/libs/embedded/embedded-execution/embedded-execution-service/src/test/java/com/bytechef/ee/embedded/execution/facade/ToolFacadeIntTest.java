@@ -41,7 +41,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,7 +130,7 @@ class ToolFacadeIntTest {
         assertThat(getExternalInvocationLogs(connectedUserId)).singleElement()
             .satisfies(externalInvocationLog -> {
                 assertThat(externalInvocationLog.getType()).isEqualTo(PlatformType.EMBEDDED);
-                assertThat(externalInvocationLog.getSurface()).isEqualTo(ExternalInvocationSurface.EMBEDDED_API_TOOL);
+                assertThat(externalInvocationLog.getSource()).isEqualTo(ExternalInvocationSource.API_TOOL);
                 assertThat(externalInvocationLog.getKind()).isEqualTo(ExternalInvocationKind.COMPONENT);
                 assertThat(externalInvocationLog.getToolName()).isEqualTo("slack_send");
                 assertThat(externalInvocationLog.getComponentName()).isEqualTo("slack");
@@ -183,7 +183,7 @@ class ToolFacadeIntTest {
         assertThat(getExternalInvocationLogs(connectedUserId)).singleElement()
             .satisfies(externalInvocationLog -> {
                 assertThat(externalInvocationLog.getOutcome()).isEqualTo(ExternalInvocationOutcome.CONNECTION_REQUIRED);
-                assertThat(externalInvocationLog.getSurface()).isEqualTo(ExternalInvocationSurface.EMBEDDED_API_TOOL);
+                assertThat(externalInvocationLog.getSource()).isEqualTo(ExternalInvocationSource.API_TOOL);
                 assertThat(externalInvocationLog.getConnectedUserId()).isEqualTo(connectedUserId);
                 assertThat(externalInvocationLog.getConnectionId()).isNull();
                 assertThat(externalInvocationLog.getErrorType()).isNull();

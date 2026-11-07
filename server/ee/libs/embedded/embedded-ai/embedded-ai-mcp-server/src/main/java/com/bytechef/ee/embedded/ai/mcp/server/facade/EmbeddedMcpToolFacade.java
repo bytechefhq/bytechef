@@ -61,7 +61,7 @@ import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
-import com.bytechef.platform.external.invocation.ExternalInvocationSurface;
+import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.external.invocation.WorkflowToolRunResult;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -382,7 +382,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             Long connectionId = integrationInstance == null ? null : integrationInstance.getConnectionId();
 
             ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
-                .builder(PlatformType.EMBEDDED, ExternalInvocationSurface.MCP_EMBEDDED,
+                .builder(PlatformType.EMBEDDED, ExternalInvocationSource.MCP_SERVER,
                     ExternalInvocationKind.COMPONENT,
                     toolName)
                 .componentName(componentName)
@@ -457,7 +457,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 connectedUserId, integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId());
 
             ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
-                .builder(PlatformType.EMBEDDED, ExternalInvocationSurface.MCP_EMBEDDED, ExternalInvocationKind.WORKFLOW,
+                .builder(PlatformType.EMBEDDED, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.WORKFLOW,
                     toolName)
                 .componentName(componentName)
                 .environment(environment.ordinal())
