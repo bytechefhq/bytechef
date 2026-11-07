@@ -23,6 +23,7 @@ import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolCatalog;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.automation.ai.tool.AssetFileToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.DeploymentToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
@@ -32,6 +33,9 @@ import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScopedProjectGuard;
 import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
 import com.bytechef.automation.ai.tool.aiagent.AiAgentToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.datatable.DataTableToolCallbacksFactory;
+import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
+import com.bytechef.automation.assetfile.service.AssetFileFacade;
 import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
@@ -41,6 +45,8 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
+import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
@@ -63,6 +69,8 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -90,6 +98,14 @@ public final class AiHubAgentFixtures {
     public final AiHubChatService chatService = mock(AiHubChatService.class);
     public final AiHubChatAccessPolicy chatAccessPolicy = mock(AiHubChatAccessPolicy.class);
     public final AiAgentFacade aiAgentFacade = mock(AiAgentFacade.class);
+    public final AssetFileToolCallbacksFactory assetFileToolCallbacksFactory = new AssetFileToolCallbacksFactory(
+        mock(AssetFileFacade.class), null);
+    public final DataTableToolCallbacksFactory dataTableToolCallbacksFactory = new DataTableToolCallbacksFactory(
+        mock(WorkspaceDataTableFacade.class));
+    public final KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory =
+        new KnowledgeBaseToolCallbacksFactory(
+            mock(WorkspaceKnowledgeBaseFacade.class), mock(KnowledgeBaseFacade.class),
+            mock(KnowledgeBaseDocumentFacade.class));
     public final ChatModel chatModel = mock(ChatModel.class);
     public final ComponentTools componentTools = mock(ComponentTools.class);
     public final PersistedWorkflowChecker persistedWorkflowChecker = mock(PersistedWorkflowChecker.class);
@@ -211,7 +227,8 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskToolCallbacks(
             readProjectTools, readProjectWorkflowTools, workflowExecutionTools, componentToolsProvider(),
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
-            aiAgentToolCallbacksFactoryProvider(), absentProvider(), absentProvider(), absentProvider(),
+            aiAgentToolCallbacksFactoryProvider(), availableProvider(assetFileToolCallbacksFactory),
+            availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
             availableProvider(aiAgentFacade), interactivePickerToolCallbacks, projectWorkflowFacade, chatService,
             chatAccessPolicy,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
@@ -231,7 +248,8 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubBuildToolCallbacks(
             projectTools, projectWorkflowLifecycleTools, workflowExecutionTools, componentToolsProvider(),
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
-            aiAgentToolCallbacksFactoryProvider(), absentProvider(), absentProvider(), absentProvider(),
+            aiAgentToolCallbacksFactoryProvider(), availableProvider(assetFileToolCallbacksFactory),
+            availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
             availableProvider(aiAgentFacade), interactivePickerToolCallbacks, intelligentToolCatalog, workspaceFacade,
             projectWorkflowFacade,
             projectDeploymentFacade, chatService, chatAccessPolicy, artifactRecorder, policy,
@@ -321,11 +339,6 @@ public final class AiHubAgentFixtures {
 
     @SuppressWarnings("unchecked")
     private static ObjectProvider<ToolSearchToolCallingAdvisor> toolSearchAdvisorProvider() {
-        return mock(ObjectProvider.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> ObjectProvider<T> absentProvider() {
         return mock(ObjectProvider.class);
     }
 
