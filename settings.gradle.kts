@@ -565,6 +565,7 @@ include("server:libs:modules:task-dispatchers:terminate")
 
 include("server:libs:test:test-support")
 include("server:libs:test:test-int-support")
+include("server:libs:test:voice-test-support")
 
 include("sdks:backend:embedded:ai-componentkit")
 include("sdks:backend:embedded:ai-componentkit-spring")
