@@ -63,6 +63,10 @@ import {
  */
 export interface WorkflowExecution {
     /**
+     * The id of the connected user the embedded workflow ran for; empty for a workflow that does not belong to a connected user.
+     */
+    readonly connectedUserId?: number;
+    /**
      * The path from a top-level task execution to the task execution to focus, set when the execution is loaded lazily. It ends at the earliest failed leaf task execution that was not retried, under the latest attempt of its top-level task, else at the last started or last created task execution. It is empty when no such task execution can be resolved, for example when the job has no task executions. When it is set, the job's task executions are the top-level ones only and their children are loaded through the children endpoint.
      */
     focusPath?: Array<FocusPathElement>;
@@ -142,6 +146,7 @@ export function WorkflowExecutionFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
+        'connectedUserId': json['connectedUserId'] == null ? undefined : json['connectedUserId'],
         'focusPath': json['focusPath'] == null ? undefined : ((json['focusPath'] as Array<any>).map(FocusPathElementFromJSON)),
         'id': json['id'],
         'job': json['job'] == null ? undefined : JobFromJSON(json['job']),
@@ -160,7 +165,7 @@ export function WorkflowExecutionToJSON(json: any): WorkflowExecution {
     return WorkflowExecutionToJSONTyped(json, false);
 }
 
-export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id'|'projectVersion'|'source'|'sourceName'|'taskExecutionCount'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'connectedUserId'|'id'|'projectVersion'|'source'|'sourceName'|'taskExecutionCount'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

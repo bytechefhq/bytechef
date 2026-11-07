@@ -7,6 +7,7 @@ Contains information about execution of a project workflow.
 
 Name | Type
 ------------ | -------------
+`connectedUserId` | number
 `focusPath` | [Array&lt;FocusPathElement&gt;](FocusPathElement.md)
 `id` | number
 `job` | [Job](Job.md)
@@ -26,6 +27,7 @@ import type { WorkflowExecution } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "connectedUserId": null,
   "focusPath": null,
   "id": null,
   "job": null,
