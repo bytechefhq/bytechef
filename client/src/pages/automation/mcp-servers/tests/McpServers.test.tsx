@@ -1,5 +1,5 @@
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
-import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import {MODE, Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen} from '@testing-library/react';
 import {ReactNode} from 'react';
@@ -8,6 +8,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import McpServers from '../McpServers';
 
 const hoisted = vi.hoisted(() => ({
+    copilotButtonProps: [] as Array<Record<string, unknown>>,
     mcpServersState: {
         allComponentNames: [],
         componentDefinitions: [],
@@ -52,7 +53,11 @@ vi.mock('@/shared/layout/Header', () => ({
 }));
 
 vi.mock('@/shared/components/copilot/CopilotButton', () => ({
-    default: () => null,
+    default: (props: Record<string, unknown>) => {
+        hoisted.copilotButtonProps.push(props);
+
+        return null;
+    },
 }));
 
 vi.mock('../components/McpServerDialog', () => ({
@@ -79,6 +84,7 @@ const renderMcpServers = () => {
 describe('McpServers', () => {
     beforeEach(() => {
         useCopilotPostTurnRegistry.setState({callbacks: {}});
+        hoisted.copilotButtonProps.length = 0;
         hoisted.mcpServersState.mcpServersIsLoading = false;
         hoisted.mcpServersState.tagsIsLoading = false;
     });
@@ -92,6 +98,17 @@ describe('McpServers', () => {
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['workspaceMcpServers']});
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['mcpProjects']});
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['mcpProjectsByServerId']});
+    });
+
+    it('should open the MCP server copilot in Ask mode so the panel can switch between Ask and Build', () => {
+        renderMcpServers();
+
+        expect(hoisted.copilotButtonProps.length).toBeGreaterThan(0);
+
+        hoisted.copilotButtonProps.forEach((props) => {
+            expect(props.source).toBe(Source.MCP_SERVER);
+            expect(props.mode ?? MODE.ASK).toBe(MODE.ASK);
+        });
     });
 
     it('should not refresh the MCP server queries after a copilot turn for another source', () => {
