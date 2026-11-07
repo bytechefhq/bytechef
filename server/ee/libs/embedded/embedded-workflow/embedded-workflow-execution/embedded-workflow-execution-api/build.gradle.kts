@@ -1,4 +1,5 @@
 dependencies {
+    api(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-api"))
     api(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
     api(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
