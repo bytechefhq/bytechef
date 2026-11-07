@@ -443,6 +443,57 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
+    public void testExportProjectSkipsDataSyncWorkflows() throws Exception {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        ProjectWorkflow dataSyncProjectWorkflow = addDataSyncWorkflow(projectDTO);
+
+        byte[] exportedData = projectFacade.exportProject(projectDTO.id(), null);
+
+        List<String> workflowEntryNames = new ArrayList<>();
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(exportedData))) {
+            ZipEntry zipEntry;
+
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                String name = zipEntry.getName();
+
+                if (name.startsWith("workflow-")) {
+                    workflowEntryNames.add(name);
+                }
+
+                zipInputStream.closeEntry();
+            }
+        }
+
+        assertThat(workflowEntryNames).hasSize(1)
+            .doesNotContain("workflow-" + dataSyncProjectWorkflow.getUuid() + ".json");
+
+        long importedProjectId = projectFacade.importProject(exportedData, workspace.getId());
+
+        assertThat(projectWorkflowServiceImpl.getProjectWorkflows(importedProjectId))
+            .extracting(ProjectWorkflow::getType)
+            .containsExactly(ProjectWorkflowType.WORKFLOW);
+    }
+
+    @Test
+    public void testDuplicateProjectSkipsDataSyncWorkflows() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        addDataSyncWorkflow(projectDTO);
+
+        ProjectDTO duplicatedProjectDTO = projectFacade.duplicateProject(projectDTO.id());
+
+        assertThat(projectWorkflowServiceImpl.getProjectWorkflows(Objects.requireNonNull(duplicatedProjectDTO.id())))
+            .extracting(ProjectWorkflow::getType)
+            .containsExactly(ProjectWorkflowType.WORKFLOW);
+    }
+
+    @Test
     public void testExportProjectVersion() {
         ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
 
@@ -1473,6 +1524,18 @@ public class ProjectFacadeIntTest {
 
         return projectWorkflowServiceImpl.addWorkflow(
             project.getId(), project.getLastProjectVersion(), agentWorkflow.getId(), ProjectWorkflowType.AI_AGENT);
+    }
+
+    private ProjectWorkflow addDataSyncWorkflow(ProjectDTO projectDTO) {
+        Workflow dataSyncWorkflow = workflowService.create(
+            "{\"label\":\"data sync\",\"tasks\":[]}", Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        Project project = projectRepository.findById(Objects.requireNonNull(projectDTO.id()))
+            .orElseThrow();
+
+        return projectWorkflowServiceImpl.addWorkflow(
+            project.getId(), project.getLastProjectVersion(), dataSyncWorkflow.getId(),
+            ProjectWorkflowType.DATA_SYNC);
     }
 
     @TestConfiguration
