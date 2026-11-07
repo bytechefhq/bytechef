@@ -64,6 +64,12 @@ public enum CopilotAgentType implements AgentType {
     COMPONENT_RULE_BUILD(Source.COMPONENT_RULE, Mode.BUILD),
     WORKFLOW_EDITOR_EMBEDDED_ASK(Source.WORKFLOW_EDITOR_EMBEDDED, Mode.ASK),
     WORKFLOW_EDITOR_EMBEDDED_BUILD(Source.WORKFLOW_EDITOR_EMBEDDED, Mode.BUILD),
+    CODE_WORKFLOW_ASK(Source.CODE_WORKFLOW, Mode.ASK),
+    CODE_WORKFLOW_BUILD(Source.CODE_WORKFLOW, Mode.BUILD),
+    CODE_WORKFLOW_EMBEDDED_ASK(Source.CODE_WORKFLOW_EMBEDDED, Mode.ASK),
+    CODE_WORKFLOW_EMBEDDED_BUILD(Source.CODE_WORKFLOW_EMBEDDED, Mode.BUILD),
+    CUSTOM_COMPONENT_ASK(Source.CUSTOM_COMPONENT, Mode.ASK),
+    CUSTOM_COMPONENT_BUILD(Source.CUSTOM_COMPONENT, Mode.BUILD),
     SKILLS("skills"),
     CONFIGURE_CLUSTER_ELEMENT("configureClusterElement"),
     WRITE_SCRIPT("writeScript"),
@@ -72,7 +78,9 @@ public enum CopilotAgentType implements AgentType {
     DEBUG_WORKFLOW_EXECUTION("debugWorkflowExecution"),
     BUILD_INTEGRATION_WORKFLOW("buildIntegrationWorkflow"),
     CONFIGURE_MCP_SERVER("configureMcpServer"),
-    BUILD_AI_AGENT("buildAiAgent");
+    BUILD_AI_AGENT("buildAiAgent"),
+    BUILD_CUSTOM_COMPONENT("buildCustomComponent"),
+    BUILD_CODE_WORKFLOW("buildCodeWorkflow");
 
     private final String key;
 
