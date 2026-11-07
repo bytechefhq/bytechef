@@ -1837,8 +1837,6 @@ export function applySavedPositions(
             const dagrePosition = allNodes[nodeIndex].position;
             const rawSavedPosition = nodeData.metadata.ui.nodePosition;
 
-            // When one axis is undefined (cleared after node insertion to allow
-            // dagre to shift on the main axis), fall back to dagre's position.
             const savedPosition = {
                 x: (rawSavedPosition.x ?? dagrePosition.x) + (crossAxis === 'x' ? crossAxisShift : 0),
                 y: (rawSavedPosition.y ?? dagrePosition.y) + (crossAxis === 'y' ? crossAxisShift : 0),

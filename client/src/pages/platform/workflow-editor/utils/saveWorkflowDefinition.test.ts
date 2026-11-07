@@ -1,7 +1,8 @@
-import {SPACE} from '@/shared/constants';
+import {FINAL_PLACEHOLDER_NODE_ID, SPACE} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {clearAllWorkflowMutations, isWorkflowMutating} from './workflowMutationGuard';
 
@@ -36,6 +37,8 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore', () =
 
 function makeWorkflowState(tasks: Array<Record<string, unknown>> = [], triggers: Array<Record<string, unknown>> = []) {
     return {
+        nodes: [] as Array<Record<string, unknown>>,
+        savedPositionCrossAxisShift: 0,
         setWorkflow: vi.fn(),
         workflow: {
             definition: JSON.stringify({tasks, triggers}, null, SPACE),
@@ -815,6 +818,119 @@ describe('saveWorkflowDefinition', () => {
             expect(optimisticWorkflow.tasks[0].name).toBe('task_1');
             expect(optimisticWorkflow.tasks[1].name).toBe('httpClient_1');
             expect(optimisticWorkflow.tasks[2].name).toBe('task_2');
+        });
+
+        it('should keep the saved positions of tasks after the insertion point intact', async () => {
+            mockWorkflowState = makeWorkflowState([
+                {name: 'task_1', parameters: {}, type: 'test/v1/action'},
+                {
+                    metadata: {ui: {nodePosition: {x: 3068, y: 553}}},
+                    name: 'task_2',
+                    parameters: {},
+                    type: 'test/v1/action',
+                },
+            ]);
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                nodeIndex: 1,
+                updateWorkflowMutation: mutation,
+            });
+
+            const optimisticWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+            const definitionTasks = JSON.parse(optimisticWorkflow.definition).tasks;
+
+            expect(definitionTasks.map((task: {name: string}) => task.name)).toEqual([
+                'task_1',
+                'httpClient_1',
+                'task_2',
+            ]);
+            expect(definitionTasks[2].metadata.ui.nodePosition).toEqual({x: 3068, y: 553});
+        });
+
+        it('should pin a task inserted between two pinned tasks at their midpoint', async () => {
+            mockWorkflowState = makeWorkflowState([
+                {
+                    metadata: {ui: {nodePosition: {x: 100, y: 600}}},
+                    name: 'task_1',
+                    parameters: {},
+                    type: 'test/v1/action',
+                },
+                {
+                    metadata: {ui: {nodePosition: {x: 500, y: 800}}},
+                    name: 'task_2',
+                    parameters: {},
+                    type: 'test/v1/action',
+                },
+            ]);
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                nodeIndex: 1,
+                updateWorkflowMutation: mutation,
+            });
+
+            const optimisticWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+            const definitionTasks = JSON.parse(optimisticWorkflow.definition).tasks;
+
+            expect(definitionTasks[1].name).toBe('httpClient_1');
+            expect(definitionTasks[1].metadata.ui.nodePosition).toEqual({x: 300, y: 700});
+        });
+
+        it('should pin a task appended after a pinned last task where the trailing placeholder was', async () => {
+            mockWorkflowState = makeWorkflowState([
+                {
+                    metadata: {ui: {nodePosition: {x: 3000, y: 500}}},
+                    name: 'task_1',
+                    parameters: {},
+                    type: 'test/v1/action',
+                },
+            ]);
+            mockWorkflowState.nodes = [
+                {
+                    data: {},
+                    id: FINAL_PLACEHOLDER_NODE_ID,
+                    measured: {height: 28, width: 72},
+                    position: {x: 3400, y: 536},
+                    type: 'placeholder',
+                },
+            ];
+            const mutation = makeMutation();
+            const previousDirection = useLayoutDirectionStore.getState().layoutDirection;
+
+            useLayoutDirectionStore.setState({layoutDirection: 'LR'});
+
+            try {
+                await saveWorkflowDefinition({
+                    nodeData: {
+                        componentName: 'httpClient',
+                        name: 'httpClient_1',
+                        operationName: 'get',
+                        version: 1,
+                    } as unknown as NodeDataType,
+                    updateWorkflowMutation: mutation,
+                });
+            } finally {
+                useLayoutDirectionStore.setState({layoutDirection: previousDirection});
+            }
+
+            const optimisticWorkflow = mockWorkflowState.setWorkflow.mock.calls[0][0];
+            const definitionTasks = JSON.parse(optimisticWorkflow.definition).tasks;
+
+            expect(definitionTasks[1].name).toBe('httpClient_1');
+            expect(definitionTasks[1].metadata.ui.nodePosition).toEqual({x: 3400, y: 514});
         });
 
         it('should not modify tasks when updating an existing task', async () => {
