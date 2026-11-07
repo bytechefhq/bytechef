@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260501000001" author="Ivica Cardic">
+        <createTable tableName="ai_hub_chat_component">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="chat_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+            <column name="workspace_id" type="BIGINT"/>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_version" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="connection_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="environment" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+            tableName="ai_hub_chat_component"
+            constraintName="uk_ccc_chat_comp_conn_env"
+            columnNames="chat_id, component_name, component_version, connection_id, environment"/>
+        <createIndex tableName="ai_hub_chat_component"
+                     indexName="idx_ccc_chat">
+            <column name="chat_id"/>
+        </createIndex>
+        <sql>
+            CREATE UNIQUE INDEX uk_ahtc_user_comp ON ai_hub_chat_component
+                (user_id, workspace_id, component_name, component_version) WHERE chat_id IS NULL
+        </sql>
+        <createIndex tableName="ai_hub_chat_component" indexName="idx_ahtc_user_workspace">
+            <column name="user_id"/>
+            <column name="workspace_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="ai_hub_chat_component"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260501000001-1" author="Ivica Cardic" contextFilter="mono or multitenant">
+        <addForeignKeyConstraint
+            baseTableName="ai_hub_chat_component"
+            baseColumnNames="chat_id"
+            constraintName="fk_ccc_chat"
+            referencedTableName="ai_hub_chat"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+        <addForeignKeyConstraint
+            baseTableName="ai_hub_chat_component"
+            baseColumnNames="connection_id"
+            constraintName="fk_ccc_connection"
+            referencedTableName="connection"
+            referencedColumnNames="id"
+            onDelete="SET NULL"/>
+    </changeSet>
+</databaseChangeLog>
