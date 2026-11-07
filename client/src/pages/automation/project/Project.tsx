@@ -5,6 +5,7 @@ import {useProject} from '@/pages/automation/project/hooks/useProject';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
+import useTestRunChatTrigger from '@/pages/platform/workflow-editor/hooks/useTestRunChatTrigger';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
@@ -52,6 +53,8 @@ const Project = () => {
 
     const {runDisabled} = useRun();
 
+    const chatTrigger = useTestRunChatTrigger(workflow);
+
     const copilotLayoutShifted = useCopilotLayoutShifted();
 
     return (
@@ -80,10 +83,7 @@ const Project = () => {
                 {projectId && (
                     <ProjectHeader
                         bottomResizablePanelRef={bottomResizablePanelRef}
-                        chatTrigger={
-                            workflow.triggers &&
-                            workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
-                        }
+                        chatTrigger={chatTrigger}
                         projectId={projectId}
                         projectWorkflowId={projectWorkflowId}
                         runDisabled={runDisabled}

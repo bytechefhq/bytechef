@@ -9,6 +9,7 @@ import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/emb
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
+import useTestRunChatTrigger from '@/pages/platform/workflow-editor/hooks/useTestRunChatTrigger';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
@@ -51,6 +52,8 @@ const Integration = () => {
 
     const {runDisabled} = useRun();
 
+    const chatTrigger = useTestRunChatTrigger(workflow);
+
     const copilotLayoutShifted = useCopilotLayoutShifted();
 
     return (
@@ -79,10 +82,7 @@ const Integration = () => {
                 {integrationId && (
                     <IntegrationHeader
                         bottomResizablePanelRef={bottomResizablePanelRef}
-                        chatTrigger={
-                            workflow.triggers &&
-                            workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
-                        }
+                        chatTrigger={chatTrigger}
                         integrationId={integrationId}
                         integrationWorkflowId={integrationWorkflowId}
                         runDisabled={runDisabled}

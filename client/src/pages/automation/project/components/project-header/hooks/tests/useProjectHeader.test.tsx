@@ -15,6 +15,7 @@ const hoisted = vi.hoisted(() => {
         },
         chatSpies: {
             resetMessages: vi.fn(),
+            setChatTriggerName: vi.fn(),
             setWorkflowTestChatPanelOpen: vi.fn(),
             workflowTestChatPanelOpen: false,
         },
@@ -379,6 +380,91 @@ describe('useProjectHeader', () => {
         // Verify workflow stopped
         expect(hoisted.editorSpies.setWorkflowIsRunning).toHaveBeenCalledWith(false);
         expect(latest.close).toHaveBeenCalled();
+    });
+
+    it('closes the chat panel when a chat test session is stopped', () => {
+        const panelRef = makePanelRef(0);
+        const {result} = renderHook(() =>
+            useProjectHeader({bottomResizablePanelRef: panelRef, chatTrigger: true, projectId: 42})
+        );
+
+        act(() => {
+            result.current.handleRunClick();
+        });
+
+        expect(hoisted.chatSpies.setChatTriggerName).toHaveBeenCalled();
+
+        hoisted.chatSpies.setWorkflowTestChatPanelOpen.mockClear();
+
+        act(() => {
+            result.current.handleStopClick();
+        });
+
+        expect(hoisted.chatSpies.setWorkflowTestChatPanelOpen).toHaveBeenCalledWith(false);
+    });
+
+    it('does not stop a test run when chat mode turns on while it runs', () => {
+        const panelRef = makePanelRef(0);
+        const editorState = hoisted.editorSpies as unknown as {workflowIsRunning?: boolean};
+
+        const {rerender, result} = renderHook(
+            (props: {chatTrigger: boolean}) =>
+                useProjectHeader({bottomResizablePanelRef: panelRef, chatTrigger: props.chatTrigger, projectId: 42}),
+            {initialProps: {chatTrigger: false}}
+        );
+
+        act(() => {
+            result.current.handleRunClick();
+        });
+
+        editorState.workflowIsRunning = true;
+        hoisted.editorSpies.setWorkflowIsRunning.mockClear();
+        hoisted.chatSpies.setWorkflowTestChatPanelOpen.mockClear();
+        latest.close.mockClear();
+
+        try {
+            rerender({chatTrigger: true});
+
+            expect(latest.close).not.toHaveBeenCalled();
+            expect(hoisted.editorSpies.setWorkflowIsRunning).not.toHaveBeenCalledWith(false);
+            expect(hoisted.chatSpies.setWorkflowTestChatPanelOpen).not.toHaveBeenCalled();
+        } finally {
+            delete editorState.workflowIsRunning;
+        }
+    });
+
+    it('stops the chat test session when the chat panel closes', () => {
+        const panelRef = makePanelRef(0);
+        const chatState = hoisted.chatSpies as unknown as {workflowTestChatPanelOpen: boolean};
+        const editorState = hoisted.editorSpies as unknown as {workflowIsRunning?: boolean};
+
+        const {rerender, result} = renderHook(() =>
+            useProjectHeader({bottomResizablePanelRef: panelRef, chatTrigger: true, projectId: 42})
+        );
+
+        try {
+            act(() => {
+                result.current.handleRunClick();
+            });
+
+            chatState.workflowTestChatPanelOpen = true;
+            editorState.workflowIsRunning = true;
+
+            rerender();
+
+            hoisted.editorSpies.setWorkflowIsRunning.mockClear();
+            latest.close.mockClear();
+
+            chatState.workflowTestChatPanelOpen = false;
+
+            rerender();
+
+            expect(hoisted.editorSpies.setWorkflowIsRunning).toHaveBeenCalledWith(false);
+            expect(latest.close).toHaveBeenCalled();
+        } finally {
+            chatState.workflowTestChatPanelOpen = false;
+            delete editorState.workflowIsRunning;
+        }
     });
 
     it('reports unpublished changes when the project has never been published', () => {

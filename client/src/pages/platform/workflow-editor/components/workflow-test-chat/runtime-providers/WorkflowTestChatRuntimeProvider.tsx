@@ -68,14 +68,16 @@ export function WorkflowTestChatRuntimeProvider({
         }))
     );
     const workflow = useWorkflowDataStore((state) => state.workflow!);
-    const {conversationId, messages, setLastAssistantMessageContent, setMessage} = useWorkflowTestChatStore(
-        useShallow((state) => ({
-            conversationId: state.conversationId,
-            messages: state.messages,
-            setLastAssistantMessageContent: state.setLastAssistantMessageContent,
-            setMessage: state.setMessage,
-        }))
-    );
+    const {chatTriggerName, conversationId, messages, setLastAssistantMessageContent, setMessage} =
+        useWorkflowTestChatStore(
+            useShallow((state) => ({
+                chatTriggerName: state.chatTriggerName,
+                conversationId: state.conversationId,
+                messages: state.messages,
+                setLastAssistantMessageContent: state.setLastAssistantMessageContent,
+                setMessage: state.setMessage,
+            }))
+        );
 
     const {error: streamError, setStreamRequest} = useWorkflowTestStream({
         onError: (errorMessage) => {
@@ -124,18 +126,20 @@ export function WorkflowTestChatRuntimeProvider({
             // Prepare an empty assistant message so streaming appears immediately
             setMessage({content: '', role: 'assistant'} as ThreadMessageLike);
 
+            const testRunChatTriggerName = getChatTriggerName(workflow, chatTriggerName);
+
             const request = getTestWorkflowStreamPostRequest({
                 environmentId: currentEnvironmentId,
                 id: workflow.id!,
                 testWorkflowRequest: {
                     inputs: {
-                        [getChatTriggerName(workflow)]: {
+                        [testRunChatTriggerName]: {
                             attachments: message.attachments,
                             conversationId,
                             message: input,
                         },
                     },
-                    triggerName: getChatTriggerName(workflow),
+                    triggerName: testRunChatTriggerName,
                 },
             });
 

@@ -7,6 +7,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
+import useTestRunChatTrigger from '@/pages/platform/workflow-editor/hooks/useTestRunChatTrigger';
 import {RequestI, WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -61,6 +62,8 @@ const AutomationWorkflow = () => {
     const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
 
     const {workflowUuid} = useParams();
+
+    const chatTrigger = useTestRunChatTrigger(workflow);
 
     const {cancelLeave, confirmLeave, showLeaveDialog, workflowIsRunning, workflowTestExecution} =
         useWorkflowTestRunGuard(workflow.id, currentEnvironmentId);
@@ -170,10 +173,7 @@ const AutomationWorkflow = () => {
             <div className="flex w-full flex-col">
                 <AutomationWorkflowEditorHeader
                     bottomResizablePanelRef={bottomResizablePanelRef}
-                    chatTrigger={
-                        workflow.triggers &&
-                        workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
-                    }
+                    chatTrigger={chatTrigger}
                     currentWorkflowId={workflowUuid!}
                     projectId={projectId}
                     runDisabled={runDisabled}

@@ -11,6 +11,7 @@ import {
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
+import useTestRunChatTrigger from '@/pages/platform/workflow-editor/hooks/useTestRunChatTrigger';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -54,6 +55,8 @@ const WorkflowBuilder = () => {
 
     const {runDisabled} = useRun();
 
+    const chatTrigger = useTestRunChatTrigger(workflow);
+
     if (!initialized) {
         return (
             <div className="flex size-full items-center justify-center">
@@ -70,9 +73,7 @@ const WorkflowBuilder = () => {
         <div className="flex size-full flex-col">
             <WorkflowBuilderHeader
                 bottomResizablePanelRef={bottomResizablePanelRef}
-                chatTrigger={
-                    workflow.triggers && workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
-                }
+                chatTrigger={chatTrigger}
                 projectId={projectId}
                 runDisabled={runDisabled}
                 updateWorkflowMutation={updateWorkflowMutation}
