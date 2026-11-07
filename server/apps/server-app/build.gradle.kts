@@ -107,6 +107,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-tool"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-tool"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-agent-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-tool"))
