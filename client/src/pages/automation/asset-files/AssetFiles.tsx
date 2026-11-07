@@ -18,6 +18,9 @@ import AssetFileUploadZone from '@/pages/automation/asset-files/components/Asset
 import {useAssetFileUpload} from '@/pages/automation/asset-files/hooks/useAssetFileUpload';
 import {useAssetFilesStore} from '@/pages/automation/asset-files/stores/useAssetFilesStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -51,6 +54,7 @@ const AssetFiles = () => {
     const searchQuery = useAssetFilesStore((state) => state.searchQuery);
     const setSearchQuery = useAssetFilesStore((state) => state.setSearchQuery);
     const setSelectedFileId = useAssetFilesStore((state) => state.setSelectedFileId);
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
 
     useEffect(() => {
         if (!deepLinkFileId) {
@@ -262,6 +266,8 @@ const AssetFiles = () => {
 
     const toolbarRight = (
         <div className="flex items-center gap-1">
+            <CopilotButton source={Source.ASSET_FILE} />
+
             {!showCenteredEmpty && (
                 <>
                     <Input
@@ -327,6 +333,15 @@ const AssetFiles = () => {
             />
         </>
     );
+
+    useEffect(() => {
+        return registerPostTurn(Source.ASSET_FILE, () => {
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFiles']});
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFile']});
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFileTextContent']});
+            void queryClient.invalidateQueries({queryKey: ['GetAssetFileVersions']});
+        });
+    }, [queryClient, registerPostTurn]);
 
     return (
         <LayoutContainer

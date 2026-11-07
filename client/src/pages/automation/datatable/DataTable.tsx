@@ -1,9 +1,13 @@
 import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
 import CreateDataTableDialog from '@/pages/automation/datatables/components/CreateDataTableDialog';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {useQueryClient} from '@tanstack/react-query';
 import {Plus} from 'lucide-react';
+import {useEffect} from 'react';
 import {DataGrid} from 'react-data-grid';
 import {useParams} from 'react-router-dom';
 
@@ -25,6 +29,7 @@ import {useSelectedRowsStore} from './stores/useSelectedRowsStore';
 const DataTable = () => {
     const {id} = useParams<{id: string}>();
     const {selectedRows} = useSelectedRowsStore();
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
 
     const {
         gridColumns,
@@ -41,6 +46,15 @@ const DataTable = () => {
         tablesError,
         tablesLoading,
     } = useDataTable({tableId: id});
+
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        return registerPostTurn(Source.DATA_TABLE, () => {
+            queryClient.invalidateQueries({queryKey: ['dataTables']});
+            queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
+        });
+    }, [queryClient, registerPostTurn]);
 
     return (
         <LayoutContainer

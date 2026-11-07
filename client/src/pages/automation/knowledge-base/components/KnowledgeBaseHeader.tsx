@@ -1,16 +1,19 @@
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList} from '@/components/ui/breadcrumb';
 import ListPageBreadcrumbItem from '@/shared/components/ListPageBreadcrumbItem';
 import Header from '@/shared/layout/Header';
+import {ReactNode} from 'react';
 
 interface KnowledgeBaseHeaderProps {
     knowledgeBaseName: string | undefined;
+    right?: ReactNode;
 }
 
-const KnowledgeBaseHeader = ({knowledgeBaseName}: KnowledgeBaseHeaderProps) => {
+const KnowledgeBaseHeader = ({knowledgeBaseName, right}: KnowledgeBaseHeaderProps) => {
     return (
         <Header
             centerTitle
             position="main"
+            right={right}
             title={
                 <Breadcrumb className="min-w-0">
                     <BreadcrumbList className="flex-nowrap">

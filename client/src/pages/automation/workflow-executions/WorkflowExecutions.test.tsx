@@ -26,8 +26,13 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 
 vi.mock('@/shared/stores/useApplicationInfoStore', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/stores/useApplicationInfoStore')>()),
-    useApplicationInfoStore: (selector: (state: {application: {edition: string}}) => unknown) =>
-        selector({application: {edition: hoisted.edition}}),
+    useApplicationInfoStore: (
+        selector: (state: {ai: {copilot: {enabled: boolean}}; application: {edition: string}}) => unknown
+    ) => selector({ai: {copilot: {enabled: false}}, application: {edition: hoisted.edition}}),
+}));
+
+vi.mock('@/shared/components/copilot/CopilotButton', () => ({
+    default: () => null,
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
