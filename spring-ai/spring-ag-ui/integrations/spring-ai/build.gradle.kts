@@ -13,4 +13,6 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-model")
     implementation("org.springframework.ai:spring-ai-client-chat")
     implementation("tools.jackson.core:jackson-databind")
+
+    testImplementation("io.micrometer:context-propagation")
 }
