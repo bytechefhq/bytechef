@@ -33,6 +33,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static com.agui.server.EventFactory.*;
 import static java.util.stream.Collectors.toList;
@@ -60,6 +61,8 @@ import static java.util.stream.Collectors.toList;
  * @since 1.0
  */
 public class SpringAIAgent extends LocalAgent {
+
+    public static final String TOOL_CALLBACK_DECORATOR_KEY = SpringAIAgent.class.getName() + ".toolCallbackDecorator";
 
     private static final Logger log = LoggerFactory.getLogger(SpringAIAgent.class);
 
@@ -488,9 +491,21 @@ public class SpringAIAgent extends LocalAgent {
             }
         }
 
-        Map<String, Object> advisorParameters = this.advisorParams(input);
+        Map<String, Object> advisorParameters = new HashMap<>();
+        Map<String, Object> agentAdvisorParameters = this.advisorParams(input);
 
-        if (advisorParameters != null && !advisorParameters.isEmpty()) {
+        if (agentAdvisorParameters != null) {
+            advisorParameters.putAll(agentAdvisorParameters);
+        }
+
+        advisorParameters.put(
+            TOOL_CALLBACK_DECORATOR_KEY,
+            (UnaryOperator<ToolCallback>) toolCallback -> new AgUiFunctionToolCallback(
+                toolCallback,
+                new ToolCallEventEmitter(
+                    textMessageStream, toolEventConsumer, throwable -> this.toolErrorMessage(input, throwable))));
+
+        if (!advisorParameters.isEmpty()) {
             try {
                 chatRequest = chatRequest.advisors(advisorSpec -> advisorSpec.params(advisorParameters));
             } catch (RuntimeException e) {
