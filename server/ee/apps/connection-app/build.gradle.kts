@@ -18,7 +18,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation(project(":server:libs:automation:automation-connection:automation-connection-service"))
-    implementation(project(":server:libs:automation:automation-swagger"))
+    implementation(project(":server:libs:automation:automation-openapi"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:environment-config"))
@@ -34,7 +34,7 @@ dependencies {
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
-    implementation(project(":server:libs:platform:platform-swagger"))
+    implementation(project(":server:libs:platform:platform-openapi"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
 
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
@@ -48,7 +48,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
-    implementation(project(":server:ee:libs:embedded:embedded-swagger"))
+    implementation(project(":server:ee:libs:embedded:embedded-openapi"))
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")

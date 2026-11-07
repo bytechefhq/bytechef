@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.swagger.config;
+package com.bytechef.platform.openapi.config;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
@@ -24,25 +24,19 @@ import org.springframework.context.annotation.Profile;
 /**
  * @author Ivica Cardic
  */
-@Configuration("automationSwaggerConfiguration")
+@Configuration("platformOpenApiConfiguration")
 @Profile("api-docs")
-public class SwaggerConfiguration {
+public class OpenApiConfiguration {
 
     @Bean
-    public GroupedOpenApi automationInternalOpenApi() {
+    public GroupedOpenApi platformInternalOpenApi() {
         return GroupedOpenApi.builder()
-            .group("automation-internal")
-            .displayName("Automation Internal API")
-            .pathsToMatch("/api/automation/internal/**")
-            .build();
-    }
-
-    @Bean
-    public GroupedOpenApi automationPublicOpenApi() {
-        return GroupedOpenApi.builder()
-            .group("automation-public")
-            .displayName("Automation Public V1 API")
-            .pathsToMatch("/api/automation/v1/**")
+            .group("platform-internal")
+            .displayName("Platform Internal API")
+            .pathsToMatch(
+                "/api/platform/internal/**")
+            .pathsToExclude(
+                "/api/platform/internal/dummy")
             .build();
     }
 }
