@@ -1,0 +1,20 @@
+dependencies {
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.springframework.ai:spring-ai-model")
+    implementation("org.springframework.data:spring-data-jdbc")
+    implementation("tools.jackson.core:jackson-databind")
+    implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
+    implementation(project(":server:libs:ai:ai-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:exception:exception-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation(project(":server:libs:test:test-support"))
+}
