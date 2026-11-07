@@ -516,6 +516,50 @@ describe('buildAiHubSubscriber', () => {
         });
     });
 
+    describe('code resource open-tab tools', () => {
+        it('opens a custom component tab when the openCustomComponentTab tool result arrives', () => {
+            deliverToolResult(
+                createSubscriber(),
+                'call-cc',
+                'openCustomComponentTab',
+                JSON.stringify({customComponentId: 'cc-1', name: 'My Component', opened: true})
+            );
+
+            expect(aiHubTabsStore.getState().openTabs[0]).toMatchObject({
+                customComponentId: 'cc-1',
+                kind: 'customComponent',
+                name: 'My Component',
+            });
+        });
+
+        it('opens a code workflow tab when the openCodeWorkflowTab tool result arrives', () => {
+            deliverToolResult(
+                createSubscriber(),
+                'call-cw',
+                'openCodeWorkflowTab',
+                JSON.stringify({language: 'PYTHON', name: 'My Code Workflow', opened: true, projectId: '11'})
+            );
+
+            expect(aiHubTabsStore.getState().openTabs[0]).toMatchObject({
+                kind: 'codeWorkflow',
+                language: 'PYTHON',
+                name: 'My Code Workflow',
+                projectId: '11',
+            });
+        });
+
+        it('opens no tab when the tool reports opened:false', () => {
+            deliverToolResult(
+                createSubscriber(),
+                'call-cc',
+                'openCustomComponentTab',
+                JSON.stringify({error: 'customComponentId is required', opened: false})
+            );
+
+            expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
+        });
+    });
+
     describe('AI Agent-mutating tools', () => {
         it('notifies onAiAgentMutated for the agent builder mutations only', () => {
             const onAiAgentMutated = vi.fn();
