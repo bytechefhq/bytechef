@@ -34,6 +34,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.service.ConnectedUserProjectDeploymentResolver;
 import com.bytechef.automation.configuration.service.ConnectedUserWorkflowCopyResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -306,9 +307,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @Override
     @Transactional(readOnly = true)
     public Page<WorkflowExecutionDTO> getWorkflowExecutions(
-        Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
-        Long projectId, Long projectDeploymentId, Long connectedUserId, String workflowId, Integer projectVersion,
-        long workspaceId, int pageNumber) {
+        Boolean embedded, Long environmentId, @Nullable ProjectDeploymentOwner projectDeploymentOwner,
+        Status jobStatus, Instant jobStartDate, Instant jobEndDate, Long projectId, Long projectDeploymentId,
+        Long connectedUserId, String workflowId, Integer projectVersion, long workspaceId, int pageNumber) {
 
         if (connectedUserId != null) {
             return getConnectedUserWorkflowExecutions(
@@ -349,8 +350,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             return Page.empty();
         }
 
-        List<Long> projectDeploymentIds = getProjectDeploymentIds(
-            embedded, environmentId, projectDeploymentId, embeddedProjectDeployments);
+        List<Long> projectDeploymentIds = projectDeploymentOwner == null
+            ? getProjectDeploymentIds(embedded, environmentId, projectDeploymentId, embeddedProjectDeployments)
+            : getOwnedProjectDeploymentIds(projectDeploymentOwner, environmentId, projectDeploymentId, workspaceId);
 
         if (projectDeploymentIds.isEmpty()) {
             return Page.empty();
@@ -413,6 +415,22 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             pageNumber);
 
         return toWorkflowExecutionPage(rowsPage, projectId);
+    }
+
+    private List<Long> getOwnedProjectDeploymentIds(
+        ProjectDeploymentOwner projectDeploymentOwner, @Nullable Long environmentId,
+        @Nullable Long projectDeploymentId, long workspaceId) {
+
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
+        List<Long> ownedProjectDeploymentIds = projectDeploymentService.getOwnedProjectDeploymentIds(
+            projectDeploymentOwner, environment, workspaceId);
+
+        if (projectDeploymentId == null) {
+            return ownedProjectDeploymentIds;
+        }
+
+        return ownedProjectDeploymentIds.contains(projectDeploymentId) ? List.of(projectDeploymentId) : List.of();
     }
 
     private List<Long> getProjectDeploymentIds(

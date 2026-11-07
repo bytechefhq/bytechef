@@ -189,7 +189,10 @@ class ProjectWorkflowExecutionFacadeIntTest {
     private ContextService contextService;
 
     @Autowired
-    private EmbeddedProjectDeploymentIds embeddedProjectDeploymentIds;
+    private OwnedProjectDeploymentIds embeddedProjectDeploymentIds;
+
+    @Autowired
+    private OwnedProjectDeploymentIds mcpProjectDeploymentIds;
 
     @Autowired
     private ProjectWorkflowExecutionFacade facade;
@@ -260,6 +263,7 @@ class ProjectWorkflowExecutionFacadeIntTest {
     @AfterEach
     void afterEach() {
         embeddedProjectDeploymentIds.clear();
+        mcpProjectDeploymentIds.clear();
     }
 
     @Test
@@ -743,6 +747,85 @@ class ProjectWorkflowExecutionFacadeIntTest {
         }
     }
 
+    @Nested
+    class ProjectDeploymentOwnerIntTest {
+
+        private Job mcpJob;
+        private ProjectDeployment mcpProjectDeployment;
+        private Project project;
+        private Job projectJob;
+        private ProjectDeployment projectProjectDeployment;
+
+        @BeforeEach
+        void beforeEach() {
+            project = createProject(workspace);
+
+            String workflowId = createWorkflowId(project);
+
+            projectProjectDeployment = createProjectDeployment(project, "project deployment");
+            mcpProjectDeployment = createProjectDeployment(project, "MCP server");
+
+            mcpProjectDeploymentIds.add(getId(mcpProjectDeployment));
+
+            projectJob = saveJob(workflowId, null);
+            mcpJob = saveJob(workflowId, null);
+
+            principalJobService.create(
+                getId(projectJob), getId(projectProjectDeployment), PlatformType.AUTOMATION);
+            principalJobService.create(getId(mcpJob), getId(mcpProjectDeployment), PlatformType.AUTOMATION);
+        }
+
+        @Test
+        void testWithoutOwnerExcludesOwnedDeployments() {
+            Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
+                false, null, null, null, null, null, getId(project), null, null, null, null, getId(workspace), 0);
+
+            assertThat(workflowExecutionDTOPage.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactly(projectJob.getId());
+        }
+
+        @Test
+        void testOwnerReturnsOnlyItsDeployments() {
+            Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
+                false, null, ProjectDeploymentOwner.MCP_SERVER, null, null, null, getId(project), null, null, null,
+                null, getId(workspace), 0);
+
+            assertThat(workflowExecutionDTOPage.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactly(mcpJob.getId());
+        }
+
+        @Test
+        void testOwnerWithoutContributorReturnsNothing() {
+            Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
+                false, null, ProjectDeploymentOwner.API_COLLECTION, null, null, null, getId(project), null, null,
+                null, null, getId(workspace), 0);
+
+            assertThat(workflowExecutionDTOPage.getContent()).isEmpty();
+        }
+
+        @Test
+        void testOwnerIgnoresDeploymentsOfOtherWorkspaces() {
+            Workspace otherWorkspace = workspaceRepository.save(new Workspace("other-owner-workspace"));
+
+            Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
+                false, null, ProjectDeploymentOwner.MCP_SERVER, null, null, null, getId(project), null, null, null,
+                null, getId(otherWorkspace), 0);
+
+            assertThat(workflowExecutionDTOPage.getContent()).isEmpty();
+        }
+
+        @Test
+        void testOwnerRejectsADeploymentItDoesNotOwn() {
+            Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
+                false, null, ProjectDeploymentOwner.MCP_SERVER, null, null, null, getId(project),
+                getId(projectProjectDeployment), null, null, null, getId(workspace), 0);
+
+            assertThat(workflowExecutionDTOPage.getContent()).isEmpty();
+        }
+    }
+
     /**
      * A project with two versions of one workflow (same uuid, a new workflow id per version), both declaring
      * {@code trigger_1} and {@code trigger_2}, and a deployment pointing at version 2.
@@ -1131,7 +1214,7 @@ class ProjectWorkflowExecutionFacadeIntTest {
         return taskExecutionRepository.save(taskExecution);
     }
 
-    static class EmbeddedProjectDeploymentIds {
+    static class OwnedProjectDeploymentIds {
 
         private final Set<Long> projectDeploymentIds = ConcurrentHashMap.newKeySet();
 
@@ -1169,16 +1252,29 @@ class ProjectWorkflowExecutionFacadeIntTest {
     static class ProjectWorkflowExecutionFacadeIntTestConfiguration {
 
         @Bean
-        EmbeddedProjectDeploymentIds embeddedProjectDeploymentIds() {
-            return new EmbeddedProjectDeploymentIds();
+        OwnedProjectDeploymentIds embeddedProjectDeploymentIds() {
+            return new OwnedProjectDeploymentIds();
         }
 
         @Bean
         ProjectDeploymentOwnerContributor embeddedProjectDeploymentOwnerContributor(
-            EmbeddedProjectDeploymentIds embeddedProjectDeploymentIds) {
+            OwnedProjectDeploymentIds embeddedProjectDeploymentIds) {
 
             return ProjectDeploymentOwnerContributor.of(
                 ProjectDeploymentOwner.EMBEDDED, embeddedProjectDeploymentIds::getConditionTemplate);
+        }
+
+        @Bean
+        OwnedProjectDeploymentIds mcpProjectDeploymentIds() {
+            return new OwnedProjectDeploymentIds();
+        }
+
+        @Bean
+        ProjectDeploymentOwnerContributor mcpProjectDeploymentOwnerContributor(
+            OwnedProjectDeploymentIds mcpProjectDeploymentIds) {
+
+            return ProjectDeploymentOwnerContributor.of(
+                ProjectDeploymentOwner.MCP_SERVER, mcpProjectDeploymentIds::getConditionTemplate);
         }
 
         @Bean

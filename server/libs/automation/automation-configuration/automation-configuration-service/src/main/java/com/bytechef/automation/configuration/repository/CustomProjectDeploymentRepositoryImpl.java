@@ -124,4 +124,35 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
 
         return projectDeployments;
     }
+
+    @Override
+    public List<Long> findAllOwnedProjectDeploymentIds(
+        ProjectDeploymentOwner projectDeploymentOwner, Integer environment, long workspaceId) {
+
+        List<Object> arguments = new ArrayList<>();
+        List<String> conditions = new ArrayList<>();
+
+        arguments.add(workspaceId);
+
+        conditions.add("project.workspace_id = ?");
+        conditions.add(
+            projectOwnershipService.getSelectProjectDeploymentsCondition(
+                projectDeploymentOwner, "project_deployment.id"));
+
+        if (environment != null) {
+            arguments.add(environment);
+
+            conditions.add("project_deployment.environment = ?");
+        }
+
+        String query = """
+            SELECT project_deployment.id FROM project_deployment
+            JOIN project ON project_deployment.project_id = project.id
+            """ + "WHERE " + String.join(" AND ", conditions);
+
+        return jdbcClient.sql(query)
+            .params(arguments)
+            .query(Long.class)
+            .list();
+    }
 }
