@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T14:37:43.670834+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T11:22:48.321792+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "workflow-execution", description = "The Automation Workflow Execution Internal API")
 public interface WorkflowExecutionApi {
@@ -227,6 +227,7 @@ public interface WorkflowExecutionApi {
      * @param id The id of a workspace. (required)
      * @param embedded If embedded automation workflows executions should be filtered. (optional)
      * @param environmentId The id of an environment. (optional)
+     * @param source Where the executed workflows are exposed. PROJECT returns executions of project deployments; MCP_SERVER, A2A_SERVER and API_COLLECTION return executions of the deployments an MCP server, an A2A server or an API collection created for its project. (optional, default to PROJECT)
      * @param jobStatus The status of an executed job (optional)
      * @param jobStartDate The start date of a job. (optional)
      * @param jobEndDate The end date of a job. (optional)
@@ -258,6 +259,7 @@ public interface WorkflowExecutionApi {
         @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "embedded", description = "If embedded automation workflows executions should be filtered.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "embedded", required = false) @Nullable Boolean embedded,
         @Parameter(name = "environmentId", description = "The id of an environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = false) @Nullable Long environmentId,
+        @Parameter(name = "source", description = "Where the executed workflows are exposed. PROJECT returns executions of project deployments; MCP_SERVER, A2A_SERVER and API_COLLECTION return executions of the deployments an MCP server, an A2A server or an API collection created for its project.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "source", required = false, defaultValue = "PROJECT") String source,
         @Parameter(name = "jobStatus", description = "The status of an executed job", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStatus", required = false) @Nullable String jobStatus,
         @Parameter(name = "jobStartDate", description = "The start date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobStartDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Nullable OffsetDateTime jobStartDate,
         @Parameter(name = "jobEndDate", description = "The end date of a job.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "jobEndDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Nullable OffsetDateTime jobEndDate,
