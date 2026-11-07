@@ -3541,11 +3541,6 @@
     "workflowNodeDescription": null,
     "workflowSyncExecution": false
   }, {
-    "agentRequestDefinition": {
-      "attachmentsPath": null,
-      "conversationIdPath": "results.from",
-      "messagePath": "results.message.text"
-    },
     "batch": false,
     "deduplicate": null,
     "deprecated": false,
@@ -3698,6 +3693,11 @@
     "workflowNodeDescription": null,
     "workflowSyncExecution": false
   }, {
+    "agentRequestDefinition": {
+      "attachmentsPath": null,
+      "conversationIdPath": "results.from",
+      "messagePath": "results.message.text"
+    },
     "batch": false,
     "deduplicate": null,
     "deprecated": false,
