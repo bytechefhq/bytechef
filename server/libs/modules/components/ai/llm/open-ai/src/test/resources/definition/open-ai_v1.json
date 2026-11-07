@@ -4575,6 +4575,205 @@
       "required": true
     },
     "workflowNodeDescription": null
+  }, {
+    "name": "voiceAgent",
+    "description": "Start a real-time voice agent conversation using OpenAI's Realtime API. Handles end-to-end voice interaction with integrated speech-to-text, LLM reasoning, and text-to-speech in a single WebSocket connection.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "gpt-realtime",
+      "description": "The OpenAI Realtime model used for the voice agent conversation.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Model",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "model",
+      "options": [ {
+        "description": null,
+        "label": "gpt-realtime",
+        "value": "gpt-realtime"
+      }, {
+        "description": null,
+        "label": "gpt-realtime-1.5",
+        "value": "gpt-realtime-1.5"
+      }, {
+        "description": null,
+        "label": "gpt-realtime-2",
+        "value": "gpt-realtime-2"
+      }, {
+        "description": null,
+        "label": "gpt-realtime-2.1",
+        "value": "gpt-realtime-2.1"
+      }, {
+        "description": null,
+        "label": "gpt-realtime-mini",
+        "value": "gpt-realtime-mini"
+      }, {
+        "description": null,
+        "label": "gpt-realtime-2.1-mini",
+        "value": "gpt-realtime-2.1-mini"
+      }, {
+        "description": null,
+        "label": "gpt-4o-realtime-preview",
+        "value": "gpt-4o-realtime-preview"
+      }, {
+        "description": null,
+        "label": "gpt-4o-mini-realtime-preview",
+        "value": "gpt-4o-mini-realtime-preview"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT_AREA",
+      "defaultValue": null,
+      "description": "The system instructions that define the agent's behavior and personality.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Instructions",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "instructions",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": "alloy",
+      "description": "The voice OpenAI uses for the agent's speech output.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Voice",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "voice",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The initial greeting the agent speaks when the conversation starts.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Greeting",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "greeting",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Whether OpenAI should transcribe the caller's audio into a text transcript.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Transcribe Caller Audio",
+      "metadata": { },
+      "name": "inputAudioTranscription",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": false,
+      "controlType": "INTEGER",
+      "defaultValue": 16000,
+      "description": "The sample rate of the inbound browser audio in Hz, before it is resampled to the 24 kHz OpenAI's Realtime API requires.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Input Sample Rate",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "inputSampleRate",
+      "options": [ ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": false,
+      "controlType": "INTEGER",
+      "defaultValue": 24000,
+      "description": "The sample rate of the audio the browser should expect in Hz. OpenAI's Realtime API always emits 24 kHz PCM16 audio; this value does not change what OpenAI sends.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Output Sample Rate",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "outputSampleRate",
+      "options": [ ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": false,
+      "type": "INTEGER"
+    } ],
+    "title": "OpenAI Voice Agent",
+    "type": {
+      "name": "VOICE_AGENT",
+      "key": "voiceAgent",
+      "label": "Voice Agent",
+      "multipleElements": false,
+      "required": true
+    },
+    "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
     "name": "artificial-intelligence",

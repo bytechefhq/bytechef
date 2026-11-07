@@ -26,6 +26,7 @@ import com.bytechef.component.ai.llm.openai.action.OpenAiCreateTranscriptionActi
 import com.bytechef.component.ai.llm.openai.action.OpenAiStreamChatAction;
 import com.bytechef.component.ai.llm.openai.cluster.OpenAiChatModel;
 import com.bytechef.component.ai.llm.openai.cluster.OpenAiEmbedding;
+import com.bytechef.component.ai.llm.openai.cluster.OpenAiVoiceAgent;
 import com.bytechef.component.ai.llm.openai.connection.OpenAiConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -55,7 +56,8 @@ public class OpenAiComponentHandler implements ComponentHandler {
             OpenAiCreateTranscriptionAction.ACTION_DEFINITION)
         .clusterElements(
             OpenAiEmbedding.CLUSTER_ELEMENT_DEFINITION,
-            OpenAiChatModel.CLUSTER_ELEMENT_DEFINITION);
+            OpenAiChatModel.CLUSTER_ELEMENT_DEFINITION,
+            OpenAiVoiceAgent.CLUSTER_ELEMENT_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
