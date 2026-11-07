@@ -1,0 +1,8 @@
+{
+  "label": "Simulation Child",
+  "tasks": [ {
+    "name": "childTask",
+    "type": "trap/v1/perform",
+    "parameters": { }
+  } ]
+}

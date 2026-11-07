@@ -1,0 +1,147 @@
+{
+  "label": "Simulation All Dispatchers",
+  "tasks": [ {
+    "name": "top_1",
+    "type": "trap/v1/perform",
+    "parameters": { }
+  }, {
+    "name": "loop_1",
+    "type": "loop/v1",
+    "parameters": {
+      "items": [ "c1", "c2", "other" ],
+      "iteratee": [ {
+        "name": "branch_1",
+        "type": "branch/v1",
+        "parameters": {
+          "expression": "=loop_1.item",
+          "cases": [ {
+            "key": "c1",
+            "tasks": [ {
+              "name": "branchCase1",
+              "type": "trap/v1/perform",
+              "parameters": { }
+            } ]
+          }, {
+            "key": "c2",
+            "tasks": [ {
+              "name": "branchCase2",
+              "type": "trap/v1/perform",
+              "parameters": { }
+            } ]
+          } ],
+          "default": [ {
+            "name": "branchDefault",
+            "type": "trap/v1/perform",
+            "parameters": { }
+          } ]
+        }
+      } ]
+    }
+  }, {
+    "name": "each_1",
+    "type": "each/v1",
+    "parameters": {
+      "items": [ true, false ],
+      "iteratee": {
+        "name": "condition_1",
+        "type": "condition/v1",
+        "parameters": {
+          "rawExpression": true,
+          "expression": "=each_1.item",
+          "caseTrue": [ {
+            "name": "conditionTrue",
+            "type": "trap/v1/perform",
+            "parameters": { }
+          } ],
+          "caseFalse": [ {
+            "name": "conditionFalse",
+            "type": "trap/v1/perform",
+            "parameters": { }
+          } ]
+        }
+      }
+    }
+  }, {
+    "name": "map_1",
+    "type": "map/v1",
+    "parameters": {
+      "items": [ 1, 2 ],
+      "iteratee": [ {
+        "name": "mapItem",
+        "type": "trap/v1/perform",
+        "parameters": { }
+      } ]
+    }
+  }, {
+    "name": "parallel_1",
+    "type": "parallel/v1",
+    "parameters": {
+      "tasks": [ {
+        "name": "parallelA",
+        "type": "trap/v1/perform",
+        "parameters": { }
+      }, {
+        "name": "parallelB",
+        "type": "trap/v1/perform",
+        "parameters": { }
+      } ]
+    }
+  }, {
+    "name": "forkJoin_1",
+    "type": "fork-join/v1",
+    "parameters": {
+      "branches": [ [ {
+        "name": "forkA",
+        "type": "trap/v1/perform",
+        "parameters": { }
+      } ], [ {
+        "name": "forkB",
+        "type": "trap/v1/perform",
+        "parameters": { }
+      } ] ]
+    }
+  }, {
+    "name": "onError_1",
+    "type": "on-error/v1",
+    "parameters": {
+      "main-branch": [ {
+        "name": "unsimulatable_1",
+        "type": "unsimulatable/v1/run",
+        "parameters": { }
+      } ],
+      "on-error-branch": [ {
+        "name": "onErrorBranch",
+        "type": "trap/v1/perform",
+        "parameters": { }
+      } ]
+    }
+  }, {
+    "name": "subflow_1",
+    "type": "subflow/v1",
+    "parameters": {
+      "workflowUuid": "simulationChild",
+      "inputs": { }
+    }
+  }, {
+    "name": "agent_1",
+    "type": "trap/v1/agent",
+    "parameters": { },
+    "clusterElements": {
+      "tools": [ {
+        "name": "trapTool_1",
+        "type": "trap/v1/perform",
+        "parameters": { }
+      } ]
+    }
+  }, {
+    "name": "dynamicOutput_1",
+    "type": "trap/v1/dynamicOutput",
+    "parameters": { }
+  }, {
+    "name": "final_1",
+    "type": "trap/v1/perform",
+    "parameters": {
+      "value": "=top_1.value"
+    }
+  } ]
+}
