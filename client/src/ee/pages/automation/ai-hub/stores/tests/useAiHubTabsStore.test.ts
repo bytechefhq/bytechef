@@ -184,6 +184,56 @@ describe('useAiHubTabsStore', () => {
         expect(openTabs.find((openTab) => openTab.id === firstTabId)?.name).toBe('Renamed Agent');
     });
 
+    it('opens a custom component tab and dedups it by customComponentId', () => {
+        let firstTabId = '';
+        let secondTabId = '';
+
+        act(() => {
+            firstTabId = aiHubTabsStore
+                .getState()
+                .openCustomComponentTab({customComponentId: 'cc-1', name: 'My Component'});
+
+            secondTabId = aiHubTabsStore
+                .getState()
+                .openCustomComponentTab({customComponentId: 'cc-1', name: 'Renamed Component'});
+        });
+
+        const {activeTabId, openTabs, rightPanelOpen} = aiHubTabsStore.getState();
+
+        expect(secondTabId).toBe(firstTabId);
+        expect(openTabs).toHaveLength(1);
+        expect(openTabs[0]).toMatchObject({
+            customComponentId: 'cc-1',
+            kind: 'customComponent',
+            name: 'Renamed Component',
+        });
+        expect(getTabGenericId(openTabs[0]!)).toBe('cc-1');
+        expect(activeTabId).toBe(firstTabId);
+        expect(rightPanelOpen).toBe(true);
+    });
+
+    it('opens a code workflow tab and dedups it by projectId', () => {
+        let firstTabId = '';
+        let secondTabId = '';
+
+        act(() => {
+            firstTabId = aiHubTabsStore
+                .getState()
+                .openCodeWorkflowTab({language: 'PYTHON', name: 'My Code Workflow', projectId: '11'});
+
+            secondTabId = aiHubTabsStore
+                .getState()
+                .openCodeWorkflowTab({language: 'JAVASCRIPT', name: 'My Code Workflow', projectId: '11'});
+        });
+
+        const {openTabs} = aiHubTabsStore.getState();
+
+        expect(secondTabId).toBe(firstTabId);
+        expect(openTabs).toHaveLength(1);
+        expect(openTabs[0]).toMatchObject({kind: 'codeWorkflow', language: 'JAVASCRIPT', projectId: '11'});
+        expect(getTabGenericId(openTabs[0]!)).toBe('11');
+    });
+
     describe('setActiveChatId home to chat hand-off', () => {
         it('inherits the open tabs and rightPanelOpen from home view when first chat is created', () => {
             const {result} = renderHook(() => useAiHubTabsStore());

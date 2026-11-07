@@ -6,12 +6,40 @@ import WorkflowTabLabel from '@/ee/pages/automation/ai-hub/WorkflowTabLabel';
 import ResourcePickerMenu, {
     ResourcePickerSelectionI,
 } from '@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu';
-import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
+import {AiHubTabType, useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
+import CustomComponentDetail from '@/ee/pages/settings/platform/custom-components/CustomComponentDetail';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {BotIcon, PanelRightIcon, PlusIcon, XIcon} from 'lucide-react';
-import {useEffect, useRef} from 'react';
+import ProjectCodeWorkflowDetail from '@/pages/platform/code-workflow/ProjectCodeWorkflowDetail';
+import {BlocksIcon, BotIcon, CodeIcon, PanelRightIcon, PlusIcon, XIcon} from 'lucide-react';
+import {ReactNode, useEffect, useRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
+
+const TAB_ICONS: Record<Exclude<AiHubTabType['kind'], 'workflow'>, ReactNode> = {
+    aiAgent: <BotIcon className="size-3.5 shrink-0" />,
+    codeWorkflow: <CodeIcon className="size-3.5 shrink-0" />,
+    customComponent: <BlocksIcon className="size-3.5 shrink-0" />,
+};
+
+const AiHubResourcePanelTabContent = ({tab}: {tab: AiHubTabType}) => {
+    switch (tab.kind) {
+        case 'aiAgent':
+            return <AiHubAiAgentViewer aiAgentId={tab.aiAgentId} key={tab.aiAgentId} name={tab.name} />;
+        case 'codeWorkflow':
+            return (
+                <ProjectCodeWorkflowDetail
+                    headerless
+                    key={tab.projectId}
+                    language={tab.language}
+                    projectId={tab.projectId}
+                />
+            );
+        case 'customComponent':
+            return <CustomComponentDetail customComponentId={tab.customComponentId} key={tab.customComponentId} />;
+        case 'workflow':
+            return <AiHubWorkflowViewer projectId={tab.projectId} projectWorkflowId={tab.projectWorkflowId} />;
+    }
+};
 
 const AiHubResourcePanel = () => {
     const activeTabRef = useRef<HTMLDivElement | null>(null);
@@ -86,7 +114,7 @@ const AiHubResourcePanel = () => {
                                             onClick={() => setActiveTab(tab.id)}
                                             type="button"
                                         >
-                                            <BotIcon className="size-3.5 shrink-0" />
+                                            {TAB_ICONS[tab.kind]}
 
                                             <span className="truncate">{tab.name}</span>
                                         </button>
@@ -144,18 +172,7 @@ const AiHubResourcePanel = () => {
 
                 {activeTab ? (
                     <div className="min-h-0 flex-1">
-                        {activeTab.kind === 'workflow' ? (
-                            <AiHubWorkflowViewer
-                                projectId={activeTab.projectId}
-                                projectWorkflowId={activeTab.projectWorkflowId}
-                            />
-                        ) : (
-                            <AiHubAiAgentViewer
-                                aiAgentId={activeTab.aiAgentId}
-                                key={activeTab.aiAgentId}
-                                name={activeTab.name}
-                            />
-                        )}
+                        <AiHubResourcePanelTabContent tab={activeTab} />
                     </div>
                 ) : (
                     <div className="flex flex-1 items-center justify-center px-4 text-center text-sm text-muted-foreground">
