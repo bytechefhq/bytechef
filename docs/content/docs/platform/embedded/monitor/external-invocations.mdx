@@ -21,13 +21,13 @@ The page is available on Enterprise Edition only.
 
 ## What is recorded
 
-A record is written for every call made on behalf of a connected user through one of three surfaces:
+A record is written for every call made on behalf of a connected user through one of three sources:
 
-| Surface | Calls recorded |
+| Source | Calls recorded |
 |---|---|
-| **Embedded MCP** | Component tools and workflow tools an AI agent calls through an embedded MCP server. |
-| **Embedded API (Action)** | Actions executed with `POST /{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}`. |
-| **Embedded API (Tool)** | Tools executed with `POST /{externalUserId}/tools`. |
+| **MCP** | Component tools and workflow tools an AI agent calls through an embedded MCP server. |
+| **API (Action)** | Actions executed with `POST /{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}`. |
+| **API (Tool)** | Tools executed with `POST /{externalUserId}/tools`. |
 
 The call is recorded whether it succeeds or fails, including when the connected user has not
 connected the integration the tool needs. A call that is rejected before it runs, such as a call to a
@@ -52,7 +52,7 @@ Each call is one row, newest first:
 | **Status** | How the call ended, for example `SUCCESS`, `ERROR`, `CONNECTION_REQUIRED` or `TIMEOUT`. |
 | **Tool** | The tool name the AI agent called, or the action name your code executed. |
 | **Type** | What was called: a **Component tool** or a **Workflow tool** through embedded MCP or `POST /{externalUserId}/tools`, or an **Action** through the Embedded API action endpoint. |
-| **Surface** | Where the call came in: **Embedded MCP**, **Embedded API (Action)** or **Embedded API (Tool)**. |
+| **Source** | Where the call came in: **MCP**, **API (Action)** or **API (Tool)**. |
 | **Server** | The embedded MCP server the call came through. Embedded API calls show a dash. |
 | **Target** | What ran: the component and operation, such as `slack / sendMessage`, or the name of the workflow a workflow tool ran. |
 | **Duration** | How long the call took, in milliseconds. |
@@ -81,7 +81,7 @@ the call returned:
 
 | Filter | Narrows the list to |
 |---|---|
-| **Surface** | Calls that came in through one surface. |
+| **Source** | Calls that came in through one source: **MCP Servers**, **API (Action)** or **API (Tool)**. |
 | **Status** | Calls that ended one way. |
 | **MCP Server** | Calls made through one embedded MCP server. The filter appears when there is at least one embedded MCP server. |
 | **Start date** / **End date** | Calls made within a date range. |
@@ -103,7 +103,7 @@ Authorization: Bearer <API Key>
 X-Environment: PRODUCTION
 ```
 
-The endpoint accepts the same `surface`, `outcome`, `startDate` and `endDate` filters as the page, plus
+The endpoint accepts the same `source`, `outcome`, `startDate` and `endDate` filters as the page, plus
 `pageNumber`. It returns only the calls of the user named in the path. See the
 [API reference](/openapi/backend/embedded-external-invocation).
 
