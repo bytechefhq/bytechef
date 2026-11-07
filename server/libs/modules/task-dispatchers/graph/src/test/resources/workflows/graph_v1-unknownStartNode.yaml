@@ -1,0 +1,12 @@
+---
+label: "Graph Unknown Start Node"
+tasks:
+- name: "graph_1"
+  type: "graph/v1"
+  parameters:
+    startNode: "missingNode"
+    nodes:
+    - name: "aTask"
+      type: "var/v1/set"
+      parameters:
+        value: "a"

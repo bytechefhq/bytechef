@@ -85,8 +85,33 @@ public class TaskDispatcherJobTestExecutor {
     }
 
     public TaskDispatcherJobExecution execute(
+        String workflowId, EventPublishingTaskCompletionHandlerFactoriesFunction taskCompletionHandlerFactoriesFunction,
+        TaskDispatcherResolverFactoriesFunction taskDispatcherResolverFactoriesFunction,
+        TaskHandlerMapSupplier taskHandlerMapSupplier) {
+
+        return execute(
+            workflowId, Map.of(), taskCompletionHandlerFactoriesFunction, taskDispatcherResolverFactoriesFunction,
+            taskHandlerMapSupplier);
+    }
+
+    public TaskDispatcherJobExecution execute(
         String workflowId, Map<String, Object> inputs,
         TaskCompletionHandlerFactoriesFunction taskCompletionHandlerFactoriesFunction,
+        TaskDispatcherResolverFactoriesFunction taskDispatcherResolverFactoriesFunction,
+        TaskHandlerMapSupplier taskHandlerMapSupplier) {
+
+        return execute(
+            workflowId, inputs,
+            (
+                eventPublisher, contextService, counterService,
+                taskExecutionService) -> taskCompletionHandlerFactoriesFunction
+                    .apply(contextService, counterService, taskExecutionService),
+            taskDispatcherResolverFactoriesFunction, taskHandlerMapSupplier);
+    }
+
+    public TaskDispatcherJobExecution execute(
+        String workflowId, Map<String, Object> inputs,
+        EventPublishingTaskCompletionHandlerFactoriesFunction taskCompletionHandlerFactoriesFunction,
         TaskDispatcherResolverFactoriesFunction taskDispatcherResolverFactoriesFunction,
         TaskHandlerMapSupplier taskHandlerMapSupplier) {
 
@@ -99,12 +124,15 @@ public class TaskDispatcherJobTestExecutor {
         JobService jobService = new JobServiceImpl(new InMemoryJobRepository(taskExecutionRepository, objectMapper));
         TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
 
+        ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
+
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, SpelEvaluator.create(), event -> {}, jobService, -1, asyncMessageBroker, List.of(),
-            taskCompletionHandlerFactoriesFunction.apply(contextService, counterService, taskExecutionService),
+            taskCompletionHandlerFactoriesFunction.apply(
+                coordinatorEventPublisher, contextService, counterService, taskExecutionService),
             List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
-                createEventPublisher(asyncMessageBroker), contextService, counterService, taskExecutionService),
+                coordinatorEventPublisher, contextService, counterService, taskExecutionService),
             taskExecutionService, taskExecutor, taskHandlerMapSupplier.get()::get, taskFileStorage, -1,
             workflowService);
 
@@ -142,6 +170,14 @@ public class TaskDispatcherJobTestExecutor {
                 .findFirst()
                 .orElseThrow();
         }
+    }
+
+    @FunctionalInterface
+    public interface EventPublishingTaskCompletionHandlerFactoriesFunction {
+
+        List<TaskCompletionHandlerFactory> apply(
+            ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
+            TaskExecutionService taskExecutionService);
     }
 
     @FunctionalInterface

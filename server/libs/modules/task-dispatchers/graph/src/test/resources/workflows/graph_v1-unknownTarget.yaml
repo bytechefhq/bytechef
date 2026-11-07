@@ -1,0 +1,14 @@
+---
+label: "Graph Unknown Target"
+tasks:
+- name: "graph_1"
+  type: "graph/v1"
+  parameters:
+    nodes:
+    - name: "aTask"
+      type: "var/v1/set"
+      parameters:
+        value: "a"
+    transitions:
+    - from: "aTask"
+      to: "missingNode"

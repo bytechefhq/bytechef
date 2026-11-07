@@ -1,0 +1,29 @@
+---
+label: "Graph Dynamic Target"
+inputs:
+- name: "nextNode"
+  type: "string"
+  required: true
+outputs:
+- name: "result"
+  value: "${graph_1}"
+tasks:
+- name: "graph_1"
+  type: "graph/v1"
+  parameters:
+    nodes:
+    - name: "router"
+      type: "var/v1/set"
+      parameters:
+        value: "=nextNode"
+    - name: "review"
+      type: "var/v1/set"
+      parameters:
+        value: "review output"
+    - name: "approve"
+      type: "var/v1/set"
+      parameters:
+        value: "approve output"
+    transitions:
+    - from: "router"
+      to: "=router"

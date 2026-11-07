@@ -56,6 +56,10 @@ import tools.jackson.databind.ObjectMapper;
 @Import(JacksonConfiguration.class)
 public class TaskDispatcherIntTestConfiguration {
 
+    static {
+        DeferredEvaluationParameterKeysLoader.loadAll();
+    }
+
     @Bean
     ClassPathResourceWorkflowRepository classPathResourceWorkflowRepository(
         ResourcePatternResolver resourcePatternResolver) {

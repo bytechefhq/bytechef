@@ -1,0 +1,15 @@
+---
+label: "Graph Duplicate Node Names"
+tasks:
+- name: "graph_1"
+  type: "graph/v1"
+  parameters:
+    nodes:
+    - name: "aTask"
+      type: "var/v1/set"
+      parameters:
+        value: "first"
+    - name: "aTask"
+      type: "var/v1/set"
+      parameters:
+        value: "second"
