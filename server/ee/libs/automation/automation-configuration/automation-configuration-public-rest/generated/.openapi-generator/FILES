@@ -3,3 +3,14 @@ pom.xml
 src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/ApiUtil.java
 src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/ProjectCodeWorkflowApi.java
 src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/ProjectGitApi.java
+src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/WorkflowExecutionApi.java
+src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/model/EnvironmentModel.java
+src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/model/ExecutionErrorModel.java
+src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/model/ProjectDeploymentReferenceModel.java
+src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/model/ProjectReferenceModel.java
+src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/model/TaskExecutionModel.java
+src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/model/WorkflowExecutionBasicModel.java
+src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/model/WorkflowExecutionModel.java
+src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/model/WorkflowExecutionStatusModel.java
+src/main/java/com/bytechef/ee/automation/configuration/public_/web/rest/model/WorkflowReferenceModel.java
+src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java
