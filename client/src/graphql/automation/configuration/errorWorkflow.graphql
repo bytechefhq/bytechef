@@ -1,0 +1,40 @@
+query projectErrorWorkflow($id: ID!) {
+    project(id: $id) {
+        errorProjectWorkflowId
+    }
+}
+
+mutation updateProjectErrorWorkflow($projectId: ID!, $errorProjectWorkflowId: ID) {
+    updateProjectErrorWorkflow(projectId: $projectId, errorProjectWorkflowId: $errorProjectWorkflowId)
+}
+
+query eligibleErrorWorkflows($projectId: ID!, $projectVersion: Int!) {
+    eligibleErrorWorkflows(projectId: $projectId, projectVersion: $projectVersion) {
+        id
+        workflowId
+        workflow {
+            label
+        }
+    }
+}
+
+query projectWorkflowErrorConfig($id: ID!) {
+    projectWorkflow(id: $id) {
+        errorProjectWorkflowId
+        errorWorkflowDisabled
+    }
+}
+
+mutation updateProjectWorkflowErrorWorkflow(
+    $projectId: ID!
+    $projectWorkflowId: ID!
+    $errorProjectWorkflowId: ID
+    $errorWorkflowDisabled: Boolean!
+) {
+    updateProjectWorkflowErrorWorkflow(
+        projectId: $projectId
+        projectWorkflowId: $projectWorkflowId
+        errorProjectWorkflowId: $errorProjectWorkflowId
+        errorWorkflowDisabled: $errorWorkflowDisabled
+    )
+}

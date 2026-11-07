@@ -2,12 +2,14 @@ import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ErrorWorkflowDialog from '@/pages/automation/project/components/ErrorWorkflowDialog';
 import LoadWorkflowVersionDialog from '@/pages/automation/project/components/LoadWorkflowVersionDialog';
 import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
 import ProjectTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/ProjectTabButtons/ProjectTabButtons';
+import WorkflowErrorHandlingDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/WorkflowErrorHandlingDialog';
 import WorkflowTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/WorkflowTabButtons';
 import {useSettingsMenu} from '@/pages/automation/project/components/project-header/components/settings-menu/hooks/useSettingsMenu';
 import {useCreateProjectWorkflow} from '@/pages/automation/project/hooks/useCreateProjectWorkflow';
@@ -50,10 +52,12 @@ const SettingsMenu = ({
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
+    const [showErrorWorkflowDialog, setShowErrorWorkflowDialog] = useState(false);
     const [showLoadWorkflowVersionDialog, setShowLoadWorkflowVersionDialog] = useState(false);
     const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
     const [showProjectShareDialog, setShowProjectShareDialog] = useState(false);
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
+    const [showWorkflowErrorHandlingDialog, setShowWorkflowErrorHandlingDialog] = useState(false);
     const [showWorkflowShareDialog, setShowWorkflowShareDialog] = useState(false);
 
     const {setShowEditWorkflowDialog, showEditWorkflowDialog} = useWorkflowEditorStore(
@@ -146,6 +150,7 @@ const SettingsMenu = ({
                                 onShareWorkflow={() => setShowWorkflowShareDialog(true)}
                                 onShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
                                 onShowEditWorkflowDialog={() => setShowEditWorkflowDialog(true)}
+                                onShowErrorHandlingDialog={() => setShowWorkflowErrorHandlingDialog(true)}
                                 onShowLoadWorkflowVersionDialog={() => setShowLoadWorkflowVersionDialog(true)}
                                 workflowId={workflow.id!}
                             />
@@ -166,6 +171,7 @@ const SettingsMenu = ({
                                 onPullProjectFromGitClick={handlePullProjectFromGitClick}
                                 onShareProject={() => setShowProjectShareDialog(true)}
                                 onShowEditProjectDialogClick={() => setShowEditProjectDialog(true)}
+                                onShowErrorWorkflowDialog={() => setShowErrorWorkflowDialog(true)}
                                 onShowProjectGitConfigurationDialog={() => setShowProjectGitConfigurationDialog(true)}
                                 onShowProjectVersionHistorySheet={() => setShowProjectVersionHistorySheet(true)}
                                 projectGitConfigurationEnabled={projectGitConfiguration?.enabled ?? false}
@@ -268,6 +274,14 @@ const SettingsMenu = ({
                 />
             )}
 
+            {showErrorWorkflowDialog && (
+                <ErrorWorkflowDialog
+                    onClose={() => setShowErrorWorkflowDialog(false)}
+                    projectId={String(project.id!)}
+                    projectVersion={project.lastProjectVersion!}
+                />
+            )}
+
             {showProjectVersionHistorySheet && projectVersions && (
                 <ProjectVersionHistorySheet
                     deleteProjectVersionPending={deleteProjectVersionPending}
@@ -278,6 +292,15 @@ const SettingsMenu = ({
                     projectVersions={projectVersions}
                     restoreProjectVersionPending={restoreProjectVersionPending}
                     sheetOpen={showProjectVersionHistorySheet}
+                />
+            )}
+
+            {showWorkflowErrorHandlingDialog && (
+                <WorkflowErrorHandlingDialog
+                    onClose={() => setShowWorkflowErrorHandlingDialog(false)}
+                    projectId={String(project.id!)}
+                    projectVersion={project.lastProjectVersion!}
+                    projectWorkflowId={String(workflow.projectWorkflowId)}
                 />
             )}
 
