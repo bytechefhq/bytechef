@@ -18,6 +18,7 @@ package com.bytechef.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.advisor.EnvironmentAwareQuestionAnswerAdvisor;
 import com.bytechef.ai.copilot.agent.ClusterElementSpringAIAgent;
 import com.bytechef.ai.copilot.agent.CodeEditorSpringAIAgent;
@@ -202,6 +203,7 @@ public class CopilotConfiguration {
     private final String skillsBuildSystemPrompt;
     private final String workflowExecutionBuildSystemPrompt;
 
+    private final CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory;
     private final InteractivePickerToolCallbacks interactivePickerToolCallbacks;
     private final ActionDefinitionService actionDefinitionService;
     private final ActionDefinitionFacade actionDefinitionFacade;
@@ -236,8 +238,10 @@ public class CopilotConfiguration {
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, ActionDefinitionService actionDefinitionService,
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, PropertyOptionsResolver propertyOptionsResolver,
-        ScopedConnectionGuard scopedConnectionGuard, ObjectProvider<DataTableTools> dataTableToolsProvider) {
+        ScopedConnectionGuard scopedConnectionGuard, ObjectProvider<DataTableTools> dataTableToolsProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory) {
 
+        this.copilotGuardrailsAdvisorFactory = copilotGuardrailsAdvisorFactory;
         this.dataTableTools = dataTableToolsProvider.getIfAvailable();
         this.interactivePickerToolCallbacks = interactivePickerToolCallbacks;
         this.scopedConnectionGuard = scopedConnectionGuard;
@@ -287,6 +291,7 @@ public class CopilotConfiguration {
             List.of(readProjectWorkflowTools, componentTools, workflowValidatorTools, workflowInstructionTools));
 
         CodeEditorSpringAIAgent springAIAgent = CodeEditorSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.CODE_EDITOR_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -310,6 +315,7 @@ public class CopilotConfiguration {
         throws AGUIException {
 
         return CodeEditorSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.CODE_EDITOR_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -338,6 +344,7 @@ public class CopilotConfiguration {
                 workflowInstructionTools));
 
         WorkflowCodeEditorSpringAIAgent springAIAgent = WorkflowCodeEditorSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.WORKFLOW_CODE_EDITOR_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -365,6 +372,7 @@ public class CopilotConfiguration {
                 workflowInstructionTools));
 
         WorkflowCodeEditorSpringAIAgent springAIAgent = WorkflowCodeEditorSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.WORKFLOW_CODE_EDITOR_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -392,6 +400,7 @@ public class CopilotConfiguration {
                 workflowInstructionTools));
 
         ClusterElementSpringAIAgent springAIAgent = ClusterElementSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.CLUSTER_ELEMENT_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -415,6 +424,7 @@ public class CopilotConfiguration {
         throws AGUIException {
 
         return ClusterElementSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.CLUSTER_ELEMENT_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -485,6 +495,7 @@ public class CopilotConfiguration {
         tools.addAll(interactivePickerToolCallbacks.write());
 
         WorkflowEditorSpringAIAgent springAIAgent = WorkflowEditorSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.WORKFLOW_EDITOR_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -527,6 +538,7 @@ public class CopilotConfiguration {
         tools.addAll(interactivePickerToolCallbacks.write());
 
         return WorkflowEditorSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.WORKFLOW_EDITOR_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -550,6 +562,7 @@ public class CopilotConfiguration {
         throws AGUIException {
 
         return ConverterSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.CONVERTER_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -580,6 +593,7 @@ public class CopilotConfiguration {
                 workflowInstructionTools));
 
         SkillsSpringAIAgent springAIAgent = SkillsSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.SKILLS_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -603,6 +617,7 @@ public class CopilotConfiguration {
         throws AGUIException {
 
         return SkillsSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.SKILLS_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -624,6 +639,7 @@ public class CopilotConfiguration {
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
 
         return JsonSchemaBuilderSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.JSON_SCHEMA_BUILDER_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -642,6 +658,7 @@ public class CopilotConfiguration {
         List<Object> tools = new ArrayList<>(List.of(new JsonSchemaTools()));
 
         return JsonSchemaBuilderSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.JSON_SCHEMA_BUILDER_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -658,6 +675,7 @@ public class CopilotConfiguration {
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
 
         return SampleOutputSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.SAMPLE_OUTPUT_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -676,6 +694,7 @@ public class CopilotConfiguration {
         List<Object> tools = new ArrayList<>(List.of(new SampleOutputTools()));
 
         return SampleOutputSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.SAMPLE_OUTPUT_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -782,10 +801,12 @@ public class CopilotConfiguration {
         throws AGUIException {
 
         IntelligentToolChatClientFactory mcpServerChatClientFactory =
-            candidateChatModel -> mcpServerBuildSubAgentChatClientFactoryProvider.getObject()
-                .get(candidateChatModel);
+            candidateChatModel -> copilotGuardrailsAdvisorFactory.guardedChatClient(
+                mcpServerBuildSubAgentChatClientFactoryProvider.getObject()
+                    .get(candidateChatModel));
 
         return McpServerSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.MCP_SERVER_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -834,7 +855,7 @@ public class CopilotConfiguration {
         ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
         ComponentTools componentTools, List<ToolCallback> webSearchToolCallbacks) {
 
-        ChatClient.Builder builder = ChatClient.builder(chatModel)
+        ChatClient.Builder builder = chatClientBuilder(chatModel)
             .defaultSystem(codeEditorAskSystemPrompt);
 
         List<Object> tools = new ArrayList<>(
@@ -870,7 +891,7 @@ public class CopilotConfiguration {
         ChatModel chatModel, ScriptTools scriptTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools) {
 
-        return ChatClient.builder(chatModel)
+        return chatClientBuilder(chatModel)
             .defaultSystem(codeEditorBuildSystemPrompt)
             .defaultTools(
                 readProjectWorkflowTools, scriptTools, componentTools, workflowValidatorTools,
@@ -917,7 +938,7 @@ public class CopilotConfiguration {
         List<ToolCallback> webSearchToolCallbacks,
         Advisor questionAnswerAdvisor) {
 
-        ChatClient.Builder builder = ChatClient.builder(chatModel)
+        ChatClient.Builder builder = chatClientBuilder(chatModel)
             .defaultSystem(workflowEditorAskSystemPrompt)
             .defaultAdvisors(questionAnswerAdvisor);
 
@@ -978,7 +999,7 @@ public class CopilotConfiguration {
                 propertyOptionsResolver, ToolStateVisibilityMetrics.NOOP, scopedConnectionGuard));
         toolCallbacks.addAll(webSearchToolCallbacks);
 
-        return ChatClient.builder(chatModel)
+        return chatClientBuilder(chatModel)
             .defaultSystem(buildWorkflowSubAgentSystemPrompt(askToolAvailable))
             .defaultAdvisors(new TokenUsageLoggerAdvisor(CopilotAgentType.BUILD_WORKFLOW.key()))
             .defaultTools(
@@ -1038,7 +1059,7 @@ public class CopilotConfiguration {
         ChatModel chatModel, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools,
         ScriptTools scriptTools, List<ToolCallback> webSearchToolCallbacks) {
 
-        return ChatClient.builder(chatModel)
+        return chatClientBuilder(chatModel)
             .defaultSystem(converterSubAgentSystemPrompt())
             .defaultTools(
                 withDataTableTools(
@@ -1095,7 +1116,7 @@ public class CopilotConfiguration {
         ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
         ComponentTools componentTools, TaskTools taskTools, List<ToolCallback> webSearchToolCallbacks) {
 
-        ChatClient.Builder builder = ChatClient.builder(chatModel)
+        ChatClient.Builder builder = chatClientBuilder(chatModel)
             .defaultSystem(clusterElementAskSystemPrompt);
 
         List<Object> tools = new ArrayList<>(
@@ -1135,7 +1156,7 @@ public class CopilotConfiguration {
         ChatModel chatModel, ClusterElementTools clusterElementTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools) {
 
-        return ChatClient.builder(chatModel)
+        return chatClientBuilder(chatModel)
             .defaultSystem(clusterElementBuildSystemPrompt)
             .defaultTools(
                 readProjectWorkflowTools, clusterElementTools, componentTools, taskTools, workflowValidatorTools,
@@ -1177,7 +1198,7 @@ public class CopilotConfiguration {
         ReadProjectWorkflowTools readProjectWorkflowTools, ReadSkillsTools readSkillsTools,
         List<ToolCallback> webSearchToolCallbacks) {
 
-        ChatClient.Builder builder = ChatClient.builder(chatModel)
+        ChatClient.Builder builder = chatClientBuilder(chatModel)
             .defaultSystem(skillsAskSystemPrompt);
 
         List<Object> tools = new ArrayList<>(
@@ -1219,7 +1240,7 @@ public class CopilotConfiguration {
         ReadProjectWorkflowTools readProjectWorkflowTools, SkillsTools skillsTools,
         ComponentTools componentTools) {
 
-        return ChatClient.builder(chatModel)
+        return chatClientBuilder(chatModel)
             .defaultSystem(skillsBuildSystemPrompt)
             .defaultTools(
                 skillsTools, readProjectTools, readProjectWorkflowTools, componentTools, workflowValidatorTools,
@@ -1290,12 +1311,17 @@ public class CopilotConfiguration {
         ChatModel chatModel, WorkflowExecutionTools workflowExecutionTools, ProjectWorkflowTools projectWorkflowTools,
         ScriptTools scriptTools, TaskTools taskTools) {
 
-        return ChatClient.builder(chatModel)
+        return chatClientBuilder(chatModel)
             .defaultSystem(workflowExecutionBuildSystemPrompt)
             .defaultTools(
                 workflowExecutionTools, projectWorkflowTools, scriptTools, taskTools, workflowValidatorTools,
                 workflowInstructionTools)
             .build();
+    }
+
+    private ChatClient.Builder chatClientBuilder(ChatModel chatModel) {
+        return ChatClient.builder(chatModel)
+            .defaultAdvisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors());
     }
 
     private String getSystemPrompt(Resource systemPromptResource) {

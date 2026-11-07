@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
@@ -60,6 +61,7 @@ import org.springframework.core.io.Resource;
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class EmbeddedCopilotConfiguration {
 
+    private final CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory;
     private final State state = new State();
     private final WorkflowInstructionTools workflowInstructionTools;
     private final WorkflowValidatorTools workflowValidatorTools;
@@ -76,8 +78,10 @@ public class EmbeddedCopilotConfiguration {
         @Value("classpath:prompt_workflow_editor_embedded_build.txt") Resource promptWorkflowEditorEmbeddedBuildResource,
         @Value("classpath:prompt_code_workflow_embedded_ask.txt") Resource promptCodeWorkflowEmbeddedAskResource,
         @Value("classpath:prompt_code_workflow_embedded_build.txt") Resource promptCodeWorkflowEmbeddedBuildResource,
-        WorkflowInstructionTools workflowInstructionTools, WorkflowValidatorTools workflowValidatorTools) {
+        WorkflowInstructionTools workflowInstructionTools, WorkflowValidatorTools workflowValidatorTools,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory) {
 
+        this.copilotGuardrailsAdvisorFactory = copilotGuardrailsAdvisorFactory;
         this.workflowInstructionTools = workflowInstructionTools;
         this.workflowValidatorTools = workflowValidatorTools;
 
@@ -103,6 +107,7 @@ public class EmbeddedCopilotConfiguration {
                 workflowInstructionTools));
 
         WorkflowEditorSpringAIAgent springAIAgent = WorkflowEditorSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.WORKFLOW_EDITOR_EMBEDDED_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -136,6 +141,7 @@ public class EmbeddedCopilotConfiguration {
                 workflowInstructionTools));
 
         return WorkflowEditorSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.WORKFLOW_EDITOR_EMBEDDED_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -156,6 +162,7 @@ public class EmbeddedCopilotConfiguration {
         SecurityContextRehydrator securityContextRehydrator) throws AGUIException {
 
         return EmbeddedCodeWorkflowSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.CODE_WORKFLOW_EMBEDDED_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -172,6 +179,7 @@ public class EmbeddedCopilotConfiguration {
         SecurityContextRehydrator securityContextRehydrator) throws AGUIException {
 
         return EmbeddedCodeWorkflowSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.CODE_WORKFLOW_EMBEDDED_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -210,12 +218,17 @@ public class EmbeddedCopilotConfiguration {
         ChatModel chatModel, IntegrationTools integrationTools, IntegrationWorkflowTools integrationWorkflowTools,
         ComponentTools componentTools, TaskTools taskTools) {
 
-        return ChatClient.builder(chatModel)
+        return chatClientBuilder(chatModel)
             .defaultSystem(workflowEditorEmbeddedBuildSystemPrompt)
             .defaultTools(
                 integrationTools, integrationWorkflowTools, componentTools, taskTools, workflowValidatorTools,
                 workflowInstructionTools)
             .build();
+    }
+
+    private ChatClient.Builder chatClientBuilder(ChatModel chatModel) {
+        return ChatClient.builder(chatModel)
+            .defaultAdvisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors());
     }
 
     private static List<ToolCallback> wrapTools(

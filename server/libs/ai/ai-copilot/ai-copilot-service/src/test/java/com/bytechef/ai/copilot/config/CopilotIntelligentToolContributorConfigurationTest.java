@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
@@ -671,7 +672,8 @@ final class CopilotIntelligentToolContributorConfigurationTest {
                 mock(ClusterElementDefinitionService.class), mock(ClusterElementDefinitionFacade.class),
                 propertyOptionsResolver, connectionListerProvider, scopedConnectionGuard),
             actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
-            propertyOptionsResolver, scopedConnectionGuard, emptyDataTableToolsProvider());
+            propertyOptionsResolver, scopedConnectionGuard, emptyDataTableToolsProvider(),
+            new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
     }
 
     private static IntelligentToolDefinition definitionNamed(
