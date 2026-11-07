@@ -26,11 +26,12 @@ describe('getSettingsNavItems', () => {
         });
     });
 
-    it('lists Memories and Hub under an AI group of the Automation current workspace, not under the Organization AI group', () => {
+    it('lists Memories, Agent Rules and Hub under an AI group of the Automation current workspace, not under the Organization AI group', () => {
         const {organization, section} = splitAtOrganization(getSettingsNavItems(PlatformType.AUTOMATION));
 
         expect(findAiGroup(section)?.items).toEqual([
             {href: '/automation/settings/ai/memories', title: 'Memories'},
+            {href: '/automation/settings/ai/rules', title: 'Agent Rules'},
             {href: '/automation/settings/ai/hub', title: 'Hub'},
         ]);
         expect(findAiGroup(organization)?.items?.map((item) => item.title)).toEqual([

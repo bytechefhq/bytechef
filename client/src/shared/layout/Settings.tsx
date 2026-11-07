@@ -66,6 +66,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             return edition === EditionType.EE && aiHubEnabled;
         }
 
+        if (pageKey === 'ai/rules') {
+            return edition === EditionType.EE;
+        }
+
         if (pageKey === 'billing') {
             return billingEnabled;
         }
