@@ -15,6 +15,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClientRequest;
@@ -245,6 +247,64 @@ class PinnedToolSearchToolCallingAdvisorTest {
 
     private PinnedToolSearchToolCallingAdvisor newAdvisor() {
         return newAdvisor(List.of());
+    }
+
+    @Test
+    void testDiscoveredCatalogToolGoesThroughTheRunsToolCallbackDecorator() {
+        when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
+
+        ToolCallback catalogTool = toolCallback("searchProjects");
+        ToolCallback decoratedCatalogTool = toolCallback("searchProjects");
+
+        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor(List.of(catalogTool));
+
+        ToolResponseMessage searchHit = ToolResponseMessage.builder()
+            .responses(List.of(new ToolResponse("call-1", "toolSearchTool", "[\"searchProjects\"]")))
+            .build();
+        Prompt prompt = new Prompt(
+            List.of(new SystemMessage("base system"), new UserMessage("hi"), searchHit),
+            ToolCallingChatOptions.builder()
+                .toolCallbacks(toolCallback("askUserQuestion"))
+                .build());
+        UnaryOperator<ToolCallback> toolCallbackDecorator =
+            toolCallback -> toolCallback == catalogTool ? decoratedCatalogTool : toolCallback;
+        ChatClientRequest request = ChatClientRequest.builder()
+            .prompt(prompt)
+            .context(ChatMemory.CONVERSATION_ID, "conv-1")
+            .context(SpringAIAgent.TOOL_CALLBACK_DECORATOR_KEY, toolCallbackDecorator)
+            .build();
+
+        ChatClientRequest afterBeforeCall = advisor.doBeforeCall(advisor.doInitializeLoop(request, null), null);
+
+        ToolCallingChatOptions toolCallingChatOptions = (ToolCallingChatOptions) afterBeforeCall.prompt()
+            .getOptions();
+
+        assertThat(toolCallingChatOptions.getToolCallbacks())
+            .contains(decoratedCatalogTool)
+            .doesNotContain(catalogTool);
+        assertThat(toolCallingChatOptions.getToolContext())
+            .extractingByKey(RunCatalogToolCallingManager.RUN_CATALOG_TOOL_CALLBACKS_KEY)
+            .isEqualTo(Map.of("searchProjects", decoratedCatalogTool));
+    }
+
+    @Test
+    void testRunCatalogToolsStayCallableWhenToolSearchIsUnavailable() {
+        when(toolCallingManager.resolveToolDefinitions(any())).thenThrow(new IllegalStateException("no embedding"));
+
+        ToolCallback catalogTool = toolCallback("listComponents");
+
+        PinnedToolSearchToolCallingAdvisor advisor = newAdvisor(List.of(catalogTool));
+
+        ChatClientRequest afterBeforeCall = advisor.doBeforeCall(
+            advisor.doInitializeLoop(newRequest(toolCallback("askUserQuestion")), null), null);
+
+        ToolCallingChatOptions toolCallingChatOptions = (ToolCallingChatOptions) afterBeforeCall.prompt()
+            .getOptions();
+
+        assertThat(toolNames(afterBeforeCall)).containsExactly("askUserQuestion");
+        assertThat(toolCallingChatOptions.getToolContext())
+            .extractingByKey(RunCatalogToolCallingManager.RUN_CATALOG_TOOL_CALLBACKS_KEY)
+            .isEqualTo(Map.of("listComponents", catalogTool));
     }
 
     private PinnedToolSearchToolCallingAdvisor newAdvisor(List<ToolCallback> catalogToolCallbacks) {
