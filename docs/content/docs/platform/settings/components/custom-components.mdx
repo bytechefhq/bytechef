@@ -1191,6 +1191,17 @@ The generated code is yours to edit. Build it into a jar that meets [the Java co
 it. For a REST API that needs no code at all, an [API connector](/platform/settings/components/api-connectors) turns
 the specification into a component directly.
 
+## Deploying with the CLI
+
+The CLI uploads a built component to the deploy endpoint above:
+
+```bash
+bytechef component deploy --file ./acme_tasks.js
+```
+
+`--file` takes a single-file JavaScript or Python component, or a Java `.jar`; the extension selects the language. The
+CLI profile's token must be an [admin API key](/platform/settings/admin-api-keys).
+
 ## See also
 
 - [Developer Guide](/developer-guide) - the full Java component reference.
