@@ -6,6 +6,20 @@ description: "Learn how to monitor projects and workflows in ByteChef."
 After a project is deployed and executed, its workflow activity appears here-allowing you to review how your automation
 is performing and explore the details of each execution.
 
+## Where runs come from
+
+The **Type** select at the top of the left sidebar picks which runs the page lists:
+
+| Type | Lists runs of |
+|---|---|
+| **Projects** | Project deployments: runs started by a trigger, a schedule, or by hand. This is the default. |
+| **MCP Servers** | Workflow tools an AI client called through an MCP server in the workspace. |
+| **A2A Servers** | Skills another agent called through an A2A server in the workspace. |
+| **API Collections** | Endpoints called on an API collection. Enterprise Edition only. |
+
+Adding a project to an MCP server, an A2A server or an API collection creates a separate deployment of that project,
+named after the server or the collection. Its runs are listed under that type and not under **Projects**.
+
 ## The executions table
 
 Each run is one row:
@@ -15,7 +29,7 @@ Each run is one row:
 | **Status** | The run's job status: `CREATED`, `STARTED`, `COMPLETED`, `FAILED`, or `STOPPED`. `STOPPED` covers a run interrupted at any point, whether or not it had started. All five are offered by the filter below. |
 | **Workflow** | The workflow that ran. Nested rows for a subflow show **Subflow** instead. |
 | **Project** | The project the workflow belongs to. |
-| **Deployment** | The project deployment the run belongs to. |
+| **Deployment** | The project deployment the run belongs to. For the MCP Servers, A2A Servers and API Collections types the column is named **MCP server**, **A2A server** or **API collection** and shows the name of the server or collection that ran the workflow. |
 | **Version** | The published project version the deployment is on. |
 | **Duration** | How long the run took. |
 | **Start date** / **End date** | When the run started and finished. |
@@ -29,11 +43,12 @@ Executions can be narrowed by any combination of these filters:
 
 | Filter | Narrows the list to |
 |---|---|
+| **Type** | Runs from one source: projects, MCP servers, A2A servers or API collections. See [Where runs come from](#where-runs-come-from) |
 | **Environment** | Runs from deployments in one environment |
 | **Status** | Runs in one execution state |
 | **Start date** / **End date** | Runs that began or ended within a date range |
 | **Project** | Runs belonging to one project |
-| **Deployment** | Runs from one project deployment |
+| **Deployment** | Runs from one project deployment. Shown for the Projects type only |
 | **Workflow** | Runs of one workflow |
 
 The **Status** filter offers `STARTED`, `COMPLETED`, `CREATED`, `STOPPED`, and `FAILED`. The
