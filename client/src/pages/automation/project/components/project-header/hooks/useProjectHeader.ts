@@ -4,6 +4,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import getChatTriggerName from '@/pages/platform/workflow-editor/utils/getChatTriggerName';
 import getSelectedTestRunTriggerName from '@/pages/platform/workflow-editor/utils/getSelectedTestRunTriggerName';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
@@ -19,7 +20,7 @@ import {ProjectKeys, useGetProjectQuery} from '@/shared/queries/automation/proje
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {useQueryClient} from '@tanstack/react-query';
-import {RefObject, useCallback, useEffect, useMemo, useState} from 'react';
+import {RefObject, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -35,6 +36,8 @@ interface UseProjectHeaderProps {
 
 export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectId}: UseProjectHeaderProps) => {
     const [jobId, setJobId] = useState<string | null>(null);
+
+    const chatSessionRef = useRef(chatTrigger);
 
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -54,13 +57,15 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             setWorkflowNodeDetailsPanelOpen: state.setWorkflowNodeDetailsPanelOpen,
         }))
     );
-    const {resetMessages, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} = useWorkflowTestChatStore(
-        useShallow((state) => ({
-            resetMessages: state.resetMessages,
-            setWorkflowTestChatPanelOpen: state.setWorkflowTestChatPanelOpen,
-            workflowTestChatPanelOpen: state.workflowTestChatPanelOpen,
-        }))
-    );
+    const {resetMessages, setChatTriggerName, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} =
+        useWorkflowTestChatStore(
+            useShallow((state) => ({
+                resetMessages: state.resetMessages,
+                setChatTriggerName: state.setChatTriggerName,
+                setWorkflowTestChatPanelOpen: state.setWorkflowTestChatPanelOpen,
+                workflowTestChatPanelOpen: state.workflowTestChatPanelOpen,
+            }))
+        );
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {captureProjectPublished, captureProjectWorkflowTested} = useAnalytics();
@@ -208,6 +213,9 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             captureProjectWorkflowTested();
 
             if (chatTrigger) {
+                chatSessionRef.current = true;
+
+                setChatTriggerName(getChatTriggerName(workflow, getSelectedTestRunTriggerName(workflow)));
                 resetMessages();
                 setDataPillPanelOpen(false);
                 setWorkflowNodeDetailsPanelOpen(false);
@@ -232,6 +240,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         chatTrigger,
         persistJobId,
         resetMessages,
+        setChatTriggerName,
         setDataPillPanelOpen,
         setShowBottomPanelOpen,
         setStreamRequest,
@@ -264,7 +273,9 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             });
         }
 
-        if (chatTrigger) {
+        if (chatSessionRef.current) {
+            chatSessionRef.current = false;
+
             setWorkflowTestChatPanelOpen(false);
 
             if (bottomResizablePanelRef.current) {
@@ -281,7 +292,6 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         }
     }, [
         bottomResizablePanelRef,
-        chatTrigger,
         closeWorkflowTestStream,
         getPersistedJobId,
         jobId,
@@ -293,12 +303,12 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
     ]);
 
     // Stop the workflow execution when:
-    // - We are in chat mode (`chatTrigger` is true) and the chat panel is not open (`!workflowTestChatPanelOpen`)
+    // - A chat test session is active (`chatSessionRef`) and the chat panel is not open (`!workflowTestChatPanelOpen`)
     useEffect(() => {
-        if (chatTrigger && !workflowTestChatPanelOpen) {
+        if (chatSessionRef.current && !workflowTestChatPanelOpen) {
             handleStopClick();
         }
-    }, [chatTrigger, handleStopClick, workflowTestChatPanelOpen]);
+    }, [handleStopClick, workflowTestChatPanelOpen]);
 
     // On mount: try to restore an ongoing workflow execution using jobId persisted in localStorage by calling
     // attach endpoint.
