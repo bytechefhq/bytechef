@@ -40,6 +40,7 @@ public enum CopilotAgentType implements AgentType {
     JSON_SCHEMA_BUILDER_BUILD(Source.JSON_SCHEMA_BUILDER, Mode.BUILD),
     SAMPLE_OUTPUT_ASK(Source.SAMPLE_OUTPUT, Mode.ASK),
     SAMPLE_OUTPUT_BUILD(Source.SAMPLE_OUTPUT, Mode.BUILD),
+    MCP_SERVER_ASK(Source.MCP_SERVER, Mode.ASK),
     MCP_SERVER_BUILD(Source.MCP_SERVER, Mode.BUILD),
     AI_AGENT_ASK(Source.AI_AGENT, Mode.ASK),
     AI_AGENT_BUILD(Source.AI_AGENT, Mode.BUILD),

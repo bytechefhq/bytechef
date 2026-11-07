@@ -38,20 +38,25 @@ class SourceTest {
     void testAgentIdCombinesTheSourceAndMode() {
         assertThat(Source.WORKFLOW_CODE_EDITOR.agentId(Mode.ASK)).isEqualTo("workflow_code_editor_ask");
         assertThat(Source.WORKFLOW_EDITOR_EMBEDDED.agentId(Mode.BUILD)).isEqualTo("workflow_editor_embedded_build");
+        assertThat(Source.MCP_SERVER.agentId(Mode.ASK)).isEqualTo("mcp_server_ask");
+        assertThat(Source.MCP_SERVER.agentId(Mode.BUILD)).isEqualTo("mcp_server_build");
     }
 
     @Test
     void testBuildOnlySourcesAlwaysResolveToBuild() {
         assertThat(Source.CONVERTER.resolveMode(Mode.ASK)).isEqualTo(Mode.BUILD);
-        assertThat(Source.MCP_SERVER.resolveMode(null)).isEqualTo(Mode.BUILD);
-        assertThat(Source.MCP_SERVER.agentId(Mode.ASK)).isEqualTo("mcp_server_build");
+        assertThat(Source.CONVERTER.resolveMode(null)).isEqualTo(Mode.BUILD);
+        assertThat(Source.CONVERTER.agentId(Mode.ASK)).isEqualTo("converter_build");
     }
 
     @Test
     void testResolveModeRequiresAModeForNonBuildOnlySources() {
         assertThat(Source.WORKFLOW_EDITOR.resolveMode(Mode.ASK)).isEqualTo(Mode.ASK);
+        assertThat(Source.MCP_SERVER.resolveMode(Mode.ASK)).isEqualTo(Mode.ASK);
 
         assertThatThrownBy(() -> Source.WORKFLOW_EDITOR.resolveMode(null))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Source.MCP_SERVER.resolveMode(null))
             .isInstanceOf(IllegalArgumentException.class);
     }
 

@@ -43,7 +43,7 @@ public enum Source {
     API_COLLECTION,
     ASSET_FILE,
     COMPONENT_RULE,
-    MCP_SERVER(WorkflowOwner.PROJECT, true),
+    MCP_SERVER,
     CODE_WORKFLOW,
     CODE_WORKFLOW_EMBEDDED(WorkflowOwner.INTEGRATION, false),
     WORKFLOW_EDITOR_EMBEDDED(WorkflowOwner.INTEGRATION, false),

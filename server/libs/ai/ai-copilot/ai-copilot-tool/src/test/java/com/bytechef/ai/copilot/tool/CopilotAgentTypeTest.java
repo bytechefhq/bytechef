@@ -45,6 +45,12 @@ class CopilotAgentTypeTest {
             .isEqualTo("workflow_code_editor_ask");
         assertThat(CopilotAgentType.WORKFLOW_EDITOR_EMBEDDED_BUILD.key()).isEqualTo("workflow_editor_embedded_build");
         assertThat(CopilotAgentType.CONVERTER_BUILD.key()).isEqualTo(Source.CONVERTER.agentId(Mode.ASK));
+        assertThat(CopilotAgentType.MCP_SERVER_ASK.key())
+            .isEqualTo(Source.MCP_SERVER.agentId(Mode.ASK))
+            .isEqualTo("mcp_server_ask");
+        assertThat(CopilotAgentType.MCP_SERVER_BUILD.key())
+            .isEqualTo(Source.MCP_SERVER.agentId(Mode.BUILD))
+            .isEqualTo("mcp_server_build");
     }
 
     @Test

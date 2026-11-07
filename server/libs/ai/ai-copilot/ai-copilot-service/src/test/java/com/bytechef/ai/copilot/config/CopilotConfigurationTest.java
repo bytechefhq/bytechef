@@ -31,7 +31,11 @@ import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
+import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
+import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.tool.DataTableTools;
+import com.bytechef.automation.ai.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -61,6 +65,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -112,6 +117,46 @@ class CopilotConfigurationTest {
     }
 
     @Test
+    void testMcpServerAskAgentIsRegisteredUnderTheMcpServerSourceId() throws AGUIException {
+        McpServerSpringAIAgent mcpServerSpringAIAgent = copilotConfiguration.mcpServerAskSpringAIAgent(
+            mock(ChatMemory.class), mock(ChatModel.class),
+            CopilotConfigurationTest.<McpServerToolCallbacksFactory>emptyProvider(), PROMPT_RESOURCE,
+            mock(SecurityContextRehydrator.class),
+            CopilotConfigurationTest.<OverrideChatClientResolver>emptyProvider());
+
+        assertThat(mcpServerSpringAIAgent.getAgentId()).isEqualTo("mcp_server_ask");
+    }
+
+    @Test
+    void testMcpServerAskAgentToolsAreReadOnly() {
+        McpServerToolCallbacksFactory mcpServerToolCallbacksFactory = new McpServerToolCallbacksFactory(
+            mock(McpProjectFacade.class), mock(McpProjectWorkflowFacade.class), mock(WorkspaceMcpServerFacade.class));
+
+        List<ToolCallback> toolCallbacks = copilotConfiguration.mcpServerAskToolCallbacks(
+            mock(SecurityContextRehydrator.class), mcpServerToolCallbacksFactory);
+
+        assertThat(toolCallbacks)
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .containsExactly("listMcpServers", "listMcpProjectWorkflows");
+    }
+
+    @Test
+    void testMcpServerAskAgentHasNoToolsWithoutTheMcpServerToolCallbacksFactory() {
+        assertThat(copilotConfiguration.mcpServerAskToolCallbacks(mock(SecurityContextRehydrator.class), null))
+            .isEmpty();
+    }
+
+    @Test
+    void testMcpServerAskPromptIsReadOnly() {
+        String prompt = readResource("prompt_mcp_server_ask.txt");
+
+        assertThat(prompt)
+            .contains("listMcpServers", "listMcpProjectWorkflows", "READ-ONLY", "switch to Build mode")
+            .doesNotContain("configureMcpServer", "updateMcpProjectWorkflowParameters");
+    }
+
+    @Test
     void testEveryRegisteredChatAgentIdIsAUniqueCopilotAgentTypeKey() throws ReflectiveOperationException {
         Set<String> copilotAgentTypeKeys = Arrays.stream(CopilotAgentType.values())
             .map(CopilotAgentType::key)
@@ -128,11 +173,12 @@ class CopilotConfigurationTest {
         }
 
         assertThat(agentIds)
-            .hasSize(18)
+            .hasSize(19)
             .doesNotHaveDuplicates()
             .allSatisfy(agentId -> assertThat(copilotAgentTypeKeys).contains(agentId))
             .contains(
-                "workflow_code_editor_ask", "workflow_code_editor_build", "converter_build", "mcp_server_build",
+                "workflow_code_editor_ask", "workflow_code_editor_build", "converter_build", "mcp_server_ask",
+                "mcp_server_build",
                 "workflow_execution_ask", "workflow_execution_build");
     }
 

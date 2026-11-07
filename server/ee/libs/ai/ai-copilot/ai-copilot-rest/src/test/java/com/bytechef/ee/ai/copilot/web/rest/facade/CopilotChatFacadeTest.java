@@ -456,15 +456,31 @@ class CopilotChatFacadeTest {
     }
 
     @Test
-    void testChatRoutesMcpServerToBuildRegardlessOfMode() {
-        LocalAgent agent = localAgent("mcp_server_build");
-        CopilotChatFacadeImpl facade = facadeWith(agent);
+    void testChatRoutesMcpServerAskToTheAskAgent() {
+        LocalAgent askAgent = localAgent("mcp_server_ask");
+        LocalAgent buildAgent = localAgent("mcp_server_build");
+        CopilotChatFacadeImpl facade = facadeWith(askAgent, buildAgent);
 
-        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+        when(agUiService.runAgent(eq(askAgent), any())).thenReturn(new SseEmitter());
 
         facade.chat("mcp_server", agUiParameters("ASK"));
 
-        verify(agUiService).runAgent(eq(agent), any());
+        verify(agUiService).runAgent(eq(askAgent), any());
+        verify(agUiService, never()).runAgent(eq(buildAgent), any());
+    }
+
+    @Test
+    void testChatRoutesMcpServerBuildToTheBuildAgent() {
+        LocalAgent askAgent = localAgent("mcp_server_ask");
+        LocalAgent buildAgent = localAgent("mcp_server_build");
+        CopilotChatFacadeImpl facade = facadeWith(askAgent, buildAgent);
+
+        when(agUiService.runAgent(eq(buildAgent), any())).thenReturn(new SseEmitter());
+
+        facade.chat("mcp_server", agUiParameters("BUILD"));
+
+        verify(agUiService).runAgent(eq(buildAgent), any());
+        verify(agUiService, never()).runAgent(eq(askAgent), any());
     }
 
     @Test
@@ -518,7 +534,7 @@ class CopilotChatFacadeTest {
 
     @Test
     void testChatAlwaysBuildAgentRequiresWorkspaceEditorRoleInAskMode() {
-        LocalAgent agent = localAgent("mcp_server_build");
+        LocalAgent agent = localAgent("converter_build");
         CopilotChatFacadeImpl facade = new CopilotChatFacadeImpl(
             agUiService, List.of(agent), Optional.of(permissionService), Optional.of(projectWorkflowService),
             Optional.empty(), Optional.empty());
@@ -529,11 +545,30 @@ class CopilotChatFacadeTest {
         when(permissionService.hasWorkspaceRole(5L, "VIEWER")).thenReturn(true);
         when(permissionService.hasWorkspaceRole(5L, "EDITOR")).thenReturn(false);
 
-        assertThatThrownBy(() -> facade.chat("mcp_server", parameters))
+        assertThatThrownBy(() -> facade.chat("converter", parameters))
             .isInstanceOf(AccessDeniedException.class)
             .hasMessage("Access denied to workspace 5");
 
         verify(agUiService, never()).runAgent(any(), any());
+    }
+
+    @Test
+    void testChatMcpServerAskRequiresOnlyWorkspaceViewerRole() {
+        LocalAgent agent = localAgent("mcp_server_ask");
+        CopilotChatFacadeImpl facade = new CopilotChatFacadeImpl(
+            agUiService, List.of(agent), Optional.of(permissionService), Optional.of(projectWorkflowService),
+            Optional.empty(), Optional.empty());
+
+        AgUiParameters parameters = parameters(
+            Map.<String, Object>of(CopilotConstants.STATE_WORKSPACE_ID, "5", "mode", "ASK"));
+
+        when(permissionService.hasWorkspaceRole(5L, "VIEWER")).thenReturn(true);
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        facade.chat("mcp_server", parameters);
+
+        verify(agUiService).runAgent(eq(agent), any());
+        verify(permissionService, never()).hasWorkspaceRole(5L, "EDITOR");
     }
 
     @Test
@@ -873,9 +908,9 @@ class CopilotChatFacadeTest {
         return localAgent;
     }
 
-    private CopilotChatFacadeImpl facadeWith(LocalAgent localAgent) {
+    private CopilotChatFacadeImpl facadeWith(LocalAgent... localAgents) {
         return new CopilotChatFacadeImpl(
-            agUiService, List.of(localAgent), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+            agUiService, List.of(localAgents), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     private AgUiParameters parameters(Map<String, Object> stateMap) {
