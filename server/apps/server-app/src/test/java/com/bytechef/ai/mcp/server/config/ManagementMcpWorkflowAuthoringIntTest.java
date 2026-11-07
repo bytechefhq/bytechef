@@ -50,7 +50,9 @@ import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.server.ServerApplication;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -58,6 +60,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -190,6 +194,23 @@ class ManagementMcpWorkflowAuthoringIntTest {
         for (String intelligentToolName : INTELLIGENT_TOOL_NAMES) {
             assertThat(instructions).doesNotContain(intelligentToolName);
         }
+    }
+
+    @Test
+    void testCopilotDisabledServerServesTheViewerReadToolsReadOnlyWithTheirViewers() {
+        Map<String, McpSchema.Tool> tools = managementMcpServerConfiguration.toolSpecifications()
+            .stream()
+            .map(McpServerFeatures.AsyncToolSpecification::tool)
+            .filter(tool -> List.of("queryDataTable", "getAssetFileContent")
+                .contains(tool.name()))
+            .collect(Collectors.toMap(McpSchema.Tool::name, Function.identity()));
+
+        assertThat(tools).containsOnlyKeys("queryDataTable", "getAssetFileContent");
+        assertThat(tools.values()).allSatisfy(tool -> {
+            assertThat(tool.meta()).containsKey("ui");
+            assertThat(tool.annotations()
+                .readOnlyHint()).isTrue();
+        });
     }
 
     @Test

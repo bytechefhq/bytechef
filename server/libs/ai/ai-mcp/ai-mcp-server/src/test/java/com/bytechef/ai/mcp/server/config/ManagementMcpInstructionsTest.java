@@ -52,7 +52,34 @@ class ManagementMcpInstructionsTest {
         "listMcpServers", "updateMcpProjectWorkflowParameters", "lookupPropertyOptions", "buildAiAgent",
         "listAiAgents", "getAiAgent", "createAiAgent", "updateAiAgent", "addAiAgentElement", "updateAiAgentElement",
         "deleteAiAgentElement", "addAiAgentChannel", "deleteAiAgentChannel", "updateAiAgentSettings",
-        "searchAiAgentTools", "searchAiAgentReferences");
+        "searchAiAgentTools", "searchAiAgentReferences", "queryDataTable", "getAssetFileContent");
+
+    @Test
+    void testDescribesTheViewerReadToolsWhenRegistered() {
+        Set<String> toolNames = deterministicToolNames();
+
+        toolNames.addAll(List.of("queryDataTable", "getAssetFileContent"));
+
+        assertThat(ManagementMcpInstructions.build(toolNames))
+            .contains(
+                "queryDataTable returns the rows of a data table", "getAssetFileContent returns the content",
+                "Both are read-only, take a workspaceId");
+    }
+
+    @Test
+    void testDescribesOnlyTheRegisteredViewerReadTool() {
+        Set<String> toolNames = deterministicToolNames();
+
+        toolNames.add("getAssetFileContent");
+
+        String instructions = ManagementMcpInstructions.build(toolNames);
+
+        assertThat(instructions)
+            .contains("getAssetFileContent returns the content", "It is read-only")
+            .doesNotContain("queryDataTable");
+
+        assertNoAbsentToolNamed(toolNames);
+    }
 
     @Test
     void testOmitsIntelligentToolsWhenNotRegistered() {

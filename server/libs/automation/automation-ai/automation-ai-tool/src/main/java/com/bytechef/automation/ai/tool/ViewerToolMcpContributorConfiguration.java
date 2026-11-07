@@ -19,12 +19,18 @@ package com.bytechef.automation.ai.tool;
 import com.bytechef.ai.mcp.server.spi.McpAppResources;
 import com.bytechef.ai.mcp.server.spi.McpAppUiDescriptor;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.ai.tool.datatable.QueryDataTableToolCallback;
+import com.bytechef.automation.assetfile.service.AssetFileFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.commons.util.JsonUtils;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,12 +43,34 @@ import org.springframework.context.annotation.Configuration;
 public class ViewerToolMcpContributorConfiguration {
 
     @Bean
-    McpServerToolCallbackContributor viewerToolMcpContributor() {
+    McpServerToolCallbackContributor viewerToolMcpContributor(
+        ObjectProvider<WorkspaceDataTableFacade> workspaceDataTableFacadeProvider,
+        ObjectProvider<AssetFileFacade> assetFileFacadeProvider,
+        ObjectProvider<WorkspaceFacade> workspaceFacadeProvider) {
+
         return new McpServerToolCallbackContributor() {
 
             @Override
             public List<ToolCallback> getToolCallbacks() {
-                return List.of();
+                WorkspaceFacade workspaceFacade = workspaceFacadeProvider.getIfAvailable();
+
+                if (workspaceFacade == null) {
+                    return List.of();
+                }
+
+                List<ToolCallback> toolCallbacks = new ArrayList<>();
+
+                workspaceDataTableFacadeProvider.ifAvailable(
+                    workspaceDataTableFacade -> toolCallbacks.add(
+                        new WorkspaceScopedFlatToolCallback(
+                            new QueryDataTableToolCallback(workspaceDataTableFacade), workspaceFacade)));
+
+                assetFileFacadeProvider.ifAvailable(
+                    assetFileFacade -> toolCallbacks.add(
+                        new WorkspaceScopedFlatToolCallback(
+                            new GetAssetFileContentToolCallback(assetFileFacade), workspaceFacade)));
+
+                return toolCallbacks;
             }
 
             @Override

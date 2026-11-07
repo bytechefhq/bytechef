@@ -20,18 +20,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.mcp.server.spi.McpAppResources;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.EnvironmentScopedToolCallback;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
+import com.bytechef.automation.ai.tool.ViewerToolMcpContributorConfiguration;
 import com.bytechef.automation.ai.tool.WorkspaceTools;
+import com.bytechef.automation.assetfile.service.AssetFileFacade;
+import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.jackson.config.JacksonConfiguration;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.modelcontextprotocol.server.McpAsyncServer;
+import io.modelcontextprotocol.server.McpAsyncServerExchange;
+import io.modelcontextprotocol.server.McpServerFeatures;
+import io.modelcontextprotocol.spec.McpSchema;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -307,6 +322,85 @@ class ManagementMcpServerConfigurationIntTest {
                 assertThat(toolDefinitions)
                     .allSatisfy(toolDefinition -> assertThat(toolDefinition.inputSchema()).contains("workspaceId"));
             });
+        }
+    }
+
+    @Nested
+    class McpAppViewerToolsTest {
+
+        private final WorkspaceDataTableFacade workspaceDataTableFacade = mock(WorkspaceDataTableFacade.class);
+        private final WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
+
+        private final ApplicationContextRunner viewerApplicationContextRunner = applicationContextRunner
+            .withUserConfiguration(ViewerToolMcpContributorConfiguration.class)
+            .withBean(AssetFileFacade.class, () -> mock(AssetFileFacade.class))
+            .withBean(WorkspaceDataTableFacade.class, () -> workspaceDataTableFacade)
+            .withBean(WorkspaceFacade.class, () -> workspaceFacade);
+
+        @Test
+        void testServesQueryDataTableAndGetAssetFileContentReadOnlyWithTheirViewers() {
+            viewerApplicationContextRunner.run(context -> {
+                assertThat(context).hasNotFailed();
+
+                Map<String, McpSchema.Tool> tools = getTools(context.getBean(ManagementMcpServerConfiguration.class));
+
+                assertThat(tools.get("queryDataTable")
+                    .meta()).containsEntry("ui", Map.of("resourceUri", McpAppResources.DATA_TABLE_VIEWER_URI));
+                assertThat(tools.get("getAssetFileContent")
+                    .meta()).containsEntry("ui", Map.of("resourceUri", McpAppResources.FILE_VIEWER_URI));
+
+                assertThat(List.of(tools.get("queryDataTable"), tools.get("getAssetFileContent")))
+                    .allSatisfy(tool -> {
+                        assertThat(tool.annotations()
+                            .readOnlyHint()).isTrue();
+                        assertThat(JsonUtils.write(tool.inputSchema())).contains("\"workspaceId\"");
+                    });
+
+                assertThat(ManagementMcpInstructions.build(tools.keySet()))
+                    .contains("queryDataTable returns the rows", "getAssetFileContent returns the content");
+            });
+        }
+
+        @Test
+        void testQueryDataTableResultCarriesTheRowsForTheViewer() {
+            when(workspaceFacade.getMyWorkspaces()).thenReturn(List.of(new Workspace(42L, "Workspace 42")));
+            when(workspaceDataTableFacade.listTables(42L, 0L)).thenReturn(
+                List.of(new DataTableInfo(7L, "leads", null, List.of(), Instant.EPOCH)));
+            when(workspaceDataTableFacade.listRows(7L, 50, 0, 0L)).thenReturn(
+                List.of(new DataTableRow(1L, Map.of("name", "Ada"))));
+
+            viewerApplicationContextRunner.run(context -> {
+                assertThat(context).hasNotFailed();
+
+                McpServerFeatures.AsyncToolSpecification toolSpecification = context
+                    .getBean(ManagementMcpServerConfiguration.class)
+                    .toolSpecifications()
+                    .stream()
+                    .filter(specification -> "queryDataTable".equals(specification.tool()
+                        .name()))
+                    .findFirst()
+                    .orElseThrow();
+
+                McpSchema.CallToolResult callToolResult = toolSpecification.callHandler()
+                    .apply(
+                        mock(McpAsyncServerExchange.class),
+                        McpSchema.CallToolRequest.builder()
+                            .name("queryDataTable")
+                            .arguments(Map.of("workspaceId", 42, "dataTableId", "7"))
+                            .build())
+                    .block();
+
+                assertThat(callToolResult.isError()).isNotEqualTo(Boolean.TRUE);
+                assertThat(callToolResult.structuredContent())
+                    .isEqualTo(Map.of("rows", List.of(Map.of("name", "Ada"))));
+            });
+        }
+
+        private static Map<String, McpSchema.Tool> getTools(ManagementMcpServerConfiguration configuration) {
+            return configuration.toolSpecifications()
+                .stream()
+                .map(McpServerFeatures.AsyncToolSpecification::tool)
+                .collect(Collectors.toMap(McpSchema.Tool::name, Function.identity()));
         }
     }
 }

@@ -93,6 +93,10 @@ final class ManagementMcpInstructions {
 
         paragraphs.add(search());
 
+        if (names.contains("queryDataTable") || names.contains("getAssetFileContent")) {
+            paragraphs.add(viewers(names));
+        }
+
         if (names.containsAll(MCP_SERVER_TOOL_NAMES)) {
             paragraphs.add(mcpServers(names));
         }
@@ -226,6 +230,23 @@ final class ManagementMcpInstructions {
             To find something, listProjects and listWorkflows take an optional query that matches names and \
             descriptions; searchWorkflows without a projectId searches the workflows of every project in a \
             workspace. getProject also reports publication state, the last version and deployments.""";
+    }
+
+    private static String viewers(Set<String> names) {
+        List<String> reads = new ArrayList<>();
+
+        if (names.contains("queryDataTable")) {
+            reads.add("queryDataTable returns the rows of a data table by its dataTableId");
+        }
+
+        if (names.contains("getAssetFileContent")) {
+            reads.add("getAssetFileContent returns the content of a text file by its id");
+        }
+
+        return String.join(" and ", reads) + ". "
+            + (reads.size() > 1 ? "Both are" : "It is") + " read-only, take a workspaceId and an environment, "
+            + "and render as a viewer in clients that support MCP Apps; ask the user for the id, which the "
+            + "ByteChef UI shows.";
     }
 
     private static String mcpServers(Set<String> names) {
