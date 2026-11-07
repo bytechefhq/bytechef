@@ -17,10 +17,14 @@
 package com.bytechef.automation.workflow.execution.web.rest.mapper;
 
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionSource;
 import com.bytechef.automation.workflow.execution.web.rest.mapper.config.AutomationWorkflowExecutionMapperSpringConfig;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionModel;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -34,7 +38,19 @@ public class WorkflowExecutionMapper {
         extends Converter<WorkflowExecutionDTO, WorkflowExecutionModel> {
 
         @Override
+        @Mapping(target = "source", ignore = true)
         WorkflowExecutionModel convert(WorkflowExecutionDTO workflowExecution);
+
+        @AfterMapping
+        default void afterMapping(
+            WorkflowExecutionDTO workflowExecution, @MappingTarget WorkflowExecutionModel workflowExecutionModel) {
+
+            WorkflowExecutionSource source = workflowExecution.source();
+
+            if (source != null && source != WorkflowExecutionSource.ANY) {
+                workflowExecutionModel.setSource(WorkflowExecutionModel.SourceEnum.fromValue(source.name()));
+            }
+        }
     }
 
     @Mapper(

@@ -72,6 +72,7 @@ import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionSource;
 import com.bytechef.cache.config.CacheConfiguration;
 import com.bytechef.commons.data.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
@@ -125,6 +126,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -776,9 +778,11 @@ class ProjectWorkflowExecutionFacadeIntTest {
         }
 
         @Test
-        void testWithoutOwnerExcludesOwnedDeployments() {
+        void testProjectSourceExcludesOwnedDeployments() {
             Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
-                false, null, null, null, null, null, getId(project), null, null, null, null, getId(workspace), 0);
+                false, null, WorkflowExecutionSource.PROJECT_DEPLOYMENT, null, null, null, getId(project), null, null,
+                null, null,
+                getId(workspace), 0);
 
             assertThat(workflowExecutionDTOPage.getContent())
                 .extracting(WorkflowExecutionDTO::id)
@@ -786,9 +790,47 @@ class ProjectWorkflowExecutionFacadeIntTest {
         }
 
         @Test
+        void testAnySourceReturnsProjectAndOwnedDeployments() {
+            Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
+                false, null, WorkflowExecutionSource.ANY, null, null, null, getId(project), null, null, null, null,
+                getId(workspace), 0);
+
+            assertThat(workflowExecutionDTOPage.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactlyInAnyOrder(projectJob.getId(), mcpJob.getId());
+        }
+
+        @Test
+        void testAnySourceMarksEachExecutionWithTheSourceOfItsDeployment() {
+            Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
+                false, null, WorkflowExecutionSource.ANY, null, null, null, getId(project), null, null, null, null,
+                getId(workspace), 0);
+
+            Map<Long, WorkflowExecutionDTO> workflowExecutionDTOMap = workflowExecutionDTOPage.getContent()
+                .stream()
+                .collect(Collectors.toMap(WorkflowExecutionDTO::id, Function.identity()));
+
+            assertThat(workflowExecutionDTOMap.get(projectJob.getId())
+                .source()).isEqualTo(WorkflowExecutionSource.PROJECT_DEPLOYMENT);
+            assertThat(workflowExecutionDTOMap.get(mcpJob.getId())
+                .source()).isEqualTo(WorkflowExecutionSource.MCP_SERVER);
+        }
+
+        @Test
+        void testAnySourceKeepsTheProjectDeploymentFilter() {
+            Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
+                false, null, WorkflowExecutionSource.ANY, null, null, null, getId(project),
+                getId(mcpProjectDeployment), null, null, null, getId(workspace), 0);
+
+            assertThat(workflowExecutionDTOPage.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactly(mcpJob.getId());
+        }
+
+        @Test
         void testOwnerReturnsOnlyItsDeployments() {
             Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
-                false, null, ProjectDeploymentOwner.MCP_SERVER, null, null, null, getId(project), null, null, null,
+                false, null, WorkflowExecutionSource.MCP_SERVER, null, null, null, getId(project), null, null, null,
                 null, getId(workspace), 0);
 
             assertThat(workflowExecutionDTOPage.getContent())
@@ -799,7 +841,7 @@ class ProjectWorkflowExecutionFacadeIntTest {
         @Test
         void testOwnerWithoutContributorReturnsNothing() {
             Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
-                false, null, ProjectDeploymentOwner.API_COLLECTION, null, null, null, getId(project), null, null,
+                false, null, WorkflowExecutionSource.API_COLLECTION, null, null, null, getId(project), null, null,
                 null, null, getId(workspace), 0);
 
             assertThat(workflowExecutionDTOPage.getContent()).isEmpty();
@@ -810,7 +852,7 @@ class ProjectWorkflowExecutionFacadeIntTest {
             Workspace otherWorkspace = workspaceRepository.save(new Workspace("other-owner-workspace"));
 
             Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
-                false, null, ProjectDeploymentOwner.MCP_SERVER, null, null, null, getId(project), null, null, null,
+                false, null, WorkflowExecutionSource.MCP_SERVER, null, null, null, getId(project), null, null, null,
                 null, getId(otherWorkspace), 0);
 
             assertThat(workflowExecutionDTOPage.getContent()).isEmpty();
@@ -819,7 +861,7 @@ class ProjectWorkflowExecutionFacadeIntTest {
         @Test
         void testOwnerRejectsADeploymentItDoesNotOwn() {
             Page<WorkflowExecutionDTO> workflowExecutionDTOPage = facade.getWorkflowExecutions(
-                false, null, ProjectDeploymentOwner.MCP_SERVER, null, null, null, getId(project),
+                false, null, WorkflowExecutionSource.MCP_SERVER, null, null, null, getId(project),
                 getId(projectProjectDeployment), null, null, null, getId(workspace), 0);
 
             assertThat(workflowExecutionDTOPage.getContent()).isEmpty();

@@ -27,8 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionSource;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
@@ -243,7 +243,8 @@ class WorkflowExecutionApiControllerIntTest {
             33L, null, null, null, null, null, null, List.of(), 0L);
 
         when(projectWorkflowExecutionFacade.getWorkflowExecutions(
-            null, null, null, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L, 0))
+            null, null, WorkflowExecutionSource.PROJECT_DEPLOYMENT, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L,
+            0))
                 .thenReturn(new PageImpl<>(List.of(workflowExecutionDTO), PageRequest.of(0, 20), 1));
 
         mockMvc.perform(
@@ -258,13 +259,14 @@ class WorkflowExecutionApiControllerIntTest {
             .andExpect(jsonPath("$.content[0].id").value(33));
 
         verify(projectWorkflowExecutionFacade).getWorkflowExecutions(
-            null, null, null, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L, 0);
+            null, null, WorkflowExecutionSource.PROJECT_DEPLOYMENT, null, null, null, null, 9L, 7L, "workflow-1", 2, 1L,
+            0);
     }
 
     @Test
-    void getWorkflowExecutionsPagePassesTheSourceAsTheProjectDeploymentOwner() throws Exception {
+    void getWorkflowExecutionsPagePassesTheSourceToTheFacade() throws Exception {
         when(projectWorkflowExecutionFacade.getWorkflowExecutions(
-            null, null, ProjectDeploymentOwner.MCP_SERVER, null, null, null, null, null, null, null, null, 1L, 0))
+            null, null, WorkflowExecutionSource.MCP_SERVER, null, null, null, null, null, null, null, null, 1L, 0))
                 .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
 
         mockMvc.perform(
@@ -274,23 +276,65 @@ class WorkflowExecutionApiControllerIntTest {
             .andExpect(status().isOk());
 
         verify(projectWorkflowExecutionFacade).getWorkflowExecutions(
-            null, null, ProjectDeploymentOwner.MCP_SERVER, null, null, null, null, null, null, null, null, 1L, 0);
+            null, null, WorkflowExecutionSource.MCP_SERVER, null, null, null, null, null, null, null, null, 1L, 0);
     }
 
     @Test
-    void getWorkflowExecutionsPageTreatsTheProjectSourceAsNoProjectDeploymentOwner() throws Exception {
+    void getWorkflowExecutionsPagePassesTheProjectSourceToTheFacade() throws Exception {
         when(projectWorkflowExecutionFacade.getWorkflowExecutions(
-            null, null, null, null, null, null, null, null, null, null, null, 1L, 0))
+            null, null, WorkflowExecutionSource.PROJECT_DEPLOYMENT, null, null, null, null, null, null, null, null, 1L,
+            0))
                 .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
 
         mockMvc.perform(
             get("/internal/workspaces/1/workflow-executions")
-                .queryParam("source", "PROJECT")
+                .queryParam("source", "PROJECT_DEPLOYMENT")
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
 
         verify(projectWorkflowExecutionFacade).getWorkflowExecutions(
-            null, null, null, null, null, null, null, null, null, null, null, 1L, 0);
+            null, null, WorkflowExecutionSource.PROJECT_DEPLOYMENT, null, null, null, null, null, null, null, null, 1L,
+            0);
+    }
+
+    @Test
+    void getWorkflowExecutionsPageReturnsTheSourceAndSourceNameOfEachExecution() throws Exception {
+        WorkflowExecutionDTO mcpServerWorkflowExecutionDTO = new WorkflowExecutionDTO(
+            41L, null, null, null, null, null, null, WorkflowExecutionSource.MCP_SERVER, "mcptest");
+        WorkflowExecutionDTO projectWorkflowExecutionDTO = new WorkflowExecutionDTO(
+            42L, null, null, null, null, null, null, WorkflowExecutionSource.PROJECT_DEPLOYMENT, null);
+
+        when(projectWorkflowExecutionFacade.getWorkflowExecutions(
+            null, null, WorkflowExecutionSource.ANY, null, null, null, null, null, null, null, null, 1L, 0))
+                .thenReturn(
+                    new PageImpl<>(
+                        List.of(mcpServerWorkflowExecutionDTO, projectWorkflowExecutionDTO), PageRequest.of(0, 20), 2));
+
+        mockMvc.perform(
+            get("/internal/workspaces/1/workflow-executions")
+                .queryParam("source", "ANY")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content[0].source").value("MCP_SERVER"))
+            .andExpect(jsonPath("$.content[0].sourceName").value("mcptest"))
+            .andExpect(jsonPath("$.content[1].source").value("PROJECT_DEPLOYMENT"))
+            .andExpect(jsonPath("$.content[1].sourceName").doesNotExist());
+    }
+
+    @Test
+    void getWorkflowExecutionsPagePassesTheAnySourceToTheFacade() throws Exception {
+        when(projectWorkflowExecutionFacade.getWorkflowExecutions(
+            null, null, WorkflowExecutionSource.ANY, null, null, null, null, null, null, null, null, 1L, 0))
+                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
+
+        mockMvc.perform(
+            get("/internal/workspaces/1/workflow-executions")
+                .queryParam("source", "ANY")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        verify(projectWorkflowExecutionFacade).getWorkflowExecutions(
+            null, null, WorkflowExecutionSource.ANY, null, null, null, null, null, null, null, null, 1L, 0);
     }
 
     @Configuration

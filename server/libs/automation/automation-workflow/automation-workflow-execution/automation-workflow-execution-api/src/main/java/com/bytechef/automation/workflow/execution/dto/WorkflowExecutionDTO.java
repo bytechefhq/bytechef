@@ -33,13 +33,34 @@ import org.jspecify.annotations.Nullable;
 public record WorkflowExecutionDTO(
     long id, Project project, ProjectDeployment projectDeployment, @Nullable Integer projectVersion,
     @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution,
-    @Nullable List<FocusPathElementDTO> focusPath, @Nullable Long taskExecutionCount) {
+    @Nullable List<FocusPathElementDTO> focusPath, @Nullable Long taskExecutionCount,
+    @Nullable WorkflowExecutionSource source, @Nullable String sourceName) {
 
     public WorkflowExecutionDTO(
         long id, Project project, ProjectDeployment projectDeployment, @Nullable Integer projectVersion,
         @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution) {
 
-        this(id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, null, null);
+        this(id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, null, null, null, null);
+    }
+
+    public WorkflowExecutionDTO(
+        long id, Project project, ProjectDeployment projectDeployment, @Nullable Integer projectVersion,
+        @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution,
+        @Nullable List<FocusPathElementDTO> focusPath, @Nullable Long taskExecutionCount) {
+
+        this(
+            id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, focusPath,
+            taskExecutionCount, null, null);
+    }
+
+    public WorkflowExecutionDTO(
+        long id, Project project, ProjectDeployment projectDeployment, @Nullable Integer projectVersion,
+        @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution,
+        @Nullable WorkflowExecutionSource source, @Nullable String sourceName) {
+
+        this(
+            id, project, projectDeployment, projectVersion, job, workflow, triggerExecution, null, null, source,
+            sourceName);
     }
 
     public boolean isTriggerOnly() {

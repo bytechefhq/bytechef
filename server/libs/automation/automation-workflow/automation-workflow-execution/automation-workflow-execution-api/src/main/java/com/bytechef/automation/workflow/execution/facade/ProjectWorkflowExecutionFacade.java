@@ -17,12 +17,11 @@
 package com.bytechef.automation.workflow.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
-import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionSource;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import java.time.Instant;
-import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 
 /**
@@ -63,12 +62,12 @@ public interface ProjectWorkflowExecutionFacade {
         long workspaceId, int pageNumber) {
 
         return getWorkflowExecutions(
-            embedded, environmentId, null, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId,
-            connectedUserId, workflowId, projectVersion, workspaceId, pageNumber);
+            embedded, environmentId, WorkflowExecutionSource.PROJECT, jobStatus, jobStartDate, jobEndDate, projectId,
+            projectDeploymentId, connectedUserId, workflowId, projectVersion, workspaceId, pageNumber);
     }
 
     Page<WorkflowExecutionDTO> getWorkflowExecutions(
-        Boolean embedded, Long environmentId, @Nullable ProjectDeploymentOwner projectDeploymentOwner,
-        Status jobStatus, Instant jobStartDate, Instant jobEndDate, Long projectId, Long projectDeploymentId,
+        Boolean embedded, Long environmentId, WorkflowExecutionSource workflowExecutionSource, Status jobStatus,
+        Instant jobStartDate, Instant jobEndDate, Long projectId, Long projectDeploymentId,
         Long connectedUserId, String workflowId, Integer projectVersion, long workspaceId, int pageNumber);
 }
