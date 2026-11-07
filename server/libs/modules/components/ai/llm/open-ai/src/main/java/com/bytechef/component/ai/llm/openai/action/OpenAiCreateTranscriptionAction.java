@@ -38,6 +38,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.client.okhttp.OpenAIOkHttpClientAsync;
 import com.openai.models.audio.AudioResponseFormat;
 import java.net.MalformedURLException;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
@@ -102,6 +103,10 @@ public class OpenAiCreateTranscriptionAction {
             return OpenAiAudioTranscriptionModel.builder()
                 .openAiClient(
                     OpenAIOkHttpClient.builder()
+                        .apiKey(token)
+                        .build())
+                .openAiClientAsync(
+                    OpenAIOkHttpClientAsync.builder()
                         .apiKey(token)
                         .build())
                 .options(
