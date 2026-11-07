@@ -8,13 +8,17 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("tools.jackson.core:jackson-databind")
     implementation(project(":server:libs:ai:ai-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-agent-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:exception:exception-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
     implementation(project(":server:libs:platform:platform-data-table:platform-data-table-api"))
+    implementation(rootProject.libs.com.google.auto.service.auto.service.annotations)
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -22,4 +26,5 @@ dependencies {
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.springframework:spring-webflux")
     testImplementation(project(":server:libs:test:test-support"))
+    annotationProcessor(rootProject.libs.com.google.auto.service.auto.service)
 }
