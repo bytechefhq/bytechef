@@ -77,8 +77,8 @@ class EmbeddedAiGatewayChatCompletionApiControllerTest {
         when(connectedUser.getId()).thenReturn(5L);
         when(connectedUser.isEnabled()).thenReturn(true);
 
-        when(aiGatewayFacade.chatCompletion(any(), any(), anyLong())).thenReturn(chatCompletionResponse());
-        when(aiGatewayFacade.chatCompletionStream(any(), any(), any(), any()))
+        when(aiGatewayFacade.chatCompletion(any(), any(), any(), anyLong())).thenReturn(chatCompletionResponse());
+        when(aiGatewayFacade.chatCompletionStream(any(), any(), any(), any(), any()))
             .thenReturn(Flux.just(chatCompletionResponse()));
 
         mockMvc = MockMvcBuilders.standaloneSetup(
@@ -104,7 +104,7 @@ class EmbeddedAiGatewayChatCompletionApiControllerTest {
                 .content(REQUEST_BODY))
             .andExpect(status().isOk());
 
-        verify(aiGatewayFacade).chatCompletion(any(), any(), eq(5L));
+        verify(aiGatewayFacade).chatCompletion(any(), any(), any(), eq(5L));
     }
 
     @Test
@@ -306,7 +306,7 @@ class EmbeddedAiGatewayChatCompletionApiControllerTest {
 
         when(connectedUserService.fetchConnectedUser("customer-1", ENVIRONMENT_ID))
             .thenReturn(Optional.of(connectedUser));
-        when(aiGatewayFacade.chatCompletion(any(), any(), anyLong()))
+        when(aiGatewayFacade.chatCompletion(any(), any(), any(), anyLong()))
             .thenReturn(chatCompletionResponseWithMetadata());
 
         MvcResult mvcResult = mockMvc.perform(
@@ -332,7 +332,7 @@ class EmbeddedAiGatewayChatCompletionApiControllerTest {
         ArgumentCaptor<AiGatewayChatCompletionRequest> requestCaptor = ArgumentCaptor.forClass(
             AiGatewayChatCompletionRequest.class);
 
-        verify(aiGatewayFacade).chatCompletion(requestCaptor.capture(), any(), eq(5L));
+        verify(aiGatewayFacade).chatCompletion(requestCaptor.capture(), any(), any(), eq(5L));
 
         return requestCaptor.getValue();
     }
@@ -357,7 +357,7 @@ class EmbeddedAiGatewayChatCompletionApiControllerTest {
             "chatCompletionsStream", handlerMethod.getMethod()
                 .getName());
 
-        verify(aiGatewayFacade).chatCompletionStream(any(), any(), eq(5L), any());
+        verify(aiGatewayFacade).chatCompletionStream(any(), any(), any(), eq(5L), any());
     }
 
     @Test

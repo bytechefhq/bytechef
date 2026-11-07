@@ -25,6 +25,7 @@ import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayContentBlock;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayContentBlockType;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayTool;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayToolChoice;
+import com.bytechef.ee.platform.ai.gateway.dto.AiPromptHeaders;
 import com.bytechef.ee.platform.ai.observability.facade.AiObservabilityTracingHeaders;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -81,9 +82,10 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
         }
 
         AiObservabilityTracingHeaders tracingHeaders = resolveTracingHeaders();
+        AiPromptHeaders promptHeaders = resolvePromptHeaders();
 
         AiGatewayChatCompletionResponse domainResponse =
-            aiGatewayFacade.chatCompletion(request, tracingHeaders);
+            aiGatewayFacade.chatCompletion(request, tracingHeaders, promptHeaders);
 
         ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
 
@@ -141,8 +143,9 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
             AiGatewayChatCompletionRequest request = toDomainRequest(chatCompletionRequestModel);
 
             AiObservabilityTracingHeaders tracingHeaders = resolveTracingHeaders();
+            AiPromptHeaders promptHeaders = resolvePromptHeaders();
 
-            return aiGatewayFacade.chatCompletionStream(request, tracingHeaders)
+            return aiGatewayFacade.chatCompletionStream(request, tracingHeaders, promptHeaders)
                 .<ServerSentEvent<Object>>map(domainResponse -> ServerSentEvent.<Object>builder()
                     .data(toResponseModel(domainResponse))
                     .build());
@@ -165,6 +168,21 @@ class AiGatewayChatCompletionApiController implements ChatCompletionApi {
     }
 
     public record StreamErrorChunkModel(String type, String message) {
+    }
+
+    private AiPromptHeaders resolvePromptHeaders() {
+        ServletRequestAttributes requestAttributes =
+            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+        if (requestAttributes == null) {
+            return new AiPromptHeaders(null, null);
+        }
+
+        HttpServletRequest httpServletRequest = requestAttributes.getRequest();
+
+        return new AiPromptHeaders(
+            httpServletRequest.getHeader(AiPromptHeaders.HEADER_PROMPT_NAME),
+            httpServletRequest.getHeader(AiPromptHeaders.HEADER_PROMPT_ENVIRONMENT));
     }
 
     private AiObservabilityTracingHeaders resolveTracingHeaders() {

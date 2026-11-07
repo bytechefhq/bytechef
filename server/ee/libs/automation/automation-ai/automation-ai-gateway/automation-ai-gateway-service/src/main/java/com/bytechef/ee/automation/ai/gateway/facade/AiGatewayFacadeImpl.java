@@ -16,6 +16,7 @@ import com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsS
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProjectService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilitySessionService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
+import com.bytechef.ee.automation.ai.prompt.service.WorkspaceAiPromptService;
 import com.bytechef.ee.platform.ai.gateway.cache.AiGatewayResponseCache;
 import com.bytechef.ee.platform.ai.gateway.compression.AiGatewayContextCompressor;
 import com.bytechef.ee.platform.ai.gateway.cost.AiGatewayCostCalculator;
@@ -35,6 +36,7 @@ import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatRole;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayContentBlock;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingResponse;
+import com.bytechef.ee.platform.ai.gateway.dto.AiPromptHeaders;
 import com.bytechef.ee.platform.ai.gateway.event.AiGatewayBudgetExceededEvent;
 import com.bytechef.ee.platform.ai.gateway.event.AiGatewayTraceCompletedEvent;
 import com.bytechef.ee.platform.ai.gateway.metrics.AiGatewayMetrics;
@@ -71,6 +73,9 @@ import com.bytechef.ee.platform.ai.observability.facade.AiObservabilityTracingHe
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySessionService;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySpanService;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityTraceService;
+import com.bytechef.ee.platform.ai.prompt.AiPrompt;
+import com.bytechef.ee.platform.ai.prompt.AiPromptVersion;
+import com.bytechef.ee.platform.ai.prompt.AiPromptVersionService;
 import com.bytechef.platform.ai.sensitivedata.tokenization.PiiToken;
 import com.bytechef.platform.ai.sensitivedata.tokenization.PiiTokenSession;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -85,6 +90,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +99,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
@@ -145,6 +152,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private static final double CONTEXT_WINDOW_USAGE_RATIO = 0.85;
     private static final BigDecimal DEFAULT_FALLBACK_COST_PER_M_TOKENS = new BigDecimal("10.00");
     private static final Logger log = LoggerFactory.getLogger(AiGatewayFacadeImpl.class);
+    private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{\\{(\\w+)}}");
 
     private static final String TRACE_DEDUP_INDEX = "uq_ai_obs_trace_ext_trace_id";
     private static final Pattern TRACE_DEDUP_INDEX_PATTERN =
@@ -170,6 +178,8 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private final AiGatewayRoutingPolicyService aiGatewayRoutingPolicyService;
     private final AiGatewaySpendService aiGatewaySpendService;
     private final PromptComplexityScorer promptComplexityScorer;
+    private final WorkspaceAiPromptService workspaceAiPromptService;
+    private final AiPromptVersionService aiPromptVersionService;
     private final AiObservabilitySessionService aiObservabilitySessionService;
     private final WorkspaceAiObservabilitySessionService workspaceAiObservabilitySessionService;
     private final WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService;
@@ -205,6 +215,8 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         AiGatewayRoutingPolicyService aiGatewayRoutingPolicyService,
         AiGatewaySpendService aiGatewaySpendService,
         PromptComplexityScorer promptComplexityScorer,
+        WorkspaceAiPromptService workspaceAiPromptService,
+        AiPromptVersionService aiPromptVersionService,
         AiObservabilitySessionService aiObservabilitySessionService,
         WorkspaceAiObservabilitySessionService workspaceAiObservabilitySessionService,
         WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService,
@@ -239,6 +251,8 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         this.aiGatewayRoutingPolicyService = aiGatewayRoutingPolicyService;
         this.aiGatewaySpendService = aiGatewaySpendService;
         this.promptComplexityScorer = promptComplexityScorer;
+        this.workspaceAiPromptService = workspaceAiPromptService;
+        this.aiPromptVersionService = aiPromptVersionService;
         this.aiObservabilitySessionService = aiObservabilitySessionService;
         this.workspaceAiObservabilitySessionService = workspaceAiObservabilitySessionService;
         this.workspaceAiObservabilityTraceService = workspaceAiObservabilityTraceService;
@@ -307,7 +321,16 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public AiGatewayChatCompletionResponse chatCompletion(
         AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
-        @Nullable Long connectedUserId) {
+        @Nullable AiPromptHeaders promptHeaders) {
+
+        return chatCompletion(request, tracingHeaders, promptHeaders, null);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public AiGatewayChatCompletionResponse chatCompletion(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable AiPromptHeaders promptHeaders, @Nullable Long connectedUserId) {
 
         if (tracingHeaders == null) {
             tracingHeaders = new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of());
@@ -321,6 +344,12 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
 
         Long workspaceId = resolveWorkspaceIdFromTags(request.tags());
         Long projectId = resolveProjectId(request.tags());
+
+        ResolvedPrompt resolvedPrompt = resolvePrompt(promptHeaders, workspaceId, request);
+
+        if (resolvedPrompt != null) {
+            request = prependSystemMessage(request, resolvedPrompt.content());
+        }
 
         PiiTokenSession session = aiGatewayGuardrails.newTokenSession();
 
@@ -345,7 +374,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 success = false;
 
                 processTracingHeaders(
-                    tracingHeaders, workspaceId, request, null, startTime, false, connectedUserId);
+                    tracingHeaders, workspaceId, request, null, startTime, false, resolvedPrompt, connectedUserId);
 
                 throw exception;
             }
@@ -355,7 +384,8 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                     response, resolvePlatformType(connectedUserId), workspaceId, projectId);
 
             processTracingHeaders(
-                tracingHeaders, workspaceId, request, scannedResponse, startTime, success, connectedUserId);
+                tracingHeaders, workspaceId, request, scannedResponse, startTime, success, resolvedPrompt,
+                connectedUserId);
 
             response = aiGatewayGuardrails.restoreResponse(scannedResponse, session);
 
@@ -597,31 +627,43 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     public Flux<AiGatewayChatCompletionResponse> chatCompletionStream(
         AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders) {
 
-        return chatCompletionStream(request, tracingHeaders, (AtomicLong) null);
+        return chatCompletionStream(request, tracingHeaders, (AiPromptHeaders) null);
     }
 
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Flux<AiGatewayChatCompletionResponse> chatCompletionStream(
         AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable AiPromptHeaders promptHeaders) {
+
+        return chatCompletionStream(request, tracingHeaders, promptHeaders, null);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Flux<AiGatewayChatCompletionResponse> chatCompletionStream(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable AiPromptHeaders promptHeaders, @Nullable AtomicLong traceIdHolder) {
+
+        return chatCompletionStream(request, tracingHeaders, promptHeaders, null, traceIdHolder);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Flux<AiGatewayChatCompletionResponse> chatCompletionStream(
+        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
+        @Nullable AiPromptHeaders promptHeaders, @Nullable Long connectedUserId,
         @Nullable AtomicLong traceIdHolder) {
 
-        return chatCompletionStream(request, tracingHeaders, null, traceIdHolder);
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public Flux<AiGatewayChatCompletionResponse> chatCompletionStream(
-        AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
-        @Nullable Long connectedUserId, @Nullable AtomicLong traceIdHolder) {
-
         return Flux.defer(
-            () -> chatCompletionStreamInternal(request, tracingHeaders, connectedUserId, traceIdHolder));
+            () -> chatCompletionStreamInternal(
+                request, tracingHeaders, promptHeaders, connectedUserId, traceIdHolder));
     }
 
     private Flux<AiGatewayChatCompletionResponse> chatCompletionStreamInternal(
         AiGatewayChatCompletionRequest request, @Nullable AiObservabilityTracingHeaders tracingHeaders,
-        @Nullable Long connectedUserId, @Nullable AtomicLong traceIdHolder) {
+        @Nullable AiPromptHeaders promptHeaders, @Nullable Long connectedUserId,
+        @Nullable AtomicLong traceIdHolder) {
 
         AiObservabilityTracingHeaders effectiveTracingHeaders = tracingHeaders != null
             ? tracingHeaders
@@ -636,9 +678,12 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         Long workspaceId = resolveWorkspaceIdFromTags(request.tags());
         Long projectId = resolveProjectId(request.tags());
 
+        ResolvedPrompt resolvedPrompt = resolvePrompt(promptHeaders, workspaceId, request);
+
         AiGatewayChatCompletionRequest effectiveRequest = applyRoutingPolicyPrecedence(
             aiGatewayGuardrails.apply(
-                request, resolvePlatformType(connectedUserId), workspaceId, projectId, null),
+                resolvedPrompt != null ? prependSystemMessage(request, resolvedPrompt.content()) : request,
+                resolvePlatformType(connectedUserId), workspaceId, projectId, null),
             connectedUserId, requestSettings);
 
         long startTime = System.currentTimeMillis();
@@ -2126,6 +2171,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         @Nullable AiGatewayChatCompletionResponse response,
         long startTime,
         boolean success,
+        @Nullable ResolvedPrompt resolvedPrompt,
         @Nullable Long connectedUserId) {
 
         if (workspaceId == null) {
@@ -2198,6 +2244,11 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                     log.warn("Invalid parentSpanId header value '{}' — ignoring",
                         tracingHeaders.parentSpanId());
                 }
+            }
+
+            if (resolvedPrompt != null) {
+                span.setPromptId(resolvedPrompt.promptId());
+                span.setPromptVersionId(resolvedPrompt.promptVersionId());
             }
 
             applyConnectedUserSpanAttribute(span, connectedUserId);
@@ -2648,7 +2699,90 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         return url;
     }
 
+    private AiGatewayChatCompletionRequest prependSystemMessage(
+        AiGatewayChatCompletionRequest request, String systemContent) {
+
+        List<AiGatewayChatMessage> updatedMessages = new ArrayList<>();
+
+        updatedMessages.add(new AiGatewayChatMessage(AiGatewayChatRole.SYSTEM, systemContent));
+
+        for (AiGatewayChatMessage message : request.messages()) {
+            if (message.role() != AiGatewayChatRole.SYSTEM) {
+                updatedMessages.add(message);
+            }
+        }
+
+        return new AiGatewayChatCompletionRequest(
+            request.model(), updatedMessages, request.temperature(), request.maxTokens(), request.topP(),
+            request.stream(), request.routingPolicy(), request.cache(), request.toolChoice(), request.tools(),
+            request.tags());
+    }
+
+    private @Nullable ResolvedPrompt resolvePrompt(
+        @Nullable AiPromptHeaders promptHeaders, @Nullable Long workspaceId, AiGatewayChatCompletionRequest request) {
+
+        if (promptHeaders == null || !promptHeaders.hasPromptEnabled()) {
+            return null;
+        }
+
+        AiGatewayProject project = resolveProject(request.tags());
+
+        Long projectId = project != null ? project.getId() : null;
+
+        Optional<AiPrompt> promptOptional = workspaceAiPromptService.getPromptByName(
+            workspaceId, projectId, promptHeaders.promptName());
+
+        if (promptOptional.isEmpty()) {
+            throw new IllegalArgumentException("Prompt not found: " + promptHeaders.promptName());
+        }
+
+        AiPrompt prompt = promptOptional.get();
+
+        String environment = promptHeaders.resolvedEnvironment();
+
+        Optional<AiPromptVersion> activeVersionOptional = aiPromptVersionService.getActiveVersion(
+            prompt.getId(), environment);
+
+        if (activeVersionOptional.isEmpty()) {
+            throw new IllegalArgumentException(
+                "No active prompt version found for prompt '" + promptHeaders.promptName() +
+                    "' in environment '" + environment + "'");
+        }
+
+        AiPromptVersion activeVersion = activeVersionOptional.get();
+
+        Map<String, Object> requestVariables = request.tags() == null ? Map.of() : new HashMap<>(request.tags());
+
+        String resolvedContent = substituteVariables(activeVersion.getContent(), requestVariables);
+
+        return new ResolvedPrompt(prompt.getId(), activeVersion.getId(), resolvedContent);
+    }
+
+    private static String substituteVariables(String content, Map<String, Object> variables) {
+        if (variables.isEmpty()) {
+            return content;
+        }
+
+        Matcher matcher = VARIABLE_PATTERN.matcher(content);
+        StringBuilder result = new StringBuilder();
+
+        while (matcher.find()) {
+            Object value = variables.get(matcher.group(1));
+
+            String replacement = value != null ? Matcher.quoteReplacement(value.toString()) : matcher.group(0);
+
+            matcher.appendReplacement(result, replacement);
+        }
+
+        matcher.appendTail(result);
+
+        return result.toString();
+    }
+
     private record ModelResolution(AiGatewayProvider provider, AiModel model) {
+    }
+
+    private record ResolvedPrompt(Long promptId, Long promptVersionId, String content) {
     }
 
     private record EmbeddedRequestSettings(

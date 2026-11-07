@@ -184,7 +184,7 @@ class EmbeddedAiGatewayPhase2IntTest {
         AiGatewayChatCompletionRequest baseRequest = buildRequest("anthropic/chain-gpt-4", null);
 
         AiGatewayChatCompletionResponse connectedUserWins =
-            aiGatewayFacadeImpl.chatCompletion(baseRequest, null, connectedUser.getId());
+            aiGatewayFacadeImpl.chatCompletion(baseRequest, null, null, connectedUser.getId());
 
         assertThat(connectedUserWins.gatewayMetadata()
             .routingPolicy())
@@ -198,7 +198,7 @@ class EmbeddedAiGatewayPhase2IntTest {
         aiGatewayRoutingPolicyService.update(reloadedConnectedUserPolicy);
 
         AiGatewayChatCompletionResponse modelDefaultWins =
-            aiGatewayFacadeImpl.chatCompletion(baseRequest, null, connectedUser.getId());
+            aiGatewayFacadeImpl.chatCompletion(baseRequest, null, null, connectedUser.getId());
 
         assertThat(modelDefaultWins.gatewayMetadata()
             .routingPolicy())
@@ -212,7 +212,7 @@ class EmbeddedAiGatewayPhase2IntTest {
         aiModelRepository.save(reloadedModel);
 
         AiGatewayChatCompletionResponse embeddedDefaultWins =
-            aiGatewayFacadeImpl.chatCompletion(baseRequest, null, connectedUser.getId());
+            aiGatewayFacadeImpl.chatCompletion(baseRequest, null, null, connectedUser.getId());
 
         assertThat(embeddedDefaultWins.gatewayMetadata()
             .routingPolicy())
@@ -223,7 +223,7 @@ class EmbeddedAiGatewayPhase2IntTest {
             buildRequest("anthropic/chain-gpt-4", unassignedPolicy.getName());
 
         assertThatThrownBy(
-            () -> aiGatewayFacadeImpl.chatCompletion(unassignedPlanRequest, null, connectedUser.getId()))
+            () -> aiGatewayFacadeImpl.chatCompletion(unassignedPlanRequest, null, null, connectedUser.getId()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Routing policy not found: " + unassignedPolicy.getName());
     }
@@ -245,7 +245,7 @@ class EmbeddedAiGatewayPhase2IntTest {
 
         AiGatewayChatCompletionRequest request = buildRequest("azure-openai/byok-gpt-4", null);
 
-        aiGatewayFacadeImpl.chatCompletion(request, null, connectedUser.getId());
+        aiGatewayFacadeImpl.chatCompletion(request, null, null, connectedUser.getId());
 
         ArgumentCaptor<AiGatewayProvider> providerCaptor = ArgumentCaptor.forClass(AiGatewayProvider.class);
 
@@ -269,7 +269,7 @@ class EmbeddedAiGatewayPhase2IntTest {
 
         AiGatewayChatCompletionRequest request = buildRequest("cohere/byok-fallback-gpt-4", null);
 
-        aiGatewayFacadeImpl.chatCompletion(request, null, connectedUser.getId());
+        aiGatewayFacadeImpl.chatCompletion(request, null, null, connectedUser.getId());
 
         ArgumentCaptor<AiGatewayProvider> providerCaptor = ArgumentCaptor.forClass(AiGatewayProvider.class);
 
@@ -336,7 +336,7 @@ class EmbeddedAiGatewayPhase2IntTest {
             .minus(1, ChronoUnit.HOURS);
 
         aiGatewayFacadeImpl.chatCompletion(
-            buildRequest("deepseek/spend-write-gpt-4", null), null, connectedUser.getId());
+            buildRequest("deepseek/spend-write-gpt-4", null), null, null, connectedUser.getId());
 
         authenticateTenantAdmin();
 
@@ -438,7 +438,7 @@ class EmbeddedAiGatewayPhase2IntTest {
         Instant periodStart = Instant.now()
             .truncatedTo(ChronoUnit.HOURS);
 
-        aiGatewayFacadeImpl.chatCompletion(request, null, connectedUser.getId());
+        aiGatewayFacadeImpl.chatCompletion(request, null, null, connectedUser.getId());
 
         Instant periodEnd = periodStart.plus(2, ChronoUnit.HOURS);
 
@@ -454,7 +454,7 @@ class EmbeddedAiGatewayPhase2IntTest {
             .as("The rollup must turn the embedded request's workspace-less usage row into spend the cap can read")
             .isEqualByComparingTo(BigDecimal.ONE);
 
-        assertThatThrownBy(() -> aiGatewayFacadeImpl.chatCompletion(request, null, connectedUser.getId()))
+        assertThatThrownBy(() -> aiGatewayFacadeImpl.chatCompletion(request, null, null, connectedUser.getId()))
             .as("Once the rolled-up spend reaches the cap, the connected user's next request must be rejected")
             .isInstanceOf(BudgetExceededException.class);
     }
@@ -475,9 +475,9 @@ class EmbeddedAiGatewayPhase2IntTest {
         AiGatewayChatCompletionRequest request = buildRequest("google-gemini/shared-plan-model", null);
 
         AiGatewayChatCompletionResponse firstResponse =
-            aiGatewayFacadeImpl.chatCompletion(request, null, firstCustomer.getId());
+            aiGatewayFacadeImpl.chatCompletion(request, null, null, firstCustomer.getId());
         AiGatewayChatCompletionResponse secondResponse =
-            aiGatewayFacadeImpl.chatCompletion(request, null, secondCustomer.getId());
+            aiGatewayFacadeImpl.chatCompletion(request, null, null, secondCustomer.getId());
 
         assertThat(firstResponse.gatewayMetadata()
             .routingPolicy()).isEqualTo(plan.getName());
@@ -514,20 +514,20 @@ class EmbeddedAiGatewayPhase2IntTest {
         Instant periodStart = Instant.now()
             .truncatedTo(ChronoUnit.MINUTES);
 
-        aiGatewayFacadeImpl.chatCompletion(request, null, cappedCustomer.getId());
-        aiGatewayFacadeImpl.chatCompletion(request, null, uncappedCustomer.getId());
+        aiGatewayFacadeImpl.chatCompletion(request, null, null, cappedCustomer.getId());
+        aiGatewayFacadeImpl.chatCompletion(request, null, null, uncappedCustomer.getId());
 
         AiGatewaySpendRollupJob rollupJob = new AiGatewaySpendRollupJob(
             aiGatewaySpendService, aiLlmUsageService, workspaceAiGatewaySpendService);
 
         rollupJob.rollUp(periodStart, periodStart.plus(2, ChronoUnit.HOURS));
 
-        assertThatThrownBy(() -> aiGatewayFacadeImpl.chatCompletion(request, null, cappedCustomer.getId()))
+        assertThatThrownBy(() -> aiGatewayFacadeImpl.chatCompletion(request, null, null, cappedCustomer.getId()))
             .as("$1 of spend is over the customer's own $0.50 cap")
             .isInstanceOf(BudgetExceededException.class)
             .hasMessageContaining("Cap: $0.50");
 
-        assertThatThrownBy(() -> aiGatewayFacadeImpl.chatCompletion(request, null, uncappedCustomer.getId()))
+        assertThatThrownBy(() -> aiGatewayFacadeImpl.chatCompletion(request, null, null, uncappedCustomer.getId()))
             .as("The same $1 is over the $0.75 embedded default a customer with no cap of its own gets -- the "
                 + "default cap is genuinely enforced, not merely never reached")
             .isInstanceOf(BudgetExceededException.class)

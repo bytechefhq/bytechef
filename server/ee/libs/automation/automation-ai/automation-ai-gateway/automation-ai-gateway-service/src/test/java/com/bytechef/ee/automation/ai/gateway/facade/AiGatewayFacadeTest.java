@@ -34,6 +34,7 @@ import com.bytechef.ee.automation.ai.gateway.ratelimit.AiGatewayRateLimitChecker
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProjectService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilitySessionService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
+import com.bytechef.ee.automation.ai.prompt.service.WorkspaceAiPromptService;
 import com.bytechef.ee.platform.ai.gateway.cache.AiGatewayResponseCache;
 import com.bytechef.ee.platform.ai.gateway.compression.AiGatewayContextCompressor;
 import com.bytechef.ee.platform.ai.gateway.cost.AiGatewayCostCalculator;
@@ -54,6 +55,7 @@ import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayContentBlock;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayContentBlockType;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayEmbeddingResponse;
+import com.bytechef.ee.platform.ai.gateway.dto.AiPromptHeaders;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayEmbeddingModelFactory;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayProviderResolver;
@@ -79,6 +81,10 @@ import com.bytechef.ee.platform.ai.observability.facade.AiObservabilityTracingHe
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySessionService;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySpanService;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityTraceService;
+import com.bytechef.ee.platform.ai.prompt.AiPrompt;
+import com.bytechef.ee.platform.ai.prompt.AiPromptVersion;
+import com.bytechef.ee.platform.ai.prompt.AiPromptVersionService;
+import com.bytechef.ee.platform.ai.prompt.AiPromptVersionType;
 import com.bytechef.platform.ai.sensitivedata.tokenization.PiiToken;
 import com.bytechef.platform.ai.sensitivedata.tokenization.PiiTokenSession;
 import com.bytechef.platform.constant.PlatformType;
@@ -190,6 +196,12 @@ class AiGatewayFacadeTest {
     private PromptComplexityScorer promptComplexityScorer;
 
     @Mock
+    private WorkspaceAiPromptService workspaceAiPromptService;
+
+    @Mock
+    private AiPromptVersionService aiPromptVersionService;
+
+    @Mock
     private AiObservabilitySessionService aiObservabilitySessionService;
 
     @Mock
@@ -271,7 +283,7 @@ class AiGatewayFacadeTest {
             aiGatewayProviderResolver,
             aiGatewayRequestLogService, aiGatewayResponseCache, aiGatewayRetryHandler,
             aiGatewayRouter, aiGatewayRoutingPolicyService, aiGatewaySpendService, promptComplexityScorer,
-            aiObservabilitySessionService,
+            workspaceAiPromptService, aiPromptVersionService, aiObservabilitySessionService,
             workspaceAiObservabilitySessionService, workspaceAiObservabilityTraceService,
             aiObservabilitySpanService, aiObservabilityTraceService,
             mock(com.bytechef.platform.tag.service.TagService.class),
@@ -1231,6 +1243,102 @@ class AiGatewayFacadeTest {
     }
 
     @Test
+    void testChatCompletionWithPromptHeadersPrependsResolvedPromptAndStampsSpan() {
+        Map<String, String> tags = Map.of("workspace_id", "1", "customer", "Ada");
+
+        AiGatewayChatCompletionRequest request = new AiGatewayChatCompletionRequest(
+            "openai/gpt-4",
+            List.of(
+                new AiGatewayChatMessage("system", "ignored"), new AiGatewayChatMessage("user", "Hello")),
+            null, null, null, false, null, null, null, null, tags);
+
+        when(aiGatewayBudgetChecker.checkBudget(1L)).thenReturn(BudgetCheckResult.allowed());
+        when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
+
+        AiGatewayProvider provider = createProvider();
+        AiModel model = createModel(provider);
+
+        when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiGatewayContextCompressor.compress(any(), any(Integer.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiPrompt prompt = new AiPrompt("greeting");
+
+        ReflectionTestUtils.setField(prompt, "id", 7L);
+
+        AiPromptVersion promptVersion = new AiPromptVersion(
+            7L, 1, AiPromptVersionType.TEXT, "Greet {{customer}} politely", "tester");
+
+        ReflectionTestUtils.setField(promptVersion, "id", 70L);
+
+        when(workspaceAiPromptService.getPromptByName(eq(1L), any(), eq("greeting")))
+            .thenReturn(Optional.of(prompt));
+        when(aiPromptVersionService.getActiveVersion(7L, "staging")).thenReturn(Optional.of(promptVersion));
+
+        ChatModel chatModel = mock(ChatModel.class);
+
+        when(aiGatewayChatModelFactory.getChatModel(any())).thenReturn(chatModel);
+
+        ChatResponse chatResponse = mockChatResponse();
+
+        when(chatModel.call(any(Prompt.class))).thenReturn(chatResponse);
+        when(aiGatewayCostCalculator.calculateCost(any(), any(Integer.class), any(Integer.class)))
+            .thenReturn(BigDecimal.ZERO);
+        when(workspaceAiObservabilityTraceService.findByExternalTraceId(any(), anyString()))
+            .thenReturn(Optional.empty());
+
+        doAnswer(invocation -> {
+            AiObservabilityTrace trace = invocation.getArgument(0);
+
+            ReflectionTestUtils.setField(trace, "id", 300L);
+
+            return null;
+        }).when(workspaceAiObservabilityTraceService)
+            .createInWorkspace(any(AiObservabilityTrace.class), anyLong());
+
+        AiObservabilityTracingHeaders tracingHeaders = new AiObservabilityTracingHeaders(
+            "prompt-trace-1", null, "prompt-span", null, null, Map.of(), List.of());
+
+        aiGatewayFacade.chatCompletion(request, tracingHeaders, new AiPromptHeaders("greeting", "staging"));
+
+        ArgumentCaptor<Prompt> promptCaptor = ArgumentCaptor.forClass(Prompt.class);
+
+        verify(chatModel).call(promptCaptor.capture());
+
+        List<Message> sentMessages = promptCaptor.getValue()
+            .getInstructions();
+
+        assertThat(sentMessages).hasSize(2);
+        assertThat(sentMessages.getFirst()
+            .getText()).isEqualTo("Greet Ada politely");
+
+        ArgumentCaptor<AiObservabilitySpan> spanCaptor = ArgumentCaptor.forClass(AiObservabilitySpan.class);
+
+        verify(aiObservabilitySpanService).create(spanCaptor.capture());
+
+        AiObservabilitySpan span = spanCaptor.getValue();
+
+        assertEquals(7L, span.getPromptId());
+        assertEquals(70L, span.getPromptVersionId());
+    }
+
+    @Test
+    void testChatCompletionWithUnknownPromptNameFailsBeforeCallingModel() {
+        AiGatewayChatCompletionRequest request = createDefaultRequest();
+
+        when(aiGatewayBudgetChecker.checkBudget(1L)).thenReturn(BudgetCheckResult.allowed());
+        when(workspaceAiPromptService.getPromptByName(eq(1L), any(), eq("missing")))
+            .thenReturn(Optional.empty());
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiGatewayFacade.chatCompletion(request, null, new AiPromptHeaders("missing", null)));
+
+        verify(aiGatewayChatModelFactory, never()).getChatModel(any());
+    }
+
+    @Test
     void testChatCompletionPersistsExperimentSourceWhenTracingHeadersOverrideIt() {
         AiGatewayChatCompletionRequest request = createDefaultRequest();
 
@@ -1444,7 +1552,7 @@ class AiGatewayFacadeTest {
             .thenThrow(new IllegalArgumentException("policy not found"));
 
         AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(
-            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), 5L);
+            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), null, 5L);
 
         assertNotNull(response);
 
@@ -1480,7 +1588,7 @@ class AiGatewayFacadeTest {
         when(aiGatewayRoutingPolicyService.getRoutingPolicy(42L))
             .thenThrow(new IllegalArgumentException("policy not found"));
 
-        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, 5L, null))
+        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, null, 5L, null))
             .expectNextCount(1)
             .verifyComplete();
 
@@ -1514,7 +1622,7 @@ class AiGatewayFacadeTest {
         when(aiGatewayRoutingPolicyService.getRoutingPolicy(99L))
             .thenThrow(new IllegalArgumentException("policy not found"));
 
-        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, null, null))
+        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, null, null, null))
             .expectNextCount(1)
             .verifyComplete();
 
@@ -1548,7 +1656,7 @@ class AiGatewayFacadeTest {
         when(aiGatewayRoutingPolicyService.getRoutingPolicy(99L))
             .thenThrow(new IllegalArgumentException("policy not found"));
 
-        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, 5L, null))
+        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, null, 5L, null))
             .expectNextCount(1)
             .verifyComplete();
 
@@ -1592,7 +1700,7 @@ class AiGatewayFacadeTest {
 
         when(aiGatewayRoutingPolicyService.getRoutingPolicy(99L)).thenReturn(otherCustomersPolicy);
 
-        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, 5L);
+        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, null, 5L);
 
         assertThat(response).isNotNull();
 
@@ -1638,7 +1746,7 @@ class AiGatewayFacadeTest {
             .thenReturn(connectedUserPolicy)
             .thenThrow(new IllegalArgumentException("policy not found"));
 
-        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, 5L);
+        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, null, 5L);
 
         assertNotNull(response);
 
@@ -1688,7 +1796,7 @@ class AiGatewayFacadeTest {
         when(aiGatewayRoutingPolicyService.getRoutingPolicy(42L))
             .thenThrow(new IllegalArgumentException("policy not found"));
 
-        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, 5L);
+        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, null, 5L);
 
         assertNotNull(response);
 
@@ -1760,7 +1868,7 @@ class AiGatewayFacadeTest {
             .thenThrow(new IllegalArgumentException("policy not found"));
 
         AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(
-            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), 5L);
+            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), null, 5L);
 
         assertNotNull(response);
 
@@ -1823,7 +1931,7 @@ class AiGatewayFacadeTest {
         });
 
         AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(
-            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), 5L);
+            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), null, 5L);
 
         assertNotNull(response);
 
@@ -1895,7 +2003,7 @@ class AiGatewayFacadeTest {
         });
 
         AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(
-            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), 5L);
+            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), null, 5L);
 
         assertNotNull(response);
 
@@ -1961,7 +2069,8 @@ class AiGatewayFacadeTest {
 
         assertThrows(AiGatewayProviderScopeViolationException.class,
             () -> aiGatewayFacade.chatCompletion(
-                request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), 5L));
+                request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), null,
+                5L));
 
         verifyNoInteractions(aiGatewayChatModelFactory);
     }
@@ -1975,7 +2084,7 @@ class AiGatewayFacadeTest {
             null, null, null, false, "premium-plan", null, null, null, null);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-            () -> aiGatewayFacade.chatCompletion(request, null, 5L));
+            () -> aiGatewayFacade.chatCompletion(request, null, null, 5L));
 
         assertEquals("Routing policy not found: premium-plan", exception.getMessage());
 
@@ -1991,7 +2100,7 @@ class AiGatewayFacadeTest {
             "openai/gpt-4", List.of(new AiGatewayChatMessage("user", "Hello")),
             null, null, null, true, "premium-plan", null, null, null, null);
 
-        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, 5L, null))
+        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, null, 5L, null))
             .expectErrorMatches(throwable -> throwable instanceof IllegalArgumentException
                 && "Routing policy not found: premium-plan".equals(throwable.getMessage()))
             .verify();
@@ -2065,9 +2174,9 @@ class AiGatewayFacadeTest {
         when(aiGatewayRoutingPolicyService.getRoutingPolicy(12L)).thenReturn(assignedPlan);
 
         IllegalArgumentException missingPlanException = assertThrows(IllegalArgumentException.class,
-            () -> aiGatewayFacade.chatCompletion(requestNamingPlan("missing-plan"), null, 5L));
+            () -> aiGatewayFacade.chatCompletion(requestNamingPlan("missing-plan"), null, null, 5L));
         IllegalArgumentException unassignedPlanException = assertThrows(IllegalArgumentException.class,
-            () -> aiGatewayFacade.chatCompletion(requestNamingPlan("other-plan"), null, 5L));
+            () -> aiGatewayFacade.chatCompletion(requestNamingPlan("other-plan"), null, null, 5L));
 
         assertEquals("Routing policy not found: missing-plan", missingPlanException.getMessage());
         assertEquals("Routing policy not found: other-plan", unassignedPlanException.getMessage());
@@ -2088,7 +2197,7 @@ class AiGatewayFacadeTest {
         when(aiGatewayRoutingPolicyService.getRoutingPolicy(12L)).thenReturn(assignedPlan);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-            () -> aiGatewayFacade.chatCompletion(requestNamingPlan("assigned-plan"), null, 5L));
+            () -> aiGatewayFacade.chatCompletion(requestNamingPlan("assigned-plan"), null, null, 5L));
 
         assertEquals("Routing policy not found: assigned-plan", exception.getMessage());
 
@@ -2134,7 +2243,7 @@ class AiGatewayFacadeTest {
             .thenReturn(BigDecimal.ZERO);
 
         AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(
-            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), 5L);
+            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), null, 5L);
 
         assertNotNull(response);
 
@@ -2173,7 +2282,7 @@ class AiGatewayFacadeTest {
             .thenReturn(BigDecimal.ZERO);
 
         AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(
-            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), 5L);
+            request, new AiObservabilityTracingHeaders(null, null, null, null, null, Map.of(), List.of()), null, 5L);
 
         assertNotNull(response);
 
@@ -2271,7 +2380,7 @@ class AiGatewayFacadeTest {
         when(aiGatewayRoutingPolicyService.getRoutingPolicy(42L))
             .thenThrow(new IllegalArgumentException("policy not found"));
 
-        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, 7L, null))
+        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, null, 7L, null))
             .expectNextCount(1)
             .verifyComplete();
 
@@ -2297,7 +2406,7 @@ class AiGatewayFacadeTest {
             .thenReturn(Money.usd(new BigDecimal("100.00")));
 
         assertThrows(BudgetExceededException.class,
-            () -> aiGatewayFacade.chatCompletion(request, null, 5L));
+            () -> aiGatewayFacade.chatCompletion(request, null, null, 5L));
 
         verify(aiGatewayRoutingPolicyService, never()).getRoutingPolicy(anyLong());
         verify(aiModelService, never()).getModel(anyLong(), anyString());
@@ -2335,7 +2444,7 @@ class AiGatewayFacadeTest {
         when(aiGatewayCostCalculator.calculateCost(any(), any(Integer.class), any(Integer.class)))
             .thenReturn(BigDecimal.ZERO);
 
-        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, 5L);
+        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, null, 5L);
 
         assertNotNull(response);
     }
@@ -2368,7 +2477,7 @@ class AiGatewayFacadeTest {
         when(aiGatewayCostCalculator.calculateCost(any(), any(Integer.class), any(Integer.class)))
             .thenReturn(BigDecimal.ZERO);
 
-        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, 5L);
+        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, null, 5L);
 
         assertNotNull(response);
 
@@ -2422,7 +2531,7 @@ class AiGatewayFacadeTest {
             .thenReturn(Money.usd(new BigDecimal("10.00")));
 
         assertThrows(BudgetExceededException.class,
-            () -> aiGatewayFacade.chatCompletion(createConnectedUserRequest(), null, 5L));
+            () -> aiGatewayFacade.chatCompletion(createConnectedUserRequest(), null, null, 5L));
 
         verifyNoInteractions(aiGatewayChatModelFactory);
     }
@@ -2443,7 +2552,7 @@ class AiGatewayFacadeTest {
             .thenReturn(Money.usd(new BigDecimal("100.00")));
 
         assertThrows(BudgetExceededException.class,
-            () -> aiGatewayFacade.chatCompletion(request, null, 5L));
+            () -> aiGatewayFacade.chatCompletion(request, null, null, 5L));
 
         verify(aiGatewayRoutingPolicyService, never()).getRoutingPolicy(anyLong());
         verifyNoInteractions(aiGatewayChatModelFactory);
@@ -2457,7 +2566,7 @@ class AiGatewayFacadeTest {
 
         stubDirectChatCompletion(request);
 
-        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, 5L);
+        AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(request, null, null, 5L);
 
         assertNotNull(response);
 
@@ -2472,7 +2581,7 @@ class AiGatewayFacadeTest {
 
         stubDirectChatCompletionStream(request);
 
-        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, 5L, null))
+        StepVerifier.create(aiGatewayFacade.chatCompletionStream(request, null, null, 5L, null))
             .expectNextCount(1)
             .verifyComplete();
 
@@ -2486,7 +2595,7 @@ class AiGatewayFacadeTest {
         AiGatewayChatCompletionRequest request = createDefaultRequest();
 
         IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class, () -> aiGatewayFacade.chatCompletion(request, null, 5L));
+            IllegalArgumentException.class, () -> aiGatewayFacade.chatCompletion(request, null, null, 5L));
 
         assertEquals(
             "Embedded requests must not carry a 'workspace_id' or 'project_id' tag", exception.getMessage());
@@ -2503,7 +2612,7 @@ class AiGatewayFacadeTest {
             null, null, null, false, null, null, null, null, Map.of("project_id", "3"));
 
         IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class, () -> aiGatewayFacade.chatCompletion(request, null, 5L));
+            IllegalArgumentException.class, () -> aiGatewayFacade.chatCompletion(request, null, null, 5L));
 
         assertEquals(
             "Embedded requests must not carry a 'workspace_id' or 'project_id' tag", exception.getMessage());
@@ -2519,7 +2628,7 @@ class AiGatewayFacadeTest {
 
         stubDirectChatCompletion(request);
 
-        aiGatewayFacade.chatCompletion(request, null, 5L);
+        aiGatewayFacade.chatCompletion(request, null, null, 5L);
 
         verify(embeddedSettingsService).find(ENVIRONMENT_ID);
         verify(embeddedSettingsService, never()).find(0L);
@@ -2529,7 +2638,7 @@ class AiGatewayFacadeTest {
     void testConnectedUserWithoutAnAuthenticatedEnvironmentIsRejected() {
         AiGatewayChatCompletionRequest request = createConnectedUserRequest();
 
-        assertThrows(AccessDeniedException.class, () -> aiGatewayFacade.chatCompletion(request, null, 5L));
+        assertThrows(AccessDeniedException.class, () -> aiGatewayFacade.chatCompletion(request, null, null, 5L));
 
         verifyNoInteractions(embeddedSettingsService, aiGatewayChatModelFactory);
     }

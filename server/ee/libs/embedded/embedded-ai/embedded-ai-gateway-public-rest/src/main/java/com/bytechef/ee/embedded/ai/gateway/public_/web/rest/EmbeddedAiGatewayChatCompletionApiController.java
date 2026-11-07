@@ -98,7 +98,7 @@ public class EmbeddedAiGatewayChatCompletionApiController {
         }
 
         AiGatewayChatCompletionResponse response = aiGatewayFacade.chatCompletion(
-            request, null, connectedUserId.get());
+            request, null, null, connectedUserId.get());
 
         ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
 
@@ -123,7 +123,7 @@ public class EmbeddedAiGatewayChatCompletionApiController {
         return Flux.defer(() -> {
             AiGatewayChatCompletionRequest request = toDomainRequest(payload);
 
-            return aiGatewayFacade.chatCompletionStream(request, null, connectedUserId.get(), null)
+            return aiGatewayFacade.chatCompletionStream(request, null, null, connectedUserId.get(), null)
                 .<ServerSentEvent<Object>>map(
                     domainResponse -> ServerSentEvent.<Object>builder()
                         .data(toResponseModel(domainResponse))
