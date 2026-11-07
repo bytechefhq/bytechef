@@ -100,8 +100,6 @@ export interface ComponentDefinition {
     actions?: Array<ActionDefinitionBasic>;
     /**
      * The AI Agent channels this component declares.
-     * @type {Array<AgentChannelDefinition>}
-     * @memberof ComponentDefinition
      */
     agentChannels?: Array<AgentChannelDefinition>;
     /**
