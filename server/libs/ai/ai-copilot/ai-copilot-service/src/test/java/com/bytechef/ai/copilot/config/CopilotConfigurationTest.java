@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.server.LocalAgent;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.McpServerSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
@@ -97,7 +98,8 @@ class CopilotConfigurationTest {
         mock(WorkflowValidatorTools.class), mock(WorkflowInstructionTools.class),
         mock(InteractivePickerToolCallbacks.class), mock(ActionDefinitionService.class),
         mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class), mock(TriggerDefinitionFacade.class),
-        mock(PropertyOptionsResolver.class), mock(ScopedConnectionGuard.class), emptyDataTableToolsProvider());
+        mock(PropertyOptionsResolver.class), mock(ScopedConnectionGuard.class), emptyDataTableToolsProvider(),
+        new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
 
     @Test
     void testMcpServerBuildAgentIsRegisteredUnderTheMcpServerSourceId() throws AGUIException {
@@ -322,7 +324,8 @@ class CopilotConfigurationTest {
             mock(InteractivePickerToolCallbacks.class), mock(ActionDefinitionService.class),
             mock(ActionDefinitionFacade.class), mock(TriggerDefinitionService.class),
             mock(TriggerDefinitionFacade.class), mock(PropertyOptionsResolver.class),
-            mock(ScopedConnectionGuard.class), emptyDataTableToolsProvider());
+            mock(ScopedConnectionGuard.class), emptyDataTableToolsProvider(),
+            new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
     }
 
     private static String readResource(String name) {

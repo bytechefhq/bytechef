@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.agui.core.exception.AGUIException;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
@@ -51,7 +52,8 @@ class EmbeddedCopilotConfigurationTest {
     private static final Resource PROMPT_RESOURCE = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
 
     private final EmbeddedCopilotConfiguration embeddedCopilotConfiguration = new EmbeddedCopilotConfiguration(
-        PROMPT_RESOURCE, PROMPT_RESOURCE, mock(WorkflowInstructionTools.class), mock(WorkflowValidatorTools.class));
+        PROMPT_RESOURCE, PROMPT_RESOURCE, mock(WorkflowInstructionTools.class), mock(WorkflowValidatorTools.class),
+        new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
     private final IntegrationTools integrationTools = new IntegrationTools(mock(IntegrationFacade.class));
     private final IntegrationWorkflowTools integrationWorkflowTools =
         new IntegrationWorkflowTools(mock(IntegrationWorkflowFacade.class), mock(ObjectProvider.class));
