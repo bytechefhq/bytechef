@@ -266,7 +266,7 @@ public final class AiHubAgentFixtures {
             availableProvider(componentRuleToolCallbacksFactory),
             availableProvider(aiAgentFacade), availableProvider(customComponentFacade),
             availableProvider(projectCodeWorkflowFacade), interactivePickerToolCallbacks, intelligentToolCatalog,
-            workspaceFacade, projectWorkflowFacade, chatService, chatAccessPolicy, policy,
+            workspaceFacade, projectWorkflowFacade, chatService, chatAccessPolicy, policy, sessionMemory,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
 
@@ -294,7 +294,7 @@ public final class AiHubAgentFixtures {
             projectWorkflowFacade,
             projectDeploymentFacade, availableProvider(environmentPromotionFacade),
             availableProvider(environmentService),
-            chatService, chatAccessPolicy, artifactRecorder, policy,
+            chatService, chatAccessPolicy, artifactRecorder, policy, sessionMemory,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
 
