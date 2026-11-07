@@ -138,7 +138,9 @@ export default function getExecutedEdgeStatus(
     const sourceStatus = resolveNodeStatus(sourceNode, workflowTestNodeStates);
 
     if (targetNode?.type === 'taskDispatcherBottomGhostNode') {
-        return sourceStatus === 'COMPLETED' ? 'COMPLETED' : undefined;
+        const isRunningLeftRail = sourceNode?.type === 'taskDispatcherLeftGhostNode' && sourceStatus === 'RUNNING';
+
+        return sourceStatus === 'COMPLETED' || isRunningLeftRail ? 'COMPLETED' : undefined;
     }
 
     if (!isReachedStatus(sourceNode, sourceStatus)) {
@@ -157,6 +159,7 @@ export default function getExecutedEdgeStatus(
 function isTaskDispatcherEntryNode(node: Node | undefined): boolean {
     return (
         node?.type === 'taskDispatcherTopGhostNode' ||
+        node?.type === 'taskDispatcherLeftGhostNode' ||
         Boolean((node?.data as {taskDispatcher?: boolean} | undefined)?.taskDispatcher)
     );
 }
