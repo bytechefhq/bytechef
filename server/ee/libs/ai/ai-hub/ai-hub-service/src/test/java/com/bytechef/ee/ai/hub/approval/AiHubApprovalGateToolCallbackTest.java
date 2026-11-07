@@ -39,6 +39,7 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.PlatformTransactionManager;
 import tools.jackson.core.type.TypeReference;
 
@@ -150,7 +151,8 @@ class AiHubApprovalGateToolCallbackTest {
         @SuppressWarnings("unchecked")
         AiHubChatService notDeletedChatService = new AiHubChatServiceImpl(
             chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, mock(ObjectProvider.class), registry,
-            mock(PlatformTransactionManager.class), mock(ObjectProvider.class));
+            mock(PlatformTransactionManager.class), mock(ObjectProvider.class),
+            mock(ApplicationEventPublisher.class));
 
         AiHubChat chat = new AiHubChat(USER_ID);
 

@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.tool.toolsearch.ToolIndex;
 import org.springframework.ai.tool.toolsearch.ToolReference;
@@ -30,47 +32,50 @@ import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
  *
  * @author Ivica Cardic
  */
-public class MultiSessionToolIndex implements ToolIndex {
+public class CatalogToolIndex implements ToolIndex {
 
-    private static final String METADATA_SESSION_ID = "sessionId";
+    static final String METADATA_SESSION_ID = "sessionId";
+
+    private static final Logger log = LoggerFactory.getLogger(CatalogToolIndex.class);
 
     private static final double SIMILARITY_THRESHOLD = 0.2;
 
-    private final ToolIndex delegate;
     private final VectorStore vectorStore;
-    private final Set<String> additionalSessionIds;
+    private final Set<String> catalogSessionIds;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public MultiSessionToolIndex(ToolIndex delegate, VectorStore vectorStore, Set<String> additionalSessionIds) {
-        this.delegate = delegate;
+    public CatalogToolIndex(VectorStore vectorStore, Set<String> catalogSessionIds) {
         this.vectorStore = vectorStore;
-        this.additionalSessionIds = Set.copyOf(additionalSessionIds);
+        this.catalogSessionIds = Set.copyOf(catalogSessionIds);
     }
 
     @Override
     public void indexTool(String sessionId, ToolReference toolReference) {
-        delegate.indexTool(sessionId, toolReference);
+        indexTools(sessionId, List.of(toolReference));
     }
 
     @Override
     public void indexTools(String sessionId, List<ToolReference> toolReferences) {
-        delegate.indexTools(sessionId, toolReferences);
+        if (log.isTraceEnabled()) {
+            log.trace("Not indexing {} request tools under session {}", toolReferences.size(), sessionId);
+        }
     }
 
     @Override
     public void clearIndex(String sessionId) {
-        delegate.clearIndex(sessionId);
+        if (catalogSessionIds.contains(sessionId)) {
+            return;
+        }
+
+        vectorStore.delete(
+            new FilterExpressionBuilder()
+                .eq(METADATA_SESSION_ID, sessionId)
+                .build());
     }
 
     @Override
     public ToolSearchResponse search(ToolSearchRequest toolSearchRequest) {
-        List<String> sessionIds = new ArrayList<>(additionalSessionIds);
-
-        String requestSessionId = toolSearchRequest.sessionId();
-
-        if (requestSessionId != null && !requestSessionId.isBlank() && !sessionIds.contains(requestSessionId)) {
-            sessionIds.add(requestSessionId);
-        }
+        List<String> sessionIds = new ArrayList<>(catalogSessionIds);
 
         Integer maxResults = toolSearchRequest.maxResults();
         int perSessionTopK = maxResults != null ? maxResults : 10;

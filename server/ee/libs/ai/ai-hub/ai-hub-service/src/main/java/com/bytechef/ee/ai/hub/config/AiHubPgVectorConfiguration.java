@@ -40,31 +40,34 @@ public class AiHubPgVectorConfiguration {
     @Bean("toolSearchPgVectorStore")
     public @Nullable VectorStore toolSearchPgVectorStore(
         @Qualifier("pgVectorJdbcTemplate") ObjectProvider<JdbcTemplate> pgVectorJdbcTemplateProvider,
-        ObjectProvider<EmbeddingModel> embeddingModelProvider, PgVectorStoreProperties properties,
+        @Qualifier("copilotEmbeddingModel") ObjectProvider<EmbeddingModel> copilotEmbeddingModelProvider,
+        PgVectorStoreProperties properties,
         ObjectProvider<ObservationRegistry> observationRegistry,
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
         ObjectProvider<BatchingStrategy> batchingStrategyProvider) {
 
         JdbcTemplate pgVectorJdbcTemplate = pgVectorJdbcTemplateProvider.getIfAvailable();
-        EmbeddingModel embeddingModel = embeddingModelProvider.getIfAvailable();
+        EmbeddingModel copilotEmbeddingModel = copilotEmbeddingModelProvider.getIfAvailable();
         BatchingStrategy batchingStrategy = batchingStrategyProvider.getIfAvailable();
 
-        if (pgVectorJdbcTemplate == null || embeddingModel == null || batchingStrategy == null) {
-            log.info(
+        if (pgVectorJdbcTemplate == null || copilotEmbeddingModel == null || batchingStrategy == null) {
+            log.warn(
                 "AI Hub tool search disabled: it needs the pgvector store (bytechef.ai.vectorstore.provider=pgvector " +
-                    "and bytechef.ai.vectorstore.pgvector.url) and an embedding model");
+                    "and bytechef.ai.vectorstore.pgvector.url) and the fixed-key copilot embedding model " +
+                    "(bytechef.ai.copilot.embedding.provider). The AI Hub catalog tools are unavailable and the " +
+                    "agents run with their pinned tools only");
 
             return null;
         }
 
         PgVectorSchemaUtils.initializeSchema(
             () -> buildToolSearchVectorStore(
-                pgVectorJdbcTemplate, embeddingModel, properties, observationRegistry, customObservationConvention,
-                batchingStrategy, true)
+                pgVectorJdbcTemplate, copilotEmbeddingModel, properties, observationRegistry,
+                customObservationConvention, batchingStrategy, true)
                     .afterPropertiesSet());
 
         return buildToolSearchVectorStore(
-            pgVectorJdbcTemplate, embeddingModel, properties, observationRegistry, customObservationConvention,
+            pgVectorJdbcTemplate, copilotEmbeddingModel, properties, observationRegistry, customObservationConvention,
             batchingStrategy, false);
     }
 

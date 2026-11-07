@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:pgvector-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))

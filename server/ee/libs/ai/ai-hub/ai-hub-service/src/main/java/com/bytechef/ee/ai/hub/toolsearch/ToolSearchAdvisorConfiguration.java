@@ -10,12 +10,14 @@ package com.bytechef.ee.ai.hub.toolsearch;
 import com.agui.spring.ai.TurnEndingToolCallingManager;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.commons.util.MemoizationUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.AiHubToolCallbackWrappers;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
 import com.bytechef.ee.ai.hub.config.AiHubPgVectorConfiguration;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import io.micrometer.observation.ObservationRegistry;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.embedding.BatchingStrategy;
-import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.model.tool.DefaultToolCallingManager;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
@@ -35,7 +35,6 @@ import org.springframework.ai.tool.execution.DefaultToolExecutionExceptionProces
 import org.springframework.ai.tool.toolsearch.ToolIndex;
 import org.springframework.ai.tool.toolsearch.index.vectorstore.VectorToolIndex;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -58,45 +57,22 @@ public class ToolSearchAdvisorConfiguration {
 
     @Bean
     @Nullable
-    VectorToolIndex toolSearchVectorToolIndex(
-        @Qualifier("toolSearchPgVectorStore") ObjectProvider<VectorStore> toolSearchPgVectorStoreProvider) {
-
-        VectorStore toolSearchPgVectorStore = toolSearchPgVectorStoreProvider.getIfAvailable();
-
-        return toolSearchPgVectorStore == null ? null : new VectorToolIndex(toolSearchPgVectorStore);
-    }
-
-    @Bean
-    @Nullable
     ToolSearchCatalogFeeder toolSearchCatalogFeeder(
         @Qualifier("toolSearchPgVectorStore") ObjectProvider<VectorStore> toolSearchPgVectorStoreProvider,
         @Qualifier("pgVectorJdbcTemplate") ObjectProvider<JdbcTemplate> pgVectorJdbcTemplateProvider,
-        @Qualifier("copilotEmbeddingModel") ObjectProvider<EmbeddingModel> copilotEmbeddingModelProvider,
-        PgVectorStoreProperties properties, ObjectProvider<ObservationRegistry> observationRegistry,
-        ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
-        ObjectProvider<BatchingStrategy> batchingStrategyProvider) {
+        PgVectorStoreProperties properties, ObjectProvider<ApplicationProperties> applicationPropertiesProvider) {
 
+        VectorStore toolSearchPgVectorStore = toolSearchPgVectorStoreProvider.getIfAvailable();
         JdbcTemplate pgVectorJdbcTemplate = pgVectorJdbcTemplateProvider.getIfAvailable();
-        EmbeddingModel copilotEmbeddingModel = copilotEmbeddingModelProvider.getIfAvailable();
-        BatchingStrategy batchingStrategy = batchingStrategyProvider.getIfAvailable();
 
-        if (toolSearchPgVectorStoreProvider.getIfAvailable() == null || pgVectorJdbcTemplate == null ||
-            copilotEmbeddingModel == null || batchingStrategy == null) {
-
-            log.info(
-                "AI Hub tool catalog indexing disabled: it needs the tool search pgvector store and a fixed-key " +
-                    "copilot embedding model (bytechef.ai.copilot.embedding.provider)");
-
+        if (toolSearchPgVectorStore == null || pgVectorJdbcTemplate == null) {
             return null;
         }
 
-        VectorStore loaderVectorStore = AiHubPgVectorConfiguration.buildToolSearchVectorStore(
-            pgVectorJdbcTemplate, copilotEmbeddingModel, properties, observationRegistry, customObservationConvention,
-            batchingStrategy, false);
-
         return new ToolSearchCatalogFeeder(
-            new VectorToolIndex(loaderVectorStore), pgVectorJdbcTemplate, properties.getSchemaName(),
-            AiHubPgVectorConfiguration.vectorTableName(properties));
+            new VectorToolIndex(toolSearchPgVectorStore),
+            embeddingModelIdentity(applicationPropertiesProvider.getIfAvailable(), properties), pgVectorJdbcTemplate,
+            properties.getSchemaName(), AiHubPgVectorConfiguration.vectorTableName(properties));
     }
 
     @Bean
@@ -113,7 +89,6 @@ public class ToolSearchAdvisorConfiguration {
     @Bean(defaultCandidate = false)
     @Nullable
     ToolSearchToolCallingAdvisor aiHubAskToolSearchToolCallAdvisor(
-        ObjectProvider<VectorToolIndex> toolSearchVectorToolIndexProvider,
         @Qualifier("toolSearchPgVectorStore") ObjectProvider<VectorStore> toolSearchPgVectorStoreProvider,
         ObjectProvider<ObservationRegistry> observationRegistryProvider,
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
@@ -121,7 +96,7 @@ public class ToolSearchAdvisorConfiguration {
         ToolSearchCatalogWarmup toolSearchCatalogWarmup, ObjectProvider<AiHubApprovalGate> approvalGateProvider) {
 
         return buildModeAdvisor(
-            toolSearchVectorToolIndexProvider.getIfAvailable(), toolSearchPgVectorStoreProvider.getIfAvailable(),
+            toolSearchPgVectorStoreProvider.getIfAvailable(),
             observationRegistryProvider.getIfUnique(() -> ObservationRegistry.NOOP),
             findCatalog(globalToolCatalogProvider, ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID),
             securityContextRehydratorProvider.getIfAvailable(), toolSearchCatalogWarmup,
@@ -131,7 +106,6 @@ public class ToolSearchAdvisorConfiguration {
     @Bean(defaultCandidate = false)
     @Nullable
     ToolSearchToolCallingAdvisor aiHubBuildToolSearchToolCallAdvisor(
-        ObjectProvider<VectorToolIndex> toolSearchVectorToolIndexProvider,
         @Qualifier("toolSearchPgVectorStore") ObjectProvider<VectorStore> toolSearchPgVectorStoreProvider,
         ObjectProvider<ObservationRegistry> observationRegistryProvider,
         ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
@@ -139,25 +113,53 @@ public class ToolSearchAdvisorConfiguration {
         ToolSearchCatalogWarmup toolSearchCatalogWarmup, ObjectProvider<AiHubApprovalGate> approvalGateProvider) {
 
         return buildModeAdvisor(
-            toolSearchVectorToolIndexProvider.getIfAvailable(), toolSearchPgVectorStoreProvider.getIfAvailable(),
+            toolSearchPgVectorStoreProvider.getIfAvailable(),
             observationRegistryProvider.getIfUnique(() -> ObservationRegistry.NOOP),
             findCatalog(globalToolCatalogProvider, ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID),
             securityContextRehydratorProvider.getIfAvailable(), toolSearchCatalogWarmup,
             approvalGateProvider.getIfAvailable());
     }
 
+    @Bean
+    ToolSearchSessionEvictor toolSearchSessionEvictor(
+        @Qualifier("aiHubAskToolSearchToolCallAdvisor") //
+        ObjectProvider<ToolSearchToolCallingAdvisor> askToolSearchToolCallAdvisorProvider,
+        @Qualifier("aiHubBuildToolSearchToolCallAdvisor") //
+        ObjectProvider<ToolSearchToolCallingAdvisor> buildToolSearchToolCallAdvisorProvider) {
+
+        return new ToolSearchSessionEvictor(
+            () -> {
+                List<ToolSearchToolCallingAdvisor> advisors = new ArrayList<>();
+
+                askToolSearchToolCallAdvisorProvider.ifAvailable(advisors::add);
+                buildToolSearchToolCallAdvisorProvider.ifAvailable(advisors::add);
+
+                return advisors;
+            });
+    }
+
     static @Nullable ToolSearchToolCallingAdvisor buildModeAdvisor(
-        @Nullable VectorToolIndex vectorToolIndex, @Nullable VectorStore toolSearchPgVectorStore,
-        ObservationRegistry observationRegistry, @Nullable AiHubGlobalToolCatalog globalToolCatalog,
+        @Nullable VectorStore toolSearchPgVectorStore, ObservationRegistry observationRegistry,
+        @Nullable AiHubGlobalToolCatalog globalToolCatalog,
         @Nullable SecurityContextRehydrator securityContextRehydrator,
         ToolSearchCatalogWarmup toolSearchCatalogWarmup, @Nullable AiHubApprovalGate approvalGate) {
 
-        if (vectorToolIndex == null || toolSearchPgVectorStore == null || globalToolCatalog == null) {
+        if (globalToolCatalog == null) {
             return null;
         }
 
-        ToolIndex searcher = new MultiSessionToolIndex(
-            vectorToolIndex, toolSearchPgVectorStore, Set.of(globalToolCatalog.sessionId()));
+        if (toolSearchPgVectorStore == null) {
+            log.warn(
+                "AI Hub tool search is unavailable, so the {} catalog tools of session {} cannot be reached and the " +
+                    "agent runs with its pinned tools only",
+                globalToolCatalog.toolCallbacks()
+                    .size(),
+                globalToolCatalog.sessionId());
+
+            return null;
+        }
+
+        ToolIndex searcher = new CatalogToolIndex(toolSearchPgVectorStore, Set.of(globalToolCatalog.sessionId()));
 
         Supplier<Map<String, ToolCallback>> callbackMapSupplier = MemoizationUtils.memoize(
             () -> wrapCatalogToolCallbacks(globalToolCatalog.toolCallbacks(), securityContextRehydrator, approvalGate));
@@ -165,6 +167,35 @@ public class ToolSearchAdvisorConfiguration {
         return new PinnedToolSearchToolCallingAdvisor(
             buildToolCallingManager(observationRegistry, callbackMapSupplier), searcher, MAX_SEARCH_RESULTS,
             ChatMemory.CONVERSATION_ID, callbackMapSupplier, toolSearchCatalogWarmup::warmUp);
+    }
+
+    static String embeddingModelIdentity(
+        @Nullable ApplicationProperties applicationProperties, PgVectorStoreProperties properties) {
+
+        String dimensions = String.valueOf(properties.getDimensions());
+
+        if (applicationProperties == null) {
+            return "unknown:" + dimensions;
+        }
+
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        ApplicationProperties.Ai.Copilot.Embedding.Provider provider = ai.getCopilot()
+            .getEmbedding()
+            .getProvider();
+
+        ApplicationProperties.Ai.Provider.Embedding embedding = ai.getProvider()
+            .getEmbedding();
+
+        String model = provider == ApplicationProperties.Ai.Copilot.Embedding.Provider.OLLAMA
+            ? embedding.getOllama()
+                .getOptions()
+                .getModel()
+            : embedding.getOpenAi()
+                .getOptions()
+                .getModel();
+
+        return provider + ":" + model + ":" + dimensions;
     }
 
     static Map<String, ToolCallback> wrapCatalogToolCallbacks(
