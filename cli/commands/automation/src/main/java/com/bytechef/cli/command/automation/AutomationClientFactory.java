@@ -20,6 +20,7 @@ import com.bytechef.cli.client.automation.ApiClient;
 import com.bytechef.cli.client.automation.ApiException;
 import com.bytechef.cli.client.automation.api.ProjectCodeWorkflowApi;
 import com.bytechef.cli.client.automation.api.ProjectGitApi;
+import com.bytechef.cli.client.automation.api.WorkflowExecutionApi;
 import com.bytechef.cli.client.automationapiplatform.api.ApiCollectionApi;
 import com.bytechef.cli.client.automationapiplatform.api.ApiCollectionEndpointApi;
 import com.bytechef.cli.client.automationapp.api.AppApi;
@@ -62,6 +63,10 @@ final class AutomationClientFactory {
         apiClient.setRequestInterceptor(new AuthInterceptor(config));
 
         return apiClient;
+    }
+
+    static WorkflowExecutionApi workflowExecutionApi(CliConfig config) {
+        return new WorkflowExecutionApi(apiClient(config));
     }
 
     static ProjectCodeWorkflowApi projectCodeWorkflowApi(CliConfig config) {
