@@ -17,6 +17,9 @@
 package com.bytechef.platform.coordinator.monitor;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -28,6 +31,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.worker.event.CancelControlTaskEvent;
 import com.bytechef.tenant.service.TenantService;
 import java.time.Duration;
 import java.time.Instant;
@@ -65,6 +69,7 @@ public class OrphanedJobRecoveryMonitorTest {
 
         taskExecution = mock(TaskExecution.class);
 
+        when(taskExecution.getId()).thenReturn(10L);
         when(taskExecution.getJobId()).thenReturn(1L);
         when(taskExecution.getStatus()).thenReturn(TaskExecution.Status.STARTED);
         when(taskExecution.getLastModifiedDate()).thenReturn(staleInstant);
@@ -74,6 +79,7 @@ public class OrphanedJobRecoveryMonitorTest {
         when(jobService.getStaleJobs(any(), any())).thenReturn(List.of());
         when(jobService.getJob(1L)).thenReturn(job);
         when(tenantService.getTenantIds()).thenReturn(List.of("public"));
+        when(taskExecutionService.failIfUnfinished(anyLong(), anyString())).thenReturn(true);
     }
 
     @Test
@@ -83,12 +89,26 @@ public class OrphanedJobRecoveryMonitorTest {
 
         monitor.recoverOrphanedJobs();
 
-        verify(taskExecution).setStatus(TaskExecution.Status.FAILED);
-        verify(taskExecutionService).update(taskExecution);
+        verify(taskExecutionService).failIfUnfinished(eq(10L), anyString());
+        verify(eventPublisher).publishEvent(any(CancelControlTaskEvent.class));
         verify(job).setStatus(Job.Status.FAILED);
         verify(jobService).update(job);
         verify(eventPublisher).publishEvent(any(JobStatusApplicationEvent.class));
         verify(eventPublisher, never()).publishEvent(any(ResumeJobEvent.class));
+    }
+
+    @Test
+    public void testRecoveryLeavesATaskThatCompletedAfterItWasRead() {
+        when(taskExecutionService.failIfUnfinished(anyLong(), anyString())).thenReturn(false);
+
+        OrphanedJobRecoveryMonitor monitor = new OrphanedJobRecoveryMonitor(
+            false, eventPublisher, jobService, 3, Duration.ofMinutes(5), taskExecutionService, tenantService);
+
+        monitor.recoverOrphanedJobs();
+
+        verify(taskExecutionService, never()).update(any());
+        verify(taskExecution, never()).setStatus(any());
+        verify(eventPublisher, never()).publishEvent(any(CancelControlTaskEvent.class));
     }
 
     @Test
@@ -129,7 +149,7 @@ public class OrphanedJobRecoveryMonitorTest {
 
         monitor.recoverOrphanedJobs();
 
-        verify(taskExecutionService, never()).update(any());
+        verify(taskExecutionService, never()).failIfUnfinished(anyLong(), anyString());
         verify(jobService, never()).update(any());
     }
 
@@ -167,7 +187,7 @@ public class OrphanedJobRecoveryMonitorTest {
 
         monitor.recoverOrphanedJobs();
 
-        verify(taskExecutionService, never()).update(any());
+        verify(taskExecutionService, never()).failIfUnfinished(anyLong(), anyString());
         verify(jobService, never()).update(any());
         verify(eventPublisher, never()).publishEvent(any(JobStatusApplicationEvent.class));
     }
@@ -198,7 +218,7 @@ public class OrphanedJobRecoveryMonitorTest {
     }
 
     @Test
-    public void testRecoversJobWhenChildJobLookupIsUnsupported() {
+    public void testSkipsJobWhenChildJobLookupIsUnsupported() {
         when(jobService.getChildJobIds(1L)).thenThrow(new UnsupportedOperationException());
 
         OrphanedJobRecoveryMonitor monitor = new OrphanedJobRecoveryMonitor(
@@ -206,8 +226,22 @@ public class OrphanedJobRecoveryMonitorTest {
 
         monitor.recoverOrphanedJobs();
 
-        verify(job).setStatus(Job.Status.FAILED);
-        verify(jobService).update(job);
+        verify(taskExecutionService, never()).failIfUnfinished(anyLong(), anyString());
+        verify(jobService, never()).update(any());
+    }
+
+    @Test
+    public void testSkipsJobWhoseUnfinishedTaskExecutionsAreOnlyQueued() {
+        when(taskExecution.getStatus()).thenReturn(TaskExecution.Status.CREATED);
+        when(jobService.getStaleJobs(any(), any())).thenReturn(List.of(job));
+
+        OrphanedJobRecoveryMonitor monitor = new OrphanedJobRecoveryMonitor(
+            false, eventPublisher, jobService, 3, Duration.ofMinutes(5), taskExecutionService, tenantService);
+
+        monitor.recoverOrphanedJobs();
+
+        verify(taskExecutionService, never()).failIfUnfinished(anyLong(), anyString());
+        verify(jobService, never()).update(any());
     }
 
     private void mockChildJob(Job.Status status) {

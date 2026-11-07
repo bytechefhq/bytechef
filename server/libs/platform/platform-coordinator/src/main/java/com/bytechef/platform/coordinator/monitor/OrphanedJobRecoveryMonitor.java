@@ -22,13 +22,11 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.error.ExecutionError;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -47,9 +45,6 @@ public class OrphanedJobRecoveryMonitor {
     private static final Logger log = LoggerFactory.getLogger(OrphanedJobRecoveryMonitor.class);
 
     public static final String AUTO_RECOVERY_ATTEMPTS = "autoRecoveryAttempts";
-
-    private static final Set<Job.Status> NON_TERMINAL_JOB_STATUSES = EnumSet.of(
-        Job.Status.CREATED, Job.Status.STARTED, Job.Status.STOPPED);
 
     private final boolean autoResume;
     private final ApplicationEventPublisher eventPublisher;
@@ -120,32 +115,6 @@ public class OrphanedJobRecoveryMonitor {
         }
     }
 
-    private boolean hasNonTerminalChildJob(long jobId) {
-        List<Long> childJobIds;
-
-        try {
-            childJobIds = jobService.getChildJobIds(jobId);
-        } catch (UnsupportedOperationException exception) {
-            if (log.isTraceEnabled()) {
-                log.trace("Child-job lookup is not supported in this deployment", exception);
-            }
-
-            return false;
-        }
-
-        if (childJobIds.isEmpty()) {
-            return false;
-        }
-
-        for (Job childJob : jobService.getJobs(childJobIds)) {
-            if (NON_TERMINAL_JOB_STATUSES.contains(childJob.getStatus())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private void recoverJob(long jobId, Instant cutoff) {
         Job job = jobService.getJob(jobId);
 
@@ -159,12 +128,8 @@ public class OrphanedJobRecoveryMonitor {
             return;
         }
 
-        List<TaskExecution> nonTerminalTaskExecutions = taskExecutionService.getJobTaskExecutions(jobId)
-            .stream()
-            .filter(taskExecution -> taskExecution.getStatus() == null ||
-                !taskExecution.getStatus()
-                    .isTerminated())
-            .toList();
+        List<TaskExecution> nonTerminalTaskExecutions = JobMonitorSupport.getNonTerminalTaskExecutions(
+            taskExecutionService, jobId);
 
         boolean anyFresh = nonTerminalTaskExecutions.stream()
             .anyMatch(taskExecution -> taskExecution.getLastModifiedDate() != null &&
@@ -175,23 +140,23 @@ public class OrphanedJobRecoveryMonitor {
             return;
         }
 
-        if (hasNonTerminalChildJob(jobId)) {
+        boolean onlyQueued = !nonTerminalTaskExecutions.isEmpty() && nonTerminalTaskExecutions.stream()
+            .noneMatch(taskExecution -> taskExecution.getStatus() == TaskExecution.Status.STARTED);
+
+        if (onlyQueued) {
+            return;
+        }
+
+        if (JobMonitorSupport.hasNonTerminalChildJob(jobService, jobId)) {
             return;
         }
 
         Instant now = Instant.now();
 
-        for (TaskExecution taskExecution : nonTerminalTaskExecutions) {
-            taskExecution.setStatus(TaskExecution.Status.FAILED);
-            taskExecution.setEndDate(now);
-            taskExecution.setError(
-                new ExecutionError(
-                    "Orphaned execution: no heartbeat received before %s; the executing node likely crashed"
-                        .formatted(cutoff),
-                    List.of()));
-
-            taskExecutionService.update(taskExecution);
-        }
+        JobMonitorSupport.failAndCancelTaskExecutions(
+            jobId, nonTerminalTaskExecutions,
+            "Orphaned execution: no heartbeat received before %s; the executing node likely crashed".formatted(cutoff),
+            taskExecutionService, eventPublisher);
 
         int autoRecoveryAttempts = getAutoRecoveryAttempts(job);
         boolean resume = autoResume && job.getParentTaskExecutionId() == null &&
