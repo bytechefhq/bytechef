@@ -23,6 +23,7 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.automation.ai.mcp.tool.ConfigureMcpServerToolCallback;
 import com.bytechef.automation.ai.mcp.tool.McpServerAgentType;
+import com.bytechef.automation.ai.mcp.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.ai.mcp.tool.agent.McpServerSpringAIAgent;
 import com.bytechef.platform.ai.tool.RehydrateContextToolCallback;
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
@@ -31,6 +32,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
@@ -66,6 +68,39 @@ public class McpServerAgentConfiguration {
         }
 
         return toolCallbacks;
+    }
+
+    @Bean
+    McpServerSpringAIAgent mcpServerAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel,
+        ObjectProvider<McpServerToolCallbacksFactory> mcpServerToolCallbacksFactoryProvider,
+        @Value("classpath:prompt_mcp_server_ask.txt") Resource promptMcpServerAskResource,
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        throws AGUIException {
+
+        return McpServerSpringAIAgent.builder()
+            .agentId(McpServerAgentType.MCP_SERVER_ASK.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptMcpServerAskResource))
+            .state(state)
+            .toolCallbacks(
+                mcpServerAskToolCallbacks(
+                    securityContextRehydrator, mcpServerToolCallbacksFactoryProvider.getIfAvailable()))
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+    }
+
+    List<ToolCallback> mcpServerAskToolCallbacks(
+        SecurityContextRehydrator securityContextRehydrator,
+        @Nullable McpServerToolCallbacksFactory mcpServerToolCallbacksFactory) {
+
+        if (mcpServerToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return wrapTools(securityContextRehydrator, new ArrayList<>(mcpServerToolCallbacksFactory.readToolCallbacks()));
     }
 
     @Bean

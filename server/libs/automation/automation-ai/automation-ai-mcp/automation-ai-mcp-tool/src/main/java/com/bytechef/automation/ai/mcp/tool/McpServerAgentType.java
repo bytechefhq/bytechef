@@ -25,6 +25,7 @@ import com.bytechef.ai.copilot.util.Source;
  */
 public enum McpServerAgentType implements AgentType {
 
+    MCP_SERVER_ASK(Source.MCP_SERVER, Mode.ASK),
     MCP_SERVER_BUILD(Source.MCP_SERVER, Mode.BUILD),
     CONFIGURE_MCP_SERVER("configureMcpServer");
 

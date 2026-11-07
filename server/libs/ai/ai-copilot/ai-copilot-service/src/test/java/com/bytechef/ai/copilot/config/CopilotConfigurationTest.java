@@ -75,12 +75,12 @@ class CopilotConfigurationTest {
         }
 
         assertThat(agentIds)
-            .hasSize(12)
+            .hasSize(13)
             .doesNotHaveDuplicates()
             .allSatisfy(agentId -> assertThat(copilotAgentTypeKeys).contains(agentId))
             .contains(
-                "code_editor_ask", "code_editor_build", "converter_build", "mcp_server_build", "workflow_execution_ask",
-                "workflow_execution_build");
+                "code_editor_ask", "code_editor_build", "converter_build", "mcp_server_ask", "mcp_server_build",
+                "workflow_execution_ask", "workflow_execution_build");
     }
 
     private Object invokeWithStubs(Method method) throws ReflectiveOperationException {

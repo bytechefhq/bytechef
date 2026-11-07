@@ -23,14 +23,24 @@ import com.agui.core.exception.AGUIException;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
+import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
+import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
+import com.bytechef.automation.ai.mcp.tool.McpServerToolCallbacksFactory;
 import com.bytechef.automation.ai.mcp.tool.agent.McpServerSpringAIAgent;
 import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 /**
@@ -52,6 +62,54 @@ class McpServerAgentConfigurationTest {
             McpServerAgentConfigurationTest.<SubAgentChatModelResolver>emptyProvider());
 
         assertThat(mcpServerSpringAIAgent.getAgentId()).isEqualTo("mcp_server_build");
+    }
+
+    @Test
+    void testMcpServerAskAgentIsRegisteredUnderTheMcpServerSourceId() throws AGUIException {
+        McpServerSpringAIAgent mcpServerSpringAIAgent = mcpServerAgentConfiguration.mcpServerAskSpringAIAgent(
+            mock(ChatMemory.class), mock(ChatModel.class),
+            McpServerAgentConfigurationTest.<McpServerToolCallbacksFactory>emptyProvider(), PROMPT_RESOURCE,
+            mock(SecurityContextRehydrator.class),
+            McpServerAgentConfigurationTest.<OverrideChatClientResolver>emptyProvider());
+
+        assertThat(mcpServerSpringAIAgent.getAgentId()).isEqualTo("mcp_server_ask");
+    }
+
+    @Test
+    void testMcpServerAskAgentToolsAreReadOnly() {
+        McpServerToolCallbacksFactory mcpServerToolCallbacksFactory = new McpServerToolCallbacksFactory(
+            mock(McpProjectFacade.class), mock(McpProjectWorkflowFacade.class), mock(WorkspaceMcpServerFacade.class));
+
+        List<ToolCallback> toolCallbacks = mcpServerAgentConfiguration.mcpServerAskToolCallbacks(
+            mock(SecurityContextRehydrator.class), mcpServerToolCallbacksFactory);
+
+        assertThat(toolCallbacks)
+            .extracting(toolCallback -> toolCallback.getToolDefinition()
+                .name())
+            .containsExactly("listMcpServers", "listMcpProjectWorkflows");
+    }
+
+    @Test
+    void testMcpServerAskAgentHasNoToolsWithoutTheMcpServerToolCallbacksFactory() {
+        assertThat(mcpServerAgentConfiguration.mcpServerAskToolCallbacks(mock(SecurityContextRehydrator.class), null))
+            .isEmpty();
+    }
+
+    @Test
+    void testMcpServerAskPromptIsReadOnly() {
+        String prompt = readResource("prompt_mcp_server_ask.txt");
+
+        assertThat(prompt)
+            .contains("listMcpServers", "listMcpProjectWorkflows", "READ-ONLY", "switch to Build mode")
+            .doesNotContain("configureMcpServer", "updateMcpProjectWorkflowParameters");
+    }
+
+    private static String readResource(String name) {
+        try (InputStream inputStream = new ClassPathResource(name).getInputStream()) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException exception) {
+            throw new UncheckedIOException(exception);
+        }
     }
 
     @SuppressWarnings("unchecked")
