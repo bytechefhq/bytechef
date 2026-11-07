@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.workflow.execution.web.rest;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
@@ -18,13 +19,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.ee.embedded.workflow.execution.dto.EmbeddedWorkflowExecutionDTO;
 import com.bytechef.ee.embedded.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.ee.embedded.workflow.execution.facade.EmbeddedWorkflowExecutionFacade;
 import com.bytechef.ee.embedded.workflow.execution.facade.IntegrationWorkflowExecutionFacade;
 import com.bytechef.platform.workflow.execution.dto.FocusPathElementDTO;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.web.rest.error.GlobalResponseEntityExceptionHandler;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -37,6 +41,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,11 +56,83 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(value = WorkflowExecutionApiController.class)
 class WorkflowExecutionApiControllerIntTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @MockitoBean
+    private EmbeddedWorkflowExecutionFacade embeddedWorkflowExecutionFacade;
 
     @MockitoBean
     private IntegrationWorkflowExecutionFacade integrationWorkflowExecutionFacade;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    void testGetAnyWorkflowExecutionsPagePassesTheFiltersToTheFacade() throws Exception {
+        when(embeddedWorkflowExecutionFacade.getWorkflowExecutions(any(), any(), any(), any(), any(), anyLong(),
+            anyInt()))
+                .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 20), 0));
+
+        mockMvc.perform(
+            get("/internal/workflow-executions/any")
+                .queryParam("workspaceId", "1")
+                .queryParam("environmentId", "2")
+                .queryParam("jobStatus", "FAILED")
+                .queryParam("jobStartDate", "2026-03-10T00:00:00Z")
+                .queryParam("connectedUserId", "7")
+                .queryParam("pageNumber", "3")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        verify(embeddedWorkflowExecutionFacade).getWorkflowExecutions(
+            2L, Job.Status.FAILED, Instant.parse("2026-03-10T00:00:00Z"), null, 7L, 1L, 3);
+    }
+
+    @Test
+    void testGetAnyWorkflowExecutionsPageReturnsTheSourceOfEachExecution() throws Exception {
+        Job automationJob = new Job(5L);
+
+        automationJob.setStatus(Job.Status.COMPLETED);
+
+        Job integrationJob = new Job(6L);
+
+        integrationJob.setStatus(Job.Status.FAILED);
+
+        List<EmbeddedWorkflowExecutionDTO> embeddedWorkflowExecutionDTOs = List.of(
+            EmbeddedWorkflowExecutionDTO.of(
+                new com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO(
+                    5L, null, null, 2, new JobDTO(automationJob), null, null)),
+            EmbeddedWorkflowExecutionDTO.of(
+                new WorkflowExecutionDTO(6L, null, null, null, new JobDTO(integrationJob), null, null)));
+
+        when(embeddedWorkflowExecutionFacade.getWorkflowExecutions(any(), any(), any(), any(), any(), anyLong(),
+            anyInt()))
+                .thenReturn(new PageImpl<>(embeddedWorkflowExecutionDTOs, PageRequest.of(0, 20), 2));
+
+        mockMvc.perform(
+            get("/internal/workflow-executions/any")
+                .queryParam("workspaceId", "1")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.totalElements").value(2))
+            .andExpect(jsonPath("$.content[0].source").value("AUTOMATION"))
+            .andExpect(jsonPath("$.content[0].automationWorkflowExecution.id").value(5))
+            .andExpect(jsonPath("$.content[0].automationWorkflowExecution.projectVersion").value(2))
+            .andExpect(jsonPath("$.content[0].integrationWorkflowExecution").doesNotExist())
+            .andExpect(jsonPath("$.content[1].source").value("INTEGRATION"))
+            .andExpect(jsonPath("$.content[1].integrationWorkflowExecution.id").value(6))
+            .andExpect(jsonPath("$.content[1].integrationWorkflowExecution.job.status").value("FAILED"))
+            .andExpect(jsonPath("$.content[1].automationWorkflowExecution").doesNotExist());
+    }
+
+    @Test
+    void testGetAnyWorkflowExecutionsPageRequiresTheWorkspace() throws Exception {
+        mockMvc.perform(
+            get("/internal/workflow-executions/any")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+
+        verify(embeddedWorkflowExecutionFacade, never())
+            .getWorkflowExecutions(any(), any(), any(), any(), any(), anyLong(), anyInt());
+    }
 
     @Test
     void testGetWorkflowExecutionPassesLazyFlag() throws Exception {
@@ -235,10 +313,11 @@ class WorkflowExecutionApiControllerIntTest {
 
         @Bean
         WorkflowExecutionApiController workflowExecutionApiController(
-            ConversionService conversionService,
+            ConversionService conversionService, EmbeddedWorkflowExecutionFacade embeddedWorkflowExecutionFacade,
             IntegrationWorkflowExecutionFacade integrationWorkflowExecutionFacade) {
 
-            return new WorkflowExecutionApiController(conversionService, integrationWorkflowExecutionFacade);
+            return new WorkflowExecutionApiController(
+                conversionService, embeddedWorkflowExecutionFacade, integrationWorkflowExecutionFacade);
         }
     }
 }
