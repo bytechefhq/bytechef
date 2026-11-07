@@ -1,9 +1,10 @@
 import Button from '@/components/Button/Button';
 import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
+import TooltipTriggerIcon from '@/components/TooltipTriggerIcon/TooltipTriggerIcon';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent} from '@/components/ui/tooltip';
 import useCreateTestDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/hooks/useCreateTestDialog';
 import {InfoIcon} from 'lucide-react';
 
@@ -28,9 +29,9 @@ const CreateTestDialog = ({onClose, onCreate}: CreateTestDialogProps) => {
                                     <Label htmlFor="test-name">Name</Label>
 
                                     <Tooltip>
-                                        <TooltipTrigger asChild>
+                                        <TooltipTriggerIcon label="Name">
                                             <InfoIcon className="size-3.5 text-muted-foreground" />
-                                        </TooltipTrigger>
+                                        </TooltipTriggerIcon>
 
                                         <TooltipContent className="max-w-64" side="right">
                                             A short, descriptive name for this test suite. Use it to group related
@@ -52,9 +53,9 @@ const CreateTestDialog = ({onClose, onCreate}: CreateTestDialogProps) => {
                                     <Label htmlFor="test-description">Description (optional)</Label>
 
                                     <Tooltip>
-                                        <TooltipTrigger asChild>
+                                        <TooltipTriggerIcon label="Description">
                                             <InfoIcon className="size-3.5 text-muted-foreground" />
-                                        </TooltipTrigger>
+                                        </TooltipTriggerIcon>
 
                                         <TooltipContent className="max-w-64" side="right">
                                             An optional description explaining the purpose of this test, what agent

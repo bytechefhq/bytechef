@@ -65,7 +65,7 @@ describe('CreateTestDialog', () => {
                 </TooltipHarness>
             );
 
-            await user.type(screen.getByLabelText(/Name/), 'My test');
+            await user.type(screen.getByRole('textbox', {name: /Name/}), 'My test');
 
             expect(screen.getByRole('button', {name: 'Create'})).toBeEnabled();
         });
@@ -79,7 +79,7 @@ describe('CreateTestDialog', () => {
                 </TooltipHarness>
             );
 
-            await user.type(screen.getByLabelText(/Name/), 'My test');
+            await user.type(screen.getByRole('textbox', {name: /Name/}), 'My test');
             await user.click(screen.getByRole('button', {name: 'Create'}));
 
             expect(onCreate).toHaveBeenCalledTimes(1);

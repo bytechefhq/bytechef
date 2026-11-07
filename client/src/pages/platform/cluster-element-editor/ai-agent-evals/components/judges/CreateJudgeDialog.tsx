@@ -2,9 +2,10 @@ import Button from '@/components/Button/Button';
 import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import TooltipTriggerIcon from '@/components/TooltipTriggerIcon/TooltipTriggerIcon';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent} from '@/components/ui/tooltip';
 import useCreateJudgeDialog, {
     type JudgeEditDataI,
 } from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/judges/hooks/useCreateJudgeDialog';
@@ -99,9 +100,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                     <Label htmlFor="judge-name">Name</Label>
 
                                     <Tooltip>
-                                        <TooltipTrigger asChild>
+                                        <TooltipTriggerIcon label="Name">
                                             <InfoIcon className="size-3.5 text-muted-foreground" />
-                                        </TooltipTrigger>
+                                        </TooltipTriggerIcon>
 
                                         <TooltipContent className="max-w-64" side="right">
                                             A descriptive name for this judge. It appears in evaluation results
@@ -124,9 +125,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                         <Label>Type</Label>
 
                                         <Tooltip>
-                                            <TooltipTrigger asChild>
+                                            <TooltipTriggerIcon label="Type">
                                                 <InfoIcon className="size-3.5 text-muted-foreground" />
-                                            </TooltipTrigger>
+                                            </TooltipTriggerIcon>
 
                                             <TooltipContent className="max-w-64" side="right">
                                                 The evaluation method the judge uses. LLM Rule uses an AI model to
@@ -164,9 +165,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label>Provider</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Provider">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The AI provider whose model will evaluate the agent's response.
@@ -199,9 +200,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                                 <Label htmlFor="judge-model">Model</Label>
 
                                                 <Tooltip>
-                                                    <TooltipTrigger asChild>
+                                                    <TooltipTriggerIcon label="Model">
                                                         <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                    </TooltipTrigger>
+                                                    </TooltipTriggerIcon>
 
                                                     <TooltipContent className="max-w-64" side="right">
                                                         The specific LLM that will act as the judge. More capable models
@@ -245,9 +246,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                                 <Label>Connection</Label>
 
                                                 <Tooltip>
-                                                    <TooltipTrigger asChild>
+                                                    <TooltipTriggerIcon label="Connection">
                                                         <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                    </TooltipTrigger>
+                                                    </TooltipTriggerIcon>
 
                                                     <TooltipContent className="max-w-64" side="right">
                                                         The API connection used to authenticate with the selected
@@ -278,9 +279,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label htmlFor="judge-rule">Evaluation Rule</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Evaluation Rule">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     A natural-language instruction that tells the LLM judge how to
@@ -308,9 +309,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label htmlFor="judge-text">Text</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Text">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The exact text string to look for in the agent's response. The check
@@ -333,9 +334,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label>Mode</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Mode">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     "Must Contain" passes when the text is found in the response. "Must
@@ -383,9 +384,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label htmlFor="judge-pattern">Pattern</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Pattern">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     A regular expression pattern to test against the agent's response.
@@ -408,9 +409,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label>Mode</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Mode">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     "Must Match" passes when the regex finds a match in the response.
@@ -458,9 +459,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label htmlFor="judge-min-length">Min Length (optional)</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Min Length">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The minimum number of characters the agent's response must contain
@@ -485,9 +486,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label htmlFor="judge-max-length">Max Length (optional)</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Max Length">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The maximum number of characters allowed in the agent's response.
@@ -515,9 +516,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                         <Label htmlFor="judge-schema">JSON Schema</Label>
 
                                         <Tooltip>
-                                            <TooltipTrigger asChild>
+                                            <TooltipTriggerIcon label="JSON Schema">
                                                 <InfoIcon className="size-3.5 text-muted-foreground" />
-                                            </TooltipTrigger>
+                                            </TooltipTriggerIcon>
 
                                             <TooltipContent className="max-w-64" side="right">
                                                 A JSON Schema definition that the agent's response must conform to. The
@@ -549,9 +550,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label htmlFor="judge-expected-output">Expected Output</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Expected Output">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The reference text to compare the agent's response against. The
@@ -575,9 +576,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label htmlFor="judge-threshold">Threshold (0-1)</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Threshold">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The minimum similarity score required to pass. A value of 1.0
@@ -603,9 +604,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label>Algorithm</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Algorithm">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The method used to compute similarity. Cosine measures the angle
@@ -654,9 +655,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label htmlFor="judge-expected-value">Expected Value</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Expected Value">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The exact text the agent response must match.
@@ -677,9 +678,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label>Case Sensitive</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Case Sensitive">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     When enabled, the comparison is case-sensitive.
@@ -725,9 +726,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label htmlFor="judge-tool-name">Tool Name</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Tool Name">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The name of the tool that should be used during the conversation.
@@ -748,9 +749,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label>Position</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Position">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     Where in the conversation the tool should appear.
@@ -778,9 +779,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label>Comparison</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Comparison">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     How to compare the actual tool usage count against the expected
@@ -809,9 +810,9 @@ const CreateJudgeDialog = ({editData, onClose, onCreate, onUpdate}: CreateJudgeD
                                             <Label htmlFor="judge-tool-count">Count</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Count">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The expected number of times the tool should be used.

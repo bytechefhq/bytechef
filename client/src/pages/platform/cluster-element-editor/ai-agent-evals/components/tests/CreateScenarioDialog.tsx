@@ -1,9 +1,10 @@
 import Button from '@/components/Button/Button';
 import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
+import TooltipTriggerIcon from '@/components/TooltipTriggerIcon/TooltipTriggerIcon';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent} from '@/components/ui/tooltip';
 import {AiAgentScenarioType} from '@/shared/middleware/graphql';
 import {InfoIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -100,9 +101,9 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                                     <Label htmlFor="scenario-name">Name</Label>
 
                                     <Tooltip>
-                                        <TooltipTrigger asChild>
+                                        <TooltipTriggerIcon label="Name">
                                             <InfoIcon className="size-3.5 text-muted-foreground" />
-                                        </TooltipTrigger>
+                                        </TooltipTriggerIcon>
 
                                         <TooltipContent className="max-w-64" side="right">
                                             A short, descriptive name for this scenario. It appears in test results so
@@ -124,9 +125,9 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                                     <Label>Type</Label>
 
                                     <Tooltip>
-                                        <TooltipTrigger asChild>
+                                        <TooltipTriggerIcon label="Type">
                                             <InfoIcon className="size-3.5 text-muted-foreground" />
-                                        </TooltipTrigger>
+                                        </TooltipTriggerIcon>
 
                                         <TooltipContent className="max-w-64" side="right">
                                             Single-turn sends one message and evaluates the response. Multi-turn
@@ -172,9 +173,9 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                                             <Label htmlFor="scenario-user-message">User Message</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="User Message">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The exact message sent to the agent as user input. This is the
@@ -197,9 +198,9 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                                             <Label htmlFor="scenario-expected-output">Expected Output (optional)</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Expected Output">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The ideal or reference response you expect from the agent. Judges
@@ -225,9 +226,9 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                                             <Label htmlFor="scenario-persona-prompt">Persona Prompt</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Persona Prompt">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     Instructions that define a simulated user persona. This persona will
@@ -251,9 +252,9 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                                             <Label htmlFor="scenario-first-message">First Message (Optional)</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="First Message">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     Optional fixed opening message. If set, this is sent as the first
@@ -277,9 +278,9 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                                             <Label htmlFor="scenario-max-turns">Max Turns</Label>
 
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTriggerIcon label="Max Turns">
                                                     <InfoIcon className="size-3.5 text-muted-foreground" />
-                                                </TooltipTrigger>
+                                                </TooltipTriggerIcon>
 
                                                 <TooltipContent className="max-w-64" side="right">
                                                     The maximum number of conversation exchanges (turns) between the
@@ -306,9 +307,9 @@ const CreateScenarioDialog = ({agentEvalTestId, editData, onClose, onCreate, onU
                                     <Label htmlFor="scenario-number-of-runs">Number of Runs</Label>
 
                                     <Tooltip>
-                                        <TooltipTrigger asChild>
+                                        <TooltipTriggerIcon label="Number of Runs">
                                             <InfoIcon className="size-3.5 text-muted-foreground" />
-                                        </TooltipTrigger>
+                                        </TooltipTriggerIcon>
 
                                         <TooltipContent className="max-w-64" side="right">
                                             Run this scenario multiple times to detect non-deterministic behavior. Each

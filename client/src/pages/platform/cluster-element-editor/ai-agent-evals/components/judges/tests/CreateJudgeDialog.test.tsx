@@ -70,7 +70,7 @@ describe('CreateJudgeDialog', () => {
                 </TooltipHarness>
             );
 
-            await user.type(screen.getByLabelText(/Name/), 'My judge');
+            await user.type(screen.getByRole('textbox', {name: /Name/}), 'My judge');
 
             expect(screen.getByRole('button', {name: 'Create'})).toBeEnabled();
         });
@@ -104,7 +104,7 @@ describe('CreateJudgeDialog', () => {
                 </TooltipHarness>
             );
 
-            expect(screen.getByLabelText(/Name/)).toHaveValue('Existing judge');
+            expect(screen.getByRole('textbox', {name: /Name/})).toHaveValue('Existing judge');
         });
     });
 
@@ -159,7 +159,7 @@ describe('CreateJudgeDialog', () => {
                 </TooltipHarness>
             );
 
-            await user.type(screen.getByLabelText(/Name/), 'My judge');
+            await user.type(screen.getByRole('textbox', {name: /Name/}), 'My judge');
             await user.click(screen.getByRole('button', {name: 'Create'}));
 
             expect(onCreate).toHaveBeenCalledWith('My judge', expect.anything(), expect.anything());
