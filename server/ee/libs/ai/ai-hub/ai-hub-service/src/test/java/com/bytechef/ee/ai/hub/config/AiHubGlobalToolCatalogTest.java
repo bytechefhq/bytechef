@@ -107,6 +107,32 @@ class AiHubGlobalToolCatalogTest {
         assertThat(toolNames(buildCatalog.toolCallbacks())).contains("deleteProject", "createProjectDeployment");
     }
 
+    @Test
+    void testEachModeCatalogHoldsTheDomainToolsOfItsMode() {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        AiHubGlobalToolCatalog askCatalog = configuration.aiHubAskGlobalToolCatalog(
+            fixtures.askToolCallbacks(), provider(componentTools), provider(taskTools),
+            provider(taskDispatcherTools));
+        AiHubGlobalToolCatalog buildCatalog = configuration.aiHubBuildGlobalToolCatalog(
+            fixtures.buildToolCallbacks(), provider(componentTools), provider(taskTools),
+            provider(taskDispatcherTools));
+
+        assertThat(toolNames(askCatalog.toolCallbacks()))
+            .contains(
+                "listAiAgents", "getAiAgent", "openAiAgentTab", "listAssetFiles", "getAssetFileContent",
+                "listDataTables", "queryDataTable", "listKnowledgeBases", "queryKnowledgeBase", "listApiCollections",
+                "listComponentRules", "proposeComponentRuleCondition")
+            .doesNotContain(
+                "createAiAgent", "createAssetFile", "createDataTable", "dropDataTable", "createKnowledgeBase",
+                "createApiCollection", "createComponentRule");
+        assertThat(toolNames(buildCatalog.toolCallbacks()))
+            .contains(
+                "listAiAgents", "createAiAgent", "deleteAiAgentElement", "createAssetFile", "createDataTable",
+                "dropDataTable", "createKnowledgeBase", "deleteKnowledgeBase", "createApiCollection",
+                "createComponentRule");
+    }
+
     private List<ToolCallback> catalogToolCallbacks() {
         return AiHubConfiguration.catalogToolCallbacks(
             AiHubAgentFixtures.withBuildWorkflow()

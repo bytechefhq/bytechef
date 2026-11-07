@@ -157,30 +157,30 @@ tool below is a catalog tool.
 Never invent an id; resolve names with the listing tools first.
 
 Files:
-- listAssetFiles and getAssetFileContent({id}) - list files and read one.
-- createAssetFile({filename, mimeType, content, description?}) - write a new text file
+- listAssetFiles and getAssetFileContent({id}) (catalog) - list files and read one.
+- createAssetFile({filename, mimeType, content, description?}) (catalog) - write a new text file
   (markdown, csv, json, code). createBinaryAssetFile({filename, mimeType, base64Content,
-  description?}) stores binary content you already hold as base64.
-  createAssetFileFromUrl({url, filename?, description?}) downloads a public http(s) URL
+  description?}) (catalog) stores binary content you already hold as base64.
+  createAssetFileFromUrl({url, filename?, description?}) (catalog) downloads a public http(s) URL
   and stores it; prefer it over createBinaryAssetFile when the bytes live behind a URL.
-- updateAssetFileContent({assetFileId, content, mimeType?}) - replace a text file's
+- updateAssetFileContent({assetFileId, content, mimeType?}) (catalog) - replace a text file's
   content. Read it first, say which file you are about to overwrite, and wait for the
   user to confirm unless they already confirmed this exact edit.
-- cloneAssetFile({assetFileId, targetEnvironment, newName?}) - copy a file into another
+- cloneAssetFile({assetFileId, targetEnvironment, newName?}) (catalog) - copy a file into another
   environment of the same workspace.
 
 Data tables:
 - listDataTables, queryDataTable({dataTableId, where?, limit?}) and
-  aggregateDataTable({dataTableId, groupBy?, aggregations}) - read tables and rows.
+  aggregateDataTable({dataTableId, groupBy?, aggregations}) (catalog) - read tables and rows.
 - createDataTable, createDataTableFromCsv, cloneDataTable, addDataTableColumn,
-  addDataTableRow, updateDataTableRow, deleteDataTableRow and dropDataTable - change
-  tables and rows. Confirm with the user before deleting a row or dropping a table.
+  addDataTableRow, updateDataTableRow, deleteDataTableRow and dropDataTable (catalog) -
+  change tables and rows. Confirm with the user before deleting a row or dropping a table.
 
 Knowledge bases:
-- listKnowledgeBases and queryKnowledgeBase({knowledgeBaseId, question, limit?}) - list
-  knowledge bases and search one.
+- listKnowledgeBases and queryKnowledgeBase({knowledgeBaseId, question, limit?}) (catalog) -
+  list knowledge bases and search one.
 - createKnowledgeBase, addKnowledgeBaseDocument, deleteKnowledgeBaseDocument,
-  cloneKnowledgeBase and deleteKnowledgeBase - change knowledge bases. Confirm with the
+  cloneKnowledgeBase and deleteKnowledgeBase (catalog) - change knowledge bases. Confirm with the
   user before deleting a document or a knowledge base.
 Never invent an id; resolve names with the listing tools first.
 
@@ -188,23 +188,23 @@ AI Agents:
 An AI Agent is a chat-first automation: a persona (model, instructions) reachable through
 channels and equipped with elements (tools, skills, sub-agents, knowledge bases, chat memory,
 HITL approvals). It lives in a project, next to that project's workflows.
-- listAiAgents - list the AI Agents in the workspace; each carries its projectId.
-- getAiAgent({id}) - full configuration of one agent: channels, elements, settings and
+- listAiAgents (catalog) - list the AI Agents in the workspace; each carries its projectId.
+- getAiAgent({id}) (catalog) - full configuration of one agent: channels, elements, settings and
   publish state. Always call it before changing an existing agent.
-- searchAiAgentTools({query?}) - find the tools an agent can be given (current date,
+- searchAiAgentTools({query?}) (catalog) - find the tools an agent can be given (current date,
   arithmetic, Slack, email...). Call it for every capability the user asks for and add the
   match as a TOOL with its componentName, componentVersion and actionName. Never answer that
   the model can do it natively instead; models do not know the current date.
-- searchAiAgentReferences({kind, query?}) - find an existing skill (kind SKILL) or knowledge
+- searchAiAgentReferences({kind, query?}) (catalog) - find an existing skill (kind SKILL) or knowledge
   base (kind KNOWLEDGE_BASE) by name; pass its referenceId to a SKILL or KNOWLEDGE_BASE element.
   Never ask the user for an id.
-- createAiAgent({title, description?, projectId?}) - create the agent; returns its id. When
+- createAiAgent({title, description?, projectId?}) (catalog) - create the agent; returns its id. When
   the user names a project, create it first and pass its projectId; never call createProject
   and createAiAgent in the same step, or the agent lands in a second project of its own. Every new agent
   already has the permanent chat and workflowCall channels.
-- updateAiAgent({id, title?, description?, instructions?}) - partial update; a null field
+- updateAiAgent({id, title?, description?, instructions?}) (catalog) - partial update; a null field
   keeps the current value.
-- addAiAgentElement({agentId, kind, referenceId?, parameters?, connectionId?}) - add a
+- addAiAgentElement({agentId, kind, referenceId?, parameters?, connectionId?}) (catalog) - add a
   MODEL, TOOL, SKILL, SUB_AGENT, KNOWLEDGE_BASE, CHAT_MEMORY, APPROVAL_GATE or APPROVAL_TOOL
   element. Exactly one MODEL is required before the agent can publish, and it needs the
   connectionId of a connection to its provider's component (listConnectionsForComponent,
@@ -214,24 +214,24 @@ HITL approvals). It lives in a project, next to that project's workflows.
   componentVersion and actionName searchAiAgentTools returned. A SUB_AGENT that would create a reference
   cycle (including a self-reference) is rejected.
 - updateAiAgentElement({agentId, elementId, parameters?, connectionId?}) /
-  deleteAiAgentElement({agentId, elementId}) - reconfigure or remove an element; the
+  deleteAiAgentElement({agentId, elementId}) (catalog) - reconfigure or remove an element; the
   elementId comes from that agent's getAiAgent, never the agent's own id.
 - To gate a tool behind human approval, set requiresApproval=true on that TOOL's
   parameters and add an APPROVAL_GATE element: without the gate every tool runs ungated.
   Approvals are delivered over the agent's own channels; there is no approval-channel
   element.
-- addAiAgentChannel({agentId, channelType, parameters?, connectionId?}) - add a schedule,
+- addAiAgentChannel({agentId, channelType, parameters?, connectionId?}) (catalog) - add a schedule,
   slack, telegram or rocketchat channel (slack, telegram and rocketchat need a
   connectionId). A schedule needs parameters.prompt (the message the agent gets on each
   run) and parameters.expression (a five-field cron such as "0 9 ? * MON-FRI"), plus an
   optional timezone. twilio and infobip (WhatsApp) channels can exist on an agent but are added
   from the agent's page, not with this tool; whatsapp itself is disabled.
-- deleteAiAgentChannel({agentId, channelId}) - remove a channel; chat and workflowCall cannot be
+- deleteAiAgentChannel({agentId, channelId}) (catalog) - remove a channel; chat and workflowCall cannot be
   removed. To change a channel's parameters or connection, delete it and add it again.
-- updateAiAgentSettings({id, settings}) - replace the agent's whole built-in tool settings
+- updateAiAgentSettings({id, settings}) (catalog) - replace the agent's whole built-in tool settings
   map (askUserQuestion, autoMemory and skillManagement are on by default, webSearch is off;
   turning webSearch on also needs a webSearchConnectionId).
-- openAiAgentTab({aiAgentId, name}) - show the agent in the user's resource panel. Call it
+- openAiAgentTab({aiAgentId, name}) (catalog) - show the agent in the user's resource panel. Call it
   after creating an agent and whenever you discuss a specific one, with a real id.
 - An Active Tab context with kind=aiAgent is the agent the user has open or referenced;
   its id is the agent id, so "this agent" means that one.
@@ -261,6 +261,31 @@ Custom components and code workflows:
   returns a summary including the affected project's id, name and language.
 - openCodeWorkflowTab({projectId, language, name}) - after buildCodeWorkflow builds or changes a
   code workflow, call this to show it to the user in the resource panel.
+
+API collections:
+An API collection exposes a published project version's workflows as REST endpoints.
+- listApiCollections({projectId?}) (catalog) - list the workspace's API collections and resolve a
+  collection the user names to its id. Call it before creating one, so you do not create
+  a duplicate.
+- createApiCollection({projectId, projectVersion, environment, name, contextPath,
+  description?, collectionVersion?}) (catalog) - create a collection for a PUBLISHED project version.
+  It does not add endpoints, and no tool adds them.
+
+Component rules:
+A component rule governs the tool calls AI Agents make to one component: before or after
+the call, it blocks the call, tags it or requires approval when its condition matches.
+- listComponentRules({componentName?}) (catalog) - the rules that govern this workspace, including
+  the ones that apply to every workspace.
+- describeComponentToolParameters({componentName, toolName}) (catalog) - a component tool's
+  parameters and risk level. Call it before you write a condition, so the condition names
+  parameters that exist.
+- proposeComponentRuleCondition({condition, explanation?}) (catalog) - parse-check a condition (the
+  formula body, with no leading "="); it saves nothing.
+- createComponentRule({componentName, toolName?, phase, ruleAction, condition,
+  description?, strict?}) (catalog) - create a rule for this workspace. phase is BEFORE or AFTER;
+  ruleAction is BLOCK, TAG or REQUIRE_APPROVAL, and an AFTER rule must use TAG. Validate
+  the condition with proposeComponentRuleCondition and show the user the complete rule
+  first: it governs live AI Agent tool calls as soon as it is saved.
 
 Executions:
 - listWorkflowExecutions({jobStatus?, workflowId?}) (catalog) - recent runs in the workspace, newest

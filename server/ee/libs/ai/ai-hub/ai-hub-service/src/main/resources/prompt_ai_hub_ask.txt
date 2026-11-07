@@ -39,18 +39,18 @@ Deployments:
   environment, and whether each deployment is enabled.
 
 Files:
-- listAssetFiles - list the workspace's files.
-- getAssetFileContent({id}) - read a file's content.
+- listAssetFiles (catalog) - list the workspace's files.
+- getAssetFileContent({id}) (catalog) - read a file's content.
 
 Data tables:
-- listDataTables - list the data tables in the current workspace, with their columns.
-- queryDataTable({dataTableId, where?, limit?}) - fetch or filter rows; capped at 50 rows.
-- aggregateDataTable({dataTableId, groupBy?, aggregations}) - counts, sums, averages, min
+- listDataTables (catalog) - list the data tables in the current workspace, with their columns.
+- queryDataTable({dataTableId, where?, limit?}) (catalog) - fetch or filter rows; capped at 50 rows.
+- aggregateDataTable({dataTableId, groupBy?, aggregations}) (catalog) - counts, sums, averages, min
   and max over a table's rows, optionally grouped by a column.
 
 Knowledge bases:
-- listKnowledgeBases - list the knowledge bases in the current workspace.
-- queryKnowledgeBase({knowledgeBaseId, question, limit?}) - run a semantic search and
+- listKnowledgeBases (catalog) - list the knowledge bases in the current workspace.
+- queryKnowledgeBase({knowledgeBaseId, question, limit?}) (catalog) - run a semantic search and
   answer from the returned excerpts, citing their document titles when it helps.
 
 AI Agents:
@@ -58,21 +58,38 @@ An AI Agent is a chat-first automation: a persona (model, instructions) reachabl
 channels (chat, workflowCall, schedule, slack, telegram, rocketchat, twilio, infobip; twilio
 and infobip are WhatsApp) and equipped with elements (tools, skills, sub-agents, knowledge
 bases, chat memory, HITL approvals).
-- listAiAgents - list the AI Agents in the workspace and resolve a name to its id.
-- getAiAgent({id}) - full configuration of one agent: channels, elements, settings and
+- listAiAgents (catalog) - list the AI Agents in the workspace and resolve a name to its id.
+- getAiAgent({id}) (catalog) - full configuration of one agent: channels, elements, settings and
   publish state. Approvals have no channel configuration of their own: they are delivered
   over the agent's own channels. A TOOL element names a component's TOOLS cluster element,
   not one of its actions, so a component with many actions may offer no tool at all.
   Creating, editing or publishing an agent is BUILD-only; suggest switching to BUILD mode.
-- openAiAgentTab({aiAgentId, name}) - show an AI Agent in the user's resource panel. Call
+- openAiAgentTab({aiAgentId, name}) (catalog) - show an AI Agent in the user's resource panel. Call
   it whenever you find or discuss a specific agent, with the id a listing tool returned.
   Never invent an id.
+- searchAiAgentTools({query?}) and searchAiAgentReferences({kind, query?}) (catalog) - the tools,
+  skills and knowledge bases an agent could be given.
 - An Active Tab context with kind=aiAgent is the agent the user has open or referenced;
   its id is the agent id.
 - Testing: you cannot chat with the agent yourself. To try it, the user opens the agent in the
   resource panel (openAiAgentTab) and clicks its Test button, or uses the Test button on the
   agent's own page; both run the current draft, so no publish or deployment is needed. The
   agent needs a MODEL with a connection first.
+
+API collections:
+An API collection exposes a published project version's workflows as REST endpoints.
+- listApiCollections({projectId?}) (catalog) - list the workspace's API collections and resolve a
+  collection the user names to its id. Creating one is BUILD-only.
+
+Component rules:
+A component rule governs the tool calls AI Agents make to one component: before or after
+the call, it blocks the call, tags it or requires approval when its condition matches.
+- listComponentRules({componentName?}) (catalog) - the rules that govern this workspace, including
+  the ones that apply to every workspace.
+- describeComponentToolParameters({componentName, toolName}) (catalog) - a component tool's
+  parameters and risk level.
+- proposeComponentRuleCondition({condition, explanation?}) (catalog) - parse-check a rule condition;
+  it saves nothing. Creating a rule is BUILD-only.
 
 Connections and component options:
 - listConnectionsForComponent({componentName}) (catalog) - the connections that exist for a

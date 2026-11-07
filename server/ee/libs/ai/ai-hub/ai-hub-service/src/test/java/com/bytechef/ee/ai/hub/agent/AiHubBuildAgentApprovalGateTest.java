@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.agui.core.agent.RunAgentInput;
@@ -110,6 +111,54 @@ class AiHubBuildAgentApprovalGateTest {
         assertThat(result).contains("\"awaitingApproval\":true");
         assertThat(buildAgent.endsTurn(new ToolResponseMessage.ToolResponse("call-1", "deleteProject", result)))
             .isTrue();
+    }
+
+    @Test
+    void testDeleteAiAgentElementFoundInTheCatalogIsHeldForApproval() throws Exception {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        AiHubChat chat = new AiHubChat();
+
+        chat.setId(CHAT_ID);
+        chat.setThreadId(THREAD_ID);
+        chat.setUserId(USER_ID);
+
+        when(fixtures.chatService.findNotDeletedByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+        when(fixtures.policy.decide(WORKSPACE_ID)).thenReturn(new AiHubToolApprovalPolicy.Decision(Set.of(), Set.of()));
+        when(fixtures.approvalService.findPending(CHAT_ID)).thenReturn(Optional.empty());
+        when(fixtures.approvalService.createPending(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiHubSpringAIAgent buildAgent = fixtures.buildAgent();
+
+        assertThat(buildAgent.pinnedToolCallbacks())
+            .noneMatch(toolCallback -> "deleteAiAgentElement".equals(toolCallback.getToolDefinition()
+                .name()));
+
+        Map<String, Object> toolContext = buildAgent.toolContext(newInput());
+
+        AiHubGlobalToolCatalog buildGlobalToolCatalog = fixtures.buildGlobalToolCatalog();
+
+        ToolCallback deleteAiAgentElement = buildGlobalToolCatalog.toolCallbacks()
+            .stream()
+            .filter(toolCallback -> "deleteAiAgentElement".equals(toolCallback.getToolDefinition()
+                .name()))
+            .map(toolCallback -> AiHubToolCallbackWrappers.wrap(
+                toolCallback, fixtures.securityContextRehydrator, fixtures.approvalGate))
+            .findFirst()
+            .orElseThrow();
+
+        String result = deleteAiAgentElement.call("{\"agentId\":42,\"elementId\":3}", new ToolContext(toolContext));
+
+        ArgumentCaptor<AiHubToolApproval> approvalCaptor = ArgumentCaptor.forClass(AiHubToolApproval.class);
+
+        verify(fixtures.approvalService).createPending(approvalCaptor.capture());
+        verifyNoInteractions(fixtures.aiAgentFacade);
+
+        AiHubToolApproval approval = approvalCaptor.getValue();
+
+        assertThat(approval.getToolName()).isEqualTo("deleteAiAgentElement");
+        assertThat(approval.getMode()).isEqualTo("BUILD");
+        assertThat(result).contains("\"awaitingApproval\":true");
     }
 
     private static RunAgentInput newInput() {

@@ -41,13 +41,9 @@ class AiHubConfigurationToolSetTest {
             .askAgent();
 
         assertThat(toolNames(askAgent)).containsExactlyInAnyOrder(
-            "aggregateDataTable", "askUserQuestion", "checkWorkflow", "describeComponentToolParameters",
-            "explainCodeWorkflow", "explainCustomComponent", "getAiAgent", "getAssetFileContent", "getWorkflow",
-            "listAiAgents", "listApiCollections", "listAssetFiles", "listComponentRules", "listDataTables",
-            "listKnowledgeBases", "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab",
-            "openCustomComponentTab", "openWorkflowChatTab", "openWorkflowTab", "proposeComponentRuleCondition",
-            "queryDataTable", "queryKnowledgeBase", "searchAiAgentReferences", "searchAiAgentTools", "searchProjects",
-            "searchWorkflows");
+            "askUserQuestion", "checkWorkflow", "explainCodeWorkflow", "explainCustomComponent", "getWorkflow",
+            "listProjects", "listWorkflows", "openCodeWorkflowTab", "openCustomComponentTab", "openWorkflowChatTab",
+            "openWorkflowTab", "searchProjects", "searchWorkflows");
     }
 
     @Test
@@ -58,7 +54,11 @@ class AiHubConfigurationToolSetTest {
         assertThat(toolNames(askToolCallbacks.unpinned())).containsExactlyInAnyOrder(
             "getProject", "getProjectStatus", "listWorkflowExecutions", "getWorkflowExecution", "getAction",
             "getTrigger", "getClusterElement", "searchDocs", "listProjectDeployments", "listConnectionsForComponent",
-            "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions");
+            "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions",
+            "listAiAgents", "getAiAgent", "searchAiAgentTools", "searchAiAgentReferences", "openAiAgentTab",
+            "listAssetFiles", "getAssetFileContent", "listDataTables", "queryDataTable", "aggregateDataTable",
+            "listKnowledgeBases", "queryKnowledgeBase", "listApiCollections", "listComponentRules",
+            "describeComponentToolParameters", "proposeComponentRuleCondition");
     }
 
     @Test
@@ -70,7 +70,9 @@ class AiHubConfigurationToolSetTest {
             "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
             "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition",
             "createAiAgent", "addAiAgentElement", "deleteAiAgentChannel", "importWorkflow", "buildCustomComponent",
-            "buildCodeWorkflow");
+            "buildCodeWorkflow", "createAssetFile", "updateAssetFileContent", "createDataTable", "addDataTableRow",
+            "dropDataTable", "createKnowledgeBase", "deleteKnowledgeBase", "createApiCollection",
+            "createComponentRule");
     }
 
     @Test
@@ -107,22 +109,12 @@ class AiHubConfigurationToolSetTest {
             .buildAgent();
 
         assertThat(toolNames(buildAgent)).containsExactlyInAnyOrder(
-            "addAiAgentChannel", "addAiAgentElement", "addDataTableColumn", "addDataTableRow",
-            "addKnowledgeBaseDocument", "aggregateDataTable", "askUserQuestion", "buildCodeWorkflow",
-            "buildCustomComponent", "buildWorkflow", "checkWorkflow",
-            "cloneAssetFile", "cloneDataTable", "cloneKnowledgeBase", "createAiAgent", "createApiCollection",
-            "createAssetFile", "createAssetFileFromUrl", "createBinaryAssetFile", "createComponentRule",
-            "createConnection", "createDataTable", "createDataTableFromCsv", "createKnowledgeBase", "createProject",
-            "createProjectWorkflow", "describeComponentToolParameters", "getAiAgent", "getAssetFileContent",
-            "getWorkflow", "importWorkflow", "listAiAgents", "listApiCollections", "listAssetFiles",
-            "listComponentRules", "listConnectionsForComponent", "listDataTables", "listKnowledgeBases", "listProjects",
-            "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab", "openCustomComponentTab", "openWorkflowChatTab",
-            "openWorkflowTab", "proposeComponentRuleCondition", "queryDataTable", "queryKnowledgeBase",
-            "saveWorkflowTestConnection",
-            "searchAiAgentReferences", "searchAiAgentTools", "searchProjects", "searchWorkflows",
-            "selectClusterElementPropertyOption", "selectConnection", "selectPropertyOption",
-            "selectTriggerPropertyOption", "updateAiAgent", "updateAiAgentElement", "updateAiAgentSettings",
-            "updateAssetFileContent", "updateDataTableRow");
+            "askUserQuestion", "buildCodeWorkflow", "buildCustomComponent", "buildWorkflow", "checkWorkflow",
+            "createConnection", "createProject", "createProjectWorkflow", "getWorkflow", "importWorkflow",
+            "listConnectionsForComponent", "listProjects", "listWorkflows", "openCodeWorkflowTab",
+            "openCustomComponentTab", "openWorkflowChatTab", "openWorkflowTab", "saveWorkflowTestConnection",
+            "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
+            "selectPropertyOption", "selectTriggerPropertyOption");
     }
 
     @Test
@@ -136,8 +128,17 @@ class AiHubConfigurationToolSetTest {
             "searchDocs", "listProjectDeployments", "createProjectDeployment", "updateProjectDeployment",
             "deleteProjectDeployment", "rollbackProjectDeployment", "toggleProjectDeployment", "promoteWorkflow",
             "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions",
-            "listChatWorkflows", "createWorkflowChat", "deleteAiAgentChannel", "deleteAiAgentElement",
-            "deleteDataTableRow", "deleteKnowledgeBase", "deleteKnowledgeBaseDocument", "dropDataTable");
+            "listChatWorkflows", "createWorkflowChat", "listAiAgents", "getAiAgent", "searchAiAgentTools",
+            "searchAiAgentReferences", "openAiAgentTab", "createAiAgent", "updateAiAgent", "updateAiAgentSettings",
+            "addAiAgentElement", "updateAiAgentElement", "deleteAiAgentElement", "addAiAgentChannel",
+            "deleteAiAgentChannel", "listAssetFiles", "getAssetFileContent", "createAssetFile", "createBinaryAssetFile",
+            "createAssetFileFromUrl", "updateAssetFileContent", "cloneAssetFile", "listDataTables", "queryDataTable",
+            "aggregateDataTable", "createDataTable", "createDataTableFromCsv", "cloneDataTable", "addDataTableColumn",
+            "addDataTableRow", "updateDataTableRow", "deleteDataTableRow", "dropDataTable", "listKnowledgeBases",
+            "queryKnowledgeBase", "createKnowledgeBase", "addKnowledgeBaseDocument", "deleteKnowledgeBaseDocument",
+            "cloneKnowledgeBase", "deleteKnowledgeBase", "listApiCollections", "createApiCollection",
+            "listComponentRules", "describeComponentToolParameters", "proposeComponentRuleCondition",
+            "createComponentRule");
     }
 
     @Test
