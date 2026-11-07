@@ -53,21 +53,29 @@ not in the latest released version, so this section is commented out. Tracked in
 
 ## Voice
 
-The widget can hold a spoken conversation with a workflow whose trigger is Browser → Voice Session (browser/v1/voiceSession):
+The widget supports two independent voice setups - don't set both on the same config, they're
+alternatives, not a pair:
+
+- **`voiceMode: true`** - the workflow behind `webhookUrl` itself has a `browser/v1/voiceSession`
+  trigger (no separate voice webhook). The widget takes over the surface with a full-screen voice
+  layout.
+- **`voiceWebhookUrl`** - a *separate* voice trigger next to your text `webhookUrl`'s chat trigger.
+  Set it to add a mic button alongside the regular chat thread; clicking it opens a voice session
+  against `voiceWebhookUrl` while typed messages keep going to `webhookUrl` as usual.
+
+This example is the first case - the whole widget is a voice conversation with a workflow whose
+trigger is Browser → Voice Session (browser/v1/voiceSession):
 
 tsx
 <AutomationChat
     config={{
-        chatMode: true,
         title: 'Voice Assistant',
         voiceMode: true,
-        voiceWebhookUrl: 'https://<your-host>/webhooks/<voice-webhook-id>',
-        webhookUrl: 'https://<your-host>/webhooks/<webhook-id>',
+        webhookUrl: 'https://<your-host>/webhooks/<voice-webhook-id>',
     }}
 />
 
 
-- voiceMode: true with chatMode: false takes over the surface with a full-screen voice layout; with chatMode: true the regular thread gains a voice-mode button and a push-to-talk microphone in the composer.
 - Under the hood the widget mints a session token (POST <webhook>/voice-session-token), then streams microphone audio over a WebSocket (/webhooks/<id>/wss) and plays the assistant's audio back - emitting transcript and status events you can observe via the exported BrowserVoiceSession types.
 - Voice requires a secure (https) context and microphone permission; checkVoiceSupport() is exported to feature-detect before showing voice controls.
 */}

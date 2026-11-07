@@ -1,6 +1,6 @@
 ---
 title: Voice Quickstart
-description: Build a browser voice workflow with a Voice Agent cluster element, test it in the editor, and connect a browser client to it.
+description: Build a browser voice workflow with a Voice Agent cluster element, test it in the editor, and wire it to the chat widget.
 ee: true
 comingSoon: true
 ---
@@ -125,13 +125,47 @@ A minimal two-task follow-up: summarize the call, then post it somewhere.
 
 ## Step 6 - Wire up a frontend
 
-The editor test panel (Step 4) is one way to reach the trigger; a deployed workflow is reached directly:
+The editor test panel (Step 4) is one way to reach a deployed trigger; two more:
+
+### Embedded chat widget
+
+The widget supports two independent voice setups (see the widget's README for the full picture).
+The workflow you just built has no chat trigger - its trigger *is* `browser/v1/voiceSession` - so
+it's the first case: set `voiceMode: true` and point `webhookUrl` straight at it. The widget takes
+over the full screen with `VoiceModeLayout` and mints session tokens against that same `webhookUrl`;
+no separate `voiceWebhookUrl` is involved.
+
+```tsx
+import {AutomationChatModal} from '@bytechef/chat';
+
+<AutomationChatModal
+    config={{
+        webhookUrl: 'https://your-bytechef-instance.com/api/automation/webhooks/abc123',
+        voiceMode: true,
+    }}
+/>
+```
+
+The other setup, `voiceWebhookUrl`, is for a *different* shape entirely: a text-chat workflow (its
+own `webhookUrl`, a chat trigger) that also wants a voice mic button next to the composer. Point
+`voiceWebhookUrl` at a second, separate workflow whose trigger is `browser/v1/voiceSession`, and the
+widget adds that mic beside the regular chat thread without replacing it. Don't set both `voiceMode`
+and `voiceWebhookUrl` together - they're alternatives, not a pair.
+
+If you embed the widget inside an `<iframe>`, the iframe element must have `allow="microphone"` or
+`getUserMedia` is silently denied:
+
+```html
+<iframe src="https://your-site.com/chat" allow="microphone"></iframe>
+```
+
+See the [widget README](https://github.com/bytechefhq/bytechef/blob/master/sdks/frontend/automation/chat/library/README.md) for the full config reference.
 
 ### Direct WebSocket integration
 
 Mint a single-use session token with `POST /api/automation/webhooks/{webhookId}/voice-session-token`,
 then open `wss://your-instance/api/automation/webhooks/{webhookId}/wss?sessionToken=…`. This is what
-the editor test panel does under the hood.
+both the widget and the editor test panel do under the hood.
 
 ## Limits
 
@@ -150,7 +184,7 @@ the editor test panel does under the hood.
   balancer with more than one replica, configure session affinity for the voice path
   `/webhooks/{id}/wss`, for example cookie-based affinity on the ingress. Client-IP affinity also works,
   but it breaks when the caller's network changes, which is a common cause of the drop itself. A
-  page embedded on another site only sends an affinity cookie set with `SameSite=None; Secure`.
+  widget embedded on another site only sends an affinity cookie set with `SameSite=None; Secure`.
   Without affinity, a reconnect that lands on another replica starts a new call: the caller hears the
   greeting again, the original call ends as `client_closed` after 30 seconds, and the post-call
   workflow runs twice, each run with part of the transcript. Editor test sessions never resume, so
@@ -198,7 +232,7 @@ The browser doesn't support `AudioWorklet`. Upgrade to Chrome 66+, Firefox 76+, 
 ### "Invalid or expired session token" on WS upgrade
 
 The session token is single-use with a short TTL. This usually means the WS was opened twice with
-the same token, or the client clock is significantly skewed. The editor mints a fresh
+the same token, or the client clock is significantly skewed. The widget and editor both mint a fresh
 token per session start automatically - this only surfaces with a hand-rolled integration.
 
 ### No audio, or the assistant never responds
