@@ -1,4 +1,5 @@
 import Badge, {type BadgeStyleType} from '@/components/Badge/Badge';
+import Button from '@/components/Button/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
 import {
@@ -139,7 +140,18 @@ const ExternalInvocationsTable = ({
                     </TableCell>
 
                     <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                        {sourceLabel(externalInvocationLog)}
+                        {onViewJob &&
+                        externalInvocationLog.kind === 'WORKFLOW' &&
+                        externalInvocationLog.jobId != null ? (
+                            <Button
+                                className="h-auto p-0 font-normal"
+                                label={sourceLabel(externalInvocationLog)}
+                                onClick={() => onViewJob(Number(externalInvocationLog.jobId))}
+                                variant="link"
+                            />
+                        ) : (
+                            sourceLabel(externalInvocationLog)
+                        )}
                     </TableCell>
 
                     <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
