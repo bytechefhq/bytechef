@@ -224,6 +224,14 @@ describe('AiHubToolGroupHeader', () => {
         expect(screen.getByRole('status')).toHaveTextContent('Importing workflow...');
     });
 
+    it('labels a running research call', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'research', 0);
+
+        renderHeader([{toolCallId: 'call-1', toolName: 'research'}]);
+
+        expect(screen.getByRole('status')).toHaveTextContent('Researching the web...');
+    });
+
     it('labels any other running call generically', () => {
         aiChatToolCallStore.getState().startToolCall('call-1', 'listWorkflows', 0);
 
