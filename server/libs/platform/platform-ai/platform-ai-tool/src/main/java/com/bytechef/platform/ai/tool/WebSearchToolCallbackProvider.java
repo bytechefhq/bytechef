@@ -110,7 +110,7 @@ public class WebSearchToolCallbackProvider {
             case BRAVE -> {
                 ApplicationProperties.Ai.Brave brave = ai.getBrave();
 
-                yield toConnection(brave.isEnabled(), brave.getApiKey(), brave.getBaseUrl());
+                yield toConnection(brave.isEnabled(), brave.getApiKey(), WebSearchProvider.BRAVE_BASE_URL);
             }
             case FIRECRAWL -> {
                 ApplicationProperties.Ai.Firecrawl firecrawl = ai.getFirecrawl();
