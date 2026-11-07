@@ -26,6 +26,7 @@ import org.springframework.ai.tool.ToolCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -57,6 +58,12 @@ import static java.util.stream.Collectors.toList;
 public class SpringAIAgent extends LocalAgent {
 
     private static final Logger log = LoggerFactory.getLogger(SpringAIAgent.class);
+
+    static final String OUTPUT_LIMIT_MESSAGE = "The model reached its output token limit before finishing this "
+        + "response, so any change it was about to make was not applied. Try a smaller request, or pick a model with "
+        + "a larger output limit.";
+
+    private static final Set<String> OUTPUT_LIMIT_FINISH_REASONS = Set.of("max_tokens", "length");
 
     /**
      * The Spring AI ChatClient used for processing chat requests and responses.
@@ -169,6 +176,7 @@ public class SpringAIAgent extends LocalAgent {
         );
 
         final List<BaseEvent> deferredEvents = new ArrayList<>();
+        final AtomicReference<String> finishReason = new AtomicReference<>("");
 
         var textMessageStream = new TextMessageStream(messageId, subscriber);
 
@@ -185,7 +193,7 @@ public class SpringAIAgent extends LocalAgent {
                 .chatResponse()
                 .contextCapture()
                 .subscribe(
-                    evt -> onEvent(subscriber, evt, assistantMessage, textMessageStream),
+                    evt -> onEvent(subscriber, evt, assistantMessage, textMessageStream, finishReason),
                     err -> {
                         log.error(
                             "Agent '{}' chat stream failed for threadId={} runId={}: {}",
@@ -193,7 +201,7 @@ public class SpringAIAgent extends LocalAgent {
 
                         this.onError(input, err, subscriber);
                     },
-                    () -> onComplete(input, assistantMessage, subscriber, textMessageStream, deferredEvents)
+                    () -> onComplete(input, assistantMessage, subscriber, textMessageStream, deferredEvents, finishReason)
                 );
         } catch (AGUIException | RuntimeException e) {
             log.error("Agent '{}' failed to start chat stream for threadId={} runId={}", this.agentId, threadId, runId, e);
@@ -283,10 +291,17 @@ public class SpringAIAgent extends LocalAgent {
      * @param subscriber the event subscriber to notify
      * @param evt the chat response event from Spring AI
      * @param textMessageStream the run's text message stream the content is emitted to
+     * @param finishReason the latest non-empty finish reason reported by the model
      */
-    private void onEvent(AgentSubscriber subscriber, ChatResponse evt, AssistantMessage assistantMessage, TextMessageStream textMessageStream) {
+    private void onEvent(AgentSubscriber subscriber, ChatResponse evt, AssistantMessage assistantMessage, TextMessageStream textMessageStream, AtomicReference<String> finishReason) {
         if (evt.getResult() == null) {
             return;
+        }
+
+        String chunkFinishReason = evt.getResult().getMetadata().getFinishReason();
+
+        if (chunkFinishReason != null && !chunkFinishReason.isEmpty()) {
+            finishReason.set(chunkFinishReason);
         }
 
         if (evt.hasToolCalls()) {
@@ -330,8 +345,9 @@ public class SpringAIAgent extends LocalAgent {
      * @param subscriber the event subscriber to notify
      * @param textMessageStream the run's text message stream, ended here if it is still open
      * @param deferredEvents list of tool call events to process after message completion
+     * @param finishReason the finish reason of the model's last response
      */
-    private void onComplete(RunAgentInput input, AssistantMessage assistantMessage, AgentSubscriber subscriber, TextMessageStream textMessageStream, List<BaseEvent> deferredEvents) {
+    private void onComplete(RunAgentInput input, AssistantMessage assistantMessage, AgentSubscriber subscriber, TextMessageStream textMessageStream, List<BaseEvent> deferredEvents, AtomicReference<String> finishReason) {
         textMessageStream.end();
 
         deferredEvents.forEach(deferredEvent -> {
@@ -341,7 +357,22 @@ public class SpringAIAgent extends LocalAgent {
 
         subscriber.onNewMessage(assistantMessage);
 
+        if (OUTPUT_LIMIT_FINISH_REASONS.contains(finishReason.get().toLowerCase(Locale.ROOT))) {
+            log.warn(
+                "Agent '{}' stopped at the model's output token limit (finish reason '{}') for threadId={} runId={}",
+                this.agentId, finishReason.get(), input.threadId(), input.runId());
+
+            this.onError(input, OUTPUT_LIMIT_MESSAGE, subscriber);
+
+            return;
+        }
+
         this.emitEvent(runFinishedEvent(input.threadId(), input.runId()), subscriber);
+        subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), state, this, input));
+    }
+
+    private void onError(RunAgentInput input, String message, AgentSubscriber subscriber) {
+        this.emitEvent(runErrorEvent(message), subscriber);
         subscriber.onRunFinalized(new AgentSubscriberParams(input.messages(), state, this, input));
     }
 
