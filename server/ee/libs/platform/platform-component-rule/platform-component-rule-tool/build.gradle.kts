@@ -1,0 +1,17 @@
+dependencies {
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    annotationProcessor(rootProject.libs.com.google.auto.service.auto.service)
+    implementation(project(":server:ee:libs:platform:platform-component-rule:platform-component-rule-api"))
+    implementation(project(":server:libs:ai:ai-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-agent-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
+    implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool-api"))
+    implementation(project(":server:libs:config:app-config"))
+    implementation(project(":server:libs:core:evaluator:evaluator-api"))
+    implementation(project(":server:libs:core:exception:exception-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
+    implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(rootProject.libs.com.google.auto.service.auto.service.annotations)
+    testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
+}

@@ -754,6 +754,7 @@ include("server:ee:libs:platform:platform-component:platform-component-runner-ku
 include("server:ee:libs:platform:platform-component-rule:platform-component-rule-api")
 include("server:ee:libs:platform:platform-component-rule:platform-component-rule-graphql")
 include("server:ee:libs:platform:platform-component-rule:platform-component-rule-service")
+include("server:ee:libs:platform:platform-component-rule:platform-component-rule-tool")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-api")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-client")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-rest")
