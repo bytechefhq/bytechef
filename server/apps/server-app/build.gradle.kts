@@ -284,6 +284,7 @@ dependencies {
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-rest"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-service"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-copilot"))
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-graphql"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-rest"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-service"))
