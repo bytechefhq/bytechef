@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.validator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.OptionsDataSource;
@@ -44,6 +46,7 @@ import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.Workflow
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -69,14 +72,20 @@ class WorkflowValidatorOptionsTest {
         "sheetName", "STRING", null, false, true, null, null, null, null, null);
 
     private final ActionDefinitionService actionDefinitionService = mock(ActionDefinitionService.class);
+    private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
     private final TriggerDefinitionService triggerDefinitionService = mock(TriggerDefinitionService.class);
 
     private final WorkflowValidatorFacadeImpl workflowValidatorFacade = new WorkflowValidatorFacadeImpl(
         mock(ActionDefinitionFacade.class), actionDefinitionService, mock(ClusterElementDefinitionService.class),
-        mock(ComponentDefinitionService.class), mock(ConnectionService.class),
+        componentDefinitionService, mock(ConnectionService.class), SpelEvaluator.create(),
         mock(TaskDispatcherDefinitionService.class), mock(TriggerDefinitionFacade.class), triggerDefinitionService,
         mock(WorkflowNodeTestOutputService.class), mock(WorkflowService.class),
         mock(WorkflowTestConfigurationService.class), List.of());
+
+    @BeforeEach
+    void beforeEach() {
+        when(componentDefinitionService.hasComponentDefinition(any(), any())).thenReturn(true);
+    }
 
     @Test
     void testArrayValueOutsideTheOptionsIsAnError() {
