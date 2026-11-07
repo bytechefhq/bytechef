@@ -21,9 +21,16 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.coordinator.ErrorWorkflowDispatchCounter;
+import com.bytechef.platform.coordinator.event.listener.ErrorWorkflowJobStatusApplicationEventListener;
+import com.bytechef.platform.coordinator.event.listener.ErrorWorkflowPayloadFactory;
+import com.bytechef.platform.coordinator.event.listener.ErrorWorkflowResolver;
 import com.bytechef.platform.coordinator.event.listener.ExecutionDataJobCompletionListener;
 import com.bytechef.platform.coordinator.event.listener.ExecutionDataJobDeletionListener;
 import com.bytechef.platform.coordinator.event.listener.NotificationJobStatusApplicationEventListener;
@@ -40,6 +47,7 @@ import com.bytechef.platform.notification.handler.NotificationHandlerRegistry;
 import com.bytechef.platform.notification.handler.NotificationSenderRegistry;
 import com.bytechef.platform.notification.service.NotificationService;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TaskStateFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.tenant.service.TenantService;
@@ -51,6 +59,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 /**
  * @author Matija Petanjek
@@ -150,6 +159,28 @@ public class PlatformCoordinatorConfiguration {
         ObjectProvider<TaskStateFacade> taskStateServiceObjectProvider) {
 
         return new SuspendedTaskStateJobDeletionListener(taskStateServiceObjectProvider.getIfAvailable());
+    }
+
+    @Bean
+    ErrorWorkflowResolver errorWorkflowResolver(
+        ProjectDeploymentService projectDeploymentService, ProjectService projectService,
+        ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
+
+        return new ErrorWorkflowResolver(
+            projectDeploymentService, projectService, projectWorkflowService, workflowService);
+    }
+
+    @Bean
+    @Order(300)
+    ErrorWorkflowJobStatusApplicationEventListener errorWorkflowJobStatusApplicationEventListener(
+        ErrorWorkflowResolver errorWorkflowResolver, ObjectProvider<MeterRegistry> meterRegistryObjectProvider,
+        PrincipalJobFacade principalJobFacade, PrincipalJobService principalJobService,
+        TaskExecutionService taskExecutionService) {
+
+        return new ErrorWorkflowJobStatusApplicationEventListener(
+            new ErrorWorkflowPayloadFactory(publicUrl), errorWorkflowResolver, jobService, principalJobFacade,
+            principalJobService, taskExecutionService,
+            new ErrorWorkflowDispatchCounter(meterRegistryObjectProvider.getIfAvailable()));
     }
 
     @Bean
