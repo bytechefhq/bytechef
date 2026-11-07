@@ -236,6 +236,7 @@ export const ExternalInvocations = ({
                             externalInvocationLogs={externalInvocationLogs}
                             mcpServerNames={mcpServerNames}
                             onViewJob={onViewJob}
+                            showConnectedUser={type === PlatformType.Embedded}
                             showSource={showSource}
                         />
                     </div>

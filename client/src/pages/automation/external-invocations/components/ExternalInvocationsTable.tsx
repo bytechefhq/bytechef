@@ -24,6 +24,7 @@ interface ExternalInvocationsTableProps {
     a2aServerNames?: Record<string, string>;
     mcpServerNames?: Record<string, string>;
     onViewJob?: (jobId: number) => void;
+    showConnectedUser?: boolean;
     showSource?: boolean;
     externalInvocationLogs: Array<ExternalInvocationLogItemType>;
 }
@@ -124,6 +125,7 @@ const ExternalInvocationsTable = ({
     externalInvocationLogs,
     mcpServerNames,
     onViewJob,
+    showConnectedUser = false,
     showSource = true,
 }: ExternalInvocationsTableProps) => (
     <Table>
@@ -138,6 +140,10 @@ const ExternalInvocationsTable = ({
                 {showSource && <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Source</TableHead>}
 
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Server</TableHead>
+
+                {showConnectedUser && (
+                    <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Connected User</TableHead>
+                )}
 
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Target</TableHead>
 
@@ -193,6 +199,12 @@ const ExternalInvocationsTable = ({
                         <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
                             {serverLabel(externalInvocationLog, mcpServerNames, a2aServerNames)}
                         </TableCell>
+
+                        {showConnectedUser && (
+                            <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
+                                {externalInvocationLog.externalUserId || externalInvocationLog.connectedUserId || '—'}
+                            </TableCell>
+                        )}
 
                         <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
                             {targetLabel(externalInvocationLog)}
