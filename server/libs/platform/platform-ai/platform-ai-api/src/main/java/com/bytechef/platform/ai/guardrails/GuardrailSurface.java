@@ -25,7 +25,9 @@ public final class GuardrailSurface {
 
     public static final String AI_AGENT = "ai_agent";
 
-    public static final Set<String> ALL = Set.of(AI_AGENT);
+    public static final String AI_HUB = "ai_hub";
+
+    public static final Set<String> ALL = Set.of(AI_AGENT, AI_HUB);
 
     private GuardrailSurface() {
     }
