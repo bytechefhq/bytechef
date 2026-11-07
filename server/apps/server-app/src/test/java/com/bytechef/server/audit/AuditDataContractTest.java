@@ -86,6 +86,7 @@ class AuditDataContractTest {
     private static final String OUTPUT_PREVIEW = "computes a task output without saving it";
     private static final String CONNECTIVITY_CHECK = "connectivity check that saves nothing";
     private static final String EXPORT_READ = "reads data for an export";
+    private static final String NO_AUDIT_EVENT = "no audit event is defined for this change yet";
     private static final String TAGS = "tag assignment";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String ROW_DATA = "data table rows are data and are not recorded";
@@ -110,6 +111,9 @@ class AuditDataContractTest {
         Map.entry("AutomationProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
         Map.entry("AutomationProjectCodeWorkflowFacadeImpl.updateCodeWorkflowSource", DEFINITION_EDIT),
         Map.entry("AutomationProjectConfigurationFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
+        Map.entry("ComponentRuleServiceImpl.deleteComponentRule", NO_AUDIT_EVENT),
+        Map.entry("ComponentRuleServiceImpl.saveComponentRule", NO_AUDIT_EVENT),
+        Map.entry("ComponentRuleSettingsServiceImpl.saveSettings", NO_AUDIT_EVENT),
         Map.entry("ConnectedUserConnectionFacadeImpl.updateConnectedUserConnectionTags", TAGS),
         Map.entry("ConnectedUserConnectionFacadeImpl.updateIntegrationInstanceConnectionCredentials",
             RECORDED_BY_CALLER),
