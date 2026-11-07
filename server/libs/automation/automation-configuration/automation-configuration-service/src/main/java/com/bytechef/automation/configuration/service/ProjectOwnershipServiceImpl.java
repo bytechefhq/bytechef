@@ -19,13 +19,16 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.ownership.OwnerContributorMissingException;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerReference;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -197,6 +200,49 @@ public class ProjectOwnershipServiceImpl implements ProjectOwnershipService, Sma
             "SELECT project.id FROM project WHERE project.id IN (:ids) AND " + combine(conditions), projectIds);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, ProjectDeploymentOwnerReference> getProjectDeploymentOwnerReferences(
+        Collection<Long> projectDeploymentIds) {
+
+        if (projectDeploymentIds.isEmpty()) {
+            return Map.of();
+        }
+
+        Map<Long, ProjectDeploymentOwnerReference> projectDeploymentOwnerReferences = new HashMap<>();
+
+        List<Long> distinctIds = projectDeploymentIds.stream()
+            .distinct()
+            .toList();
+
+        for (ProjectDeploymentOwnerContributor contributor : projectDeploymentOwnerContributors) {
+            ProjectDeploymentOwner projectDeploymentOwner = contributor.getProjectDeploymentOwner();
+            String ownerNameExpression = contributor.getProjectDeploymentOwnerNameExpression("project_deployment.id");
+
+            String query = "SELECT project_deployment.id AS id, " +
+                (ownerNameExpression == null ? "NULL" : "(" + ownerNameExpression + ")") +
+                " AS owner_name FROM project_deployment WHERE project_deployment.id IN (:ids) AND (" +
+                contributor.getProjectDeploymentClaimCondition("project_deployment.id") + ")";
+
+            for (int fromIndex = 0; fromIndex < distinctIds.size(); fromIndex += CHUNK_SIZE) {
+                List<Long> idsChunk = distinctIds.subList(
+                    fromIndex, Math.min(fromIndex + CHUNK_SIZE, distinctIds.size()));
+
+                jdbcClient
+                    .sql(query)
+                    .param("ids", idsChunk)
+                    .query((resultSet, rowNum) -> Map.entry(
+                        resultSet.getLong("id"),
+                        new ProjectDeploymentOwnerReference(
+                            projectDeploymentOwner, resultSet.getString("owner_name"))))
+                    .list()
+                    .forEach(entry -> projectDeploymentOwnerReferences.putIfAbsent(entry.getKey(), entry.getValue()));
+            }
+        }
+
+        return projectDeploymentOwnerReferences;
+    }
+
     private Set<Long> selectIdsInChunks(String query, Collection<Long> ids) {
         Set<Long> selectedIds = new HashSet<>();
 
@@ -280,6 +326,8 @@ public class ProjectOwnershipServiceImpl implements ProjectOwnershipService, Sma
         for (ProjectDeploymentOwnerContributor projectDeploymentOwnerContributor : projectDeploymentOwnerContributors) {
             PROJECT_DEPLOYMENT_ID_COLUMNS
                 .forEach(projectDeploymentOwnerContributor::getProjectDeploymentClaimCondition);
+            PROJECT_DEPLOYMENT_ID_COLUMNS
+                .forEach(projectDeploymentOwnerContributor::getProjectDeploymentOwnerNameExpression);
         }
     }
 

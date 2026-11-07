@@ -29,10 +29,15 @@ public class McpOwnerContributorConfiguration {
 
     private static final String MCP_SERVER_DEPLOYMENT_CLAIM_CONDITION =
         "EXISTS (SELECT 1 FROM mcp_project WHERE mcp_project.project_deployment_id = %1$s)";
+    private static final String MCP_SERVER_NAME =
+        "(SELECT owner_mcp_server.name FROM mcp_project owner_mcp_project JOIN mcp_server owner_mcp_server ON " +
+            "owner_mcp_server.id = owner_mcp_project.mcp_server_id WHERE owner_mcp_project.project_deployment_id = %1$s "
+            +
+            "ORDER BY owner_mcp_server.id LIMIT 1)";
 
     @Bean
     ProjectDeploymentOwnerContributor mcpServerProjectDeploymentOwnerContributor() {
         return ProjectDeploymentOwnerContributor.of(
-            ProjectDeploymentOwner.MCP_SERVER, MCP_SERVER_DEPLOYMENT_CLAIM_CONDITION);
+            ProjectDeploymentOwner.MCP_SERVER, MCP_SERVER_DEPLOYMENT_CLAIM_CONDITION, MCP_SERVER_NAME);
     }
 }

@@ -9,12 +9,15 @@ package com.bytechef.ee.automation.configuration.remote.client.service;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerReference;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
@@ -112,6 +115,13 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     @Override
     public List<Long> getOwnedProjectDeploymentIds(
         ProjectDeploymentOwner projectDeploymentOwner, Environment environment, long workspaceId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Map<Long, ProjectDeploymentOwnerReference> getProjectDeploymentOwnerReferences(
+        Collection<Long> projectDeploymentIds) {
 
         throw new UnsupportedOperationException();
     }
