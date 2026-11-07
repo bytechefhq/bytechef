@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -235,4 +236,16 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
         return projectWorkflowRepository.save(curProjectWorkflow);
     }
 
+    @Override
+    public ProjectWorkflow updateErrorWorkflow(
+        long id, @Nullable Long errorProjectWorkflowId, boolean errorWorkflowDisabled) {
+
+        ProjectWorkflow projectWorkflow = projectWorkflowRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("ProjectWorkflow not found"));
+
+        projectWorkflow.setErrorProjectWorkflowId(errorProjectWorkflowId);
+        projectWorkflow.setErrorWorkflowDisabled(errorWorkflowDisabled);
+
+        return projectWorkflowRepository.save(projectWorkflow);
+    }
 }

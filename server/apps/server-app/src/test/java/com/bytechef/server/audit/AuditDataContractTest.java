@@ -81,6 +81,7 @@ class AuditDataContractTest {
         "count", "exists", "fetch", "find", "get", "has", "is", "list", "load", "read", "search");
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
+    private static final String ERROR_WORKFLOW_SETTING = "error workflow handler setting";
     private static final String TAGS = "tag assignment";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
@@ -137,7 +138,9 @@ class AuditDataContractTest {
         Map.entry("McpServerFacadeImpl.updateMcpServerTags", TAGS),
         Map.entry("McpServerFacadeImpl.updateMcpTool", DELEGATES),
         Map.entry("ProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
+        Map.entry("ProjectFacadeImpl.updateProjectErrorWorkflow", ERROR_WORKFLOW_SETTING),
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
+        Map.entry("ProjectWorkflowFacadeImpl.updateWorkflowErrorWorkflow", ERROR_WORKFLOW_SETTING),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),

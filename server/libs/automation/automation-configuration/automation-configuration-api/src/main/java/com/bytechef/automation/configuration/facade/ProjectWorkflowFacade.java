@@ -68,4 +68,7 @@ public interface ProjectWorkflowFacade {
     void restoreProjectVersionWorkflow(long projectId, int projectVersion, String workflowUuid);
 
     ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version);
+
+    void updateWorkflowErrorWorkflow(
+        long projectId, long projectWorkflowId, @Nullable Long errorProjectWorkflowId, boolean errorWorkflowDisabled);
 }

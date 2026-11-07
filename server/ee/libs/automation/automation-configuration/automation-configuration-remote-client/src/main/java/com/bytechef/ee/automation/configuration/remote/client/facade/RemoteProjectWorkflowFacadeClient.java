@@ -126,4 +126,11 @@ public class RemoteProjectWorkflowFacadeClient implements ProjectWorkflowFacade 
     public ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void updateWorkflowErrorWorkflow(
+        long projectId, long projectWorkflowId, Long errorProjectWorkflowId, boolean errorWorkflowDisabled) {
+
+        throw new UnsupportedOperationException();
+    }
 }

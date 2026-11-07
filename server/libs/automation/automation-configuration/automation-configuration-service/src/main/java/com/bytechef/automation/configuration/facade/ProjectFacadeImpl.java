@@ -96,6 +96,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     private final CategoryService categoryService;
     private final ComponentDefinitionHelper componentDefinitionHelper;
+    private final ErrorWorkflowConfigurationValidator errorWorkflowConfigurationValidator;
     private final PreBuiltTemplateService preBuiltTemplateService;
     private final ProjectOwnershipService projectOwnershipService;
     private final ProjectService projectService;
@@ -115,8 +116,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
         ApplicationProperties applicationProperties, CategoryService categoryService,
-        ComponentDefinitionHelper componentDefinitionHelper, PreBuiltTemplateService preBuiltTemplateService,
-        ProjectWorkflowService projectWorkflowService,
+        ComponentDefinitionHelper componentDefinitionHelper,
+        ErrorWorkflowConfigurationValidator errorWorkflowConfigurationValidator,
+        PreBuiltTemplateService preBuiltTemplateService, ProjectWorkflowService projectWorkflowService,
         ProjectDeploymentService projectDeploymentService, ProjectOwnershipService projectOwnershipService,
         ProjectService projectService,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowFacade projectWorkflowFacade,
@@ -128,6 +130,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         this.categoryService = categoryService;
         this.componentDefinitionHelper = componentDefinitionHelper;
+        this.errorWorkflowConfigurationValidator = errorWorkflowConfigurationValidator;
         this.preBuiltTemplateService = preBuiltTemplateService;
         this.projectWorkflowService = projectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
@@ -617,6 +620,16 @@ public class ProjectFacadeImpl implements ProjectFacade {
         project.setTags(tags);
 
         projectService.update(project);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_EDIT')")
+    public void updateProjectErrorWorkflow(long projectId, @Nullable Long errorProjectWorkflowId) {
+        if (errorProjectWorkflowId != null) {
+            errorWorkflowConfigurationValidator.validate(projectId, errorProjectWorkflowId, null);
+        }
+
+        projectService.updateErrorWorkflow(projectId, errorProjectWorkflowId);
     }
 
     private List<Tag> checkTags(List<Tag> tags) {

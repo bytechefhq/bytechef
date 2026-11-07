@@ -23,6 +23,7 @@ import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.graphql.error.GraphQlBadRequestException;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.tag.domain.Tag;
@@ -31,6 +32,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -97,6 +99,19 @@ public class ProjectGraphQlController {
         @Argument String id, @Argument Long workspaceId, @Argument boolean sharedProject) {
 
         return projectFacade.importProjectTemplate(id, workspaceId, sharedProject);
+    }
+
+    @MutationMapping(name = "updateProjectErrorWorkflow")
+    public Boolean updateProjectErrorWorkflow(
+        @Argument long projectId, @Argument @Nullable Long errorProjectWorkflowId) {
+
+        try {
+            projectFacade.updateProjectErrorWorkflow(projectId, errorProjectWorkflowId);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new GraphQlBadRequestException(illegalArgumentException.getMessage(), illegalArgumentException);
+        }
+
+        return true;
     }
 
     @QueryMapping(name = "project")

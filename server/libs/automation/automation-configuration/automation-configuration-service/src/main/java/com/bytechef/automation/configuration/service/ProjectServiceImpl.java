@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.data.domain.Sort;
@@ -248,4 +249,12 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.save(curProject);
     }
 
+    @Override
+    public Project updateErrorWorkflow(long id, @Nullable Long errorProjectWorkflowId) {
+        Project project = getProject(id);
+
+        project.setErrorProjectWorkflowId(errorProjectWorkflowId);
+
+        return projectRepository.save(project);
+    }
 }

@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -80,4 +81,5 @@ public interface ProjectWorkflowService {
 
     ProjectWorkflow update(ProjectWorkflow projectWorkflow);
 
+    ProjectWorkflow updateErrorWorkflow(long id, @Nullable Long errorProjectWorkflowId, boolean errorWorkflowDisabled);
 }

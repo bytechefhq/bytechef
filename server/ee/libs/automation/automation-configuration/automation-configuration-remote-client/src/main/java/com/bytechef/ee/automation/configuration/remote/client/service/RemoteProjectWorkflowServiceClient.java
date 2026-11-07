@@ -163,4 +163,8 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public ProjectWorkflow updateErrorWorkflow(long id, Long errorProjectWorkflowId, boolean errorWorkflowDisabled) {
+        throw new UnsupportedOperationException();
+    }
 }

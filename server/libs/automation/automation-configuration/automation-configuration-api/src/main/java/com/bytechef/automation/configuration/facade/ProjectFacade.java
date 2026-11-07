@@ -74,4 +74,6 @@ public interface ProjectFacade {
     void restoreProjectVersion(long id, int projectVersion);
 
     void updateProject(ProjectDTO projectDTO);
+
+    void updateProjectErrorWorkflow(long projectId, @Nullable Long errorProjectWorkflowId);
 }
