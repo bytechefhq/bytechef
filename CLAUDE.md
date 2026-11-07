@@ -394,6 +394,18 @@ platform-coordinator sweep, acting only on approval suspends. There are no appro
 
 Never add notification logic under `server/libs/atlas/`. See `.agents/hitl-approvals.md`.
 
+### Component Rules (EE)
+
+`server/ee/libs/platform/platform-component-rule/` governs **AI agent tool calls**, not workflow action
+executions. A rule is keyed on `(componentName, toolName, workspaceId)` of a TOOLS cluster element and enforced by
+`RuleEnforcingToolCallback`, which `ClusterElementToolCallbacks.build()` wraps around every tool callback an agent
+can call. That wrapper must never become a `DelegatingToolCallback`, or the gate's resume unwrap strips the rule
+check. The condition is a ByteChef formula body, not free SpEL. A non-strict rule fails open on an unevaluable
+condition; `strict` inverts that per rule. The enforcement cache is keyed by (tenantId, componentName,
+workspaceId), since component names are global. A null `workspace_id` means every workspace in the tenant. The
+page is Settings → Current Workspace → Agent Rules. See `.agents/component-rules.md`, including the worker-app
+distributed-deployment gap.
+
 ### Spring Boot Project Conventions
 
 - **Integration Test Naming**: All integration test classes must end with "IntTest" suffix (e.g., `WorkflowFacadeIntTest.java`)
