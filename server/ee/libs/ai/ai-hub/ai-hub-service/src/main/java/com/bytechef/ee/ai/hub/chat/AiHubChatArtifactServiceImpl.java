@@ -50,7 +50,8 @@ public class AiHubChatArtifactServiceImpl implements AiHubChatArtifactService {
 
     private static final Set<AiHubChatArtifactKind> REMOVABLE_REFERENCE_KINDS = EnumSet.of(
         AiHubChatArtifactKind.WORKFLOW_REFERENCED, AiHubChatArtifactKind.CUSTOM_COMPONENT_REFERENCED,
-        AiHubChatArtifactKind.CODE_WORKFLOW_REFERENCED, AiHubChatArtifactKind.AI_AGENT_REFERENCED);
+        AiHubChatArtifactKind.CODE_WORKFLOW_REFERENCED, AiHubChatArtifactKind.AI_AGENT_REFERENCED,
+        AiHubChatArtifactKind.FILE_REFERENCED);
 
     private static final Logger log = LoggerFactory.getLogger(AiHubChatArtifactServiceImpl.class);
 
@@ -251,11 +252,13 @@ public class AiHubChatArtifactServiceImpl implements AiHubChatArtifactService {
     }
 
     @Override
-    public void deleteReference(long artifactId, long requesterWorkspaceId, long requesterUserId) {
+    public Optional<AiHubChatArtifact> deleteReference(
+        long artifactId, long requesterWorkspaceId, long requesterUserId) {
+
         Optional<AiHubChatArtifact> artifactOptional = chatArtifactRepository.findById(artifactId);
 
         if (artifactOptional.isEmpty()) {
-            return;
+            return Optional.empty();
         }
 
         AiHubChatArtifact artifact = artifactOptional.get();
@@ -270,6 +273,8 @@ public class AiHubChatArtifactServiceImpl implements AiHubChatArtifactService {
         }
 
         chatArtifactRepository.deleteById(artifactId);
+
+        return artifactOptional;
     }
 
     @Override

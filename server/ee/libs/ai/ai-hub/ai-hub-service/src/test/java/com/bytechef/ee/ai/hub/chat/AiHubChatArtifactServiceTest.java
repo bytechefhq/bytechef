@@ -491,8 +491,23 @@ class AiHubChatArtifactServiceTest {
     }
 
     @Test
+    void testDeleteReferenceRemovesFileReferencedRowAndReturnsIt() {
+        AiHubChat chat = buildChat(CHAT_ID, USER_ID, THREAD_ID);
+        AiHubChatArtifact referenced = buildArtifact(605L, "FILE_REFERENCED", "77");
+
+        when(chatArtifactRepository.findById(605L)).thenReturn(Optional.of(referenced));
+        when(chatService.getViewable(CHAT_ID, WORKSPACE_ID, USER_ID)).thenReturn(chat);
+
+        Optional<AiHubChatArtifact> deleted = chatArtifactService.deleteReference(605L, WORKSPACE_ID, USER_ID);
+
+        assertThat(deleted).containsSame(referenced);
+
+        verify(chatArtifactRepository).deleteById(605L);
+    }
+
+    @Test
     void testDeleteReferenceRefusesReferenceKindsThatAreNotRemovable() {
-        AiHubChatArtifact referenced = buildArtifact(602L, "FILE_REFERENCED", "f-1");
+        AiHubChatArtifact referenced = buildArtifact(602L, "DATA_TABLE_REFERENCED", "dt-1");
 
         when(chatArtifactRepository.findById(602L)).thenReturn(Optional.of(referenced));
         when(chatService.getViewable(CHAT_ID, WORKSPACE_ID, USER_ID))
