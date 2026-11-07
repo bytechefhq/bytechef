@@ -6,6 +6,7 @@ import com.bytechef.platform.configuration.web.rest.model.HelpModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -23,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ClusterElementDefinitionBasic", description = "A cluster element basic definition.")
 @JsonTypeName("ClusterElementDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T08:59:49.415939+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class ClusterElementDefinitionBasicModel {
 
   private String componentName;
@@ -43,6 +44,47 @@ public class ClusterElementDefinitionBasicModel {
   private @Nullable Boolean outputFunctionDefined;
 
   private @Nullable Boolean outputSchemaDefined;
+
+  /**
+   * How much damage one call of this tool can do.
+   */
+  public enum RiskLevelEnum {
+    LOW("LOW"),
+    
+    MEDIUM("MEDIUM"),
+    
+    HIGH("HIGH"),
+    
+    CRITICAL("CRITICAL");
+
+    private final String value;
+
+    RiskLevelEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static RiskLevelEnum fromValue(String value) {
+      for (RiskLevelEnum b : RiskLevelEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable RiskLevelEnum riskLevel;
 
   private @Nullable String title;
 
@@ -252,6 +294,27 @@ public class ClusterElementDefinitionBasicModel {
     this.outputSchemaDefined = outputSchemaDefined;
   }
 
+  public ClusterElementDefinitionBasicModel riskLevel(@Nullable RiskLevelEnum riskLevel) {
+    this.riskLevel = riskLevel;
+    return this;
+  }
+
+  /**
+   * How much damage one call of this tool can do.
+   * @return riskLevel
+   */
+  
+  @Schema(name = "riskLevel", description = "How much damage one call of this tool can do.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("riskLevel")
+  public @Nullable RiskLevelEnum getRiskLevel() {
+    return riskLevel;
+  }
+
+  @JsonProperty("riskLevel")
+  public void setRiskLevel(@Nullable RiskLevelEnum riskLevel) {
+    this.riskLevel = riskLevel;
+  }
+
   public ClusterElementDefinitionBasicModel title(@Nullable String title) {
     this.title = title;
     return this;
@@ -312,13 +375,14 @@ public class ClusterElementDefinitionBasicModel {
         Objects.equals(this.outputDefined, clusterElementDefinitionBasic.outputDefined) &&
         Objects.equals(this.outputFunctionDefined, clusterElementDefinitionBasic.outputFunctionDefined) &&
         Objects.equals(this.outputSchemaDefined, clusterElementDefinitionBasic.outputSchemaDefined) &&
+        Objects.equals(this.riskLevel, clusterElementDefinitionBasic.riskLevel) &&
         Objects.equals(this.title, clusterElementDefinitionBasic.title) &&
         Objects.equals(this.type, clusterElementDefinitionBasic.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, icon, outputDefined, outputFunctionDefined, outputSchemaDefined, title, type);
+    return Objects.hash(componentName, componentVersion, description, help, name, icon, outputDefined, outputFunctionDefined, outputSchemaDefined, riskLevel, title, type);
   }
 
   @Override
@@ -334,6 +398,7 @@ public class ClusterElementDefinitionBasicModel {
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
     sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    outputSchemaDefined: ").append(toIndentedString(outputSchemaDefined)).append("\n");
+    sb.append("    riskLevel: ").append(toIndentedString(riskLevel)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
