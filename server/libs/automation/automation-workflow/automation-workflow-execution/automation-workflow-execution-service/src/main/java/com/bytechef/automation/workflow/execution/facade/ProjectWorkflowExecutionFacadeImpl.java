@@ -63,6 +63,7 @@ import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO;
+import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionScopeDTO;
 import com.bytechef.platform.workflow.execution.facade.LazyTaskExecutionTreeBuilder;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
@@ -313,10 +314,50 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         Instant jobStartDate, Instant jobEndDate, Long projectId, Long projectDeploymentId, Long connectedUserId,
         String workflowId, Integer projectVersion, long workspaceId, int pageNumber) {
 
+        WorkflowExecutionScopeDTO workflowExecutionScopeDTO = getWorkflowExecutionScope(
+            embedded, environmentId, workflowExecutionSource, jobStatus, projectId, projectDeploymentId,
+            connectedUserId, workflowId, projectVersion, workspaceId);
+
+        if (workflowExecutionScopeDTO == null) {
+            return Page.empty();
+        }
+
+        Page<WorkflowExecutionRowDTO> rowsPage = workflowExecutionRowService.getWorkflowExecutionRows(
+            jobStatus, jobStartDate, jobEndDate, workflowExecutionScopeDTO.principalIds(), PlatformType.AUTOMATION,
+            workflowExecutionScopeDTO.workflowIds(), true,
+            workflowExecutionScopeDTO.failedTriggerWorkflowExecutionIds(), pageNumber);
+
+        return new PageImpl<>(
+            toWorkflowExecutionDTOs(rowsPage.getContent(), projectId), rowsPage.getPageable(),
+            rowsPage.getTotalElements());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<WorkflowExecutionDTO> getWorkflowExecutions(List<WorkflowExecutionRowDTO> workflowExecutionRowDTOs) {
+        return toWorkflowExecutionDTOs(workflowExecutionRowDTOs, null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public @Nullable WorkflowExecutionScopeDTO getEmbeddedWorkflowExecutionScope(
+        @Nullable Long environmentId, @Nullable Status jobStatus, @Nullable Long connectedUserId, long workspaceId) {
+
+        return getWorkflowExecutionScope(
+            true, environmentId, WorkflowExecutionSource.PROJECT_DEPLOYMENT, jobStatus, null, null, connectedUserId,
+            null, null,
+            workspaceId);
+    }
+
+    private @Nullable WorkflowExecutionScopeDTO getWorkflowExecutionScope(
+        Boolean embedded, @Nullable Long environmentId, WorkflowExecutionSource workflowExecutionSource,
+        @Nullable Status jobStatus, @Nullable Long projectId, @Nullable Long projectDeploymentId,
+        @Nullable Long connectedUserId, @Nullable String workflowId, @Nullable Integer projectVersion,
+        long workspaceId) {
+
         if (connectedUserId != null) {
-            return getConnectedUserWorkflowExecutions(
-                connectedUserId, environmentId, jobStatus, jobStartDate, jobEndDate, workflowId, projectVersion,
-                pageNumber);
+            return getConnectedUserWorkflowExecutionScope(
+                connectedUserId, environmentId, jobStatus, workflowId, projectVersion);
         }
 
         List<ProjectDeployment> embeddedProjectDeployments = null;
@@ -349,7 +390,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         }
 
         if (workflowIds.isEmpty()) {
-            return Page.empty();
+            return null;
         }
 
         List<Long> projectDeploymentIds = getSourceProjectDeploymentIds(
@@ -357,29 +398,28 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             workspaceId);
 
         if (projectDeploymentIds.isEmpty()) {
-            return Page.empty();
+            return null;
         }
 
-        return getWorkflowExecutionPage(
-            jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, workflowIds, projectId, pageNumber);
+        return toWorkflowExecutionScope(jobStatus, projectDeploymentIds, workflowIds);
     }
 
-    private Page<WorkflowExecutionDTO> getConnectedUserWorkflowExecutions(
-        long connectedUserId, @Nullable Long environmentId, @Nullable Status jobStatus, @Nullable Instant jobStartDate,
-        @Nullable Instant jobEndDate, @Nullable String workflowId, @Nullable Integer projectVersion, int pageNumber) {
+    private @Nullable WorkflowExecutionScopeDTO getConnectedUserWorkflowExecutionScope(
+        long connectedUserId, @Nullable Long environmentId, @Nullable Status jobStatus, @Nullable String workflowId,
+        @Nullable Integer projectVersion) {
 
         ConnectedUserProjectDeploymentResolver connectedUserProjectDeploymentResolver =
             connectedUserProjectDeploymentResolverProvider.getIfAvailable();
 
         if (connectedUserProjectDeploymentResolver == null) {
-            return Page.empty();
+            return null;
         }
 
         List<Long> connectedUserProjectDeploymentIds = connectedUserProjectDeploymentResolver.getProjectDeploymentIds(
             connectedUserId);
 
         if (connectedUserProjectDeploymentIds.isEmpty()) {
-            return Page.empty();
+            return null;
         }
 
         Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
@@ -391,7 +431,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             .toList();
 
         if (projectDeployments.isEmpty()) {
-            return Page.empty();
+            return null;
         }
 
         List<String> workflowIds = workflowId == null
@@ -399,24 +439,19 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             : getWorkflowVersionWorkflowIds(workflowId, projectVersion);
 
         if (workflowIds.isEmpty()) {
-            return Page.empty();
+            return null;
         }
 
-        return getWorkflowExecutionPage(
-            jobStatus, jobStartDate, jobEndDate, CollectionUtils.map(projectDeployments, ProjectDeployment::getId),
-            workflowIds, null, pageNumber);
+        return toWorkflowExecutionScope(
+            jobStatus, CollectionUtils.map(projectDeployments, ProjectDeployment::getId), workflowIds);
     }
 
-    private Page<WorkflowExecutionDTO> getWorkflowExecutionPage(
-        @Nullable Status jobStatus, @Nullable Instant jobStartDate, @Nullable Instant jobEndDate,
-        List<Long> projectDeploymentIds, List<String> workflowIds, @Nullable Long projectId, int pageNumber) {
+    private WorkflowExecutionScopeDTO toWorkflowExecutionScope(
+        @Nullable Status jobStatus, List<Long> projectDeploymentIds, List<String> workflowIds) {
 
-        Page<WorkflowExecutionRowDTO> rowsPage = workflowExecutionRowService.getWorkflowExecutionRows(
-            jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, PlatformType.AUTOMATION, workflowIds,
-            true, getFailedTriggerWorkflowExecutionIds(jobStatus, projectDeploymentIds, workflowIds),
-            pageNumber);
-
-        return toWorkflowExecutionPage(rowsPage, projectId);
+        return new WorkflowExecutionScopeDTO(
+            PlatformType.AUTOMATION, projectDeploymentIds, workflowIds,
+            getFailedTriggerWorkflowExecutionIds(jobStatus, projectDeploymentIds, workflowIds));
     }
 
     private List<Long> getSourceProjectDeploymentIds(
@@ -431,7 +466,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 workspaceId);
         }
 
-        if (workflowExecutionSource == WorkflowExecutionSource.PROJECT) {
+        if (workflowExecutionSource == WorkflowExecutionSource.PROJECT_DEPLOYMENT) {
             return getProjectDeploymentIds(embedded, environmentId, projectDeploymentId, embeddedProjectDeployments);
         }
 
@@ -488,10 +523,10 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             .toList();
     }
 
-    private Page<WorkflowExecutionDTO> toWorkflowExecutionPage(
-        Page<WorkflowExecutionRowDTO> rowsPage, Long projectId) {
+    private List<WorkflowExecutionDTO> toWorkflowExecutionDTOs(
+        List<WorkflowExecutionRowDTO> workflowExecutionRowDTOs, @Nullable Long projectId) {
 
-        List<Long> jobIds = rowsPage.getContent()
+        List<Long> jobIds = workflowExecutionRowDTOs
             .stream()
             .filter(row -> row.kind() == WorkflowExecutionRowDTO.Kind.JOB)
             .map(WorkflowExecutionRowDTO::id)
@@ -569,22 +604,19 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
         Map<Long, WorkflowExecutionDTO> triggerWorkflowExecutionDTOMap = buildTriggerWorkflowExecutionDTOs(
             triggerExecutionService.getTriggerExecutions(
-                rowsPage.getContent()
+                workflowExecutionRowDTOs
                     .stream()
                     .filter(row -> row.kind() == WorkflowExecutionRowDTO.Kind.TRIGGER_EXECUTION)
                     .map(WorkflowExecutionRowDTO::id)
                     .toList()));
 
-        List<WorkflowExecutionDTO> workflowExecutionDTOs = rowsPage.getContent()
+        return workflowExecutionRowDTOs
             .stream()
             .map(row -> row.kind() == WorkflowExecutionRowDTO.Kind.JOB
                 ? jobWorkflowExecutionDTOMap.get(row.id())
                 : triggerWorkflowExecutionDTOMap.get(row.id()))
             .filter(Objects::nonNull)
             .toList();
-
-        return new PageImpl<>(
-            workflowExecutionDTOs, rowsPage.getPageable(), rowsPage.getTotalElements());
     }
 
     private List<String> getProjectDeploymentWorkflowIds(List<ProjectDeployment> projectDeployments) {

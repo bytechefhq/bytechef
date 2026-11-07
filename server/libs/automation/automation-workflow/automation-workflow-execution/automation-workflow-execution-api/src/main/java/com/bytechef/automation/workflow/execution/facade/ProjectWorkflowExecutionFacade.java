@@ -21,7 +21,11 @@ import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionSource;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
+import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO;
+import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionScopeDTO;
 import java.time.Instant;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 
 /**
@@ -62,7 +66,8 @@ public interface ProjectWorkflowExecutionFacade {
         long workspaceId, int pageNumber) {
 
         return getWorkflowExecutions(
-            embedded, environmentId, WorkflowExecutionSource.PROJECT, jobStatus, jobStartDate, jobEndDate, projectId,
+            embedded, environmentId, WorkflowExecutionSource.PROJECT_DEPLOYMENT, jobStatus, jobStartDate, jobEndDate,
+            projectId,
             projectDeploymentId, connectedUserId, workflowId, projectVersion, workspaceId, pageNumber);
     }
 
@@ -70,4 +75,10 @@ public interface ProjectWorkflowExecutionFacade {
         Boolean embedded, Long environmentId, WorkflowExecutionSource workflowExecutionSource, Status jobStatus,
         Instant jobStartDate, Instant jobEndDate, Long projectId, Long projectDeploymentId,
         Long connectedUserId, String workflowId, Integer projectVersion, long workspaceId, int pageNumber);
+
+    List<WorkflowExecutionDTO> getWorkflowExecutions(List<WorkflowExecutionRowDTO> workflowExecutionRowDTOs);
+
+    @Nullable
+    WorkflowExecutionScopeDTO getEmbeddedWorkflowExecutionScope(
+        @Nullable Long environmentId, @Nullable Status jobStatus, @Nullable Long connectedUserId, long workspaceId);
 }
