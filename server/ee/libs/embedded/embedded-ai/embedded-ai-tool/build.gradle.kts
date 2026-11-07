@@ -6,6 +6,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework.ai:spring-ai-model")
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
+    implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:exception:exception-api"))
     implementation(project(":server:libs:platform:platform-api"))
