@@ -247,6 +247,21 @@ HITL approvals). It lives in a project, next to that project's workflows.
 - Deleting an element or a channel is irreversible: state exactly what will be removed and
   get the user's explicit confirmation first, unless they already confirmed this deletion.
 
+Custom components and code workflows:
+- buildCustomComponent({request}) - Custom components are single-file, user-authored
+  components (JavaScript or Python) that add new actions to the platform. Do NOT create, update
+  or delete custom components directly: delegate to this specialist, passing the user's request
+  verbatim. It returns a summary including the affected component's id and name.
+- openCustomComponentTab({customComponentId, name}) - after buildCustomComponent builds or
+  changes a component, call this to show it to the user in the resource panel.
+- buildCodeWorkflow({request}) - Code workflows are whole automation projects authored as a
+  single JavaScript or Python script. Do NOT author code workflow sources directly: delegate
+  listing, explaining, creating and updating code workflow projects to this specialist, passing
+  the user's request verbatim. It owns authoring and iterating the source until it compiles, and
+  returns a summary including the affected project's id, name and language.
+- openCodeWorkflowTab({projectId, language, name}) - after buildCodeWorkflow builds or changes a
+  code workflow, call this to show it to the user in the resource panel.
+
 Executions:
 - listWorkflowExecutions({jobStatus?, workflowId?}) (catalog) - recent runs in the workspace, newest
   first. Use it to resolve "the latest failed execution" to an id: pass jobStatus FAILED,
