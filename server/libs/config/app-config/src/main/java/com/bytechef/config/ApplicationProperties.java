@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 
 /**
  * Application configuration properties. Contains all configurable properties for the platform, including AI, messaging,
@@ -3244,12 +3245,22 @@ public class ApplicationProperties {
 
         private ApprovalTask approvalTask = new ApprovalTask();
 
+        private ProjectImport projectImport = new ProjectImport();
+
         public ApprovalTask getApprovalTask() {
             return approvalTask;
         }
 
+        public ProjectImport getProjectImport() {
+            return projectImport;
+        }
+
         public void setApprovalTask(ApprovalTask approvalTask) {
             this.approvalTask = approvalTask;
+        }
+
+        public void setProjectImport(ProjectImport projectImport) {
+            this.projectImport = projectImport;
         }
 
         public static class ApprovalTask {
@@ -3275,6 +3286,39 @@ public class ApplicationProperties {
                 public void setEnabled(boolean enabled) {
                     this.enabled = enabled;
                 }
+            }
+        }
+
+        public static class ProjectImport {
+
+            private int maxEntryCount;
+
+            private DataSize maxEntrySize;
+
+            private DataSize maxTotalSize;
+
+            public int getMaxEntryCount() {
+                return maxEntryCount;
+            }
+
+            public DataSize getMaxEntrySize() {
+                return maxEntrySize;
+            }
+
+            public DataSize getMaxTotalSize() {
+                return maxTotalSize;
+            }
+
+            public void setMaxEntryCount(int maxEntryCount) {
+                this.maxEntryCount = maxEntryCount;
+            }
+
+            public void setMaxEntrySize(DataSize maxEntrySize) {
+                this.maxEntrySize = maxEntrySize;
+            }
+
+            public void setMaxTotalSize(DataSize maxTotalSize) {
+                this.maxTotalSize = maxTotalSize;
             }
         }
     }

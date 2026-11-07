@@ -143,6 +143,13 @@ bytechef:
     approval-task:
       reconciliation:
         enabled: true
+    project-import:
+      # Maximum number of entries in an imported project or template archive
+      max-entry-count: 1000
+      # Maximum uncompressed size of a single entry in an imported project or template archive
+      max-entry-size: 10MB
+      # Maximum uncompressed size of all entries in an imported project or template archive
+      max-total-size: 50MB
   cache:
     # Cache provider (CAFFEINE | REDIS(EE)) default: CAFFEINE
     provider: CAFFEINE

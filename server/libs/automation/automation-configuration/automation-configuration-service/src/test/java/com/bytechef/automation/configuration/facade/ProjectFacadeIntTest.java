@@ -98,6 +98,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(
     classes = ProjectIntTestConfiguration.class,
     properties = {
+        "bytechef.automation.project-import.max-entry-size=64KB",
         "bytechef.workflow.repository.jdbc.enabled=true"
     })
 @Import(PostgreSQLContainerConfiguration.class)
@@ -947,6 +948,33 @@ public class ProjectFacadeIntTest {
             projectFacade.getSharedProject(projectUuid);
 
         assertThat(sharedProjectDTO).isNull();
+    }
+
+    @Test
+    public void testImportProjectRejectsAnEntryAboveTheUncompressedSizeLimit() throws Exception {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+            zipOutputStream.putNextEntry(new ZipEntry("project.json"));
+
+            zipOutputStream.write(
+                "{\"name\":\"Oversized Project\",\"description\":\"\"}".getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-oversized.json"));
+
+            zipOutputStream.write(new byte[128 * 1024]);
+
+            zipOutputStream.closeEntry();
+        }
+
+        byte[] zipData = byteArrayOutputStream.toByteArray();
+
+        assertThat(zipData.length).isLessThan(64 * 1024);
+
+        Assertions.assertThrows(
+            IllegalArgumentException.class, () -> projectFacade.importProject(zipData, workspace.getId()));
     }
 
     @Test

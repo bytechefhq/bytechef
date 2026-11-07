@@ -75,7 +75,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -84,6 +83,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.unit.DataSize;
 
 /**
  * @author Ivica Cardic
@@ -94,6 +94,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectFacadeImpl.class);
 
+    private final BoundedZipReader boundedZipReader;
     private final CategoryService categoryService;
     private final ComponentDefinitionHelper componentDefinitionHelper;
     private final PreBuiltTemplateService preBuiltTemplateService;
@@ -126,6 +127,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         WorkflowNodeTestOutputService workflowNodeTestOutputService,
         List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
+        this.boundedZipReader = createBoundedZipReader(applicationProperties);
         this.categoryService = categoryService;
         this.componentDefinitionHelper = componentDefinitionHelper;
         this.preBuiltTemplateService = preBuiltTemplateService;
@@ -842,26 +844,21 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     private TemplateFiles readTemplate(byte[] data, boolean sharedTemplate) {
-        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(data))) {
+        try {
             String projectJson = null;
             String templateJson = null;
-            ZipEntry zipEntry;
             List<String> workflowJsons = new ArrayList<>();
 
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                byte[] entryData = zipInputStream.readAllBytes();
-
-                String name = zipEntry.getName();
+            for (BoundedZipReader.Entry entry : boundedZipReader.read(data)) {
+                String name = entry.name();
 
                 if ("project.json".equals(name)) {
-                    projectJson = new String(entryData, StandardCharsets.UTF_8);
+                    projectJson = new String(entry.data(), StandardCharsets.UTF_8);
                 } else if ("template.json".equals(name)) {
-                    templateJson = new String(entryData, StandardCharsets.UTF_8);
+                    templateJson = new String(entry.data(), StandardCharsets.UTF_8);
                 } else if (name.startsWith("workflow-") && name.endsWith(".json")) {
-                    workflowJsons.add(new String(entryData, StandardCharsets.UTF_8));
+                    workflowJsons.add(new String(entry.data(), StandardCharsets.UTF_8));
                 }
-
-                zipInputStream.closeEntry();
             }
 
             if (projectJson == null || sharedTemplate && (templateJson == null) || workflowJsons.isEmpty()) {
@@ -872,6 +869,19 @@ public class ProjectFacadeImpl implements ProjectFacade {
         } catch (IOException e) {
             throw new RuntimeException("Failed to read shared project", e);
         }
+    }
+
+    private static BoundedZipReader createBoundedZipReader(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Automation.ProjectImport projectImport = applicationProperties.getAutomation()
+            .getProjectImport();
+
+        return new BoundedZipReader(
+            projectImport.getMaxEntryCount(), toBytes(projectImport.getMaxEntrySize()),
+            toBytes(projectImport.getMaxTotalSize()));
+    }
+
+    private static long toBytes(DataSize dataSize) {
+        return dataSize == null ? 0 : dataSize.toBytes();
     }
 
     private ProjectDTO toProjectDTO(Project project) {
