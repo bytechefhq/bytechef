@@ -569,6 +569,46 @@ export type DisconnectConnectionMutationVariables = Exact<{
 
 export type DisconnectConnectionMutation = { disconnectConnection: boolean };
 
+export type ProjectErrorWorkflowQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ProjectErrorWorkflowQuery = { project: { errorProjectWorkflowId: string | null } | null };
+
+export type UpdateProjectErrorWorkflowMutationVariables = Exact<{
+  projectId: string | number;
+  errorProjectWorkflowId?: string | number | null | undefined;
+}>;
+
+
+export type UpdateProjectErrorWorkflowMutation = { updateProjectErrorWorkflow: boolean | null };
+
+export type EligibleErrorWorkflowsQueryVariables = Exact<{
+  projectId: string | number;
+  projectVersion: number;
+}>;
+
+
+export type EligibleErrorWorkflowsQuery = { eligibleErrorWorkflows: Array<{ id: string, workflowId: string, workflow: { label: string } }> };
+
+export type ProjectWorkflowErrorConfigQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ProjectWorkflowErrorConfigQuery = { projectWorkflow: { errorProjectWorkflowId: string | null, errorWorkflowDisabled: boolean } | null };
+
+export type UpdateProjectWorkflowErrorWorkflowMutationVariables = Exact<{
+  projectId: string | number;
+  projectWorkflowId: string | number;
+  errorProjectWorkflowId?: string | number | null | undefined;
+  errorWorkflowDisabled: boolean;
+}>;
+
+
+export type UpdateProjectWorkflowErrorWorkflowMutation = { updateProjectWorkflowErrorWorkflow: boolean | null };
+
 export type ExportSharedProjectMutationVariables = Exact<{
   id: string | number;
   description?: string | null | undefined;
@@ -4478,6 +4518,129 @@ export const useDisconnectConnectionMutation = <
       {
     mutationKey: ['DisconnectConnection'],
     mutationFn: (variables?: DisconnectConnectionMutationVariables) => fetcher<DisconnectConnectionMutation, DisconnectConnectionMutationVariables>(DisconnectConnectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ProjectErrorWorkflowDocument = new TypedDocumentString(`
+    query projectErrorWorkflow($id: ID!) {
+  project(id: $id) {
+    errorProjectWorkflowId
+  }
+}
+    `);
+
+export const useProjectErrorWorkflowQuery = <
+      TData = ProjectErrorWorkflowQuery,
+      TError = unknown
+    >(
+      variables: ProjectErrorWorkflowQueryVariables,
+      options?: Omit<UseQueryOptions<ProjectErrorWorkflowQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectErrorWorkflowQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ProjectErrorWorkflowQuery, TError, TData>(
+      {
+    queryKey: ['projectErrorWorkflow', variables],
+    queryFn: fetcher<ProjectErrorWorkflowQuery, ProjectErrorWorkflowQueryVariables>(ProjectErrorWorkflowDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateProjectErrorWorkflowDocument = new TypedDocumentString(`
+    mutation updateProjectErrorWorkflow($projectId: ID!, $errorProjectWorkflowId: ID) {
+  updateProjectErrorWorkflow(
+    projectId: $projectId
+    errorProjectWorkflowId: $errorProjectWorkflowId
+  )
+}
+    `);
+
+export const useUpdateProjectErrorWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateProjectErrorWorkflowMutation, TError, UpdateProjectErrorWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateProjectErrorWorkflowMutation, TError, UpdateProjectErrorWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['updateProjectErrorWorkflow'],
+    mutationFn: (variables?: UpdateProjectErrorWorkflowMutationVariables) => fetcher<UpdateProjectErrorWorkflowMutation, UpdateProjectErrorWorkflowMutationVariables>(UpdateProjectErrorWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EligibleErrorWorkflowsDocument = new TypedDocumentString(`
+    query eligibleErrorWorkflows($projectId: ID!, $projectVersion: Int!) {
+  eligibleErrorWorkflows(projectId: $projectId, projectVersion: $projectVersion) {
+    id
+    workflowId
+    workflow {
+      label
+    }
+  }
+}
+    `);
+
+export const useEligibleErrorWorkflowsQuery = <
+      TData = EligibleErrorWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: EligibleErrorWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<EligibleErrorWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EligibleErrorWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EligibleErrorWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['eligibleErrorWorkflows', variables],
+    queryFn: fetcher<EligibleErrorWorkflowsQuery, EligibleErrorWorkflowsQueryVariables>(EligibleErrorWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const ProjectWorkflowErrorConfigDocument = new TypedDocumentString(`
+    query projectWorkflowErrorConfig($id: ID!) {
+  projectWorkflow(id: $id) {
+    errorProjectWorkflowId
+    errorWorkflowDisabled
+  }
+}
+    `);
+
+export const useProjectWorkflowErrorConfigQuery = <
+      TData = ProjectWorkflowErrorConfigQuery,
+      TError = unknown
+    >(
+      variables: ProjectWorkflowErrorConfigQueryVariables,
+      options?: Omit<UseQueryOptions<ProjectWorkflowErrorConfigQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectWorkflowErrorConfigQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ProjectWorkflowErrorConfigQuery, TError, TData>(
+      {
+    queryKey: ['projectWorkflowErrorConfig', variables],
+    queryFn: fetcher<ProjectWorkflowErrorConfigQuery, ProjectWorkflowErrorConfigQueryVariables>(ProjectWorkflowErrorConfigDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateProjectWorkflowErrorWorkflowDocument = new TypedDocumentString(`
+    mutation updateProjectWorkflowErrorWorkflow($projectId: ID!, $projectWorkflowId: ID!, $errorProjectWorkflowId: ID, $errorWorkflowDisabled: Boolean!) {
+  updateProjectWorkflowErrorWorkflow(
+    projectId: $projectId
+    projectWorkflowId: $projectWorkflowId
+    errorProjectWorkflowId: $errorProjectWorkflowId
+    errorWorkflowDisabled: $errorWorkflowDisabled
+  )
+}
+    `);
+
+export const useUpdateProjectWorkflowErrorWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateProjectWorkflowErrorWorkflowMutation, TError, UpdateProjectWorkflowErrorWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateProjectWorkflowErrorWorkflowMutation, TError, UpdateProjectWorkflowErrorWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['updateProjectWorkflowErrorWorkflow'],
+    mutationFn: (variables?: UpdateProjectWorkflowErrorWorkflowMutationVariables) => fetcher<UpdateProjectWorkflowErrorWorkflowMutation, UpdateProjectWorkflowErrorWorkflowMutationVariables>(UpdateProjectWorkflowErrorWorkflowDocument, variables)(),
     ...options
   }
     )};

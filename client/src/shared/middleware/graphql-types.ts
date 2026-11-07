@@ -2026,6 +2026,8 @@ export type Mutation = {
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
   updateMcpTool?: Maybe<McpTool>;
+  updateProjectErrorWorkflow?: Maybe<Scalars['Boolean']['output']>;
+  updateProjectWorkflowErrorWorkflow?: Maybe<Scalars['Boolean']['output']>;
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
   updateWorkspaceMcpToolEnabled?: Maybe<McpTool>;
@@ -2995,6 +2997,20 @@ export type MutationUpdateMcpToolArgs = {
 };
 
 
+export type MutationUpdateProjectErrorWorkflowArgs = {
+  errorProjectWorkflowId?: InputMaybe<Scalars['ID']['input']>;
+  projectId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateProjectWorkflowErrorWorkflowArgs = {
+  errorProjectWorkflowId?: InputMaybe<Scalars['ID']['input']>;
+  errorWorkflowDisabled: Scalars['Boolean']['input'];
+  projectId: Scalars['ID']['input'];
+  projectWorkflowId: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateUserArgs = {
   login: Scalars['String']['input'];
   role: Scalars['String']['input'];
@@ -3145,6 +3161,7 @@ export enum PlatformType {
 export type Project = {
   __typename?: 'Project';
   category?: Maybe<Category>;
+  errorProjectWorkflowId?: Maybe<Scalars['ID']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   tags?: Maybe<Array<Maybe<Tag>>>;
@@ -3238,6 +3255,8 @@ export type ProjectWorkflow = {
   __typename?: 'ProjectWorkflow';
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['String']['output']>;
+  errorProjectWorkflowId?: Maybe<Scalars['ID']['output']>;
+  errorWorkflowDisabled: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
@@ -3443,6 +3462,7 @@ export type Query = {
   editorJobFileLogs: LogPage;
   editorJobFileLogsExist: Scalars['Boolean']['output'];
   editorTaskExecutionFileLogs: Array<LogEntry>;
+  eligibleErrorWorkflows: Array<ProjectWorkflow>;
   embeddedMcpComponentsByServerId?: Maybe<Array<Maybe<McpComponent>>>;
   embeddedMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   embeddedMcpServers?: Maybe<Array<Maybe<McpServer>>>;
@@ -3508,6 +3528,7 @@ export type Query = {
   projectTemplate?: Maybe<ProjectTemplate>;
   projectVersionWorkflowChange: VersionWorkflowChange;
   projectVersionWorkflowChanges: VersionWorkflowChanges;
+  projectWorkflow?: Maybe<ProjectWorkflow>;
   projects?: Maybe<Array<Maybe<Project>>>;
   provisionableConnectedUserMcpServers: Array<ProvisionableConnectedUserMcpServer>;
   provisionableConnectedUserProjects: Array<ProvisionableConnectedUserProject>;
@@ -4006,6 +4027,12 @@ export type QueryEditorTaskExecutionFileLogsArgs = {
 };
 
 
+export type QueryEligibleErrorWorkflowsArgs = {
+  projectId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+};
+
+
 export type QueryEmbeddedMcpComponentsByServerIdArgs = {
   mcpServerId: Scalars['ID']['input'];
 };
@@ -4273,6 +4300,11 @@ export type QueryProjectVersionWorkflowChangeArgs = {
 export type QueryProjectVersionWorkflowChangesArgs = {
   projectId: Scalars['ID']['input'];
   projectVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryProjectWorkflowArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
