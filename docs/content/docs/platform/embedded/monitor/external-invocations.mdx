@@ -54,7 +54,7 @@ Each call is one row, newest first:
 | **Type** | What was called: a **Component tool** or a **Workflow tool** through embedded MCP or `POST /{externalUserId}/tools`, or an **Action** through the Embedded API action endpoint. |
 | **Surface** | Where the call came in: **Embedded MCP**, **Embedded API (Action)** or **Embedded API (Tool)**. |
 | **Server** | The embedded MCP server the call came through. Embedded API calls show a dash. |
-| **Source** | What ran: the component and operation, such as `slack / sendMessage`, or the name of the workflow a workflow tool ran. |
+| **Target** | What ran: the component and operation, such as `slack / sendMessage`, or the name of the workflow a workflow tool ran. |
 | **Duration** | How long the call took, in milliseconds. |
 | **Date** | When the call was made. |
 | **Actions** | **View** opens the workflow run a workflow tool started, with the input and output of each step. **Stop** stops that run while it is still going: the call ended with `TIMEOUT`, `APPROVAL_REQUIRED` or `SUSPENDED`. Both are unavailable for component tool and action calls, which start no workflow run. |
