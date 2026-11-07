@@ -25,6 +25,12 @@ public final class ToolSuspendConstants {
 
     public static final String GATED_TOOL_INPUT = "__BYTECHEF_GATED_TOOL_INPUT__";
 
+    public static final String RULE_COMPONENT_NAME = "__BYTECHEF_RULE_COMPONENT_NAME__";
+
+    public static final String RULE_IDS = "__BYTECHEF_RULE_IDS__";
+
+    public static final String RULE_TOOL_NAME = "__BYTECHEF_RULE_TOOL_NAME__";
+
     private ToolSuspendConstants() {
     }
 }

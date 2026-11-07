@@ -139,7 +139,7 @@ public class AiAgentUtilsApprovalGate {
             checkGatableChild(toolClusterElement.getComponentName(), toolClusterElement.getClusterElementName());
 
             List<ToolCallback> elementToolCallbacks = clusterElementToolCallbacks.build(
-                toolClusterElement, componentConnections, context);
+                toolClusterElement, componentConnections, context, approvalChannelClusterElements);
 
             for (ToolCallback toolCallback : elementToolCallbacks) {
                 toolCallbacks.add(
