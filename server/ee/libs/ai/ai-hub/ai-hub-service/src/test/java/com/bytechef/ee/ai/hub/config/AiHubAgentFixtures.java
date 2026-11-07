@@ -61,6 +61,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -93,6 +94,7 @@ public final class AiHubAgentFixtures {
     public final ProjectService projectService = mock(ProjectService.class);
     public final AiHubToolApprovalPolicy policy = mock(AiHubToolApprovalPolicy.class);
     public final ProjectDeploymentFacade projectDeploymentFacade = mock(ProjectDeploymentFacade.class);
+    public final WorkflowFacade workflowFacade = mock(WorkflowFacade.class);
     public final ProjectFacade projectFacade = mock(ProjectFacade.class);
     public final ProjectWorkflowFacade projectWorkflowFacade = mock(ProjectWorkflowFacade.class);
     public final ProjectWorkflowTools projectWorkflowTools = mock(ProjectWorkflowTools.class);
@@ -227,7 +229,7 @@ public final class AiHubAgentFixtures {
             projectTools, projectWorkflowLifecycleTools, workflowExecutionTools, componentToolsProvider(),
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
             interactivePickerToolCallbacks, intelligentToolCatalog, workspaceFacade, projectWorkflowFacade,
-            projectDeploymentFacade, chatService, chatAccessPolicy, artifactRecorder, policy,
+            projectDeploymentFacade, chatService, chatAccessPolicy, artifactRecorder, policy, workflowFacade,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
 

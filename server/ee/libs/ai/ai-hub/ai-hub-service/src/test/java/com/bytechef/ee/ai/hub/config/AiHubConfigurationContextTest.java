@@ -67,6 +67,7 @@ import com.bytechef.ee.ai.hub.web.graphql.AiHubChatArtifactGraphQlController;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubChatGraphQlController;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubToolApprovalGraphQlController;
 import com.bytechef.ee.ai.hub.web.graphql.AiHubToolApprovalRuleGraphQlController;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import java.util.List;
@@ -335,6 +336,7 @@ class AiHubConfigurationContextTest {
             .withBean(IntelligentToolCatalog.class, () -> fixtures.intelligentToolCatalog)
             .withBean(WorkspaceFacade.class, () -> fixtures.workspaceFacade)
             .withBean(ProjectWorkflowFacade.class, () -> fixtures.projectWorkflowFacade)
+            .withBean(WorkflowFacade.class, () -> fixtures.workflowFacade)
             .withBean(AiHubChatArtifactRecorder.class, () -> fixtures.artifactRecorder)
             .withBean(SecurityContextRehydrator.class, () -> fixtures.securityContextRehydrator)
             .withBean(AiHubApprovalGate.class, () -> fixtures.approvalGate)
@@ -377,6 +379,7 @@ class AiHubConfigurationContextTest {
             .withBean(IntelligentToolCatalog.class, () -> fixtures.intelligentToolCatalog)
             .withBean(WorkspaceFacade.class, () -> fixtures.workspaceFacade)
             .withBean(ProjectWorkflowFacade.class, () -> fixtures.projectWorkflowFacade)
+            .withBean(WorkflowFacade.class, () -> fixtures.workflowFacade)
             .withBean(AiHubChatArtifactRecorder.class, () -> fixtures.artifactRecorder)
             .withBean(SecurityContextRehydrator.class, () -> fixtures.securityContextRehydrator)
             .withBean(AiHubChatRepository.class, () -> mock(AiHubChatRepository.class))

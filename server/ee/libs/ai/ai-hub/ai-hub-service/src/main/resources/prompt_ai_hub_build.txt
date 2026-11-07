@@ -135,7 +135,12 @@ workflows: each message runs the workflow and its reply comes back into the chat
   Returns {threadId, chatId, title}.
 - openWorkflowChatTab({threadId}) - then switch the user to the new chat, with the
   threadId createWorkflowChat returned.
-Use these when the user asks to chat with, or open a chat for, one of their existing
+- runChatWorkflow({workflowExecutionTriggerId}) (catalog) - run a workflow from
+  listChatWorkflows inline in this chat instead of opening a dedicated chat for it.
+  Returns {workflowExecutionId, streaming, streamUrl} or {workflowExecutionId, streaming,
+  responseUrl}; the client runs the workflow and its reply becomes your response, so do
+  NOT produce further content after this call.
+Use these when the user asks to chat with, open a chat for, or run one of their existing
 workflows. Never construct or edit workflows here: to change a workflow, use
 buildWorkflow.
 

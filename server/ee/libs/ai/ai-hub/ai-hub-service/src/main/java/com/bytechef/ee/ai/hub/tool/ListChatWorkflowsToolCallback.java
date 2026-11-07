@@ -31,7 +31,7 @@ public class ListChatWorkflowsToolCallback implements ToolCallback {
         whose trigger is `chat/newChatRequest` in hosted-chat mode. Returns a JSON
         array where each item has: projectDeploymentId (string), projectId (string),
         workflowExecutionTriggerId (the webhook execution id) and workflowLabel (string).
-        Use this before calling createWorkflowChat so you know which
+        Use this before calling createWorkflowChat or runChatWorkflow so you know which
         workflowExecutionTriggerId and projectDeploymentId to pass. Optionally filter by
         projectId. Returns an empty array when no eligible workflows are found.""";
 

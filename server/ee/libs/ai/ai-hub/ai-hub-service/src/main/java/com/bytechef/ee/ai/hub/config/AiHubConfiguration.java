@@ -50,6 +50,7 @@ import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.RunChatWorkflowToolCallback;
 import com.bytechef.ee.ai.hub.tool.SearchDocsTools;
 import com.bytechef.ee.ai.hub.tool.UserRequestForwardingToolCallback;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
@@ -60,6 +61,7 @@ import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -186,7 +188,7 @@ public class AiHubConfiguration {
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectDeploymentFacade projectDeploymentFacade, AiHubChatService chatService,
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
-        AiHubToolApprovalPolicy toolApprovalPolicy,
+        AiHubToolApprovalPolicy toolApprovalPolicy, WorkflowFacade workflowFacade,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
         @Qualifier("copilotPgVectorStore") ObjectProvider<VectorStore> copilotPgVectorStoreProvider) {
 
@@ -204,6 +206,8 @@ public class AiHubConfiguration {
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
         toolCallbacks.add(new ListChatWorkflowsToolCallback(projectDeploymentFacade));
         toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService, projectDeploymentFacade));
+        toolCallbacks.add(
+            new RunChatWorkflowToolCallback(projectDeploymentFacade, workflowFacade, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(
             intelligentToolCatalog.getByNames(
                 INTELLIGENT_TOOL_NAMES, IntelligentToolVariant.BUILD,

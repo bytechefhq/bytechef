@@ -57,7 +57,8 @@ class AiHubConfigurationToolSetTest {
 
         assertThat(toolNames(askToolCallbacks.toolCallbacks())).doesNotContain(
             "createProject", "deleteProject", "createProjectDeployment", "selectConnection", "buildWorkflow",
-            "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "listComponents", "getActionDefinition");
+            "updateWorkflow", "listChatWorkflows", "createWorkflowChat", "runChatWorkflow", "listComponents",
+            "getActionDefinition");
     }
 
     @Test
@@ -84,7 +85,7 @@ class AiHubConfigurationToolSetTest {
             "searchDocs", "listProjectDeployments", "createProjectDeployment", "updateProjectDeployment",
             "deleteProjectDeployment", "rollbackProjectDeployment", "toggleProjectDeployment", "promoteWorkflow",
             "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions",
-            "listChatWorkflows", "createWorkflowChat");
+            "listChatWorkflows", "createWorkflowChat", "runChatWorkflow");
     }
 
     @Test
