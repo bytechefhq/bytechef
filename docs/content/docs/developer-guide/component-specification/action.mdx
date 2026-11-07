@@ -10,7 +10,7 @@ The action definition is used to specify the behavior and UI of an action inside
 - `title(String title)` - Sets the display name of the action (shown in the UI).
 - `description(String description)` - Provides a short description of the action (shown in the UI and tooltips).
 - `deprecated(boolean deprecated)` - Marks the action as deprecated. Deprecated actions should not be used in new integrations.
-- `perform(PerformFunction perform)` - Defines the action logic with access to the configured connection. Several overloads exist for specialized cases (`CallableResponsePerformFunction`, `WebhookResponsePerformFunction`, `StreamPerformFunction`, `WebSocketPerformFunction`), all sharing the same three-argument shape below.
+- `perform(PerformFunction perform)` - Defines the action logic with access to the configured connection. Several overloads exist for specialized cases (`CallableResponsePerformFunction`, `WebhookResponsePerformFunction`, `StreamPerformFunction`), all sharing the same three-argument shape below. Actions no longer stream over WebSockets — only a Voice Agent cluster element can return a `WebSocketHandler`, and only the voice session engine invokes one.
   Perform functions receive:
   - `Parameters inputParameters` - Getter for action properties (values set by the user in the Properties tab).
   - `Parameters connectionParameters` - Getter for connection properties (if the action uses a connection).
