@@ -39,7 +39,8 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
     }),
 }));
 
-vi.mock('@/shared/queries/automation/projects.queries', () => ({
+vi.mock('@/shared/queries/automation/projects.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/queries/automation/projects.queries')>()),
     useGetWorkspaceProjectsQuery: () => ({data: hoisted.projects, error: null, isLoading: false}),
 }));
 
