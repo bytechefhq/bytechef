@@ -69,6 +69,55 @@ describe('useWorkflowExecutionDetail', () => {
         expect(result.current.taskExecutionAttempts).toEqual([]);
     });
 
+    it('reports the trigger error for a job that failed in its trigger before any task ran', () => {
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 10864, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue({
+            data: {
+                id: 10864,
+                job: {id: '10864', status: 'FAILED', taskExecutions: []},
+                triggerExecution: failedTriggerExecution,
+            },
+            isLoading: false,
+        });
+
+        const {result} = renderHook(() => useWorkflowExecutionDetail(10864, true));
+
+        expect(result.current.jobFailedWithNoExecutions).toBe(true);
+        expect(result.current.jobFailureError).toEqual(failedTriggerExecution.error);
+    });
+
+    it('prefers the job error over the trigger error for a job that failed before any task ran', () => {
+        const jobError = {message: 'Job could not start', stackTrace: []};
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 10865, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue({
+            data: {
+                id: 10865,
+                job: {error: jobError, id: '10865', status: 'FAILED', taskExecutions: []},
+                triggerExecution: failedTriggerExecution,
+            },
+            isLoading: false,
+        });
+
+        const {result} = renderHook(() => useWorkflowExecutionDetail(10865, true));
+
+        expect(result.current.jobFailureError).toEqual(jobError);
+    });
+
+    it('falls back to a generic error for a job that failed before any task ran without any recorded error', () => {
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 10866, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue({
+            data: {id: 10866, job: {id: '10866', status: 'FAILED', taskExecutions: []}},
+            isLoading: false,
+        });
+
+        const {result} = renderHook(() => useWorkflowExecutionDetail(10866, true));
+
+        expect(result.current.jobFailureError.message).toBe(
+            'Workflow execution failed before any executions were created.'
+        );
+    });
+
     it('keeps asking for the job detail for a job-backed row', () => {
         useWorkflowExecutionSheetStore.setState({workflowExecutionId: 5, workflowExecutionKind: 'JOB'});
         executionQueryMock.mockReturnValue({data: undefined, isLoading: true});
