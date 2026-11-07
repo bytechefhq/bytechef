@@ -64,6 +64,10 @@ export interface ClusterElementDefinitionBasic {
      */
     outputSchemaDefined?: boolean;
     /**
+     * How much damage one call of this tool can do.
+     */
+    riskLevel?: ClusterElementDefinitionBasicRiskLevelEnum;
+    /**
      * The cluster element title.
      */
     title?: string;
@@ -72,6 +76,19 @@ export interface ClusterElementDefinitionBasic {
      */
     type: string;
 }
+
+
+/**
+ * @export
+ */
+export const ClusterElementDefinitionBasicRiskLevelEnum = {
+    Low: 'LOW',
+    Medium: 'MEDIUM',
+    High: 'HIGH',
+    Critical: 'CRITICAL',
+} as const;
+export type ClusterElementDefinitionBasicRiskLevelEnum = typeof ClusterElementDefinitionBasicRiskLevelEnum[keyof typeof ClusterElementDefinitionBasicRiskLevelEnum];
+
 
 /**
  * Check if a given object implements the ClusterElementDefinitionBasic interface.
@@ -104,6 +121,7 @@ export function ClusterElementDefinitionBasicFromJSONTyped(json: any, ignoreDisc
         'outputDefined': json['outputDefined'],
         'outputFunctionDefined': json['outputFunctionDefined'] == null ? undefined : json['outputFunctionDefined'],
         'outputSchemaDefined': json['outputSchemaDefined'] == null ? undefined : json['outputSchemaDefined'],
+        'riskLevel': json['riskLevel'] == null ? undefined : json['riskLevel'],
         'title': json['title'] == null ? undefined : json['title'],
         'type': json['type'],
     };
@@ -129,6 +147,7 @@ export function ClusterElementDefinitionBasicToJSONTyped(value?: ClusterElementD
         'outputDefined': value['outputDefined'],
         'outputFunctionDefined': value['outputFunctionDefined'],
         'outputSchemaDefined': value['outputSchemaDefined'],
+        'riskLevel': value['riskLevel'],
         'title': value['title'],
         'type': value['type'],
     };
