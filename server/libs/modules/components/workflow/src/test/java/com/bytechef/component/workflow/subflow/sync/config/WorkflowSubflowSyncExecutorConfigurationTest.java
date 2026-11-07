@@ -25,10 +25,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.listener.SharedApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
+import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -51,14 +54,19 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.mock.env.MockEnvironment;
 
 /**
@@ -68,6 +76,7 @@ import org.springframework.mock.env.MockEnvironment;
 class WorkflowSubflowSyncExecutorConfigurationTest {
 
     private static final int MAX_SUBFLOW_DEPTH = 3;
+    private static final String TASK_DISPATCHER_PACKAGE = "com.bytechef.task.dispatcher";
 
     private final JobService jobService = mock(JobService.class);
     private final SubflowResolver subflowResolver = mock(SubflowResolver.class);
@@ -125,6 +134,41 @@ class WorkflowSubflowSyncExecutorConfigurationTest {
         assertThatThrownBy(() -> subflowSyncExecutor.execute("uuid-1", "newWorkflowCall", Map.of(), true, null))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("resolved");
+    }
+
+    @Test
+    void testEveryTaskCompletionHandlerOnClasspathIsRegistered() {
+        Set<String> registeredClassNames = workflowSubflowSyncExecutorConfiguration
+            .getTaskCompletionHandlerFactories(
+                mock(ContextService.class), mock(ApplicationEventPublisher.class), mock(CounterService.class),
+                mock(Evaluator.class), jobService, mock(TaskExecutionService.class), mock(TaskFileStorage.class))
+            .stream()
+            .map(
+                taskCompletionHandlerFactory -> taskCompletionHandlerFactory.createTaskCompletionHandler(
+                    mock(TaskCompletionHandler.class), mockTaskDispatcher()))
+            .map(taskCompletionHandler -> taskCompletionHandler.getClass()
+                .getName())
+            .collect(Collectors.toSet());
+
+        assertThat(registeredClassNames).containsAll(findClassNames(TaskCompletionHandler.class));
+    }
+
+    @Test
+    void testEveryTaskDispatcherOnClasspathIsRegistered() {
+        Set<String> registeredClassNames = workflowSubflowSyncExecutorConfiguration
+            .getTaskDispatcherResolverFactories(
+                mock(ChildJobPrincipalFactory.class), mock(ContextService.class), mock(CounterService.class),
+                mock(ApplicationEventPublisher.class), mock(Evaluator.class), jobService, subflowResolver,
+                mock(TaskExecutionService.class), mock(TaskFileStorage.class))
+            .stream()
+            .map(
+                taskDispatcherResolverFactory -> taskDispatcherResolverFactory.createTaskDispatcherResolver(
+                    mockTaskDispatcher()))
+            .map(taskDispatcherResolver -> taskDispatcherResolver.getClass()
+                .getName())
+            .collect(Collectors.toSet());
+
+        assertThat(registeredClassNames).containsAll(findClassNames(TaskDispatcherResolver.class));
     }
 
     @Test
@@ -189,5 +233,26 @@ class WorkflowSubflowSyncExecutorConfigurationTest {
         job.setMetadata(metadata);
 
         return job;
+    }
+
+    private static Set<String> findClassNames(Class<?> type) {
+        ClassPathScanningCandidateComponentProvider provider =
+            new ClassPathScanningCandidateComponentProvider(false);
+
+        provider.addIncludeFilter(new AssignableTypeFilter(type));
+
+        Set<String> classNames = provider.findCandidateComponents(TASK_DISPATCHER_PACKAGE)
+            .stream()
+            .map(BeanDefinition::getBeanClassName)
+            .collect(Collectors.toSet());
+
+        assertThat(classNames).isNotEmpty();
+
+        return classNames;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static TaskDispatcher<? super Task> mockTaskDispatcher() {
+        return mock(TaskDispatcher.class);
     }
 }
