@@ -24,19 +24,18 @@ interface ExternalInvocationsTableProps {
     a2aServerNames?: Record<string, string>;
     mcpServerNames?: Record<string, string>;
     onViewJob?: (jobId: number) => void;
-    showSurface?: boolean;
+    showSource?: boolean;
     externalInvocationLogs: Array<ExternalInvocationLogItemType>;
 }
 
 const PINNED_IDLE_CELL_CLASS_NAME =
     'sticky right-0 z-10 bg-surface-neutral-primary [tr:nth-child(even)>&]:bg-surface-neutral-secondary';
 
-const SURFACE_LABELS: Record<string, string> = {
-    A2A: 'A2A',
-    EMBEDDED_API_ACTION: 'Embedded API (Action)',
-    EMBEDDED_API_TOOL: 'Embedded API (Tool)',
-    MCP_AUTOMATION: 'MCP',
-    MCP_EMBEDDED: 'Embedded MCP',
+const SOURCE_LABELS: Record<string, string> = {
+    A2A_SERVER: 'A2A',
+    API_ACTION: 'API (Action)',
+    API_TOOL: 'API (Tool)',
+    MCP_SERVER: 'MCP',
 };
 
 interface InvocationTypeI {
@@ -49,9 +48,9 @@ const KIND_TYPES: Record<string, InvocationTypeI> = {
     WORKFLOW: {icon: WorkflowIcon, label: 'Workflow tool'},
 };
 
-const SURFACE_TYPES: Record<string, InvocationTypeI> = {
-    A2A: {icon: SparklesIcon, label: 'Skill'},
-    EMBEDDED_API_ACTION: {icon: ZapIcon, label: 'Action'},
+const SOURCE_TYPES: Record<string, InvocationTypeI> = {
+    A2A_SERVER: {icon: SparklesIcon, label: 'Skill'},
+    API_ACTION: {icon: ZapIcon, label: 'Action'},
 };
 
 const OUTCOME_STYLE_TYPES: Record<string, BadgeStyleType> = {
@@ -91,7 +90,7 @@ const targetLabel = (externalInvocationLog: ExternalInvocationLogItemType): stri
 };
 
 const InvocationTypeCell = ({externalInvocationLog}: {externalInvocationLog: ExternalInvocationLogItemType}) => {
-    const invocationType = SURFACE_TYPES[externalInvocationLog.surface] || KIND_TYPES[externalInvocationLog.kind];
+    const invocationType = SOURCE_TYPES[externalInvocationLog.source] || KIND_TYPES[externalInvocationLog.kind];
 
     if (!invocationType) {
         return <>{externalInvocationLog.kind}</>;
@@ -125,7 +124,7 @@ const ExternalInvocationsTable = ({
     externalInvocationLogs,
     mcpServerNames,
     onViewJob,
-    showSurface = true,
+    showSource = true,
 }: ExternalInvocationsTableProps) => (
     <Table>
         <TableHeader className={EXECUTIONS_TABLE_HEADER_CLASS_NAME}>
@@ -136,7 +135,7 @@ const ExternalInvocationsTable = ({
 
                 <TableHead className={twMerge(EXECUTIONS_TABLE_HEAD_CLASS_NAME, 'text-center')}>Type</TableHead>
 
-                {showSurface && <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Surface</TableHead>}
+                {showSource && <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Source</TableHead>}
 
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Server</TableHead>
 
@@ -185,9 +184,9 @@ const ExternalInvocationsTable = ({
                             <InvocationTypeCell externalInvocationLog={externalInvocationLog} />
                         </TableCell>
 
-                        {showSurface && (
+                        {showSource && (
                             <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                                {SURFACE_LABELS[externalInvocationLog.surface] || externalInvocationLog.surface}
+                                {SOURCE_LABELS[externalInvocationLog.source] || externalInvocationLog.source}
                             </TableCell>
                         )}
 

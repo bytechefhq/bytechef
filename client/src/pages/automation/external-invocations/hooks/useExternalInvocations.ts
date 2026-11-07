@@ -1,5 +1,5 @@
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
-import {surfaceHasA2aServer, surfaceHasMcpServer} from '@/pages/automation/external-invocations/utils/surfaceServers';
+import {sourceHasA2aServer, sourceHasMcpServer} from '@/pages/automation/external-invocations/utils/sourceServers';
 import {
     ExternalInvocationLogsQuery,
     ExternalInvocationLogsQueryVariables,
@@ -30,7 +30,7 @@ interface ExternalInvocationsFiltersI {
     outcome: string | undefined;
     pageNumber: number;
     startDate: Date | undefined;
-    surface: string | undefined;
+    source: string | undefined;
 }
 
 interface UseExternalInvocationsI {
@@ -39,15 +39,15 @@ interface UseExternalInvocationsI {
     filterMcpServerId: string | undefined;
     filterOutcome: string | undefined;
     filterPageNumber: number;
+    filterSource: string | undefined;
     filterStartDate: Date | undefined;
-    filterSurface: string | undefined;
     handleA2aServerChange: (item?: ComboBoxItemType) => void;
     handleEndDateChange: (date: Date | undefined) => void;
     handleMcpServerChange: (item?: ComboBoxItemType) => void;
     handleOutcomeChange: (item?: ComboBoxItemType) => void;
     handlePaginationClick: (pageNumber: number) => void;
+    handleSourceChange: (item?: ComboBoxItemType) => void;
     handleStartDateChange: (date: Date | undefined) => void;
-    handleSurfaceChange: (item?: ComboBoxItemType) => void;
     refetchExternalInvocations: () => void;
     externalInvocationLogPage: ExternalInvocationLogsQuery['externalInvocationLogs'] | undefined;
     externalInvocationLogs: Array<ExternalInvocationLogItemType>;
@@ -67,7 +67,7 @@ const toFilterVariables = (
     mcpServerId: filters.mcpServerId ? Number(filters.mcpServerId) : undefined,
     outcome: filters.outcome || undefined,
     page: filters.pageNumber,
-    surface: filters.surface || undefined,
+    source: filters.source || undefined,
     toDate: filters.endDate ? endOfDay(filters.endDate).getTime() : undefined,
     type,
 });
@@ -83,7 +83,7 @@ export const useExternalInvocations = ({
     const [filterOutcome, setFilterOutcome] = useState<string | undefined>(undefined);
     const [filterPageNumber, setFilterPageNumber] = useState<number>(0);
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(undefined);
-    const [filterSurface, setFilterSurface] = useState<string | undefined>(undefined);
+    const [filterSource, setFilterSource] = useState<string | undefined>(undefined);
 
     const filterVariables = toFilterVariables(
         {
@@ -92,8 +92,8 @@ export const useExternalInvocations = ({
             mcpServerId: filterMcpServerId,
             outcome: filterOutcome,
             pageNumber: filterPageNumber,
+            source: filterSource,
             startDate: filterStartDate,
-            surface: filterSurface,
         },
         type,
         environmentId
@@ -143,16 +143,16 @@ export const useExternalInvocations = ({
         setFilterPageNumber(0);
     };
 
-    const handleSurfaceChange = (item?: ComboBoxItemType) => {
-        const surface = item?.value ? String(item.value) : undefined;
+    const handleSourceChange = (item?: ComboBoxItemType) => {
+        const source = item?.value ? String(item.value) : undefined;
 
-        setFilterSurface(surface);
+        setFilterSource(source);
 
-        if (!surfaceHasA2aServer(surface)) {
+        if (!sourceHasA2aServer(source)) {
             setFilterA2aServerId(undefined);
         }
 
-        if (!surfaceHasMcpServer(surface)) {
+        if (!sourceHasMcpServer(source)) {
             setFilterMcpServerId(undefined);
         }
 
@@ -170,15 +170,15 @@ export const useExternalInvocations = ({
         filterMcpServerId,
         filterOutcome,
         filterPageNumber,
+        filterSource,
         filterStartDate,
-        filterSurface,
         handleA2aServerChange,
         handleEndDateChange,
         handleMcpServerChange,
         handleOutcomeChange,
         handlePaginationClick,
+        handleSourceChange,
         handleStartDateChange,
-        handleSurfaceChange,
         refetchExternalInvocations: activeQuery.refetch,
     };
 };

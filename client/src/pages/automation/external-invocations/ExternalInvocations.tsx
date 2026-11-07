@@ -11,7 +11,7 @@ import {
     ExternalInvocationsWorkspaceScopeI,
     useExternalInvocations,
 } from '@/pages/automation/external-invocations/hooks/useExternalInvocations';
-import {surfaceHasA2aServer, surfaceHasMcpServer} from '@/pages/automation/external-invocations/utils/surfaceServers';
+import {sourceHasA2aServer, sourceHasMcpServer} from '@/pages/automation/external-invocations/utils/sourceServers';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
@@ -34,15 +34,15 @@ const outcomeOptions = [
     {label: 'Suspended', value: 'SUSPENDED'},
 ];
 
-const surfaceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
+const sourceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
     [PlatformType.Automation]: [
-        {label: 'MCP', value: 'MCP_AUTOMATION'},
-        {label: 'A2A', value: 'A2A'},
+        {label: 'MCP Servers', value: 'MCP_SERVER'},
+        {label: 'A2A Servers', value: 'A2A_SERVER'},
     ],
     [PlatformType.Embedded]: [
-        {label: 'Embedded MCP', value: 'MCP_EMBEDDED'},
-        {label: 'Embedded API (Action)', value: 'EMBEDDED_API_ACTION'},
-        {label: 'Embedded API (Tool)', value: 'EMBEDDED_API_TOOL'},
+        {label: 'MCP Servers', value: 'MCP_SERVER'},
+        {label: 'API (Action)', value: 'API_ACTION'},
+        {label: 'API (Tool)', value: 'API_TOOL'},
     ],
 };
 
@@ -79,15 +79,15 @@ export const ExternalInvocations = ({
         filterMcpServerId,
         filterOutcome,
         filterPageNumber,
+        filterSource,
         filterStartDate,
-        filterSurface,
         handleA2aServerChange,
         handleEndDateChange,
         handleMcpServerChange,
         handleOutcomeChange,
         handlePaginationClick,
+        handleSourceChange,
         handleStartDateChange,
-        handleSurfaceChange,
         refetchExternalInvocations,
     } = useExternalInvocations({environmentId, type, workspaceScope});
 
@@ -105,9 +105,9 @@ export const ExternalInvocations = ({
         [mcpServerOptions]
     );
 
-    const showSurface = surfaceOptionsByType[type].length > 1;
+    const showSource = sourceOptionsByType[type].length > 1;
 
-    const visibleSurfaceOptions = useMemo(() => [ANY_FILTER_OPTION, ...surfaceOptionsByType[type]], [type]);
+    const visibleSourceOptions = useMemo(() => [ANY_FILTER_OPTION, ...sourceOptionsByType[type]], [type]);
 
     const hasActiveFilters =
         !!filterA2aServerId ||
@@ -115,7 +115,7 @@ export const ExternalInvocations = ({
         !!filterMcpServerId ||
         !!filterOutcome ||
         !!filterStartDate ||
-        !!filterSurface;
+        !!filterSource;
 
     const isFirstRun =
         !externalInvocationLogsIsLoading &&
@@ -171,15 +171,11 @@ export const ExternalInvocations = ({
             }
             leftSidebarBody={
                 <div className="space-y-4 px-2">
-                    {showSurface && (
+                    {showSource && (
                         <div className="flex flex-col space-y-2">
-                            <Label>Surface</Label>
+                            <Label>Source</Label>
 
-                            <ComboBox
-                                items={visibleSurfaceOptions}
-                                onChange={handleSurfaceChange}
-                                value={filterSurface}
-                            />
+                            <ComboBox items={visibleSourceOptions} onChange={handleSourceChange} value={filterSource} />
                         </div>
                     )}
 
@@ -189,7 +185,7 @@ export const ExternalInvocations = ({
                         <ComboBox items={outcomeOptions} onChange={handleOutcomeChange} value={filterOutcome} />
                     </div>
 
-                    {surfaceHasMcpServer(filterSurface) && mcpServerOptions && mcpServerOptions.length > 0 && (
+                    {sourceHasMcpServer(filterSource) && mcpServerOptions && mcpServerOptions.length > 0 && (
                         <div className="flex flex-col space-y-2">
                             <Label>MCP Server</Label>
 
@@ -202,7 +198,7 @@ export const ExternalInvocations = ({
                         </div>
                     )}
 
-                    {surfaceHasA2aServer(filterSurface) && a2aServerOptions && a2aServerOptions.length > 0 && (
+                    {sourceHasA2aServer(filterSource) && a2aServerOptions && a2aServerOptions.length > 0 && (
                         <div className="flex flex-col space-y-2">
                             <Label>A2A Server</Label>
 
@@ -240,7 +236,7 @@ export const ExternalInvocations = ({
                             externalInvocationLogs={externalInvocationLogs}
                             mcpServerNames={mcpServerNames}
                             onViewJob={onViewJob}
-                            showSurface={showSurface}
+                            showSource={showSource}
                         />
                     </div>
                 ) : isFirstRun ? (

@@ -31,14 +31,14 @@ const baseLog = {
     mcpServerId: null,
     operationName: 'sendMessage',
     outcome: 'SUCCESS',
-    surface: 'MCP_AUTOMATION',
+    source: 'MCP_SERVER',
     toolName: 'slack_sendMessage',
     workflowName: null,
     workspaceId: null,
 };
 
 describe('ExternalInvocationsTable', () => {
-    it('renders a row with the tool name, mapped surface label and outcome', () => {
+    it('renders a row with the tool name, mapped source label and outcome', () => {
         render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} />);
 
         expect(screen.getByText('slack_sendMessage')).toBeInTheDocument();
@@ -56,16 +56,14 @@ describe('ExternalInvocationsTable', () => {
     });
 
     it.each([
-        ['MCP_AUTOMATION', 'COMPONENT', 'Component tool'],
-        ['MCP_AUTOMATION', 'WORKFLOW', 'Workflow tool'],
-        ['MCP_EMBEDDED', 'COMPONENT', 'Component tool'],
-        ['MCP_EMBEDDED', 'WORKFLOW', 'Workflow tool'],
-        ['EMBEDDED_API_TOOL', 'COMPONENT', 'Component tool'],
-        ['EMBEDDED_API_ACTION', 'COMPONENT', 'Action'],
-        ['A2A', 'WORKFLOW', 'Skill'],
-        ['MCP_AUTOMATION', 'UNKNOWN_KIND', 'UNKNOWN_KIND'],
-    ])('renders a %s %s call as %s in the Type column', (surface, kind, expectedLabel) => {
-        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, kind, surface}]} />);
+        ['MCP_SERVER', 'COMPONENT', 'Component tool'],
+        ['MCP_SERVER', 'WORKFLOW', 'Workflow tool'],
+        ['API_TOOL', 'COMPONENT', 'Component tool'],
+        ['API_ACTION', 'COMPONENT', 'Action'],
+        ['A2A_SERVER', 'WORKFLOW', 'Skill'],
+        ['MCP_SERVER', 'UNKNOWN_KIND', 'UNKNOWN_KIND'],
+    ])('renders a %s %s call as %s in the Type column', (source, kind, expectedLabel) => {
+        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, kind, source}]} />);
 
         expect(screen.getAllByRole('columnheader')[1]).toHaveTextContent('Tool');
         expect(screen.getAllByRole('columnheader')[2]).toHaveTextContent('Type');
@@ -88,14 +86,13 @@ describe('ExternalInvocationsTable', () => {
     });
 
     it.each([
-        ['A2A', 'A2A'],
-        ['EMBEDDED_API_ACTION', 'Embedded API (Action)'],
-        ['EMBEDDED_API_TOOL', 'Embedded API (Tool)'],
-        ['MCP_AUTOMATION', 'MCP'],
-        ['MCP_EMBEDDED', 'Embedded MCP'],
-        ['FUTURE_SURFACE', 'FUTURE_SURFACE'],
-    ])('labels the %s surface as %s', (surface, label) => {
-        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, surface}]} />);
+        ['A2A_SERVER', 'A2A'],
+        ['API_ACTION', 'API (Action)'],
+        ['API_TOOL', 'API (Tool)'],
+        ['MCP_SERVER', 'MCP'],
+        ['FUTURE_SOURCE', 'FUTURE_SOURCE'],
+    ])('labels the %s source as %s', (source, label) => {
+        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, source}]} />);
 
         expect(screen.getByText(label)).toBeInTheDocument();
     });
@@ -184,7 +181,7 @@ describe('ExternalInvocationsTable', () => {
                         componentName: null,
                         kind: 'WORKFLOW',
                         operationName: null,
-                        surface: 'A2A',
+                        source: 'A2A_SERVER',
                         toolName: 'Summarize',
                     },
                 ]}
@@ -196,10 +193,10 @@ describe('ExternalInvocationsTable', () => {
         expect(screen.queryByText('Sales MCP')).not.toBeInTheDocument();
     });
 
-    it('hides the surface column when showSurface is false', () => {
-        render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} showSurface={false} />);
+    it('hides the source column when showSource is false', () => {
+        render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} showSource={false} />);
 
-        expect(screen.queryByText('Surface')).not.toBeInTheDocument();
+        expect(screen.queryByText('Source')).not.toBeInTheDocument();
         expect(screen.queryByText('MCP')).not.toBeInTheDocument();
         expect(screen.getByText('Target')).toBeInTheDocument();
         expect(screen.getByText('Server')).toBeInTheDocument();

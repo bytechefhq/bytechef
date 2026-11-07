@@ -130,7 +130,7 @@ describe('useExternalInvocations', () => {
         );
     });
 
-    it('clears the server filter the selected surface cannot have', () => {
+    it('clears the server filter the selected source cannot have', () => {
         const {result} = renderUseExternalInvocations({environmentId: 2, workspaceId: 1049});
 
         act(() => {
@@ -139,7 +139,7 @@ describe('useExternalInvocations', () => {
         });
 
         act(() => {
-            result.current.handleSurfaceChange({label: 'A2A', value: 'A2A'});
+            result.current.handleSourceChange({label: 'A2A Servers', value: 'A2A_SERVER'});
         });
 
         expect(result.current.filterA2aServerId).toBe('4');
@@ -147,13 +147,13 @@ describe('useExternalInvocations', () => {
 
         act(() => {
             result.current.handleMcpServerChange({label: 'Sales tools', value: '11'});
-            result.current.handleSurfaceChange({label: 'MCP', value: 'MCP_AUTOMATION'});
+            result.current.handleSourceChange({label: 'MCP Servers', value: 'MCP_SERVER'});
         });
 
         expect(result.current.filterA2aServerId).toBeUndefined();
         expect(result.current.filterMcpServerId).toBe('11');
         expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
-            expect.objectContaining({a2aServerId: undefined, mcpServerId: 11, surface: 'MCP_AUTOMATION'}),
+            expect.objectContaining({a2aServerId: undefined, mcpServerId: 11, source: 'MCP_SERVER'}),
             {enabled: true}
         );
     });
@@ -215,7 +215,7 @@ describe('useExternalInvocations', () => {
         expect(result.current.externalInvocationLogPage).toBeUndefined();
     });
 
-    it('passes the surface, outcome and date filters as query variables and clears them again', () => {
+    it('passes the source, outcome and date filters as query variables and clears them again', () => {
         const startDate = new Date(Date.UTC(2026, 9, 1));
         const endDate = new Date(2026, 9, 31);
 
@@ -226,13 +226,13 @@ describe('useExternalInvocations', () => {
         });
 
         act(() => {
-            result.current.handleSurfaceChange({label: 'MCP', value: 'MCP_AUTOMATION'});
+            result.current.handleSourceChange({label: 'MCP Servers', value: 'MCP_SERVER'});
             result.current.handleOutcomeChange({label: 'Error', value: 'ERROR'});
             result.current.handleStartDateChange(startDate);
             result.current.handleEndDateChange(endDate);
         });
 
-        expect(result.current.filterSurface).toBe('MCP_AUTOMATION');
+        expect(result.current.filterSource).toBe('MCP_SERVER');
         expect(result.current.filterOutcome).toBe('ERROR');
         expect(result.current.filterStartDate).toBe(startDate);
         expect(result.current.filterEndDate).toBe(endDate);
@@ -245,7 +245,7 @@ describe('useExternalInvocations', () => {
                 mcpServerId: undefined,
                 outcome: 'ERROR',
                 page: 0,
-                surface: 'MCP_AUTOMATION',
+                source: 'MCP_SERVER',
                 toDate: new Date(2026, 9, 31, 23, 59, 59, 999).getTime(),
                 type: 'AUTOMATION',
             },
@@ -253,7 +253,7 @@ describe('useExternalInvocations', () => {
         );
 
         act(() => {
-            result.current.handleSurfaceChange(undefined);
+            result.current.handleSourceChange(undefined);
             result.current.handleOutcomeChange(undefined);
             result.current.handleMcpServerChange(undefined);
             result.current.handleStartDateChange(undefined);
@@ -268,7 +268,7 @@ describe('useExternalInvocations', () => {
                 mcpServerId: undefined,
                 outcome: undefined,
                 page: 0,
-                surface: undefined,
+                source: undefined,
                 toDate: undefined,
                 type: 'AUTOMATION',
             },
