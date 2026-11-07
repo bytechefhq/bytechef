@@ -115,14 +115,19 @@ describe('artifactOpen', () => {
         });
     });
 
-    it('is clickable but not removable for the custom component and code workflow references', () => {
+    it('is clickable and removable for the custom component and code workflow references', () => {
         const customComponentArtifact = buildArtifact({kind: 'CUSTOM_COMPONENT_REFERENCED', metadataJson: null});
         const codeWorkflowArtifact = buildArtifact({kind: 'CODE_WORKFLOW_REFERENCED', metadataJson: null});
 
         expect(isArtifactClickable(customComponentArtifact)).toBe(true);
-        expect(isArtifactRemovable(customComponentArtifact)).toBe(false);
+        expect(isArtifactRemovable(customComponentArtifact)).toBe(true);
         expect(isArtifactClickable(codeWorkflowArtifact)).toBe(true);
-        expect(isArtifactRemovable(codeWorkflowArtifact)).toBe(false);
+        expect(isArtifactRemovable(codeWorkflowArtifact)).toBe(true);
+    });
+
+    it('is not removable for the reference kinds the server refuses to delete', () => {
+        expect(isArtifactRemovable(buildArtifact({kind: 'FILE_REFERENCED'}))).toBe(false);
+        expect(isArtifactRemovable(buildArtifact({kind: 'SKILL_REFERENCED'}))).toBe(false);
     });
 
     it('does nothing for a workflow artifact without a projectId', () => {
