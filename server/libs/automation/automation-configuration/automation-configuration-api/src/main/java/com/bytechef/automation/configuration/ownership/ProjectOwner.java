@@ -25,7 +25,8 @@ public enum ProjectOwner {
 
     EMBEDDED_AUTOMATION_WORKFLOW_PROJECT("automation_workflow_project"),
     EMBEDDED_CONNECTED_USER_PROJECT("connected_user_project"),
-    CONTEXT_STORE("context_store_source");
+    CONTEXT_STORE("context_store_source"),
+    KNOWLEDGE_BASE("knowledge_base_source");
 
     private final List<String> ownerTables;
 

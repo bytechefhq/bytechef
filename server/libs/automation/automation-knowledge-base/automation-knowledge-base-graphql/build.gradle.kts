@@ -5,6 +5,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context")
+    implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.graphql:spring-graphql")
     implementation("org.springframework:spring-web")
     implementation("io.projectreactor:reactor-core")

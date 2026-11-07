@@ -22,12 +22,15 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseVectorStoreMetadataService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -60,7 +63,10 @@ import tools.jackson.databind.json.JsonMapper;
         @Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class),
         @Filter(
             type = FilterType.REGEX,
-            pattern = "com\\.bytechef\\.platform\\.knowledgebase\\.config\\.KnowledgeBasePgVectorConfiguration")
+            pattern = {
+                "com\\.bytechef\\.platform\\.knowledgebase\\.config\\.KnowledgeBasePgVectorConfiguration",
+                "com\\.bytechef\\.automation\\.knowledgebase\\.facade\\.WorkspaceKnowledgeBaseSourceFacadeImpl"
+            })
     })
 @EnableAutoConfiguration(excludeName = {
     "org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechAutoConfiguration",
@@ -75,6 +81,11 @@ import tools.jackson.databind.json.JsonMapper;
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class AutomationKnowledgeBaseIntTestConfiguration {
+
+    @Bean
+    ComponentDefinitionService componentDefinitionService() {
+        return mock(ComponentDefinitionService.class);
+    }
 
     @Bean
     EmbeddingModel embeddingModel() {
@@ -139,7 +150,8 @@ public class AutomationKnowledgeBaseIntTestConfiguration {
         @Override
         protected List<?> userConverters() {
             return Arrays.asList(
-                new FileEntryToStringConverter(objectMapper), new StringToFileEntryConverter(objectMapper));
+                new FileEntryToStringConverter(objectMapper), new MapWrapperToStringConverter(objectMapper),
+                new StringToFileEntryConverter(objectMapper), new StringToMapWrapperConverter(objectMapper));
         }
     }
 }
