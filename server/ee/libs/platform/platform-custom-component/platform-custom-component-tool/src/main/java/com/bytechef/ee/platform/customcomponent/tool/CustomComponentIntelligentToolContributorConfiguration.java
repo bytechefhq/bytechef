@@ -41,9 +41,20 @@ public class CustomComponentIntelligentToolContributorConfiguration {
                 "buildCustomComponent", CustomComponentAgentType.BUILD_CUSTOM_COMPONENT, Set.of(),
                 variant -> factoryForVariant(
                     variant, customComponentAskFactoryProvider, customComponentBuildFactoryProvider),
-                chatClientFactory -> new CustomComponentAgentToolCallback(chatClientFactory, chatModelResolver)));
+                chatClientFactory -> new CustomComponentAgentToolCallback(chatClientFactory, chatModelResolver)),
+            new SimpleIntelligentToolDefinition(
+                "explainCustomComponent", CustomComponentAgentType.EXPLAIN_CUSTOM_COMPONENT, Set.of(),
+                variant -> askFactory(variant, customComponentAskFactoryProvider),
+                chatClientFactory -> CustomComponentAgentToolCallback.readOnly(chatClientFactory, chatModelResolver)));
 
         return () -> definitions;
+    }
+
+    @Nullable
+    private static IntelligentToolChatClientFactory askFactory(
+        IntelligentToolVariant variant, ObjectProvider<IntelligentToolChatClientFactory> askProvider) {
+
+        return variant == IntelligentToolVariant.ASK ? askProvider.getIfAvailable() : null;
     }
 
     @Nullable

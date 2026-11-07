@@ -40,9 +40,20 @@ public class CodeWorkflowIntelligentToolContributorConfiguration {
             new SimpleIntelligentToolDefinition(
                 "buildCodeWorkflow", CodeWorkflowAgentType.BUILD_CODE_WORKFLOW, Set.of(),
                 variant -> factoryForVariant(variant, codeWorkflowAskFactoryProvider, codeWorkflowBuildFactoryProvider),
-                chatClientFactory -> new CodeWorkflowAgentToolCallback(chatClientFactory, chatModelResolver)));
+                chatClientFactory -> new CodeWorkflowAgentToolCallback(chatClientFactory, chatModelResolver)),
+            new SimpleIntelligentToolDefinition(
+                "explainCodeWorkflow", CodeWorkflowAgentType.EXPLAIN_CODE_WORKFLOW, Set.of(),
+                variant -> askFactory(variant, codeWorkflowAskFactoryProvider),
+                chatClientFactory -> CodeWorkflowAgentToolCallback.readOnly(chatClientFactory, chatModelResolver)));
 
         return () -> definitions;
+    }
+
+    @Nullable
+    private static IntelligentToolChatClientFactory askFactory(
+        IntelligentToolVariant variant, ObjectProvider<IntelligentToolChatClientFactory> askProvider) {
+
+        return variant == IntelligentToolVariant.ASK ? askProvider.getIfAvailable() : null;
     }
 
     @Nullable

@@ -34,13 +34,17 @@ import org.springframework.beans.factory.ObjectProvider;
 final class AutomationIntelligentToolContributorConfigurationTest {
 
     @Test
-    void testContributesTwoDefinitionsWithExpectedNamesAndAgentTypeKeys() {
+    void testContributesTheBuildAndReadOnlyDefinitionsWithExpectedNamesAndAgentTypeKeys() {
         List<IntelligentToolDefinition> definitions = definitionsWithAllProvidersPresent();
 
-        assertThat(definitions).hasSize(2);
-
         assertThat(definitions).extracting(IntelligentToolDefinition::name)
-            .containsExactly("buildCustomComponent", "buildCodeWorkflow");
+            .containsExactly("buildCustomComponent", "buildCodeWorkflow", "explainCustomComponent",
+                "explainCodeWorkflow");
+
+        assertThat(definitionNamed(definitions, "explainCustomComponent").agentType())
+            .isEqualTo(CustomComponentAgentType.EXPLAIN_CUSTOM_COMPONENT);
+        assertThat(definitionNamed(definitions, "explainCodeWorkflow").agentType())
+            .isEqualTo(CodeWorkflowAgentType.EXPLAIN_CODE_WORKFLOW);
 
         assertThat(definitionNamed(definitions, "buildCustomComponent").agentType())
             .isEqualTo(CustomComponentAgentType.BUILD_CUSTOM_COMPONENT);
@@ -58,13 +62,51 @@ final class AutomationIntelligentToolContributorConfigurationTest {
     }
 
     @Test
-    void testChatClientFactoryIsPresentForBothVariantsWhenBeansPresent() {
+    void testChatClientFactoryIsPresentForBothVariantsOfTheBuildDefinitionsWhenBeansPresent() {
         List<IntelligentToolDefinition> definitions = definitionsWithAllProvidersPresent();
 
-        for (IntelligentToolDefinition definition : definitions) {
+        for (String name : List.of("buildCustomComponent", "buildCodeWorkflow")) {
+            IntelligentToolDefinition definition = definitionNamed(definitions, name);
+
             assertThat(definition.chatClientFactory(IntelligentToolVariant.ASK)).isNotNull();
             assertThat(definition.chatClientFactory(IntelligentToolVariant.BUILD)).isNotNull();
         }
+    }
+
+    @Test
+    void testReadOnlyDefinitionsRouteOnlyToTheAskSubAgents() {
+        IntelligentToolChatClientFactory customComponentAskFactory = mock(IntelligentToolChatClientFactory.class);
+        IntelligentToolChatClientFactory codeWorkflowAskFactory = mock(IntelligentToolChatClientFactory.class);
+
+        IntelligentToolContributor contributor = automationIntelligentToolContributor(
+            present(customComponentAskFactory), present(mock(IntelligentToolChatClientFactory.class)),
+            present(codeWorkflowAskFactory), present(mock(IntelligentToolChatClientFactory.class)),
+            present(mock(SubAgentChatModelResolver.class)));
+
+        List<IntelligentToolDefinition> definitions = contributor.getIntelligentToolDefinitions();
+
+        IntelligentToolDefinition explainCustomComponent = definitionNamed(definitions, "explainCustomComponent");
+
+        assertThat(explainCustomComponent.chatClientFactory(IntelligentToolVariant.ASK))
+            .isSameAs(customComponentAskFactory);
+        assertThat(explainCustomComponent.chatClientFactory(IntelligentToolVariant.BUILD)).isNull();
+
+        IntelligentToolDefinition explainCodeWorkflow = definitionNamed(definitions, "explainCodeWorkflow");
+
+        assertThat(explainCodeWorkflow.chatClientFactory(IntelligentToolVariant.ASK)).isSameAs(codeWorkflowAskFactory);
+        assertThat(explainCodeWorkflow.chatClientFactory(IntelligentToolVariant.BUILD)).isNull();
+    }
+
+    @Test
+    void testReadOnlyDefinitionsCreateReadOnlyNamedToolCallbacks() {
+        List<IntelligentToolDefinition> definitions = definitionsWithAllProvidersPresent();
+
+        assertThat(definitionNamed(definitions, "explainCustomComponent").create(chatModel -> mock(ChatClient.class))
+            .getToolDefinition()
+            .name()).isEqualTo("explainCustomComponent");
+        assertThat(definitionNamed(definitions, "explainCodeWorkflow").create(chatModel -> mock(ChatClient.class))
+            .getToolDefinition()
+            .name()).isEqualTo("explainCodeWorkflow");
     }
 
     @Test
@@ -156,7 +198,8 @@ final class AutomationIntelligentToolContributorConfigurationTest {
             new CodeWorkflowIntelligentToolContributorConfiguration().codeWorkflowIntelligentToolContributor(
                 codeWorkflowAskFactoryProvider, codeWorkflowBuildFactoryProvider, chatModelResolverProvider);
 
-        List<String> order = List.of("buildCustomComponent", "buildCodeWorkflow");
+        List<String> order = List.of(
+            "buildCustomComponent", "buildCodeWorkflow", "explainCustomComponent", "explainCodeWorkflow");
 
         return () -> Stream.of(contributor1, contributor2)
             .flatMap(contributor -> contributor.getIntelligentToolDefinitions()

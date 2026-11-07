@@ -27,7 +27,8 @@ public enum CustomComponentAgentType implements AgentType {
 
     CUSTOM_COMPONENT_ASK(Source.CUSTOM_COMPONENT, Mode.ASK),
     CUSTOM_COMPONENT_BUILD(Source.CUSTOM_COMPONENT, Mode.BUILD),
-    BUILD_CUSTOM_COMPONENT("buildCustomComponent");
+    BUILD_CUSTOM_COMPONENT("buildCustomComponent"),
+    EXPLAIN_CUSTOM_COMPONENT("explainCustomComponent");
 
     private final String key;
 

@@ -46,6 +46,14 @@ public class CodeWorkflowAgentToolCallback implements ToolCallback {
             Creates a new code workflow project when the request describes one that doesn't exist, or updates
             an existing one named or identified by id in the request.""";
 
+    private static final String EXPLAIN_DESCRIPTION =
+        """
+            Delegate a question about code workflows to a read-only Code Workflow subagent. Code
+            workflows are whole automation projects authored as a single JavaScript or Python script.
+            The subagent lists code workflow projects, reads their source and explains what they do and how
+            they work; it cannot create or change a code workflow. Prefer calling it over reasoning about code
+            workflows directly. The result is a synthesised markdown report.""";
+
     private static final String INPUT_SCHEMA =
         """
             {
@@ -59,22 +67,44 @@ public class CodeWorkflowAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
+    private final AgentType agentType;
     private final IntelligentToolChatClientFactory chatClientFactory;
     private final @Nullable SubAgentChatModelResolver chatModelResolver;
+    private final String description;
+    private final String toolName;
 
-    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CodeWorkflowAgentToolCallback(
         IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
 
+        this("buildCodeWorkflow", DESCRIPTION, CodeWorkflowAgentType.BUILD_CODE_WORKFLOW, chatClientFactory,
+            chatModelResolver);
+    }
+
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    private CodeWorkflowAgentToolCallback(
+        String toolName, String description, AgentType agentType,
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
+        this.agentType = agentType;
         this.chatClientFactory = chatClientFactory;
         this.chatModelResolver = chatModelResolver;
+        this.description = description;
+        this.toolName = toolName;
+    }
+
+    public static CodeWorkflowAgentToolCallback readOnly(
+        IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver) {
+
+        return new CodeWorkflowAgentToolCallback(
+            "explainCodeWorkflow", EXPLAIN_DESCRIPTION, CodeWorkflowAgentType.EXPLAIN_CODE_WORKFLOW, chatClientFactory,
+            chatModelResolver);
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("buildCodeWorkflow")
-            .description(DESCRIPTION)
+            .name(toolName)
+            .description(description)
             .inputSchema(INPUT_SCHEMA)
             .build();
     }
@@ -104,7 +134,7 @@ public class CodeWorkflowAgentToolCallback implements ToolCallback {
                 chatClientFactory.get(SubAgentChatModelResolution.resolve(chatModelResolver, parentContext));
 
             String result = CurrentAgentContext.callWith(
-                CodeWorkflowAgentType.BUILD_CODE_WORKFLOW, parentAgent,
+                agentType, parentAgent,
                 () -> codeWorkflowChatClient.prompt(request)
                     .toolContext(parentContext)
                     .call()
@@ -119,7 +149,7 @@ public class CodeWorkflowAgentToolCallback implements ToolCallback {
             return result;
         } catch (JacksonException exception) {
             log.warn(
-                "buildCodeWorkflow rejected malformed tool input: {} — first 200 chars of input: {}",
+                "{} rejected malformed tool input: {} — first 200 chars of input: {}", toolName,
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
@@ -128,7 +158,7 @@ public class CodeWorkflowAgentToolCallback implements ToolCallback {
             return ToolErrors.toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                CodeWorkflowAgentToolCallback.class, "buildCodeWorkflow", exception);
+                CodeWorkflowAgentToolCallback.class, toolName, exception);
         }
     }
 

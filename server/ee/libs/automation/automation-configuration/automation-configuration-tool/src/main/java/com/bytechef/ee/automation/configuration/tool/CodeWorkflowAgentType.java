@@ -27,7 +27,8 @@ public enum CodeWorkflowAgentType implements AgentType {
 
     CODE_WORKFLOW_ASK(Source.CODE_WORKFLOW, Mode.ASK),
     CODE_WORKFLOW_BUILD(Source.CODE_WORKFLOW, Mode.BUILD),
-    BUILD_CODE_WORKFLOW("buildCodeWorkflow");
+    BUILD_CODE_WORKFLOW("buildCodeWorkflow"),
+    EXPLAIN_CODE_WORKFLOW("explainCodeWorkflow");
 
     private final String key;
 
