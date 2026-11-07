@@ -100,7 +100,7 @@ docker compose -f docker-compose.dev.server.yml up -d
     - `automation-data-table/` - Data table management
     - `automation-knowledge-base/` - Knowledge base integration
     - `automation-search/` - Search services for automation entities
-    - `automation-swagger/` - OpenAPI/Swagger surface for automation APIs
+    - `automation-openapi/` - OpenAPI (Scalar) surface for automation APIs
     - `automation-task/` - Task management services
     - `automation-workflow/` - Workflow coordination and execution
 
