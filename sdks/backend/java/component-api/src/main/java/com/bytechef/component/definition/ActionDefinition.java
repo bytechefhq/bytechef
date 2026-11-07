@@ -420,24 +420,6 @@ public interface ActionDefinition {
             void addTimeoutListener(Runnable timeoutListener);
 
             /**
-             * Registers a listener for turn-cancel events. Fires when {@link #cancelTurn(String)} is called or when the
-             * platform's WS handler propagates a cancellation from an adjacent chain node. Components are expected to
-             * abort in-flight work for the given turnId — close provider WS connections, drop queued audio/text, stop
-             * ongoing LLM streams.
-             *
-             * <p>
-             * Default implementation is a no-op so existing components keep compiling. Components that should
-             * participate in barge-in coordination (streaming agents, TTS) override and wire cancellation here.
-             *
-             * @param turnCancelListener consumer invoked with the cancelled turnId
-             */
-            default void addTurnCancelListener(Consumer<String> turnCancelListener) {
-            }
-
-            default void cancelTurn(String turnId) {
-            }
-
-            /**
              * Marks the WebSocket communication as completed.
              */
             void complete();
@@ -670,30 +652,6 @@ public interface ActionDefinition {
          * @throws Exception if an error occurs during action execution or setup
          */
         SseEmitterHandler apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-            throws Exception;
-    }
-
-    /**
-     * Functional interface for executing actions that require bidirectional WebSocket communication. Returns a
-     * {@link WebSocketHandler} that bridges the action's WebSocket data to/from connected clients.
-     *
-     * @see WebSocketHandler
-     * @see ActionContext
-     * @see Parameters
-     */
-    @FunctionalInterface
-    interface WebSocketPerformFunction extends BasePerformFunction {
-
-        /**
-         * Executes the action and returns a {@link WebSocketHandler} for bidirectional WebSocket communication.
-         *
-         * @param inputParameters      the input parameters for the action
-         * @param connectionParameters the connection parameters for authentication
-         * @param context              the action execution context
-         * @return the {@link WebSocketHandler} that will handle WebSocket messages
-         * @throws Exception if an error occurs during action execution
-         */
-        WebSocketHandler apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
 

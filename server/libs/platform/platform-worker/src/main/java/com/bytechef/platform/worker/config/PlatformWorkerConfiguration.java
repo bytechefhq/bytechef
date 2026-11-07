@@ -24,7 +24,6 @@ import com.bytechef.platform.worker.task.CallableResponseTaskExecutionPostOutput
 import com.bytechef.platform.worker.task.ClusterElementCallsTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SseStreamTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
-import com.bytechef.platform.worker.task.WebSocketStreamTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,14 +46,6 @@ public class PlatformWorkerConfiguration {
     @Order(2)
     SseStreamTaskExecutionPostOutputProcessor sseStreamTaskExecutionPostOutputProcessor(MessageBroker messageBroker) {
         return new SseStreamTaskExecutionPostOutputProcessor(messageBroker);
-    }
-
-    @Bean
-    @Order(3)
-    WebSocketStreamTaskExecutionPostOutputProcessor webSocketStreamTaskExecutionPostOutputProcessor(
-        MessageBroker messageBroker) {
-
-        return new WebSocketStreamTaskExecutionPostOutputProcessor(messageBroker);
     }
 
     @Bean

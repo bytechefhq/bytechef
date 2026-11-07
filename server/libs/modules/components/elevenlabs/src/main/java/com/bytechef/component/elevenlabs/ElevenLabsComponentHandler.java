@@ -22,8 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.elevenlabs.action.ElevenLabsCreateRealtimeSpeechAction;
-import com.bytechef.component.elevenlabs.action.ElevenLabsCreateRealtimeTranscriptAction;
 import com.bytechef.component.elevenlabs.action.ElevenLabsCreateSoundEffectAction;
 import com.bytechef.component.elevenlabs.action.ElevenLabsCreateSpeechAction;
 import com.bytechef.component.elevenlabs.action.ElevenLabsCreateSpeechWithTimingAction;
@@ -50,8 +48,6 @@ public class ElevenLabsComponentHandler implements ComponentHandler {
         .customActionHelp("", "https://elevenlabs.io/docs/api-reference/introduction")
         .connection(ElevenLabsConnection.CONNECTION_DEFINITION)
         .actions(
-            ElevenLabsCreateRealtimeSpeechAction.ACTION_DEFINITION,
-            ElevenLabsCreateRealtimeTranscriptAction.ACTION_DEFINITION,
             ElevenLabsCreateSoundEffectAction.ACTION_DEFINITION,
             ElevenLabsCreateSpeechAction.ACTION_DEFINITION,
             ElevenLabsCreateSpeechWithTimingAction.ACTION_DEFINITION,

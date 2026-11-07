@@ -1043,7 +1043,6 @@ public class JobSyncExecutor {
         return List.of(
             new CallableResponseTaskExecutionPostOutputProcessor(),
             new SseStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
-            new WebSocketStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
             new ClusterElementCallsTaskExecutionPostOutputProcessor(ClusterElementCallRecorder.getInstance()),
             new SuspendTaskExecutionPostOutputProcessor(null),
             new WebhookResponseTaskExecutionPostOutputProcessor());
