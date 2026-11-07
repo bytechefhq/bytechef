@@ -24,11 +24,15 @@ import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,15 +43,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
 
+    private final DataTableRowService dataTableRowService;
     private final DataTableService dataTableService;
     private final WorkspaceDataTableService workspaceDataTableService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceDataTableFacadeImpl(
-        DataTableService dataTableService, WorkspaceDataTableService workspaceDataTableService) {
+        DataTableRowService dataTableRowService, DataTableService dataTableService,
+        WorkspaceDataTableService workspaceDataTableService) {
 
+        this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
         this.workspaceDataTableService = workspaceDataTableService;
+    }
+
+    @Override
+    public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
+        dataTableService.addColumn(dataTableService.getBaseNameById(dataTableId), columnSpec, environmentId);
     }
 
     @Override
@@ -64,6 +76,16 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
         long dataTableId = dataTableService.getIdByBaseName(baseName);
 
         workspaceDataTableService.assignDataTableToWorkspace(dataTableId, workspaceId);
+    }
+
+    @Override
+    public boolean deleteRow(long dataTableId, long rowId, long environmentId) {
+        return dataTableRowService.deleteRow(dataTableService.getBaseNameById(dataTableId), rowId, environmentId);
+    }
+
+    @Override
+    public boolean dropTable(long dataTableId, long environmentId) {
+        return dataTableService.dropTable(dataTableService.getBaseNameById(dataTableId), environmentId);
     }
 
     @Override
@@ -90,6 +112,30 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
 
     @Override
     @Transactional(readOnly = true)
+    public long getDataTableId(String baseName) {
+        return dataTableService.getIdByBaseName(baseName);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public @Nullable DataTableRow getRow(long dataTableId, long rowId, long environmentId) {
+        return dataTableRowService.getRow(dataTableService.getBaseNameById(dataTableId), rowId, environmentId);
+    }
+
+    @Override
+    public DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId) {
+        return dataTableRowService.insertRow(dataTableService.getBaseNameById(dataTableId), values, environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId) {
+        return dataTableRowService.listRows(
+            dataTableService.getBaseNameById(dataTableId), limit, offset, environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<DataTableInfo> listTables(long workspaceId, long environmentId) {
         List<DataTableInfo> dataTableInfos = dataTableService.listTables(environmentId);
 
@@ -102,5 +148,11 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
         return dataTableInfos.stream()
             .filter(dataTableInfo -> dataTableInfo.id() != null && dataTableIds.contains(dataTableInfo.id()))
             .toList();
+    }
+
+    @Override
+    public DataTableRow updateRow(long dataTableId, long rowId, Map<String, Object> values, long environmentId) {
+        return dataTableRowService.updateRow(
+            dataTableService.getBaseNameById(dataTableId), rowId, values, environmentId);
     }
 }
