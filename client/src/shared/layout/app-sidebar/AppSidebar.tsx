@@ -138,7 +138,7 @@ export function AppSidebar({navigation}: AppSidebarProps) {
     }, [currentEnvironmentId]);
 
     return (
-        <Sidebar className="h-full" collapsible="icon">
+        <Sidebar className="h-full border-sidebar-border" collapsible="icon">
             <SidebarHeader className="py-[13px]">
                 <div className="flex items-center justify-between gap-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-3">
                     <AppSidebarWorkspaceSelect />
