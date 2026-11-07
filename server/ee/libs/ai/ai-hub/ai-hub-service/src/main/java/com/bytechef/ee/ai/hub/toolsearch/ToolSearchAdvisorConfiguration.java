@@ -223,9 +223,10 @@ public class ToolSearchAdvisorConfiguration {
         return new TurnEndingToolCallingManager(
             new LazyToolCallingManager(
                 () -> new UnknownToolRecoveringToolCallingManager(
-                    new DefaultToolCallingManager(
-                        observationRegistry, new MapToolCallbackResolver(callbackMapSupplier.get()),
-                        new DefaultToolExecutionExceptionProcessor(false)))),
+                    new RunCatalogToolCallingManager(
+                        new DefaultToolCallingManager(
+                            observationRegistry, new MapToolCallbackResolver(callbackMapSupplier.get()),
+                            new DefaultToolExecutionExceptionProcessor(false))))),
             AiHubSpringAIAgent::isTurnEnding);
     }
 
