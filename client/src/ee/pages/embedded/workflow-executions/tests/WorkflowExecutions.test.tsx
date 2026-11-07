@@ -573,7 +573,7 @@ describe('WorkflowExecutions', () => {
 
         renderWorkflowExecutions('source=INTEGRATIONS&connectedUserId=42');
 
-        expect(useGetConnectedUserQueryMock).toHaveBeenLastCalledWith(42, true);
+        expect(useGetConnectedUserQueryMock).toHaveBeenCalledWith(42, true);
         expect(getFilterComboBox('Connected User')).toHaveTextContent('User user-42');
         expect(screen.getAllByText(/user-42/).length).toBeGreaterThan(1);
 

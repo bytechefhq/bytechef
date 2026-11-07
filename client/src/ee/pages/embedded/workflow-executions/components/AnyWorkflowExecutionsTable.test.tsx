@@ -25,10 +25,11 @@ vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
 
 const automationJobRow = {
     automationWorkflowExecution: {
+        connectedUserId: 5,
         id: 3,
         job: {id: '3', startDate: new Date('2026-10-20T10:00:00Z'), status: 'COMPLETED'},
         project: {name: 'Sales Sync'},
-        projectDeployment: {name: 'user-5'},
+        projectDeployment: {name: '__EMBEDDED__user-5__DEVELOPMENT'},
         workflow: {label: 'Sync contacts'},
     },
     job: {id: '3', startDate: new Date('2026-10-20T10:00:00Z'), status: 'COMPLETED'},
@@ -39,7 +40,7 @@ const automationTriggerRow = {
     automationWorkflowExecution: {
         id: 4,
         project: {name: 'Sales Sync'},
-        projectDeployment: {name: 'user-5'},
+        projectDeployment: {name: '__EMBEDDED__user-5__DEVELOPMENT'},
         workflow: {label: 'Failed trigger'},
     },
     workflow: {label: 'Failed trigger'},
@@ -80,7 +81,8 @@ describe('AnyWorkflowExecutionsTable', () => {
 
         expect(screen.getByRole('img', {name: 'Automation'})).toBeInTheDocument();
         expect(screen.getByText('Sales Sync')).toBeInTheDocument();
-        expect(screen.getByText('user-5')).toBeInTheDocument();
+        expect(screen.getByText('external-5')).toBeInTheDocument();
+        expect(screen.queryByText('__EMBEDDED__user-5__DEVELOPMENT')).not.toBeInTheDocument();
 
         expect(screen.getByRole('img', {name: 'Integration'})).toBeInTheDocument();
         expect(screen.getByText('Gmail')).toBeInTheDocument();

@@ -1,3 +1,4 @@
+import EmbeddedWorkflowExecutionConnectedUser from '@/ee/pages/embedded/workflow-executions/components/EmbeddedWorkflowExecutionConnectedUser';
 import EmbeddedWorkflowExecutionsTableContent from '@/ee/pages/embedded/workflow-executions/components/EmbeddedWorkflowExecutionsTableContent';
 import {getWorkflowExecutionColumns} from '@/ee/pages/embedded/workflow-executions/components/getWorkflowExecutionColumns';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
@@ -32,8 +33,8 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
                 header: 'Project',
                 id: 'project',
             }),
-            columnHelper.accessor((row) => row.projectDeployment, {
-                cell: (info) => info.getValue()?.name,
+            columnHelper.accessor((row) => row.connectedUserId, {
+                cell: (info) => <EmbeddedWorkflowExecutionConnectedUser connectedUserId={info.getValue()} />,
                 header: 'Connected user',
                 id: 'connectedUser',
             }),

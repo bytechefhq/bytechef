@@ -844,7 +844,10 @@ export const WorkflowExecutions = () => {
                     ) : filterSource === WorkflowExecutionsSource.Automations ? (
                         <AutomationWorkflowExecutionsTable data={workflowExecutions as AutomationWorkflowExecution[]} />
                     ) : (
-                        <EmbeddedWorkflowExecutionsTable data={workflowExecutions as EmbeddedWorkflowExecution[]} />
+                        <EmbeddedWorkflowExecutionsTable
+                            data={workflowExecutions as EmbeddedWorkflowExecution[]}
+                            showConnectedUser
+                        />
                     )
                 ) : (
                     <EmptyList
