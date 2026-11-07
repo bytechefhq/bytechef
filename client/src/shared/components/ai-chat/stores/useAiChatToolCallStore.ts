@@ -51,12 +51,18 @@ interface ToolCallStateI {
     appendProgressiveOutput: (toolCallId: string, chunk: string) => void;
     completeToolCall: (toolCallId: string, result: unknown, isError: boolean) => void;
     failAllRunning: (errorResult: unknown, status?: 'aborted' | 'error') => void;
-    failRunningInChat: (chatId: string, errorResult: unknown, status?: 'aborted' | 'error') => void;
+    failRunningInChat: (
+        chatId: string,
+        errorResult: unknown,
+        status?: 'aborted' | 'error',
+        keepToolCallIds?: ReadonlySet<string>
+    ) => void;
     findRunningToolCallByName: (toolName: string, chatId?: string) => RunningToolCallEntryType | undefined;
     finishProgress: (toolCallId: string, outcome: SubagentProgressOutcomeType) => void;
     order: string[];
     /** Drops the entries of `chatId` attached to the message at `fromMessageIndex` or any later one. */
     removeFromMessageIndex: (chatId: string, fromMessageIndex: number) => void;
+    reopenToolCall: (toolCallId: string) => void;
     reset: () => void;
     resetForChat: (chatId: string | undefined) => void;
     /** Moves the entries of `chatId` down by `offset` messages, after that many messages were inserted before them. */
@@ -263,7 +269,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                 return {...state, toolCalls: updated};
             }),
 
-        failRunningInChat: (chatId, errorResult, status = 'aborted') =>
+        failRunningInChat: (chatId, errorResult, status = 'aborted', keepToolCallIds) =>
             set((state) => {
                 const updated: Record<string, ToolCallEntryI> = {...state.toolCalls};
                 let mutated = false;
@@ -271,7 +277,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                 for (const id of state.order) {
                     const entry = updated[id];
 
-                    if (entry && entry.status === 'running' && entry.chatId === chatId) {
+                    if (entry && entry.status === 'running' && entry.chatId === chatId && !keepToolCallIds?.has(id)) {
                         const terminated: TerminalToolCallEntryType = {
                             args: entry.args,
                             chatId: entry.chatId,
@@ -343,6 +349,19 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
             }),
 
         reset: () => set({order: [], toolCalls: {}}),
+
+        reopenToolCall: (toolCallId) =>
+            set((state) => {
+                const existing = state.toolCalls[toolCallId];
+
+                if (!existing || existing.status === 'aborted' || existing.status === 'running') {
+                    return state;
+                }
+
+                const reopened: RunningToolCallEntryType = {...existing, status: 'running'};
+
+                return {...state, toolCalls: {...state.toolCalls, [toolCallId]: reopened}};
+            }),
 
         shiftMessageIndexes: (chatId, offset) =>
             set((state) => {

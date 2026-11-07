@@ -19,6 +19,11 @@ import {
 } from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {sanitizeAssistantMessages} from '@/ee/pages/automation/ai-hub/runtime-providers/stripLeakedToolMarkup';
 import {isParsedToolResultValue} from '@/ee/pages/automation/ai-hub/runtime-providers/toolResultValue';
+import {
+    WorkflowStreamCompleteType,
+    fetchWorkflowResponse,
+    openWorkflowSseStream,
+} from '@/ee/pages/automation/ai-hub/runtime-providers/workflowStreamHandler';
 import {generateMessageId} from '@/ee/pages/automation/ai-hub/stores/messageId';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
@@ -194,6 +199,38 @@ const validateOpenChatTabResult = (raw: unknown): OpenChatTabResultType | null =
     }
 
     return {error: typeof record.error === 'string' ? record.error : 'tool reported opened:false', opened: false};
+};
+
+interface RunChatWorkflowResultI {
+    streaming: boolean;
+    url: string;
+}
+
+const WEBHOOK_URL_PREFIX = '/webhooks/';
+
+const isWebhookUrl = (value: unknown): value is string =>
+    typeof value === 'string' && value.startsWith(WEBHOOK_URL_PREFIX) && !value.includes('..');
+
+export const validateRunChatWorkflowResult = (raw: unknown): RunChatWorkflowResultI | null => {
+    if (typeof raw !== 'object' || raw === null) {
+        return null;
+    }
+
+    const record = raw as Record<string, unknown>;
+
+    if (typeof record.workflowExecutionId !== 'string') {
+        return null;
+    }
+
+    if (record.streaming === true && isWebhookUrl(record.streamUrl)) {
+        return {streaming: true, url: record.streamUrl};
+    }
+
+    if (record.streaming === false && isWebhookUrl(record.responseUrl)) {
+        return {streaming: false, url: record.responseUrl};
+    }
+
+    return null;
 };
 
 const toWorkflowQuestionOption = (
@@ -560,12 +597,17 @@ const parseToolResult = (content: string): {ok: true; value: unknown} | {ok: fal
     }
 };
 
-export const terminateOrphanRunningToolCalls = (chatId: string | undefined): void => {
+export const terminateOrphanRunningToolCalls = (
+    chatId: string | undefined,
+    keepToolCallIds?: ReadonlySet<string>
+): void => {
     if (chatId == null) {
         return;
     }
 
-    aiChatToolCallStore.getState().failRunningInChat(chatId, {reason: 'Run finished with no result event'}, 'aborted');
+    aiChatToolCallStore
+        .getState()
+        .failRunningInChat(chatId, {reason: 'Run finished with no result event'}, 'aborted', keepToolCallIds);
 };
 
 /**
@@ -593,6 +635,7 @@ export const buildAiHubSubscriber = ({
     runLifecycle,
     turnAbortSignal,
 }: BuildSubscriberDepsI): AgentSubscriber => {
+    const runningWorkflowToolCallIds = new Set<string>();
     const toolCallNamesById = new Map<string, string>();
     const unrecoveredToolFailures = new Map<string, string>();
 
@@ -790,6 +833,95 @@ export const buildAiHubSubscriber = ({
         onChatOpened?.();
     };
 
+    const surfaceWorkflowRunFailure = (toolCallId: string, errorMessage: string) => {
+        aiChatToolCallStore.getState().completeToolCall(toolCallId, {error: errorMessage}, true);
+
+        if (!isStaleChat()) {
+            aiChatRetryableErrorStore.getState().setError({
+                errorMessage,
+                lastUserMessage: getLastUserMessage(),
+                toolName: 'runChatWorkflow',
+            });
+        }
+    };
+
+    const runChatWorkflow = (toolCallId: string, toolResultContent: string) => {
+        const parsedResult = parseJson<unknown>(toolResultContent, 'runChatWorkflow result');
+        const workflowRun = validateRunChatWorkflowResult(parsedResult);
+
+        if (workflowRun === null) {
+            console.warn('[AiHub] runChatWorkflow: malformed result', toolResultContent);
+
+            aiChatToolCallStore.getState().completeToolCall(toolCallId, {error: 'malformed result'}, true);
+
+            recordToolFailure('runChatWorkflow', 'malformed result');
+
+            return;
+        }
+
+        aiChatToolCallStore.getState().reopenToolCall(toolCallId);
+
+        runningWorkflowToolCallIds.add(toolCallId);
+
+        const replyMessageId = generateMessageId();
+
+        let reply = '';
+
+        const appendReply = (chunk: string) => {
+            if (isStaleChat()) {
+                return;
+            }
+
+            const replyStarted = reply !== '';
+
+            reply += chunk;
+
+            if (!replyStarted) {
+                addMessage({content: reply, id: replyMessageId, role: 'assistant'});
+
+                return;
+            }
+
+            useAiHubStore.setState((state) => ({
+                messages: state.messages.map((message) =>
+                    message.id === replyMessageId ? {...message, content: reply} : message
+                ),
+            }));
+        };
+
+        const onError = (streamError: {message: string}) => {
+            runningWorkflowToolCallIds.delete(toolCallId);
+
+            surfaceWorkflowRunFailure(toolCallId, streamError.message);
+        };
+
+        const onComplete = (info: WorkflowStreamCompleteType) => {
+            runningWorkflowToolCallIds.delete(toolCallId);
+
+            if (info.kind === 'empty') {
+                surfaceWorkflowRunFailure(toolCallId, 'The workflow finished without producing any output');
+
+                return;
+            }
+
+            aiChatToolCallStore.getState().completeToolCall(toolCallId, parsedResult, false);
+        };
+
+        const workflowRunRequest = {
+            message: getLastUserMessage(),
+            onChunk: appendReply,
+            onComplete,
+            onError,
+            signal: turnAbortSignal,
+        };
+
+        if (workflowRun.streaming) {
+            void openWorkflowSseStream({...workflowRunRequest, streamUrl: workflowRun.url});
+        } else {
+            void fetchWorkflowResponse({...workflowRunRequest, responseUrl: workflowRun.url});
+        }
+    };
+
     const addInteractiveDataPart = (toolCallId: string, toolCallName: string | undefined, content: string) => {
         const dataPart = toToolResultDataPart(toolCallName ?? '', content);
 
@@ -875,7 +1007,7 @@ export const buildAiHubSubscriber = ({
 
             runLifecycle?.onSettle();
 
-            terminateOrphanRunningToolCalls(subscriberChatId);
+            terminateOrphanRunningToolCalls(subscriberChatId, runningWorkflowToolCallIds);
 
             if (subscriberChatId != null) {
                 aiHubChatsStore.getState().clearActivityState(subscriberChatId);
@@ -886,7 +1018,7 @@ export const buildAiHubSubscriber = ({
 
             runLifecycle?.onSettle();
 
-            terminateOrphanRunningToolCalls(subscriberChatId);
+            terminateOrphanRunningToolCalls(subscriberChatId, runningWorkflowToolCallIds);
 
             if (subscriberChatId != null && aiHubChatsStore.getState().chatActivity[subscriberChatId] !== 'paused') {
                 aiHubChatsStore.getState().clearActivityState(subscriberChatId);
@@ -990,6 +1122,8 @@ export const buildAiHubSubscriber = ({
                 openCustomComponentTab(toolCallName, toolResultContent);
             } else if (toolCallName === 'openWorkflowChatTab') {
                 openChat(toolCallName, toolResultContent);
+            } else if (toolCallName === 'runChatWorkflow') {
+                runChatWorkflow(event.toolCallId, toolResultContent);
             } else {
                 addInteractiveDataPart(event.toolCallId, toolCallName, toolResultContent);
             }

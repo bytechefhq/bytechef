@@ -228,4 +228,34 @@ describe('aiChatToolCallStore', () => {
             expect(aiChatToolCallStore.getState().order).not.toContain('call-A1');
         });
     });
+
+    it('failRunningInChat keeps the running entries it is told to keep', () => {
+        aiChatToolCallStore.getState().startToolCall('call-A1', 'runChatWorkflow', 0, 'conv-A');
+        aiChatToolCallStore.getState().startToolCall('call-A2', 'research', 0, 'conv-A');
+
+        aiChatToolCallStore.getState().failRunningInChat('conv-A', {reason: 'done'}, 'aborted', new Set(['call-A1']));
+
+        expect(aiChatToolCallStore.getState().toolCalls['call-A1'].status).toBe('running');
+        expect(aiChatToolCallStore.getState().toolCalls['call-A2'].status).toBe('aborted');
+    });
+
+    it('reopenToolCall returns a completed entry to running so progressive output appends again', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'runChatWorkflow', 0, 'conv-A');
+        aiChatToolCallStore.getState().completeToolCall('call-1', {streaming: true}, false);
+
+        aiChatToolCallStore.getState().reopenToolCall('call-1');
+        aiChatToolCallStore.getState().appendProgressiveOutput('call-1', 'Hi');
+
+        expect(aiChatToolCallStore.getState().toolCalls['call-1'].status).toBe('running');
+        expect(aiChatToolCallStore.getState().toolCalls['call-1'].progressiveOutput).toBe('Hi');
+    });
+
+    it('reopenToolCall leaves an aborted entry aborted', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'runChatWorkflow', 0, 'conv-A');
+        aiChatToolCallStore.getState().failRunningInChat('conv-A', {reason: 'stop'}, 'aborted');
+
+        aiChatToolCallStore.getState().reopenToolCall('call-1');
+
+        expect(aiChatToolCallStore.getState().toolCalls['call-1'].status).toBe('aborted');
+    });
 });
