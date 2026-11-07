@@ -1,0 +1,16 @@
+{
+  "label": "Simulation Complete",
+  "tasks": [ {
+    "name": "task1",
+    "label": "Produce a value",
+    "type": "test/v1/produce",
+    "parameters": { }
+  }, {
+    "name": "task2",
+    "label": "Consume task1 output",
+    "type": "test/v1/consume",
+    "parameters": {
+      "input": "${task1.value}"
+    }
+  } ]
+}
