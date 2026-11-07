@@ -329,15 +329,7 @@ describe('AutomationWorkflows', () => {
 
         renderWithProviders(<AutomationWorkflows />);
 
-        const tagChipSpans = screen.getAllByText('sales');
-        const tagChipSpan = tagChipSpans.find((element) => element.tagName === 'SPAN' && element.className === 'py-1');
-
-        expect(tagChipSpan).toBeDefined();
-
-        const tagChip = tagChipSpan!.closest('div');
-        const removeButton = tagChip!.querySelector('button');
-
-        await user.click(removeButton!);
+        await user.click(screen.getByRole('button', {name: 'Remove tag'}));
 
         expect(hoisted.updateProjectMutate).toHaveBeenCalledTimes(1);
 
