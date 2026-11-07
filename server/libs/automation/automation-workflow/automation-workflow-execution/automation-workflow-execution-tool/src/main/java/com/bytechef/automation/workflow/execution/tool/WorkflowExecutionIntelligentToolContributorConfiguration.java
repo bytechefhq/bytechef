@@ -24,6 +24,7 @@ import com.bytechef.ai.copilot.tool.catalog.SimpleIntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +38,8 @@ public class WorkflowExecutionIntelligentToolContributorConfiguration {
 
     @Bean
     public IntelligentToolContributor workflowExecutionIntelligentToolContributor(
+        @Qualifier("workflowExecutionAskSubAgentChatClientFactory") //
+        ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionAskFactoryProvider,
         @Qualifier("workflowExecutionBuildSubAgentChatClientFactory") //
         ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider,
         ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider) {
@@ -46,10 +49,21 @@ public class WorkflowExecutionIntelligentToolContributorConfiguration {
         List<IntelligentToolDefinition> definitions = List.of(
             new SimpleIntelligentToolDefinition(
                 "debugWorkflowExecution", WorkflowExecutionAgentType.DEBUG_WORKFLOW_EXECUTION, Set.of(),
-                variant -> variant == IntelligentToolVariant.BUILD
-                    ? workflowExecutionBuildFactoryProvider.getIfAvailable() : null,
+                variant -> factoryForVariant(
+                    variant, workflowExecutionAskFactoryProvider, workflowExecutionBuildFactoryProvider),
                 chatClientFactory -> new WorkflowExecutionAgentToolCallback(chatClientFactory, chatModelResolver)));
 
         return () -> definitions;
+    }
+
+    @Nullable
+    private static IntelligentToolChatClientFactory factoryForVariant(
+        IntelligentToolVariant variant, ObjectProvider<IntelligentToolChatClientFactory> askProvider,
+        ObjectProvider<IntelligentToolChatClientFactory> buildProvider) {
+
+        return switch (variant) {
+            case ASK -> askProvider.getIfAvailable();
+            case BUILD -> buildProvider.getIfAvailable();
+        };
     }
 }

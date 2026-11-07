@@ -24,6 +24,7 @@ import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolContributor;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
+import com.bytechef.automation.ai.tool.WorkflowIntelligentToolContributorConfiguration;
 import com.bytechef.automation.configuration.tool.PersistedWorkflowChecker;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.configuration.tool.WorkflowIntelligentToolContributorConfiguration;
@@ -84,6 +85,7 @@ final class IntelligentToolAskCapabilityTest {
 
     private static List<IntelligentToolDefinition> definitions() {
         IntelligentToolContributor workflowContributor = workflowIntelligentToolContributor(
+            present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
             present(mock(IntelligentToolChatClientFactory.class)),
@@ -154,6 +156,7 @@ final class IntelligentToolAskCapabilityTest {
         ObjectProvider<IntelligentToolChatClientFactory> workflowEditorAskFactoryProvider,
         ObjectProvider<IntelligentToolChatClientFactory> workflowEditorBuildFactoryProvider,
         ObjectProvider<IntelligentToolChatClientFactory> converterBuildFactoryProvider,
+        ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionAskFactoryProvider,
         ObjectProvider<IntelligentToolChatClientFactory> workflowExecutionBuildFactoryProvider,
         ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider,
         ObjectProvider<ProjectWorkflowLifecycleTools> projectWorkflowLifecycleToolsProvider,
@@ -161,7 +164,7 @@ final class IntelligentToolAskCapabilityTest {
 
         IntelligentToolContributor contributor1 =
             new WorkflowExecutionIntelligentToolContributorConfiguration().workflowExecutionIntelligentToolContributor(
-                workflowExecutionBuildFactoryProvider, chatModelResolverProvider);
+                workflowExecutionAskFactoryProvider, workflowExecutionBuildFactoryProvider, chatModelResolverProvider);
         IntelligentToolContributor contributor2 =
             new WorkflowIntelligentToolContributorConfiguration().workflowIntelligentToolContributor(
                 workflowEditorAskFactoryProvider, workflowEditorBuildFactoryProvider, converterBuildFactoryProvider,

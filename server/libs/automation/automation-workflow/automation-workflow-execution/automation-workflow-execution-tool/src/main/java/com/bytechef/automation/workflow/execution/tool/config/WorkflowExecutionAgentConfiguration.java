@@ -16,10 +16,20 @@
 
 package com.bytechef.automation.workflow.execution.tool.config;
 
+import com.agui.core.exception.AGUIException;
+import com.agui.core.state.State;
+import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.automation.configuration.tool.ProjectWorkflowTools;
+import com.bytechef.automation.configuration.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.configuration.tool.ScriptTools;
+import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionAgentType;
 import com.bytechef.automation.workflow.execution.tool.WorkflowExecutionTools;
+import com.bytechef.automation.workflow.execution.tool.agent.WorkflowExecutionSpringAIAgent;
+import com.bytechef.platform.ai.tool.RehydrateContextToolCallback;
+import com.bytechef.platform.ai.tool.SecurityContextRehydrator;
+import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
+import com.bytechef.platform.component.tool.ComponentTools;
 import com.bytechef.platform.component.tool.TaskTools;
 import com.bytechef.platform.workflow.tool.WorkflowInstructionTools;
 import com.bytechef.platform.workflow.tool.WorkflowValidatorTools;
@@ -27,8 +37,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.support.ToolCallbacks;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -45,6 +61,7 @@ public class WorkflowExecutionAgentConfiguration {
 
     private final WorkflowValidatorTools workflowValidatorTools;
     private final WorkflowInstructionTools workflowInstructionTools;
+    private final State state = new State();
     private final String workflowExecutionBuildSystemPrompt;
 
     @SuppressFBWarnings({
@@ -58,6 +75,112 @@ public class WorkflowExecutionAgentConfiguration {
         this.workflowValidatorTools = workflowValidatorTools;
         this.workflowInstructionTools = workflowInstructionTools;
         this.workflowExecutionBuildSystemPrompt = getSystemPrompt(promptWorkflowExecutionBuildResource);
+    }
+
+    private List<ToolCallback> wrapTools(SecurityContextRehydrator securityContextRehydrator, List<Object> tools) {
+        List<ToolCallback> toolCallbacks = new ArrayList<>();
+
+        for (Object tool : tools) {
+            if (tool instanceof ToolCallback toolCallback) {
+                toolCallbacks.add(RehydrateContextToolCallback.wrap(toolCallback, securityContextRehydrator));
+            } else {
+                for (ToolCallback toolCallback : ToolCallbacks.from(tool)) {
+                    toolCallbacks.add(RehydrateContextToolCallback.wrap(toolCallback, securityContextRehydrator));
+                }
+            }
+        }
+
+        return toolCallbacks;
+    }
+
+    @Bean
+    WorkflowExecutionSpringAIAgent workflowExecutionAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, WorkflowExecutionTools workflowExecutionTools,
+        ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools,
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider,
+        @Value("classpath:prompt_workflow_execution_ask.txt") Resource promptWorkflowExecutionAskResource,
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
+
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                workflowExecutionTools, readProjectWorkflowTools, componentTools, workflowValidatorTools,
+                workflowInstructionTools));
+
+        WorkflowExecutionSpringAIAgent springAIAgent = WorkflowExecutionSpringAIAgent.builder()
+            .agentId(WorkflowExecutionAgentType.WORKFLOW_EXECUTION_ASK.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptWorkflowExecutionAskResource))
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
+            .state(state)
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+
+        springAIAgent.setWebSearchToolCallbackProvider(webSearchToolCallbackProvider);
+
+        return springAIAgent;
+    }
+
+    @Bean
+    WorkflowExecutionSpringAIAgent workflowExecutionBuildSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, WorkflowExecutionTools workflowExecutionTools,
+        ProjectWorkflowTools projectWorkflowTools, ScriptTools scriptTools, TaskTools taskTools,
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
+
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                workflowExecutionTools, projectWorkflowTools, scriptTools, taskTools, workflowValidatorTools,
+                workflowInstructionTools));
+
+        return WorkflowExecutionSpringAIAgent.builder()
+            .agentId(WorkflowExecutionAgentType.WORKFLOW_EXECUTION_BUILD.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(workflowExecutionBuildSystemPrompt)
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
+            .state(state)
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+    }
+
+    @Bean
+    public ChatClient workflowExecutionAskSubAgentChatClient(
+        ChatModel chatModel, WorkflowExecutionTools workflowExecutionTools,
+        ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools,
+        @Value("classpath:prompt_workflow_execution_ask.txt") Resource promptWorkflowExecutionAskResource) {
+
+        return buildWorkflowExecutionAskSubAgentChatClient(
+            chatModel, getSystemPrompt(promptWorkflowExecutionAskResource), workflowExecutionTools,
+            readProjectWorkflowTools, componentTools);
+    }
+
+    @Bean
+    public IntelligentToolChatClientFactory workflowExecutionAskSubAgentChatClientFactory(
+        @Qualifier("workflowExecutionAskSubAgentChatClient") ChatClient workflowExecutionAskSubAgentChatClient,
+        WorkflowExecutionTools workflowExecutionTools, ReadProjectWorkflowTools readProjectWorkflowTools,
+        ComponentTools componentTools,
+        @Value("classpath:prompt_workflow_execution_ask.txt") Resource promptWorkflowExecutionAskResource) {
+
+        String systemPrompt = getSystemPrompt(promptWorkflowExecutionAskResource);
+
+        return candidateChatModel -> candidateChatModel == null
+            ? workflowExecutionAskSubAgentChatClient
+            : buildWorkflowExecutionAskSubAgentChatClient(
+                candidateChatModel, systemPrompt, workflowExecutionTools, readProjectWorkflowTools, componentTools);
+    }
+
+    private ChatClient buildWorkflowExecutionAskSubAgentChatClient(
+        ChatModel chatModel, String systemPrompt, WorkflowExecutionTools workflowExecutionTools,
+        ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools) {
+
+        return ChatClient.builder(chatModel)
+            .defaultSystem(systemPrompt)
+            .defaultTools(
+                workflowExecutionTools, readProjectWorkflowTools, componentTools, workflowValidatorTools,
+                workflowInstructionTools)
+            .build();
     }
 
     @Bean

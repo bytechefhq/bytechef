@@ -17,15 +17,23 @@
 package com.bytechef.automation.workflow.execution.tool;
 
 import com.bytechef.ai.agent.tool.AgentType;
+import com.bytechef.ai.copilot.util.Mode;
+import com.bytechef.ai.copilot.util.Source;
 
 /**
  * @author Ivica Cardic
  */
 public enum WorkflowExecutionAgentType implements AgentType {
 
+    WORKFLOW_EXECUTION_ASK(Source.WORKFLOW_EXECUTION, Mode.ASK),
+    WORKFLOW_EXECUTION_BUILD(Source.WORKFLOW_EXECUTION, Mode.BUILD),
     DEBUG_WORKFLOW_EXECUTION("debugWorkflowExecution");
 
     private final String key;
+
+    WorkflowExecutionAgentType(Source source, Mode mode) {
+        this(source.agentId(mode));
+    }
 
     WorkflowExecutionAgentType(String key) {
         this.key = key;
