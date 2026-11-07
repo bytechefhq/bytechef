@@ -97,7 +97,8 @@ Each `buildWorkflow` / `importWorkflow` delegation on the hub replays that speci
 chat, so "make it shorter" refines the last draft instead of starting over. `AiHubConfiguration#wrapDelegate` wraps
 the delegate's chat client (outside `AiHubGatedToolFilterAdvisor`, whose `mutate()` would otherwise drop it) in
 `SubAgentContributingChatClient`, which runs a list of `SubAgentAdvisorContributor`s on every `call()` and `stream()`
-with the `ToolContext` the delegate forwarded through `.toolContext(...)`. The one contributor today is
+with the `ToolContext` the delegate forwarded through `.toolContext(...)`. `AiHubConfiguration#delegateContributors`
+builds the list: `WorkspaceAdvisorContributor` first (only when an `AiGuardrails` bean exists), then
 `SubAgentSessionMemoryContributor`:
 
 - The session is `SubAgentSessionMemoryContributor.sessionKey(threadId, agentTypeKey)`, `<threadId>:<agentTypeKey>`,
@@ -115,6 +116,23 @@ with the `ToolContext` the delegate forwarded through `.toolContext(...)`. The o
 
 Memory is hub only. Every other surface that builds the same delegates (the Copilot, the management MCP server) does
 so without `wrapDelegate`, so a specialist there starts from nothing on every call.
+
+## Sub-agent guardrails
+
+`WorkspaceAdvisorContributor` attaches an `AiGuardrailsAdvisor` (surface `ai_hub`, `RestorationDestination.CONVERSATION`)
+to each delegate call when the workspace's guardrails are active. The workspace comes per call from
+`AgentToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY`, which `WorkspaceScopedSubAgentToolCallback` sets to the
+workspace it resolved and access-checked (the chat's by default); with none, the tenant default
+(`AiGuardrailsSettingsTarget.platform()`) applies. When the
+workspace has no active guardrail, or the EE guardrails module is absent, the call is unchanged.
+
+- The advisor's order is `GuardrailAdvisorOrder.WORKSPACE_FLOOR` (highest precedence), so it runs outside the session
+  memory advisor whatever the list order. The specialist's session therefore stores redacted or tokenized text, and a
+  blocked call stores nothing.
+- A `BLOCK` violation throws `AiGuardrailViolationException` out of the delegate's `ChatClient` call; its message
+  carries the category, never the matched content.
+- The parent agent does not re-scan a delegate's tool result, and the hub's own top-level turns are not guarded on
+  this branch.
 
 ## The wrap site and the approval gate
 
