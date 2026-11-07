@@ -1,0 +1,87 @@
+enum ComponentRulePhase {
+    BEFORE
+    AFTER
+}
+
+enum ComponentRuleActionType {
+    BLOCK
+    TAG
+    REQUIRE_APPROVAL
+}
+
+type ComponentRule {
+    id: ID!
+    componentName: String!
+    componentTitle: String
+    componentIcon: String
+    toolName: String
+    toolRiskLevel: RiskLevel
+    phase: ComponentRulePhase!
+    ruleAction: ComponentRuleActionType!
+    condition: String!
+    description: String
+    enabled: Boolean!
+    strict: Boolean!
+    "The workspace this rule governs. Null means the rule applies to every workspace in the tenant."
+    workspaceId: ID
+}
+
+type ComponentRuleSettings {
+    observeMode: Boolean!
+    approvalExpiresInHours: Int!
+    """
+    True when this workspace has no override of its own and is therefore following the tenant default, so the
+    client can say so. Always false when workspaceId was null, since the tenant default inherits from nothing.
+    """
+    inherited: Boolean!
+}
+
+extend type Query {
+    """
+    Lists configured component rules. Omit componentName to list every rule in the tenant, which is what the flat
+    Rules list renders. Omit workspaceId, or pass null, to list every rule regardless of the workspace it governs;
+    passing a workspaceId narrows to that workspace's own rules plus the tenant-wide ones. Admin-only.
+    """
+    componentRules(componentName: String, workspaceId: ID): [ComponentRule!]!
+
+    """
+    Rule settings for the given workspace: its own override if it has one, else the tenant default. A null
+    workspaceId asks for the tenant default directly. Admin-only.
+    """
+    componentRuleSettings(workspaceId: ID): ComponentRuleSettings!
+}
+
+extend type Mutation {
+    """
+    Creates a rule when id is absent, updates that rule when it is present. Rejects a BLOCK or REQUIRE_APPROVAL rule
+    in the AFTER phase — the tool has already run by then — and a condition that is not a valid ByteChef formula
+    expression, as typed errors. Admin-only; saving a rule whose workspaceId is null additionally requires a tenant
+    administrator, since such a rule applies to every workspace in the tenant.
+    """
+    saveComponentRule(
+        id: ID
+        componentName: String!
+        toolName: String
+        phase: ComponentRulePhase!
+        ruleAction: ComponentRuleActionType!
+        condition: String!
+        description: String
+        enabled: Boolean!
+        strict: Boolean!
+        "The workspace this rule should govern. Null means every workspace in the tenant."
+        workspaceId: ID
+    ): ComponentRule!
+
+    """
+    Deletes a rule. Admin-only.
+    """
+    deleteComponentRule(id: ID!): Boolean!
+
+    """
+    Sets rule settings for the given workspace. A null workspaceId sets the tenant default. Observe mode evaluates
+    every rule and enforces none. Admin-only.
+    """
+    updateComponentRuleSettings(
+        observeMode: Boolean!, approvalExpiresInHours: Int!, workspaceId: ID
+    ): ComponentRuleSettings!
+}
