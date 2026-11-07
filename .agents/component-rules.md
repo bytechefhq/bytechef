@@ -153,8 +153,30 @@ component, so every tool call there is allowed, `strict` `BLOCK` rules included.
 `component-rule-remote-client` and an endpoint on the app that owns the data. Audit events published from
 worker-app have the same gap.
 
+## AI authoring tools and the rule copilot
+
+GraphQL is not the only write path. `server/ee/libs/automation/automation-ai/automation-ai-tool/.../componentrule/`
+holds four tool callbacks, built by `ComponentRuleToolCallbacksFactory`: `listComponentRules`,
+`describeComponentToolParameters` and `proposeComponentRuleCondition` (the read list), plus `createComponentRule`
+(the write list adds it). `proposeComponentRuleCondition` persists nothing; it only validates a condition, so it sits
+on the read list and the Ask agent can answer "how would I write this rule" without a mode switch.
+
+`ComponentRuleAgentConfiguration` (`automation-ai-copilot`) registers the factory and the `component_rule_ask` /
+`component_rule_build` Copilot agents. It is gated on `@ConditionalOnEEVersion` plus Copilot OR AI Hub enabled, since
+both surfaces consume the factory. `AiHubConfiguration` puts the read list on the hub ASK agent and the write list on
+BUILD, pinned rather than catalog-demoted. The rule dialog's **Generate with AI** button opens the panel in Ask mode
+scoped to the chosen component and tool (`useComponentRuleCopilot`); a valid `proposeComponentRuleCondition` result
+is dropped into the condition field, and nothing is saved until the admin clicks Save.
+
+`CreateComponentRuleToolCallback` resolves the workspace from `AgentToolInvocationContext.fromToolContext(...)` and has
+no `workspaceId` field on its schema: the model choosing the workspace would be guessing. An unresolvable workspace
+returns a tool error and writes nothing. There is no tenant-wide fallback here, because a tenant-wide rule from a tool
+would be exactly the silent widening the design forbids; a tenant-wide rule stays creatable only through the settings
+page's admin-gated "Apply to all workspaces" checkbox. `ListComponentRulesToolCallback` returns the workspace's rules
+plus the tenant-wide ones, each carrying its own `workspaceId`; when the workspace cannot be resolved it narrows to
+tenant-wide only, matching the enforcer.
+
 ## Not on this branch
 
-The 0_732 version of this feature also has AI authoring tools and a Copilot rule-builder agent, an approval-task
-backstop channel, a `RULE_BLOCKED` tool-invocation log event, and a tabbed Settings → AI → Agents page. None of
-those are here.
+The 0_732 version of this feature also has an approval-task backstop channel, a `RULE_BLOCKED` tool-invocation log
+event, and a tabbed Settings → AI → Agents page. None of those are here.
