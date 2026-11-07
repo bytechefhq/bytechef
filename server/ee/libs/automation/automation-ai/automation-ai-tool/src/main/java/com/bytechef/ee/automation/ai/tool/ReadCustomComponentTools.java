@@ -10,7 +10,6 @@ package com.bytechef.ee.automation.ai.tool;
 import com.bytechef.ee.automation.ai.tool.exception.CustomComponentToolErrorType;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
 import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
-import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -49,11 +48,9 @@ public class ReadCustomComponentTools {
             }
 
             return source;
-        } catch (Exception e) {
-            log.error("getCustomComponentSource({}): Failed to get custom component source", id, e);
-
-            throw new ExecutionException(
-                "Failed to get custom component source: " + e.getMessage(), e,
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "getCustomComponentSource(" + id + ")", "Failed to get custom component source", exception,
                 CustomComponentToolErrorType.GET_SOURCE);
         }
     }
@@ -68,11 +65,10 @@ public class ReadCustomComponentTools {
             }
 
             return customComponents;
-        } catch (Exception e) {
-            log.error("listCustomComponents(): Failed to list custom components", e);
-
-            throw new ExecutionException(
-                "Failed to list custom components: " + e.getMessage(), e, CustomComponentToolErrorType.LIST);
+        } catch (RuntimeException exception) {
+            throw AutomationToolFailures.toExecutionException(
+                log, "listCustomComponents()", "Failed to list custom components", exception,
+                CustomComponentToolErrorType.LIST);
         }
     }
 }
