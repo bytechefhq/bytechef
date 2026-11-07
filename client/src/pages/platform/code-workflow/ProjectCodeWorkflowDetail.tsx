@@ -1,6 +1,9 @@
 import CodeWorkflowSourceEditor from '@/pages/platform/code-workflow/CodeWorkflowSourceEditor';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useCodeWorkflowSourceQuery, useUpdateCodeWorkflowSourceMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
+import {useEffect} from 'react';
 
 interface ProjectCodeWorkflowDetailProps {
     headerless?: boolean;
@@ -34,6 +37,12 @@ const ProjectCodeWorkflowDetail = ({
             invalidateWorkflowQueries?.();
         },
     });
+
+    useEffect(() => {
+        return useCopilotPostTurnRegistry.getState().register(Source.CODE_WORKFLOW, () => {
+            queryClient.invalidateQueries({queryKey: ['codeWorkflowSource', {projectId}]});
+        });
+    }, [projectId, queryClient]);
 
     return (
         <CodeWorkflowSourceEditor

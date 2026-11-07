@@ -2,6 +2,10 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
 import MonacoEditorWrapper from '@/shared/components/MonacoEditorWrapper';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
@@ -16,9 +20,10 @@ import {
     usePublishCustomComponentMutation,
     useUpdateCustomComponentSourceMutation,
 } from '@/shared/middleware/graphql';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {ArrowLeftIcon, SendIcon, ZapIcon} from 'lucide-react';
-import {useRef, useState} from 'react';
+import {ArrowLeftIcon, SendIcon, SparklesIcon, ZapIcon} from 'lucide-react';
+import {useEffect, useRef, useState} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 const MONACO_LANGUAGE_BY_CUSTOM_COMPONENT_LANGUAGE: Record<CustomComponentLanguage, string> = {
@@ -34,7 +39,8 @@ interface CustomComponentDetailHeaderProps {
     isPublishing: boolean;
     isSaveDisabled: boolean;
     isSaving: boolean;
-    onBack: () => void;
+    onAskCopilot?: () => void;
+    onBack?: () => void;
     onPublish: () => void;
     onSave: () => void;
     showSaveButton: boolean;
@@ -47,6 +53,7 @@ const CustomComponentDetailHeader = ({
     isPublishing,
     isSaveDisabled,
     isSaving,
+    onAskCopilot,
     onBack,
     onPublish,
     onSave,
@@ -68,18 +75,30 @@ const CustomComponentDetailHeader = ({
                         onClick={onPublish}
                         variant="outline"
                     />
+
+                    {onAskCopilot && (
+                        <Button
+                            aria-label="Ask Copilot"
+                            icon={<SparklesIcon />}
+                            onClick={onAskCopilot}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    )}
                 </div>
             )
         }
         title={
             <div className="flex items-center gap-2">
-                <Button
-                    aria-label="Back"
-                    icon={<ArrowLeftIcon className="size-5" />}
-                    onClick={onBack}
-                    size="icon"
-                    variant="ghost"
-                />
+                {onBack && (
+                    <Button
+                        aria-label="Back"
+                        icon={<ArrowLeftIcon className="size-5" />}
+                        onClick={onBack}
+                        size="icon"
+                        variant="ghost"
+                    />
+                )}
 
                 <span>{customComponent?.title || customComponent?.name || 'Custom Component'}</span>
 
@@ -207,14 +226,24 @@ const CustomComponentSourceEditor = ({monacoLanguage, onChange, value}: CustomCo
     </div>
 );
 
-const CustomComponentDetail = () => {
+interface CustomComponentDetailProps {
+    customComponentId?: string;
+}
+
+const CustomComponentDetail = ({customComponentId: customComponentIdProp}: CustomComponentDetailProps = {}) => {
     const params = useParams<{id: string}>();
 
-    const id = params.id ?? '';
+    const id = customComponentIdProp ?? params.id ?? '';
 
     const [isSourceDirty, setIsSourceDirty] = useState(false);
 
     const latestSourceRef = useRef('');
+
+    const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
+
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+    const setContext = useCopilotStore((state) => state.setContext);
+    const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -252,7 +281,9 @@ const CustomComponentDetail = () => {
             if (updatedId && updatedId !== id) {
                 queryClient.invalidateQueries({queryKey: ['customComponents']});
 
-                navigate(location.pathname.replace(/\/[^/]+$/, `/${updatedId}`));
+                if (!customComponentIdProp) {
+                    navigate(location.pathname.replace(/\/[^/]+$/, `/${updatedId}`));
+                }
             } else {
                 queryClient.invalidateQueries({queryKey: ['customComponent', {id}]});
                 queryClient.invalidateQueries({queryKey: ['customComponentSource', {id}]});
@@ -276,7 +307,21 @@ const CustomComponentDetail = () => {
         isSourceDirty ||
         publishCustomComponentMutation.isPending;
 
-    const handleBack = () => navigate(-1);
+    const handleBack = customComponentIdProp ? undefined : () => navigate(-1);
+
+    const handleAskCopilot =
+        copilotEnabled && !customComponentIdProp
+            ? () => {
+                  setContext({
+                      environmentId: DEVELOPMENT_ENVIRONMENT,
+                      mode: MODE.ASK,
+                      parameters: {customComponentId: id},
+                      source: Source.CUSTOM_COMPONENT,
+                  });
+
+                  setCopilotPanelOpen(true);
+              }
+            : undefined;
 
     const handlePublish = () => {
         publishCustomComponentMutation.mutate({id});
@@ -291,6 +336,14 @@ const CustomComponentDetail = () => {
         latestSourceRef.current = value ?? '';
     };
 
+    useEffect(() => {
+        return registerPostTurn(Source.CUSTOM_COMPONENT, () => {
+            queryClient.invalidateQueries({queryKey: ['customComponent', {id}]});
+            queryClient.invalidateQueries({queryKey: ['customComponentSource', {id}]});
+            queryClient.invalidateQueries({queryKey: ['customComponents']});
+        });
+    }, [id, queryClient, registerPostTurn]);
+
     return (
         <LayoutContainer
             header={
@@ -300,6 +353,7 @@ const CustomComponentDetail = () => {
                     isPublishing={publishCustomComponentMutation.isPending}
                     isSaveDisabled={!isSourceDirty || updateCustomComponentSourceMutation.isPending}
                     isSaving={updateCustomComponentSourceMutation.isPending}
+                    onAskCopilot={handleAskCopilot}
                     onBack={handleBack}
                     onPublish={handlePublish}
                     onSave={handleSave}

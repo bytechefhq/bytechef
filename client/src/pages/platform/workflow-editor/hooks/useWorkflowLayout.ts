@@ -91,8 +91,8 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         return noInputs && noConnections;
     }, [workflow]);
 
-    const {useGetComponentDefinitionsQuery} = useWorkflowEditor();
-    const {integrationId} = useParams();
+    const {codeWorkflow, codeWorkflowLanguage, useGetComponentDefinitionsQuery} = useWorkflowEditor();
+    const {integrationId, projectId} = useParams();
 
     const componentDefinitionsQueryParameters: object = {
         actionDefinitions: true,
@@ -170,11 +170,29 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     const handleCopilotClick = () => {
         const {context: currentContext} = useCopilotStore.getState();
 
+        const isCodeWorkflow = codeWorkflow === true && !!codeWorkflowLanguage;
+
+        const source = integrationId
+            ? isCodeWorkflow
+                ? Source.CODE_WORKFLOW_EMBEDDED
+                : Source.WORKFLOW_EDITOR_EMBEDDED
+            : isCodeWorkflow
+              ? Source.CODE_WORKFLOW
+              : Source.WORKFLOW_EDITOR;
+
+        const keepMode = isWorkflowEditorSource(source)
+            ? isWorkflowEditorSource(currentContext.source)
+            : currentContext.source === source;
+
         setContext({
             ...currentContext,
-            mode: isWorkflowEditorSource(currentContext.source) ? currentContext.mode : MODE.ASK,
-            parameters: integrationId ? {integrationId} : {},
-            source: integrationId ? Source.WORKFLOW_EDITOR_EMBEDDED : Source.WORKFLOW_EDITOR,
+            mode: keepMode ? currentContext.mode : MODE.ASK,
+            parameters: {
+                ...(integrationId ? {integrationId} : {}),
+                ...(isCodeWorkflow ? {language: codeWorkflowLanguage} : {}),
+                ...(isCodeWorkflow && !integrationId && projectId ? {projectId} : {}),
+            },
+            source,
         });
 
         if (!copilotPanelOpen) {
