@@ -11,6 +11,12 @@ export interface AutomationChatConfig {
      */
     webhookUrl: string;
 
+    voiceMode?: boolean;
+
+    chatMode?: boolean;
+
+    voiceWebhookUrl?: string;
+
     /**
      * Welcome message title
      * @default 'Hello there!'

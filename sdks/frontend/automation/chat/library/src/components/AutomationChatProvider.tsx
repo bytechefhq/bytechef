@@ -16,6 +16,9 @@ import {useChatStore} from '@/stores/useChatStore';
 import type {PendingApprovalI} from '@/stores/useChatStore';
 import {ApprovalResolutionContext} from '@/components/approvalResolutionContext';
 import {useSSE} from '@/hooks/useSSE';
+import {useAutomationChatVoiceSession} from '@/hooks/useAutomationChatVoiceSession';
+import {checkVoiceSupport} from '@/lib/BrowserVoiceSession';
+import {createWebhookVoiceAdapter} from '@/lib/ByteChefRealtimeVoiceAdapter';
 import {extractStreamChunk} from '@/utils/stream-utils';
 import {drainSseResponse} from '@/utils/sse-parser';
 import {canRenderApprovalFormInChat} from '@/utils/approval-form';
@@ -50,15 +53,24 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
     children,
     config,
 }: AutomationChatProviderProps) {
-    const {webhookUrl, title = 'Hello there!', description = 'How can I help you today?', suggestions} = config;
+    const {
+        chatMode = false,
+        description = 'How can I help you today?',
+        suggestions,
+        title = 'Hello there!',
+        voiceMode = false,
+        voiceWebhookUrl,
+        webhookUrl,
+    } = config;
 
-    const contextValue = useMemo(
-        () => ({
-            title,
-            description,
-            suggestions,
-        }),
-        [title, description, suggestions]
+    const voiceUnsupportedReason = useMemo(() => checkVoiceSupport(), []);
+    const browserSupportsVoice = voiceUnsupportedReason === null;
+
+    const voiceEnabled = Boolean(voiceWebhookUrl) && browserSupportsVoice;
+
+    const realtimeVoiceAdapter = useMemo(
+        () => (voiceMode ? createWebhookVoiceAdapter(webhookUrl) : undefined),
+        [voiceMode, webhookUrl]
     );
 
     // Automatically detect SSE mode based on URL ending
@@ -80,6 +92,42 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
                 setResumeUrl: state.setResumeUrl,
             }))
         );
+
+    const voice = useAutomationChatVoiceSession({
+        onEvent: (event) => {
+            if (event.type === 'transcript_final' && typeof event.text === 'string' && event.text.length > 0) {
+                setMessage({content: event.text, role: 'user'});
+            } else if (event.type === 'assistant_text' && typeof event.text === 'string') {
+                if (event.done) {
+                    return;
+                }
+
+                appendToLastAssistantMessage(event.text);
+            }
+        },
+        voiceWebhookUrl: voiceWebhookUrl ?? '',
+    });
+
+    useEffect(() => {
+        if (voice.status === 'active' || voice.status === 'connecting') {
+            setStreamRequest(null);
+            setIsRunning(false);
+        }
+    }, [voice.status]);
+
+    const contextValue = useMemo(
+        () => ({
+            chatMode,
+            description,
+            suggestions,
+            title,
+            voice: voiceEnabled ? voice : undefined,
+            voiceEnabled,
+            voiceMode,
+            webhookUrl,
+        }),
+        [chatMode, description, suggestions, title, voice, voiceEnabled, voiceMode, webhookUrl]
+    );
 
     const handleError = useCallback(() => {
         setIsRunning(false);
@@ -353,13 +401,14 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
             () => ({
                 adapters: {
                     attachments: attachmentAdapter,
+                    ...(realtimeVoiceAdapter ? {voice: realtimeVoiceAdapter} : {}),
                 },
                 convertMessage,
                 isRunning,
                 messages,
                 onNew,
             }),
-            [isRunning, messages, onNew]
+            [isRunning, messages, onNew, realtimeVoiceAdapter]
         )
     );
 

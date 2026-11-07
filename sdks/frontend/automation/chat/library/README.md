@@ -67,7 +67,87 @@ interface ByteChefChatConfig {
      * The full webhook URL to connect to
      */
     webhookUrl: string;
+
+    /**
+     * Optional base URL of a ByteChef browser-voice webhook. When set, the widget renders a mic button.
+     * Clicking the mic opens a WebSocket to <voiceWebhookUrl>/wss after minting a session token at
+     * POST <voiceWebhookUrl>/voice-session-token.
+     *
+     * The URL points at a workflow with a browser/v1/voiceSession trigger. See the voice quickstart
+     * docs for setup: docs/voice/quickstart.md
+     */
+    voiceWebhookUrl?: string;
 }
+```
+
+### Voice support
+
+Voice requires a modern browser (Chrome 66+, Firefox 76+, Safari 14.1+) and a secure context (HTTPS or
+localhost). The widget gates the mic button automatically — on unsupported browsers no mic appears, no
+silent failure at click time.
+
+The widget supports two independent voice setups, and `AutomationChatProvider` wires both from the same
+`AutomationChatConfig`:
+
+- **`voiceWebhookUrl`** — a separate voice trigger next to your text `webhookUrl`'s chat trigger. Set it to
+  add a mic button alongside the regular chat thread; clicking it opens a voice session against
+  `voiceWebhookUrl` while typed messages keep going to `webhookUrl` as usual.
+- **`voiceMode: true`** — the workflow behind `webhookUrl` itself has a `browser/v1/voiceSession` trigger
+  (no separate voice webhook). Set this when the whole widget IS the voice experience — it renders
+  `VoiceModeLayout`'s full-screen voice UI instead of the text thread, minting tokens against `webhookUrl`.
+
+If you embed the widget inside an `<iframe>`, the iframe MUST grant microphone access via the `allow`
+attribute or `getUserMedia` is silently denied by the browser:
+
+```html
+<iframe src="https://your-site.com/chat-widget" allow="microphone"></iframe>
+```
+
+The voice session is bound to the workflow's webhook — the widget hits
+`POST <voiceWebhookUrl>/voice-session-token` to mint a single-use token, then opens
+`WSS <voiceWebhookUrl>/wss?sessionToken=…`. The token TTL is 60 seconds; on expiry or replay the server
+closes the WebSocket with a `POLICY_VIOLATION` and the widget shows the error.
+
+If the connection drops unexpectedly, the widget reconnects automatically: it mints a fresh session token
+(a new `POST .../voice-session-token`) and re-opens the socket with `resumeSessionId` set to the
+server-assigned `sessionId` from the original `connected` frame, so the workflow splices the new connection
+back onto the same in-flight session. Reconnects back off (1s, 2s, 4s, …) and give up after a few attempts,
+surfacing a single terminal error. Either a successful reconnect or a graceful end is reported to the host
+app as a `session_end` event carrying a `reason` (e.g. `silence_timeout`, `session_limit`, `client_closed`).
+
+The target workflow's trigger is `browser/v1/voiceSession`, with the voice agent and any tools it can call
+declared as cluster elements — the voice agent under `clusterElements.voiceAgent`, tools as a **sibling**
+list under `clusterElements.tools` (not nested inside the voice agent):
+
+```json
+{
+    "triggers": [
+        {
+            "name": "trigger_1",
+            "type": "browser/v1/voiceSession",
+            "parameters": {"sampleRate": 16000, "silenceTimeoutSeconds": 120},
+            "clusterElements": {
+                "voiceAgent": {
+                    "name": "voiceAgent_1",
+                    "type": "deepgram/v1/voiceAgent",
+                    "parameters": {"prompt": "…", "greeting": "…"}
+                },
+                "tools": [{"name": "getOrder_1", "type": "shopify/v1/getOrder", "parameters": {}}]
+            }
+        }
+    ]
+}
+```
+
+If you need to detect voice support before mounting the widget (e.g. to render a different UI on
+unsupported browsers), import the helper:
+
+```tsx
+import {checkVoiceSupport} from '@bytechef/chat';
+
+const voiceReason = checkVoiceSupport();
+// null = voice works
+// string = human-readable reason voice does not work in this browser
 ```
 
 ### ByteChefChatModal Additional Props

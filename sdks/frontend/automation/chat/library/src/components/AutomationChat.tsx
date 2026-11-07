@@ -1,6 +1,8 @@
 import {FC} from 'react';
 import {AutomationChatProvider} from './AutomationChatProvider';
 import {Thread} from './assistant-ui/thread';
+import {useAutomationChatConfig} from '@/hooks/useAutomationChatConfig';
+import {VoiceModeLayout} from '@/lib/VoiceModeLayout';
 import type {AutomationChatConfig} from '@/types';
 
 export interface AutomationChatProps {
@@ -20,6 +22,16 @@ export interface AutomationChatProps {
     header?: React.ReactNode;
 }
 
+const AutomationChatContent: FC = () => {
+    const {chatMode, voiceMode} = useAutomationChatConfig();
+
+    if (voiceMode && !chatMode) {
+        return <VoiceModeLayout sessionLimitSeconds={150} />;
+    }
+
+    return <Thread />;
+};
+
 /**
  * AutomationChat - Embeddable chat widget
  *
@@ -38,7 +50,7 @@ export const AutomationChat: FC<AutomationChatProps> = ({config, className = '',
             {header && <div className="bytechef-chat-header">{header}</div>}
             <AutomationChatProvider config={config}>
                 <div className="flex w-full flex-1 flex-col">
-                    <Thread />
+                    <AutomationChatContent />
                 </div>
             </AutomationChatProvider>
         </div>

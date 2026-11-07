@@ -3,6 +3,8 @@ import {BotIcon, ChevronDownIcon} from 'lucide-react';
 import {AssistantModalPrimitive} from '@assistant-ui/react';
 import {Thread} from './assistant-ui/thread';
 import {TooltipIconButton} from './assistant-ui/tooltip-icon-button';
+import {useAutomationChatConfig} from '@/hooks/useAutomationChatConfig';
+import {VoiceModeLayout} from '@/lib/VoiceModeLayout';
 import type {AutomationChatModalConfig} from '@/types';
 import {AutomationChatProvider} from './AutomationChatProvider';
 
@@ -53,6 +55,16 @@ const AssistantModalButton = forwardRef<HTMLButtonElement, AssistantModalButtonP
 
 AssistantModalButton.displayName = 'AssistantModalButton';
 
+const AutomationChatModalContent: FC = () => {
+    const {chatMode, voiceMode} = useAutomationChatConfig();
+
+    if (voiceMode && !chatMode) {
+        return <VoiceModeLayout sessionLimitSeconds={150} />;
+    }
+
+    return <Thread />;
+};
+
 /**
  * AutomationChatModal - Modal chat widget
  *
@@ -89,7 +101,7 @@ export const AutomationChatModal: FC<AutomationChatModalProps> = ({config, posit
                     sideOffset={16}
                     className="aui-root aui-modal-content data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-1/2 data-[state=closed]:slide-out-to-right-1/2 data-[state=closed]:zoom-out data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-1/2 data-[state=open]:slide-in-from-right-1/2 data-[state=open]:zoom-in z-50 h-[500px] w-[400px] overflow-clip overscroll-contain rounded-xl border bg-popover p-0 text-popover-foreground shadow-md outline-none data-[state=closed]:animate-out data-[state=open]:animate-in [&>.aui-thread-root]:bg-inherit"
                 >
-                    <Thread />
+                    <AutomationChatModalContent />
                 </AssistantModalPrimitive.Content>
             </AssistantModalPrimitive.Root>
         </AutomationChatProvider>
