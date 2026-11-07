@@ -16,6 +16,7 @@ dependencies {
     implementation("org.springframework.security:spring-security-core")
     implementation(project(":sdks:backend:java:component-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
+    implementation(project(":server:libs:automation:automation-connection:automation-connection-tool"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-tool"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
     implementation(project(":server:libs:platform:platform-component:platform-component-tool"))

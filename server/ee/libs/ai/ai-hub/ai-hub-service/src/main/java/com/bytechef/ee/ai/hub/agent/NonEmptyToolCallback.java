@@ -28,13 +28,10 @@ public final class NonEmptyToolCallback implements DelegatingToolCallback {
     private static final String EMPTY_RESULT_PLACEHOLDER = "{\"result\":\"no content\"}";
 
     private final ToolCallback delegate;
-    private final String toolName;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     private NonEmptyToolCallback(ToolCallback delegate) {
         this.delegate = delegate;
-        this.toolName = delegate.getToolDefinition()
-            .name();
     }
 
     public static ToolCallback wrap(ToolCallback delegate) {
@@ -73,7 +70,7 @@ public final class NonEmptyToolCallback implements DelegatingToolCallback {
         if (log.isDebugEnabled()) {
             String preview = toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200));
 
-            log.debug("Tool '{}' invoked with input: {}", toolName, preview);
+            log.debug("Tool '{}' invoked with input: {}", toolName(), preview);
         }
     }
 
@@ -86,8 +83,14 @@ public final class NonEmptyToolCallback implements DelegatingToolCallback {
             "Tool '{}' returned {}; substituting placeholder so the Anthropic Messages API does not reject the next "
                 + "agent iteration with empty user-message content. Investigate the underlying callback to see why "
                 + "it returned no content; the LLM will see the placeholder in this turn's history.",
-            toolName, result == null ? "null" : "empty/whitespace");
+            toolName(), result == null ? "null" : "empty/whitespace");
 
         return EMPTY_RESULT_PLACEHOLDER;
+    }
+
+    private String toolName() {
+        ToolDefinition toolDefinition = delegate.getToolDefinition();
+
+        return toolDefinition.name();
     }
 }

@@ -14,6 +14,8 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.ai.hub.chat.AiHubChatDeletedEvent;
 import com.bytechef.ee.ai.hub.config.AiHubPgVectorConfiguration;
+import com.bytechef.ee.ai.hub.util.Mode;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.observation.ObservationRegistry;
 import java.util.ArrayList;
@@ -188,11 +190,11 @@ class ToolSearchCatalogFeederIntTest {
     @Test
     void testATurnWritesNoRowsForItsConversation() {
         ToolSearchToolCallingAdvisor advisor = ToolSearchAdvisorConfiguration.buildModeAdvisor(
-            pgVectorStore, ObservationRegistry.NOOP,
+            Mode.BUILD, pgVectorStore, ObservationRegistry.NOOP,
             new AiHubGlobalToolCatalog(
                 ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID,
                 List.of(toolCallback("listComponents", "List every component"))),
-            null, new ToolSearchCatalogWarmup(null, List.of()), null);
+            null, null, new ToolSearchCatalogWarmup(null, List.of()), null);
 
         assertThat(advisor).isInstanceOf(PinnedToolSearchToolCallingAdvisor.class);
 
@@ -236,11 +238,11 @@ class ToolSearchCatalogFeederIntTest {
             List.of(toolCallback("listComponents", "List every component")));
 
         ToolSearchToolCallingAdvisor advisor = ToolSearchAdvisorConfiguration.buildModeAdvisor(
-            pgVectorStore, ObservationRegistry.NOOP,
+            Mode.BUILD, pgVectorStore, ObservationRegistry.NOOP,
             new AiHubGlobalToolCatalog(
                 ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID,
                 List.of(toolCallback("listComponents", "List every component"))),
-            null, new ToolSearchCatalogWarmup(null, List.of()), null);
+            null, null, new ToolSearchCatalogWarmup(null, List.of()), null);
 
         new ToolSearchSessionEvictor(() -> List.of(advisor))
             .onChatDeleted(new AiHubChatDeletedEvent(1L, "conversation-1"));
@@ -256,7 +258,8 @@ class ToolSearchCatalogFeederIntTest {
 
     private static ToolSearchCatalogFeeder newFeeder(String embeddingModelIdentity) {
         return new ToolSearchCatalogFeeder(
-            new VectorToolIndex(pgVectorStore), embeddingModelIdentity, jdbcTemplate, properties.getSchemaName(),
+            mock(ClusterElementDefinitionService.class), new VectorToolIndex(pgVectorStore), embeddingModelIdentity,
+            jdbcTemplate, properties.getSchemaName(),
             AiHubPgVectorConfiguration.vectorTableName(properties));
     }
 

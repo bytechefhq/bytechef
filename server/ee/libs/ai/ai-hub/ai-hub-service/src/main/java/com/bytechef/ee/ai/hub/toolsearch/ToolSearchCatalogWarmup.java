@@ -50,6 +50,8 @@ final class ToolSearchCatalogWarmup {
                     feeder.populateGlobalTools(globalToolCatalog.sessionId(), globalToolCatalog.toolCallbacks());
                 }
 
+                feeder.populateClusterElementTools();
+
                 populated = true;
             } catch (RuntimeException exception) {
                 log.warn(
