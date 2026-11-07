@@ -156,7 +156,7 @@ const AssetFiles = () => {
 
         for (const file of selectedFiles) {
             try {
-                await upload(currentWorkspaceId, currentEnvironmentId, file);
+                await upload(currentWorkspaceId!, currentEnvironmentId, file);
             } catch (uploadError) {
                 console.error('Upload failed', uploadError);
 
@@ -339,7 +339,7 @@ const AssetFiles = () => {
                 <AssetFileUploadZone
                     environment={currentEnvironmentId}
                     onUploaded={() => void refetch()}
-                    workspaceId={currentWorkspaceId}
+                    workspaceId={currentWorkspaceId!}
                 >
                     {showCenteredEmpty ? (
                         <div className="flex size-full items-center justify-center">
