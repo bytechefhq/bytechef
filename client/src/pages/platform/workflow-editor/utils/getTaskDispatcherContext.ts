@@ -48,6 +48,10 @@ function getContextFromTaskNodeData(
         context.forkJoinId = nodeData.forkJoinData.forkJoinId as string;
         context.index = (nodeData.forkJoinData.index as number) + indexIncrement;
         context.taskDispatcherId = nodeData.forkJoinData.forkJoinId as string;
+    } else if (nodeData.graphData) {
+        context.graphId = nodeData.graphData.graphId as string;
+        context.index = (nodeData.graphData.index as number) + indexIncrement;
+        context.taskDispatcherId = nodeData.graphData.graphId as string;
     } else if (nodeData.onErrorData) {
         context.index = (nodeData.onErrorData.index as number) + indexIncrement;
         context.onErrorCase = nodeData.onErrorData.onErrorCase as
@@ -74,6 +78,7 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
     const isParallelPlaceholder = placeholderNode.id.includes('parallel') && isPlaceholder;
     const isEachPlaceholder = placeholderNode.id.includes('each') && isPlaceholder;
     const isForkJoinPlaceholder = placeholderNode.id.includes('forkJoin') && isPlaceholder;
+    const isGraphPlaceholder = placeholderNode.id.includes('graph') && isPlaceholder;
     const isOnErrorPlaceholder = placeholderNode.id.includes('onError') && isPlaceholder;
     const isTerminatePlaceholder = placeholderNode.id.includes('terminate') && isPlaceholder;
 
@@ -128,6 +133,12 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
         context.branchIndex = placeholderNode.data?.branchIndex as number;
         context.forkJoinId = forkJoinId;
         context.taskDispatcherId = forkJoinId;
+    } else if (isGraphPlaceholder) {
+        const graphId = placeholderNode.data?.graphId as string;
+
+        context.index = undefined;
+        context.graphId = graphId;
+        context.taskDispatcherId = graphId;
     } else if (isOnErrorPlaceholder) {
         const onErrorId = placeholderNode.data.onErrorId as string;
 
@@ -211,6 +222,7 @@ export default function getTaskDispatcherContext({
                 targetNode.data.parallelData ||
                 targetNode.data.eachData ||
                 targetNode.data.forkJoinData ||
+                targetNode.data.graphData ||
                 targetNode.data.onErrorData ||
                 targetNode.data.terminateData
             ) {
@@ -263,6 +275,7 @@ export default function getTaskDispatcherContext({
             !sourceNode.data.mapData &&
             !sourceNode.data.branchData &&
             !sourceNode.data.forkJoinData &&
+            !sourceNode.data.graphData &&
             !sourceNode.data.onErrorData &&
             !sourceNode.data.terminateData
         ) {

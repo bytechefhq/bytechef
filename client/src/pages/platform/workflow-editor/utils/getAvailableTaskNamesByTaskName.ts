@@ -1,9 +1,12 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
+import {GraphTransitionType} from '@/shared/types';
 
+import {findGraphMembersPrecedingMember} from './graph/graphReachability';
 import {forEachNestedTaskGroup} from './taskTraversalUtils';
 
 interface VisitTasksProps {
     availableTaskNamesByTaskName: Map<string, Set<string>>;
+    graphTransitions: Array<GraphTransitionType> | undefined;
     inheritedTaskNames: Set<string>;
     repeated: boolean;
     tasks: Array<WorkflowTask>;
@@ -13,14 +16,34 @@ function isLoopTask(task: WorkflowTask): boolean {
     return !!task.type?.startsWith('loop/');
 }
 
-function visitTasks({availableTaskNamesByTaskName, inheritedTaskNames, repeated, tasks}: VisitTasksProps): void {
+function visitTasks({
+    availableTaskNamesByTaskName,
+    graphTransitions,
+    inheritedTaskNames,
+    repeated,
+    tasks,
+}: VisitTasksProps): void {
+    const graphMemberNames = graphTransitions ? tasks.map((memberTask) => memberTask.name) : undefined;
+
     tasks.forEach((currentTask, index) => {
         const availableTaskNames = new Set(inheritedTaskNames);
 
-        const candidateTasks = repeated ? tasks : tasks.slice(0, index);
+        if (graphTransitions && graphMemberNames) {
+            const precedingGraphMemberNames = findGraphMembersPrecedingMember(
+                currentTask.name,
+                graphTransitions,
+                graphMemberNames
+            );
 
-        for (const candidateTask of candidateTasks) {
-            availableTaskNames.add(candidateTask.name);
+            for (const precedingGraphMemberName of precedingGraphMemberNames) {
+                availableTaskNames.add(precedingGraphMemberName);
+            }
+        } else {
+            const candidateTasks = repeated ? tasks : tasks.slice(0, index);
+
+            for (const candidateTask of candidateTasks) {
+                availableTaskNames.add(candidateTask.name);
+            }
         }
 
         if (!availableTaskNamesByTaskName.has(currentTask.name)) {
@@ -31,17 +54,39 @@ function visitTasks({availableTaskNamesByTaskName, inheritedTaskNames, repeated,
             return;
         }
 
+        const parameters = currentTask.parameters as Record<string, unknown>;
         const nestedInheritedTaskNames = new Set([...availableTaskNames, currentTask.name]);
         const nestedTasksRepeated = isLoopTask(currentTask);
 
-        forEachNestedTaskGroup(currentTask.parameters as Record<string, unknown>, (nestedTasks) =>
+        forEachNestedTaskGroup(parameters, (nestedTasks, key) => {
+            if (key !== 'nodes') {
+                visitTasks({
+                    availableTaskNamesByTaskName,
+                    graphTransitions: undefined,
+                    inheritedTaskNames: nestedInheritedTaskNames,
+                    repeated: nestedTasksRepeated,
+                    tasks: nestedTasks,
+                });
+
+                return;
+            }
+
+            for (const memberTask of nestedTasks) {
+                availableTaskNames.add(memberTask.name);
+            }
+
+            const nestedGraphTransitions = Array.isArray(parameters.transitions)
+                ? (parameters.transitions as Array<GraphTransitionType>)
+                : [];
+
             visitTasks({
                 availableTaskNamesByTaskName,
+                graphTransitions: nestedGraphTransitions,
                 inheritedTaskNames: nestedInheritedTaskNames,
-                repeated: nestedTasksRepeated,
+                repeated: false,
                 tasks: nestedTasks,
-            })
-        );
+            });
+        });
     });
 }
 
@@ -60,13 +105,15 @@ export default function getAvailableTaskNamesByTaskName(tasks: Array<WorkflowTas
 
     const availableTaskNamesByTaskName = new Map<string, Set<string>>();
 
-    const topLevelTasks = tasks.filter((currentTask) => !nestedTaskNames.has(currentTask.name));
+    const rootTasks = tasks.filter((currentTask) => !nestedTaskNames.has(currentTask.name));
+    const rootInheritedTaskNames = new Set<string>();
 
     visitTasks({
         availableTaskNamesByTaskName,
-        inheritedTaskNames: new Set(),
+        graphTransitions: undefined,
+        inheritedTaskNames: rootInheritedTaskNames,
         repeated: false,
-        tasks: topLevelTasks,
+        tasks: rootTasks,
     });
 
     return availableTaskNamesByTaskName;

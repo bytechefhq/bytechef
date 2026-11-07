@@ -106,11 +106,15 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
+    const currentNodeName = currentNode?.workflowNodeName ?? currentNode?.name;
+
+    const graphTransitionEditorOpen = !!currentNode?.dataPillAnchorNodeName;
+
     const shouldFetchPreviousWorkflowNodeOutputs =
-        (dataPillPanelOpen || workflowNodeDetailsPanelOpen) &&
+        (dataPillPanelOpen || workflowNodeDetailsPanelOpen || graphTransitionEditorOpen) &&
         !!workflowNodes?.length &&
         !!currentNode &&
-        !!currentNode?.name;
+        !!currentNodeName;
 
     const {data: workflowNodeOutputs, isPending: isWorkflowNodeOutputsPending} = useGetPreviousWorkflowNodeOutputsQuery(
         {
@@ -118,7 +122,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
             id: workflow.id!,
             lastWorkflowNodeName: currentNode?.clusterElementType
                 ? rootClusterElementNodeData?.workflowNodeName
-                : currentNode?.name,
+                : currentNodeName,
         },
         shouldFetchPreviousWorkflowNodeOutputs
     );

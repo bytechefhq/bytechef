@@ -67,14 +67,18 @@ describe('resolveTestStateNodeName', () => {
 describe('getExecutedEdgeStatus', () => {
     it('marks an edge COMPLETED when both endpoints completed', () => {
         const states = {logger_1: {status: 'COMPLETED' as const}, var_1: {status: 'COMPLETED' as const}};
+        const sourceNode = taskNode('var_1');
+        const targetNode = taskNode('logger_1');
 
-        expect(getExecutedEdgeStatus(taskNode('var_1'), taskNode('logger_1'), states)).toBe('COMPLETED');
+        expect(getExecutedEdgeStatus({sourceNode, targetNode, workflowTestNodeStates: states})).toBe('COMPLETED');
     });
 
     it('marks the incoming edge of a failed node COMPLETED, since the data reached it', () => {
         const states = {http_1: {status: 'FAILED' as const}, var_1: {status: 'COMPLETED' as const}};
+        const sourceNode = taskNode('var_1');
+        const targetNode = taskNode('http_1');
 
-        expect(getExecutedEdgeStatus(taskNode('var_1'), taskNode('http_1'), states)).toBe('COMPLETED');
+        expect(getExecutedEdgeStatus({sourceNode, targetNode, workflowTestNodeStates: states})).toBe('COMPLETED');
     });
 
     it('never colors the edges into or out of a "+" placeholder', () => {
@@ -86,13 +90,19 @@ describe('getExecutedEdgeStatus', () => {
         };
 
         const states = {parallel_1: {status: 'COMPLETED' as const}};
+        const topGhost = ghostNode('parallel_1', 'parallel-top-ghost');
+        const bottomGhost = ghostNode('parallel_1', 'parallel-bottom-ghost');
 
         expect(
-            getExecutedEdgeStatus(ghostNode('parallel_1', 'parallel-top-ghost'), placeholderNode, states)
+            getExecutedEdgeStatus({sourceNode: topGhost, targetNode: placeholderNode, workflowTestNodeStates: states})
         ).toBeUndefined();
 
         expect(
-            getExecutedEdgeStatus(placeholderNode, ghostNode('parallel_1', 'parallel-bottom-ghost'), states)
+            getExecutedEdgeStatus({
+                sourceNode: placeholderNode,
+                targetNode: bottomGhost,
+                workflowTestNodeStates: states,
+            })
         ).toBeUndefined();
     });
 
@@ -112,13 +122,37 @@ describe('getExecutedEdgeStatus', () => {
         const takenPlaceholder = conditionPlaceholderNode('caseFalse', 'right');
         const untakenPlaceholder = conditionPlaceholderNode('caseTrue', 'left');
 
-        expect(getExecutedEdgeStatus(topGhost, takenPlaceholder, states, takenEmptyConditionCases)).toBe('COMPLETED');
-        expect(getExecutedEdgeStatus(takenPlaceholder, bottomGhost, states, takenEmptyConditionCases)).toBe(
-            'COMPLETED'
-        );
-        expect(getExecutedEdgeStatus(topGhost, untakenPlaceholder, states, takenEmptyConditionCases)).toBeUndefined();
         expect(
-            getExecutedEdgeStatus(untakenPlaceholder, bottomGhost, states, takenEmptyConditionCases)
+            getExecutedEdgeStatus({
+                sourceNode: topGhost,
+                takenEmptyConditionCases,
+                targetNode: takenPlaceholder,
+                workflowTestNodeStates: states,
+            })
+        ).toBe('COMPLETED');
+        expect(
+            getExecutedEdgeStatus({
+                sourceNode: takenPlaceholder,
+                takenEmptyConditionCases,
+                targetNode: bottomGhost,
+                workflowTestNodeStates: states,
+            })
+        ).toBe('COMPLETED');
+        expect(
+            getExecutedEdgeStatus({
+                sourceNode: topGhost,
+                takenEmptyConditionCases,
+                targetNode: untakenPlaceholder,
+                workflowTestNodeStates: states,
+            })
+        ).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus({
+                sourceNode: untakenPlaceholder,
+                takenEmptyConditionCases,
+                targetNode: bottomGhost,
+                workflowTestNodeStates: states,
+            })
         ).toBeUndefined();
     });
 
@@ -138,8 +172,22 @@ describe('getExecutedEdgeStatus', () => {
         const untakenPlaceholder = readonlyConditionPlaceholderNode('caseTrue', 'left');
 
         expect(isConditionPlaceholderNode(untakenPlaceholder)).toBe(true);
-        expect(getExecutedEdgeStatus(topGhost, takenPlaceholder, states, takenEmptyConditionCases)).toBe('COMPLETED');
-        expect(getExecutedEdgeStatus(topGhost, untakenPlaceholder, states, takenEmptyConditionCases)).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus({
+                sourceNode: topGhost,
+                takenEmptyConditionCases,
+                targetNode: takenPlaceholder,
+                workflowTestNodeStates: states,
+            })
+        ).toBe('COMPLETED');
+        expect(
+            getExecutedEdgeStatus({
+                sourceNode: topGhost,
+                takenEmptyConditionCases,
+                targetNode: untakenPlaceholder,
+                workflowTestNodeStates: states,
+            })
+        ).toBeUndefined();
     });
 
     it('leaves the stem into a condition with two empty cases neutral, since the taken side is unknown', () => {
@@ -151,92 +199,120 @@ describe('getExecutedEdgeStatus', () => {
 
         const states = {condition_2: {status: 'COMPLETED' as const}};
         const topGhost = ghostNode('condition_2', 'condition-top-ghost');
+        const emptyConditionNode = conditionNode([], []);
+        const filledConditionNode = conditionNode([{name: 'logger_1'}], []);
 
-        expect(getExecutedEdgeStatus(conditionNode([], []), topGhost, states)).toBeUndefined();
-        expect(getExecutedEdgeStatus(conditionNode([{name: 'logger_1'}], []), topGhost, states)).toBe('COMPLETED');
+        expect(
+            getExecutedEdgeStatus({
+                sourceNode: emptyConditionNode,
+                targetNode: topGhost,
+                workflowTestNodeStates: states,
+            })
+        ).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus({
+                sourceNode: filledConditionNode,
+                targetNode: topGhost,
+                workflowTestNodeStates: states,
+            })
+        ).toBe('COMPLETED');
     });
 
     it('colors dispatcher plumbing through ghost nodes', () => {
         const states = {condition_1: {status: 'COMPLETED' as const}, logger_3: {status: 'COMPLETED' as const}};
+        const sourceNode = ghostNode('condition_1', 'condition-top-ghost');
+        const targetNode = taskNode('logger_3');
 
-        expect(
-            getExecutedEdgeStatus(ghostNode('condition_1', 'condition-top-ghost'), taskNode('logger_3'), states)
-        ).toBe('COMPLETED');
+        expect(getExecutedEdgeStatus({sourceNode, targetNode, workflowTestNodeStates: states})).toBe('COMPLETED');
     });
 
     it('colors plumbing out of a dispatcher that failed through a nested child', () => {
         const states = {condition_1: {status: 'FAILED' as const}, condition_2: {status: 'FAILED' as const}};
+        const outerConditionNode = taskNode('condition_1');
+        const topGhost = ghostNode('condition_1', 'condition-top-ghost');
+        const nestedConditionNode = taskNode('condition_2');
 
         expect(
-            getExecutedEdgeStatus(taskNode('condition_1'), ghostNode('condition_1', 'condition-top-ghost'), states)
+            getExecutedEdgeStatus({
+                sourceNode: outerConditionNode,
+                targetNode: topGhost,
+                workflowTestNodeStates: states,
+            })
         ).toBe('COMPLETED');
 
         expect(
-            getExecutedEdgeStatus(ghostNode('condition_1', 'condition-top-ghost'), taskNode('condition_2'), states)
+            getExecutedEdgeStatus({
+                sourceNode: topGhost,
+                targetNode: nestedConditionNode,
+                workflowTestNodeStates: states,
+            })
         ).toBe('COMPLETED');
     });
 
     it('keeps the sibling branch of a failed dispatcher gray', () => {
         const states = {condition_1: {status: 'FAILED' as const}, condition_2: {status: 'FAILED' as const}};
+        const sourceNode = ghostNode('condition_1', 'condition-top-ghost');
+        const targetNode = taskNode('logger_2');
 
-        expect(
-            getExecutedEdgeStatus(ghostNode('condition_1', 'condition-top-ghost'), taskNode('logger_2'), states)
-        ).toBeUndefined();
+        expect(getExecutedEdgeStatus({sourceNode, targetNode, workflowTestNodeStates: states})).toBeUndefined();
     });
 
     it('colors a completed child of a dispatcher that failed later in the same branch', () => {
         const states = {condition_1: {status: 'FAILED' as const}, logger_5: {status: 'COMPLETED' as const}};
+        const sourceNode = ghostNode('condition_1', 'condition-top-ghost');
+        const targetNode = taskNode('logger_5');
 
-        expect(
-            getExecutedEdgeStatus(ghostNode('condition_1', 'condition-top-ghost'), taskNode('logger_5'), states)
-        ).toBe('COMPLETED');
+        expect(getExecutedEdgeStatus({sourceNode, targetNode, workflowTestNodeStates: states})).toBe('COMPLETED');
     });
 
     it('keeps the untaken branch gray: child without state into an executed ghost', () => {
         const states = {condition_1: {status: 'COMPLETED' as const}};
+        const sourceNode = taskNode('logger_2');
+        const targetNode = ghostNode('condition_1', 'condition-bottom-ghost');
 
-        expect(
-            getExecutedEdgeStatus(taskNode('logger_2'), ghostNode('condition_1', 'condition-bottom-ghost'), states)
-        ).toBeUndefined();
+        expect(getExecutedEdgeStatus({sourceNode, targetNode, workflowTestNodeStates: states})).toBeUndefined();
     });
 
     it('colors a completed branch into the join green even when a sibling branch failed the dispatcher', () => {
         const states = {dataStorage_2: {status: 'COMPLETED' as const}, parallel_1: {status: 'FAILED' as const}};
+        const sourceNode = taskNode('dataStorage_2');
+        const targetNode = bottomGhostNode('parallel_1', 'parallel-bottom-ghost');
 
-        expect(
-            getExecutedEdgeStatus(
-                taskNode('dataStorage_2'),
-                bottomGhostNode('parallel_1', 'parallel-bottom-ghost'),
-                states
-            )
-        ).toBe('COMPLETED');
+        expect(getExecutedEdgeStatus({sourceNode, targetNode, workflowTestNodeStates: states})).toBe('COMPLETED');
     });
 
     it('keeps the edge from a failed last child into the join neutral', () => {
         const states = {http_1: {status: 'FAILED' as const}, parallel_1: {status: 'FAILED' as const}};
+        const sourceNode = taskNode('http_1');
+        const targetNode = bottomGhostNode('parallel_1', 'parallel-bottom-ghost');
 
-        expect(
-            getExecutedEdgeStatus(taskNode('http_1'), bottomGhostNode('parallel_1', 'parallel-bottom-ghost'), states)
-        ).toBeUndefined();
+        expect(getExecutedEdgeStatus({sourceNode, targetNode, workflowTestNodeStates: states})).toBeUndefined();
     });
 
     it('keeps the edge from a failed nested dispatcher into the outer join neutral', () => {
         const states = {condition_2: {status: 'FAILED' as const}, parallel_1: {status: 'FAILED' as const}};
+        const sourceNode = bottomGhostNode('condition_2', 'condition-bottom-ghost');
+        const targetNode = bottomGhostNode('parallel_1', 'parallel-bottom-ghost');
 
-        expect(
-            getExecutedEdgeStatus(
-                bottomGhostNode('condition_2', 'condition-bottom-ghost'),
-                bottomGhostNode('parallel_1', 'parallel-bottom-ghost'),
-                states
-            )
-        ).toBeUndefined();
+        expect(getExecutedEdgeStatus({sourceNode, targetNode, workflowTestNodeStates: states})).toBeUndefined();
     });
 
     it('colors only the edge out of the trigger that started the run', () => {
         const states = {trigger_2: {status: 'COMPLETED' as const}, var_1: {status: 'COMPLETED' as const}};
+        const startingTriggerNode = triggerNode('trigger_2');
+        const idleTriggerNode = triggerNode('trigger_1');
+        const varNode = taskNode('var_1');
 
-        expect(getExecutedEdgeStatus(triggerNode('trigger_2'), taskNode('var_1'), states)).toBe('COMPLETED');
-        expect(getExecutedEdgeStatus(triggerNode('trigger_1'), taskNode('var_1'), states)).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus({
+                sourceNode: startingTriggerNode,
+                targetNode: varNode,
+                workflowTestNodeStates: states,
+            })
+        ).toBe('COMPLETED');
+        expect(
+            getExecutedEdgeStatus({sourceNode: idleTriggerNode, targetNode: varNode, workflowTestNodeStates: states})
+        ).toBeUndefined();
     });
 
     it('colors the way into a running loop up to its completed child', () => {
@@ -247,10 +323,19 @@ describe('getExecutedEdgeStatus', () => {
         };
 
         const topGhost = ghostNode('loop_2', 'loop-top-ghost');
+        const varNode = taskNode('var_1');
+        const loopNode = dispatcherNode('loop_2');
+        const loggerNode = taskNode('logger_1');
 
-        expect(getExecutedEdgeStatus(taskNode('var_1'), dispatcherNode('loop_2'), states)).toBe('COMPLETED');
-        expect(getExecutedEdgeStatus(dispatcherNode('loop_2'), topGhost, states)).toBe('COMPLETED');
-        expect(getExecutedEdgeStatus(topGhost, taskNode('logger_1'), states)).toBe('COMPLETED');
+        expect(getExecutedEdgeStatus({sourceNode: varNode, targetNode: loopNode, workflowTestNodeStates: states})).toBe(
+            'COMPLETED'
+        );
+        expect(
+            getExecutedEdgeStatus({sourceNode: loopNode, targetNode: topGhost, workflowTestNodeStates: states})
+        ).toBe('COMPLETED');
+        expect(
+            getExecutedEdgeStatus({sourceNode: topGhost, targetNode: loggerNode, workflowTestNodeStates: states})
+        ).toBe('COMPLETED');
     });
 
     it('keeps the edges of a running loop neutral where the run has not reached yet', () => {
@@ -260,15 +345,27 @@ describe('getExecutedEdgeStatus', () => {
         };
 
         const topGhost = ghostNode('loop_2', 'loop-top-ghost');
+        const runningLoggerNode = taskNode('logger_1');
+        const unreachedLoggerNode = taskNode('logger_2');
+        const innerBottomGhost = bottomGhostNode('loop_2', 'loop-bottom-ghost');
+        const outerBottomGhost = bottomGhostNode('loop_1', 'loop-bottom-ghost');
 
-        expect(getExecutedEdgeStatus(topGhost, taskNode('logger_1'), states)).toBeUndefined();
-        expect(getExecutedEdgeStatus(topGhost, taskNode('logger_2'), states)).toBeUndefined();
         expect(
-            getExecutedEdgeStatus(
-                bottomGhostNode('loop_2', 'loop-bottom-ghost'),
-                bottomGhostNode('loop_1', 'loop-bottom-ghost'),
-                states
-            )
+            getExecutedEdgeStatus({sourceNode: topGhost, targetNode: runningLoggerNode, workflowTestNodeStates: states})
+        ).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus({
+                sourceNode: topGhost,
+                targetNode: unreachedLoggerNode,
+                workflowTestNodeStates: states,
+            })
+        ).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus({
+                sourceNode: innerBottomGhost,
+                targetNode: outerBottomGhost,
+                workflowTestNodeStates: states,
+            })
         ).toBeUndefined();
     });
 
@@ -276,18 +373,28 @@ describe('getExecutedEdgeStatus', () => {
         const states = {loop_2: {status: 'RUNNING' as const}};
 
         const leftGhost = leftGhostNode('loop_2');
+        const topGhost = ghostNode('loop_2', 'loop-top-ghost');
+        const bottomGhost = bottomGhostNode('loop_2', 'loop-bottom-ghost');
 
-        expect(getExecutedEdgeStatus(ghostNode('loop_2', 'loop-top-ghost'), leftGhost, states)).toBe('COMPLETED');
-        expect(getExecutedEdgeStatus(leftGhost, bottomGhostNode('loop_2', 'loop-bottom-ghost'), states)).toBe(
-            'COMPLETED'
-        );
+        expect(
+            getExecutedEdgeStatus({sourceNode: topGhost, targetNode: leftGhost, workflowTestNodeStates: states})
+        ).toBe('COMPLETED');
+        expect(
+            getExecutedEdgeStatus({sourceNode: leftGhost, targetNode: bottomGhost, workflowTestNodeStates: states})
+        ).toBe('COMPLETED');
     });
 
     it('keeps the left rail of a loop the run has not reached neutral', () => {
         const leftGhost = leftGhostNode('loop_2');
+        const topGhost = ghostNode('loop_2', 'loop-top-ghost');
+        const bottomGhost = bottomGhostNode('loop_2', 'loop-bottom-ghost');
 
-        expect(getExecutedEdgeStatus(ghostNode('loop_2', 'loop-top-ghost'), leftGhost, {})).toBeUndefined();
-        expect(getExecutedEdgeStatus(leftGhost, bottomGhostNode('loop_2', 'loop-bottom-ghost'), {})).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus({sourceNode: topGhost, targetNode: leftGhost, workflowTestNodeStates: {}})
+        ).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus({sourceNode: leftGhost, targetNode: bottomGhost, workflowTestNodeStates: {}})
+        ).toBeUndefined();
     });
 
     it('colors the way into a running dispatcher nested in a running loop', () => {
@@ -296,16 +403,24 @@ describe('getExecutedEdgeStatus', () => {
             loop_2: {status: 'RUNNING' as const},
         };
 
-        expect(
-            getExecutedEdgeStatus(ghostNode('loop_2', 'loop-top-ghost'), dispatcherNode('condition_1'), states)
-        ).toBe('COMPLETED');
+        const sourceNode = ghostNode('loop_2', 'loop-top-ghost');
+        const targetNode = dispatcherNode('condition_1');
+
+        expect(getExecutedEdgeStatus({sourceNode, targetNode, workflowTestNodeStates: states})).toBe('COMPLETED');
     });
 
     it('is neutral while the target is still running or has no state', () => {
         const states = {logger_1: {status: 'RUNNING' as const}, var_1: {status: 'COMPLETED' as const}};
+        const varNode = taskNode('var_1');
+        const runningLoggerNode = taskNode('logger_1');
+        const missingNode = taskNode('missing');
 
-        expect(getExecutedEdgeStatus(taskNode('var_1'), taskNode('logger_1'), states)).toBeUndefined();
-        expect(getExecutedEdgeStatus(taskNode('var_1'), taskNode('missing'), states)).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus({sourceNode: varNode, targetNode: runningLoggerNode, workflowTestNodeStates: states})
+        ).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus({sourceNode: varNode, targetNode: missingNode, workflowTestNodeStates: states})
+        ).toBeUndefined();
     });
 });
 
@@ -338,7 +453,11 @@ describe('bypassDisabledEdgeEndpoints', () => {
             {disabledTaskNames, edges, nodes}
         );
 
-        return getExecutedEdgeStatus(endpoints.sourceNode, endpoints.targetNode, states);
+        return getExecutedEdgeStatus({
+            sourceNode: endpoints.sourceNode,
+            targetNode: endpoints.targetNode,
+            workflowTestNodeStates: states,
+        });
     };
 
     it('carries the executed trail across a disabled node up to the failed node', () => {
@@ -373,15 +492,25 @@ describe('bypassDisabledEdgeEndpoints', () => {
         });
 
         expect(endpoints.targetNode?.id).toBe('openAi_2');
-        expect(getExecutedEdgeStatus(endpoints.sourceNode, endpoints.targetNode, states)).toBeUndefined();
+        expect(
+            getExecutedEdgeStatus({
+                sourceNode: endpoints.sourceNode,
+                targetNode: endpoints.targetNode,
+                workflowTestNodeStates: states,
+            })
+        ).toBeUndefined();
     });
 
     it('keeps an untaken branch neutral across a disabled node', () => {
         const endpoints = bypassDisabledEdgeEndpoints(nodes[0], nodes[1], {disabledTaskNames: new Set(), edges, nodes});
 
+        const states = {parallel_1: {status: 'COMPLETED' as const}};
+
         expect(
-            getExecutedEdgeStatus(endpoints.sourceNode, endpoints.targetNode, {
-                parallel_1: {status: 'COMPLETED' as const},
+            getExecutedEdgeStatus({
+                sourceNode: endpoints.sourceNode,
+                targetNode: endpoints.targetNode,
+                workflowTestNodeStates: states,
             })
         ).toBeUndefined();
     });
@@ -390,5 +519,247 @@ describe('bypassDisabledEdgeEndpoints', () => {
         const endpoints = bypassDisabledEdgeEndpoints(nodes[2], nodes[4], {disabledTaskNames: new Set(), edges, nodes});
 
         expect(endpoints).toEqual({sourceNode: nodes[2], targetNode: nodes[4]});
+    });
+});
+
+describe('getExecutedEdgeStatus graph transition arm', () => {
+    interface NodeExecutionProps {
+        nodeName: string;
+        startedAtSecond: number;
+        status?: string;
+    }
+
+    const nodeExecution = ({nodeName, startedAtSecond, status = 'COMPLETED'}: NodeExecutionProps) => ({
+        nodeName,
+        startDate: new Date(`2024-01-01T10:00:${String(startedAtSecond).padStart(2, '0')}`),
+        status,
+    });
+
+    const fanOutExecutions = [
+        nodeExecution({nodeName: 'node_a', startedAtSecond: 1}),
+        nodeExecution({nodeName: 'node_b', startedAtSecond: 2}),
+        nodeExecution({nodeName: 'node_c', startedAtSecond: 3}),
+    ];
+
+    it('marks a transition COMPLETED when its target was dispatched right after its source', () => {
+        const graphTransition = {
+            from: 'node_a',
+            nodeExecutionRuns: [fanOutExecutions],
+            to: 'node_b',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBe('COMPLETED');
+    });
+
+    it('leaves an untaken sibling transition neutral even though its target completed later', () => {
+        const graphTransition = {
+            from: 'node_a',
+            nodeExecutionRuns: [fanOutExecutions],
+            to: 'node_c',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBeUndefined();
+    });
+
+    it('orders executions by startDate rather than trusting the order it was handed', () => {
+        const nodeExecutions = [
+            nodeExecution({nodeName: 'node_c', startedAtSecond: 3}),
+            nodeExecution({nodeName: 'node_b', startedAtSecond: 2}),
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 1}),
+        ];
+
+        const graphTransition = {
+            from: 'node_a',
+            nodeExecutionRuns: [nodeExecutions],
+            to: 'node_b',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBe('COMPLETED');
+    });
+
+    it('marks a self transition COMPLETED across consecutive visits of one node', () => {
+        const nodeExecutions = [
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 1}),
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 2}),
+        ];
+
+        const graphTransition = {
+            from: 'node_a',
+            nodeExecutionRuns: [nodeExecutions],
+            to: 'node_a',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBe('COMPLETED');
+    });
+
+    it('paints a transition FAILED when the visit it led to failed', () => {
+        const nodeExecutions = [
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 1}),
+            nodeExecution({nodeName: 'node_b', startedAtSecond: 2, status: 'FAILED'}),
+        ];
+
+        const graphTransition = {
+            from: 'node_a',
+            nodeExecutionRuns: [nodeExecutions],
+            to: 'node_b',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBe('FAILED');
+    });
+
+    it('prefers FAILED over COMPLETED when a cycle took the same transition both ways', () => {
+        const nodeExecutions = [
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 1}),
+            nodeExecution({nodeName: 'node_b', startedAtSecond: 2}),
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 3}),
+            nodeExecution({nodeName: 'node_b', startedAtSecond: 4, status: 'FAILED'}),
+        ];
+
+        const graphTransition = {
+            from: 'node_a',
+            nodeExecutionRuns: [nodeExecutions],
+            to: 'node_b',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBe('FAILED');
+    });
+
+    it('stays neutral while the visit it led to is still running', () => {
+        const nodeExecutions = [
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 1}),
+            nodeExecution({nodeName: 'node_b', startedAtSecond: 2, status: 'STARTED'}),
+        ];
+
+        const graphTransition = {
+            from: 'node_a',
+            nodeExecutionRuns: [nodeExecutions],
+            to: 'node_b',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBeUndefined();
+    });
+
+    it('marks a dynamic transition COMPLETED when the next visit is a node no static transition names', () => {
+        const graphTransition = {
+            dynamic: true,
+            from: 'node_a',
+            nodeExecutionRuns: [fanOutExecutions],
+            staticTargetNames: ['node_c'],
+            to: "=nextStep + '_1'",
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBe('COMPLETED');
+    });
+
+    it('leaves a dynamic transition neutral when the next visit is a declared static target', () => {
+        const graphTransition = {
+            dynamic: true,
+            from: 'node_a',
+            nodeExecutionRuns: [fanOutExecutions],
+            staticTargetNames: ['node_b'],
+            to: "=nextStep + '_1'",
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBeUndefined();
+    });
+
+    it('paints a dynamic transition FAILED when the visit it resolved to failed', () => {
+        const nodeExecutions = [
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 1}),
+            nodeExecution({nodeName: 'node_b', startedAtSecond: 2, status: 'FAILED'}),
+        ];
+
+        const graphTransition = {
+            dynamic: true,
+            from: 'node_a',
+            nodeExecutionRuns: [nodeExecutions],
+            staticTargetNames: [],
+            to: '=${node_a.decision}',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBe('FAILED');
+    });
+
+    it('marks a transition COMPLETED when only a later run of the graph took it', () => {
+        const firstRun = [
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 1}),
+            nodeExecution({nodeName: 'node_c', startedAtSecond: 2}),
+        ];
+        const secondRun = [
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 3}),
+            nodeExecution({nodeName: 'node_b', startedAtSecond: 4}),
+        ];
+
+        const graphTransition = {
+            from: 'node_a',
+            nodeExecutionRuns: [firstRun, secondRun],
+            to: 'node_b',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBe('COMPLETED');
+    });
+
+    it('never pairs the last visit of one run with the first visit of the next', () => {
+        const firstRun = [nodeExecution({nodeName: 'node_b', startedAtSecond: 1})];
+        const secondRun = [nodeExecution({nodeName: 'node_a', startedAtSecond: 2})];
+
+        const graphTransition = {
+            from: 'node_b',
+            nodeExecutionRuns: [firstRun, secondRun],
+            to: 'node_a',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBeUndefined();
+    });
+
+    it('prefers FAILED when one run failed on a transition another run completed', () => {
+        const firstRun = [
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 1}),
+            nodeExecution({nodeName: 'node_b', startedAtSecond: 2, status: 'FAILED'}),
+        ];
+        const secondRun = [
+            nodeExecution({nodeName: 'node_a', startedAtSecond: 3}),
+            nodeExecution({nodeName: 'node_b', startedAtSecond: 4}),
+        ];
+
+        const graphTransition = {
+            from: 'node_a',
+            nodeExecutionRuns: [firstRun, secondRun],
+            to: 'node_b',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBe('FAILED');
+    });
+
+    it('stays neutral when an endpoint has no name, which matches no dispatch', () => {
+        const namelessExecutions = [
+            nodeExecution({nodeName: '', startedAtSecond: 1}),
+            nodeExecution({nodeName: '', startedAtSecond: 2}),
+        ];
+
+        const graphTransition = {
+            from: '',
+            nodeExecutionRuns: [namelessExecutions],
+            to: '',
+        };
+
+        expect(getExecutedEdgeStatus({graphTransition, workflowTestNodeStates: {}})).toBeUndefined();
+    });
+
+    it('never consults node states in the graph arm, so a completed pair alone proves nothing', () => {
+        const states = {node_a: {status: 'COMPLETED' as const}, node_c: {status: 'COMPLETED' as const}};
+
+        const sourceNode = taskNode('node_a');
+        const targetNode = taskNode('node_c');
+
+        const graphTransition = {
+            from: 'node_a',
+            nodeExecutionRuns: [fanOutExecutions],
+            to: 'node_c',
+        };
+
+        expect(
+            getExecutedEdgeStatus({graphTransition, sourceNode, targetNode, workflowTestNodeStates: states})
+        ).toBeUndefined();
     });
 });

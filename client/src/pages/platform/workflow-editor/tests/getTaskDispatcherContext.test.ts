@@ -93,6 +93,19 @@ describe('getContextFromTaskNodeData', () => {
         });
     });
 
+    it('should extract context for graphData', () => {
+        const nodeData: NodeDataType = makeNodeData({
+            graphData: {graphId: 'graph_1', index: 2},
+            taskDispatcherId: 'graph_1',
+        });
+
+        expect(getContextFromTaskNodeData(nodeData)).toEqual({
+            graphId: 'graph_1',
+            index: 2,
+            taskDispatcherId: 'graph_1',
+        });
+    });
+
     it('should return undefined for empty nodeData', () => {
         expect(getContextFromTaskNodeData(makeNodeData({}))).toEqual({taskDispatcherId: undefined});
     });
@@ -168,6 +181,19 @@ describe('getContextFromPlaceholderNode', () => {
             index: 0,
             mapId: 'map_1',
             taskDispatcherId: 'map_1',
+        });
+    });
+
+    it('should extract context for the graph add-node placeholder', () => {
+        const node = makePlaceholderNode('graph_1-graph-placeholder', {
+            graphId: 'graph_1',
+        });
+
+        expect(getContextFromPlaceholderNode(node)?.index).toBeUndefined();
+
+        expect(getContextFromPlaceholderNode(node)).toMatchObject({
+            graphId: 'graph_1',
+            taskDispatcherId: 'graph_1',
         });
     });
 

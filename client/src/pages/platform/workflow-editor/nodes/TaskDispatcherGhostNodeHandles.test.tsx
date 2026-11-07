@@ -118,3 +118,26 @@ describe('ghost bar side handles', () => {
         expect(handle('-right')?.className).toContain('bottom-8');
     });
 });
+
+describe('ghost bars carry no graph transition handles', () => {
+    beforeEach(() => {
+        directionStoreState.layoutDirection = 'TB';
+    });
+
+    it.each([
+        ['top', 'loop_1-loop-top-ghost'],
+        ['bottom', 'loop_1-loop-bottom-ghost'],
+    ])('renders no graph transition handle on the %s bar', (component, id) => {
+        const {container} = render(
+            <ReactFlowProvider>
+                {component === 'top' ? (
+                    <TaskDispatcherTopGhostNode id={id} />
+                ) : (
+                    <TaskDispatcherBottomGhostNode id={id} />
+                )}
+            </ReactFlowProvider>
+        );
+
+        expect(container.querySelector('[data-handleid*="graph-transition"]')).toBeNull();
+    });
+});

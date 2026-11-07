@@ -222,3 +222,73 @@ describe('getTasksStructuralFingerprint', () => {
         expect(getTasksStructuralFingerprint([definitionOrder])).toBe(getTasksStructuralFingerprint([serverOrder]));
     });
 });
+
+describe('graph layout signature', () => {
+    interface MakeGraphTaskProps {
+        positions?: Record<string, {x: number; y: number}>;
+        startNode?: string;
+        transitions: Array<{condition?: string; from: string; to: string}>;
+    }
+
+    const makeGraphTask = ({positions = {}, startNode = 'node_0', transitions}: MakeGraphTaskProps) =>
+        ({
+            name: 'graph_1',
+            parameters: {
+                nodes: ['node_0', 'node_1'].map((name) => ({
+                    name,
+                    ...(positions[name] ? {metadata: {ui: {nodePosition: positions[name]}}} : {}),
+                })),
+                startNode,
+                transitions,
+            },
+            type: 'graph/v1',
+        }) as unknown as WorkflowTask;
+
+    it('changes the fingerprint when a transition is added, retargeted or conditioned', () => {
+        const none = getTasksStructuralFingerprint([makeGraphTask({transitions: []})]);
+        const added = getTasksStructuralFingerprint([makeGraphTask({transitions: [{from: 'node_0', to: 'node_1'}]})]);
+        const retargeted = getTasksStructuralFingerprint([
+            makeGraphTask({transitions: [{from: 'node_0', to: 'node_2'}]}),
+        ]);
+        const conditioned = getTasksStructuralFingerprint([
+            makeGraphTask({transitions: [{condition: '${node_0.ok}', from: 'node_0', to: 'node_2'}]}),
+        ]);
+
+        expect(none).not.toBe(added);
+        expect(added).not.toBe(retargeted);
+        expect(retargeted).not.toBe(conditioned);
+    });
+
+    it('changes the fingerprint when a member moves, since the frame is sized from member positions', () => {
+        const transitions = [{from: 'node_0', to: 'node_1'}];
+
+        const unplaced = getTasksStructuralFingerprint([makeGraphTask({transitions})]);
+        const placed = getTasksStructuralFingerprint([
+            makeGraphTask({positions: {node_1: {x: 300, y: 0}}, transitions}),
+        ]);
+        const moved = getTasksStructuralFingerprint([
+            makeGraphTask({positions: {node_1: {x: 300, y: 120}}, transitions}),
+        ]);
+
+        expect(unplaced).not.toBe(placed);
+        expect(placed).not.toBe(moved);
+    });
+
+    it('changes the fingerprint when the start node is re-pointed', () => {
+        const transitions = [{from: 'node_0', to: 'node_1'}];
+        const positions = {node_0: {x: 24, y: 0}, node_1: {x: 300, y: 0}};
+
+        expect(getTasksStructuralFingerprint([makeGraphTask({positions, startNode: 'node_0', transitions})])).not.toBe(
+            getTasksStructuralFingerprint([makeGraphTask({positions, startNode: 'node_1', transitions})])
+        );
+    });
+
+    it('keeps the fingerprint stable when nothing structural changed', () => {
+        const transitions = [{from: 'node_0', to: 'node_1'}];
+        const positions = {node_1: {x: 300, y: 0}};
+
+        expect(getTasksStructuralFingerprint([makeGraphTask({positions, transitions})])).toBe(
+            getTasksStructuralFingerprint([makeGraphTask({positions, transitions})])
+        );
+    });
+});

@@ -10,6 +10,7 @@ import DescriptionTab from '@/pages/platform/workflow-editor/components/node-det
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
 import OutputTab from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import GraphTransitionsPanel from '@/pages/platform/workflow-editor/components/properties/graph/GraphTransitionsPanel';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import DeprecatedBadge from '@/shared/components/DeprecatedBadge';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
@@ -158,6 +159,16 @@ const WorkflowNodeDetailsPanel = ({
     const missingRequiredProperties = useMemo(
         () => getMissingRequiredPropertyLabels(errors, currentOperationProperties),
         [currentOperationProperties, errors]
+    );
+
+    const isGraphNode = !!currentNode?.taskDispatcher && currentNode.componentName === 'graph';
+
+    const displayedOperationProperties = useMemo(
+        () =>
+            isGraphNode
+                ? currentOperationProperties?.filter((property) => property.name !== 'transitions')
+                : currentOperationProperties,
+        [currentOperationProperties, isGraphNode]
     );
 
     if (!(panelOpen ?? workflowNodeDetailsPanelOpen)) {
@@ -514,9 +525,13 @@ const WorkflowNodeDetailsPanel = ({
                                             />
                                         )}
 
+                                    {activeTab === 'properties' && isGraphNode && currentNode?.workflowNodeName && (
+                                        <GraphTransitionsPanel graphId={currentNode.workflowNodeName} />
+                                    )}
+
                                     {activeTab === 'properties' &&
                                         (!operationDataMissing &&
-                                        currentOperationProperties?.length &&
+                                        displayedOperationProperties?.length &&
                                         !awaitingFirstSave &&
                                         !propertiesLoading ? (
                                             <Properties
@@ -524,7 +539,7 @@ const WorkflowNodeDetailsPanel = ({
                                                 displayConditionsQuery={activeDisplayConditionsQuery}
                                                 key={`${currentNode?.componentName}-${currentNode?.type}_${currentOperationName}_properties`}
                                                 operationName={currentOperationName}
-                                                properties={currentOperationProperties}
+                                                properties={displayedOperationProperties}
                                             />
                                         ) : (
                                             <PropertiesTabSkeleton />

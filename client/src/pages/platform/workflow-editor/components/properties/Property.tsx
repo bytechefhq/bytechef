@@ -413,7 +413,7 @@ const Property = ({
         <li
             aria-label={`${name} property`}
             className={twMerge(
-                'w-full',
+                'w-full list-none',
                 hidden && 'hidden',
                 controlType === 'OBJECT_BUILDER' && 'flex-col',
                 controlType === 'ARRAY_BUILDER' && 'flex-col',

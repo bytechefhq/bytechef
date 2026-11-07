@@ -595,4 +595,126 @@ describe('WorkflowNode reset position action', () => {
 
         expect(recordedContextMenuProps.value?.hasSavedPosition).toBe(true);
     });
+
+    it('hides the reset position action on a graph member that carries a saved position', () => {
+        renderNode(
+            {
+                componentName: 'httpClient',
+                graphData: {graphId: 'graph_1', index: 0},
+                metadata: {ui: {nodePosition: {x: 10, y: 20}}},
+                name: 'task_1',
+                workflowNodeName: 'task_1',
+            } as unknown as NodeDataType,
+            'task_1'
+        );
+
+        expect(recordedContextMenuProps.value?.hasSavedPosition).toBe(false);
+    });
+});
+
+describe('WorkflowNode graph transition handles', () => {
+    beforeEach(() => {
+        directionStoreState.layoutDirection = 'TB';
+        editorStoreState.renamingNodeName = undefined;
+    });
+
+    function renderMember(overrides: Partial<NodeDataType> = {}, id: string = 'task_1') {
+        return renderNode(
+            {
+                componentName: 'httpClient',
+                graphData: {graphId: 'graph_1', index: 0},
+                name: id,
+                workflowNodeName: id,
+                ...overrides,
+            } as unknown as NodeDataType,
+            id
+        );
+    }
+
+    it('keeps the duration clear of the source handle so a transition can still be dragged after a test run', () => {
+        testNodeStatesState.value = {task_1: {durationMillis: 4, status: 'COMPLETED'}};
+
+        renderMember();
+
+        const duration = screen.getByText('4ms');
+
+        expect(duration).toHaveClass('ml-2.5');
+        expect(duration).not.toHaveClass('-translate-x-1/2');
+
+        testNodeStatesState.value = {};
+    });
+
+    it('renders no transition handles on a node that is not a graph member', () => {
+        const {container} = renderNode(
+            {
+                componentName: 'httpClient',
+                name: 'task_1',
+                workflowNodeName: 'task_1',
+            } as unknown as NodeDataType,
+            'task_1'
+        );
+
+        expect(container.querySelector('[data-handleid*="graph-transition"]')).toBeNull();
+    });
+
+    it('puts graph member transition handles on the main axis in TB', () => {
+        const {container} = renderMember();
+
+        expect(container.querySelector('[data-handleid="task_1-graph-transition-target"]')?.className).toContain(
+            'react-flow__handle-top'
+        );
+        expect(container.querySelector('[data-handleid="task_1-graph-transition-source"]')?.className).toContain(
+            'react-flow__handle-bottom'
+        );
+    });
+
+    it('centres graph member transition handles on the box rather than the label-widened element', () => {
+        const {container} = renderMember();
+
+        const sourceHandle = container.querySelector<HTMLElement>('[data-handleid="task_1-graph-transition-source"]');
+
+        expect(sourceHandle!.style.left).toBe('36px');
+    });
+
+    it('moves graph member transition handles onto the horizontal axis in LR', () => {
+        directionStoreState.layoutDirection = 'LR';
+
+        const {container} = renderMember();
+
+        expect(container.querySelector('[data-handleid="task_1-graph-transition-target"]')?.className).toContain(
+            'react-flow__handle-left'
+        );
+        expect(container.querySelector('[data-handleid="task_1-graph-transition-source"]')?.className).toContain(
+            'react-flow__handle-right'
+        );
+    });
+
+    it('makes graph member transition handles connectable so transitions can be drawn', () => {
+        const {container} = renderMember();
+
+        const targetHandle = container.querySelector('[data-handleid="task_1-graph-transition-target"]');
+        const sourceHandle = container.querySelector('[data-handleid="task_1-graph-transition-source"]');
+
+        expect(targetHandle?.classList.contains('connectable')).toBe(true);
+        expect(sourceHandle?.classList.contains('connectable')).toBe(true);
+    });
+
+    it('keeps the dynamic stub anchor on the source side and never connectable', () => {
+        const {container} = renderMember();
+
+        const dynamicHandle = container.querySelector('[data-handleid="task_1-graph-transition-dynamic"]');
+
+        expect(dynamicHandle?.className).toContain('react-flow__handle-bottom');
+        expect(dynamicHandle?.classList.contains('connectable')).toBe(false);
+    });
+
+    it('anchors a task-dispatcher member transitions on the dispatcher node itself', () => {
+        const {container} = renderMember(
+            {componentName: 'loop', name: 'loop_1', taskDispatcher: true, workflowNodeName: 'loop_1'},
+            'loop_1'
+        );
+
+        expect(container.querySelector('[data-handleid="loop_1-graph-transition-source"]')).not.toBeNull();
+        expect(container.querySelector('[data-handleid="loop_1-graph-transition-target"]')).not.toBeNull();
+    });
 });

@@ -36,6 +36,10 @@ vi.mock('../providers/workflowEditorProvider', () => ({
 
 vi.mock('../utils/saveWorkflowDefinition', () => ({default: saveWorkflowDefinitionMock}));
 
+vi.mock('./GraphTransitionHandles', () => ({
+    default: ({nodeId}: {nodeId: string}) => <div data-testid={`graph-transition-handles-${nodeId}`} />,
+}));
+
 const CLUSTER_ROOT_DATA = {
     clusterFrame: {clusterRootId: 'aiAgent_1', height: 320, width: 640},
     label: 'AI Agent',
@@ -112,6 +116,29 @@ describe('ClusterFrameShell', () => {
 
         expect(shell).toHaveStyle({height: '320px', width: '640px'});
         expect(screen.getByText('root card')).toBeInTheDocument();
+    });
+
+    it('renders graph transition handles on the frame of a graph member', () => {
+        render(
+            <ClusterFrameShell
+                data={{...CLUSTER_ROOT_DATA, graphData: {graphId: 'graph_1', index: 1}} as NodeDataType}
+                nodeId="aiAgent_1"
+            >
+                <div>root card</div>
+            </ClusterFrameShell>
+        );
+
+        expect(screen.getByTestId('graph-transition-handles-aiAgent_1')).toBeInTheDocument();
+    });
+
+    it('leaves graph transition handles off a frame outside a graph', () => {
+        render(
+            <ClusterFrameShell data={CLUSTER_ROOT_DATA} nodeId="aiAgent_1">
+                <div>root card</div>
+            </ClusterFrameShell>
+        );
+
+        expect(screen.queryByTestId('graph-transition-handles-aiAgent_1')).not.toBeInTheDocument();
     });
 
     it('renders the children bare when no box has been computed', () => {

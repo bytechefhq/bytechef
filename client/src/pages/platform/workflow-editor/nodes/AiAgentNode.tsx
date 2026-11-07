@@ -36,6 +36,7 @@ import getClusterRootOutcome from '../utils/getClusterRootOutcome';
 import {getNodeLabel} from '../utils/getNodeLabel';
 import {getTask} from '../utils/getTask';
 import getTestNodeStateBorderClassName from '../utils/getTestNodeStateBorderClassName';
+import {GRAPH_MEMBER_BOX_WIDTH, GRAPH_MEMBER_NOMINAL_SIZE} from '../utils/graph/graphFrameGeometry';
 import handleDeleteTask from '../utils/handleDeleteTask';
 import pasteNode from '../utils/pasteNode';
 import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
@@ -44,6 +45,7 @@ import {toggleNodeDisabled} from '../utils/toggleNodeDisabled';
 import ClusterFrameShell from './ClusterFrameShell';
 import ClusterRootOutcomeBadge from './ClusterRootOutcomeBadge';
 import DisabledNodeBadge from './DisabledNodeBadge';
+import GraphTransitionHandles from './GraphTransitionHandles';
 import styles from './NodeTypes.module.css';
 import WorkflowTestNodeStatus from './WorkflowTestNodeStatus';
 
@@ -155,7 +157,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
-    const hasSavedNodePosition = data.metadata?.ui?.nodePosition;
+    const hasSavedNodePosition = !data.graphData && data.metadata?.ui?.nodePosition;
 
     const {tasks: workflowTasks, triggers: workflowTriggers} = workflow;
 
@@ -680,6 +682,17 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                     : undefined
                             }
                             type="source"
+                        />
+                    )}
+
+                    {data.graphData && (
+                        <GraphTransitionHandles
+                            boxWidth={
+                                hasValidClusterElements ? GRAPH_MEMBER_NOMINAL_SIZE.width : GRAPH_MEMBER_BOX_WIDTH
+                            }
+                            connectable
+                            direction={layoutDirection}
+                            nodeId={id}
                         />
                     )}
                 </div>

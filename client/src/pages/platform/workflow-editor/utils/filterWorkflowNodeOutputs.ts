@@ -16,15 +16,18 @@ export default function filterWorkflowNodeOutputs(
 
     return workflowNodeOutputs.reduce(
         (acc, output) => {
-            const {actionDefinition, taskDispatcherDefinition, triggerDefinition} = output;
+            const {
+                actionDefinition,
+                outputResponse,
+                taskDispatcherDefinition,
+                triggerDefinition,
+                variableOutputResponse,
+            } = output;
 
-            if (
-                !actionDefinition &&
-                !triggerDefinition &&
-                !taskDispatcherDefinition?.outputDefined &&
-                !taskDispatcherDefinition?.variablePropertiesDefined
-            ) {
-                return acc;
+            if (!actionDefinition && !triggerDefinition) {
+                if (!outputResponse?.outputSchema && !variableOutputResponse?.outputSchema) {
+                    return acc;
+                }
             }
 
             let componentName: string | undefined;

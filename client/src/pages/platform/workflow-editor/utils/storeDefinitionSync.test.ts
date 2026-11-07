@@ -81,6 +81,49 @@ describe('store definition sync', () => {
             expect(parsed.tasks[0].metadata.ui.nodePosition).toEqual({x: 200, y: 300});
         });
 
+        it('should patch the flat store tasks in place so a graph member move re-runs the layout', () => {
+            const acumbamailMember = makeTask('acumbamail_1');
+            const graphTask: WorkflowTask = {
+                ...makeTask('graph_1'),
+                parameters: {
+                    nodes: [makeTask('accelo_1'), acumbamailMember],
+                    transitions: [],
+                },
+            };
+            const definition = makeDefinition([graphTask]);
+
+            useWorkflowDataStore.setState({
+                workflow: {
+                    ...useWorkflowDataStore.getState().workflow,
+                    definition,
+                    id: '1',
+                    tasks: [graphTask, makeTask('accelo_1'), acumbamailMember],
+                    version: 1,
+                },
+            });
+
+            const mockMutation = createMockMutation();
+
+            saveWorkflowNodesPosition({
+                draggedNodeId: 'graph_1',
+                nodePositions: {acumbamail_1: {x: 300, y: 200}},
+                updateWorkflowMutation: mockMutation as never,
+            });
+
+            const storedTasks = useWorkflowDataStore.getState().workflow.tasks!;
+
+            expect(storedTasks).toHaveLength(3);
+
+            const topLevelMember = storedTasks.find((task) => task.name === 'acumbamail_1');
+
+            expect(topLevelMember!.metadata!.ui!.nodePosition).toEqual({x: 300, y: 200});
+
+            const nestedMembers = storedTasks[0].parameters!.nodes as WorkflowTask[];
+            const nestedMember = nestedMembers.find((member) => member.name === 'acumbamail_1');
+
+            expect(nestedMember!.metadata!.ui!.nodePosition).toEqual({x: 300, y: 200});
+        });
+
         it('should update store definition for nested task positions', () => {
             const conditionTask: WorkflowTask = {
                 ...makeTask('condition_1'),

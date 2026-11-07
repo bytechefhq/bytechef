@@ -11,6 +11,8 @@ import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
 import {getCrossAxis} from './directionUtils';
+import {getGraphFrameId} from './graph/graphFrameGeometry';
+import isGraphRouteEdge from './graph/isGraphRouteEdge';
 import {ELK_FRAME_DISPATCHER_COMPONENT_NAMES} from './isElkLayoutSupported';
 import {
     GetLayoutElementsProps,
@@ -85,6 +87,8 @@ const TB_BRANCH_ENTRY_INSET = 26;
 // merge stubs become extension + ELK_LAYER_SPACING + INTERIOR_PULL_REBALANCE
 // = 80 instead of a cramped 52.
 const BOTTOM_BAR_EXIT_EXTENSION = 14;
+
+const GRAPH_FRAME_ENTRY_OFFSET = -28;
 
 // Size of a node's visual anchor: the 72px icon box whose edges carry the
 // connection handles (see `w-[72px]` in TaskDispatcherTopGhostNode.tsx and the
@@ -357,6 +361,22 @@ function getGhostIds(dispatcherNode: Node): {bottomGhostId: string; topGhostId: 
     };
 }
 
+function isGraphDispatcherNode(node: Node): boolean {
+    return (node.data as NodeDataType).componentName === 'graph';
+}
+
+function getContinuationSourceId(node: Node): string {
+    if (!isFrameDispatcherNode(node)) {
+        return node.id;
+    }
+
+    if (isGraphDispatcherNode(node)) {
+        return getGraphFrameId(node.id);
+    }
+
+    return getGhostIds(node).bottomGhostId;
+}
+
 /**
  * Walks a frame's chain from its first child to the frame's bottom bar,
  * following continuation edges — a nested frame's continuation leaves from its
@@ -379,13 +399,12 @@ function collectChainMainNodes(
         visitedNodeIds.add(currentNode.id);
         chainNodes.push(currentNode);
 
-        const continuationSourceId = isFrameDispatcherNode(currentNode)
-            ? getGhostIds(currentNode).bottomGhostId
-            : currentNode.id;
+        const continuationSourceId = getContinuationSourceId(currentNode);
 
         const continuationEdge = edges.find(
             (candidateEdge) =>
                 candidateEdge.source === continuationSourceId &&
+                !isGraphRouteEdge(candidateEdge) &&
                 nodesById.get(candidateEdge.target)?.type !== 'placeholder'
         );
 
@@ -439,6 +458,19 @@ function getElkNodeSize(
     direction: LayoutDirectionType,
     populatedDispatcherIds: Set<string> = new Set()
 ): {height: number; width: number} {
+    const graphFrame = (node.data as NodeDataType).graphFrame;
+
+    if (graphFrame) {
+        const frameMainFootprint = (frameMainSize: number) =>
+            frameMainSize + GRAPH_FRAME_ENTRY_OFFSET + (ANCHOR_MAIN_FOOTPRINT - NODE_ANCHOR_SIZE) / 2;
+
+        if (direction === 'TB') {
+            return {height: frameMainFootprint(graphFrame.height), width: graphFrame.width};
+        }
+
+        return {height: graphFrame.height, width: frameMainFootprint(graphFrame.width)};
+    }
+
     const {height, width} = getDagreNodeSize(
         isReadOnlyPlaceholder(node) ? {...node, type: 'placeholder'} : node,
         direction
@@ -496,7 +528,7 @@ function getElkNodeSize(
  * Child tasks — including nested dispatcher nodes — carry
  * conditionData.conditionId / loopData.loopId.
  */
-function getOwningDispatcherId(node: Node): string | undefined {
+export function getOwningDispatcherId(node: Node): string | undefined {
     const nodeData = node.data as NodeDataType;
 
     if (nodeData.taskDispatcherId && nodeData.taskDispatcherId !== node.id) {
@@ -509,6 +541,7 @@ function getOwningDispatcherId(node: Node): string | undefined {
         nodeData.branchData?.branchId ||
         nodeData.parallelData?.parallelId ||
         nodeData.forkJoinData?.forkJoinId ||
+        nodeData.graphData?.graphId ||
         nodeData.eachData?.eachId ||
         nodeData.mapData?.mapId ||
         nodeData.onErrorData?.onErrorId
@@ -668,6 +701,10 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
         // (dagre parity: constrainLeftGhostPositions) — they are not part of the
         // ELK graph, so their edges must not be either
         if (currentEdge.source.endsWith(LEFT_GHOST_ID_SUFFIX) || currentEdge.target.endsWith(LEFT_GHOST_ID_SUFFIX)) {
+            return;
+        }
+
+        if (isGraphRouteEdge(currentEdge)) {
             return;
         }
 
@@ -834,11 +871,11 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
     };
 }
 
-type ElkInstanceType = {layout: (graph: ElkNode) => Promise<ElkNode>};
+export type ElkInstanceType = {layout: (graph: ElkNode) => Promise<ElkNode>};
 
 let elkInstance: ElkInstanceType | null = null;
 
-const loadElk = async (): Promise<ElkInstanceType> => {
+export const loadElk = async (): Promise<ElkInstanceType> => {
     if (!elkInstance) {
         const {default: ELK} = await import('elkjs/lib/elk.bundled.js');
 
@@ -847,6 +884,24 @@ const loadElk = async (): Promise<ElkInstanceType> => {
 
     return elkInstance;
 };
+
+interface GetRenderedMainOffsetProps {
+    footprintMainSize: number;
+    node: Node;
+    renderedMainSize: number;
+}
+
+function getRenderedMainOffset({footprintMainSize, node, renderedMainSize}: GetRenderedMainOffsetProps): number {
+    if (node.type === 'taskDispatcherBottomGhostNode') {
+        return 0;
+    }
+
+    if ((node.data as NodeDataType).graphFrame) {
+        return GRAPH_FRAME_ENTRY_OFFSET;
+    }
+
+    return (footprintMainSize - renderedMainSize) / 2;
+}
 
 /**
  * Approximate rendered ANCHOR box of a node: the 72px icon square whose center
@@ -862,6 +917,12 @@ const loadElk = async (): Promise<ElkInstanceType> => {
 function getRenderedNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
     if (isReadOnlyPlaceholder(node)) {
         return {height: READ_ONLY_PLACEHOLDER_RENDERED_SIZE, width: READ_ONLY_PLACEHOLDER_RENDERED_SIZE};
+    }
+
+    const graphFrame = (node.data as NodeDataType).graphFrame;
+
+    if (graphFrame) {
+        return {height: graphFrame.height, width: graphFrame.width};
     }
 
     const clusterFrame = (node.data as NodeDataType)?.clusterFrame;
@@ -1149,14 +1210,16 @@ export const getElkLayoutElements = async ({
                 y: box.y + (box.height - renderedSize.height) / 2,
             };
 
-            // A bottom bar's footprint carries BOTTOM_BAR_EXIT_EXTENSION below the
-            // bar; pin the bar to the footprint start so the extension lengthens
-            // the exit edge instead of splitting around the bar.
-            if (node.type === 'taskDispatcherBottomGhostNode') {
-                const mainAxis = crossAxis === 'x' ? 'y' : 'x';
+            const mainAxis = crossAxis === 'x' ? 'y' : 'x';
+            const mainSizeKey = mainAxis === 'y' ? 'height' : 'width';
 
-                position[mainAxis] = box[mainAxis];
-            }
+            const renderedMainOffset = getRenderedMainOffset({
+                footprintMainSize: box[mainSizeKey],
+                node,
+                renderedMainSize: renderedSize[mainSizeKey],
+            });
+
+            position[mainAxis] = box[mainAxis] + renderedMainOffset;
 
             position[crossAxis] += centeringOffset;
 
@@ -1188,20 +1251,18 @@ export const getElkLayoutElements = async ({
                 return mainAxis === 'y' ? renderedSize.height : renderedSize.width;
             };
 
-            // A bottom bar pins to its footprint start (the exit extension
-            // lengthens the exit edge); everything else centers in its footprint
             const placeNode = (node: Node, footprintStart: number): void => {
-                const renderedOffset =
-                    node.type === 'taskDispatcherBottomGhostNode'
-                        ? 0
-                        : (footprintMainOf(node) - renderedMainOf(node)) / 2;
+                const footprintMainSize = footprintMainOf(node);
+                const renderedMainSize = renderedMainOf(node);
+
+                const renderedOffset = getRenderedMainOffset({footprintMainSize, node, renderedMainSize});
 
                 node.position = {...node.position, [mainAxis]: footprintStart + renderedOffset};
             };
 
             const findContinuationEdge = (sourceId: string): Edge | undefined =>
                 edges.find((candidateEdge) => {
-                    if (candidateEdge.source !== sourceId) {
+                    if (candidateEdge.source !== sourceId || isGraphRouteEdge(candidateEdge)) {
                         return false;
                     }
 
@@ -1218,6 +1279,18 @@ export const getElkLayoutElements = async ({
             // bar's footprint end. Mutual recursion with placeChain handles
             // arbitrary nesting depth.
             const placeFrame = (frameDispatcherNode: Node, frameTopFootprintStart: number): number => {
+                if (isGraphDispatcherNode(frameDispatcherNode)) {
+                    const graphFrameNode = layoutedNodesById.get(getGraphFrameId(frameDispatcherNode.id));
+
+                    if (!graphFrameNode) {
+                        return frameTopFootprintStart;
+                    }
+
+                    placeNode(graphFrameNode, frameTopFootprintStart);
+
+                    return frameTopFootprintStart + footprintMainOf(graphFrameNode);
+                }
+
                 const {bottomGhostId, topGhostId} = getGhostIds(frameDispatcherNode);
 
                 const topGhostNode = layoutedNodesById.get(topGhostId);
@@ -1287,11 +1360,7 @@ export const getElkLayoutElements = async ({
                         memberEnd = placeFrame(currentNode, memberEnd + ELK_LAYER_SPACING);
                     }
 
-                    const continuationSourceId = isFrameDispatcherNode(currentNode)
-                        ? getGhostIds(currentNode).bottomGhostId
-                        : currentNode.id;
-
-                    const continuationEdge = findContinuationEdge(continuationSourceId);
+                    const continuationEdge = findContinuationEdge(getContinuationSourceId(currentNode));
 
                     if (!continuationEdge || continuationEdge.target === terminalId) {
                         return memberEnd;

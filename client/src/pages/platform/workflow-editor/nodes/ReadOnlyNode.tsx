@@ -12,14 +12,16 @@ import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import getChangeHighlightBorderClassName from '../utils/getChangeHighlightBorderClassName';
 import getTestNodeStateBorderClassName from '../utils/getTestNodeStateBorderClassName';
+import {GRAPH_MEMBER_BOX_WIDTH} from '../utils/graph/graphFrameGeometry';
 import {CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET, REGULAR_NODE_HANDLE_OFFSET} from '../utils/postDagreConstraints';
 import DisabledNodeBadge from './DisabledNodeBadge';
+import GraphTransitionHandles from './GraphTransitionHandles';
 import styles from './NodeTypes.module.css';
 import WorkflowTestNodeStatus from './WorkflowTestNodeStatus';
 
 const MAX_VISIBLE_CLUSTER_ELEMENT_ICONS = 5;
 
-const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
+const ReadOnlyNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
     const changeHighlights = useWorkflowChangeHighlight();
@@ -129,6 +131,15 @@ const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
                 style={layoutDirection === 'TB' ? {left: `${handleOffset}px`} : undefined}
                 type="source"
             />
+
+            {data.graphData && (
+                <GraphTransitionHandles
+                    boxWidth={GRAPH_MEMBER_BOX_WIDTH}
+                    connectable={false}
+                    direction={layoutDirection}
+                    nodeId={id}
+                />
+            )}
         </div>
     );
 };

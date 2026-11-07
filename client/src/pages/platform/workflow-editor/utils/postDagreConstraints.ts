@@ -3,6 +3,7 @@ import {
     CLUSTER_ROOT_NODE_WIDTH,
     FINAL_PLACEHOLDER_NODE_ID,
     FINAL_PLACEHOLDER_NODE_SIZE,
+    GRAPH_FRAME_NODE_TYPE,
     LayoutDirectionType,
     NODE_HEIGHT,
     NODE_WIDTH,
@@ -58,6 +59,7 @@ function getParentDispatcherId(nodeData: NodeDataType): string | undefined {
         nodeData.parallelData?.parallelId ||
         nodeData.eachData?.eachId ||
         nodeData.forkJoinData?.forkJoinId ||
+        nodeData.graphData?.graphId ||
         nodeData.onErrorData?.onErrorId ||
         nodeData.taskDispatcherId
     );
@@ -120,6 +122,7 @@ function collectNestedDispatcherNodes(dispatcherId: string, allNodes: Node[], co
             data.eachData?.eachId === dispatcherId ||
             data.parallelData?.parallelId === dispatcherId ||
             data.forkJoinData?.forkJoinId === dispatcherId ||
+            data.graphData?.graphId === dispatcherId ||
             data.onErrorData?.onErrorId === dispatcherId;
 
         if (belongsToDispatcher) {
@@ -1831,6 +1834,10 @@ export function applySavedPositions(
         : undefined;
 
     for (let nodeIndex = 0; nodeIndex < allNodes.length; nodeIndex++) {
+        if (allNodes[nodeIndex].parentId) {
+            continue;
+        }
+
         const nodeData = allNodes[nodeIndex].data as NodeDataType;
 
         if (containsNodePosition(nodeData.metadata)) {
@@ -1863,6 +1870,7 @@ export function applySavedPositions(
             'taskDispatcherTopGhostNode',
             'taskDispatcherBottomGhostNode',
             'taskDispatcherLeftGhostNode',
+            GRAPH_FRAME_NODE_TYPE,
             'placeholder',
         ]);
 
@@ -1878,6 +1886,10 @@ export function applySavedPositions(
 
             for (let nodeIndex = 0; nodeIndex < allNodes.length; nodeIndex++) {
                 if (shifted.has(allNodes[nodeIndex].id)) {
+                    continue;
+                }
+
+                if (allNodes[nodeIndex].parentId) {
                     continue;
                 }
 
@@ -1914,6 +1926,7 @@ export function applySavedPositions(
                         nodeData.eachData?.eachId ||
                         nodeData.parallelData?.parallelId ||
                         nodeData.forkJoinData?.forkJoinId ||
+                        nodeData.graphData?.graphId ||
                         nodeData.onErrorData?.onErrorId;
 
                     if (!parentDispatcherId) {
@@ -2031,6 +2044,7 @@ export function adjustBottomGhostForMovedChildren(
             dispatcherData.eachData?.eachId ||
             dispatcherData.parallelData?.parallelId ||
             dispatcherData.forkJoinData?.forkJoinId ||
+            dispatcherData.graphData?.graphId ||
             dispatcherData.onErrorData?.onErrorId;
 
         const parentMainAxisDelta = parentDispatcherId
@@ -2735,6 +2749,12 @@ export function alignTrailingPlaceholder(
  * Returns the main-axis rendered size for any node type.
  */
 function getNodeMainAxisSize(node: Node, mainAxis: 'x' | 'y'): number {
+    const graphFrame = (node.data as NodeDataType).graphFrame;
+
+    if (graphFrame) {
+        return mainAxis === 'y' ? graphFrame.height : graphFrame.width;
+    }
+
     if (node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode') {
         return 2;
     }

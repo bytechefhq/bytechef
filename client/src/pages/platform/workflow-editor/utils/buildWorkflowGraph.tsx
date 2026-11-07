@@ -1,6 +1,7 @@
 import {
     EDGE_STYLES,
     FINAL_PLACEHOLDER_NODE_ID,
+    GRAPH_FRAME_NODE_TYPE,
     ON_ERROR_WIRE_KEY_ERROR_BRANCH,
     ON_ERROR_WIRE_KEY_MAIN_BRANCH,
     TASK_DISPATCHER_NAMES,
@@ -23,6 +24,8 @@ import createEachEdges from './createEachEdges';
 import createEachNode from './createEachNode';
 import createForkJoinEdges from './createForkJoinEdges';
 import createForkJoinNode from './createForkJoinNode';
+import createGraphEdges from './createGraphEdges';
+import createGraphNode from './createGraphNode';
 import createLoopEdges from './createLoopEdges';
 import createLoopNode from './createLoopNode';
 import createMapEdges from './createMapEdges';
@@ -68,6 +71,7 @@ export default function buildWorkflowGraph({
         const conditionChildTasks = {};
         const eachChildTasks = {};
         const forkJoinChildTasks = {};
+        const graphChildTasks = {};
         const loopChildTasks = {};
         const mapChildTasks = {};
         const onErrorChildTasks = {};
@@ -75,17 +79,18 @@ export default function buildWorkflowGraph({
 
         // First pass: collect all task dispatcher data and save it in the corresponding objects
         tasks.forEach((task) => {
-            collectTaskDispatcherData(
-                task,
+            collectTaskDispatcherData({
                 branchChildTasks,
                 conditionChildTasks,
                 eachChildTasks,
                 forkJoinChildTasks,
+                graphChildTasks,
                 loopChildTasks,
                 mapChildTasks,
                 onErrorChildTasks,
-                parallelChildTasks
-            );
+                parallelChildTasks,
+                task,
+            });
         });
 
         tasks.forEach((task) => {
@@ -126,6 +131,7 @@ export default function buildWorkflowGraph({
                 conditionChildTasks,
                 eachChildTasks,
                 forkJoinChildTasks,
+                graphChildTasks,
                 loopChildTasks,
                 mapChildTasks,
                 onErrorChildTasks,
@@ -244,6 +250,12 @@ export default function buildWorkflowGraph({
                         createLeftGhost: laneCount <= 1,
                     },
                 });
+            } else if (componentName === 'graph') {
+                allNodes = createGraphNode({
+                    allNodes: [...allNodes, taskNode],
+                    graphId: taskNode.id,
+                    isNested,
+                });
             } else {
                 allNodes.push(taskNode);
             }
@@ -272,6 +284,7 @@ export default function buildWorkflowGraph({
         const isMapNode = nodeData.componentName === 'map';
         const isParallellNode = nodeData.componentName === 'parallel';
         const isForkJoinNode = nodeData.componentName === 'fork-join';
+        const isGraphNode = nodeData.componentName === 'graph';
         const isOnErrorNode = nodeData.componentName === 'on-error';
 
         const isConditionPlaceholderNode = nodeData.conditionId && node.type === 'placeholder';
@@ -355,12 +368,21 @@ export default function buildWorkflowGraph({
             return;
         }
 
+        if (isGraphNode) {
+            const graphEdges = createGraphEdges(node);
+
+            taskEdges.push(...graphEdges);
+
+            return;
+        }
+
         if (nextNode && tasks) {
             const isNextNodeTaskDispatcherBottomNode = nextNode.type === 'taskDispatcherBottomGhostNode';
 
             const nextNodeData: NodeDataType = nextNode.data as NodeDataType;
 
-            const isTaskDispatcherBottomGhostNode = node.type === 'taskDispatcherBottomGhostNode';
+            const isTaskDispatcherBottomGhostNode =
+                node.type === 'taskDispatcherBottomGhostNode' || node.type === GRAPH_FRAME_NODE_TYPE;
 
             if (isTaskDispatcherBottomGhostNode) {
                 const edgeFromTaskDispatcherBottomGhost = createEdgeFromTaskDispatcherBottomGhostNode({
@@ -431,6 +453,10 @@ export default function buildWorkflowGraph({
                         return;
                     }
                 }
+            }
+
+            if (nodeData.graphData?.graphId) {
+                return;
             }
 
             if (isConditionPlaceholderNode || isBranchPlaceholderNode || isOnErrorPlaceholderNode) {

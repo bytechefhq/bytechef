@@ -4,6 +4,7 @@ import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration
 import {invalidatePreviousWorkflowNodeOutputsForWorkflow} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {
     BranchCaseType,
+    GraphTransitionType,
     NodeDataType,
     UpdateWorkflowMutationType,
     WorkflowDefinitionType,
@@ -16,6 +17,7 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import findAndRemoveClusterElement from './findAndRemoveClusterElement';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
+import {removeTransitionsForNode} from './graph/graphTransitionMutations';
 import {resolveClusterRootId, resolveMainClusterRootName} from './resolveClusterRootId';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
@@ -227,6 +229,28 @@ export default function handleDeleteTask({
 
             return parentForkJoinTask;
         }) as Array<WorkflowTaskType>;
+    } else if (data.graphData) {
+        const parentGraphTask = TASK_DISPATCHER_CONFIG.graph.getTask({
+            taskDispatcherId: data.graphData.graphId,
+            tasks: workflowTasks,
+        });
+
+        if (!parentGraphTask) {
+            return;
+        }
+
+        const graphNodes = (parentGraphTask.parameters?.nodes || []) as WorkflowTask[];
+        const graphTransitions = (parentGraphTask.parameters?.transitions || []) as GraphTransitionType[];
+
+        parentGraphTask.parameters = {
+            ...parentGraphTask.parameters,
+            nodes: graphNodes.filter((graphNode) => graphNode.name !== data.name),
+            startNode:
+                parentGraphTask.parameters?.startNode === data.name ? undefined : parentGraphTask.parameters?.startNode,
+            transitions: removeTransitionsForNode(graphTransitions, data.name),
+        };
+
+        updatedTasks = getRecursivelyUpdatedTasks(workflowTasks, parentGraphTask) as Array<WorkflowTaskType>;
     } else if (data.onErrorData) {
         const parentOnErrorTask = TASK_DISPATCHER_CONFIG['on-error'].getTask({
             taskDispatcherId: data.onErrorData.onErrorId,

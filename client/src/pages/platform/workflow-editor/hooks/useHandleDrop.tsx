@@ -19,7 +19,7 @@ import {
     UpdateWorkflowMutationType,
 } from '@/shared/types';
 import {QueryClient, useQueryClient} from '@tanstack/react-query';
-import {Edge, Node} from '@xyflow/react';
+import {Edge, Node, XYPosition} from '@xyflow/react';
 
 import {convertNameToSnakeCase} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -189,6 +189,12 @@ async function saveDroppedNode({
     });
 }
 
+interface HandleDropOnGraphFrameProps {
+    dropPosition: XYPosition;
+    droppedNode: ClickedDefinitionType;
+    graphId: string;
+}
+
 export default function useHandleDrop({
     taskDispatcherDefinitions,
 }: {
@@ -198,6 +204,7 @@ export default function useHandleDrop({
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
     (droppedNode: ClickedDefinitionType, targetTriggerName: string) => void,
     (droppedNode: ClickedDefinitionType) => void,
+    (handleDropOnGraphFrameProps: HandleDropOnGraphFrameProps) => void,
     (targetNode: Node, droppedNode: ClickedDefinitionType) => Promise<void>,
 ] {
     const {captureComponentUsed} = useAnalytics();
@@ -280,6 +287,28 @@ export default function useHandleDrop({
         });
     }
 
+    async function handleDropOnGraphFrame({dropPosition, droppedNode, graphId}: HandleDropOnGraphFrameProps) {
+        const graphPlaceholderNodeId = `${graphId}-graph-placeholder`;
+
+        const placeholderNode = useWorkflowDataStore
+            .getState()
+            .nodes.find((node) => node.id === graphPlaceholderNodeId);
+
+        if (!placeholderNode) {
+            return;
+        }
+
+        const {setGraphPendingConnection} = useWorkflowEditorStore.getState();
+
+        setGraphPendingConnection({dropPosition, from: '', graphId});
+
+        try {
+            await handleDropOnPlaceholderNode(placeholderNode, droppedNode);
+        } finally {
+            setGraphPendingConnection(undefined);
+        }
+    }
+
     async function handleDropOnClusterElementPlaceholder(targetNode: Node, droppedNode: ClickedDefinitionType) {
         const {clusterElementType, multipleClusterElementsNode} = targetNode.data as NodeDataType;
         const {nodes, workflow} = useWorkflowDataStore.getState();
@@ -352,6 +381,7 @@ export default function useHandleDrop({
         handleDropOnWorkflowEdge,
         handleDropOnTriggerNode,
         handleDropOnTriggerPlaceholder,
+        handleDropOnGraphFrame,
         handleDropOnClusterElementPlaceholder,
     ];
 }

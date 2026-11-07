@@ -90,6 +90,11 @@ export function buildGenericNodeData(
                     forkJoinId: taskDispatcherId,
                     index: taskDispatcherContext.index ?? 0,
                 };
+            } else if (type === 'graph') {
+                newNodeData.graphData = {
+                    graphId: taskDispatcherId,
+                    index: taskDispatcherContext.index ?? 0,
+                };
             } else if (type === 'on-error') {
                 newNodeData.onErrorData = {
                     index: taskDispatcherContext.index ?? 0,
@@ -411,6 +416,41 @@ export const TASK_DISPATCHER_CONFIG = {
                 },
             };
         },
+    },
+    graph: {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'graph'),
+        contextIdentifier: 'graphId',
+        dataKey: 'graphData',
+        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
+            const parts = placeholderId.split('-');
+
+            return {taskDispatcherId: parts[0]};
+        },
+        getDispatcherId: (context: TaskDispatcherContextType) => context.graphId,
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+            nodes: [],
+            transitions: [],
+        }),
+        getSubtasks: ({node, task}: {node?: Node; task?: WorkflowTask}): Array<WorkflowTask> => {
+            const parameters = (node?.data as NodeDataType)?.parameters || task?.parameters;
+
+            return (parameters?.nodes || []) as Array<WorkflowTask>;
+        },
+        getTask: getTaskDispatcherTask,
+        initializeParameters: () => ({
+            maxTransitions: 100,
+            nodes: [],
+            transitions: [],
+        }),
+        updateTaskParameters: ({task, updatedSubtasks}: UpdateTaskParametersType): WorkflowTask => ({
+            ...task,
+            parameters: {
+                ...task.parameters,
+                nodes: updatedSubtasks,
+            },
+        }),
     },
     loop: {
         buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>

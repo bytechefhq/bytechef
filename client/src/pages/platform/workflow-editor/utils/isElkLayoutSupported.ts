@@ -2,6 +2,8 @@ import {CHILDLESS_TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
+import {LayoutEngineType} from '../stores/useLayoutEngineStore';
+
 // Dispatchers the ELK engine lays out as compound frames (every task
 // dispatcher with children). Childless dispatchers (loopBreak, subflow,
 // terminate) own no children and lay out as plain chain nodes, so they are
@@ -11,6 +13,7 @@ export const ELK_FRAME_DISPATCHER_COMPONENT_NAMES = [
     'condition',
     'each',
     'fork-join',
+    'graph',
     'loop',
     'map',
     'on-error',
@@ -43,4 +46,8 @@ export default function isElkLayoutSupported(nodes: Node[]): boolean {
 
         return true;
     });
+}
+
+export function isElkLayoutActive(layoutEngine: LayoutEngineType, nodes: Node[]): boolean {
+    return layoutEngine === 'elk' && isElkLayoutSupported(nodes);
 }

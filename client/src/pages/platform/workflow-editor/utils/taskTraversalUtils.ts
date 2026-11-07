@@ -49,4 +49,8 @@ export function forEachNestedTaskGroup(
             }
         }
     }
+
+    if (Array.isArray(parameters.nodes)) {
+        callback(parameters.nodes as WorkflowTask[], 'nodes');
+    }
 }

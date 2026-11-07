@@ -29,13 +29,13 @@ export default function orderExecutedTriggerFanInEdgesLast({
                     nodes,
                 });
 
-                return (
-                    getExecutedEdgeStatus(
-                        executedEdgeEndpoints.sourceNode,
-                        executedEdgeEndpoints.targetNode,
-                        workflowTestNodeStates
-                    ) !== undefined
-                );
+                const executedEdgeStatus = getExecutedEdgeStatus({
+                    sourceNode: executedEdgeEndpoints.sourceNode,
+                    targetNode: executedEdgeEndpoints.targetNode,
+                    workflowTestNodeStates,
+                });
+
+                return executedEdgeStatus !== undefined;
             })
             .map((edge) => edge.id)
     );

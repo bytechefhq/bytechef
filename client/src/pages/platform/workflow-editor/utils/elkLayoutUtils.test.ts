@@ -1,4 +1,9 @@
-import {FINAL_PLACEHOLDER_NODE_ID, FINAL_PLACEHOLDER_NODE_SIZE, TRIGGER_PLACEHOLDER_NODE_ID} from '@/shared/constants';
+import {
+    FINAL_PLACEHOLDER_NODE_ID,
+    FINAL_PLACEHOLDER_NODE_SIZE,
+    GRAPH_TRANSITION_EDGE_TYPE,
+    TRIGGER_PLACEHOLDER_NODE_ID,
+} from '@/shared/constants';
 import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
@@ -2476,6 +2481,344 @@ describe('getElkLayoutElements with parallel and fork-join', () => {
 
         // Parallel (caseTrue) stays left of the FALSE branch child
         expect(positionOf(result.nodes, 'parallel_1').x).toBeLessThan(positionOf(result.nodes, 'childFalse1').x);
+    });
+});
+
+describe('getElkLayoutElements with graph', () => {
+    const graphNode = (
+        id: string,
+        conditionParent?: {conditionCase: 'caseTrue' | 'caseFalse'; conditionId: string}
+    ): Node => ({
+        data: {
+            componentName: 'graph',
+            ...(conditionParent
+                ? {
+                      conditionData: {
+                          conditionCase: conditionParent.conditionCase,
+                          conditionId: conditionParent.conditionId,
+                          index: 0,
+                      },
+                  }
+                : {}),
+            taskDispatcher: true,
+            taskDispatcherId: id,
+            workflowNodeName: id,
+        },
+        id,
+        position: {x: 0, y: 0},
+        type: 'workflow',
+    });
+
+    const graphFrameNode = (graphId: string, size: {height: number; width: number}): Node => ({
+        data: {
+            graphFrame: {graphId, height: size.height, width: size.width},
+            graphId,
+            taskDispatcherId: graphId,
+        },
+        height: size.height,
+        id: `${graphId}-graph-frame`,
+        position: {x: 0, y: 0},
+        type: 'graphFrame',
+        width: size.width,
+    });
+
+    const graphEntryEdge = (graphId: string): Edge => edge(graphId, `${graphId}-graph-frame`);
+
+    it('lays the frame out at its own size and centers it under the dispatcher', async () => {
+        const nodes: Node[] = [graphNode('graph_1'), graphFrameNode('graph_1', {height: 240, width: 400})];
+
+        const result = await getElkLayoutElements({
+            canvasWidth: 2000,
+            direction: 'TB',
+            edges: [graphEntryEdge('graph_1')],
+            nodes,
+        });
+
+        const framePosition = positionOf(result.nodes, 'graph_1-graph-frame');
+        const graphPosition = positionOf(result.nodes, 'graph_1');
+
+        expect(Math.abs(framePosition.x + 400 / 2 - (graphPosition.x + 36))).toBeLessThanOrEqual(1);
+        expect(framePosition.y - (graphPosition.y + 72)).toBe(TOP_BOX_GAP);
+    });
+
+    it.each([
+        ['TB', 'y', 72, 'height'],
+        ['LR', 'x', 72, 'width'],
+    ] as const)(
+        'pulls the frame up to its dispatcher without stretching the exit edge (%s)',
+        async (direction, mainAxis, anchorSize, frameMainSize) => {
+            const frameSize = {height: 240, width: 400};
+
+            const layoutFrameChain = async (withFrame: boolean) =>
+                getElkLayoutElements({
+                    canvasWidth: 2000,
+                    direction,
+                    edges: withFrame
+                        ? [graphEntryEdge('graph_1'), edge('graph_1-graph-frame', 'task_1')]
+                        : [edge('graph_1', 'task_1')],
+                    nodes: withFrame
+                        ? [graphNode('graph_1'), graphFrameNode('graph_1', frameSize), taskNode('task_1')]
+                        : [graphNode('graph_1'), taskNode('task_1')],
+                });
+
+            const result = await layoutFrameChain(true);
+            const plainChain = await layoutFrameChain(false);
+
+            const dispatcherEnd = positionOf(result.nodes, 'graph_1')[mainAxis] + anchorSize;
+            const frameStart = positionOf(result.nodes, 'graph_1-graph-frame')[mainAxis];
+            const frameEnd = frameStart + frameSize[frameMainSize];
+
+            expect(frameStart - dispatcherEnd).toBe(TOP_BOX_GAP);
+
+            const plainGap =
+                positionOf(plainChain.nodes, 'task_1')[mainAxis] -
+                (positionOf(plainChain.nodes, 'graph_1')[mainAxis] + anchorSize);
+
+            expect(positionOf(result.nodes, 'task_1')[mainAxis] - frameEnd).toBe(plainGap);
+        }
+    );
+
+    it('pushes the task after the frame down by exactly what the frame grows', async () => {
+        const layoutWithFrameHeight = async (height: number) =>
+            getElkLayoutElements({
+                canvasWidth: 2000,
+                direction: 'TB',
+                edges: [graphEntryEdge('graph_1'), edge('graph_1-graph-frame', 'task_1')],
+                nodes: [graphNode('graph_1'), graphFrameNode('graph_1', {height, width: 400}), taskNode('task_1')],
+            });
+
+        const shortResult = await layoutWithFrameHeight(240);
+        const tallResult = await layoutWithFrameHeight(640);
+
+        const shortSpan = positionOf(shortResult.nodes, 'task_1').y - positionOf(shortResult.nodes, 'graph_1').y;
+        const tallSpan = positionOf(tallResult.nodes, 'task_1').y - positionOf(tallResult.nodes, 'graph_1').y;
+
+        expect(tallSpan - shortSpan).toBe(400);
+    });
+
+    it('moves the whole graph frame with a dispatcher that has a saved position', async () => {
+        const nodes: Node[] = [graphNode('graph_1'), graphFrameNode('graph_1', {height: 240, width: 400})];
+
+        (nodes[0].data as Record<string, unknown>).metadata = {ui: {nodePosition: {x: 400, y: 900}}};
+
+        const result = await getElkLayoutElements({
+            canvasWidth: 1000,
+            direction: 'TB',
+            edges: [graphEntryEdge('graph_1')],
+            nodes,
+        });
+
+        expect(positionOf(result.nodes, 'graph_1')).toEqual({x: 400, y: 900});
+        expect(positionOf(result.nodes, 'graph_1-graph-frame').y - (900 + 72)).toBe(TOP_BOX_GAP);
+        expect(Math.abs(positionOf(result.nodes, 'graph_1-graph-frame').x + 200 - (400 + 36))).toBeLessThanOrEqual(1);
+    });
+
+    it('lays out a graph inside a condition branch', async () => {
+        const nodes: Node[] = [
+            conditionNode('condition_1'),
+            ...conditionGhostNodes('condition_1'),
+            graphNode('graph_1', {conditionCase: 'caseTrue', conditionId: 'condition_1'}),
+            graphFrameNode('graph_1', {height: 240, width: 400}),
+            taskNode('childFalse1', {conditionCase: 'caseFalse', conditionId: 'condition_1'}),
+        ];
+
+        const edges: Edge[] = [
+            edge('condition_1', 'condition_1-condition-top-ghost'),
+            edge('condition_1-condition-top-ghost', 'graph_1'),
+            graphEntryEdge('graph_1'),
+            edge('graph_1-graph-frame', 'condition_1-condition-bottom-ghost'),
+            edge('condition_1-condition-top-ghost', 'childFalse1'),
+            edge('childFalse1', 'condition_1-condition-bottom-ghost'),
+        ];
+
+        expect(collectScopeEdgeViolations(buildElkGraph(nodes, edges, 'TB'))).toEqual([]);
+
+        const result = await getElkLayoutElements({canvasWidth: 2000, direction: 'TB', edges, nodes});
+
+        expect(positionOf(result.nodes, 'graph_1').x).toBeLessThan(positionOf(result.nodes, 'childFalse1').x);
+    });
+
+    it('keeps the chain rhythm past a graph frame when a taller sibling branch shares its layers', async () => {
+        const nodes: Node[] = [
+            conditionNode('condition_1'),
+            ...conditionGhostNodes('condition_1'),
+            graphNode('graph_1', {conditionCase: 'caseTrue', conditionId: 'condition_1'}),
+            graphFrameNode('graph_1', {height: 240, width: 400}),
+            taskNode('afterGraph', {conditionCase: 'caseTrue', conditionId: 'condition_1'}),
+            taskNode('childFalse1', {conditionCase: 'caseFalse', conditionId: 'condition_1'}),
+            graphNode('graph_2', {conditionCase: 'caseFalse', conditionId: 'condition_1'}),
+            graphFrameNode('graph_2', {height: 640, width: 400}),
+        ];
+
+        const edges: Edge[] = [
+            edge('condition_1', 'condition_1-condition-top-ghost'),
+            edge('condition_1-condition-top-ghost', 'graph_1'),
+            graphEntryEdge('graph_1'),
+            edge('graph_1-graph-frame', 'afterGraph'),
+            edge('afterGraph', 'condition_1-condition-bottom-ghost'),
+            edge('condition_1-condition-top-ghost', 'childFalse1'),
+            edge('childFalse1', 'graph_2'),
+            graphEntryEdge('graph_2'),
+            edge('graph_2-graph-frame', 'condition_1-condition-bottom-ghost'),
+        ];
+
+        const result = await getElkLayoutElements({canvasWidth: 2000, direction: 'TB', edges, nodes});
+
+        const plainChain = await getElkLayoutElements({
+            canvasWidth: 2000,
+            direction: 'TB',
+            edges: [edge('task_1', 'task_2')],
+            nodes: [taskNode('task_1'), taskNode('task_2')],
+        });
+
+        const plainGap = positionOf(plainChain.nodes, 'task_2').y - (positionOf(plainChain.nodes, 'task_1').y + 72);
+
+        const frameStart = positionOf(result.nodes, 'graph_1-graph-frame').y;
+
+        expect(frameStart - (positionOf(result.nodes, 'graph_1').y + 72)).toBe(TOP_BOX_GAP);
+        expect(positionOf(result.nodes, 'afterGraph').y - (frameStart + 240)).toBe(plainGap);
+    });
+
+    describe('graphTransition edge isolation from ELK ranking', () => {
+        const structuralNodes: Node[] = [taskNode('n0'), taskNode('n1')];
+
+        const structuralEdges: Edge[] = [edge('n0', 'n1')];
+
+        const cyclicTransitionEdges: Edge[] = [
+            {
+                id: 'graph_1-transition-0',
+                source: 'n0',
+                sourceHandle: 'n0-graph-transition-source',
+                target: 'n1',
+                targetHandle: 'n1-graph-transition-target',
+                type: GRAPH_TRANSITION_EDGE_TYPE,
+            },
+            {
+                id: 'graph_1-transition-1',
+                source: 'n1',
+                sourceHandle: 'n1-graph-transition-source',
+                target: 'n0',
+                targetHandle: 'n0-graph-transition-target',
+                type: GRAPH_TRANSITION_EDGE_TYPE,
+            },
+        ];
+
+        it('excludes graphTransition edges from the ELK graph entirely', () => {
+            const graph = buildElkGraph(structuralNodes, [...cyclicTransitionEdges, ...structuralEdges], 'TB');
+
+            const allScopeEdgeIds = new Set<string>();
+
+            const collectEdgeIds = (elkNode: ElkNode) => {
+                (elkNode.edges ?? []).forEach((scopeEdge) => allScopeEdgeIds.add(scopeEdge.id));
+                (elkNode.children ?? []).forEach(collectEdgeIds);
+            };
+
+            collectEdgeIds(graph);
+
+            expect([...allScopeEdgeIds]).toEqual(['elk-edge-n0=>n1']);
+            expect(collectScopeEdgeViolations(graph)).toEqual([]);
+        });
+
+        it('keeps chain walking on the structural edge when a self-transition sorts before it', async () => {
+            const nodes: Node[] = [
+                conditionNode('condition_1'),
+                ...conditionGhostNodes('condition_1'),
+                taskNode('childTrue1', {conditionCase: 'caseTrue', conditionId: 'condition_1'}),
+                taskNode('childTrue2', {conditionCase: 'caseTrue', conditionId: 'condition_1'}),
+                taskNode('childTrue3', {conditionCase: 'caseTrue', conditionId: 'condition_1'}),
+                taskNode('childFalse1', {conditionCase: 'caseFalse', conditionId: 'condition_1'}),
+            ];
+
+            const structuralBranchEdges: Edge[] = [
+                edge('condition_1', 'condition_1-condition-top-ghost'),
+                edge('condition_1-condition-top-ghost', 'childTrue1'),
+                edge('childTrue1', 'childTrue2'),
+                edge('childTrue2', 'childTrue3'),
+                edge('childTrue3', 'condition_1-condition-bottom-ghost'),
+                edge('condition_1-condition-top-ghost', 'childFalse1'),
+                edge('childFalse1', 'condition_1-condition-bottom-ghost'),
+            ];
+
+            const selfTransitionEdges: Edge[] = [
+                {
+                    id: 'graph_1-transition-self-false',
+                    source: 'childFalse1',
+                    sourceHandle: 'childFalse1-graph-transition-source',
+                    target: 'childFalse1',
+                    targetHandle: 'childFalse1-graph-transition-dynamic',
+                    type: GRAPH_TRANSITION_EDGE_TYPE,
+                },
+                {
+                    id: 'graph_1-transition-self-true',
+                    source: 'childTrue1',
+                    sourceHandle: 'childTrue1-graph-transition-source',
+                    target: 'childTrue1',
+                    targetHandle: 'childTrue1-graph-transition-dynamic',
+                    type: GRAPH_TRANSITION_EDGE_TYPE,
+                },
+            ];
+
+            const baseline = await getElkLayoutElements({
+                canvasWidth: 1200,
+                direction: 'TB',
+                edges: structuralBranchEdges,
+                nodes,
+            });
+
+            const withSelfTransitions = await getElkLayoutElements({
+                canvasWidth: 1200,
+                direction: 'TB',
+                edges: [...selfTransitionEdges, ...structuralBranchEdges],
+                nodes,
+            });
+
+            for (const id of [
+                'condition_1',
+                'condition_1-condition-top-ghost',
+                'condition_1-condition-bottom-ghost',
+                'childTrue1',
+                'childTrue2',
+                'childTrue3',
+                'childFalse1',
+            ]) {
+                expect(positionOf(withSelfTransitions.nodes, id)).toEqual(positionOf(baseline.nodes, id));
+            }
+
+            const topGhostBarY = positionOf(withSelfTransitions.nodes, 'condition_1-condition-top-ghost').y;
+            const bottomGhostBarY = positionOf(withSelfTransitions.nodes, 'condition_1-condition-bottom-ghost').y;
+
+            const interiorCenter = (topGhostBarY + 2 + bottomGhostBarY) / 2;
+            const falseChildCenter = positionOf(withSelfTransitions.nodes, 'childFalse1').y + 36;
+
+            expect(Math.abs(falseChildCenter - interiorCenter)).toBeLessThanOrEqual(1);
+        });
+
+        it('lays out identically with a cyclic pair of graphTransition edges, and does not throw', async () => {
+            const withoutTransitions = await getElkLayoutElements({
+                canvasWidth: 2000,
+                direction: 'TB',
+                edges: structuralEdges,
+                nodes: structuralNodes,
+            });
+
+            const withTransitions = await getElkLayoutElements({
+                canvasWidth: 2000,
+                direction: 'TB',
+                edges: [...cyclicTransitionEdges, ...structuralEdges],
+                nodes: structuralNodes,
+            });
+
+            for (const id of ['n0', 'n1']) {
+                expect(positionOf(withTransitions.nodes, id)).toEqual(positionOf(withoutTransitions.nodes, id));
+            }
+
+            const returnedTransitionIds = withTransitions.edges
+                .filter((returnedEdge) => returnedEdge.type === GRAPH_TRANSITION_EDGE_TYPE)
+                .map((returnedEdge) => returnedEdge.id)
+                .sort();
+
+            expect(returnedTransitionIds).toEqual(['graph_1-transition-0', 'graph_1-transition-1']);
+        });
     });
 });
 
