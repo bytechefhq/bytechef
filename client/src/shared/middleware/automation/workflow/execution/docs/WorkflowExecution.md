@@ -13,6 +13,8 @@ Name | Type
 `project` | [ProjectBasic](ProjectBasic.md)
 `projectDeployment` | [ProjectDeploymentBasic](ProjectDeploymentBasic.md)
 `projectVersion` | number
+`source` | string
+`sourceName` | string
 `taskExecutionCount` | number
 `triggerExecution` | [TriggerExecution](TriggerExecution.md)
 `workflow` | [WorkflowBasic](WorkflowBasic.md)
@@ -30,6 +32,8 @@ const example = {
   "project": null,
   "projectDeployment": null,
   "projectVersion": null,
+  "source": null,
+  "sourceName": null,
   "taskExecutionCount": null,
   "triggerExecution": null,
   "workflow": null,
