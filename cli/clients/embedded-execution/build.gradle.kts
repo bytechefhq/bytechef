@@ -6,7 +6,7 @@ plugins {
 val generateClient by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
     generatorName.set("java")
     library.set("native")
-    inputSpec.set("${rootDir}/server/ee/libs/embedded/embedded-execution/embedded-execution-public-rest/openapi.yaml")
+    inputSpec.set("$projectDir/openapi.yaml")
     outputDir.set("$projectDir/generated")
     apiPackage.set("com.bytechef.cli.client.embeddedexecution.api")
     modelPackage.set("com.bytechef.cli.client.embeddedexecution.model")
