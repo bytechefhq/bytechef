@@ -1142,6 +1142,14 @@ export type DataTableSearchResult = SearchResult & {
   type: SearchAssetType;
 };
 
+export type DataTableStorageUsage = {
+  __typename?: 'DataTableStorageUsage';
+  limitBytes: Scalars['Long']['output'];
+  percentage: Scalars['Float']['output'];
+  unlimited: Scalars['Boolean']['output'];
+  usedBytes: Scalars['Long']['output'];
+};
+
 export type DataTableTagsEntry = {
   __typename?: 'DataTableTagsEntry';
   tableId: Scalars['ID']['output'];
@@ -3521,6 +3529,7 @@ export type Query = {
   customComponents: Array<CustomComponent>;
   dataTableRows: Array<DataTableRow>;
   dataTableRowsPage: DataTableRowPage;
+  dataTableStorageUsage: DataTableStorageUsage;
   dataTableTags: Array<Tag>;
   dataTableTagsByTable: Array<DataTableTagsEntry>;
   dataTableWebhooks: Array<DataTableWebhook>;
