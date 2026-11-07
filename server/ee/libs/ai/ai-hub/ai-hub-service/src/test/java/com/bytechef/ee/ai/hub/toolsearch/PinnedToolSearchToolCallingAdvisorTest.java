@@ -13,10 +13,23 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.agui.spring.ai.AgUiFunctionToolCallback;
+import com.agui.spring.ai.AgUiToolCallListener;
 import com.agui.spring.ai.SpringAIAgent;
+import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
+import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ee.ai.hub.agent.AiHubToolCallbackWrappers;
+import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.util.AiHubStateKeys;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.LinkedHashMap;
@@ -182,6 +195,46 @@ class PinnedToolSearchToolCallingAdvisorTest {
         advisor.doInitializeLoop(newRequest(toolCallback("askUserQuestion")), null);
 
         assertThat(catalogResolutions).hasValue(1);
+    }
+
+    @Test
+    void testSeedingCatalogDoesNotForceLazyToolSchemas() {
+        when(toolCallingManager.resolveToolDefinitions(any())).thenReturn(List.of());
+
+        ClusterElementDefinitionService clusterElementDefinitionService =
+            mock(ClusterElementDefinitionService.class);
+
+        ClusterElementToolCallback lazyCallback = new ClusterElementToolCallback(
+            "slack_sendMessage", "Send a Slack message", "slack", 1, "sendMessage", clusterElementDefinitionService,
+            mock(ClusterElementDefinitionFacade.class), mock(ConnectionDefinitionService.class),
+            mock(CopilotConnectionLister.class));
+
+        AiHubApprovalGate approvalGate = new AiHubApprovalGate(
+            mock(AiHubToolApprovalPolicy.class), mock(AiHubToolApprovalService.class), mock(AiHubChatService.class));
+
+        ToolCallback wrappedCallback = AiHubToolCallbackWrappers.wrap(
+            lazyCallback, mock(SecurityContextRehydrator.class), approvalGate);
+
+        PinnedToolSearchToolCallingAdvisor advisor = new PinnedToolSearchToolCallingAdvisor(
+            toolCallingManager, toolIndex, 5, ChatMemory.CONVERSATION_ID,
+            () -> Map.of("slack_sendMessage", wrappedCallback), () -> {});
+
+        UnaryOperator<ToolCallback> toolCallbackDecorator =
+            toolCallback -> new AgUiFunctionToolCallback(toolCallback, mock(AgUiToolCallListener.class));
+        ChatClientRequest request = ChatClientRequest.builder()
+            .prompt(
+                new Prompt(
+                    List.of(new SystemMessage("base system"), new UserMessage("hi")),
+                    ToolCallingChatOptions.builder()
+                        .toolCallbacks(toolCallback("askUserQuestion"))
+                        .build()))
+            .context(ChatMemory.CONVERSATION_ID, "conv-1")
+            .context(SpringAIAgent.TOOL_CALLBACK_DECORATOR_KEY, toolCallbackDecorator)
+            .build();
+
+        advisor.doBeforeCall(advisor.doInitializeLoop(request, null), null);
+
+        verifyNoInteractions(clusterElementDefinitionService);
     }
 
     @Test

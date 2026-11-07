@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.hub.toolsearch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -16,13 +17,28 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.agui.spring.ai.TurnEndingToolCallingManager;
+import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
+import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.ai.hub.approval.AiHubApprovalGate;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
+import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatDeletedEvent;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService;
+import com.bytechef.ee.ai.hub.util.Mode;
+import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import io.micrometer.observation.ObservationRegistry;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -46,8 +62,8 @@ class ToolSearchAdvisorConfigurationTest {
             ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID, List.of(toolCallback("listComponents")));
 
         assertThat(
-            ToolSearchAdvisorConfiguration.buildModeAdvisor(null, ObservationRegistry.NOOP, catalog, null, warmup,
-                null))
+            ToolSearchAdvisorConfiguration.buildModeAdvisor(
+                Mode.ASK, null, ObservationRegistry.NOOP, catalog, null, null, warmup, null))
                     .isNull();
     }
 
@@ -55,7 +71,7 @@ class ToolSearchAdvisorConfigurationTest {
     void testAdvisorIsAbsentWithoutAModeCatalog() {
         assertThat(
             ToolSearchAdvisorConfiguration.buildModeAdvisor(
-                mock(VectorStore.class), ObservationRegistry.NOOP, null, null, warmup, null))
+                Mode.ASK, mock(VectorStore.class), ObservationRegistry.NOOP, null, null, null, warmup, null))
                     .isNull();
     }
 
@@ -67,7 +83,7 @@ class ToolSearchAdvisorConfigurationTest {
             ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID, List.of(catalogTool));
 
         ToolSearchToolCallingAdvisor advisor = ToolSearchAdvisorConfiguration.buildModeAdvisor(
-            mock(VectorStore.class), ObservationRegistry.NOOP, catalog, null, warmup, null);
+            Mode.BUILD, mock(VectorStore.class), ObservationRegistry.NOOP, catalog, null, null, warmup, null);
 
         assertThat(advisor).isInstanceOf(PinnedToolSearchToolCallingAdvisor.class);
 
@@ -91,6 +107,86 @@ class ToolSearchAdvisorConfigurationTest {
     }
 
     @Test
+    void testBuildModeReachesEveryClusterElementToolAndAskModeOnlyTheOnesThatRead() {
+        ClusterElementDefinitionService clusterElementDefinitionService =
+            mock(ClusterElementDefinitionService.class);
+        AiHubClusterElementToolCallbacks clusterElementToolCallbacks = clusterElementToolCallbacks(
+            clusterElementDefinitionService);
+        AiHubGlobalToolCatalog catalog = new AiHubGlobalToolCatalog(
+            ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID, List.of(toolCallback("listComponents")));
+
+        assertThat(
+            ToolSearchAdvisorConfiguration.catalogCallbackMap(
+                Mode.BUILD, catalog, clusterElementToolCallbacks, null, null))
+                    .containsOnlyKeys("listComponents", "slack_sendMessage", "slack_listChannels");
+        assertThat(
+            ToolSearchAdvisorConfiguration.catalogCallbackMap(
+                Mode.ASK, catalog, clusterElementToolCallbacks, null, null))
+                    .containsOnlyKeys("listComponents", "slack_listChannels");
+        verify(clusterElementDefinitionService, never()).getClusterElementDefinition(
+            anyString(), anyInt(), anyString());
+    }
+
+    @Test
+    void testAnUnapprovedClusterElementToolThatWritesIsHeldForApproval() {
+        AiHubToolApprovalService approvalService = mock(AiHubToolApprovalService.class);
+        AiHubChatService chatService = mock(AiHubChatService.class);
+        AiHubChat chat = new AiHubChat(3L);
+
+        chat.setId(11L);
+        chat.setThreadId("thread-1");
+        chat.setWorkspaceId(7L);
+
+        when(chatService.findNotDeletedByThreadId("thread-1")).thenReturn(Optional.of(chat));
+        when(approvalService.findPending(11L)).thenReturn(Optional.empty());
+        when(approvalService.createPending(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade = mock(ClusterElementDefinitionFacade.class);
+        AiHubApprovalGate approvalGate = new AiHubApprovalGate(
+            workspaceId -> new AiHubToolApprovalPolicy.Decision(Set.of(), Set.of()), approvalService, chatService);
+
+        Map<String, ToolCallback> callbackMap = ToolSearchAdvisorConfiguration.catalogCallbackMap(
+            Mode.BUILD,
+            new AiHubGlobalToolCatalog(ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID, List.of()),
+            clusterElementToolCallbacks(mock(ClusterElementDefinitionService.class), clusterElementDefinitionFacade),
+            null, approvalGate);
+
+        String result = callbackMap.get("slack_sendMessage")
+            .call(
+                "{\"text\":\"hi\"}",
+                new ToolContext(
+                    AgentToolInvocationContext.builder()
+                        .workspaceId(7L)
+                        .userId(3L)
+                        .environmentId(1L)
+                        .conversationId("thread-1")
+                        .build()
+                        .toToolContext()));
+
+        assertThat(result).contains("\"awaitingApproval\":true");
+        verify(approvalService).createPending(any());
+        verify(clusterElementDefinitionFacade, never()).executeTool(
+            anyString(), anyInt(), anyString(), any(), any());
+    }
+
+    @Test
+    void testSearchCoversTheClusterElementSessionsOfTheMode() {
+        AiHubGlobalToolCatalog catalog = new AiHubGlobalToolCatalog(
+            ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID, List.of());
+        AiHubClusterElementToolCallbacks clusterElementToolCallbacks = new AiHubClusterElementToolCallbacks(Map::of);
+
+        assertThat(ToolSearchAdvisorConfiguration.searchSessionIds(Mode.ASK, catalog, clusterElementToolCallbacks))
+            .containsExactlyInAnyOrder(
+                ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID, ToolSearchCatalogFeeder.CLUSTER_ELEMENT_READ_SESSION_ID);
+        assertThat(ToolSearchAdvisorConfiguration.searchSessionIds(Mode.BUILD, catalog, clusterElementToolCallbacks))
+            .contains(
+                ToolSearchCatalogFeeder.CLUSTER_ELEMENT_READ_SESSION_ID,
+                ToolSearchCatalogFeeder.CLUSTER_ELEMENT_WRITE_SESSION_ID);
+        assertThat(ToolSearchAdvisorConfiguration.searchSessionIds(Mode.BUILD, catalog, null))
+            .containsExactly(ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID);
+    }
+
+    @Test
     void testToolCallingManagerEndsTheTurnLikeTheAgent() {
         assertThat(ToolSearchAdvisorConfiguration.buildToolCallingManager(ObservationRegistry.NOOP, Map::of))
             .isInstanceOf(TurnEndingToolCallingManager.class);
@@ -99,7 +195,8 @@ class ToolSearchAdvisorConfigurationTest {
     @Test
     void testFeederIsAbsentWithoutTheToolSearchVectorStore() {
         ToolSearchCatalogFeeder feeder = configuration.toolSearchCatalogFeeder(
-            provider(null), provider(mock(JdbcTemplate.class)), new PgVectorStoreProperties(), provider(null));
+            provider(mock(ClusterElementDefinitionService.class)), provider(null), provider(mock(JdbcTemplate.class)),
+            new PgVectorStoreProperties(), provider(null));
 
         assertThat(feeder).isNull();
     }
@@ -107,8 +204,8 @@ class ToolSearchAdvisorConfigurationTest {
     @Test
     void testFeederIsBuiltWhenEverythingIsPresent() {
         ToolSearchCatalogFeeder feeder = configuration.toolSearchCatalogFeeder(
-            provider(mock(VectorStore.class)), provider(mock(JdbcTemplate.class)), new PgVectorStoreProperties(),
-            provider(null));
+            provider(mock(ClusterElementDefinitionService.class)), provider(mock(VectorStore.class)),
+            provider(mock(JdbcTemplate.class)), new PgVectorStoreProperties(), provider(null));
 
         assertThat(feeder).isNotNull();
     }
@@ -171,5 +268,35 @@ class ToolSearchAdvisorConfigurationTest {
                 .build());
 
         return toolCallback;
+    }
+
+    private static AiHubClusterElementToolCallbacks clusterElementToolCallbacks(
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        return clusterElementToolCallbacks(clusterElementDefinitionService, mock(ClusterElementDefinitionFacade.class));
+    }
+
+    private static AiHubClusterElementToolCallbacks clusterElementToolCallbacks(
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade) {
+
+        ConnectionDefinitionService connectionDefinitionService = mock(ConnectionDefinitionService.class);
+
+        when(connectionDefinitionService.getConnectionDefinition(anyString(), any()))
+            .thenThrow(new NoSuchElementException("no connection"));
+
+        CopilotConnectionLister connectionLister = mock(CopilotConnectionLister.class);
+
+        return new AiHubClusterElementToolCallbacks(
+            () -> Map.of(
+                "slack_sendMessage",
+                new ClusterElementToolCallback(
+                    "slack_sendMessage", "Send a message", "slack", 1, "sendMessage", clusterElementDefinitionService,
+                    clusterElementDefinitionFacade, connectionDefinitionService, connectionLister),
+                "slack_listChannels",
+                new ClusterElementToolCallback(
+                    "slack_listChannels", "List channels", "slack", 1, "listChannels",
+                    clusterElementDefinitionService, clusterElementDefinitionFacade, connectionDefinitionService,
+                    connectionLister)));
     }
 }

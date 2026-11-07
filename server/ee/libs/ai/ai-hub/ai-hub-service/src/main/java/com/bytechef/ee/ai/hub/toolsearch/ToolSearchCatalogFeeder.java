@@ -7,6 +7,10 @@
 
 package com.bytechef.ee.ai.hub.toolsearch;
 
+import com.bytechef.component.definition.ai.agent.BaseToolFunction;
+import com.bytechef.ee.ai.hub.util.ToolNameNormalizer;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -14,8 +18,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HexFormat;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.ToolCallback;
@@ -38,10 +45,15 @@ public class ToolSearchCatalogFeeder {
 
     public static final String GLOBAL_BUILD_SESSION_ID = CATALOG_SESSION_ID + ":global:build";
 
+    public static final String CLUSTER_ELEMENT_READ_SESSION_ID = CATALOG_SESSION_ID + ":clusterElement:read";
+
+    public static final String CLUSTER_ELEMENT_WRITE_SESSION_ID = CATALOG_SESSION_ID + ":clusterElement:write";
+
     static final String META_TABLE_NAME = "ai_hub_tool_search_catalog_meta";
 
     private static final Logger log = LoggerFactory.getLogger(ToolSearchCatalogFeeder.class);
 
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final VectorToolIndex vectorToolIndex;
     private final String embeddingModelIdentity;
     private final JdbcTemplate pgVectorJdbcTemplate;
@@ -52,9 +64,10 @@ public class ToolSearchCatalogFeeder {
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ToolSearchCatalogFeeder(
-        VectorToolIndex vectorToolIndex, String embeddingModelIdentity, JdbcTemplate pgVectorJdbcTemplate,
-        String schemaName, String vectorTableName) {
+        ClusterElementDefinitionService clusterElementDefinitionService, VectorToolIndex vectorToolIndex,
+        String embeddingModelIdentity, JdbcTemplate pgVectorJdbcTemplate, String schemaName, String vectorTableName) {
 
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.vectorToolIndex = vectorToolIndex;
         this.embeddingModelIdentity = embeddingModelIdentity;
         this.pgVectorJdbcTemplate = pgVectorJdbcTemplate;
@@ -62,7 +75,6 @@ public class ToolSearchCatalogFeeder {
         this.qualifiedMetaTableName = schemaName + "." + META_TABLE_NAME;
     }
 
-    @SuppressFBWarnings("UNSAFE_HASH_EQUALS")
     public void populateGlobalTools(String sessionId, List<ToolCallback> toolCallbacks) {
         List<CatalogEntry> entries = new ArrayList<>();
 
@@ -77,6 +89,51 @@ public class ToolSearchCatalogFeeder {
             entries.add(new CatalogEntry(toolDefinition.name(), summary));
         }
 
+        populateSession(sessionId, entries, toolCallbacks.size());
+    }
+
+    public void populateClusterElementTools() {
+        List<ClusterElementDefinition> clusterElementDefinitions =
+            clusterElementDefinitionService.getClusterElementDefinitionStubs(BaseToolFunction.TOOLS);
+
+        Map<String, CatalogEntry> readOnlyEntries = new LinkedHashMap<>();
+        Map<String, CatalogEntry> writeEntries = new LinkedHashMap<>();
+
+        for (ClusterElementDefinition clusterElementDefinition : clusterElementDefinitions) {
+            String summary = buildSummary(clusterElementDefinition);
+
+            if (summary == null) {
+                continue;
+            }
+
+            String toolName = ToolNameNormalizer.toToolName(
+                clusterElementDefinition.getComponentName(), clusterElementDefinition.getName());
+
+            Map<String, CatalogEntry> entries = AiHubClusterElementToolCallbacks.isReadOnly(
+                clusterElementDefinition.getName()) ? readOnlyEntries : writeEntries;
+
+            entries.putIfAbsent(toolName, new CatalogEntry(toolName, summary));
+        }
+
+        populateSession(
+            CLUSTER_ELEMENT_READ_SESSION_ID, List.copyOf(readOnlyEntries.values()), readOnlyEntries.size());
+        populateSession(CLUSTER_ELEMENT_WRITE_SESSION_ID, List.copyOf(writeEntries.values()), writeEntries.size());
+    }
+
+    static @Nullable String buildSummary(ClusterElementDefinition clusterElementDefinition) {
+        String description = clusterElementDefinition.getDescription();
+        String title = clusterElementDefinition.getTitle();
+        boolean hasTitle = title != null && !title.isBlank();
+
+        if (description != null && !description.isBlank()) {
+            return hasTitle ? title + ". " + description : description;
+        }
+
+        return hasTitle ? title : null;
+    }
+
+    @SuppressFBWarnings("UNSAFE_HASH_EQUALS")
+    private void populateSession(String sessionId, List<CatalogEntry> entries, int toolCount) {
         String currentHash = computeCatalogHash(embeddingModelIdentity, entries);
 
         ensureMetaTable();
@@ -87,8 +144,8 @@ public class ToolSearchCatalogFeeder {
             .equals(currentHash)) {
 
             log.info(
-                "Global tool session unchanged (hash matches {} entries under session {}); skipping re-embedding",
-                entries.size(), sessionId);
+                "Tool search session {} unchanged (hash matches {} entries); skipping re-embedding", sessionId,
+                entries.size());
 
             return;
         }
@@ -97,9 +154,7 @@ public class ToolSearchCatalogFeeder {
 
         writeStoredHash(sessionId, currentHash, indexed);
 
-        log.info(
-            "Global tool session populated: indexed {} of {} static tools under session {}",
-            indexed, toolCallbacks.size(), sessionId);
+        log.info("Tool search session {} populated: indexed {} of {} tools", sessionId, indexed, toolCount);
     }
 
     private int indexEntries(String sessionId, List<CatalogEntry> entries) {
