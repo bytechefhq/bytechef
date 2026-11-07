@@ -54,6 +54,8 @@ dependencies {
     testImplementation("org.springframework.graphql:spring-graphql")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
+    testImplementation(project(":server:libs:automation:automation-asset-file:automation-asset-file-api"))
+    testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
     testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
     testImplementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-api"))
     testImplementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api"))
