@@ -15,6 +15,8 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.security:spring-security-core")
     implementation(project(":sdks:backend:java:component-api"))
+    implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-tool"))
+    implementation(project(":server:ee:libs:platform:platform-component-rule:platform-component-rule-tool"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-agent:automation-ai-agent-tool"))
     implementation(project(":server:libs:automation:automation-asset-file:automation-asset-file-tool"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-tool"))
@@ -67,7 +69,10 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation(project(":server:libs:automation:automation-asset-file:automation-asset-file-api"))
+    testImplementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-component-rule:platform-component-rule-api"))
     testImplementation(project(":server:libs:automation:automation-connection:automation-connection-tool"))
+    testImplementation(project(":server:libs:core:evaluator:evaluator-api"))
     testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
     testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
     testImplementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-api"))
@@ -87,6 +92,8 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-service"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
     testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
+    testImplementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    testImplementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))
 
     testRuntimeOnly("org.postgresql:postgresql")
 }
