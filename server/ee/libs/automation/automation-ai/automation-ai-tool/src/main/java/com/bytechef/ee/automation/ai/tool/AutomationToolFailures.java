@@ -1,0 +1,45 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.automation.ai.tool;
+
+import com.bytechef.exception.ErrorType;
+import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
+import org.slf4j.Logger;
+import org.springframework.security.access.AccessDeniedException;
+
+/**
+ * @version ee
+ * @author Ivica Cardic
+ */
+final class AutomationToolFailures {
+
+    private AutomationToolFailures() {
+    }
+
+    static ExecutionException toExecutionException(
+        Logger log, String invocation, String failureMessage, RuntimeException exception, ErrorType errorType) {
+
+        if (exception instanceof ExecutionException executionException) {
+            return executionException;
+        }
+
+        if (exception instanceof AccessDeniedException) {
+            log.warn("{}: access denied: {}", invocation, exception.getMessage());
+
+            return new ExecutionException(
+                failureMessage + ": not permitted, the current user lacks permission for this operation", exception,
+                errorType);
+        }
+
+        log.error("{}: {}", invocation, failureMessage, exception);
+
+        return new ExecutionException(
+            failureMessage + ": " + ToolUtils.toUserFacingDetail(exception), exception, errorType);
+    }
+}
