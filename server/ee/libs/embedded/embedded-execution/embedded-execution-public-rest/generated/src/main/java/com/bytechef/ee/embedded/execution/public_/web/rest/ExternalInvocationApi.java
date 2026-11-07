@@ -10,7 +10,7 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentMode
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExecuteAction400ResponseModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationOutcomeModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationPageModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationSurfaceModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationSourceModel;
 import org.springframework.lang.Nullable;
 import java.time.OffsetDateTime;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T10:03:58.085959+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T20:26:51.462029+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "external-invocation", description = "The Embedded External Invocation Public API")
 public interface ExternalInvocationApi {
@@ -56,7 +56,7 @@ public interface ExternalInvocationApi {
      *
      * @param externalUserId The external user id. (required)
      * @param xEnvironment The environment. (optional)
-     * @param surface Return only invocations made through this surface. (optional)
+     * @param source Return only invocations made through this source. (optional)
      * @param outcome Return only invocations with this outcome. (optional)
      * @param startDate Return only invocations recorded at or after this instant. (optional)
      * @param endDate Return only invocations recorded at or before this instant. (optional)
@@ -106,7 +106,7 @@ public interface ExternalInvocationApi {
     default ResponseEntity<ExternalInvocationPageModel> getExternalInvocationsPage(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment,
-        @Parameter(name = "surface", description = "Return only invocations made through this surface.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "surface", required = false) @Nullable ExternalInvocationSurfaceModel surface,
+        @Parameter(name = "source", description = "Return only invocations made through this source.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "source", required = false) @Nullable ExternalInvocationSourceModel source,
         @Parameter(name = "outcome", description = "Return only invocations with this outcome.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "outcome", required = false) @Nullable ExternalInvocationOutcomeModel outcome,
         @Parameter(name = "startDate", description = "Return only invocations recorded at or after this instant.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Nullable OffsetDateTime startDate,
         @Parameter(name = "endDate", description = "Return only invocations recorded at or before this instant.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Nullable OffsetDateTime endDate,
@@ -115,7 +115,7 @@ public interface ExternalInvocationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"content\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"durationMs\" : 6, \"errorMessage\" : \"errorMessage\", \"errorType\" : \"errorType\", \"id\" : 1, \"integrationInstanceId\" : 5, \"jobId\" : 5, \"kind\" : \"COMPONENT\", \"operationName\" : \"operationName\", \"outcome\" : \"SUCCESS\", \"surface\" : \"MCP_EMBEDDED\", \"toolName\" : \"toolName\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"durationMs\" : 6, \"errorMessage\" : \"errorMessage\", \"errorType\" : \"errorType\", \"id\" : 1, \"integrationInstanceId\" : 5, \"jobId\" : 5, \"kind\" : \"COMPONENT\", \"operationName\" : \"operationName\", \"outcome\" : \"SUCCESS\", \"surface\" : \"MCP_EMBEDDED\", \"toolName\" : \"toolName\" } ], \"number\" : 2, \"numberOfElements\" : 7, \"size\" : 9, \"totalElements\" : 3, \"totalPages\" : 2 }";
+                    String exampleString = "{ \"content\" : [ { \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"durationMs\" : 6, \"errorMessage\" : \"errorMessage\", \"errorType\" : \"errorType\", \"id\" : 1, \"integrationInstanceId\" : 5, \"jobId\" : 5, \"kind\" : \"COMPONENT\", \"operationName\" : \"operationName\", \"outcome\" : \"SUCCESS\", \"source\" : \"MCP_SERVER\", \"toolName\" : \"toolName\" }, { \"componentName\" : \"componentName\", \"componentVersion\" : 0, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"durationMs\" : 6, \"errorMessage\" : \"errorMessage\", \"errorType\" : \"errorType\", \"id\" : 1, \"integrationInstanceId\" : 5, \"jobId\" : 5, \"kind\" : \"COMPONENT\", \"operationName\" : \"operationName\", \"outcome\" : \"SUCCESS\", \"source\" : \"MCP_SERVER\", \"toolName\" : \"toolName\" } ], \"number\" : 2, \"numberOfElements\" : 7, \"size\" : 9, \"totalElements\" : 3, \"totalPages\" : 2 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

@@ -14,7 +14,7 @@ src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/External
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExternalInvocationModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExternalInvocationOutcomeModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExternalInvocationPageModel.java
-src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExternalInvocationSurfaceModel.java
+src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ExternalInvocationSourceModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/FunctionModel.java
 src/main/java/com/bytechef/ee/embedded/execution/public_/web/rest/model/ToolModel.java
 src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java
