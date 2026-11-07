@@ -35,6 +35,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.webhook.web.rest.handler.ApprovalResolutionLookup.Resolution;
+import com.bytechef.platform.workflow.execution.facade.ApprovalInputException;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
@@ -51,6 +52,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
@@ -179,6 +181,58 @@ class WhatsAppInteractivityHandlerTest {
         when(approvalResolutionLookup.describe(RESUME_ID)).thenReturn(Resolution.RESOLVED);
 
         expectReply("ℹ️ This approval was already resolved.");
+
+        WhatsAppInteractivityHandler.Result result = whatsAppInteractivityHandler.handle(
+            rawBody, sign(rawBody, APP_SECRET));
+
+        assertThat(result).isEqualTo(WhatsAppInteractivityHandler.Result.HANDLED);
+
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    void testApprovalNeedingFormInputRepliesWithTheFormHint() throws Exception {
+        String rawBody = buttonReplyBody("a:" + RESUME_ID);
+
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), eq(Map.of("approved", true)), eq("Jane")))
+            .thenThrow(new ApprovalInputException(List.of("'Amount' is required")));
+
+        expectReply("⚠️ This approval could not be applied here — open the approval form.");
+
+        WhatsAppInteractivityHandler.Result result = whatsAppInteractivityHandler.handle(
+            rawBody, sign(rawBody, APP_SECRET));
+
+        assertThat(result).isEqualTo(WhatsAppInteractivityHandler.Result.HANDLED);
+
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    void testLostConcurrentResumeRaceRepliesThatItWasResolved() throws Exception {
+        String rawBody = buttonReplyBody("a:" + RESUME_ID);
+
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), eq(Map.of("approved", true)), eq("Jane")))
+            .thenThrow(new RuntimeException(new OptimisticLockingFailureException("stale job version")));
+        when(approvalResolutionLookup.describe(RESUME_ID)).thenReturn(Resolution.RESOLVED);
+
+        expectReply("ℹ️ This approval was already resolved.");
+
+        WhatsAppInteractivityHandler.Result result = whatsAppInteractivityHandler.handle(
+            rawBody, sign(rawBody, APP_SECRET));
+
+        assertThat(result).isEqualTo(WhatsAppInteractivityHandler.Result.HANDLED);
+
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    void testUnexpectedResumeFailureAsksToTryAgain() throws Exception {
+        String rawBody = buttonReplyBody("a:" + RESUME_ID);
+
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), eq(Map.of("approved", true)), eq("Jane")))
+            .thenThrow(new IllegalStateException("database unavailable"));
+
+        expectReply("⚠️ This approval could not be applied — try again in a moment.");
 
         WhatsAppInteractivityHandler.Result result = whatsAppInteractivityHandler.handle(
             rawBody, sign(rawBody, APP_SECRET));

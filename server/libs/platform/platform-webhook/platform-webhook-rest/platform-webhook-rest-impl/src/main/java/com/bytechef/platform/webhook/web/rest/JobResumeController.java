@@ -33,7 +33,6 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -130,7 +129,7 @@ public class JobResumeController {
         } catch (ApprovalInputException approvalInputException) {
             return invalidApprovalInput(approvalInputException);
         } catch (RuntimeException exception) {
-            if (!isOptimisticLockingFailure(exception)) {
+            if (!ResumeExceptions.isOptimisticLockingFailure(exception)) {
                 throw exception;
             }
 
@@ -192,7 +191,7 @@ public class JobResumeController {
         } catch (RuntimeException exception) {
             closeRegistrationIfPresent(registrationReference);
 
-            if (!isOptimisticLockingFailure(exception)) {
+            if (!ResumeExceptions.isOptimisticLockingFailure(exception)) {
                 throw exception;
             }
 
@@ -257,16 +256,6 @@ public class JobResumeController {
             case STREAMING_NOT_ALLOWED -> HttpStatus.NOT_ACCEPTABLE;
             case OK -> throw new IllegalArgumentException("A successful resume has no error status");
         };
-    }
-
-    private static boolean isOptimisticLockingFailure(Throwable throwable) {
-        for (Throwable cause = throwable; cause != null; cause = cause.getCause()) {
-            if (cause instanceof OptimisticLockingFailureException) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private <T> T retryWhileNotYetSuspended(Supplier<T> resumeSupplier, Predicate<T> notYetSuspended) {

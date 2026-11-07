@@ -21,7 +21,9 @@ import com.bytechef.component.definition.approval.ApprovalButtonPayload;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.webhook.web.rest.ResumeExceptions;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.facade.ApprovalInputException;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
@@ -46,6 +48,8 @@ public class TelegramInteractivityHandler {
     private static final Connection UNAVAILABLE = new Connection();
 
     private static final String NO_LONGER_AVAILABLE_TEXT = "This approval is no longer available.";
+    private static final String FAILED_TEXT = "This approval could not be applied — try again in a moment.";
+    private static final String NOT_APPLIED_TEXT = "This approval could not be applied here — open the approval form.";
     private static final String NOT_YET_SUSPENDED_TEXT = "Still preparing — try again in a moment.";
 
     private final ApprovalResolutionLookup approvalResolutionLookup;
@@ -134,9 +138,38 @@ public class TelegramInteractivityHandler {
 
         String userName = extractUserName(callbackQuery);
 
-        JobResumeOutcome outcome = TenantContext.callWithTenantId(
-            tenantId,
-            () -> jobResumeFacade.resumeJob(resumeId, Map.of("approved", approved), asApprovedBy(userName)));
+        JobResumeOutcome outcome;
+
+        try {
+            outcome = TenantContext.callWithTenantId(
+                tenantId,
+                () -> jobResumeFacade.resumeJob(resumeId, Map.of("approved", approved), asApprovedBy(userName)));
+        } catch (RuntimeException runtimeException) {
+            ApprovalInputException approvalInputException = ResumeExceptions.findApprovalInputException(
+                runtimeException);
+
+            if (approvalInputException != null) {
+                log.info(
+                    "Telegram approval callback for short id {} needs the approval form: {}",
+                    approvalButtonPayload.shortId(), approvalInputException.getMessage());
+
+                answerCallback(connection, callbackQuery, NOT_APPLIED_TEXT);
+
+                return Result.HANDLED;
+            }
+
+            if (!ResumeExceptions.isOptimisticLockingFailure(runtimeException)) {
+                log.error(
+                    "Telegram approval callback for short id {} failed", approvalButtonPayload.shortId(),
+                    runtimeException);
+
+                answerCallback(connection, callbackQuery, FAILED_TEXT);
+
+                return Result.HANDLED;
+            }
+
+            outcome = JobResumeOutcome.GONE;
+        }
 
         if (outcome == JobResumeOutcome.NOT_YET_SUSPENDED) {
             answerCallback(connection, callbackQuery, NOT_YET_SUSPENDED_TEXT);
@@ -251,8 +284,9 @@ public class TelegramInteractivityHandler {
                 case EXPIRED -> "⌛ This approval expired before it was resolved.";
                 case UNAVAILABLE -> "⚠️ This approval is no longer available.";
             };
-            case INVALID_ID, JOB_FAILED, NOT_YET_SUSPENDED, STREAMING_NOT_ALLOWED ->
-                "⚠️ This approval is no longer available.";
+            case INVALID_ID -> "⚠️ This approval is no longer available.";
+            case JOB_FAILED -> "❌ The workflow failed before this approval could be applied.";
+            case NOT_YET_SUSPENDED, STREAMING_NOT_ALLOWED -> "⚠️ This approval could not be applied yet.";
         };
 
         callTelegram(

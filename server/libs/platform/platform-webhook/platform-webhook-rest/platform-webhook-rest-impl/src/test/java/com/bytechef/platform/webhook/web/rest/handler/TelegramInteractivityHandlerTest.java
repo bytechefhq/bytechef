@@ -34,6 +34,7 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.webhook.web.rest.handler.ApprovalResolutionLookup.Resolution;
+import com.bytechef.platform.workflow.execution.facade.ApprovalInputException;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
@@ -50,6 +51,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
@@ -86,8 +88,8 @@ class TelegramInteractivityHandlerTest {
             .build();
 
         telegramInteractivityHandler = new TelegramInteractivityHandler(
-            approvalResolutionLookup, connectionService, jobResumeFacade, defaultApprovalTokens,
-            restClientBuilder.build());
+            approvalResolutionLookup, connectionService, jobResumeFacade,
+            defaultApprovalTokens, restClientBuilder.build());
 
         connection.setParameters(Map.of("botToken", BOT_TOKEN, "webhookSecretToken", SECRET_TOKEN));
 
@@ -178,6 +180,66 @@ class TelegramInteractivityHandlerTest {
         assertThat(result).isEqualTo(TelegramInteractivityHandler.Result.HANDLED);
         assertThat(capturedOutput.getAll()).contains("Telegram answerCallbackQuery call failed")
             .doesNotContain(BOT_TOKEN);
+    }
+
+    @Test
+    void testApprovalNeedingFormInputAnswersWithTheFormHint() {
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), eq(Map.of("approved", true)), eq("@jane")))
+            .thenThrow(new ApprovalInputException(List.of("'Amount' is required")));
+
+        mockRestServiceServer.expect(requestTo(TELEGRAM_API + "answerCallbackQuery"))
+            .andExpect(
+                content().json(
+                    "{\"callback_query_id\":\"cb-1\",\"text\":\"This approval could not be applied here — open the approval form.\"}",
+                    JsonCompareMode.STRICT))
+            .andRespond(withSuccess());
+
+        TelegramInteractivityHandler.Result result = telegramInteractivityHandler.handle(
+            callbackBody(SHORT_ID + ":a"), SECRET_TOKEN);
+
+        assertThat(result).isEqualTo(TelegramInteractivityHandler.Result.HANDLED);
+
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    void testLostConcurrentResumeRaceSaysItWasAlreadyResolved() {
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), eq(Map.of("approved", true)), eq("@jane")))
+            .thenThrow(new RuntimeException(new OptimisticLockingFailureException("stale job version")));
+        when(approvalResolutionLookup.describe(RESUME_ID)).thenReturn(Resolution.RESOLVED);
+
+        mockRestServiceServer.expect(requestTo(TELEGRAM_API + "answerCallbackQuery"))
+            .andRespond(withSuccess());
+        mockRestServiceServer.expect(requestTo(TELEGRAM_API + "editMessageText"))
+            .andExpect(
+                content().json(
+                    "{\"chat_id\":7,\"message_id\":9,\"text\":\"ℹ️ This approval was already resolved.\"}",
+                    JsonCompareMode.STRICT))
+            .andRespond(withSuccess());
+
+        telegramInteractivityHandler.handle(callbackBody(SHORT_ID + ":a"), SECRET_TOKEN);
+
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    void testUnexpectedResumeFailureAsksToTryAgain() {
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), eq(Map.of("approved", true)), eq("@jane")))
+            .thenThrow(new IllegalStateException("database unavailable"));
+
+        mockRestServiceServer.expect(requestTo(TELEGRAM_API + "answerCallbackQuery"))
+            .andExpect(
+                content().json(
+                    "{\"callback_query_id\":\"cb-1\",\"text\":\"This approval could not be applied — try again in a moment.\"}",
+                    JsonCompareMode.STRICT))
+            .andRespond(withSuccess());
+
+        TelegramInteractivityHandler.Result result = telegramInteractivityHandler.handle(
+            callbackBody(SHORT_ID + ":a"), SECRET_TOKEN);
+
+        assertThat(result).isEqualTo(TelegramInteractivityHandler.Result.HANDLED);
+
+        mockRestServiceServer.verify();
     }
 
     @Test

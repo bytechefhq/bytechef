@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.webhook.web.rest.handler.ApprovalResolutionLookup.Resolution;
+import com.bytechef.platform.workflow.execution.facade.ApprovalInputException;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
@@ -47,6 +48,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 /**
  * @author Ivica Cardic
@@ -156,6 +158,63 @@ class DiscordInteractivityHandlerTest {
             Map.of(
                 "type", 7, "data",
                 Map.of("content", "⌛ This approval expired before it was resolved.", "components", List.of())));
+    }
+
+    @Test
+    void testApprovalNeedingFormInputRepliesWithTheFormHint() throws Exception {
+        String rawBody = buttonClickBody(SHORT_ID + ":a");
+
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), eq(Map.of("approved", true)), eq("@jane")))
+            .thenThrow(new ApprovalInputException(List.of("'Amount' is required")));
+
+        DiscordInteractivityHandler interactivityHandler = handler(publicKeyHex);
+
+        DiscordInteractivityHandler.Response response = interactivityHandler.handle(
+            rawBody, sign(rawBody), TIMESTAMP);
+
+        assertThat(response.body()).isEqualTo(
+            Map.of(
+                "type", 4, "data",
+                Map.of(
+                    "content", "This approval could not be applied here — open the approval form.", "flags", 64)));
+    }
+
+    @Test
+    void testLostConcurrentResumeRaceSaysItWasAlreadyResolved() throws Exception {
+        String rawBody = buttonClickBody(SHORT_ID + ":a");
+
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), eq(Map.of("approved", true)), eq("@jane")))
+            .thenThrow(new RuntimeException(new OptimisticLockingFailureException("stale job version")));
+        when(approvalResolutionLookup.describe(RESUME_ID)).thenReturn(Resolution.RESOLVED);
+
+        DiscordInteractivityHandler interactivityHandler = handler(publicKeyHex);
+
+        DiscordInteractivityHandler.Response response = interactivityHandler.handle(
+            rawBody, sign(rawBody), TIMESTAMP);
+
+        assertThat(response.body()).isEqualTo(
+            Map.of(
+                "type", 7, "data",
+                Map.of("content", "ℹ️ This approval was already resolved.", "components", List.of())));
+    }
+
+    @Test
+    void testUnexpectedResumeFailureAsksToTryAgain() throws Exception {
+        String rawBody = buttonClickBody(SHORT_ID + ":a");
+
+        when(jobResumeFacade.resumeJob(eq(RESUME_ID), eq(Map.of("approved", true)), eq("@jane")))
+            .thenThrow(new IllegalStateException("database unavailable"));
+
+        DiscordInteractivityHandler interactivityHandler = handler(publicKeyHex);
+
+        DiscordInteractivityHandler.Response response = interactivityHandler.handle(
+            rawBody, sign(rawBody), TIMESTAMP);
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(response.body()).isEqualTo(
+            Map.of(
+                "type", 4, "data",
+                Map.of("content", "This approval could not be applied — try again in a moment.", "flags", 64)));
     }
 
     @Test

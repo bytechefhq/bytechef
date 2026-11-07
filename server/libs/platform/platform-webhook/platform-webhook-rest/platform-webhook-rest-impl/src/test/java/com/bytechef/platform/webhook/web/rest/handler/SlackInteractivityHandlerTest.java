@@ -36,6 +36,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.webhook.web.rest.handler.ApprovalResolutionLookup.Resolution;
+import com.bytechef.platform.workflow.execution.facade.ApprovalInputException;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
@@ -53,6 +54,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
@@ -389,6 +391,105 @@ class SlackInteractivityHandlerTest {
             rawBody, timestamp, sign(timestamp, rawBody, SIGNING_SECRET));
 
         assertEquals(SlackInteractivityHandler.Result.HANDLED, result);
+
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    void testApprovalNeedingFormInputRepliesEphemerallyWithTheFormHint() throws Exception {
+        RestClient.Builder restClientBuilder = RestClient.builder();
+
+        MockRestServiceServer mockRestServiceServer = MockRestServiceServer.bindTo(restClientBuilder)
+            .build();
+
+        SlackInteractivityHandler handler = new SlackInteractivityHandler(
+            approvalResolutionLookup, connectionService, jobResumeFacade, null, restClientBuilder.build());
+
+        mockRestServiceServer.expect(requestTo("https://hooks.slack.invalid/actions/x"))
+            .andExpect(
+                content().json(
+                    "{\"response_type\":\"ephemeral\",\"replace_original\":false,"
+                        + "\"text\":\":warning: This approval could not be applied here — open the approval form.\"}",
+                    JsonCompareMode.STRICT))
+            .andRespond(withSuccess());
+
+        when(jobResumeFacade.resumeJob(anyString(), eq(Map.of("approved", true)), eq("@jane")))
+            .thenThrow(new ApprovalInputException(List.of("'Amount' is required")));
+
+        String rawBody = rawBody(SlackInteractivityHandler.ACTION_APPROVE);
+        String timestamp = String.valueOf(Instant.now()
+            .getEpochSecond());
+
+        SlackInteractivityHandler.Result result = handler.handle(
+            rawBody, timestamp, sign(timestamp, rawBody, SIGNING_SECRET));
+
+        assertEquals(SlackInteractivityHandler.Result.HANDLED, result);
+
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    void testUnexpectedResumeFailureRepliesEphemerallyToTryAgain() throws Exception {
+        RestClient.Builder restClientBuilder = RestClient.builder();
+
+        MockRestServiceServer mockRestServiceServer = MockRestServiceServer.bindTo(restClientBuilder)
+            .build();
+
+        SlackInteractivityHandler handler = new SlackInteractivityHandler(
+            approvalResolutionLookup, connectionService, jobResumeFacade, null, restClientBuilder.build());
+
+        mockRestServiceServer.expect(requestTo("https://hooks.slack.invalid/actions/x"))
+            .andExpect(
+                content().json(
+                    "{\"response_type\":\"ephemeral\",\"replace_original\":false,"
+                        + "\"text\":\":warning: This approval could not be applied — try again in a moment.\"}",
+                    JsonCompareMode.STRICT))
+            .andRespond(withSuccess());
+
+        when(jobResumeFacade.resumeJob(anyString(), eq(Map.of("approved", true)), eq("@jane")))
+            .thenThrow(new IllegalStateException("database unavailable"));
+
+        String rawBody = rawBody(SlackInteractivityHandler.ACTION_APPROVE);
+        String timestamp = String.valueOf(Instant.now()
+            .getEpochSecond());
+
+        SlackInteractivityHandler.Result result = handler.handle(
+            rawBody, timestamp, sign(timestamp, rawBody, SIGNING_SECRET));
+
+        assertEquals(SlackInteractivityHandler.Result.HANDLED, result);
+
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    void testLostConcurrentResumeRaceSaysItWasAlreadyResolved() throws Exception {
+        RestClient.Builder restClientBuilder = RestClient.builder();
+
+        MockRestServiceServer mockRestServiceServer = MockRestServiceServer.bindTo(restClientBuilder)
+            .build();
+
+        SlackInteractivityHandler handler = new SlackInteractivityHandler(
+            approvalResolutionLookup, connectionService, jobResumeFacade, null, restClientBuilder.build());
+
+        when(jobResumeFacade.resumeJob(anyString(), eq(Map.of("approved", true)), eq("@jane")))
+            .thenThrow(new RuntimeException(new OptimisticLockingFailureException("stale job version")));
+        when(approvalResolutionLookup.describe(defaultResumeId())).thenReturn(Resolution.RESOLVED);
+
+        mockRestServiceServer.expect(requestTo("https://hooks.slack.invalid/actions/x"))
+            .andExpect(
+                content().json(
+                    JsonUtils.write(
+                        Map.of(
+                            "replace_original", true, "text",
+                            ":information_source: This approval was already resolved.")),
+                    JsonCompareMode.STRICT))
+            .andRespond(withSuccess());
+
+        String rawBody = rawBody(SlackInteractivityHandler.ACTION_APPROVE);
+        String timestamp = String.valueOf(Instant.now()
+            .getEpochSecond());
+
+        handler.handle(rawBody, timestamp, sign(timestamp, rawBody, SIGNING_SECRET));
 
         mockRestServiceServer.verify();
     }

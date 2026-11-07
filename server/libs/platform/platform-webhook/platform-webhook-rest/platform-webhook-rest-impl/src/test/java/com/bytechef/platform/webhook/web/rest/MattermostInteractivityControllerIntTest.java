@@ -33,6 +33,7 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.facade.ApprovalInputException;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
@@ -49,6 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -156,6 +158,54 @@ class MattermostInteractivityControllerIntTest {
                 content().json(
                     "{\"update\":{\"message\":\":information_source: This approval was already resolved.\"}}",
                     JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void testApprovalNeedingFormInputRepliesWithTheFormHint() throws Exception {
+        String signedToken = signedToken();
+
+        when(jobResumeFacade.resumeJob(eq(signedToken), eq(Map.of("approved", true))))
+            .thenThrow(new ApprovalInputException(List.of("'Amount' is required")));
+
+        perform(signedToken, true)
+            .andExpect(status().isOk())
+            .andExpect(content().json(
+                "{\"ephemeral_text\":\":warning: This approval could not be applied here — open the approval form.\"}",
+                JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void testLostConcurrentResumeRaceReportsTheResolution() throws Exception {
+        String signedToken = signedToken();
+
+        Job job = new Job(JOB_ID);
+
+        job.setStatus(Job.Status.COMPLETED);
+
+        when(jobService.fetchJob(JOB_ID)).thenReturn(Optional.of(job));
+        when(jobResumeFacade.resumeJob(eq(signedToken), eq(Map.of("approved", true))))
+            .thenThrow(new RuntimeException(new OptimisticLockingFailureException("stale job version")));
+
+        perform(signedToken, true)
+            .andExpect(status().isOk())
+            .andExpect(
+                content().json(
+                    "{\"update\":{\"message\":\":information_source: This approval was already resolved.\"}}",
+                    JsonCompareMode.STRICT));
+    }
+
+    @Test
+    void testUnexpectedResumeFailureAsksToTryAgain() throws Exception {
+        String signedToken = signedToken();
+
+        when(jobResumeFacade.resumeJob(eq(signedToken), eq(Map.of("approved", true))))
+            .thenThrow(new IllegalStateException("database unavailable"));
+
+        perform(signedToken, true)
+            .andExpect(status().isOk())
+            .andExpect(content().json(
+                "{\"ephemeral_text\":\":warning: This approval could not be applied — try again in a moment.\"}",
+                JsonCompareMode.STRICT));
     }
 
     @Test
