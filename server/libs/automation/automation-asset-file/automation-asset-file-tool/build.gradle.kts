@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":server:libs:ai:ai-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-agent-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
+    implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:automation:automation-asset-file:automation-asset-file-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
