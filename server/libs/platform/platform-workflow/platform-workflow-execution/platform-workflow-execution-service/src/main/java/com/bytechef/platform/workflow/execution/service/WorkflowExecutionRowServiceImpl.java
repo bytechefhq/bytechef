@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.execution.service;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO;
+import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionScopeDTO;
 import com.bytechef.platform.workflow.execution.repository.PrincipalJobRepository;
 import com.bytechef.platform.workflow.execution.repository.WorkflowExecutionRowRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -50,9 +51,20 @@ public class WorkflowExecutionRowServiceImpl implements WorkflowExecutionRowServ
         List<String> workflowIds, boolean onlyRootJobs, List<String> failedTriggerWorkflowExecutionIds,
         int pageNumber) {
 
+        return getWorkflowExecutionRows(
+            status, startDate, endDate,
+            List.of(new WorkflowExecutionScopeDTO(type, principalIds, workflowIds, failedTriggerWorkflowExecutionIds)),
+            onlyRootJobs, pageNumber);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<WorkflowExecutionRowDTO> getWorkflowExecutionRows(
+        Status status, Instant startDate, Instant endDate, List<WorkflowExecutionScopeDTO> workflowExecutionScopeDTOs,
+        boolean onlyRootJobs, int pageNumber) {
+
         return workflowExecutionRowRepository.findAll(
-            status == null ? null : status.ordinal(), startDate, endDate, principalIds, type.ordinal(), workflowIds,
-            onlyRootJobs, failedTriggerWorkflowExecutionIds,
+            status == null ? null : status.ordinal(), startDate, endDate, workflowExecutionScopeDTOs, onlyRootJobs,
             PageRequest.of(pageNumber, PrincipalJobRepository.DEFAULT_PAGE_SIZE));
     }
 }

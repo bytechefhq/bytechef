@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.execution.service;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO;
+import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionScopeDTO;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -36,4 +37,8 @@ public interface WorkflowExecutionRowService {
         Status status, Instant startDate, Instant endDate, List<Long> principalIds, PlatformType type,
         List<String> workflowIds, boolean onlyRootJobs, List<String> failedTriggerWorkflowExecutionIds,
         int pageNumber);
+
+    Page<WorkflowExecutionRowDTO> getWorkflowExecutionRows(
+        Status status, Instant startDate, Instant endDate, List<WorkflowExecutionScopeDTO> workflowExecutionScopeDTOs,
+        boolean onlyRootJobs, int pageNumber);
 }
