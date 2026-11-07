@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.ai.hub.chat.AiHubChatDeletedEvent;
 import com.bytechef.ee.ai.hub.config.AiHubPgVectorConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.observation.ObservationRegistry;
@@ -22,12 +23,20 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
+import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.Embedding;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingRequest;
 import org.springframework.ai.embedding.EmbeddingResponse;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.toolsearch.ToolReference;
@@ -140,7 +149,7 @@ class ToolSearchCatalogFeederIntTest {
     }
 
     @Test
-    void testSearchFindsCatalogAndConversationToolsButNotTheOtherMode() {
+    void testSearchFindsTheModeCatalogToolsButNotTheOtherMode() {
         newFeeder().populateGlobalTools(
             ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID,
             List.of(toolCallback("listComponents", "List every component")));
@@ -148,31 +157,106 @@ class ToolSearchCatalogFeederIntTest {
             ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID,
             List.of(toolCallback("searchComponents", "Search for a component")));
 
-        VectorToolIndex vectorToolIndex = new VectorToolIndex(pgVectorStore);
+        CatalogToolIndex catalogToolIndex = new CatalogToolIndex(
+            pgVectorStore, Set.of(ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID));
 
-        vectorToolIndex.indexTools(
-            "conversation-1",
-            List.of(ToolReference.builder()
-                .toolName("getAction")
-                .summary("Get a component action")
-                .build()));
-
-        MultiSessionToolIndex multiSessionToolIndex = new MultiSessionToolIndex(
-            vectorToolIndex, pgVectorStore, Set.of(ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID));
-
-        List<String> toolNames = multiSessionToolIndex.search(
+        List<String> toolNames = catalogToolIndex.search(
             new ToolSearchRequest("conversation-1", "component", 5, null))
             .toolReferences()
             .stream()
             .map(ToolReference::toolName)
             .toList();
 
-        assertThat(toolNames).containsExactlyInAnyOrder("listComponents", "getAction");
+        assertThat(toolNames).containsExactly("listComponents");
+    }
+
+    @Test
+    void testChangedEmbeddingModelReindexesAnUnchangedCatalog() {
+        List<ToolCallback> toolCallbacks = List.of(toolCallback("listComponents", "List every component"));
+
+        newFeeder().populateGlobalTools(ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID, toolCallbacks);
+
+        List<String> idsBefore = rowIds(ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID);
+
+        newFeeder("OLLAMA:nomic-embed-text:4").populateGlobalTools(
+            ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID, toolCallbacks);
+
+        assertThat(rowIds(ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID)).hasSize(1)
+            .doesNotContainAnyElementsOf(idsBefore);
+    }
+
+    @Test
+    void testATurnWritesNoRowsForItsConversation() {
+        ToolSearchToolCallingAdvisor advisor = ToolSearchAdvisorConfiguration.buildModeAdvisor(
+            pgVectorStore, ObservationRegistry.NOOP,
+            new AiHubGlobalToolCatalog(
+                ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID,
+                List.of(toolCallback("listComponents", "List every component"))),
+            null, new ToolSearchCatalogWarmup(null, List.of()), null);
+
+        assertThat(advisor).isInstanceOf(PinnedToolSearchToolCallingAdvisor.class);
+
+        ChatClientRequest chatClientRequest = ChatClientRequest.builder()
+            .prompt(
+                new Prompt(
+                    List.of(new SystemMessage("system"), new UserMessage("hi")),
+                    ToolCallingChatOptions.builder()
+                        .toolCallbacks(
+                            toolCallback("listProjects", "List every project"),
+                            toolCallback("getWorkflow", "Get a workflow"))
+                        .build()))
+            .context(ChatMemory.CONVERSATION_ID, "conversation-1")
+            .build();
+
+        ((PinnedToolSearchToolCallingAdvisor) advisor).doInitializeLoop(
+            chatClientRequest, mock(CallAdvisorChain.class));
+
+        assertThat(rowCount("conversation-1")).isZero();
+        assertThat(rowCount(ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID)).isZero();
+    }
+
+    @Test
+    void testDeletingAChatClearsTheRowsOfItsSession() {
+        new VectorToolIndex(pgVectorStore).indexTools(
+            "conversation-1",
+            List.of(
+                ToolReference.builder()
+                    .toolName("getAction")
+                    .summary("Get a component action")
+                    .build()));
+        new VectorToolIndex(pgVectorStore).indexTools(
+            "conversation-2",
+            List.of(
+                ToolReference.builder()
+                    .toolName("getAction")
+                    .summary("Get a component action")
+                    .build()));
+        newFeeder().populateGlobalTools(
+            ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID,
+            List.of(toolCallback("listComponents", "List every component")));
+
+        ToolSearchToolCallingAdvisor advisor = ToolSearchAdvisorConfiguration.buildModeAdvisor(
+            pgVectorStore, ObservationRegistry.NOOP,
+            new AiHubGlobalToolCatalog(
+                ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID,
+                List.of(toolCallback("listComponents", "List every component"))),
+            null, new ToolSearchCatalogWarmup(null, List.of()), null);
+
+        new ToolSearchSessionEvictor(() -> List.of(advisor))
+            .onChatDeleted(new AiHubChatDeletedEvent(1L, "conversation-1"));
+
+        assertThat(rowCount("conversation-1")).isZero();
+        assertThat(rowCount("conversation-2")).isEqualTo(1);
+        assertThat(rowCount(ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID)).isEqualTo(1);
     }
 
     private static ToolSearchCatalogFeeder newFeeder() {
+        return newFeeder("OPENAI:text-embedding-3-small:4");
+    }
+
+    private static ToolSearchCatalogFeeder newFeeder(String embeddingModelIdentity) {
         return new ToolSearchCatalogFeeder(
-            new VectorToolIndex(pgVectorStore), jdbcTemplate, properties.getSchemaName(),
+            new VectorToolIndex(pgVectorStore), embeddingModelIdentity, jdbcTemplate, properties.getSchemaName(),
             AiHubPgVectorConfiguration.vectorTableName(properties));
     }
 

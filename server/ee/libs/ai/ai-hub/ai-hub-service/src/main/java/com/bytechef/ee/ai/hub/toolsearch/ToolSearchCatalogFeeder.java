@@ -43,6 +43,7 @@ public class ToolSearchCatalogFeeder {
     private static final Logger log = LoggerFactory.getLogger(ToolSearchCatalogFeeder.class);
 
     private final VectorToolIndex vectorToolIndex;
+    private final String embeddingModelIdentity;
     private final JdbcTemplate pgVectorJdbcTemplate;
     private final String qualifiedMetaTableName;
     private final String qualifiedVectorTableName;
@@ -51,10 +52,11 @@ public class ToolSearchCatalogFeeder {
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ToolSearchCatalogFeeder(
-        VectorToolIndex vectorToolIndex, JdbcTemplate pgVectorJdbcTemplate, String schemaName,
-        String vectorTableName) {
+        VectorToolIndex vectorToolIndex, String embeddingModelIdentity, JdbcTemplate pgVectorJdbcTemplate,
+        String schemaName, String vectorTableName) {
 
         this.vectorToolIndex = vectorToolIndex;
+        this.embeddingModelIdentity = embeddingModelIdentity;
         this.pgVectorJdbcTemplate = pgVectorJdbcTemplate;
         this.qualifiedVectorTableName = schemaName + "." + vectorTableName;
         this.qualifiedMetaTableName = schemaName + "." + META_TABLE_NAME;
@@ -75,7 +77,7 @@ public class ToolSearchCatalogFeeder {
             entries.add(new CatalogEntry(toolDefinition.name(), summary));
         }
 
-        String currentHash = computeCatalogHash(entries);
+        String currentHash = computeCatalogHash(embeddingModelIdentity, entries);
 
         ensureMetaTable();
 
@@ -134,13 +136,16 @@ public class ToolSearchCatalogFeeder {
     record CatalogEntry(String toolName, String summary) {
     }
 
-    static String computeCatalogHash(List<CatalogEntry> entries) {
+    static String computeCatalogHash(String embeddingModelIdentity, List<CatalogEntry> entries) {
         List<CatalogEntry> sorted = new ArrayList<>(entries);
 
         sorted.sort(Comparator.comparing(CatalogEntry::toolName));
 
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+            digest.update(embeddingModelIdentity.getBytes(StandardCharsets.UTF_8));
+            digest.update((byte) 1);
 
             for (CatalogEntry entry : sorted) {
                 digest.update(entry.toolName()

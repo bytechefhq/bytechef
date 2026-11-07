@@ -16,18 +16,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.agui.spring.ai.TurnEndingToolCallingManager;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.ai.hub.chat.AiHubChatDeletedEvent;
 import io.micrometer.observation.ObservationRegistry;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
-import org.springframework.ai.embedding.BatchingStrategy;
-import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
-import org.springframework.ai.tool.toolsearch.index.vectorstore.VectorToolIndex;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -48,8 +46,8 @@ class ToolSearchAdvisorConfigurationTest {
             ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID, List.of(toolCallback("listComponents")));
 
         assertThat(
-            ToolSearchAdvisorConfiguration.buildModeAdvisor(
-                null, null, ObservationRegistry.NOOP, catalog, null, warmup, null))
+            ToolSearchAdvisorConfiguration.buildModeAdvisor(null, ObservationRegistry.NOOP, catalog, null, warmup,
+                null))
                     .isNull();
     }
 
@@ -57,8 +55,7 @@ class ToolSearchAdvisorConfigurationTest {
     void testAdvisorIsAbsentWithoutAModeCatalog() {
         assertThat(
             ToolSearchAdvisorConfiguration.buildModeAdvisor(
-                mock(VectorToolIndex.class), mock(VectorStore.class), ObservationRegistry.NOOP, null, null, warmup,
-                null))
+                mock(VectorStore.class), ObservationRegistry.NOOP, null, null, warmup, null))
                     .isNull();
     }
 
@@ -70,8 +67,7 @@ class ToolSearchAdvisorConfigurationTest {
             ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID, List.of(catalogTool));
 
         ToolSearchToolCallingAdvisor advisor = ToolSearchAdvisorConfiguration.buildModeAdvisor(
-            mock(VectorToolIndex.class), mock(VectorStore.class), ObservationRegistry.NOOP, catalog, null, warmup,
-            null);
+            mock(VectorStore.class), ObservationRegistry.NOOP, catalog, null, warmup, null);
 
         assertThat(advisor).isInstanceOf(PinnedToolSearchToolCallingAdvisor.class);
 
@@ -101,11 +97,9 @@ class ToolSearchAdvisorConfigurationTest {
     }
 
     @Test
-    void testFeederIsAbsentWithoutTheCopilotEmbeddingModel() {
+    void testFeederIsAbsentWithoutTheToolSearchVectorStore() {
         ToolSearchCatalogFeeder feeder = configuration.toolSearchCatalogFeeder(
-            provider(mock(VectorStore.class)), provider(mock(JdbcTemplate.class)), provider(null),
-            new PgVectorStoreProperties(), provider(ObservationRegistry.NOOP),
-            provider((VectorStoreObservationConvention) null), provider(mock(BatchingStrategy.class)));
+            provider(null), provider(mock(JdbcTemplate.class)), new PgVectorStoreProperties(), provider(null));
 
         assertThat(feeder).isNull();
     }
@@ -113,11 +107,46 @@ class ToolSearchAdvisorConfigurationTest {
     @Test
     void testFeederIsBuiltWhenEverythingIsPresent() {
         ToolSearchCatalogFeeder feeder = configuration.toolSearchCatalogFeeder(
-            provider(mock(VectorStore.class)), provider(mock(JdbcTemplate.class)),
-            provider(mock(EmbeddingModel.class)), new PgVectorStoreProperties(), provider(ObservationRegistry.NOOP),
-            provider((VectorStoreObservationConvention) null), provider(mock(BatchingStrategy.class)));
+            provider(mock(VectorStore.class)), provider(mock(JdbcTemplate.class)), new PgVectorStoreProperties(),
+            provider(null));
 
         assertThat(feeder).isNotNull();
+    }
+
+    @Test
+    void testEmbeddingModelIdentityNamesTheCopilotProviderAndModel() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        ai.getCopilot()
+            .getEmbedding()
+            .setProvider(ApplicationProperties.Ai.Copilot.Embedding.Provider.OLLAMA);
+        ai.getProvider()
+            .getEmbedding()
+            .getOllama()
+            .getOptions()
+            .setModel("nomic-embed-text");
+
+        PgVectorStoreProperties properties = new PgVectorStoreProperties();
+
+        properties.setDimensions(768);
+
+        assertThat(ToolSearchAdvisorConfiguration.embeddingModelIdentity(applicationProperties, properties))
+            .isEqualTo("OLLAMA:nomic-embed-text:768");
+    }
+
+    @Test
+    void testSessionEvictorClearsTheDeletedChatsSessionOnEveryAdvisor() {
+        ToolSearchToolCallingAdvisor askAdvisor = mock(ToolSearchToolCallingAdvisor.class);
+        ToolSearchToolCallingAdvisor buildAdvisor = mock(ToolSearchToolCallingAdvisor.class);
+
+        ToolSearchSessionEvictor evictor = new ToolSearchSessionEvictor(() -> List.of(askAdvisor, buildAdvisor));
+
+        evictor.onChatDeleted(new AiHubChatDeletedEvent(1L, "thread-1"));
+
+        verify(askAdvisor).evictSession("thread-1");
+        verify(buildAdvisor).evictSession("thread-1");
     }
 
     @SuppressWarnings("unchecked")
