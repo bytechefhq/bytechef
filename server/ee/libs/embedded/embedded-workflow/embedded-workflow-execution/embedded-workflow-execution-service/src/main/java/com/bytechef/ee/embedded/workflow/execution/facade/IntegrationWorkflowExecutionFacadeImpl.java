@@ -59,6 +59,7 @@ import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionChildrenPageDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
+import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionScopeDTO;
 import com.bytechef.platform.workflow.execution.facade.LazyTaskExecutionTreeBuilder;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
@@ -297,33 +298,68 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         Long integrationId, Long integrationInstanceConfigurationId, Long connectedUserId, String workflowId,
         int pageNumber) {
 
-        List<String> workflowIds = resolveWorkflowIds(workflowId, integrationId);
+        WorkflowExecutionScopeDTO workflowExecutionScopeDTO = getWorkflowExecutionScope(
+            environmentId, integrationId, integrationInstanceConfigurationId, connectedUserId, workflowId);
 
-        if (workflowIds.isEmpty()) {
+        if (workflowExecutionScopeDTO == null) {
             return Page.empty();
-        } else {
-            List<Long> integrationInstanceIds = resolveIntegrationInstanceIds(
-                environmentId, integrationInstanceConfigurationId, connectedUserId);
-
-            if (integrationInstanceIds.isEmpty()) {
-                return Page.empty();
-            } else {
-                Page<Long> jobIdsPage = principalJobService.getJobIds(
-                    jobStatus, jobStartDate, jobEndDate, integrationInstanceIds, PlatformType.EMBEDDED, workflowIds,
-                    true, pageNumber);
-
-                return toWorkflowExecutionsPage(jobIdsPage, integrationId);
-            }
         }
-    }
 
-    private Page<WorkflowExecutionDTO> toWorkflowExecutionsPage(Page<Long> jobIdsPage, @Nullable Long integrationId) {
+        Page<Long> jobIdsPage = principalJobService.getJobIds(
+            jobStatus, jobStartDate, jobEndDate, workflowExecutionScopeDTO.principalIds(), PlatformType.EMBEDDED,
+            workflowExecutionScopeDTO.workflowIds(), true, pageNumber);
+
         List<Long> jobIds = jobIdsPage.getContent();
 
         if (jobIds.isEmpty()) {
             return Page.empty();
         }
 
+        return new PageImpl<>(
+            toWorkflowExecutionDTOs(jobIds, integrationId), jobIdsPage.getPageable(), jobIdsPage.getTotalElements());
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public List<WorkflowExecutionDTO> getWorkflowExecutions(List<Long> jobIds) {
+        if (jobIds.isEmpty()) {
+            return List.of();
+        }
+
+        return toWorkflowExecutionDTOs(jobIds, null);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public @Nullable WorkflowExecutionScopeDTO getWorkflowExecutionScope(
+        @Nullable Long environmentId, @Nullable Long connectedUserId) {
+
+        return getWorkflowExecutionScope(environmentId, null, null, connectedUserId, null);
+    }
+
+    private @Nullable WorkflowExecutionScopeDTO getWorkflowExecutionScope(
+        @Nullable Long environmentId, @Nullable Long integrationId, @Nullable Long integrationInstanceConfigurationId,
+        @Nullable Long connectedUserId, @Nullable String workflowId) {
+
+        List<String> workflowIds = resolveWorkflowIds(workflowId, integrationId);
+
+        if (workflowIds.isEmpty()) {
+            return null;
+        }
+
+        List<Long> integrationInstanceIds = resolveIntegrationInstanceIds(
+            environmentId, integrationInstanceConfigurationId, connectedUserId);
+
+        if (integrationInstanceIds.isEmpty()) {
+            return null;
+        }
+
+        return new WorkflowExecutionScopeDTO(PlatformType.EMBEDDED, integrationInstanceIds, workflowIds, List.of());
+    }
+
+    private List<WorkflowExecutionDTO> toWorkflowExecutionDTOs(List<Long> jobIds, @Nullable Long integrationId) {
         List<Job> jobs = jobService.getJobs(jobIds);
 
         Map<Long, Job> jobMap = jobs.stream()
@@ -392,11 +428,9 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
             }
         }
 
-        List<WorkflowExecutionDTO> workflowExecutionDTOs = buildWorkflowExecutionDTOs(
+        return buildWorkflowExecutionDTOs(
             jobIds, jobMap, workflows, workflowIntegrationMap, jobToPrincipalMap, integrationInstanceMap,
             integrationInstanceConfigurationMap, triggerExecutionByJobIdMap);
-
-        return new PageImpl<>(workflowExecutionDTOs, jobIdsPage.getPageable(), jobIdsPage.getTotalElements());
     }
 
     /**
