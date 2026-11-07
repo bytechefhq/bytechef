@@ -152,7 +152,7 @@ class IntegrationToolsTest {
 
     private static IntegrationDTO dto(Long id, String name, String description, String componentName) {
         return new IntegrationDTO(
-            null, componentName, 1, null, Instant.now(), description, null, null, id, List.of(), List.of(), null,
-            Instant.now(), null, Status.DRAFT, null, false, name, null, List.of(), null, 1);
+            null, false, null, componentName, 1, null, Instant.now(), description, null, null, id, List.of(),
+            List.of(), null, Instant.now(), null, Status.DRAFT, null, false, name, null, List.of(), null, 1);
     }
 }
