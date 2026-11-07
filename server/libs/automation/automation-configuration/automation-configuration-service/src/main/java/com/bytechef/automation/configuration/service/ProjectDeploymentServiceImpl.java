@@ -18,10 +18,13 @@ package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerReference;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.domain.Environment;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
@@ -37,10 +40,13 @@ import org.springframework.util.Assert;
 public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
 
     private final ProjectDeploymentRepository projectDeploymentRepository;
+    private final ProjectOwnershipService projectOwnershipService;
 
-    public ProjectDeploymentServiceImpl(ProjectDeploymentRepository projectDeploymentRepository) {
+    public ProjectDeploymentServiceImpl(
+        ProjectDeploymentRepository projectDeploymentRepository, ProjectOwnershipService projectOwnershipService) {
 
         this.projectDeploymentRepository = projectDeploymentRepository;
+        this.projectOwnershipService = projectOwnershipService;
     }
 
     @Override
@@ -121,6 +127,14 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
         return projectDeploymentRepository.findAllProjectDeployments(
             embedded, environment == null ? null : environment.ordinal(), projectId, tagId,
             workspaceId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, ProjectDeploymentOwnerReference> getProjectDeploymentOwnerReferences(
+        Collection<Long> projectDeploymentIds) {
+
+        return projectOwnershipService.getProjectDeploymentOwnerReferences(projectDeploymentIds);
     }
 
     @Override

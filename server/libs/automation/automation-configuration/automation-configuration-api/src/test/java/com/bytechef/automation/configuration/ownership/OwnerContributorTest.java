@@ -55,6 +55,37 @@ class OwnerContributorTest {
     }
 
     @Test
+    void testProjectDeploymentOwnerContributorFormatsTheColumnIntoTheOwnerNameTemplate() {
+        ProjectDeploymentOwnerContributor projectDeploymentOwnerContributor = ProjectDeploymentOwnerContributor.of(
+            ProjectDeploymentOwner.MCP_SERVER,
+            "EXISTS (SELECT 1 FROM mcp_project WHERE mcp_project.project_deployment_id = %1$s)",
+            "(SELECT mcp_server.name FROM mcp_project JOIN mcp_server ON mcp_server.id = mcp_project.mcp_server_id " +
+                "WHERE mcp_project.project_deployment_id = %1$s)");
+
+        assertThat(projectDeploymentOwnerContributor.getProjectDeploymentOwnerNameExpression("project_deployment.id"))
+            .isEqualTo("(SELECT mcp_server.name FROM mcp_project JOIN mcp_server ON mcp_server.id = " +
+                "mcp_project.mcp_server_id WHERE mcp_project.project_deployment_id = project_deployment.id)");
+    }
+
+    @Test
+    void testProjectDeploymentOwnerContributorWithoutAnOwnerNameTemplateHasNoOwnerNameExpression() {
+        ProjectDeploymentOwnerContributor projectDeploymentOwnerContributor = ProjectDeploymentOwnerContributor.of(
+            ProjectDeploymentOwner.EMBEDDED, "%1$s = 1");
+
+        assertThat(projectDeploymentOwnerContributor.getProjectDeploymentOwnerNameExpression("project_deployment.id"))
+            .isNull();
+    }
+
+    @Test
+    void testFactoryRejectsAnOwnerNameTemplateWithoutTheIdColumn() {
+        assertThatThrownBy(
+            () -> ProjectDeploymentOwnerContributor.of(
+                ProjectDeploymentOwner.MCP_SERVER, "%1$s = 1", "(SELECT mcp_server.name FROM mcp_server)"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("%1$s");
+    }
+
+    @Test
     void testFactoriesRejectAPositionalPlaceholder() {
         assertThatThrownBy(
             () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "%1$s = ?"))

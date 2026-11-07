@@ -35,6 +35,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.ownership.OwnerContributorMissingException;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerReference;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
@@ -48,6 +49,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.sql.DataSource;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -442,6 +444,58 @@ public class ProjectOwnershipServiceIntTest {
                 .isEmpty();
         assertThat(projectOwnershipService.getOwnedProjectDeploymentIds(List.of(), ProjectDeploymentOwner.EMBEDDED))
             .isEmpty();
+    }
+
+    @Test
+    public void testGetProjectDeploymentOwnerReferencesReturnsTheOwnerOfEachClaimedDeployment() {
+        long projectId = saveProject("p1");
+
+        long a2aServerProjectDeploymentId = saveDeployment(projectId, "d1");
+        long mcpServerProjectDeploymentId = saveDeployment(projectId, "d2");
+        long plainProjectDeploymentId = saveDeployment(projectId, "d3");
+
+        testOwnerContributors.addDeploymentId(ProjectDeploymentOwner.A2A_SERVER, a2aServerProjectDeploymentId);
+        testOwnerContributors.addDeploymentId(ProjectDeploymentOwner.MCP_SERVER, mcpServerProjectDeploymentId);
+
+        assertThat(
+            projectOwnershipService.getProjectDeploymentOwnerReferences(
+                List.of(a2aServerProjectDeploymentId, mcpServerProjectDeploymentId, plainProjectDeploymentId)))
+                    .isEqualTo(
+                        Map.of(
+                            a2aServerProjectDeploymentId,
+                            new ProjectDeploymentOwnerReference(ProjectDeploymentOwner.A2A_SERVER, null),
+                            mcpServerProjectDeploymentId,
+                            new ProjectDeploymentOwnerReference(ProjectDeploymentOwner.MCP_SERVER, null)));
+    }
+
+    @Test
+    public void testGetProjectDeploymentOwnerReferencesResolvesTheOwnerName() {
+        long projectId = saveProject("p1");
+
+        long ownedProjectDeploymentId = saveDeployment(projectId, "owner name");
+        long plainProjectDeploymentId = saveDeployment(projectId, "plain");
+
+        ProjectOwnershipService namingService = new ProjectOwnershipServiceImpl(
+            jdbcClient,
+            List.of(
+                ProjectDeploymentOwnerContributor.of(
+                    ProjectDeploymentOwner.MCP_SERVER, "%1$s = " + ownedProjectDeploymentId,
+                    "(SELECT owner_deployment.name FROM project_deployment owner_deployment WHERE " +
+                        "owner_deployment.id = %1$s)")),
+            List.of());
+
+        assertThat(
+            namingService.getProjectDeploymentOwnerReferences(
+                List.of(ownedProjectDeploymentId, plainProjectDeploymentId)))
+                    .isEqualTo(
+                        Map.of(
+                            ownedProjectDeploymentId,
+                            new ProjectDeploymentOwnerReference(ProjectDeploymentOwner.MCP_SERVER, "owner name")));
+    }
+
+    @Test
+    public void testGetProjectDeploymentOwnerReferencesWithEmptyIdsReturnsEmpty() {
+        assertThat(projectOwnershipService.getProjectDeploymentOwnerReferences(List.of())).isEmpty();
     }
 
     @Test

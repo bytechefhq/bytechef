@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.ownership;
 
 import java.util.function.Supplier;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -25,27 +26,39 @@ public final class ProjectDeploymentOwnerContributor {
 
     private final ProjectDeploymentOwner projectDeploymentOwner;
     private final Supplier<OwnerConditionTemplate> ownerConditionTemplateSupplier;
+    private final @Nullable OwnerConditionTemplate ownerNameTemplate;
 
     private ProjectDeploymentOwnerContributor(
         ProjectDeploymentOwner projectDeploymentOwner,
-        Supplier<OwnerConditionTemplate> ownerConditionTemplateSupplier) {
+        Supplier<OwnerConditionTemplate> ownerConditionTemplateSupplier,
+        @Nullable OwnerConditionTemplate ownerNameTemplate) {
 
         this.projectDeploymentOwner = projectDeploymentOwner;
         this.ownerConditionTemplateSupplier = ownerConditionTemplateSupplier;
+        this.ownerNameTemplate = ownerNameTemplate;
     }
 
     public static ProjectDeploymentOwnerContributor
         of(ProjectDeploymentOwner projectDeploymentOwner, String conditionTemplate) {
         OwnerConditionTemplate ownerConditionTemplate = new OwnerConditionTemplate(conditionTemplate);
 
-        return new ProjectDeploymentOwnerContributor(projectDeploymentOwner, () -> ownerConditionTemplate);
+        return new ProjectDeploymentOwnerContributor(projectDeploymentOwner, () -> ownerConditionTemplate, null);
+    }
+
+    public static ProjectDeploymentOwnerContributor of(
+        ProjectDeploymentOwner projectDeploymentOwner, String conditionTemplate, String ownerNameTemplate) {
+
+        OwnerConditionTemplate ownerConditionTemplate = new OwnerConditionTemplate(conditionTemplate);
+
+        return new ProjectDeploymentOwnerContributor(
+            projectDeploymentOwner, () -> ownerConditionTemplate, new OwnerConditionTemplate(ownerNameTemplate));
     }
 
     public static ProjectDeploymentOwnerContributor of(
         ProjectDeploymentOwner projectDeploymentOwner, Supplier<String> conditionTemplateSupplier) {
 
         return new ProjectDeploymentOwnerContributor(
-            projectDeploymentOwner, () -> new OwnerConditionTemplate(conditionTemplateSupplier.get()));
+            projectDeploymentOwner, () -> new OwnerConditionTemplate(conditionTemplateSupplier.get()), null);
     }
 
     public ProjectDeploymentOwner getProjectDeploymentOwner() {
@@ -56,5 +69,13 @@ public final class ProjectDeploymentOwnerContributor {
         OwnerConditionTemplate ownerConditionTemplate = ownerConditionTemplateSupplier.get();
 
         return ownerConditionTemplate.format(projectDeploymentIdColumn);
+    }
+
+    public @Nullable String getProjectDeploymentOwnerNameExpression(String projectDeploymentIdColumn) {
+        if (ownerNameTemplate == null) {
+            return null;
+        }
+
+        return ownerNameTemplate.format(projectDeploymentIdColumn);
     }
 }

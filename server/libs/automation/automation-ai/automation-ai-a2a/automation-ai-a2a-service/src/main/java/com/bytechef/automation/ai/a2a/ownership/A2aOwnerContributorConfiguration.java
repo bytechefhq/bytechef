@@ -29,10 +29,15 @@ public class A2aOwnerContributorConfiguration {
 
     private static final String A2A_SERVER_DEPLOYMENT_CLAIM_CONDITION =
         "EXISTS (SELECT 1 FROM a2a_project WHERE a2a_project.project_deployment_id = %1$s)";
+    private static final String A2A_SERVER_NAME =
+        "(SELECT owner_a2a_server.name FROM a2a_project owner_a2a_project JOIN a2a_server owner_a2a_server ON " +
+            "owner_a2a_server.id = owner_a2a_project.a2a_server_id WHERE owner_a2a_project.project_deployment_id = %1$s "
+            +
+            "ORDER BY owner_a2a_server.id LIMIT 1)";
 
     @Bean
     ProjectDeploymentOwnerContributor a2aServerProjectDeploymentOwnerContributor() {
         return ProjectDeploymentOwnerContributor.of(
-            ProjectDeploymentOwner.A2A_SERVER, A2A_SERVER_DEPLOYMENT_CLAIM_CONDITION);
+            ProjectDeploymentOwner.A2A_SERVER, A2A_SERVER_DEPLOYMENT_CLAIM_CONDITION, A2A_SERVER_NAME);
     }
 }

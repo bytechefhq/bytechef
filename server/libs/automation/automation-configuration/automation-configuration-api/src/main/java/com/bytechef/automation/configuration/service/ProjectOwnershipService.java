@@ -17,8 +17,10 @@
 package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerReference;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -38,4 +40,7 @@ public interface ProjectOwnershipService {
         Collection<Long> projectDeploymentIds, ProjectDeploymentOwner projectDeploymentOwner);
 
     Set<Long> getOwnedProjectIds(Collection<Long> projectIds, Set<ProjectOwner> projectOwners);
+
+    Map<Long, ProjectDeploymentOwnerReference> getProjectDeploymentOwnerReferences(
+        Collection<Long> projectDeploymentIds);
 }

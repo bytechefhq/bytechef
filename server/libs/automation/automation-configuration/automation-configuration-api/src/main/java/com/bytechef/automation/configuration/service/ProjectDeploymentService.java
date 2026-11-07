@@ -18,8 +18,11 @@ package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerReference;
 import com.bytechef.platform.configuration.domain.Environment;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
@@ -54,6 +57,9 @@ public interface ProjectDeploymentService {
 
     List<Long> getOwnedProjectDeploymentIds(
         ProjectDeploymentOwner projectDeploymentOwner, @Nullable Environment environment, long workspaceId);
+
+    Map<Long, ProjectDeploymentOwnerReference> getProjectDeploymentOwnerReferences(
+        Collection<Long> projectDeploymentIds);
 
     boolean isProjectDeploymentEnabled(long projectDeploymentId);
 
