@@ -1,5 +1,6 @@
 import Badge, {type BadgeStyleType} from '@/components/Badge/Badge';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
 import {
     EXECUTIONS_TABLE_CELL_CLASS_NAME,
@@ -12,6 +13,7 @@ import {
     PINNED_STRIPED_CELL_CLASS_NAME,
 } from '@/shared/components/workflow-executions/workflowExecutionsTableClassNames';
 import {ExternalInvocationLogsQuery} from '@/shared/middleware/graphql';
+import {type LucideIcon, PuzzleIcon, SparklesIcon, WorkflowIcon, ZapIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 import ExternalInvocationsDropdownMenu from './ExternalInvocationsDropdownMenu';
@@ -37,14 +39,19 @@ const SURFACE_LABELS: Record<string, string> = {
     MCP_EMBEDDED: 'Embedded MCP',
 };
 
-const KIND_LABELS: Record<string, string> = {
-    COMPONENT: 'Component tool',
-    WORKFLOW: 'Workflow tool',
+interface InvocationTypeI {
+    icon: LucideIcon;
+    label: string;
+}
+
+const KIND_TYPES: Record<string, InvocationTypeI> = {
+    COMPONENT: {icon: PuzzleIcon, label: 'Component tool'},
+    WORKFLOW: {icon: WorkflowIcon, label: 'Workflow tool'},
 };
 
-const SURFACE_TYPE_LABELS: Record<string, string> = {
-    A2A: 'Skill',
-    EMBEDDED_API_ACTION: 'Action',
+const SURFACE_TYPES: Record<string, InvocationTypeI> = {
+    A2A: {icon: SparklesIcon, label: 'Skill'},
+    EMBEDDED_API_ACTION: {icon: ZapIcon, label: 'Action'},
 };
 
 const OUTCOME_STYLE_TYPES: Record<string, BadgeStyleType> = {
@@ -83,10 +90,27 @@ const sourceLabel = (externalInvocationLog: ExternalInvocationLogItemType): stri
         : componentName;
 };
 
-const typeLabel = (externalInvocationLog: ExternalInvocationLogItemType): string =>
-    SURFACE_TYPE_LABELS[externalInvocationLog.surface] ||
-    KIND_LABELS[externalInvocationLog.kind] ||
-    externalInvocationLog.kind;
+const InvocationTypeCell = ({externalInvocationLog}: {externalInvocationLog: ExternalInvocationLogItemType}) => {
+    const invocationType = SURFACE_TYPES[externalInvocationLog.surface] || KIND_TYPES[externalInvocationLog.kind];
+
+    if (!invocationType) {
+        return <>{externalInvocationLog.kind}</>;
+    }
+
+    const Icon = invocationType.icon;
+
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <span aria-label={invocationType.label} className="inline-flex align-middle" role="img">
+                    <Icon className="size-4 text-content-neutral-secondary" />
+                </span>
+            </TooltipTrigger>
+
+            <TooltipContent>{invocationType.label}</TooltipContent>
+        </Tooltip>
+    );
+};
 
 const formatCreatedDate = (createdDate: unknown): string => {
     if (createdDate == null) {
@@ -110,7 +134,7 @@ const ExternalInvocationsTable = ({
 
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Tool</TableHead>
 
-                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Type</TableHead>
+                <TableHead className={twMerge(EXECUTIONS_TABLE_HEAD_CLASS_NAME, 'text-center')}>Type</TableHead>
 
                 {showSurface && <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Surface</TableHead>}
 
@@ -157,8 +181,8 @@ const ExternalInvocationsTable = ({
                             {externalInvocationLog.toolName || '—'}
                         </TableCell>
 
-                        <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                            {typeLabel(externalInvocationLog)}
+                        <TableCell className={twMerge(EXECUTIONS_TABLE_CELL_CLASS_NAME, 'text-center')}>
+                            <InvocationTypeCell externalInvocationLog={externalInvocationLog} />
                         </TableCell>
 
                         {showSurface && (
