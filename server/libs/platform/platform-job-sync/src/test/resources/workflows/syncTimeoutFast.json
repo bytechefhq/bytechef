@@ -1,0 +1,9 @@
+{
+  "label": "Sync Timeout Fast",
+  "tasks": [ {
+    "name": "task1",
+    "label": "Produce a value",
+    "type": "test/v1/produce",
+    "parameters": { }
+  } ]
+}

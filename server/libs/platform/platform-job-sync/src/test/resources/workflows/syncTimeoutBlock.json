@@ -1,0 +1,9 @@
+{
+  "label": "Sync Timeout Block",
+  "tasks": [ {
+    "name": "task1",
+    "label": "Block until released",
+    "type": "test/v1/block",
+    "parameters": { }
+  } ]
+}
