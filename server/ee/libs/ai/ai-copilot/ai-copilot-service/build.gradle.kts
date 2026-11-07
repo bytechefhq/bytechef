@@ -23,5 +23,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation(project(":spring-ai:spring-ag-ui:integrations:spring-ai"))
+    testImplementation(project(":spring-ai:spring-ag-ui:packages:server"))
+    testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-guardrails:platform-ai-guardrails-service"))
+    testImplementation(project(":server:ee:libs:platform:platform-ai:platform-ai-workspace"))
     testImplementation(project(":server:libs:test:test-support"))
 }
