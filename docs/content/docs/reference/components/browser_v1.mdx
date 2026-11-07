@@ -1,0 +1,104 @@
+---
+title: "Browser"
+description: "Triggers that surface in a customer's browser, including voice sessions answered by a voice agent."
+---
+
+
+Categories: Communication
+
+
+Type: browser/v1
+
+<hr />
+
+
+
+
+
+## Triggers
+
+
+### Browser Voice Session
+Name: voiceSession
+
+`Triggers when a browser opens a voice session against this workflow. The Voice Agent cluster element answers the caller for the length of the session; the workflow's tasks run afterwards with the session transcript as the trigger output.`
+
+Type: WEBSOCKET
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sampleRate | Audio Sample Rate | STRING <details> <summary> Options </summary> <span>16000</span>, <span>24000</span> </details> | PCM16 sample rate for both inbound mic audio and outbound TTS playback. | false |
+| echoCancellation | Echo Cancellation | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Request the browser apply built-in echo cancellation to the mic stream. | false |
+| noiseSuppression | Noise Suppression | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Request the browser apply built-in noise suppression to the mic stream. | false |
+| sessionLimitSeconds | Session limit (seconds) | INTEGER | Maximum duration of a voice session. 0 uses the server's maximum session duration (30 minutes). | false |
+| silenceTimeoutSeconds | Silence timeout (seconds) | INTEGER | End the session after this many seconds without audio from the caller. 0 disables the timeout. | false |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| sessionId | STRING | ByteChef-issued session id |
+| startedAt | STRING | ISO-8601 session start timestamp |
+| durationSeconds | INTEGER | Session length in seconds |
+| endReason | STRING | client_closed, session_limit, silence_timeout, provider_error or server_shutdown |
+| transcript | ARRAY <details> <summary> Items </summary> [&#123;STRING\(role), STRING\(text), STRING\(at)&#125;] </details> |  |
+| toolCalls | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), &#123;&#125;\(arguments), STRING\(result), STRING\(at)&#125;] </details> |  |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "Browser Voice Session",
+  "name" : "voiceSession",
+  "parameters" : {
+    "sampleRate" : "",
+    "echoCancellation" : false,
+    "noiseSuppression" : false,
+    "sessionLimitSeconds" : 1,
+    "silenceTimeoutSeconds" : 1
+  },
+  "type" : "browser/v1/voiceSession"
+}
+```
+
+
+
+
+
+<hr />
+
+## Additional Instructions
+
+#### Voice Session trigger
+
+The **Voice Session** trigger starts when a customer opens a voice session from a web page, and lets them talk to a
+voice agent. It is a cluster root with two slots:
+
+- **Voice Agent** (required): the provider element that answers the call, such as OpenAI Realtime, Deepgram or
+  ElevenLabs.
+- **Tools** (optional): tools the voice agent may call during the conversation.
+
+The conversation runs outside the workflow engine while the caller is connected. When the session ends, the rest of the
+workflow runs once with the session's transcript, tool calls, duration and end reason.
+
+#### Session limits
+
+- **Silence timeout** ends the session after that many seconds without caller audio; `0` disables it.
+- **Session limit** is the longest a session may last; `0` uses the server's maximum session duration (30 minutes).
+
+#### Notes
+
+- The trigger itself needs no connection; each Voice Agent element uses its own provider connection.
+- A session is refused when the workflow is disabled or the trigger has no Voice Agent, and nothing runs in that case.
