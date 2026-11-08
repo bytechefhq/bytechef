@@ -153,6 +153,12 @@ describe('ReadOnlyNode', () => {
         expect(screen.getByTitle('Disabled: skipped during execution')).toBeInTheDocument();
     });
 
+    it('describes a disabled trigger as not starting runs', () => {
+        renderNode({...BASE_DATA, disabled: true, isEffectivelyDisabled: true, trigger: true} as NodeDataType);
+
+        expect(screen.getByTitle('Disabled: does not start runs')).toBeInTheDocument();
+    });
+
     it('does not show the disabled badge for a node only muted via ancestor derivation', () => {
         renderNode({...BASE_DATA, isEffectivelyDisabled: true});
 

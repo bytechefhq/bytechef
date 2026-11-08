@@ -106,7 +106,7 @@ const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
                 <div className="flex items-center gap-1">
                     <span className="font-semibold">{data.title || data.label}</span>
 
-                    {data.disabled && <DisabledNodeBadge />}
+                    {data.disabled && <DisabledNodeBadge trigger={!!data.trigger} />}
                 </div>
 
                 {data.operationName && <pre className="text-sm">{data.operationName}</pre>}
