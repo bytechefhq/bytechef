@@ -35,6 +35,7 @@ final class StubApi implements AutoCloseable {
     private String lastPath;
     private String lastAuthorization;
     private String lastEnvironment;
+    private String lastBody;
 
     private StubApi(HttpServer server) {
         this.server = server;
@@ -52,6 +53,10 @@ final class StubApi implements AutoCloseable {
                 .getFirst("Authorization");
             stub.lastEnvironment = exchange.getRequestHeaders()
                 .getFirst("X-Environment");
+            stub.lastBody = new String(
+                exchange.getRequestBody()
+                    .readAllBytes(),
+                StandardCharsets.UTF_8);
 
             byte[] body = jsonBody.getBytes(StandardCharsets.UTF_8);
 
@@ -84,6 +89,10 @@ final class StubApi implements AutoCloseable {
 
     String lastEnvironment() {
         return lastEnvironment;
+    }
+
+    String lastBody() {
+        return lastBody;
     }
 
     @Override

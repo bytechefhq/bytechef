@@ -18,6 +18,7 @@ package com.bytechef.cli.command.embedded;
 
 import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
 import com.bytechef.cli.client.embeddedconfiguration.ApiException;
+import com.bytechef.cli.client.embeddedconfiguration.api.AutomationProjectCodeWorkflowApi;
 import com.bytechef.cli.client.embeddedconfiguration.api.AutomationWorkflowProjectApi;
 import com.bytechef.cli.client.embeddedconfiguration.api.ConnectedUserApi;
 import com.bytechef.cli.client.embeddedconfiguration.api.ConnectedUserProjectWorkflowApi;
@@ -62,6 +63,10 @@ final class EmbeddedConfigurationClientFactory {
 
     static AutomationWorkflowProjectApi automationWorkflowProjectApi(CliConfig config) {
         return new AutomationWorkflowProjectApi(apiClient(config));
+    }
+
+    static AutomationProjectCodeWorkflowApi automationProjectCodeWorkflowApi(CliConfig config) {
+        return new AutomationProjectCodeWorkflowApi(apiClient(config));
     }
 
     static ConnectedUserProjectWorkflowApi connectedUserProjectWorkflowApi(CliConfig config) {
