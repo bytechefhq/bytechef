@@ -7,11 +7,13 @@ const hoisted = vi.hoisted(() => ({
     handleAddAuthorityMapping: vi.fn(),
     handleOpenChange: vi.fn(),
     handleSave: vi.fn(),
+    setIsMcpEmbedded: vi.fn(),
     setIsMcpManagement: vi.fn(),
     state: {
         authorityMappings: [] as {authority: string; externalGroup: string}[],
         isEditing: false,
         isMcpAutomation: false,
+        isMcpEmbedded: false,
         name: 'Acme SSO',
         open: true,
         providerType: 'OIDC' as 'OIDC' | 'SAML',
@@ -40,7 +42,7 @@ vi.mock('../hooks/useIdentityProviderDialog', () => ({
         isEnabled: true,
         isEnforced: false,
         isMcpAutomation: hoisted.state.isMcpAutomation,
-        isMcpEmbedded: false,
+        isMcpEmbedded: hoisted.state.isMcpEmbedded,
         isMcpManagement: false,
         isMfaRequired: false,
         isValidateMcpAudience: false,
@@ -60,7 +62,7 @@ vi.mock('../hooks/useIdentityProviderDialog', () => ({
         setIsEnabled: vi.fn(),
         setIsEnforced: vi.fn(),
         setIsMcpAutomation: vi.fn(),
-        setIsMcpEmbedded: vi.fn(),
+        setIsMcpEmbedded: hoisted.setIsMcpEmbedded,
         setIsMcpManagement: hoisted.setIsMcpManagement,
         setIsMfaRequired: vi.fn(),
         setIsValidateMcpAudience: vi.fn(),
@@ -78,6 +80,7 @@ beforeEach(() => {
     hoisted.state.authorityMappings = [];
     hoisted.state.isEditing = false;
     hoisted.state.isMcpAutomation = false;
+    hoisted.state.isMcpEmbedded = false;
     hoisted.state.name = 'Acme SSO';
     hoisted.state.open = true;
     hoisted.state.providerType = 'OIDC';
@@ -181,12 +184,12 @@ describe('IdentityProviderDialog', () => {
     });
 
     describe('MCP trust', () => {
-        it('should offer the automation and management MCP surfaces for an OIDC provider', () => {
+        it('should offer the automation, management and embedded MCP surfaces for an OIDC provider', () => {
             render(<IdentityProviderDialog />);
 
             expect(screen.getByLabelText('Use for automation MCP servers')).toBeInTheDocument();
             expect(screen.getByLabelText('Use for management MCP servers')).toBeInTheDocument();
-            expect(screen.queryByLabelText('Use for embedded MCP servers')).not.toBeInTheDocument();
+            expect(screen.getByLabelText('Use for embedded MCP servers')).toBeInTheDocument();
         });
 
         it('should not offer MCP surfaces for a SAML provider', () => {
@@ -196,6 +199,7 @@ describe('IdentityProviderDialog', () => {
 
             expect(screen.queryByLabelText('Use for automation MCP servers')).not.toBeInTheDocument();
             expect(screen.queryByLabelText('Use for management MCP servers')).not.toBeInTheDocument();
+            expect(screen.queryByLabelText('Use for embedded MCP servers')).not.toBeInTheDocument();
         });
 
         it('should hide the audience, groups claim and mappings until an MCP surface is enabled', () => {
@@ -226,6 +230,26 @@ describe('IdentityProviderDialog', () => {
             await user.click(screen.getByLabelText('Use for management MCP servers'));
 
             expect(hoisted.setIsMcpManagement).toHaveBeenCalledWith(true);
+        });
+
+        it('should enable the embedded surface when its checkbox is clicked', async () => {
+            const user = userEvent.setup();
+
+            render(<IdentityProviderDialog />);
+
+            await user.click(screen.getByLabelText('Use for embedded MCP servers'));
+
+            expect(hoisted.setIsMcpEmbedded).toHaveBeenCalledWith(true);
+        });
+
+        it('should show the audience, groups claim and mappings when only the embedded surface is enabled', () => {
+            hoisted.state.isMcpEmbedded = true;
+
+            render(<IdentityProviderDialog />);
+
+            expect(screen.getByLabelText('Require token audience to match the MCP endpoint')).toBeInTheDocument();
+            expect(screen.getByText('Groups Claim')).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Add mapping'})).toBeInTheDocument();
         });
 
         it('should add an authority mapping row when requested', async () => {

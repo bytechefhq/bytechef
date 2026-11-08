@@ -40,6 +40,7 @@ const IdentityProviderDialog = () => {
         isEnabled,
         isEnforced,
         isMcpAutomation,
+        isMcpEmbedded,
         isMcpManagement,
         isMfaRequired,
         isValidateMcpAudience,
@@ -60,6 +61,7 @@ const IdentityProviderDialog = () => {
         setIsEnabled,
         setIsEnforced,
         setIsMcpAutomation,
+        setIsMcpEmbedded,
         setIsMcpManagement,
         setIsMfaRequired,
         setIsValidateMcpAudience,
@@ -74,7 +76,7 @@ const IdentityProviderDialog = () => {
         signingCertificate,
     } = useIdentityProviderDialog();
 
-    const mcpEnabled = providerType === 'OIDC' && (isMcpAutomation || isMcpManagement);
+    const mcpEnabled = providerType === 'OIDC' && (isMcpAutomation || isMcpEmbedded || isMcpManagement);
 
     const saveDisabled = useMemo(() => {
         if (!name || domains.length === 0) {
@@ -413,6 +415,27 @@ const IdentityProviderDialog = () => {
 
                                             <p className="pl-6 text-xs text-muted-foreground">
                                                 Trust this provider&apos;s tokens on the management MCP endpoint.
+                                            </p>
+                                        </fieldset>
+                                    )}
+
+                                    {providerType === 'OIDC' && (
+                                        <fieldset className="space-y-1 border-0 p-0">
+                                            <div className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    checked={isMcpEmbedded}
+                                                    id="mcpEmbedded"
+                                                    onCheckedChange={(checked) => setIsMcpEmbedded(checked === true)}
+                                                />
+
+                                                <label className="text-sm font-normal" htmlFor="mcpEmbedded">
+                                                    Use for embedded MCP servers
+                                                </label>
+                                            </div>
+
+                                            <p className="pl-6 text-xs text-muted-foreground">
+                                                Trust this provider&apos;s tokens on embedded MCP endpoints, so your end
+                                                users sign in as connected users.
                                             </p>
                                         </fieldset>
                                     )}
