@@ -62,18 +62,19 @@ OIDC providers also offer the MCP settings described in [MCP servers](#mcp-serve
 
 ### MCP servers
 
-Identity providers configured here are used for signing in to ByteChef. An OIDC provider can also authorize MCP clients for this account. OIDC providers have two more checkboxes (SAML providers cannot be used for MCP):
+Identity providers configured here are used for signing in to ByteChef. An OIDC provider can also authorize MCP clients for this account. OIDC providers have three more checkboxes (SAML providers cannot be used for MCP):
 
 - **Use for automation MCP servers** - accept this provider's tokens on the account's [automation MCP servers](/platform/automation/deploy/mcp-servers) (`https://<your-host>/api/automation/<secret-key>/mcp`).
 - **Use for management MCP servers** - accept this provider's tokens on the account's [management MCP server](/platform/settings/mcp-server) (`https://<your-host>/api/management/<secret-key>/mcp`).
+- **Use for embedded MCP servers** - accept this provider's tokens on the account's [embedded MCP servers](/platform/embedded/configure/mcp-servers) (`https://<your-host>/api/embedded/<secret-key>/mcp`), so your end users sign in with your identity provider instead of a ByteChef-signed JWT. See [Embedded MCP servers](#embedded-mcp-servers).
 
 These tokens are accepted on the secret-key URLs only; the tenant-less management URL (`/api/management/mcp`) rejects them with `401`. A provider is trusted only by the account it is registered in, so the same token sent to another account's MCP server is rejected, and an unknown or forged secret key is rejected before the account's providers are consulted.
 
-Like any other MCP access token, the token must carry the endpoint's scope in its `scope` (or `scp`) claim: `mcp:automation` for automation MCP servers and `mcp:management` for the management MCP server. Configure your identity provider to issue that scope; a token without it is rejected with `403` and an `insufficient_scope` challenge. Group claims and group mappings never stand in for the scope.
+Like any other MCP access token, the token must carry the endpoint's scope in its `scope` (or `scp`) claim: `mcp:automation` for automation MCP servers, `mcp:management` for the management MCP server and `mcp:embedded` for embedded MCP servers. Configure your identity provider to issue that scope; a token without it is rejected with `403` and an `insufficient_scope` challenge. Group claims and group mappings never stand in for the scope.
 
-A token from the provider acts as a ByteChef user. ByteChef reads the token's `email` claim and looks for an **active** user with that email in the account the MCP URL belongs to. The request is rejected with `401` when there is no such user, when the user is deactivated, or when the token's `email_verified` claim is `false`. An accepted request carries that user's roles, plus any authorities granted by the group mappings below.
+On automation and management MCP servers, a token from the provider acts as a ByteChef user. ByteChef reads the token's `email` claim and looks for an **active** user with that email in the account the MCP URL belongs to. The request is rejected with `401` when there is no such user, when the user is deactivated, or when the token's `email_verified` claim is `false`. An accepted request carries that user's roles, plus any authorities granted by the group mappings below.
 
-Once either checkbox is ticked, three more settings appear:
+Once any of these checkboxes is ticked, three more settings appear:
 
 | Field | Purpose |
 |---|---|
@@ -83,7 +84,15 @@ Once either checkbox is ticked, three more settings appear:
 
 MCP clients find the provider through the server's protected resource metadata (`/.well-known/oauth-protected-resource/api/<automation|management>/<secret-key>/mcp`), which lists the account's identity providers before the installation's own issuers. The account's providers are listed only for a valid secret key; for an unknown key the metadata lists the installation's issuers alone.
 
-Accepting identity provider tokens on MCP servers requires the installation to trust at least one issuer under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties - see [MCP Server → JWT from a trusted issuer](/platform/settings/mcp-server#jwt-from-a-trusted-issuer-optional). Those installation-wide issuers keep working alongside the providers configured here. A change to a provider takes effect on every server node within 30 seconds.
+Accepting identity provider tokens on automation and management MCP servers requires the installation to trust at least one issuer under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties - see [MCP Server → JWT from a trusted issuer](/platform/settings/mcp-server#jwt-from-a-trusted-issuer-optional). Those installation-wide issuers keep working alongside the providers configured here. A change to a provider takes effect on every server node within 30 seconds.
+
+#### Embedded MCP servers
+
+On an embedded MCP server, a token from a provider with **Use for embedded MCP servers** ticked acts as one of your end users, not as a ByteChef user. Its `sub` claim is the external user id: the token resolves to the ConnectedUser with that id in the request's environment, created on first use, and a disabled ConnectedUser is rejected with `401`. The environment comes from the `X-Environment` header (`PRODUCTION` when omitted) and must be the server's own environment. The token must carry the `mcp:embedded` scope. The authorities granted by the group mappings apply to that ConnectedUser's request.
+
+The server still accepts ByteChef-signed JWTs, so existing integrations keep working. A token whose issuer is not one of the account's embedded providers is handled as a ByteChef-signed JWT, and rejected with `401` when it is not one. The **Require authentication** setting of the server applies to both kinds of token.
+
+Embedded MCP clients find the provider through `/.well-known/oauth-protected-resource/api/embedded/<secret-key>/mcp`, which lists the account's embedded providers and the `mcp:embedded` scope. It answers `404` for an unknown or forged secret key, and when the account has no embedded provider. Embedded MCP servers do not need the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties.
 
 ## What gets federated
 
