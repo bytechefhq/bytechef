@@ -78,6 +78,27 @@ class ConnectedUserWorkflowWebhookUrlResolverTest {
     }
 
     @Test
+    void testResolvesFirstEnabledWebhookTrigger() {
+        String definition = "{\"label\": \"Workflow\", \"triggers\": [" +
+            "{\"name\": \"trigger_1\", \"type\": \"webhook/v1/awaitWorkflowAndRespond\", \"disabled\": true}, " +
+            "{\"name\": \"trigger_2\", \"type\": \"webhook/v1/awaitWorkflowAndRespond\"}], \"tasks\": []}";
+
+        when(projectWorkflowService.fetchProjectWorkflowWorkflowId(PROJECT_DEPLOYMENT_ID, WORKFLOW_UUID))
+            .thenReturn(Optional.of(WORKFLOW_ID));
+        when(workflowService.getWorkflow(WORKFLOW_ID))
+            .thenReturn(new Workflow(WORKFLOW_ID, definition, Workflow.Format.JSON));
+
+        mockTriggerDefinition("webhook", "awaitWorkflowAndRespond", TriggerType.STATIC_WEBHOOK);
+
+        String staticWebhookUrl = resolver.resolve(PROJECT_DEPLOYMENT_ID, WORKFLOW_UUID);
+
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, PROJECT_DEPLOYMENT_ID, WORKFLOW_UUID, "trigger_2");
+
+        assertThat(staticWebhookUrl).isEqualTo("https://bytechef.example.com/webhooks/" + workflowExecutionId);
+    }
+
+    @Test
     void testResolveReturnsNullForARequestTrigger() {
         mockDeployedWorkflow("request/v1/awaitWorkflowAndRespond");
 

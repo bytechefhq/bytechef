@@ -139,7 +139,7 @@ public class ProjectDeploymentWorkflowGraphQlController {
     public String workflowExecutionId(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
         Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.ofEnabled(workflow);
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
@@ -239,7 +239,7 @@ public class ProjectDeploymentWorkflowGraphQlController {
                 continue;
             }
 
-            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.ofEnabled(workflow);
 
             if (workflowTriggers.isEmpty() || !hasHostedChatTrigger(workflowTriggers)) {
                 continue;
@@ -272,19 +272,19 @@ public class ProjectDeploymentWorkflowGraphQlController {
     }
 
     /**
-     * Matches the client's legacy filter: at least one trigger type starts with {@code chat/}, and the first trigger's
-     * {@code parameters.mode} is absent or equal to {@code 1}.
+     * Matches the client's legacy filter: at least one trigger type starts with {@code chat/}, and the first enabled
+     * chat trigger's {@code parameters.mode} is absent or equal to {@code 1}.
      */
     private static boolean hasHostedChatTrigger(List<WorkflowTrigger> workflowTriggers) {
-        boolean hasChatTrigger = workflowTriggers.stream()
-            .map(WorkflowTrigger::getType)
-            .anyMatch(type -> type != null && type.startsWith(CHAT_TRIGGER_TYPE_PREFIX));
+        WorkflowTrigger workflowTrigger = workflowTriggers.stream()
+            .filter(candidate -> candidate.getType() != null && candidate.getType()
+                .startsWith(CHAT_TRIGGER_TYPE_PREFIX))
+            .findFirst()
+            .orElse(null);
 
-        if (!hasChatTrigger) {
+        if (workflowTrigger == null) {
             return false;
         }
-
-        WorkflowTrigger workflowTrigger = workflowTriggers.getFirst();
 
         Map<String, ?> parameters = workflowTrigger.getParameters();
 

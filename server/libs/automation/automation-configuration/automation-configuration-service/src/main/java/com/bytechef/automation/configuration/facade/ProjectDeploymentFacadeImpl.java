@@ -927,7 +927,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private String getStaticWebhookUrl(long projectDeploymentId, String workflowId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.ofEnabled(workflow);
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
