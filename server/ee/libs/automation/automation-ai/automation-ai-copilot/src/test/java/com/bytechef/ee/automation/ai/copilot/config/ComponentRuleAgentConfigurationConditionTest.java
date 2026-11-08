@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.ai.copilot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ee.automation.ai.tool.componentrule.ComponentRuleToolCallbacksFactory;
 import com.bytechef.ee.platform.component.rule.ComponentRuleService;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -111,6 +113,12 @@ class ComponentRuleAgentConfigurationConditionTest {
         @Bean
         ChatModel chatModel() {
             return Mockito.mock(ChatModel.class);
+        }
+
+        @Bean
+        @SuppressWarnings("unchecked")
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory() {
+            return new CopilotGuardrailsAdvisorFactory(Mockito.mock(ObjectProvider.class));
         }
 
         @Bean

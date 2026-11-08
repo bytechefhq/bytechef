@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
@@ -51,6 +52,7 @@ public class AutomationCopilotConfiguration {
     private final String codeWorkflowBuildSystemPrompt;
     private final String customComponentAskSystemPrompt;
     private final String customComponentBuildSystemPrompt;
+    private final CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory;
 
     private final State state = new State();
 
@@ -59,12 +61,14 @@ public class AutomationCopilotConfiguration {
         @Value("classpath:prompt_code_workflow_ask.txt") Resource promptCodeWorkflowAskResource,
         @Value("classpath:prompt_code_workflow_build.txt") Resource promptCodeWorkflowBuildResource,
         @Value("classpath:prompt_custom_component_ask.txt") Resource promptCustomComponentAskResource,
-        @Value("classpath:prompt_custom_component_build.txt") Resource promptCustomComponentBuildResource) {
+        @Value("classpath:prompt_custom_component_build.txt") Resource promptCustomComponentBuildResource,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory) {
 
         this.codeWorkflowAskSystemPrompt = readPrompt(promptCodeWorkflowAskResource);
         this.codeWorkflowBuildSystemPrompt = readPrompt(promptCodeWorkflowBuildResource);
         this.customComponentAskSystemPrompt = readPrompt(promptCustomComponentAskResource);
         this.customComponentBuildSystemPrompt = readPrompt(promptCustomComponentBuildResource);
+        this.copilotGuardrailsAdvisorFactory = copilotGuardrailsAdvisorFactory;
     }
 
     @Bean
@@ -73,6 +77,7 @@ public class AutomationCopilotConfiguration {
         SecurityContextRehydrator securityContextRehydrator) throws AGUIException {
 
         return CodeWorkflowSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.CODE_WORKFLOW_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -89,6 +94,7 @@ public class AutomationCopilotConfiguration {
         throws AGUIException {
 
         return CodeWorkflowSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.CODE_WORKFLOW_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -155,6 +161,7 @@ public class AutomationCopilotConfiguration {
         SecurityContextRehydrator securityContextRehydrator) throws AGUIException {
 
         return CustomComponentSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.CUSTOM_COMPONENT_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -171,6 +178,7 @@ public class AutomationCopilotConfiguration {
         throws AGUIException {
 
         return CustomComponentSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.CUSTOM_COMPONENT_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -237,7 +245,8 @@ public class AutomationCopilotConfiguration {
     }
 
     private ChatClient.Builder chatClientBuilder(ChatModel chatModel) {
-        return ChatClient.builder(chatModel);
+        return ChatClient.builder(chatModel)
+            .defaultAdvisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors());
     }
 
     private List<ToolCallback> wrapTools(SecurityContextRehydrator securityContextRehydrator, List<Object> tools) {
