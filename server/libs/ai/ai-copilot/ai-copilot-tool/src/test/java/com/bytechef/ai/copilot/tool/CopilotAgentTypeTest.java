@@ -51,6 +51,12 @@ class CopilotAgentTypeTest {
         assertThat(CopilotAgentType.MCP_SERVER_BUILD.key())
             .isEqualTo(Source.MCP_SERVER.agentId(Mode.BUILD))
             .isEqualTo("mcp_server_build");
+        assertThat(CopilotAgentType.WORKFLOW_EXECUTION_EMBEDDED_ASK.key())
+            .isEqualTo(Source.WORKFLOW_EXECUTION_EMBEDDED.agentId(Mode.ASK))
+            .isEqualTo("workflow_execution_embedded_ask");
+        assertThat(CopilotAgentType.WORKFLOW_EXECUTION_EMBEDDED_BUILD.key())
+            .isEqualTo(Source.WORKFLOW_EXECUTION_EMBEDDED.agentId(Mode.BUILD))
+            .isEqualTo("workflow_execution_embedded_build");
     }
 
     @Test

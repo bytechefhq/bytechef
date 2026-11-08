@@ -11,6 +11,7 @@ import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.WorkflowEditorSpringAIAgent;
+import com.bytechef.ai.copilot.agent.WorkflowExecutionSpringAIAgent;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
@@ -20,6 +21,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.copilot.agent.EmbeddedCodeWorkflowSpringAIAgent;
 import com.bytechef.ee.embedded.ai.tool.IntegrationCodeWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.IntegrationTools;
+import com.bytechef.ee.embedded.ai.tool.IntegrationWorkflowExecutionTools;
 import com.bytechef.ee.embedded.ai.tool.IntegrationWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationCodeWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationTools;
@@ -67,6 +69,8 @@ public class EmbeddedCopilotConfiguration {
     private final String codeWorkflowEmbeddedBuildSystemPrompt;
     private final String workflowEditorEmbeddedAskSystemPrompt;
     private final String workflowEditorEmbeddedBuildSystemPrompt;
+    private final String workflowExecutionEmbeddedAskSystemPrompt;
+    private final String workflowExecutionEmbeddedBuildSystemPrompt;
 
     @SuppressFBWarnings({
         "EI", "CT_CONSTRUCTOR_THROW"
@@ -76,6 +80,8 @@ public class EmbeddedCopilotConfiguration {
         @Value("classpath:prompt_workflow_editor_embedded_build.txt") Resource promptWorkflowEditorEmbeddedBuildResource,
         @Value("classpath:prompt_code_workflow_embedded_ask.txt") Resource promptCodeWorkflowEmbeddedAskResource,
         @Value("classpath:prompt_code_workflow_embedded_build.txt") Resource promptCodeWorkflowEmbeddedBuildResource,
+        @Value("classpath:prompt_workflow_execution_embedded_ask.txt") Resource promptWorkflowExecutionEmbeddedAskResource,
+        @Value("classpath:prompt_workflow_execution_embedded_build.txt") Resource promptWorkflowExecutionEmbeddedBuildResource,
         WorkflowInstructionTools workflowInstructionTools, WorkflowValidatorTools workflowValidatorTools) {
 
         this.workflowInstructionTools = workflowInstructionTools;
@@ -85,6 +91,8 @@ public class EmbeddedCopilotConfiguration {
         this.codeWorkflowEmbeddedBuildSystemPrompt = getSystemPrompt(promptCodeWorkflowEmbeddedBuildResource);
         this.workflowEditorEmbeddedAskSystemPrompt = getSystemPrompt(promptWorkflowEditorEmbeddedAskResource);
         this.workflowEditorEmbeddedBuildSystemPrompt = getSystemPrompt(promptWorkflowEditorEmbeddedBuildResource);
+        this.workflowExecutionEmbeddedAskSystemPrompt = getSystemPrompt(promptWorkflowExecutionEmbeddedAskResource);
+        this.workflowExecutionEmbeddedBuildSystemPrompt = getSystemPrompt(promptWorkflowExecutionEmbeddedBuildResource);
     }
 
     @Bean
@@ -146,6 +154,57 @@ public class EmbeddedCopilotConfiguration {
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .permissionService(permissionService)
             .securityContextRehydrator(securityContextRehydrator)
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+    }
+
+    @Bean
+    WorkflowExecutionSpringAIAgent workflowExecutionEmbeddedAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, IntegrationWorkflowExecutionTools integrationWorkflowExecutionTools,
+        ReadIntegrationWorkflowTools readIntegrationWorkflowTools, ComponentTools componentTools,
+        WebSearchToolCallbackProvider webSearchToolCallbackProvider,
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
+
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                integrationWorkflowExecutionTools, readIntegrationWorkflowTools, componentTools, workflowValidatorTools,
+                workflowInstructionTools));
+
+        WorkflowExecutionSpringAIAgent springAIAgent = WorkflowExecutionSpringAIAgent.builder()
+            .agentId(CopilotAgentType.WORKFLOW_EXECUTION_EMBEDDED_ASK.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(workflowExecutionEmbeddedAskSystemPrompt)
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
+            .state(state)
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
+            .build();
+
+        springAIAgent.setWebSearchToolCallbackProvider(webSearchToolCallbackProvider);
+
+        return springAIAgent;
+    }
+
+    @Bean
+    WorkflowExecutionSpringAIAgent workflowExecutionEmbeddedBuildSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, IntegrationWorkflowExecutionTools integrationWorkflowExecutionTools,
+        IntegrationWorkflowTools integrationWorkflowTools, TaskTools taskTools,
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
+
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                integrationWorkflowExecutionTools, integrationWorkflowTools, taskTools, workflowValidatorTools,
+                workflowInstructionTools));
+
+        return WorkflowExecutionSpringAIAgent.builder()
+            .agentId(CopilotAgentType.WORKFLOW_EXECUTION_EMBEDDED_BUILD.key())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(workflowExecutionEmbeddedBuildSystemPrompt)
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
+            .state(state)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }

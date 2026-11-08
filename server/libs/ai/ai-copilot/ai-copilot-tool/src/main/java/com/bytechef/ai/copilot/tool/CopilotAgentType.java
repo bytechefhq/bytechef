@@ -82,7 +82,9 @@ public enum CopilotAgentType implements AgentType {
     BUILD_CUSTOM_COMPONENT("buildCustomComponent"),
     BUILD_CODE_WORKFLOW("buildCodeWorkflow"),
     EXPLAIN_CUSTOM_COMPONENT("explainCustomComponent"),
-    EXPLAIN_CODE_WORKFLOW("explainCodeWorkflow");
+    EXPLAIN_CODE_WORKFLOW("explainCodeWorkflow"),
+    WORKFLOW_EXECUTION_EMBEDDED_ASK(Source.WORKFLOW_EXECUTION_EMBEDDED, Mode.ASK),
+    WORKFLOW_EXECUTION_EMBEDDED_BUILD(Source.WORKFLOW_EXECUTION_EMBEDDED, Mode.BUILD);
 
     private final String key;
 

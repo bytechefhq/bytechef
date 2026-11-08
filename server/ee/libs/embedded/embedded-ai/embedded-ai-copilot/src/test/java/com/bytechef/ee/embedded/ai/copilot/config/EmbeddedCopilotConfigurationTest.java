@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import com.agui.core.exception.AGUIException;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.WorkflowEditorSpringAIAgent;
+import com.bytechef.ai.copilot.agent.WorkflowExecutionSpringAIAgent;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -20,6 +21,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.copilot.agent.EmbeddedCodeWorkflowSpringAIAgent;
 import com.bytechef.ee.embedded.ai.tool.IntegrationCodeWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.IntegrationTools;
+import com.bytechef.ee.embedded.ai.tool.IntegrationWorkflowExecutionTools;
 import com.bytechef.ee.embedded.ai.tool.IntegrationWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationCodeWorkflowTools;
 import com.bytechef.ee.embedded.ai.tool.ReadIntegrationTools;
@@ -27,6 +29,7 @@ import com.bytechef.ee.embedded.ai.tool.ReadIntegrationWorkflowTools;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
+import com.bytechef.ee.embedded.workflow.execution.facade.IntegrationWorkflowExecutionFacade;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
@@ -55,11 +58,13 @@ class EmbeddedCopilotConfigurationTest {
     private static final Resource PROMPT_RESOURCE = new ByteArrayResource("prompt".getBytes(StandardCharsets.UTF_8));
 
     private final EmbeddedCopilotConfiguration embeddedCopilotConfiguration = new EmbeddedCopilotConfiguration(
-        PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, mock(WorkflowInstructionTools.class),
-        mock(WorkflowValidatorTools.class));
+        PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE, PROMPT_RESOURCE,
+        mock(WorkflowInstructionTools.class), mock(WorkflowValidatorTools.class));
     private final IntegrationTools integrationTools = new IntegrationTools(mock(IntegrationFacade.class));
     private final IntegrationWorkflowTools integrationWorkflowTools =
         new IntegrationWorkflowTools(mock(IntegrationWorkflowFacade.class), mock(ObjectProvider.class));
+    private final IntegrationWorkflowExecutionTools integrationWorkflowExecutionTools =
+        new IntegrationWorkflowExecutionTools(mock(IntegrationWorkflowExecutionFacade.class));
 
     @Test
     void testCodeWorkflowEmbeddedAgentsAreRegisteredUnderTheirAgentIds() throws AGUIException {
@@ -134,6 +139,37 @@ class EmbeddedCopilotConfigurationTest {
     }
 
     @Test
+    void testWorkflowExecutionEmbeddedAskAgentIsRegisteredUnderTheAskAgentId() throws AGUIException {
+        WorkflowExecutionSpringAIAgent workflowExecutionSpringAIAgent = workflowExecutionEmbeddedAskSpringAIAgent();
+
+        assertThat(workflowExecutionSpringAIAgent.getAgentId()).isEqualTo("workflow_execution_embedded_ask");
+    }
+
+    @Test
+    void testWorkflowExecutionEmbeddedAskAgentExposesNoWriteTools() throws AGUIException {
+        WorkflowExecutionSpringAIAgent workflowExecutionSpringAIAgent = workflowExecutionEmbeddedAskSpringAIAgent();
+
+        assertThat(toolNames(workflowExecutionSpringAIAgent))
+            .contains("getWorkflowExecution", "listWorkflowExecutions", "getWorkflow")
+            .noneMatch(EmbeddedCopilotConfigurationTest::isWriteToolName);
+    }
+
+    @Test
+    void testWorkflowExecutionEmbeddedBuildAgentIsRegisteredUnderTheBuildAgentId() throws AGUIException {
+        WorkflowExecutionSpringAIAgent workflowExecutionSpringAIAgent = workflowExecutionEmbeddedBuildSpringAIAgent();
+
+        assertThat(workflowExecutionSpringAIAgent.getAgentId()).isEqualTo("workflow_execution_embedded_build");
+    }
+
+    @Test
+    void testWorkflowExecutionEmbeddedBuildAgentExposesTheExecutionAndWorkflowWriteTools() throws AGUIException {
+        WorkflowExecutionSpringAIAgent workflowExecutionSpringAIAgent = workflowExecutionEmbeddedBuildSpringAIAgent();
+
+        assertThat(toolNames(workflowExecutionSpringAIAgent))
+            .contains("getWorkflowExecution", "listWorkflowExecutions", "updateWorkflow");
+    }
+
+    @Test
     void testBuildSubAgentChatClientFactoryReturnsTheDefaultChatClientWithoutACandidateModel() {
         ChatClient defaultChatClient = mock(ChatClient.class);
 
@@ -166,9 +202,9 @@ class EmbeddedCopilotConfigurationTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static List<String> toolNames(WorkflowEditorSpringAIAgent workflowEditorSpringAIAgent) {
+    private static List<String> toolNames(Object springAIAgent) {
         List<ToolCallback> toolCallbacks =
-            (List<ToolCallback>) ReflectionTestUtils.getField(workflowEditorSpringAIAgent, "toolCallbacks");
+            (List<ToolCallback>) ReflectionTestUtils.getField(springAIAgent, "toolCallbacks");
 
         assertThat(toolCallbacks).isNotNull();
 
@@ -176,6 +212,19 @@ class EmbeddedCopilotConfigurationTest {
             .map(toolCallback -> toolCallback.getToolDefinition()
                 .name())
             .toList();
+    }
+
+    private WorkflowExecutionSpringAIAgent workflowExecutionEmbeddedAskSpringAIAgent() throws AGUIException {
+        return embeddedCopilotConfiguration.workflowExecutionEmbeddedAskSpringAIAgent(
+            mock(ChatMemory.class), mock(ChatModel.class), integrationWorkflowExecutionTools,
+            new ReadIntegrationWorkflowTools(integrationWorkflowTools), mock(ComponentTools.class),
+            mock(WebSearchToolCallbackProvider.class), mock(SecurityContextRehydrator.class), emptyProvider());
+    }
+
+    private WorkflowExecutionSpringAIAgent workflowExecutionEmbeddedBuildSpringAIAgent() throws AGUIException {
+        return embeddedCopilotConfiguration.workflowExecutionEmbeddedBuildSpringAIAgent(
+            mock(ChatMemory.class), mock(ChatModel.class), integrationWorkflowExecutionTools, integrationWorkflowTools,
+            mock(TaskTools.class), mock(SecurityContextRehydrator.class), emptyProvider());
     }
 
     @SuppressWarnings("unchecked")
