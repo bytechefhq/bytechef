@@ -8,7 +8,7 @@ import {useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 export default function useTestRunChatTrigger(workflow: {
-    triggers?: Array<Pick<WorkflowTrigger, 'name' | 'type'>>;
+    triggers?: Array<Pick<WorkflowTrigger, 'disabled' | 'name' | 'type'>>;
 }): boolean {
     const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({

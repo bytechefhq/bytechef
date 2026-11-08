@@ -4,7 +4,12 @@ import {beforeEach, describe, expect, it} from 'vitest';
 
 import getSelectedTestRunTriggerName from './getSelectedTestRunTriggerName';
 
-const workflow = {triggers: [{name: 'trigger_1'}, {name: 'trigger_2'}]};
+const workflow = {
+    triggers: [
+        {name: 'trigger_1', type: 'webhook/v1/webhook'},
+        {name: 'trigger_2', type: 'webhook/v1/webhook'},
+    ],
+};
 
 describe('getSelectedTestRunTriggerName', () => {
     beforeEach(() => {
@@ -40,5 +45,16 @@ describe('getSelectedTestRunTriggerName', () => {
 
     it('returns undefined when the workflow has no triggers', () => {
         expect(getSelectedTestRunTriggerName({})).toBeUndefined();
+    });
+
+    it('skips a disabled first trigger when the details panel is closed', () => {
+        expect(
+            getSelectedTestRunTriggerName({
+                triggers: [
+                    {disabled: true, name: 'trigger_1', type: 'webhook/v1/webhook'},
+                    {disabled: false, name: 'trigger_2', type: 'webhook/v1/webhook'},
+                ],
+            })
+        ).toBe('trigger_2');
     });
 });
