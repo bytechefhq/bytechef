@@ -1296,7 +1296,7 @@ public class ProjectDeploymentFacadeIntTest {
                         "label": "Schedule",
                         "name": "trigger_1",
                         "type": "schedule/v1/schedule",
-                        "disabled": %s
+                        "disabled": DISABLED
                     },
                     {
                         "label": "Webhook",
@@ -1305,7 +1305,7 @@ public class ProjectDeploymentFacadeIntTest {
                     }
                 ],
                 "tasks": []
-            }""".formatted(firstTriggerDisabled);
+            }""".replace("DISABLED", String.valueOf(firstTriggerDisabled));
     }
 
     private long createTwoTriggerProjectDeployment(boolean firstTriggerDisabled) {
