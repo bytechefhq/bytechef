@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.security.web.authentication;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -51,6 +52,10 @@ public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvi
         if (secretKey != null) {
             ApiKey apiKey = apiKeyService.fetchApiKey(secretKey, environmentId)
                 .orElseThrow(() -> new BadCredentialsException("Invalid API key"));
+
+            if (apiKey.getType() != PlatformType.EMBEDDED) {
+                throw new BadCredentialsException("Embedded API key required");
+            }
 
             apiKeyId = apiKey.getId();
         }
