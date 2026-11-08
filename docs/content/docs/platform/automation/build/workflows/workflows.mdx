@@ -279,14 +279,32 @@ After picking **Schedule → Cron**, set the expression and timezone on the **Pr
 
 #### Multiple triggers
 
-A workflow can have **more than one trigger** - for example, run on a schedule *and* on an incoming webhook. On deployment every trigger is enabled, and any of them can start a run of the same workflow.
+A workflow can have **more than one trigger** - for example, run on a schedule *and* on an incoming webhook. On deployment every **enabled** trigger is enabled, and any of them can start a run of the same workflow.
 
 - **Add a trigger:** click the dashed **+** slot next to the last trigger (to its right in the vertical layout, below it in the horizontal layout) and pick a trigger, or drag a trigger from the components list onto the slot.
 - **Replace a trigger:** open the trigger's node menu and choose **Replace**, or drop a different trigger onto it.
 - **Remove a trigger:** open the trigger's node menu, or right-click the trigger, and choose **Delete**. Delete is offered only while the workflow has more than one trigger, so a workflow always keeps at least one.
-- **Test from a specific trigger:** click the trigger to open its panel, then click **Test** in the header. The test run starts from that trigger, with its sample output as the trigger's output. With no trigger panel open, a test run starts from the first trigger.
+- **Test from a specific trigger:** click the trigger to open its panel, then click **Test** in the header. The test run starts from that trigger, with its sample output as the trigger's output. With no trigger panel open, a test run starts from the first enabled trigger.
+- **Disable a trigger:** open the trigger's node menu (⋮) or right-click the trigger, and choose **Disable**. Choose **Enable** to turn it back on. The trigger keeps its configuration and is shown muted with a **Disabled** badge. See [Disabling a trigger](#disabling-a-trigger).
 
 Every trigger connects to the first step of the workflow, and their connections join into a single line with one **+** for inserting a step after the triggers.
+
+#### Disabling a trigger
+
+Disabling a trigger keeps it in the workflow without letting it start runs. This is useful when you want to pause one trigger and keep the others.
+
+Disabling takes effect the next time the workflow is published and deployed. A running deployment keeps its triggers until then.
+
+While a trigger is disabled:
+
+- It never starts a run, and it is not activated on deployment.
+- Incoming requests to its webhook, chat or form URL are refused.
+- It is not exposed through MCP, A2A or the API Platform.
+- A subflow step that calls a workflow whose callable trigger is disabled fails.
+
+A disabled trigger still needs its connections to be set up before you deploy.
+
+The last enabled trigger cannot be disabled, so a workflow always keeps at least one. Manual triggers cannot be disabled.
 
 ### Edit Component
 
@@ -543,8 +561,8 @@ change its version, or open a workflow's executions without leaving the editor. 
 The header's **Test** button runs the current workflow from its trigger and streams the run's
 progress and result into the **Output panel** at the bottom of the editor; while a run is
 in-flight, the button turns into a **Stop** button that cancels it. In a workflow with
-[multiple triggers](#multiple-triggers), the run starts from the trigger whose panel is open, or from
-the first trigger when no trigger panel is open. If the trigger the run starts from is a
+[multiple triggers](#multiple-triggers), the run starts from the trigger whose panel is open if it is enabled, otherwise from
+the first enabled trigger. If the trigger the run starts from is a
 chat trigger, the same button is labeled **Chat** instead - clicking it opens the
 [test chat panel](#test-with-chat) rather than starting a run immediately, and you drive the run by
 sending it messages.
