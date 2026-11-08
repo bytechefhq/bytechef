@@ -24,6 +24,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
+import com.bytechef.automation.configuration.dto.WorkspaceProjectWorkflowDTO;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
@@ -66,6 +68,9 @@ public class ProjectWorkflowGraphQlControllerIntTest {
 
     @Autowired
     private GraphQlTester graphQlTester;
+
+    @Autowired
+    private ProjectFacade projectFacade;
 
     @Autowired
     private ProjectWorkflowFacade projectWorkflowFacade;
@@ -274,5 +279,45 @@ public class ProjectWorkflowGraphQlControllerIntTest {
             new Workflow(
                 JsonUtils.write(Map.of("label", label, "description", description)), Workflow.Format.JSON),
             List.of(), List.of());
+    }
+
+    @Test
+    void testWorkspaceProjectWorkflows() {
+        when(projectFacade.getWorkspaceLatestProjectWorkflows(eq(1L)))
+            .thenReturn(
+                List.of(
+                    new WorkspaceProjectWorkflowDTO(10L, "Alpha Project", 101L, "wf-alpha", "Alpha Onboarding")));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    workspaceProjectWorkflows(workspaceId: 1) {
+                        projectId
+                        projectName
+                        projectWorkflowId
+                        workflowId
+                        workflowLabel
+                    }
+                }
+                """)
+            .execute()
+            .path("workspaceProjectWorkflows")
+            .entityList(Object.class)
+            .hasSize(1)
+            .path("workspaceProjectWorkflows[0].projectId")
+            .entity(String.class)
+            .isEqualTo("10")
+            .path("workspaceProjectWorkflows[0].projectName")
+            .entity(String.class)
+            .isEqualTo("Alpha Project")
+            .path("workspaceProjectWorkflows[0].projectWorkflowId")
+            .entity(String.class)
+            .isEqualTo("101")
+            .path("workspaceProjectWorkflows[0].workflowId")
+            .entity(String.class)
+            .isEqualTo("wf-alpha")
+            .path("workspaceProjectWorkflows[0].workflowLabel")
+            .entity(String.class)
+            .isEqualTo("Alpha Onboarding");
     }
 }

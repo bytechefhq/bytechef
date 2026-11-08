@@ -41,6 +41,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.dto.WorkspaceProjectWorkflowDTO;
 import com.bytechef.automation.configuration.listener.ProjectContentContributor;
 import com.bytechef.automation.configuration.listener.ProjectDeleteEventListener;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
@@ -1606,5 +1607,59 @@ public class ProjectFacadeIntTest {
                 }
             };
         }
+    }
+
+    @Test
+    public void testGetWorkspaceLatestProjectWorkflowsMatchesPerProjectListing() {
+        Workspace workspace = workspaceRepository.save(new Workspace("test_workspace_latest_project_workflows"));
+
+        List<Long> projectIds = new ArrayList<>();
+
+        for (int projectIndex = 0; projectIndex < 3; projectIndex++) {
+            Project project = new Project();
+
+            project.setName("test_project_" + projectIndex);
+            project.setWorkspaceId(workspace.getId());
+
+            project = projectRepository.save(project);
+
+            for (int workflowIndex = 0; workflowIndex < 4; workflowIndex++) {
+                Workflow workflow = new Workflow(
+                    "{\"label\":\"test_workflow_label_" + workflowIndex + "\",\"tasks\":[]}", Workflow.Format.JSON);
+
+                workflow.setNew(true);
+
+                workflow = workflowRepository.save(workflow);
+
+                projectWorkflowRepository.save(
+                    new ProjectWorkflow(
+                        project.getId(), project.getLastProjectVersion(), workflow.getId(), UUID.randomUUID()));
+            }
+
+            projectIds.add(project.getId());
+        }
+
+        List<String> perProjectWorkflowIds = projectIds.stream()
+            .flatMap(projectId -> projectWorkflowFacade.getProjectWorkflows(projectId)
+                .stream()
+                .map(ProjectWorkflowDTO::getId))
+            .sorted()
+            .toList();
+
+        List<WorkspaceProjectWorkflowDTO> workspaceProjectWorkflows =
+            projectFacade.getWorkspaceLatestProjectWorkflows(workspace.getId());
+
+        assertThat(
+            workspaceProjectWorkflows.stream()
+                .map(WorkspaceProjectWorkflowDTO::workflowId)
+                .sorted()
+                .toList()).isEqualTo(perProjectWorkflowIds);
+
+        assertThat(workspaceProjectWorkflows).hasSize(12)
+            .allSatisfy(workspaceProjectWorkflow -> {
+                assertThat(workspaceProjectWorkflow.projectName()).startsWith("test_project_");
+                assertThat(workspaceProjectWorkflow.workflowLabel()).startsWith("test_workflow_label_");
+                assertThat(projectIds).contains(workspaceProjectWorkflow.projectId());
+            });
     }
 }

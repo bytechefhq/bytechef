@@ -23,6 +23,8 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
+import com.bytechef.automation.configuration.dto.WorkspaceProjectWorkflowDTO;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
@@ -46,6 +48,7 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class ProjectWorkflowGraphQlController {
 
+    private final ProjectFacade projectFacade;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowFacade workflowFacade;
@@ -53,9 +56,10 @@ public class ProjectWorkflowGraphQlController {
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowGraphQlController(
-        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
-        WorkflowFacade workflowFacade, WorkflowService workflowService) {
+        ProjectFacade projectFacade, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowService projectWorkflowService, WorkflowFacade workflowFacade, WorkflowService workflowService) {
 
+        this.projectFacade = projectFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowFacade = workflowFacade;
@@ -124,6 +128,11 @@ public class ProjectWorkflowGraphQlController {
     @QueryMapping(name = "sharedWorkflow")
     public SharedWorkflowDTO sharedWorkflow(@Argument String workflowUuid) {
         return projectWorkflowFacade.getSharedWorkflow(workflowUuid);
+    }
+
+    @QueryMapping(name = "workspaceProjectWorkflows")
+    public List<WorkspaceProjectWorkflowDTO> workspaceProjectWorkflows(@Argument long workspaceId) {
+        return projectFacade.getWorkspaceLatestProjectWorkflows(workspaceId);
     }
 
     @QueryMapping(name = "workflowTemplate")

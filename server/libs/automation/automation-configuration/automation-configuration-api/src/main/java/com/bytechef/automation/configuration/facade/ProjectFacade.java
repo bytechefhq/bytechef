@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
+import com.bytechef.automation.configuration.dto.WorkspaceProjectWorkflowDTO;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import java.util.Collection;
 import java.util.List;
@@ -64,6 +65,8 @@ public interface ProjectFacade {
         @Nullable Status status, @Nullable Long tagId, long workspaceId);
 
     List<ProjectWorkflowDTO> getWorkspaceProjectWorkflows(long workspaceId);
+
+    List<WorkspaceProjectWorkflowDTO> getWorkspaceLatestProjectWorkflows(long workspaceId);
 
     long importProject(byte[] projectData, long workspaceId);
 

@@ -4,6 +4,7 @@ extend type Query {
     projectVersionWorkflowChanges(projectId: ID!, projectVersion: Int!): VersionWorkflowChanges!
     sharedWorkflow(workflowUuid: String!): SharedWorkflow
     workflowTemplate(id: String!, sharedWorkflow: Boolean!): WorkflowTemplate
+    workspaceProjectWorkflows(workspaceId: ID!): [WorkspaceProjectWorkflow!]!
 }
 
 extend type Mutation {
@@ -25,6 +26,14 @@ type ProjectWorkflow {
     lastModifiedBy: String
     lastModifiedDate: String
     version: Int!
+}
+
+type WorkspaceProjectWorkflow {
+    projectId: ID!
+    projectName: String!
+    projectWorkflowId: ID!
+    workflowId: String!
+    workflowLabel: String!
 }
 
 type SharedWorkflow {
