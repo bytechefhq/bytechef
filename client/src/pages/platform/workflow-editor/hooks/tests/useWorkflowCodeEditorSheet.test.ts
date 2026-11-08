@@ -30,10 +30,6 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
         selector({ai: {copilot: {enabled: true}}}),
 }));
 
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => () => true,
-}));
-
 const ORIGINAL_DEFINITION = '{"tasks": []}';
 
 const UPDATED_DEFINITION = '{"tasks": [{"name": "delay_1", "type": "delay/v1/delay"}]}';

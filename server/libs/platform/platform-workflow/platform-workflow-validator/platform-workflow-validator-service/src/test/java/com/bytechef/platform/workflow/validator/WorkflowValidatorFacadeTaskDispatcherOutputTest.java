@@ -21,18 +21,24 @@ import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDisp
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.string;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEFAULTS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -54,6 +60,7 @@ import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -262,9 +269,12 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
     @BeforeEach
     void beforeEach() {
+        doAnswer(invocation -> namedActionDefinition(invocation.getArgument(2))).when(actionDefinitionService)
+            .getActionDefinition(anyString(), anyInt(), anyString());
+
         ActionDefinition varActionDefinition = actionDefinition(
-            ComponentDsl.string("type"), ComponentDsl.string("value"));
-        ActionDefinition loggerActionDefinition = actionDefinition(ComponentDsl.string("text"));
+            "set", ComponentDsl.string("type"), ComponentDsl.string("value"));
+        ActionDefinition loggerActionDefinition = actionDefinition("info", ComponentDsl.string("text"));
 
         when(componentDefinitionService.hasComponentDefinition(any(), any())).thenReturn(true);
         when(actionDefinitionService.getActionDefinition("var", 1, "set")).thenReturn(varActionDefinition);
@@ -325,7 +335,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
     @Test
     void theNodeTestOutputSatisfiesTheReferenceWhenTheWorkflowIdIsKnown() {
-        ActionDefinition httpClientActionDefinition = actionDefinition(ComponentDsl.string("uri"));
+        ActionDefinition httpClientActionDefinition = actionDefinition("get", ComponentDsl.string("uri"));
         WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
 
         when(actionDefinitionService.getActionDefinition("httpClient", 1, "get"))
@@ -346,7 +356,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
     @Test
     void aPropertyMissingFromTheNodeTestOutputIsAnError() {
-        ActionDefinition httpClientActionDefinition = actionDefinition(ComponentDsl.string("uri"));
+        ActionDefinition httpClientActionDefinition = actionDefinition("get", ComponentDsl.string("uri"));
         WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
 
         when(actionDefinitionService.getActionDefinition("httpClient", 1, "get"))
@@ -534,7 +544,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
     @Test
     void aTestOutputRecordedForAnotherOperationIsIgnored() {
-        ActionDefinition httpClientActionDefinition = actionDefinition(ComponentDsl.string("uri"));
+        ActionDefinition httpClientActionDefinition = actionDefinition("get", ComponentDsl.string("uri"));
         WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
 
         when(actionDefinitionService.getActionDefinition("httpClient", 1, "get"))
@@ -605,14 +615,34 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
     private void stubComponent(String name, String title, boolean connectionRequired) {
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+        List<ClusterElementDefinition> clusterElementDefinitions = switch (name) {
+            case "aiAgent" -> List.of(clusterElementDefinition("chat", "tools"));
+            case "httpClient" -> List.of(clusterElementDefinition("get", "tools"));
+            case "openAi" -> List.of(clusterElementDefinition("model", "model"));
+            default -> List.of();
+        };
 
+        when(componentDefinition.getClusterElements()).thenReturn(clusterElementDefinitions);
         when(componentDefinition.getTitle()).thenReturn(title);
         when(componentDefinition.isConnectionRequired()).thenReturn(connectionRequired);
         when(componentDefinitionService.getComponentDefinition(name, 1)).thenReturn(componentDefinition);
     }
 
-    private static ActionDefinition actionDefinition(ComponentDsl.ModifiableStringProperty... properties) {
+    private static ClusterElementDefinition clusterElementDefinition(String name, String slotKey) {
+        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+        when(clusterElementDefinition.getName()).thenReturn(name);
+        when(clusterElementDefinition.getType()).thenReturn(new ClusterElementType(slotKey, slotKey, slotKey, false));
+
+        return clusterElementDefinition;
+    }
+
+    private static ActionDefinition actionDefinition(
+        String name, ComponentDsl.ModifiableStringProperty... properties) {
+
         ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getName()).thenReturn(name);
 
         List<Property> propertyList = Arrays.stream(properties)
             .map(property -> (Property) Property.toProperty(property))
@@ -622,5 +652,17 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
             .getProperties();
 
         return actionDefinition;
+    }
+
+    private static ActionDefinition namedActionDefinition(String name) {
+        return mock(ActionDefinition.class, invocation -> {
+            Method method = invocation.getMethod();
+
+            if ("getName".equals(method.getName())) {
+                return name;
+            }
+
+            return RETURNS_DEFAULTS.answer(invocation);
+        });
     }
 }

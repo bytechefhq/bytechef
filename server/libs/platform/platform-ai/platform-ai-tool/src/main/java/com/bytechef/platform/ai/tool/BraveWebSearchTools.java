@@ -16,9 +16,8 @@
 
 package com.bytechef.platform.ai.tool;
 
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.exception.BraveToolErrorType;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -30,18 +29,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 /**
  * @author Ivica Cardic
  */
-@Component
-@Conditional(BraveWebSearchCondition.class)
 public class BraveWebSearchTools {
 
-    private static final String BASE_URL = "https://api.search.brave.com/res/v1";
     private static final int MAX_COUNT = 20;
     private static final int MIN_COUNT = 1;
 
@@ -49,13 +43,10 @@ public class BraveWebSearchTools {
 
     private final RestClient restClient;
 
-    public BraveWebSearchTools(ApplicationProperties applicationProperties, RestClient.Builder restClientBuilder) {
-        ApplicationProperties.Ai.Brave brave = applicationProperties.getAi()
-            .getBrave();
-
+    public BraveWebSearchTools(String baseUrl, String apiKey, RestClient.Builder restClientBuilder) {
         this.restClient = restClientBuilder
-            .baseUrl(BASE_URL)
-            .defaultHeader("X-Subscription-Token", brave.getApiKey())
+            .baseUrl(baseUrl)
+            .defaultHeader("X-Subscription-Token", apiKey)
             .defaultHeader("Accept", "application/json")
             .build();
     }
@@ -134,8 +125,7 @@ public class BraveWebSearchTools {
                 "braveWebSearch({}, {}, {}, {}): Failed to perform Brave search for query: {}", query, count, country,
                 freshness, query, e);
 
-            throw new ExecutionException(
-                "Failed to perform Brave search: " + e.getMessage(), e, BraveToolErrorType.WEB_SEARCH);
+            throw ToolUtils.toToolExecutionException("perform Brave search", e, BraveToolErrorType.WEB_SEARCH);
         }
     }
 

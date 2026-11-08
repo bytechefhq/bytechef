@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.NoSuchElementException;
@@ -26,7 +27,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -37,7 +37,7 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         Update an existing MCP server's name and/or enabled state. Supply mcpServerId (numeric, from
-        listMcpServers). At least one of name or enabled must be supplied — fields you omit are left
+        listMcpServers). At least one of name or enabled must be supplied; fields you omit are left
         unchanged. Use enabled=true to bring a server online or enabled=false to take it offline. Returns
         {mcpServerId, name, enabled} reflecting the post-update values.""";
 
@@ -46,7 +46,7 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
             {
                 "type": "object",
                 "properties": {
-                    "mcpServerId": {"type": "string", "description": "Numeric MCP server id from listMcpServers"},
+                    "mcpServerId": {"type": "integer", "description": "Numeric MCP server id from listMcpServers"},
                     "name": {"type": "string", "description": "New server name (optional; leave omitted to keep)"},
                     "enabled": {"type": "boolean", "description": "New enabled state (optional; leave omitted to keep)"}
                 },
@@ -54,7 +54,6 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
             }""";
 
     private final WorkspaceMcpServerFacade workspaceMcpServerFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public UpdateMcpServerToolCallback(WorkspaceMcpServerFacade workspaceMcpServerFacade) {
@@ -78,7 +77,7 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            UpdateMcpServerInput input = jsonMapper.readValue(toolInput, UpdateMcpServerInput.class);
+            UpdateMcpServerInput input = JsonUtils.read(toolInput, UpdateMcpServerInput.class);
 
             String mcpServerIdString = input.mcpServerId();
 
@@ -100,31 +99,44 @@ public class UpdateMcpServerToolCallback implements ToolCallback {
             try {
                 mcpServerId = Long.parseLong(mcpServerIdString);
             } catch (NumberFormatException exception) {
-                return toolError("Invalid mcpServerId — must be a numeric id");
+                return toolError("Invalid mcpServerId: must be a numeric id");
             }
 
-            McpServer updated = workspaceMcpServerFacade.updateWorkspaceMcpServer(
-                mcpServerId, nameSupplied ? name : null, input.enabled());
+            McpServer updated;
 
-            return jsonMapper.writeValueAsString(
+            try {
+                updated = workspaceMcpServerFacade.updateWorkspaceMcpServer(
+                    mcpServerId, nameSupplied ? name : null, input.enabled());
+            } catch (NoSuchElementException exception) {
+                return toolError("MCP server " + mcpServerId + " not found. Check the id with listMcpServers.");
+            }
+
+            return writeResult(
                 new UpdateMcpServerOutput(updated.getId(), updated.getName(), updated.isEnabled()));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
-        } catch (IllegalArgumentException | NoSuchElementException
-            | com.bytechef.exception.ConfigurationException exception) {
+            return ToolErrors.invalidInput(exception);
+        } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(jsonMapper, UpdateMcpServerToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(UpdateMcpServerToolCallback.class, TOOL_NAME, exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record UpdateMcpServerInput(String mcpServerId, @Nullable String name, @Nullable Boolean enabled) {
     }
 
     public record UpdateMcpServerOutput(long mcpServerId, String name, boolean enabled) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(UpdateMcpServerToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

@@ -78,7 +78,7 @@ const AskUserQuestionMessage = ({data}: DataMessagePartProps<AskUserQuestionData
         const summary = buildAnswerSummary(questions, nextAnswers);
         const messageText = totalSteps === 1 ? `User picked: ${answer}` : `User picked:\n${summary}`;
 
-        markAnswered(fingerprint, summary);
+        markAnswered(fingerprint, totalSteps === 1 ? answer : summary);
 
         aui.thread.append({
             content: [{text: messageText, type: 'text'}],

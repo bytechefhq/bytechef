@@ -17,16 +17,22 @@
 package com.bytechef.automation.ai.tool;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
+import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -47,18 +53,21 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
         {
             "type": "object",
             "properties": {
-                "projectDeploymentId": {"type": "string", "description": "Numeric project deployment id"},
+                "projectDeploymentId": {"type": "integer", "description": "Numeric project deployment id"},
                 "projectVersion": {"type": "integer", "description": "Target PUBLISHED project version"}
             },
             "required": ["projectDeploymentId", "projectVersion"]
         }""";
 
     private final ProjectDeploymentFacade projectDeploymentFacade;
-    private final JsonMapper jsonMapper = new JsonMapper();
+    private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public RollbackProjectDeploymentToolCallback(ProjectDeploymentFacade projectDeploymentFacade) {
+    public RollbackProjectDeploymentToolCallback(
+        ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowService projectWorkflowService) {
+
         this.projectDeploymentFacade = projectDeploymentFacade;
+        this.projectWorkflowService = projectWorkflowService;
     }
 
     @Override
@@ -78,7 +87,7 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            RollbackProjectDeploymentInput input = jsonMapper.readValue(
+            RollbackProjectDeploymentInput input = JsonUtils.read(
                 toolInput, RollbackProjectDeploymentInput.class);
 
             if (input.projectDeploymentId() == null || input.projectDeploymentId()
@@ -133,7 +142,9 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
                 .project(existing.project())
                 .projectId(existing.projectId())
                 .projectVersion(input.projectVersion())
-                .projectDeploymentWorkflows(existing.projectDeploymentWorkflows())
+                .projectDeploymentWorkflows(
+                    toTargetVersionWorkflows(
+                        existing.projectId(), input.projectVersion(), existing.projectDeploymentWorkflows()))
                 .tags(existing.tags())
                 .version(existing.version())
                 .build();
@@ -146,21 +157,54 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
                         + " could not be rolled back — one of its workflows no longer exists");
             }
 
-            return jsonMapper.writeValueAsString(
+            return writeResult(
                 new RollbackProjectDeploymentOutput(
                     projectDeploymentId, input.projectVersion(), previousProjectVersion));
         } catch (JacksonException exception) {
-            return toolError("Invalid tool input: " + exception.getMessage());
+            return ToolErrors.invalidInput(exception);
         } catch (IllegalArgumentException | com.bytechef.exception.ConfigurationException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
-            return ToolErrors.runtimeFailure(
-                jsonMapper, RollbackProjectDeploymentToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(RollbackProjectDeploymentToolCallback.class, TOOL_NAME, exception);
         }
     }
 
+    private List<ProjectDeploymentWorkflowDTO> toTargetVersionWorkflows(
+        long projectId, int projectVersion, @Nullable List<ProjectDeploymentWorkflowDTO> projectDeploymentWorkflows) {
+
+        List<ProjectDeploymentWorkflowDTO> targetVersionWorkflows = new ArrayList<>();
+
+        if (projectDeploymentWorkflows == null) {
+            return targetVersionWorkflows;
+        }
+
+        for (ProjectDeploymentWorkflowDTO projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            Optional<ProjectWorkflow> projectWorkflowOptional = projectWorkflowService.fetchProjectWorkflow(
+                projectId, projectVersion, projectDeploymentWorkflow.workflowUuid());
+
+            if (projectWorkflowOptional.isEmpty()) {
+                continue;
+            }
+
+            ProjectWorkflow projectWorkflow = projectWorkflowOptional.get();
+
+            targetVersionWorkflows.add(
+                new ProjectDeploymentWorkflowDTO(
+                    projectDeploymentWorkflow.connections(), projectDeploymentWorkflow.createdBy(),
+                    projectDeploymentWorkflow.createdDate(), projectDeploymentWorkflow.inputs(),
+                    projectDeploymentWorkflow.enabled(), projectDeploymentWorkflow.id(),
+                    projectDeploymentWorkflow.lastExecutionDate(), projectDeploymentWorkflow.lastExecutionStatus(),
+                    projectDeploymentWorkflow.lastModifiedBy(), projectDeploymentWorkflow.lastModifiedDate(),
+                    projectDeploymentWorkflow.projectDeploymentId(), projectDeploymentWorkflow.staticWebhookUrl(),
+                    projectDeploymentWorkflow.version(), projectWorkflow.getWorkflowId(),
+                    projectDeploymentWorkflow.workflowUuid()));
+        }
+
+        return targetVersionWorkflows;
+    }
+
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record RollbackProjectDeploymentInput(String projectDeploymentId, Integer projectVersion) {
@@ -168,5 +212,13 @@ public class RollbackProjectDeploymentToolCallback implements ToolCallback {
 
     public record RollbackProjectDeploymentOutput(
         long projectDeploymentId, int projectVersion, int previousProjectVersion) {
+    }
+
+    private static String writeResult(Object result) {
+        try {
+            return JsonUtils.write(result);
+        } catch (JacksonException exception) {
+            return ToolErrors.runtimeFailure(RollbackProjectDeploymentToolCallback.class, TOOL_NAME, exception);
+        }
     }
 }

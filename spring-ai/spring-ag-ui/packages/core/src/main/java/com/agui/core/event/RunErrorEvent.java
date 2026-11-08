@@ -23,6 +23,8 @@ public class RunErrorEvent extends BaseEvent {
 
     private String error;
 
+    private String code;
+
     /**
      * Creates a new RunErrorEvent with type set to {@link EventType#RUN_ERROR}.
      * <p>
@@ -50,5 +52,13 @@ public class RunErrorEvent extends BaseEvent {
      */
     public String getError() {
         return this.error;
+    }
+
+    public void setCode(final String code) {
+        this.code = code;
+    }
+
+    public String getCode() {
+        return this.code;
     }
 }

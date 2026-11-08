@@ -18,6 +18,7 @@ package com.bytechef.platform.component.facade;
 
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
@@ -27,7 +28,9 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -60,6 +63,12 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
             searchText, componentConnection);
     }
 
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
+        return componentDefinitionService.fetchComponentDefinition(name, version);
+    }
+
     private @Nullable ComponentConnection getComponentConnection(@Nullable Long connectionId) {
         ComponentConnection componentConnection = null;
 
@@ -85,5 +94,17 @@ public class ComponentDefinitionFacadeImpl implements ComponentDefinitionFacade 
                     connection.getName(), status),
                 ConnectionErrorType.INVALID_CONNECTION);
         }
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public ComponentDefinition getComponentDefinition(String name, @Nullable Integer version) {
+        return componentDefinitionService.getComponentDefinition(name, version);
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public List<ComponentDefinition> getComponentDefinitions() {
+        return componentDefinitionService.getComponentDefinitions();
     }
 }

@@ -68,4 +68,21 @@ class ObjectMapperFactoryTest {
 
         assertThat(event.getError()).isEqualTo("old format");
     }
+
+    @Test
+    void shouldSerializeRunErrorEventCodeOnlyWhenSet() {
+        JsonMapper mapper = JsonMapper.builder()
+            .addModule(ObjectMapperFactory.createModule())
+            .build();
+
+        RunErrorEvent codedEvent = new RunErrorEvent();
+        codedEvent.setError("model unavailable");
+        codedEvent.setCode("MODEL_UNAVAILABLE");
+
+        RunErrorEvent uncodedEvent = new RunErrorEvent();
+        uncodedEvent.setError("agent crashed");
+
+        assertThat(mapper.writeValueAsString(codedEvent)).contains("\"code\":\"MODEL_UNAVAILABLE\"");
+        assertThat(mapper.writeValueAsString(uncodedEvent)).doesNotContain("\"code\"");
+    }
 }

@@ -44,6 +44,7 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -121,6 +122,19 @@ class WorkspaceFacadeIntTest {
     }
 
     @Test
+    void testGetMyWorkspacesFiltersToMembershipForNonAdmin() {
+        when(permissionService.isTenantAdmin()).thenReturn(false);
+        when(permissionService.getMyWorkspaceRole(workspace1.getId())).thenReturn("VIEWER");
+        when(permissionService.getMyWorkspaceRole(workspace3.getId())).thenReturn("EDITOR");
+
+        List<Workspace> workspaces = workspaceFacade.getMyWorkspaces();
+
+        assertThat(workspaces)
+            .extracting(Workspace::getId)
+            .containsExactlyInAnyOrder(workspace1.getId(), workspace3.getId());
+    }
+
+    @Test
     void testGetUserWorkspacesEmptyWhenNonAdminHasNoMemberships() {
         when(permissionService.isTenantAdmin()).thenReturn(false);
         when(permissionService.getMyWorkspaceRole(anyLong())).thenReturn(null);
@@ -157,6 +171,16 @@ class WorkspaceFacadeIntTest {
             when(permissionService.isTenantAdmin()).thenReturn(true);
 
             assertNotDenied(() -> workspaceFacade.getUserWorkspaces(USER_ID));
+        }
+
+        @Test
+        void testGetMyWorkspacesIsGatedOnAuthentication() {
+            assertNotDenied(() -> workspaceFacade.getMyWorkspaces());
+
+            SecurityContextHolder.clearContext();
+
+            assertThatThrownBy(() -> workspaceFacade.getMyWorkspaces())
+                .isInstanceOfAny(AccessDeniedException.class, AuthenticationCredentialsNotFoundException.class);
         }
 
         private static void assertDenied(ThrowingCallable call) {

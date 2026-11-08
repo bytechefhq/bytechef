@@ -52,10 +52,12 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentReposit
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
+import com.bytechef.automation.configuration.repository.WorkspaceConnectionRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
+import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -165,6 +167,12 @@ class McpProjectFacadeIntTest {
     private WorkspaceMcpServerRepository workspaceMcpServerRepository;
 
     @Autowired
+    private WorkspaceConnectionRepository workspaceConnectionRepository;
+
+    @Autowired
+    private WorkspaceConnectionService workspaceConnectionService;
+
+    @Autowired
     private WorkspaceRepository workspaceRepository;
 
     @Autowired
@@ -231,6 +239,7 @@ class McpProjectFacadeIntTest {
         projectDeploymentRepository.deleteAll();
         projectWorkflowRepository.deleteAll();
         projectRepository.deleteAll();
+        workspaceConnectionRepository.deleteAll();
         workspaceRepository.deleteAll();
         categoryRepository.deleteAll();
         mcpServerRepository.deleteAll();
@@ -911,6 +920,82 @@ class McpProjectFacadeIntTest {
         }
 
         @Test
+        void testCreateMcpProjectRejectsAConfiguredConnectionOfAnotherWorkspace() {
+            stubRequiredSlackConnection();
+            stubForeignWorkspaceConnection(92L);
+
+            assertThatThrownBy(() -> mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1),
+                List.of(slackWorkflowConfiguration(workflowId1, 92L, Map.of()))))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Connection 92 cannot be used");
+        }
+
+        @Test
+        void testUpdateMcpProjectRejectsAKeptWorkflowConnectionOfAnotherWorkspace() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            stubRequiredSlackConnection();
+            stubForeignWorkspaceConnection(93L);
+
+            long mcpProjectId = mcpProject.getId();
+
+            assertThatThrownBy(() -> mcpProjectFacade.updateMcpProject(
+                mcpProjectId, List.of(workflowId1), List.of(slackWorkflowConfiguration(workflowId1, 93L, Map.of()))))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Connection 93 cannot be used");
+        }
+
+        @Test
+        void testUpdateMcpProjectKeepsAnUnchangedStoredConnectionOfAKeptWorkflow() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            stubRequiredSlackConnection();
+            stubForeignWorkspaceConnection(95L);
+
+            ProjectDeploymentWorkflow storedProjectDeploymentWorkflow =
+                projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(mcpProject.getProjectDeploymentId())
+                    .getFirst();
+
+            storedProjectDeploymentWorkflow.setConnections(
+                List.of(new ProjectDeploymentWorkflowConnection(95L, "slack", "newWorkflowCall_1")));
+
+            projectDeploymentWorkflowRepository.save(storedProjectDeploymentWorkflow);
+
+            mcpProjectFacade.updateMcpProject(
+                mcpProject.getId(), List.of(workflowId1),
+                List.of(slackWorkflowConfiguration(workflowId1, 95L, Map.of("channel", "general"))));
+
+            assertThat(projectDeploymentWorkflowRepository.findAllByProjectDeploymentId(
+                mcpProject.getProjectDeploymentId()))
+                    .singleElement()
+                    .satisfies(projectDeploymentWorkflow -> {
+                        assertThat(projectDeploymentWorkflow.getConnections())
+                            .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                            .containsExactly(95L);
+                        assertThat(projectDeploymentWorkflow.getInputs()).isEqualTo(Map.of("channel", "general"));
+                    });
+        }
+
+        @Test
+        void testUpdateMcpProjectRejectsAKeptWorkflowConnectionFromAnotherEnvironment() {
+            McpProject mcpProject = mcpProjectFacade.createMcpProject(
+                mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+            stubRequiredSlackConnection();
+            stubConnection(94L, "slack", Environment.PRODUCTION);
+
+            long mcpProjectId = mcpProject.getId();
+
+            assertThatThrownBy(() -> mcpProjectFacade.updateMcpProject(
+                mcpProjectId, List.of(workflowId1), List.of(slackWorkflowConfiguration(workflowId1, 94L, Map.of()))))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Connection 94 cannot be used");
+        }
+
+        @Test
         void testCreateMcpProjectRejectsAConfigurationWithoutTheRequiredConnection() {
             stubRequiredSlackConnection();
 
@@ -959,6 +1044,22 @@ class McpProjectFacadeIntTest {
             connection.setId(connectionId);
 
             when(connectionService.getConnection(connectionId)).thenReturn(connection);
+
+            workspaceConnectionService.create(connectionId, project.getWorkspaceId());
+        }
+
+        private void stubForeignWorkspaceConnection(long connectionId) {
+            Workspace foreignWorkspace = workspaceRepository.save(new Workspace("foreign-workspace"));
+
+            Connection connection = new Connection();
+
+            connection.setComponentName("slack");
+            connection.setEnvironmentId(Environment.DEVELOPMENT.ordinal());
+            connection.setId(connectionId);
+
+            when(connectionService.getConnection(connectionId)).thenReturn(connection);
+
+            workspaceConnectionService.create(connectionId, foreignWorkspace.getId());
         }
 
         private void stubRequiredSlackConnection() {

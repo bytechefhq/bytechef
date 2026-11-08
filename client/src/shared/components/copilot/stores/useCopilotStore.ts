@@ -21,12 +21,76 @@ export enum Source {
     SKILLS = 'SKILLS',
     WORKFLOW_CODE_EDITOR = 'WORKFLOW_CODE_EDITOR',
     MCP_SERVER = 'MCP_SERVER',
+    JSON_SCHEMA_BUILDER = 'JSON_SCHEMA_BUILDER',
+    SAMPLE_OUTPUT = 'SAMPLE_OUTPUT',
+    CODE_WORKFLOW = 'CODE_WORKFLOW',
+    CODE_WORKFLOW_EMBEDDED = 'CODE_WORKFLOW_EMBEDDED',
+    CUSTOM_COMPONENT = 'CUSTOM_COMPONENT',
+    WORKFLOW_EDITOR_EMBEDDED = 'WORKFLOW_EDITOR_EMBEDDED',
+    WORKFLOW_EXECUTION_EMBEDDED = 'WORKFLOW_EXECUTION_EMBEDDED',
+    KNOWLEDGE_BASE = 'KNOWLEDGE_BASE',
+    DATA_TABLE = 'DATA_TABLE',
+    AI_AGENT = 'AI_AGENT',
+    DEPLOYMENT = 'DEPLOYMENT',
+    PROJECT = 'PROJECT',
+    PROJECT_DEPLOYMENT = 'PROJECT_DEPLOYMENT',
+    API_COLLECTION = 'API_COLLECTION',
+    ASSET_FILE = 'ASSET_FILE',
+    COMPONENT_RULE = 'COMPONENT_RULE',
 }
 
+export const isWorkflowEditorSource = (source: Source) =>
+    source === Source.WORKFLOW_EDITOR || source === Source.WORKFLOW_EDITOR_EMBEDDED;
+
+export interface CodeEditorCopilotParametersI {
+    language: string;
+}
+
+export interface ClusterElementCopilotParametersI {
+    taskName?: string;
+}
+
+export interface IntentCopilotParametersI {
+    intent: string;
+}
+
+export interface WorkflowCodeEditorCopilotParametersI {
+    format: string;
+}
+
+export interface WorkflowEditorCopilotParametersI {
+    integrationId?: string;
+    workflowId?: string;
+}
+
+export interface WorkflowExecutionCopilotParametersI {
+    environmentId?: number;
+    workflowExecutionId?: number;
+    workflowId?: string;
+    workspaceId?: number;
+}
+
+export interface WorkflowNodeCopilotParametersI {
+    propertyPath?: string;
+    title?: string;
+    workflowId?: string;
+    workflowNodeName?: string;
+}
+
+export type CopilotContextParametersType =
+    | Record<string, never>
+    | CodeEditorCopilotParametersI
+    | ClusterElementCopilotParametersI
+    | IntentCopilotParametersI
+    | WorkflowCodeEditorCopilotParametersI
+    | WorkflowEditorCopilotParametersI
+    | WorkflowExecutionCopilotParametersI
+    | WorkflowNodeCopilotParametersI;
+
 export type ContextType = {
+    environmentId?: number;
     source: Source;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    parameters: Record<string, any>;
+    parameters: CopilotContextParametersType;
     mode: MODE;
     workflowExecutionError?: {
         errorMessage?: string;
@@ -37,6 +101,7 @@ export type ContextType = {
 };
 
 interface ConversationSnapshotI {
+    composerPlaceholder: string | undefined;
     context: ContextType;
     conversationId: string | undefined;
     messages: ThreadMessageLike[];
@@ -51,6 +116,9 @@ interface CopilotStateI {
 
     context: ContextType;
     setContext: (context: ContextType | undefined) => void;
+
+    composerPlaceholder: string | undefined;
+    setComposerPlaceholder: (composerPlaceholder: string | undefined) => void;
 
     setWorkflowExecutionError: (
         workflowExecutionError:
@@ -78,6 +146,9 @@ interface CopilotStateI {
 
     globalPanelConversationToken: string | null;
     setGlobalPanelConversationToken: (token: string | null) => void;
+
+    workflowEditorWorkflowKey: string | undefined;
+    bindWorkflowEditorWorkflow: (workflowKey: string) => void;
 }
 
 export const useCopilotStore = create<CopilotStateI>()(
@@ -87,7 +158,12 @@ export const useCopilotStore = create<CopilotStateI>()(
             // New conversation = reset the picker too. The picker is "per conversation" by design, so a
             // user who picked GPT-4o in one conversation lands on the workspace default in the next one
             // rather than carrying the selection across unrelated threads.
-            set({conversationId: generateRandomId(), selectedLlmModel: null, selectedLlmProvider: null});
+            set((state) => ({
+                context: {...state.context, mode: MODE.ASK},
+                conversationId: generateRandomId(),
+                selectedLlmModel: null,
+                selectedLlmProvider: null,
+            }));
         },
 
         context: {
@@ -103,6 +179,9 @@ export const useCopilotStore = create<CopilotStateI>()(
                     context,
                 };
             }),
+
+        composerPlaceholder: undefined,
+        setComposerPlaceholder: (composerPlaceholder) => set({composerPlaceholder}),
 
         setWorkflowExecutionError: (error) =>
             set((state) => {
@@ -120,7 +199,7 @@ export const useCopilotStore = create<CopilotStateI>()(
             set((state) => {
                 return {
                     ...state,
-                    messages: [...state.messages, message],
+                    messages: [...state.messages, message.id ? message : {...message, id: generateRandomId()}],
                 };
             }),
         appendToLastAssistantMessage: (text: string) =>
@@ -144,7 +223,7 @@ export const useCopilotStore = create<CopilotStateI>()(
                 }
 
                 // No assistant message for the current turn yet; create one.
-                messages.push({role: 'assistant', content: text} as ThreadMessageLike);
+                messages.push({role: 'assistant', content: text, id: generateRandomId()} as ThreadMessageLike);
 
                 return {...state, messages};
             }),
@@ -181,6 +260,7 @@ export const useCopilotStore = create<CopilotStateI>()(
 
             set((state) => {
                 const snapshot: ConversationSnapshotI = {
+                    composerPlaceholder: state.composerPlaceholder,
                     context: state.context,
                     conversationId: state.conversationId,
                     messages: state.messages,
@@ -221,6 +301,7 @@ export const useCopilotStore = create<CopilotStateI>()(
 
                 return {
                     ...state,
+                    composerPlaceholder: snapshot.composerPlaceholder,
                     context: snapshot.context,
                     conversationId: snapshot.conversationId,
                     conversationStack: nextStack,
@@ -232,5 +313,27 @@ export const useCopilotStore = create<CopilotStateI>()(
 
         globalPanelConversationToken: null,
         setGlobalPanelConversationToken: (token) => set({globalPanelConversationToken: token}),
+
+        workflowEditorWorkflowKey: undefined,
+        bindWorkflowEditorWorkflow: (workflowKey) =>
+            set((state) => {
+                if (state.workflowEditorWorkflowKey === workflowKey) {
+                    return state;
+                }
+
+                if (state.workflowEditorWorkflowKey === undefined) {
+                    return {...state, workflowEditorWorkflowKey: workflowKey};
+                }
+
+                return {
+                    ...state,
+                    context: {...state.context, mode: MODE.ASK},
+                    conversationId: generateRandomId(),
+                    messages: [],
+                    selectedLlmModel: null,
+                    selectedLlmProvider: null,
+                    workflowEditorWorkflowKey: workflowKey,
+                };
+            }),
     }))
 );

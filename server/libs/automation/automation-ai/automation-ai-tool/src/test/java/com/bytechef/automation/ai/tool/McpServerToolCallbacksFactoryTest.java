@@ -19,12 +19,9 @@ package com.bytechef.automation.ai.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
+import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
-import com.bytechef.automation.ai.mcp.service.McpProjectService;
-import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
-import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.tool.ToolCallback;
@@ -35,9 +32,7 @@ import org.springframework.ai.tool.ToolCallback;
 final class McpServerToolCallbacksFactoryTest {
 
     private final McpServerToolCallbacksFactory factory = new McpServerToolCallbacksFactory(
-        mock(McpProjectFacade.class), mock(McpProjectService.class), mock(McpProjectWorkflowService.class),
-        mock(ProjectDeploymentWorkflowService.class), mock(WorkflowService.class),
-        mock(WorkspaceMcpServerFacade.class));
+        mock(McpProjectFacade.class), mock(McpProjectWorkflowFacade.class), mock(WorkspaceMcpServerFacade.class));
 
     @Test
     void readListContainsListMcpServersAndListMcpProjectWorkflows() {

@@ -130,6 +130,46 @@ class WorkflowValidatorDuplicateNodeNamesTest {
     }
 
     @Test
+    void detectsCollisionBetweenTaskAndNestedClusterElementNames() {
+        String workflow =
+            """
+                {
+                    "label": "Test Workflow",
+                    "description": "Test workflow description",
+                    "triggers": [
+                        {"label": "Chat", "name": "trigger_1", "type": "chat/v1/newChatRequest", "parameters": {}}
+                    ],
+                    "tasks": [
+                        {
+                            "label": "Agent",
+                            "name": "chat_1",
+                            "type": "aiAgent/v1/chat",
+                            "parameters": {},
+                            "clusterElements": {
+                                "model": {"label": "Model", "name": "model_1", "type": "anthropic/v1/model", "parameters": {}},
+                                "tools": [
+                                    {
+                                        "label": "Approval Gate",
+                                        "name": "approvalGate_1",
+                                        "type": "aiAgentUtils/v1/approvalGate",
+                                        "parameters": {"name": "Post to Slack"},
+                                        "clusterElements": {
+                                            "approvalChannels": [
+                                                {"label": "Chat", "name": "chat_1", "type": "chat/v1/chat", "parameters": {}}
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+                """;
+
+        assertEquals("Node names must be unique. Duplicate node name: chat_1", validate(workflow));
+    }
+
+    @Test
     void detectsCollisionBetweenInputAndTaskName() {
         String workflow = """
             {

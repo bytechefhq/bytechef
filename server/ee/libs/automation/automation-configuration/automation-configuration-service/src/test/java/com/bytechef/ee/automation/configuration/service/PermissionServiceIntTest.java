@@ -14,9 +14,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
+import com.bytechef.automation.configuration.repository.WorkspaceConnectionRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.security.ConnectionOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -75,6 +78,9 @@ class PermissionServiceIntTest {
 
     @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
+
+    @Autowired
+    private WorkspaceConnectionRepository workspaceConnectionRepository;
 
     @Autowired
     private WorkspaceRepository workspaceRepository;
@@ -407,6 +413,30 @@ class PermissionServiceIntTest {
             resolver("Connection", ResourceOwner.unknown()));
 
         assertThat(resourcePermissionService.hasResourceScope(1L, "Connection", "WORKFLOW_VIEW")).isFalse();
+    }
+
+    @Test
+    void testHasResourceScopeForAConnectionRequiresMembershipOfItsWorkspace() {
+        addMember(WorkspaceRole.VIEWER);
+
+        Workspace foreignWorkspace = workspaceRepository.save(
+            new Workspace("Permission Service Foreign " + UUID.randomUUID()));
+
+        WorkspaceConnection workspaceConnection = workspaceConnectionRepository.save(
+            new WorkspaceConnection(91001L, workspaceId));
+        WorkspaceConnection foreignWorkspaceConnection = workspaceConnectionRepository.save(
+            new WorkspaceConnection(91002L, foreignWorkspace.getId()));
+
+        try {
+            PermissionService resourcePermissionService = createPermissionService(
+                new ConnectionOwnershipResolver(workspaceConnectionRepository));
+
+            assertThat(resourcePermissionService.hasResourceScope(91001L, "Connection", "WORKFLOW_VIEW")).isTrue();
+            assertThat(resourcePermissionService.hasResourceScope(91002L, "Connection", "WORKFLOW_VIEW")).isFalse();
+            assertThat(resourcePermissionService.hasResourceScope(91003L, "Connection", "WORKFLOW_VIEW")).isFalse();
+        } finally {
+            workspaceConnectionRepository.deleteAll(List.of(workspaceConnection, foreignWorkspaceConnection));
+        }
     }
 
     @Test

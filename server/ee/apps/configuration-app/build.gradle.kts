@@ -36,7 +36,6 @@ dependencies {
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-graphql"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-service"))
     implementation(project(":server:libs:automation:automation-swagger"))
-    implementation(project(":server:libs:config:ai-model-config"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:async-config"))
     implementation(project(":server:libs:config:automation-demo-config"))

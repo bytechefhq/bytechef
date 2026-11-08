@@ -40,7 +40,7 @@ public final class LookupPropertyTracker {
     private static final Pattern WORD_BOUNDARY = Pattern.compile("(?<=[a-z0-9])(?=[A-Z])|[^A-Za-z0-9]+");
     private static final Set<String> GENERIC_WORDS = Set.of("id", "ids", "key", "name", "value", "values");
     private static final Set<String> RESOLVING_TOOL_NAMES = Set.of(
-        "selectPropertyOption", "selectTriggerPropertyOption");
+        "selectClusterElementPropertyOption", "selectPropertyOption", "selectTriggerPropertyOption");
 
     private final Set<String> lookupPropertyNames = ConcurrentHashMap.newKeySet();
     private final Set<String> resolvedPropertyNames = ConcurrentHashMap.newKeySet();

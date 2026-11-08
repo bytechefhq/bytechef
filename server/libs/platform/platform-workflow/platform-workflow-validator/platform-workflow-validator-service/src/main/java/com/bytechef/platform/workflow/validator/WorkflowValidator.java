@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
@@ -1006,6 +1007,68 @@ public class WorkflowValidator {
         return new ArrayList<>(duplicateNames);
     }
 
+    public static void validateNodeTypesExist(
+        String workflow, BiPredicate<String, String> nodeTypeExists, StringBuilder errors) {
+
+        JsonNode workflowJsonNode;
+
+        try {
+            workflowJsonNode = com.bytechef.commons.util.JsonUtils.readTree(workflow);
+        } catch (Exception exception) {
+            return;
+        }
+
+        JsonNode triggersJsonNode = workflowJsonNode.get("triggers");
+
+        if (triggersJsonNode != null && triggersJsonNode.isArray()) {
+            for (JsonNode triggerJsonNode : triggersJsonNode) {
+                checkNodeTypeExists(triggerJsonNode, true, nodeTypeExists, errors);
+            }
+        }
+
+        JsonNode tasksJsonNode = workflowJsonNode.get("tasks");
+
+        if (tasksJsonNode != null && tasksJsonNode.isArray()) {
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                checkTaskTypeExists(taskJsonNode, nodeTypeExists, errors);
+            }
+        }
+    }
+
+    private static void checkTaskTypeExists(
+        JsonNode taskJsonNode, BiPredicate<String, String> nodeTypeExists, StringBuilder errors) {
+
+        if (!taskJsonNode.isObject()) {
+            return;
+        }
+
+        checkNodeTypeExists(taskJsonNode, false, nodeTypeExists, errors);
+
+        forEachNestedTask(
+            taskJsonNode.get("parameters"),
+            nestedTaskJsonNode -> checkTaskTypeExists(nestedTaskJsonNode, nodeTypeExists, errors));
+    }
+
+    private static void checkNodeTypeExists(
+        JsonNode nodeJsonNode, boolean trigger, BiPredicate<String, String> nodeTypeExists, StringBuilder errors) {
+
+        JsonNode nameJsonNode = nodeJsonNode.get("name");
+        JsonNode typeJsonNode = nodeJsonNode.get("type");
+
+        if (nameJsonNode == null || !nameJsonNode.isString() || typeJsonNode == null || !typeJsonNode.isString()) {
+            return;
+        }
+
+        String type = typeJsonNode.asString();
+
+        if (!TaskValidator.isWellFormedType(type) || nodeTypeExists.test(type, trigger ? "trigger" : "task")) {
+            return;
+        }
+
+        StringUtils.appendWithNewline(
+            "[" + nameJsonNode.asString() + "] " + ValidationErrorUtils.unknownNodeType(type, trigger), errors);
+    }
+
     public static List<String> getReservedNodeNames(String workflow) {
         try {
             JsonMapper jsonMapper = JsonMapper.builder()
@@ -1063,6 +1126,18 @@ public class WorkflowValidator {
 
         if (parametersJsonNode != null && parametersJsonNode.isObject()) {
             collectNestedTaskNames(parametersJsonNode, nodeNames);
+        }
+
+        JsonNode clusterElementsJsonNode = taskJsonNode.get("clusterElements");
+
+        if (clusterElementsJsonNode != null && clusterElementsJsonNode.isObject()) {
+            for (JsonNode clusterElementJsonNode : clusterElementsJsonNode) {
+                if (clusterElementJsonNode.isArray()) {
+                    collectTaskNames(clusterElementJsonNode, nodeNames);
+                } else {
+                    collectTaskName(clusterElementJsonNode, nodeNames);
+                }
+            }
         }
     }
 
@@ -1221,6 +1296,15 @@ public class WorkflowValidator {
         @Nullable
         default List<String> getRequiredClusterElementTypes(String taskType) {
             return getClusterElementTypes(taskType);
+        }
+
+        /**
+         * The slot keys a cluster element type can be placed under: empty when no such cluster element is defined,
+         * {@code null} when this provider cannot tell.
+         */
+        @Nullable
+        default Set<String> getClusterElementSlotKeys(String clusterElementType) {
+            return null;
         }
     }
 

@@ -16,9 +16,8 @@
 
 package com.bytechef.platform.ai.tool;
 
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.exception.FirecrawlToolErrorType;
+import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -30,9 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 /**
@@ -40,21 +37,16 @@ import org.springframework.web.client.RestClient;
  *
  * @author Marko Krišković
  */
-@Component
-@ConditionalOnProperty(name = "bytechef.ai.firecrawl.enabled")
 public class FirecrawlTools {
 
     private static final Logger log = LoggerFactory.getLogger(FirecrawlTools.class);
 
     private final RestClient restClient;
 
-    public FirecrawlTools(ApplicationProperties applicationProperties, RestClient.Builder restClientBuilder) {
-        ApplicationProperties.Ai.Firecrawl firecrawl = applicationProperties.getAi()
-            .getFirecrawl();
-
+    public FirecrawlTools(String baseUrl, String apiKey, RestClient.Builder restClientBuilder) {
         this.restClient = restClientBuilder
-            .baseUrl(firecrawl.getBaseUrl())
-            .defaultHeader("Authorization", "Bearer " + firecrawl.getApiKey())
+            .baseUrl(baseUrl)
+            .defaultHeader("Authorization", "Bearer " + apiKey)
             .build();
     }
 
@@ -124,8 +116,7 @@ public class FirecrawlTools {
                 "webSearch({}, {}, {}): Failed to perform Firecrawl search for query: {}", query, limit, country, query,
                 e);
 
-            throw new ExecutionException(
-                "Failed to perform Firecrawl search: " + e.getMessage(), e, FirecrawlToolErrorType.WEB_SEARCH);
+            throw ToolUtils.toToolExecutionException("perform Firecrawl search", e, FirecrawlToolErrorType.WEB_SEARCH);
         }
     }
 
@@ -182,8 +173,7 @@ public class FirecrawlTools {
             log.error(
                 "webpageScrape({}, {}): Failed to scrape URL with Firecrawl: {}", url, onlyMainContent, url, e);
 
-            throw new ExecutionException(
-                "Failed to scrape URL: " + e.getMessage(), e, FirecrawlToolErrorType.WEBPAGE_SCRAPE);
+            throw ToolUtils.toToolExecutionException("scrape URL", e, FirecrawlToolErrorType.WEBPAGE_SCRAPE);
         }
     }
 
@@ -263,8 +253,7 @@ public class FirecrawlTools {
                 "websiteMap({}, {}, {}, {}, {}): Failed to map website URLs for: {}", url, search, limit,
                 includeSubdomains, ignoreQueryParameters, url, e);
 
-            throw new ExecutionException(
-                "Failed to map website: " + e.getMessage(), e, FirecrawlToolErrorType.WEBSITE_MAP);
+            throw ToolUtils.toToolExecutionException("map website", e, FirecrawlToolErrorType.WEBSITE_MAP);
         }
     }
 

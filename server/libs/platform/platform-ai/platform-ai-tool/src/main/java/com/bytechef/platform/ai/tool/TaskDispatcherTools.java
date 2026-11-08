@@ -17,13 +17,13 @@
 package com.bytechef.platform.ai.tool;
 
 import com.bytechef.exception.ExecutionException;
-import com.bytechef.platform.ai.tool.exception.TaskDispatcherToolErrorType;
 import com.bytechef.platform.ai.tool.util.ToolUtils;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.workflow.task.dispatcher.exception.TaskDispatcherDefinitionErrorType;
+import com.bytechef.platform.workflow.task.dispatcher.facade.TaskDispatcherDefinitionFacade;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -49,7 +49,7 @@ public class TaskDispatcherTools {
     private static final String FAILED_TO_GET_TASK_DISPATCHER = "Failed to get task dispatcher";
     private static final String FAILED_TO_SEARCH_TASK_DISPATCHERS = "Failed to search task dispatchers";
 
-    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
+    private final TaskDispatcherDefinitionFacade taskDispatcherDefinitionFacade;
 
     private static final String DEFAULT_TASK_DISPATCHER_DEFINITION = """
         {
@@ -63,8 +63,8 @@ public class TaskDispatcherTools {
     private static final List<String> taskDispatcherNames = List.of("branch", "condition", "loop", "map", "on-error");
 
     @SuppressFBWarnings("EI")
-    public TaskDispatcherTools(TaskDispatcherDefinitionService taskDispatcherDefinitionService) {
-        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
+    public TaskDispatcherTools(TaskDispatcherDefinitionFacade taskDispatcherDefinitionFacade) {
+        this.taskDispatcherDefinitionFacade = taskDispatcherDefinitionFacade;
     }
 
     @Tool(
@@ -72,7 +72,7 @@ public class TaskDispatcherTools {
     public List<TaskDispatcherMinimalInfo> listTaskDispatchers() {
         try {
             List<TaskDispatcherDefinition> taskDispatcherDefinitions =
-                taskDispatcherDefinitionService.getTaskDispatcherDefinitions();
+                taskDispatcherDefinitionFacade.getTaskDispatcherDefinitions();
 
             if (log.isDebugEnabled()) {
                 log.debug("listTaskDispatchers(): Found {} task dispatchers", taskDispatcherDefinitions.size());
@@ -89,7 +89,7 @@ public class TaskDispatcherTools {
             log.error("listTaskDispatchers(): " + FAILED_TO_LIST_TASK_DISPATCHERS, e);
 
             throw new ExecutionException(
-                FAILED_TO_LIST_TASK_DISPATCHERS, e, TaskDispatcherToolErrorType.LIST_TASK_DISPATCHERS);
+                FAILED_TO_LIST_TASK_DISPATCHERS, e, TaskDispatcherDefinitionErrorType.LIST_TASK_DISPATCHERS);
         }
     }
 
@@ -101,7 +101,7 @@ public class TaskDispatcherTools {
 
         try {
             TaskDispatcherDefinition taskDispatcherDefinition =
-                taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version);
+                taskDispatcherDefinitionFacade.getTaskDispatcherDefinition(name, version);
 
             if (log.isDebugEnabled()) {
                 log.debug("getTaskDispatcher({}, {}): Retrieved task dispatcher {}", name, version, name);
@@ -129,7 +129,7 @@ public class TaskDispatcherTools {
             log.error("getTaskDispatcher({}, {}): Failed to get task dispatcher {}", name, version, name, e);
 
             throw new ExecutionException(
-                FAILED_TO_GET_TASK_DISPATCHER, e, TaskDispatcherToolErrorType.GET_TASK_DISPATCHER);
+                FAILED_TO_GET_TASK_DISPATCHER, e, TaskDispatcherDefinitionErrorType.GET_TASK_DISPATCHER);
         }
     }
 
@@ -141,7 +141,7 @@ public class TaskDispatcherTools {
 
         try {
             TaskDispatcherDefinition taskDispatcherDefinition =
-                taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version);
+                taskDispatcherDefinitionFacade.getTaskDispatcherDefinition(name, version);
 
             // fix it
             OutputResponse outputResponse = null;
@@ -150,7 +150,7 @@ public class TaskDispatcherTools {
                 if (taskDispatcherDefinition.isOutputSchemaDefined()) {
                     outputResponse = taskDispatcherDefinition.getOutputResponse();
                 } else if (taskDispatcherDefinition.isOutputFunctionDefined()) {
-                    outputResponse = taskDispatcherDefinitionService.executeOutput(taskDispatcherDefinition.getName(),
+                    outputResponse = taskDispatcherDefinitionFacade.executeOutput(taskDispatcherDefinition.getName(),
                         taskDispatcherDefinition.getVersion(), Map.of());
                 }
             }
@@ -174,7 +174,7 @@ public class TaskDispatcherTools {
                 version, name, e);
 
             throw new ExecutionException("Failed to get output properties", e,
-                TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_OUTPUT);
+                TaskDispatcherDefinitionErrorType.GET_TASK_DISPATCHER_OUTPUT);
         }
     }
 
@@ -186,7 +186,7 @@ public class TaskDispatcherTools {
 
         try {
             TaskDispatcherDefinition taskDispatcherDefinition =
-                taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version);
+                taskDispatcherDefinitionFacade.getTaskDispatcherDefinition(name, version);
 
             List<? extends BaseProperty> properties = taskDispatcherDefinition.getProperties();
             List<? extends BaseProperty> taskProperties = taskDispatcherDefinition.getTaskProperties();
@@ -208,7 +208,7 @@ public class TaskDispatcherTools {
                 name, e);
 
             throw new ExecutionException("Failed to get properties", e,
-                TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_PROPERTIES);
+                TaskDispatcherDefinitionErrorType.GET_TASK_DISPATCHER_PROPERTIES);
         }
     }
 
@@ -220,7 +220,7 @@ public class TaskDispatcherTools {
 
         try {
             List<TaskDispatcherDefinition> taskDispatcherDefinitions =
-                taskDispatcherDefinitionService.getTaskDispatcherDefinitions();
+                taskDispatcherDefinitionFacade.getTaskDispatcherDefinitions();
             String lowerQuery = query.toLowerCase()
                 .trim();
 
@@ -249,7 +249,7 @@ public class TaskDispatcherTools {
                 "searchTaskDispatchers({}): Failed to search task dispatchers with query '{}'", query, query, e);
 
             throw new ExecutionException(
-                FAILED_TO_SEARCH_TASK_DISPATCHERS, e, TaskDispatcherToolErrorType.SEARCH_TASK_DISPATCHERS);
+                FAILED_TO_SEARCH_TASK_DISPATCHERS, e, TaskDispatcherDefinitionErrorType.SEARCH_TASK_DISPATCHERS);
         }
     }
 
@@ -261,7 +261,7 @@ public class TaskDispatcherTools {
 
         try {
             TaskDispatcherDefinition taskDispatcherDefinition =
-                taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version);
+                taskDispatcherDefinitionFacade.getTaskDispatcherDefinition(name, version);
 
             List<Property> properties = new ArrayList<>(taskDispatcherDefinition.getProperties());
 
@@ -290,7 +290,7 @@ public class TaskDispatcherTools {
 
             throw new ExecutionException(
                 "Failed to generate task dispatcher definition", e,
-                TaskDispatcherToolErrorType.GET_TASK_DISPATCHER_DEFINITION);
+                TaskDispatcherDefinitionErrorType.GET_TASK_DISPATCHER_DEFINITION);
         }
     }
 

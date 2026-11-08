@@ -25,11 +25,18 @@ import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
+import com.bytechef.platform.mcp.security.McpServerConnectionAccessResolver;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,12 +51,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class McpComponentServiceImpl implements McpComponentService {
 
     private final McpComponentRepository mcpComponentRepository;
+    private final ObjectProvider<McpServerConnectionAccessResolver> mcpServerConnectionAccessResolvers;
     private final McpToolRepository mcpToolRepository;
 
+    @SuppressFBWarnings("EI")
     public McpComponentServiceImpl(
-        McpComponentRepository mcpComponentRepository, McpToolRepository mcpToolRepository) {
+        McpComponentRepository mcpComponentRepository,
+        ObjectProvider<McpServerConnectionAccessResolver> mcpServerConnectionAccessResolvers,
+        McpToolRepository mcpToolRepository) {
 
         this.mcpComponentRepository = mcpComponentRepository;
+        this.mcpServerConnectionAccessResolvers = mcpServerConnectionAccessResolvers;
         this.mcpToolRepository = mcpToolRepository;
     }
 
@@ -62,6 +74,8 @@ public class McpComponentServiceImpl implements McpComponentService {
     })
     @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent create(McpComponent mcpComponent) {
+        checkConnectionAccess(mcpComponent.getMcpServerId(), mcpComponent.getConnectionId());
+
         return mcpComponentRepository.save(mcpComponent);
     }
 
@@ -74,6 +88,8 @@ public class McpComponentServiceImpl implements McpComponentService {
     })
     @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent create(McpComponent mcpComponent, List<McpTool> mcpTools) {
+        checkConnectionAccess(mcpComponent.getMcpServerId(), mcpComponent.getConnectionId());
+
         McpComponent savedMcpComponent = mcpComponentRepository.save(mcpComponent);
 
         for (McpTool mcpTool : mcpTools) {
@@ -95,6 +111,12 @@ public class McpComponentServiceImpl implements McpComponentService {
         McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools) {
 
         McpComponent currentMcpComponent = OptionalUtils.get(mcpComponentRepository.findById(mcpComponent.getId()));
+
+        Long connectionId = mcpComponent.getConnectionId();
+
+        if (!Objects.equals(connectionId, currentMcpComponent.getConnectionId())) {
+            checkConnectionAccess(currentMcpComponent.getMcpServerId(), connectionId);
+        }
 
         currentMcpComponent.setConnectionId(mcpComponent.getConnectionId());
         currentMcpComponent.setVersion(mcpComponent.getVersion());
@@ -156,5 +178,19 @@ public class McpComponentServiceImpl implements McpComponentService {
     @Override
     public List<McpComponent> getMcpServerMcpComponents(long mcpServerId) {
         return mcpComponentRepository.findAllByMcpServerId(mcpServerId);
+    }
+
+    private void checkConnectionAccess(long mcpServerId, @Nullable Long connectionId) {
+        if (connectionId == null || SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)) {
+            return;
+        }
+
+        boolean granted = mcpServerConnectionAccessResolvers.orderedStream()
+            .anyMatch(resolver -> resolver.isMcpServerConnection(mcpServerId, connectionId));
+
+        if (!granted) {
+            throw new AccessDeniedException(
+                "Connection %d cannot be used by MCP server %d".formatted(connectionId, mcpServerId));
+        }
     }
 }
