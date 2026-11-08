@@ -29,11 +29,7 @@ import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.JobContextAware;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tenant.TenantContext;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springaicommunity.agent.common.workspace.Workspace;
@@ -109,27 +105,6 @@ class AgentWorkspaceResolverTest {
         Workspace workspace = resolveForTenant("tenant_one", actionContext, null);
 
         assertThat(workspace.root()).isEqualTo(basedir.resolve("tenant_one/test/workflow-___project_1/default"));
-    }
-
-    @Test
-    void testResolveForTestRunRemovesExpiredTestWorkspaces() throws IOException {
-        Path expiredTestWorkspace = Files.createDirectories(basedir.resolve("tenant_one/test/job-1"));
-        Path recentTestWorkspace = Files.createDirectories(basedir.resolve("tenant_one/test/job-2"));
-
-        Files.setLastModifiedTime(
-            expiredTestWorkspace,
-            FileTime.from(Instant.now()
-                .minus(AgentWorkspaceResolver.TEST_WORKSPACE_RETENTION)
-                .minusSeconds(60)));
-
-        ActionContextAware actionContext = mock(ActionContextAware.class);
-
-        when(actionContext.getJobId()).thenReturn(3L);
-
-        resolveForTenant("tenant_one", actionContext, null);
-
-        assertThat(expiredTestWorkspace).doesNotExist();
-        assertThat(recentTestWorkspace).isDirectory();
     }
 
     @Test

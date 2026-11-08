@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
     testImplementation("org.mockito:mockito-core")
     testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))

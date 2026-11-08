@@ -20,6 +20,12 @@ bytechef:
         enabled: false
       workspace:
         basedir: ${user.home}/bytechef/data/ai-agent-workspaces
+        # How often each node removes expired test workspaces and the workspaces of deleted deployments and instances
+        cleanup-interval: 1h
+        # Remove deployed workspaces not modified for this long; unset keeps them while their deployment exists
+        # idle-retention: 30d
+        # How long the workspaces of editor test runs are kept
+        test-retention: 24h
         # Largest size of one agent workspace; 0 means no limit
         max-size: 1GB
     auto-memory:

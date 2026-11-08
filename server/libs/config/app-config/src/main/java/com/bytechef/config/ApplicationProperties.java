@@ -1058,6 +1058,9 @@ public class ApplicationProperties {
                  */
                 private String basedir;
                 private DataSize maxSize;
+                private Duration cleanupInterval;
+                private Duration idleRetention;
+                private Duration testRetention;
 
                 public String getBasedir() {
                     return basedir;
@@ -1067,12 +1070,36 @@ public class ApplicationProperties {
                     return maxSize;
                 }
 
+                public Duration getCleanupInterval() {
+                    return cleanupInterval;
+                }
+
+                public Duration getIdleRetention() {
+                    return idleRetention;
+                }
+
+                public Duration getTestRetention() {
+                    return testRetention;
+                }
+
                 public void setBasedir(String basedir) {
                     this.basedir = basedir;
                 }
 
                 public void setMaxSize(DataSize maxSize) {
                     this.maxSize = maxSize;
+                }
+
+                public void setCleanupInterval(Duration cleanupInterval) {
+                    this.cleanupInterval = cleanupInterval;
+                }
+
+                public void setIdleRetention(Duration idleRetention) {
+                    this.idleRetention = idleRetention;
+                }
+
+                public void setTestRetention(Duration testRetention) {
+                    this.testRetention = testRetention;
                 }
             }
         }
