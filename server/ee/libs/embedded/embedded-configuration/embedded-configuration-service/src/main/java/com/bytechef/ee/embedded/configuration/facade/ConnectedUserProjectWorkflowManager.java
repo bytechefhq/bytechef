@@ -29,6 +29,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -73,6 +74,7 @@ class ConnectedUserProjectWorkflowManager {
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationFacade workflowTestConfigurationFacade;
+    private final WorkflowValidatorFacade workflowValidatorFacade;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowManager(
@@ -80,7 +82,8 @@ class ConnectedUserProjectWorkflowManager {
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
         ConnectionService connectionService, ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService,
-        WorkflowTestConfigurationFacade workflowTestConfigurationFacade) {
+        WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
+        WorkflowValidatorFacade workflowValidatorFacade) {
         this.connectUserProjectService = connectUserProjectService;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectionService = connectionService;
@@ -89,6 +92,7 @@ class ConnectedUserProjectWorkflowManager {
         this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
         this.workflowTestConfigurationFacade = workflowTestConfigurationFacade;
+        this.workflowValidatorFacade = workflowValidatorFacade;
     }
 
     public String createProjectWorkflow(String externalUserId, String definition, Environment environment) {
@@ -122,6 +126,8 @@ class ConnectedUserProjectWorkflowManager {
 
     public void updateProjectWorkflow(
         String externalUserId, String workflowUuid, String definition, Environment environment) {
+        workflowValidatorFacade.validateHasEnabledTrigger(definition);
+
         ConnectedUserProject connectedUserProject = getOrCreateConnectedUserProject(externalUserId, environment);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
