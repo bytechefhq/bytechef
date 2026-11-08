@@ -3,6 +3,7 @@ import PageLoader from '@/components/PageLoader';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import ApiConnectorEndpointDetailPanel from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorEndpointDetailPanel';
 import ApiConnectorList from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorList';
+import ComponentPoliciesTab from '@/ee/pages/settings/platform/component-policies/ComponentPoliciesTab';
 import NewComponentMenu from '@/ee/pages/settings/platform/components/components/NewComponentMenu';
 import CustomComponentList from '@/ee/pages/settings/platform/custom-components/components/CustomComponentList';
 import Header from '@/shared/layout/Header';
@@ -12,7 +13,7 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Link2Icon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
-export type ComponentsTabType = 'api-connectors' | 'custom';
+export type ComponentsTabType = 'api-connectors' | 'custom' | 'policies';
 
 interface ComponentsProps {
     tab: ComponentsTabType;
@@ -59,8 +60,14 @@ const Components = ({tab}: ComponentsProps) => {
                         <TabsTrigger value="custom">Custom Components</TabsTrigger>
 
                         <TabsTrigger value="api-connectors">API Connectors</TabsTrigger>
+
+                        <TabsTrigger value="policies">Policies</TabsTrigger>
                     </TabsList>
                 )}
+
+                <TabsContent value="policies">
+                    <ComponentPoliciesTab />
+                </TabsContent>
 
                 <TabsContent className="flex flex-col" value="custom">
                     <PageLoader errors={[customComponentsError]} loading={customComponentsLoading}>
