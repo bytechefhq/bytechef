@@ -5,7 +5,6 @@ import {useGetIntegrationWorkflowsQuery} from '@/ee/shared/queries/embedded/inte
 import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
@@ -39,7 +38,6 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
                 showBottomPanel: state.showBottomPanel,
             }))
         );
-    const setCurrentNode = useWorkflowNodeDetailsPanelStore((state) => state.setCurrentNode);
 
     const {captureIntegrationPublished, captureIntegrationWorkflowTested} = useAnalytics();
     const navigate = useNavigate();
@@ -93,10 +91,6 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
     });
 
     const handleIntegrationWorkflowValueChange = (integrationWorkflowId: number) => {
-        setWorkflowTestExecution(undefined);
-        useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
-        setCurrentNode(undefined);
-
         navigate(
             `/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowId}?${searchParams}`
         );
