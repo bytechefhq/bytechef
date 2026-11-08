@@ -1,16 +1,18 @@
-import {render, renderHook, resetAll, screen} from '@/shared/util/test-utils';
+import {act, render, renderHook, resetAll, screen, userEvent, waitFor} from '@/shared/util/test-utils';
 import {
     type CellKeyDownArgs,
     type CellKeyboardEvent,
     type ColSpanArgs,
     type Column,
+    type RenderCellProps,
     type RenderSummaryCellProps,
+    type RowsChangeData,
 } from 'react-data-grid';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {type GridRowType, type SummaryRowType} from '../../components/cell-renderers';
 import {useCurrentDataTableStore} from '../../stores/useCurrentDataTableStore';
-import {useDataTable} from '../useDataTable';
+import {ADD_ROW_ID, DRAFT_ROW_ID, useDataTable} from '../useDataTable';
 
 const hoisted = vi.hoisted(() => {
     const dataTable = {
@@ -25,6 +27,7 @@ const hoisted = vi.hoisted(() => {
         dataTable,
         defaultColumns: dataTable.columns,
         insertRowMutate: vi.fn(),
+        invalidateQueries: vi.fn(() => Promise.resolve()),
         rowsQueryResult: {
             data: {
                 pages: [
@@ -49,6 +52,7 @@ const hoisted = vi.hoisted(() => {
             error: null,
             isLoading: false,
         },
+        updateRowMutate: vi.fn(),
     };
 });
 
@@ -64,7 +68,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
         ...actual,
         useDataTablesQuery: () => hoisted.tablesQueryResult,
         useInsertDataTableRowMutation: () => ({mutate: hoisted.insertRowMutate}),
-        useUpdateDataTableRowMutation: () => ({mutate: vi.fn()}),
+        useUpdateDataTableRowMutation: () => ({mutate: hoisted.updateRowMutate}),
     };
 });
 
@@ -82,7 +86,7 @@ vi.mock('@tanstack/react-query', async (importOriginal) => {
 
     return {
         ...actual,
-        useQueryClient: () => ({invalidateQueries: vi.fn()}),
+        useQueryClient: () => ({invalidateQueries: hoisted.invalidateQueries}),
     };
 });
 
@@ -97,6 +101,32 @@ const createKeyDownArgs = (rowId: string) =>
 const createKeyboardEvent = (key: string) => ({key, preventGridDefault: vi.fn()}) as unknown as CellKeyboardEvent;
 
 const renderUseDataTable = () => renderHook(() => useDataTable({tableId: 'table-1'}));
+
+type InsertRowOptionsType = {
+    onError: () => void;
+    onSuccess: (response: {insertDataTableRow: {id: string} | null}) => Promise<void>;
+};
+
+const getDraftRow = (rows: GridRowType[]) => rows.find((row) => row.id === DRAFT_ROW_ID);
+
+const changeDraftRow = (result: {current: ReturnType<typeof useDataTable>}, values: Record<string, unknown>) => {
+    const rows = result.current.gridRowsWithAdd;
+    const draftRowIndex = rows.findIndex((row) => row.id === DRAFT_ROW_ID);
+    const updatedRows = rows.map((row, index) => (index === draftRowIndex ? {...row, ...values} : row));
+
+    act(() => {
+        result.current.handleRowsChange(updatedRows, {
+            column: result.current.gridColumns[1],
+            indexes: [draftRowIndex],
+        } as RowsChangeData<GridRowType, SummaryRowType>);
+    });
+};
+
+const addDraftRow = (result: {current: ReturnType<typeof useDataTable>}) => {
+    act(() => {
+        result.current.handleCellKeyDown(createKeyDownArgs(ADD_ROW_ID), createKeyboardEvent('Enter'));
+    });
+};
 
 beforeEach(() => {
     hoisted.dataTable.columns = hoisted.defaultColumns;
@@ -172,17 +202,32 @@ describe('useDataTable', () => {
     });
 
     describe('add row cell keyboard', () => {
-        it('should insert a row when Enter is pressed on the add row cell', () => {
+        it('should add a draft row without inserting when Enter is pressed on the add row cell', () => {
             const {result} = renderUseDataTable();
 
             const keyboardEvent = createKeyboardEvent('Enter');
 
-            result.current.handleCellKeyDown(createKeyDownArgs('-1'), keyboardEvent);
+            act(() => {
+                result.current.handleCellKeyDown(createKeyDownArgs(ADD_ROW_ID), keyboardEvent);
+            });
 
             expect(keyboardEvent.preventGridDefault).toHaveBeenCalled();
-            expect(hoisted.insertRowMutate).toHaveBeenCalledWith({
-                input: {environmentId: '0', tableId: 'table-1', values: {}},
-            });
+            expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
+            expect(result.current.gridRowsWithAdd.map((row) => row.id)).toEqual([
+                'row-1',
+                'row-2',
+                DRAFT_ROW_ID,
+                ADD_ROW_ID,
+            ]);
+        });
+
+        it('should keep a single draft row when Enter is pressed twice on the add row cell', () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+            addDraftRow(result);
+
+            expect(result.current.gridRowsWithAdd.filter((row) => row.id === DRAFT_ROW_ID)).toHaveLength(1);
         });
 
         it('should not insert a row when Enter is pressed on a data row', () => {
@@ -201,10 +246,119 @@ describe('useDataTable', () => {
 
             const keyboardEvent = createKeyboardEvent('ArrowDown');
 
-            result.current.handleCellKeyDown(createKeyDownArgs('-1'), keyboardEvent);
+            result.current.handleCellKeyDown(createKeyDownArgs(ADD_ROW_ID), keyboardEvent);
 
             expect(keyboardEvent.preventGridDefault).not.toHaveBeenCalled();
             expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('draft row', () => {
+        it('should insert the draft row with the value of its first committed edit', () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+            changeDraftRow(result, {title: 'new'});
+
+            expect(hoisted.insertRowMutate).toHaveBeenCalledTimes(1);
+            expect(hoisted.insertRowMutate).toHaveBeenCalledWith(
+                {input: {environmentId: '0', tableId: 'table-1', values: {title: 'new'}}},
+                expect.any(Object)
+            );
+            expect(hoisted.updateRowMutate).not.toHaveBeenCalled();
+        });
+
+        it('should not insert the draft row while its values are empty', () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+            changeDraftRow(result, {title: ''});
+
+            expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
+            expect(getDraftRow(result.current.gridRowsWithAdd)).toEqual({id: DRAFT_ROW_ID, title: ''});
+        });
+
+        it('should insert the draft row when a boolean cell of it is toggled', async () => {
+            hoisted.dataTable.columns = [{id: 'column-3', name: 'active', type: 'BOOLEAN'}];
+
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+
+            const booleanColumn = result.current.gridColumns[1];
+            const draftRow = getDraftRow(result.current.gridRowsWithAdd)!;
+
+            render(<>{booleanColumn.renderCell?.({row: draftRow} as RenderCellProps<GridRowType, SummaryRowType>)}</>);
+
+            await userEvent.click(screen.getByRole('checkbox', {name: 'Toggle active'}));
+
+            expect(hoisted.insertRowMutate).toHaveBeenCalledWith(
+                {input: {environmentId: '0', tableId: 'table-1', values: {active: true}}},
+                expect.any(Object)
+            );
+        });
+
+        it('should not insert the draft row again while its insert is pending', () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+            changeDraftRow(result, {title: 'new'});
+            changeDraftRow(result, {count: 3});
+
+            expect(hoisted.insertRowMutate).toHaveBeenCalledTimes(1);
+        });
+
+        it('should remove the draft row and update the inserted row with edits made during the insert', async () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+            changeDraftRow(result, {title: 'new'});
+            changeDraftRow(result, {count: 3});
+
+            const insertRowOptions = hoisted.insertRowMutate.mock.calls[0][1] as InsertRowOptionsType;
+
+            await act(async () => {
+                await insertRowOptions.onSuccess({insertDataTableRow: {id: 'row-3'}});
+            });
+
+            await waitFor(() => {
+                expect(getDraftRow(result.current.gridRowsWithAdd)).toBeUndefined();
+            });
+
+            expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['dataTableRowsPage']});
+            expect(hoisted.updateRowMutate).toHaveBeenCalledWith({
+                input: {environmentId: '0', id: 'row-3', tableId: 'table-1', values: {count: 3}},
+            });
+        });
+
+        it('should insert the draft row again after a failed insert when it is edited', () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+            changeDraftRow(result, {title: 'new'});
+
+            const insertRowOptions = hoisted.insertRowMutate.mock.calls[0][1] as InsertRowOptionsType;
+
+            act(() => {
+                insertRowOptions.onError();
+            });
+
+            changeDraftRow(result, {title: 'newer'});
+
+            expect(hoisted.insertRowMutate).toHaveBeenCalledTimes(2);
+            expect(getDraftRow(result.current.gridRowsWithAdd)).toEqual({id: DRAFT_ROW_ID, title: 'newer'});
+        });
+
+        it('should exclude the draft row from the selected rows', () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+
+            act(() => {
+                result.current.handleSelectedRowsChange(new Set(['row-1', DRAFT_ROW_ID]));
+            });
+
+            expect(result.current.selectedRows).toEqual(new Set(['row-1']));
         });
     });
 });
