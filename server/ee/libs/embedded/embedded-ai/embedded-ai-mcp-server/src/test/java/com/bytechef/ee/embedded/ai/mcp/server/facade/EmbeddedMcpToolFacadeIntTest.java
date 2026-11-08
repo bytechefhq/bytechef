@@ -26,6 +26,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
@@ -70,6 +71,7 @@ import com.bytechef.platform.mcp.repository.McpToolRepository;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
@@ -87,6 +89,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -1240,6 +1243,7 @@ class EmbeddedMcpToolFacadeIntTest {
     static class FacadeIntTestConfiguration {
 
         @Bean
+        @SuppressWarnings("unchecked")
         EmbeddedMcpToolFacade embeddedMcpToolFacade(
             ClusterElementDefinitionFacade clusterElementDefinitionFacade,
             ClusterElementDefinitionService clusterElementDefinitionService,
@@ -1258,12 +1262,14 @@ class EmbeddedMcpToolFacadeIntTest {
             WorkflowService workflowService) {
 
             return new EmbeddedMcpToolFacade(
-                clusterElementDefinitionFacade, clusterElementDefinitionService, componentDefinitionService,
-                connectedUserService, evaluator, integrationInstanceConfigurationService,
+                mock(ObjectProvider.class), clusterElementDefinitionFacade, clusterElementDefinitionService,
+                componentDefinitionService, connectedUserService, evaluator, integrationInstanceConfigurationService,
                 integrationInstanceConfigurationWorkflowService, integrationInstanceService,
-                integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
-                mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
-                mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade, "http://localhost:8080",
+                integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter,
+                mock(JobResumeFacade.class), mock(JobService.class), jwtTokenService, mcpComponentService,
+                mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
+                mcpIntegrationInstanceToolService,
+                mcpServerService, principalJobFacade, "http://localhost:8080",
                 taskExecutionService, taskFileStorage, externalInvocationRecorder, workflowService);
         }
     }

@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.ai.mcp.server.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
@@ -35,9 +36,11 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
+import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.server.FilterableMcpAsyncServer;
 import com.bytechef.platform.mcp.server.FilterableMcpServerBuilder;
+import com.bytechef.platform.mcp.server.McpToolAuthorizationEvaluator;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -45,7 +48,9 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.domain.TenantKey;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpServerFeatures;
@@ -55,6 +60,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.mcp.McpToolUtils;
@@ -79,10 +85,14 @@ import org.springframework.web.servlet.function.ServerResponse;
 @ConditionalOnEEVersion
 public class EmbeddedMcpServerConfiguration {
 
+    private static final String AUTHORITIES = "authorities";
     private static final String ENVIRONMENT = "environment";
     private static final String EXTERNAL_USER_ID = "externalUserId";
     private static final String SECRET_KEY = "secretKey";
     private static final String SURFACE = McpOutboundRedactorProvider.SURFACE_EMBEDDED;
+
+    private static final McpToolAuthorizationEvaluator TOOL_AUTHORIZATION_EVALUATOR =
+        new McpToolAuthorizationEvaluator();
 
     @Bean
     WebMvcStreamableServerTransportProvider embeddedWebMvcStreamableHttpServerTransportProvider() {
@@ -104,7 +114,8 @@ public class EmbeddedMcpServerConfiguration {
 
     @Bean
     EmbeddedMcpToolFacade embeddedMcpToolFacade(
-        ApplicationProperties applicationProperties, ClusterElementDefinitionFacade clusterElementDefinitionFacade,
+        ApplicationProperties applicationProperties, ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
+        ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
         TaskFileStorage durableTaskFileStorage, Evaluator evaluator,
@@ -112,23 +123,23 @@ public class EmbeddedMcpServerConfiguration {
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
-        JobCompletionAwaiter jobCompletionAwaiter, JwtTokenService jwtTokenService,
-        McpComponentService mcpComponentService, McpIntegrationComponentService mcpIntegrationComponentService,
+        JobCompletionAwaiter jobCompletionAwaiter, JobResumeFacade jobResumeFacade, JobService jobService,
+        JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
+        McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
         PrincipalJobFacade principalJobFacade, TaskExecutionService taskExecutionService,
         ExternalInvocationRecorder externalInvocationRecorder, WorkflowService workflowService) {
 
         return new EmbeddedMcpToolFacade(
-            clusterElementDefinitionFacade, clusterElementDefinitionService, componentDefinitionService,
-            connectedUserService, evaluator, integrationInstanceConfigurationService,
+            approvalTokensObjectProvider, clusterElementDefinitionFacade, clusterElementDefinitionService,
+            componentDefinitionService, connectedUserService, evaluator, integrationInstanceConfigurationService,
             integrationInstanceConfigurationWorkflowService, integrationInstanceService,
-            integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
-            mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
-            mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade,
-            applicationProperties.getPublicUrl(), taskExecutionService, durableTaskFileStorage,
-            externalInvocationRecorder,
-            workflowService);
+            integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jobResumeFacade, jobService,
+            jwtTokenService, mcpComponentService, mcpIntegrationComponentService,
+            mcpIntegrationInstanceConfigurationWorkflowService, mcpIntegrationInstanceToolService, mcpServerService,
+            principalJobFacade, applicationProperties.getPublicUrl(), taskExecutionService, durableTaskFileStorage,
+            externalInvocationRecorder, workflowService);
     }
 
     @Bean
@@ -162,21 +173,23 @@ public class EmbeddedMcpServerConfiguration {
 
                 String tenantId = tenantKey.getTenantId();
 
-                mcpComponentService.getMcpServerMcpComponents(mcpServer.getId())
-                    .stream()
-                    .flatMap(
-                        mcpComponent -> CollectionUtils.stream(
-                            mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
-                    .forEach(mcpTool -> {
-                        var callback = embeddedMcpToolFacade.getFunctionToolCallback(
-                            mcpTool, externalUserId, environment, tenantId);
+                authorizedComponents(
+                    mcpServer, mcpComponentService.getMcpServerMcpComponents(mcpServer.getId()),
+                    authorities(mcpTransportContext))
+                        .stream()
+                        .flatMap(
+                            mcpComponent -> CollectionUtils.stream(
+                                mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
+                        .forEach(mcpTool -> {
+                            var callback = embeddedMcpToolFacade.getFunctionToolCallback(
+                                mcpTool, externalUserId, environment, tenantId);
 
-                        if (callback != null) {
-                            toolSpecifications.add(
-                                McpToolUtils.toAsyncToolSpecification(
-                                    guard(callback, mcpOutboundRedactorProviderProvider)));
-                        }
-                    });
+                            if (callback != null) {
+                                toolSpecifications.add(
+                                    McpToolUtils.toAsyncToolSpecification(
+                                        guard(callback, mcpOutboundRedactorProviderProvider)));
+                            }
+                        });
 
                 mcpIntegrationInstanceConfigurationService
                     .getMcpServerMcpIntegrationInstanceConfigurations(mcpServer.getId())
@@ -186,6 +199,8 @@ public class EmbeddedMcpServerConfiguration {
                             mcpIntegrationInstanceConfiguration, externalUserId, environment, tenantId)))
                     .map(toolCallback -> guard(toolCallback, mcpOutboundRedactorProviderProvider))
                     .map(McpToolUtils::toAsyncToolSpecification)
+                    .map(toolSpecification -> EmbeddedApprovalElicitingToolSpecifications.decorate(
+                        toolSpecification, embeddedMcpToolFacade, mcpOutboundRedactorProviderProvider, null, SURFACE))
                     .forEach(toolSpecifications::add);
 
                 return toolSpecifications;
@@ -230,10 +245,32 @@ public class EmbeddedMcpServerConfiguration {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
         if (!(securityContext.getAuthentication() instanceof McpAnonymousAuthenticationToken)) {
+            context.put(AUTHORITIES, SecurityUtils.fetchCurrentUserAuthorities());
             context.put(EXTERNAL_USER_ID, SecurityUtils.getCurrentUserLogin());
         }
 
         return McpTransportContext.create(context);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Set<String> authorities(McpTransportContext mcpTransportContext) {
+        Object authoritiesObject = mcpTransportContext.get(AUTHORITIES);
+
+        return authoritiesObject instanceof Set ? (Set<String>) authoritiesObject : Set.of();
+    }
+
+    static List<McpComponent> authorizedComponents(
+        McpServer mcpServer, List<McpComponent> mcpComponents, Set<String> principalAuthorities) {
+
+        if (!mcpServer.isEnforceToolAuthorization()) {
+            return mcpComponents;
+        }
+
+        return mcpComponents.stream()
+            .filter(
+                mcpComponent -> TOOL_AUTHORIZATION_EVALUATOR.isComponentAuthorized(
+                    principalAuthorities, mcpComponent.getRequiredAuthorities()))
+            .toList();
     }
 
     private com.bytechef.platform.configuration.domain.Environment getEnvironment(String environment) {

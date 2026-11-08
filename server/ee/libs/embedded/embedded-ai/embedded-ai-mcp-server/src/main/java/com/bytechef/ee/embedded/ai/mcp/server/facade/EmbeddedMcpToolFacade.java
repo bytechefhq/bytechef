@@ -14,6 +14,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
@@ -47,6 +48,7 @@ import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.constant.WorkflowConstants;
+import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
@@ -70,9 +72,14 @@ import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
+import com.bytechef.platform.workflow.execution.facade.ApprovalInputException;
+import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.execution.token.ApprovalFormUrls;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,6 +97,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Tool facade for the embedded MCP server. Handles both component-level tools (direct action execution) and integration
@@ -105,8 +113,10 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private static final String APPROVAL = "approval";
     private static final Set<String> APPROVAL_COMPONENT_NAMES = Set.of(APPROVAL, WAIT_FOR_APPROVAL);
     private static final String APPROVAL_REQUIRED_STATUS = "approval_required";
+    private static final long RESUME_POLL_INTERVAL_MILLIS = 500;
     private static final String STOPPED_MESSAGE = "The workflow run was stopped before it finished.";
 
+    private final ObjectProvider<ApprovalTokens> approvalTokensObjectProvider;
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
@@ -117,6 +127,8 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
     private final JobCompletionAwaiter jobCompletionAwaiter;
+    private final JobResumeFacade jobResumeFacade;
+    private final JobService jobService;
     private final McpComponentService mcpComponentService;
     private final McpIntegrationComponentService mcpIntegrationComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
@@ -132,6 +144,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     @SuppressFBWarnings("EI")
     public EmbeddedMcpToolFacade(
+        ObjectProvider<ApprovalTokens> approvalTokensObjectProvider,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
@@ -139,8 +152,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
-        JobCompletionAwaiter jobCompletionAwaiter, JwtTokenService jwtTokenService,
-        McpComponentService mcpComponentService, McpIntegrationComponentService mcpIntegrationComponentService,
+        JobCompletionAwaiter jobCompletionAwaiter, JobResumeFacade jobResumeFacade, JobService jobService,
+        JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
+        McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpServerService mcpServerService, PrincipalJobFacade principalJobFacade, String publicUrl,
@@ -149,6 +163,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
         super(evaluator);
 
+        this.approvalTokensObjectProvider = approvalTokensObjectProvider;
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
@@ -159,6 +174,8 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
         this.jobCompletionAwaiter = jobCompletionAwaiter;
+        this.jobResumeFacade = jobResumeFacade;
+        this.jobService = jobService;
         this.mcpComponentService = mcpComponentService;
         this.mcpIntegrationComponentService = mcpIntegrationComponentService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
@@ -562,8 +579,26 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         WorkflowToolRunResult.Status status;
 
         if (isSuspendedForApproval(job)) {
+            Object jobResumeId = job.getMetadata(MetadataConstants.JOB_RESUME_ID);
+
+            String jobResumeIdString = jobResumeId == null ? null : jobResumeId.toString();
+            ApprovalTokens approvalTokens = approvalTokensObjectProvider.getIfAvailable();
+
+            String formUrl = ApprovalFormUrls
+                .buildFormUrl(publicUrl, jobResumeIdString, approvalTokens, resolveApprovalExpiresAt(job))
+                .orElse(null);
+
             result.put("status", APPROVAL_REQUIRED_STATUS);
-            result.put("message", "Approval required — the workflow run is paused waiting for a human decision.");
+            result.put(
+                "message",
+                formUrl == null
+                    ? "Approval required — the workflow run is paused waiting for a human decision."
+                    : "Approval required — the workflow run is paused waiting for a human decision. " +
+                        "Resolve it at: " + formUrl);
+
+            if (formUrl != null) {
+                result.put("formUrl", formUrl);
+            }
 
             status = WorkflowToolRunResult.Status.APPROVAL_REQUIRED;
         } else if (job.getMetadata(MetadataConstants.JOB_RESUME_ID) != null) {
@@ -600,6 +635,119 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
         return taskExecutionService.fetchLastJobTaskExecution(Objects.requireNonNull(job.getId()))
             .filter(taskExecution -> taskExecution.getStatus() == TaskExecution.Status.STARTED);
+    }
+
+    public Optional<String> resolvePendingApprovalFormUrl(long jobId) {
+        return fetchPendingApprovalJob(jobId)
+            .flatMap(job -> ApprovalFormUrls.buildFormUrl(
+                publicUrl, getJobResumeId(job), approvalTokensObjectProvider.getIfAvailable(),
+                resolveApprovalExpiresAt(job)));
+    }
+
+    public Optional<String> resolvePendingApprovalResumeToken(long jobId) {
+        return fetchPendingApprovalJob(jobId)
+            .flatMap(job -> ApprovalFormUrls.buildResumeToken(
+                getJobResumeId(job), approvalTokensObjectProvider.getIfAvailable(), resolveApprovalExpiresAt(job)));
+    }
+
+    public @Nullable Object awaitApprovedWorkflowRun(long jobId) {
+        Instant deadline = Instant.now()
+            .plus(JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT);
+
+        Job job = jobService.getJob(jobId);
+
+        while (job.getStatus() == Job.Status.STOPPED && Instant.now()
+            .isBefore(deadline)) {
+
+            try {
+                Thread.sleep(RESUME_POLL_INTERVAL_MILLIS);
+            } catch (InterruptedException interruptedException) {
+                Thread.currentThread()
+                    .interrupt();
+
+                break;
+            }
+
+            job = jobService.getJob(jobId);
+        }
+
+        if (job.getStatus() == Job.Status.STOPPED) {
+            WorkflowToolRunResult workflowToolRunResult = describeStoppedJob(job);
+
+            return workflowToolRunResult.result();
+        }
+
+        Duration remaining = Duration.between(Instant.now(), deadline);
+
+        job = jobCompletionAwaiter.await(jobId, remaining.isNegative() ? Duration.ofSeconds(1) : remaining)
+            .join();
+
+        if (job.getStatus() == Job.Status.STOPPED) {
+            WorkflowToolRunResult workflowToolRunResult = describeStoppedJob(job);
+
+            return workflowToolRunResult.result();
+        }
+
+        Job completedJob = job;
+
+        JobExecutionErrors.checkForError(completedJob, taskExecutionService);
+
+        if (completedJob.getOutputs() == null) {
+            return null;
+        }
+
+        return getCallableResponseOutput(completedJob)
+            .orElseGet(() -> taskFileStorage.readJobOutputs(completedJob.getOutputs()));
+    }
+
+    public @Nullable Object resolveApprovalAndAwait(String resumeToken, Map<String, Object> data, long jobId) {
+        JobResumeFacade.JobResumeOutcome outcome;
+
+        try {
+            outcome = jobResumeFacade.resumeJob(resumeToken, data);
+        } catch (ApprovalInputException approvalInputException) {
+            return Map.of(
+                "status", "approval_input_required",
+                "message", approvalInputException.getMessage() + " Resolve the approval through its form instead.");
+        }
+
+        if (outcome != JobResumeFacade.JobResumeOutcome.OK) {
+            return Map.of(
+                "status", "approval_unavailable",
+                "message", "The approval could no longer be resolved (" + outcome + ").");
+        }
+
+        return awaitApprovedWorkflowRun(jobId);
+    }
+
+    private Optional<Job> fetchPendingApprovalJob(long jobId) {
+        return jobService.fetchJob(jobId)
+            .filter(job -> job.getStatus() == Job.Status.STOPPED)
+            .filter(job -> job.getMetadata(MetadataConstants.JOB_RESUME_ID) != null);
+    }
+
+    private static String getJobResumeId(Job job) {
+        return String.valueOf(job.getMetadata(MetadataConstants.JOB_RESUME_ID));
+    }
+
+    private @Nullable Instant resolveApprovalExpiresAt(Job job) {
+        Object taskExecutionResumeId = job.getMetadata(MetadataConstants.TASK_EXECUTION_RESUME_ID);
+
+        if (taskExecutionResumeId == null) {
+            return null;
+        }
+
+        try {
+            TaskExecution taskExecution = taskExecutionService.getTaskExecution(
+                ConvertUtils.convertValue(taskExecutionResumeId, Long.class));
+
+            return SuspendUtils.extractSuspendExpiresAt(taskExecution.getMetadata());
+        } catch (RuntimeException runtimeException) {
+            log.warn(
+                "Could not read the approval expiry of job {}: {}", job.getId(), runtimeException.getMessage());
+
+            return null;
+        }
     }
 
     private boolean isToolEnabled(long integrationInstanceId, long mcpToolId) {
