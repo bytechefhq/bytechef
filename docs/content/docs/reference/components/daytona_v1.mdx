@@ -30,6 +30,14 @@ Version: 1
 
 
 
+## Connection Setup
+
+1. Sign in to the [Daytona Dashboard](https://app.daytona.io/dashboard) and open the [Keys](https://app.daytona.io/dashboard/keys) page.
+2. Click **Create Key**.
+3. Enter a name for the key (e.g., **ByteChef**), set its expiration date, and select the `write:sandboxes` and `delete:sandboxes` permissions.
+4. Click **Create** and copy the key.
+5. In ByteChef, create a Daytona connection and paste the key into **API Key**.
+6. Leave **Base URL** set to `https://app.daytona.io/api` unless you run a self-hosted Daytona deployment, in which case enter its API URL.
 
 
 
@@ -262,3 +270,22 @@ Type: OBJECT
 
 
 
+<hr />
+
+## Additional Instructions
+
+#### Running code from an AI Agent
+
+**Execute Code** is also available as a tool for the AI Agent. Add it under the agent's tools, and the agent can write code (Python, TypeScript, JavaScript or Bash), run it in an isolated Daytona sandbox, and use the output in its answer. This is useful for data analysis, calculations and scripts that the model should not try to compute in its head.
+
+The tool returns `exitCode`, `stdout`, `success`, `sandboxId` and any `charts` the code produced (for example, matplotlib plots).
+
+#### Sandbox lifecycle
+
+By default, **Execute Code** creates a new sandbox, runs the code and deletes the sandbox when the run finishes, so nothing carries over between runs.
+
+To keep files, installed packages and variables between runs:
+
+1. Create a sandbox with **Create Sandbox**, or run **Execute Code** with **Keep Sandbox** enabled. Both return a `sandboxId`.
+2. Pass that `sandboxId` to later **Execute Code** and **Upload File** calls. A sandbox passed in this way is never deleted by **Execute Code**.
+3. Delete the sandbox with **Delete Sandbox** when you are done. Sandboxes you keep count against your Daytona usage until you delete them.
