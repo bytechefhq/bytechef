@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:08:48.999333+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-08T15:31:17.523768+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "account", description = "The `Account` Common Object represents a \"company\" in CRMs.")
 public interface AccountApi {
@@ -53,7 +53,7 @@ public interface AccountApi {
      *
      * @param createUpdateAccountModel  (required)
      * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (optional)
-     * @param xEnvironment The environment of an integration. (optional)
+     * @param xEnvironment The environment of an integration, in any letter case. Defaults to PRODUCTION. (optional)
      * @return Account created (status code 201)
      *         or Bad request (status code 400)
      *         or Unauthorized (status code 401)
@@ -114,7 +114,7 @@ public interface AccountApi {
     default ResponseEntity<CreatedModel> createAccount(
         @Parameter(name = "CreateUpdateAccountModel", description = "", required = true) @Valid @RequestBody CreateUpdateAccountModel createUpdateAccountModel,
         @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = false) @Nullable Long xInstanceId,
-        @Parameter(name = "X-Environment", description = "The environment of an integration.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable String xEnvironment
+        @Parameter(name = "X-Environment", description = "The environment of an integration, in any letter case. Defaults to PRODUCTION.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable String xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -181,7 +181,7 @@ public interface AccountApi {
      *
      * @param accountId  (required)
      * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (optional)
-     * @param xEnvironment The environment of an integration. (optional)
+     * @param xEnvironment The environment of an integration, in any letter case. Defaults to PRODUCTION. (optional)
      * @param includeRawData Whether to include raw data fetched from the 3rd party provider. (optional)
      * @return Account (status code 200)
      *         or Bad request (status code 400)
@@ -240,7 +240,7 @@ public interface AccountApi {
     default ResponseEntity<AccountModel> getAccount(
         @Parameter(name = "account_id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("account_id") String accountId,
         @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = false) @Nullable Long xInstanceId,
-        @Parameter(name = "X-Environment", description = "The environment of an integration.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable String xEnvironment,
+        @Parameter(name = "X-Environment", description = "The environment of an integration, in any letter case. Defaults to PRODUCTION.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable String xEnvironment,
         @Parameter(name = "include_raw_data", description = "Whether to include raw data fetched from the 3rd party provider.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "include_raw_data", required = false) @Nullable Boolean includeRawData
     ) {
         getRequest().ifPresent(request -> {
@@ -297,7 +297,7 @@ public interface AccountApi {
      * GET /accounts : List accounts
      *
      * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (optional)
-     * @param xEnvironment The environment of an integration. (optional)
+     * @param xEnvironment The environment of an integration, in any letter case. Defaults to PRODUCTION. (optional)
      * @param includeRawData Whether to include raw data fetched from the 3rd party provider. (optional)
      * @param pageable Pageable parameters. (optional)
      * @return Paginated Accounts (status code 200)
@@ -350,7 +350,7 @@ public interface AccountApi {
     )
     default ResponseEntity<com.bytechef.ee.embedded.unified.pagination.CursorPageSlice> listAccounts(
         @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = false) @Nullable Long xInstanceId,
-        @Parameter(name = "X-Environment", description = "The environment of an integration.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable String xEnvironment,
+        @Parameter(name = "X-Environment", description = "The environment of an integration, in any letter case. Defaults to PRODUCTION.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable String xEnvironment,
         @Parameter(name = "include_raw_data", description = "Whether to include raw data fetched from the 3rd party provider.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "include_raw_data", required = false) @Nullable Boolean includeRawData,
         @Parameter(name = "pageable", description = "Pageable parameters.", in = ParameterIn.QUERY) @Valid @Nullable ListAccountsPageableParameterModel pageable
     ) {
@@ -410,7 +410,7 @@ public interface AccountApi {
      * @param accountId  (required)
      * @param createUpdateAccountModel  (required)
      * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (optional)
-     * @param xEnvironment The environment of an integration. (optional)
+     * @param xEnvironment The environment of an integration, in any letter case. Defaults to PRODUCTION. (optional)
      * @return Account updated (status code 204)
      *         or Bad request (status code 400)
      *         or Unauthorized (status code 401)
@@ -470,7 +470,7 @@ public interface AccountApi {
         @Parameter(name = "account_id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("account_id") String accountId,
         @Parameter(name = "CreateUpdateAccountModel", description = "", required = true) @Valid @RequestBody CreateUpdateAccountModel createUpdateAccountModel,
         @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = false) @Nullable Long xInstanceId,
-        @Parameter(name = "X-Environment", description = "The environment of an integration.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable String xEnvironment
+        @Parameter(name = "X-Environment", description = "The environment of an integration, in any letter case. Defaults to PRODUCTION.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable String xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
