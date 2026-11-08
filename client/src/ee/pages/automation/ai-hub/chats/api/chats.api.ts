@@ -75,17 +75,18 @@ export interface AiHubChatArtifactI {
     status: AiHubArtifactStatusType;
 }
 
-export type ChatKindType = 'STANDARD' | 'WORKFLOW_CHAT';
+export type ChatKindType = 'AGENT_CHAT' | 'STANDARD' | 'WORKFLOW_CHAT';
 
 /**
  * Whether a chat is served by a workflow's webhook rather than by the LLM. Use this instead of comparing kinds so
  * an LLM-only affordance is never offered in a chat with no LLM behind it.
  */
 export function isWebhookBridgedChat(kind: ChatKindType | undefined): boolean {
-    return kind === 'WORKFLOW_CHAT';
+    return kind === 'WORKFLOW_CHAT' || kind === 'AGENT_CHAT';
 }
 
 export interface AiHubChatI {
+    aiAgentId: number | null;
     /**
      * Whether the title was set automatically and is still eligible for LLM regeneration. Flips to false once the
      * LLM regenerates a title or the user renames the chat.
@@ -161,14 +162,23 @@ function toArtifact(artifact: GraphQlArtifactType): AiHubChatArtifactI {
     };
 }
 
+function toChatKind(kind: GraphQlChatType['kind']): ChatKindType {
+    if (kind === 'WORKFLOW_CHAT' || kind === 'AGENT_CHAT') {
+        return kind;
+    }
+
+    return 'STANDARD';
+}
+
 export function toChat(chat: GraphQlChatType): AiHubChatI {
     return {
+        aiAgentId: chat.aiAgentId != null ? Number(chat.aiAgentId) : null,
         autoTitled: chat.autoTitled,
         createdAt: toIsoString(chat.createdAt),
         environmentId: Number(chat.environmentId),
         id: Number(chat.id),
         isOwner: chat.isOwner,
-        kind: chat.kind === 'WORKFLOW_CHAT' ? 'WORKFLOW_CHAT' : 'STANDARD',
+        kind: toChatKind(chat.kind),
         lastPreview: chat.lastPreview ?? null,
         messageCount: chat.messageCount,
         ownerUserId: Number(chat.ownerUserId),
@@ -183,8 +193,18 @@ export function toChat(chat: GraphQlChatType): AiHubChatI {
     };
 }
 
-export function getChatDisplayTitle(chat: Pick<AiHubChatI, 'title'>): string {
-    return chat.title || 'New Chat';
+export function isChannelAgentChat(chat: Pick<AiHubChatI, 'aiAgentId' | 'kind' | 'workflowExecutionId'>): boolean {
+    return chat.kind === 'AGENT_CHAT' && chat.aiAgentId != null && chat.workflowExecutionId == null;
+}
+
+export function getChatDisplayTitle(
+    chat: Pick<AiHubChatI, 'aiAgentId' | 'kind' | 'title' | 'workflowExecutionId'>
+): string {
+    if (chat.title) {
+        return chat.title;
+    }
+
+    return isChannelAgentChat(chat) ? 'Agent Conversation' : 'New Chat';
 }
 
 export async function createAiHubChat({

@@ -7,15 +7,36 @@ import {act, renderHook} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {chatWorkflowsQueryMock, createMutateAsyncMock, hasWorkspaceScopeMock, navigateMock, workspaceRef} = vi.hoisted(
-    () => ({
-        chatWorkflowsQueryMock: vi.fn(),
-        createMutateAsyncMock: vi.fn(),
-        hasWorkspaceScopeMock: vi.fn(),
-        navigateMock: vi.fn(),
-        workspaceRef: {currentWorkspaceId: 3 as number | null},
-    })
-);
+const {
+    chatAgentsQueryMock,
+    chatWorkflowsQueryMock,
+    createAgentChatMutateAsyncMock,
+    createMutateAsyncMock,
+    hasWorkspaceScopeMock,
+    navigateMock,
+    workspaceRef,
+} = vi.hoisted(() => ({
+    chatAgentsQueryMock: vi.fn(),
+    chatWorkflowsQueryMock: vi.fn(),
+    createAgentChatMutateAsyncMock: vi.fn(),
+    createMutateAsyncMock: vi.fn(),
+    hasWorkspaceScopeMock: vi.fn(),
+    navigateMock: vi.fn(),
+    workspaceRef: {currentWorkspaceId: 3 as number | null},
+}));
+
+const chatAgentsData = {
+    workspaceChatAgents: [
+        {
+            agentName: 'support-agent',
+            agentTitle: 'Support Agent',
+            aiAgentId: '11',
+            projectDeploymentId: '6',
+            workflowExecutionId: 'exec-agent-1',
+            workflowLabel: 'Agent1',
+        },
+    ],
+};
 
 const chatWorkflowsData = {
     workspaceChatWorkflows: [
@@ -27,6 +48,15 @@ const chatWorkflowsData = {
             workflowExecutionId: 'exec-1',
             workflowId: '9',
             workflowLabel: 'Support',
+        },
+        {
+            projectDeploymentId: '6',
+            projectId: '2',
+            projectName: 'Agents',
+            projectWorkflowId: '10',
+            workflowExecutionId: 'exec-agent-1',
+            workflowId: '12',
+            workflowLabel: 'Agent1',
         },
     ],
 };
@@ -54,7 +84,9 @@ vi.mock('@/shared/hooks/useLoadWorkspaceScopes', () => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useCreateAgentChatAiHubChatMutation: () => ({mutateAsync: createAgentChatMutateAsyncMock}),
     useCreateWorkflowChatAiHubChatMutation: () => ({mutateAsync: createMutateAsyncMock}),
+    useWorkspaceChatAgentsQuery: chatAgentsQueryMock,
     useWorkspaceChatWorkflowsQuery: chatWorkflowsQueryMock,
 }));
 
@@ -72,6 +104,11 @@ describe('useAiHubChatLaunchers', () => {
         chatWorkflowsQueryMock.mockImplementation((_variables: unknown, options: {enabled?: boolean}) => ({
             data: options.enabled ? chatWorkflowsData : undefined,
         }));
+        chatAgentsQueryMock.mockReset();
+        chatAgentsQueryMock.mockImplementation((_variables: unknown, options: {enabled?: boolean}) => ({
+            data: options.enabled ? chatAgentsData : undefined,
+        }));
+        createAgentChatMutateAsyncMock.mockReset();
         hasWorkspaceScopeMock.mockReset();
         hasWorkspaceScopeMock.mockReturnValue(true);
         createMutateAsyncMock.mockReset();
@@ -96,7 +133,61 @@ describe('useAiHubChatLaunchers', () => {
 
         expect(hasWorkspaceScopeMock).toHaveBeenCalledWith(3, 'WORKFLOW_VIEW');
         expect(chatWorkflowsQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: false});
+        expect(chatAgentsQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: false});
         expect(result.current.workflowChats).toEqual([]);
+        expect(result.current.agentChats).toEqual([]);
+    });
+
+    it('labels agent chats with the agent title and keeps their workflows out of the workflow chats', () => {
+        const {result} = renderHook(() => useAiHubChatLaunchers(), {wrapper});
+
+        expect(result.current.agentChats).toEqual([
+            {label: 'Support Agent', projectDeploymentId: '6', workflowExecutionId: 'exec-agent-1'},
+        ]);
+        expect(result.current.workflowChats.map((workflowChat) => workflowChat.workflowExecutionId)).toEqual([
+            'exec-1',
+        ]);
+    });
+
+    it('creates an agent chat through the agent chat mutation and navigates to it', async () => {
+        createAgentChatMutateAsyncMock.mockResolvedValue({
+            createAgentChatAiHubChat: {id: '12', kind: 'AGENT_CHAT', threadId: 'thread-12'},
+        });
+
+        const {result} = renderHook(() => useAiHubChatLaunchers(), {wrapper});
+
+        await act(async () => {
+            await result.current.onSelectAgentChat('exec-agent-1', '6', 'Support Agent');
+        });
+
+        expect(createAgentChatMutateAsyncMock).toHaveBeenCalledWith({
+            environment: 2,
+            projectDeploymentId: '6',
+            title: 'Support Agent',
+            workflowExecutionId: 'exec-agent-1',
+            workspaceId: '3',
+        });
+        expect(createMutateAsyncMock).not.toHaveBeenCalled();
+        expect(navigateMock).toHaveBeenCalledWith('/automation/ai-hub/chats/12');
+        expect(aiHubChatsStore.getState().currentChatId).toBe(12);
+        expect(aiHubStore.getState().chatId).toBe('thread-12');
+    });
+
+    it('settles without switching chats when creating the agent chat fails', async () => {
+        createAgentChatMutateAsyncMock.mockRejectedValue(new Error('Agent is not deployed'));
+
+        aiHubStore.setState({chatId: 'thread-home'});
+
+        const {result} = renderHook(() => useAiHubChatLaunchers(), {wrapper});
+
+        await act(async () => {
+            await expect(
+                result.current.onSelectAgentChat('exec-agent-1', '6', 'Support Agent')
+            ).resolves.toBeUndefined();
+        });
+
+        expect(navigateMock).not.toHaveBeenCalled();
+        expect(aiHubStore.getState().chatId).toBe('thread-home');
     });
 
     it('creates a chat titled with the label on select and navigates to it', async () => {

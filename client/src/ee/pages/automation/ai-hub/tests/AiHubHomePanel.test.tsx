@@ -18,6 +18,8 @@ const {catalogQueryRef, defaultModelQueryRef, launchersRef, modelPickerPropsRef,
     },
     launchersRef: {
         current: {
+            agentChats: [] as {label: string; projectDeploymentId: string; workflowExecutionId: string}[],
+            onSelectAgentChat: vi.fn(),
             onSelectWorkflowChat: vi.fn(),
             workflowChats: [] as {label: string; projectDeploymentId: string; workflowExecutionId: string}[],
         },
@@ -91,7 +93,12 @@ const renderHome = () =>
 
 describe('AiHubHomePanel', () => {
     beforeEach(() => {
-        launchersRef.current = {onSelectWorkflowChat: vi.fn(), workflowChats: []};
+        launchersRef.current = {
+            agentChats: [],
+            onSelectAgentChat: vi.fn(),
+            onSelectWorkflowChat: vi.fn(),
+            workflowChats: [],
+        };
         navigateMock.mockReset();
 
         localStorage.clear();
@@ -135,6 +142,8 @@ describe('AiHubHomePanel', () => {
     it('lets a user start a workflow chat when no provider is enabled', async () => {
         defaultModelQueryRef.current = {data: {aiDefaultModel: null}, isPending: false};
         launchersRef.current = {
+            agentChats: [],
+            onSelectAgentChat: vi.fn(),
             onSelectWorkflowChat: vi.fn(),
             workflowChats: [{label: 'Support - Answer tickets', projectDeploymentId: '7', workflowExecutionId: 'w-1'}],
         };
@@ -151,12 +160,32 @@ describe('AiHubHomePanel', () => {
         expect(launchersRef.current.onSelectWorkflowChat).toHaveBeenCalledWith('w-1', '7', 'Support - Answer tickets');
     });
 
+    it('lets a user start an agent chat when no provider is enabled', async () => {
+        defaultModelQueryRef.current = {data: {aiDefaultModel: null}, isPending: false};
+        launchersRef.current = {
+            agentChats: [{label: 'Support Agent', projectDeploymentId: '42', workflowExecutionId: 'exec-agent-1'}],
+            onSelectAgentChat: vi.fn(),
+            onSelectWorkflowChat: vi.fn(),
+            workflowChats: [],
+        };
+
+        const user = userEvent.setup();
+
+        renderHome();
+
+        await user.click(screen.getByRole('button', {name: 'Support Agent'}));
+
+        expect(launchersRef.current.onSelectAgentChat).toHaveBeenCalledWith('exec-agent-1', '42', 'Support Agent');
+        expect(launchersRef.current.onSelectWorkflowChat).not.toHaveBeenCalled();
+    });
+
     it('lists no workflow chats when there are none to start', () => {
         defaultModelQueryRef.current = {data: {aiDefaultModel: null}, isPending: false};
 
         renderHome();
 
         expect(screen.queryByText(/Workflow chats run your workflows/)).toBeNull();
+        expect(screen.queryByText(/Agents run on their own model/)).toBeNull();
     });
 
     describe('model picker', () => {

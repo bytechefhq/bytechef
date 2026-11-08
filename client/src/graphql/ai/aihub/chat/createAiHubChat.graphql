@@ -12,6 +12,7 @@ mutation createAiHubChat($workspaceId: ID!, $environment: Int!, $threadId: Strin
         createdAt
         updatedAt
         autoTitled
+        aiAgentId
         kind
         workflowExecutionId
         projectDeploymentId

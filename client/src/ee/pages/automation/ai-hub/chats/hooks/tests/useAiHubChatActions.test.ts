@@ -35,6 +35,7 @@ vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useChats', () => ({
 const {useAiHubChatActions} = await import('../useAiHubChatActions');
 
 const CHAT: AiHubChatI = {
+    aiAgentId: null,
     autoTitled: true,
     createdAt: '2026-10-18T00:00:00Z',
     environmentId: 0,

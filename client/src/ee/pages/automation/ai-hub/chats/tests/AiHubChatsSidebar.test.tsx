@@ -62,6 +62,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
 
 function buildChat(overrides: Partial<AiHubChatI> = {}): AiHubChatI {
     return {
+        aiAgentId: null,
         autoTitled: true,
         createdAt: new Date().toISOString(),
         environmentId: 2,

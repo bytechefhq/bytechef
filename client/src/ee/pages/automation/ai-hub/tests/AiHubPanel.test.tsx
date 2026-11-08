@@ -116,6 +116,7 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 
 function buildChat(overrides: Partial<AiHubChatI> = {}): AiHubChatI {
     return {
+        aiAgentId: null,
         autoTitled: true,
         createdAt: new Date().toISOString(),
         environmentId: 1,

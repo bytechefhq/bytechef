@@ -8,12 +8,14 @@ import {
     getChatDisplayTitle,
     getChatMessages,
     getToolApprovals,
+    isChannelAgentChat,
     isWebhookBridgedChat,
     patchChat,
     toChat,
 } from '../chats.api';
 
 const graphQlChat = {
+    aiAgentId: null,
     autoTitled: false,
     createdAt: '1716000000000',
     environmentId: '0',
@@ -181,6 +183,7 @@ describe('chats.api', () => {
 describe('toChat', () => {
     it('maps the GraphQL chat to the domain shape', () => {
         expect(toChat(graphQlChat)).toEqual({
+            aiAgentId: null,
             autoTitled: false,
             createdAt: new Date(1716000000000).toISOString(),
             environmentId: 0,
@@ -220,19 +223,42 @@ describe('toChat', () => {
         });
     });
 
-    it('treats only WORKFLOW_CHAT as webhook bridged', () => {
+    it('maps an agent chat with its agent id', () => {
+        expect(toChat({...graphQlChat, aiAgentId: '11', kind: AiHubChatKind.AgentChat})).toMatchObject({
+            aiAgentId: 11,
+            kind: 'AGENT_CHAT',
+        });
+    });
+
+    it('treats workflow and agent chats as webhook bridged', () => {
         expect(isWebhookBridgedChat('WORKFLOW_CHAT')).toBe(true);
+        expect(isWebhookBridgedChat('AGENT_CHAT')).toBe(true);
         expect(isWebhookBridgedChat('STANDARD')).toBe(false);
         expect(isWebhookBridgedChat(undefined)).toBe(false);
     });
 });
 
+const untitledChat = {aiAgentId: null, kind: 'STANDARD' as const, title: null, workflowExecutionId: null};
+
 describe('getChatDisplayTitle', () => {
     it('returns the stored title when present', () => {
-        expect(getChatDisplayTitle({title: 'Custom title'})).toBe('Custom title');
+        expect(getChatDisplayTitle({...untitledChat, title: 'Custom title'})).toBe('Custom title');
     });
 
     it('falls back to "New Chat" for an untitled chat', () => {
-        expect(getChatDisplayTitle({title: null})).toBe('New Chat');
+        expect(getChatDisplayTitle(untitledChat)).toBe('New Chat');
+    });
+
+    it('labels an untitled channel-born agent chat as an agent conversation', () => {
+        expect(getChatDisplayTitle({...untitledChat, aiAgentId: 11, kind: 'AGENT_CHAT'})).toBe('Agent Conversation');
+    });
+});
+
+describe('isChannelAgentChat', () => {
+    it('is true only for an agent chat with an agent id and no execution', () => {
+        expect(isChannelAgentChat({aiAgentId: 11, kind: 'AGENT_CHAT', workflowExecutionId: null})).toBe(true);
+        expect(isChannelAgentChat({aiAgentId: 11, kind: 'AGENT_CHAT', workflowExecutionId: 'exec-1'})).toBe(false);
+        expect(isChannelAgentChat({aiAgentId: null, kind: 'AGENT_CHAT', workflowExecutionId: 'exec-1'})).toBe(false);
+        expect(isChannelAgentChat({aiAgentId: 11, kind: 'WORKFLOW_CHAT', workflowExecutionId: null})).toBe(false);
     });
 });

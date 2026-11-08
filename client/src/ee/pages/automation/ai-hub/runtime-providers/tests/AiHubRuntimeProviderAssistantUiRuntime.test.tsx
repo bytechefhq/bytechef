@@ -145,6 +145,7 @@ const loadChatAndRenderProvider = async () => {
 
     await act(async () => {
         await result.current({
+            aiAgentId: null,
             autoTitled: false,
             createdAt: '2026-10-19T08:00:00Z',
             environmentId: 0,

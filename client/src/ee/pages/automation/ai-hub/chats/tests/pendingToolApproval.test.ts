@@ -12,6 +12,7 @@ import {
 
 function buildChat(overrides: Partial<AiHubChatI> = {}): AiHubChatI {
     return {
+        aiAgentId: null,
         autoTitled: true,
         createdAt: new Date().toISOString(),
         environmentId: 0,

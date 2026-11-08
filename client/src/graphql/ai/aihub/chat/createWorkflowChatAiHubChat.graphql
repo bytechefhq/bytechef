@@ -27,6 +27,7 @@ mutation createWorkflowChatAiHubChat(
         workflowExecutionId
         projectDeploymentId
         autoTitled
+        aiAgentId
         ownerUserId
         isOwner
     }

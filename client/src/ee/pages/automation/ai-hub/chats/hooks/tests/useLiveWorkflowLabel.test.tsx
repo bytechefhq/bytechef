@@ -54,6 +54,7 @@ const {useLiveWorkflowLabel} = await import('../useLiveWorkflowLabel');
 
 function buildChat(overrides: Partial<AiHubChatI> = {}): AiHubChatI {
     return {
+        aiAgentId: null,
         autoTitled: false,
         createdAt: '',
         environmentId: 2,
