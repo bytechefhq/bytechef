@@ -913,11 +913,16 @@ public class ApplicationProperties {
              */
             private List<String> allowedPrivateHosts;
 
+            private FileSystem fileSystem = new FileSystem();
             private Shell shell = new Shell();
             private Workspace workspace = new Workspace();
 
             public List<String> getAllowedPrivateHosts() {
                 return allowedPrivateHosts;
+            }
+
+            public FileSystem getFileSystem() {
+                return fileSystem;
             }
 
             public Shell getShell() {
@@ -932,12 +937,29 @@ public class ApplicationProperties {
                 this.allowedPrivateHosts = allowedPrivateHosts;
             }
 
+            public void setFileSystem(FileSystem fileSystem) {
+                this.fileSystem = fileSystem;
+            }
+
             public void setShell(Shell shell) {
                 this.shell = shell;
             }
 
             public void setWorkspace(Workspace workspace) {
                 this.workspace = workspace;
+            }
+
+            public static class FileSystem {
+
+                private boolean enabled;
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
             }
 
             /**

@@ -153,6 +153,9 @@ bytechef:
     agent-utils:
       # Hosts the web fetch and A2A agent tools may reach although they resolve to a private or loopback address
       allowed-private-hosts: []
+      file-system:
+        # Offer the File System, Glob, Grep and List Directory tools, which read and write files on the server's disk
+        enabled: false
       shell:
         # Allow Shell Tools elements to run commands directly on the server instead of in a Docker container. Local
         # commands are not confined to the agent workspace; allow only on trusted single-tenant installations

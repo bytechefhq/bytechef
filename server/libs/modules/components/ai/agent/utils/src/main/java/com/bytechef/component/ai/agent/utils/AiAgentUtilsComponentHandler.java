@@ -107,11 +107,19 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
 
         List<ClusterElementDefinition<?>> clusterElements = new ArrayList<>(List.of(
             agentUtilsApprovalGate.clusterElementDefinition,
-            AiAgentUtilsAskUserQuestionTool.CLUSTER_ELEMENT_DEFINITION,
-            new AiAgentUtilsFileSystemTools(agentWorkspaceResolver).clusterElementDefinition,
-            new AiAgentUtilsGrepTool(agentWorkspaceResolver).clusterElementDefinition,
-            new AiAgentUtilsGlobTool(agentWorkspaceResolver).clusterElementDefinition,
-            new AiAgentUtilsListDirectoryTool(agentWorkspaceResolver).clusterElementDefinition,
+            AiAgentUtilsAskUserQuestionTool.CLUSTER_ELEMENT_DEFINITION));
+
+        ApplicationProperties.Ai.AgentUtils.FileSystem fileSystem = agentUtils.getFileSystem();
+
+        if (fileSystem.isEnabled()) {
+            clusterElements.addAll(List.of(
+                new AiAgentUtilsFileSystemTools(agentWorkspaceResolver).clusterElementDefinition,
+                new AiAgentUtilsGrepTool(agentWorkspaceResolver).clusterElementDefinition,
+                new AiAgentUtilsGlobTool(agentWorkspaceResolver).clusterElementDefinition,
+                new AiAgentUtilsListDirectoryTool(agentWorkspaceResolver).clusterElementDefinition));
+        }
+
+        clusterElements.addAll(List.of(
             agentUtilsSmartWebFetchTool.clusterElementDefinition,
             agentUtilsAutoMemoryTool.clusterElementDefinition,
             AiAgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
