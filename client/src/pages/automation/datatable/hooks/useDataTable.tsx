@@ -45,6 +45,17 @@ import {useSelectedRowsStore} from '../stores/useSelectedRowsStore';
 const PAGE_SIZE = 500;
 const DEFAULT_COLUMN_WIDTH = 180;
 
+export const ADD_ROW_ID = '-1';
+export const DRAFT_ROW_ID = 'draft';
+
+function getDraftRowValues(draftRow: GridRowType): Record<string, unknown> {
+    return Object.fromEntries(
+        Object.entries(draftRow).filter(
+            ([columnKey, value]) => columnKey !== 'id' && value !== undefined && value !== null && value !== ''
+        )
+    );
+}
+
 interface UseDataTableParamsI {
     tableId: string | undefined;
 }
@@ -97,7 +108,7 @@ function buildUserColumn({
 }: BuildUserColumnParamsI): Column<GridRowType, SummaryRowType> {
     const baseColumnConfig = {
         cellClass: 'datatable-cell',
-        editable: (row: GridRowType) => row.id !== '-1',
+        editable: (row: GridRowType) => row.id !== ADD_ROW_ID,
         headerCellClass: 'datatable-cell',
         key: column.name,
         name: column.name,
@@ -278,6 +289,10 @@ function buildGridColumns({
 export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     const [localRows, setLocalRows] = useState<GridRowType[]>([]);
     const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
+    const [draftRow, setDraftRow] = useState<GridRowType | null>(null);
+
+    const draftRowRef = useRef<GridRowType | null>(null);
+    const isDraftInsertPendingRef = useRef(false);
 
     const {setOpen: setAddColumnDialogOpen} = useAddDataTableColumnDialogStore();
     const {dataTable, setDataTable} = useCurrentDataTableStore();
@@ -311,8 +326,8 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     }, [pagesData]);
 
     const gridRowsWithAdd: GridRowType[] = useMemo(() => {
-        return [...localRows, {id: '-1'} as GridRowType];
-    }, [localRows]);
+        return [...localRows, ...(draftRow ? [draftRow] : []), {id: ADD_ROW_ID} as GridRowType];
+    }, [draftRow, localRows]);
 
     const queryClient = useQueryClient();
 
@@ -329,9 +344,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
     }, [queryClient]);
 
-    const insertRowMutation = useInsertDataTableRowMutation({
-        onSuccess: invalidateRows,
-    });
+    const insertRowMutation = useInsertDataTableRowMutation();
 
     const updateRowMutation = useUpdateDataTableRowMutation({
         onSuccess: invalidateRows,
@@ -347,11 +360,82 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         }
     }, []);
 
+    const clearDraftRow = useCallback(() => {
+        draftRowRef.current = null;
+        isDraftInsertPendingRef.current = false;
+
+        setDraftRow(null);
+    }, []);
+
+    const handleDraftRowChange = useCallback(
+        (updatedDraftRow: GridRowType) => {
+            draftRowRef.current = updatedDraftRow;
+
+            setDraftRow(updatedDraftRow);
+
+            if (isDraftInsertPendingRef.current || !dataTable?.id) {
+                return;
+            }
+
+            const insertedValues = getDraftRowValues(updatedDraftRow);
+
+            if (Object.keys(insertedValues).length === 0) {
+                return;
+            }
+
+            const tableId = dataTable.id;
+
+            isDraftInsertPendingRef.current = true;
+
+            insertRowMutation.mutate(
+                {input: {environmentId: String(environmentId), tableId, values: insertedValues}},
+                {
+                    onError: () => {
+                        isDraftInsertPendingRef.current = false;
+                    },
+                    onSuccess: async (response) => {
+                        await queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
+
+                        const insertedRowId = response.insertDataTableRow?.id;
+                        const latestValues = draftRowRef.current ? getDraftRowValues(draftRowRef.current) : {};
+
+                        const valuesEditedDuringInsert = Object.fromEntries(
+                            Object.entries(latestValues).filter(
+                                ([columnKey, value]) => insertedValues[columnKey] !== value
+                            )
+                        );
+
+                        clearDraftRow();
+
+                        if (insertedRowId && Object.keys(valuesEditedDuringInsert).length > 0) {
+                            updateRowMutation.mutate({
+                                input: {
+                                    environmentId: String(environmentId),
+                                    id: insertedRowId,
+                                    tableId,
+                                    values: valuesEditedDuringInsert,
+                                },
+                            });
+                        }
+                    },
+                }
+            );
+        },
+        [clearDraftRow, dataTable?.id, environmentId, insertRowMutation, queryClient, updateRowMutation]
+    );
+
     const handleRowsChange = useCallback(
         (updatedRows: GridRowType[], changeData: RowsChangeData<GridRowType, SummaryRowType>) => {
             if (changeData.indexes.length === 1) {
                 const rowIndex = changeData.indexes[0];
                 const updatedRow = updatedRows[rowIndex];
+
+                if (updatedRow.id === DRAFT_ROW_ID) {
+                    handleDraftRowChange(updatedRow);
+
+                    return;
+                }
+
                 const originalRow = localRows.find((row) => row.id === updatedRow.id);
 
                 if (!originalRow) {
@@ -379,18 +463,19 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
                     });
                 }
 
-                setLocalRows(updatedRows.filter((row) => row.id !== '-1'));
+                setLocalRows(updatedRows.filter((row) => row.id !== ADD_ROW_ID && row.id !== DRAFT_ROW_ID));
             }
         },
-        [localRows, dataTable?.id, environmentId, updateRowMutation]
+        [localRows, dataTable?.id, environmentId, handleDraftRowChange, updateRowMutation]
     );
 
     const handleSelectedRowsChange = useCallback(
         (nextSelectedRows: ReadonlySet<string>) => {
-            if (nextSelectedRows.has('-1')) {
+            if (nextSelectedRows.has(ADD_ROW_ID) || nextSelectedRows.has(DRAFT_ROW_ID)) {
                 const filteredSelection = new Set(nextSelectedRows);
 
-                filteredSelection.delete('-1');
+                filteredSelection.delete(ADD_ROW_ID);
+                filteredSelection.delete(DRAFT_ROW_ID);
                 setSelectedRows(filteredSelection);
             } else {
                 setSelectedRows(nextSelectedRows);
@@ -416,6 +501,12 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
         (rowId: string, columnName: string, value: boolean) => {
             if (!dataTable?.id) return;
 
+            if (rowId === DRAFT_ROW_ID) {
+                handleDraftRowChange({...(draftRowRef.current ?? {id: DRAFT_ROW_ID}), [columnName]: value});
+
+                return;
+            }
+
             updateRowMutation.mutate({
                 input: {
                     environmentId: String(environmentId),
@@ -425,20 +516,22 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
                 },
             });
         },
-        [dataTable?.id, environmentId, updateRowMutation]
+        [dataTable?.id, environmentId, handleDraftRowChange, updateRowMutation]
     );
 
     const handleAddRow = useCallback(() => {
-        if (!dataTable?.id) return;
+        if (!dataTable?.id || draftRowRef.current) return;
 
-        insertRowMutation.mutate({
-            input: {environmentId: String(environmentId), tableId: dataTable.id, values: {}},
-        });
-    }, [dataTable?.id, environmentId, insertRowMutation]);
+        const newDraftRow: GridRowType = {id: DRAFT_ROW_ID};
+
+        draftRowRef.current = newDraftRow;
+
+        setDraftRow(newDraftRow);
+    }, [dataTable?.id]);
 
     const handleCellClick = useCallback(
         ({row}: CellMouseArgs<GridRowType, SummaryRowType>, event: CellMouseEvent) => {
-            if (row.id !== '-1') {
+            if (row.id !== ADD_ROW_ID) {
                 return;
             }
 
@@ -451,7 +544,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
 
     const handleCellKeyDown = useCallback(
         ({row}: CellKeyDownArgs<GridRowType, SummaryRowType>, event: CellKeyboardEvent) => {
-            if (row?.id !== '-1' || event.key !== 'Enter') {
+            if (row?.id !== ADD_ROW_ID || event.key !== 'Enter') {
                 return;
             }
 
@@ -507,6 +600,10 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     useEffect(() => {
         handleSelectedRowsChange(new Set());
     }, [tableId, handleSelectedRowsChange]);
+
+    useEffect(() => {
+        clearDraftRow();
+    }, [tableId, clearDraftRow]);
 
     useEffect(() => {
         setLocalRows(gridRows);
