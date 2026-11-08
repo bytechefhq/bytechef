@@ -61,7 +61,7 @@ class AiHubConfigurationToolSetTest {
             "listKnowledgeBases", "queryKnowledgeBase", "listContextSources", "searchContextStore",
             "getContextStoreRecord", "listAvailableSourceComponents", "describeSourceComponentEntities",
             "semanticSearchContextStore", "listApiCollections", "listComponentRules",
-            "describeComponentToolParameters", "proposeComponentRuleCondition");
+            "describeComponentToolParameters", "proposeComponentRuleCondition", "listAiHubChats");
     }
 
     @Test
@@ -169,7 +169,8 @@ class AiHubConfigurationToolSetTest {
             "deleteContextStoreSource", "refreshContextStoreSource", "setContextStoreSourceEnabled",
             "deleteContextStore", "listApiCollections", "createApiCollection", "listComponentRules",
             "describeComponentToolParameters", "proposeComponentRuleCondition", "createComponentRule",
-            "promoteApiCollection", "promoteMcpServer", "promoteA2aServer", "promoteProjectDeployment");
+            "promoteApiCollection", "promoteMcpServer", "promoteA2aServer", "promoteProjectDeployment",
+            "listAiHubChats");
     }
 
     @Test

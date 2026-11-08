@@ -66,6 +66,7 @@ import com.bytechef.ee.ai.hub.tool.AiHubChatToolToolCallbacks;
 import com.bytechef.ee.ai.hub.tool.AiHubSubAgentToolCallbackFactory;
 import com.bytechef.ee.ai.hub.tool.CheckWorkflowTools;
 import com.bytechef.ee.ai.hub.tool.CreateWorkflowChatToolCallback;
+import com.bytechef.ee.ai.hub.tool.ListAiHubChatsToolCallback;
 import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenAiAgentTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenCodeWorkflowTabToolCallback;
@@ -250,6 +251,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(openCustomComponentTabToolCallbacks(customComponentFacadeProvider, null));
         toolCallbacks.addAll(openCodeWorkflowTabToolCallbacks(projectCodeWorkflowFacadeProvider, null));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
+        toolCallbacks.add(new ListAiHubChatsToolCallback(chatService));
 
         AiGuardrails aiGuardrails = aiGuardrailsProvider.getIfAvailable();
         AiGuardrailMetrics aiGuardrailMetrics = aiGuardrailMetrics(aiGuardrails, meterRegistryProvider);
@@ -323,6 +325,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(
             openCodeWorkflowTabToolCallbacks(projectCodeWorkflowFacadeProvider, aiHubChatArtifactRecorder));
         toolCallbacks.add(new OpenWorkflowChatTabToolCallback(chatService, chatAccessPolicy));
+        toolCallbacks.add(new ListAiHubChatsToolCallback(chatService));
         toolCallbacks.add(new ListChatWorkflowsToolCallback(projectDeploymentFacade));
         toolCallbacks.add(new CreateWorkflowChatToolCallback(chatService, projectDeploymentFacade));
         toolCallbacks.add(
