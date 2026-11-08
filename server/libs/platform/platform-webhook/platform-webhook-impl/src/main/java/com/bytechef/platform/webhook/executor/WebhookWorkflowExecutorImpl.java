@@ -275,8 +275,19 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         JobPrincipalAccessor jobPrincipalAccessor =
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
-        return !jobPrincipalAccessor.isWorkflowEnabled(
-            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
+        if (!jobPrincipalAccessor.isWorkflowEnabled(
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid())) {
+
+            return true;
+        }
+
+        Workflow workflow = workflowService.getWorkflow(getWorkflowId(workflowExecutionId));
+
+        Optional<WorkflowTrigger> workflowTriggerOptional = WorkflowTrigger.fetch(
+            workflow, workflowExecutionId.getTriggerName());
+
+        return workflowTriggerOptional.isPresent() && !workflowTriggerOptional.get()
+            .isEnabled();
     }
 
     /**

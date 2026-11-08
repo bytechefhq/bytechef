@@ -85,6 +85,12 @@ public abstract class AbstractWebhookTriggerController {
         HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws IOException, ServletException {
 
+        if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
+            return ResponseEntity.status(HttpStatus.GONE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("detail", "Workflow is disabled."));
+        }
+
         ResponseEntity<Object> responseEntity;
         WebhookTriggerFlags webhookTriggerFlags = webhookWorkflowExecutor.getWebhookTriggerFlags(workflowExecutionId);
 
