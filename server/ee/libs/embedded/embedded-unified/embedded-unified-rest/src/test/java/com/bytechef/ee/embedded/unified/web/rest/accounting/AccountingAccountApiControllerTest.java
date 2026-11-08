@@ -85,6 +85,29 @@ class AccountingAccountApiControllerTest {
     }
 
     @Test
+    void testAccountingAccountDefaultsAMissingEnvironmentHeaderToProduction() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestConnectedUserAuthentication.of(EXTERNAL_USER_ID));
+
+        doReturn(mock(CursorPageSlice.class)).when(unifiedApiFacade)
+            .getPage(any(), any(), any(), any(), any(), any());
+
+        accountingAccountApiController.createAccount(new CreateUpdateAccountModel(), INSTANCE_ID, null);
+        accountingAccountApiController.getAccount(ACCOUNT_ID, INSTANCE_ID, null, false);
+        accountingAccountApiController.listAccounts(INSTANCE_ID, null, false, new ListAccountsPageableParameterModel());
+        accountingAccountApiController.updateAccount(ACCOUNT_ID, new CreateUpdateAccountModel(), INSTANCE_ID, null);
+
+        verify(unifiedApiFacade).create(
+            eq(EXTERNAL_USER_ID), any(), any(), eq(INSTANCE_ID), eq(Environment.PRODUCTION), any());
+        verify(unifiedApiFacade).get(
+            eq(EXTERNAL_USER_ID), eq(ACCOUNT_ID), any(), eq(INSTANCE_ID), eq(Environment.PRODUCTION), any());
+        verify(unifiedApiFacade).getPage(
+            eq(EXTERNAL_USER_ID), any(), any(), eq(INSTANCE_ID), eq(Environment.PRODUCTION), any());
+        verify(unifiedApiFacade).update(
+            eq(EXTERNAL_USER_ID), eq(ACCOUNT_ID), any(), any(), eq(INSTANCE_ID), eq(Environment.PRODUCTION), any());
+    }
+
+    @Test
     void testAPlatformSessionWhoseLoginIsAnExternalIdIsRefused() {
         SecurityContextHolder.getContext()
             .setAuthentication(new UsernamePasswordAuthenticationToken(EXTERNAL_USER_ID, "", List.of()));

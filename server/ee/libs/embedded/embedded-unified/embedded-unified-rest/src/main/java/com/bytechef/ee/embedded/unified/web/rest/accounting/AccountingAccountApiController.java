@@ -15,14 +15,13 @@ import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthenticat
 import com.bytechef.ee.embedded.unified.facade.UnifiedApiFacade;
 import com.bytechef.ee.embedded.unified.pagination.CursorPageRequest;
 import com.bytechef.ee.embedded.unified.pagination.CursorPageSlice;
+import com.bytechef.ee.embedded.unified.web.rest.EnvironmentHeader;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.AccountModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.CreateUpdateAccountModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.CreatedModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.ListAccountsPageableParameterModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,7 +57,7 @@ public class AccountingAccountApiController implements AccountApi {
                     ConnectedUserAuthentications.getCurrentExternalUserId(),
                     conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
                     UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId,
-                    Environment.valueOf(StringUtils.upperCase(environment)),
+                    EnvironmentHeader.toEnvironment(environment),
                     AccountingModelType.ACCOUNT)));
     }
 
@@ -71,7 +70,7 @@ public class AccountingAccountApiController implements AccountApi {
                 unifiedApiFacade.get(
                     ConnectedUserAuthentications.getCurrentExternalUserId(), accountId,
                     UnifiedApiDefinition.UnifiedApiCategory.CRM,
-                    xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)), AccountingModelType.ACCOUNT),
+                    xInstanceId, EnvironmentHeader.toEnvironment(environment), AccountingModelType.ACCOUNT),
                 AccountModel.class));
     }
 
@@ -85,7 +84,7 @@ public class AccountingAccountApiController implements AccountApi {
                     ConnectedUserAuthentications.getCurrentExternalUserId(),
                     conversionService.convert(pageable, CursorPageRequest.class),
                     UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId,
-                    Environment.valueOf(StringUtils.upperCase(environment)),
+                    EnvironmentHeader.toEnvironment(environment),
                     AccountingModelType.ACCOUNT)
                 .map(unifiedOutputModel -> conversionService.convert(unifiedOutputModel, AccountModel.class)));
     }
@@ -98,7 +97,7 @@ public class AccountingAccountApiController implements AccountApi {
             ConnectedUserAuthentications.getCurrentExternalUserId(), accountId,
             conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
             UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId,
-            Environment.valueOf(StringUtils.upperCase(environment)), AccountingModelType.ACCOUNT);
+            EnvironmentHeader.toEnvironment(environment), AccountingModelType.ACCOUNT);
 
         return ResponseEntity.noContent()
             .build();
