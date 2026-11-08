@@ -10,6 +10,7 @@ import AiExperiments from './components/experiments/AiExperiments';
 import AiObservabilityExports from './components/exports/AiObservabilityExports';
 import AiGatewayModels from './components/models/AiGatewayModels';
 import AiGatewayDashboard from './components/monitoring/AiGatewayDashboard';
+import AiGatewayPlayground from './components/playground/AiGatewayPlayground';
 import AiGatewayProjects from './components/projects/AiGatewayProjects';
 import AiPrompts from './components/prompts/AiPrompts';
 import AiGatewayProviders from './components/providers/AiGatewayProviders';
@@ -30,6 +31,7 @@ type AiGatewayPageType =
     | 'exports'
     | 'models'
     | 'monitoring'
+    | 'playground'
     | 'projects'
     | 'prompts'
     | 'providers'
@@ -50,6 +52,7 @@ const GATEWAY_SECTIONS: {id: AiGatewayPageType; label: string}[] = [
     {id: 'budget', label: 'Budget'},
     {id: 'rateLimits', label: 'Rate Limits'},
     {id: 'monitoring', label: 'Monitoring'},
+    {id: 'playground', label: 'Playground'},
     {id: 'datasets', label: 'Datasets'},
     {id: 'experiments', label: 'Experiments'},
     {id: 'traces', label: 'Traces'},
@@ -126,6 +129,8 @@ const AiGateway = () => {
             {activePage === 'rateLimits' && <AiGatewayRateLimits />}
 
             {activePage === 'monitoring' && <AiGatewayDashboard />}
+
+            {activePage === 'playground' && <AiGatewayPlayground />}
 
             {activePage === 'traces' &&
                 (selectedTraceId ? (
