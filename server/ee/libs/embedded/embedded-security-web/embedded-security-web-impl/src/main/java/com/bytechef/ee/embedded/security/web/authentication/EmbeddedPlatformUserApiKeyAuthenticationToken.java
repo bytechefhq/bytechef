@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.security.web.authentication;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.CredentialType;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.userdetails.User;
 
 /**
@@ -27,8 +28,8 @@ public class EmbeddedPlatformUserApiKeyAuthenticationToken extends AbstractApiKe
         this.secretKey = secretKey;
     }
 
-    public EmbeddedPlatformUserApiKeyAuthenticationToken(long environmentId, User user) {
-        super(environmentId, user);
+    public EmbeddedPlatformUserApiKeyAuthenticationToken(long environmentId, User user, @Nullable Long apiKeyId) {
+        super(environmentId, user, apiKeyId);
     }
 
     public String getSecretKey() {

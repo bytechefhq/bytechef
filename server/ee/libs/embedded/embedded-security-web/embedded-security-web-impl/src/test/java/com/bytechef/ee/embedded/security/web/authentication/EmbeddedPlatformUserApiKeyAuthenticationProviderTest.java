@@ -9,7 +9,10 @@ package com.bytechef.ee.embedded.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.constant.PlatformType;
@@ -27,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * @version ee
@@ -35,6 +39,7 @@ import org.springframework.security.core.GrantedAuthority;
  */
 class EmbeddedPlatformUserApiKeyAuthenticationProviderTest {
 
+    private static final long API_KEY_ID = 9L;
     private static final long ENVIRONMENT_ID = 2L;
     private static final String SECRET_KEY = "secret-key";
     private static final long USER_ID = 7L;
@@ -55,8 +60,8 @@ class EmbeddedPlatformUserApiKeyAuthenticationProviderTest {
     }
 
     @Test
-    void testAuthenticatesTypedKeyAsItsOwnUser() {
-        stubApiKey(PlatformType.EMBEDDED);
+    void testAuthenticatesEmbeddedKeyAsItsOwnUser() {
+        stubApiKey(PlatformType.EMBEDDED, USER_ID);
         stubUser(true);
 
         Authentication authentication = provider.authenticate(createToken());
@@ -66,32 +71,69 @@ class EmbeddedPlatformUserApiKeyAuthenticationProviderTest {
         assertThat(authentication.getAuthorities())
             .extracting(GrantedAuthority::getAuthority)
             .containsExactly("ROLE_ADMIN");
+        assertThat(((EmbeddedPlatformUserApiKeyAuthenticationToken) authentication).getApiKeyId())
+            .isEqualTo(API_KEY_ID);
     }
 
     @Test
-    void testRejectsKeyWithoutType() {
-        stubApiKey(null);
+    void testRejectsAdminKey() {
+        stubApiKey(null, USER_ID);
         stubUser(true);
 
         assertThatThrownBy(() -> provider.authenticate(createToken()))
-            .isInstanceOf(BadCredentialsException.class);
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("Embedded API key required");
+    }
+
+    @Test
+    void testRejectsAutomationKey() {
+        stubApiKey(PlatformType.AUTOMATION, USER_ID);
+        stubUser(true);
+
+        assertThatThrownBy(() -> provider.authenticate(createToken()))
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("Embedded API key required");
+    }
+
+    @Test
+    void testRejectsKeyWithoutOwner() {
+        stubApiKey(PlatformType.EMBEDDED, null);
+
+        assertThatThrownBy(() -> provider.authenticate(createToken()))
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("API key has no owner");
+
+        verify(userService, never()).fetchUser(anyLong());
     }
 
     @Test
     void testRejectsUnknownKey() {
-        when(apiKeyService.getApiKey(SECRET_KEY, ENVIRONMENT_ID)).thenThrow(new IllegalArgumentException("unknown"));
+        when(apiKeyService.fetchApiKey(SECRET_KEY, ENVIRONMENT_ID)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> provider.authenticate(createToken()))
-            .isInstanceOf(BadCredentialsException.class);
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("Unknown API secret key");
     }
 
     @Test
-    void testRejectsNotActivatedUser() {
-        stubApiKey(PlatformType.AUTOMATION);
+    void testRejectsNotActivatedUserWithoutTheSecretKeyInTheMessage() {
+        stubApiKey(PlatformType.EMBEDDED, USER_ID);
         stubUser(false);
 
         assertThatThrownBy(() -> provider.authenticate(createToken()))
-            .isInstanceOf(UserNotActivatedException.class);
+            .isInstanceOf(UserNotActivatedException.class)
+            .hasMessage("User admin@localhost.com was not activated");
+    }
+
+    @Test
+    void testRejectsMissingUserWithoutTheSecretKeyInTheMessage() {
+        stubApiKey(PlatformType.EMBEDDED, USER_ID);
+
+        when(userService.fetchUser(USER_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> provider.authenticate(createToken()))
+            .isInstanceOf(UsernameNotFoundException.class)
+            .hasMessage("User 7 was not found in the database");
     }
 
     @Test
@@ -104,13 +146,17 @@ class EmbeddedPlatformUserApiKeyAuthenticationProviderTest {
         return new EmbeddedPlatformUserApiKeyAuthenticationToken(ENVIRONMENT_ID, SECRET_KEY, "tenant");
     }
 
-    private void stubApiKey(PlatformType type) {
+    private void stubApiKey(PlatformType type, Long userId) {
         ApiKey apiKey = new ApiKey();
 
+        apiKey.setId(API_KEY_ID);
         apiKey.setType(type);
-        apiKey.setUserId(USER_ID);
 
-        when(apiKeyService.getApiKey(SECRET_KEY, ENVIRONMENT_ID)).thenReturn(apiKey);
+        if (userId != null) {
+            apiKey.setUserId(userId);
+        }
+
+        when(apiKeyService.fetchApiKey(SECRET_KEY, ENVIRONMENT_ID)).thenReturn(Optional.of(apiKey));
     }
 
     private void stubUser(boolean activated) {
