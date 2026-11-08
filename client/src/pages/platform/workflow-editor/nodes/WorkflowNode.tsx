@@ -677,7 +677,11 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         [workflowTriggers]
     );
 
+    const isLastEnabledTrigger = (isManualTrigger || !data.disabled) && enabledTriggerCount <= 1;
+
     const showTriggerDisableAction = !isManualTrigger && (!!data.disabled || enabledTriggerCount > 1);
+
+    const showTriggerDeleteAction = triggerCount > 1 && !isLastEnabledTrigger;
 
     const nodeLabel = useMemo(
         () =>
@@ -1011,7 +1015,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             onToggleDisabled={handleToggleDisabledClick}
             showCopyAction
             showCutAction
-            showDeleteAction={!data.trigger || triggerCount > 1}
+            showDeleteAction={!data.trigger || showTriggerDeleteAction}
             showDisableAction={!data.trigger || showTriggerDisableAction}
             showInfoAction
             showRenameAction
@@ -1090,7 +1094,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     onToggleDisabled={handleToggleDisabledClick}
                     showCopyAction={!data.trigger}
                     showCutAction={!data.trigger}
-                    showDeleteAction={!data.trigger || triggerCount > 1}
+                    showDeleteAction={!data.trigger || showTriggerDeleteAction}
                     showDisableAction={!data.trigger || showTriggerDisableAction}
                     showInfoAction
                     showRenameAction

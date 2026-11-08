@@ -27,4 +27,29 @@ describe('upsertTrigger', () => {
         expect(result[0].metadata).toEqual({ui: {nodePosition: {x: 10, y: 20}}});
         expect(result[1].name).toBe('trigger_2');
     });
+
+    it('keeps the disabled flag when an existing trigger is saved again', () => {
+        const existing = [
+            {disabled: true, name: 'trigger_1', type: 'webhook/v1/onReceive'},
+            {name: 'trigger_2', type: 'schedule/v1/onInterval'},
+        ] as WorkflowTrigger[];
+        const next = {label: 'Renamed', name: 'trigger_1', type: 'webhook/v1/onReceive'} as WorkflowTrigger;
+
+        const result = upsertTrigger(existing, next);
+
+        expect(result[0].label).toBe('Renamed');
+        expect(result[0].disabled).toBe(true);
+    });
+
+    it('drops the disabled flag when the trigger is replaced with another type', () => {
+        const existing = [
+            {disabled: true, name: 'trigger_1', type: 'webhook/v1/onReceive'},
+            {name: 'trigger_2', type: 'schedule/v1/onInterval'},
+        ] as WorkflowTrigger[];
+        const next = {name: 'trigger_1', type: 'manual/v1/manual'} as WorkflowTrigger;
+
+        const result = upsertTrigger(existing, next);
+
+        expect(result[0]).not.toHaveProperty('disabled');
+    });
 });

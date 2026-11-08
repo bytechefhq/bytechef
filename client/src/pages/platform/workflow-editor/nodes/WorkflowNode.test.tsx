@@ -441,6 +441,39 @@ describe('WorkflowNode', () => {
             expect((recordedContextMenuProps.value?.data as NodeDataType).disabled).toBe(true);
         });
 
+        it('hides Delete on the last enabled trigger', () => {
+            dataStoreState.triggers = [
+                {name: 'trigger_1', type: 'webhook/v1/webhook'},
+                {disabled: true, name: 'trigger_2', type: 'schedule/v1/schedule'},
+            ];
+
+            renderNode(WEBHOOK_TRIGGER_DATA, 'trigger_1');
+
+            expect(recordedContextMenuProps.value?.showDeleteAction).toBe(false);
+        });
+
+        it('shows Delete on a disabled trigger next to an enabled one', () => {
+            dataStoreState.triggers = [
+                {name: 'trigger_2', type: 'schedule/v1/schedule'},
+                {disabled: true, name: 'trigger_1', type: 'webhook/v1/webhook'},
+            ];
+
+            renderNode({...WEBHOOK_TRIGGER_DATA, disabled: true} as NodeDataType, 'trigger_1');
+
+            expect(recordedContextMenuProps.value?.showDeleteAction).toBe(true);
+        });
+
+        it('shows Delete on a trigger when another trigger is enabled', () => {
+            dataStoreState.triggers = [
+                {name: 'trigger_1', type: 'webhook/v1/webhook'},
+                {name: 'trigger_2', type: 'schedule/v1/schedule'},
+            ];
+
+            renderNode(WEBHOOK_TRIGGER_DATA, 'trigger_1');
+
+            expect(recordedContextMenuProps.value?.showDeleteAction).toBe(true);
+        });
+
         it('renders a disabled trigger muted with the Disabled badge', () => {
             renderNode({...WEBHOOK_TRIGGER_DATA, disabled: true} as NodeDataType, 'trigger_1');
 
