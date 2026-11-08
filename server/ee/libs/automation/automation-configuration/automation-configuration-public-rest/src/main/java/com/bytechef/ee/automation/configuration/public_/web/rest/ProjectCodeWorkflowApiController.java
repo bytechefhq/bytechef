@@ -39,10 +39,10 @@ public class ProjectCodeWorkflowApiController implements ProjectCodeWorkflowApi 
     }
 
     @Override
-    public ResponseEntity<Void> deployProject(Long projectId, MultipartFile projectFile) {
+    public ResponseEntity<Void> deployProject(Long workspaceId, MultipartFile projectFile) {
         try {
             projectCodeWorkflowFacade.save(
-                projectId, projectFile.getBytes(),
+                workspaceId, projectFile.getBytes(),
                 Language.of(Objects.requireNonNull(projectFile.getOriginalFilename())));
         } catch (IOException e) {
             throw new RuntimeException(e);
