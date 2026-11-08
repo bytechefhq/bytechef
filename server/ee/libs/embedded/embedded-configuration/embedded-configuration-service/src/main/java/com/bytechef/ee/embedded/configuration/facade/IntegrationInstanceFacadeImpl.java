@@ -345,7 +345,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
         Workflow workflow = workflowService.getWorkflow(integrationWorkflow.getWorkflowId());
 
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.ofEnabled(workflow);
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
@@ -383,7 +383,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 // change the logic and send the all inputs at once
 //        validateInputs(integrationInstanceWorkflow.getInputs(), workflow);
 
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.ofEnabled(workflow);
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(
                 integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId());

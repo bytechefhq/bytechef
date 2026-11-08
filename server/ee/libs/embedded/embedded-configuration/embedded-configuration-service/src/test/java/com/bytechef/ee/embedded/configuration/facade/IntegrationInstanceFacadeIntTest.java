@@ -150,6 +150,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 })
 class IntegrationInstanceFacadeIntTest {
 
+    private static final String DISABLED_TRIGGER_WORKFLOW_DEFINITION = """
+        {"label":"Disabled trigger","inputs":[],"triggers":[\
+        {"name":"trigger_1","type":"slack/v1/newMessage","disabled":true},\
+        {"name":"trigger_2","type":"slack/v1/newMessage"}],\
+        "tasks":[]}
+        """;
+
     private static final String TWO_TRIGGER_WORKFLOW_DEFINITION = """
         {"label":"Two triggers","inputs":[],"triggers":[\
         {"name":"trigger_1","type":"slack/v1/newMessage"},{"name":"trigger_2","type":"slack/v1/newMessage"}],\
@@ -373,6 +380,68 @@ class IntegrationInstanceFacadeIntTest {
             eq(twoTriggerWorkflowId),
             argThat(workflowExecutionId -> "trigger_2".equals(workflowExecutionId.getTriggerName())),
             any(), anyMap(), any());
+    }
+
+    @Test
+    void testEnableSkipsDisabledTrigger() {
+        String disabledTriggerWorkflowId = createDisabledTriggerWorkflow();
+
+        authenticate(createTenantAdminAuthentication());
+
+        integrationInstanceFacade.enableIntegrationInstanceWorkflow(
+            integrationInstanceAId, disabledTriggerWorkflowId, true);
+
+        verify(triggerLifecycleFacade).executeTriggerEnable(
+            eq(disabledTriggerWorkflowId),
+            argThat(workflowExecutionId -> "trigger_2".equals(workflowExecutionId.getTriggerName())),
+            any(), anyMap(), any(), anyString(), anyLong());
+        verify(triggerLifecycleFacade, never()).executeTriggerEnable(
+            eq(disabledTriggerWorkflowId),
+            argThat(workflowExecutionId -> "trigger_1".equals(workflowExecutionId.getTriggerName())),
+            any(), anyMap(), any(), anyString(), anyLong());
+    }
+
+    @Test
+    void testDisableSkipsDisabledTrigger() {
+        String disabledTriggerWorkflowId = createDisabledTriggerWorkflow();
+
+        authenticate(createTenantAdminAuthentication());
+
+        integrationInstanceFacade.enableIntegrationInstanceWorkflow(
+            integrationInstanceAId, disabledTriggerWorkflowId, true);
+
+        integrationInstanceFacade.enableIntegrationInstanceWorkflow(
+            integrationInstanceAId, disabledTriggerWorkflowId, false);
+
+        verify(triggerLifecycleFacade).executeTriggerDisable(
+            eq(disabledTriggerWorkflowId),
+            argThat(workflowExecutionId -> "trigger_2".equals(workflowExecutionId.getTriggerName())),
+            any(), anyMap(), any());
+        verify(triggerLifecycleFacade, never()).executeTriggerDisable(
+            eq(disabledTriggerWorkflowId),
+            argThat(workflowExecutionId -> "trigger_1".equals(workflowExecutionId.getTriggerName())),
+            any(), anyMap(), any());
+    }
+
+    private String createDisabledTriggerWorkflow() {
+        Workflow disabledTriggerWorkflow = workflowService.create(
+            DISABLED_TRIGGER_WORKFLOW_DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        String disabledTriggerWorkflowId = disabledTriggerWorkflow.getId();
+
+        integrationWorkflowService.addWorkflow(integrationId, 1, disabledTriggerWorkflowId);
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        integrationInstanceConfigurationWorkflow.setEnabled(true);
+        integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+            integrationInstanceConfigurationId);
+        integrationInstanceConfigurationWorkflow.setWorkflowId(disabledTriggerWorkflowId);
+
+        integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
+
+        return disabledTriggerWorkflowId;
     }
 
     @Test

@@ -31,11 +31,15 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.calls;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
@@ -70,6 +74,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -142,6 +147,9 @@ public class ProjectDeploymentFacadeIntTest {
 
     @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
+
+    @Autowired
+    private WorkflowRepository workflowRepository;
 
     @Autowired
     TagRepository tagRepository;
@@ -1094,6 +1102,180 @@ public class ProjectDeploymentFacadeIntTest {
         verify(triggerLifecycleFacade, atLeastOnce()).executeTriggerDisable(any(), any(), any(), any(), any());
         verify(triggerLifecycleFacade, atLeastOnce()).executeTriggerEnable(
             any(), any(), any(), any(), any(), any(), anyLong());
+    }
+
+    @Test
+    public void testEnableSkipsDisabledTrigger() {
+        long projectDeploymentId = createTwoTriggerProjectDeployment(true);
+
+        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+        verify(triggerLifecycleFacade).executeTriggerEnable(
+            any(), argThat(workflowExecutionId -> hasTriggerName(workflowExecutionId, "trigger_2")), any(), any(),
+            any(), any(), anyLong());
+        verify(triggerLifecycleFacade, never()).executeTriggerEnable(
+            any(), argThat(workflowExecutionId -> hasTriggerName(workflowExecutionId, "trigger_1")), any(), any(),
+            any(), any(), anyLong());
+    }
+
+    @Test
+    public void testDisableSkipsDisabledTrigger() {
+        long projectDeploymentId = createTwoTriggerProjectDeployment(true);
+
+        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+        reset(triggerLifecycleFacade);
+
+        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, false);
+
+        verify(triggerLifecycleFacade).executeTriggerDisable(
+            any(), argThat(workflowExecutionId -> hasTriggerName(workflowExecutionId, "trigger_2")), any(), any(),
+            any());
+        verify(triggerLifecycleFacade, never()).executeTriggerDisable(
+            any(), argThat(workflowExecutionId -> hasTriggerName(workflowExecutionId, "trigger_1")), any(), any(),
+            any());
+    }
+
+    @Test
+    public void testUpdateDeploymentDisablesTriggerTurnedOffInNewVersion() {
+        long projectDeploymentId = createTwoTriggerProjectDeployment(false);
+
+        ProjectDeployment projectDeployment = projectDeploymentRepository.findById(projectDeploymentId)
+            .orElseThrow();
+
+        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+
+        ProjectWorkflow projectWorkflowV1 = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectDeployment.getProjectId(), 1)
+            .getFirst();
+
+        ProjectWorkflow draftProjectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectDeployment.getProjectId(), 2)
+            .getFirst();
+
+        Workflow draftWorkflow = workflowRepository.findById(draftProjectWorkflow.getWorkflowId())
+            .orElseThrow();
+
+        projectWorkflowFacade.updateWorkflow(
+            draftWorkflow.getId(), twoTriggerDefinition(true), draftWorkflow.getVersion());
+
+        projectFacade.publishProject(projectDeployment.getProjectId(), "Published v2 for test", false);
+
+        ProjectWorkflow projectWorkflowV2 = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectDeployment.getProjectId(), 2)
+            .getFirst();
+
+        reset(triggerLifecycleFacade);
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
+            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, 0,
+            projectWorkflowV2.getWorkflowId(), projectWorkflowV2.getUuidAsString());
+
+        ProjectDeploymentDTO currentProjectDeploymentDTO = projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentId);
+
+        projectDeploymentFacade.updateProjectDeployment(
+            ProjectDeploymentDTO.builder()
+                .id(projectDeploymentId)
+                .projectId(projectDeployment.getProjectId())
+                .name(currentProjectDeploymentDTO.name())
+                .enabled(true)
+                .environment(currentProjectDeploymentDTO.environment())
+                .projectVersion(2)
+                .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
+                .version(currentProjectDeploymentDTO.version())
+                .build());
+
+        assertThat(projectWorkflowV1.getWorkflowId()).isNotEqualTo(projectWorkflowV2.getWorkflowId());
+
+        verify(triggerLifecycleFacade, times(1)).executeTriggerDisable(
+            any(), argThat(workflowExecutionId -> hasTriggerName(workflowExecutionId, "trigger_1")), any(), any(),
+            any());
+        verify(triggerLifecycleFacade, never()).executeTriggerEnable(
+            any(), argThat(workflowExecutionId -> hasTriggerName(workflowExecutionId, "trigger_1")), any(), any(),
+            any(), any(), anyLong());
+        verify(triggerLifecycleFacade, times(1)).executeTriggerEnable(
+            any(), argThat(workflowExecutionId -> hasTriggerName(workflowExecutionId, "trigger_2")), any(), any(),
+            any(), any(), anyLong());
+    }
+
+    @Test
+    public void testEnableStillRequiresDisabledTriggerConnection() {
+        ComponentConnection componentConnection = new ComponentConnection(
+            "schedule", 1, "trigger_1", "connection", true);
+
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTrigger.class)))
+            .thenAnswer(invocation -> {
+                WorkflowTrigger workflowTrigger = invocation.getArgument(0);
+
+                return Objects.equals(workflowTrigger.getName(), "trigger_1")
+                    ? List.of(componentConnection) : List.of();
+            });
+
+        long projectDeploymentId = createTwoTriggerProjectDeployment(true);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(projectDeploymentId)
+            .getFirst();
+
+        assertThatThrownBy(
+            () -> projectDeploymentFacade.enableProjectDeploymentWorkflow(
+                projectDeploymentId, projectDeploymentWorkflow.getWorkflowId(), true))
+                    .isInstanceOf(ConfigurationException.class);
+
+        verify(triggerLifecycleFacade, never()).executeTriggerEnable(
+            any(), any(), any(), any(), any(), any(), anyLong());
+    }
+
+    private static boolean hasTriggerName(WorkflowExecutionId workflowExecutionId, String triggerName) {
+        return workflowExecutionId != null && Objects.equals(workflowExecutionId.getTriggerName(), triggerName);
+    }
+
+    private static String twoTriggerDefinition(boolean firstTriggerDisabled) {
+        return """
+            {
+                "label": "Two Trigger Workflow",
+                "triggers": [
+                    {
+                        "label": "Schedule",
+                        "name": "trigger_1",
+                        "type": "schedule/v1/schedule",
+                        "disabled": %s
+                    },
+                    {
+                        "label": "Webhook",
+                        "name": "trigger_2",
+                        "type": "webhook/v1/webhook"
+                    }
+                ],
+                "tasks": []
+            }""".formatted(firstTriggerDisabled);
+    }
+
+    private long createTwoTriggerProjectDeployment(boolean firstTriggerDisabled) {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        projectDeploymentFacadeHelper.addTestWorkflow(projectDTO, twoTriggerDefinition(firstTriggerDisabled));
+
+        projectFacade.publishProject(projectDTO.id(), "Published for test", false);
+
+        ProjectWorkflow publishedProjectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectDTO.id(), 1)
+            .getFirst();
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
+            List.of(), null, null, Map.of(), true, null, null, null, null, null, null, null, 0,
+            publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
+
+        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+            .projectId(projectDTO.id())
+            .name("Two Trigger Deployment")
+            .environment(Environment.DEVELOPMENT)
+            .projectVersion(1)
+            .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
+            .build();
+
+        return projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO);
     }
 
     private long createProjectDeploymentWithInputs(
