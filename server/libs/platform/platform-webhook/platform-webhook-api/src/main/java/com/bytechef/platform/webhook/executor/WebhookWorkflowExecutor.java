@@ -117,8 +117,10 @@ public interface WebhookWorkflowExecutor {
     boolean hasSuspendingTask(WorkflowExecutionId workflowExecutionId);
 
     /**
-     * Checks whether the workflow or its trigger associated with the given execution id is currently disabled. Both
-     * transports use this to short-circuit the dispatch path before execution is invoked.
+     * Returns whether the workflow or the trigger named in the execution id is disabled.
+     *
+     * @param workflowExecutionId the workflow execution id
+     * @return {@code true} when the workflow or its trigger is disabled
      */
     boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId);
 

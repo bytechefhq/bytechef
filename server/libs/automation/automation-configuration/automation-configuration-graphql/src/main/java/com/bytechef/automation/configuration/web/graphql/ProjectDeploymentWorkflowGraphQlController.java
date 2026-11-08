@@ -271,10 +271,6 @@ public class ProjectDeploymentWorkflowGraphQlController {
         return chatWorkflows;
     }
 
-    /**
-     * Matches the client's legacy filter: at least one trigger type starts with {@code chat/}, and the first enabled
-     * chat trigger's {@code parameters.mode} is absent or equal to {@code 1}.
-     */
     private static boolean hasHostedChatTrigger(List<WorkflowTrigger> workflowTriggers) {
         WorkflowTrigger workflowTrigger = workflowTriggers.stream()
             .filter(candidate -> candidate.getType() != null && candidate.getType()
