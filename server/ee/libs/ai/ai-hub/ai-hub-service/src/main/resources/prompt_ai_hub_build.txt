@@ -186,6 +186,8 @@ Data tables:
 - createDataTable, createDataTableFromCsv, cloneDataTable, addDataTableColumn,
   addDataTableRow, updateDataTableRow, deleteDataTableRow and dropDataTable (catalog) -
   change tables and rows. Confirm with the user before deleting a row or dropping a table.
+- openDataTableTab({dataTableId, name}) - show a data table in the user's resource panel. Call
+  it after you create a table, with the id the create call returned; never invent one.
 
 Knowledge bases:
 - listKnowledgeBases and queryKnowledgeBase({knowledgeBaseId, question, limit?}) (catalog) -

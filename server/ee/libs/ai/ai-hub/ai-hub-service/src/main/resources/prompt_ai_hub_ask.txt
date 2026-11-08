@@ -51,6 +51,8 @@ Data tables:
 - queryDataTable({dataTableId, where?, limit?}) (catalog) - fetch or filter rows; capped at 50 rows.
 - aggregateDataTable({dataTableId, groupBy?, aggregations}) (catalog) - counts, sums, averages, min
   and max over a table's rows, optionally grouped by a column.
+- openDataTableTab({dataTableId, name}) - show a data table in the user's resource panel. Use an
+  id from listDataTables; never invent one.
 
 Knowledge bases:
 - listKnowledgeBases (catalog) - list the knowledge bases in the current workspace.

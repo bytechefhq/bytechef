@@ -71,6 +71,7 @@ import com.bytechef.ee.ai.hub.tool.ListChatWorkflowsToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenAiAgentTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenCodeWorkflowTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenCustomComponentTabToolCallback;
+import com.bytechef.ee.ai.hub.tool.OpenDataTableTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenFileTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowChatTabToolCallback;
 import com.bytechef.ee.ai.hub.tool.OpenWorkflowTabToolCallback;
@@ -169,13 +170,15 @@ public class AiHubConfiguration {
     static final Set<String> ASK_PINNED_TOOL_NAMES = Set.of(
         "askUserQuestion", "checkWorkflow", "explainCodeWorkflow", "explainCustomComponent", "getWorkflow",
         "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab", "openCustomComponentTab",
-        "openFileTab", "openWorkflowChatTab", "openWorkflowTab", "searchProjects", "searchWorkflows");
+        "openDataTableTab", "openFileTab", "openWorkflowChatTab", "openWorkflowTab", "searchProjects",
+        "searchWorkflows");
 
     static final Set<String> BUILD_PINNED_TOOL_NAMES = Set.of(
         "askUserQuestion", "buildCodeWorkflow", "buildCustomComponent", "buildWorkflow", "checkWorkflow",
         "createConnection", "createProject", "createProjectWorkflow", "data_analyst", "getWorkflow", "image_generator",
         "importWorkflow", "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab",
-        "openCodeWorkflowTab", "openCustomComponentTab", "openFileTab", "openWorkflowChatTab", "openWorkflowTab",
+        "openCodeWorkflowTab", "openCustomComponentTab", "openDataTableTab", "openFileTab",
+        "openWorkflowChatTab", "openWorkflowTab",
         "saveWorkflowTestConnection", "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption",
         "selectConnection", "selectPropertyOption", "selectTriggerPropertyOption", "slide_builder");
 
@@ -246,6 +249,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(componentRuleFlatCrudToolCallbacks(componentRuleToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, null));
         toolCallbacks.addAll(openFileTabToolCallbacks(assetFileFacadeProvider, null));
+        toolCallbacks.add(new OpenDataTableTabToolCallback(null));
         toolCallbacks.addAll(interactivePickerToolCallbacks.read());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, null));
         toolCallbacks.addAll(openCustomComponentTabToolCallbacks(customComponentFacadeProvider, null));
@@ -318,6 +322,7 @@ public class AiHubConfiguration {
             .addAll(promoteToEnvironmentToolCallbacks(environmentPromotionFacadeProvider, environmentServiceProvider));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(openFileTabToolCallbacks(assetFileFacadeProvider, aiHubChatArtifactRecorder));
+        toolCallbacks.add(new OpenDataTableTabToolCallback(aiHubChatArtifactRecorder));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(

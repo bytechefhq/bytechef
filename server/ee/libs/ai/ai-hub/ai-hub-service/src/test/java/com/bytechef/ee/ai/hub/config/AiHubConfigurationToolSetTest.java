@@ -44,7 +44,8 @@ class AiHubConfigurationToolSetTest {
         assertThat(toolNames(askAgent)).containsExactlyInAnyOrder(
             "askUserQuestion", "checkWorkflow", "explainCodeWorkflow", "explainCustomComponent", "getWorkflow",
             "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab", "openCustomComponentTab",
-            "openFileTab", "openWorkflowChatTab", "openWorkflowTab", "searchProjects", "searchWorkflows");
+            "openDataTableTab", "openFileTab", "openWorkflowChatTab", "openWorkflowTab", "searchProjects",
+            "searchWorkflows");
     }
 
     @Test
@@ -137,7 +138,8 @@ class AiHubConfigurationToolSetTest {
             "createConnection", "createProject", "createProjectWorkflow", "data_analyst", "getWorkflow",
             "image_generator", "importWorkflow",
             "listConnectionsForComponent", "listProjects", "listWorkflows", "openAiAgentTab", "openCodeWorkflowTab",
-            "openCustomComponentTab", "openFileTab", "openWorkflowChatTab", "openWorkflowTab",
+            "openCustomComponentTab", "openDataTableTab", "openFileTab",
+            "openWorkflowChatTab", "openWorkflowTab",
             "saveWorkflowTestConnection",
             "searchProjects", "searchWorkflows", "selectClusterElementPropertyOption", "selectConnection",
             "selectPropertyOption", "selectTriggerPropertyOption", "slide_builder");
