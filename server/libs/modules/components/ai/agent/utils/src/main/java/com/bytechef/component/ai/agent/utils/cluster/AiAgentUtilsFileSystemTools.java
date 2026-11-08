@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorks
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
+import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspace;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.WorkspacePathToolCallback;
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -30,7 +31,7 @@ import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderF
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
-import org.springaicommunity.agent.common.workspace.Workspace;
+import java.util.Set;
 import org.springaicommunity.agent.tools.FileSystemTools;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
@@ -75,7 +76,7 @@ public class AiAgentUtilsFileSystemTools {
     private ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        Workspace workspace = agentWorkspaceResolver.resolve(
+        AgentWorkspace workspace = agentWorkspaceResolver.resolve(
             context, CLUSTER_ELEMENT_NAME, inputParameters.getString(WORKSPACE_NAME));
 
         FileSystemTools fileSystemTools = FileSystemTools.builder()
@@ -84,7 +85,9 @@ public class AiAgentUtilsFileSystemTools {
 
         List<ToolCallback> toolCallbacks = Arrays.stream(ToolCallbacks.from(fileSystemTools))
             .<ToolCallback>map(
-                toolCallback -> new WorkspacePathToolCallback(toolCallback, FILE_PATH_ARGUMENT_NAME, workspace.root()))
+                toolCallback -> new WorkspacePathToolCallback(
+                    toolCallback, workspace, WorkspacePathToolCallback.FILES_DESCRIPTION,
+                    Set.of(FILE_PATH_ARGUMENT_NAME), Set.of()))
             .toList();
 
         if (inputParameters.getBoolean(READ_ONLY, false)) {

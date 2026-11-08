@@ -140,13 +140,39 @@ class AiAgentUtilsFileSystemToolsTest {
     }
 
     @Test
-    void testToolDescriptionsNameTheWorkspace() throws Exception {
-        Path workspace = basedir.resolve(AGENT_WORKSPACE)
-            .toAbsolutePath()
-            .normalize();
-
+    void testToolDescriptionsNameTheSandboxWorkspaceInsteadOfTheHostPath() throws Exception {
         assertThat(applyTools()).allSatisfy(toolCallback -> assertThat(toolCallback.getToolDefinition()
-            .description()).contains("The agent workspace is " + workspace));
+            .description()).contains("The agent workspace is /workspace.")
+                .doesNotContain(basedir.toString()));
+    }
+
+    @Test
+    void testReadWithASandboxPathReadsFromTheWorkspace() throws Exception {
+        ToolCallback[] toolCallbacks = applyTools();
+
+        Files.writeString(
+            Files.createDirectories(basedir.resolve(AGENT_WORKSPACE))
+                .resolve("notes.txt"),
+            "workspace content");
+
+        String result = callTool(toolCallbacks, "Read", Map.of("filePath", "/workspace/notes.txt"));
+
+        assertThat(result).contains("workspace content")
+            .contains("/workspace/notes.txt")
+            .doesNotContain(basedir.toString());
+    }
+
+    @Test
+    void testWriteWithASandboxParentTraversalIsDeniedWithoutShowingTheHostPath() throws Exception {
+        Path workspace = basedir.resolve(AGENT_WORKSPACE);
+
+        String result = callTool(
+            applyTools(), "Write", Map.of("filePath", "/workspace/../escaped.txt", "content", "x"));
+
+        assertThat(result).contains("Access denied")
+            .doesNotContain(basedir.toString());
+        assertThat(workspace.resolve("../escaped.txt")
+            .normalize()).doesNotExist();
     }
 
     private ToolCallback[] applyTools() throws Exception {
