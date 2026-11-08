@@ -235,7 +235,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
             Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
-            WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflow)
+            WorkflowTrigger workflowTrigger = WorkflowTrigger.ofEnabled(workflow)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Workflow trigger not found"));

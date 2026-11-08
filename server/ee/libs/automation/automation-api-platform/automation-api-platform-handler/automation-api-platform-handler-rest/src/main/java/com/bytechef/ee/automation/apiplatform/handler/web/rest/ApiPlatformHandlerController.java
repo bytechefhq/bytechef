@@ -212,7 +212,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     private String getApiPlatformTriggerName(String workflowId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.ofEnabled(workflow);
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());

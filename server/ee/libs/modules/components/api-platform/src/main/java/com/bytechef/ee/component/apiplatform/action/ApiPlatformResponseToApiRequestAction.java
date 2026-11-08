@@ -118,7 +118,7 @@ public class ApiPlatformResponseToApiRequestAction {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflow)
+        WorkflowTrigger workflowTrigger = WorkflowTrigger.ofEnabled(workflow)
             .stream()
             .findFirst()
             .orElse(null);

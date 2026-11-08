@@ -10,22 +10,30 @@ package com.bytechef.ee.automation.apiplatform.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.ownership.OwnerContributorMissingException;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.repository.ProjectDeploymentRepository;
+import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.config.ApiCollectionIntTestConfiguration;
 import com.bytechef.ee.automation.apiplatform.configuration.config.ApiCollectionIntTestConfigurationSharedMocks;
+import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiCollectionRepository;
+import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +58,9 @@ class ApiCollectionFacadeIntTest {
     private ApiCollectionFacade apiCollectionFacade;
 
     @Autowired
+    private ApiCollectionEndpointService apiCollectionEndpointService;
+
+    @Autowired
     private ApiCollectionRepository apiCollectionRepository;
 
     @Autowired
@@ -65,9 +76,16 @@ class ApiCollectionFacadeIntTest {
     private ProjectDeploymentService projectDeploymentService;
 
     @Autowired
+    private ProjectDeploymentWorkflowRepository projectDeploymentWorkflowRepository;
+
+    @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private WorkflowService workflowService;
+
     private Project project;
+    private String workflowId;
 
     @BeforeEach
     void beforeEach() {
@@ -83,9 +101,19 @@ class ApiCollectionFacadeIntTest {
 
     @AfterEach
     void afterEach() {
+        jdbcClient.sql("DELETE FROM api_collection_endpoint")
+            .update();
+
         apiCollectionRepository.deleteAll();
+        projectDeploymentWorkflowRepository.deleteAll();
         projectDeploymentRepository.deleteAll();
         projectRepository.deleteAll();
+
+        if (workflowId != null) {
+            workflowService.delete(workflowId);
+
+            workflowId = null;
+        }
     }
 
     @Test
@@ -135,6 +163,43 @@ class ApiCollectionFacadeIntTest {
                 OwnerContributorMissingException.class,
                 exception -> assertThat(exception.getProjectDeploymentOwners())
                     .contains(ProjectDeploymentOwner.API_COLLECTION));
+    }
+
+    @Test
+    void testGetOpenApiSpecificationSkipsDisabledFirstTrigger() {
+        Workflow workflow = workflowService.create(
+            JsonUtils.write(
+                Map.of(
+                    "label", "api-workflow",
+                    "triggers", List.of(
+                        Map.of("name", "trigger_1", "type", "webhook/v1/autoRespondingWithHTTP200", "disabled", true),
+                        Map.of("name", "trigger_2", "type", "apiPlatform/v1/newApiRequest", "parameters", Map.of())),
+                    "tasks", List.of())),
+            Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        workflowId = workflow.getId();
+
+        ApiCollectionDTO apiCollectionDTO = apiCollectionFacade.createApiCollection(
+            getApiCollectionDTO("test-collection"));
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setProjectDeploymentId(apiCollectionDTO.projectDeploymentId());
+        projectDeploymentWorkflow.setWorkflowId(workflowId);
+
+        projectDeploymentWorkflow = projectDeploymentWorkflowRepository.save(projectDeploymentWorkflow);
+
+        ApiCollectionEndpoint apiCollectionEndpoint = new ApiCollectionEndpoint();
+
+        apiCollectionEndpoint.setApiCollectionId(apiCollectionDTO.id());
+        apiCollectionEndpoint.setHttpMethod(ApiCollectionEndpoint.HttpMethod.GET);
+        apiCollectionEndpoint.setName("test-endpoint");
+        apiCollectionEndpoint.setPath("/test");
+        apiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflow.getId());
+
+        apiCollectionEndpointService.create(apiCollectionEndpoint);
+
+        assertThat(apiCollectionFacade.getOpenApiSpecification(apiCollectionDTO.id())).contains("/test");
     }
 
     private ApiCollectionDTO getApiCollectionDTO(String name) {
