@@ -86,7 +86,7 @@ A workspace belongs to the deployment, not to the person running it: everyone wh
 
 The agent sees its workspace as `/workspace`, never as a path on the server. Each tool's description names the workspace, a relative path is resolved against it, and the paths the tools return start with `/workspace`.
 
-Every tool has an advanced **Workspace Name** option (letters, digits, `-` and `_`, default `default`). Tools of the same agent with the same workspace name share files, so a file written by File System Tools is visible to Grep Tool and Shell Tools. Give tools different names to keep their files apart.
+Every tool has an advanced **Workspace Name** option (letters, digits, `-` and `_`, default `default`). Tools in the same workflow with the same workspace name share files, even when they belong to different AI Agents, so a file written by File System Tools is visible to Grep Tool and Shell Tools. Tools with different names do not share files, even within one agent; give them different names to keep their files apart.
 
 Editor test runs get a fresh workspace per run, removed after 24 hours. Deployed workflows keep their workspace between runs.
 
