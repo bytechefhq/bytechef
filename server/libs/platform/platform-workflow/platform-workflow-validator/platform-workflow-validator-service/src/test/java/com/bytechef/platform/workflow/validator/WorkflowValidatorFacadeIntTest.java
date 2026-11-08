@@ -155,6 +155,29 @@ class WorkflowValidatorFacadeIntTest {
     }
 
     @Test
+    void testValidateHasEnabledTriggerRejectsAllDisabledTriggers() {
+        String definition = """
+            {"label":"t","triggers":[{"name":"trigger_1","type":"webhook/v1/webhook","disabled":true}],"tasks":[]}
+            """;
+
+        assertThatThrownBy(() -> workflowValidatorFacade.validateHasEnabledTrigger(definition))
+            .asInstanceOf(type(ConfigurationException.class))
+            .extracting(ConfigurationException::getErrorKey)
+            .isEqualTo(WorkflowValidatorErrorType.NO_ENABLED_TRIGGER.getErrorKey());
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings = {
+            "{\"label\":\"t\",\"triggers\":[{\"name\":\"trigger_1\",\"type\":\"manual/v1/manual\",\"disabled\":true}],\"tasks\":[]}",
+            "{\"label\":\"t\",\"triggers\":[],\"tasks\":[]}", "{\"label\":\"t\",\"tasks\":[]}", "not json"
+        })
+    void testValidateHasEnabledTriggerAcceptsDefinitionsWithAnEnabledTriggerOrNone(String definition) {
+        assertThatCode(() -> workflowValidatorFacade.validateHasEnabledTrigger(definition))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
     void testErrorKeysAreUnique() throws IllegalAccessException {
         List<Integer> errorKeys = new ArrayList<>();
 

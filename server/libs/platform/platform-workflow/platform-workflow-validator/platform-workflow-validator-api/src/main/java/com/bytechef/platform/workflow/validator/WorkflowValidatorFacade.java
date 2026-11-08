@@ -101,6 +101,16 @@ public interface WorkflowValidatorFacade {
     List<String> getReservedNodeNames(String workflow);
 
     /**
+     * Returns whether the workflow declares triggers but none of them is enabled. A trigger is enabled unless its
+     * <code>disabled</code> flag is true; manual triggers are always enabled. A workflow without triggers, and workflow
+     * JSON that cannot be parsed, yield false.
+     *
+     * @param workflow the workflow JSON string to inspect
+     * @return true when every declared trigger is disabled
+     */
+    boolean hasNoEnabledTrigger(String workflow);
+
+    /**
      * Save-time guard that rejects a workflow whose input names the expression evaluator cannot resolve. Delegates to
      * {@link #getInvalidInputNames(String)} so the guard and the editor's inline validation agree on what counts as a
      * valid name.
@@ -135,6 +145,20 @@ public interface WorkflowValidatorFacade {
             throw new ConfigurationException(
                 "Workflow node names must be unique. Duplicate node names: " + String.join(", ", duplicateNodeNames),
                 WorkflowValidatorErrorType.DUPLICATE_NODE_NAMES);
+        }
+    }
+
+    /**
+     * Save-time guard that rejects a workflow whose triggers are all disabled. Delegates to
+     * {@link #hasNoEnabledTrigger(String)}, so it fails open on workflow JSON that cannot be parsed.
+     *
+     * @param workflow the workflow JSON string to inspect
+     * @throws ConfigurationException if the workflow has triggers and none of them is enabled
+     */
+    default void validateHasEnabledTrigger(String workflow) {
+        if (hasNoEnabledTrigger(workflow)) {
+            throw new ConfigurationException(
+                "A workflow must have at least one enabled trigger.", WorkflowValidatorErrorType.NO_ENABLED_TRIGGER);
         }
     }
 

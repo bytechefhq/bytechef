@@ -160,6 +160,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')")
     public ProjectWorkflow addWorkflow(long projectId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
+        workflowValidatorFacade.validateHasEnabledTrigger(definition);
 
         Project project = projectService.getProject(projectId);
 

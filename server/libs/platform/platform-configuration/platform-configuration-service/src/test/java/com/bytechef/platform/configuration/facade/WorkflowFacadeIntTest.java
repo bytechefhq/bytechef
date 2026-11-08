@@ -33,6 +33,7 @@ import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestCo
 import com.bytechef.platform.configuration.config.PlatformConfigurationIntTestConfigurationSharedMocks;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
+import com.bytechef.platform.workflow.validator.exception.WorkflowValidatorErrorType;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -155,6 +156,36 @@ class WorkflowFacadeIntTest {
 
         assertThat(persistedWorkflow.getLabel()).isEqualTo("Test Workflow");
         assertThat(persistedWorkflow.getTasks(true)).isEmpty();
+        assertThat(persistedWorkflow.getVersion()).isEqualTo(workflow.getVersion());
+    }
+
+    @Test
+    void testUpdateRejectsWorkflowWithoutEnabledTrigger() {
+        Workflow workflow = createWorkflow(TEST_WORKFLOW_DEFINITION);
+
+        String allTriggersDisabledDefinition = """
+            {
+                "label": "Disabled Triggers Workflow",
+                "triggers": [
+                    {
+                        "name": "trigger_1",
+                        "type": "webhook/v1/webhook",
+                        "disabled": true
+                    }
+                ],
+                "tasks": []
+            }
+            """;
+
+        assertThatThrownBy(
+            () -> workflowFacade.update(workflow.getId(), allTriggersDisabledDefinition, workflow.getVersion()))
+                .isInstanceOf(ConfigurationException.class)
+                .extracting(throwable -> ((ConfigurationException) throwable).getErrorKey())
+                .isEqualTo(WorkflowValidatorErrorType.NO_ENABLED_TRIGGER.getErrorKey());
+
+        Workflow persistedWorkflow = workflowService.getWorkflow(workflow.getId());
+
+        assertThat(persistedWorkflow.getLabel()).isEqualTo("Test Workflow");
         assertThat(persistedWorkflow.getVersion()).isEqualTo(workflow.getVersion());
     }
 
