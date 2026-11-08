@@ -30,8 +30,9 @@ describe('DeletePropertyButton', () => {
 
         const deleteButton = screen.getByRole('button', {name: 'Delete brojEtaza'});
 
-        expect(deleteButton).toHaveClass('ml-1', 'size-3.5', 'p-0', '[&_svg]:size-2.5');
-        expect(deleteButton).not.toHaveClass('size-5', 'p-1', '[&_svg]:size-3');
+        expect(deleteButton).toHaveClass('ml-1', 'size-3.5', 'p-0');
+        expect(deleteButton).not.toHaveClass('size-5', 'p-1');
+        expect(deleteButton.querySelector('svg')).toHaveClass('size-3');
     });
 
     it('calls onClick when clicked', () => {
