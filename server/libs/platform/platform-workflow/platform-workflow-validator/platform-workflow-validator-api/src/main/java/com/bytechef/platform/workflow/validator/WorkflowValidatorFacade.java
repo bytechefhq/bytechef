@@ -101,9 +101,7 @@ public interface WorkflowValidatorFacade {
     List<String> getReservedNodeNames(String workflow);
 
     /**
-     * Returns whether the workflow declares triggers but none of them is enabled. A trigger is enabled unless its
-     * <code>disabled</code> flag is true; manual triggers are always enabled. A workflow without triggers, and workflow
-     * JSON that cannot be parsed, yield false.
+     * Returns whether the workflow declares triggers but none of them is enabled.
      *
      * @param workflow the workflow JSON string to inspect
      * @return true when every declared trigger is disabled
@@ -149,8 +147,7 @@ public interface WorkflowValidatorFacade {
     }
 
     /**
-     * Save-time guard that rejects a workflow whose triggers are all disabled. Delegates to
-     * {@link #hasNoEnabledTrigger(String)}, so it fails open on workflow JSON that cannot be parsed.
+     * Rejects a workflow whose triggers are all disabled.
      *
      * @param workflow the workflow JSON string to inspect
      * @throws ConfigurationException if the workflow has triggers and none of them is enabled
