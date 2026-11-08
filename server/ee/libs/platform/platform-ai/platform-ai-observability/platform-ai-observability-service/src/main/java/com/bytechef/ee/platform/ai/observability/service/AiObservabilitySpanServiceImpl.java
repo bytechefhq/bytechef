@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.ai.observability.service;
 
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpan;
+import com.bytechef.ee.platform.ai.observability.dto.AiPromptVersionMetrics;
 import com.bytechef.ee.platform.ai.observability.repository.AiObservabilitySpanRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,6 +41,13 @@ class AiObservabilitySpanServiceImpl implements AiObservabilitySpanService {
         Validate.isTrue(span.getId() == null, "span id must be null");
 
         aiObservabilitySpanRepository.save(span);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AiPromptVersionMetrics getPromptVersionMetrics(long promptVersionId) {
+        return aiObservabilitySpanRepository.aggregateMetricsByPromptVersion(promptVersionId)
+            .orElseGet(AiPromptVersionMetrics::empty);
     }
 
     @Override

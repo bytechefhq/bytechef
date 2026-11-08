@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.ai.observability.service;
 
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilitySpan;
+import com.bytechef.ee.platform.ai.observability.dto.AiPromptVersionMetrics;
 import java.util.List;
 
 /**
@@ -17,6 +18,8 @@ import java.util.List;
 public interface AiObservabilitySpanService {
 
     void create(AiObservabilitySpan span);
+
+    AiPromptVersionMetrics getPromptVersionMetrics(long promptVersionId);
 
     AiObservabilitySpan getSpan(long id);
 

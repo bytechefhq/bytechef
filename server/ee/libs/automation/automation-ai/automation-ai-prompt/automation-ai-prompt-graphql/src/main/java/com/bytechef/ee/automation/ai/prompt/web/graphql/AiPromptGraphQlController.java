@@ -9,6 +9,8 @@ package com.bytechef.ee.automation.ai.prompt.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.automation.ai.prompt.facade.AiPromptFacade;
+import com.bytechef.ee.platform.ai.observability.dto.AiPromptVersionMetrics;
+import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySpanService;
 import com.bytechef.ee.platform.ai.prompt.AiPrompt;
 import com.bytechef.ee.platform.ai.prompt.AiPromptVersion;
 import com.bytechef.ee.platform.ai.prompt.AiPromptVersionService;
@@ -35,11 +37,16 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 class AiPromptGraphQlController {
 
+    private final AiObservabilitySpanService aiObservabilitySpanService;
     private final AiPromptFacade aiPromptFacade;
     private final AiPromptVersionService aiPromptVersionService;
 
     @SuppressFBWarnings("EI")
-    AiPromptGraphQlController(AiPromptFacade aiPromptFacade, AiPromptVersionService aiPromptVersionService) {
+    AiPromptGraphQlController(
+        AiObservabilitySpanService aiObservabilitySpanService, AiPromptFacade aiPromptFacade,
+        AiPromptVersionService aiPromptVersionService) {
+
+        this.aiObservabilitySpanService = aiObservabilitySpanService;
         this.aiPromptFacade = aiPromptFacade;
         this.aiPromptVersionService = aiPromptVersionService;
     }
@@ -62,6 +69,11 @@ class AiPromptGraphQlController {
     @SchemaMapping(typeName = "AiPrompt", field = "versions")
     public List<AiPromptVersion> versions(AiPrompt prompt) {
         return aiPromptVersionService.getVersionsByPrompt(prompt.getId());
+    }
+
+    @SchemaMapping(typeName = "AiPromptVersion", field = "metrics")
+    public AiPromptVersionMetrics metrics(AiPromptVersion version) {
+        return aiObservabilitySpanService.getPromptVersionMetrics(version.getId());
     }
 
     @MutationMapping
