@@ -52,7 +52,7 @@ public class IntegrationCodeWorkflowApiController implements IntegrationCodeWork
 
     @Override
     public ResponseEntity<Void> deployIntegrationCodeWorkflow(
-        EnvironmentModel xEnvironment, Boolean enable, MultipartFile integrationFile) {
+        MultipartFile integrationFile, EnvironmentModel xEnvironment, Boolean enable) {
 
         try {
             integrationCodeWorkflowFacade.save(

@@ -62,7 +62,7 @@ public class AutomationProjectCodeWorkflowApiController implements AutomationPro
 
     @Override
     public ResponseEntity<AutomationProjectCodeWorkflowDeployResultModel> deployAutomationProjectCodeWorkflow(
-        EnvironmentModel xEnvironment, MultipartFile projectFile, Boolean release) {
+        MultipartFile projectFile, EnvironmentModel xEnvironment, Boolean release) {
 
         List<String> warnings;
 
