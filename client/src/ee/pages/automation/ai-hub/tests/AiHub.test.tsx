@@ -77,6 +77,7 @@ const WORKFLOW_TAB = {
 };
 
 const buildChat = (overrides: Partial<AiHubChatI> = {}): AiHubChatI => ({
+    aiAgentId: null,
     autoTitled: true,
     createdAt: '2026-10-18T00:00:00Z',
     environmentId: 1,

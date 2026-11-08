@@ -12,6 +12,7 @@ query aiHubChats($workspaceId: ID!, $environment: Int!, $status: AiHubChatStatus
         createdAt
         updatedAt
         autoTitled
+        aiAgentId
         kind
         workflowExecutionId
         projectDeploymentId

@@ -12,6 +12,7 @@ mutation updateAiHubChat($input: AiHubChatPatchInput!) {
         createdAt
         updatedAt
         autoTitled
+        aiAgentId
         kind
         workflowExecutionId
         projectDeploymentId

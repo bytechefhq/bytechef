@@ -11,7 +11,11 @@ import AiHubChatsSidebarToggle from '@/ee/pages/automation/ai-hub/AiHubChatsSide
 import AiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/AiHubArtifactsCard';
 import useAiHubArtifactsCard from '@/ee/pages/automation/ai-hub/artifacts/useAiHubArtifactsCard';
 import AiHubChatActionDialogs from '@/ee/pages/automation/ai-hub/chats/AiHubChatActionDialogs';
-import {getChatDisplayTitle, isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {
+    getChatDisplayTitle,
+    isChannelAgentChat,
+    isWebhookBridgedChat,
+} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {useAiHubChatActions} from '@/ee/pages/automation/ai-hub/chats/hooks/useAiHubChatActions';
 import useCurrentAiHubChat from '@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat';
 import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
@@ -71,13 +75,24 @@ const AiHubPanel = () => {
 
     const chatActions = useAiHubChatActions();
 
-    const {onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
+    const {agentChats, onSelectAgentChat, onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
 
     const {visible: artifactsCardVisible} = useAiHubArtifactsCard();
 
     const chatTitle = currentChat ? getChatDisplayTitle(currentChat) : 'New Chat';
 
     const isWorkflowChat = isWebhookBridgedChat(currentChat?.kind);
+
+    let bridgedBadgeLabel = 'Workflow chat';
+    let bridgedBadgeTitle = "This chat runs a workflow. Messages go to the workflow's chat trigger instead of an LLM.";
+
+    if (currentChat != null && isChannelAgentChat(currentChat)) {
+        bridgedBadgeLabel = 'Agent conversation';
+        bridgedBadgeTitle = "Recorded from one of the agent's channels, not started here.";
+    } else if (currentChat?.kind === 'AGENT_CHAT') {
+        bridgedBadgeLabel = 'Agent chat';
+        bridgedBadgeTitle = "This chat runs an AI Agent. Messages go to the agent's workflow instead of an LLM.";
+    }
 
     const shownLlmSelection =
         chatLlmSelection?.provider != null && chatLlmSelection.model != null
@@ -103,9 +118,9 @@ const AiHubPanel = () => {
                     {isWorkflowChat && (
                         <span
                             className="shrink-0 rounded-full bg-surface-brand-secondary px-2 py-1 text-xs leading-none font-medium text-content-brand-primary"
-                            title="This chat runs a workflow. Messages go to the workflow's chat trigger instead of an LLM."
+                            title={bridgedBadgeTitle}
                         >
-                            Workflow chat
+                            {bridgedBadgeLabel}
                         </span>
                     )}
                 </div>
@@ -187,6 +202,7 @@ const AiHubPanel = () => {
                         modelPicker={
                             !isWorkflowChat && currentChatId != null && currentWorkspaceId != null ? (
                                 <ModelPicker
+                                    agentChats={agentChats}
                                     defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
                                     defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}
                                     environment={currentEnvironmentId}
@@ -194,6 +210,7 @@ const AiHubPanel = () => {
                                         writeLastUsedModel(currentWorkspaceId, provider, model);
                                         setChatLlmSelection(currentChatId, provider, model);
                                     }}
+                                    onSelectAgentChat={onSelectAgentChat}
                                     onSelectWorkflowChat={onSelectWorkflowChat}
                                     selectedModel={shownLlmSelection?.model ?? null}
                                     selectedProvider={shownLlmSelection?.provider ?? null}

@@ -22,7 +22,7 @@ const AiHubHomePanel = () => {
 
     const navigate = useNavigate();
 
-    const {onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
+    const {agentChats, onSelectAgentChat, onSelectWorkflowChat, workflowChats} = useAiHubChatLaunchers();
 
     const {data: defaultModelData, isPending: isDefaultModelPending} = useAiDefaultModelQuery({
         environment: String(currentEnvironmentId),
@@ -62,6 +62,30 @@ const AiHubHomePanel = () => {
 
                         <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>{AI_PROVIDERS_LINK_LABEL}</Button>
 
+                        {agentChats.length > 0 && (
+                            <fieldset className="mt-4 flex w-full max-w-md flex-col gap-2 border-0">
+                                <legend className="mb-2 text-sm text-content-neutral-secondary">
+                                    Agents run on their own model and need no AI provider here:
+                                </legend>
+
+                                {agentChats.map((agentChat) => (
+                                    <Button
+                                        key={`${agentChat.projectDeploymentId}-${agentChat.workflowExecutionId}`}
+                                        onClick={() =>
+                                            onSelectAgentChat(
+                                                agentChat.workflowExecutionId,
+                                                agentChat.projectDeploymentId,
+                                                agentChat.label
+                                            )
+                                        }
+                                        variant="outline"
+                                    >
+                                        {agentChat.label}
+                                    </Button>
+                                ))}
+                            </fieldset>
+                        )}
+
                         {workflowChats.length > 0 && (
                             <fieldset className="mt-4 flex w-full max-w-md flex-col gap-2 border-0">
                                 <legend className="mb-2 text-sm text-content-neutral-secondary">
@@ -100,6 +124,7 @@ const AiHubHomePanel = () => {
                             modelPicker={
                                 currentWorkspaceId != null ? (
                                     <ModelPicker
+                                        agentChats={agentChats}
                                         defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
                                         defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}
                                         environment={currentEnvironmentId}
@@ -107,6 +132,7 @@ const AiHubHomePanel = () => {
                                             writeLastUsedModel(currentWorkspaceId, provider, model);
                                             setDraftLlmSelection(provider, model);
                                         }}
+                                        onSelectAgentChat={onSelectAgentChat}
                                         onSelectWorkflowChat={onSelectWorkflowChat}
                                         selectedModel={shownLlmSelection?.model ?? null}
                                         selectedProvider={shownLlmSelection?.provider ?? null}

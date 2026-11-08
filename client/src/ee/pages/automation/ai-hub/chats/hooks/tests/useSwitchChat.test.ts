@@ -53,6 +53,7 @@ const mockGetToolApprovals = vi.mocked(getToolApprovals);
 const mockReportMutationError = vi.mocked(reportMutationError);
 
 const buildChat = (overrides: Partial<AiHubChatI> = {}): AiHubChatI => ({
+    aiAgentId: null,
     autoTitled: false,
     createdAt: '2026-04-01T00:00:00Z',
     environmentId: 0,

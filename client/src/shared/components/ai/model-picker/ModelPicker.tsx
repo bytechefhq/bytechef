@@ -29,7 +29,14 @@ export interface ModelPickerWorkflowChatI {
     workflowExecutionId: string;
 }
 
+export interface ModelPickerAgentChatI {
+    label: string;
+    projectDeploymentId: string;
+    workflowExecutionId: string;
+}
+
 export interface ModelPickerPropsI {
+    agentChats?: ModelPickerAgentChatI[];
     agentDefaultModel?: string | null;
     agentDefaultProvider?: string | null;
     defaultModel?: string | null;
@@ -38,6 +45,7 @@ export interface ModelPickerPropsI {
     iconOnly?: boolean;
     layout?: 'compact' | 'full';
     onChange: (provider: string | null, model: string | null) => void;
+    onSelectAgentChat?: (workflowExecutionId: string, projectDeploymentId: string, label: string) => void;
     onSelectPersonalAgent?: (agentId: number) => void;
     onSelectWorkflowChat?: (workflowExecutionId: string, projectDeploymentId: string, label: string) => void;
     personalAgents?: ModelPickerPersonalAgentI[];
@@ -50,6 +58,7 @@ export interface ModelPickerPropsI {
 const isPresent = <T,>(value: T | null): value is T => value != null;
 
 const ModelPicker = ({
+    agentChats,
     agentDefaultModel,
     agentDefaultProvider,
     defaultModel,
@@ -58,6 +67,7 @@ const ModelPicker = ({
     iconOnly = false,
     layout = 'compact',
     onChange,
+    onSelectAgentChat,
     onSelectPersonalAgent,
     onSelectWorkflowChat,
     personalAgents,
@@ -110,6 +120,19 @@ const ModelPicker = ({
             (first.title ?? first.name).localeCompare(second.title ?? second.name)
         );
     }, [personalAgents, searchQuery, showPersonalAgentsSection]);
+
+    const showAgentChatsSection = onSelectAgentChat != null && (agentChats?.length ?? 0) > 0;
+
+    const sortedAgentChats = useMemo(() => {
+        if (!showAgentChatsSection || agentChats == null) {
+            return [];
+        }
+
+        const query = searchQuery.trim().toLowerCase();
+        const filtered = query ? agentChats.filter((chat) => chat.label.toLowerCase().includes(query)) : agentChats;
+
+        return [...filtered].sort((first, second) => first.label.localeCompare(second.label));
+    }, [agentChats, searchQuery, showAgentChatsSection]);
 
     const showWorkflowChatsSection = onSelectWorkflowChat != null && (workflowChats?.length ?? 0) > 0;
 
@@ -184,6 +207,11 @@ const ModelPicker = ({
 
     const handleSelectPersonalAgent = (agentId: number) => {
         onSelectPersonalAgent?.(agentId);
+        closeMenu();
+    };
+
+    const handleSelectAgentChat = (chat: ModelPickerAgentChatI) => {
+        onSelectAgentChat?.(chat.workflowExecutionId, chat.projectDeploymentId, chat.label);
         closeMenu();
     };
 
@@ -289,6 +317,33 @@ const ModelPicker = ({
                     </DropdownMenuSub>
                 )}
 
+                {showAgentChatsSection && (
+                    <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                            <BotIcon className="text-muted-foreground" />
+
+                            <span>Agents</span>
+                        </DropdownMenuSubTrigger>
+
+                        <DropdownMenuPortal>
+                            <DropdownMenuSubContent className="max-h-80 overflow-y-auto">
+                                {sortedAgentChats.length === 0 ? (
+                                    <div className="px-2 py-1.5 text-sm text-muted-foreground">No matching agents.</div>
+                                ) : (
+                                    sortedAgentChats.map((chat) => (
+                                        <DropdownMenuItem
+                                            key={chat.workflowExecutionId}
+                                            onSelect={() => handleSelectAgentChat(chat)}
+                                        >
+                                            <span className="truncate">{chat.label}</span>
+                                        </DropdownMenuItem>
+                                    ))
+                                )}
+                            </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                )}
+
                 {showWorkflowChatsSection && (
                     <DropdownMenuSub>
                         <DropdownMenuSubTrigger>
@@ -318,7 +373,9 @@ const ModelPicker = ({
                     </DropdownMenuSub>
                 )}
 
-                {(showPersonalAgentsSection || showWorkflowChatsSection) && <DropdownMenuSeparator />}
+                {(showPersonalAgentsSection || showAgentChatsSection || showWorkflowChatsSection) && (
+                    <DropdownMenuSeparator />
+                )}
 
                 {sortedProviders.length === 0 ? (
                     <div className="px-2 py-1.5 text-sm text-muted-foreground">

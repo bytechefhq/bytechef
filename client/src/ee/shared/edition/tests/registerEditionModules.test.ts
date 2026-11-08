@@ -1,3 +1,5 @@
+import useOpenAgentChat from '@/ee/shared/edition/useOpenAgentChat';
+import {getAgentChatApi} from '@/shared/edition/agent-chat/agentChatApi';
 import {getProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -94,5 +96,9 @@ describe('registerEditionModules', () => {
         result.current.mutate(input, mutateCallbacks);
 
         expect(mutateMock).toHaveBeenCalledWith(input, mutateCallbacks);
+    });
+
+    it('registers the EE agent chat opener', () => {
+        expect(getAgentChatApi().useOpenAgentChat).toBe(useOpenAgentChat);
     });
 });

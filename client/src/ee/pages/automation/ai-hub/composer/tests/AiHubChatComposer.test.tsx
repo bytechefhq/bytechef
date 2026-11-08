@@ -10,15 +10,28 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AiHubChatComposer from '../AiHubChatComposer';
 
-const {cancelAiHubRunMock, cancelRunMock, composerTextRef, currentChatKindRef, currentWorkspaceIdRef, setTextMock} =
-    vi.hoisted(() => ({
-        cancelAiHubRunMock: vi.fn(),
-        cancelRunMock: vi.fn(),
-        composerTextRef: {current: ''},
-        currentChatKindRef: {current: 'STANDARD' as 'STANDARD' | 'WORKFLOW_CHAT'},
-        currentWorkspaceIdRef: {current: 3 as number | undefined},
-        setTextMock: vi.fn(),
-    }));
+const {
+    cancelAiHubRunMock,
+    cancelRunMock,
+    composerTextRef,
+    currentChatAgentRef,
+    currentChatKindRef,
+    currentWorkspaceIdRef,
+    setTextMock,
+} = vi.hoisted(() => ({
+    cancelAiHubRunMock: vi.fn(),
+    cancelRunMock: vi.fn(),
+    composerTextRef: {current: ''},
+    currentChatAgentRef: {
+        current: {aiAgentId: null, workflowExecutionId: null} as {
+            aiAgentId: number | null;
+            workflowExecutionId: string | null;
+        },
+    },
+    currentChatKindRef: {current: 'STANDARD' as 'AGENT_CHAT' | 'STANDARD' | 'WORKFLOW_CHAT'},
+    currentWorkspaceIdRef: {current: 3 as number | undefined},
+    setTextMock: vi.fn(),
+}));
 
 vi.mock('@assistant-ui/react', () => ({
     ComposerPrimitive: {
@@ -56,7 +69,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
 }));
 
 vi.mock('@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat', () => ({
-    default: () => ({id: 7, kind: currentChatKindRef.current}),
+    default: () => ({id: 7, kind: currentChatKindRef.current, ...currentChatAgentRef.current}),
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
@@ -88,6 +101,7 @@ describe('AiHubChatComposer', () => {
         vi.clearAllMocks();
 
         composerTextRef.current = '';
+        currentChatAgentRef.current = {aiAgentId: null, workflowExecutionId: null};
         currentChatKindRef.current = 'STANDARD';
         currentWorkspaceIdRef.current = 3;
 
@@ -106,6 +120,30 @@ describe('AiHubChatComposer', () => {
         expect(screen.getByRole('switch', {name: 'Build mode on'})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Send message'})).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Stop generating'})).toBeNull();
+    });
+
+    it('replaces the message input with a read-only notice for a channel-born agent chat', () => {
+        currentChatKindRef.current = 'AGENT_CHAT';
+        currentChatAgentRef.current = {aiAgentId: 9, workflowExecutionId: null};
+
+        renderComposer();
+
+        expect(screen.queryByRole('textbox', {name: 'Message input'})).toBeNull();
+        expect(screen.queryByRole('button', {name: 'Send message'})).toBeNull();
+        expect(screen.getByTestId('channel-born-readonly-notice')).toBeInTheDocument();
+    });
+
+    it.each([
+        {aiAgentId: 9, kind: 'AGENT_CHAT' as const, workflowExecutionId: 'exec-1'},
+        {aiAgentId: null, kind: 'WORKFLOW_CHAT' as const, workflowExecutionId: 'exec-1'},
+    ])('keeps the message input for a $kind chat bound to an execution', ({aiAgentId, kind, workflowExecutionId}) => {
+        currentChatKindRef.current = kind;
+        currentChatAgentRef.current = {aiAgentId, workflowExecutionId};
+
+        renderComposer();
+
+        expect(screen.getByRole('textbox', {name: 'Message input'})).toBeInTheDocument();
+        expect(screen.queryByTestId('channel-born-readonly-notice')).toBeNull();
     });
 
     it.each([undefined, 0])('disables the input and Send while the workspace id is %s', (workspaceId) => {

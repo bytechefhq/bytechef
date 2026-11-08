@@ -1,6 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
+import {isChannelAgentChat, isWebhookBridgedChat} from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import useCurrentAiHubChat from '@/ee/pages/automation/ai-hub/chats/hooks/useCurrentAiHubChat';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {hasPendingToolApproval} from '@/ee/pages/automation/ai-hub/chats/pendingToolApproval';
@@ -24,7 +24,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
 import {useCancelAiHubRunMutation} from '@/shared/middleware/graphql';
 import {ComposerPrimitive, useAui} from '@assistant-ui/react';
-import {ArrowUpIcon, HexagonIcon, SquareIcon, XIcon} from 'lucide-react';
+import {ArrowUpIcon, HexagonIcon, RadioTowerIcon, SquareIcon, XIcon} from 'lucide-react';
 import {KeyboardEvent, ReactNode, useCallback, useEffect, useRef} from 'react';
 
 const KIND_LABELS: Record<ReferencedResourceKindType, string> = {
@@ -194,6 +194,24 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
 
         requestAnimationFrame(() => textarea.focus());
     }, [resourcePickerOpen]);
+
+    if (currentChat != null && isChannelAgentChat(currentChat)) {
+        return (
+            <div className="mx-auto flex w-full max-w-[var(--thread-max-width,44rem)] flex-col gap-2 px-3 pb-2">
+                <div
+                    className="flex items-center gap-2 rounded-2xl border border-border px-4 py-3 text-sm text-muted-foreground"
+                    data-testid="channel-born-readonly-notice"
+                >
+                    <RadioTowerIcon aria-hidden className="size-4 shrink-0" />
+
+                    <span>
+                        This conversation happens on the agent&apos;s channel. You can read it here, but you can&apos;t
+                        reply from the AI Hub.
+                    </span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="mx-auto flex w-full max-w-[var(--thread-max-width,44rem)] flex-col gap-2 px-3 pb-2">
