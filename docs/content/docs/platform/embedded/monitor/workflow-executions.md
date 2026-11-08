@@ -65,7 +65,7 @@ Click on any execution row to open a detail sheet that shows:
 
 <!-- TODO screenshot: Workflow execution detail sheet open, showing the workflow panel with a selected step and its Input / Output / Error tabs -->
 
-In **Automations** mode, the execution detail sheet reuses the automation execution view and carries an [AI Copilot](/platform/automation/build/ai-copilot): it analyzes the finished or failed execution and helps debug errors. Copilot is an Enterprise Edition feature and is disabled by default _(the AI Copilot is coming soon - not yet available in the latest released version)_.
+In **Automations** mode, the execution detail sheet reuses the automation execution view and carries an [AI Copilot](/platform/automation/build/ai-copilot): it analyzes the finished or failed execution and helps debug errors. In **Integrations** mode, the sparkle button in the detail sheet header opens an integration-scoped Copilot for the same job: Ask mode reads the execution and the integration's workflows and explains the failure, and Build mode can also change the integration workflow to fix it. It reads only executions of the current environment. Copilot is an Enterprise Edition feature and is disabled by default _(the AI Copilot is coming soon - not yet available in the latest released version)_.
 
 In both modes the detail colours the run on its read-only canvas and lists each AI
 Agent tool call as a row under the agent's task, the same way the
