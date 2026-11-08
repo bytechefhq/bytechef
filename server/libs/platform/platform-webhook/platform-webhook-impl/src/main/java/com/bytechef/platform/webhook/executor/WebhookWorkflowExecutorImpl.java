@@ -286,8 +286,8 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         Optional<WorkflowTrigger> workflowTriggerOptional = WorkflowTrigger.fetch(
             workflow, workflowExecutionId.getTriggerName());
 
-        return workflowTriggerOptional.isPresent() && !workflowTriggerOptional.get()
-            .isEnabled();
+        return workflowTriggerOptional.map(workflowTrigger -> !workflowTrigger.isEnabled())
+            .orElse(false);
     }
 
     /**

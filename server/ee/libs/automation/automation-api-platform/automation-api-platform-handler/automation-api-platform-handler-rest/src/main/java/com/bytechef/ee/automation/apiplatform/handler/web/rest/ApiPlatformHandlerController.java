@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -78,6 +80,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectWorkflowService projectWorkflowService;
+    private final WebhookWorkflowExecutor webhookWorkflowExecutor;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -95,6 +98,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectWorkflowService = projectWorkflowService;
+        this.webhookWorkflowExecutor = webhookWorkflowExecutor;
         this.workflowService = workflowService;
     }
 
@@ -194,6 +198,12 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
                 PlatformType.AUTOMATION, apiCollection.getProjectDeploymentId(), workflowUuid, triggerName);
+
+            if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
+                return ResponseEntity.status(HttpStatus.GONE)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of("detail", "Workflow is disabled."));
+            }
 
             return doProcessTrigger(workflowExecutionId, webhookRequest, httpServletRequest, httpServletResponse);
         });

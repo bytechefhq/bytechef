@@ -28,7 +28,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
@@ -76,13 +76,12 @@ public class TriggerFormApiController implements TriggerFormApi {
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
-        Optional<WorkflowTrigger> workflowTriggerOptional = WorkflowTrigger.fetch(
-            workflow, workflowExecutionId.getTriggerName());
+        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
+            if (Objects.equals(workflowTrigger.getName(), workflowExecutionId.getTriggerName()) &&
+                !workflowTrigger.isEnabled()) {
 
-        if (workflowTriggerOptional.isPresent() && !workflowTriggerOptional.get()
-            .isEnabled()) {
-
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Trigger is disabled: " + id);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Trigger is disabled: " + id);
+            }
         }
 
         Map<String, Object> parameters = getParameters(workflowExecutionId, workflowId, workflowTriggers);
