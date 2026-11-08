@@ -45,6 +45,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springaicommunity.agent.common.exec.ExecBackend;
 import org.springaicommunity.agent.common.exec.ExecResult;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
  * @author Ivica Cardic
@@ -74,6 +75,25 @@ class AiAgentUtilsShellToolsTest {
         assertThat(callBash(false, "pwd")).contains("in container");
 
         verify(execBackend).run(any());
+    }
+
+    @Test
+    void testDockerBashDescriptionNamesTheSandboxWorkspace() throws Exception {
+        when(inputParameters.getString(AiAgentUtilsShellTools.EXEC_BACKEND, AiAgentUtilsShellTools.DOCKER))
+            .thenReturn(AiAgentUtilsShellTools.DOCKER);
+
+        assertThat(bashDescription(false)).contains("The agent workspace is /workspace.")
+            .doesNotContain(basedir.toString());
+    }
+
+    @Test
+    void testLocalBashDescriptionNamesTheHostWorkspace() throws Exception {
+        givenLocalBackend();
+
+        assertThat(bashDescription(true)).contains(
+            "The agent workspace is " + basedir.resolve(AGENT_WORKSPACE)
+                .toAbsolutePath()
+                .normalize());
     }
 
     @Test
@@ -124,7 +144,17 @@ class AiAgentUtilsShellToolsTest {
         assertThat(result).contains("value=unset");
     }
 
+    private String bashDescription(boolean allowLocal) throws Exception {
+        ToolDefinition toolDefinition = bashToolCallback(allowLocal).getToolDefinition();
+
+        return toolDefinition.description();
+    }
+
     private String callBash(boolean allowLocal, String command) throws Exception {
+        return bashToolCallback(allowLocal).call(JsonUtils.write(Map.of("command", command)));
+    }
+
+    private ToolCallback bashToolCallback(boolean allowLocal) throws Exception {
         ActionContextAware actionContext = mock(ActionContextAware.class);
 
         when(actionContext.getPlatformType()).thenReturn(PlatformType.AUTOMATION);
@@ -139,13 +169,11 @@ class AiAgentUtilsShellToolsTest {
             .apply(inputParameters, connectionParameters, actionContext)
             .getToolCallbacks();
 
-        ToolCallback bashToolCallback = Arrays.stream(toolCallbacks)
+        return Arrays.stream(toolCallbacks)
             .filter(toolCallback -> "Bash".equals(toolCallback.getToolDefinition()
                 .name()))
             .findFirst()
             .orElseThrow();
-
-        return bashToolCallback.call(JsonUtils.write(Map.of("command", command)));
     }
 
     private AiAgentUtilsShellTools createShellTools(boolean allowLocal) {

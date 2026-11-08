@@ -22,7 +22,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.ai.agent.utils.cluster.exec.DockerExecBackendRegistry;
+import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspace;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver;
+import com.bytechef.component.ai.agent.utils.cluster.workspace.WorkspacePathToolCallback;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
@@ -35,8 +37,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springaicommunity.agent.common.exec.ExecBackend;
-import org.springaicommunity.agent.common.workspace.Workspace;
 import org.springaicommunity.agent.exec.LocalExecBackend;
 import org.springaicommunity.agent.tools.ShellTools;
 import org.springframework.ai.support.ToolCallbacks;
@@ -53,6 +55,10 @@ public class AiAgentUtilsShellTools {
 
     private static final String CLUSTER_ELEMENT_NAME = "shellTools";
     private static final String DEFAULT_PATH = "/usr/local/bin:/usr/bin:/bin";
+    private static final String DOCKER_WORKSPACE_DESCRIPTION =
+        "Commands start in it, and it is the only host directory they can see.";
+    private static final String LOCAL_WORKSPACE_DESCRIPTION =
+        "Commands start in it but run directly on the server, so refer to workspace files with relative paths.";
 
     private final boolean allowLocal;
     private final AgentWorkspaceResolver agentWorkspaceResolver;
@@ -92,14 +98,23 @@ public class AiAgentUtilsShellTools {
     private ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        Workspace workspace = agentWorkspaceResolver.resolve(
+        AgentWorkspace workspace = agentWorkspaceResolver.resolve(
             context, CLUSTER_ELEMENT_NAME, inputParameters.getString(WORKSPACE_NAME));
 
+        String execBackend = inputParameters.getString(EXEC_BACKEND, DOCKER);
+
         ShellTools shellTools = ShellTools.builder()
-            .execBackend(createExecBackend(inputParameters.getString(EXEC_BACKEND, DOCKER), workspace.root()))
+            .execBackend(createExecBackend(execBackend, workspace.root()))
             .build();
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(shellTools));
+        if (LOCAL.equals(execBackend)) {
+            return WorkspacePathToolCallback.wrap(
+                ToolCallbacks.from(shellTools), workspace.withHostPaths(), LOCAL_WORKSPACE_DESCRIPTION, Set.of(),
+                Set.of());
+        }
+
+        return WorkspacePathToolCallback.wrap(
+            ToolCallbacks.from(shellTools), workspace, DOCKER_WORKSPACE_DESCRIPTION, Set.of(), Set.of());
     }
 
     private ExecBackend createExecBackend(String execBackend, Path workspaceRoot) {
