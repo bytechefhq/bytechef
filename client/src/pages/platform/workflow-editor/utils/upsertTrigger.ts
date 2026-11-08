@@ -7,9 +7,14 @@ export default function upsertTrigger(triggers: WorkflowTrigger[], newTrigger: W
         return [...triggers, newTrigger];
     }
 
+    const existingTrigger = triggers[existingIndex];
+
+    const keepDisabled = !!existingTrigger.disabled && existingTrigger.type === newTrigger.type;
+
     const mergedTrigger: WorkflowTrigger = {
         ...newTrigger,
-        metadata: newTrigger.metadata ?? triggers[existingIndex].metadata,
+        ...(keepDisabled && {disabled: true}),
+        metadata: newTrigger.metadata ?? existingTrigger.metadata,
     };
 
     return [...triggers.slice(0, existingIndex), mergedTrigger, ...triggers.slice(existingIndex + 1)];
