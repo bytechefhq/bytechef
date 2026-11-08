@@ -314,6 +314,12 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
             TenantContext.setCurrentTenantId(workflowExecutionId.getTenantId());
 
             try {
+                if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
+                    session.close(CloseStatus.POLICY_VIOLATION.withReason("Workflow is disabled."));
+
+                    return;
+                }
+
                 webhookWorkflowExecutor.stream(workflowExecutionId, webhookRequest, streamBridge);
             } finally {
                 TenantContext.setCurrentTenantId(currentTenantId);

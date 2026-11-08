@@ -103,6 +103,7 @@ public class WebhookWorkflowExecutorTest {
         when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(any())).thenReturn(jobPrincipalAccessor);
         when(jobPrincipalAccessor.getInputMap(anyLong(), anyString())).thenReturn(Map.of());
         when(jobPrincipalAccessor.getWorkflowId(anyLong(), anyString())).thenReturn("workflow-id");
+        when(jobPrincipalAccessor.isWorkflowEnabled(anyLong(), anyString())).thenReturn(true);
         when(evaluator.evaluate(any(), any(), anyBoolean())).thenAnswer(invocation -> invocation.getArgument(0));
 
         webhookWorkflowExecutor = new WebhookWorkflowExecutorImpl(
@@ -350,6 +351,61 @@ public class WebhookWorkflowExecutorTest {
         private static WorkflowTask workflowTask(String name, String type) {
             return new WorkflowTask(Map.of("name", name, "type", type));
         }
+    }
+
+    @Test
+    public void testIsWorkflowDisabledWhenTriggerDisabled() {
+        givenTrigger("trigger_1", "webhook/v1/webhook", true);
+
+        assertThat(webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)).isTrue();
+    }
+
+    @Test
+    public void testIsWorkflowDisabledFalseForEnabledTrigger() {
+        givenTrigger("trigger_1", "webhook/v1/webhook", false);
+
+        assertThat(webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)).isFalse();
+    }
+
+    @Test
+    public void testIsWorkflowDisabledFalseForDisabledManualTrigger() {
+        givenTrigger("trigger_1", "manual/v1/manual", true);
+
+        assertThat(webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)).isFalse();
+    }
+
+    @Test
+    public void testIsWorkflowDisabledFalseForUnknownTrigger() {
+        givenTrigger("other_trigger", "webhook/v1/webhook", true);
+
+        assertThat(webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)).isFalse();
+    }
+
+    @Test
+    public void testStreamRejectsDisabledTrigger() {
+        givenTrigger("trigger_1", "webhook/v1/webhook", true);
+
+        SseStreamBridge sseStreamBridge = mock(SseStreamBridge.class);
+
+        webhookWorkflowExecutor.stream(workflowExecutionId, webhookRequest, sseStreamBridge);
+
+        ArgumentCaptor<Throwable> throwableArgumentCaptor = ArgumentCaptor.forClass(Throwable.class);
+
+        verify(sseStreamBridge).onError(throwableArgumentCaptor.capture());
+
+        assertThat(throwableArgumentCaptor.getValue()).hasMessage("Workflow is disabled.");
+
+        verify(principalJobFacade, never()).createJob(any(), anyLong(), any());
+    }
+
+    private void givenTrigger(String triggerName, String type, boolean disabled) {
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getExtensions(any(), any(), any())).thenReturn(
+            List.of(
+                new WorkflowTrigger(
+                    Map.of("name", triggerName, "type", type, "disabled", disabled, "parameters", Map.of()))));
+        when(workflowService.getWorkflow("workflow-id")).thenReturn(workflow);
     }
 
     private Duration executeSyncAndCaptureTimeout(Map<String, ?> triggerParameters) {
