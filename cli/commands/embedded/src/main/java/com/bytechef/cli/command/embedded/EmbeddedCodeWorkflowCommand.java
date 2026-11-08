@@ -103,6 +103,40 @@ public class EmbeddedCodeWorkflowCommand {
         }
     }
 
+    @SuppressFBWarnings(
+        value = "PATH_TRAVERSAL_IN",
+        justification = "The integration file path is supplied by the CLI user on purpose.")
+    @Command(name = "embedded integration deploy", description = "Deploy a code based integration.")
+    public void integrationDeploy(
+        @Option(longName = "file", required = true) String file,
+        @Option(
+            longName = "enable",
+            description = "also create or move the integration's instance configuration in the profile environment "
+                + "to the published version and enable it",
+            defaultValue = "false") boolean enable,
+        @Option(longName = "profile") String profile,
+        @Option(longName = "host") String host,
+        @Option(longName = "token") String token,
+        @Option(longName = "environment") String environment) {
+
+        File integrationFile = new File(file);
+
+        if (!integrationFile.exists()) {
+            throw new CliException(1, "Integration file not found: " + file);
+        }
+
+        CliConfig config = resolve(profile, host, token, environment);
+
+        try {
+            EmbeddedConfigurationClientFactory.integrationCodeWorkflowApi(config)
+                .deployIntegrationCodeWorkflow(null, enable, integrationFile);
+
+            new OutputRenderer(System.out).message("Integration deployed.");
+        } catch (ApiException e) {
+            throw EmbeddedConfigurationClientFactory.toCliException(e);
+        }
+    }
+
     void setConfigPath(Path configPath) {
         this.configPath = configPath;
     }

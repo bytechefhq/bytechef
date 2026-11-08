@@ -46,6 +46,7 @@ import org.junit.jupiter.api.io.TempDir;
 class EmbeddedCodeWorkflowCommandTest {
 
     private static final String DEPLOY_PATH = "/api/embedded/v1/automation-project-code-workflows/deploy";
+    private static final String INTEGRATION_DEPLOY_PATH = "/api/embedded/v1/integration-code-workflows/deploy";
     private static final String LIST_PATH = "/api/embedded/v1/automation-project-code-workflows";
     private static final String SECRET_TOKEN = "btc_secret_token_value";
 
@@ -172,6 +173,102 @@ class EmbeddedCodeWorkflowCommandTest {
 
             assertEquals(1, code);
         }
+    }
+
+    @Test
+    void testIntegrationDeployRejectsAMissingFile() {
+        EmbeddedCodeWorkflowCommand command = new EmbeddedCodeWorkflowCommand();
+
+        command.setConfigPath(Path.of("/nonexistent/config"));
+        command.setEnvironmentVariables(Map.of());
+
+        CliException exception = assertThrows(
+            CliException.class,
+            () -> command.integrationDeploy(
+                "/nonexistent/integration.js", false, "default", "http://localhost:8080", "token", "PRODUCTION"));
+
+        assertEquals(1, exception.exitCode());
+    }
+
+    @Test
+    void testIntegrationDeployPostsTheIntegrationFile() throws Exception {
+        Path integrationFile = integrationFile();
+
+        try (StubApi stub = StubApi.start(204, "")) {
+            CapturedRun capturedRun = capture(() -> CliApplication.execute(
+                "embedded", "integration", "deploy", "--file", integrationFile.toString(), "--host", stub.host(),
+                "--token", SECRET_TOKEN, "--environment", "STAGING"));
+
+            assertEquals(0, capturedRun.exitCode(), capturedRun.output());
+            assertEquals(INTEGRATION_DEPLOY_PATH + "?enable=false", stub.lastPath());
+            assertEquals("Bearer " + SECRET_TOKEN, stub.lastAuthorization());
+            assertEquals("STAGING", stub.lastEnvironment());
+            assertTrue(stub.lastBody()
+                .contains("name=\"integrationFile\""), stub.lastBody());
+            assertTrue(stub.lastBody()
+                .contains("filename=\"integration.js\""), stub.lastBody());
+            assertTrue(capturedRun.output()
+                .contains("Integration deployed."), capturedRun.output());
+            assertFalse(capturedRun.output()
+                .contains(SECRET_TOKEN), capturedRun.output());
+        }
+    }
+
+    @Test
+    void testIntegrationDeploySendsTheEnableFlag() throws Exception {
+        Path integrationFile = integrationFile();
+
+        try (StubApi stub = StubApi.start(204, "")) {
+            int code = CliApplication.execute(
+                "embedded", "integration", "deploy", "--file", integrationFile.toString(), "--enable", "--host",
+                stub.host(), "--token", "btc_x", "--environment", "PRODUCTION");
+
+            assertEquals(0, code);
+            assertEquals(INTEGRATION_DEPLOY_PATH + "?enable=true", stub.lastPath());
+            assertEquals("PRODUCTION", stub.lastEnvironment());
+        }
+    }
+
+    @Test
+    void testIntegrationDeployUnauthorizedReturnsExitCode2WithoutLeakingTheToken() throws Exception {
+        assertIntegrationDeployExitCode(401, 2);
+    }
+
+    @Test
+    void testIntegrationDeployForbiddenReturnsExitCode2WithoutLeakingTheToken() throws Exception {
+        assertIntegrationDeployExitCode(403, 2);
+    }
+
+    @Test
+    void testIntegrationDeployNotFoundReturnsExitCode3() throws Exception {
+        assertIntegrationDeployExitCode(404, 3);
+    }
+
+    @Test
+    void testIntegrationDeployServerErrorReturnsExitCode1() throws Exception {
+        assertIntegrationDeployExitCode(500, 1);
+    }
+
+    private void assertIntegrationDeployExitCode(int status, int expectedExitCode) throws Exception {
+        Path integrationFile = integrationFile();
+
+        try (StubApi stub = StubApi.start(status, "{\"message\":\"failed\"}")) {
+            CapturedRun capturedRun = capture(() -> CliApplication.execute(
+                "embedded", "integration", "deploy", "--file", integrationFile.toString(), "--host", stub.host(),
+                "--token", SECRET_TOKEN, "--environment", "PRODUCTION"));
+
+            assertEquals(expectedExitCode, capturedRun.exitCode(), capturedRun.output());
+            assertFalse(capturedRun.output()
+                .contains(SECRET_TOKEN), capturedRun.output());
+        }
+    }
+
+    private Path integrationFile() throws IOException {
+        Path integrationFile = tempDir.resolve("integration.js");
+
+        Files.writeString(integrationFile, "export default {name: 'crm'};");
+
+        return integrationFile;
     }
 
     private Path projectFile() throws IOException {
