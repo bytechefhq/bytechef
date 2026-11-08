@@ -3,7 +3,6 @@ import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {getClusterElementsLabel} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, UpdateWorkflowMutationType} from '@/shared/types';
 import {ClipboardPasteIcon, ClipboardXIcon} from 'lucide-react';
 import {MouseEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -150,10 +149,6 @@ const WorkflowNodesTabs = ({
         }))
     );
 
-    const getFeatureFlag = useFeatureFlagsStore();
-
-    const ff_3158 = getFeatureFlag('ff-3158');
-
     const visibleActionComponentDefinitions = useMemo(
         () =>
             actionComponentDefinitions.filter(
@@ -173,11 +168,8 @@ const WorkflowNodesTabs = ({
     });
 
     const helperComponentDefinitions = useMemo(
-        () =>
-            actionComponentDefinitions.filter(
-                ({name}) => HELPER_COMPONENT_NAMES.has(name) && (ff_3158 || name !== 'claudeCode')
-            ),
-        [actionComponentDefinitions, ff_3158]
+        () => actionComponentDefinitions.filter(({name}) => HELPER_COMPONENT_NAMES.has(name)),
+        [actionComponentDefinitions]
     );
 
     const canPaste = showPaste && !!copiedNode && copiedWorkflowId === workflow.id;
