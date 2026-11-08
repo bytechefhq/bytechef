@@ -76,6 +76,8 @@ A **New Version** dialog takes the prompt Content (a textarea that recognizes `{
 
 The **Playground** is a single interactive page for trying prompts against the configured providers. A Text/Chat mode toggle switches the input between a plain textarea and a chat-style message list, and a **Compare** toggle runs the same prompt against two models side by side (Model A / Model B selectors, each labeled with its provider). Responses stream over SSE when the Stream checkbox is on (disabled while comparing); a parameters panel exposes Temperature, Max Tokens, and Top P sliders. Each response panel reports the model name, latency, prompt/completion/total token counts, cost, finish reason, and a link back to the resulting trace in **Traces**.
 
+Every Playground run belongs to the current workspace. You need at least the Editor role in that workspace, and the run goes through the same checks as API traffic: the workspace budget, rate limits, guardrails and routing apply, and the request is traced and counted against the workspace spend. A managed prompt can only be used from the workspace that owns it.
+
 <!-- TODO screenshot: Playground in Compare mode with two model responses side by side -->
 
 ## Traces & Sessions
