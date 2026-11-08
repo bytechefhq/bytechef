@@ -18,6 +18,7 @@ import {
     type CellMouseEvent,
     type ColSpanArgs,
     Column,
+    type PositionChangeArgs,
     RowsChangeData,
 } from 'react-data-grid';
 
@@ -47,6 +48,8 @@ const DEFAULT_COLUMN_WIDTH = 180;
 
 export const ADD_ROW_ID = '-1';
 export const DRAFT_ROW_ID = 'draft';
+
+const POPOVER_CONTENT_SELECTOR = '[data-radix-popper-content-wrapper]';
 
 function getDraftRowValues(draftRow: GridRowType): Record<string, unknown> {
     return Object.fromEntries(
@@ -291,7 +294,12 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
     const [draftRow, setDraftRow] = useState<GridRowType | null>(null);
 
+    const commitDraftRowRef = useRef<() => void>(() => {});
+    const draftGenerationRef = useRef(0);
     const draftRowRef = useRef<GridRowType | null>(null);
+    const draftTableIdRef = useRef<string | undefined>(undefined);
+    const gridContainerRef = useRef<HTMLDivElement>(null);
+    const isAddRowRequestedRef = useRef(false);
     const isDraftInsertPendingRef = useRef(false);
 
     const {setOpen: setAddColumnDialogOpen} = useAddDataTableColumnDialogStore();
@@ -361,67 +369,120 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     }, []);
 
     const clearDraftRow = useCallback(() => {
+        draftGenerationRef.current += 1;
         draftRowRef.current = null;
+        draftTableIdRef.current = undefined;
+        isAddRowRequestedRef.current = false;
         isDraftInsertPendingRef.current = false;
 
         setDraftRow(null);
     }, []);
 
-    const handleDraftRowChange = useCallback(
-        (updatedDraftRow: GridRowType) => {
-            draftRowRef.current = updatedDraftRow;
+    const createDraftRow = useCallback((tableId: string) => {
+        const newDraftRow: GridRowType = {id: DRAFT_ROW_ID};
 
-            setDraftRow(updatedDraftRow);
+        draftGenerationRef.current += 1;
+        draftRowRef.current = newDraftRow;
+        draftTableIdRef.current = tableId;
 
-            if (isDraftInsertPendingRef.current || !dataTable?.id) {
-                return;
+        setDraftRow(newDraftRow);
+    }, []);
+
+    const commitDraftRow = useCallback(() => {
+        const currentDraftRow = draftRowRef.current;
+        const tableId = draftTableIdRef.current;
+
+        if (!currentDraftRow || !tableId || isDraftInsertPendingRef.current) {
+            return;
+        }
+
+        const insertedValues = getDraftRowValues(currentDraftRow);
+        const isAddRowRequested = isAddRowRequestedRef.current;
+
+        if (Object.keys(insertedValues).length === 0) {
+            clearDraftRow();
+
+            if (isAddRowRequested) {
+                createDraftRow(tableId);
             }
 
-            const insertedValues = getDraftRowValues(updatedDraftRow);
+            return;
+        }
 
-            if (Object.keys(insertedValues).length === 0) {
-                return;
-            }
+        const draftGeneration = draftGenerationRef.current;
 
-            const tableId = dataTable.id;
+        isDraftInsertPendingRef.current = true;
 
-            isDraftInsertPendingRef.current = true;
-
-            insertRowMutation.mutate(
-                {input: {environmentId: String(environmentId), tableId, values: insertedValues}},
-                {
-                    onError: () => {
+        insertRowMutation.mutate(
+            {input: {environmentId: String(environmentId), tableId, values: insertedValues}},
+            {
+                onError: () => {
+                    if (draftGenerationRef.current === draftGeneration) {
+                        isAddRowRequestedRef.current = false;
                         isDraftInsertPendingRef.current = false;
-                    },
-                    onSuccess: async (response) => {
-                        await queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
+                    }
+                },
+                onSuccess: async (response) => {
+                    await queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
 
-                        const insertedRowId = response.insertDataTableRow?.id;
-                        const latestValues = draftRowRef.current ? getDraftRowValues(draftRowRef.current) : {};
+                    if (draftGenerationRef.current !== draftGeneration) {
+                        return;
+                    }
 
-                        const valuesEditedDuringInsert = Object.fromEntries(
-                            Object.entries(latestValues).filter(
-                                ([columnKey, value]) => insertedValues[columnKey] !== value
-                            )
-                        );
+                    const insertedRowId = response.insertDataTableRow?.id;
+                    const latestValues = draftRowRef.current ? getDraftRowValues(draftRowRef.current) : {};
+                    const shouldAddRow = isAddRowRequestedRef.current;
 
-                        clearDraftRow();
+                    const valuesEditedDuringInsert = Object.fromEntries(
+                        Object.entries(latestValues).filter(([columnKey, value]) => insertedValues[columnKey] !== value)
+                    );
 
-                        if (insertedRowId && Object.keys(valuesEditedDuringInsert).length > 0) {
-                            updateRowMutation.mutate({
-                                input: {
-                                    environmentId: String(environmentId),
-                                    id: insertedRowId,
-                                    tableId,
-                                    values: valuesEditedDuringInsert,
-                                },
-                            });
-                        }
-                    },
-                }
-            );
+                    clearDraftRow();
+
+                    if (insertedRowId && Object.keys(valuesEditedDuringInsert).length > 0) {
+                        updateRowMutation.mutate({
+                            input: {
+                                environmentId: String(environmentId),
+                                id: insertedRowId,
+                                tableId,
+                                values: valuesEditedDuringInsert,
+                            },
+                        });
+                    }
+
+                    if (shouldAddRow) {
+                        createDraftRow(tableId);
+                    }
+                },
+            }
+        );
+    }, [clearDraftRow, createDraftRow, environmentId, insertRowMutation, queryClient, updateRowMutation]);
+
+    const scheduleDraftRowCommit = useCallback(() => {
+        const draftGeneration = draftGenerationRef.current;
+
+        setTimeout(() => {
+            if (draftGenerationRef.current === draftGeneration) {
+                commitDraftRowRef.current();
+            }
+        }, 0);
+    }, []);
+
+    const handleDraftRowChange = useCallback((updatedDraftRow: GridRowType) => {
+        draftRowRef.current = updatedDraftRow;
+
+        setDraftRow(updatedDraftRow);
+    }, []);
+
+    const handleActivePositionChange = useCallback(
+        ({row}: PositionChangeArgs<GridRowType, SummaryRowType>) => {
+            if (!draftRowRef.current || row?.id === DRAFT_ROW_ID) {
+                return;
+            }
+
+            scheduleDraftRowCommit();
         },
-        [clearDraftRow, dataTable?.id, environmentId, insertRowMutation, queryClient, updateRowMutation]
+        [scheduleDraftRowCommit]
     );
 
     const handleRowsChange = useCallback(
@@ -520,14 +581,18 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     );
 
     const handleAddRow = useCallback(() => {
-        if (!dataTable?.id || draftRowRef.current) return;
+        if (!dataTable?.id) return;
 
-        const newDraftRow: GridRowType = {id: DRAFT_ROW_ID};
+        if (draftRowRef.current) {
+            isAddRowRequestedRef.current = true;
 
-        draftRowRef.current = newDraftRow;
+            commitDraftRow();
 
-        setDraftRow(newDraftRow);
-    }, [dataTable?.id]);
+            return;
+        }
+
+        createDraftRow(dataTable.id);
+    }, [commitDraftRow, createDraftRow, dataTable?.id]);
 
     const handleCellClick = useCallback(
         ({row}: CellMouseArgs<GridRowType, SummaryRowType>, event: CellMouseEvent) => {
@@ -556,6 +621,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     );
 
     const localRowCount = localRows.length;
+    const hasDraftRow = draftRow !== null;
 
     const gridColumns: Column<GridRowType, SummaryRowType>[] = useMemo(
         () =>
@@ -602,8 +668,39 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     }, [tableId, handleSelectedRowsChange]);
 
     useEffect(() => {
-        clearDraftRow();
+        commitDraftRowRef.current = commitDraftRow;
+    }, [commitDraftRow]);
+
+    useEffect(() => {
+        return () => {
+            commitDraftRowRef.current();
+
+            clearDraftRow();
+        };
     }, [tableId, clearDraftRow]);
+
+    useEffect(() => {
+        if (!hasDraftRow) {
+            return;
+        }
+
+        const handleWindowMouseDown = (event: MouseEvent) => {
+            const target = event.target;
+
+            if (
+                target instanceof Element &&
+                (gridContainerRef.current?.contains(target) || target.closest(POPOVER_CONTENT_SELECTOR))
+            ) {
+                return;
+            }
+
+            scheduleDraftRowCommit();
+        };
+
+        window.addEventListener('mousedown', handleWindowMouseDown);
+
+        return () => window.removeEventListener('mousedown', handleWindowMouseDown);
+    }, [hasDraftRow, scheduleDraftRowCommit]);
 
     useEffect(() => {
         setLocalRows(gridRows);
@@ -623,7 +720,9 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
 
     return {
         gridColumns,
+        gridContainerRef,
         gridRowsWithAdd,
+        handleActivePositionChange,
         handleCellClick,
         handleCellKeyDown,
         handleGridScroll,

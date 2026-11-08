@@ -28,7 +28,9 @@ const DataTable = () => {
 
     const {
         gridColumns,
+        gridContainerRef,
         gridRowsWithAdd,
+        handleActivePositionChange,
         handleCellClick,
         handleCellKeyDown,
         handleGridScroll,
@@ -65,11 +67,12 @@ const DataTable = () => {
             leftSidebarWidth="64"
         >
             <PageLoader errors={[tablesError, rowsError]} loading={tablesLoading || rowsLoading}>
-                <div className="grid p-4 pt-0">
+                <div className="grid p-4 pt-0" ref={gridContainerRef}>
                     <DataGrid
                         aria-description="Data Table"
                         bottomSummaryRows={[{}]}
                         columns={gridColumns}
+                        onActivePositionChange={handleActivePositionChange}
                         onCellClick={handleCellClick}
                         onCellKeyDown={handleCellKeyDown}
                         onRowsChange={handleRowsChange}
