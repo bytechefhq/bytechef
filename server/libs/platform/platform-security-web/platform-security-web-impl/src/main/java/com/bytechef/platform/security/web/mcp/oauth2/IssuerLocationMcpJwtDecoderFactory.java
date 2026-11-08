@@ -45,6 +45,6 @@ public class IssuerLocationMcpJwtDecoderFactory implements McpJwtDecoderFactory 
 
     @Override
     public boolean isTrustedIssuer(String issuer) {
-        return trustedIssuerUris.contains(issuer);
+        return trustedIssuerUris.contains(issuer) || McpTenantTrustContext.getIssuer(issuer) != null;
     }
 }

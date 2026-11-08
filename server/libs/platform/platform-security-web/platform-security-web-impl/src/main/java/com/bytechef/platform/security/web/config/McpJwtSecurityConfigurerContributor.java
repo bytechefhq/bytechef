@@ -19,6 +19,7 @@ package com.bytechef.platform.security.web.config;
 import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.security.web.mcp.SelfIssuedTokenRevocationChecker;
 import com.bytechef.platform.security.web.mcp.oauth2.McpAudienceValidator;
+import com.bytechef.platform.security.web.mcp.oauth2.McpFederatedIssuerAuthenticator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtIdentityMapper;
 import com.bytechef.platform.security.web.mcp.oauth2.TenantAwareJwtAuthenticationFilter;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -39,6 +40,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerContributor {
 
     private final AuthorityService authorityService;
+    private final ObjectProvider<McpFederatedIssuerAuthenticator> mcpFederatedIssuerAuthenticatorProvider;
     private final McpResourceServerProperties mcpResourceServerProperties;
     private final ObjectProvider<McpServerSecretVerifier> mcpServerSecretVerifierProvider;
     private final @Nullable String publicUrl;
@@ -50,9 +52,11 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
         McpResourceServerProperties mcpResourceServerProperties, UserService userService,
         AuthorityService authorityService, ObjectProvider<McpServerSecretVerifier> mcpServerSecretVerifierProvider,
         ObjectProvider<SelfIssuedTokenRevocationChecker> selfIssuedTokenRevocationCheckerProvider,
-        @Value("${bytechef.public-url:}") @Nullable String publicUrl) {
+        @Value("${bytechef.public-url:}") @Nullable String publicUrl,
+        ObjectProvider<McpFederatedIssuerAuthenticator> mcpFederatedIssuerAuthenticatorProvider) {
 
         this.authorityService = authorityService;
+        this.mcpFederatedIssuerAuthenticatorProvider = mcpFederatedIssuerAuthenticatorProvider;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
         this.mcpServerSecretVerifierProvider = mcpServerSecretVerifierProvider;
         this.publicUrl = publicUrl;
@@ -84,7 +88,7 @@ public class McpJwtSecurityConfigurerContributor implements SecurityConfigurerCo
                 authorityService,
                 mcpServerSecretVerifierProvider.orderedStream()
                     .toList(),
-                selfIssuedTokenRevocationChecker, publicUrl));
+                selfIssuedTokenRevocationChecker, publicUrl, mcpFederatedIssuerAuthenticatorProvider.getIfAvailable()));
     }
 
     private boolean hasSelfIssuer() {

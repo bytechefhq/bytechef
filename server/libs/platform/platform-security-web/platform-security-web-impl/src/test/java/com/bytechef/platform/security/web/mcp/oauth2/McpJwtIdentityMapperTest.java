@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.GrantedAuthority;
@@ -159,6 +160,42 @@ class McpJwtIdentityMapperTest {
             .isThrownBy(
                 () -> mcpJwtIdentityMapper.map(
                     jwt, issuer, Set.of(new SimpleGrantedAuthority("SCOPE_mcp:automation")), "acme"));
+    }
+
+    @Test
+    void testTenantIssuerMapsConfiguredGroupsAndDropsUnmappedOnes() {
+        Jwt jwt = jwtBuilder().subject("jane")
+            .claim("groups", List.of("editors", "ROLE_ADMIN", "sales"))
+            .build();
+
+        McpJwtIdentity mcpJwtIdentity = new McpJwtIdentityMapper().mapTenantIssuer(
+            jwt, new McpTenantIssuer("https://issuer.test", false, null, Map.of("editors", "ROLE_EDITOR")), "acme");
+
+        assertThat(mcpJwtIdentity.tenantId()).isEqualTo("acme");
+        assertThat(mcpJwtIdentity.login()).isEqualTo("jane");
+        assertThat(authorityNames(mcpJwtIdentity)).containsExactly("ROLE_EDITOR");
+    }
+
+    @Test
+    void testTenantIssuerWithoutMappingsNeverGrantsReservedAuthoritiesFromTheClaim() {
+        Jwt jwt = jwtBuilder().subject("jane")
+            .claim("roles", List.of("ROLE_ADMIN", "SCOPE_mcp:management", "engineering"))
+            .build();
+
+        McpJwtIdentity mcpJwtIdentity = new McpJwtIdentityMapper().mapTenantIssuer(
+            jwt, new McpTenantIssuer("https://issuer.test", false, "roles", Map.of()), "acme");
+
+        assertThat(authorityNames(mcpJwtIdentity)).containsExactly("engineering");
+    }
+
+    @Test
+    void testTenantIssuerRejectsTokenWithoutSubject() {
+        Jwt jwt = jwtBuilder().claim("groups", List.of("editors"))
+            .build();
+
+        assertThatExceptionOfType(OAuth2AuthenticationException.class)
+            .isThrownBy(() -> new McpJwtIdentityMapper().mapTenantIssuer(
+                jwt, new McpTenantIssuer("https://issuer.test", false, null, Map.of()), "acme"));
     }
 
     private static Issuer issuer(String tenantClaim, String authoritiesClaim, List<String> authorities) {

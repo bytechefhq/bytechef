@@ -18,6 +18,8 @@ package com.bytechef.platform.security.web.mcp.oauth2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -34,5 +36,28 @@ class IssuerLocationMcpJwtDecoderFactoryTest {
     @Test
     void testRejectsUntrustedIssuer() {
         assertThat(issuerLocationMcpJwtDecoderFactory.createJwtDecoder("https://attacker.test")).isNull();
+    }
+
+    @Test
+    void testTrustsTenantIssuerOnlyWhileTheRequestTenantTrustsIt() {
+        String tenantIssuerUri = "https://idp.customer.test";
+
+        assertThat(issuerLocationMcpJwtDecoderFactory.isTrustedIssuer(tenantIssuerUri)).isFalse();
+
+        McpTenantTrustContext.set(List.of(new McpTenantIssuer(tenantIssuerUri, false, null, Map.of())));
+
+        try {
+            assertThat(issuerLocationMcpJwtDecoderFactory.isTrustedIssuer(tenantIssuerUri)).isTrue();
+            assertThat(issuerLocationMcpJwtDecoderFactory.isTrustedIssuer("https://attacker.test")).isFalse();
+        } finally {
+            McpTenantTrustContext.clear();
+        }
+
+        assertThat(issuerLocationMcpJwtDecoderFactory.isTrustedIssuer(tenantIssuerUri)).isFalse();
+    }
+
+    @Test
+    void testTrustsStaticIssuer() {
+        assertThat(issuerLocationMcpJwtDecoderFactory.isTrustedIssuer(STATIC_ISSUER_URI)).isTrue();
     }
 }

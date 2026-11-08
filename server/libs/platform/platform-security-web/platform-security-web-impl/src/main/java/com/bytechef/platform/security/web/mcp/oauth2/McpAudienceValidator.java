@@ -38,6 +38,14 @@ public class McpAudienceValidator {
         return containsUrl(audiences, requestUrl);
     }
 
+    public boolean isTenantAudienceValid(Jwt jwt, McpTenantIssuer tenantIssuer, String requestUrl) {
+        if (!tenantIssuer.validateAudience()) {
+            return true;
+        }
+
+        return containsUrl(jwt.getAudience(), requestUrl);
+    }
+
     private static boolean containsUrl(List<String> audiences, String requestUrl) {
         if (audiences == null) {
             return false;

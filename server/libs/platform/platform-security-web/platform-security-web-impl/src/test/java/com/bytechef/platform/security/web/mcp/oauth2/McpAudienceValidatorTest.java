@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.jwt.Jwt;
 
@@ -85,6 +86,26 @@ class McpAudienceValidatorTest {
         Jwt jwt = jwt(List.of("urn:wrong-audience"));
 
         assertThat(mcpAudienceValidator.isAudienceValid(jwt, externalIssuer("https://mcp.example.com"), ENDPOINT_URL))
+            .isFalse();
+    }
+
+    @Test
+    void testTenantIssuerWithoutAudienceValidationAcceptsAnyAudience() {
+        assertThat(mcpAudienceValidator.isTenantAudienceValid(
+            jwt(null), new McpTenantIssuer("https://idp.customer.test", false, null, Map.of()), ENDPOINT_URL))
+                .isTrue();
+    }
+
+    @Test
+    void testTenantIssuerWithAudienceValidationRequiresTheEndpointUrl() {
+        McpTenantIssuer mcpTenantIssuer = new McpTenantIssuer("https://idp.customer.test", true, null, Map.of());
+
+        assertThat(mcpAudienceValidator.isTenantAudienceValid(
+            jwt(List.of(ENDPOINT_URL)), mcpTenantIssuer, ENDPOINT_URL)).isTrue();
+        assertThat(mcpAudienceValidator.isTenantAudienceValid(
+            jwt(List.of("https://mcp.example.com/api/automation/other/mcp")), mcpTenantIssuer,
+            ENDPOINT_URL)).isFalse();
+        assertThat(mcpAudienceValidator.isTenantAudienceValid(jwt(null), mcpTenantIssuer, ENDPOINT_URL))
             .isFalse();
     }
 

@@ -24,20 +24,6 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Request-scoped holder for the external MCP issuers the current request's tenant trusts, keyed by issuer URI.
- * Populated by {@code McpTenantTrustResolutionFilter} once the tenant has been resolved from the endpoint's URL secret,
- * and read on the same request thread by both the JWT decoder factory (to admit a per-tenant issuer's token for
- * decoding) and {@link TenantAwareJwtAuthenticationFilter} (the authoritative per-tenant trust and policy check).
- * Thread-local, cleared at the end of the request - the JWT analogue of {@code TenantContext}.
- *
- * <p>
- * <strong>Base / CE seam:</strong> this class carries no federation logic - it is a neutral request-scoped map of
- * issuer URIs, empty unless something populates it. It is designed to move to CE with the base resource server (the
- * decoder factory and {@link TenantAwareJwtAuthenticationFilter} that read it), so the base can compile and run
- * standalone: on a CE-only build the map is always empty, so only statically configured issuers are admitted. The
- * <em>writer</em> - {@code McpTenantTrustResolutionFilter}, which resolves a tenant's identity providers - is the
- * enterprise-only half and stays EE.
- *
  * @author Ivica Cardic
  */
 public final class McpTenantTrustContext {

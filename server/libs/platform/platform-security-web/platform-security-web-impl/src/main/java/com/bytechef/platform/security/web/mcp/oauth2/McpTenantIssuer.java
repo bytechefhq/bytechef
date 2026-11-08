@@ -21,12 +21,6 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A per-tenant external MCP issuer resolved from a tenant's {@code IdentityProvider} record: the issuer trusted for
- * this tenant only, whether its tokens must be audience-bound, which token claim carries the caller's groups, and how
- * those groups map to ByteChef authorities. Because trust is per-tenant, such an issuer's tokens need no
- * ByteChef-specific shaping (no scope, audience optional). A blank {@code authoritiesClaim} means the conventional OIDC
- * {@code groups} claim.
- *
  * @author Ivica Cardic
  */
 @SuppressFBWarnings({

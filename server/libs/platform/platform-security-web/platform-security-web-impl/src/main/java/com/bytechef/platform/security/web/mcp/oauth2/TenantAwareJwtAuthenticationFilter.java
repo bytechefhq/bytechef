@@ -61,6 +61,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(TenantAwareJwtAuthenticationFilter.class);
 
     private static final String AUTOMATION_SCOPE = "mcp:automation";
+    private static final String DEFAULT_EMAIL_CLAIM = "email";
     private static final String EMAIL_VERIFIED_CLAIM = "email_verified";
     private static final Pattern CANONICAL_MANAGEMENT_PATTERN = Pattern.compile("^/api/management/mcp$");
     private static final String MANAGEMENT_SCOPE = "mcp:management";
@@ -72,6 +73,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     private final RequestMatcher managementRequestMatcher =
         RegexRequestMatcher.regexMatcher("^/api/management(/[^/]+)?/mcp$");
     private final McpAudienceValidator mcpAudienceValidator;
+    private final @Nullable McpFederatedIssuerAuthenticator mcpFederatedIssuerAuthenticator;
     private final McpTenantProtectedResourceMetadataAuthenticationEntryPoint mcpAuthenticationEntryPoint;
     private final McpJwtIdentityMapper mcpJwtIdentityMapper;
     private final McpResourceServerProperties mcpResourceServerProperties;
@@ -86,10 +88,12 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         McpAudienceValidator mcpAudienceValidator, McpJwtIdentityMapper mcpJwtIdentityMapper,
         McpResourceServerProperties mcpResourceServerProperties, UserService userService,
         AuthorityService authorityService, List<McpServerSecretVerifier> mcpServerSecretVerifiers,
-        @Nullable SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker, @Nullable String publicUrl) {
+        @Nullable SelfIssuedTokenRevocationChecker selfIssuedTokenRevocationChecker, @Nullable String publicUrl,
+        @Nullable McpFederatedIssuerAuthenticator mcpFederatedIssuerAuthenticator) {
 
         this.authorityService = authorityService;
         this.mcpAudienceValidator = mcpAudienceValidator;
+        this.mcpFederatedIssuerAuthenticator = mcpFederatedIssuerAuthenticator;
         this.mcpAuthenticationEntryPoint = new McpTenantProtectedResourceMetadataAuthenticationEntryPoint(publicUrl);
         this.mcpJwtIdentityMapper = mcpJwtIdentityMapper;
         this.mcpResourceServerProperties = mcpResourceServerProperties;
@@ -160,14 +164,14 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (staticIssuer.isEmpty()) {
-            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+        McpJwtIdentity mcpJwtIdentity;
 
-            return;
+        if (staticIssuer.isPresent()) {
+            mcpJwtIdentity = authenticateStaticIssuer(
+                request, response, jwtAuthenticationToken, jwt, staticIssuer.get(), urlTenantId);
+        } else {
+            mcpJwtIdentity = authenticateFederatedIssuer(request, response, jwt, urlTenantId);
         }
-
-        McpJwtIdentity mcpJwtIdentity = authenticateStaticIssuer(
-            request, response, jwtAuthenticationToken, jwt, staticIssuer.get(), urlTenantId);
 
         if (mcpJwtIdentity == null) {
             return;
@@ -185,6 +189,50 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
 
         TenantContext.runWithTenantId(
             mcpJwtIdentity.tenantId(), () -> filterChain.doFilter(request, response));
+    }
+
+    @Nullable
+    private McpJwtIdentity authenticateFederatedIssuer(
+        HttpServletRequest request, HttpServletResponse response, Jwt jwt, String urlTenantId) {
+
+        Optional<McpJwtIdentity> federatedIdentity;
+
+        try {
+            federatedIdentity = mcpFederatedIssuerAuthenticator == null
+                ? Optional.empty() : mcpFederatedIssuerAuthenticator.authenticate(jwt, request, urlTenantId);
+        } catch (OAuth2AuthenticationException oAuth2AuthenticationException) {
+            federatedIdentity = Optional.empty();
+        }
+
+        if (federatedIdentity.isEmpty()) {
+            log.warn(
+                "Rejecting MCP JWT from {} for {}: the issuer is not trusted by tenant {}", jwt.getIssuer(),
+                request.getServletPath(), urlTenantId);
+
+            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+
+            return null;
+        }
+
+        User user = fetchActiveUserByEmail(jwt, DEFAULT_EMAIL_CLAIM, urlTenantId).orElse(null);
+
+        if (user == null) {
+            log.warn(
+                "Rejecting MCP JWT from {} for {}: no active ByteChef user matches the token", jwt.getIssuer(),
+                request.getServletPath());
+
+            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+
+            return null;
+        }
+
+        McpJwtIdentity mcpJwtIdentity = federatedIdentity.get();
+
+        List<GrantedAuthority> authorities = new ArrayList<>(mcpJwtIdentity.authorities());
+
+        authorities.addAll(getUserAuthorities(user, urlTenantId));
+
+        return new McpJwtIdentity(urlTenantId, user.getLogin(), authorities);
     }
 
     @Nullable
@@ -328,25 +376,29 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private Optional<User> fetchActiveUser(Jwt jwt, Issuer issuer, String tenantId) {
-        Optional<User> user;
-
-        if (issuer.isSelf()) {
-            String login = jwt.getSubject();
-
-            if (StringUtils.isBlank(login)) {
-                return Optional.empty();
-            }
-
-            user = TenantContext.callWithTenantId(tenantId, () -> userService.fetchUserByLogin(login));
-        } else {
-            String email = jwt.getClaimAsString(issuer.getEmailClaim());
-
-            if (StringUtils.isBlank(email) || Boolean.FALSE.equals(jwt.getClaimAsBoolean(EMAIL_VERIFIED_CLAIM))) {
-                return Optional.empty();
-            }
-
-            user = TenantContext.callWithTenantId(tenantId, () -> userService.fetchUserByEmail(email));
+        if (!issuer.isSelf()) {
+            return fetchActiveUserByEmail(jwt, issuer.getEmailClaim(), tenantId);
         }
+
+        String login = jwt.getSubject();
+
+        if (StringUtils.isBlank(login)) {
+            return Optional.empty();
+        }
+
+        Optional<User> user = TenantContext.callWithTenantId(tenantId, () -> userService.fetchUserByLogin(login));
+
+        return user.filter(User::isActivated);
+    }
+
+    private Optional<User> fetchActiveUserByEmail(Jwt jwt, String emailClaim, String tenantId) {
+        String email = jwt.getClaimAsString(emailClaim);
+
+        if (StringUtils.isBlank(email) || Boolean.FALSE.equals(jwt.getClaimAsBoolean(EMAIL_VERIFIED_CLAIM))) {
+            return Optional.empty();
+        }
+
+        Optional<User> user = TenantContext.callWithTenantId(tenantId, () -> userService.fetchUserByEmail(email));
 
         return user.filter(User::isActivated);
     }

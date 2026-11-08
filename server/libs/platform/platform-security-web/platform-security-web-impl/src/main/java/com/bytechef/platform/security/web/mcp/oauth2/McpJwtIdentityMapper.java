@@ -20,6 +20,7 @@ import com.bytechef.platform.security.web.config.McpResourceServerProperties.Iss
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,6 +35,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
  */
 public class McpJwtIdentityMapper {
 
+    private static final String DEFAULT_GROUPS_CLAIM = "groups";
     private static final List<String> RESERVED_AUTHORITY_PREFIXES = List.of("ROLE_", "SCOPE_");
 
     public McpJwtIdentity map(
@@ -68,6 +70,30 @@ public class McpJwtIdentityMapper {
             .forEach(authorities::add);
 
         return new McpJwtIdentity(urlTenantId, getSubject(jwt), authorities);
+    }
+
+    public McpJwtIdentity mapTenantIssuer(Jwt jwt, McpTenantIssuer tenantIssuer, String urlTenantId) {
+        String groupsClaim = StringUtils.isNotBlank(tenantIssuer.authoritiesClaim())
+            ? tenantIssuer.authoritiesClaim() : DEFAULT_GROUPS_CLAIM;
+
+        List<String> groups = jwt.getClaimAsStringList(groupsClaim);
+        Map<String, String> authorityMappings = tenantIssuer.authorityMappings();
+
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        if (groups != null) {
+            for (String group : groups) {
+                String authority = authorityMappings.get(group);
+
+                if (authority != null) {
+                    authorities.add(new SimpleGrantedAuthority(authority));
+                } else if (authorityMappings.isEmpty() && isGrantableClaimValue(group)) {
+                    authorities.add(new SimpleGrantedAuthority(group));
+                }
+            }
+        }
+
+        return new McpJwtIdentity(urlTenantId, getSubject(jwt), List.copyOf(authorities));
     }
 
     private static boolean isMatchingTenant(String claimTenantId, String urlTenantId) {
