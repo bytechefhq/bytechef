@@ -69,6 +69,16 @@ administrator returns `403`.
 each with its `name`, its `kind` (`REFERENCE` for a code project, `COPY` for a visual one) and the labels of its
 workflow templates.
 
+The `bytechef` CLI wraps both endpoints:
+
+```bash
+bytechef embedded code-workflow deploy --file src/sample_catalog_code_project.py --environment DEVELOPMENT
+bytechef embedded code-workflow list --output table
+```
+
+`--release` on `deploy` also points the configuration of the profile's environment at the published version. The
+profile token must be an Embedded API key of an administrator; an organization admin key is rejected with `401`.
+
 ## Component tasks
 
 A catalog code project follows the automation project contract, so its tasks can also be
