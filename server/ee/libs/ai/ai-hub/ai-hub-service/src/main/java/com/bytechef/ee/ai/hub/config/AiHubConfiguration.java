@@ -64,14 +64,19 @@ import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.automation.ai.tool.ApiCollectionToolCallbacksFactory;
+import com.bytechef.ee.automation.ai.tool.PromoteToEnvironmentToolCallback;
 import com.bytechef.ee.automation.ai.tool.componentrule.ComponentRuleToolCallbacksFactory;
+import com.bytechef.ee.automation.ai.tool.contextstore.ContextStoreToolCallbacksFactory;
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
+import com.bytechef.ee.automation.promotion.PromotionResourceType;
+import com.bytechef.ee.automation.promotion.facade.EnvironmentPromotionFacade;
 import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.ai.tool.WebSearchToolCallbackProvider;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -174,6 +179,7 @@ public class AiHubConfiguration {
         ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider,
         ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
         ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
+        ObjectProvider<ContextStoreToolCallbacksFactory> contextStoreToolCallbacksFactoryProvider,
         ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider,
         ObjectProvider<ComponentRuleToolCallbacksFactory> componentRuleToolCallbacksFactoryProvider,
         ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
@@ -198,6 +204,7 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(assetFileFlatCrudToolCallbacks(assetFileToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(dataTableFlatCrudToolCallbacks(dataTableToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(knowledgeBaseFlatCrudToolCallbacks(knowledgeBaseToolCallbacksFactoryProvider, false));
+        toolCallbacks.addAll(contextStoreFlatCrudToolCallbacks(contextStoreToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(apiCollectionFlatCrudToolCallbacks(apiCollectionToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(componentRuleFlatCrudToolCallbacks(componentRuleToolCallbacksFactoryProvider, false));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, null));
@@ -225,6 +232,7 @@ public class AiHubConfiguration {
         ObjectProvider<AssetFileToolCallbacksFactory> assetFileToolCallbacksFactoryProvider,
         ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
         ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
+        ObjectProvider<ContextStoreToolCallbacksFactory> contextStoreToolCallbacksFactoryProvider,
         ObjectProvider<ApiCollectionToolCallbacksFactory> apiCollectionToolCallbacksFactoryProvider,
         ObjectProvider<ComponentRuleToolCallbacksFactory> componentRuleToolCallbacksFactoryProvider,
         ObjectProvider<AiAgentFacade> aiAgentFacadeProvider,
@@ -232,7 +240,9 @@ public class AiHubConfiguration {
         ObjectProvider<ProjectCodeWorkflowFacade> projectCodeWorkflowFacadeProvider,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks, IntelligentToolCatalog intelligentToolCatalog,
         WorkspaceFacade workspaceFacade, ProjectWorkflowFacade projectWorkflowFacade,
-        ProjectDeploymentFacade projectDeploymentFacade, AiHubChatService chatService,
+        ProjectDeploymentFacade projectDeploymentFacade,
+        ObjectProvider<EnvironmentPromotionFacade> environmentPromotionFacadeProvider,
+        ObjectProvider<EnvironmentService> environmentServiceProvider, AiHubChatService chatService,
         AiHubChatAccessPolicy chatAccessPolicy, AiHubChatArtifactRecorder aiHubChatArtifactRecorder,
         AiHubToolApprovalPolicy toolApprovalPolicy,
         ObjectProvider<EmbeddingProviderStatusProvider> embeddingProviderStatusProviderProvider,
@@ -251,8 +261,11 @@ public class AiHubConfiguration {
         toolCallbacks.addAll(assetFileFlatCrudToolCallbacks(assetFileToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(dataTableFlatCrudToolCallbacks(dataTableToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(knowledgeBaseFlatCrudToolCallbacks(knowledgeBaseToolCallbacksFactoryProvider, true));
+        toolCallbacks.addAll(contextStoreFlatCrudToolCallbacks(contextStoreToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(apiCollectionFlatCrudToolCallbacks(apiCollectionToolCallbacksFactoryProvider, true));
         toolCallbacks.addAll(componentRuleFlatCrudToolCallbacks(componentRuleToolCallbacksFactoryProvider, true));
+        toolCallbacks
+            .addAll(promoteToEnvironmentToolCallbacks(environmentPromotionFacadeProvider, environmentServiceProvider));
         toolCallbacks.addAll(openAiAgentTabToolCallbacks(aiAgentFacadeProvider, aiHubChatArtifactRecorder));
         toolCallbacks.addAll(interactivePickerToolCallbacks.write());
         toolCallbacks.add(new OpenWorkflowTabToolCallback(projectWorkflowFacade, aiHubChatArtifactRecorder));
@@ -574,6 +587,38 @@ public class AiHubConfiguration {
         return writable
             ? knowledgeBaseToolCallbacksFactory.writeToolCallbacks()
             : knowledgeBaseToolCallbacksFactory.readToolCallbacks();
+    }
+
+    static List<ToolCallback> contextStoreFlatCrudToolCallbacks(
+        ObjectProvider<ContextStoreToolCallbacksFactory> contextStoreToolCallbacksFactoryProvider, boolean writable) {
+
+        ContextStoreToolCallbacksFactory contextStoreToolCallbacksFactory = contextStoreToolCallbacksFactoryProvider
+            .getIfAvailable();
+
+        if (contextStoreToolCallbacksFactory == null) {
+            return List.of();
+        }
+
+        return writable
+            ? contextStoreToolCallbacksFactory.writeToolCallbacks()
+            : contextStoreToolCallbacksFactory.readToolCallbacks();
+    }
+
+    static List<ToolCallback> promoteToEnvironmentToolCallbacks(
+        ObjectProvider<EnvironmentPromotionFacade> environmentPromotionFacadeProvider,
+        ObjectProvider<EnvironmentService> environmentServiceProvider) {
+
+        EnvironmentPromotionFacade environmentPromotionFacade = environmentPromotionFacadeProvider.getIfAvailable();
+        EnvironmentService environmentService = environmentServiceProvider.getIfAvailable();
+
+        if (environmentPromotionFacade == null || environmentService == null) {
+            return List.of();
+        }
+
+        return Arrays.stream(PromotionResourceType.values())
+            .map(promotionResourceType -> (ToolCallback) new PromoteToEnvironmentToolCallback(
+                promotionResourceType, environmentPromotionFacade, environmentService))
+            .toList();
     }
 
     static List<ToolCallback> apiCollectionFlatCrudToolCallbacks(

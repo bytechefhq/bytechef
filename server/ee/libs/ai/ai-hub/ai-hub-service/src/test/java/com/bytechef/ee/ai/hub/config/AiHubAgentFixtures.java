@@ -59,9 +59,16 @@ import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.automation.ai.tool.ApiCollectionToolCallbacksFactory;
 import com.bytechef.ee.automation.ai.tool.componentrule.ComponentRuleToolCallbacksFactory;
+import com.bytechef.ee.automation.ai.tool.contextstore.ContextStoreToolCallbacksFactory;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
 import com.bytechef.ee.automation.configuration.facade.ProjectCodeWorkflowFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreFacade;
+import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
+import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
+import com.bytechef.ee.automation.promotion.facade.EnvironmentPromotionFacade;
 import com.bytechef.ee.platform.component.rule.ComponentRuleService;
+import com.bytechef.ee.platform.contextstore.service.ContextStoreQueryService;
+import com.bytechef.ee.platform.contextstore.service.ContextStoreSemanticSearchService;
 import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.ai.tool.ComponentTools;
@@ -75,6 +82,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
 import java.util.ArrayList;
@@ -120,6 +128,13 @@ public final class AiHubAgentFixtures {
         new KnowledgeBaseToolCallbacksFactory(
             mock(WorkspaceKnowledgeBaseFacade.class), mock(KnowledgeBaseFacade.class),
             mock(KnowledgeBaseDocumentFacade.class));
+    public final ContextStoreToolCallbacksFactory contextStoreToolCallbacksFactory =
+        new ContextStoreToolCallbacksFactory(
+            mock(WorkspaceContextStoreSourceService.class), mock(ContextStoreQueryService.class),
+            mock(ContextStoreSourceFacade.class), mock(ContextStoreFacade.class),
+            mock(ContextStoreSemanticSearchService.class), mock(ClusterElementDefinitionService.class));
+    public final EnvironmentPromotionFacade environmentPromotionFacade = mock(EnvironmentPromotionFacade.class);
+    public final EnvironmentService environmentService = mock(EnvironmentService.class);
     public final ChatModel chatModel = mock(ChatModel.class);
     public final ComponentTools componentTools = mock(ComponentTools.class);
     public final PersistedWorkflowChecker persistedWorkflowChecker = mock(PersistedWorkflowChecker.class);
@@ -247,7 +262,8 @@ public final class AiHubAgentFixtures {
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
             aiAgentToolCallbacksFactoryProvider(), availableProvider(assetFileToolCallbacksFactory),
             availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
-            availableProvider(apiCollectionToolCallbacksFactory), availableProvider(componentRuleToolCallbacksFactory),
+            availableProvider(contextStoreToolCallbacksFactory), availableProvider(apiCollectionToolCallbacksFactory),
+            availableProvider(componentRuleToolCallbacksFactory),
             availableProvider(aiAgentFacade), availableProvider(customComponentFacade),
             availableProvider(projectCodeWorkflowFacade), interactivePickerToolCallbacks, intelligentToolCatalog,
             workspaceFacade, projectWorkflowFacade, chatService, chatAccessPolicy, policy,
@@ -270,12 +286,15 @@ public final class AiHubAgentFixtures {
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
             aiAgentToolCallbacksFactoryProvider(), availableProvider(assetFileToolCallbacksFactory),
             availableProvider(dataTableToolCallbacksFactory), availableProvider(knowledgeBaseToolCallbacksFactory),
-            availableProvider(apiCollectionToolCallbacksFactory), availableProvider(componentRuleToolCallbacksFactory),
+            availableProvider(contextStoreToolCallbacksFactory), availableProvider(apiCollectionToolCallbacksFactory),
+            availableProvider(componentRuleToolCallbacksFactory),
             availableProvider(aiAgentFacade), availableProvider(customComponentFacade),
             availableProvider(projectCodeWorkflowFacade), interactivePickerToolCallbacks, intelligentToolCatalog,
             workspaceFacade,
             projectWorkflowFacade,
-            projectDeploymentFacade, chatService, chatAccessPolicy, artifactRecorder, policy,
+            projectDeploymentFacade, availableProvider(environmentPromotionFacade),
+            availableProvider(environmentService),
+            chatService, chatAccessPolicy, artifactRecorder, policy,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
     }
 

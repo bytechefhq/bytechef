@@ -22,6 +22,7 @@ import com.bytechef.automation.ai.tool.WorkspaceScopedSubAgentToolCallback;
 import com.bytechef.ee.ai.hub.agent.AiHubSpringAIAgent;
 import com.bytechef.ee.ai.hub.agent.NonEmptyToolCallback;
 import com.bytechef.ee.ai.hub.approval.AiHubApprovalGateToolCallback;
+import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalDefaults;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
@@ -57,7 +58,9 @@ class AiHubConfigurationToolSetTest {
             "lookupActionPropertyOptions", "lookupTriggerPropertyOptions", "lookupClusterElementPropertyOptions",
             "listAiAgents", "getAiAgent", "searchAiAgentTools", "searchAiAgentReferences", "listAssetFiles",
             "getAssetFileContent", "listDataTables", "queryDataTable", "aggregateDataTable",
-            "listKnowledgeBases", "queryKnowledgeBase", "listApiCollections", "listComponentRules",
+            "listKnowledgeBases", "queryKnowledgeBase", "listContextSources", "searchContextStore",
+            "getContextStoreRecord", "listAvailableSourceComponents", "describeSourceComponentEntities",
+            "semanticSearchContextStore", "listApiCollections", "listComponentRules",
             "describeComponentToolParameters", "proposeComponentRuleCondition");
     }
 
@@ -72,7 +75,8 @@ class AiHubConfigurationToolSetTest {
             "createAiAgent", "addAiAgentElement", "deleteAiAgentChannel", "importWorkflow", "buildCustomComponent",
             "buildCodeWorkflow", "createAssetFile", "updateAssetFileContent", "createDataTable", "addDataTableRow",
             "dropDataTable", "createKnowledgeBase", "deleteKnowledgeBase", "createApiCollection",
-            "createComponentRule");
+            "createComponentRule", "createContextStoreSource", "deleteContextStoreSource", "deleteContextStore",
+            "promoteApiCollection", "promoteMcpServer", "promoteA2aServer", "promoteProjectDeployment");
     }
 
     @Test
@@ -136,9 +140,26 @@ class AiHubConfigurationToolSetTest {
             "aggregateDataTable", "createDataTable", "createDataTableFromCsv", "cloneDataTable", "addDataTableColumn",
             "addDataTableRow", "updateDataTableRow", "deleteDataTableRow", "dropDataTable", "listKnowledgeBases",
             "queryKnowledgeBase", "createKnowledgeBase", "addKnowledgeBaseDocument", "deleteKnowledgeBaseDocument",
-            "cloneKnowledgeBase", "deleteKnowledgeBase", "listApiCollections", "createApiCollection",
-            "listComponentRules", "describeComponentToolParameters", "proposeComponentRuleCondition",
-            "createComponentRule");
+            "cloneKnowledgeBase", "deleteKnowledgeBase", "listContextSources", "searchContextStore",
+            "getContextStoreRecord", "listAvailableSourceComponents", "describeSourceComponentEntities",
+            "semanticSearchContextStore", "createContextStoreSource", "updateContextStoreSource",
+            "deleteContextStoreSource", "refreshContextStoreSource", "setContextStoreSourceEnabled",
+            "deleteContextStore", "listApiCollections", "createApiCollection", "listComponentRules",
+            "describeComponentToolParameters", "proposeComponentRuleCondition", "createComponentRule",
+            "promoteApiCollection", "promoteMcpServer", "promoteA2aServer", "promoteProjectDeployment");
+    }
+
+    @Test
+    void testBuildPromotionAndContextStoreDeleteToolsAreGatedByDefault() {
+        AiHubModeToolCallbacks buildToolCallbacks = AiHubAgentFixtures.withBuildWorkflow()
+            .buildToolCallbacks();
+
+        assertThat(toolNames(buildToolCallbacks.unpinned()))
+            .filteredOn(toolName -> toolName.startsWith("promote") || toolName.contains("ContextStore"))
+            .filteredOn(AiHubToolApprovalDefaults::isGatedByDefault)
+            .containsExactlyInAnyOrder(
+                "promoteWorkflow", "promoteApiCollection", "promoteMcpServer", "promoteA2aServer",
+                "promoteProjectDeployment", "deleteContextStoreSource", "deleteContextStore");
     }
 
     @Test

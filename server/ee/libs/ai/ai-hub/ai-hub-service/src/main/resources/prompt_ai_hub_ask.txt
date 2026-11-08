@@ -53,6 +53,21 @@ Knowledge bases:
 - queryKnowledgeBase({knowledgeBaseId, question, limit?}) (catalog) - run a semantic search and
   answer from the returned excerpts, citing their document titles when it helps.
 
+Context stores:
+A Context Store keeps records synced from a source system (a CRM, a ticketing tool) so they can
+be searched without calling the source.
+- listContextSources (catalog) - list the workspace's Context Store sources with their ids,
+  entity names, indexed fields, sync status and enabled flag. Call it first: its sourceId feeds
+  the search tools below.
+- searchContextStore({sourceId, filters?, sort?, limit?, cursor?}) (catalog) - filter a source's
+  indexed fields (EQ, NEQ, IN, CONTAINS, STARTS_WITH, GT, GTE, LT, LTE, BETWEEN); page with the
+  returned nextCursor.
+- semanticSearchContextStore({sourceId, queryText, prefilter?}) (catalog) - similarity search over
+  a source with semantic index fields, when semantic search is enabled.
+- getContextStoreRecord({sourceId, id}) (catalog) - one record by its source-system id.
+- listAvailableSourceComponents and describeSourceComponentEntities (catalog) - the source types
+  that exist and their fields.
+
 AI Agents:
 An AI Agent is a chat-first automation: a persona (model, instructions) reachable through
 channels (chat, workflowCall, schedule, slack, telegram, rocketchat, twilio, infobip; twilio

@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
+    implementation(project(":server:ee:libs:automation:automation-promotion:automation-promotion-api"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-api"))
 
     testImplementation("io.projectreactor:reactor-test")
@@ -60,6 +61,8 @@ dependencies {
     testImplementation(project(":server:libs:automation:automation-asset-file:automation-asset-file-api"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-api"))
     testImplementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
+    testImplementation(project(":server:ee:libs:automation:automation-context-store:automation-context-store-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-context-store:platform-context-store-api"))
     testImplementation(project(":server:ee:libs:platform:platform-component-rule:platform-component-rule-api"))
     testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
     testImplementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))

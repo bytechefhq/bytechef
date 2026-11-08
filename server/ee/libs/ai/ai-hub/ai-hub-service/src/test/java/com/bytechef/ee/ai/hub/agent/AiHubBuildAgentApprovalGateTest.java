@@ -161,6 +161,55 @@ class AiHubBuildAgentApprovalGateTest {
         assertThat(result).contains("\"awaitingApproval\":true");
     }
 
+    @Test
+    void testPromoteApiCollectionFoundInTheCatalogIsHeldForApproval() throws Exception {
+        AiHubAgentFixtures fixtures = AiHubAgentFixtures.withBuildWorkflow();
+
+        AiHubChat chat = new AiHubChat();
+
+        chat.setId(CHAT_ID);
+        chat.setThreadId(THREAD_ID);
+        chat.setUserId(USER_ID);
+
+        when(fixtures.chatService.findNotDeletedByThreadId(THREAD_ID)).thenReturn(Optional.of(chat));
+        when(fixtures.policy.decide(WORKSPACE_ID)).thenReturn(new AiHubToolApprovalPolicy.Decision(Set.of(), Set.of()));
+        when(fixtures.approvalService.findPending(CHAT_ID)).thenReturn(Optional.empty());
+        when(fixtures.approvalService.createPending(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiHubSpringAIAgent buildAgent = fixtures.buildAgent();
+
+        assertThat(buildAgent.pinnedToolCallbacks())
+            .noneMatch(toolCallback -> "promoteApiCollection".equals(toolCallback.getToolDefinition()
+                .name()));
+
+        Map<String, Object> toolContext = buildAgent.toolContext(newInput());
+
+        AiHubGlobalToolCatalog buildGlobalToolCatalog = fixtures.buildGlobalToolCatalog();
+
+        ToolCallback promoteApiCollection = buildGlobalToolCatalog.toolCallbacks()
+            .stream()
+            .filter(toolCallback -> "promoteApiCollection".equals(toolCallback.getToolDefinition()
+                .name()))
+            .map(toolCallback -> AiHubToolCallbackWrappers.wrap(
+                toolCallback, fixtures.securityContextRehydrator, fixtures.approvalGate))
+            .findFirst()
+            .orElseThrow();
+
+        String result = promoteApiCollection.call(
+            "{\"sourceId\":7,\"targetEnvironment\":\"PRODUCTION\"}", new ToolContext(toolContext));
+
+        ArgumentCaptor<AiHubToolApproval> approvalCaptor = ArgumentCaptor.forClass(AiHubToolApproval.class);
+
+        verify(fixtures.approvalService).createPending(approvalCaptor.capture());
+        verifyNoInteractions(fixtures.environmentPromotionFacade);
+
+        AiHubToolApproval approval = approvalCaptor.getValue();
+
+        assertThat(approval.getToolName()).isEqualTo("promoteApiCollection");
+        assertThat(approval.getMode()).isEqualTo("BUILD");
+        assertThat(result).contains("\"awaitingApproval\":true");
+    }
+
     private static RunAgentInput newInput() {
         State state = new State();
 

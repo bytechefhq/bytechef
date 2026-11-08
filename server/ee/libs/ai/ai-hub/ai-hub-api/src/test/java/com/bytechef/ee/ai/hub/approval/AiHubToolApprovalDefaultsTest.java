@@ -20,6 +20,23 @@ import org.junit.jupiter.api.Test;
 class AiHubToolApprovalDefaultsTest {
 
     @Test
+    void testTheEnvironmentPromotionToolsAreGated() {
+        assertThat(AiHubToolApprovalDefaults.isGatedByDefault("promoteApiCollection")).isTrue();
+        assertThat(AiHubToolApprovalDefaults.isGatedByDefault("promoteMcpServer")).isTrue();
+        assertThat(AiHubToolApprovalDefaults.isGatedByDefault("promoteA2aServer")).isTrue();
+        assertThat(AiHubToolApprovalDefaults.isGatedByDefault("promoteProjectDeployment")).isTrue();
+    }
+
+    @Test
+    void testOnlyTheContextStoreDeleteToolsAreGated() {
+        assertThat(AiHubToolApprovalDefaults.isGatedByDefault("deleteContextStore")).isTrue();
+        assertThat(AiHubToolApprovalDefaults.isGatedByDefault("deleteContextStoreSource")).isTrue();
+        assertThat(AiHubToolApprovalDefaults.isGatedByDefault("createContextStoreSource")).isFalse();
+        assertThat(AiHubToolApprovalDefaults.isGatedByDefault("setContextStoreSourceEnabled")).isFalse();
+        assertThat(AiHubToolApprovalDefaults.isGatedByDefault("searchContextStore")).isFalse();
+    }
+
+    @Test
     void testAComponentToolThatReadsIsNotGated() {
         assertThat(AiHubToolApprovalDefaults.isComponentToolGatedByDefault("getRows")).isFalse();
         assertThat(AiHubToolApprovalDefaults.isComponentToolGatedByDefault("listChannels")).isFalse();
