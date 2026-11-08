@@ -1,10 +1,10 @@
 ---
 title: "Claude Code"
-description: "Allows you to chat with Claude Code and added MCP tools"
+description: "Runs Claude Code on the ByteChef server, with the MCP servers and skills you attach to it."
 ---
 
 
-Categories: 
+Categories: Artificial Intelligence
 
 
 Type: claudeCode/v1
@@ -17,104 +17,16 @@ Type: claudeCode/v1
 ## Actions
 
 
-### Initialize Claude Code
-Name: initializeClaude
-
-`Performs a no-op probe against the Claude agent so connectivity issues surface early.`
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Initialize Claude Code",
-  "name" : "initializeClaude",
-  "type" : "claudeCode/v1/initializeClaude"
-}
-```
-
-#### Output
-
-
-___Sample Output:___
-
-```Sample result```
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
-### Add MCP Server
-Name: addMCP
-
-`Builds an HTTP-transport MCP server descriptor that can be passed to the Chat action.`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| label | Label | STRING | The name of the MCP server | true |
-| url | URL | STRING | The URL of the MCP server | true |
-| authenticationType | Authentication Type | INTEGER <details> <summary> Options </summary> <span>0</span>, <span>1</span>, <span>2</span> </details> | The type of authentication to use for connecting to the MCP server | true |
-| Authentication | Authentication | STRING | The access token/API key to use for authentication | true |
-| Authentication | Authentication | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(value)&#125;] </details> | The custom headers to use for authentication | false |
-
-#### Example JSON Structure
-```json
-{
-  "label" : "Add MCP Server",
-  "name" : "addMCP",
-  "parameters" : {
-    "label" : "",
-    "url" : "",
-    "authenticationType" : 1,
-    "Authentication" : [ {
-      "name" : "",
-      "value" : ""
-    } ]
-  },
-  "type" : "claudeCode/v1/addMCP"
-}
-```
-
-#### Output
-
-
-___Sample Output:___
-
-```Sample result```
-
-
-
-Type: STRING
-
-
-
-
-
-
-
-
-
-
 ### Chat
 Name: chat
 
-`Chat with Claude with registered tools`
+`Sends a message to Claude Code. Claude Code can use the tools of the attached MCP servers and the attached skills.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| script | Message | STRING | Command to send to Claude | true |
-| mcpServers | MCP Servers | ARRAY <details> <summary> Items </summary> [STRING] </details> | MCP servers (HTTP transport) configured via the 'Add MCP Server' action. | false |
+| script | Message | STRING | The message to send to Claude Code. | true |
 
 #### Example JSON Structure
 ```json
@@ -122,8 +34,7 @@ Name: chat
   "label" : "Chat",
   "name" : "chat",
   "parameters" : {
-    "script" : "",
-    "mcpServers" : [ "" ]
+    "script" : ""
   },
   "type" : "claudeCode/v1/chat"
 }
@@ -151,3 +62,34 @@ Type: STRING
 
 
 
+<hr />
+
+## Additional Instructions
+
+#### Before you start
+
+Claude Code runs as the Claude Code CLI on the ByteChef server. The component is off by default.
+
+1. Set `bytechef.component.claude-code.enabled` to `true` (environment variable `BYTECHEF_COMPONENT_CLAUDE_CODE_ENABLED=true`).
+2. Install the `claude` CLI on the server, on the `PATH` of the user that runs ByteChef.
+3. Set `ANTHROPIC_API_KEY` in the environment of the ByteChef server.
+
+Chat checks that the CLI is installed before it starts and fails with a setup message when it is not. Restart ByteChef after you install the CLI.
+
+Claude Code runs with all tool permissions on the server. Run ByteChef as a user that has access only to what Claude Code needs.
+
+#### MCP Servers
+
+Add **MCP Server** elements from the **MCP Client** component to the **MCP Servers** slot to give Claude Code the tools of those servers. Each element uses its own MCP Client connection:
+
+- **Server URL** and **Transport Type** tell Claude Code where the server is and how to reach it.
+- The connection's authorization (bearer token or OAuth2) becomes the `Authorization` header of every request. OAuth2 tokens are read when the run starts.
+- **Server Name** is the prefix of the server's tool names. It defaults to the host of the server URL. When two servers have the same name, the second one gets a `_2` suffix.
+
+#### Skills
+
+Add **Skills** elements from the **AI Agent Utils** component to the **Skills** slot to give Claude Code skills from the ByteChef skill library (**Settings > AI > Skills**). Every file of each selected skill is available to Claude Code, including its scripts and templates.
+
+#### How a run works
+
+Each Chat run gets a new, empty working directory. The selected skills are written to `.claude/skills` in that directory, and Claude Code loads only the settings of that directory. The settings, plugins and output styles in the home directory of the server user are not used. The directory is deleted when the run ends, also when it fails.
