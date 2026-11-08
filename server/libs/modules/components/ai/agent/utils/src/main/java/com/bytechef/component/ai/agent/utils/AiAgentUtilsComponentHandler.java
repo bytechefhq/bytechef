@@ -68,6 +68,7 @@ import java.util.Map;
 import java.util.Set;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.util.unit.DataSize;
 
 /**
  * @author Ivica Cardic
@@ -183,7 +184,9 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             return new AgentWorkspaceResolver(null);
         }
 
-        return new AgentWorkspaceResolver(Path.of(basedir));
+        DataSize maxSize = workspace.getMaxSize();
+
+        return new AgentWorkspaceResolver(Path.of(basedir), maxSize == null ? 0 : maxSize.toBytes());
     }
 
     private static DockerExecBackendRegistry createDockerExecBackendRegistry(

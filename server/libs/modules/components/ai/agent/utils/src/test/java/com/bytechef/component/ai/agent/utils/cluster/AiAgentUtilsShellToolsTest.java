@@ -62,6 +62,8 @@ class AiAgentUtilsShellToolsTest {
     private final DockerExecBackendRegistry dockerExecBackendRegistry = mock(DockerExecBackendRegistry.class);
     private final Parameters inputParameters = mock(Parameters.class);
 
+    private long workspaceMaxBytes;
+
     @Test
     void testBashRunsInTheDockerContainerOfTheAgentWorkspaceByDefault() throws Exception {
         ExecBackend execBackend = mock(ExecBackend.class);
@@ -144,6 +146,21 @@ class AiAgentUtilsShellToolsTest {
         assertThat(result).contains("value=unset");
     }
 
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    void testLocalBashOverTheWorkspaceSizeLimitRunsOnlyCleanupCommands() throws Exception {
+        givenLocalBackend();
+
+        workspaceMaxBytes = 1024;
+
+        assertThat(callBash(true, "head -c 2048 /dev/zero > big.bin")).contains("over its limit");
+        assertThat(callBash(true, "echo still-running")).contains("the command was not run")
+            .doesNotContain("still-running");
+        assertThat(callBash(true, "rm big.bin")).doesNotContain("over its limit");
+        assertThat(callBash(true, "echo running-again")).contains("running-again")
+            .doesNotContain("over its limit");
+    }
+
     private String bashDescription(boolean allowLocal) throws Exception {
         ToolDefinition toolDefinition = bashToolCallback(allowLocal).getToolDefinition();
 
@@ -177,7 +194,8 @@ class AiAgentUtilsShellToolsTest {
     }
 
     private AiAgentUtilsShellTools createShellTools(boolean allowLocal) {
-        return new AiAgentUtilsShellTools(new AgentWorkspaceResolver(basedir), dockerExecBackendRegistry, allowLocal);
+        return new AiAgentUtilsShellTools(
+            new AgentWorkspaceResolver(basedir, workspaceMaxBytes), dockerExecBackendRegistry, allowLocal);
     }
 
     private List<String> execBackendOptionValues(boolean allowLocal) {

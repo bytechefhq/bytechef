@@ -54,6 +54,8 @@ class AiAgentUtilsFileSystemToolsTest {
     private final Parameters connectionParameters = mock(Parameters.class);
     private final Parameters inputParameters = mock(Parameters.class);
 
+    private long workspaceMaxBytes;
+
     @Test
     void testApplyExposesReadWriteAndEdit() throws Exception {
         assertThat(toolNames(applyTools())).containsExactlyInAnyOrder("Read", "Write", "Edit");
@@ -175,6 +177,31 @@ class AiAgentUtilsFileSystemToolsTest {
             .normalize()).doesNotExist();
     }
 
+    @Test
+    void testWriteOverTheWorkspaceSizeLimitIsRefused() throws Exception {
+        Path workspace = basedir.resolve(AGENT_WORKSPACE);
+
+        workspaceMaxBytes = 10;
+
+        String result = callTool(
+            applyTools(), "Write", Map.of("filePath", "/workspace/big.txt", "content", "more than ten bytes"));
+
+        assertThat(result).contains("the agent workspace is full");
+        assertThat(workspace.resolve("big.txt")).doesNotExist();
+    }
+
+    @Test
+    void testWriteWithinTheWorkspaceSizeLimitSucceeds() throws Exception {
+        Path workspace = basedir.resolve(AGENT_WORKSPACE);
+
+        workspaceMaxBytes = 1024;
+
+        String result = callTool(applyTools(), "Write", Map.of("filePath", "/workspace/small.txt", "content", "small"));
+
+        assertThat(result).doesNotContain("the agent workspace is full");
+        assertThat(workspace.resolve("small.txt")).hasContent("small");
+    }
+
     private ToolCallback[] applyTools() throws Exception {
         ActionContextAware actionContext = mock(ActionContextAware.class);
 
@@ -184,7 +211,7 @@ class AiAgentUtilsFileSystemToolsTest {
         when(actionContext.getJobPrincipalWorkflowId()).thenReturn(21L);
 
         ToolCallbackProviderFunction toolCallbackProviderFunction = new AiAgentUtilsFileSystemTools(
-            new AgentWorkspaceResolver(basedir)).clusterElementDefinition.getElement();
+            new AgentWorkspaceResolver(basedir, workspaceMaxBytes)).clusterElementDefinition.getElement();
 
         return toolCallbackProviderFunction.apply(inputParameters, connectionParameters, actionContext)
             .getToolCallbacks();

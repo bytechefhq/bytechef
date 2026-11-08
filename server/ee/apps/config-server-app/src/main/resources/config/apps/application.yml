@@ -170,6 +170,8 @@ bytechef:
         enabled: false
       workspace:
         basedir: ${user.home}/bytechef/data/ai-agent-workspaces
+        # Largest size of one agent workspace; 0 means no limit
+        max-size: 1GB
     brave:
       enabled: false
     copilot:

@@ -21,7 +21,9 @@ import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspace;
+import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceQuota;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver;
+import com.bytechef.component.ai.agent.utils.cluster.workspace.FileWriteQuotaToolCallback;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.WorkspacePathToolCallback;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -83,7 +85,10 @@ public class AiAgentUtilsFileSystemTools {
             .workspace(workspace)
             .build();
 
+        AgentWorkspaceQuota quota = agentWorkspaceResolver.getQuota(workspace);
+
         List<ToolCallback> toolCallbacks = Arrays.stream(ToolCallbacks.from(fileSystemTools))
+            .map(toolCallback -> FileWriteQuotaToolCallback.wrap(toolCallback, quota))
             .<ToolCallback>map(
                 toolCallback -> new WorkspacePathToolCallback(
                     toolCallback, workspace, WorkspacePathToolCallback.FILES_DESCRIPTION,
