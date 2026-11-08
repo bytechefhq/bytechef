@@ -208,6 +208,45 @@
       "required": false
     },
     "workflowNodeDescription": null
+  }, {
+    "name": "mcpServer",
+    "description": "Gives Claude Code the tools of an MCP server. The connection's credentials authenticate every request.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": false,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "The name Claude Code gives the server, used as the prefix of its tool names. Defaults to the host of the server URL.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Server Name",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "serverName",
+      "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "title": "MCP Server",
+    "type": {
+      "name": "MCP_SERVERS",
+      "key": "mcpServers",
+      "label": "MCP Servers",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
     "name": "helpers",
@@ -607,7 +646,7 @@
   },
   "customAction": false,
   "customActionHelp": null,
-  "description": "Connects to external MCP servers to discover and call their tools.",
+  "description": "Connects to external MCP servers to discover and call their tools, from an AI Agent or Claude Code.",
   "icon": "path:assets/mcp-client.svg",
   "inputs": [ ],
   "metadata": { },
