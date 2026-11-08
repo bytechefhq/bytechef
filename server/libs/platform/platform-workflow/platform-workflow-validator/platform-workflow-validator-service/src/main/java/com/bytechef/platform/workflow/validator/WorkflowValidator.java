@@ -143,6 +143,8 @@ public class WorkflowValidator {
                     "Node names must be unique. Duplicate node name: " + duplicateNodeName, errors);
             }
 
+            validateTriggerEnablement(workflowJsonNode, errors, warnings);
+
             List<JsonNode> inputJsonNodes = new ArrayList<>();
             List<JsonNode> taskJsonNodes = new ArrayList<>();
 
@@ -876,7 +878,7 @@ public class WorkflowValidator {
 
             String type = typeJsonNode.asString();
 
-            if (type.startsWith("chat/")) {
+            if (type.startsWith("chat/") && isTriggerEnabled(triggerJsonNode)) {
                 return true;
             }
         }
@@ -969,6 +971,96 @@ public class WorkflowValidator {
         JsonNode typeJsonNode = taskJsonNode.get("type");
 
         return typeJsonNode != null ? typeJsonNode.asString() : "unknown";
+    }
+
+    private static void validateTriggerEnablement(
+        JsonNode workflowJsonNode, StringBuilder errors, StringBuilder warnings) {
+
+        JsonNode triggersJsonNode = workflowJsonNode.get("triggers");
+
+        if (triggersJsonNode == null || !triggersJsonNode.isArray() || triggersJsonNode.isEmpty()) {
+            return;
+        }
+
+        boolean anyEnabled = false;
+        String firstTriggerName = null;
+
+        for (JsonNode triggerJsonNode : triggersJsonNode) {
+            if (!triggerJsonNode.isObject()) {
+                continue;
+            }
+
+            JsonNode nameJsonNode = triggerJsonNode.get("name");
+
+            if (firstTriggerName == null && nameJsonNode != null && nameJsonNode.isString()) {
+                firstTriggerName = nameJsonNode.asString();
+            }
+
+            if (isTriggerEnabled(triggerJsonNode)) {
+                anyEnabled = true;
+            }
+
+            if (isDisabledFlagSet(triggerJsonNode) && isManualTrigger(triggerJsonNode)) {
+                StringUtils.appendWithNewline(
+                    "[" + (nameJsonNode != null && nameJsonNode.isString() ? nameJsonNode.asString() : "trigger") +
+                        "] Manual triggers cannot be disabled; the disabled flag is ignored.",
+                    warnings);
+            }
+        }
+
+        if (!anyEnabled) {
+            StringUtils.appendWithNewline(
+                "[" + (firstTriggerName == null ? "trigger" : firstTriggerName) +
+                    "] A workflow must have at least one enabled trigger.",
+                errors);
+        }
+    }
+
+    private static boolean isDisabledFlagSet(JsonNode triggerJsonNode) {
+        JsonNode disabledJsonNode = triggerJsonNode.get("disabled");
+
+        return disabledJsonNode != null && disabledJsonNode.isBoolean() && disabledJsonNode.asBoolean();
+    }
+
+    private static boolean isManualTrigger(JsonNode triggerJsonNode) {
+        JsonNode typeJsonNode = triggerJsonNode.get("type");
+
+        if (typeJsonNode == null || !typeJsonNode.isString()) {
+            return false;
+        }
+
+        String type = typeJsonNode.asString();
+
+        int separatorIndex = type.indexOf('/');
+
+        String componentName = separatorIndex < 0 ? type : type.substring(0, separatorIndex);
+
+        return "manual".equals(componentName);
+    }
+
+    private static boolean isTriggerEnabled(JsonNode triggerJsonNode) {
+        return !isDisabledFlagSet(triggerJsonNode) || isManualTrigger(triggerJsonNode);
+    }
+
+    public static boolean hasNoEnabledTrigger(String workflow) {
+        try {
+            JsonNode triggersJsonNode = com.bytechef.commons.util.JsonUtils.readTree(workflow)
+                .get("triggers");
+
+            if (triggersJsonNode == null || !triggersJsonNode.isArray() || triggersJsonNode.isEmpty()) {
+                return false;
+            }
+
+            for (JsonNode triggerJsonNode : triggersJsonNode) {
+                if (triggerJsonNode.isObject() && isTriggerEnabled(triggerJsonNode)) {
+                    return false;
+                }
+            }
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public static List<String> getDuplicateNodeNames(String workflow) {

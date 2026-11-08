@@ -106,6 +106,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     @PreAuthorize("isTenantAdmin()")
     public long addWorkflow(long integrationId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
+        workflowValidatorFacade.validateHasEnabledTrigger(definition);
         workflowValidatorFacade.validateNoReservedInputNames(definition);
         workflowValidatorFacade.validateNoReservedNodeNames(definition);
 

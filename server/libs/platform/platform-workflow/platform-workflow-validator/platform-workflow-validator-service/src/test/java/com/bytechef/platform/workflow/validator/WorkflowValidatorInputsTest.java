@@ -735,6 +735,11 @@ class WorkflowValidatorInputsTest {
             }
 
             @Override
+            public boolean hasNoEnabledTrigger(String workflow) {
+                return false;
+            }
+
+            @Override
             public List<String> getDuplicateNodeNames(String workflow) {
                 return List.of();
             }

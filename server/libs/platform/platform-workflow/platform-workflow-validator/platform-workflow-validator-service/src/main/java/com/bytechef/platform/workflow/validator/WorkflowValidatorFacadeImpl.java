@@ -206,6 +206,11 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     }
 
     @Override
+    public boolean hasNoEnabledTrigger(String workflow) {
+        return WorkflowValidator.hasNoEnabledTrigger(workflow);
+    }
+
+    @Override
     public List<String> getDuplicateNodeNames(String workflow) {
         return WorkflowValidator.getDuplicateNodeNames(workflow);
     }

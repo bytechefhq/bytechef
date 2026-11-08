@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.validator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -4481,5 +4482,112 @@ class WorkflowValidatorTest {
         String warningsString = warnings.toString();
 
         assertTrue(warningsString.contains("Unknown task type: unknown/v1"));
+    }
+
+    @Test
+    void testNoEnabledTriggerDetectsAllDisabled() {
+        String workflow = """
+            {"label": "t", "triggers": [
+                {"name": "trigger_1", "type": "webhook/v1/webhook", "disabled": true},
+                {"name": "trigger_2", "type": "webhook/v1/webhook", "disabled": true}
+            ], "tasks": []}
+            """;
+
+        assertTrue(WorkflowValidator.hasNoEnabledTrigger(workflow));
+    }
+
+    @Test
+    void testNoEnabledTriggerAllowsOneEnabled() {
+        String workflow = """
+            {"label": "t", "triggers": [
+                {"name": "trigger_1", "type": "webhook/v1/webhook", "disabled": true},
+                {"name": "trigger_2", "type": "webhook/v1/webhook"}
+            ], "tasks": []}
+            """;
+
+        assertFalse(WorkflowValidator.hasNoEnabledTrigger(workflow));
+    }
+
+    @Test
+    void testNoEnabledTriggerAllowsDisabledManual() {
+        String workflow = """
+            {"label": "t", "triggers": [
+                {"name": "trigger_1", "type": "manual/v1/manual", "disabled": true}
+            ], "tasks": []}
+            """;
+
+        assertFalse(WorkflowValidator.hasNoEnabledTrigger(workflow));
+    }
+
+    @Test
+    void testNoEnabledTriggerAllowsWorkflowWithoutTriggers() {
+        assertFalse(WorkflowValidator.hasNoEnabledTrigger("{\"label\": \"t\", \"tasks\": []}"));
+        assertFalse(WorkflowValidator.hasNoEnabledTrigger("{\"label\": \"t\", \"triggers\": [], \"tasks\": []}"));
+    }
+
+    @Test
+    void testNoEnabledTriggerFailsOpenOnUnparsableJson() {
+        assertFalse(WorkflowValidator.hasNoEnabledTrigger("not json"));
+    }
+
+    @Test
+    void testValidateWorkflowReportsNoEnabledTriggerError() {
+        String workflow = """
+            {"label": "t", "triggers": [
+                {"label": "Webhook", "name": "trigger_1", "type": "webhook/v1/webhook", "disabled": true}
+            ], "tasks": []}
+            """;
+
+        String errors = validateErrors(workflow);
+
+        assertTrue(errors.contains("A workflow must have at least one enabled trigger."), errors);
+
+        List<WorkflowValidatorFacade.NodeValidationIssue> nodeValidationIssues = NodeValidationIssueParser.parse(
+            List.of(errors.split("\n")), List.of());
+
+        assertTrue(
+            nodeValidationIssues.stream()
+                .anyMatch(
+                    issue -> issue.severity() == WorkflowValidatorFacade.WorkflowIssueSeverity.ERROR &&
+                        issue.kind() == WorkflowValidatorFacade.WorkflowIssueKind.OTHER &&
+                        issue.message()
+                            .contains("A workflow must have at least one enabled trigger.")),
+            nodeValidationIssues.toString());
+    }
+
+    @Test
+    void testValidateWorkflowWarnsOnDisabledManualTrigger() {
+        String workflow = """
+            {"label": "t", "triggers": [
+                {"label": "Manual", "name": "trigger_1", "type": "manual/v1/manual", "disabled": true}
+            ], "tasks": []}
+            """;
+
+        String warnings = validate(workflow);
+
+        assertTrue(warnings.contains("Manual triggers cannot be disabled; the disabled flag is ignored."), warnings);
+        assertFalse(validateErrors(workflow).contains("at least one enabled trigger"));
+    }
+
+    private static String validate(String workflow) {
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        WorkflowValidator.validateWorkflow(
+            workflow, (taskType, kind) -> null, (taskType, kind, warningsBuilder) -> null, taskType -> null,
+            new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
+
+        return warnings.toString();
+    }
+
+    private static String validateErrors(String workflow) {
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        WorkflowValidator.validateWorkflow(
+            workflow, (taskType, kind) -> null, (taskType, kind, warningsBuilder) -> null, taskType -> null,
+            new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
+
+        return errors.toString();
     }
 }

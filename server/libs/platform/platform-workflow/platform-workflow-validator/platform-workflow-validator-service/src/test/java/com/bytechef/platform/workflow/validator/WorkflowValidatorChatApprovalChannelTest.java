@@ -97,6 +97,36 @@ class WorkflowValidatorChatApprovalChannelTest {
     }
 
     @Test
+    void validateWorkflowChatApprovalWarningIgnoresDisabledChatTrigger() {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "triggers": [
+                    {"label": "Chat", "name": "trigger_1", "type": "chat/v1/chat", "disabled": true, "parameters": {}},
+                    {"label": "Webhook", "name": "trigger_2", "type": "webhook/v1/webhook", "parameters": {}}
+                ],
+                "tasks": [
+                    {
+                        "label": "Approval",
+                        "name": "approval_1",
+                        "type": "approval/v1/requestApproval",
+                        "parameters": {},
+                        "clusterElements": {
+                            "approvalChannels": [
+                                {"label": "Chat", "name": "chat_1", "type": "chat/v1/chat", "parameters": {}}
+                            ]
+                        }
+                    }
+                ]
+            }
+            """;
+
+        String warnings = validate(workflow);
+
+        assertTrue(warnings.contains(CHAT_ONLY_WARNING_FRAGMENT), warnings);
+    }
+
+    @Test
     void validateWorkflowChatChannelWithFallbackChannelDoesNotWarn() {
         String workflow = """
             {
