@@ -4497,6 +4497,18 @@ class WorkflowValidatorTest {
     }
 
     @Test
+    void testNoEnabledTriggerTreatsTextualTrueAsDisabled() {
+        String workflow = """
+            {"label": "t", "triggers": [
+                {"name": "trigger_1", "type": "webhook/v1/webhook", "disabled": "true"},
+                {"name": "trigger_2", "type": "webhook/v1/webhook", "disabled": "TRUE"}
+            ], "tasks": []}
+            """;
+
+        assertTrue(WorkflowValidator.hasNoEnabledTrigger(workflow));
+    }
+
+    @Test
     void testNoEnabledTriggerAllowsOneEnabled() {
         String workflow = """
             {"label": "t", "triggers": [
