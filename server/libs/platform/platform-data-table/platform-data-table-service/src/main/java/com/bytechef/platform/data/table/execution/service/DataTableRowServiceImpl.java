@@ -893,12 +893,28 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         String baseName, DataTableWebhookType dataTableWebhookType, List<DataTableRow> dataTableRows,
         long environmentId) {
 
-        if (dataTableRows.isEmpty()) {
+        List<DataTableRow> publishedDataTableRows = dataTableRows;
+
+        if (dataTableWebhookType == DataTableWebhookType.RECORD_CREATED) {
+            publishedDataTableRows = dataTableRows.stream()
+                .filter(DataTableRowServiceImpl::hasValues)
+                .toList();
+        }
+
+        if (publishedDataTableRows.isEmpty()) {
             return;
         }
 
         applicationEventPublisher.publishEvent(
-            new DataTableWebhookEvent(baseName, dataTableWebhookType, dataTableRows, environmentId));
+            new DataTableWebhookEvent(baseName, dataTableWebhookType, publishedDataTableRows, environmentId));
+    }
+
+    private static boolean hasValues(DataTableRow dataTableRow) {
+        Map<String, Object> values = dataTableRow.values();
+
+        return values.values()
+            .stream()
+            .anyMatch(Objects::nonNull);
     }
 
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
