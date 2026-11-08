@@ -55,6 +55,9 @@ public class AdminUserDTO {
     @Size(min = 5, max = UserConstants.EMAIL_MAX_LENGTH)
     private String email;
 
+    @Size(max = 255)
+    private String externalId;
+
     @Size(max = 256)
     private String imageUrl;
 
@@ -86,6 +89,7 @@ public class AdminUserDTO {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
+        this.externalId = user.getExternalId();
         this.activated = user.isActivated();
         this.imageUrl = user.getImageUrl();
         this.langKey = user.getLangKey();
@@ -124,6 +128,10 @@ public class AdminUserDTO {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getExternalId() {
+        return externalId;
     }
 
     public String getImageUrl() {
@@ -178,6 +186,10 @@ public class AdminUserDTO {
         this.email = email;
     }
 
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
@@ -222,6 +234,7 @@ public class AdminUserDTO {
             ", firstName='" + firstName + '\'' +
             ", lastName='" + lastName + '\'' +
             ", email='" + email + '\'' +
+            ", externalId='" + externalId + '\'' +
             ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +
             ", langKey='" + langKey + '\'' +

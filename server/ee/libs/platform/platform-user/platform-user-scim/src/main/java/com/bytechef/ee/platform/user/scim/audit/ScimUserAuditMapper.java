@@ -85,6 +85,8 @@ public class ScimUserAuditMapper implements AuditMapper {
 
         if (auditInvocation.argument("scimUser") instanceof ScimUser scimUser) {
             putIfNotNull(data, "externalId", scimUser.externalId());
+        } else if (userState != null) {
+            putIfNotNull(data, "externalId", userState.externalId());
         }
 
         if (previousUserState != null && currentUserState != null) {
@@ -118,6 +120,10 @@ public class ScimUserAuditMapper implements AuditMapper {
             changedFields.add("email");
 
             putIfNotNull(data, "previousEmail", previousUserState.email());
+        }
+
+        if (!Objects.equals(previousUserState.externalId(), userState.externalId())) {
+            changedFields.add("externalId");
         }
 
         if (!Objects.equals(previousUserState.firstName(), userState.firstName())) {
@@ -154,8 +160,8 @@ public class ScimUserAuditMapper implements AuditMapper {
     }
 
     private record UserState(
-        @Nullable Long id, @Nullable String login, @Nullable String email, @Nullable String firstName,
-        @Nullable String lastName, boolean activated, List<Long> authorityIds) {
+        @Nullable Long id, @Nullable String login, @Nullable String email, @Nullable String externalId,
+        @Nullable String firstName, @Nullable String lastName, boolean activated, List<Long> authorityIds) {
 
         static UserState of(User user) {
             List<Long> authorityIds = user.getAuthorityIds();
@@ -166,8 +172,8 @@ public class ScimUserAuditMapper implements AuditMapper {
                     .toList();
 
             return new UserState(
-                user.getId(), user.getLogin(), user.getEmail(), user.getFirstName(), user.getLastName(),
-                user.isActivated(), sortedAuthorityIds);
+                user.getId(), user.getLogin(), user.getEmail(), user.getExternalId(), user.getFirstName(),
+                user.getLastName(), user.isActivated(), sortedAuthorityIds);
         }
     }
 }

@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ScimUserFacade {
 
     private static final String ACTIVE = "active";
+    private static final String EXTERNAL_ID = "externalId";
     private static final String REPLACE = "replace";
 
     private final UserService userService;
@@ -175,22 +176,31 @@ public class ScimUserFacade {
         Object value = scimPatchOperation.value();
 
         if (path != null) {
-            switch (path) {
-                case ACTIVE -> user.setActivated(Boolean.parseBoolean(String.valueOf(value)));
-                case "userName" -> user.setLogin(toLogin(String.valueOf(value)));
-                case "name.givenName" -> user.setFirstName(String.valueOf(value));
-                case "name.familyName" -> user.setLastName(String.valueOf(value));
-                default -> {
-                }
+            applyAttribute(user, path, value);
+        } else if (value instanceof Map<?, ?> valueMap) {
+            // Without a path the value holds the attributes to replace (RFC 7644 Section 3.5.2.3)
+            for (Map.Entry<?, ?> entry : valueMap.entrySet()) {
+                applyAttribute(user, String.valueOf(entry.getKey()), entry.getValue());
             }
-        } else if (value instanceof Map<?, ?> valueMap && valueMap.containsKey(ACTIVE)) {
-            user.setActivated(Boolean.parseBoolean(String.valueOf(valueMap.get(ACTIVE))));
+        }
+    }
+
+    private static void applyAttribute(User user, String path, Object value) {
+        switch (path) {
+            case ACTIVE -> user.setActivated(Boolean.parseBoolean(String.valueOf(value)));
+            case EXTERNAL_ID -> user.setExternalId(value == null ? null : String.valueOf(value));
+            case "userName" -> user.setLogin(toLogin(String.valueOf(value)));
+            case "name.givenName" -> user.setFirstName(String.valueOf(value));
+            case "name.familyName" -> user.setLastName(String.valueOf(value));
+            default -> {
+            }
         }
     }
 
     private static void applyScimUser(AdminUserDTO adminUserDTO, ScimUser scimUser) {
         adminUserDTO.setLogin(scimUser.userName());
         adminUserDTO.setEmail(extractPrimaryEmail(scimUser));
+        adminUserDTO.setExternalId(scimUser.externalId());
         adminUserDTO.setActivated(scimUser.active());
 
         ScimName scimName = scimUser.name();
