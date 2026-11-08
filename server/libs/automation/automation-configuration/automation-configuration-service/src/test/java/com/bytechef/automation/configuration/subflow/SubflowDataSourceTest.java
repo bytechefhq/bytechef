@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -34,9 +35,11 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.component.constant.WorkflowConstants;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.domain.SubflowEntry;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +52,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class SubflowDataSourceTest {
 
     private static final String WORKFLOW_UUID = "test-workflow-uuid";
@@ -80,7 +85,7 @@ class SubflowDataSourceTest {
         when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
-            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.ofEnabled(workflow))
                 .thenReturn(List.of());
 
             BaseProperty.BaseValueProperty<?> result = subflowDataSource.getSubWorkflowInputSchema(WORKFLOW_UUID);
@@ -105,7 +110,7 @@ class SubflowDataSourceTest {
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class);
             MockedStatic<MapUtils> mockedMapUtils = mockStatic(MapUtils.class)) {
 
-            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.ofEnabled(workflow))
                 .thenReturn(List.of(callableTrigger));
             mockedMapUtils
                 .when(() -> MapUtils.getString(callableTrigger.getParameters(), WorkflowConstants.INPUT_SCHEMA))
@@ -191,7 +196,7 @@ class SubflowDataSourceTest {
         when(projectService.getProject(1L)).thenReturn(project);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
-            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.ofEnabled(workflow))
                 .thenReturn(List.of(callableTrigger));
 
             List<SubflowEntry> result =
@@ -203,6 +208,40 @@ class SubflowDataSourceTest {
             assertEquals("My Project > My Workflow", result.getFirst()
                 .name());
         }
+    }
+
+    @Test
+    void testOmitsWorkflowWithDisabledCallableTrigger() {
+        ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
+
+        when(projectWorkflow.getWorkflowId()).thenReturn("disabled-workflow-id");
+        lenient().when(projectWorkflow.getProjectId())
+            .thenReturn(1L);
+        lenient().when(projectWorkflow.getUuidAsString())
+            .thenReturn("disabled-uuid");
+
+        when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(List.of(projectWorkflow));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getExtensions(WorkflowExtConstants.TRIGGERS, WorkflowTrigger.class, List.of()))
+            .thenReturn(
+                List.of(
+                    new WorkflowTrigger(
+                        Map.of("name", "trigger_1", "type", "workflow/v1/newWorkflowCall", "disabled", true))));
+        when(workflowService.getWorkflow("disabled-workflow-id")).thenReturn(workflow);
+
+        Project project = mock(Project.class);
+
+        lenient().when(project.getName())
+            .thenReturn("Project");
+        lenient().when(projectService.getProject(1L))
+            .thenReturn(project);
+
+        List<SubflowEntry> result =
+            subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, WorkflowConstants.NEW_WORKFLOW_CALL, null);
+
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -243,9 +282,9 @@ class SubflowDataSourceTest {
         when(projectService.getProject(1L)).thenReturn(project);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
-            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(callableWorkflow))
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.ofEnabled(callableWorkflow))
                 .thenReturn(List.of(callableTrigger));
-            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(nonCallableWorkflow))
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.ofEnabled(nonCallableWorkflow))
                 .thenReturn(List.of(nonCallableTrigger));
 
             List<SubflowEntry> result =
@@ -303,9 +342,9 @@ class SubflowDataSourceTest {
         when(projectService.getProject(2L)).thenReturn(project2);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
-            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow1))
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.ofEnabled(workflow1))
                 .thenReturn(List.of(trigger1));
-            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow2))
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.ofEnabled(workflow2))
                 .thenReturn(List.of(trigger2));
 
             List<SubflowEntry> result = subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION,
@@ -342,7 +381,7 @@ class SubflowDataSourceTest {
         when(projectService.getProject(1L)).thenReturn(project);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
-            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.ofEnabled(workflow))
                 .thenReturn(List.of(callableTrigger));
 
             List<SubflowEntry> result =
@@ -379,7 +418,7 @@ class SubflowDataSourceTest {
         when(projectService.getProject(1L)).thenReturn(project);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
-            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.ofEnabled(workflow))
                 .thenReturn(List.of(callableTrigger));
 
             List<SubflowEntry> result =
