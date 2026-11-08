@@ -1,6 +1,8 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import OAuth2Button from '@/shared/components/connection/OAuth2Button';
+import {useMcpServerCatalogQuery} from '@/shared/middleware/graphql';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {useGetOAuth2AuthorizationParametersQuery} from '@/shared/queries/platform/oauth2.queries';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
@@ -8,7 +10,7 @@ import {act, render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ComponentProps, ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
-import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 vi.mock('@/shared/queries/platform/connectionDefinitions.queries', () => ({
     useGetConnectionDefinitionQuery: vi.fn(() => ({data: undefined, error: null, isLoading: false})),
@@ -51,6 +53,7 @@ vi.mock('@/shared/middleware/graphql', async () => {
     return {
         ...actual,
         useConnectionCredentialStoresQuery: vi.fn(() => ({data: undefined})),
+        useMcpServerCatalogQuery: vi.fn(() => ({data: undefined})),
     };
 });
 
@@ -425,6 +428,196 @@ describe('ConnectionDialog', () => {
             expect(hoisted.removeQueries).toHaveBeenCalledWith({
                 queryKey: ['automation_connections', 'oAuth2AuthorizationParameters'],
             });
+        });
+    });
+
+    describe('choosing a known MCP server', () => {
+        const MCP_SERVER_CATALOG = [
+            {
+                authentication: {dynamicClientRegistration: true, type: 'oauth2'},
+                description: 'Official Notion MCP server',
+                slug: 'notion',
+                title: 'Notion',
+                transportType: 'httpStreamable',
+                url: 'https://mcp.notion.com/mcp',
+            },
+            {
+                authentication: {
+                    authorizationUrl: 'https://elevenlabs.io/app/oauth/authorize',
+                    dynamicClientRegistration: false,
+                    pkce: true,
+                    tokenUrl: 'https://api.us.elevenlabs.io/v1/oauth/token',
+                    type: 'oauth2',
+                },
+                slug: 'elevenlabs',
+                title: 'ElevenLabs',
+                transportType: 'httpStreamable',
+                url: 'https://api.elevenlabs.io/mcp',
+            },
+            {
+                authentication: {type: 'none'},
+                slug: 'deepwiki',
+                title: 'DeepWiki',
+                transportType: 'sse',
+                url: 'https://mcp.deepwiki.com/sse',
+            },
+        ];
+
+        beforeEach(() => {
+            vi.mocked(useMcpServerCatalogQuery).mockClear();
+
+            vi.mocked(useMcpServerCatalogQuery).mockReturnValue({
+                data: {mcpServerCatalog: MCP_SERVER_CATALOG},
+            } as never);
+
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizationRequired: false,
+                    authorizations: [
+                        {title: 'Bearer Token', type: 'BEARER_TOKEN'},
+                        {title: 'OAuth2 (manual)', type: 'OAUTH2_AUTHORIZATION_CODE'},
+                        {title: 'OAuth2 (PKCE)', type: 'OAUTH2_AUTHORIZATION_CODE_PKCE'},
+                    ],
+                    properties: [
+                        {name: 'url', type: 'STRING'},
+                        {name: 'transportType', type: 'STRING'},
+                    ],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+        });
+
+        afterEach(() => {
+            usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+        });
+
+        const renderMcpClientDialog = (mutateAsync = vi.fn()) =>
+            renderDialog({
+                componentDefinition: {name: 'mcpClient', title: 'MCP Client'} as never,
+                useCreateConnectionMutation: (() => ({isPending: false, mutateAsync, reset: vi.fn()})) as never,
+            });
+
+        it('selects the automatic OAuth2 authorization for a server with dynamic client registration', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'Notion'}));
+
+            expect(await screen.findByText('OAuth2 (PKCE)')).toBeInTheDocument();
+            expect(screen.getByText('Official Notion MCP server')).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Next'})).toBeInTheDocument();
+        });
+
+        it('selects the PKCE authorization for a manual OAuth2 server that requires PKCE', async () => {
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog();
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'ElevenLabs'}));
+
+            expect(await screen.findByText('OAuth2 (PKCE)')).toBeInTheDocument();
+            expect(
+                screen.getByText(
+                    'Enter the Client Id of an OAuth app registered with this server, and its Client Secret if it has one.'
+                )
+            ).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Next'})).toBeInTheDocument();
+        });
+
+        it('saves the prefilled server URL and transport type', async () => {
+            const mutateAsync = vi.fn().mockResolvedValue(1);
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog(mutateAsync);
+
+            await user.click(screen.getByRole('combobox', {name: 'Choose a known server'}));
+            await user.click(await screen.findByRole('option', {name: 'DeepWiki'}));
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(mutateAsync).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        authorizationType: undefined,
+                        componentName: 'mcpClient',
+                        parameters: {transportType: 'sse', url: 'https://mcp.deepwiki.com/sse'},
+                    })
+                )
+            );
+        });
+
+        it('hides the picker when the catalog is empty', () => {
+            vi.mocked(useMcpServerCatalogQuery).mockReturnValue({data: {mcpServerCatalog: []}} as never);
+
+            renderMcpClientDialog();
+
+            expect(screen.queryByRole('combobox', {name: 'Choose a known server'})).not.toBeInTheDocument();
+            expect(screen.getByTestId('connection-properties')).toBeInTheDocument();
+        });
+
+        it('hides the picker when the catalog cannot be loaded', () => {
+            vi.mocked(useMcpServerCatalogQuery).mockReturnValue({
+                data: undefined,
+                error: new Error('Bad Gateway'),
+            } as never);
+
+            renderMcpClientDialog();
+
+            expect(screen.queryByRole('combobox', {name: 'Choose a known server'})).not.toBeInTheDocument();
+        });
+
+        it('keeps manual entry when no server is picked', async () => {
+            const mutateAsync = vi.fn().mockResolvedValue(1);
+            const user = userEvent.setup({pointerEventsCheck: 0});
+
+            renderMcpClientDialog(mutateAsync);
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(mutateAsync).toHaveBeenCalledWith(
+                    expect.objectContaining({componentName: 'mcpClient', parameters: {}})
+                )
+            );
+        });
+
+        it('shows the picker for an automation connection', () => {
+            usePlatformTypeStore.setState({currentType: PlatformType.AUTOMATION});
+
+            renderMcpClientDialog();
+
+            expect(screen.getByRole('combobox', {name: 'Choose a known server'})).toBeInTheDocument();
+            expect(useMcpServerCatalogQuery).toHaveBeenLastCalledWith(
+                undefined,
+                expect.objectContaining({enabled: true})
+            );
+        });
+
+        it('hides the picker and skips the catalog for an embedded connection', () => {
+            usePlatformTypeStore.setState({currentType: PlatformType.EMBEDDED});
+
+            renderMcpClientDialog();
+
+            expect(screen.queryByRole('combobox', {name: 'Choose a known server'})).not.toBeInTheDocument();
+            expect(screen.getByTestId('connection-properties')).toBeInTheDocument();
+            expect(useMcpServerCatalogQuery).toHaveBeenLastCalledWith(
+                undefined,
+                expect.objectContaining({enabled: false})
+            );
+        });
+
+        it('does not query the catalog for other components', () => {
+            renderDialog({componentDefinition: {name: 'slack', title: 'Slack'} as never});
+
+            expect(useMcpServerCatalogQuery).toHaveBeenLastCalledWith(
+                undefined,
+                expect.objectContaining({enabled: false})
+            );
+            expect(screen.queryByRole('combobox', {name: 'Choose a known server'})).not.toBeInTheDocument();
         });
     });
 });

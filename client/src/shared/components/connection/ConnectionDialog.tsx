@@ -54,6 +54,9 @@ import {twMerge} from 'tailwind-merge';
 import ComponentSelectionInput from './ComponentSelectionInput';
 import OAuth2Button from './OAuth2Button';
 import Scopes from './Scopes';
+import ConnectionPrefillPicker from './connection-prefill/ConnectionPrefillPicker';
+import {ConnectionPrefillOptionI} from './connection-prefill/types';
+import useConnectionPrefillOptions from './connection-prefill/useConnectionPrefillOptions';
 
 export interface ConnectionDialogFormProps {
     authorizationType: string;
@@ -178,6 +181,11 @@ const ConnectionDialog = ({
 
     const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetConnectionTagsQuery();
 
+    const connectionPrefillOptions = useConnectionPrefillOptions(
+        selectedComponentDefinition?.name,
+        isOpen && !connection?.id && currentType !== PlatformType.EMBEDDED
+    );
+
     const {
         data: oAuth2Properties,
         error: oAuth2PropertiesError,
@@ -283,6 +291,20 @@ const ConnectionDialog = ({
     const tagNames = connection?.tags?.map((tag) => tag.name);
 
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
+
+    function applyConnectionPrefill({prefill}: ConnectionPrefillOptionI) {
+        const authorizationTypeValues = authorizationOptions.map((authorizationOption) => authorizationOption.value);
+
+        if (authorizationTypeValues.includes(prefill.authorizationType)) {
+            setAuthorizationType(prefill.authorizationType);
+            setUsePredefinedOAuthApp(false);
+            setValue('authorizationType', prefill.authorizationType as string);
+        }
+
+        for (const [parameterName, parameterValue] of Object.entries(prefill.parameters)) {
+            setValue(`parameters.${parameterName}`, parameterValue as never, {shouldValidate: true});
+        }
+    }
 
     function closeDialog() {
         setIsOpen(false);
@@ -691,6 +713,13 @@ const ConnectionDialog = ({
                                                     </FormControl>
                                                 </FormItem>
                                             )}
+                                        />
+                                    )}
+
+                                    {!connection?.id && (
+                                        <ConnectionPrefillPicker
+                                            onSelect={applyConnectionPrefill}
+                                            options={connectionPrefillOptions}
                                         />
                                     )}
 
