@@ -430,6 +430,12 @@ export type AiDefaultModel = {
 export type AiHubChat = {
   __typename?: 'AiHubChat';
   /**
+   * The AI Agent a chat recorded from one of the agent's channels belongs to. Null for chats created in the AI Hub. A
+   * non-null aiAgentId with a null workflowExecutionId marks a chat recorded from a channel, which the hub can read but
+   * not continue.
+   */
+  aiAgentId?: Maybe<Scalars['Long']['output']>;
+  /**
    * Whether the title was set automatically and remains eligible for LLM regeneration. Flips to false
    * when the LLM regenerates a title or the user renames the chat, so regeneration fires once and then stops.
    */
@@ -441,7 +447,7 @@ export type AiHubChat = {
   isOwner: Scalars['Boolean']['output'];
   /**
    * Discriminator for the chat flavour. STANDARD (default) talks to the LLM agent; WORKFLOW_CHAT
-   * binds the chat to a specific workflow execution. Both kinds run through AiHubRuntimeProvider and the
+   * binds the chat to a specific workflow execution, and AGENT_CHAT to an AI Agent's generated workflow. Both kinds run through AiHubRuntimeProvider and the
    * AG-UI endpoint; the server routes WORKFLOW_CHAT turns to WebhookBridgeAgent, which runs the workflow
    * server-side.
    */
@@ -522,6 +528,7 @@ export enum AiHubChatArtifactStatus {
 }
 
 export enum AiHubChatKind {
+  AgentChat = 'AGENT_CHAT',
   Standard = 'STANDARD',
   WorkflowChat = 'WORKFLOW_CHAT'
 }
@@ -2227,6 +2234,11 @@ export type Mutation = {
   createA2aProject?: Maybe<A2aProject>;
   createA2aServer?: Maybe<A2aServer>;
   createAdditionalFilesInSkill: AiSkill;
+  /**
+   * Creates an agent chat bound to an AI Agent workflow's execution id, as createWorkflowChatAiHubChat with the same
+   * checks, but stamped AGENT_CHAT so the hub presents it as the agent the user picked.
+   */
+  createAgentChatAiHubChat: AiHubChat;
   createAiAgent: AiAgent;
   createAiAgentEvalScenario: AiAgentEvalScenario;
   createAiAgentEvalTest: AiAgentEvalTest;
@@ -2533,6 +2545,15 @@ export type MutationCreateA2aServerArgs = {
 export type MutationCreateAdditionalFilesInSkillArgs = {
   additionalFiles: Scalars['Map']['input'];
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateAgentChatAiHubChatArgs = {
+  environment: Scalars['Int']['input'];
+  projectDeploymentId: Scalars['ID']['input'];
+  title?: InputMaybe<Scalars['String']['input']>;
+  workflowExecutionId: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
