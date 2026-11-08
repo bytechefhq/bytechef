@@ -14,4 +14,15 @@ dependencies {
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-api"))
+
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.springframework.boot:spring-boot-liquibase")
+    testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
+    testImplementation("org.springframework.security:spring-security-config")
+    testImplementation(project(":server:libs:config:app-config"))
+    testImplementation(project(":server:libs:core:encryption:encryption-impl"))
+    testImplementation(project(":server:libs:config:jdbc-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:test:test-int-support"))
 }

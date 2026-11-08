@@ -8,11 +8,13 @@
 package com.bytechef.ee.platform.user.service;
 
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.platform.user.event.IdentityProviderChangedEvent;
 import com.bytechef.ee.platform.user.repository.IdentityProviderRepository;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,12 +28,15 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class IdentityProviderServiceImpl implements IdentityProviderService {
 
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final Encryption encryption;
     private final IdentityProviderRepository identityProviderRepository;
 
     public IdentityProviderServiceImpl(
-        Encryption encryption, IdentityProviderRepository identityProviderRepository) {
+        ApplicationEventPublisher applicationEventPublisher, Encryption encryption,
+        IdentityProviderRepository identityProviderRepository) {
 
+        this.applicationEventPublisher = applicationEventPublisher;
         this.encryption = encryption;
         this.identityProviderRepository = identityProviderRepository;
     }
@@ -40,12 +45,18 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
     public IdentityProvider create(IdentityProvider identityProvider) {
         identityProvider.setClientSecret(encryption.encrypt(identityProvider.getClientSecret()));
 
-        return identityProviderRepository.save(identityProvider);
+        IdentityProvider savedIdentityProvider = identityProviderRepository.save(identityProvider);
+
+        applicationEventPublisher.publishEvent(new IdentityProviderChangedEvent());
+
+        return savedIdentityProvider;
     }
 
     @Override
     public void delete(long id) {
         identityProviderRepository.deleteById(id);
+
+        applicationEventPublisher.publishEvent(new IdentityProviderChangedEvent());
     }
 
     @Override
@@ -91,7 +102,11 @@ public class IdentityProviderServiceImpl implements IdentityProviderService {
             identityProvider.setClientSecret(existingIdentityProvider.getClientSecret());
         }
 
-        return identityProviderRepository.save(identityProvider);
+        IdentityProvider savedIdentityProvider = identityProviderRepository.save(identityProvider);
+
+        applicationEventPublisher.publishEvent(new IdentityProviderChangedEvent());
+
+        return savedIdentityProvider;
     }
 
     @Override
