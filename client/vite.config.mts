@@ -71,6 +71,7 @@ export default ({mode}) => {
             },
         },
         server: {
+            allowedHosts: ['.ngrok.dev'],
             host: '127.0.0.1',
             proxy: {
                 '/.well-known': {
