@@ -13,6 +13,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -52,6 +53,20 @@ class AutomationApiKeyAuthenticationProviderTest {
     }
 
     @Test
+    void testAdminApiKeyIsRejected() {
+        assertThatThrownBy(() -> newProvider(null, true, true).authenticate(newToken()))
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("Automation API key required");
+    }
+
+    @Test
+    void testEmbeddedApiKeyIsRejected() {
+        assertThatThrownBy(() -> newProvider(PlatformType.EMBEDDED, true, true).authenticate(newToken()))
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("Automation API key required");
+    }
+
+    @Test
     void testInactiveUserIsRejectedWithoutTheSecretKeyInTheMessage() {
         assertThatThrownBy(() -> newProvider(false, true).authenticate(newToken()))
             .isInstanceOf(UserNotActivatedException.class)
@@ -70,9 +85,16 @@ class AutomationApiKeyAuthenticationProviderTest {
     }
 
     private static AutomationApiKeyAuthenticationProvider newProvider(boolean activated, boolean userExists) {
+        return newProvider(PlatformType.AUTOMATION, activated, userExists);
+    }
+
+    private static AutomationApiKeyAuthenticationProvider newProvider(
+        PlatformType type, boolean activated, boolean userExists) {
+
         ApiKey apiKey = mock(ApiKey.class);
 
         when(apiKey.getId()).thenReturn(7L);
+        when(apiKey.getType()).thenReturn(type);
         when(apiKey.getUserId()).thenReturn(1L);
 
         ApiKeyService apiKeyService = mock(ApiKeyService.class);
