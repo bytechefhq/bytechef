@@ -520,7 +520,7 @@ class WorkflowTestApiControllerIntTest {
 
         Object emitter = ReflectionTestUtils.getField(controller, "emitter");
 
-        assert emitter != null;
+        assertThat(emitter).isNotNull();
 
         if (emitter instanceof Cache<?, ?> cache) {
             @SuppressWarnings("unchecked")
@@ -544,7 +544,7 @@ class WorkflowTestApiControllerIntTest {
 
         Object pendingEvents = ReflectionTestUtils.getField(controller, "pendingEvents");
 
-        assert pendingEvents != null;
+        assertThat(pendingEvents).isNotNull();
 
         List<SseEmitter.SseEventBuilder> eventBuilders = null;
 
@@ -636,7 +636,7 @@ class WorkflowTestApiControllerIntTest {
 
         Object emitter = ReflectionTestUtils.getField(controller, "emitter");
 
-        assert emitter != null;
+        assertThat(emitter).isNotNull();
 
         if (emitter instanceof Cache<?, ?> cache) {
             @SuppressWarnings("unchecked")
@@ -658,7 +658,7 @@ class WorkflowTestApiControllerIntTest {
 
         Object pendingEvents2 = ReflectionTestUtils.getField(controller, "pendingEvents");
 
-        assert pendingEvents2 != null;
+        assertThat(pendingEvents2).isNotNull();
 
         List<SseEmitter.SseEventBuilder> beforeStop = null;
 
