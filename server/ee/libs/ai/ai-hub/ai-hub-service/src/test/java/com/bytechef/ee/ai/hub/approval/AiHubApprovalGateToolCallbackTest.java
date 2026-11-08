@@ -27,6 +27,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatServiceImpl;
 import com.bytechef.ee.ai.hub.chat.AiHubChatStatus;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
+import com.bytechef.ee.ai.hub.mcpserver.AiHubMcpToolCallback;
 import com.bytechef.ee.ai.hub.toolsearch.ClusterElementToolCallback;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.HashMap;
@@ -159,6 +160,91 @@ class AiHubApprovalGateToolCallbackTest {
 
         assertThat(result).contains("\"awaitingApproval\":true");
         verify(clusterElementTool, never()).call(anyString(), any());
+    }
+
+    @Test
+    void testAReadingChatToolTheOwnerFlaggedIsHeldForApproval() {
+        when(approvalService.findPending(CHAT_ID)).thenReturn(Optional.empty());
+        when(approvalService.createPending(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ClusterElementToolCallback clusterElementTool = clusterElementToolCallback("slack", "listChannels");
+
+        when(clusterElementTool.isRequiresApproval()).thenReturn(true);
+
+        String result = gate(Set.of(), Set.of(), NonEmptyToolCallback.wrap(clusterElementTool)).call(
+            "{}", toolContext());
+
+        assertThat(result).contains("\"awaitingApproval\":true");
+        verify(clusterElementTool, never()).call(anyString(), any());
+    }
+
+    @Test
+    void testAWorkspaceExemptionWinsOverTheOwnersApprovalFlag() {
+        ClusterElementToolCallback clusterElementTool = clusterElementToolCallback("slack", "sendMessage");
+
+        when(clusterElementTool.isRequiresApproval()).thenReturn(true);
+
+        String result = gate(Set.of(), Set.of("slack_sendMessage"), NonEmptyToolCallback.wrap(clusterElementTool))
+            .call("{}", toolContext());
+
+        assertThat(result).isEqualTo("[]");
+        verify(approvalService, never()).createPending(any());
+    }
+
+    @Test
+    void testAnMcpToolThatIsNotReadOnlyIsHeldForApprovalAsACatalogRow() {
+        when(approvalService.findPending(CHAT_ID)).thenReturn(Optional.empty());
+        when(approvalService.createPending(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ToolCallback mcpTool = callback("create_page", "{\"created\":true}");
+
+        String result = gate(
+            Set.of(), Set.of(), NonEmptyToolCallback.wrap(new AiHubMcpToolCallback(mcpTool, 5L, false)))
+                .call("{}", toolContext());
+
+        assertThat(result).contains("\"awaitingApproval\":true");
+        verify(mcpTool, never()).call(anyString(), any());
+
+        ArgumentCaptor<AiHubToolApproval> captor = ArgumentCaptor.forClass(AiHubToolApproval.class);
+
+        verify(approvalService).createPending(captor.capture());
+
+        AiHubToolApproval saved = captor.getValue();
+
+        assertThat(saved.getToolKind()).isEqualTo(AiHubToolApproval.ToolKind.CATALOG);
+    }
+
+    @Test
+    void testAReadOnlyMcpToolRunsWithoutApprovalUnlessAWorkspaceRuleRequiresIt() {
+        ToolCallback mcpTool = callback("search_docs", "{\"hits\":[]}");
+
+        String result = gate(
+            Set.of(), Set.of(), NonEmptyToolCallback.wrap(new AiHubMcpToolCallback(mcpTool, 5L, true)))
+                .call("{}", toolContext());
+
+        assertThat(result).isEqualTo("{\"hits\":[]}");
+        verify(approvalService, never()).createPending(any());
+
+        when(approvalService.findPending(CHAT_ID)).thenReturn(Optional.empty());
+        when(approvalService.createPending(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        String requiredResult = gate(
+            Set.of("search_docs"), Set.of(), NonEmptyToolCallback.wrap(new AiHubMcpToolCallback(mcpTool, 5L, true)))
+                .call("{}", toolContext());
+
+        assertThat(requiredResult).contains("\"awaitingApproval\":true");
+    }
+
+    @Test
+    void testAWorkspaceExemptionLetsAWritingMcpToolRun() {
+        ToolCallback mcpTool = callback("create_page", "{\"created\":true}");
+
+        String result = gate(
+            Set.of(), Set.of("create_page"), NonEmptyToolCallback.wrap(new AiHubMcpToolCallback(mcpTool, 5L, false)))
+                .call("{}", toolContext());
+
+        assertThat(result).isEqualTo("{\"created\":true}");
+        verify(approvalService, never()).createPending(any());
     }
 
     @Test

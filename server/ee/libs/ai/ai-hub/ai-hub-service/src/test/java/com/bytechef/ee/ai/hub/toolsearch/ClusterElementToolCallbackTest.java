@@ -114,6 +114,29 @@ class ClusterElementToolCallbackTest {
     }
 
     @Test
+    void testAPinnedConnectionThatWasDeletedAsksToReconnectInsteadOfUsingAnother() {
+        when(workspaceConnectionFacade.getConnections(WORKSPACE_ID, "slack", null, ENVIRONMENT_ID, null))
+            .thenReturn(List.of(connection(11L, "Team Slack")));
+
+        String result = pinnedToolCallback(42L).call("{}", toolContext(WORKSPACE_ID));
+
+        assertThat(result)
+            .contains("\"connectionRequired\":true")
+            .contains("reconnect");
+        verifyNoInteractions(clusterElementDefinitionFacade);
+    }
+
+    @Test
+    void testAPinnedConnectionThatStillExistsIsUsed() {
+        when(workspaceConnectionFacade.getConnections(WORKSPACE_ID, "slack", null, ENVIRONMENT_ID, null))
+            .thenReturn(List.of(connection(11L, "Team Slack"), connection(42L, "Pinned Slack")));
+        when(clusterElementDefinitionFacade.executeTool(eq("slack"), eq(1), eq("sendMessage"), anyMap(), eq(42L)))
+            .thenReturn(Map.of("ok", true));
+
+        assertThat(pinnedToolCallback(42L).call("{}", toolContext(WORKSPACE_ID))).isEqualTo("{\"ok\":true}");
+    }
+
+    @Test
     void testTwoConnectionsAreReportedInsteadOfPickingOne() {
         when(workspaceConnectionFacade.getConnections(WORKSPACE_ID, "slack", null, ENVIRONMENT_ID, null))
             .thenReturn(List.of(connection(11L, "Team Slack"), connection(12L, "Ops Slack")));
@@ -177,6 +200,22 @@ class ClusterElementToolCallbackTest {
         verify(clusterElementDefinitionService, times(1)).getClusterElementDefinition("slack", 1, "sendMessage");
         verify(clusterElementDefinitionFacade, never()).executeTool(
             anyString(), anyInt(), anyString(), anyMap(), anyLong());
+    }
+
+    @SuppressWarnings("unchecked")
+    private ClusterElementToolCallback pinnedToolCallback(long pinnedConnectionId) {
+        SecurityContextRehydrator securityContextRehydrator = mock(SecurityContextRehydrator.class);
+
+        when(securityContextRehydrator.withUserSecurityContext(any(), any()))
+            .thenAnswer(invocation -> invocation.getArgument(1, Supplier.class)
+                .get());
+
+        return new ClusterElementToolCallback(
+            "slack_sendMessage", "Send a Slack message", "slack", 1, "sendMessage", clusterElementDefinitionService,
+            clusterElementDefinitionFacade, connectionDefinitionService,
+            new WorkspaceCopilotConnectionLister(
+                workspaceConnectionFacade, new PropertyOptionsResolver(securityContextRehydrator)),
+            pinnedConnectionId, Map.of(), false);
     }
 
     private static ToolContext toolContext(long workspaceId) {

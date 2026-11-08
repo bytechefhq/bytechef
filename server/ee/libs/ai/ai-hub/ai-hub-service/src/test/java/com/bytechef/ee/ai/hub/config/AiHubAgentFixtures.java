@@ -190,7 +190,7 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskSpringAIAgent(
             sessionMemory, defaultChatModel, askToolCallbacks(), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider());
+            toolSearchAdvisorProvider(), availableProvider(null));
     }
 
     private AiHubSpringAIAgent buildAgent(
@@ -201,7 +201,7 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubBuildSpringAIAgent(
             sessionMemory, defaultChatModel, buildToolCallbacks(), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider());
+            toolSearchAdvisorProvider(), availableProvider(null));
     }
 
     public AiHubModeToolCallbacks askToolCallbacks() {
@@ -209,7 +209,8 @@ public final class AiHubAgentFixtures {
             readProjectTools, readProjectWorkflowTools, workflowExecutionTools, componentToolsProvider(),
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
             interactivePickerToolCallbacks, projectWorkflowFacade, chatService, chatAccessPolicy,
-            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
+            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
+            availableProvider(null));
     }
 
     public AiHubGlobalToolCatalog askGlobalToolCatalog() {
@@ -228,7 +229,8 @@ public final class AiHubAgentFixtures {
             persistedWorkflowCheckerProvider(), projectServiceProvider(), deploymentToolCallbacksFactoryProvider(),
             interactivePickerToolCallbacks, intelligentToolCatalog, workspaceFacade, projectWorkflowFacade,
             projectDeploymentFacade, chatService, chatAccessPolicy, artifactRecorder, policy,
-            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore));
+            availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
+            availableProvider(null));
     }
 
     @SuppressWarnings("unchecked")

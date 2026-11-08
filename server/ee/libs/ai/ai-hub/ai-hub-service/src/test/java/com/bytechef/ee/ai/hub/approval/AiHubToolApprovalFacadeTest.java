@@ -549,7 +549,8 @@ class AiHubToolApprovalFacadeTest {
 
         return new AiHubToolApprovalFacadeImpl(
             approvalService, chatService, userService, provider(pinnedToolCallbacksSource), globalToolCatalogProvider(),
-            provider(clusterElementToolCallbacks), provider(continuationStarterSource), securityContextRehydrator,
+            provider(clusterElementToolCallbacks), provider(null), provider(continuationStarterSource),
+            securityContextRehydrator,
             transactionManager, clock);
     }
 

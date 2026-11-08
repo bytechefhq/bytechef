@@ -103,4 +103,41 @@ class CatalogToolIndexTest {
         assertThat(filterExpression).contains(CATALOG_SESSION_ID)
             .doesNotContain("conversation-1");
     }
+
+    @Test
+    void testSearchAlsoCoversTheThreadsOwnChatToolSession() {
+        CatalogToolIndex catalogToolIndex = new CatalogToolIndex(
+            vectorStore, Set.of(CATALOG_SESSION_ID), threadId -> "chat-tools:" + threadId);
+
+        when(vectorStore.similaritySearch(any(SearchRequest.class))).thenReturn(List.<Document>of());
+
+        catalogToolIndex.search(new ToolSearchRequest("thread-1", "search the docs", 5, null));
+
+        ArgumentCaptor<SearchRequest> searchRequestCaptor = ArgumentCaptor.forClass(SearchRequest.class);
+
+        verify(vectorStore).similaritySearch(searchRequestCaptor.capture());
+
+        SearchRequest searchRequest = searchRequestCaptor.getValue();
+
+        String filterExpression = String.valueOf(searchRequest.getFilterExpression());
+
+        assertThat(filterExpression).contains(CATALOG_SESSION_ID)
+            .contains("chat-tools:thread-1");
+        assertThat(searchRequest.getTopK()).isEqualTo(10);
+    }
+
+    @Test
+    void testClearIndexOfAThreadLeavesItsChatToolSessionAlone() {
+        CatalogToolIndex catalogToolIndex = new CatalogToolIndex(
+            vectorStore, Set.of(CATALOG_SESSION_ID), threadId -> "chat-tools:" + threadId);
+
+        catalogToolIndex.clearIndex("thread-1");
+
+        ArgumentCaptor<Filter.Expression> expressionCaptor = ArgumentCaptor.forClass(Filter.Expression.class);
+
+        verify(vectorStore).delete(expressionCaptor.capture());
+
+        assertThat(expressionCaptor.getValue()
+            .toString()).doesNotContain("chat-tools:");
+    }
 }
