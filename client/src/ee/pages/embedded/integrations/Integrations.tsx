@@ -110,7 +110,7 @@ const Integrations = () => {
 
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button>
+                                        <Button aria-label="More integration options">
                                             <ChevronDownIcon />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -193,7 +193,7 @@ const Integrations = () => {
 
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
-                                            <Button>
+                                            <Button aria-label="More integration options">
                                                 <ChevronDownIcon />
                                             </Button>
                                         </DropdownMenuTrigger>

@@ -46,7 +46,7 @@ const NewCodeWorkflowDialog = ({onClose}: NewCodeWorkflowDialogProps) => {
     const {control, getValues, handleSubmit, setValue} = form;
 
     const {data: categories} = useGetProjectCategoriesQuery(currentWorkspaceId!);
-    const {data: tags} = useGetProjectTagsQuery();
+    const {data: tags} = useGetProjectTagsQuery(currentWorkspaceId!);
 
     const navigate = useNavigate();
     const queryClient = useQueryClient();

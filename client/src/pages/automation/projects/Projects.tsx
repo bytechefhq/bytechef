@@ -33,7 +33,15 @@ import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automa
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, CodeIcon, FileUpIcon, FolderIcon, LayoutTemplateIcon, UploadIcon} from 'lucide-react';
+import {
+    ChevronDownIcon,
+    CodeIcon,
+    FileUpIcon,
+    FolderIcon,
+    LayoutTemplateIcon,
+    PlusIcon,
+    UploadIcon,
+} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -177,6 +185,20 @@ const Projects = () => {
                                             </DropdownMenuTrigger>
 
                                             <DropdownMenuContent align="end">
+                                                <ProjectDialog
+                                                    onSuccess={(projectId) =>
+                                                        projectId && setNewlyCreatedProjectId(projectId)
+                                                    }
+                                                    project={undefined}
+                                                    triggerNode={
+                                                        <DropdownMenuItem
+                                                            icon={<PlusIcon />}
+                                                            label="New Project"
+                                                            onSelect={(event) => event.preventDefault()}
+                                                        />
+                                                    }
+                                                />
+
                                                 <DropdownMenuItem
                                                     icon={<LayoutTemplateIcon />}
                                                     label="From Template"
@@ -273,6 +295,20 @@ const Projects = () => {
                                         </DropdownMenuTrigger>
 
                                         <DropdownMenuContent align="start" alignOffset={alignOffset}>
+                                            <ProjectDialog
+                                                onSuccess={(projectId) =>
+                                                    projectId && setNewlyCreatedProjectId(projectId)
+                                                }
+                                                project={undefined}
+                                                triggerNode={
+                                                    <DropdownMenuItem
+                                                        icon={<PlusIcon />}
+                                                        label="New Project"
+                                                        onSelect={(event) => event.preventDefault()}
+                                                    />
+                                                }
+                                            />
+
                                             <DropdownMenuItem
                                                 icon={<LayoutTemplateIcon />}
                                                 label="From Template"
