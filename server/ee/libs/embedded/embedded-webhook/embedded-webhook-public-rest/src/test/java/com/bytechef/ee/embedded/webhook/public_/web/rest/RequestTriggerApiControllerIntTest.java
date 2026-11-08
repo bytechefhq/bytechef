@@ -143,6 +143,27 @@ class RequestTriggerApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "user-1")
+    void testIntegrationWorkflowDispatchesTheEnabledRequestTrigger() {
+        stubConnectedUser("user-1", 1L);
+        stubIntegrationWorkflow();
+
+        when(workflowService.getWorkflow("integration-wf-1"))
+            .thenReturn(
+                new Workflow(
+                    "{\"label\":\"Summarize\",\"triggers\":["
+                        + "{\"name\":\"t_disabled\",\"type\":\"request/v1\",\"disabled\":true},"
+                        + "{\"name\":\"t_enabled\",\"type\":\"request/v1\"}],\"tasks\":[]}",
+                    Workflow.Format.JSON));
+
+        expectDispatched(WORKFLOW_PATH, "uuid-1");
+
+        WorkflowExecutionId workflowExecutionId = captureDispatchedWorkflowExecutionId();
+
+        Assertions.assertEquals("t_enabled", workflowExecutionId.getTriggerName());
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
     void testIntegrationWorkflowWithoutARequestTriggerIsRefusedWithAMessageNamingTheProblem() {
         stubConnectedUser("user-1", 1L);
         stubIntegrationWorkflow();
