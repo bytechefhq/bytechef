@@ -529,6 +529,7 @@ const AddContextSourceDialog = ({contextStoreId: presetContextStoreId, trigger}:
                                                         string,
                                                         unknown
                                                     >,
+                                                    mcpComponentId: '',
                                                 }}
                                             >
                                                 <Properties

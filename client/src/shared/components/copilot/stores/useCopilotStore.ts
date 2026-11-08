@@ -66,6 +66,10 @@ export interface ComponentRuleCopilotParametersI {
     toolName?: string;
 }
 
+export interface ContextStoreCopilotParametersI {
+    contextStoreId?: string;
+}
+
 export interface CustomComponentCopilotParametersI {
     customComponentId?: string;
 }
@@ -112,6 +116,7 @@ export type CopilotContextParametersType =
     | ClusterElementCopilotParametersI
     | CodeWorkflowCopilotParametersI
     | ComponentRuleCopilotParametersI
+    | ContextStoreCopilotParametersI
     | CustomComponentCopilotParametersI
     | DataTableCopilotParametersI
     | IntentCopilotParametersI
