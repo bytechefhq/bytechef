@@ -44,6 +44,8 @@ bytechef:
         response-scan-enabled: false
         response-scan-streaming-enabled: false
         secret-redaction-enabled: false
+      otlp:
+        max-spans-per-request: 1000
       # Prompt complexity scorer used by the intelligent routing strategies (deterministic | opennlp)
       prompt-complexity-scorer: deterministic
       rate-limiting:

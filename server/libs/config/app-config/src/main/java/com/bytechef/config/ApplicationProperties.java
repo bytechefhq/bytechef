@@ -1635,7 +1635,7 @@ public class ApplicationProperties {
 
             public static class Otlp {
 
-                private int maxSpansPerRequest = 1_000;
+                private int maxSpansPerRequest;
 
                 public int getMaxSpansPerRequest() {
                     return maxSpansPerRequest;
