@@ -235,17 +235,22 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
             Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
-            WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflow)
+            List<WorkflowTrigger> apiTriggers = WorkflowTrigger.of(workflow)
                 .stream()
-                .filter(trigger -> Objects.equals(
-                    WorkflowNodeType.ofType(trigger.getType())
-                        .operation(),
-                    "newApiRequest"))
-                .findFirst()
-                .orElseThrow(() -> new ConfigurationException(
-                    "Invalid workflow trigger type", ApiCollectionErrorType.INVALID_WORKFLOW_TRIGGER_TYPE));
+                .filter(ApiCollectionFacadeImpl::isNewApiRequestTrigger)
+                .toList();
 
-            if (!workflowTrigger.isEnabled()) {
+            if (apiTriggers.isEmpty()) {
+                throw new ConfigurationException(
+                    "Invalid workflow trigger type", ApiCollectionErrorType.INVALID_WORKFLOW_TRIGGER_TYPE);
+            }
+
+            WorkflowTrigger workflowTrigger = apiTriggers.stream()
+                .filter(WorkflowTrigger::isEnabled)
+                .findFirst()
+                .orElse(null);
+
+            if (workflowTrigger == null) {
                 continue;
             }
 
@@ -490,5 +495,11 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
         return new ApiCollectionEndpointDTO(
             apiCollectionEndpoint, projectDeploymentWorkflow.isEnabled(), workflowUuid);
+    }
+
+    private static boolean isNewApiRequestTrigger(WorkflowTrigger workflowTrigger) {
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+        return Objects.equals(workflowNodeType.operation(), "newApiRequest");
     }
 }

@@ -187,6 +187,18 @@ class ApiCollectionFacadeIntTest {
         assertThat(apiCollectionFacade.getOpenApiSpecification(apiCollectionId)).doesNotContain("/test");
     }
 
+    @Test
+    void testGetOpenApiSpecificationUsesEnabledApiTriggerAfterDisabledOne() {
+        long apiCollectionId = createApiCollectionWithEndpoint(
+            List.of(
+                Map.of(
+                    "name", "trigger_1", "type", "apiPlatform/v1/newApiRequest", "parameters", Map.of(), "disabled",
+                    true),
+                Map.of("name", "trigger_2", "type", "apiPlatform/v1/newApiRequest", "parameters", Map.of())));
+
+        assertThat(apiCollectionFacade.getOpenApiSpecification(apiCollectionId)).contains("/test");
+    }
+
     private long createApiCollectionWithEndpoint(List<Map<String, Object>> triggers) {
         Workflow workflow = workflowService.create(
             JsonUtils.write(Map.of("label", "api-workflow", "triggers", triggers, "tasks", List.of())),
