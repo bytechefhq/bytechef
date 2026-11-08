@@ -32,6 +32,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.ai.tool.ToolCallback;
@@ -46,6 +48,9 @@ class AiAgentUtilsGrepToolTest {
 
     @TempDir
     private Path basedir;
+
+    @TempDir
+    private Path outsideDirectory;
 
     private final Parameters connectionParameters = mock(Parameters.class);
     private final Parameters inputParameters = mock(Parameters.class);
@@ -70,6 +75,25 @@ class AiAgentUtilsGrepToolTest {
         String result = toolCallback.call(JsonUtils.write(Map.of("pattern", "needle", "path", "/workspace")));
 
         assertThat(result).contains("/workspace/docs/notes.txt")
+            .doesNotContain(basedir.toString());
+    }
+
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    void testSymlinkToAFileOutsideTheWorkspaceIsNotSearched() throws Exception {
+        ToolCallback toolCallback = applyTool();
+
+        Path secret = Files.writeString(outsideDirectory.resolve("secret.txt"), "TOPSECRET");
+
+        Files.createSymbolicLink(basedir.resolve(AGENT_WORKSPACE)
+            .resolve("link.txt"), secret);
+
+        String result = toolCallback.call(
+            JsonUtils.write(Map.of("pattern", "TOPSECRET", "path", "/workspace", "outputMode", "content")));
+
+        assertThat(result).contains("Access denied")
+            .contains("/workspace/link.txt")
+            .doesNotContain("TOPSECRET")
             .doesNotContain(basedir.toString());
     }
 
