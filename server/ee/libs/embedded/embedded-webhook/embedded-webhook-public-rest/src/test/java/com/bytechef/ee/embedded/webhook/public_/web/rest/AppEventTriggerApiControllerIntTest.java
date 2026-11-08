@@ -246,6 +246,32 @@ class AppEventTriggerApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "user-1")
+    void testIntegrationWorkflowDispatchesTheEnabledAppEventTrigger() {
+        stubConnectedUser("user-1", 1L);
+
+        stubIntegrationWorkflows(5L, "int-wf-1");
+
+        when(workflowService.getWorkflow("int-wf-1")).thenReturn(
+            new Workflow(
+                "{\"label\":\"App Event Workflow\",\"triggers\":["
+                    + "{\"name\":\"t_disabled\",\"type\":\"appEvent/v1/newEvent\",\"disabled\":true},"
+                    + "{\"name\":\"t_enabled\",\"type\":\"appEvent/v1/newEvent\"}],\"tasks\":[]}",
+                Workflow.Format.JSON));
+
+        postAppEvent();
+
+        ArgumentCaptor<WorkflowExecutionId> workflowExecutionIdCaptor =
+            ArgumentCaptor.forClass(WorkflowExecutionId.class);
+
+        verify(webhookWorkflowExecutor).executeAsync(workflowExecutionIdCaptor.capture(), any(WebhookRequest.class));
+
+        Assertions.assertEquals(
+            "t_enabled", workflowExecutionIdCaptor.getValue()
+                .getTriggerName());
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
     void testIntegrationWorkflowWithDisabledTriggerIsNotDispatched() {
         stubConnectedUser("user-1", 1L);
 
