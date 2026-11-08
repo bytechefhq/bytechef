@@ -1,0 +1,9 @@
+query workspaceProjectWorkflows($workspaceId: ID!) {
+    workspaceProjectWorkflows(workspaceId: $workspaceId) {
+        projectId
+        projectName
+        projectWorkflowId
+        workflowId
+        workflowLabel
+    }
+}
