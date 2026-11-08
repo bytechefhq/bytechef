@@ -21,6 +21,7 @@ The header reads **Users**, described as "Manage organization users: invite or d
 |---|---|
 | **Email** | The user's email address. |
 | **Name** | First and last name, when set. |
+| **External ID** | The ID the identity provider sent over SCIM, or `—` for users not provisioned through SCIM. |
 | **Role** | The organization authority, shown verbatim - `ROLE_ADMIN` or `ROLE_USER`. Every Community Edition account reads `ROLE_ADMIN`. |
 | **Status** | **Active** when the account is activated, **Pending** otherwise. |
 | *(actions)* | Per-row **edit** (pencil) and **delete** (trash) buttons. The edit button is Enterprise Edition only - it exists to change a role, and Community Edition has none to change. |
