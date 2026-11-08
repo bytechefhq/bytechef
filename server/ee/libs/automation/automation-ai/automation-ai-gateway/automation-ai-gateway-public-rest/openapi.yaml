@@ -16,6 +16,8 @@ tags:
     description: "The AI Gateway Routing Public API"
   - name: "tag"
     description: "The AI Gateway Tag Public API"
+  - name: "score"
+    description: "The AI Gateway Score Public API"
 paths:
   /chat/completions:
     post:
@@ -171,6 +173,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TagList"
+  /scores:
+    post:
+      description: "Create a score (annotation or evaluation result) for a trace or a specific\
+        \ span within a trace. Scores can be numeric, categorical, or boolean and are used\
+        \ for manual annotation, programmatic scoring, and LLM-as-judge evaluation."
+      summary: "Create a score for a trace or span"
+      tags:
+        - "score"
+      operationId: "createScore"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScoreRequest"
+        required: true
+      responses:
+        "200":
+          description: "The score was created."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScoreResponse"
+        "400":
+          description: "Invalid input (e.g. unknown data type, missing required fields)."
+        "404":
+          description: "The referenced trace does not exist."
 components:
   schemas:
     ChatCompletionRequest:
@@ -480,3 +508,47 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/Tag"
+    ScoreRequest:
+      description: "A request to create a score for a trace or span."
+      type: "object"
+      required:
+        - "traceId"
+        - "name"
+        - "dataType"
+      properties:
+        traceId:
+          description: "The ID of the trace to score."
+          type: "integer"
+          format: "int64"
+        spanId:
+          description: "Optional ID of a specific span within the trace. If omitted the score\
+            \ applies to the whole trace."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The score name (e.g. 'helpfulness', 'hallucination')."
+          type: "string"
+        dataType:
+          description: "The score data type: NUMERIC, CATEGORICAL, or BOOLEAN."
+          type: "string"
+        value:
+          description: "Numeric value, required when dataType is NUMERIC or BOOLEAN\
+            \ (0/1)."
+          type: "number"
+        stringValue:
+          description: "String value, required when dataType is CATEGORICAL."
+          type: "string"
+        comment:
+          description: "Optional free-text comment explaining the score."
+          type: "string"
+    ScoreResponse:
+      description: "The result of creating a score."
+      type: "object"
+      properties:
+        id:
+          description: "The generated score ID."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The score name."
+          type: "string"

@@ -32,6 +32,8 @@ bytechef:
       enabled: false
     gateway:
       enabled: false
+      external-scores:
+        max-batch-size: 1000
       guardrails:
         blocked-terms: ""
         injection-detection-enabled: false

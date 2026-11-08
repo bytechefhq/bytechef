@@ -1481,6 +1481,7 @@ public class ApplicationProperties {
         public static class Gateway {
 
             private boolean enabled;
+            private ExternalScores externalScores = new ExternalScores();
             private Guardrails guardrails = new Guardrails();
             private Otlp otlp = new Otlp();
             private String promptComplexityScorer;
@@ -1492,6 +1493,14 @@ public class ApplicationProperties {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+
+            public ExternalScores getExternalScores() {
+                return externalScores;
+            }
+
+            public void setExternalScores(ExternalScores externalScores) {
+                this.externalScores = externalScores;
             }
 
             public Guardrails getGuardrails() {
@@ -1524,6 +1533,19 @@ public class ApplicationProperties {
 
             public void setRateLimiting(RateLimiting rateLimiting) {
                 this.rateLimiting = rateLimiting;
+            }
+
+            public static class ExternalScores {
+
+                private int maxBatchSize;
+
+                public int getMaxBatchSize() {
+                    return maxBatchSize;
+                }
+
+                public void setMaxBatchSize(int maxBatchSize) {
+                    this.maxBatchSize = maxBatchSize;
+                }
             }
 
             public static class Guardrails {

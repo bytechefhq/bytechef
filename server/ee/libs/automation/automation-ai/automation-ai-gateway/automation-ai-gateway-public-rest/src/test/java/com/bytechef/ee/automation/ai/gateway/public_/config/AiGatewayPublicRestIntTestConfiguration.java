@@ -43,6 +43,7 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @ComponentScan(
     basePackages = {
+        "com.bytechef.ee.automation.ai.eval",
         "com.bytechef.ee.automation.ai.gateway.facade",
         "com.bytechef.ee.automation.ai.gateway.public_.web.rest",
         "com.bytechef.ee.automation.ai.gateway.service",
@@ -52,10 +53,13 @@ import org.springframework.security.web.SecurityFilterChain;
         "com.bytechef.ee.automation.ai.gateway.routing",
         "com.bytechef.ee.automation.ai.gateway.cost",
         "com.bytechef.ee.automation.ai.observability",
+        "com.bytechef.ee.automation.ai.prompt",
+        "com.bytechef.ee.platform.ai.eval",
         "com.bytechef.ee.platform.ai.gateway",
         "com.bytechef.ee.platform.ai.model.catalog",
         "com.bytechef.ee.platform.ai.llm.usage",
         "com.bytechef.ee.platform.ai.observability",
+        "com.bytechef.ee.platform.ai.prompt",
         "com.bytechef.encryption",
         "com.bytechef.file.storage"
     },
@@ -64,11 +68,13 @@ import org.springframework.security.web.SecurityFilterChain;
             type = FilterType.REGEX,
             pattern = {
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.facade\\.AiGatewayFacadeImpl",
+                "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.facade\\.AiEvalRuleFacadeImpl",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.facade\\.AiGatewayPlaygroundFacadeImpl",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayChatCompletionApiController",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayEmbeddingApiController",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayModelApiController",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayRoutingApiController",
+                "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayScoreApiController",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\..+Test.*"
             })
     })
