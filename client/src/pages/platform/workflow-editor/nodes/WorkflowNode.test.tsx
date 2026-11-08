@@ -19,7 +19,10 @@ const {
     recordedContextMenuProps,
     testNodeStatesState,
 } = vi.hoisted(() => ({
-    dataStoreState: {definition: '{}'},
+    dataStoreState: {
+        definition: '{}',
+        triggers: [] as {disabled?: boolean; name: string; type: string}[],
+    },
     directionStoreState: {layoutDirection: 'TB'},
     editorStoreState: {renamingNodeName: undefined as string | undefined},
     popoverMenuMock: vi.fn(),
@@ -103,7 +106,12 @@ vi.mock('../stores/useWorkflowDataStore', () => ({
     default: (selector: (state: Record<string, unknown>) => unknown) =>
         selector({
             incrementLayoutResetCounter: vi.fn(),
-            workflow: {definition: dataStoreState.definition, id: 'workflow-1', tasks: [], triggers: []},
+            workflow: {
+                definition: dataStoreState.definition,
+                id: 'workflow-1',
+                tasks: [],
+                triggers: dataStoreState.triggers,
+            },
         }),
 }));
 
@@ -175,6 +183,7 @@ function renderNode(data: NodeDataType = NESTED_CLUSTER_ROOT_DATA, id = 'approva
 describe('WorkflowNode', () => {
     beforeEach(() => {
         dataStoreState.definition = '{}';
+        dataStoreState.triggers = [];
         directionStoreState.layoutDirection = 'TB';
         editorStoreState.renamingNodeName = undefined;
 
@@ -363,6 +372,84 @@ describe('WorkflowNode', () => {
                 'References disabled nodes action_1, action_3 — they will not run, so this value will not resolve'
             )
         ).toBeInTheDocument();
+    });
+
+    describe('trigger disable action', () => {
+        const WEBHOOK_TRIGGER_DATA = {
+            componentName: 'webhook',
+            label: 'Webhook',
+            name: 'trigger_1',
+            operationName: 'webhook',
+            trigger: true,
+            type: 'webhook/v1/webhook',
+            workflowNodeName: 'trigger_1',
+        } as unknown as NodeDataType;
+
+        it('shows Disable on a trigger when another trigger is enabled', () => {
+            dataStoreState.triggers = [
+                {name: 'trigger_1', type: 'webhook/v1/webhook'},
+                {name: 'trigger_2', type: 'schedule/v1/schedule'},
+            ];
+
+            renderNode(WEBHOOK_TRIGGER_DATA, 'trigger_1');
+
+            expect(recordedContextMenuProps.value?.showDisableAction).toBe(true);
+        });
+
+        it('hides Disable on the last enabled trigger', () => {
+            dataStoreState.triggers = [
+                {name: 'trigger_1', type: 'webhook/v1/webhook'},
+                {disabled: true, name: 'trigger_2', type: 'schedule/v1/schedule'},
+            ];
+
+            renderNode(WEBHOOK_TRIGGER_DATA, 'trigger_1');
+
+            expect(recordedContextMenuProps.value?.showDisableAction).toBe(false);
+        });
+
+        it('hides Disable on a manual trigger', () => {
+            dataStoreState.triggers = [
+                {name: 'trigger_3', type: 'manual/v1/manual'},
+                {name: 'trigger_2', type: 'schedule/v1/schedule'},
+            ];
+
+            renderNode(MANUAL_TRIGGER_DATA, 'trigger_3');
+
+            expect(recordedContextMenuProps.value?.showDisableAction).toBe(false);
+        });
+
+        it('counts a manual trigger as enabled even when it is marked disabled', () => {
+            dataStoreState.triggers = [
+                {disabled: true, name: 'trigger_3', type: 'manual/v1/manual'},
+                {name: 'trigger_1', type: 'webhook/v1/webhook'},
+            ];
+
+            renderNode(WEBHOOK_TRIGGER_DATA, 'trigger_1');
+
+            expect(recordedContextMenuProps.value?.showDisableAction).toBe(true);
+        });
+
+        it('shows Enable on a disabled trigger', () => {
+            dataStoreState.triggers = [
+                {name: 'trigger_2', type: 'schedule/v1/schedule'},
+                {disabled: true, name: 'trigger_1', type: 'webhook/v1/webhook'},
+            ];
+
+            renderNode({...WEBHOOK_TRIGGER_DATA, disabled: true} as NodeDataType, 'trigger_1');
+
+            expect(recordedContextMenuProps.value?.showDisableAction).toBe(true);
+            expect((recordedContextMenuProps.value?.data as NodeDataType).disabled).toBe(true);
+        });
+
+        it('renders a disabled trigger muted with the Disabled badge', () => {
+            renderNode({...WEBHOOK_TRIGGER_DATA, disabled: true} as NodeDataType, 'trigger_1');
+
+            const nodeBox = screen.getByRole('button', {name: 'trigger_1 node'}).closest('[data-nodetype]');
+
+            expect(nodeBox?.className).toContain('opacity-50');
+            expect(nodeBox?.className).toContain('grayscale');
+            expect(screen.getByTitle('Disabled — skipped during execution')).toBeInTheDocument();
+        });
     });
 
     it('keeps TB condition labels on the node, beside the stem', () => {
