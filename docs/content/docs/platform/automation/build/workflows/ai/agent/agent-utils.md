@@ -128,7 +128,15 @@ The agent sees its workspace as `/workspace`, never as a path on the server. Eac
 
 Every tool has an advanced **Workspace Name** option (letters, digits, `-` and `_`, default `default`). Tools in the same workflow with the same workspace name share files, even when they belong to different AI Agents, so a file written by File System Tools is visible to Grep Tool and Shell Tools. Tools with different names do not share files, even within one agent; give them different names to keep their files apart.
 
-Editor test runs get a fresh workspace per run, removed after 24 hours. Deployed workflows keep their workspace between runs.
+Editor test runs get a fresh workspace per run. Deployed workflows keep their workspace between runs.
+
+Each ByteChef server removes old workspaces from its own disk once an hour ([`BYTECHEF_AI_AGENT_UTILS_WORKSPACE_CLEANUP_INTERVAL`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)):
+
+- the workspaces of editor test runs, 24 hours after the run ([`BYTECHEF_AI_AGENT_UTILS_WORKSPACE_TEST_RETENTION`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration));
+- the workspaces of a deleted project deployment or integration instance, of a workflow removed from it, and of a deleted tenant;
+- optionally, deployed workspaces nothing has changed for a set time ([`BYTECHEF_AI_AGENT_UTILS_WORKSPACE_IDLE_RETENTION`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)). This is off by default.
+
+Removal happens on the next cleanup, not at the moment you delete something. On a deployment with several servers, each server cleans up its own workspaces.
 
 > **Coming soon.** The workspace size limit is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 
