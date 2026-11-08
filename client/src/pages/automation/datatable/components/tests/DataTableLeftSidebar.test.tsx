@@ -222,8 +222,8 @@ describe('DataTableLeftSidebar', () => {
         });
     });
 
-    describe('delete dialog', () => {
-        it('should open delete confirmation dialog when delete is clicked', async () => {
+    describe('delete action', () => {
+        it('should set the table to delete when delete is clicked', async () => {
             const user = userEvent.setup();
 
             renderWithProviders(<DataTableLeftSidebar />);
@@ -231,15 +231,15 @@ describe('DataTableLeftSidebar', () => {
             const menuButtons = screen.getAllByRole('button', {name: 'Table menu'});
 
             await user.click(menuButtons[0]);
+            await user.click(screen.getByText('Delete'));
 
-            const deleteOption = screen.getByText('Delete');
+            const {tableIdToDelete, tableNameToDelete} = useDeleteDataTableAlertDialogStore.getState();
 
-            await user.click(deleteOption);
-
-            expect(screen.getByText('Are you absolutely sure?')).toBeInTheDocument();
+            expect(tableIdToDelete).toBe('table-1');
+            expect(tableNameToDelete).toBe('Alpha');
         });
 
-        it('should close delete dialog when cancel is clicked', async () => {
+        it('should not render the delete dialog itself', async () => {
             const user = userEvent.setup();
 
             renderWithProviders(<DataTableLeftSidebar />);
@@ -247,21 +247,14 @@ describe('DataTableLeftSidebar', () => {
             const menuButtons = screen.getAllByRole('button', {name: 'Table menu'});
 
             await user.click(menuButtons[0]);
-
-            const deleteOption = screen.getByText('Delete');
-
-            await user.click(deleteOption);
-
-            const cancelButton = screen.getByRole('button', {name: 'Cancel'});
-
-            await user.click(cancelButton);
+            await user.click(screen.getByText('Delete'));
 
             expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
         });
     });
 
-    describe('rename dialog', () => {
-        it('should open rename dialog when rename is clicked', async () => {
+    describe('rename action', () => {
+        it('should set the table to rename when rename is clicked', async () => {
             const user = userEvent.setup();
 
             renderWithProviders(<DataTableLeftSidebar />);
@@ -269,15 +262,15 @@ describe('DataTableLeftSidebar', () => {
             const menuButtons = screen.getAllByRole('button', {name: 'Table menu'});
 
             await user.click(menuButtons[0]);
+            await user.click(screen.getByText('Rename'));
 
-            const renameOption = screen.getByText('Rename');
+            const {baseName, tableIdToRename} = useRenameDataTableDialogStore.getState();
 
-            await user.click(renameOption);
-
-            expect(screen.getByText('Rename Table')).toBeInTheDocument();
+            expect(tableIdToRename).toBe('table-1');
+            expect(baseName).toBe('Alpha');
         });
 
-        it('should show input with current table name in rename dialog', async () => {
+        it('should not render the rename dialog itself', async () => {
             const user = userEvent.setup();
 
             renderWithProviders(<DataTableLeftSidebar />);
@@ -285,32 +278,7 @@ describe('DataTableLeftSidebar', () => {
             const menuButtons = screen.getAllByRole('button', {name: 'Table menu'});
 
             await user.click(menuButtons[0]);
-
-            const renameOption = screen.getByText('Rename');
-
-            await user.click(renameOption);
-
-            const input = screen.getByRole('textbox');
-
-            expect(input).toHaveValue('Alpha');
-        });
-
-        it('should close rename dialog when cancel is clicked', async () => {
-            const user = userEvent.setup();
-
-            renderWithProviders(<DataTableLeftSidebar />);
-
-            const menuButtons = screen.getAllByRole('button', {name: 'Table menu'});
-
-            await user.click(menuButtons[0]);
-
-            const renameOption = screen.getByText('Rename');
-
-            await user.click(renameOption);
-
-            const cancelButton = screen.getByRole('button', {name: 'Cancel'});
-
-            await user.click(cancelButton);
+            await user.click(screen.getByText('Rename'));
 
             expect(screen.queryByText('Rename Table')).not.toBeInTheDocument();
         });
