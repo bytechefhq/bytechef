@@ -37,8 +37,6 @@ export interface GetOAuth2AuthorizationParametersRequest {
     componentName: string;
     /**
      * The id of a connection whose credentials are being updated.
-     * @type {number}
-     * @memberof GetOAuth2AuthorizationParametersRequest
      */
     connectionId?: number;
     /**

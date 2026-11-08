@@ -41,8 +41,6 @@ export interface OAuth2 {
     scopes?: { [key: string]: string; };
     /**
      * Opaque, server-sealed state the client must post back with the authorization code.
-     * @type {string}
-     * @memberof OAuth2
      */
     authorizationContext?: string;
 }
