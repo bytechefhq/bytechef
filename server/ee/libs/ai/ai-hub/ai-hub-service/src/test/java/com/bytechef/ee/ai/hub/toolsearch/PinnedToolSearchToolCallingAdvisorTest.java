@@ -360,6 +360,103 @@ class PinnedToolSearchToolCallingAdvisorTest {
             .isEqualTo(Map.of("listComponents", catalogTool));
     }
 
+    @Test
+    void testChatToolsJoinTheRunCatalogAndOnlyTheUncataloguedOnesAreIndexedForTheThread() {
+        when(toolCallingManager.resolveToolDefinitions(any())).thenThrow(new IllegalStateException("no embedding"));
+
+        ToolCallback catalogTool = toolCallback("listComponents");
+        ToolCallback clusterElementCatalogTool = toolCallback("slack_sendMessage");
+        ToolCallback pinnedSlackTool = toolCallback("slack_sendMessage");
+        ToolCallback pinnedGithubTool = toolCallback("github_createIssue");
+        ToolCallback mcpTool = toolCallback("search_docs");
+        ToolCallback collidingMcpTool = toolCallback("listComponents");
+
+        Map<String, ToolCallback> catalogToolCallbacks = new LinkedHashMap<>();
+
+        catalogToolCallbacks.put("listComponents", catalogTool);
+        catalogToolCallbacks.put("slack_sendMessage", clusterElementCatalogTool);
+
+        Map<String, List<ToolCallback>> indexedToolCallbacks = new LinkedHashMap<>();
+
+        PinnedToolSearchToolCallingAdvisor advisor = new PinnedToolSearchToolCallingAdvisor(
+            toolCallingManager, toolIndex, 5, ChatMemory.CONVERSATION_ID, () -> catalogToolCallbacks, () -> {},
+            indexedToolCallbacks::put);
+
+        Map<String, ToolCallback> componentToolCallbacks = new LinkedHashMap<>();
+
+        componentToolCallbacks.put("slack_sendMessage", pinnedSlackTool);
+        componentToolCallbacks.put("github_createIssue", pinnedGithubTool);
+
+        Map<String, ToolCallback> additionalToolCallbacks = new LinkedHashMap<>();
+
+        additionalToolCallbacks.put("search_docs", mcpTool);
+        additionalToolCallbacks.put("listComponents", collidingMcpTool);
+
+        ChatClientRequest request = ChatClientRequest.builder()
+            .prompt(
+                new Prompt(
+                    List.of(new SystemMessage("base system"), new UserMessage("hi")),
+                    ToolCallingChatOptions.builder()
+                        .toolCallbacks(toolCallback("askUserQuestion"))
+                        .build()))
+            .context(ChatMemory.CONVERSATION_ID, "thread-1")
+            .context(
+                PinnedToolSearchToolCallingAdvisor.USER_TOOL_CALLBACKS_KEY,
+                new PinnedToolSearchToolCallingAdvisor.UserToolCallbacks(
+                    "thread-1", componentToolCallbacks, additionalToolCallbacks))
+            .build();
+
+        ChatClientRequest afterBeforeCall = advisor.doBeforeCall(advisor.doInitializeLoop(request, null), null);
+
+        ToolCallingChatOptions toolCallingChatOptions = (ToolCallingChatOptions) afterBeforeCall.prompt()
+            .getOptions();
+
+        assertThat(toolCallingChatOptions.getToolContext())
+            .extractingByKey(RunCatalogToolCallingManager.RUN_CATALOG_TOOL_CALLBACKS_KEY)
+            .isEqualTo(
+                Map.of(
+                    "listComponents", catalogTool, "slack_sendMessage", pinnedSlackTool, "github_createIssue",
+                    pinnedGithubTool, "search_docs", mcpTool));
+        assertThat(indexedToolCallbacks).containsOnlyKeys("thread-1");
+        assertThat(indexedToolCallbacks.get("thread-1")).containsExactly(pinnedGithubTool, mcpTool);
+    }
+
+    @Test
+    void testAFailingChatToolIndexerDoesNotFailTheTurn() {
+        when(toolCallingManager.resolveToolDefinitions(any())).thenThrow(new IllegalStateException("no embedding"));
+
+        ToolCallback mcpTool = toolCallback("search_docs");
+
+        PinnedToolSearchToolCallingAdvisor advisor = new PinnedToolSearchToolCallingAdvisor(
+            toolCallingManager, toolIndex, 5, ChatMemory.CONVERSATION_ID, Map::of, () -> {},
+            (threadId, toolCallbacks) -> {
+                throw new IllegalStateException("pgvector down");
+            });
+
+        ChatClientRequest request = ChatClientRequest.builder()
+            .prompt(
+                new Prompt(
+                    List.of(new SystemMessage("base system"), new UserMessage("hi")),
+                    ToolCallingChatOptions.builder()
+                        .toolCallbacks(toolCallback("askUserQuestion"))
+                        .build()))
+            .context(ChatMemory.CONVERSATION_ID, "thread-1")
+            .context(
+                PinnedToolSearchToolCallingAdvisor.USER_TOOL_CALLBACKS_KEY,
+                new PinnedToolSearchToolCallingAdvisor.UserToolCallbacks(
+                    "thread-1", Map.of(), Map.of("search_docs", mcpTool)))
+            .build();
+
+        ChatClientRequest afterBeforeCall = advisor.doBeforeCall(advisor.doInitializeLoop(request, null), null);
+
+        ToolCallingChatOptions toolCallingChatOptions = (ToolCallingChatOptions) afterBeforeCall.prompt()
+            .getOptions();
+
+        assertThat(toolCallingChatOptions.getToolContext())
+            .extractingByKey(RunCatalogToolCallingManager.RUN_CATALOG_TOOL_CALLBACKS_KEY)
+            .isEqualTo(Map.of("search_docs", mcpTool));
+    }
+
     private PinnedToolSearchToolCallingAdvisor newAdvisor(List<ToolCallback> catalogToolCallbacks) {
         Map<String, ToolCallback> catalogToolCallbacksByName = catalogToolCallbacks.stream()
             .collect(Collectors.toMap(

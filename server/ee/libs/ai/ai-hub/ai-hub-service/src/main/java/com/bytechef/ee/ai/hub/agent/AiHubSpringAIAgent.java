@@ -107,6 +107,7 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
     private final @Nullable AiGuardrails aiGuardrails;
     private final @Nullable AiGuardrailMetrics aiGuardrailMetrics;
+
     @FunctionalInterface
     public interface ChatToolBindingResolver {
 

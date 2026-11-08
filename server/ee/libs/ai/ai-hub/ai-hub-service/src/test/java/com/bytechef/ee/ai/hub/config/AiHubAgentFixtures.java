@@ -262,7 +262,8 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubAskSpringAIAgent(
             sessionMemory, defaultChatModel, askToolCallbacks(), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider(), availableProvider(aiGuardrails), availableProvider(meterRegistry));
+            toolSearchAdvisorProvider(), availableProvider(aiGuardrails), availableProvider(meterRegistry),
+            availableProvider(null));
     }
 
     private AiHubSpringAIAgent buildAgent(
@@ -282,7 +283,8 @@ public final class AiHubAgentFixtures {
         return configuration.aiHubBuildSpringAIAgent(
             sessionMemory, defaultChatModel, buildToolCallbacks(catalog), securityContextRehydrator, approvalGate,
             inFlightRunRegistryProvider(), overrideChatClientResolverProvider, webSearchToolCallbackProviderProvider(),
-            toolSearchAdvisorProvider(), availableProvider(aiGuardrails), availableProvider(meterRegistry));
+            toolSearchAdvisorProvider(), availableProvider(aiGuardrails), availableProvider(meterRegistry),
+            availableProvider(null));
     }
 
     public AiHubModeToolCallbacks askToolCallbacks() {
@@ -297,7 +299,8 @@ public final class AiHubAgentFixtures {
             availableProvider(projectCodeWorkflowFacade), interactivePickerToolCallbacks, intelligentToolCatalog,
             workspaceFacade, projectWorkflowFacade, chatService, chatAccessPolicy, policy, sessionMemory,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
-            availableProvider(aiGuardrails), availableProvider(meterRegistry));
+            availableProvider(aiGuardrails), availableProvider(meterRegistry),
+            availableProvider(null));
     }
 
     public AiHubGlobalToolCatalog askGlobalToolCatalog() {
@@ -330,7 +333,8 @@ public final class AiHubAgentFixtures {
             availableProvider(environmentService),
             chatService, chatAccessPolicy, artifactRecorder, policy, sessionMemory,
             availableProvider(embeddingProviderStatusProvider), availableProvider(copilotPgVectorStore),
-            availableProvider(aiGuardrails), availableProvider(meterRegistry));
+            availableProvider(aiGuardrails), availableProvider(meterRegistry),
+            availableProvider(null));
     }
 
     @SuppressWarnings("unchecked")

@@ -252,6 +252,93 @@ class ToolSearchCatalogFeederIntTest {
         assertThat(rowCount(ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID)).isEqualTo(1);
     }
 
+    @Test
+    void testAThreadsChatToolsAreFoundOnlyByThatThreadsSearch() {
+        String threadOneSessionId = ToolSearchCatalogFeeder.userSessionId(Mode.BUILD, "thread-1");
+
+        newFeeder().populateUserTools(
+            threadOneSessionId, List.of(toolCallback("search_docs", "Search the project docs")));
+        newFeeder().populateGlobalTools(
+            ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID,
+            List.of(toolCallback("listComponents", "List every component")));
+
+        CatalogToolIndex catalogToolIndex = new CatalogToolIndex(
+            pgVectorStore, Set.of(ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID),
+            threadId -> ToolSearchCatalogFeeder.userSessionId(Mode.BUILD, threadId));
+
+        assertThat(searchToolNames(catalogToolIndex, "thread-1", "project")).containsExactly("search_docs");
+        assertThat(searchToolNames(catalogToolIndex, "thread-2", "project")).isEmpty();
+        assertThat(searchToolNames(catalogToolIndex, "thread-2", "component")).containsExactly("listComponents");
+    }
+
+    @Test
+    void testUnchangedChatToolsAreNotReembeddedAndRemovingThemClearsTheSession() {
+        String sessionId = ToolSearchCatalogFeeder.userSessionId(Mode.ASK, "thread-1");
+        List<ToolCallback> toolCallbacks = List.of(toolCallback("search_docs", "Search the project docs"));
+
+        newFeeder().populateUserTools(sessionId, toolCallbacks);
+
+        List<String> idsBefore = rowIds(sessionId);
+
+        newFeeder().populateUserTools(sessionId, toolCallbacks);
+
+        assertThat(rowIds(sessionId)).isEqualTo(idsBefore)
+            .hasSize(1);
+
+        newFeeder().populateUserTools(sessionId, List.of());
+
+        assertThat(rowCount(sessionId)).isZero();
+    }
+
+    @Test
+    void testAThreadWithoutChatToolsWritesNoMetaRow() {
+        String sessionId = ToolSearchCatalogFeeder.userSessionId(Mode.ASK, "thread-1");
+
+        newFeeder().populateUserTools(sessionId, List.of());
+
+        Integer metaRows = jdbcTemplate.queryForObject(
+            "SELECT count(*) FROM public." + ToolSearchCatalogFeeder.META_TABLE_NAME + " WHERE session_id = ?",
+            Integer.class, sessionId);
+
+        assertThat(metaRows).isZero();
+    }
+
+    @Test
+    void testDeletingAChatClearsItsChatToolSessionsInBothModes() {
+        ToolSearchCatalogFeeder toolSearchCatalogFeeder = newFeeder();
+
+        toolSearchCatalogFeeder.populateUserTools(
+            ToolSearchCatalogFeeder.userSessionId(Mode.ASK, "thread-1"),
+            List.of(toolCallback("search_docs", "Search the project docs")));
+        toolSearchCatalogFeeder.populateUserTools(
+            ToolSearchCatalogFeeder.userSessionId(Mode.BUILD, "thread-1"),
+            List.of(toolCallback("create_page", "Create a project page")));
+        toolSearchCatalogFeeder.populateUserTools(
+            ToolSearchCatalogFeeder.userSessionId(Mode.BUILD, "thread-2"),
+            List.of(toolCallback("create_page", "Create a project page")));
+
+        new ToolSearchSessionEvictor(List::of, () -> toolSearchCatalogFeeder)
+            .onChatDeleted(new AiHubChatDeletedEvent(1L, "thread-1"));
+
+        assertThat(rowCount(ToolSearchCatalogFeeder.userSessionId(Mode.ASK, "thread-1"))).isZero();
+        assertThat(rowCount(ToolSearchCatalogFeeder.userSessionId(Mode.BUILD, "thread-1"))).isZero();
+        assertThat(rowCount(ToolSearchCatalogFeeder.userSessionId(Mode.BUILD, "thread-2"))).isEqualTo(1);
+
+        toolSearchCatalogFeeder.populateUserTools(
+            ToolSearchCatalogFeeder.userSessionId(Mode.ASK, "thread-1"),
+            List.of(toolCallback("search_docs", "Search the project docs")));
+
+        assertThat(rowCount(ToolSearchCatalogFeeder.userSessionId(Mode.ASK, "thread-1"))).isEqualTo(1);
+    }
+
+    private static List<String> searchToolNames(CatalogToolIndex catalogToolIndex, String threadId, String query) {
+        return catalogToolIndex.search(new ToolSearchRequest(threadId, query, 5, null))
+            .toolReferences()
+            .stream()
+            .map(ToolReference::toolName)
+            .toList();
+    }
+
     private static ToolSearchCatalogFeeder newFeeder() {
         return newFeeder("OPENAI:text-embedding-3-small:4");
     }
