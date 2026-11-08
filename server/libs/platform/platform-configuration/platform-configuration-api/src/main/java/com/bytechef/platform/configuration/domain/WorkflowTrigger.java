@@ -22,6 +22,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.util.Collections;
@@ -39,6 +40,7 @@ import org.springframework.util.Assert;
 public class WorkflowTrigger implements Serializable, Trigger {
 
     private String description;
+    private boolean disabled;
     private final Map<String, Object> extensions = new HashMap<>();
     private Map<String, ?> metadata = new HashMap<>();
     private String name;
@@ -53,6 +55,8 @@ public class WorkflowTrigger implements Serializable, Trigger {
         for (Map.Entry<String, ?> entry : source.entrySet()) {
             if (WorkflowConstants.DESCRIPTION.equals(entry.getKey())) {
                 this.description = MapUtils.getString(source, WorkflowConstants.DESCRIPTION);
+            } else if (WorkflowConstants.DISABLED.equals(entry.getKey())) {
+                this.disabled = MapUtils.getBoolean(source, WorkflowConstants.DISABLED, false);
             } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
                 this.label = MapUtils.getString(source, WorkflowConstants.LABEL);
             } else if (WorkflowConstants.METADATA.equals(entry.getKey())) {
@@ -79,6 +83,14 @@ public class WorkflowTrigger implements Serializable, Trigger {
 
     public static List<WorkflowTrigger> of(Workflow workflow) {
         return workflow.getExtensions(WorkflowExtConstants.TRIGGERS, WorkflowTrigger.class, List.of());
+    }
+
+    public static List<WorkflowTrigger> ofEnabled(Workflow workflow) {
+        List<WorkflowTrigger> workflowTriggers = of(workflow);
+
+        return workflowTriggers.stream()
+            .filter(WorkflowTrigger::isEnabled)
+            .toList();
     }
 
     public static WorkflowTrigger of(String triggerName, Workflow workflow) {
@@ -125,6 +137,23 @@ public class WorkflowTrigger implements Serializable, Trigger {
     @Override
     public int hashCode() {
         return Objects.hash(label, name, parameters, timeout, type);
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    /**
+     * Manual triggers are always enabled, regardless of the disabled flag.
+     */
+    public boolean isEnabled() {
+        if (!disabled) {
+            return true;
+        }
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+        return "manual".equals(workflowNodeType.name());
     }
 
     public String getDescription() {
@@ -183,6 +212,10 @@ public class WorkflowTrigger implements Serializable, Trigger {
             map.put(WorkflowConstants.DESCRIPTION, description);
         }
 
+        if (disabled) {
+            map.put(WorkflowConstants.DISABLED, true);
+        }
+
         if (label != null) {
             map.put(WorkflowConstants.LABEL, label);
         }
@@ -210,6 +243,7 @@ public class WorkflowTrigger implements Serializable, Trigger {
             "name='" + name + '\'' +
             ", label='" + label + '\'' +
             ", description='" + description + '\'' +
+            ", disabled=" + disabled +
             ", timeout='" + timeout + '\'' +
             ", type='" + type + '\'' +
             ", parameters=" + parameters +
