@@ -246,6 +246,36 @@ class AppEventTriggerApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "user-1")
+    void testIntegrationWorkflowWithDisabledTriggerIsNotDispatched() {
+        stubConnectedUser("user-1", 1L);
+
+        List<IntegrationWorkflow> integrationWorkflows = stubIntegrationWorkflows(5L, "int-wf-1", "int-wf-2");
+
+        IntegrationWorkflow enabledIntegrationWorkflow = integrationWorkflows.get(0);
+        IntegrationWorkflow disabledIntegrationWorkflow = integrationWorkflows.get(1);
+
+        when(webhookWorkflowExecutor.isWorkflowDisabled(any(WorkflowExecutionId.class)))
+            .thenAnswer(invocation -> {
+                WorkflowExecutionId workflowExecutionId = invocation.getArgument(0);
+
+                return Objects.equals(
+                    workflowExecutionId.getWorkflowUuid(), disabledIntegrationWorkflow.getUuidAsString());
+            });
+
+        postAppEvent();
+
+        ArgumentCaptor<WorkflowExecutionId> workflowExecutionIdCaptor =
+            ArgumentCaptor.forClass(WorkflowExecutionId.class);
+
+        verify(webhookWorkflowExecutor).executeAsync(workflowExecutionIdCaptor.capture(), any(WebhookRequest.class));
+
+        Assertions.assertEquals(
+            enabledIntegrationWorkflow.getUuidAsString(), workflowExecutionIdCaptor.getValue()
+                .getWorkflowUuid());
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
     void testReferenceWithoutAppEventTriggerIsSkipped() {
         stubConnectedUser("user-1", 1L);
 

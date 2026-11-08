@@ -192,10 +192,15 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
                 IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
                     workflowId);
 
-                workflowExecutionIds.add(
-                    WorkflowExecutionId.of(
-                        PlatformType.EMBEDDED, integrationInstance.getId(), integrationWorkflow.getUuidAsString(),
-                        appEventTriggerName));
+                WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+                    PlatformType.EMBEDDED, integrationInstance.getId(), integrationWorkflow.getUuidAsString(),
+                    appEventTriggerName);
+
+                if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
+                    continue;
+                }
+
+                workflowExecutionIds.add(workflowExecutionId);
             }
         }
 
@@ -373,7 +378,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
     }
 
     private static String findAppEventTriggerName(Workflow workflow) {
-        return WorkflowTrigger.of(workflow)
+        return WorkflowTrigger.ofEnabled(workflow)
             .stream()
             .map(workflowTrigger -> {
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
