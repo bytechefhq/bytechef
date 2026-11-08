@@ -59,10 +59,20 @@ public class AgentWorkspaceResolver {
     private static final Pattern WORKSPACE_NAME_PATTERN = Pattern.compile("[A-Za-z0-9_-]{1,64}");
 
     private final @Nullable Path basedir;
+    private final long workspaceMaxBytes;
 
     public AgentWorkspaceResolver(@Nullable Path basedir) {
+        this(basedir, 0);
+    }
+
+    public AgentWorkspaceResolver(@Nullable Path basedir, long workspaceMaxBytes) {
         this.basedir = basedir == null ? null : basedir.toAbsolutePath()
             .normalize();
+        this.workspaceMaxBytes = workspaceMaxBytes;
+    }
+
+    public AgentWorkspaceQuota getQuota(AgentWorkspace workspace) {
+        return new AgentWorkspaceQuota(workspace.root(), workspaceMaxBytes);
     }
 
     public static ModifiableStringProperty workspaceNameProperty() {

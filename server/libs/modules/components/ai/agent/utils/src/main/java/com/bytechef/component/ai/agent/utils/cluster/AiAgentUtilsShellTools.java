@@ -23,7 +23,9 @@ import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.ai.agent.utils.cluster.exec.DockerExecBackendRegistry;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspace;
+import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceQuota;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver;
+import com.bytechef.component.ai.agent.utils.cluster.workspace.ShellQuotaToolCallback;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.WorkspacePathToolCallback;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -34,6 +36,7 @@ import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderF
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +45,7 @@ import org.springaicommunity.agent.common.exec.ExecBackend;
 import org.springaicommunity.agent.exec.LocalExecBackend;
 import org.springaicommunity.agent.tools.ShellTools;
 import org.springframework.ai.support.ToolCallbacks;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
@@ -107,14 +111,19 @@ public class AiAgentUtilsShellTools {
             .execBackend(createExecBackend(execBackend, workspace.root()))
             .build();
 
+        AgentWorkspaceQuota quota = agentWorkspaceResolver.getQuota(workspace);
+
+        ToolCallback[] toolCallbacks = Arrays.stream(ToolCallbacks.from(shellTools))
+            .map(toolCallback -> ShellQuotaToolCallback.wrap(toolCallback, quota))
+            .toArray(ToolCallback[]::new);
+
         if (LOCAL.equals(execBackend)) {
             return WorkspacePathToolCallback.wrap(
-                ToolCallbacks.from(shellTools), workspace.withHostPaths(), LOCAL_WORKSPACE_DESCRIPTION, Set.of(),
-                Set.of());
+                toolCallbacks, workspace.withHostPaths(), LOCAL_WORKSPACE_DESCRIPTION, Set.of(), Set.of());
         }
 
         return WorkspacePathToolCallback.wrap(
-            ToolCallbacks.from(shellTools), workspace, DOCKER_WORKSPACE_DESCRIPTION, Set.of(), Set.of());
+            toolCallbacks, workspace, DOCKER_WORKSPACE_DESCRIPTION, Set.of(), Set.of());
     }
 
     private ExecBackend createExecBackend(String execBackend, Path workspaceRoot) {

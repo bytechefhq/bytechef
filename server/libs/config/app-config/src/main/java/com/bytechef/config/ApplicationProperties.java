@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 
 /**
  * Application configuration properties. Contains all configurable properties for the platform, including AI, messaging,
@@ -1056,13 +1057,22 @@ public class ApplicationProperties {
                  * Base directory under which each tenant's agents get their own workspace directory
                  */
                 private String basedir;
+                private DataSize maxSize;
 
                 public String getBasedir() {
                     return basedir;
                 }
 
+                public DataSize getMaxSize() {
+                    return maxSize;
+                }
+
                 public void setBasedir(String basedir) {
                     this.basedir = basedir;
+                }
+
+                public void setMaxSize(DataSize maxSize) {
+                    this.maxSize = maxSize;
                 }
             }
         }
