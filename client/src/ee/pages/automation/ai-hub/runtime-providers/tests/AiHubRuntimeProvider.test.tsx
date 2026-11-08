@@ -560,6 +560,34 @@ describe('buildAiHubSubscriber', () => {
         });
     });
 
+    describe('openDataTableTab', () => {
+        it('opens a data table tab when the openDataTableTab tool result arrives', () => {
+            deliverToolResult(
+                createSubscriber(),
+                'call-data-table',
+                'openDataTableTab',
+                JSON.stringify({dataTableId: '5', name: 'Leads', opened: true})
+            );
+
+            expect(aiHubTabsStore.getState().openTabs[0]).toMatchObject({
+                dataTableId: '5',
+                kind: 'dataTable',
+                name: 'Leads',
+            });
+        });
+
+        it('opens no tab when the tool reports an error', () => {
+            deliverToolResult(
+                createSubscriber(),
+                'call-data-table',
+                'openDataTableTab',
+                JSON.stringify({error: 'dataTableId is required'})
+            );
+
+            expect(aiHubTabsStore.getState().openTabs).toHaveLength(0);
+        });
+    });
+
     describe('openFileTab', () => {
         it('opens a file tab when the openFileTab tool result arrives', () => {
             deliverToolResult(

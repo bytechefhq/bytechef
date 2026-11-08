@@ -2,8 +2,11 @@ import Button from '@/components/Button/Button';
 import {ToggleGroup, ToggleGroupItem} from '@/components/ui/toggle-group';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiHubAiAgentViewer from '@/ee/pages/automation/ai-hub/AiHubAiAgentViewer';
+import AiHubDataTableViewer from '@/ee/pages/automation/ai-hub/AiHubDataTableViewer';
 import AiHubFilePicker from '@/ee/pages/automation/ai-hub/AiHubFilePicker';
 import AiHubFileViewer from '@/ee/pages/automation/ai-hub/AiHubFileViewer';
+import AiHubKnowledgeBaseViewer from '@/ee/pages/automation/ai-hub/AiHubKnowledgeBaseViewer';
+import AiHubWorkflowExecutionViewer from '@/ee/pages/automation/ai-hub/AiHubWorkflowExecutionViewer';
 import AiHubWorkflowViewer from '@/ee/pages/automation/ai-hub/AiHubWorkflowViewer';
 import WorkflowTabLabel from '@/ee/pages/automation/ai-hub/WorkflowTabLabel';
 import {
@@ -17,9 +20,12 @@ import {
     BlocksIcon,
     BotIcon,
     CodeIcon,
+    DatabaseIcon,
     DownloadIcon,
     ExternalLinkIcon,
     FileTextIcon,
+    HistoryIcon,
+    LayersIcon,
     PanelRightIcon,
     XIcon,
 } from 'lucide-react';
@@ -32,7 +38,10 @@ const TAB_ICONS: Record<Exclude<AiHubTabType['kind'], 'workflow'>, ReactNode> = 
     aiAgent: <BotIcon className="size-3.5 shrink-0" />,
     codeWorkflow: <CodeIcon className="size-3.5 shrink-0" />,
     customComponent: <BlocksIcon className="size-3.5 shrink-0" />,
+    dataTable: <DatabaseIcon className="size-3.5 shrink-0" />,
     file: <FileTextIcon className="size-3.5 shrink-0" />,
+    knowledgeBase: <LayersIcon className="size-3.5 shrink-0" />,
+    workflowExecution: <HistoryIcon className="size-3.5 shrink-0" />,
 };
 
 const TEXTUAL_FILE_EXTENSIONS = new Set([
@@ -81,8 +90,25 @@ const AiHubResourcePanelTabContent = ({tab}: {tab: AiHubTabType}) => {
             );
         case 'customComponent':
             return <CustomComponentDetail customComponentId={tab.customComponentId} key={tab.customComponentId} />;
+        case 'dataTable':
+            return <AiHubDataTableViewer dataTableId={tab.dataTableId} key={tab.dataTableId} name={tab.name} />;
         case 'file':
             return <AiHubFileViewer fileId={tab.fileId} key={tab.fileId} name={tab.name} viewMode={tab.viewMode} />;
+        case 'knowledgeBase':
+            return (
+                <AiHubKnowledgeBaseViewer
+                    key={tab.knowledgeBaseId}
+                    knowledgeBaseId={tab.knowledgeBaseId}
+                    name={tab.name}
+                />
+            );
+        case 'workflowExecution':
+            return (
+                <AiHubWorkflowExecutionViewer
+                    key={tab.workflowExecutionId}
+                    workflowExecutionId={tab.workflowExecutionId}
+                />
+            );
         case 'workflow':
             return <AiHubWorkflowViewer projectId={tab.projectId} projectWorkflowId={tab.projectWorkflowId} />;
     }

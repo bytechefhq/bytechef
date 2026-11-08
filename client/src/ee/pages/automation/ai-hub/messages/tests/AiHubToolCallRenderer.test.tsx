@@ -95,6 +95,7 @@ describe('AiHubToolCallRenderer', () => {
                 'openAiAgentTab',
                 'openCodeWorkflowTab',
                 'openCustomComponentTab',
+                'openDataTableTab',
                 'openFileTab',
                 'openWorkflowTab',
             ]);

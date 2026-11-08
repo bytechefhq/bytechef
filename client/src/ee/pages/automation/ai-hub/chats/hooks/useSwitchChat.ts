@@ -2,6 +2,7 @@ import {
     isAiAgentArtifactKind,
     isCodeWorkflowArtifactKind,
     isCustomComponentArtifactKind,
+    isDataTableArtifactKind,
     isFileArtifactKind,
     isWorkflowArtifactKind,
     parseArtifactMetadata,
@@ -424,6 +425,13 @@ function artifactToOpenToolCall(artifact: AiHubChatArtifactI): OpenToolCallI | n
 
     if (isFileArtifactKind(artifact.kind)) {
         return {args: {fileId: artifact.artifactId, name: artifact.artifactName}, toolName: 'openFileTab'};
+    }
+
+    if (isDataTableArtifactKind(artifact.kind)) {
+        return {
+            args: {dataTableId: artifact.artifactId, name: artifact.artifactName},
+            toolName: 'openDataTableTab',
+        };
     }
 
     if (isCustomComponentArtifactKind(artifact.kind)) {

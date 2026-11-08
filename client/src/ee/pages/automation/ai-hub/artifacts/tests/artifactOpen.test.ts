@@ -183,4 +183,53 @@ describe('artifactOpen', () => {
         expect(isArtifactRemovable(buildArtifact({kind: 'WORKFLOW_CREATED'}))).toBe(false);
         expect(isArtifactRemovable(buildArtifact({kind: 'WORKFLOW_UPDATED'}))).toBe(false);
     });
+
+    it('opens a data table tab for a DATA_TABLE_REFERENCED artifact', () => {
+        handleArtifactQuickOpen(
+            buildArtifact({artifactId: '5', artifactName: 'Leads', kind: 'DATA_TABLE_REFERENCED', metadataJson: null})
+        );
+
+        expect(aiHubTabsStore.getState().openTabs[0]).toMatchObject({dataTableId: '5', kind: 'dataTable'});
+    });
+
+    it('opens a knowledge base tab for a KB_REFERENCED artifact', () => {
+        handleArtifactQuickOpen(
+            buildArtifact({artifactId: '9', artifactName: 'Handbook', kind: 'KB_REFERENCED', metadataJson: null})
+        );
+
+        expect(aiHubTabsStore.getState().openTabs[0]).toMatchObject({kind: 'knowledgeBase', knowledgeBaseId: '9'});
+    });
+
+    it('opens a workflow execution tab for a started workflow execution artifact', () => {
+        handleArtifactQuickOpen(
+            buildArtifact({
+                artifactId: '77',
+                artifactName: 'Run',
+                kind: 'WORKFLOW_EXECUTION_STARTED',
+                metadataJson: null,
+            })
+        );
+
+        expect(aiHubTabsStore.getState().openTabs[0]).toMatchObject({
+            kind: 'workflowExecution',
+            workflowExecutionId: 77,
+        });
+    });
+
+    it('is clickable but not removable for the data table, knowledge base and execution references', () => {
+        const dataTableArtifact = buildArtifact({kind: 'DATA_TABLE_REFERENCED', metadataJson: null});
+        const knowledgeBaseArtifact = buildArtifact({kind: 'KB_REFERENCED', metadataJson: null});
+        const executionArtifact = buildArtifact({artifactId: '77', kind: 'WORKFLOW_EXECUTION_REFERENCED'});
+
+        expect(isArtifactClickable(dataTableArtifact)).toBe(true);
+        expect(isArtifactClickable(knowledgeBaseArtifact)).toBe(true);
+        expect(isArtifactClickable(executionArtifact)).toBe(true);
+        expect(isArtifactRemovable(dataTableArtifact)).toBe(false);
+    });
+
+    it('is not clickable for a workflow execution artifact without a numeric id', () => {
+        expect(isArtifactClickable(buildArtifact({artifactId: 'exec-1', kind: 'WORKFLOW_EXECUTION_STARTED'}))).toBe(
+            false
+        );
+    });
 });

@@ -35,6 +35,27 @@ export interface AiHubFileTabI {
     viewMode: AiHubViewModeType;
 }
 
+export interface AiHubDataTableTabI {
+    dataTableId: string;
+    id: string;
+    kind: 'dataTable';
+    name: string;
+}
+
+export interface AiHubKnowledgeBaseTabI {
+    id: string;
+    kind: 'knowledgeBase';
+    knowledgeBaseId: string;
+    name: string;
+}
+
+export interface AiHubWorkflowExecutionTabI {
+    id: string;
+    kind: 'workflowExecution';
+    name: string;
+    workflowExecutionId: number;
+}
+
 export interface AiHubWorkflowTabI {
     id: string;
     kind: 'workflow';
@@ -45,7 +66,16 @@ export interface AiHubWorkflowTabI {
 }
 
 export type AiHubTabType =
-    AiHubAiAgentTabI | AiHubCodeWorkflowTabI | AiHubCustomComponentTabI | AiHubFileTabI | AiHubWorkflowTabI;
+    | AiHubAiAgentTabI
+    | AiHubCodeWorkflowTabI
+    | AiHubCustomComponentTabI
+    | AiHubDataTableTabI
+    | AiHubFileTabI
+    | AiHubKnowledgeBaseTabI
+    | AiHubWorkflowExecutionTabI
+    | AiHubWorkflowTabI;
+
+type AiHubNamedResourceTabType = AiHubDataTableTabI | AiHubKnowledgeBaseTabI | AiHubWorkflowExecutionTabI;
 
 export interface OpenAiAgentTabArgsI {
     aiAgentId: string;
@@ -91,8 +121,11 @@ interface AiHubTabsStateI {
     openAiAgentTab: (aiAgent: OpenAiAgentTabArgsI) => string;
     openCodeWorkflowTab: (codeWorkflow: OpenCodeWorkflowTabArgsI) => string;
     openCustomComponentTab: (customComponent: OpenCustomComponentTabArgsI) => string;
+    openDataTableTab: (dataTableId: string, name: string) => string;
     openFileTab: (fileId: string, name: string) => string;
+    openKnowledgeBaseTab: (knowledgeBaseId: string, name: string) => string;
     openTabs: AiHubTabType[];
+    openWorkflowExecutionTab: (workflowExecutionId: number, name: string) => string;
     /**
      * Opens a workflow tab, or focuses the existing one. A workflow tab is project-scoped: opening another workflow of
      * a project that already has a tab re-points that tab instead of adding a second one.
@@ -154,11 +187,48 @@ export const getTabGenericId = (tab: AiHubTabType): string => {
             return tab.projectId;
         case 'customComponent':
             return tab.customComponentId;
+        case 'dataTable':
+            return tab.dataTableId;
         case 'file':
             return tab.fileId;
+        case 'knowledgeBase':
+            return tab.knowledgeBaseId;
+        case 'workflowExecution':
+            return String(tab.workflowExecutionId);
         case 'workflow':
             return tab.workflowId;
     }
+};
+
+const openNamedResourceTab = (
+    state: AiHubTabsStateI,
+    newTab: AiHubNamedResourceTabType
+): {nextState: AiHubTabsStateI; tabId: string} => {
+    const existing = state.openTabs.find(
+        (tab) => tab.kind === newTab.kind && getTabGenericId(tab) === getTabGenericId(newTab)
+    );
+
+    if (existing) {
+        return {
+            nextState: {
+                ...state,
+                activeTabId: existing.id,
+                openTabs: state.openTabs.map((tab) => (tab.id === existing.id ? {...tab, name: newTab.name} : tab)),
+                rightPanelOpen: true,
+            },
+            tabId: existing.id,
+        };
+    }
+
+    return {
+        nextState: {
+            ...state,
+            activeTabId: newTab.id,
+            openTabs: [...state.openTabs, newTab],
+            rightPanelOpen: true,
+        },
+        tabId: newTab.id,
+    };
 };
 
 export const attachTab = (open: () => string): {ownsTab: boolean; tabId: string} => {
@@ -325,6 +395,24 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
 
                     return tabIdToReturn;
                 },
+                openDataTableTab: (dataTableId, name) => {
+                    let tabIdToReturn = '';
+
+                    set((state) => {
+                        const {nextState, tabId} = openNamedResourceTab(state, {
+                            dataTableId,
+                            id: getRandomId(),
+                            kind: 'dataTable',
+                            name,
+                        });
+
+                        tabIdToReturn = tabId;
+
+                        return nextState;
+                    });
+
+                    return tabIdToReturn;
+                },
                 openFileTab: (fileId, name) => {
                     let tabIdToReturn = '';
 
@@ -361,7 +449,43 @@ export const aiHubTabsStore = create<AiHubTabsStateI>()(
 
                     return tabIdToReturn;
                 },
+                openKnowledgeBaseTab: (knowledgeBaseId, name) => {
+                    let tabIdToReturn = '';
+
+                    set((state) => {
+                        const {nextState, tabId} = openNamedResourceTab(state, {
+                            id: getRandomId(),
+                            kind: 'knowledgeBase',
+                            knowledgeBaseId,
+                            name,
+                        });
+
+                        tabIdToReturn = tabId;
+
+                        return nextState;
+                    });
+
+                    return tabIdToReturn;
+                },
                 openTabs: [],
+                openWorkflowExecutionTab: (workflowExecutionId, name) => {
+                    let tabIdToReturn = '';
+
+                    set((state) => {
+                        const {nextState, tabId} = openNamedResourceTab(state, {
+                            id: getRandomId(),
+                            kind: 'workflowExecution',
+                            name,
+                            workflowExecutionId,
+                        });
+
+                        tabIdToReturn = tabId;
+
+                        return nextState;
+                    });
+
+                    return tabIdToReturn;
+                },
                 openWorkflowTab: ({name, projectId, projectWorkflowId, workflowId}) => {
                     let tabIdToReturn = '';
 

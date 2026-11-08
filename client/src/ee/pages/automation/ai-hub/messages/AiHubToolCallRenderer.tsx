@@ -11,6 +11,7 @@ import {
     ChevronDownIcon,
     ChevronRightIcon,
     CodeIcon,
+    DatabaseIcon,
     FileTextIcon,
     Loader2Icon,
     WorkflowIcon,
@@ -146,6 +147,7 @@ const ARTIFACT_OPEN_META: Record<string, {icon: ComponentType<{className?: strin
     openAiAgentTab: {icon: BotIcon, kind: 'AI Agent'},
     openCodeWorkflowTab: {icon: CodeIcon, kind: 'Code Workflow'},
     openCustomComponentTab: {icon: BlocksIcon, kind: 'Custom Component'},
+    openDataTableTab: {icon: DatabaseIcon, kind: 'Data Table'},
     openFileTab: {icon: FileTextIcon, kind: 'File'},
     openWorkflowTab: {icon: WorkflowIcon, kind: 'Workflow'},
 };
@@ -159,6 +161,8 @@ const openArtifactTab = (toolName: string, args: Record<string, unknown> | undef
         aiHubTabsStore.getState().openAiAgentTab({aiAgentId: args.aiAgentId, name});
     } else if (toolName === 'openFileTab' && typeof args?.fileId === 'string' && args.fileId) {
         aiHubTabsStore.getState().openFileTab(args.fileId, name);
+    } else if (toolName === 'openDataTableTab' && args?.dataTableId != null && args.dataTableId !== '') {
+        aiHubTabsStore.getState().openDataTableTab(String(args.dataTableId), name);
     } else if (
         toolName === 'openCustomComponentTab' &&
         args?.customComponentId != null &&

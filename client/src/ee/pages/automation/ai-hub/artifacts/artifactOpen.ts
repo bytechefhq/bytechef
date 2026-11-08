@@ -13,6 +13,18 @@ export function isAiAgentArtifactKind(kind: AiHubArtifactKindType): boolean {
     return kind === 'AI_AGENT_REFERENCED';
 }
 
+export function isDataTableArtifactKind(kind: AiHubArtifactKindType): boolean {
+    return kind === 'DATA_TABLE_REFERENCED';
+}
+
+export function isKnowledgeBaseArtifactKind(kind: AiHubArtifactKindType): boolean {
+    return kind === 'KB_REFERENCED';
+}
+
+export function isWorkflowExecutionArtifactKind(kind: AiHubArtifactKindType): boolean {
+    return kind === 'WORKFLOW_EXECUTION_REFERENCED' || kind === 'WORKFLOW_EXECUTION_STARTED';
+}
+
 export function isFileArtifactKind(kind: AiHubArtifactKindType): boolean {
     return kind === 'FILE_REFERENCED';
 }
@@ -85,6 +97,28 @@ export function handleArtifactQuickOpen(artifact: AiHubChatArtifactI): void {
         return;
     }
 
+    if (isDataTableArtifactKind(artifact.kind)) {
+        aiHubTabsStore.getState().openDataTableTab(artifact.artifactId, artifact.artifactName);
+
+        return;
+    }
+
+    if (isKnowledgeBaseArtifactKind(artifact.kind)) {
+        aiHubTabsStore.getState().openKnowledgeBaseTab(artifact.artifactId, artifact.artifactName);
+
+        return;
+    }
+
+    if (isWorkflowExecutionArtifactKind(artifact.kind)) {
+        const workflowExecutionId = Number(artifact.artifactId);
+
+        if (Number.isFinite(workflowExecutionId) && workflowExecutionId > 0) {
+            aiHubTabsStore.getState().openWorkflowExecutionTab(workflowExecutionId, artifact.artifactName);
+        }
+
+        return;
+    }
+
     if (isCustomComponentArtifactKind(artifact.kind)) {
         aiHubTabsStore
             .getState()
@@ -136,9 +170,15 @@ export function isArtifactClickable(artifact: AiHubChatArtifactI): boolean {
         isAiAgentArtifactKind(artifact.kind) ||
         isCodeWorkflowArtifactKind(artifact.kind) ||
         isCustomComponentArtifactKind(artifact.kind) ||
-        isFileArtifactKind(artifact.kind)
+        isDataTableArtifactKind(artifact.kind) ||
+        isFileArtifactKind(artifact.kind) ||
+        isKnowledgeBaseArtifactKind(artifact.kind)
     ) {
         return true;
+    }
+
+    if (isWorkflowExecutionArtifactKind(artifact.kind)) {
+        return Number(artifact.artifactId) > 0;
     }
 
     if (!isWorkflowArtifactKind(artifact.kind)) {

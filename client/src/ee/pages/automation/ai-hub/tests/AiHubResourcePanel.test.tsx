@@ -17,6 +17,24 @@ vi.mock('@/ee/pages/automation/ai-hub/AiHubFileViewer', () => ({
     ),
 }));
 
+vi.mock('@/ee/pages/automation/ai-hub/AiHubDataTableViewer', () => ({
+    default: ({dataTableId}: {dataTableId: string}) => (
+        <div data-testid="data-table-viewer">{`dataTable:${dataTableId}`}</div>
+    ),
+}));
+
+vi.mock('@/ee/pages/automation/ai-hub/AiHubKnowledgeBaseViewer', () => ({
+    default: ({knowledgeBaseId}: {knowledgeBaseId: string}) => (
+        <div data-testid="knowledge-base-viewer">{`knowledgeBase:${knowledgeBaseId}`}</div>
+    ),
+}));
+
+vi.mock('@/ee/pages/automation/ai-hub/AiHubWorkflowExecutionViewer', () => ({
+    default: ({workflowExecutionId}: {workflowExecutionId: number}) => (
+        <div data-testid="workflow-execution-viewer">{`workflowExecution:${workflowExecutionId}`}</div>
+    ),
+}));
+
 vi.mock('@/ee/pages/automation/ai-hub/AiHubFilePicker', () => ({
     default: () => <button type="button">Open file</button>,
 }));
@@ -60,6 +78,27 @@ describe('AiHubResourcePanel', () => {
             rightPanelOpen: true,
             snapshotsByChatId: {},
         });
+    });
+
+    it.each([
+        [{dataTableId: '5', id: 'dt', kind: 'dataTable' as const, name: 'Leads'}, 'data-table-viewer', 'dataTable:5'],
+        [
+            {id: 'kb', kind: 'knowledgeBase' as const, knowledgeBaseId: '9', name: 'Handbook'},
+            'knowledge-base-viewer',
+            'knowledgeBase:9',
+        ],
+        [
+            {id: 'we', kind: 'workflowExecution' as const, name: 'Nightly sync', workflowExecutionId: 77},
+            'workflow-execution-viewer',
+            'workflowExecution:77',
+        ],
+    ])('renders the %o tab body', (tab, testId, text) => {
+        aiHubTabsStore.setState({activeTabId: tab.id, openTabs: [tab]});
+
+        renderPanel();
+
+        expect(screen.getByTestId(testId)).toHaveTextContent(text);
+        expect(screen.getByText(tab.name)).toBeInTheDocument();
     });
 
     it('renders the active workflow tab body', () => {

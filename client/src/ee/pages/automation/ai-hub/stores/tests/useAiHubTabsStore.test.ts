@@ -446,4 +446,40 @@ describe('useAiHubTabsStore', () => {
             expect(inferDefaultViewMode(name)).toBe(viewMode);
         });
     });
+
+    describe('data table, knowledge base and workflow execution tabs', () => {
+        it('opens one tab per resource and renames it when reopened', () => {
+            const dataTableTabId = aiHubTabsStore.getState().openDataTableTab('5', 'Leads');
+            const knowledgeBaseTabId = aiHubTabsStore.getState().openKnowledgeBaseTab('9', 'Handbook');
+            const workflowExecutionTabId = aiHubTabsStore.getState().openWorkflowExecutionTab(77, 'Nightly sync');
+
+            const reopenedDataTableTabId = aiHubTabsStore.getState().openDataTableTab('5', 'Qualified leads');
+
+            const state = aiHubTabsStore.getState();
+
+            expect(reopenedDataTableTabId).toBe(dataTableTabId);
+            expect(state.openTabs).toHaveLength(3);
+            expect(state.activeTabId).toBe(dataTableTabId);
+            expect(state.rightPanelOpen).toBe(true);
+            expect(state.openTabs[0]).toMatchObject({dataTableId: '5', kind: 'dataTable', name: 'Qualified leads'});
+            expect(state.openTabs[1]).toMatchObject({id: knowledgeBaseTabId, kind: 'knowledgeBase'});
+            expect(state.openTabs[2]).toMatchObject({id: workflowExecutionTabId, workflowExecutionId: 77});
+        });
+
+        it('keeps a data table and a knowledge base with the same id apart', () => {
+            const dataTableTabId = aiHubTabsStore.getState().openDataTableTab('5', 'Leads');
+            const knowledgeBaseTabId = aiHubTabsStore.getState().openKnowledgeBaseTab('5', 'Handbook');
+
+            expect(knowledgeBaseTabId).not.toBe(dataTableTabId);
+            expect(aiHubTabsStore.getState().openTabs).toHaveLength(2);
+        });
+
+        it('derives the generic id of each new tab kind', () => {
+            aiHubTabsStore.getState().openDataTableTab('5', 'Leads');
+            aiHubTabsStore.getState().openKnowledgeBaseTab('9', 'Handbook');
+            aiHubTabsStore.getState().openWorkflowExecutionTab(77, 'Nightly sync');
+
+            expect(aiHubTabsStore.getState().openTabs.map(getTabGenericId)).toEqual(['5', '9', '77']);
+        });
+    });
 });
