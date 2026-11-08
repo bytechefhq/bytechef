@@ -1,9 +1,24 @@
 import PageLoader from '@/components/PageLoader';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
+    AiEvalScoreDataType,
+    AiEvalScoreSource,
     AiObservabilitySpanType as AiObservabilitySpanTypeEnum,
+    useAiEvalScoresByTraceQuery,
+    useAiExperimentRunByTraceIdQuery,
     useAiObservabilityTraceQuery,
+    useCreateAiEvalScoreMutation,
 } from '@/shared/middleware/graphql';
-import {ArrowLeftIcon, ChevronDownIcon, ChevronRightIcon} from 'lucide-react';
+import {useQueryClient} from '@tanstack/react-query';
+import {
+    ArrowLeftIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
+    FlaskConicalIcon,
+    StarIcon,
+    ThumbsDownIcon,
+    ThumbsUpIcon,
+} from 'lucide-react';
 import {useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -65,14 +80,24 @@ function buildSpanTree(spans: AiObservabilitySpanType[]): SpanTreeNodeI[] {
     return roots;
 }
 
+interface SpanScoreI {
+    id: string;
+    name: string;
+    source: string;
+    stringValue?: string | null;
+    value?: number | null;
+}
+
 interface SpanNodeProps {
     depth: number;
     expandedSpanIds: Set<string>;
     node: SpanTreeNodeI;
+    onScoreSpan: (spanId: string, scoreValue: number) => void;
     onToggleExpand: (spanId: string) => void;
+    spanScores: Map<string, SpanScoreI[]>;
 }
 
-const SpanNode = ({depth, expandedSpanIds, node, onToggleExpand}: SpanNodeProps) => {
+const SpanNode = ({depth, expandedSpanIds, node, onScoreSpan, onToggleExpand, spanScores}: SpanNodeProps) => {
     const {span} = node;
     const isExpanded = expandedSpanIds.has(span.id);
 
@@ -193,6 +218,46 @@ const SpanNode = ({depth, expandedSpanIds, node, onToggleExpand}: SpanNodeProps)
                                 </pre>
                             </div>
                         )}
+
+                        <div className="mt-3 border-t pt-3" onClick={(event) => event.stopPropagation()}>
+                            <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                                <StarIcon className="size-3" />
+
+                                <span>Span Scores ({(spanScores.get(span.id) ?? []).length})</span>
+                            </div>
+
+                            {(spanScores.get(span.id) ?? []).length > 0 && (
+                                <div className="mb-2 flex flex-wrap gap-1">
+                                    {(spanScores.get(span.id) ?? []).map((spanScore) => (
+                                        <span className="rounded bg-muted px-2 py-0.5 text-xs" key={spanScore.id}>
+                                            {`${spanScore.name}: ${
+                                                spanScore.value != null
+                                                    ? Number(spanScore.value).toFixed(2)
+                                                    : spanScore.stringValue || '-'
+                                            }`}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground">Quick score:</span>
+
+                                <button
+                                    className="flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-surface-success-secondary-hover"
+                                    onClick={() => onScoreSpan(span.id, 1)}
+                                >
+                                    <ThumbsUpIcon className="size-3" />
+                                </button>
+
+                                <button
+                                    className="flex items-center gap-1 rounded-md border px-2 py-1 text-xs hover:bg-surface-destructive-secondary"
+                                    onClick={() => onScoreSpan(span.id, 0)}
+                                >
+                                    <ThumbsDownIcon className="size-3" />
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
@@ -203,7 +268,9 @@ const SpanNode = ({depth, expandedSpanIds, node, onToggleExpand}: SpanNodeProps)
                     expandedSpanIds={expandedSpanIds}
                     key={childNode.span.id}
                     node={childNode}
+                    onScoreSpan={onScoreSpan}
                     onToggleExpand={onToggleExpand}
+                    spanScores={spanScores}
                 />
             ))}
         </div>
@@ -245,14 +312,96 @@ const TraceMetadata = ({metadata}: TraceMetadataProps) => {
 };
 
 const AiObservabilityTraceDetail = ({onBack, traceId}: AiObservabilityTraceDetailProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const queryClient = useQueryClient();
+
     const [expandedSpanIds, setExpandedSpanIds] = useState<Set<string>>(new Set());
-    const [spanView, setSpanView] = useState<'tree' | 'waterfall'>('tree');
 
     const {
         data: traceData,
         isError: traceIsError,
         isLoading: traceIsLoading,
     } = useAiObservabilityTraceQuery({id: traceId});
+
+    const {data: experimentRunData} = useAiExperimentRunByTraceIdQuery({traceId});
+
+    const experimentRun = experimentRunData?.aiExperimentRunByTraceId;
+
+    const {data: scoresData} = useAiEvalScoresByTraceQuery({
+        traceId: traceId,
+    });
+
+    const allScores = (scoresData?.aiEvalScoresByTrace ?? []).filter(
+        (score): score is NonNullable<typeof score> => score != null
+    );
+
+    const traceScores = allScores.filter((score) => !score.spanId);
+
+    const createScoreMutation = useCreateAiEvalScoreMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['aiEvalScoresByTrace']});
+        },
+    });
+
+    const isScoreSubmitting = createScoreMutation.isPending;
+
+    const handleQuickScore = (scoreValue: number) => {
+        if (currentWorkspaceId == null || isScoreSubmitting) {
+            return;
+        }
+
+        createScoreMutation.mutate({
+            dataType: AiEvalScoreDataType.Boolean,
+            name: 'quality',
+            source: AiEvalScoreSource.Manual,
+            traceId: traceId,
+            value: scoreValue,
+            workspaceId: String(currentWorkspaceId),
+        });
+    };
+
+    const handleSpanScore = useCallback(
+        (spanId: string, scoreValue: number) => {
+            if (currentWorkspaceId == null || createScoreMutation.isPending) {
+                return;
+            }
+
+            createScoreMutation.mutate({
+                dataType: AiEvalScoreDataType.Boolean,
+                name: 'quality',
+                source: AiEvalScoreSource.Manual,
+                spanId,
+                traceId: traceId,
+                value: scoreValue,
+                workspaceId: String(currentWorkspaceId),
+            });
+        },
+        [createScoreMutation, currentWorkspaceId, traceId]
+    );
+
+    const spanScoresMap = useMemo(() => {
+        const map = new Map<string, SpanScoreI[]>();
+
+        for (const score of allScores) {
+            if (!score.spanId) {
+                continue;
+            }
+
+            const list = map.get(score.spanId) ?? [];
+
+            list.push({
+                id: score.id,
+                name: score.name,
+                source: score.source,
+                stringValue: score.stringValue,
+                value: score.value,
+            });
+
+            map.set(score.spanId, list);
+        }
+
+        return map;
+    }, [allScores]);
 
     const trace = traceData?.aiObservabilityTrace;
 
@@ -276,6 +425,8 @@ const AiObservabilityTraceDetail = ({onBack, traceId}: AiObservabilityTraceDetai
     );
 
     const spanTree = useMemo(() => buildSpanTree(spans), [spans]);
+
+    const [spanView, setSpanView] = useState<'tree' | 'waterfall'>('tree');
 
     if (traceIsLoading) {
         return <PageLoader loading={true} />;
@@ -325,6 +476,20 @@ const AiObservabilityTraceDetail = ({onBack, traceId}: AiObservabilityTraceDetai
 
                 <span>Back to Traces</span>
             </button>
+
+            {experimentRun != null && (
+                <div className="mb-4 flex items-center gap-2 rounded-md border border-amber-300 bg-surface-warning-secondary px-4 py-3 text-sm dark:border-amber-700">
+                    <FlaskConicalIcon className="size-4 shrink-0 text-content-warning-primary" />
+
+                    <div className="flex-1">
+                        <span className="font-medium">{`This trace was generated by an experiment replay.`}</span>
+
+                        <span className="ml-2 text-muted-foreground">
+                            {`Experiment #${experimentRun.experimentId} · run #${experimentRun.id} · dataset item #${experimentRun.datasetItemId}`}
+                        </span>
+                    </div>
+                </div>
+            )}
 
             <div className="mb-6 rounded-lg border bg-card p-6">
                 <div className="mb-4 flex items-center gap-3">
@@ -376,6 +541,52 @@ const AiObservabilityTraceDetail = ({onBack, traceId}: AiObservabilityTraceDetai
                 {trace.metadata && <TraceMetadata metadata={trace.metadata} />}
             </div>
 
+            <div className="mb-6">
+                <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold">
+                    <StarIcon className="size-4" />
+
+                    <span>Scores ({traceScores.length})</span>
+                </h3>
+
+                {traceScores.length > 0 && (
+                    <div className="mb-3 flex flex-wrap gap-2">
+                        {traceScores.map((traceScore) => (
+                            <div className="rounded-md border px-3 py-2 text-sm" key={traceScore.id}>
+                                <span className="font-medium">{traceScore.name}:</span>
+
+                                <span className="ml-1">
+                                    {traceScore.value != null
+                                        ? Number(traceScore.value).toFixed(2)
+                                        : traceScore.stringValue || '-'}
+                                </span>
+
+                                <span className="ml-2 text-xs text-muted-foreground">{traceScore.source}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Quick score:</span>
+
+                    <button
+                        className="flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-surface-success-secondary-hover disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled={isScoreSubmitting}
+                        onClick={() => handleQuickScore(1)}
+                    >
+                        <ThumbsUpIcon className="size-3" />
+                    </button>
+
+                    <button
+                        className="flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-surface-destructive-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                        disabled={isScoreSubmitting}
+                        onClick={() => handleQuickScore(0)}
+                    >
+                        <ThumbsDownIcon className="size-3" />
+                    </button>
+                </div>
+            </div>
+
             <div className="mb-3 flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Spans</h3>
 
@@ -418,7 +629,9 @@ const AiObservabilityTraceDetail = ({onBack, traceId}: AiObservabilityTraceDetai
                             expandedSpanIds={expandedSpanIds}
                             key={rootNode.span.id}
                             node={rootNode}
+                            onScoreSpan={handleSpanScore}
                             onToggleExpand={handleToggleExpand}
+                            spanScores={spanScoresMap}
                         />
                     ))}
                 </div>

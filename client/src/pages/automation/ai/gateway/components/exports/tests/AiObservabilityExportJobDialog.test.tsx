@@ -10,6 +10,7 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 vi.mock('@/shared/middleware/graphql', () => ({
     AiObservabilityExportFormat: {Csv: 'CSV', Json: 'JSON', Jsonl: 'JSONL'},
     AiObservabilityExportScope: {
+        Prompts: 'PROMPTS',
         RequestLogs: 'REQUEST_LOGS',
         Sessions: 'SESSIONS',
         Traces: 'TRACES',

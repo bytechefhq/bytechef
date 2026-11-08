@@ -26,6 +26,7 @@ const SCOPE_OPTIONS: {label: string; value: AiObservabilityExportScope}[] = [
     {label: 'Traces', value: AiObservabilityExportScope.Traces},
     {label: 'Request Logs', value: AiObservabilityExportScope.RequestLogs},
     {label: 'Sessions', value: AiObservabilityExportScope.Sessions},
+    {label: 'Prompts', value: AiObservabilityExportScope.Prompts},
 ];
 
 const FORMAT_OPTIONS: {label: string; value: AiObservabilityExportFormat}[] = [

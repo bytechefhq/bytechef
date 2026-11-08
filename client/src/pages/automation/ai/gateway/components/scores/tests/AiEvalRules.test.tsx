@@ -1,8 +1,20 @@
-import {render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it} from 'vitest';
+import {fireEvent, render, screen, stubMutation} from '@/shared/util/test-utils';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AiEvalRuleType} from '../../../types';
 import AiEvalRules from '../AiEvalRules';
+
+vi.mock('@/shared/middleware/graphql', () => ({
+    useRunAiEvalRuleOnHistoricalTracesMutation: vi.fn(),
+}));
+
+const {useRunAiEvalRuleOnHistoricalTracesMutation} = await import('@/shared/middleware/graphql');
+
+const runOnHistoryMutation = stubMutation(vi.mocked(useRunAiEvalRuleOnHistoricalTracesMutation));
+
+beforeEach(() => {
+    runOnHistoryMutation.mutate.mockClear();
+});
 
 const evalRule: AiEvalRuleType = {
     createdDate: '1700000000000',
@@ -21,20 +33,47 @@ const evalRule: AiEvalRuleType = {
     workspaceId: '1',
 };
 
-describe('AiEvalRules', () => {
-    it('renders a row per eval rule', () => {
-        render(<AiEvalRules evalRules={[evalRule]} isLoading={false} />);
+const renderRules = () => {
+    render(<AiEvalRules evalRules={[evalRule]} isLoading={false} />);
+};
 
-        expect(screen.getByText('Helpfulness')).toBeInTheDocument();
-        expect(screen.getByText('gpt-4')).toBeInTheDocument();
-        expect(screen.getByText('50%')).toBeInTheDocument();
-        expect(screen.getByText('30s')).toBeInTheDocument();
-        expect(screen.getByText('Enabled')).toBeInTheDocument();
+const openHistoryDialog = () => {
+    fireEvent.click(screen.getByRole('button', {name: 'Run on History'}));
+};
+
+describe('AiEvalRules run-on-history dialog', () => {
+    it('renders with the dialog role', () => {
+        renderRules();
+
+        openHistoryDialog();
+
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
 
-    it('renders the empty state when there are no eval rules', () => {
-        render(<AiEvalRules evalRules={[]} isLoading={false} />);
+    it('names the dialog by its title', () => {
+        renderRules();
 
-        expect(screen.getByText('No Eval Rules')).toBeInTheDocument();
+        openHistoryDialog();
+
+        expect(screen.getByRole('dialog', {name: 'Run Helpfulness on History'})).toBeInTheDocument();
+    });
+
+    it('closes on Escape', () => {
+        renderRules();
+
+        openHistoryDialog();
+
+        fireEvent.keyDown(screen.getByRole('dialog'), {key: 'Escape'});
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('associates every label with its control', () => {
+        renderRules();
+
+        openHistoryDialog();
+
+        expect(screen.getByLabelText('Start Date')).toBeInTheDocument();
+        expect(screen.getByLabelText('End Date')).toBeInTheDocument();
     });
 });

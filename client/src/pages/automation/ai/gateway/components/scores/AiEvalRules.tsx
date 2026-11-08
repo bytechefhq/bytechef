@@ -1,6 +1,21 @@
+import Button from '@/components/Button/Button';
+import {
+    Dialog,
+    DialogBody,
+    DialogCancelButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogMain,
+} from '@/components/Dialog';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {BrainCircuitIcon} from 'lucide-react';
+import {Input} from '@/components/ui/input';
+import {Label} from '@/components/ui/label';
+import {useRunAiEvalRuleOnHistoricalTracesMutation} from '@/shared/middleware/graphql';
+import {BrainCircuitIcon, HistoryIcon} from 'lucide-react';
+import {useCallback, useState} from 'react';
+import {toast} from 'sonner';
 
 import {AiEvalRuleType} from '../../types';
 
@@ -9,7 +24,42 @@ interface AiEvalRulesProps {
     isLoading: boolean;
 }
 
+const toDateTimeLocal = (date: Date): string => {
+    const pad = (value: number) => String(value).padStart(2, '0');
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+};
+
 const AiEvalRules = ({evalRules, isLoading}: AiEvalRulesProps) => {
+    const defaultEnd = new Date();
+    const defaultStart = new Date(defaultEnd.getTime() - 24 * 60 * 60 * 1000);
+
+    const [historyRule, setHistoryRule] = useState<AiEvalRuleType | undefined>(undefined);
+    const [startDate, setStartDate] = useState(toDateTimeLocal(defaultStart));
+    const [endDate, setEndDate] = useState(toDateTimeLocal(defaultEnd));
+
+    const runHistoricalMutation = useRunAiEvalRuleOnHistoricalTracesMutation({
+        onSuccess: (data) => {
+            const count = data?.runAiEvalRuleOnHistoricalTraces ?? 0;
+
+            toast(`Queued ${count} trace${count === 1 ? '' : 's'} for re-evaluation.`);
+
+            setHistoryRule(undefined);
+        },
+    });
+
+    const handleRun = useCallback(() => {
+        if (!historyRule) {
+            return;
+        }
+
+        runHistoricalMutation.mutate({
+            endDate: new Date(endDate).getTime(),
+            ruleId: historyRule.id,
+            startDate: new Date(startDate).getTime(),
+        });
+    }, [endDate, historyRule, runHistoricalMutation, startDate]);
+
     if (isLoading) {
         return <PageLoader loading={true} />;
     }
@@ -38,6 +88,8 @@ const AiEvalRules = ({evalRules, isLoading}: AiEvalRulesProps) => {
                         <th className="px-3 py-2 font-medium">Delay</th>
 
                         <th className="px-3 py-2 font-medium">Status</th>
+
+                        <th className="px-3 py-2 font-medium">Actions</th>
                     </tr>
                 </thead>
 
@@ -63,10 +115,76 @@ const AiEvalRules = ({evalRules, isLoading}: AiEvalRulesProps) => {
                                     {rule.enabled ? 'Enabled' : 'Disabled'}
                                 </span>
                             </td>
+
+                            <td className="px-3 py-2">
+                                <button
+                                    className="flex items-center gap-1 text-xs text-content-brand-primary"
+                                    onClick={() => setHistoryRule(rule)}
+                                    title="Run on historical traces"
+                                >
+                                    <HistoryIcon className="size-3" />
+                                    Run on History
+                                </button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            {historyRule && (
+                <Dialog
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            setHistoryRule(undefined);
+                        }
+                    }}
+                    open
+                >
+                    <DialogContent aria-describedby={undefined}>
+                        <DialogMain>
+                            <DialogHeader title={`Run ${historyRule.name} on History`} />
+
+                            <DialogBody>
+                                <fieldset className="border-0">
+                                    <Label className="mb-1 block" htmlFor="ai-eval-rule-history-start-date">
+                                        Start Date
+                                    </Label>
+
+                                    <Input
+                                        id="ai-eval-rule-history-start-date"
+                                        onChange={(event) => setStartDate(event.target.value)}
+                                        type="datetime-local"
+                                        value={startDate}
+                                    />
+                                </fieldset>
+
+                                <fieldset className="border-0">
+                                    <Label className="mb-1 block" htmlFor="ai-eval-rule-history-end-date">
+                                        End Date
+                                    </Label>
+
+                                    <Input
+                                        id="ai-eval-rule-history-end-date"
+                                        onChange={(event) => setEndDate(event.target.value)}
+                                        type="datetime-local"
+                                        value={endDate}
+                                    />
+                                </fieldset>
+                            </DialogBody>
+
+                            <DialogFooter>
+                                <DialogCancelButton />
+
+                                <Button
+                                    disabled={runHistoricalMutation.isPending}
+                                    label={runHistoricalMutation.isPending ? 'Queuing...' : 'Run'}
+                                    onClick={handleRun}
+                                />
+                            </DialogFooter>
+                        </DialogMain>
+                    </DialogContent>
+                </Dialog>
+            )}
         </div>
     );
 };

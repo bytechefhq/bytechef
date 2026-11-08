@@ -219,6 +219,8 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
 
                                 <th className="pb-2 font-medium">Content</th>
 
+                                <th className="pb-2 font-medium">Metrics</th>
+
                                 <th className="pb-2 font-medium">Actions</th>
                             </tr>
                         </thead>
@@ -260,6 +262,31 @@ const AiPromptDetail = ({onBack, promptId}: AiPromptDetailProps) => {
                                             {version.content.substring(0, 50)}
 
                                             {version.content.length > 50 ? '...' : ''}
+                                        </td>
+
+                                        <td className="py-3 text-xs text-muted-foreground">
+                                            {version.metrics && version.metrics.invocationCount > 0 ? (
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span>{version.metrics.invocationCount} calls</span>
+
+                                                    {version.metrics.avgLatencyMs != null && (
+                                                        <span>{Math.round(version.metrics.avgLatencyMs)}ms avg</span>
+                                                    )}
+
+                                                    {version.metrics.avgCostUsd != null && (
+                                                        <span>${version.metrics.avgCostUsd.toFixed(4)} avg</span>
+                                                    )}
+
+                                                    {version.metrics.errorRate != null &&
+                                                        version.metrics.errorRate > 0 && (
+                                                            <span className="text-content-destructive">
+                                                                {(version.metrics.errorRate * 100).toFixed(1)}% errors
+                                                            </span>
+                                                        )}
+                                                </div>
+                                            ) : (
+                                                <span>-</span>
+                                            )}
                                         </td>
 
                                         <td className="py-3">
