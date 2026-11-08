@@ -47,6 +47,16 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
         new EmbeddedMcpServerApiKeyAuthenticationProvider(connectedUserService, mcpServerService);
 
     @Test
+    void testSupportsOnlyApiKeyToken() {
+        assertThat(
+            embeddedMcpServerApiKeyAuthenticationProvider.supports(EmbeddedMcpServerApiKeyAuthenticationToken.class))
+                .isTrue();
+        assertThat(
+            embeddedMcpServerApiKeyAuthenticationProvider.supports(EmbeddedMcpServerOAuth2AuthenticationToken.class))
+                .isFalse();
+    }
+
+    @Test
     void testAuthenticateReturnsAnonymousWhenAuthenticationNotRequired() {
         mockMcpServer(PlatformType.EMBEDDED, false);
 
