@@ -32,6 +32,10 @@ Setting up a connection is a quick process:
   External credential stores are on the upcoming release track and are not yet available in the latest released version of ByteChef. Once available: if your administrator has configured an external secret backend, the create dialog shows a **Credential storage** selector. Choosing a non-default store lets you toggle **Register existing credential** and reference a secret that already lives in that store by its path or UUID, instead of typing the credentials into ByteChef. The selector only appears when more than one credential store is available, and it cannot be changed after the connection is created.
 </Callout>
 
+<Callout type="warn" title="Coming soon">
+  Choosing a known MCP server is on the upcoming release track and is not yet available in the latest released version of ByteChef. Once available, the create dialog of an **MCP Client** connection shows a **Choose a known server** list above the server URL. Picking a server from ByteChef's MCP server catalog fills in its URL, transport type and authorization: servers that support dynamic client registration get **OAuth2 (PKCE)** with the URL fields left empty, so ByteChef discovers the authorization server and registers itself. OAuth servers that require PKCE get **OAuth2 (PKCE)** with their authorization URL, token URL and scopes, and you add the client id (and client secret, if the app has one) of an OAuth app registered with the server. Other OAuth servers get **OAuth2 (manual)** with their authorization URL, token URL and scopes. Every field stays editable, and you can skip the list and enter the server yourself. The list is hidden when the catalog cannot be fetched (see [`GITHUB_PROXY_BASE_URL`](/platform/use-bytechef/self-hosted/configuration/environment-variables#github-proxy-configuration)).
+</Callout>
+
 Connections are scoped to the currently selected **environment** (development, staging, or production). Use the environment selector in the left sidebar header to switch between them.
 
 ## Managing Connections
