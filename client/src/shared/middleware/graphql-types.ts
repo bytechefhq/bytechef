@@ -933,6 +933,7 @@ export enum AiObservabilityExportJobType {
 }
 
 export enum AiObservabilityExportScope {
+  Prompts = 'PROMPTS',
   RequestLogs = 'REQUEST_LOGS',
   Sessions = 'SESSIONS',
   Traces = 'TRACES'
@@ -1092,10 +1093,19 @@ export type AiPromptVersion = {
   createdDate?: Maybe<Scalars['Long']['output']>;
   environment?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  metrics?: Maybe<AiPromptVersionMetrics>;
   promptId: Scalars['ID']['output'];
   type: AiPromptVersionType;
   variables?: Maybe<Scalars['String']['output']>;
   versionNumber: Scalars['Int']['output'];
+};
+
+export type AiPromptVersionMetrics = {
+  __typename?: 'AiPromptVersionMetrics';
+  avgCostUsd?: Maybe<Scalars['Float']['output']>;
+  avgLatencyMs?: Maybe<Scalars['Float']['output']>;
+  errorRate?: Maybe<Scalars['Float']['output']>;
+  invocationCount: Scalars['Int']['output'];
 };
 
 export enum AiPromptVersionType {
@@ -2907,6 +2917,7 @@ export type Mutation = {
   renameDataTableColumn: Scalars['Boolean']['output'];
   revokeRegisteredClientGrant: Scalars['Boolean']['output'];
   revokeRegisteredClientGrants: Scalars['Boolean']['output'];
+  runAiEvalRuleOnHistoricalTraces?: Maybe<Scalars['Int']['output']>;
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
@@ -3856,6 +3867,13 @@ export type MutationRevokeRegisteredClientGrantArgs = {
 
 export type MutationRevokeRegisteredClientGrantsArgs = {
   registeredClientId: Scalars['ID']['input'];
+};
+
+
+export type MutationRunAiEvalRuleOnHistoricalTracesArgs = {
+  endDate: Scalars['Long']['input'];
+  ruleId: Scalars['ID']['input'];
+  startDate: Scalars['Long']['input'];
 };
 
 

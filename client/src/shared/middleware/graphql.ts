@@ -449,6 +449,15 @@ export type DeleteAiEvalRuleMutationVariables = Exact<{
 
 export type DeleteAiEvalRuleMutation = { deleteAiEvalRule: boolean | null };
 
+export type RunAiEvalRuleOnHistoricalTracesMutationVariables = Exact<{
+  ruleId: string | number;
+  startDate: any;
+  endDate: any;
+}>;
+
+
+export type RunAiEvalRuleOnHistoricalTracesMutation = { runAiEvalRuleOnHistoricalTraces: number | null };
+
 export type UpdateAiEvalRuleMutationVariables = Exact<{
   delaySeconds?: number | null | undefined;
   enabled: boolean;
@@ -1039,14 +1048,14 @@ export type AiPromptsQueryVariables = Exact<{
 }>;
 
 
-export type AiPromptsQuery = { aiPrompts: Array<{ createdDate: any, description: string | null, id: string, lastModifiedDate: any, name: string, projectId: string | null, version: number | null, versions: Array<{ active: boolean, commitMessage: string | null, content: string, createdBy: string, createdDate: any, environment: string | null, id: string, promptId: string, type: Types.AiPromptVersionType, variables: string | null, versionNumber: number } | null> | null } | null> | null };
+export type AiPromptsQuery = { aiPrompts: Array<{ createdDate: any, description: string | null, id: string, lastModifiedDate: any, name: string, projectId: string | null, version: number | null, versions: Array<{ active: boolean, commitMessage: string | null, content: string, createdBy: string, createdDate: any, environment: string | null, id: string, promptId: string, type: Types.AiPromptVersionType, variables: string | null, versionNumber: number, metrics: { avgCostUsd: number | null, avgLatencyMs: number | null, errorRate: number | null, invocationCount: number } | null } | null> | null } | null> | null };
 
 export type AiPromptQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
-export type AiPromptQuery = { aiPrompt: { createdDate: any, description: string | null, id: string, lastModifiedDate: any, name: string, projectId: string | null, version: number | null, versions: Array<{ active: boolean, commitMessage: string | null, content: string, createdBy: string, createdDate: any, environment: string | null, id: string, promptId: string, type: Types.AiPromptVersionType, variables: string | null, versionNumber: number } | null> | null } | null };
+export type AiPromptQuery = { aiPrompt: { createdDate: any, description: string | null, id: string, lastModifiedDate: any, name: string, projectId: string | null, version: number | null, versions: Array<{ active: boolean, commitMessage: string | null, content: string, createdBy: string, createdDate: any, environment: string | null, id: string, promptId: string, type: Types.AiPromptVersionType, variables: string | null, versionNumber: number, metrics: { avgCostUsd: number | null, avgLatencyMs: number | null, errorRate: number | null, invocationCount: number } | null } | null> | null } | null };
 
 export type CreateAiPromptMutationVariables = Exact<{
   input: Types.CreateAiPromptInput;
@@ -4987,6 +4996,29 @@ export const useDeleteAiEvalRuleMutation = <
   }
     )};
 
+export const RunAiEvalRuleOnHistoricalTracesDocument = new TypedDocumentString(`
+    mutation runAiEvalRuleOnHistoricalTraces($ruleId: ID!, $startDate: Long!, $endDate: Long!) {
+  runAiEvalRuleOnHistoricalTraces(
+    ruleId: $ruleId
+    startDate: $startDate
+    endDate: $endDate
+  )
+}
+    `);
+
+export const useRunAiEvalRuleOnHistoricalTracesMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RunAiEvalRuleOnHistoricalTracesMutation, TError, RunAiEvalRuleOnHistoricalTracesMutationVariables, TContext>) => {
+    
+    return useMutation<RunAiEvalRuleOnHistoricalTracesMutation, TError, RunAiEvalRuleOnHistoricalTracesMutationVariables, TContext>(
+      {
+    mutationKey: ['runAiEvalRuleOnHistoricalTraces'],
+    mutationFn: (variables?: RunAiEvalRuleOnHistoricalTracesMutationVariables) => fetcher<RunAiEvalRuleOnHistoricalTracesMutation, RunAiEvalRuleOnHistoricalTracesMutationVariables>(RunAiEvalRuleOnHistoricalTracesDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const UpdateAiEvalRuleDocument = new TypedDocumentString(`
     mutation updateAiEvalRule($delaySeconds: Int, $enabled: Boolean!, $filters: String, $id: ID!, $model: String!, $name: String!, $promptTemplate: String!, $samplingRate: Float!, $scoreConfigId: ID!) {
   updateAiEvalRule(
@@ -7335,6 +7367,12 @@ export const AiPromptsDocument = new TypedDocumentString(`
       createdDate
       environment
       id
+      metrics {
+        avgCostUsd
+        avgLatencyMs
+        errorRate
+        invocationCount
+      }
       promptId
       type
       variables
@@ -7378,6 +7416,12 @@ export const AiPromptDocument = new TypedDocumentString(`
       createdDate
       environment
       id
+      metrics {
+        avgCostUsd
+        avgLatencyMs
+        errorRate
+        invocationCount
+      }
       promptId
       type
       variables
