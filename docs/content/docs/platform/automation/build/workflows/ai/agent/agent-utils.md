@@ -69,6 +69,8 @@ A set of coding-agent-style tools for working with files and a shell: read, writ
 
 A separate **List Directory** tool is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 
+File System Tools, Glob Tool, Grep Tool and List Directory Tool are offered only when the server enables them ([`BYTECHEF_AI_AGENT_UTILS_FILE_SYSTEM_ENABLED`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)); otherwise they do not appear in the Tools slot. Shell Tools has its own setting, described below.
+
 #### Agent workspace
 
 Each of these tools works only inside the agent's own **workspace** directory; files outside it are not reachable through them. Workspaces live under the server's workspace base directory ([`BYTECHEF_AI_AGENT_UTILS_WORKSPACE_BASEDIR`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)), separated by tenant and then by the run's owner: the project deployment or integration instance, its environment and its workflow.
