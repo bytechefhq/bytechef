@@ -1,0 +1,3 @@
+mutation removeAiHubChatTool($workspaceId: ID!, $chatToolId: ID!) {
+    removeAiHubChatTool(workspaceId: $workspaceId, chatToolId: $chatToolId)
+}

@@ -18,6 +18,7 @@ import {
 } from '@/ee/pages/automation/ai-hub/runtime-providers/stores/useAiHubRunStateStore';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {aiHubTabsStore, getTabGenericId} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
+import ChatToolChips from '@/ee/pages/automation/ai-hub/tools/ChatToolChips';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
 import {useCancelAiHubRunMutation} from '@/shared/middleware/graphql';
@@ -189,6 +190,10 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
     return (
         <div className="mx-auto flex w-full max-w-[var(--thread-max-width,44rem)] flex-col gap-2 px-3 pb-2">
             <ComposerPrimitive.Root className="flex w-full flex-col rounded-2xl border border-border bg-muted/40 shadow-sm focus-within:border-foreground/20">
+                {chatId && currentWorkspaceId != null && (
+                    <ChatToolChips chatId={chatId} workspaceId={currentWorkspaceId} />
+                )}
+
                 {referencedResources.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 px-3 pt-2" data-testid="reference-chips">
                         {referencedResources.map((resource) => (

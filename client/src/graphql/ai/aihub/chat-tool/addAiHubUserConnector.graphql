@@ -1,0 +1,15 @@
+mutation addAiHubUserConnector(
+    $workspaceId: ID!
+    $componentName: String!
+    $componentVersion: Int!
+    $connectionId: ID
+    $environment: Int!
+) {
+    addAiHubUserConnector(
+        workspaceId: $workspaceId
+        componentName: $componentName
+        componentVersion: $componentVersion
+        connectionId: $connectionId
+        environment: $environment
+    )
+}

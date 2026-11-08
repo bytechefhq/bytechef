@@ -1,3 +1,4 @@
+import {CommandItem} from '@/components/ui/command';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -322,6 +323,68 @@ describe('ResourcePickerMenu', () => {
             await userEvent.click(screen.getByText('Show 5 more…'));
 
             expect(await screen.findByText('Workflow 24')).toBeInTheDocument();
+        });
+    });
+
+    describe('custom branches', () => {
+        const connectorsBranch = (onCloseSpy: () => void) => ({
+            key: 'connectors',
+            renderBranch: (onBack: () => void, onClose: () => void) => (
+                <>
+                    <CommandItem onSelect={onBack} value="branch-back">
+                        Branch back
+                    </CommandItem>
+
+                    <CommandItem
+                        onSelect={() => {
+                            onCloseSpy();
+                            onClose();
+                        }}
+                        value="branch-close"
+                    >
+                        Manage connectors
+                    </CommandItem>
+                </>
+            ),
+            renderRootItem: (onEnter: () => void) => (
+                <CommandItem onSelect={onEnter} value="root-connectors">
+                    Connectors
+                </CommandItem>
+            ),
+        });
+
+        it('lists a custom branch at the root and drills into its body', async () => {
+            await renderMenu({customBranches: [connectorsBranch(vi.fn())]});
+            await openMenu();
+
+            await userEvent.click(await screen.findByText('Connectors'));
+
+            expect(await screen.findByText('Manage connectors')).toBeInTheDocument();
+            expect(screen.queryByText('Workflows')).not.toBeInTheDocument();
+        });
+
+        it('returns to the root from the branch body', async () => {
+            await renderMenu({customBranches: [connectorsBranch(vi.fn())]});
+            await openMenu();
+
+            await userEvent.click(await screen.findByText('Connectors'));
+            await userEvent.click(await screen.findByText('Branch back'));
+
+            expect(await screen.findByText('Workflows')).toBeInTheDocument();
+        });
+
+        it('closes the picker from the branch body', async () => {
+            const onCloseSpy = vi.fn();
+            const onOpenChange = vi.fn();
+
+            await renderMenu({customBranches: [connectorsBranch(onCloseSpy)], onOpenChange});
+            await openMenu();
+
+            await userEvent.click(await screen.findByText('Connectors'));
+            await userEvent.click(await screen.findByText('Manage connectors'));
+
+            expect(onCloseSpy).toHaveBeenCalledTimes(1);
+            expect(onOpenChange).toHaveBeenLastCalledWith(false);
         });
     });
 });

@@ -6,7 +6,7 @@ import {useAiAgentsQuery} from '@/shared/middleware/graphql';
 import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {BotIcon, ChevronLeftIcon, ChevronRightIcon, WorkflowIcon} from 'lucide-react';
-import {ReactNode, useMemo, useState} from 'react';
+import {Fragment, ReactNode, useMemo, useState} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
 
 export interface ResourcePickerSelectionI {
@@ -17,8 +17,15 @@ export interface ResourcePickerSelectionI {
     projectWorkflowId?: number;
 }
 
+export interface ResourcePickerCustomBranchI {
+    key: string;
+    renderBranch: (onBack: () => void, onClose: () => void) => ReactNode;
+    renderRootItem: (onEnter: () => void) => ReactNode;
+}
+
 export interface ResourcePickerMenuPropsI {
     workspaceId: number;
+    customBranches?: ResourcePickerCustomBranchI[];
     open?: boolean;
     trigger: ReactNode;
     onOpenChange?: (open: boolean) => void;
@@ -36,13 +43,14 @@ interface WorkflowItemI {
 const SECTION_INITIAL_CAP = 20;
 const SECTION_EXPAND_INCREMENT = 50;
 
-type MenuPathType = [] | ['aiAgents'] | ['workflows'] | ['workflows', string];
+type MenuPathType = [] | ['aiAgents'] | ['workflows'] | ['workflows', string] | ['custom', string];
 
 const EmptyMessage = ({children}: {children: ReactNode}) => (
     <div className="py-6 text-center text-sm text-muted-foreground">{children}</div>
 );
 
 const ResourcePickerMenu = ({
+    customBranches,
     onOpenChange,
     onSelect,
     open: controlledOpen,
@@ -57,7 +65,7 @@ const ResourcePickerMenu = ({
     const [workflowsShowCount, setWorkflowsShowCount] = useState(SECTION_INITIAL_CAP);
 
     const open = controlledOpen ?? uncontrolledOpen;
-    const selectedProjectId = menuPath.length === 2 ? menuPath[1] : undefined;
+    const selectedProjectId = menuPath.length === 2 && menuPath[0] === 'workflows' ? menuPath[1] : undefined;
 
     const {data: projects, isLoading: projectsLoading} = useGetWorkspaceProjectsQuery(
         {id: workspaceId},
@@ -122,6 +130,14 @@ const ResourcePickerMenu = ({
                 projectWorkflowId: workflow.projectWorkflowId ?? 0,
             }));
     }, [lowerSearch, projectWorkflows, selectedProjectId, selectedWorkflowProject]);
+
+    const activeCustomBranch = useMemo(() => {
+        if (menuPath.length !== 2 || menuPath[0] !== 'custom') {
+            return null;
+        }
+
+        return customBranches?.find((branch) => branch.key === menuPath[1]) ?? null;
+    }, [customBranches, menuPath]);
 
     const showsWorkflowProjects =
         (menuPath.length === 1 && menuPath[0] === 'workflows') || (menuPath.length === 0 && debouncedSearch !== '');
@@ -209,7 +225,18 @@ const ResourcePickerMenu = ({
 
                                     <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                                 </CommandItem>
+
+                                {customBranches?.map((branch) => (
+                                    <Fragment key={`custom-branch-${branch.key}`}>
+                                        {branch.renderRootItem(() => navigateTo(['custom', branch.key]))}
+                                    </Fragment>
+                                ))}
                             </CommandGroup>
+                        ) : menuPath[0] === 'custom' ? (
+                            activeCustomBranch?.renderBranch(
+                                () => navigateTo([]),
+                                () => handleOpenChange(false)
+                            )
                         ) : (
                             <>
                                 {menuPath.length > 0 && (

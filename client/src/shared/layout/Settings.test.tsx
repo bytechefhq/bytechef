@@ -148,34 +148,40 @@ describe('Settings', () => {
         expect(screen.getByText('Users')).toBeInTheDocument();
     });
 
-    describe('AI Hub tool approvals entry', () => {
+    describe('AI Hub entries', () => {
         const aiHubNavGroup: SettingsNavItemI = {
-            items: [{href: 'ai-hub/tool-approvals', title: 'Tool Approvals'}],
+            items: [
+                {href: 'ai-hub/connectors', title: 'Connectors'},
+                {href: 'ai-hub/tool-approvals', title: 'Tool Approvals'},
+            ],
             title: 'AI Hub',
         };
 
-        it('shows the entry on the EE edition with the AI Hub enabled', () => {
+        it('shows the entries on the EE edition with the AI Hub enabled', () => {
             hoisted.aiHubEnabled = true;
 
             renderSettings([{title: 'Organization'}, aiHubNavGroup], '/automation/settings/ai-hub/tool-approvals');
 
+            expect(screen.getByRole('link', {name: 'Connectors'})).toBeInTheDocument();
             expect(screen.getByRole('link', {name: 'Tool Approvals'})).toBeInTheDocument();
         });
 
-        it('hides the entry and its group when the AI Hub is disabled', () => {
+        it('hides the entries and their group when the AI Hub is disabled', () => {
             renderSettings([{href: 'users', title: 'Users'}, aiHubNavGroup]);
 
             expect(screen.queryByText('AI Hub')).not.toBeInTheDocument();
+            expect(screen.queryByText('Connectors')).not.toBeInTheDocument();
             expect(screen.queryByText('Tool Approvals')).not.toBeInTheDocument();
         });
 
-        it('hides the entry on the CE edition even when the AI Hub is enabled', () => {
+        it('hides the entries on the CE edition even when the AI Hub is enabled', () => {
             hoisted.aiHubEnabled = true;
             hoisted.edition = 'CE';
 
             renderSettings([{href: 'users', title: 'Users'}, aiHubNavGroup]);
 
             expect(screen.queryByText('AI Hub')).not.toBeInTheDocument();
+            expect(screen.queryByText('Connectors')).not.toBeInTheDocument();
             expect(screen.queryByText('Tool Approvals')).not.toBeInTheDocument();
         });
     });

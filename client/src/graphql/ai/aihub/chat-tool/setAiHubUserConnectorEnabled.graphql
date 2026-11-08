@@ -1,0 +1,3 @@
+mutation setAiHubUserConnectorEnabled($workspaceId: ID!, $connectorId: ID!, $enabled: Boolean!) {
+    setAiHubUserConnectorEnabled(workspaceId: $workspaceId, connectorId: $connectorId, enabled: $enabled)
+}

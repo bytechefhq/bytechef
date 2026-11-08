@@ -43,6 +43,12 @@ vi.mock('@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu', () =>
     ),
 }));
 
+vi.mock('@/ee/pages/automation/ai-hub/tools/ChatToolChips', () => ({
+    default: ({chatId, workspaceId}: {chatId: string; workspaceId: number}) => (
+        <div data-chat-id={chatId} data-testid="chat-tool-chips" data-workspace-id={workspaceId} />
+    ),
+}));
+
 vi.mock('@/shared/middleware/graphql', () => ({
     useCancelAiHubRunMutation: () => ({mutate: cancelAiHubRunMock}),
 }));
@@ -107,6 +113,23 @@ describe('AiHubChatComposer', () => {
 
         expect(screen.getByRole('textbox', {name: 'Message input'})).toBeDisabled();
         expect(screen.getByRole('button', {name: 'Send message'})).toBeDisabled();
+    });
+
+    it('renders the chat tool chips for the open chat', () => {
+        renderComposer();
+
+        const chatToolChips = screen.getByTestId('chat-tool-chips');
+
+        expect(chatToolChips).toHaveAttribute('data-chat-id', 'thread-7');
+        expect(chatToolChips).toHaveAttribute('data-workspace-id', '3');
+    });
+
+    it('renders no chat tool chips on the home view', () => {
+        aiHubStore.setState({chatId: undefined});
+
+        renderComposer();
+
+        expect(screen.queryByTestId('chat-tool-chips')).toBeNull();
     });
 
     it('switches between Build and Ask mode', () => {
