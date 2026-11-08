@@ -36,7 +36,9 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacadeImpl;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -63,6 +65,7 @@ import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorag
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -128,16 +131,18 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @MockitoBean(types = {
     CacheManager.class, CategoryService.class, CodeWorkflowContainerFacade.class, CodeWorkflowContainerService.class,
     CodeWorkflowFileStorage.class,
-    ComponentConnectionFacade.class, ComponentDefinitionHelper.class, ConnectionFacade.class,
+    ComponentConnectionFacade.class, ComponentDefinitionHelper.class, ConnectionDefinitionService.class,
+    ConnectionFacade.class,
     ConnectionLifecycleFacade.class, ConnectionService.class, EnvironmentService.class, Evaluator.class,
     JobFacade.class, JobService.class, PreBuiltTemplateService.class, PrincipalJobFacade.class,
     PrincipalJobService.class, ProjectCodeWorkflowService.class, ProjectDeploymentService.class,
     ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectOwnershipService.class, ProjectService.class,
-    ProjectWorkflowService.class,
+    ProjectVisibilityFilter.class, ProjectWorkflowService.class,
     SharedTemplateFileStorage.class, SharedTemplateService.class, TagService.class, TriggerDefinitionService.class,
     TriggerExecutionService.class, TriggerLifecycleFacade.class, WorkflowCacheManager.class, WorkflowFacade.class,
     WorkflowNodeTestOutputService.class, WorkflowService.class, WorkflowTestConfigurationService.class,
-    WorkflowValidatorFacade.class, WorkspaceConnectionService.class, WorkspaceService.class
+    WorkflowValidatorFacade.class, WorkspaceConnectionFacade.class, WorkspaceConnectionService.class,
+    WorkspaceService.class
 })
 class ProjectCodeWorkflowFacadeIntTest {
 
@@ -615,6 +620,8 @@ class ProjectCodeWorkflowFacadeIntTest {
     }
 
     private void stubDeploymentCreation() {
+        allowDeploymentChanges();
+
         when(projectWorkflowService.getProjectWorkflows(PROJECT_ID, 1))
             .thenReturn(List.of(new ProjectWorkflow(PROJECT_ID, 1, "wf-1", UUID.randomUUID())));
         when(projectDeploymentService.create(any(ProjectDeployment.class)))
@@ -632,6 +639,8 @@ class ProjectCodeWorkflowFacadeIntTest {
     }
 
     private void stubMoveToVersionTwo() {
+        allowDeploymentChanges();
+
         Project project = newProject();
 
         project.publish(null);
@@ -682,6 +691,11 @@ class ProjectCodeWorkflowFacadeIntTest {
         when(projectService.getProject(PROJECT_ID)).thenAnswer(invocation -> publishedProject(1));
 
         stubCodeWorkflowContainer();
+    }
+
+    private void allowDeploymentChanges() {
+        when(permissionService.hasResourceScope(any(), anyString(), eq("DEPLOYMENT_CREATE"))).thenReturn(true);
+        when(permissionService.hasResourceScope(any(), anyString(), eq("DEPLOYMENT_EDIT"))).thenReturn(true);
     }
 
     private void allowSave() {
