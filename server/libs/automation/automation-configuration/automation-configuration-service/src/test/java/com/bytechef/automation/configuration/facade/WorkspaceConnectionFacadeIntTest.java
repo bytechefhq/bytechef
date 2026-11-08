@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
@@ -39,10 +40,13 @@ import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import org.apache.commons.lang3.Validate;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,6 +77,9 @@ public class WorkspaceConnectionFacadeIntTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ConnectionFacade connectionFacade;
 
     @Autowired
     private ProjectFacade projectFacade;
@@ -262,6 +269,23 @@ public class WorkspaceConnectionFacadeIntTest {
 
         assertThat(configurationsAfterDisconnect.getFirst()
             .getConnections()).isEmpty();
+    }
+
+    @Test
+    public void testGetConnectionsIncludesAiProviderConnectionsWhenTheWorkspaceHasNone() {
+        ConnectionDTO aiProviderConnection = ConnectionDTO.builder()
+            .componentName("openAi")
+            .id(-1300L)
+            .name("Open AI")
+            .build();
+
+        when(connectionFacade.getAiProviderConnections("openAi", 1, 0L, null))
+            .thenReturn(List.of(aiProviderConnection));
+
+        List<ConnectionDTO> connections = workspaceConnectionFacade.getConnections(
+            Validate.notNull(workspace.getId(), "id"), "openAi", 1, 0L, null);
+
+        assertThat(connections).containsExactly(aiProviderConnection);
     }
 
     @Test

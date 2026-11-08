@@ -50,6 +50,9 @@ public interface ConnectionService {
 
     List<Connection> getConnections(List<Long> connectionIds);
 
+    List<Connection> getAiProviderConnections(
+        @Nullable String componentName, @Nullable Integer connectionVersion, @Nullable Integer environmentId);
+
     Connection update(long id, List<Long> tagIds);
 
     Connection update(long id, String name, List<Long> tagIds, int version);

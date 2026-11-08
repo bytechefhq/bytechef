@@ -21,12 +21,17 @@ import com.bytechef.commons.util.FormatUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.connection.domain.AiProviderConnectionId;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
+import com.bytechef.platform.connection.repository.AiProviderConnectionRepository;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,9 +55,15 @@ import org.springframework.util.Assert;
 public class ConnectionServiceImpl implements ConnectionService {
     private static final Logger log = LoggerFactory.getLogger(ConnectionServiceImpl.class);
 
+    private final ObjectProvider<AiProviderConnectionRepository> aiProviderConnectionRepositoryProvider;
     private final ConnectionRepository connectionRepository;
 
-    public ConnectionServiceImpl(ConnectionRepository connectionRepository) {
+    @SuppressFBWarnings("EI")
+    public ConnectionServiceImpl(
+        ObjectProvider<AiProviderConnectionRepository> aiProviderConnectionRepositoryProvider,
+        ConnectionRepository connectionRepository) {
+
+        this.aiProviderConnectionRepositoryProvider = aiProviderConnectionRepositoryProvider;
         this.connectionRepository = connectionRepository;
     }
 
@@ -93,6 +105,8 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public void delete(long id) {
+        rejectIfAiProviderConnection(id);
+
         Connection connection = connectionRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
 
@@ -102,6 +116,15 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public Connection getConnection(long id) {
+        if (AiProviderConnectionId.isAiProviderConnectionId(id)) {
+            AiProviderConnectionRepository aiProviderConnectionRepository = getAiProviderConnectionRepository();
+
+            if (aiProviderConnectionRepository != null) {
+                return OptionalUtils.get(
+                    aiProviderConnectionRepository.findById(id), "Connection does not exist for id=" + id);
+            }
+        }
+
         return OptionalUtils.get(connectionRepository.findById(id), "Connection does not exist for id=" + id);
     }
 
@@ -114,15 +137,20 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections(PlatformType type) {
-        return CollectionUtils.filter(
+        List<Connection> connections = CollectionUtils.filter(
             connectionRepository.findAll(Sort.by("name", "id")), connection -> connection.getType() == type);
+
+        return mergeByName(connections, getProjectedConnections(type, null, null, null));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Connection> getConnections(String componentName, int version, PlatformType type) {
-        return connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
-            componentName, version, type.ordinal());
+        List<Connection> connections =
+            connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
+                componentName, version, type.ordinal());
+
+        return mergeByName(connections, getProjectedConnections(type, componentName, version, null));
     }
 
     @Override
@@ -159,16 +187,57 @@ public class ConnectionServiceImpl implements ConnectionService {
                 .toList();
         }
 
-        return CollectionUtils.toList(connections);
+        List<Connection> connectionList = CollectionUtils.toList(connections);
+
+        if (tagId != null) {
+            return connectionList;
+        }
+
+        return mergeByName(
+            connectionList, getProjectedConnections(type, componentName, connectionVersion, environmentId));
     }
 
     @Override
     public List<Connection> getConnections(List<Long> connectionIds) {
-        return connectionRepository.findAllByIdIn(connectionIds);
+        List<Long> realConnectionIds = connectionIds.stream()
+            .filter(
+                connectionId -> connectionId != null && !AiProviderConnectionId.isAiProviderConnectionId(connectionId))
+            .toList();
+
+        List<Connection> connections = connectionRepository.findAllByIdIn(realConnectionIds);
+
+        List<Long> aiProviderConnectionIds = connectionIds.stream()
+            .filter(
+                connectionId -> connectionId != null && AiProviderConnectionId.isAiProviderConnectionId(connectionId))
+            .toList();
+
+        AiProviderConnectionRepository aiProviderConnectionRepository = getAiProviderConnectionRepository();
+
+        if (aiProviderConnectionRepository == null || aiProviderConnectionIds.isEmpty()) {
+            return connections;
+        }
+
+        return mergeByName(connections, aiProviderConnectionRepository.findAllByIdIn(aiProviderConnectionIds));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Connection> getAiProviderConnections(
+        @Nullable String componentName, @Nullable Integer connectionVersion, @Nullable Integer environmentId) {
+
+        AiProviderConnectionRepository aiProviderConnectionRepository = getAiProviderConnectionRepository();
+
+        if (aiProviderConnectionRepository == null) {
+            return List.of();
+        }
+
+        return aiProviderConnectionRepository.find(componentName, connectionVersion, environmentId);
     }
 
     @Override
     public Connection update(long id, List<Long> tagIds) {
+        rejectIfAiProviderConnection(id);
+
         Connection connection = getConnection(id);
 
         connection.setTagIds(tagIds);
@@ -178,6 +247,8 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection update(long id, String name, List<Long> tagIds, int version) {
+        rejectIfAiProviderConnection(id);
+
         Connection curConnection = getConnection(id);
 
         if (name != null) {
@@ -195,6 +266,8 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection updateConnectionCredentialStatus(long connectionId, CredentialStatus status) {
+        rejectIfAiProviderConnection(connectionId);
+
         Assert.notNull(status, "'status' must not be null");
 
         Connection connection = getConnection(connectionId);
@@ -207,6 +280,8 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection updateConnectionStatus(long connectionId, ConnectionStatus status) {
+        rejectIfAiProviderConnection(connectionId);
+
         Assert.notNull(status, "'status' must not be null");
 
         Connection connection = connectionRepository.findById(connectionId)
@@ -223,6 +298,8 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection updateCreatedBy(long id, String newCreatedBy) {
+        rejectIfAiProviderConnection(id);
+
         Connection connection = connectionRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
 
@@ -233,6 +310,8 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        rejectIfAiProviderConnection(connectionId);
+
         Assert.notNull(parameters, "'parameters' must not be null");
 
         Connection connection = getConnection(connectionId);
@@ -260,6 +339,8 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        rejectIfAiProviderConnection(connectionId);
+
         Assert.notNull(parameters, "'parameters' must not be null");
 
         Connection connection = getConnection(connectionId);
@@ -267,5 +348,45 @@ public class ConnectionServiceImpl implements ConnectionService {
         connection.setParameters(new HashMap<>(parameters));
 
         return connectionRepository.save(connection);
+    }
+
+    private @Nullable AiProviderConnectionRepository getAiProviderConnectionRepository() {
+        return aiProviderConnectionRepositoryProvider.getIfAvailable();
+    }
+
+    private List<Connection> getProjectedConnections(
+        PlatformType type, @Nullable String componentName, @Nullable Integer connectionVersion,
+        @Nullable Long environmentId) {
+
+        AiProviderConnectionRepository aiProviderConnectionRepository = getAiProviderConnectionRepository();
+
+        if (aiProviderConnectionRepository == null || type != PlatformType.AUTOMATION) {
+            return List.of();
+        }
+
+        return aiProviderConnectionRepository.find(
+            componentName, connectionVersion, environmentId == null ? null : environmentId.intValue());
+    }
+
+    private static List<Connection> mergeByName(List<Connection> connections, List<Connection> projectedConnections) {
+        if (projectedConnections.isEmpty()) {
+            return connections;
+        }
+
+        List<Connection> mergedConnections = new ArrayList<>(connections);
+
+        mergedConnections.addAll(projectedConnections);
+
+        mergedConnections.sort(Comparator.comparing(Connection::getName, String.CASE_INSENSITIVE_ORDER));
+
+        return mergedConnections;
+    }
+
+    private static void rejectIfAiProviderConnection(long id) {
+        if (AiProviderConnectionId.isAiProviderConnectionId(id)) {
+            throw new ConfigurationException(
+                "Connection id=%s is an AI provider connection and is read-only".formatted(id),
+                ConnectionErrorType.AI_PROVIDER_CONNECTION_READ_ONLY);
+        }
     }
 }

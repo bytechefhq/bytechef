@@ -14,6 +14,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,6 +32,14 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
 
     @Override
     public void delete(Long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ConnectionDTO> getAiProviderConnections(
+        @Nullable String componentName, @Nullable Integer connectionVersion, @Nullable Long environmentId,
+        @Nullable Long tagId) {
+
         throw new UnsupportedOperationException();
     }
 

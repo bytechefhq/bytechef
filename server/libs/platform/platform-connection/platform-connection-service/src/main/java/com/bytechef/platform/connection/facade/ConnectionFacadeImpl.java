@@ -51,6 +51,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -124,6 +125,22 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         }
 
         connectionService.delete(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConnectionDTO> getAiProviderConnections(
+        @Nullable String componentName, @Nullable Integer connectionVersion, @Nullable Long environmentId,
+        @Nullable Long tagId) {
+
+        if (tagId != null) {
+            return List.of();
+        }
+
+        List<Connection> connections = connectionService.getAiProviderConnections(
+            componentName, connectionVersion, environmentId == null ? null : environmentId.intValue());
+
+        return getConnections(connections);
     }
 
     @Override
