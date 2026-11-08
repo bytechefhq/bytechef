@@ -8,12 +8,14 @@
 package com.bytechef.ee.automation.ai.gateway.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ee.automation.ai.gateway.budget.AiGatewayBudgetChecker;
 import com.bytechef.ee.automation.ai.gateway.config.AiGatewayIntTestConfiguration;
 import com.bytechef.ee.automation.ai.gateway.ratelimit.AiGatewayRateLimitChecker;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilitySessionService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
+import com.bytechef.ee.automation.ai.prompt.service.WorkspaceAiPromptService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayBudget;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayBudgetEnforcementMode;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayBudgetPeriod;
@@ -29,6 +31,11 @@ import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTrace;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceSource;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySpanService;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityTraceService;
+import com.bytechef.ee.platform.ai.prompt.AiPrompt;
+import com.bytechef.ee.platform.ai.prompt.AiPromptVersion;
+import com.bytechef.ee.platform.ai.prompt.AiPromptVersionService;
+import com.bytechef.ee.platform.ai.prompt.AiPromptVersionType;
+import com.bytechef.ee.platform.ai.prompt.repository.AiPromptVersionRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,12 +46,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * @version ee
- *
  * @author Ivica Cardic
+ * @version ee
  */
 @ActiveProfiles("testint")
 @SpringBootTest(classes = AiGatewayIntTestConfiguration.class)
@@ -56,10 +63,19 @@ public class AiGatewayCriticalPathIntTest {
     private static final Long WORKSPACE_B = 2L;
 
     @Autowired
+    private WorkspaceAiPromptService workspaceAiPromptService;
+
+    @Autowired
     private WorkspaceAiObservabilitySessionService workspaceAiObservabilitySessionService;
 
     @Autowired
     private WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService;
+
+    @Autowired
+    private AiPromptVersionService aiPromptVersionService;
+
+    @Autowired
+    private AiPromptVersionRepository aiPromptVersionRepository;
 
     @Autowired
     private AiLlmUsageService aiGatewayRequestLogService;
@@ -90,6 +106,59 @@ public class AiGatewayCriticalPathIntTest {
 
     @Autowired
     private com.bytechef.ee.platform.ai.gateway.ratelimit.AiGatewayRateLimiter aiGatewayRateLimiter;
+
+    @Test
+    public void testWorkspaceIsolationForPrompts() {
+        AiPrompt inA = workspaceAiPromptService.createInWorkspace(
+            new AiPrompt("isolation-prompt-a-" + UUID.randomUUID()), WORKSPACE_A);
+        AiPrompt inB = workspaceAiPromptService.createInWorkspace(
+            new AiPrompt("isolation-prompt-b-" + UUID.randomUUID()), WORKSPACE_B);
+
+        List<AiPrompt> promptsInA = workspaceAiPromptService.getPromptsByWorkspace(WORKSPACE_A);
+        List<AiPrompt> promptsInB = workspaceAiPromptService.getPromptsByWorkspace(WORKSPACE_B);
+
+        assertThat(promptsInA)
+            .as("workspace A query must not return workspace B's prompt")
+            .extracting(AiPrompt::getId)
+            .contains(inA.getId())
+            .doesNotContain(inB.getId());
+
+        assertThat(promptsInB)
+            .as("workspace B query must not return workspace A's prompt")
+            .extracting(AiPrompt::getId)
+            .contains(inB.getId())
+            .doesNotContain(inA.getId());
+    }
+
+    @Test
+    public void testAiPromptVersionOptimisticLock() {
+        AiPrompt prompt = workspaceAiPromptService.createInWorkspace(
+            new AiPrompt("optimistic-" + UUID.randomUUID()), WORKSPACE_A);
+
+        Long promptId = Validate.notNull(prompt.getId(), "id");
+
+        AiPromptVersion created = aiPromptVersionService.create(
+            new AiPromptVersion(promptId, 1, AiPromptVersionType.TEXT, "original", "tester"));
+
+        Long versionId = Validate.notNull(created.getId(), "id");
+
+        AiPromptVersion staleCopyA = aiPromptVersionRepository.findById(versionId)
+            .orElseThrow();
+        AiPromptVersion staleCopyB = aiPromptVersionRepository.findById(versionId)
+            .orElseThrow();
+
+        staleCopyA.setContent("winner writes first");
+
+        AiPromptVersion winner = aiPromptVersionService.update(staleCopyA);
+
+        assertThat(winner.getContent()).isEqualTo("winner writes first");
+
+        staleCopyB.setContent("loser tries to write over stale version");
+
+        assertThatThrownBy(() -> aiPromptVersionService.update(staleCopyB))
+            .as("second update against the stale snapshot must fail with an optimistic-lock exception")
+            .isInstanceOf(OptimisticLockingFailureException.class);
+    }
 
     @Test
     public void testCriticalPathEndToEndSuccessfulRequestPersistsLogAndTrace() {
