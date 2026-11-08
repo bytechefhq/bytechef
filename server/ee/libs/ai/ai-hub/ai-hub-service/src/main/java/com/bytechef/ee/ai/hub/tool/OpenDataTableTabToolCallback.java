@@ -73,21 +73,21 @@ public class OpenDataTableTabToolCallback implements ToolCallback {
         try {
             OpenDataTableTabInput input = JsonUtils.read(toolInput, OpenDataTableTabInput.class);
 
-            if (input.dataTableId() == null || input.dataTableId()
-                .isBlank()) {
+            String dataTableId = input.dataTableId();
 
+            if (dataTableId == null || dataTableId.isBlank()) {
                 return ToolErrors.toolError("dataTableId is required");
             }
 
-            if (input.name() == null || input.name()
-                .isBlank()) {
+            String name = input.name();
 
+            if (name == null || name.isBlank()) {
                 return ToolErrors.toolError("name is required");
             }
 
-            recordArtifact(AiHubToolInvocationContext.fromToolContext(toolContext), input);
+            recordArtifact(AiHubToolInvocationContext.fromToolContext(toolContext), dataTableId, name);
 
-            return JsonUtils.write(new OpenDataTableTabOutput(true, input.dataTableId(), input.name()));
+            return JsonUtils.write(new OpenDataTableTabOutput(true, dataTableId, name));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
         } catch (RuntimeException exception) {
@@ -96,20 +96,24 @@ public class OpenDataTableTabToolCallback implements ToolCallback {
     }
 
     private void recordArtifact(
-        @Nullable AiHubToolInvocationContext invocationContext, OpenDataTableTabInput input) {
+        @Nullable AiHubToolInvocationContext invocationContext, String dataTableId, String name) {
 
-        if (artifactRecorder == null || invocationContext == null || invocationContext.threadId() == null) {
+        if (artifactRecorder == null || invocationContext == null) {
+            return;
+        }
+
+        String threadId = invocationContext.threadId();
+
+        if (threadId == null) {
             return;
         }
 
         try {
             artifactRecorder.recordReference(
-                invocationContext.threadId(), invocationContext.userId(), DATA_TABLE_REFERENCED,
-                input.dataTableId(), input.name());
+                threadId, invocationContext.userId(), DATA_TABLE_REFERENCED, dataTableId, name);
         } catch (RuntimeException exception) {
             log.warn(
-                "Failed to record data table artifact for openDataTableTab (dataTableId={})", input.dataTableId(),
-                exception);
+                "Failed to record data table artifact for openDataTableTab (dataTableId={})", dataTableId, exception);
         }
     }
 
