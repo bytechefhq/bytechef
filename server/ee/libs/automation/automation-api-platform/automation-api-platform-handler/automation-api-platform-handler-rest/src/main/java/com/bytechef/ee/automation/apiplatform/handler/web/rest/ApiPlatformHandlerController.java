@@ -212,20 +212,26 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     private String getApiPlatformTriggerName(String workflowId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+        List<WorkflowTrigger> apiPlatformTriggers = WorkflowTrigger.of(workflow)
+            .stream()
+            .filter(ApiPlatformHandlerController::isApiPlatformTrigger)
+            .toList();
 
-        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+        return apiPlatformTriggers.stream()
+            .filter(WorkflowTrigger::isEnabled)
+            .findFirst()
+            .or(() -> apiPlatformTriggers.stream()
+                .findFirst())
+            .map(WorkflowTrigger::getName)
+            .orElseThrow(() -> new IllegalStateException(
+                "No API Platform trigger found in workflow '%s'".formatted(workflowId)));
+    }
 
-            if (Objects.equals(workflowNodeType.name(), API_PLATFORM_TRIGGER_COMPONENT_NAME) &&
-                Objects.equals(workflowNodeType.operation(), API_PLATFORM_TRIGGER_OPERATION_NAME)) {
+    private static boolean isApiPlatformTrigger(WorkflowTrigger workflowTrigger) {
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-                return workflowTrigger.getName();
-            }
-        }
-
-        throw new IllegalStateException(
-            "No API Platform trigger found in workflow '%s'".formatted(workflowId));
+        return Objects.equals(workflowNodeType.name(), API_PLATFORM_TRIGGER_COMPONENT_NAME) &&
+            Objects.equals(workflowNodeType.operation(), API_PLATFORM_TRIGGER_OPERATION_NAME);
     }
 
     private ApiCollectionEndpointResult getApiCollectionEndpoint(
