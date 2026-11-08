@@ -3,6 +3,7 @@ import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinition,
 } from '@/shared/middleware/platform/configuration';
+import {paintMonochromeSvgWithCurrentColor} from '@/shared/util/svg-utils';
 import {ComponentIcon} from 'lucide-react';
 import {HTMLAttributes, MouseEvent, useEffect, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -134,6 +135,7 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
                             cacheRequests={true}
                             className="size-7"
                             loader={<ComponentIcon className="size-7" />}
+                            preProcessor={paintMonochromeSvgWithCurrentColor}
                             src={node.icon}
                             title={node.title}
                         />

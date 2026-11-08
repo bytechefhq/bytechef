@@ -482,7 +482,12 @@ const WorkflowNodesPopoverMenuOperationList = ({
         >
             <header className="flex items-center space-x-2 rounded-tr-lg px-3 py-1.5">
                 {icon ? (
-                    <InlineSVG className="size-8" loader={<ComponentIcon className="size-8" />} src={icon} />
+                    <InlineSVG
+                        className="size-8"
+                        loader={<ComponentIcon className="size-8" />}
+                        preProcessor={paintMonochromeSvgWithCurrentColor}
+                        src={icon}
+                    />
                 ) : (
                     <ComponentIcon className="size-8" />
                 )}
