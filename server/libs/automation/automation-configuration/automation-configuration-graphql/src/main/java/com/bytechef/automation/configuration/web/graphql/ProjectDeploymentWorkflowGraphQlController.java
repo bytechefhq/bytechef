@@ -239,14 +239,15 @@ public class ProjectDeploymentWorkflowGraphQlController {
                 continue;
             }
 
-            List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.ofEnabled(workflow);
+            WorkflowTrigger hostedChatTrigger = findHostedChatTrigger(WorkflowTrigger.ofEnabled(workflow));
 
-            if (workflowTriggers.isEmpty() || !hasHostedChatTrigger(workflowTriggers)) {
+            if (hostedChatTrigger == null) {
                 continue;
             }
 
             String webhookExecutionId = resolveStaticWebhookExecutionId(
-                workflow, workflowTriggers, projectDeploymentWorkflow, projectWorkflowMap, triggerDefinitionMap);
+                workflow, List.of(hostedChatTrigger), projectDeploymentWorkflow, projectWorkflowMap,
+                triggerDefinitionMap);
 
             if (webhookExecutionId == null) {
                 continue;
@@ -271,17 +272,16 @@ public class ProjectDeploymentWorkflowGraphQlController {
         return chatWorkflows;
     }
 
-    private static boolean hasHostedChatTrigger(List<WorkflowTrigger> workflowTriggers) {
-        WorkflowTrigger workflowTrigger = workflowTriggers.stream()
-            .filter(candidate -> candidate.getType() != null && candidate.getType()
+    private static WorkflowTrigger findHostedChatTrigger(List<WorkflowTrigger> workflowTriggers) {
+        return workflowTriggers.stream()
+            .filter(workflowTrigger -> workflowTrigger.getType() != null && workflowTrigger.getType()
                 .startsWith(CHAT_TRIGGER_TYPE_PREFIX))
+            .filter(ProjectDeploymentWorkflowGraphQlController::isHostedChatMode)
             .findFirst()
             .orElse(null);
+    }
 
-        if (workflowTrigger == null) {
-            return false;
-        }
-
+    private static boolean isHostedChatMode(WorkflowTrigger workflowTrigger) {
         Map<String, ?> parameters = workflowTrigger.getParameters();
 
         Object mode = parameters.get("mode");
