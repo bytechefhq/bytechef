@@ -45,6 +45,8 @@ export interface WorkflowTask {
     description?: string;
     /**
      * When true, the task is skipped during workflow execution.
+     * @type {boolean}
+     * @memberof WorkflowTask
      */
     disabled?: boolean;
     /**
