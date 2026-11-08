@@ -669,6 +669,18 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const triggerCount = workflowTriggers?.length ?? 0;
 
+    const isManualTrigger = !!data.trigger && data.componentName === 'manual';
+
+    const enabledTriggerCount = useMemo(
+        () =>
+            (workflowTriggers ?? []).filter(
+                (workflowTrigger) => !workflowTrigger.disabled || workflowTrigger.type?.split('/')[0] === 'manual'
+            ).length,
+        [workflowTriggers]
+    );
+
+    const showTriggerDisableAction = !isManualTrigger && (!!data.disabled || enabledTriggerCount > 1);
+
     const nodeLabel = useMemo(
         () =>
             getNodeLabel({
@@ -1002,7 +1014,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             showCopyAction
             showCutAction
             showDeleteAction={!data.trigger || triggerCount > 1}
-            showDisableAction={!data.trigger}
+            showDisableAction={!data.trigger || showTriggerDisableAction}
             showInfoAction
             showRenameAction
             trigger={kebabButton}
@@ -1081,7 +1093,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     showCopyAction={!data.trigger}
                     showCutAction={!data.trigger}
                     showDeleteAction={!data.trigger || triggerCount > 1}
-                    showDisableAction={!data.trigger}
+                    showDisableAction={!data.trigger || showTriggerDisableAction}
                     showInfoAction
                     showRenameAction
                 >
