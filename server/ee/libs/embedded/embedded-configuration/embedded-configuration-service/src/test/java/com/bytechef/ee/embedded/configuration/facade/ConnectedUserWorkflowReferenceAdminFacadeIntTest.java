@@ -251,6 +251,8 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
 
     @Test
     void testGetReferencesListsOnlyTheReferencesOfConnectedUsersInTheEnvironment() {
+        when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class))).thenReturn(true);
+
         givenSlackAutomationWorkflowEnvironment();
 
         long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
@@ -277,6 +279,8 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
 
     @Test
     void testGetCopiesListsOnlyTheCopiesOfConnectedUsersInTheEnvironment() {
+        when(permissionService.hasEmbeddedScope(eq("CONNECTED_USER_VIEW"), any(Environment.class))).thenReturn(true);
+
         givenSlackAutomationWorkflowEnvironment();
 
         long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
