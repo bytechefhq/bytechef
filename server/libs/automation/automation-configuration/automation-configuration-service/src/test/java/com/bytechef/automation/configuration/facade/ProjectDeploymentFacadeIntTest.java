@@ -29,8 +29,10 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.calls;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -61,8 +63,10 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.repository.CategoryRepository;
+import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -1227,6 +1231,58 @@ public class ProjectDeploymentFacadeIntTest {
             any(), any(), any(), any(), any(), any(), anyLong());
     }
 
+    @Test
+    public void testGetStaticWebhookUrlSkipsDisabledTrigger() {
+        mockStaticWebhookTriggerDefinition();
+
+        long projectDeploymentId = createProjectDeploymentWithDefinition(
+            """
+                {
+                    "label": "Two Webhook Workflow",
+                    "triggers": [
+                        {"label": "Webhook 1", "name": "trigger_1", "type": "webhook/v1/webhook", "disabled": true},
+                        {"label": "Webhook 2", "name": "trigger_2", "type": "webhook/v1/webhook"}
+                    ],
+                    "tasks": []
+                }""");
+
+        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacade.getProjectDeployment(projectDeploymentId);
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
+            projectDeploymentDTO.projectDeploymentWorkflows()
+                .getFirst();
+
+        String staticWebhookUrl = projectDeploymentWorkflowDTO.staticWebhookUrl();
+
+        assertThat(staticWebhookUrl).isNotNull();
+        assertThat(WorkflowExecutionId.parse(staticWebhookUrl.substring(staticWebhookUrl.lastIndexOf('/') + 1)))
+            .matches(workflowExecutionId -> hasTriggerName(workflowExecutionId, "trigger_2"));
+    }
+
+    @Test
+    public void testGetStaticWebhookUrlNullWhenOnlyWebhookDisabled() {
+        mockStaticWebhookTriggerDefinition();
+
+        long projectDeploymentId = createProjectDeploymentWithDefinition(
+            """
+                {
+                    "label": "Webhook And Schedule Workflow",
+                    "triggers": [
+                        {"label": "Webhook", "name": "trigger_1", "type": "webhook/v1/webhook", "disabled": true},
+                        {"label": "Schedule", "name": "trigger_2", "type": "schedule/v1/schedule"}
+                    ],
+                    "tasks": []
+                }""");
+
+        ProjectDeploymentDTO projectDeploymentDTO = projectDeploymentFacade.getProjectDeployment(projectDeploymentId);
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO =
+            projectDeploymentDTO.projectDeploymentWorkflows()
+                .getFirst();
+
+        assertThat(projectDeploymentWorkflowDTO.staticWebhookUrl()).isNull();
+    }
+
     private static boolean hasTriggerName(WorkflowExecutionId workflowExecutionId, String triggerName) {
         return workflowExecutionId != null && Objects.equals(workflowExecutionId.getTriggerName(), triggerName);
     }
@@ -1253,9 +1309,22 @@ public class ProjectDeploymentFacadeIntTest {
     }
 
     private long createTwoTriggerProjectDeployment(boolean firstTriggerDisabled) {
+        return createProjectDeploymentWithDefinition(twoTriggerDefinition(firstTriggerDisabled));
+    }
+
+    private void mockStaticWebhookTriggerDefinition() {
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+
+        when(triggerDefinition.getType()).thenReturn(TriggerType.STATIC_WEBHOOK);
+
+        doReturn(triggerDefinition).when(triggerDefinitionService)
+            .getTriggerDefinition("webhook", 1, "webhook");
+    }
+
+    private long createProjectDeploymentWithDefinition(String definition) {
         ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
-        projectDeploymentFacadeHelper.addTestWorkflow(projectDTO, twoTriggerDefinition(firstTriggerDisabled));
+        projectDeploymentFacadeHelper.addTestWorkflow(projectDTO, definition);
 
         projectFacade.publishProject(projectDTO.id(), "Published for test", false);
 

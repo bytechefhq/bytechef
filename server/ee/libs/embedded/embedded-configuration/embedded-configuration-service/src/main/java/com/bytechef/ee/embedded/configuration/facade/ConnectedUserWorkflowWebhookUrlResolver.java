@@ -81,7 +81,7 @@ class ConnectedUserWorkflowWebhookUrlResolver {
 
         Workflow workflow = workflowService.getWorkflow(workflowId.get());
 
-        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
+        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.ofEnabled(workflow)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (isStaticWebhookTrigger(workflowNodeType)) {
