@@ -6,11 +6,15 @@ comingSoon: true
 ---
 
 The [AI Hub](/platform/automation/build/hub) assistant can act on external systems, but only
-through connectors you have deliberately handed it. **Settings → Current Workspace → AI Hub
-Connectors** is where that choice is made - and unmade.
+through connectors you have deliberately handed it. **Settings → Current Workspace → AI Hub →
+Connectors** is where that choice is made - and unmade. The **+** menu in the chat composer has a
+**Connectors** entry too, which switches one of your connectors off for the current chat only and
+links back to this page.
 
 The page is reachable by any workspace member, not only administrators: the connectors listed are
-**yours**, not the workspace's, so each person curates their own assistant.
+**yours**, not the workspace's, so each person curates their own assistant. Nobody else can list,
+use or remove them, and they are offered only in chats you own - when someone you shared a chat
+with sends a message, the assistant does not get your connectors or MCP servers.
 
 {/* TODO screenshot: Settings → AI Hub Connectors - the Pre-built Connectors section with several connector rows, one expanded to show its per-tool toggles, and the Custom MCP section below */}
 
@@ -49,6 +53,22 @@ Expanding a row **queries the server live** for its tool list, so the tools you 
 advertises right now - not a stored copy. Each has its own toggle, and switching one off filters it
 out of the assistant's tool list. If the server cannot be reached the row reads "Could not connect to
 this server to list its tools."
+
+The URL must use `http` or `https` and may not point at a private, loopback or cloud metadata
+address. An administrator who needs to reach an internal MCP server lists its host under
+`bytechef.ai.hub.mcp-server.allowed-hosts`. The auth token is stored encrypted and is never shown
+again after you save it.
+
+## How the assistant uses them
+
+Your connectors' tools and your MCP servers' tools are not all handed to the model on every turn.
+They join the assistant's tool catalog, and the assistant searches it for the tools a request needs.
+
+- **Ask mode** offers only read tools: a component tool whose name marks it as a read, and an MCP
+  tool whose server declares it read-only. Everything else waits for Build mode.
+- **Approval.** A component tool marked **Requires approval** asks before it runs, and so does every
+  MCP tool its server does not declare read-only. A rule under **Settings → Current Workspace → AI
+  Hub → Tool Approvals** can exempt a tool from either.
 
 ## See also
 
