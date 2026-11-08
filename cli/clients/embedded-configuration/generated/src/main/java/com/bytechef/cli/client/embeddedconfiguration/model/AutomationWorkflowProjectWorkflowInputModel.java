@@ -19,6 +19,7 @@ import java.util.StringJoiner;
 import java.util.Objects;
 import java.util.Map;
 import java.util.HashMap;
+import com.bytechef.cli.client.embeddedconfiguration.model.ComponentInputReferenceModel;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -37,6 +38,7 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiClient;
   AutomationWorkflowProjectWorkflowInputModel.JSON_PROPERTY_LABEL,
   AutomationWorkflowProjectWorkflowInputModel.JSON_PROPERTY_TYPE,
   AutomationWorkflowProjectWorkflowInputModel.JSON_PROPERTY_REQUIRED,
+  AutomationWorkflowProjectWorkflowInputModel.JSON_PROPERTY_COMPONENT_REFERENCE,
   AutomationWorkflowProjectWorkflowInputModel.JSON_PROPERTY_PROVIDED
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", comments = "Generator version: 7.26.0")
@@ -56,6 +58,10 @@ public class AutomationWorkflowProjectWorkflowInputModel {
   public static final String JSON_PROPERTY_REQUIRED = "required";
   @jakarta.annotation.Nullable
   private Boolean required;
+
+  public static final String JSON_PROPERTY_COMPONENT_REFERENCE = "componentReference";
+  @jakarta.annotation.Nullable
+  private ComponentInputReferenceModel componentReference;
 
   public static final String JSON_PROPERTY_PROVIDED = "provided";
   @jakarta.annotation.Nullable
@@ -160,6 +166,30 @@ public class AutomationWorkflowProjectWorkflowInputModel {
   }
 
 
+  public AutomationWorkflowProjectWorkflowInputModel componentReference(@jakarta.annotation.Nullable ComponentInputReferenceModel componentReference) {
+    this.componentReference = componentReference;
+    return this;
+  }
+
+  /**
+   * Get componentReference
+   * @return componentReference
+   */
+  @jakarta.annotation.Nullable
+  @JsonProperty(value = JSON_PROPERTY_COMPONENT_REFERENCE, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public ComponentInputReferenceModel getComponentReference() {
+    return componentReference;
+  }
+
+
+  @JsonProperty(value = JSON_PROPERTY_COMPONENT_REFERENCE, required = false)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setComponentReference(@jakarta.annotation.Nullable ComponentInputReferenceModel componentReference) {
+    this.componentReference = componentReference;
+  }
+
+
   public AutomationWorkflowProjectWorkflowInputModel provided(@jakarta.annotation.Nullable Boolean provided) {
     this.provided = provided;
     return this;
@@ -200,12 +230,13 @@ public class AutomationWorkflowProjectWorkflowInputModel {
         Objects.equals(this.label, automationWorkflowProjectWorkflowInput.label) &&
         Objects.equals(this.type, automationWorkflowProjectWorkflowInput.type) &&
         Objects.equals(this.required, automationWorkflowProjectWorkflowInput.required) &&
+        Objects.equals(this.componentReference, automationWorkflowProjectWorkflowInput.componentReference) &&
         Objects.equals(this.provided, automationWorkflowProjectWorkflowInput.provided);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, label, type, required, provided);
+    return Objects.hash(name, label, type, required, componentReference, provided);
   }
 
   @Override
@@ -216,6 +247,7 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
+    sb.append("    componentReference: ").append(toIndentedString(componentReference)).append("\n");
     sb.append("    provided: ").append(toIndentedString(provided)).append("\n");
     sb.append("}");
     return sb.toString();
@@ -279,6 +311,11 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     // add `required` to the URL query string
     if (getRequired() != null) {
       joiner.add(String.format(java.util.Locale.ROOT, "%srequired%s=%s", prefix, suffix, ApiClient.urlEncode(ApiClient.valueToString(getRequired()))));
+    }
+
+    // add `componentReference` to the URL query string
+    if (getComponentReference() != null) {
+      joiner.add(getComponentReference().toUrlQueryString(prefix + "componentReference" + suffix));
     }
 
     // add `provided` to the URL query string
