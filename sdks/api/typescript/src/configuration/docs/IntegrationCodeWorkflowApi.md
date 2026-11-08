@@ -10,7 +10,7 @@ All URIs are relative to */api/embedded/v1*
 
 ## deployIntegrationCodeWorkflow
 
-> deployIntegrationCodeWorkflow(xEnvironment, enable, integrationFile)
+> deployIntegrationCodeWorkflow(integrationFile, xEnvironment, enable)
 
 Deploy a code based integration
 
@@ -34,12 +34,12 @@ async function example() {
   const api = new IntegrationCodeWorkflowApi(config);
 
   const body = {
+    // Blob | The file of a code-native integration.
+    integrationFile: BINARY_DATA_HERE,
     // Environment | The environment. (optional)
     xEnvironment: ...,
     // boolean | Whether to make the published integration live in the environment: create and enable its instance configuration when it has none there, otherwise move the existing one to the published version and enable it. (optional)
     enable: true,
-    // Blob | The file of a code-native integration. (optional)
-    integrationFile: BINARY_DATA_HERE,
   } satisfies DeployIntegrationCodeWorkflowRequest;
 
   try {
@@ -59,9 +59,9 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
+| **integrationFile** | `Blob` | The file of a code-native integration. | [Defaults to `undefined`] |
 | **xEnvironment** | `Environment` | The environment. | [Optional] [Defaults to `undefined`] [Enum: DEVELOPMENT, STAGING, PRODUCTION] |
 | **enable** | `boolean` | Whether to make the published integration live in the environment: create and enable its instance configuration when it has none there, otherwise move the existing one to the published version and enable it. | [Optional] [Defaults to `false`] |
-| **integrationFile** | `Blob` | The file of a code-native integration. | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 

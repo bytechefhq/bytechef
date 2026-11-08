@@ -31,13 +31,13 @@ import {
 
 export interface DeployAutomationProjectCodeWorkflowRequest {
     /**
+     * The file of a code-native automation project.
+     */
+    projectFile: Blob;
+    /**
      * The environment.
      */
     xEnvironment?: Environment;
-    /**
-     * The file of a code-native automation project.
-     */
-    projectFile?: Blob;
     /**
      * Whether to also point the configuration of the request environment at the newly published version.
      */
@@ -53,6 +53,13 @@ export class AutomationProjectCodeWorkflowApi extends runtime.BaseAPI {
      * Creates request options for deployAutomationProjectCodeWorkflow without sending the request
      */
     async deployAutomationProjectCodeWorkflowRequestOpts(requestParameters: DeployAutomationProjectCodeWorkflowRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['projectFile'] == null) {
+            throw new runtime.RequiredError(
+                'projectFile',
+                'Required parameter "projectFile" was null or undefined when calling deployAutomationProjectCodeWorkflow().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -120,7 +127,7 @@ export class AutomationProjectCodeWorkflowApi extends runtime.BaseAPI {
      * Deploy a new automation code workflow into the embedded catalog. Unlike the connected-user-scoped endpoints on this API, this operation is authenticated as the API key\'s own ByteChef user and does not fabricate a connected-user identity.
      * Deploy a new automation code workflow into the embedded catalog
      */
-    async deployAutomationProjectCodeWorkflow(requestParameters: DeployAutomationProjectCodeWorkflowRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AutomationProjectCodeWorkflowDeployResult> {
+    async deployAutomationProjectCodeWorkflow(requestParameters: DeployAutomationProjectCodeWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AutomationProjectCodeWorkflowDeployResult> {
         const response = await this.deployAutomationProjectCodeWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
