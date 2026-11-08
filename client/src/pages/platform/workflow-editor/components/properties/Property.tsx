@@ -8,6 +8,7 @@ import ArrayProperty from '@/pages/platform/workflow-editor/components/propertie
 import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
 import {useFormDisplayConditionsContext} from '@/pages/platform/workflow-editor/components/properties/FormDisplayConditionsContext';
 import ObjectProperty from '@/pages/platform/workflow-editor/components/properties/ObjectProperty';
+import CallAiAgentDetailLink from '@/pages/platform/workflow-editor/components/properties/components/CallAiAgentDetailLink';
 import FormControlledArrayItems from '@/pages/platform/workflow-editor/components/properties/components/FormControlledArrayItems';
 import FormControlledObjectEntries from '@/pages/platform/workflow-editor/components/properties/components/FormControlledObjectEntries';
 import FormLookupValuesWatcher from '@/pages/platform/workflow-editor/components/properties/components/FormLookupValuesWatcher';
@@ -1275,6 +1276,11 @@ const Property = ({
                             workflowNodeName={currentNode?.name ?? ''}
                         />
                     )}
+
+                    {!control &&
+                        controlType === 'SELECT' &&
+                        currentNode?.componentName === 'callAiAgent' &&
+                        name === 'agentUuid' && <CallAiAgentDetailLink agentUuid={selectValue} />}
 
                     {!control && controlType === 'SELECT' && type === 'BOOLEAN' && (
                         <PropertySelect
