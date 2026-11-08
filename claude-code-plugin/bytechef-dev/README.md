@@ -1,15 +1,17 @@
 # bytechef-dev Plugin
 
-Development tools for ByteChef — one plugin, four capabilities:
+Development tools for ByteChef — one plugin, six capabilities:
 
 | Skill | What it does |
 |---|---|
 | **ByteChef Component Builder** | Scaffold in-repo platform components (Java, `server/libs/modules/components/`) |
+| **ByteChef Custom Component Builder** | Author single-file (JS/Python/Ruby) or JAR (Java) custom components and **upload** them to a running instance |
+| **ByteChef Code Workflow Builder** | Author whole projects (automation) and integrations (embedded) as code and **deploy** them |
 | **ByteChef Management MCP Setup** | Connect Claude to a running instance's Management MCP server so it can build workflows live |
 | **ByteChef Workflow Builder** | Create/build/import/publish workflows **live**, over the Management MCP server, against a connected instance |
 | **ByteChef App Builder** | Create an app from the `create-bytechef-app` template's directory, write its key to `.env.local`, bind connections, and build, deploy and bind its workflows (DEVELOPMENT only) |
 
-The MCP Setup, Workflow Builder and App Builder skills use a configured instance: the Management MCP server's URL and an admin API key, which the MCP Setup skill asks for. The App Builder also uses the `bytechef` CLI with an automation API key.
+The MCP Setup, Workflow Builder and App Builder skills use a configured instance: the Management MCP server's URL and an admin API key, which the MCP Setup skill asks for. The App Builder also uses the `bytechef` CLI with an automation API key. The Custom Component and Code Workflow Builders deploy through the `bytechef` CLI, or over curl with `BYTECHEF_BASE_URL` and `BYTECHEF_API_KEY` set in the environment (the skill asks otherwise).
 
 ## Skills
 
@@ -38,6 +40,18 @@ Start a new Claude Code session and ask:
 - "Create a connection definition with API key auth"
 
 The skill activates automatically when it detects component-building intent.
+
+### ByteChef Custom Component Builder
+
+Single-file JS/Python/Ruby components (bare object-literal / `SimpleNamespace` / `Struct` contracts, `name` + Integer `version` + `actions[{name,title,properties,output,tool,perform}]`, plus an optional `connection` — every authorization type including OAuth2 — `icon`, dynamic property `options`, and `POLLING` `triggers`) and Java JARs (SDK `component-api` + `META-INF/services/com.bytechef.component.ComponentHandler`), deployed via `bytechef component deploy --file <path>` (or directly `POST /api/platform/v1/custom-components/deploy`, multipart `componentFile`; extension picks the language; admin-gated; `.jar` requires `java-enabled` on the server). Uploads publish; the UI editor saves a draft.
+
+Ask: "Create a custom ByteChef component in Python and upload it" / "Deploy this .js component to my ByteChef".
+
+### ByteChef Code Workflow Builder
+
+Whole projects/integrations as one artifact. Automation projects key on `name` (locked after first deploy) with `workflows[{name,label,tasks[{name,label,connections,perform}]}]`; embedded integrations key on `componentName`. A task's `perform(context)` invokes other components (`context.component.<name>.<action>`), reads the workflow's inputs and prior task outputs (`context.input()`), reads a wired connection (`context.connection(name)`) and logs; `parallel` / `forkJoin` task groups run work concurrently. Deploys: `bytechef automation project deploy` (`POST /api/automation/v1/projects/deploy`, `projectFile` + optional `workspaceId`), `bytechef embedded code-workflow deploy|list` for the embedded catalog (`/api/embedded/v1/automation-project-code-workflows`), and `bytechef embedded integration deploy [--enable]` (`POST /api/embedded/v1/integration-code-workflows/deploy`, `integrationFile`) for integrations. Java via `ProjectHandler`/`IntegrationHandler` SDK JARs.
+
+Ask: "Write a code workflow that pings an API daily and deploy it" / "Create an embedded integration as code".
 
 ### ByteChef Management MCP Setup
 
