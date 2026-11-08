@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.agui.core.exception.AGUIException;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
@@ -51,11 +52,13 @@ final class ProjectDeploymentAgentConfigurationTest {
     void testAskAgentUsesReadToolsAndBuildAgentUsesWriteTools() throws AGUIException {
         SliceSpringAIAgent askAgent = configuration.projectDeploymentAskSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), deploymentToolCallbacksFactory,
-            securityContextRehydrator, emptyProvider());
+            securityContextRehydrator, emptyProvider(),
+            new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
 
         SliceSpringAIAgent buildAgent = configuration.projectDeploymentBuildSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), deploymentToolCallbacksFactory,
-            securityContextRehydrator, emptyProvider());
+            securityContextRehydrator, emptyProvider(),
+            new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
 
         assertThat(askAgent.getAgentId()).isEqualTo("project_deployment_ask");
         assertThat(buildAgent.getAgentId()).isEqualTo("project_deployment_build");

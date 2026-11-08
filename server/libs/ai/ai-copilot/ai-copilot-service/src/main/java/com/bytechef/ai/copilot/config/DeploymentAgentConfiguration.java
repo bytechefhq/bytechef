@@ -18,6 +18,7 @@ package com.bytechef.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.AiAgentSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
@@ -58,10 +59,12 @@ public class DeploymentAgentConfiguration {
     AiAgentSpringAIAgent deploymentAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, DeploymentToolCallbacksFactory deploymentToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory)
         throws AGUIException {
 
         return AiAgentSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.DEPLOYMENT_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -77,10 +80,12 @@ public class DeploymentAgentConfiguration {
     AiAgentSpringAIAgent deploymentBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, DeploymentToolCallbacksFactory deploymentToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory)
         throws AGUIException {
 
         return AiAgentSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.DEPLOYMENT_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)

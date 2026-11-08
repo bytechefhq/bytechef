@@ -18,6 +18,7 @@ package com.bytechef.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
@@ -58,10 +59,12 @@ public class ProjectDeploymentAgentConfiguration {
     SliceSpringAIAgent projectDeploymentAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, DeploymentToolCallbacksFactory deploymentToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory)
         throws AGUIException {
 
         return SliceSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.PROJECT_DEPLOYMENT_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -76,10 +79,12 @@ public class ProjectDeploymentAgentConfiguration {
     SliceSpringAIAgent projectDeploymentBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, DeploymentToolCallbacksFactory deploymentToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory)
         throws AGUIException {
 
         return SliceSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.PROJECT_DEPLOYMENT_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)

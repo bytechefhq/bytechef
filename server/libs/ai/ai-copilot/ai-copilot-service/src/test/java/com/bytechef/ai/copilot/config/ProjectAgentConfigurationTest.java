@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import com.agui.core.exception.AGUIException;
 import com.bytechef.ai.agent.tool.AgentType;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.ProjectSpringAIAgent;
 import com.bytechef.ai.copilot.tool.ClusterElementAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
@@ -74,11 +75,13 @@ final class ProjectAgentConfigurationTest {
         ProjectSpringAIAgent askAgent = configuration.projectAskSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), new ReadProjectTools(mock(ProjectTools.class)),
             new ReadProjectWorkflowTools(mock(ProjectWorkflowTools.class)), securityContextRehydrator,
-            emptyProvider());
+            emptyProvider(),
+            new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
 
         ProjectSpringAIAgent buildAgent = configuration.projectBuildSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), mock(ProjectTools.class), lifecycleTools(),
-            securityContextRehydrator, catalog, emptyProvider());
+            securityContextRehydrator, catalog, emptyProvider(),
+            new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
 
         assertThat(askAgent.getAgentId()).isEqualTo("project_ask");
         assertThat(buildAgent.getAgentId()).isEqualTo("project_build");

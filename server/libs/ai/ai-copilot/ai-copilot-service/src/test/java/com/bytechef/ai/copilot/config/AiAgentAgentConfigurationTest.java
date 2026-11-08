@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.agui.core.exception.AGUIException;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.AiAgentSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
@@ -58,7 +59,8 @@ class AiAgentAgentConfigurationTest {
         AiAgentSpringAIAgent aiAgentSpringAIAgent = aiAgentAgentConfiguration.aiAgentAskSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), aiAgentToolCallbacksFactory, interactivePickerToolCallbacks,
             PROMPT_RESOURCE,
-            mock(SecurityContextRehydrator.class), emptyOverrideChatClientResolverProvider());
+            mock(SecurityContextRehydrator.class), emptyOverrideChatClientResolverProvider(),
+            new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
 
         assertThat(aiAgentSpringAIAgent.getAgentId()).isEqualTo(Source.AI_AGENT.agentId(Mode.ASK));
 
@@ -76,7 +78,8 @@ class AiAgentAgentConfigurationTest {
         AiAgentSpringAIAgent aiAgentSpringAIAgent = aiAgentAgentConfiguration.aiAgentBuildSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), aiAgentToolCallbacksFactory, interactivePickerToolCallbacks,
             PROMPT_RESOURCE,
-            mock(SecurityContextRehydrator.class), emptyOverrideChatClientResolverProvider());
+            mock(SecurityContextRehydrator.class), emptyOverrideChatClientResolverProvider(),
+            new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
 
         assertThat(aiAgentSpringAIAgent.getAgentId()).isEqualTo(Source.AI_AGENT.agentId(Mode.BUILD));
 

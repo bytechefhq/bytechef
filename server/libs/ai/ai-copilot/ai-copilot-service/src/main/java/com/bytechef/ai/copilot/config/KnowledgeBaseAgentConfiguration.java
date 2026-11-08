@@ -18,6 +18,7 @@ package com.bytechef.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.KnowledgeBaseSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
@@ -60,10 +61,12 @@ public class KnowledgeBaseAgentConfiguration {
         ChatMemory chatMemory, ChatModel chatModel,
         KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory)
         throws AGUIException {
 
         return KnowledgeBaseSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.KNOWLEDGE_BASE_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -80,10 +83,12 @@ public class KnowledgeBaseAgentConfiguration {
         ChatMemory chatMemory, ChatModel chatModel,
         KnowledgeBaseToolCallbacksFactory knowledgeBaseToolCallbacksFactory,
         SecurityContextRehydrator securityContextRehydrator,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory)
         throws AGUIException {
 
         return KnowledgeBaseSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.KNOWLEDGE_BASE_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)

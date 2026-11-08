@@ -18,6 +18,7 @@ package com.bytechef.ai.copilot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.automation.ai.tool.knowledgebase.KnowledgeBaseToolCallbacksFactory;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -125,6 +127,12 @@ class KnowledgeBaseAgentConfigurationConditionTest {
         @Bean
         SecurityContextRehydrator securityContextRehydrator() {
             return Mockito.mock(SecurityContextRehydrator.class);
+        }
+
+        @Bean
+        @SuppressWarnings("unchecked")
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory() {
+            return new CopilotGuardrailsAdvisorFactory(Mockito.mock(ObjectProvider.class));
         }
     }
 

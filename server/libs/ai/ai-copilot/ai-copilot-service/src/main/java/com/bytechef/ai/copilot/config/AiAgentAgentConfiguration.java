@@ -18,6 +18,7 @@ package com.bytechef.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.AiAgentSpringAIAgent;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.tool.BuildAiAgentToolCallback;
@@ -77,10 +78,12 @@ public class AiAgentAgentConfiguration {
         InteractivePickerToolCallbacks interactivePickerToolCallbacks,
         @Value("classpath:prompt_ai_agent_ask.txt") Resource promptAiAgentAskResource,
         SecurityContextRehydrator securityContextRehydrator,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory)
         throws AGUIException {
 
         return AiAgentSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.AI_AGENT_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -100,10 +103,12 @@ public class AiAgentAgentConfiguration {
         InteractivePickerToolCallbacks interactivePickerToolCallbacks,
         @Value("classpath:prompt_ai_agent_build.txt") Resource promptAiAgentBuildResource,
         SecurityContextRehydrator securityContextRehydrator,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory)
         throws AGUIException {
 
         return AiAgentSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.AI_AGENT_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -121,7 +126,8 @@ public class AiAgentAgentConfiguration {
     IntelligentToolChatClientFactory aiAgentBuildSubAgentChatClientFactory(
         ChatModel chatModel, AiAgentToolCallbacksFactory aiAgentToolCallbacksFactory,
         InteractivePickerToolCallbacks interactivePickerToolCallbacks,
-        @Value("classpath:prompt_ai_agent_build.txt") Resource promptAiAgentBuildResource) {
+        @Value("classpath:prompt_ai_agent_build.txt") Resource promptAiAgentBuildResource,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory) {
 
         String systemPrompt = readPrompt(promptAiAgentBuildResource) + BUILD_AI_AGENT_SUB_AGENT_ADDENDUM;
 
@@ -129,10 +135,15 @@ public class AiAgentAgentConfiguration {
 
         toolCallbacks.add(interactivePickerToolCallbacks.listConnectionsForComponent());
 
-        return candidateChatModel -> ChatClient.builder(candidateChatModel == null ? chatModel : candidateChatModel)
-            .defaultSystem(systemPrompt)
-            .defaultToolCallbacks(toolCallbacks)
-            .build();
+        return candidateChatModel -> {
+            ChatClient guardedChatClient = copilotGuardrailsAdvisorFactory.guardedChatClient(
+                candidateChatModel == null ? chatModel : candidateChatModel);
+
+            return guardedChatClient.mutate()
+                .defaultSystem(systemPrompt)
+                .defaultToolCallbacks(toolCallbacks)
+                .build();
+        };
     }
 
     @Bean

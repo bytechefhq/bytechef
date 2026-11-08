@@ -18,6 +18,7 @@ package com.bytechef.ai.copilot.config;
 
 import com.agui.core.exception.AGUIException;
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
 import com.bytechef.ai.copilot.agent.ProjectSpringAIAgent;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
@@ -65,10 +66,12 @@ public class ProjectAgentConfiguration {
     ProjectSpringAIAgent projectAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, SecurityContextRehydrator securityContextRehydrator,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory)
         throws AGUIException {
 
         return ProjectSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.PROJECT_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -85,10 +88,12 @@ public class ProjectAgentConfiguration {
         ProjectWorkflowLifecycleTools projectWorkflowLifecycleTools,
         SecurityContextRehydrator securityContextRehydrator,
         IntelligentToolCatalog intelligentToolCatalog,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider,
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory)
         throws AGUIException {
 
         return ProjectSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.PROJECT_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)

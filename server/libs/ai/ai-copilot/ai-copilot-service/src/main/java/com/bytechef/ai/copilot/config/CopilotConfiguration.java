@@ -720,6 +720,7 @@ public class CopilotConfiguration {
                 workflowInstructionTools));
 
         WorkflowExecutionSpringAIAgent springAIAgent = WorkflowExecutionSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.WORKFLOW_EXECUTION_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -747,6 +748,7 @@ public class CopilotConfiguration {
                 workflowInstructionTools));
 
         return WorkflowExecutionSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.WORKFLOW_EXECUTION_BUILD.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -767,6 +769,7 @@ public class CopilotConfiguration {
         throws AGUIException {
 
         return McpServerSpringAIAgent.builder()
+            .advisors(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
             .agentId(CopilotAgentType.MCP_SERVER_ASK.key())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
@@ -1278,7 +1281,7 @@ public class CopilotConfiguration {
         ChatModel chatModel, String systemPrompt, WorkflowExecutionTools workflowExecutionTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools) {
 
-        return ChatClient.builder(chatModel)
+        return chatClientBuilder(chatModel)
             .defaultSystem(systemPrompt)
             .defaultTools(
                 workflowExecutionTools, readProjectWorkflowTools, componentTools, workflowValidatorTools,

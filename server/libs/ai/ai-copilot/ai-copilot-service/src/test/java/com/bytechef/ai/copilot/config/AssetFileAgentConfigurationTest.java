@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.agui.core.exception.AGUIException;
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.agent.SliceSpringAIAgent;
 import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
@@ -62,7 +63,8 @@ final class AssetFileAgentConfigurationTest {
     void testAskAgentIdAndToolList() throws AGUIException {
         SliceSpringAIAgent askAgent = configuration.assetFileAskSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), assetFileToolCallbacksFactory, securityContextRehydrator,
-            emptyProvider());
+            emptyProvider(),
+            new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
 
         assertThat(askAgent.getAgentId()).isEqualTo(CopilotAgentType.ASSET_FILE_ASK.key());
 
@@ -76,7 +78,8 @@ final class AssetFileAgentConfigurationTest {
     void testBuildAgentIdAndToolList() throws AGUIException {
         SliceSpringAIAgent buildAgent = configuration.assetFileBuildSpringAIAgent(
             mock(ChatMemory.class), mock(ChatModel.class), assetFileToolCallbacksFactory, securityContextRehydrator,
-            emptyProvider());
+            emptyProvider(),
+            new CopilotGuardrailsAdvisorFactory(mock(ObjectProvider.class)));
 
         assertThat(buildAgent.getAgentId()).isEqualTo(CopilotAgentType.ASSET_FILE_BUILD.key());
 
