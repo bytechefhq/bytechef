@@ -40,12 +40,12 @@ function withDisabled<T extends object>(target: T, disabled: boolean): T {
 }
 
 function applyDefinitionWithDisabledFlags(definition: string): void {
-    let disabledFlagsByTaskName: Map<string, boolean>;
+    let disabledFlagsByNodeName: Map<string, boolean>;
 
     try {
         const parsedDefinition = JSON.parse(definition);
 
-        disabledFlagsByTaskName = new Map<string, boolean>([
+        disabledFlagsByNodeName = new Map<string, boolean>([
             ...flattenDefinitionTasks(parsedDefinition.tasks ?? []).map((task): [string, boolean] => [
                 task.name,
                 !!task.disabled,
@@ -63,13 +63,13 @@ function applyDefinitionWithDisabledFlags(definition: string): void {
 
     useWorkflowDataStore.setState((state) => {
         const updatedTasks = state.workflow.tasks?.map((task) => {
-            const disabled = disabledFlagsByTaskName.get(task.name);
+            const disabled = disabledFlagsByNodeName.get(task.name);
 
             return disabled === undefined || !!task.disabled === disabled ? task : withDisabled(task, disabled);
         });
 
         const updatedTriggers = state.workflow.triggers?.map((trigger) => {
-            const disabled = disabledFlagsByTaskName.get(trigger.name);
+            const disabled = disabledFlagsByNodeName.get(trigger.name);
 
             return disabled === undefined || !!trigger.disabled === disabled
                 ? trigger
@@ -77,7 +77,7 @@ function applyDefinitionWithDisabledFlags(definition: string): void {
         });
 
         const updatedNodes = state.nodes.map((node) => {
-            const disabled = disabledFlagsByTaskName.get(node.id);
+            const disabled = disabledFlagsByNodeName.get(node.id);
 
             return disabled === undefined || !!node.data.disabled === disabled
                 ? node
@@ -100,7 +100,7 @@ function applyDefinitionWithDisabledFlags(definition: string): void {
             return currentNode;
         }
 
-        const disabled = disabledFlagsByTaskName.get(currentNode.workflowNodeName);
+        const disabled = disabledFlagsByNodeName.get(currentNode.workflowNodeName);
 
         return disabled === undefined || !!currentNode.disabled === disabled
             ? currentNode
