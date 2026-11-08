@@ -4,7 +4,7 @@ import getTestRunTriggerName from '@/pages/platform/workflow-editor/utils/getTes
 import {WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 
 export default function getSelectedTestRunTriggerName(workflow: {
-    triggers?: Array<Pick<WorkflowTrigger, 'name'>>;
+    triggers?: Array<Pick<WorkflowTrigger, 'disabled' | 'name' | 'type'>>;
 }): string | undefined {
     if (!workflow.triggers?.length) {
         return undefined;

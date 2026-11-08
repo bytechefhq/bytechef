@@ -42,6 +42,7 @@ import {getContextFromTaskNodeData} from '../utils/getTaskDispatcherContext';
 import getTestNodeStateBorderClassName from '../utils/getTestNodeStateBorderClassName';
 import handleDeleteTask from '../utils/handleDeleteTask';
 import handleDeleteTrigger from '../utils/handleDeleteTrigger';
+import isTriggerEnabled from '../utils/isTriggerEnabled';
 import pasteNode from '../utils/pasteNode';
 import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
 import {resolveMainClusterRootName} from '../utils/resolveClusterRootId';
@@ -672,10 +673,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const isManualTrigger = !!data.trigger && data.componentName === 'manual';
 
     const enabledTriggerCount = useMemo(
-        () =>
-            (workflowTriggers ?? []).filter(
-                (workflowTrigger) => !workflowTrigger.disabled || workflowTrigger.type?.split('/')[0] === 'manual'
-            ).length,
+        () => (workflowTriggers ?? []).filter((workflowTrigger) => isTriggerEnabled(workflowTrigger)).length,
         [workflowTriggers]
     );
 
