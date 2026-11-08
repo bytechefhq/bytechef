@@ -20,14 +20,16 @@ import static com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorks
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
+import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspace;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver;
+import com.bytechef.component.ai.agent.utils.cluster.workspace.WorkspacePathToolCallback;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springaicommunity.agent.common.workspace.Workspace;
+import java.util.Set;
 import org.springaicommunity.agent.tools.GlobTool;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -75,7 +77,7 @@ public class AiAgentUtilsGlobTool {
     private ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        Workspace workspace = agentWorkspaceResolver.resolve(
+        AgentWorkspace workspace = agentWorkspaceResolver.resolve(
             context, CLUSTER_ELEMENT_NAME, inputParameters.getString(WORKSPACE_NAME));
 
         GlobTool.Builder builder = GlobTool.builder()
@@ -93,6 +95,8 @@ public class AiAgentUtilsGlobTool {
             builder.maxResults(maxResults);
         }
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(builder.build()));
+        return WorkspacePathToolCallback.wrap(
+            ToolCallbacks.from(builder.build()), workspace, WorkspacePathToolCallback.FILES_DESCRIPTION, Set.of("path"),
+            Set.of("pattern"));
     }
 }
