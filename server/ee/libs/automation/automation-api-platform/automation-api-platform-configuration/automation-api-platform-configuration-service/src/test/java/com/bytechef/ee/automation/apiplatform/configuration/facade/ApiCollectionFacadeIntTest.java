@@ -167,14 +167,29 @@ class ApiCollectionFacadeIntTest {
 
     @Test
     void testGetOpenApiSpecificationSkipsDisabledFirstTrigger() {
-        Workflow workflow = workflowService.create(
-            JsonUtils.write(
+        long apiCollectionId = createApiCollectionWithEndpoint(
+            List.of(
+                Map.of("name", "trigger_1", "type", "webhook/v1/autoRespondingWithHTTP200", "disabled", true),
+                Map.of("name", "trigger_2", "type", "apiPlatform/v1/newApiRequest", "parameters", Map.of())));
+
+        assertThat(apiCollectionFacade.getOpenApiSpecification(apiCollectionId)).contains("/test");
+    }
+
+    @Test
+    void testGetOpenApiSpecificationLeavesOutEndpointWithDisabledApiTrigger() {
+        long apiCollectionId = createApiCollectionWithEndpoint(
+            List.of(
+                Map.of("name", "trigger_1", "type", "webhook/v1/autoRespondingWithHTTP200"),
                 Map.of(
-                    "label", "api-workflow",
-                    "triggers", List.of(
-                        Map.of("name", "trigger_1", "type", "webhook/v1/autoRespondingWithHTTP200", "disabled", true),
-                        Map.of("name", "trigger_2", "type", "apiPlatform/v1/newApiRequest", "parameters", Map.of())),
-                    "tasks", List.of())),
+                    "name", "trigger_2", "type", "apiPlatform/v1/newApiRequest", "parameters", Map.of(), "disabled",
+                    true)));
+
+        assertThat(apiCollectionFacade.getOpenApiSpecification(apiCollectionId)).doesNotContain("/test");
+    }
+
+    private long createApiCollectionWithEndpoint(List<Map<String, Object>> triggers) {
+        Workflow workflow = workflowService.create(
+            JsonUtils.write(Map.of("label", "api-workflow", "triggers", triggers, "tasks", List.of())),
             Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
         workflowId = workflow.getId();
@@ -199,7 +214,7 @@ class ApiCollectionFacadeIntTest {
 
         apiCollectionEndpointService.create(apiCollectionEndpoint);
 
-        assertThat(apiCollectionFacade.getOpenApiSpecification(apiCollectionDTO.id())).contains("/test");
+        return apiCollectionDTO.id();
     }
 
     private ApiCollectionDTO getApiCollectionDTO(String name) {

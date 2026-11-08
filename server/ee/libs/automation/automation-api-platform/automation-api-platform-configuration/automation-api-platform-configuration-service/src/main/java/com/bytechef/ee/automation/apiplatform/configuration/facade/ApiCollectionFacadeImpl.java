@@ -235,16 +235,18 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
             Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
-            WorkflowTrigger workflowTrigger = WorkflowTrigger.ofEnabled(workflow)
+            WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflow)
                 .stream()
+                .filter(trigger -> Objects.equals(
+                    WorkflowNodeType.ofType(trigger.getType())
+                        .operation(),
+                    "newApiRequest"))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Workflow trigger not found"));
+                .orElseThrow(() -> new ConfigurationException(
+                    "Invalid workflow trigger type", ApiCollectionErrorType.INVALID_WORKFLOW_TRIGGER_TYPE));
 
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-            if (!Objects.equals(workflowNodeType.operation(), "newApiRequest")) {
-                throw new ConfigurationException(
-                    "Invalid workflow trigger type", ApiCollectionErrorType.INVALID_WORKFLOW_TRIGGER_TYPE);
+            if (!workflowTrigger.isEnabled()) {
+                continue;
             }
 
             String path = createPath(apiCollectionEndpoint, apiCollection);
