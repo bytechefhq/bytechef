@@ -18,6 +18,8 @@ import com.bytechef.cli.client.embeddedconfiguration.ApiResponse;
 import com.bytechef.cli.client.embeddedconfiguration.Configuration;
 import com.bytechef.cli.client.embeddedconfiguration.Pair;
 
+import com.bytechef.cli.client.embeddedconfiguration.model.AutomationComponentInputOptionsRequestModel;
+import com.bytechef.cli.client.embeddedconfiguration.model.CodeWorkflowNotCopyableErrorModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.ConnectedUserProjectWorkflowModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.CreateFrontendProjectWorkflowFromPromptRequestModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.CreateFrontendProjectWorkflowRequestModel;
@@ -25,6 +27,7 @@ import com.bytechef.cli.client.embeddedconfiguration.model.DisableFrontendProjec
 import com.bytechef.cli.client.embeddedconfiguration.model.EnableConnectedUserWorkflowResponseModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.EnableFrontendProjectWorkflow409ResponseModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.EnvironmentModel;
+import com.bytechef.cli.client.embeddedconfiguration.model.OptionModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.ProvisionFrontendWorkflowReference409ResponseModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.ProvisionWorkflowReferenceRequestModel;
 import com.bytechef.cli.client.embeddedconfiguration.model.PublishFrontendProjectWorkflowRequestModel;
@@ -34,6 +37,12 @@ import com.bytechef.cli.client.embeddedconfiguration.model.UpdateWorkflowInputsR
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
@@ -1912,6 +1921,136 @@ public class ConnectedUserProjectWorkflowApi {
     localVarRequestBuilder.header("Accept", "application/json");
 
     localVarRequestBuilder.method("POST", HttpRequest.BodyPublishers.noBody());
+    if (memberVarReadTimeout != null) {
+      localVarRequestBuilder.timeout(memberVarReadTimeout);
+    }
+    // Add custom headers if provided
+    localVarRequestBuilder = HttpRequestBuilderExtensions.withAdditionalHeaders(localVarRequestBuilder, headers);
+    if (memberVarInterceptor != null) {
+      memberVarInterceptor.accept(localVarRequestBuilder);
+    }
+    return localVarRequestBuilder;
+  }
+
+  /**
+   * Get component input options with a connection
+   * Resolve the dynamic option values of a component input group property with one of the authenticated connected user&#39;s own connections.
+   * @param automationComponentInputOptionsRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @return List&lt;OptionModel&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public List<OptionModel> getFrontendAutomationComponentInputOptions(@jakarta.annotation.Nonnull AutomationComponentInputOptionsRequestModel automationComponentInputOptionsRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return getFrontendAutomationComponentInputOptions(automationComponentInputOptionsRequestModel, xEnvironment, null);
+  }
+
+  /**
+   * Get component input options with a connection
+   * Resolve the dynamic option values of a component input group property with one of the authenticated connected user&#39;s own connections.
+   * @param automationComponentInputOptionsRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return List&lt;OptionModel&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public List<OptionModel> getFrontendAutomationComponentInputOptions(@jakarta.annotation.Nonnull AutomationComponentInputOptionsRequestModel automationComponentInputOptionsRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    ApiResponse<List<OptionModel>> localVarResponse = getFrontendAutomationComponentInputOptionsWithHttpInfo(automationComponentInputOptionsRequestModel, xEnvironment, headers);
+    return localVarResponse.getData();
+  }
+
+  /**
+   * Get component input options with a connection
+   * Resolve the dynamic option values of a component input group property with one of the authenticated connected user&#39;s own connections.
+   * @param automationComponentInputOptionsRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @return ApiResponse&lt;List&lt;OptionModel&gt;&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<List<OptionModel>> getFrontendAutomationComponentInputOptionsWithHttpInfo(@jakarta.annotation.Nonnull AutomationComponentInputOptionsRequestModel automationComponentInputOptionsRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment) throws ApiException {
+    return getFrontendAutomationComponentInputOptionsWithHttpInfo(automationComponentInputOptionsRequestModel, xEnvironment, null);
+  }
+
+  /**
+   * Get component input options with a connection
+   * Resolve the dynamic option values of a component input group property with one of the authenticated connected user&#39;s own connections.
+   * @param automationComponentInputOptionsRequestModel  (required)
+   * @param xEnvironment The environment. (optional)
+   * @param headers Optional headers to include in the request
+   * @return ApiResponse&lt;List&lt;OptionModel&gt;&gt;
+   * @throws ApiException if fails to make API call
+   */
+  public ApiResponse<List<OptionModel>> getFrontendAutomationComponentInputOptionsWithHttpInfo(@jakarta.annotation.Nonnull AutomationComponentInputOptionsRequestModel automationComponentInputOptionsRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    HttpRequest.Builder localVarRequestBuilder = getFrontendAutomationComponentInputOptionsRequestBuilder(automationComponentInputOptionsRequestModel, xEnvironment, headers);
+    try {
+      HttpResponse<InputStream> localVarResponse = memberVarHttpClient.send(
+          localVarRequestBuilder.build(),
+          HttpResponse.BodyHandlers.ofInputStream());
+      if (memberVarResponseInterceptor != null) {
+        memberVarResponseInterceptor.accept(localVarResponse);
+      }
+      InputStream localVarResponseBody = null;
+      try {
+        if (localVarResponse.statusCode()/ 100 != 2) {
+          throw getApiException("getFrontendAutomationComponentInputOptions", localVarResponse);
+        }
+        localVarResponseBody = ApiClient.getResponseBody(localVarResponse);
+        if (localVarResponseBody == null) {
+          return new ApiResponse<List<OptionModel>>(
+              localVarResponse.statusCode(),
+              localVarResponse.headers().map(),
+              null
+          );
+        }
+
+        
+        
+        String responseBody = new String(localVarResponseBody.readAllBytes());
+        List<OptionModel> responseValue = responseBody.isBlank()? null: memberVarObjectMapper.readValue(responseBody, new TypeReference<List<OptionModel>>() {});
+        
+
+        return new ApiResponse<List<OptionModel>>(
+            localVarResponse.statusCode(),
+            localVarResponse.headers().map(),
+            responseValue
+        );
+      } finally {
+        if (localVarResponseBody != null) {
+          localVarResponseBody.close();
+        }
+      }
+    } catch (IOException e) {
+      throw new ApiException(e);
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new ApiException(e);
+    }
+  }
+
+  private HttpRequest.Builder getFrontendAutomationComponentInputOptionsRequestBuilder(@jakarta.annotation.Nonnull AutomationComponentInputOptionsRequestModel automationComponentInputOptionsRequestModel, @jakarta.annotation.Nullable EnvironmentModel xEnvironment, Map<String, String> headers) throws ApiException {
+    // verify the required parameter 'automationComponentInputOptionsRequestModel' is set
+    if (automationComponentInputOptionsRequestModel == null) {
+      throw new ApiException(400, "Missing the required parameter 'automationComponentInputOptionsRequestModel' when calling getFrontendAutomationComponentInputOptions");
+    }
+
+    HttpRequest.Builder localVarRequestBuilder = HttpRequest.newBuilder();
+
+    String localVarPath = "/automation/component-input-options";
+
+    localVarRequestBuilder.uri(URI.create(memberVarBaseUri + localVarPath));
+
+    if (xEnvironment != null) {
+      localVarRequestBuilder.header("X-Environment", xEnvironment.toString());
+    }
+    localVarRequestBuilder.header("Content-Type", "application/json");
+    localVarRequestBuilder.header("Accept", "application/json");
+
+    try {
+      byte[] localVarPostBody = memberVarObjectMapper.writeValueAsBytes(automationComponentInputOptionsRequestModel);
+      localVarRequestBuilder.method("POST", HttpRequest.BodyPublishers.ofByteArray(localVarPostBody));
+    } catch (IOException e) {
+      throw new ApiException(e);
+    }
     if (memberVarReadTimeout != null) {
       localVarRequestBuilder.timeout(memberVarReadTimeout);
     }
