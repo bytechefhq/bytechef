@@ -144,7 +144,7 @@ public class McpProjectWorkflowMappingValidator implements McpServerEnablementVa
     }
 
     private static @Nullable WorkflowTrigger getMcpToolCallableTrigger(Workflow workflow) {
-        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
+        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.ofEnabled(workflow)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&

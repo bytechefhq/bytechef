@@ -40,7 +40,7 @@ public final class A2aWorkflowTriggerUtils {
     }
 
     public static Optional<WorkflowTrigger> fetchNewWorkflowCallTrigger(Workflow workflow) {
-        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
+        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.ofEnabled(workflow)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&

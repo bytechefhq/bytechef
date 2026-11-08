@@ -17,7 +17,9 @@
 package com.bytechef.automation.ai.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -32,6 +34,8 @@ import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
@@ -117,6 +121,45 @@ class ListMcpProjectWorkflowsToolCallbackTest {
             .contains("get_weather")
             .contains("Weather Lookup")
             .contains("\"toolCallable\":false");
+    }
+
+    @Test
+    void testOmitsWorkflowWhoseMcpTriggerIsDisabled() {
+        McpProject mcpProject = new McpProject(300L, 200L, 5L);
+
+        McpProjectWorkflow mcpProjectWorkflow = new McpProjectWorkflow();
+
+        mcpProjectWorkflow.setId(400L);
+        mcpProjectWorkflow.setProjectDeploymentWorkflowId(500L);
+        mcpProjectWorkflow.setParameters(Map.of("toolName", "get_weather"));
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setWorkflowId("workflow-1");
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getId()).thenReturn("workflow-1");
+        when(workflow.getLabel()).thenReturn("Weather Lookup");
+        when(workflow.getExtensions(eq(WorkflowExtConstants.TRIGGERS), eq(WorkflowTrigger.class), any()))
+            .thenReturn(
+                List.of(
+                    new WorkflowTrigger(
+                        Map.of(
+                            "name", "newWorkflowCall_1", "type", "workflow/v1/newWorkflowCall", "disabled", true))));
+
+        mockWorkspaceMcpServer(7L, 5L);
+
+        when(mcpProjectService.getMcpServerMcpProjects(5L)).thenReturn(List.of(mcpProject));
+        when(mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(300L))
+            .thenReturn(List.of(mcpProjectWorkflow));
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(500L))
+            .thenReturn(projectDeploymentWorkflow);
+        when(workflowService.getWorkflow("workflow-1")).thenReturn(workflow);
+
+        String result = toolCallback.call("{\"mcpServerId\": 5}", workspaceToolContext(7L));
+
+        assertThat(result).contains("\"toolCallable\":false");
     }
 
     @Nested

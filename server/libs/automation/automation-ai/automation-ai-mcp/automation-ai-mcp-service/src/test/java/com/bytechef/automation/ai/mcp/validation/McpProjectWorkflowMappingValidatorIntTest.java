@@ -222,20 +222,40 @@ class McpProjectWorkflowMappingValidatorIntTest {
             .doesNotThrowAnyException();
     }
 
+    @Test
+    void testValidateEnablementIgnoresWorkflowWhoseMcpTriggerIsDisabled() {
+        saveMcpProjectWorkflow(saveDeployment("Unmapped But Trigger Disabled Workflow", true, true), Map.of());
+
+        assertThatCode(() -> mcpProjectWorkflowMappingValidator.validateEnablement(mcpServer.getId()))
+            .doesNotThrowAnyException();
+    }
+
     private ProjectDeploymentWorkflow saveDeployment(@Nullable String workflowLabel, boolean enabled) {
+        return saveDeployment(workflowLabel, enabled, false);
+    }
+
+    private ProjectDeploymentWorkflow saveDeployment(
+        @Nullable String workflowLabel, boolean enabled, boolean mcpTriggerDisabled) {
+
         Map<String, Object> definition = new LinkedHashMap<>();
 
         if (workflowLabel != null) {
             definition.put("label", workflowLabel);
         }
 
+        Map<String, Object> mcpTrigger = new LinkedHashMap<>();
+
+        mcpTrigger.put("name", "newWorkflowCall_1");
+        mcpTrigger.put("type", "workflow/v1/newWorkflowCall");
+        mcpTrigger.put("parameters", Map.of("inputSchema", REQUIRED_INPUT_SCHEMA));
+
+        if (mcpTriggerDisabled) {
+            mcpTrigger.put("disabled", true);
+        }
+
         definition.put(
             "triggers",
-            List.of(
-                Map.of(
-                    "name", "newWorkflowCall_1",
-                    "type", "workflow/v1/newWorkflowCall",
-                    "parameters", Map.of("inputSchema", REQUIRED_INPUT_SCHEMA))));
+            List.of(mcpTrigger, Map.of("name", "manual_1", "type", "manual/v1/manual")));
         definition.put("tasks", List.of());
 
         Workflow workflow = workflowService.create(

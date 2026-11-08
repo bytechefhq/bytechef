@@ -1033,7 +1033,7 @@ class AutomationMcpToolFacadeIntTest {
         when(workflowNodeType.name()).thenReturn(WorkflowConstants.WORKFLOW);
         when(workflowNodeType.operation()).thenReturn(WorkflowConstants.NEW_WORKFLOW_CALL);
 
-        workflowTriggerMockedStatic.when(() -> WorkflowTrigger.of(any(Workflow.class)))
+        workflowTriggerMockedStatic.when(() -> WorkflowTrigger.ofEnabled(any(Workflow.class)))
             .thenReturn(List.of(workflowTrigger));
         workflowNodeTypeMockedStatic.when(() -> WorkflowNodeType.ofType(NEW_WORKFLOW_CALL_TYPE))
             .thenReturn(workflowNodeType);

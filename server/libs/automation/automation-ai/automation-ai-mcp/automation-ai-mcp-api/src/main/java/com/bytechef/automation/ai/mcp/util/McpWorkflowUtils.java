@@ -36,7 +36,7 @@ public final class McpWorkflowUtils {
     }
 
     public static @Nullable WorkflowTrigger getCallableTrigger(Workflow workflow) {
-        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
+        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.ofEnabled(workflow)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             if (Objects.equals(workflowNodeType.name(), WORKFLOW) &&
