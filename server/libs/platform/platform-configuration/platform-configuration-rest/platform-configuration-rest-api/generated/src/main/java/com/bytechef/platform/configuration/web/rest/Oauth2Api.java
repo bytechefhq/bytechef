@@ -75,7 +75,7 @@ public interface Oauth2Api {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"authorizationUrl\" : \"authorizationUrl\", \"extraQueryParameters\" : { \"key\" : \"extraQueryParameters\" }, \"clientId\" : \"clientId\", \"scopes\" : { \"key\" : true } }";
+                    String exampleString = "{ \"authorizationUrl\" : \"authorizationUrl\", \"extraQueryParameters\" : { \"key\" : \"extraQueryParameters\" }, \"clientId\" : \"clientId\", \"scopes\" : { \"key\" : true }, \"authorizationContext\" : \"authorizationContext\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
