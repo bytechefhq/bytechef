@@ -1,0 +1,15 @@
+### Running code from an AI Agent
+
+**Execute Code** is also available as a tool for the AI Agent. Add it under the agent's tools, and the agent can write code (Python, TypeScript, JavaScript or Bash), run it in an isolated Daytona sandbox, and use the output in its answer. This is useful for data analysis, calculations and scripts that the model should not try to compute in its head.
+
+The tool returns `exitCode`, `stdout`, `success`, `sandboxId` and any `charts` the code produced (for example, matplotlib plots).
+
+### Sandbox lifecycle
+
+By default, **Execute Code** creates a new sandbox, runs the code and deletes the sandbox when the run finishes, so nothing carries over between runs.
+
+To keep files, installed packages and variables between runs:
+
+1. Create a sandbox with **Create Sandbox**, or run **Execute Code** with **Keep Sandbox** enabled. Both return a `sandboxId`.
+2. Pass that `sandboxId` to later **Execute Code** and **Upload File** calls. A sandbox passed in this way is never deleted by **Execute Code**.
+3. Delete the sandbox with **Delete Sandbox** when you are done. Sandboxes you keep count against your Daytona usage until you delete them.
