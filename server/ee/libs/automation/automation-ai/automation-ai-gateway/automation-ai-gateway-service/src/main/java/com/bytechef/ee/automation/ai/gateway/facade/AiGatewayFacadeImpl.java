@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.ai.gateway.facade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.ee.automation.ai.gateway.budget.AiGatewayBudgetChecker;
+import com.bytechef.ee.automation.ai.gateway.evaluation.AiEvalExecutor;
 import com.bytechef.ee.automation.ai.gateway.guardrail.AiGatewayGuardrails;
 import com.bytechef.ee.automation.ai.gateway.ratelimit.AiGatewayRateLimitChecker;
 import com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsService;
@@ -158,6 +159,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private static final Pattern TRACE_DEDUP_INDEX_PATTERN =
         AiGatewayConstraintMatchers.wordBoundaryPattern(TRACE_DEDUP_INDEX);
 
+    private final AiEvalExecutor aiEvalExecutor;
     private final AiGatewayBudgetChecker aiGatewayBudgetChecker;
     private final @Nullable AiGatewayRateLimitChecker aiGatewayRateLimitChecker;
     private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
@@ -195,6 +197,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
     private final TransactionTemplate transactionTemplate;
 
     public AiGatewayFacadeImpl(
+        AiEvalExecutor aiEvalExecutor,
         AiGatewayBudgetChecker aiGatewayBudgetChecker,
         @Nullable AiGatewayRateLimitChecker aiGatewayRateLimitChecker,
         AiGatewayChatModelFactory aiGatewayChatModelFactory,
@@ -231,6 +234,7 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
         @Nullable PermissionService permissionService,
         PlatformTransactionManager transactionManager) {
 
+        this.aiEvalExecutor = aiEvalExecutor;
         this.aiGatewayBudgetChecker = aiGatewayBudgetChecker;
         this.aiGatewayRateLimitChecker = aiGatewayRateLimitChecker;
         this.aiGatewayChatModelFactory = aiGatewayChatModelFactory;
@@ -2269,6 +2273,15 @@ public class AiGatewayFacadeImpl implements AiGatewayFacade {
                 }
             }
 
+            if (trace.getStatus() == AiObservabilityTraceStatus.COMPLETED) {
+                try {
+                    aiEvalExecutor.evaluateTrace(trace.getId(), workspaceId);
+                } catch (Exception evalException) {
+                    log.error(
+                        "Failed to dispatch eval for model '{}' (traceId={})", request.model(), trace.getId(),
+                        evalException);
+                }
+            }
         } catch (Exception exception) {
             log.error(
                 "Failed to persist trace/span for model '{}' — tracing data will be missing",

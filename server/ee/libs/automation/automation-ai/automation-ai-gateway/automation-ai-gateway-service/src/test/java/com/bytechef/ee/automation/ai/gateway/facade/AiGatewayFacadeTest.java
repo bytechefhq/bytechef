@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.ai.gateway.budget.AiGatewayBudgetChecker;
 import com.bytechef.ee.automation.ai.gateway.budget.AiGatewayBudgetChecker.BudgetCheckResult;
+import com.bytechef.ee.automation.ai.gateway.evaluation.AiEvalExecutor;
 import com.bytechef.ee.automation.ai.gateway.ratelimit.AiGatewayRateLimitChecker;
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProjectService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilitySessionService;
@@ -137,6 +138,9 @@ import reactor.test.StepVerifier;
 class AiGatewayFacadeTest {
 
     private static final long ENVIRONMENT_ID = 1L;
+
+    @Mock
+    private AiEvalExecutor aiEvalExecutor;
 
     @Mock
     private AiGatewayBudgetChecker aiGatewayBudgetChecker;
@@ -274,7 +278,7 @@ class AiGatewayFacadeTest {
         com.bytechef.ee.automation.ai.gateway.guardrail.AiGatewayGuardrails guardrails) {
 
         return new AiGatewayFacadeImpl(
-            aiGatewayBudgetChecker, aiGatewayRateLimitChecker,
+            aiEvalExecutor, aiGatewayBudgetChecker, aiGatewayRateLimitChecker,
             aiGatewayChatModelFactory, aiGatewayConnectedUserSettingsService, aiGatewayContextCompressor,
             aiGatewayCostCalculator,
             guardrails,
@@ -1240,6 +1244,46 @@ class AiGatewayFacadeTest {
 
         verify(workspaceAiObservabilityTraceService).createInWorkspace(any(AiObservabilityTrace.class), anyLong());
         verify(aiObservabilitySpanService).create(any(AiObservabilitySpan.class));
+        verify(aiEvalExecutor).evaluateTrace(100L, 1L);
+    }
+
+    @Test
+    void testChatCompletionFailureDoesNotDispatchOnlineEval() {
+        AiGatewayChatCompletionRequest request = createDefaultRequest();
+
+        when(aiGatewayBudgetChecker.checkBudget(1L)).thenReturn(BudgetCheckResult.allowed());
+        when(aiGatewayResponseCache.shouldCache(any())).thenReturn(false);
+
+        AiGatewayProvider provider = createProvider();
+        AiModel model = createModel(provider);
+
+        when(aiGatewayProviderService.getEnabledProviders()).thenReturn(List.of(provider));
+        when(aiModelService.getModel(provider.getId(), "gpt-4")).thenReturn(model);
+        when(aiGatewayContextCompressor.compress(any(), any(Integer.class))).thenReturn(request.messages());
+
+        ChatModel chatModel = mock(ChatModel.class);
+
+        when(aiGatewayChatModelFactory.getChatModel(any())).thenReturn(chatModel);
+        when(chatModel.call(any(Prompt.class))).thenThrow(new RuntimeException("API call failed"));
+        when(workspaceAiObservabilityTraceService.findByExternalTraceId(any(), anyString()))
+            .thenReturn(Optional.empty());
+
+        doAnswer(invocation -> {
+            AiObservabilityTrace trace = invocation.getArgument(0);
+
+            ReflectionTestUtils.setField(trace, "id", 101L);
+
+            return null;
+        }).when(workspaceAiObservabilityTraceService)
+            .createInWorkspace(any(AiObservabilityTrace.class), anyLong());
+
+        AiObservabilityTracingHeaders tracingHeaders = new AiObservabilityTracingHeaders(
+            "test-trace-2", null, "test-span", null, "user-1", Map.of(), List.of());
+
+        assertThrows(RuntimeException.class, () -> aiGatewayFacade.chatCompletion(request, tracingHeaders));
+
+        verify(aiObservabilitySpanService).create(any(AiObservabilitySpan.class));
+        verify(aiEvalExecutor, never()).evaluateTrace(anyLong(), any());
     }
 
     @Test
