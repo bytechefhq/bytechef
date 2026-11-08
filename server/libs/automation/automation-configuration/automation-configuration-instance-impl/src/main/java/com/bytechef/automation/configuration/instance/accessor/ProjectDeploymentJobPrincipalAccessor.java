@@ -31,6 +31,8 @@ import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -59,6 +61,23 @@ public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccess
     @Override
     public boolean isConnectionUsed(long connectionId) {
         return projectDeploymentWorkflowService.isConnectionUsed(connectionId);
+    }
+
+    @Override
+    public boolean isJobPrincipalPresent(long jobPrincipalId) {
+        Optional<ProjectDeployment> projectDeployment = projectDeploymentService.fetchProjectDeployment(jobPrincipalId);
+
+        return projectDeployment.isPresent();
+    }
+
+    @Override
+    public boolean isJobPrincipalWorkflowPresent(long jobPrincipalId, long jobPrincipalWorkflowId) {
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(jobPrincipalId);
+
+        return projectDeploymentWorkflows.stream()
+            .anyMatch(projectDeploymentWorkflow -> Objects.equals(
+                projectDeploymentWorkflow.getId(), jobPrincipalWorkflowId));
     }
 
     @Override

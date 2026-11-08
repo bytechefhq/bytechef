@@ -64,6 +64,12 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<IntegrationInstance> fetchIntegrationInstance(long id) {
+        return integrationInstanceRepository.findById(id);
+    }
+
+    @Override
     public Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, String componentName, Environment environment) {
 

@@ -55,6 +55,11 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     }
 
     @Override
+    public Optional<IntegrationInstance> fetchIntegrationInstance(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, String componentName, Environment environment) {
 

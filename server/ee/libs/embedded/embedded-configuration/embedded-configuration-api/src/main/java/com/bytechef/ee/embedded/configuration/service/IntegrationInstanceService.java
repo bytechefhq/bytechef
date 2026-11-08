@@ -30,6 +30,8 @@ public interface IntegrationInstanceService {
 
     Set<Long> getConnectionIdsIn(Set<Long> connectionIds);
 
+    Optional<IntegrationInstance> fetchIntegrationInstance(long id);
+
     Optional<IntegrationInstance> fetchIntegrationInstance(
         long connectedUserId, String componentName, Environment environment);
 

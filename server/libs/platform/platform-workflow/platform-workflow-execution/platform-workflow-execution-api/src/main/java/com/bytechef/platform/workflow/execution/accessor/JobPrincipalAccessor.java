@@ -28,6 +28,14 @@ public interface JobPrincipalAccessor {
 
     boolean isWorkflowEnabled(long jobPrincipalId, String workflowUuid);
 
+    default boolean isJobPrincipalPresent(long jobPrincipalId) {
+        return true;
+    }
+
+    default boolean isJobPrincipalWorkflowPresent(long jobPrincipalId, long jobPrincipalWorkflowId) {
+        return true;
+    }
+
     long getEnvironmentId(long jobPrincipalId);
 
     Map<String, ?> getInputMap(long jobPrincipalId, String workflowUuid);

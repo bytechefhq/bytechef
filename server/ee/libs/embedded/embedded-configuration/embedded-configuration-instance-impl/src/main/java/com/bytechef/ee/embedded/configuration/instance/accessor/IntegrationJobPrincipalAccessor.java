@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
@@ -25,8 +26,11 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -64,6 +68,24 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
     @Override
     public boolean isConnectionUsed(long connectionId) {
         return integrationInstanceConfigurationWorkflowService.isConnectionUsed(connectionId);
+    }
+
+    @Override
+    public boolean isJobPrincipalPresent(long jobPrincipalId) {
+        Optional<IntegrationInstance> integrationInstance =
+            integrationInstanceService.fetchIntegrationInstance(jobPrincipalId);
+
+        return integrationInstance.isPresent();
+    }
+
+    @Override
+    public boolean isJobPrincipalWorkflowPresent(long jobPrincipalId, long jobPrincipalWorkflowId) {
+        List<IntegrationInstanceWorkflow> integrationInstanceWorkflows =
+            integrationInstanceWorkflowService.getIntegrationInstanceWorkflows(jobPrincipalId);
+
+        return integrationInstanceWorkflows.stream()
+            .anyMatch(integrationInstanceWorkflow -> Objects.equals(
+                integrationInstanceWorkflow.getId(), jobPrincipalWorkflowId));
     }
 
     @Override
