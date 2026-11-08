@@ -30,6 +30,16 @@ The **Environment** field in the dialog shows the environment the connection is 
   External credential stores are not available in the latest released version of ByteChef. When they are, an administrator can configure an external secret backend, and the create dialog shows a **Credential storage** selector. With a non-default store, you can turn on **Register existing credential** and reference a secret in that store by its path or UUID instead of entering the credentials in ByteChef. The selector appears only when more than one credential store is available, and it cannot be changed after the connection is created.
 </Callout>
 
+### Choose a known MCP server
+
+The create dialog of an **MCP Client** connection shows a **Choose a known server** list above the server URL. Picking a server from ByteChef's MCP server catalog fills in its URL, transport type and authorization:
+
+- Servers that support dynamic client registration get **OAuth2 (PKCE)** with the URL fields left empty. ByteChef discovers the authorization server and registers itself.
+- OAuth servers that require PKCE get **OAuth2 (PKCE)** with their authorization URL, token URL and scopes. Add the client ID, and the client secret if the app has one, of an OAuth app registered with the server.
+- Other OAuth servers get **OAuth2 (manual)** with their authorization URL, token URL and scopes.
+
+Every field stays editable, and you can skip the list and enter the server yourself. The list is hidden when the catalog cannot be fetched.
+
 ## Manage connections
 
 The **Connections** page lists every connection with its component icon, name, tags, creation date, and two status badges:
