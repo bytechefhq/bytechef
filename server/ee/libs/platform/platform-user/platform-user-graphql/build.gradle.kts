@@ -55,5 +55,8 @@ dependencies {
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
+    testImplementation("org.springframework.security:spring-security-config")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation(project(":server:ee:libs:platform:platform-user:platform-user-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

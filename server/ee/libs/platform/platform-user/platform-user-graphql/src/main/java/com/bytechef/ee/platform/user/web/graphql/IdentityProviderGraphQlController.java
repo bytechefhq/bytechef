@@ -14,6 +14,7 @@ import com.bytechef.ee.platform.user.facade.IdentityProviderFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -91,7 +92,15 @@ public class IdentityProviderGraphQlController {
                 .toList();
         }
 
+        List<AuthorityMappingDTO> authorityMappingsList = identityProvider.getAuthorityMappings()
+            .entrySet()
+            .stream()
+            .map(entry -> new AuthorityMappingDTO(entry.getValue(), entry.getKey()))
+            .toList();
+
         return new IdentityProviderDTO(
+            identityProvider.getAuthoritiesClaim(),
+            authorityMappingsList,
             identityProvider.isAutoProvision(),
             identityProvider.getClientId(),
             identityProvider.getCreatedBy(),
@@ -108,6 +117,9 @@ public class IdentityProviderGraphQlController {
                 ? identityProvider.getLastModifiedDate()
                     .toEpochMilli()
                 : null,
+            identityProvider.isMcpEmbedded(),
+            identityProvider.isMcpAutomation(),
+            identityProvider.isMcpManagement(),
             identityProvider.getMetadataUri(),
             identityProvider.getMfaMethod(),
             identityProvider.isMfaRequired(),
@@ -115,7 +127,8 @@ public class IdentityProviderGraphQlController {
             identityProvider.getNameIdFormat(),
             identityProvider.getScopes(),
             identityProvider.getSigningCertificate(),
-            identityProvider.getType());
+            identityProvider.getType(),
+            identityProvider.isValidateMcpAudience());
     }
 
     private IdentityProvider toIdentityProvider(IdentityProviderInput input) {
@@ -153,6 +166,31 @@ public class IdentityProviderGraphQlController {
             identityProvider.setIssuerUri(input.issuerUri());
         }
 
+        if (input.mcpEmbedded() != null) {
+            identityProvider.setMcpEmbedded(input.mcpEmbedded());
+        }
+
+        if (input.mcpAutomation() != null) {
+            identityProvider.setMcpAutomation(input.mcpAutomation());
+        }
+
+        if (input.mcpManagement() != null) {
+            identityProvider.setMcpManagement(input.mcpManagement());
+        }
+
+        if (input.authorityMappings() != null) {
+            Map<String, String> authorityMappings = input.authorityMappings()
+                .stream()
+                .collect(
+                    Collectors.toMap(
+                        AuthorityMappingInput::externalGroup, AuthorityMappingInput::authority,
+                        (first, second) -> first));
+
+            identityProvider.setAuthorityMappings(authorityMappings);
+        }
+
+        identityProvider.setAuthoritiesClaim(input.authoritiesClaim());
+
         if (input.metadataUri() != null) {
             identityProvider.setMetadataUri(input.metadataUri());
         }
@@ -183,21 +221,35 @@ public class IdentityProviderGraphQlController {
             identityProvider.setType(input.type());
         }
 
+        if (input.validateMcpAudience() != null) {
+            identityProvider.setValidateMcpAudience(input.validateMcpAudience());
+        }
+
         return identityProvider;
     }
 
     @SuppressFBWarnings("EI")
     record IdentityProviderDTO(
-        boolean autoProvision, String clientId, String createdBy, Long createdDate, String defaultAuthority,
-        List<String> domains, boolean enabled, boolean enforced, Long id, String issuerUri, String lastModifiedBy,
-        Long lastModifiedDate, String metadataUri, String mfaMethod, boolean mfaRequired, String name,
-        String nameIdFormat, String scopes, String signingCertificate, String type) {
+        String authoritiesClaim, List<AuthorityMappingDTO> authorityMappings, boolean autoProvision, String clientId,
+        String createdBy, Long createdDate, String defaultAuthority, List<String> domains, boolean enabled,
+        boolean enforced, Long id, String issuerUri, String lastModifiedBy, Long lastModifiedDate, boolean mcpEmbedded,
+        boolean mcpAutomation, boolean mcpManagement, String metadataUri, String mfaMethod, boolean mfaRequired,
+        String name, String nameIdFormat, String scopes, String signingCertificate, String type,
+        boolean validateMcpAudience) {
     }
 
+    record AuthorityMappingDTO(String authority, String externalGroup) {
+    }
+
+    @SuppressFBWarnings("EI")
     record IdentityProviderInput(
-        Boolean autoProvision, String clientId, String clientSecret, String defaultAuthority, List<String> domains,
-        Boolean enabled, Boolean enforced, String issuerUri, String metadataUri, String mfaMethod,
-        Boolean mfaRequired, String name, String nameIdFormat, String scopes, String signingCertificate,
-        String type) {
+        String authoritiesClaim, List<AuthorityMappingInput> authorityMappings, Boolean autoProvision, String clientId,
+        String clientSecret, String defaultAuthority, List<String> domains, Boolean enabled, Boolean enforced,
+        String issuerUri, Boolean mcpEmbedded, Boolean mcpAutomation, Boolean mcpManagement, String metadataUri,
+        String mfaMethod, Boolean mfaRequired, String name, String nameIdFormat, String scopes,
+        String signingCertificate, String type, Boolean validateMcpAudience) {
+    }
+
+    record AuthorityMappingInput(String authority, String externalGroup) {
     }
 }
