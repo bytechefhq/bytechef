@@ -734,7 +734,8 @@ class AiAgentChatActionIntTest {
             AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
             ToolCallingManager toolCallingManager) {
 
-            return new AiAgentComponentHandler(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+            return new AiAgentComponentHandler(
+                aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, null);
         }
 
         @Bean

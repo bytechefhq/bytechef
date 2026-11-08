@@ -163,6 +163,25 @@ public class AiHubChatServiceImpl implements AiHubChatService {
         long workspaceId, long userId, int environment, String workflowExecutionId, long projectDeploymentId,
         @Nullable String title) {
 
+        return createWebhookBridgedChat(
+            AiHubChatKind.WORKFLOW_CHAT, workspaceId, userId, environment, workflowExecutionId, projectDeploymentId,
+            title);
+    }
+
+    @Override
+    public AiHubChat createAgentChat(
+        long workspaceId, long userId, int environment, String workflowExecutionId, long projectDeploymentId,
+        @Nullable String title) {
+
+        return createWebhookBridgedChat(
+            AiHubChatKind.AGENT_CHAT, workspaceId, userId, environment, workflowExecutionId, projectDeploymentId,
+            title);
+    }
+
+    private AiHubChat createWebhookBridgedChat(
+        AiHubChatKind kind, long workspaceId, long userId, int environment, String workflowExecutionId,
+        long projectDeploymentId, @Nullable String title) {
+
         LocalDateTime now = LocalDateTime.now(clock);
 
         AiHubChat chat = new AiHubChat(userId);
@@ -171,7 +190,7 @@ public class AiHubChatServiceImpl implements AiHubChatService {
             .toString());
         chat.setStatus(AiHubChatStatus.ACTIVE);
         chat.setMessageCount(0);
-        chat.setKind(AiHubChatKind.WORKFLOW_CHAT);
+        chat.setKind(kind);
         chat.setWorkflowExecutionId(workflowExecutionId);
         chat.setProjectDeploymentId(projectDeploymentId);
         chat.setEnvironment(EnumOrdinals.fromOrdinal(environment, Environment.class));
@@ -189,7 +208,8 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     @Override
     public int bulkArchiveWorkflowChatAiHubChats(long workspaceId, long userId, int environment) {
         List<AiHubChat> activeWorkflowChats = chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndKindInAndStatus(
-            workspaceId, userId, environment, List.of(AiHubChatKind.WORKFLOW_CHAT.ordinal()),
+            workspaceId, userId, environment,
+            List.of(AiHubChatKind.WORKFLOW_CHAT.ordinal(), AiHubChatKind.AGENT_CHAT.ordinal()),
             AiHubChatStatus.ACTIVE.ordinal(), LIST_LIMIT);
 
         LocalDateTime now = LocalDateTime.now(clock);
@@ -221,6 +241,38 @@ public class AiHubChatServiceImpl implements AiHubChatService {
 
         return chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndStatusOrderByUpdatedAtDesc(
             workspaceId, userId, environment, status.ordinal(), LIST_LIMIT);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AiHubChatTranscriptSummary summarizeTranscript(
+        long chatId, long requesterWorkspaceId, long requesterUserId) {
+
+        AiHubChat chat = loadViewable(chatId, requesterWorkspaceId, requesterUserId);
+
+        AiHubSessionMemory sessionMemory = aiHubSessionMemoryProvider.getIfAvailable();
+
+        if (sessionMemory == null) {
+            return new AiHubChatTranscriptSummary(0, null);
+        }
+
+        List<SessionEvent> allEvents = sessionMemory.sessionService()
+            .getEvents(chat.getThreadId(), EventFilter.all());
+
+        int messageCount = 0;
+        String lastMessageContent = null;
+
+        for (SessionEvent event : allEvents) {
+            if (isVisibleConversationEvent(event)) {
+                messageCount++;
+
+                Message message = event.getMessage();
+
+                lastMessageContent = message.getText();
+            }
+        }
+
+        return new AiHubChatTranscriptSummary(messageCount, lastMessageContent);
     }
 
     @Override

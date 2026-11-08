@@ -28,6 +28,7 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder;
 import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
@@ -46,6 +47,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -56,14 +58,27 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ToolCallingManager toolCallingManager) {
 
-        return new AiAgentChatAction(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager).build();
+        return of(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, null);
+    }
+
+    public static ChatActionDefinitionWrapper of(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
+
+        return new AiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            agentConversationRecorderObjectProvider).build();
     }
 
     private AiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
-        super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+        super(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            agentConversationRecorderObjectProvider);
     }
 
     private ChatActionDefinitionWrapper build() {
@@ -108,6 +123,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
             return null;
         }
 
+        recordAgentConversationTurn(inputParameters, extensions, context);
+
         return toOutput(chatActionResult, toolExecutionEvents, context);
     }
 
@@ -130,6 +147,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
         ModelUtils.ChatActionResult chatActionResult = ModelUtils.getChatActionResult(
             call, inputParameters, context);
+
+        recordAgentConversationTurn(inputParameters, extensions, context);
 
         return toOutput(chatActionResult, toolExecutionEvents, context);
     }

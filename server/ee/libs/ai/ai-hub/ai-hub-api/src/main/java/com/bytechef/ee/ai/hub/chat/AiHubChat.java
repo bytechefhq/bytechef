@@ -81,6 +81,9 @@ public class AiHubChat {
     @Column("workspace_id")
     private @Nullable Long workspaceId;
 
+    @Column("ai_agent_id")
+    private @Nullable Long aiAgentId;
+
     public AiHubChat() {
     }
 
@@ -236,6 +239,14 @@ public class AiHubChat {
 
     public void setWorkspaceId(@Nullable Long workspaceId) {
         this.workspaceId = workspaceId;
+    }
+
+    public @Nullable Long getAiAgentId() {
+        return aiAgentId;
+    }
+
+    public void setAiAgentId(@Nullable Long aiAgentId) {
+        this.aiAgentId = aiAgentId;
     }
 
     @Override

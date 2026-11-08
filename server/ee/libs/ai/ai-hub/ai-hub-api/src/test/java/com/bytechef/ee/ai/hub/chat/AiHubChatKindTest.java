@@ -22,12 +22,14 @@ class AiHubChatKindTest {
     void testOrdinalsMatchTheStoredValues() {
         assertThat(AiHubChatKind.STANDARD.ordinal()).isZero();
         assertThat(AiHubChatKind.WORKFLOW_CHAT.ordinal()).isEqualTo(1);
-        assertThat(AiHubChatKind.values()).hasSize(2);
+        assertThat(AiHubChatKind.AGENT_CHAT.ordinal()).isEqualTo(2);
+        assertThat(AiHubChatKind.values()).hasSize(3);
     }
 
     @Test
-    void testOnlyWorkflowChatIsWebhookBridged() {
+    void testWorkflowAndAgentChatsAreWebhookBridged() {
         assertThat(AiHubChatKind.WORKFLOW_CHAT.isWebhookBridged()).isTrue();
+        assertThat(AiHubChatKind.AGENT_CHAT.isWebhookBridged()).isTrue();
         assertThat(AiHubChatKind.STANDARD.isWebhookBridged()).isFalse();
     }
 
@@ -47,5 +49,16 @@ class AiHubChatKindTest {
         assertThat(chat.getKind()).isEqualTo(AiHubChatKind.WORKFLOW_CHAT);
         assertThat(chat.getWorkflowExecutionId()).isEqualTo("tenant:uuid");
         assertThat(chat.getProjectDeploymentId()).isEqualTo(9L);
+    }
+
+    @Test
+    void testAgentIdRoundTrips() {
+        AiHubChat chat = new AiHubChat(7L);
+
+        assertThat(chat.getAiAgentId()).isNull();
+
+        chat.setAiAgentId(11L);
+
+        assertThat(chat.getAiAgentId()).isEqualTo(11L);
     }
 }

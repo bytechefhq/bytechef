@@ -133,7 +133,8 @@
         "type": "aiAgentUtils/v1/removeFileFromAiSkill",
         "parameters": { }
       } ]
-    }
+    },
+    "aiHubAgentId": 1
   }, {
     "name": "branch_out",
     "type": "branch/v1",

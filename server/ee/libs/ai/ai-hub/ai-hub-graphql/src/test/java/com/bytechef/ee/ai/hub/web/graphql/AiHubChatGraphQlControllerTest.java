@@ -131,6 +131,49 @@ class AiHubChatGraphQlControllerTest {
     }
 
     @Test
+    void testCreateAgentChatRefusesAnIdOutsideTheWorkspaceListing() {
+        when(permissionService.hasWorkspaceScope(7L, "WORKFLOW_VIEW")).thenReturn(true);
+        when(projectDeploymentFacade.findWorkspaceChatWorkflow(7L, "exec-x")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> controller.createAgentChatAiHubChat(7L, 0, "exec-x", 42L, null))
+            .isInstanceOf(ForbiddenException.class);
+
+        verifyNoInteractions(chatService);
+    }
+
+    @Test
+    void testCreateAgentChatRequiresTheWorkflowViewScope() {
+        when(permissionService.hasWorkspaceScope(7L, "WORKFLOW_VIEW")).thenReturn(false);
+
+        assertThatThrownBy(() -> controller.createAgentChatAiHubChat(7L, 0, "exec-1", 42L, null))
+            .isInstanceOf(ForbiddenException.class);
+
+        verifyNoInteractions(chatService, projectDeploymentFacade);
+    }
+
+    @Test
+    void testCreateAgentChatRequiresWorkspaceMembership() {
+        assertThatThrownBy(() -> controller.createAgentChatAiHubChat(8L, 0, "exec-1", 42L, null))
+            .isInstanceOf(ForbiddenException.class);
+
+        verifyNoInteractions(chatService);
+    }
+
+    @Test
+    void testCreateAgentChatDelegatesWithTheListingsDeploymentId() {
+        AiHubChat created = mock(AiHubChat.class);
+
+        when(permissionService.hasWorkspaceScope(7L, "WORKFLOW_VIEW")).thenReturn(true);
+        when(projectDeploymentFacade.findWorkspaceChatWorkflow(7L, "exec-1"))
+            .thenReturn(Optional.of(listedChatWorkflow("exec-1", 42L)));
+        when(chatService.createAgentChat(7L, 10L, 0, "exec-1", 42L, "Agent")).thenReturn(created);
+
+        assertThat(controller.createAgentChatAiHubChat(7L, 0, "exec-1", 999L, "Agent")).isSameAs(created);
+
+        verify(chatService).createAgentChat(7L, 10L, 0, "exec-1", 42L, "Agent");
+    }
+
+    @Test
     void testBulkArchiveWorkflowChatsDelegatesForAMember() {
         when(chatService.bulkArchiveWorkflowChatAiHubChats(7L, 10L, 0)).thenReturn(3);
 

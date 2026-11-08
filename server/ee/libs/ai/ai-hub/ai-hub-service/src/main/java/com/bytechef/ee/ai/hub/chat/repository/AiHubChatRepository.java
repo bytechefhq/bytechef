@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -141,4 +142,17 @@ public interface AiHubChatRepository extends CrudRepository<AiHubChat, Long> {
         WHERE id = :id AND status <> :deletedStatus
         """)
     int updateStatusUnlessDeleted(long id, int status, int deletedStatus, LocalDateTime updatedAt);
+
+    @Modifying
+    @Query("""
+        INSERT INTO ai_hub_chat (
+            user_id, thread_id, title, message_count, status, environment, kind, workspace_id, ai_agent_id,
+            auto_titled, created_at, updated_at)
+        VALUES (
+            :userId, :threadId, :title, 0, :status, :environment, :kind, :workspaceId, :aiAgentId, true, :now, :now)
+        ON CONFLICT (thread_id) DO NOTHING
+        """)
+    int insertAgentChatIfAbsent(
+        long userId, String threadId, @Nullable String title, int status, int environment, int kind, long workspaceId,
+        long aiAgentId, LocalDateTime now);
 }

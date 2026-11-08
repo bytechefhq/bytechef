@@ -27,7 +27,8 @@ public class TestWorkflowReservedWordContributor implements WorkflowReservedWord
     @Override
     public List<String> getReservedWords() {
         return List.of(
-            "authorizationRequired", "category", "clusterElements", "componentName", "componentVersion", "connections",
+            "aiHubAgentId", "aiHubCreatorUserId", "aiHubWorkspaceId", "authorizationRequired", "category",
+            "clusterElements", "componentName", "componentVersion", "connections",
             "tags", "triggers");
     }
 }

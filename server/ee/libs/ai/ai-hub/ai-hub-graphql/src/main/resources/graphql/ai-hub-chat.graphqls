@@ -16,7 +16,7 @@ type AiHubChat {
     updatedAt: Long
     """
     Discriminator for the chat flavour. STANDARD (default) talks to the LLM agent; WORKFLOW_CHAT
-    binds the chat to a specific workflow execution. Both kinds run through AiHubRuntimeProvider and the
+    binds the chat to a specific workflow execution, and AGENT_CHAT to an AI Agent's generated workflow. Both kinds run through AiHubRuntimeProvider and the
     AG-UI endpoint; the server routes WORKFLOW_CHAT turns to WebhookBridgeAgent, which runs the workflow
     server-side.
     """
@@ -35,6 +35,12 @@ type AiHubChat {
     when the LLM regenerates a title or the user renames the chat, so regeneration fires once and then stops.
     """
     autoTitled: Boolean!
+    """
+    The AI Agent a chat recorded from one of the agent's channels belongs to. Null for chats created in the AI Hub. A
+    non-null aiAgentId with a null workflowExecutionId marks a chat recorded from a channel, which the hub can read but
+    not continue.
+    """
+    aiAgentId: Long
     """The chat owner's user id, resolved off the row's userId column."""
     ownerUserId: Long!
     """Whether the current caller is this chat's owner."""
@@ -44,6 +50,7 @@ type AiHubChat {
 enum AiHubChatKind {
     STANDARD
     WORKFLOW_CHAT
+    AGENT_CHAT
 }
 
 enum AiHubChatStatus {
@@ -114,6 +121,14 @@ extend type Mutation {
     chat with; otherwise the call is refused as forbidden.
     """
     createWorkflowChatAiHubChat(
+        workspaceId: ID!, environment: Int!, workflowExecutionId: String!, projectDeploymentId: ID!, title: String
+    ): AiHubChat!
+
+    """
+    Creates an agent chat bound to an AI Agent workflow's execution id, as createWorkflowChatAiHubChat with the same
+    checks, but stamped AGENT_CHAT so the hub presents it as the agent the user picked.
+    """
+    createAgentChatAiHubChat(
         workspaceId: ID!, environment: Int!, workflowExecutionId: String!, projectDeploymentId: ID!, title: String
     ): AiHubChat!
 

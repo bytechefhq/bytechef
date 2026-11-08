@@ -21,6 +21,9 @@ package com.bytechef.platform.configuration.constant;
  */
 public class WorkflowExtConstants {
 
+    public static final String AI_HUB_AGENT_ID = "aiHubAgentId";
+    public static final String AI_HUB_CREATOR_USER_ID = "aiHubCreatorUserId";
+    public static final String AI_HUB_WORKSPACE_ID = "aiHubWorkspaceId";
     public static final String AUTHORIZATION_REQUIRED = "authorizationRequired";
     public static final String CLUSTER_ELEMENTS = "clusterElements";
     public static final String COMPONENT_NAME = "componentName";

@@ -49,6 +49,10 @@ public interface AiHubChatService {
         long workspaceId, long userId, int environment, String workflowExecutionId, long projectDeploymentId,
         @Nullable String title);
 
+    AiHubChat createAgentChat(
+        long workspaceId, long userId, int environment, String workflowExecutionId, long projectDeploymentId,
+        @Nullable String title);
+
     /**
      * Archives the requester's active workflow chats in the workspace and environment, capped at one listing page per
      * call.
@@ -166,6 +170,11 @@ public interface AiHubChatService {
      * Loads the chat for a requester who may manage it.
      */
     AiHubChat getManageable(long chatId, long requesterWorkspaceId, long requesterUserId);
+
+    AiHubChatTranscriptSummary summarizeTranscript(long chatId, long requesterWorkspaceId, long requesterUserId);
+
+    record AiHubChatTranscriptSummary(int messageCount, @Nullable String lastMessageContent) {
+    }
 
     /**
      * Partial update of a chat. Every field is optional, but at least one must be set.

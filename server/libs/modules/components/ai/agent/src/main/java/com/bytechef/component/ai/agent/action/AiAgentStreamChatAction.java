@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder;
 import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.ai.tool.AiAgentToolContext.SseTransport;
 import com.bytechef.platform.component.ComponentConnection;
@@ -61,6 +62,7 @@ import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.beans.factory.ObjectProvider;
 import reactor.core.publisher.Flux;
 
 /**
@@ -74,15 +76,27 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         ToolCallingManager toolCallingManager) {
 
-        return new AiAgentStreamChatAction(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager)
-            .build();
+        return of(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager, null);
+    }
+
+    public static ActionDefinition of(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
+
+        return new AiAgentStreamChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            agentConversationRecorderObjectProvider).build();
     }
 
     private AiAgentStreamChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager) {
+        ToolCallingManager toolCallingManager,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
-        super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+        super(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            agentConversationRecorderObjectProvider);
     }
 
     private ChatActionDefinitionWrapper build() {
@@ -127,7 +141,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             return null;
         }
 
-        return stream(chatClientRequestSpec, sseTransport, turnTextSeparator, inputParameters, context);
+        return stream(chatClientRequestSpec, sseTransport, turnTextSeparator, inputParameters, extensions, context);
     }
 
     protected SseEmitterHandler perform(
@@ -141,12 +155,12 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             inputParameters, connectionParameters, extensions,
             createToolExecutionListener(sseTransport, turnTextSeparator, context), context);
 
-        return stream(chatClientRequestSpec, sseTransport, turnTextSeparator, inputParameters, context);
+        return stream(chatClientRequestSpec, sseTransport, turnTextSeparator, inputParameters, extensions, context);
     }
 
-    private static SseEmitterHandler stream(
+    private SseEmitterHandler stream(
         ChatClientRequestSpec chatClientRequestSpec, SseTransport sseTransport, TurnTextSeparator turnTextSeparator,
-        Parameters inputParameters, ActionContext context) {
+        Parameters inputParameters, Parameters extensions, ActionContext context) {
 
         chatClientRequestSpec.toolContext(new AiAgentToolContext(context, sseTransport).toMap());
 
@@ -162,7 +176,8 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                         guardrailMetadataReference.set(guardrailMetadata);
                     }
                 })
-                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context))));
+                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context)))
+                .doOnComplete(createAgentConversationTurnRecorder(inputParameters, extensions, context)));
 
         return createSseHandler(
             contentFlux, sseTransport,

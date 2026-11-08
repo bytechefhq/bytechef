@@ -30,6 +30,7 @@ class GraphQlSchemaLoadsTest {
         "truncateAiHubChatMessages", "appendAiHubChatAssistantMessage", "cancelAiHubRun",
         "recordReferencedAiHubChatArtifact", "deleteAiHubChatArtifact", "resolveAiHubToolApproval",
         "createAiHubToolApprovalRule", "deleteAiHubToolApprovalRule", "createWorkflowChatAiHubChat",
+        "createAgentChatAiHubChat",
         "bulkArchiveWorkflowChatAiHubChats", "cancelWorkflowChatTurn");
 
     private static final List<String> QUERY_NAMES = List.of(
@@ -79,9 +80,9 @@ class GraphQlSchemaLoadsTest {
         GraphQLEnumType chatKind = (GraphQLEnumType) schema.getType("AiHubChatKind");
 
         assertThat(chatKind.getValues()).extracting(value -> value.getName())
-            .containsExactly("STANDARD", "WORKFLOW_CHAT");
+            .containsExactly("STANDARD", "WORKFLOW_CHAT", "AGENT_CHAT");
         assertThat(fieldNames((GraphQLObjectType) schema.getType("AiHubChat")))
-            .contains("kind", "workflowExecutionId", "projectDeploymentId");
+            .contains("kind", "workflowExecutionId", "projectDeploymentId", "aiAgentId");
     }
 
     private static GraphQLSchema buildSchema() {

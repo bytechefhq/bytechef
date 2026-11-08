@@ -48,6 +48,7 @@ class EnumOrdinalStabilityTest {
 
         expected.put("STANDARD", 0);
         expected.put("WORKFLOW_CHAT", 1);
+        expected.put("AGENT_CHAT", 2);
 
         assertOrdinalsMatch(AiHubChatKind.values(), expected);
     }

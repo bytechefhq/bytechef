@@ -95,7 +95,7 @@ public final class AiAgentWorkflowGenerator {
             "tasks",
             List.of(
                 buildBranchIn(agent, channelNodes),
-                buildAiAgentNode(agent, channels, elements, subAgentResolver, channelResolver),
+                buildAiAgentNode(agent, channels, elements, subAgentResolver, creatorUserId, channelResolver),
                 buildBranchOut(channelNodes)));
 
         return JsonUtils.write(definition);
@@ -509,7 +509,8 @@ public final class AiAgentWorkflowGenerator {
 
     private static Map<String, Object> buildAiAgentNode(
         AiAgent agent, List<AiAgentChannel> channels, List<AiAgentElement> elements,
-        Function<Long, SubAgentRef> subAgentResolver, Function<String, ResolvedAgentChannel> channelResolver) {
+        Function<Long, SubAgentRef> subAgentResolver, @Nullable Long creatorUserId,
+        Function<String, ResolvedAgentChannel> channelResolver) {
 
         Map<String, Object> parameters = new LinkedHashMap<>();
 
@@ -539,6 +540,22 @@ public final class AiAgentWorkflowGenerator {
         aiAgentNode.put("parameters", parameters);
         aiAgentNode.put(
             "clusterElements", buildClusterElements(agent, channels, elements, subAgentResolver, channelResolver));
+
+        Long workspaceId = agent.getWorkspaceId();
+
+        if (workspaceId != null) {
+            aiAgentNode.put(WorkflowExtConstants.AI_HUB_WORKSPACE_ID, workspaceId);
+        }
+
+        Long aiAgentId = agent.getId();
+
+        if (aiAgentId != null) {
+            aiAgentNode.put(WorkflowExtConstants.AI_HUB_AGENT_ID, aiAgentId);
+        }
+
+        if (creatorUserId != null) {
+            aiAgentNode.put(WorkflowExtConstants.AI_HUB_CREATOR_USER_ID, creatorUserId);
+        }
 
         return aiAgentNode;
     }
