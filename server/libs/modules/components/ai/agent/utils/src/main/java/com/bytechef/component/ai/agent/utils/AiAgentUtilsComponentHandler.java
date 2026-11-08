@@ -35,6 +35,7 @@ import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsApprovalGate;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAskUserQuestionTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAutoMemoryTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsBraveWebSearchTool;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsClaudeCodeSkills;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsFileSystemTools;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGlobTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGrepTool;
@@ -108,7 +109,8 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
 
         List<ClusterElementDefinition<?>> clusterElements = new ArrayList<>(List.of(
             agentUtilsApprovalGate.clusterElementDefinition,
-            AiAgentUtilsAskUserQuestionTool.CLUSTER_ELEMENT_DEFINITION));
+            AiAgentUtilsAskUserQuestionTool.CLUSTER_ELEMENT_DEFINITION,
+            new AiAgentUtilsClaudeCodeSkills(aiSkillFacade).clusterElementDefinition));
 
         ApplicationProperties.Ai.AgentUtils.FileSystem fileSystem = agentUtils.getFileSystem();
 

@@ -17,57 +17,197 @@
 package com.bytechef.component.claude.code.util;
 
 import com.bytechef.component.definition.Context;
-import io.github.markpollack.agents.claude.ClaudeAgentModel;
-import io.github.markpollack.agents.claude.ClaudeAgentOptions;
-import io.github.markpollack.agents.model.AgentApi;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction;
+import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction.McpServer;
+import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeSkillsFunction;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.configuration.domain.ClusterElement;
+import io.github.markpollack.claude.agent.sdk.ClaudeClient;
+import io.github.markpollack.claude.agent.sdk.ClaudeSyncClient;
+import io.github.markpollack.claude.agent.sdk.config.ClaudeCliDiscovery;
+import io.github.markpollack.claude.agent.sdk.config.ClaudeCliDiscovery.ClaudeCliNotFoundException;
+import io.github.markpollack.claude.agent.sdk.config.PermissionMode;
 import io.github.markpollack.claude.agent.sdk.mcp.McpServerConfig;
+import io.github.markpollack.claude.agent.sdk.transport.CLIOptions;
+import io.github.markpollack.claude.agent.sdk.types.Message;
+import io.github.markpollack.claude.agent.sdk.types.ResultMessage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * @author Marko Kriskovic
+ * @author Ivica Cardic
  */
 public final class ClaudeCodeUtil {
+
+    static final List<String> SETTING_SOURCES = List.of("project");
+    static final Duration TIMEOUT = Duration.ofMinutes(10);
 
     private ClaudeCodeUtil() {
     }
 
-    public static AgentApi createAgentModel() {
-        return ClaudeAgentModel.builder()
-            .defaultOptions(ClaudeAgentOptions.builder()
-                .yolo(true)
-                .build())
-            .build();
+    public static String execute(String prompt, Path workingDirectory, Map<String, McpServerConfig> mcpServerConfigs) {
+        CLIOptions cliOptions = createCliOptions(mcpServerConfigs);
+
+        try (ClaudeSyncClient claudeSyncClient = ClaudeClient.sync(cliOptions)
+            .claudePath(getClaudePath())
+            .workingDirectory(workingDirectory)
+            .timeout(TIMEOUT)
+            .build()) {
+
+            return getResult(claudeSyncClient.connectAndReceive(prompt));
+        }
     }
 
-    public static String serializeMcpServer(
-        String label, String url, Map<String, String> headers, Context context) {
-
-        McpServer mcpServer = new McpServer(label, url, headers);
-
-        return context.json(json -> json.write(mcpServer));
-    }
-
-    public static Map<String, McpServerConfig> deserializeMcpServers(
-        List<String> serializedMcpServers, Context context) {
+    public static Map<String, McpServerConfig> getMcpServerConfigs(
+        List<ClusterElement> clusterElements, Map<String, ComponentConnection> componentConnections,
+        ClusterElementDefinitionService clusterElementDefinitionService, Context context) throws Exception {
 
         Map<String, McpServerConfig> mcpServerConfigs = new LinkedHashMap<>();
 
-        for (String serializedMcpServer : serializedMcpServers) {
-            McpServer mcpServer = context.json(json -> json.read(serializedMcpServer, McpServer.class));
+        for (ClusterElement clusterElement : clusterElements) {
+            ClaudeCodeMcpServerFunction claudeCodeMcpServerFunction =
+                clusterElementDefinitionService.getClusterElement(
+                    clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+                    clusterElement.getClusterElementName());
 
-            mcpServerConfigs.put(
-                mcpServer.label(), new McpServerConfig.McpHttpServerConfig(mcpServer.url(), mcpServer.headers()));
+            McpServer mcpServer = claudeCodeMcpServerFunction.apply(
+                ParametersFactory.create(clusterElement.getParameters()),
+                getConnectionParameters(clusterElement, componentConnections), context);
+
+            mcpServerConfigs.put(getUniqueName(mcpServer.name(), mcpServerConfigs), toMcpServerConfig(mcpServer));
         }
 
         return mcpServerConfigs;
     }
 
-    public record McpServer(String label, String url, Map<String, String> headers) {
+    public static String run(
+        String prompt, Map<String, McpServerConfig> mcpServerConfigs, SkillsWriter skillsWriter,
+        ClaudeCodeExecutor claudeCodeExecutor) throws Exception {
 
-        public McpServer {
-            headers = headers == null ? Map.of() : Map.copyOf(headers);
+        Path workspace = Files.createTempDirectory("bytechef-claude-code-");
+
+        try {
+            Path skillsDirectory = Files.createDirectories(workspace.resolve(".claude/skills"));
+
+            skillsWriter.write(skillsDirectory);
+
+            return claudeCodeExecutor.execute(prompt, workspace, mcpServerConfigs);
+        } finally {
+            deleteRecursively(workspace);
         }
+    }
+
+    public static void writeSkills(
+        List<ClusterElement> clusterElements, Map<String, ComponentConnection> componentConnections,
+        ClusterElementDefinitionService clusterElementDefinitionService, Path skillsDirectory, Context context)
+        throws Exception {
+
+        for (ClusterElement clusterElement : clusterElements) {
+            ClaudeCodeSkillsFunction claudeCodeSkillsFunction = clusterElementDefinitionService.getClusterElement(
+                clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+                clusterElement.getClusterElementName());
+
+            claudeCodeSkillsFunction.apply(
+                ParametersFactory.create(clusterElement.getParameters()),
+                getConnectionParameters(clusterElement, componentConnections), skillsDirectory, context);
+        }
+    }
+
+    static String getClaudePath() {
+        try {
+            return ClaudeCliDiscovery.discoverClaudePath();
+        } catch (ClaudeCliNotFoundException claudeCliNotFoundException) {
+            throw new IllegalStateException(
+                "The Claude Code CLI is not installed on the ByteChef server. Install it for the user that runs " +
+                    "ByteChef with 'curl -fsSL https://claude.ai/install.sh | bash', put it on that user's PATH and " +
+                    "restart ByteChef.",
+                claudeCliNotFoundException);
+        }
+    }
+
+    static CLIOptions createCliOptions(Map<String, McpServerConfig> mcpServerConfigs) {
+        CLIOptions.Builder builder = CLIOptions.builder()
+            .permissionMode(PermissionMode.DANGEROUSLY_SKIP_PERMISSIONS)
+            .settingSources(SETTING_SOURCES)
+            .timeout(TIMEOUT);
+
+        if (!mcpServerConfigs.isEmpty()) {
+            builder.mcpServers(mcpServerConfigs);
+        }
+
+        return builder.build();
+    }
+
+    static String getResult(Iterable<Message> messages) {
+        for (Message message : messages) {
+            if (message instanceof ResultMessage resultMessage) {
+                if (resultMessage.isError()) {
+                    throw new IllegalStateException(
+                        "Claude Code run failed (%s): %s".formatted(resultMessage.subtype(), resultMessage.result()));
+                }
+
+                return resultMessage.result();
+            }
+        }
+
+        throw new IllegalStateException("Claude Code ended without a result");
+    }
+
+    static String getUniqueName(String name, Map<String, ?> existingNames) {
+        String uniqueName = name;
+
+        for (int index = 2; existingNames.containsKey(uniqueName); index++) {
+            uniqueName = name + "_" + index;
+        }
+
+        return uniqueName;
+    }
+
+    static McpServerConfig toMcpServerConfig(McpServer mcpServer) {
+        if (McpServer.SSE.equals(mcpServer.transportType())) {
+            return new McpServerConfig.McpSseServerConfig(mcpServer.url(), mcpServer.headers());
+        }
+
+        return new McpServerConfig.McpHttpServerConfig(mcpServer.url(), mcpServer.headers());
+    }
+
+    private static void deleteRecursively(Path directory) throws IOException {
+        try (Stream<Path> paths = Files.walk(directory)) {
+            List<Path> sortedPaths = paths.sorted(Comparator.reverseOrder())
+                .toList();
+
+            for (Path path : sortedPaths) {
+                Files.deleteIfExists(path);
+            }
+        }
+    }
+
+    private static Parameters getConnectionParameters(
+        ClusterElement clusterElement, Map<String, ComponentConnection> componentConnections) {
+
+        ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
+
+        if (componentConnection == null) {
+            return ParametersFactory.create(Map.of());
+        }
+
+        return ParametersFactory.create(componentConnection.getParameters());
+    }
+
+    @FunctionalInterface
+    public interface SkillsWriter {
+
+        void write(Path skillsDirectory) throws Exception;
     }
 }
