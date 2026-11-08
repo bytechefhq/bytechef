@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import java.util.Map;
@@ -52,6 +53,7 @@ class EmbeddedApiKeyAuthenticationProviderTest {
         ApiKey apiKey = new ApiKey();
 
         apiKey.setId(API_KEY_ID);
+        apiKey.setType(PlatformType.EMBEDDED);
 
         when(apiKeyService.fetchApiKey("secret", ENVIRONMENT_ID))
             .thenReturn(Optional.of(apiKey));
@@ -88,6 +90,16 @@ class EmbeddedApiKeyAuthenticationProviderTest {
                 .isInstanceOf(BadCredentialsException.class);
 
         verify(connectedUserService, never()).fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testAuthenticationRejectsAnAutomationApiKey() {
+        assertRejectedApiKeyType(PlatformType.AUTOMATION);
+    }
+
+    @Test
+    void testAuthenticationRejectsAnAdminApiKey() {
+        assertRejectedApiKeyType(null);
     }
 
     @Test
@@ -135,6 +147,23 @@ class EmbeddedApiKeyAuthenticationProviderTest {
 
         assertThat(authenticationToken.connectedUserId()).isEqualTo(43L);
         assertThat(authenticationToken.externalUserId()).isEqualTo(EXTERNAL_USER_ID);
+    }
+
+    private void assertRejectedApiKeyType(PlatformType type) {
+        ApiKey apiKey = new ApiKey();
+
+        apiKey.setId(API_KEY_ID);
+        apiKey.setType(type);
+
+        when(apiKeyService.fetchApiKey("other-type", ENVIRONMENT_ID))
+            .thenReturn(Optional.of(apiKey));
+
+        assertThatThrownBy(() -> provider.authenticate(
+            new EmbeddedApiKeyAuthenticationToken(ENVIRONMENT_ID, EXTERNAL_USER_ID, "other-type", "tenant")))
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Embedded API key required");
+
+        verify(connectedUserService, never()).fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID);
     }
 
     private static ConnectedUser connectedUser(long id) {
