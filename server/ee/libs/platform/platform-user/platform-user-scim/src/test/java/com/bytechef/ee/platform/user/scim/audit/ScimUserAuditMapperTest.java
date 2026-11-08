@@ -121,6 +121,29 @@ class ScimUserAuditMapperTest {
     }
 
     @Test
+    void testMapPatchedEventRecordsAChangedExternalId() {
+        User previousUser = createUser("john.doe", "john@example.com", "John", "Doe", true, List.of());
+        User patchedUser = createUser("john.doe", "john@example.com", "John", "Doe", true, List.of());
+
+        previousUser.setExternalId("ext-1");
+        patchedUser.setExternalId("ext-2");
+
+        when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(previousUser));
+
+        Map<String, Object> arguments = Map.of("id", USER_ID);
+
+        Object captured = scimUserAuditMapper.capture(
+            createAuditInvocation(ScimUserAuditEvents.SCIM_USER_PATCHED, arguments, null, null));
+
+        Map<String, String> data = scimUserAuditMapper.map(
+            createAuditInvocation(
+                ScimUserAuditEvents.SCIM_USER_PATCHED, arguments, Optional.of(patchedUser), captured));
+
+        assertThat(data).containsEntry("externalId", "ext-2")
+            .containsEntry("changedFields", "externalId");
+    }
+
+    @Test
     void testMapUpdatedEventIgnoresAuthorityOrder() {
         User previousUser = createUser("john.doe", "john@example.com", "John", "Doe", true, List.of(2L, 1L));
         User updatedUser = createUser("john.doe", "john@example.com", "John", "Doe", true, List.of(1L, 2L));

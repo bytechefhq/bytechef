@@ -62,6 +62,9 @@ public class User {
     @Column
     private String email;
 
+    @Column("external_id")
+    private String externalId;
+
     @Column("first_name")
     private String firstName;
 
@@ -155,6 +158,10 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getExternalId() {
+        return externalId;
     }
 
     public Long getId() {
@@ -267,6 +274,10 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
     public void setFirstName(String firstName) {

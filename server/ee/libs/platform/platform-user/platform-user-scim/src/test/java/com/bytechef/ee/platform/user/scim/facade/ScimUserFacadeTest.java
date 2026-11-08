@@ -139,6 +139,7 @@ class ScimUserFacadeTest {
         assertThat(adminUserDTO.getEmail()).isEqualTo("john.work@example.com");
         assertThat(adminUserDTO.getFirstName()).isEqualTo("John");
         assertThat(adminUserDTO.getLastName()).isEqualTo("Doe");
+        assertThat(adminUserDTO.getExternalId()).isEqualTo("ext-1");
         assertThat(adminUserDTO.isActivated()).isTrue();
     }
 
@@ -240,7 +241,7 @@ class ScimUserFacadeTest {
         when(userService.update(any(AdminUserDTO.class))).thenReturn(Optional.of(updatedUser));
 
         ScimUser scimUser = new ScimUser(
-            null, null, null, "new.login", new ScimName(null, "Smith", "Jane"), null,
+            null, null, "ext-2", "new.login", new ScimName(null, "Smith", "Jane"), null,
             List.of(new ScimEmail("jane@example.com", "work", true)), true, null, null);
 
         Optional<User> userOptional = scimUserFacade.replaceUser(USER_ID, scimUser);
@@ -257,6 +258,7 @@ class ScimUserFacadeTest {
         assertThat(adminUserDTO.getEmail()).isEqualTo("jane@example.com");
         assertThat(adminUserDTO.getFirstName()).isEqualTo("Jane");
         assertThat(adminUserDTO.getLastName()).isEqualTo("Smith");
+        assertThat(adminUserDTO.getExternalId()).isEqualTo("ext-2");
         assertThat(adminUserDTO.isActivated()).isTrue();
     }
 
@@ -369,6 +371,42 @@ class ScimUserFacadeTest {
         assertThat(userOptional).containsSame(user);
         assertThat(user.getLogin()).isEqualTo("jane.smith");
         assertThat(user.getFirstName()).isEqualTo("Jane");
+        assertThat(user.getLastName()).isEqualTo("Smith");
+        assertThat(user.isActivated()).isTrue();
+
+        verify(userService).save(user);
+    }
+
+    @Test
+    void testPatchUserReplacesTheExternalId() {
+        User user = createUser(true);
+
+        user.setExternalId("old-external-id");
+
+        when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(user));
+
+        scimUserFacade.patchUser(
+            USER_ID, createPatchRequest(new ScimPatchOperation("replace", "externalId", "new-external-id")));
+
+        assertThat(user.getExternalId()).isEqualTo("new-external-id");
+        assertThat(user.getEmail()).isEqualTo("john@example.com");
+
+        verify(userService).save(user);
+    }
+
+    @Test
+    void testPatchUserAppliesEveryAttributeOfAPathlessValueMap() {
+        User user = createUser(true);
+
+        when(userService.fetchUser(USER_ID)).thenReturn(Optional.of(user));
+
+        scimUserFacade.patchUser(
+            USER_ID,
+            createPatchRequest(
+                new ScimPatchOperation(
+                    "replace", null, Map.of("externalId", "new-external-id", "name.familyName", "Smith"))));
+
+        assertThat(user.getExternalId()).isEqualTo("new-external-id");
         assertThat(user.getLastName()).isEqualTo("Smith");
         assertThat(user.isActivated()).isTrue();
 

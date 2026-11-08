@@ -47,6 +47,8 @@ public interface UserRepository extends ListCrudRepository<User, Long>, ListPagi
 
     List<User> findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(LocalDateTime dateTime);
 
+    List<User> findAllByExternalIdOrderById(String externalId);
+
     Page<User> findAllByIdNotNullAndActivatedIsTrue(Pageable pageable);
 
     Optional<User> findByActivationKey(String activationKey);
