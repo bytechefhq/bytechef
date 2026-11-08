@@ -61,7 +61,7 @@ const AI_AGENT_DATA = {
     workflowNodeName: 'aiAgent_1',
 } as unknown as NodeDataType;
 
-const DISABLED_BADGE_TITLE = 'Disabled — skipped during execution';
+const DISABLED_BADGE_TITLE = 'Disabled: skipped during execution';
 
 const FRAMED_AI_AGENT_DATA = {
     ...AI_AGENT_DATA,

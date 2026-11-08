@@ -433,7 +433,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                 {nodeLabel}
                             </span>
 
-                            {data.disabled && <DisabledNodeBadge />}
+                            {data.disabled && <DisabledNodeBadge trigger={!!data.trigger} />}
 
                             {referencedDisabledNames.length > 0 && (
                                 <span title={getDisabledReferenceWarning(referencedDisabledNames)}>

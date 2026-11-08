@@ -150,13 +150,13 @@ describe('ReadOnlyNode', () => {
     it('shows the disabled badge only for the node own disabled flag', () => {
         renderNode({...BASE_DATA, disabled: true, isEffectivelyDisabled: true});
 
-        expect(screen.getByTitle('Disabled — skipped during execution')).toBeInTheDocument();
+        expect(screen.getByTitle('Disabled: skipped during execution')).toBeInTheDocument();
     });
 
     it('does not show the disabled badge for a node only muted via ancestor derivation', () => {
         renderNode({...BASE_DATA, isEffectivelyDisabled: true});
 
-        expect(screen.queryByTitle('Disabled — skipped during execution')).not.toBeInTheDocument();
+        expect(screen.queryByTitle('Disabled: skipped during execution')).not.toBeInTheDocument();
     });
 
     it('shows how the node ran in the overlaid execution', () => {

@@ -448,8 +448,14 @@ describe('WorkflowNode', () => {
 
             expect(nodeBox?.className).toContain('opacity-50');
             expect(nodeBox?.className).toContain('grayscale');
-            expect(screen.getByTitle('Disabled — skipped during execution')).toBeInTheDocument();
+            expect(screen.getByTitle('Disabled: does not start runs')).toBeInTheDocument();
         });
+    });
+
+    it('renders a disabled task with the skipped during execution badge', () => {
+        renderNode({...HTTP_CLIENT_TOOL_DATA, disabled: true} as NodeDataType, 'httpClient_1');
+
+        expect(screen.getByTitle('Disabled: skipped during execution')).toBeInTheDocument();
     });
 
     it('keeps TB condition labels on the node, beside the stem', () => {
