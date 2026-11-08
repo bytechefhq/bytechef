@@ -16,70 +16,90 @@
 
 package com.bytechef.component.claude.code.action;
 
-import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.MCP_SERVERS;
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.SCRIPT;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction.MCP_SERVERS;
+import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeSkillsFunction.SKILLS;
 
+import com.bytechef.component.claude.code.util.ClaudeCodeExecutor;
 import com.bytechef.component.claude.code.util.ClaudeCodeUtil;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Parameters;
-import io.github.markpollack.agents.claude.ClaudeAgentOptions;
-import io.github.markpollack.agents.client.AgentClient;
-import io.github.markpollack.agents.client.AgentClientResponse;
+import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.configuration.domain.ClusterElement;
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import io.github.markpollack.claude.agent.sdk.mcp.McpServerConfig;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Marko Kriskovic
+ * @author Ivica Cardic
  */
 public class ClaudeCodeChat {
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("chat")
-        .title("Chat")
-        .description("Chat with Claude with registered tools")
-        .properties(
-            string(SCRIPT)
-                .label("Message")
-                .description("Command to send to Claude")
-                .required(true),
-            array(MCP_SERVERS)
-                .label("MCP Servers")
-                .description("MCP servers (HTTP transport) configured via the 'Add MCP Server' action.")
-                .items(string())
-                .required(false))
-        .output(
-            outputSchema(
-                string()
-                    .description("The output of the Claude agent run.")),
-            sampleOutput("Sample result"))
-        .help("", "https://docs.bytechef.io/reference/components/claude-code_v1#chat")
-        .perform(ClaudeCodeChat::perform);
+    private final ClaudeCodeExecutor claudeCodeExecutor;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
 
-    protected static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+    ClaudeCodeChat(
+        ClusterElementDefinitionService clusterElementDefinitionService, ClaudeCodeExecutor claudeCodeExecutor) {
 
-        ClaudeAgentOptions.Builder optionsBuilder = ClaudeAgentOptions.builder()
-            .yolo(true);
+        this.claudeCodeExecutor = claudeCodeExecutor;
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
+    }
 
-        Map<String, McpServerConfig> mcpServers = ClaudeCodeUtil.deserializeMcpServers(
-            inputParameters.getList(MCP_SERVERS, String.class, List.of()), actionContext);
+    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+        ClaudeCodeChat claudeCodeChat = new ClaudeCodeChat(
+            clusterElementDefinitionService, ClaudeCodeUtil::execute);
 
-        if (!mcpServers.isEmpty()) {
-            optionsBuilder.mcpServers(mcpServers);
-        }
+        return action("chat")
+            .title("Chat")
+            .description(
+                "Sends a message to Claude Code. Claude Code can use the tools of the attached MCP servers and the " +
+                    "attached skills.")
+            .properties(
+                messageProperty())
+            .output(
+                outputSchema(
+                    string()
+                        .description("The final reply of the Claude Code run.")),
+                sampleOutput("Sample result"))
+            .help("", "https://docs.bytechef.io/reference/components/claude-code_v1#chat")
+            .perform((MultipleConnectionsPerformFunction) claudeCodeChat::perform);
+    }
 
-        AgentClient agentClient = AgentClient.builder(ClaudeCodeUtil.createAgentModel())
-            .defaultOptions(optionsBuilder.build())
-            .build();
+    String perform(
+        Parameters inputParameters, Map<String, ComponentConnection> componentConnections, Parameters extensions,
+        ActionContext context) throws Exception {
 
-        AgentClientResponse response = agentClient.run(inputParameters.getRequiredString(SCRIPT));
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
-        return response.getResult();
+        Map<String, McpServerConfig> mcpServerConfigs = ClaudeCodeUtil.getMcpServerConfigs(
+            clusterElementMap.getClusterElements(MCP_SERVERS), componentConnections,
+            clusterElementDefinitionService, context);
+
+        List<ClusterElement> skills = clusterElementMap.getClusterElements(SKILLS);
+
+        return ClaudeCodeUtil.run(
+            inputParameters.getRequiredString(SCRIPT), mcpServerConfigs,
+            skillsDirectory -> ClaudeCodeUtil.writeSkills(
+                skills, componentConnections, clusterElementDefinitionService, skillsDirectory, context),
+            claudeCodeExecutor);
+    }
+
+    private static ModifiableStringProperty messageProperty() {
+        return string(SCRIPT)
+            .label("Message")
+            .description("The message to send to Claude Code.")
+            .controlType(ControlType.TEXT_AREA)
+            .required(true);
     }
 }

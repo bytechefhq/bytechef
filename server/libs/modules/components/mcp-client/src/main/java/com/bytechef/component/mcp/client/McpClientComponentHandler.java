@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.mcp.client.action.McpClientCallToolAction;
+import com.bytechef.component.mcp.client.cluster.McpClientClaudeCodeMcpServer;
 import com.bytechef.component.mcp.client.cluster.McpClientTool;
 import com.bytechef.component.mcp.client.connection.McpClientConnection;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
@@ -37,16 +38,21 @@ public class McpClientComponentHandler implements ComponentHandler {
     private final ComponentDefinition componentDefinition;
 
     public McpClientComponentHandler(ConnectionDefinitionService connectionDefinitionService) {
+        McpClientClaudeCodeMcpServer mcpClientClaudeCodeMcpServer = new McpClientClaudeCodeMcpServer(
+            connectionDefinitionService);
         McpClientTool mcpClientTool = new McpClientTool(connectionDefinitionService);
 
         this.componentDefinition = component(MCP_CLIENT)
             .title("MCP Client")
-            .description("Connects to external MCP servers to discover and call their tools.")
+            .description(
+                "Connects to external MCP servers to discover and call their tools, from an AI Agent or Claude Code.")
             .icon("path:assets/mcp-client.svg")
             .categories(ComponentCategory.HELPERS, ComponentCategory.DEVELOPER_TOOLS)
             .connection(McpClientConnection.CONNECTION_DEFINITION)
             .actions(McpClientCallToolAction.of(connectionDefinitionService))
-            .clusterElements(mcpClientTool.getClusterElementDefinition());
+            .clusterElements(
+                mcpClientTool.getClusterElementDefinition(),
+                mcpClientClaudeCodeMcpServer.getClusterElementDefinition());
     }
 
     @Override

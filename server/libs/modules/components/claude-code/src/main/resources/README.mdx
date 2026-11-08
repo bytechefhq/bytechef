@@ -1,0 +1,27 @@
+### Before you start
+
+Claude Code runs as the Claude Code CLI on the ByteChef server. The component is off by default.
+
+1. Set `bytechef.component.claude-code.enabled` to `true` (environment variable `BYTECHEF_COMPONENT_CLAUDE_CODE_ENABLED=true`).
+2. Install the `claude` CLI on the server, on the `PATH` of the user that runs ByteChef.
+3. Set `ANTHROPIC_API_KEY` in the environment of the ByteChef server.
+
+Chat checks that the CLI is installed before it starts and fails with a setup message when it is not. Restart ByteChef after you install the CLI.
+
+Claude Code runs with all tool permissions on the server. Run ByteChef as a user that has access only to what Claude Code needs.
+
+### MCP Servers
+
+Add **MCP Server** elements from the **MCP Client** component to the **MCP Servers** slot to give Claude Code the tools of those servers. Each element uses its own MCP Client connection:
+
+- **Server URL** and **Transport Type** tell Claude Code where the server is and how to reach it.
+- The connection's authorization (bearer token or OAuth2) becomes the `Authorization` header of every request. OAuth2 tokens are read when the run starts.
+- **Server Name** is the prefix of the server's tool names. It defaults to the host of the server URL. When two servers have the same name, the second one gets a `_2` suffix.
+
+### Skills
+
+Add **Skills** elements from the **AI Agent Utils** component to the **Skills** slot to give Claude Code skills from the ByteChef skill library (**Settings > AI > Skills**). Every file of each selected skill is available to Claude Code, including its scripts and templates.
+
+### How a run works
+
+Each Chat run gets a new, empty working directory. The selected skills are written to `.claude/skills` in that directory, and Claude Code loads only the settings of that directory. The settings, plugins and output styles in the home directory of the server user are not used. The directory is deleted when the run ends, also when it fails.

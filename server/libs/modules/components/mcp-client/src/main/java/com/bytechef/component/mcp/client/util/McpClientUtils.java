@@ -264,24 +264,31 @@ public class McpClientUtils {
         return property;
     }
 
-    private static Consumer<HttpRequest.Builder> getRequestCustomizer(
+    public static Map<String, List<String>> getHeaders(
         Parameters connectionParameters, ConnectionDefinitionService connectionDefinitionService,
         Context context) {
 
         if (connectionParameters == null) {
-            return null;
+            return Map.of();
         }
 
         AuthorizationType authorizationType = getAuthorizationType(connectionParameters);
 
         if (authorizationType == null) {
-            return null;
+            return Map.of();
         }
 
         ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
             McpClientConstants.MCP_CLIENT, 1, authorizationType, connectionParameters.toMap(), context);
 
-        Map<String, List<String>> headers = applyResponse.getHeaders();
+        return applyResponse.getHeaders();
+    }
+
+    private static Consumer<HttpRequest.Builder> getRequestCustomizer(
+        Parameters connectionParameters, ConnectionDefinitionService connectionDefinitionService,
+        Context context) {
+
+        Map<String, List<String>> headers = getHeaders(connectionParameters, connectionDefinitionService, context);
 
         if (headers.isEmpty()) {
             return null;

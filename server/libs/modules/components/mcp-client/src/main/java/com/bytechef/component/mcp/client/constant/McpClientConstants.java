@@ -27,6 +27,7 @@ public class McpClientConstants {
     public static final String HTTP_STREAMABLE = "httpStreamable";
     public static final String INCLUDE = "include";
     public static final String MCP_CLIENT = "mcpClient";
+    public static final String SERVER_NAME = "serverName";
     public static final String TOOL_FILTER_TYPE = "toolFilterType";
     public static final String TOOL_ARGUMENTS = "toolArguments";
     public static final String TOOL_NAME = "toolName";
