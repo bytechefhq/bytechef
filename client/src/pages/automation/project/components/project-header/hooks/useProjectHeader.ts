@@ -149,7 +149,9 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             newSearchParams.delete('restoreExecutionPanel');
 
             if (useWorkflowEditorStore.getState().workflowIsRunning) {
-                navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`);
+                void navigate(
+                    `/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`
+                );
 
                 return;
             }
@@ -158,7 +160,9 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
             setCurrentNode(undefined);
 
-            navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`);
+            void navigate(
+                `/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`
+            );
 
             setShowBottomPanelOpen(false);
 
