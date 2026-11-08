@@ -454,6 +454,37 @@ export enum AiHubChatStatus {
   Deleted = 'DELETED'
 }
 
+export type AiHubChatToolBinding = {
+  __typename?: 'AiHubChatToolBinding';
+  chatComponentId: Scalars['ID']['output'];
+  chatId: Scalars['ID']['output'];
+  chatToolId: Scalars['ID']['output'];
+  clusterElementName: Scalars['String']['output'];
+  componentName: Scalars['String']['output'];
+  componentVersion: Scalars['Int']['output'];
+  connectionId?: Maybe<Scalars['ID']['output']>;
+  environment: Scalars['Int']['output'];
+  parameters: Scalars['Any']['output'];
+  /** Whether the approval gate must hold this tool call for a person's decision before it executes. */
+  requiresApproval: Scalars['Boolean']['output'];
+};
+
+export type AiHubMcpServer = {
+  __typename?: 'AiHubMcpServer';
+  enabled: Scalars['Boolean']['output'];
+  hasAuthToken: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
+
+export type AiHubMcpServerTool = {
+  __typename?: 'AiHubMcpServerTool';
+  description?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type AiHubToolApproval = {
   __typename?: 'AiHubToolApproval';
   arguments: Scalars['String']['output'];
@@ -507,6 +538,34 @@ export enum AiHubToolKind {
   Catalog = 'CATALOG',
   Component = 'COMPONENT'
 }
+
+export type AiHubUserConnector = {
+  __typename?: 'AiHubUserConnector';
+  componentName: Scalars['String']['output'];
+  componentVersion: Scalars['Int']['output'];
+  connectionId?: Maybe<Scalars['ID']['output']>;
+  connectionRequired: Scalars['Boolean']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  /** Availability — set on the Connectors page; off means unusable in every chat. */
+  enabled: Scalars['Boolean']['output'];
+  /** Participation in the chat named by the query's `chatId`; true when no chatId was supplied. */
+  enabledInChat: Scalars['Boolean']['output'];
+  icon?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+  tools: Array<AiHubUserConnectorTool>;
+};
+
+export type AiHubUserConnectorTool = {
+  __typename?: 'AiHubUserConnectorTool';
+  description?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  parameters?: Maybe<Scalars['Any']['output']>;
+  /** Whether the approval gate must hold this tool call for a person's decision before it executes. */
+  requiresApproval: Scalars['Boolean']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+};
 
 export type AiProviderCatalogItem = {
   __typename?: 'AiProviderCatalogItem';
@@ -668,6 +727,17 @@ export type ArrayProperty = Property & {
   placeholder?: Maybe<Scalars['String']['output']>;
   required?: Maybe<Scalars['Boolean']['output']>;
   type: PropertyType;
+};
+
+export type AttachAiHubChatToolInput = {
+  chatId: Scalars['ID']['input'];
+  clusterElementName: Scalars['String']['input'];
+  componentName: Scalars['String']['input'];
+  componentVersion?: InputMaybe<Scalars['Int']['input']>;
+  connectionId?: InputMaybe<Scalars['ID']['input']>;
+  environment: Scalars['Int']['input'];
+  parameters?: InputMaybe<Scalars['Any']['input']>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 export type AuditEventDataEntryType = {
@@ -2081,9 +2151,25 @@ export type McpToolInputForComponent = {
 export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
+  /**
+   * Register a new MCP server for the current user. authToken is optional (sent as a bearer token); it is
+   * encrypted at rest. Returns the new server id.
+   */
+  addAiHubMcpServer: Scalars['ID']['output'];
+  /**
+   * Add a pre-built connector to the current user's AI Hub (a user-global "added connector"). Idempotent —
+   * re-adding refreshes the connection in place. Returns the connector id.
+   */
+  addAiHubUserConnector: Scalars['ID']['output'];
   addDataTableColumn: Scalars['Boolean']['output'];
   /** Appends an assistant message to the chat's session; persists an approval-resolution continuation streamed outside the turn. */
   appendAiHubChatAssistantMessage: Scalars['Boolean']['output'];
+  /**
+   * Attach a tool to a chat. Idempotent — re-attaching the same (component, action, connection)
+   * upserts the tool's parameters in place. Returns the persisted ids so the client can immediately
+   * address the row in subsequent updates / removes.
+   */
+  attachAiHubChatTool: AiHubChatToolBinding;
   /** Archives the caller's active workflow chats in the environment. Returns the number archived. */
   bulkArchiveWorkflowChatAiHubChats: Scalars['Int']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
@@ -2198,6 +2284,11 @@ export type Mutation = {
   deleteWebSearchProvider?: Maybe<Scalars['Boolean']['output']>;
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  /**
+   * Detach a whole component binding (cascades to all its tools via the FK). Use when the user wants to
+   * remove all of e.g. Slack's tools at once instead of one at a time.
+   */
+  detachAiHubChatComponent: Scalars['Boolean']['output'];
   disconnectConnection: Scalars['Boolean']['output'];
   dropDataTable: Scalars['Boolean']['output'];
   duplicateAutomationWorkflowProject: Scalars['ID']['output'];
@@ -2240,6 +2331,12 @@ export type Mutation = {
    * references an artifact in a chat.
    */
   recordReferencedAiHubChatArtifact: AiHubChatArtifact;
+  /** Detach a single tool. Returns true on success; false when the id was not found (idempotent). */
+  removeAiHubChatTool: Scalars['Boolean']['output'];
+  /** Remove an MCP server. Idempotent — returns false when not found/owned. */
+  removeAiHubMcpServer: Scalars['Boolean']['output'];
+  /** Remove a user connector (cascades its tool config). Idempotent — returns false when not found/owned. */
+  removeAiHubUserConnector: Scalars['Boolean']['output'];
   removeDataTableColumn: Scalars['Boolean']['output'];
   removeFileInSkill: AiSkill;
   renameDataTable: Scalars['Boolean']['output'];
@@ -2250,6 +2347,35 @@ export type Mutation = {
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
+  /**
+   * Toggle a user connector on/off WITHIN ONE CHAT, leaving its user-global availability untouched. This is
+   * PARTICIPATION — the composer's per-connector switch. Absence of a chat-scoped record means participating,
+   * so existing chats are unaffected until the user flips one.
+   */
+  setAiHubChatConnectorEnabled: Scalars['Boolean']['output'];
+  /**
+   * Toggle whether the approval gate must hold this attached tool's calls for a person's decision before it
+   * executes. This is the chat owner's own switch, independent of any workspace-level component rule.
+   */
+  setAiHubChatToolRequiresApproval: AiHubChatToolBinding;
+  /** Toggle an MCP server on/off. */
+  setAiHubMcpServerEnabled: Scalars['Boolean']['output'];
+  /** Toggle a single tool of an MCP server on/off. */
+  setAiHubMcpServerToolEnabled: Scalars['Boolean']['output'];
+  /**
+   * Toggle a user connector on/off (the component-level enabled flag). This is AVAILABILITY — off means the
+   * connector is unusable everywhere, and it stops appearing in the composer's Connectors branch at all.
+   */
+  setAiHubUserConnectorEnabled: Scalars['Boolean']['output'];
+  /** Toggle a single tool within a user connector on/off. */
+  setAiHubUserConnectorToolEnabled: Scalars['Boolean']['output'];
+  /** Set the pre-configured parameter values for a single tool within a user connector. */
+  setAiHubUserConnectorToolParameters: Scalars['Boolean']['output'];
+  /**
+   * Toggle whether the approval gate must hold a single tool within a user connector for a person's decision
+   * before it executes.
+   */
+  setAiHubUserConnectorToolRequiresApproval: Scalars['Boolean']['output'];
   startAiAgentEvalRun: AiAgentEvalRun;
   startDiscoverEndpoints: EndpointDiscoveryResult;
   startGenerateForEndpoints: GenerationJobStatus;
@@ -2288,6 +2414,12 @@ export type Mutation = {
    * {@code messageCount}, {@code status} must be non-null; an all-null patch is rejected with BAD_REQUEST.
    */
   updateAiHubChat: AiHubChat;
+  /**
+   * Update only the parameters of a previously attached tool (e.g. user adjusts the default channel
+   * after attach). Other fields on the binding (component, action, connection) are immutable post-attach;
+   * if the user wants to switch connection they should detach + reattach instead.
+   */
+  updateAiHubChatToolParameters: AiHubChatToolBinding;
   updateAiSkill: AiSkill;
   updateAiSkillContent: AiSkill;
   updateAiSkillTags: AiSkill;
@@ -2332,6 +2464,24 @@ export type Mutation = {
 };
 
 
+export type MutationAddAiHubMcpServerArgs = {
+  authToken?: InputMaybe<Scalars['String']['input']>;
+  environment: Scalars['Int']['input'];
+  name: Scalars['String']['input'];
+  url: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationAddAiHubUserConnectorArgs = {
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+  connectionId?: InputMaybe<Scalars['ID']['input']>;
+  environment: Scalars['Int']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationAddDataTableColumnArgs = {
   input: AddColumnInput;
 };
@@ -2341,6 +2491,11 @@ export type MutationAppendAiHubChatAssistantMessageArgs = {
   content: Scalars['String']['input'];
   id: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationAttachAiHubChatToolArgs = {
+  input: AttachAiHubChatToolInput;
 };
 
 
@@ -2819,6 +2974,12 @@ export type MutationDeleteWorkspaceMcpServerArgs = {
 };
 
 
+export type MutationDetachAiHubChatComponentArgs = {
+  chatComponentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationDisconnectConnectionArgs = {
   connectionId: Scalars['ID']['input'];
 };
@@ -2999,6 +3160,24 @@ export type MutationRecordReferencedAiHubChatArtifactArgs = {
 };
 
 
+export type MutationRemoveAiHubChatToolArgs = {
+  chatToolId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationRemoveAiHubMcpServerArgs = {
+  mcpServerId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationRemoveAiHubUserConnectorArgs = {
+  connectorId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationRemoveDataTableColumnArgs = {
   input: RemoveColumnInput;
 };
@@ -3066,6 +3245,67 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
   workflowConnectionKey: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationSetAiHubChatConnectorEnabledArgs = {
+  chatId: Scalars['ID']['input'];
+  connectorId: Scalars['ID']['input'];
+  enabled: Scalars['Boolean']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetAiHubChatToolRequiresApprovalArgs = {
+  chatToolId: Scalars['ID']['input'];
+  requiresApproval: Scalars['Boolean']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetAiHubMcpServerEnabledArgs = {
+  enabled: Scalars['Boolean']['input'];
+  mcpServerId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetAiHubMcpServerToolEnabledArgs = {
+  enabled: Scalars['Boolean']['input'];
+  mcpServerId: Scalars['ID']['input'];
+  toolName: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetAiHubUserConnectorEnabledArgs = {
+  connectorId: Scalars['ID']['input'];
+  enabled: Scalars['Boolean']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetAiHubUserConnectorToolEnabledArgs = {
+  connectorId: Scalars['ID']['input'];
+  enabled: Scalars['Boolean']['input'];
+  toolName: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetAiHubUserConnectorToolParametersArgs = {
+  connectorId: Scalars['ID']['input'];
+  parameters: Scalars['Any']['input'];
+  toolName: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetAiHubUserConnectorToolRequiresApprovalArgs = {
+  connectorId: Scalars['ID']['input'];
+  requiresApproval: Scalars['Boolean']['input'];
+  toolName: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3204,6 +3444,13 @@ export type MutationUpdateAiAutoMemoryArgs = {
 
 export type MutationUpdateAiHubChatArgs = {
   input: AiHubChatPatchInput;
+};
+
+
+export type MutationUpdateAiHubChatToolParametersArgs = {
+  chatToolId: Scalars['ID']['input'];
+  parameters: Scalars['Any']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3830,13 +4077,40 @@ export type Query = {
   /** Returns the message history for a chat. A chat the caller may not view is reported as not found. */
   aiHubChatMessages: Array<AiHubChatMessage>;
   /**
+   * Lists components that publish at least one tool-typed cluster element, with each component's tool
+   * catalog. Powers the composer plus-button menu's Tools section so users can browse the catalog
+   * without going through chat.
+   */
+  aiHubChatToolableComponents: Array<ToolableComponent>;
+  /**
+   * Lists every tool attached to the supplied chat, joined with its parent component-binding
+   * context. Used by the chat attached-tools chip list in the composer.
+   */
+  aiHubChatTools: Array<AiHubChatToolBinding>;
+  /**
    * Lists the caller's chats in the given workspace, scoped to the supplied environment, filtered by
    * lifecycle status (default {@code ACTIVE}).
    */
   aiHubChats: Array<AiHubChat>;
+  /**
+   * The tools of one MCP server, discovered by connecting to it, each joined with its persisted enabled state.
+   * Errors if the server is unreachable.
+   */
+  aiHubMcpServerTools: Array<AiHubMcpServerTool>;
+  /** The current user's registered MCP servers for the workspace. */
+  aiHubMcpServers: Array<AiHubMcpServer>;
   aiHubToolApprovalDefaultToolNames: Array<Scalars['String']['output']>;
   aiHubToolApprovalRules: Array<AiHubToolApprovalRule>;
   aiHubToolApprovals: Array<AiHubToolApproval>;
+  /**
+   * The current user's globally-added connectors (the Connectors page Pre-built list). Each carries the
+   * component metadata, its connection, the component-level enabled flag, and its tools with per-tool
+   * enabled flags.
+   *
+   * Pass `chatId` to also resolve `enabledInChat` against that chat; without it every connector reports
+   * `enabledInChat: true`, since participating is the default.
+   */
+  aiHubUserConnectors: Array<AiHubUserConnector>;
   aiProviderCatalog: Array<AiProviderCatalogItem>;
   aiSkill: AiSkill;
   aiSkillFileContent: Scalars['String']['output'];
@@ -4130,9 +4404,31 @@ export type QueryAiHubChatMessagesArgs = {
 };
 
 
+export type QueryAiHubChatToolableComponentsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiHubChatToolsArgs = {
+  chatId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryAiHubChatsArgs = {
   environment: Scalars['Int']['input'];
   status?: InputMaybe<AiHubChatStatus>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiHubMcpServerToolsArgs = {
+  mcpServerId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiHubMcpServersArgs = {
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -4144,6 +4440,12 @@ export type QueryAiHubToolApprovalRulesArgs = {
 
 export type QueryAiHubToolApprovalsArgs = {
   chatId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAiHubUserConnectorsArgs = {
+  chatId?: InputMaybe<Scalars['ID']['input']>;
   workspaceId: Scalars['ID']['input'];
 };
 
@@ -5155,6 +5457,25 @@ export type TimeProperty = Property & {
   placeholder?: Maybe<Scalars['String']['output']>;
   required?: Maybe<Scalars['Boolean']['output']>;
   type: PropertyType;
+};
+
+export type ToolableClusterElement = {
+  __typename?: 'ToolableClusterElement';
+  description?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type ToolableComponent = {
+  __typename?: 'ToolableComponent';
+  componentName: Scalars['String']['output'];
+  componentVersion: Scalars['Int']['output'];
+  /** Whether this component requires a connection to be used (drives the composer's Connect vs toggle affordance). */
+  connectionRequired: Scalars['Boolean']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  icon?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+  tools: Array<ToolableClusterElement>;
 };
 
 export type TriggerDefinition = {
