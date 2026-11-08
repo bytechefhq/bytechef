@@ -500,7 +500,9 @@ class EmbeddedMcpToolFacadeIntTest {
 
         assertThat(result)
             .containsEntry("status", "approval_required")
-            .containsEntry("jobId", 5);
+            .containsEntry("jobId", 5)
+            .doesNotContainKey("resumeToken");
+
         assertThat(getExternalInvocationEvents()).singleElement()
             .satisfies(externalInvocationEvent -> {
                 assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.APPROVAL_REQUIRED);
@@ -823,6 +825,44 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     @Test
+    void testClusterElementToolCallOfAnUnknownExternalUserIsRecordedAsConnectionRequiredWithoutConnectedUser() {
+        McpTool mcpTool = saveMcpTool("post", Map.of(), true);
+
+        insertIntegration("httpClient");
+
+        long boundIntegrationId = insertIntegration("httpClient Code");
+
+        mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), boundIntegrationId);
+
+        mockPostClusterElementDefinition();
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinition.isConnectionRequired()).thenReturn(true);
+        when(componentDefinitionService.getComponentDefinition("httpClient", 1)).thenReturn(componentDefinition);
+
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
+            embeddedMcpToolFacade.getFunctionToolCallback(
+                mcpTool, UNCONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+
+        assertThat(functionToolCallback).isNotNull();
+
+        functionToolCallback.call("{}");
+
+        assertThat(getExternalInvocationEvents()).singleElement()
+            .satisfies(externalInvocationEvent -> {
+                assertThat(externalInvocationEvent.surface()).isEqualTo(ExternalInvocationSurface.MCP_EMBEDDED);
+                assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.CONNECTION_REQUIRED);
+                assertThat(externalInvocationEvent.externalUserId()).isEqualTo(UNCONNECTED_EXTERNAL_USER_ID);
+                assertThat(externalInvocationEvent.connectedUserId()).isNull();
+                assertThat(externalInvocationEvent.connectionId()).isNull();
+                assertThat(externalInvocationEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
+            });
+
+        verifyNoInteractions(clusterElementDefinitionFacade);
+    }
+
+    @Test
     void testWorkflowToolRunIsRecordedAgainstItsJob() {
         ToolCallback toolCallback = getConnectedWorkflowToolCallback(List.of());
 
@@ -907,6 +947,7 @@ class EmbeddedMcpToolFacadeIntTest {
                 assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.CONNECTION_REQUIRED);
                 assertThat(externalInvocationEvent.toolName()).isEqualTo("mappedTool");
                 assertThat(externalInvocationEvent.externalUserId()).isEqualTo(UNCONNECTED_EXTERNAL_USER_ID);
+                assertThat(externalInvocationEvent.connectedUserId()).isNull();
                 assertThat(externalInvocationEvent.integrationInstanceId()).isNull();
                 assertThat(externalInvocationEvent.jobId()).isNull();
             });

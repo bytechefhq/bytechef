@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.InstanceOfAssertFactories.type;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -23,6 +24,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
+import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.CredentialType;
 import com.bytechef.platform.security.web.authentication.UnresolvedCredentialAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
@@ -41,6 +43,7 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
 
     private static final Long CONNECTED_USER_ID = 77L;
     private static final long ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
+    private static final long PRODUCTION_ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
     private static final String EXTERNAL_USER_ID = "ext-user-1";
     private static final long MCP_SERVER_ID = 1050L;
     private static final String MCP_SERVER_SECRET_KEY = "server-secret";
@@ -49,6 +52,26 @@ class EmbeddedMcpServerApiKeyAuthenticationProviderTest {
     private final McpServerService mcpServerService = mock(McpServerService.class);
     private final EmbeddedMcpServerApiKeyAuthenticationProvider embeddedMcpServerApiKeyAuthenticationProvider =
         new EmbeddedMcpServerApiKeyAuthenticationProvider(connectedUserService, mcpServerService);
+
+    @Test
+    void testAuthenticatedTokenCarriesTheRequestEnvironment() {
+        mockMcpServer(PlatformType.EMBEDDED, true);
+
+        ConnectedUser connectedUser = mock(ConnectedUser.class);
+
+        when(connectedUser.isEnabled()).thenReturn(true);
+        when(connectedUser.getExternalId()).thenReturn(EXTERNAL_USER_ID);
+        when(connectedUserService.fetchConnectedUser(EXTERNAL_USER_ID, PRODUCTION_ENVIRONMENT_ID))
+            .thenReturn(Optional.of(connectedUser));
+
+        Authentication authentication = embeddedMcpServerApiKeyAuthenticationProvider.authenticate(
+            new EmbeddedMcpServerApiKeyAuthenticationToken(
+                PRODUCTION_ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY));
+
+        assertThat(authentication)
+            .asInstanceOf(type(AbstractApiKeyAuthenticationToken.class))
+            .satisfies(token -> assertThat(token.fetchEnvironmentId()).contains(PRODUCTION_ENVIRONMENT_ID));
+    }
 
     @Test
     void testAuthenticateReturnsAnonymousWhenAuthenticationNotRequired() {

@@ -34,6 +34,8 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.external.invocation.config.ExternalInvocationConfiguration;
+import com.bytechef.platform.mcp.domain.McpComponent;
+import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -43,12 +45,14 @@ import com.bytechef.platform.workflow.execution.facade.JobResumeFacade;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import io.modelcontextprotocol.common.McpTransportContext;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -124,6 +128,64 @@ class EmbeddedMcpServerConfigurationIntTest {
         assertThat(mcpTransportContext.get("externalUserId")).isNull();
         assertThat(mcpTransportContext.get("environment")).isNull();
         assertThat(mcpTransportContext.get("secretKey")).isEqualTo("server-secret");
+    }
+
+    @Test
+    void testTransportContextCarriesTheConnectedUsersAuthorities() {
+        User user = new User("ext-user-1", "", List.of(new SimpleGrantedAuthority("ROLE_SALES")));
+
+        setAuthentication(
+            new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_SALES"))));
+
+        McpTransportContext mcpTransportContext = EmbeddedMcpServerConfiguration.createMcpTransportContext(
+            "server-secret", "PRODUCTION");
+
+        assertThat(mcpTransportContext.get("authorities")).isEqualTo(Set.of("ROLE_SALES"));
+    }
+
+    @Test
+    void testTransportContextOmitsAuthoritiesForAnonymousCaller() {
+        setAuthentication(McpAnonymousAuthenticationToken.of("mcp-anonymous:embedded:1050"));
+
+        McpTransportContext mcpTransportContext = EmbeddedMcpServerConfiguration.createMcpTransportContext(
+            "server-secret", null);
+
+        assertThat(mcpTransportContext.get("authorities")).isNull();
+    }
+
+    @Test
+    void testEnforcingServerKeepsOnlyAuthorizedComponents() {
+        McpServer mcpServer = new McpServer();
+
+        mcpServer.setEnforceToolAuthorization(true);
+
+        McpComponent salesforceMcpComponent = mcpComponent("salesforce", Set.of("ROLE_SALES"));
+        McpComponent adminMcpComponent = mcpComponent("admin", Set.of("ROLE_ADMIN"));
+
+        List<McpComponent> authorizedMcpComponents = EmbeddedMcpServerConfiguration.authorizedComponents(
+            mcpServer, List.of(salesforceMcpComponent, adminMcpComponent), Set.of("ROLE_USER", "ROLE_SALES"));
+
+        assertThat(authorizedMcpComponents).containsExactly(salesforceMcpComponent);
+    }
+
+    @Test
+    void testNonEnforcingServerExposesAllComponents() {
+        McpComponent salesforceMcpComponent = mcpComponent("salesforce", Set.of("ROLE_SALES"));
+        McpComponent adminMcpComponent = mcpComponent("admin", Set.of("ROLE_ADMIN"));
+
+        List<McpComponent> authorizedMcpComponents = EmbeddedMcpServerConfiguration.authorizedComponents(
+            new McpServer(), List.of(salesforceMcpComponent, adminMcpComponent), Set.of());
+
+        assertThat(authorizedMcpComponents).containsExactly(salesforceMcpComponent, adminMcpComponent);
+    }
+
+    private static McpComponent mcpComponent(String componentName, Set<String> requiredAuthorities) {
+        McpComponent mcpComponent = new McpComponent();
+
+        mcpComponent.setComponentName(componentName);
+        mcpComponent.setRequiredAuthorities(requiredAuthorities);
+
+        return mcpComponent;
     }
 
     private static void setAuthentication(Authentication authentication) {
