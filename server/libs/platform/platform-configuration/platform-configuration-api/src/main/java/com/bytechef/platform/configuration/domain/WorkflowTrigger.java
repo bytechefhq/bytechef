@@ -143,9 +143,6 @@ public class WorkflowTrigger implements Serializable, Trigger {
         return disabled;
     }
 
-    /**
-     * Manual triggers are always enabled, regardless of the disabled flag.
-     */
     public boolean isEnabled() {
         if (!disabled) {
             return true;
