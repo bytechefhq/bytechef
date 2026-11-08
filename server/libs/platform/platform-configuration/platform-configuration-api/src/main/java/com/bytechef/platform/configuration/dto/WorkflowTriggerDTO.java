@@ -27,12 +27,14 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record WorkflowTriggerDTO(
-    List<ComponentConnection> connections, String description, Map<String, ?> metadata, String name, String label,
+    List<ComponentConnection> connections, String description, boolean disabled, Map<String, ?> metadata, String name,
+    String label,
     Map<String, ?> parameters, String timeout, String type) {
 
     public WorkflowTriggerDTO(WorkflowTrigger workflowTrigger, List<ComponentConnection> connections) {
         this(
-            connections, workflowTrigger.getDescription(), workflowTrigger.getMetadata(), workflowTrigger.getName(),
+            connections, workflowTrigger.getDescription(), workflowTrigger.isDisabled(),
+            workflowTrigger.getMetadata(), workflowTrigger.getName(),
             workflowTrigger.getLabel(), workflowTrigger.getParameters(), workflowTrigger.getTimeout(),
             workflowTrigger.getType());
     }

@@ -3550,6 +3550,9 @@ components:
         description:
           description: "The description of the task."
           type: "string"
+        disabled:
+          description: "When true, the trigger is not activated and does not start workflow executions."
+          type: "boolean"
         label:
           description: "The human-readable description of the task."
           type: "string"
