@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @version ee
- *
  * @author Ivica Cardic
  */
 class McpTenantIssuerResolverTest {

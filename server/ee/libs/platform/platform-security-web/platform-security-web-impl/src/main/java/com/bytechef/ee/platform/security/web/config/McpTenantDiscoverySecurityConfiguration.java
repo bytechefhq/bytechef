@@ -21,15 +21,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * Wires the tenant-aware protected-resource metadata endpoint for the automation and management MCP endpoints. The
- * metadata lives at {@code /.well-known/oauth-protected-resource/api/{automation|management}/**}; a dedicated
- * permit-all chain serves it, ordered ahead of the generic {@code /.well-known/oauth-protected-resource/**} chain so
- * the per-endpoint, tenant-aware document (served by {@code McpTenantProtectedResourceMetadataController}) wins over
- * the static one. Active only in EE and only when an issuer is configured (the same condition under which the discovery
- * challenge points at this metadata).
- *
  * @version ee
- *
  * @author Ivica Cardic
  */
 @Configuration

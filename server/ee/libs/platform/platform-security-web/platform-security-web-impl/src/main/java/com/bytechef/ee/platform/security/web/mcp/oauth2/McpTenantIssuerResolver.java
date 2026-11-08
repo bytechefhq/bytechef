@@ -20,18 +20,7 @@ import java.util.function.Predicate;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Resolves the external MCP issuers a tenant trusts for a given MCP surface, from that tenant's enabled
- * {@code IdentityProvider} records. Must be called within the tenant established from the endpoint's URL secret, so
- * {@link IdentityProviderService#getIdentityProviders()} returns that tenant's providers - a per-tenant issuer is
- * trusted only on its own tenant's endpoint.
- *
- * <p>
- * The resolution is cached per (tenant, surface) for a short TTL so it does not hit the database on every MCP request.
- * The TTL bounds how long an identity-provider change (including disabling one) takes to take effect, so it is kept
- * short.
- *
  * @version ee
- *
  * @author Ivica Cardic
  */
 public class McpTenantIssuerResolver {
@@ -73,18 +62,10 @@ public class McpTenantIssuerResolver {
         return cache.get(cacheKey, unusedKey -> doResolve(surface));
     }
 
-    /**
-     * Drops all cached resolutions, so the next {@link #resolve(Surface)} re-reads from the database. Invoked when an
-     * identity provider changes, so trust and discovery reflect the change immediately rather than after the TTL.
-     */
     public void evictAll() {
         cache.invalidateAll();
     }
 
-    /**
-     * The trusted issuer with the given URI for the surface, or {@code null} if the current tenant does not trust it.
-     * Convenience over {@link #resolve(Surface)} for callers that already hold an issuer URI.
-     */
     @Nullable
     public McpTenantIssuer resolveIssuer(Surface surface, String issuerUri) {
         return resolve(surface).stream()

@@ -19,13 +19,7 @@ import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 /**
- * Enterprise-only contributor that adds the per-tenant external-IdP trust filter to the MCP endpoints' chain. Active
- * only in EE and only when at least one trusted issuer is configured; otherwise a no-op. Complements the CE
- * {@code McpJwtSecurityConfigurerContributor} (which wires the base post-decode policy filter) and the EE
- * {@code McpFederatedIssuerAuthenticator} bean (which the base filter delegates non-static issuers to).
- *
  * @version ee
- *
  * @author Ivica Cardic
  */
 @Configuration

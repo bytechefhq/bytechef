@@ -14,14 +14,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 
 /**
- * Wires the {@link McpTenantTrustResolutionFilter} before the resource server's
- * {@link BearerTokenAuthenticationFilter}, so a per-tenant external identity provider's token can be decoded: the
- * filter publishes the request tenant's trusted external issuers to the request-scoped trust context that the decoder
- * factory reads. This is the enterprise half of the JWT chain wiring; the base post-decode policy filter is added
- * separately by the CE {@code McpJwtSecurityConfigurerContributor}.
- *
  * @version ee
- *
  * @author Ivica Cardic
  */
 public class McpTenantTrustResolutionConfigurer

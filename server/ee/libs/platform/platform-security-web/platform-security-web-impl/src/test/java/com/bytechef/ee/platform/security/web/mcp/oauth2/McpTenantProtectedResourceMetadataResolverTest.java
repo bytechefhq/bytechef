@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @version ee
- *
  * @author Ivica Cardic
  */
 class McpTenantProtectedResourceMetadataResolverTest {
@@ -53,6 +52,8 @@ class McpTenantProtectedResourceMetadataResolverTest {
         assertThat(metadata.get()
             .authorizationServers())
                 .containsExactly("https://idp.customer.test", "https://as.bytechef.test");
+        assertThat(metadata.get()
+            .scopesSupported()).containsExactly("mcp:automation");
     }
 
     @Test

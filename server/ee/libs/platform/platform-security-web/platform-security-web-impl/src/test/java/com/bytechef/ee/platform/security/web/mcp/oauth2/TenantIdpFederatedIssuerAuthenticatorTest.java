@@ -26,15 +26,15 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 /**
  * @version ee
- *
  * @author Ivica Cardic
  */
 class TenantIdpFederatedIssuerAuthenticatorTest {
 
     private static final String ISSUER_URI = "https://idp.customer.test";
+    private static final String PATH = "/api/automation/secret/mcp";
 
     private final TenantIdpFederatedIssuerAuthenticator tenantIdpFederatedIssuerAuthenticator =
-        new TenantIdpFederatedIssuerAuthenticator(new McpAudienceValidator(), new McpJwtIdentityMapper());
+        new TenantIdpFederatedIssuerAuthenticator(new McpAudienceValidator(), new McpJwtIdentityMapper(), null);
 
     @AfterEach
     void afterEach() {
@@ -63,7 +63,6 @@ class TenantIdpFederatedIssuerAuthenticatorTest {
 
     @Test
     void testReturnsEmptyWhenIssuerNotTrustedForTenant() {
-        // No trust context populated for this thread - the issuer is not trusted for the request's tenant.
         Optional<McpJwtIdentity> mcpJwtIdentity =
             tenantIdpFederatedIssuerAuthenticator.authenticate(jwtBuilder().build(), request(), "acme");
 
@@ -80,6 +79,32 @@ class TenantIdpFederatedIssuerAuthenticatorTest {
         assertThat(mcpJwtIdentity).isEmpty();
     }
 
+    @Test
+    void testAcceptsAudienceBoundToTheEndpointUrl() {
+        McpTenantTrustContext.set(List.of(new McpTenantIssuer(ISSUER_URI, true, null, Map.of())));
+
+        Jwt jwt = jwtBuilder().audience(List.of("http://localhost" + PATH))
+            .build();
+
+        assertThat(tenantIdpFederatedIssuerAuthenticator.authenticate(jwt, request(), "acme")).isPresent();
+    }
+
+    @Test
+    void testAnchorsTheRequiredAudienceToThePublicUrl() {
+        McpTenantTrustContext.set(List.of(new McpTenantIssuer(ISSUER_URI, true, null, Map.of())));
+
+        TenantIdpFederatedIssuerAuthenticator publicUrlAuthenticator = new TenantIdpFederatedIssuerAuthenticator(
+            new McpAudienceValidator(), new McpJwtIdentityMapper(), "https://bytechef.example.com");
+
+        Jwt publicAudienceJwt = jwtBuilder().audience(List.of("https://bytechef.example.com" + PATH))
+            .build();
+        Jwt internalAudienceJwt = jwtBuilder().audience(List.of("http://localhost" + PATH))
+            .build();
+
+        assertThat(publicUrlAuthenticator.authenticate(publicAudienceJwt, request(), "acme")).isPresent();
+        assertThat(publicUrlAuthenticator.authenticate(internalAudienceJwt, request(), "acme")).isEmpty();
+    }
+
     private static Jwt.Builder jwtBuilder() {
         return Jwt.withTokenValue("token")
             .header("alg", "none")
@@ -91,11 +116,9 @@ class TenantIdpFederatedIssuerAuthenticatorTest {
     }
 
     private static MockHttpServletRequest request() {
-        String path = "/api/embedded/secret/mcp";
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", PATH);
 
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", path);
-
-        request.setServletPath(path);
+        request.setServletPath(PATH);
 
         return request;
     }

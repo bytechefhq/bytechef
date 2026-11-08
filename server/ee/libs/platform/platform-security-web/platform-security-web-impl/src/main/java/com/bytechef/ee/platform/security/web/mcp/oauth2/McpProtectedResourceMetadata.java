@@ -12,17 +12,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
- * RFC 9728 OAuth2 protected-resource metadata for an automation or management MCP endpoint: the resource identifier and
- * the authorization server(s) whose tokens the endpoint accepts (the tenant's external identity providers plus
- * ByteChef's own configured issuers).
- *
  * @version ee
- *
  * @author Ivica Cardic
  */
 @SuppressFBWarnings({
     "EI", "EI2"
 })
 public record McpProtectedResourceMetadata(
-    String resource, @JsonProperty("authorization_servers") List<String> authorizationServers) {
+    String resource, @JsonProperty("authorization_servers") List<String> authorizationServers,
+    @JsonProperty("scopes_supported") List<String> scopesSupported, @JsonProperty("resource_name") String resourceName,
+    @JsonProperty("tls_client_certificate_bound_access_tokens") boolean tlsClientCertificateBoundAccessTokens) {
 }

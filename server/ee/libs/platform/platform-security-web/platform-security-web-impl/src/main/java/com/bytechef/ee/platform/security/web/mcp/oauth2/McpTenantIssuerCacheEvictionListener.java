@@ -14,12 +14,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Evicts the {@link McpTenantIssuerResolver} cache whenever an identity provider is created, updated, or deleted, so
- * the automation/management and embedded MCP trust and discovery reflect the change immediately rather than after the
- * cache TTL.
- *
  * @version ee
- *
  * @author Ivica Cardic
  */
 @Component

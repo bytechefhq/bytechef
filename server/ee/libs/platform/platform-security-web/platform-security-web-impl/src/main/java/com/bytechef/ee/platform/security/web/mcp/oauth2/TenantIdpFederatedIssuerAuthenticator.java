@@ -11,37 +11,33 @@ import com.bytechef.platform.security.web.mcp.oauth2.McpAudienceValidator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpFederatedIssuerAuthenticator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtIdentity;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtIdentityMapper;
+import com.bytechef.platform.security.web.mcp.oauth2.McpProtectedResourceUrls;
 import com.bytechef.platform.security.web.mcp.oauth2.McpTenantIssuer;
 import com.bytechef.platform.security.web.mcp.oauth2.McpTenantTrustContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.web.util.UrlUtils;
 
 /**
- * The enterprise implementation of {@link McpFederatedIssuerAuthenticator}: the relaxed path for a per-tenant external
- * identity provider trusted only for this request's tenant ({@link McpTenantTrustContext}). The endpoint surface is
- * authorized by the provider's surface flag rather than a token scope, so no scope is required; audience binding is
- * optional (the single-tenant trust prevents cross-tenant replay) unless the provider opts in; and authorities come
- * from the provider's group-to-authority map. Returns empty when the issuer is not trusted for this tenant or audience
- * validation fails, causing the filter to respond 401.
- *
  * @version ee
- *
  * @author Ivica Cardic
  */
 public class TenantIdpFederatedIssuerAuthenticator implements McpFederatedIssuerAuthenticator {
 
     private final McpAudienceValidator mcpAudienceValidator;
     private final McpJwtIdentityMapper mcpJwtIdentityMapper;
+    private final @Nullable String publicUrl;
 
     @SuppressFBWarnings("EI2")
     public TenantIdpFederatedIssuerAuthenticator(
-        McpAudienceValidator mcpAudienceValidator, McpJwtIdentityMapper mcpJwtIdentityMapper) {
+        McpAudienceValidator mcpAudienceValidator, McpJwtIdentityMapper mcpJwtIdentityMapper,
+        @Nullable String publicUrl) {
 
         this.mcpAudienceValidator = mcpAudienceValidator;
         this.mcpJwtIdentityMapper = mcpJwtIdentityMapper;
+        this.publicUrl = publicUrl;
     }
 
     @Override
@@ -54,18 +50,12 @@ public class TenantIdpFederatedIssuerAuthenticator implements McpFederatedIssuer
             return Optional.empty();
         }
 
-        if (!mcpAudienceValidator.isTenantAudienceValid(jwt, tenantIssuer, buildRequestUrl(request))) {
+        if (!mcpAudienceValidator.isTenantAudienceValid(
+            jwt, tenantIssuer, McpProtectedResourceUrls.resolveResourceUrl(publicUrl, request))) {
+
             return Optional.empty();
         }
 
         return Optional.of(mcpJwtIdentityMapper.mapTenantIssuer(jwt, tenantIssuer, urlTenantId));
-    }
-
-    private static String buildRequestUrl(HttpServletRequest request) {
-        String url = UrlUtils.buildFullRequestUrl(request);
-
-        int queryIndex = url.indexOf('?');
-
-        return queryIndex >= 0 ? url.substring(0, queryIndex) : url;
     }
 }

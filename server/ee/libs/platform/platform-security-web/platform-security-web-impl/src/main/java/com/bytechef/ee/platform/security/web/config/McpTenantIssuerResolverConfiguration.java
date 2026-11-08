@@ -14,17 +14,13 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.mcp.oauth2.McpAudienceValidator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpFederatedIssuerAuthenticator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtIdentityMapper;
+import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Provides the single, shared {@link McpTenantIssuerResolver} bean used by the automation/management trust filter and
- * discovery, and by the embedded MCP trust and discovery - so its per-tenant issuer cache is shared rather than
- * duplicated per call site. {@link McpTenantIssuerCacheEvictionListener} evicts that cache when any identity provider
- * changes, so trust and discovery reflect the change immediately instead of after the cache TTL.
- *
  * @version ee
- *
  * @author Ivica Cardic
  */
 @Configuration
@@ -36,13 +32,11 @@ public class McpTenantIssuerResolverConfiguration {
         return new McpTenantIssuerResolver(identityProviderService);
     }
 
-    /**
-     * The enterprise implementation of the CE {@link McpFederatedIssuerAuthenticator} SPI. Present only on an EE build,
-     * so the base JWT filter authenticates a non-statically-configured (per-tenant external IdP) issuer through
-     * federation; on a CE-only build the SPI bean is absent and such an issuer is rejected.
-     */
     @Bean
-    McpFederatedIssuerAuthenticator mcpFederatedIssuerAuthenticator() {
-        return new TenantIdpFederatedIssuerAuthenticator(new McpAudienceValidator(), new McpJwtIdentityMapper());
+    McpFederatedIssuerAuthenticator mcpFederatedIssuerAuthenticator(
+        @Value("${bytechef.public-url:}") @Nullable String publicUrl) {
+
+        return new TenantIdpFederatedIssuerAuthenticator(
+            new McpAudienceValidator(), new McpJwtIdentityMapper(), publicUrl);
     }
 }

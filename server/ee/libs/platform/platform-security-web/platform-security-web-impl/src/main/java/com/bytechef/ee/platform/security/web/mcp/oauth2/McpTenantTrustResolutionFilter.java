@@ -25,19 +25,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Runs before the resource server's {@code BearerTokenAuthenticationFilter} on the automation and management MCP
- * endpoints. It resolves the tenant from the endpoint's URL path secret (a per-tenant {@link TenantKey}) and, within
- * that tenant, loads the external identity providers the tenant trusts for the endpoint's surface, publishing them to
- * {@link McpTenantTrustContext} for the downstream JWT decoder and {@link TenantAwareJwtAuthenticationFilter}. This is
- * what lets a per-tenant IdP's token be admitted for decoding at all - trust for such an issuer is only knowable once
- * the tenant is known, which the static decoder cannot determine on its own.
- *
- * <p>
- * The context is only populated for a Bearer <em>JWT</em> request (API-key requests carry an opaque secret and are left
- * untouched, avoiding a per-request provider lookup), and is always cleared once the chain returns.
- *
  * @version ee
- *
  * @author Ivica Cardic
  */
 public class McpTenantTrustResolutionFilter extends OncePerRequestFilter {
@@ -97,7 +85,6 @@ public class McpTenantTrustResolutionFilter extends OncePerRequestFilter {
             tenantId = TenantKey.parse(matcher.group(1))
                 .getTenantId();
         } catch (RuntimeException runtimeException) {
-            // Not a parseable per-tenant secret; leave trust unpopulated so the downstream filter rejects the request.
             return false;
         }
 
