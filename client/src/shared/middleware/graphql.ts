@@ -632,6 +632,13 @@ export type DeleteAiGatewayBudgetMutationVariables = Exact<{
 
 export type DeleteAiGatewayBudgetMutation = { deleteAiGatewayBudget: boolean | null };
 
+export type PlaygroundChatCompletionMutationVariables = Exact<{
+  input: Types.PlaygroundChatCompletionInput;
+}>;
+
+
+export type PlaygroundChatCompletionMutation = { playgroundChatCompletion: { completionTokens: number | null, content: string | null, cost: number | null, finishReason: string | null, latencyMs: number | null, model: string | null, promptTokens: number | null, totalTokens: number | null, traceId: string | null } | null };
+
 export type AiGatewayProjectSettingsQueryVariables = Exact<{
   projectId: string | number;
 }>;
@@ -5651,6 +5658,35 @@ export const useDeleteAiGatewayBudgetMutation = <
       {
     mutationKey: ['deleteAiGatewayBudget'],
     mutationFn: (variables?: DeleteAiGatewayBudgetMutationVariables) => fetcher<DeleteAiGatewayBudgetMutation, DeleteAiGatewayBudgetMutationVariables>(DeleteAiGatewayBudgetDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const PlaygroundChatCompletionDocument = new TypedDocumentString(`
+    mutation playgroundChatCompletion($input: PlaygroundChatCompletionInput!) {
+  playgroundChatCompletion(input: $input) {
+    completionTokens
+    content
+    cost
+    finishReason
+    latencyMs
+    model
+    promptTokens
+    totalTokens
+    traceId
+  }
+}
+    `);
+
+export const usePlaygroundChatCompletionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<PlaygroundChatCompletionMutation, TError, PlaygroundChatCompletionMutationVariables, TContext>) => {
+    
+    return useMutation<PlaygroundChatCompletionMutation, TError, PlaygroundChatCompletionMutationVariables, TContext>(
+      {
+    mutationKey: ['playgroundChatCompletion'],
+    mutationFn: (variables?: PlaygroundChatCompletionMutationVariables) => fetcher<PlaygroundChatCompletionMutation, PlaygroundChatCompletionMutationVariables>(PlaygroundChatCompletionDocument, variables)(),
     ...options
   }
     )};

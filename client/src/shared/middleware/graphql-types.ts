@@ -2907,6 +2907,7 @@ export type Mutation = {
   instantiateAiEvalTemplate?: Maybe<AiEvalRule>;
   inviteUser: Scalars['Boolean']['output'];
   moveAutomationWorkflowProjectConfigurationConnectedUsers: ConfigurationMoveResult;
+  playgroundChatCompletion?: Maybe<PlaygroundChatCompletionResponse>;
   provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
@@ -3819,6 +3820,11 @@ export type MutationMoveAutomationWorkflowProjectConfigurationConnectedUsersArgs
 };
 
 
+export type MutationPlaygroundChatCompletionArgs = {
+  input: PlaygroundChatCompletionInput;
+};
+
+
 export type MutationProvisionConnectedUserMcpServerArgs = {
   connectedUserId: Scalars['ID']['input'];
   mcpServerId: Scalars['ID']['input'];
@@ -4584,6 +4590,41 @@ export type PendingApproval = {
 export enum PlatformType {
   Automation = 'AUTOMATION',
   Embedded = 'EMBEDDED'
+}
+
+export type PlaygroundChatCompletionInput = {
+  maxTokens?: InputMaybe<Scalars['Int']['input']>;
+  messages: Array<PlaygroundChatMessageInput>;
+  model: Scalars['String']['input'];
+  promptId?: InputMaybe<Scalars['ID']['input']>;
+  promptVariables?: InputMaybe<Scalars['String']['input']>;
+  temperature?: InputMaybe<Scalars['Float']['input']>;
+  topP?: InputMaybe<Scalars['Float']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+export type PlaygroundChatCompletionResponse = {
+  __typename?: 'PlaygroundChatCompletionResponse';
+  completionTokens?: Maybe<Scalars['Int']['output']>;
+  content?: Maybe<Scalars['String']['output']>;
+  cost?: Maybe<Scalars['Float']['output']>;
+  finishReason?: Maybe<Scalars['String']['output']>;
+  latencyMs?: Maybe<Scalars['Int']['output']>;
+  model?: Maybe<Scalars['String']['output']>;
+  promptTokens?: Maybe<Scalars['Int']['output']>;
+  totalTokens?: Maybe<Scalars['Int']['output']>;
+  traceId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type PlaygroundChatMessageInput = {
+  content: Scalars['String']['input'];
+  role: PlaygroundChatRole;
+};
+
+export enum PlaygroundChatRole {
+  Assistant = 'ASSISTANT',
+  System = 'SYSTEM',
+  User = 'USER'
 }
 
 export type Project = {
