@@ -39,7 +39,7 @@ class CreateApiCollectionToolCallbackTest {
 
         ApiCollectionDTO created = new ApiCollectionDTO(
             1, "billing-v1", null, null, null, false, List.of(), Environment.STAGING, 100L, null, null, "Billing API",
-            null, 42L, null, 200L, 3, List.of(), 0);
+            null, 42L, null, 200L, 3, List.of(), 0, null);
 
         when(facade.createApiCollection(any(ApiCollectionDTO.class))).thenReturn(created);
 
@@ -94,7 +94,7 @@ class CreateApiCollectionToolCallbackTest {
 
         ApiCollectionDTO created = new ApiCollectionDTO(
             5, "billing-v5", null, null, null, false, List.of(), Environment.PRODUCTION, 100L, null, null, "Billing v5",
-            null, 42L, null, 200L, 7, List.of(), 0);
+            null, 42L, null, 200L, 7, List.of(), 0, null);
 
         when(facade.createApiCollection(any(ApiCollectionDTO.class))).thenReturn(created);
 
