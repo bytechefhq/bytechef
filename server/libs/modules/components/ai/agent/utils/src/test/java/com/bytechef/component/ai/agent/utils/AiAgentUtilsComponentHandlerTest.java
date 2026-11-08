@@ -36,25 +36,34 @@ public class AiAgentUtilsComponentHandlerTest {
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/ai_agent-utils_v1.json", createComponentHandler(true, true, "test-key").getDefinition());
+            "definition/ai_agent-utils_v1.json",
+            createComponentHandler(true, true, true, "test-key").getDefinition());
+    }
+
+    @Test
+    public void testGetComponentDefinitionLeavesOutFileSystemToolsUnlessEnabled() {
+        assertThat(clusterElementNames(createComponentHandler(false, false, false, null)))
+            .doesNotContain("fileSystemTools", "grepTool", "globTool", "listDirectoryTool");
+        assertThat(clusterElementNames(createComponentHandler(true, false, false, null)))
+            .contains("fileSystemTools", "grepTool", "globTool", "listDirectoryTool");
     }
 
     @Test
     public void testGetComponentDefinitionLeavesOutShellToolsUnlessEnabled() {
-        assertThat(clusterElementNames(createComponentHandler(false, false, null))).doesNotContain("shellTools")
-            .contains("fileSystemTools");
-        assertThat(clusterElementNames(createComponentHandler(true, false, null))).contains("shellTools");
+        assertThat(clusterElementNames(createComponentHandler(true, false, false, null)))
+            .doesNotContain("shellTools");
+        assertThat(clusterElementNames(createComponentHandler(false, true, false, null))).contains("shellTools");
     }
 
     @Test
     public void testGetComponentDefinitionIncludesBraveWebSearchToolOnlyWhenEnabledWithApiKey() {
-        assertThat(clusterElementNames(createComponentHandler(false, true, "test-key")))
+        assertThat(clusterElementNames(createComponentHandler(false, false, true, "test-key")))
             .contains("braveWebSearchTool");
-        assertThat(clusterElementNames(createComponentHandler(false, false, "test-key")))
+        assertThat(clusterElementNames(createComponentHandler(false, false, false, "test-key")))
             .doesNotContain("braveWebSearchTool");
-        assertThat(clusterElementNames(createComponentHandler(false, true, null)))
+        assertThat(clusterElementNames(createComponentHandler(false, false, true, null)))
             .doesNotContain("braveWebSearchTool");
-        assertThat(clusterElementNames(createComponentHandler(false, true, " ")))
+        assertThat(clusterElementNames(createComponentHandler(false, false, true, " ")))
             .doesNotContain("braveWebSearchTool");
     }
 
@@ -69,7 +78,7 @@ public class AiAgentUtilsComponentHandlerTest {
     }
 
     private static AiAgentUtilsComponentHandler createComponentHandler(
-        boolean shellEnabled, boolean braveEnabled, String braveApiKey) {
+        boolean fileSystemEnabled, boolean shellEnabled, boolean braveEnabled, String braveApiKey) {
 
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
@@ -82,6 +91,8 @@ public class AiAgentUtilsComponentHandlerTest {
 
         ApplicationProperties.Ai.AgentUtils agentUtils = ai.getAgentUtils();
 
+        agentUtils.getFileSystem()
+            .setEnabled(fileSystemEnabled);
         agentUtils.getShell()
             .setEnabled(shellEnabled);
         agentUtils.getWorkspace()
