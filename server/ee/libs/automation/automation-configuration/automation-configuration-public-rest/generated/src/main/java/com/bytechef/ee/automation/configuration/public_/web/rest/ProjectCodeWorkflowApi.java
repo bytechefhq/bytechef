@@ -5,7 +5,6 @@
  */
 package com.bytechef.ee.automation.configuration.public_.web.rest;
 
-import org.springframework.lang.Nullable;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:20.760824+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-08T20:45:44.143979+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 @Validated
 @Tag(name = "project-code-workflow", description = "The Automation Project Code Workflow Public API")
 public interface ProjectCodeWorkflowApi {
@@ -47,8 +46,8 @@ public interface ProjectCodeWorkflowApi {
      * POST /projects/deploy : Deploy a new code based project
      * Deploy a new code based project.
      *
-     * @param workspaceId The id of a workspace this project will belong. (optional)
-     * @param projectFile The file of a code-native project. (optional)
+     * @param workspaceId The id of a workspace this project will belong. (required)
+     * @param projectFile The file of a code-native project. (required)
      * @return Successful operation. (status code 204)
      */
     @Operation(
@@ -66,8 +65,8 @@ public interface ProjectCodeWorkflowApi {
         consumes = { "multipart/form-data" }
     )
     default ResponseEntity<Void> deployProject(
-        @Parameter(name = "workspaceId", description = "The id of a workspace this project will belong.") @Valid @RequestParam(value = "workspaceId", required = false) Long workspaceId,
-        @Parameter(name = "projectFile", description = "The file of a code-native project.") @RequestPart(value = "projectFile", required = false) MultipartFile projectFile
+        @Parameter(name = "workspaceId", description = "The id of a workspace this project will belong.", required = true) @Valid @RequestParam(value = "workspaceId", required = true) Long workspaceId,
+        @Parameter(name = "projectFile", description = "The file of a code-native project.", required = true) @RequestPart(value = "projectFile", required = true) MultipartFile projectFile
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
