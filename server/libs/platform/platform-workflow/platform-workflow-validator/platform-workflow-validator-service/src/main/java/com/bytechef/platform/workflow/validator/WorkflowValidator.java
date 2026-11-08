@@ -1019,7 +1019,15 @@ public class WorkflowValidator {
     private static boolean isDisabledFlagSet(JsonNode triggerJsonNode) {
         JsonNode disabledJsonNode = triggerJsonNode.get("disabled");
 
-        return disabledJsonNode != null && disabledJsonNode.isBoolean() && disabledJsonNode.asBoolean();
+        if (disabledJsonNode == null) {
+            return false;
+        }
+
+        if (disabledJsonNode.isBoolean()) {
+            return disabledJsonNode.asBoolean();
+        }
+
+        return disabledJsonNode.isString() && "true".equalsIgnoreCase(disabledJsonNode.asString());
     }
 
     private static boolean isManualTrigger(JsonNode triggerJsonNode) {
@@ -1044,8 +1052,8 @@ public class WorkflowValidator {
 
     public static boolean hasNoEnabledTrigger(String workflow) {
         try {
-            JsonNode triggersJsonNode = com.bytechef.commons.util.JsonUtils.readTree(workflow)
-                .get("triggers");
+            JsonNode workflowJsonNode = com.bytechef.commons.util.JsonUtils.readTree(workflow);
+            JsonNode triggersJsonNode = workflowJsonNode.get("triggers");
 
             if (triggersJsonNode == null || !triggersJsonNode.isArray() || triggersJsonNode.isEmpty()) {
                 return false;
