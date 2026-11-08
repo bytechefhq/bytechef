@@ -75,6 +75,34 @@ describe('useStringCellEditor', () => {
 
             expect(result.current.text).toBe('');
         });
+
+        it('passes the text to the grid without committing it', () => {
+            const {result} = renderHook(() => useStringCellEditor(defaultProps));
+
+            act(() => {
+                result.current.handleTextChange({target: {value: 'New text'}} as ChangeEvent<HTMLTextAreaElement>);
+            });
+
+            expect(mockOnRowChange).toHaveBeenCalledWith({description: 'New text', id: 'row-1'}, false);
+        });
+
+        it('restores the original row on cancel after the grid passed the edited row back', () => {
+            const {rerender, result} = renderHook((props) => useStringCellEditor(props), {
+                initialProps: defaultProps,
+            });
+
+            act(() => {
+                result.current.handleTextChange({target: {value: 'New text'}} as ChangeEvent<HTMLTextAreaElement>);
+            });
+
+            rerender({...defaultProps, row: {description: 'New text', id: 'row-1'}});
+
+            act(() => {
+                result.current.handleCancel();
+            });
+
+            expect(mockOnRowChange).toHaveBeenLastCalledWith({description: 'Initial text', id: 'row-1'}, true);
+        });
     });
 
     describe('handleSave', () => {
@@ -201,7 +229,7 @@ describe('useStringCellEditor', () => {
     });
 
     describe('handleOpenChange', () => {
-        it('calls onRowChange when closing without commit', () => {
+        it('saves the unchanged text when closing without commit', () => {
             const {result} = renderHook(() => useStringCellEditor(defaultProps));
 
             act(() => {
@@ -209,6 +237,55 @@ describe('useStringCellEditor', () => {
             });
 
             expect(mockOnRowChange).toHaveBeenCalledWith({description: 'Initial text', id: 'row-1'}, true);
+            expect(result.current.isOpen).toBe(false);
+        });
+
+        it('saves the edited text when closing without commit', () => {
+            const {result} = renderHook(() => useStringCellEditor(defaultProps));
+
+            act(() => {
+                result.current.handleTextChange({target: {value: 'Edited text'}} as ChangeEvent<HTMLTextAreaElement>);
+            });
+
+            act(() => {
+                result.current.handleOpenChange(false);
+            });
+
+            expect(mockOnRowChange).toHaveBeenCalledWith({description: 'Edited text', id: 'row-1'}, true);
+        });
+
+        it('does not call onRowChange again when cancelled twice', () => {
+            const {result} = renderHook(() => useStringCellEditor(defaultProps));
+
+            act(() => {
+                result.current.handleCancel();
+            });
+
+            act(() => {
+                result.current.handleCancel();
+            });
+
+            expect(mockOnRowChange).toHaveBeenCalledTimes(1);
+        });
+
+        it('keeps the original text when closing after cancel', () => {
+            const {result} = renderHook(() => useStringCellEditor(defaultProps));
+
+            act(() => {
+                result.current.handleTextChange({target: {value: 'Edited text'}} as ChangeEvent<HTMLTextAreaElement>);
+            });
+
+            act(() => {
+                result.current.handleCancel();
+            });
+
+            vi.clearAllMocks();
+
+            act(() => {
+                result.current.handleOpenChange(false);
+            });
+
+            expect(mockOnRowChange).not.toHaveBeenCalled();
         });
 
         it('does not call onRowChange when closing after save', () => {

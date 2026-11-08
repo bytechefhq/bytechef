@@ -15,7 +15,7 @@ interface StringEditCellProps {
 }
 
 export const StringEditCell = ({columnName, onRowChange, row}: StringEditCellProps) => {
-    const {handleKeyDown, handleOpenChange, handleTextChange, isOpen, text} = useStringCellEditor({
+    const {handleCancel, handleKeyDown, handleOpenChange, handleTextChange, isOpen, text} = useStringCellEditor({
         columnName,
         onRowChange,
         row,
@@ -29,7 +29,7 @@ export const StringEditCell = ({columnName, onRowChange, row}: StringEditCellPro
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent align="start" className="-mt-9 w-96 p-0" side="bottom">
+            <PopoverContent align="start" className="-mt-9 w-96 p-0" onEscapeKeyDown={handleCancel} side="bottom">
                 <div className="flex flex-col gap-3">
                     <Textarea
                         autoFocus

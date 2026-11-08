@@ -91,6 +91,36 @@ describe('useNumberCellEditor', () => {
 
             expect(result.current.inputValue).toBe('abc');
         });
+
+        it('passes a valid value to the grid without committing it', () => {
+            const {result} = renderHook(() => useNumberCellEditor(defaultProps));
+
+            act(() => {
+                result.current.handleChange({target: {value: '100'}} as ChangeEvent<HTMLInputElement>);
+            });
+
+            expect(mockOnRowChange).toHaveBeenCalledWith({id: 'row-1', quantity: 100}, false);
+        });
+
+        it('passes null to the grid without committing when the input is cleared', () => {
+            const {result} = renderHook(() => useNumberCellEditor(defaultProps));
+
+            act(() => {
+                result.current.handleChange({target: {value: ''}} as ChangeEvent<HTMLInputElement>);
+            });
+
+            expect(mockOnRowChange).toHaveBeenCalledWith({id: 'row-1', quantity: null}, false);
+        });
+
+        it('does not pass an invalid value to the grid', () => {
+            const {result} = renderHook(() => useNumberCellEditor(defaultProps));
+
+            act(() => {
+                result.current.handleChange({target: {value: 'abc'}} as ChangeEvent<HTMLInputElement>);
+            });
+
+            expect(mockOnRowChange).not.toHaveBeenCalled();
+        });
     });
 
     describe('handleBlur', () => {
