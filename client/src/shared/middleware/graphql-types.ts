@@ -5295,6 +5295,7 @@ export type Query = {
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
+  workspaceProjectWorkflows: Array<WorkspaceProjectWorkflow>;
 };
 
 
@@ -6456,6 +6457,11 @@ export type QueryWorkspaceProjectDeploymentsArgs = {
   workspaceId: Scalars['ID']['input'];
 };
 
+
+export type QueryWorkspaceProjectWorkflowsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
 export type RecordReferencedAiHubChatArtifactInput = {
   artifactId: Scalars['String']['input'];
   artifactName: Scalars['String']['input'];
@@ -7047,4 +7053,13 @@ export type WorkflowValidationResult = {
   errors: Array<Scalars['String']['output']>;
   nodeIssues: Array<NodeValidationIssue>;
   warnings: Array<Scalars['String']['output']>;
+};
+
+export type WorkspaceProjectWorkflow = {
+  __typename?: 'WorkspaceProjectWorkflow';
+  projectId: Scalars['ID']['output'];
+  projectName: Scalars['String']['output'];
+  projectWorkflowId: Scalars['ID']['output'];
+  workflowId: Scalars['String']['output'];
+  workflowLabel: Scalars['String']['output'];
 };

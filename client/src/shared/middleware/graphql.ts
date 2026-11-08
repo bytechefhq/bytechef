@@ -1427,6 +1427,13 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 
 export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, enforceToolAuthorization: boolean, authenticationRequired: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null, mcpTools: Array<{ id: string } | null> | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
+export type WorkspaceProjectWorkflowsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkspaceProjectWorkflowsQuery = { workspaceProjectWorkflows: Array<{ projectId: string, projectName: string, projectWorkflowId: string, workflowId: string, workflowLabel: string }> };
+
 export type ContextStoreSourceQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -8519,6 +8526,34 @@ export const useWorkspaceMcpServersQuery = <
       {
     queryKey: ['workspaceMcpServers', variables],
     queryFn: fetcher<WorkspaceMcpServersQuery, WorkspaceMcpServersQueryVariables>(WorkspaceMcpServersDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkspaceProjectWorkflowsDocument = new TypedDocumentString(`
+    query workspaceProjectWorkflows($workspaceId: ID!) {
+  workspaceProjectWorkflows(workspaceId: $workspaceId) {
+    projectId
+    projectName
+    projectWorkflowId
+    workflowId
+    workflowLabel
+  }
+}
+    `);
+
+export const useWorkspaceProjectWorkflowsQuery = <
+      TData = WorkspaceProjectWorkflowsQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceProjectWorkflowsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceProjectWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceProjectWorkflowsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceProjectWorkflowsQuery, TError, TData>(
+      {
+    queryKey: ['workspaceProjectWorkflows', variables],
+    queryFn: fetcher<WorkspaceProjectWorkflowsQuery, WorkspaceProjectWorkflowsQueryVariables>(WorkspaceProjectWorkflowsDocument, variables),
     ...options
   }
     )};
