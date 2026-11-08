@@ -5,20 +5,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowNodesTabs from '../components/workflow-nodes-tabs/WorkflowNodesTabs';
 
-const hoisted = vi.hoisted(() => ({
-    featureFlagEnabled: false,
-}));
-
 vi.mock('../stores/useWorkflowDataStore', () => ({
     default: (selector: (state: object) => unknown) => selector({edges: [], nodes: [], workflow: {id: 'workflow-1'}}),
 }));
 
 vi.mock('../stores/useWorkflowEditorStore', () => ({
     default: (selector: (state: object) => unknown) => selector({copiedNode: undefined, copiedWorkflowId: undefined}),
-}));
-
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => () => hoisted.featureFlagEnabled,
 }));
 
 const actionComponentDefinitions: Array<ComponentDefinitionBasic> = [
@@ -45,8 +37,6 @@ const renderWorkflowNodesTabs = (props: Partial<Parameters<typeof WorkflowNodesT
 describe('WorkflowNodesTabs', () => {
     beforeEach(() => {
         windowResizeObserver();
-
-        hoisted.featureFlagEnabled = false;
     });
 
     afterEach(() => {
@@ -91,17 +81,7 @@ describe('WorkflowNodesTabs', () => {
         expect(screen.queryByText('Gmail')).not.toBeInTheDocument();
     });
 
-    it('should hide feature-flagged helpers when their flag is off', async () => {
-        renderWorkflowNodesTabs();
-
-        await userEvent.click(screen.getByRole('tab', {name: 'Helpers'}));
-
-        expect(screen.queryByText('Claude Code')).not.toBeInTheDocument();
-    });
-
-    it('should show feature-flagged helpers when their flag is on', async () => {
-        hoisted.featureFlagEnabled = true;
-
+    it('should list Claude Code in the Helpers tab', async () => {
         renderWorkflowNodesTabs();
 
         await userEvent.click(screen.getByRole('tab', {name: 'Helpers'}));
@@ -127,13 +107,13 @@ describe('WorkflowNodesTabs', () => {
         it('should show the match count on an unselected tab with matches', () => {
             renderWorkflowNodesTabs({showSearchMatchCounts: true});
 
-            expect(screen.getByRole('tab', {name: 'Helpers (2 matches)'})).toBeInTheDocument();
+            expect(screen.getByRole('tab', {name: 'Helpers (3 matches)'})).toBeInTheDocument();
         });
 
         it('should render the match count as phrasing content, which is all a tab button may contain', () => {
             renderWorkflowNodesTabs({showSearchMatchCounts: true});
 
-            const helpersTab = screen.getByRole('tab', {name: 'Helpers (2 matches)'});
+            const helpersTab = screen.getByRole('tab', {name: 'Helpers (3 matches)'});
 
             expect(helpersTab.querySelector('div')).toBeNull();
         });
@@ -141,7 +121,7 @@ describe('WorkflowNodesTabs', () => {
         it('should use the singular form for a single match', async () => {
             renderWorkflowNodesTabs({showSearchMatchCounts: true});
 
-            await userEvent.click(screen.getByRole('tab', {name: 'Helpers (2 matches)'}));
+            await userEvent.click(screen.getByRole('tab', {name: 'Helpers (3 matches)'}));
 
             expect(screen.getByRole('tab', {name: 'Actions (1 match)'})).toBeInTheDocument();
         });
@@ -149,7 +129,7 @@ describe('WorkflowNodesTabs', () => {
         it('should not show the match count on the selected tab', async () => {
             renderWorkflowNodesTabs({showSearchMatchCounts: true});
 
-            await userEvent.click(screen.getByRole('tab', {name: 'Helpers (2 matches)'}));
+            await userEvent.click(screen.getByRole('tab', {name: 'Helpers (3 matches)'}));
 
             expect(screen.getByRole('tab', {name: 'Helpers'})).toBeInTheDocument();
         });

@@ -1,6 +1,5 @@
 import {COMPONENT_CATEGORY_ICON} from '@/shared/constants';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {type ReactNode, useCallback, useMemo, useState} from 'react';
 
 type ActiveViewType = 'all' | 'filtered';
@@ -19,8 +18,6 @@ export const useComponentFiltering = ({componentDefinitions}: {componentDefiniti
         searchValue: '',
         selectedCategories: [],
     });
-
-    const ff_3158 = useFeatureFlagsStore()('ff-3158');
 
     const setSearchValue = useCallback((value: string) => {
         setFilterState((state) => ({...state, searchValue: value}));
@@ -54,23 +51,14 @@ export const useComponentFiltering = ({componentDefinitions}: {componentDefiniti
         return component.componentCategories?.map((category) => category.label?.toLowerCase() || '') || [];
     }, []);
 
-    const isComponentVisible = useCallback(
-        (component: ComponentDefinitionBasic) => ff_3158 || component.name !== 'claudeCode',
-        [ff_3158]
-    );
-
     const getComponentsInCategories = useCallback(
         (components: ComponentDefinitionBasic[], categories: string[]) =>
             components.filter((component) => {
-                if (!isComponentVisible(component)) {
-                    return false;
-                }
-
                 const categoryLabels = getCategoryLabels(component);
 
                 return categories.some((category) => categoryLabels.includes((category || '').toLowerCase()));
             }),
-        [getCategoryLabels, isComponentVisible]
+        [getCategoryLabels]
     );
 
     const calculateFilteredComponentsCount = useCallback(
@@ -160,17 +148,11 @@ export const useComponentFiltering = ({componentDefinitions}: {componentDefiniti
         }
 
         if (filterState.activeView === 'all' || filterState.selectedCategories.length === 0) {
-            return componentDefinitions.filter(isComponentVisible);
+            return componentDefinitions;
         }
 
         return getComponentsInCategories(componentDefinitions, filterState.selectedCategories);
-    }, [
-        componentDefinitions,
-        filterState.activeView,
-        filterState.selectedCategories,
-        getComponentsInCategories,
-        isComponentVisible,
-    ]);
+    }, [componentDefinitions, filterState.activeView, filterState.selectedCategories, getComponentsInCategories]);
 
     return {
         deselectAllCategories,

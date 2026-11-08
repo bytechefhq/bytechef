@@ -1,15 +1,9 @@
 import {COMPONENT_CATEGORY_ICON} from '@/shared/constants';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {act, renderHook} from '@testing-library/react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {describe, expect, it} from 'vitest';
 
 import {useComponentFiltering} from '../useComponentFiltering';
-
-const hoisted = vi.hoisted(() => ({enabledFeatureFlags: [] as string[]}));
-
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => (featureFlag: string) => hoisted.enabledFeatureFlags.includes(featureFlag),
-}));
 
 function makeComponentDefinition(name: string, categoryLabels: Array<string | undefined>): ComponentDefinitionBasic {
     return {
@@ -37,10 +31,6 @@ function getComponentNames(components: ComponentDefinitionBasic[]) {
 }
 
 describe('useComponentFiltering', () => {
-    beforeEach(() => {
-        hoisted.enabledFeatureFlags = [];
-    });
-
     it('starts in the all view with no selection', () => {
         const {result} = renderComponentFiltering();
 
@@ -84,7 +74,7 @@ describe('useComponentFiltering', () => {
     });
 
     describe('filteredComponents', () => {
-        it('returns every component except claudeCode in the all view when ff-3158 is off', () => {
+        it('returns every component in the all view', () => {
             const {result} = renderComponentFiltering();
 
             expect(getComponentNames(result.current.filteredComponents)).toEqual([
@@ -92,17 +82,9 @@ describe('useComponentFiltering', () => {
                 'salesforce',
                 'slack',
                 'openAi',
+                'claudeCode',
                 'uncategorized',
             ]);
-        });
-
-        it('includes claudeCode in the all view when ff-3158 is on', () => {
-            hoisted.enabledFeatureFlags = ['ff-3158'];
-
-            const {result} = renderComponentFiltering();
-
-            expect(getComponentNames(result.current.filteredComponents)).toContain('claudeCode');
-            expect(result.current.filteredComponents).toHaveLength(componentDefinitions.length);
         });
 
         it('filters by the selected categories case-insensitively', () => {
@@ -123,22 +105,6 @@ describe('useComponentFiltering', () => {
             expect(getComponentNames(result.current.filteredComponents)).toEqual(['hubspot', 'salesforce', 'slack']);
         });
 
-        it('excludes claudeCode from a matching category unless ff-3158 is on', () => {
-            const {rerender, result} = renderComponentFiltering();
-
-            act(() => {
-                result.current.toggleCategory('Developer Tools');
-            });
-
-            expect(result.current.filteredComponents).toEqual([]);
-
-            hoisted.enabledFeatureFlags = ['ff-3158'];
-
-            rerender();
-
-            expect(getComponentNames(result.current.filteredComponents)).toEqual(['claudeCode']);
-        });
-
         it('returns all components in the filtered view once every category is toggled off', () => {
             const {result} = renderComponentFiltering();
 
@@ -151,7 +117,7 @@ describe('useComponentFiltering', () => {
             });
 
             expect(result.current.filterState).toMatchObject({activeView: 'filtered', selectedCategories: []});
-            expect(result.current.filteredComponents).toHaveLength(componentDefinitions.length - 1);
+            expect(result.current.filteredComponents).toHaveLength(componentDefinitions.length);
         });
     });
 
@@ -169,7 +135,7 @@ describe('useComponentFiltering', () => {
             });
 
             expect(result.current.filterState).toMatchObject({activeView: 'all', selectedCategories: []});
-            expect(result.current.filteredComponents).toHaveLength(componentDefinitions.length - 1);
+            expect(result.current.filteredComponents).toHaveLength(componentDefinitions.length);
         });
     });
 
@@ -193,36 +159,10 @@ describe('useComponentFiltering', () => {
                 searchValue: '',
                 selectedCategories: ['CRM', 'Communication'],
             });
-            expect(result.current.filteredComponents).toHaveLength(componentDefinitions.length - 1);
+            expect(result.current.filteredComponents).toHaveLength(componentDefinitions.length);
         });
 
-        it('does not count claudeCode when ff-3158 is off, matching the filtered view', () => {
-            const {result} = renderComponentFiltering([
-                makeComponentDefinition('claudeCode', ['AI']),
-                makeComponentDefinition('openAi', ['AI']),
-            ]);
-
-            act(() => {
-                result.current.toggleCategory('AI');
-            });
-
-            act(() => {
-                result.current.setActiveView('all');
-            });
-
-            expect(result.current.filterState.filteredCount).toBe(1);
-
-            act(() => {
-                result.current.setActiveView('filtered');
-            });
-
-            expect(getComponentNames(result.current.filteredComponents)).toEqual(['openAi']);
-            expect(result.current.filteredComponents).toHaveLength(result.current.filterState.filteredCount);
-        });
-
-        it('counts claudeCode when ff-3158 is on, matching the filtered view', () => {
-            hoisted.enabledFeatureFlags = ['ff-3158'];
-
+        it('counts every component in the selected categories, matching the filtered view', () => {
             const {result} = renderComponentFiltering([
                 makeComponentDefinition('claudeCode', ['AI']),
                 makeComponentDefinition('openAi', ['AI']),
