@@ -17,6 +17,7 @@ import com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsS
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProjectService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityAlertEventService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
+import com.bytechef.ee.platform.ai.eval.service.AiEvalExecutionService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayEmbeddedSettings;
 import com.bytechef.ee.platform.ai.gateway.metrics.AiGatewayMetrics;
 import com.bytechef.ee.platform.ai.gateway.service.AiGatewayEmbeddedSettingsService;
@@ -44,6 +45,9 @@ import org.springframework.beans.factory.ObjectProvider;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class AiObservabilityDataCleanupServiceTest {
+
+    @Mock
+    private AiEvalExecutionService aiEvalExecutionService;
 
     @Mock
     private AiGatewayMetrics aiGatewayMetrics;
@@ -83,7 +87,7 @@ class AiObservabilityDataCleanupServiceTest {
     @BeforeEach
     void beforeEach() {
         cleanupService = new AiObservabilityDataCleanupService(
-            aiGatewayMetrics, aiGatewayProjectService, aiLlmUsageService,
+            aiEvalExecutionService, aiGatewayMetrics, aiGatewayProjectService, aiLlmUsageService,
             aiGatewayWorkspaceSettingsService, aiObservabilityAlertEventService, workspaceAiGatewayProjectService,
             workspaceAiObservabilityAlertEventService, workspaceAiObservabilityTraceService,
             aiObservabilityTraceService, embeddedSettingsServiceProvider);

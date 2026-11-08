@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage;
+import com.bytechef.ee.automation.ai.prompt.service.WorkspaceAiPromptService;
 import com.bytechef.ee.platform.ai.llm.usage.service.AiLlmUsageService;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityExportFormat;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityExportJob;
@@ -25,6 +26,7 @@ import com.bytechef.ee.platform.ai.observability.metrics.AiObservabilityMetrics;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityExportJobService;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySessionService;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityTraceService;
+import com.bytechef.ee.platform.ai.prompt.AiPromptVersionService;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.scheduler.event.ExportExecutionEvent;
@@ -66,6 +68,12 @@ class AiObservabilityExportExecutorTest {
     private AiLlmUsageService aiGatewayRequestLogService;
 
     @Mock
+    private WorkspaceAiPromptService workspaceAiPromptService;
+
+    @Mock
+    private AiPromptVersionService aiPromptVersionService;
+
+    @Mock
     private FileStorageServiceRegistry fileStorageServiceRegistry;
 
     @Mock
@@ -88,7 +96,7 @@ class AiObservabilityExportExecutorTest {
         aiObservabilityExportExecutor = new AiObservabilityExportExecutor(
             aiObservabilityMetrics, aiObservabilityExportJobService, workspaceAiObservabilityExportJobService,
             workspaceAiObservabilitySessionService, workspaceAiObservabilityTraceService, aiObservabilityTraceService,
-            aiObservabilitySessionService, aiGatewayRequestLogService,
+            aiObservabilitySessionService, aiGatewayRequestLogService, workspaceAiPromptService, aiPromptVersionService,
             applicationProperties, fileStorageServiceRegistry, selfProvider);
     }
 

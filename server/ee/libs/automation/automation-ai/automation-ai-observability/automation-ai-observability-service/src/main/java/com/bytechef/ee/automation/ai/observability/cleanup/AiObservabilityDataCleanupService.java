@@ -11,6 +11,7 @@ import com.bytechef.ee.automation.ai.gateway.service.AiGatewayWorkspaceSettingsS
 import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProjectService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityAlertEventService;
 import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
+import com.bytechef.ee.platform.ai.eval.service.AiEvalExecutionService;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayEmbeddedSettings;
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProject;
 import com.bytechef.ee.platform.ai.gateway.metrics.AiGatewayMetrics;
@@ -46,6 +47,7 @@ public class AiObservabilityDataCleanupService {
 
     private static final Logger log = LoggerFactory.getLogger(AiObservabilityDataCleanupService.class);
 
+    private final AiEvalExecutionService aiEvalExecutionService;
     private final AiGatewayMetrics aiGatewayMetrics;
     private final AiGatewayProjectService aiGatewayProjectService;
     private final AiLlmUsageService aiGatewayRequestLogService;
@@ -59,6 +61,7 @@ public class AiObservabilityDataCleanupService {
 
     @SuppressFBWarnings("EI2")
     public AiObservabilityDataCleanupService(
+        AiEvalExecutionService aiEvalExecutionService,
         AiGatewayMetrics aiGatewayMetrics,
         AiGatewayProjectService aiGatewayProjectService,
         AiLlmUsageService aiGatewayRequestLogService,
@@ -71,6 +74,7 @@ public class AiObservabilityDataCleanupService {
         ObjectProvider<AiGatewayEmbeddedSettingsService> embeddedSettingsServiceProvider) {
 
         this.embeddedSettingsServiceProvider = embeddedSettingsServiceProvider;
+        this.aiEvalExecutionService = aiEvalExecutionService;
         this.aiGatewayMetrics = aiGatewayMetrics;
         this.aiGatewayProjectService = aiGatewayProjectService;
         this.aiGatewayRequestLogService = aiGatewayRequestLogService;
@@ -99,6 +103,7 @@ public class AiObservabilityDataCleanupService {
                 aiGatewayRequestLogService.deleteOlderThanByWorkspace(cutoff, workspaceId);
                 workspaceAiObservabilityTraceService.deleteOlderThanByWorkspace(cutoff, workspaceId);
                 workspaceAiObservabilityAlertEventService.deleteOlderThanByWorkspace(cutoff, workspaceId);
+                aiEvalExecutionService.deleteOlderThanByWorkspace(cutoff, workspaceId);
 
                 log.debug(
                     "Cleanup completed for workspace {} (retention: {} days)", workspaceId, retentionDays);

@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.ai.observability.service;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage.Provider;
+import com.bytechef.ee.automation.ai.prompt.service.WorkspaceAiPromptService;
 import com.bytechef.ee.platform.ai.llm.usage.AiLlmUsage;
 import com.bytechef.ee.platform.ai.llm.usage.service.AiLlmUsageService;
 import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityExportFormat;
@@ -22,6 +23,9 @@ import com.bytechef.ee.platform.ai.observability.metrics.AiObservabilityMetrics;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityExportJobService;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilitySessionService;
 import com.bytechef.ee.platform.ai.observability.service.AiObservabilityTraceService;
+import com.bytechef.ee.platform.ai.prompt.AiPrompt;
+import com.bytechef.ee.platform.ai.prompt.AiPromptVersion;
+import com.bytechef.ee.platform.ai.prompt.AiPromptVersionService;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -53,6 +57,7 @@ public class AiObservabilityExportExecutor {
     private static final Logger log = LoggerFactory.getLogger(AiObservabilityExportExecutor.class);
 
     private static final String EXPORT_DIRECTORY = "ai-gateway-exports";
+    private static final int PROMPT_CONTENT_PREVIEW_LENGTH = 120;
 
     private final AiObservabilityMetrics aiObservabilityMetrics;
     private final AiObservabilityExportJobService aiObservabilityExportJobService;
@@ -62,6 +67,8 @@ public class AiObservabilityExportExecutor {
     private final AiObservabilityTraceService aiObservabilityTraceService;
     private final AiObservabilitySessionService aiObservabilitySessionService;
     private final AiLlmUsageService aiGatewayRequestLogService;
+    private final WorkspaceAiPromptService workspaceAiPromptService;
+    private final AiPromptVersionService aiPromptVersionService;
     private final FileStorageService fileStorageService;
     private final ObjectProvider<AiObservabilityExportExecutor> selfProvider;
 
@@ -74,6 +81,8 @@ public class AiObservabilityExportExecutor {
         AiObservabilityTraceService aiObservabilityTraceService,
         AiObservabilitySessionService aiObservabilitySessionService,
         AiLlmUsageService aiGatewayRequestLogService,
+        WorkspaceAiPromptService workspaceAiPromptService,
+        AiPromptVersionService aiPromptVersionService,
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry,
         ObjectProvider<AiObservabilityExportExecutor> selfProvider) {
 
@@ -85,6 +94,8 @@ public class AiObservabilityExportExecutor {
         this.aiObservabilityTraceService = aiObservabilityTraceService;
         this.aiObservabilitySessionService = aiObservabilitySessionService;
         this.aiGatewayRequestLogService = aiGatewayRequestLogService;
+        this.workspaceAiPromptService = workspaceAiPromptService;
+        this.aiPromptVersionService = aiPromptVersionService;
         this.selfProvider = selfProvider;
 
         Provider provider = applicationProperties.getFileStorage()
@@ -301,7 +312,58 @@ public class AiObservabilityExportExecutor {
                     })
                     .toList();
             }
+            case PROMPTS -> {
+                List<AiPrompt> prompts = workspaceAiPromptService.getPromptsByWorkspace(workspaceId);
+
+                List<Map<String, Object>> rows = new ArrayList<>();
+
+                for (AiPrompt prompt : prompts) {
+                    Map<String, Object> row = new LinkedHashMap<>();
+
+                    row.put("id", prompt.getId());
+                    row.put("name", prompt.getName() != null ? prompt.getName() : "");
+                    row.put("description", prompt.getDescription() != null ? prompt.getDescription() : "");
+                    row.put("createdDate", prompt.getCreatedDate() != null
+                        ? prompt.getCreatedDate()
+                            .toString()
+                        : "");
+
+                    List<AiPromptVersion> versions = aiPromptVersionService.getVersionsByPrompt(prompt.getId());
+
+                    List<Map<String, Object>> versionRows = new ArrayList<>();
+
+                    for (AiPromptVersion version : versions) {
+                        Map<String, Object> versionRow = new LinkedHashMap<>();
+
+                        versionRow.put("versionNumber", version.getVersionNumber());
+                        versionRow.put("environment",
+                            version.getEnvironment() != null ? version.getEnvironment() : "");
+                        versionRow.put("content", truncateContent(version.getContent()));
+                        versionRow.put("active", version.isActive());
+
+                        versionRows.add(versionRow);
+                    }
+
+                    row.put("versions", versionRows);
+
+                    rows.add(row);
+                }
+
+                yield rows;
+            }
         };
+    }
+
+    private String truncateContent(String content) {
+        if (content == null) {
+            return "";
+        }
+
+        if (content.length() <= PROMPT_CONTENT_PREVIEW_LENGTH) {
+            return content;
+        }
+
+        return content.substring(0, PROMPT_CONTENT_PREVIEW_LENGTH);
     }
 
     private String formatRecords(List<Map<String, Object>> records, AiObservabilityExportFormat format) {

@@ -45,6 +45,7 @@ enum AiObservabilityExportFormat {
 }
 
 enum AiObservabilityExportScope {
+    PROMPTS
     REQUEST_LOGS
     SESSIONS
     TRACES
