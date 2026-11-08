@@ -1,5 +1,5 @@
 import {SPACE} from '@/shared/constants';
-import {WorkflowTask} from '@/shared/middleware/platform/configuration';
+import {WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -23,11 +23,20 @@ function task(overrides: Partial<WorkflowTask> & {name: string}): WorkflowTask {
     };
 }
 
-function makeDefinition(tasks: Array<WorkflowTask>): string {
+function trigger(overrides: Partial<WorkflowTrigger> & {name: string}): WorkflowTrigger {
+    return {
+        parameters: {},
+        type: 'test/v1/trigger',
+        ...overrides,
+    };
+}
+
+function makeDefinition(tasks: Array<WorkflowTask>, triggers?: Array<WorkflowTrigger>): string {
     return JSON.stringify(
         {
             label: 'Test Workflow',
             tasks,
+            ...(triggers ? {triggers} : {}),
         },
         null,
         SPACE
@@ -52,11 +61,11 @@ describe('toggleNodeDisabled', () => {
         updateWorkflowMutation = {mutate: mutateMock} as unknown as UpdateWorkflowMutationType;
     });
 
-    function setDefinition(tasks: Array<WorkflowTask>) {
+    function setDefinition(tasks: Array<WorkflowTask>, triggers?: Array<WorkflowTrigger>) {
         useWorkflowDataStore.setState((state) => ({
             workflow: {
                 ...state.workflow,
-                definition: makeDefinition(tasks),
+                definition: makeDefinition(tasks, triggers),
                 id: workflowId,
                 version: 3,
             },
@@ -367,5 +376,76 @@ describe('toggleNodeDisabled', () => {
         mutateMock.mock.calls[0][1].onSuccess({version: 4});
 
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['workflowNodeOutputs', workflowId]});
+    });
+
+    it('should toggle a trigger and update workflow.triggers and the trigger node', () => {
+        const triggers = [trigger({name: 'trigger_1'}), trigger({name: 'trigger_2'})];
+
+        setDefinition([task({name: 'action_1'})], triggers);
+
+        useWorkflowDataStore.setState((state) => ({
+            nodes: [
+                {data: {workflowNodeName: 'trigger_1'}, id: 'trigger_1', position: {x: 0, y: 0}},
+                {data: {workflowNodeName: 'trigger_2'}, id: 'trigger_2', position: {x: 0, y: 0}},
+            ],
+            workflow: {...state.workflow, triggers},
+        }));
+
+        toggleNodeDisabled({queryClient, updateWorkflowMutation, workflowNodeName: 'trigger_1'});
+
+        const mutatedDefinition = mutateMock.mock.calls[0][0].workflow.definition;
+        const parsedTriggers = JSON.parse(mutatedDefinition).triggers;
+        const storeState = useWorkflowDataStore.getState();
+
+        expect(parsedTriggers[0].disabled).toBe(true);
+        expect('disabled' in parsedTriggers[1]).toBe(false);
+        expect(storeState.workflow.triggers![0].disabled).toBe(true);
+        expect(storeState.workflow.triggers![1].disabled).toBeUndefined();
+        expect(storeState.nodes[0].data.disabled).toBe(true);
+        expect(storeState.nodes[1].data.disabled).toBeUndefined();
+    });
+
+    it('should remove the disabled key when re-enabling a trigger', () => {
+        setDefinition([task({name: 'action_1'})], [trigger({disabled: true, name: 'trigger_1'})]);
+
+        toggleNodeDisabled({queryClient, updateWorkflowMutation, workflowNodeName: 'trigger_1'});
+
+        const mutatedDefinition = mutateMock.mock.calls[0][0].workflow.definition;
+        const parsedTrigger = JSON.parse(mutatedDefinition).triggers[0];
+
+        expect('disabled' in parsedTrigger).toBe(false);
+        expect(mutatedDefinition).not.toContain('false');
+    });
+
+    it('should roll back the trigger flag when the mutation fails', () => {
+        const triggers = [trigger({name: 'trigger_1'})];
+
+        setDefinition([task({name: 'action_1'})], triggers);
+
+        useWorkflowDataStore.setState((state) => ({
+            workflow: {...state.workflow, triggers},
+        }));
+
+        toggleNodeDisabled({queryClient, updateWorkflowMutation, workflowNodeName: 'trigger_1'});
+
+        expect(useWorkflowDataStore.getState().workflow.triggers![0].disabled).toBe(true);
+
+        mutateMock.mock.calls[0][1].onError();
+
+        expect(useWorkflowDataStore.getState().workflow.triggers![0].disabled).toBeUndefined();
+    });
+
+    it('should queue a trigger toggle while another mutation is in flight', () => {
+        setDefinition([task({name: 'action_1'})], [trigger({name: 'trigger_1'})]);
+        setWorkflowMutating(workflowId, true);
+
+        toggleNodeDisabled({queryClient, updateWorkflowMutation, workflowNodeName: 'trigger_1'});
+
+        expect(mutateMock).not.toHaveBeenCalled();
+
+        setWorkflowMutating(workflowId, false);
+        drainPendingSaves(workflowId);
+
+        expect(JSON.parse(mutateMock.mock.calls[0][0].workflow.definition).triggers[0].disabled).toBe(true);
     });
 });

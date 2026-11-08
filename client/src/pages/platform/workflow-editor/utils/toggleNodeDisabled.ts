@@ -1,5 +1,5 @@
 import {SPACE} from '@/shared/constants';
-import {WorkflowTask} from '@/shared/middleware/platform/configuration';
+import {WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
@@ -15,7 +15,7 @@ import {
     setWorkflowMutating,
 } from './workflowMutationGuard';
 
-function flipDisabled(task: WorkflowTask): boolean {
+function flipDisabled(task: WorkflowTask | WorkflowTrigger): boolean {
     if (task.disabled) {
         delete task.disabled;
 
@@ -45,9 +45,16 @@ function applyDefinitionWithDisabledFlags(definition: string): void {
     try {
         const parsedDefinition = JSON.parse(definition);
 
-        disabledFlagsByTaskName = new Map(
-            flattenDefinitionTasks(parsedDefinition.tasks ?? []).map((task) => [task.name, !!task.disabled])
-        );
+        disabledFlagsByTaskName = new Map<string, boolean>([
+            ...flattenDefinitionTasks(parsedDefinition.tasks ?? []).map((task): [string, boolean] => [
+                task.name,
+                !!task.disabled,
+            ]),
+            ...((parsedDefinition.triggers ?? []) as Array<WorkflowTrigger>).map((trigger): [string, boolean] => [
+                trigger.name,
+                !!trigger.disabled,
+            ]),
+        ]);
     } catch (error) {
         console.error('Failed to parse workflow definition:', error);
 
@@ -59,6 +66,14 @@ function applyDefinitionWithDisabledFlags(definition: string): void {
             const disabled = disabledFlagsByTaskName.get(task.name);
 
             return disabled === undefined || !!task.disabled === disabled ? task : withDisabled(task, disabled);
+        });
+
+        const updatedTriggers = state.workflow.triggers?.map((trigger) => {
+            const disabled = disabledFlagsByTaskName.get(trigger.name);
+
+            return disabled === undefined || !!trigger.disabled === disabled
+                ? trigger
+                : withDisabled(trigger, disabled);
         });
 
         const updatedNodes = state.nodes.map((node) => {
@@ -75,6 +90,7 @@ function applyDefinitionWithDisabledFlags(definition: string): void {
                 ...state.workflow,
                 definition,
                 tasks: updatedTasks,
+                triggers: updatedTriggers,
             },
         };
     });
@@ -101,6 +117,20 @@ function toggleInFirstMatch(
 
         if (outcome !== undefined) {
             return outcome;
+        }
+    }
+
+    return undefined;
+}
+
+function toggleInTriggers(triggers: unknown, workflowNodeName: string): boolean | undefined {
+    if (!Array.isArray(triggers)) {
+        return undefined;
+    }
+
+    for (const trigger of triggers) {
+        if (trigger && typeof trigger === 'object' && trigger.name === workflowNodeName) {
+            return flipDisabled(trigger);
         }
     }
 
@@ -187,7 +217,9 @@ export function toggleNodeDisabled(props: ToggleNodeDisabledProps): void {
         return;
     }
 
-    const disabled = toggleInTasks(workflowDefinition.tasks, workflowNodeName);
+    const disabled =
+        toggleInTriggers(workflowDefinition.triggers, workflowNodeName) ??
+        toggleInTasks(workflowDefinition.tasks, workflowNodeName);
 
     if (disabled === undefined) {
         return;
