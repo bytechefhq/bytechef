@@ -6,5 +6,6 @@
 
     <includeAll path="classpath:config/liquibase/changelog/automation/aihub/" relativeToChangelogFile="false" errorIfMissingOrEmpty="true" />
     <include file="classpath:config/liquibase/testint/connection_stub.xml" relativeToChangelogFile="false" />
+    <include file="classpath:config/liquibase/ai-hub-asset-file-table-testint.xml" relativeToChangelogFile="false" />
     <includeAll path="classpath:config/liquibase/changelog/automation/aihub_execution/" relativeToChangelogFile="false" errorIfMissingOrEmpty="true" />
 </databaseChangeLog>
