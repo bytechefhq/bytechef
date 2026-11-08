@@ -48,4 +48,15 @@ describe('getChatTriggerName', () => {
 
         expect(getChatTriggerName(workflow, 'webhook_1')).toBe('chat_1');
     });
+
+    it('falls back to an enabled chat trigger before a disabled one', () => {
+        const workflow = {
+            triggers: [
+                {disabled: true, name: 'chat_1', type: 'chat/v1/newChatRequest'},
+                {name: 'chat_2', type: 'chat/v1/newChatRequest'},
+            ],
+        };
+
+        expect(getChatTriggerName(workflow)).toBe('chat_2');
+    });
 });
