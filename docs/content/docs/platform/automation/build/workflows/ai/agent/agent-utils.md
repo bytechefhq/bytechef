@@ -130,6 +130,10 @@ Every tool has an advanced **Workspace Name** option (letters, digits, `-` and `
 
 Editor test runs get a fresh workspace per run, removed after 24 hours. Deployed workflows keep their workspace between runs.
 
+> **Coming soon.** The workspace size limit is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+Each workspace has a size limit ([`BYTECHEF_AI_AGENT_UTILS_WORKSPACE_MAX_SIZE`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration), 1 GB by default, `0` for no limit). A **Write** or **Edit** that would take the workspace over the limit is refused, and the agent is told how much space is used and asked to delete files it no longer needs. Shell commands are checked before and after they run: a command that takes the workspace over the limit still finishes, and the agent is told the workspace is full. Until files are deleted, only commands that start with `rm`, `rmdir` or `truncate`, or `find ... -delete` commands, are run. One shell command can therefore go past the limit by the amount it writes.
+
 #### Shell Tools
 
 Gives the agent three tools for running commands:
@@ -155,7 +159,7 @@ The advanced **Execution Backend** option can switch a Shell Tools element to **
 Workspaces keep tenants' files apart, but the tools are not a complete sandbox. On a server shared by several tenants:
 
 - Keep Shell Tools disabled. A Local shell runs on the server itself with the server's permissions. A Docker shell runs as root on Docker's default network, shares the host's kernel and has no CPU or memory limits.
-- Keep in mind that workspaces have no disk quota, so one agent can fill the disk under the workspace base directory.
+- Keep the workspace size limit set. It bounds the files one workspace holds, but not the number of workspaces, so many deployments together can still fill the disk under the workspace base directory.
 - The file system tools setting applies to every tenant on the server, so enable it only when every tenant may store files on the server's disk.
 
 ---
