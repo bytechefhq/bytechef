@@ -10,6 +10,7 @@ import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {ClickedOperationType, NodeDataType, PropertyAllType} from '@/shared/types';
+import {paintMonochromeSvgWithCurrentColor} from '@/shared/util/svg-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, Loader2Icon} from 'lucide-react';
 import {useCallback, useMemo, useState} from 'react';
@@ -177,7 +178,11 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 componentName,
                 componentVersion: version,
                 icon: icon ? (
-                    <InlineSVG className="size-9 text-content-neutral-primary" src={icon} />
+                    <InlineSVG
+                        className="size-9 text-content-neutral-primary"
+                        preProcessor={paintMonochromeSvgWithCurrentColor}
+                        src={icon}
+                    />
                 ) : (
                     <ComponentIcon className="size-9 text-content-neutral-primary" />
                 ),
