@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.agent.utils.cluster.exec;
 
+import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspace;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Duration;
@@ -57,8 +58,8 @@ public class DockerExecBackendRegistry {
             workspaceRoot -> DockerCliExecBackend.builder()
                 .dockerCommand(dockerCommand)
                 .image(image)
-                .mount(workspaceRoot, workspaceRoot.toString())
-                .environment(Map.of("HOME", workspaceRoot.toString()))
+                .mount(workspaceRoot, AgentWorkspace.SANDBOX_ROOT)
+                .environment(Map.of("HOME", AgentWorkspace.SANDBOX_ROOT))
                 .shellCommand("/bin/bash", "-c")
                 .build(),
             idleTimeout, Clock.systemUTC());

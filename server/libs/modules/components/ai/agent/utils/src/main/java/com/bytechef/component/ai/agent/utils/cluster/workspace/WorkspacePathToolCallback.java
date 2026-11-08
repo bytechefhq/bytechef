@@ -17,12 +17,16 @@
 package com.bytechef.component.ai.agent.utils.cluster.workspace;
 
 import com.bytechef.commons.util.JsonUtils;
-import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.UnaryOperator;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.metadata.ToolMetadata;
 
@@ -31,35 +35,51 @@ import org.springframework.ai.tool.metadata.ToolMetadata;
  */
 public class WorkspacePathToolCallback implements ToolCallback {
 
-    private final ToolCallback delegate;
-    private final String pathArgumentName;
-    private final ToolDefinition toolDefinition;
-    private final Path workspaceRoot;
+    public static final String FILES_DESCRIPTION =
+        "Only files inside it are accessible. A relative path is resolved against the workspace.";
 
-    public WorkspacePathToolCallback(ToolCallback delegate, String pathArgumentName, Path workspaceRoot) {
+    private final ToolCallback delegate;
+    private final Set<String> pathArgumentNames;
+    private final Set<String> patternArgumentNames;
+    private final ToolDefinition toolDefinition;
+    private final AgentWorkspace workspace;
+
+    public WorkspacePathToolCallback(
+        ToolCallback delegate, AgentWorkspace workspace, String workspaceDescription, Set<String> pathArgumentNames,
+        Set<String> patternArgumentNames) {
+
         ToolDefinition delegateToolDefinition = delegate.getToolDefinition();
 
         this.delegate = delegate;
-        this.pathArgumentName = pathArgumentName;
+        this.pathArgumentNames = Set.copyOf(pathArgumentNames);
+        this.patternArgumentNames = Set.copyOf(patternArgumentNames);
         this.toolDefinition = ToolDefinition.builder()
             .name(delegateToolDefinition.name())
             .description(
-                delegateToolDefinition.description() + "\n\nThe agent workspace is " + workspaceRoot +
-                    ". Only files inside it are accessible. A relative " + pathArgumentName +
-                    " is resolved against the workspace.")
+                workspace.displayText(delegateToolDefinition.description()) + "\n\nThe agent workspace is " +
+                    workspace.modelRoot() + ". " + workspaceDescription)
             .inputSchema(delegateToolDefinition.inputSchema())
             .build();
-        this.workspaceRoot = workspaceRoot;
+        this.workspace = workspace;
+    }
+
+    public static ToolCallbackProvider wrap(
+        ToolCallback[] toolCallbacks, AgentWorkspace workspace, String workspaceDescription,
+        Set<String> pathArgumentNames, Set<String> patternArgumentNames) {
+
+        return ToolCallbackProvider.from(wrapAll(
+            toolCallbacks, toolCallback -> new WorkspacePathToolCallback(
+                toolCallback, workspace, workspaceDescription, pathArgumentNames, patternArgumentNames)));
     }
 
     @Override
     public String call(String toolInput) {
-        return delegate.call(resolvePath(toolInput));
+        return workspace.displayText(delegate.call(toHostArguments(toolInput)));
     }
 
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
-        return delegate.call(resolvePath(toolInput), toolContext);
+        return workspace.displayText(delegate.call(toHostArguments(toolInput), toolContext));
     }
 
     @Override
@@ -72,21 +92,41 @@ public class WorkspacePathToolCallback implements ToolCallback {
         return delegate.getToolMetadata();
     }
 
-    private String resolvePath(String toolInput) {
+    private String toHostArguments(String toolInput) {
+        if (pathArgumentNames.isEmpty() && patternArgumentNames.isEmpty()) {
+            return toolInput;
+        }
+
         Map<String, Object> arguments = new HashMap<>(JsonUtils.readMap(toolInput));
 
-        if (!(arguments.get(pathArgumentName) instanceof String path) || path.isBlank()) {
-            return toolInput;
+        boolean changed = replaceArguments(arguments, pathArgumentNames, workspace::toHostPath);
+
+        changed |= replaceArguments(arguments, patternArgumentNames, workspace::toHostPattern);
+
+        return changed ? JsonUtils.write(arguments) : toolInput;
+    }
+
+    private static boolean replaceArguments(
+        Map<String, Object> arguments, Set<String> argumentNames, UnaryOperator<String> mapper) {
+
+        boolean changed = false;
+
+        for (String argumentName : argumentNames) {
+            if (arguments.get(argumentName) instanceof String value && !value.isBlank()) {
+                arguments.put(argumentName, mapper.apply(value));
+
+                changed = true;
+            }
         }
 
-        Path filePath = Path.of(path.strip());
+        return changed;
+    }
 
-        if (filePath.isAbsolute()) {
-            return toolInput;
-        }
+    private static List<ToolCallback> wrapAll(
+        ToolCallback[] toolCallbacks, UnaryOperator<ToolCallback> wrapper) {
 
-        arguments.put(pathArgumentName, String.valueOf(workspaceRoot.resolve(filePath)));
-
-        return JsonUtils.write(arguments);
+        return Arrays.stream(toolCallbacks)
+            .map(wrapper)
+            .toList();
     }
 }

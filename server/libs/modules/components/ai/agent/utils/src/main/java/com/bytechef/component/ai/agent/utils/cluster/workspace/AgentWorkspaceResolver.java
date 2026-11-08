@@ -38,7 +38,6 @@ import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springaicommunity.agent.common.workspace.Workspace;
 import org.springframework.util.FileSystemUtils;
 
 /**
@@ -76,7 +75,7 @@ public class AgentWorkspaceResolver {
             .advancedOption(true);
     }
 
-    public Workspace resolve(Context context, String clusterElementName, @Nullable String workspaceName) {
+    public AgentWorkspace resolve(Context context, String clusterElementName, @Nullable String workspaceName) {
         if (basedir == null) {
             throw new IllegalStateException(
                 "Agent workspaces are not configured: set bytechef.ai.agent-utils.workspace.basedir");
@@ -107,7 +106,7 @@ public class AgentWorkspaceResolver {
                 .resolve(name);
         }
 
-        return Workspace.local(createDirectory(basedir, workspaceDirectory));
+        return AgentWorkspace.sandboxed(createDirectory(basedir, workspaceDirectory));
     }
 
     private static Path createDirectory(Path basedir, Path workspaceDirectory) {

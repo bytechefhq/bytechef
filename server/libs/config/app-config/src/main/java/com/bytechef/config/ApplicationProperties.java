@@ -980,8 +980,7 @@ public class ApplicationProperties {
                 }
 
                 /**
-                 * Docker sandbox for shell commands. Each agent workspace gets its own container with the workspace
-                 * bind-mounted at the same path.
+                 * Docker sandbox for shell commands. Each agent workspace gets its own container.
                  */
                 public static class Docker {
 
