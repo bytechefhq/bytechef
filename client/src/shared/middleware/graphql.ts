@@ -2101,7 +2101,7 @@ export type CreateIdentityProviderMutationVariables = Exact<{
 }>;
 
 
-export type CreateIdentityProviderMutation = { createIdentityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } };
+export type CreateIdentityProviderMutation = { createIdentityProvider: { authoritiesClaim: string | null, autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, mcpEmbedded: boolean, mcpAutomation: boolean, mcpManagement: boolean, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string, validateMcpAudience: boolean, authorityMappings: Array<{ authority: string, externalGroup: string }> } };
 
 export type DeleteIdentityProviderMutationVariables = Exact<{
   id: string | number;
@@ -2122,12 +2122,12 @@ export type IdentityProviderQueryVariables = Exact<{
 }>;
 
 
-export type IdentityProviderQuery = { identityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } | null };
+export type IdentityProviderQuery = { identityProvider: { authoritiesClaim: string | null, autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, mcpEmbedded: boolean, mcpAutomation: boolean, mcpManagement: boolean, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string, validateMcpAudience: boolean, authorityMappings: Array<{ authority: string, externalGroup: string }> } | null };
 
 export type IdentityProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IdentityProvidersQuery = { identityProviders: Array<{ autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } | null> };
+export type IdentityProvidersQuery = { identityProviders: Array<{ authoritiesClaim: string | null, autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, mcpEmbedded: boolean, mcpAutomation: boolean, mcpManagement: boolean, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string, validateMcpAudience: boolean, authorityMappings: Array<{ authority: string, externalGroup: string }> } | null> };
 
 export type InviteUserMutationVariables = Exact<{
   email: string;
@@ -2144,7 +2144,7 @@ export type UpdateIdentityProviderMutationVariables = Exact<{
 }>;
 
 
-export type UpdateIdentityProviderMutation = { updateIdentityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } };
+export type UpdateIdentityProviderMutation = { updateIdentityProvider: { authoritiesClaim: string | null, autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, mcpEmbedded: boolean, mcpAutomation: boolean, mcpManagement: boolean, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string, validateMcpAudience: boolean, authorityMappings: Array<{ authority: string, externalGroup: string }> } };
 
 export type UpdateUserMutationVariables = Exact<{
   login: string;
@@ -9956,6 +9956,11 @@ export const useAuthoritiesQuery = <
 export const CreateIdentityProviderDocument = new TypedDocumentString(`
     mutation createIdentityProvider($input: IdentityProviderInput!) {
   createIdentityProvider(input: $input) {
+    authoritiesClaim
+    authorityMappings {
+      authority
+      externalGroup
+    }
     autoProvision
     clientId
     createdBy
@@ -9968,6 +9973,9 @@ export const CreateIdentityProviderDocument = new TypedDocumentString(`
     issuerUri
     lastModifiedBy
     lastModifiedDate
+    mcpEmbedded
+    mcpAutomation
+    mcpManagement
     metadataUri
     mfaMethod
     mfaRequired
@@ -9976,6 +9984,7 @@ export const CreateIdentityProviderDocument = new TypedDocumentString(`
     scopes
     signingCertificate
     type
+    validateMcpAudience
   }
 }
     `);
@@ -10034,6 +10043,11 @@ export const useDeleteUserMutation = <
 export const IdentityProviderDocument = new TypedDocumentString(`
     query identityProvider($id: ID!) {
   identityProvider(id: $id) {
+    authoritiesClaim
+    authorityMappings {
+      authority
+      externalGroup
+    }
     autoProvision
     clientId
     createdBy
@@ -10046,6 +10060,9 @@ export const IdentityProviderDocument = new TypedDocumentString(`
     issuerUri
     lastModifiedBy
     lastModifiedDate
+    mcpEmbedded
+    mcpAutomation
+    mcpManagement
     metadataUri
     mfaMethod
     mfaRequired
@@ -10054,6 +10071,7 @@ export const IdentityProviderDocument = new TypedDocumentString(`
     scopes
     signingCertificate
     type
+    validateMcpAudience
   }
 }
     `);
@@ -10077,6 +10095,11 @@ export const useIdentityProviderQuery = <
 export const IdentityProvidersDocument = new TypedDocumentString(`
     query identityProviders {
   identityProviders {
+    authoritiesClaim
+    authorityMappings {
+      authority
+      externalGroup
+    }
     autoProvision
     clientId
     createdBy
@@ -10089,6 +10112,9 @@ export const IdentityProvidersDocument = new TypedDocumentString(`
     issuerUri
     lastModifiedBy
     lastModifiedDate
+    mcpEmbedded
+    mcpAutomation
+    mcpManagement
     metadataUri
     mfaMethod
     mfaRequired
@@ -10097,6 +10123,7 @@ export const IdentityProvidersDocument = new TypedDocumentString(`
     scopes
     signingCertificate
     type
+    validateMcpAudience
   }
 }
     `);
@@ -10139,6 +10166,11 @@ export const useInviteUserMutation = <
 export const UpdateIdentityProviderDocument = new TypedDocumentString(`
     mutation updateIdentityProvider($id: ID!, $input: IdentityProviderInput!) {
   updateIdentityProvider(id: $id, input: $input) {
+    authoritiesClaim
+    authorityMappings {
+      authority
+      externalGroup
+    }
     autoProvision
     clientId
     createdBy
@@ -10151,6 +10183,9 @@ export const UpdateIdentityProviderDocument = new TypedDocumentString(`
     issuerUri
     lastModifiedBy
     lastModifiedDate
+    mcpEmbedded
+    mcpAutomation
+    mcpManagement
     metadataUri
     mfaMethod
     mfaRequired
@@ -10159,6 +10194,7 @@ export const UpdateIdentityProviderDocument = new TypedDocumentString(`
     scopes
     signingCertificate
     type
+    validateMcpAudience
   }
 }
     `);
