@@ -12,6 +12,7 @@ Name | Type
 `connectionId` | number
 `connectionVersion` | number
 `parameters` | { [key: string]: any; }
+`type` | string
 
 ## Example
 
@@ -25,6 +26,7 @@ const example = {
   "connectionId": null,
   "connectionVersion": null,
   "parameters": null,
+  "type": null,
 } satisfies GetOAuth2AuthorizationParametersRequest
 
 console.log(example)
