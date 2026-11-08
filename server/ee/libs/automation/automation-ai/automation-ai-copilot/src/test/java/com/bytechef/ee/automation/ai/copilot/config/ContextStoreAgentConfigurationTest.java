@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.ai.copilot.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ai.copilot.advisor.CopilotGuardrailsAdvisorFactory;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ee.automation.ai.tool.contextstore.ContextStoreToolCallbacksFactory;
 import com.bytechef.ee.automation.contextstore.facade.ContextStoreFacade;
@@ -16,9 +17,11 @@ import com.bytechef.ee.automation.contextstore.facade.ContextStoreSourceFacade;
 import com.bytechef.ee.automation.contextstore.service.WorkspaceContextStoreSourceService;
 import com.bytechef.ee.platform.contextstore.service.ContextStoreQueryService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -27,12 +30,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @version ee
  * @author Ivica Cardic
  */
 class ContextStoreAgentConfigurationTest {
+
+    private static final Advisor GUARDRAILS_ADVISOR = Mockito.mock(Advisor.class);
 
     @Test
     void testBacksOffWhenContextStoreIsDisabled() {
@@ -98,6 +104,32 @@ class ContextStoreAgentConfigurationTest {
         }
     }
 
+    @Test
+    void testContextStoreAgentsAttachTheCopilotGuardrailsAdvisors() {
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
+            addProperties(
+                context,
+                Map.of(
+                    "bytechef.ai.copilot.enabled", "true", "bytechef.context-store.enabled", "true",
+                    "bytechef.edition", "ee"));
+
+            context.register(
+                UngatedDependenciesConfiguration.class, ContextStoreDependenciesConfiguration.class,
+                ContextStoreAgentConfiguration.class);
+            context.refresh();
+
+            for (String beanName : List.of("contextStoreAskSpringAIAgent", "contextStoreBuildSpringAIAgent")) {
+                Object agent = context.getBean(beanName);
+
+                List<?> advisors = (List<?>) ReflectionTestUtils.getField(agent, "advisors");
+
+                assertThat(advisors)
+                    .as(beanName)
+                    .anySatisfy(advisor -> assertThat(advisor).isSameAs(GUARDRAILS_ADVISOR));
+            }
+        }
+    }
+
     private static void addProperties(AnnotationConfigApplicationContext context, Map<String, Object> properties) {
         ConfigurableEnvironment environment = context.getEnvironment();
 
@@ -127,6 +159,17 @@ class ContextStoreAgentConfigurationTest {
         @Bean
         SecurityContextRehydrator securityContextRehydrator() {
             return Mockito.mock(SecurityContextRehydrator.class);
+        }
+
+        @Bean
+        CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory() {
+            CopilotGuardrailsAdvisorFactory copilotGuardrailsAdvisorFactory =
+                Mockito.mock(CopilotGuardrailsAdvisorFactory.class);
+
+            Mockito.when(copilotGuardrailsAdvisorFactory.guardrailsAdvisors())
+                .thenReturn(List.of(GUARDRAILS_ADVISOR));
+
+            return copilotGuardrailsAdvisorFactory;
         }
     }
 
