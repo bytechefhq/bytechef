@@ -15,7 +15,6 @@ import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthenticat
 import com.bytechef.ee.embedded.unified.facade.UnifiedApiFacade;
 import com.bytechef.ee.embedded.unified.pagination.CursorPageRequest;
 import com.bytechef.ee.embedded.unified.pagination.CursorPageSlice;
-import com.bytechef.ee.embedded.unified.web.rest.EnvironmentHeader;
 import com.bytechef.ee.embedded.unified.web.rest.crm.model.AccountModel;
 import com.bytechef.ee.embedded.unified.web.rest.crm.model.CreateUpdateAccountModel;
 import com.bytechef.ee.embedded.unified.web.rest.crm.model.CreatedModel;
