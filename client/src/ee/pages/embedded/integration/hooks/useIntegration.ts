@@ -176,6 +176,11 @@ export const useIntegration = () => {
         setWorkflowTestChatPanelOpen(false);
 
         useWorkflowNodeDetailsPanelStore.getState().reset();
+
+        const {resetWorkflowTestNodeStates, setWorkflowTestExecution} = useWorkflowEditorStore.getState();
+
+        setWorkflowTestExecution(undefined);
+        resetWorkflowTestNodeStates(undefined);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [integrationWorkflowId]);
 

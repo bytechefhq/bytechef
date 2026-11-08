@@ -11,6 +11,7 @@ import useTestRunChatTrigger from '@/pages/platform/workflow-editor/hooks/useTes
 import {RequestI, WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
@@ -130,6 +131,11 @@ const AutomationWorkflow = () => {
         setWorkflowTestChatPanelOpen(false);
 
         useWorkflowNodeDetailsPanelStore.getState().reset();
+
+        const {resetWorkflowTestNodeStates, setWorkflowTestExecution} = useWorkflowEditorStore.getState();
+
+        setWorkflowTestExecution(undefined);
+        resetWorkflowTestNodeStates(undefined);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowUuid]);
 

@@ -1,5 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {fireEvent, render, screen, userEvent} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -15,6 +17,7 @@ const hoisted = vi.hoisted(() => {
         navigateMock: vi.fn(),
         publishMutationMock: vi.fn(),
         workflow: {id: 'workflow-1', label: 'My Workflow Template'} as Record<string, unknown>,
+        workflowUuid: 'workflow-1',
     };
 });
 
@@ -119,7 +122,7 @@ vi.mock('@/shared/components/LoadingIndicator', () => ({
 vi.mock('react-router-dom', () => ({
     useBlocker: () => undefined,
     useNavigate: () => hoisted.navigateMock,
-    useParams: () => ({workflowUuid: 'workflow-1'}),
+    useParams: () => ({workflowUuid: hoisted.workflowUuid}),
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
@@ -188,6 +191,13 @@ beforeEach(() => {
     hoisted.navigateMock.mockReset();
     hoisted.publishMutationMock.mockReset();
     hoisted.workflow = {id: 'workflow-1', label: 'My Workflow Template'};
+    hoisted.workflowUuid = 'workflow-1';
+
+    useWorkflowEditorStore.setState({
+        workflowIsRunning: false,
+        workflowTestExecution: undefined,
+        workflowTestNodeStates: {},
+    });
 });
 
 describe('AutomationWorkflow', () => {
@@ -257,5 +267,25 @@ describe('AutomationWorkflow', () => {
 
         expect(screen.getByText('V2')).toBeInTheDocument();
         expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+    });
+
+    it('clears the test output and the node states of the previous workflow once another workflow opens', () => {
+        const {rerender} = renderAutomationWorkflow();
+
+        useWorkflowEditorStore.setState({
+            workflowTestExecution: {job: {id: 'job-1'}} as WorkflowTestExecution,
+            workflowTestNodeStates: {aiAgent_1: {status: 'COMPLETED'}},
+        });
+
+        hoisted.workflowUuid = 'workflow-2';
+
+        rerender(
+            <TooltipProvider>
+                <AutomationWorkflow />
+            </TooltipProvider>
+        );
+
+        expect(useWorkflowEditorStore.getState().workflowTestExecution).toBeUndefined();
+        expect(useWorkflowEditorStore.getState().workflowTestNodeStates).toEqual({});
     });
 });
