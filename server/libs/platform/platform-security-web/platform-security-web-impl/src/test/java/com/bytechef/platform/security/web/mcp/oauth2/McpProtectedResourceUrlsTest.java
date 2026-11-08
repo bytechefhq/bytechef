@@ -61,11 +61,13 @@ class McpProtectedResourceUrlsTest {
             .isEqualTo(McpProtectedResourceUrls.MANAGEMENT_SCOPE);
         assertThat(McpProtectedResourceUrls.getRequiredScope("/api/management/mcp"))
             .isEqualTo(McpProtectedResourceUrls.MANAGEMENT_SCOPE);
+        assertThat(McpProtectedResourceUrls.getRequiredScope("/api/embedded/c2VjcmV0/mcp"))
+            .isEqualTo(McpProtectedResourceUrls.EMBEDDED_SCOPE);
     }
 
     @Test
     void testGetRequiredScopeReturnsNullForOtherPaths() {
         assertThat(McpProtectedResourceUrls.getRequiredScope("/api/platform/v1/workflows")).isNull();
-        assertThat(McpProtectedResourceUrls.getRequiredScope("/api/embedded/c2VjcmV0/mcp")).isNull();
+        assertThat(McpProtectedResourceUrls.getRequiredScope("/api/embedded/c2VjcmV0/mcp/tools")).isNull();
     }
 }

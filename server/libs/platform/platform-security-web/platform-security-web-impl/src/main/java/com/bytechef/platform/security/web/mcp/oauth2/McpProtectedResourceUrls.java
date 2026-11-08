@@ -30,9 +30,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 public final class McpProtectedResourceUrls {
 
     public static final String AUTOMATION_SCOPE = "mcp:automation";
+    public static final String EMBEDDED_SCOPE = "mcp:embedded";
     public static final String MANAGEMENT_SCOPE = "mcp:management";
 
     private static final Pattern AUTOMATION_PATH_PATTERN = Pattern.compile("^/api/automation/[^/]+/mcp/?$");
+    private static final Pattern EMBEDDED_PATH_PATTERN = Pattern.compile("^/api/embedded/[^/]+/mcp/?$");
     private static final Pattern MANAGEMENT_PATH_PATTERN = Pattern.compile("^/api/management(?:/mcp|/[^/]+/mcp)/?$");
 
     private McpProtectedResourceUrls() {
@@ -86,6 +88,12 @@ public final class McpProtectedResourceUrls {
             .matches()) {
 
             return MANAGEMENT_SCOPE;
+        }
+
+        if (EMBEDDED_PATH_PATTERN.matcher(path)
+            .matches()) {
+
+            return EMBEDDED_SCOPE;
         }
 
         return null;

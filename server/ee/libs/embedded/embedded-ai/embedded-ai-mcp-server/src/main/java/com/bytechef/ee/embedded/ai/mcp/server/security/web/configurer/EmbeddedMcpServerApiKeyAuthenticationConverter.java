@@ -8,10 +8,12 @@
 package com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer;
 
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication.EmbeddedMcpServerApiKeyAuthenticationToken;
+import com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication.EmbeddedMcpServerOAuth2AuthenticationToken;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationConverter;
+import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -27,6 +29,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @version ee
@@ -50,6 +54,10 @@ class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthe
     @Override
     @Nullable
     public Authentication convert(HttpServletRequest request) {
+        if (isAuthenticatedByOAuth2(SecurityContextHolder.getContext())) {
+            return null;
+        }
+
         String mcpServerSecretKey = getMcpServerSecretKey(request);
         Environment environment = getEnvironment(request);
         boolean environmentRequested = request.getHeader(ENVIRONMENT_HEADER_NAME) != null;
@@ -85,6 +93,17 @@ class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthe
         } catch (RuntimeException runtimeException) {
             return null;
         }
+    }
+
+    private static boolean isAuthenticatedByOAuth2(SecurityContext securityContext) {
+        Authentication authentication = securityContext.getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        return authentication instanceof EmbeddedMcpServerOAuth2AuthenticationToken ||
+            authentication instanceof McpAnonymousAuthenticationToken;
     }
 
     private static String getMcpServerSecretKey(HttpServletRequest request) {

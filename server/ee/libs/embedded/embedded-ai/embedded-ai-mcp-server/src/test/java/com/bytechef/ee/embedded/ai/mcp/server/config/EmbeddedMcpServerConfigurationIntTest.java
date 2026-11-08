@@ -30,6 +30,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
+import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
+import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantSecretVerifier;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -73,7 +75,8 @@ class EmbeddedMcpServerConfigurationIntTest {
         IntegrationInstanceWorkflowService.class, IntegrationService.class, JobCompletionAwaiter.class,
         JobService.class, JwtTokenService.class, McpComponentService.class,
         McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceConfigurationWorkflowService.class,
-        McpIntegrationInstanceToolService.class, McpServerService.class, McpToolService.class,
+        McpIntegrationInstanceToolService.class, McpServerService.class, McpTenantIssuerResolver.class,
+        McpTenantSecretVerifier.class, McpToolService.class,
         PrincipalJobFacade.class, SigningKeyService.class, SubflowResolver.class, TaskExecutionService.class,
         TaskFileStorage.class, TaskHandlerRegistry.class, WorkflowService.class);
 

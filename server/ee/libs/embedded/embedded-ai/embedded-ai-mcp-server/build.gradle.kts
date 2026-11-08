@@ -10,6 +10,7 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-mcp")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.security:spring-security-oauth2-jose")
+    implementation("org.springframework.security:spring-security-oauth2-resource-server")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))

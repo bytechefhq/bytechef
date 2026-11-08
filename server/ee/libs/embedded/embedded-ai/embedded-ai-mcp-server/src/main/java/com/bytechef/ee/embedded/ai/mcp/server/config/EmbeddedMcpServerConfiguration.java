@@ -28,6 +28,7 @@ import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolFacade;
+import com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication.EmbeddedMcpServerSecretVerifier;
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer.EmbeddedMcpServerSecurityConfigurer;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -40,6 +41,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
+import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
+import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantSecretVerifier;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
@@ -60,6 +63,8 @@ import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
+import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
+import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
@@ -106,6 +111,7 @@ import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -250,10 +256,18 @@ public class EmbeddedMcpServerConfiguration {
     }
 
     @Bean
+    McpServerSecretVerifier embeddedMcpServerSecretVerifier(McpServerService mcpServerService) {
+        return new EmbeddedMcpServerSecretVerifier(mcpServerService);
+    }
+
+    @Bean
     SecurityConfigurerContributor embeddedMcpServerSecurityConfigurerContributor(
-        ConnectedUserService connectedUserService, EnvironmentService environmentService,
-        McpServerService mcpServerService,
+        ApplicationProperties applicationProperties, ConnectedUserService connectedUserService,
+        EnvironmentService environmentService, McpServerService mcpServerService,
+        McpTenantIssuerResolver mcpTenantIssuerResolver, McpTenantSecretVerifier mcpTenantSecretVerifier,
         SigningKeyService signingKeyService) {
+
+        McpJwtDecoderFactory mcpJwtDecoderFactory = JwtDecoders::fromIssuerLocation;
 
         return new SecurityConfigurerContributor() {
 
@@ -263,7 +277,9 @@ public class EmbeddedMcpServerConfiguration {
                 getSecurityConfigurerAdapter() {
 
                 return (T) new EmbeddedMcpServerSecurityConfigurer(
-                    connectedUserService, environmentService, mcpServerService, signingKeyService);
+                    connectedUserService, environmentService, mcpServerService, signingKeyService,
+                    mcpTenantIssuerResolver, mcpTenantSecretVerifier, mcpJwtDecoderFactory,
+                    applicationProperties.getPublicUrl());
             }
         };
     }

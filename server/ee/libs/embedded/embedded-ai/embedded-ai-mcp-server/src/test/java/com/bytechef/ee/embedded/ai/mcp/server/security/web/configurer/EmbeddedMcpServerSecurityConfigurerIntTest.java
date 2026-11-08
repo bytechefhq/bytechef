@@ -17,6 +17,8 @@ import static org.springframework.test.context.NestedTestConfiguration.Enclosing
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
+import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
+import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantSecretVerifier;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -267,7 +269,8 @@ class EmbeddedMcpServerSecurityConfigurerIntTest {
                     .with(
                         new EmbeddedMcpServerSecurityConfigurer(
                             connectedUserService, () -> List.of(Environment.values()), mcpServerService,
-                            signingKeyService),
+                            signingKeyService, mock(McpTenantIssuerResolver.class),
+                            new McpTenantSecretVerifier(List::of), issuer -> null, null),
                         Customizer.withDefaults())
                     .build();
             }

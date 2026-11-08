@@ -58,8 +58,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         .getContextHolderStrategy();
     private final SecurityContextRepository securityContextRepository = new RequestAttributeSecurityContextRepository();
     private final AuthenticationSuccessHandler successHandler = new PassthroughSuccessHandler();
-    private final AuthenticationFailureHandler failureHandler = new AuthenticationEntryPointFailureHandler(
-        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+    private final AuthenticationFailureHandler failureHandler;
 
     private final AuthenticationConverter authenticationConverter;
     private final AuthenticationManager authenticationManager;
@@ -69,8 +68,18 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         RequestMatcher requestMatcher, AuthenticationConverter authenticationConverter,
         AuthenticationManager authenticationManager) {
 
+        this(
+            requestMatcher, authenticationConverter, authenticationManager,
+            new AuthenticationEntryPointFailureHandler(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+    }
+
+    public ApiKeyAuthenticationFilter(
+        RequestMatcher requestMatcher, AuthenticationConverter authenticationConverter,
+        AuthenticationManager authenticationManager, AuthenticationFailureHandler failureHandler) {
+
         this.authenticationConverter = authenticationConverter;
         this.authenticationManager = authenticationManager;
+        this.failureHandler = failureHandler;
         this.requestMatcher = new NegatedRequestMatcher(requestMatcher);
     }
 
