@@ -16,95 +16,58 @@
 
 package com.bytechef.component.claude.code.util;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.concurrent.TimeoutException;
-import org.zeroturnaround.exec.ProcessExecutor;
+import com.bytechef.component.definition.Context;
+import io.github.markpollack.agents.claude.ClaudeAgentModel;
+import io.github.markpollack.agents.claude.ClaudeAgentOptions;
+import io.github.markpollack.agents.model.AgentApi;
+import io.github.markpollack.claude.agent.sdk.mcp.McpServerConfig;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Utility class for executing Claude Code CLI commands within workflow automation.
- *
  * @author Marko Kriskovic
  */
-public class ClaudeCodeUtil {
+public final class ClaudeCodeUtil {
 
     private ClaudeCodeUtil() {
     }
 
-    /**
-     * Executes the provided bash command by writing it to a temporary script file and running it.
-     *
-     * <p>
-     * <b>Security Note:</b> Command injection is intentional for this component. The Claude Code component integrates
-     * the Claude Code CLI into workflows, allowing AI-assisted code generation and execution. Access to this component
-     * should be restricted through workflow-level permissions. Commands are constructed from workflow configuration,
-     * not from untrusted user input.
-     */
-    @SuppressFBWarnings("COMMAND_INJECTION")
-    public static String execute(String bashCommand) throws IOException, InterruptedException, TimeoutException {
-        File scriptFile = File.createTempFile("_script", ".sh");
-
-        writeStringToFile(scriptFile, bashCommand);
-
-        try {
-            Runtime runtime = Runtime.getRuntime();
-
-            Process chmodProcess = runtime.exec(new String[] {
-                "chmod", "u+x", scriptFile.getAbsolutePath()
-            });
-
-            int chmodRetCode = chmodProcess.waitFor();
-
-            if (chmodRetCode != 0) {
-                throw new IllegalStateException("Failed to chmod %s".formatted(chmodRetCode));
-            }
-
-            return new ProcessExecutor()
-                .command(scriptFile.getAbsolutePath())
-                .readOutput(true)
-                .execute()
-                .outputUTF8();
-        } finally {
-            deleteRecursively(scriptFile.toPath());
-        }
+    public static AgentApi createAgentModel() {
+        return ClaudeAgentModel.builder()
+            .defaultOptions(ClaudeAgentOptions.builder()
+                .yolo(true)
+                .build())
+            .build();
     }
 
-    private static void deleteRecursively(Path root) throws IOException {
-        if (root == null || !Files.exists(root)) {
-            return;
-        }
+    public static String serializeMcpServer(
+        String label, String url, Map<String, String> headers, Context context) {
 
-        Files.walkFileTree(root, new SimpleFileVisitor<>() {
+        McpServer mcpServer = new McpServer(label, url, headers);
 
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-
-                return FileVisitResult.CONTINUE;
-            }
-        });
-
+        return context.json(json -> json.write(mcpServer));
     }
 
-    private static void writeStringToFile(File file, String string) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
-            writer.write(string);
+    public static Map<String, McpServerConfig> deserializeMcpServers(
+        List<String> serializedMcpServers, Context context) {
+
+        Map<String, McpServerConfig> mcpServerConfigs = new LinkedHashMap<>();
+
+        for (String serializedMcpServer : serializedMcpServers) {
+            McpServer mcpServer = context.json(json -> json.read(serializedMcpServer, McpServer.class));
+
+            mcpServerConfigs.put(
+                mcpServer.label(), new McpServerConfig.McpHttpServerConfig(mcpServer.url(), mcpServer.headers()));
+        }
+
+        return mcpServerConfigs;
+    }
+
+    public record McpServer(String label, String url, Map<String, String> headers) {
+
+        public McpServer {
+            headers = headers == null ? Map.of() : Map.copyOf(headers);
         }
     }
 }
