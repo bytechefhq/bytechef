@@ -4,10 +4,14 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import IdentityProviderDialog from '../IdentityProviderDialog';
 
 const hoisted = vi.hoisted(() => ({
+    handleAddAuthorityMapping: vi.fn(),
     handleOpenChange: vi.fn(),
     handleSave: vi.fn(),
+    setIsMcpManagement: vi.fn(),
     state: {
+        authorityMappings: [] as {authority: string; externalGroup: string}[],
         isEditing: false,
+        isMcpAutomation: false,
         name: 'Acme SSO',
         open: true,
         providerType: 'OIDC' as 'OIDC' | 'SAML',
@@ -16,21 +20,30 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('../hooks/useIdentityProviderDialog', () => ({
     default: () => ({
+        authoritiesClaim: '',
+        authorityMappings: hoisted.state.authorityMappings,
         certificate: '',
         clientId: 'client-id',
         clientSecret: 'client-secret',
         domainInput: '',
         domains: ['acme.com'],
         editingProviderId: undefined,
+        handleAddAuthorityMapping: hoisted.handleAddAuthorityMapping,
         handleAddDomain: vi.fn(),
         handleOpenChange: hoisted.handleOpenChange,
+        handleRemoveAuthorityMapping: vi.fn(),
         handleRemoveDomain: vi.fn(),
         handleSave: hoisted.handleSave,
+        handleUpdateAuthorityMapping: vi.fn(),
         isAutoProvision: false,
         isEditing: hoisted.state.isEditing,
         isEnabled: true,
         isEnforced: false,
+        isMcpAutomation: hoisted.state.isMcpAutomation,
+        isMcpEmbedded: false,
+        isMcpManagement: false,
         isMfaRequired: false,
+        isValidateMcpAudience: false,
         issuerUri: 'https://accounts.example.com',
         metadataUri: '',
         mfaMethod: undefined,
@@ -38,6 +51,7 @@ vi.mock('../hooks/useIdentityProviderDialog', () => ({
         open: hoisted.state.open,
         providerType: hoisted.state.providerType,
         scopes: '',
+        setAuthoritiesClaim: vi.fn(),
         setCertificate: vi.fn(),
         setClientId: vi.fn(),
         setClientSecret: vi.fn(),
@@ -45,7 +59,11 @@ vi.mock('../hooks/useIdentityProviderDialog', () => ({
         setIsAutoProvision: vi.fn(),
         setIsEnabled: vi.fn(),
         setIsEnforced: vi.fn(),
+        setIsMcpAutomation: vi.fn(),
+        setIsMcpEmbedded: vi.fn(),
+        setIsMcpManagement: hoisted.setIsMcpManagement,
         setIsMfaRequired: vi.fn(),
+        setIsValidateMcpAudience: vi.fn(),
         setIssuerUri: vi.fn(),
         setMetadataUri: vi.fn(),
         setMfaMethod: vi.fn(),
@@ -57,7 +75,9 @@ vi.mock('../hooks/useIdentityProviderDialog', () => ({
 
 beforeEach(() => {
     windowResizeObserver();
+    hoisted.state.authorityMappings = [];
     hoisted.state.isEditing = false;
+    hoisted.state.isMcpAutomation = false;
     hoisted.state.name = 'Acme SSO';
     hoisted.state.open = true;
     hoisted.state.providerType = 'OIDC';
@@ -157,6 +177,67 @@ describe('IdentityProviderDialog', () => {
             await user.click(screen.getByRole('button', {name: 'Create'}));
 
             expect(hoisted.handleSave).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('MCP trust', () => {
+        it('should offer the automation and management MCP surfaces for an OIDC provider', () => {
+            render(<IdentityProviderDialog />);
+
+            expect(screen.getByLabelText('Use for automation MCP servers')).toBeInTheDocument();
+            expect(screen.getByLabelText('Use for management MCP servers')).toBeInTheDocument();
+            expect(screen.queryByLabelText('Use for embedded MCP servers')).not.toBeInTheDocument();
+        });
+
+        it('should not offer MCP surfaces for a SAML provider', () => {
+            hoisted.state.providerType = 'SAML';
+
+            render(<IdentityProviderDialog />);
+
+            expect(screen.queryByLabelText('Use for automation MCP servers')).not.toBeInTheDocument();
+            expect(screen.queryByLabelText('Use for management MCP servers')).not.toBeInTheDocument();
+        });
+
+        it('should hide the audience, groups claim and mappings until an MCP surface is enabled', () => {
+            render(<IdentityProviderDialog />);
+
+            expect(screen.queryByLabelText('Require token audience to match the MCP endpoint')).not.toBeInTheDocument();
+            expect(screen.queryByText('Groups Claim')).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Add mapping'})).not.toBeInTheDocument();
+        });
+
+        it('should show the audience, groups claim and existing mappings once an MCP surface is enabled', () => {
+            hoisted.state.authorityMappings = [{authority: 'ROLE_SALES', externalGroup: 'sales'}];
+            hoisted.state.isMcpAutomation = true;
+
+            render(<IdentityProviderDialog />);
+
+            expect(screen.getByLabelText('Require token audience to match the MCP endpoint')).toBeInTheDocument();
+            expect(screen.getByText('Groups Claim')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('sales')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('ROLE_SALES')).toBeInTheDocument();
+        });
+
+        it('should enable the management surface when its checkbox is clicked', async () => {
+            const user = userEvent.setup();
+
+            render(<IdentityProviderDialog />);
+
+            await user.click(screen.getByLabelText('Use for management MCP servers'));
+
+            expect(hoisted.setIsMcpManagement).toHaveBeenCalledWith(true);
+        });
+
+        it('should add an authority mapping row when requested', async () => {
+            const user = userEvent.setup();
+
+            hoisted.state.isMcpAutomation = true;
+
+            render(<IdentityProviderDialog />);
+
+            await user.click(screen.getByRole('button', {name: 'Add mapping'}));
+
+            expect(hoisted.handleAddAuthorityMapping).toHaveBeenCalledTimes(1);
         });
     });
 });

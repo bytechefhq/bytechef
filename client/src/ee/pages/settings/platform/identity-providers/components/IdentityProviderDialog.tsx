@@ -20,21 +20,29 @@ import useIdentityProviderDialog from './hooks/useIdentityProviderDialog';
 
 const IdentityProviderDialog = () => {
     const {
+        authoritiesClaim,
+        authorityMappings,
         clientId,
         clientSecret,
         defaultAuthority,
         domainInput,
         domains,
         editingProviderId,
+        handleAddAuthorityMapping,
         handleAddDomain,
         handleOpenChange,
+        handleRemoveAuthorityMapping,
         handleRemoveDomain,
         handleSave,
+        handleUpdateAuthorityMapping,
         isAutoProvision,
         isEditing,
         isEnabled,
         isEnforced,
+        isMcpAutomation,
+        isMcpManagement,
         isMfaRequired,
+        isValidateMcpAudience,
         issuerUri,
         metadataUri,
         mfaMethod,
@@ -43,6 +51,7 @@ const IdentityProviderDialog = () => {
         open,
         providerType,
         scopes,
+        setAuthoritiesClaim,
         setClientId,
         setClientSecret,
         setDefaultAuthority,
@@ -50,7 +59,10 @@ const IdentityProviderDialog = () => {
         setIsAutoProvision,
         setIsEnabled,
         setIsEnforced,
+        setIsMcpAutomation,
+        setIsMcpManagement,
         setIsMfaRequired,
+        setIsValidateMcpAudience,
         setIssuerUri,
         setMetadataUri,
         setMfaMethod,
@@ -61,6 +73,8 @@ const IdentityProviderDialog = () => {
         setSigningCertificate,
         signingCertificate,
     } = useIdentityProviderDialog();
+
+    const mcpEnabled = providerType === 'OIDC' && (isMcpAutomation || isMcpManagement);
 
     const saveDisabled = useMemo(() => {
         if (!name || domains.length === 0) {
@@ -361,6 +375,138 @@ const IdentityProviderDialog = () => {
                                             Enabled
                                         </label>
                                     </div>
+
+                                    {providerType === 'OIDC' && (
+                                        <fieldset className="space-y-1 border-0 p-0">
+                                            <div className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    checked={isMcpAutomation}
+                                                    id="mcpAutomation"
+                                                    onCheckedChange={(checked) => setIsMcpAutomation(checked === true)}
+                                                />
+
+                                                <label className="text-sm font-normal" htmlFor="mcpAutomation">
+                                                    Use for automation MCP servers
+                                                </label>
+                                            </div>
+
+                                            <p className="pl-6 text-xs text-muted-foreground">
+                                                Trust this provider&apos;s tokens on the automation MCP endpoint, so
+                                                this tenant&apos;s users can authenticate with it.
+                                            </p>
+                                        </fieldset>
+                                    )}
+
+                                    {providerType === 'OIDC' && (
+                                        <fieldset className="space-y-1 border-0 p-0">
+                                            <div className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    checked={isMcpManagement}
+                                                    id="mcpManagement"
+                                                    onCheckedChange={(checked) => setIsMcpManagement(checked === true)}
+                                                />
+
+                                                <label className="text-sm font-normal" htmlFor="mcpManagement">
+                                                    Use for management MCP servers
+                                                </label>
+                                            </div>
+
+                                            <p className="pl-6 text-xs text-muted-foreground">
+                                                Trust this provider&apos;s tokens on the management MCP endpoint.
+                                            </p>
+                                        </fieldset>
+                                    )}
+
+                                    {mcpEnabled && (
+                                        <fieldset className="space-y-1 border-0 p-0 pl-6">
+                                            <div className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    checked={isValidateMcpAudience}
+                                                    id="validateMcpAudience"
+                                                    onCheckedChange={(checked) =>
+                                                        setIsValidateMcpAudience(checked === true)
+                                                    }
+                                                />
+
+                                                <label className="text-sm font-normal" htmlFor="validateMcpAudience">
+                                                    Require token audience to match the MCP endpoint
+                                                </label>
+                                            </div>
+
+                                            <p className="pl-6 text-xs text-muted-foreground">
+                                                Reject tokens whose audience does not include this tenant&apos;s MCP
+                                                URL. Enable when this identity provider is shared across tenants.
+                                            </p>
+                                        </fieldset>
+                                    )}
+
+                                    {mcpEnabled && (
+                                        <fieldset className="space-y-2 border-0 p-0 pl-6">
+                                            <label className="text-sm font-medium">Groups Claim</label>
+
+                                            <Input
+                                                onChange={(event) => setAuthoritiesClaim(event.target.value)}
+                                                placeholder="groups"
+                                                value={authoritiesClaim}
+                                            />
+
+                                            <p className="text-xs text-muted-foreground">
+                                                The token claim that carries the caller&apos;s groups. Defaults to the
+                                                conventional OIDC <code>groups</code> claim.
+                                            </p>
+                                        </fieldset>
+                                    )}
+
+                                    {mcpEnabled && (
+                                        <fieldset className="space-y-2 border-0 p-0 pl-6">
+                                            <label className="text-sm font-medium">Group → Authority Mappings</label>
+
+                                            {authorityMappings.map((authorityMapping, index) => (
+                                                <div className="flex gap-2" key={index}>
+                                                    <Input
+                                                        onChange={(event) =>
+                                                            handleUpdateAuthorityMapping(
+                                                                index,
+                                                                'externalGroup',
+                                                                event.target.value
+                                                            )
+                                                        }
+                                                        placeholder="idp-group"
+                                                        value={authorityMapping.externalGroup}
+                                                    />
+
+                                                    <Input
+                                                        onChange={(event) =>
+                                                            handleUpdateAuthorityMapping(
+                                                                index,
+                                                                'authority',
+                                                                event.target.value
+                                                            )
+                                                        }
+                                                        placeholder="ROLE_SALES"
+                                                        value={authorityMapping.authority}
+                                                    />
+
+                                                    <Button
+                                                        onClick={() => handleRemoveAuthorityMapping(index)}
+                                                        type="button"
+                                                        variant="outline"
+                                                    >
+                                                        <XIcon className="size-4" />
+                                                    </Button>
+                                                </div>
+                                            ))}
+
+                                            <Button onClick={handleAddAuthorityMapping} type="button" variant="outline">
+                                                Add mapping
+                                            </Button>
+
+                                            <p className="text-xs text-muted-foreground">
+                                                Map the identity provider&apos;s group claim values to ByteChef
+                                                authorities used for MCP tool authorization.
+                                            </p>
+                                        </fieldset>
+                                    )}
 
                                     <div className="flex items-center space-x-2">
                                         <Checkbox

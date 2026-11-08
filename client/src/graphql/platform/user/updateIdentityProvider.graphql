@@ -1,5 +1,10 @@
 mutation updateIdentityProvider($id: ID!, $input: IdentityProviderInput!) {
     updateIdentityProvider(id: $id, input: $input) {
+        authoritiesClaim
+        authorityMappings {
+            authority
+            externalGroup
+        }
         autoProvision
         clientId
         createdBy
@@ -12,6 +17,9 @@ mutation updateIdentityProvider($id: ID!, $input: IdentityProviderInput!) {
         issuerUri
         lastModifiedBy
         lastModifiedDate
+        mcpEmbedded
+        mcpAutomation
+        mcpManagement
         metadataUri
         mfaMethod
         mfaRequired
@@ -20,5 +28,6 @@ mutation updateIdentityProvider($id: ID!, $input: IdentityProviderInput!) {
         scopes
         signingCertificate
         type
+        validateMcpAudience
     }
 }

@@ -1,5 +1,10 @@
 query identityProviders {
     identityProviders {
+        authoritiesClaim
+        authorityMappings {
+            authority
+            externalGroup
+        }
         autoProvision
         clientId
         createdBy
@@ -12,6 +17,9 @@ query identityProviders {
         issuerUri
         lastModifiedBy
         lastModifiedDate
+        mcpEmbedded
+        mcpAutomation
+        mcpManagement
         metadataUri
         mfaMethod
         mfaRequired
@@ -20,5 +28,6 @@ query identityProviders {
         scopes
         signingCertificate
         type
+        validateMcpAudience
     }
 }
