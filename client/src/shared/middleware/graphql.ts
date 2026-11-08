@@ -235,6 +235,138 @@ export type RecordReferencedAiHubChatArtifactMutationVariables = Exact<{
 
 export type RecordReferencedAiHubChatArtifactMutation = { recordReferencedAiHubChatArtifact: { id: string, chatId: string, kind: Types.AiHubChatArtifactKind, status: Types.AiHubChatArtifactStatus, artifactId: string, artifactName: string, environmentId: any, createdAt: any } };
 
+export type AddAiHubUserConnectorMutationVariables = Exact<{
+  workspaceId: string | number;
+  componentName: string;
+  componentVersion: number;
+  connectionId?: string | number | null | undefined;
+  environment: number;
+}>;
+
+
+export type AddAiHubUserConnectorMutation = { addAiHubUserConnector: string };
+
+export type AiHubChatToolableComponentsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiHubChatToolableComponentsQuery = { aiHubChatToolableComponents: Array<{ componentName: string, componentVersion: number, connectionRequired: boolean, description: string | null, icon: string | null, title: string | null, tools: Array<{ description: string | null, name: string, title: string | null }> }> };
+
+export type AiHubChatToolsQueryVariables = Exact<{
+  workspaceId: string | number;
+  chatId: string | number;
+}>;
+
+
+export type AiHubChatToolsQuery = { aiHubChatTools: Array<{ clusterElementName: string, componentName: string, componentVersion: number, connectionId: string | null, chatComponentId: string, chatId: string, chatToolId: string, environment: number, parameters: any, requiresApproval: boolean }> };
+
+export type AiHubUserConnectorsQueryVariables = Exact<{
+  workspaceId: string | number;
+  chatId?: string | number | null | undefined;
+}>;
+
+
+export type AiHubUserConnectorsQuery = { aiHubUserConnectors: Array<{ componentName: string, componentVersion: number, connectionId: string | null, connectionRequired: boolean, description: string | null, enabled: boolean, enabledInChat: boolean, icon: string | null, id: string, title: string | null, tools: Array<{ description: string | null, enabled: boolean, name: string, parameters: any, requiresApproval: boolean, title: string | null }> }> };
+
+export type AttachAiHubChatToolMutationVariables = Exact<{
+  input: Types.AttachAiHubChatToolInput;
+}>;
+
+
+export type AttachAiHubChatToolMutation = { attachAiHubChatTool: { clusterElementName: string, componentName: string, componentVersion: number, connectionId: string | null, chatComponentId: string, chatId: string, chatToolId: string, environment: number, parameters: any } };
+
+export type DetachAiHubChatComponentMutationVariables = Exact<{
+  workspaceId: string | number;
+  chatComponentId: string | number;
+}>;
+
+
+export type DetachAiHubChatComponentMutation = { detachAiHubChatComponent: boolean };
+
+export type RemoveAiHubChatToolMutationVariables = Exact<{
+  workspaceId: string | number;
+  chatToolId: string | number;
+}>;
+
+
+export type RemoveAiHubChatToolMutation = { removeAiHubChatTool: boolean };
+
+export type RemoveAiHubUserConnectorMutationVariables = Exact<{
+  workspaceId: string | number;
+  connectorId: string | number;
+}>;
+
+
+export type RemoveAiHubUserConnectorMutation = { removeAiHubUserConnector: boolean };
+
+export type SetAiHubChatConnectorEnabledMutationVariables = Exact<{
+  workspaceId: string | number;
+  chatId: string | number;
+  connectorId: string | number;
+  enabled: boolean;
+}>;
+
+
+export type SetAiHubChatConnectorEnabledMutation = { setAiHubChatConnectorEnabled: boolean };
+
+export type SetAiHubChatToolRequiresApprovalMutationVariables = Exact<{
+  workspaceId: string | number;
+  chatToolId: string | number;
+  requiresApproval: boolean;
+}>;
+
+
+export type SetAiHubChatToolRequiresApprovalMutation = { setAiHubChatToolRequiresApproval: { chatToolId: string, requiresApproval: boolean } };
+
+export type SetAiHubUserConnectorEnabledMutationVariables = Exact<{
+  workspaceId: string | number;
+  connectorId: string | number;
+  enabled: boolean;
+}>;
+
+
+export type SetAiHubUserConnectorEnabledMutation = { setAiHubUserConnectorEnabled: boolean };
+
+export type SetAiHubUserConnectorToolEnabledMutationVariables = Exact<{
+  workspaceId: string | number;
+  connectorId: string | number;
+  toolName: string;
+  enabled: boolean;
+}>;
+
+
+export type SetAiHubUserConnectorToolEnabledMutation = { setAiHubUserConnectorToolEnabled: boolean };
+
+export type SetAiHubUserConnectorToolParametersMutationVariables = Exact<{
+  workspaceId: string | number;
+  connectorId: string | number;
+  toolName: string;
+  parameters: any;
+}>;
+
+
+export type SetAiHubUserConnectorToolParametersMutation = { setAiHubUserConnectorToolParameters: boolean };
+
+export type SetAiHubUserConnectorToolRequiresApprovalMutationVariables = Exact<{
+  workspaceId: string | number;
+  connectorId: string | number;
+  toolName: string;
+  requiresApproval: boolean;
+}>;
+
+
+export type SetAiHubUserConnectorToolRequiresApprovalMutation = { setAiHubUserConnectorToolRequiresApproval: boolean };
+
+export type UpdateAiHubChatToolParametersMutationVariables = Exact<{
+  workspaceId: string | number;
+  chatToolId: string | number;
+  parameters: any;
+}>;
+
+
+export type UpdateAiHubChatToolParametersMutation = { updateAiHubChatToolParameters: { clusterElementName: string, componentName: string, componentVersion: number, connectionId: string | null, chatComponentId: string, chatId: string, chatToolId: string, environment: number, parameters: any } };
+
 export type AiHubChatArtifactsByAiHubChatQueryVariables = Exact<{
   workspaceId: string | number;
   id: string | number;
@@ -330,6 +462,59 @@ export type UpdateAiHubChatMutationVariables = Exact<{
 
 
 export type UpdateAiHubChatMutation = { updateAiHubChat: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, ownerUserId: any, isOwner: boolean } };
+
+export type AddAiHubMcpServerMutationVariables = Exact<{
+  workspaceId: string | number;
+  name: string;
+  url: string;
+  authToken?: string | null | undefined;
+  environment: number;
+}>;
+
+
+export type AddAiHubMcpServerMutation = { addAiHubMcpServer: string };
+
+export type AiHubMcpServerToolsQueryVariables = Exact<{
+  workspaceId: string | number;
+  mcpServerId: string | number;
+}>;
+
+
+export type AiHubMcpServerToolsQuery = { aiHubMcpServerTools: Array<{ description: string | null, enabled: boolean, name: string }> };
+
+export type AiHubMcpServersQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AiHubMcpServersQuery = { aiHubMcpServers: Array<{ enabled: boolean, hasAuthToken: boolean, id: string, name: string, url: string }> };
+
+export type RemoveAiHubMcpServerMutationVariables = Exact<{
+  workspaceId: string | number;
+  mcpServerId: string | number;
+}>;
+
+
+export type RemoveAiHubMcpServerMutation = { removeAiHubMcpServer: boolean };
+
+export type SetAiHubMcpServerEnabledMutationVariables = Exact<{
+  workspaceId: string | number;
+  mcpServerId: string | number;
+  enabled: boolean;
+}>;
+
+
+export type SetAiHubMcpServerEnabledMutation = { setAiHubMcpServerEnabled: boolean };
+
+export type SetAiHubMcpServerToolEnabledMutationVariables = Exact<{
+  workspaceId: string | number;
+  mcpServerId: string | number;
+  toolName: string;
+  enabled: boolean;
+}>;
+
+
+export type SetAiHubMcpServerToolEnabledMutation = { setAiHubMcpServerToolEnabled: boolean };
 
 export type AiHubToolApprovalDefaultToolNamesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -4113,6 +4298,406 @@ export const useRecordReferencedAiHubChatArtifactMutation = <
   }
     )};
 
+export const AddAiHubUserConnectorDocument = new TypedDocumentString(`
+    mutation addAiHubUserConnector($workspaceId: ID!, $componentName: String!, $componentVersion: Int!, $connectionId: ID, $environment: Int!) {
+  addAiHubUserConnector(
+    workspaceId: $workspaceId
+    componentName: $componentName
+    componentVersion: $componentVersion
+    connectionId: $connectionId
+    environment: $environment
+  )
+}
+    `);
+
+export const useAddAiHubUserConnectorMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AddAiHubUserConnectorMutation, TError, AddAiHubUserConnectorMutationVariables, TContext>) => {
+    
+    return useMutation<AddAiHubUserConnectorMutation, TError, AddAiHubUserConnectorMutationVariables, TContext>(
+      {
+    mutationKey: ['addAiHubUserConnector'],
+    mutationFn: (variables?: AddAiHubUserConnectorMutationVariables) => fetcher<AddAiHubUserConnectorMutation, AddAiHubUserConnectorMutationVariables>(AddAiHubUserConnectorDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiHubChatToolableComponentsDocument = new TypedDocumentString(`
+    query aiHubChatToolableComponents($workspaceId: ID!) {
+  aiHubChatToolableComponents(workspaceId: $workspaceId) {
+    componentName
+    componentVersion
+    connectionRequired
+    description
+    icon
+    title
+    tools {
+      description
+      name
+      title
+    }
+  }
+}
+    `);
+
+export const useAiHubChatToolableComponentsQuery = <
+      TData = AiHubChatToolableComponentsQuery,
+      TError = unknown
+    >(
+      variables: AiHubChatToolableComponentsQueryVariables,
+      options?: Omit<UseQueryOptions<AiHubChatToolableComponentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiHubChatToolableComponentsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiHubChatToolableComponentsQuery, TError, TData>(
+      {
+    queryKey: ['aiHubChatToolableComponents', variables],
+    queryFn: fetcher<AiHubChatToolableComponentsQuery, AiHubChatToolableComponentsQueryVariables>(AiHubChatToolableComponentsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiHubChatToolsDocument = new TypedDocumentString(`
+    query aiHubChatTools($workspaceId: ID!, $chatId: ID!) {
+  aiHubChatTools(workspaceId: $workspaceId, chatId: $chatId) {
+    clusterElementName
+    componentName
+    componentVersion
+    connectionId
+    chatComponentId
+    chatId
+    chatToolId
+    environment
+    parameters
+    requiresApproval
+  }
+}
+    `);
+
+export const useAiHubChatToolsQuery = <
+      TData = AiHubChatToolsQuery,
+      TError = unknown
+    >(
+      variables: AiHubChatToolsQueryVariables,
+      options?: Omit<UseQueryOptions<AiHubChatToolsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiHubChatToolsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiHubChatToolsQuery, TError, TData>(
+      {
+    queryKey: ['aiHubChatTools', variables],
+    queryFn: fetcher<AiHubChatToolsQuery, AiHubChatToolsQueryVariables>(AiHubChatToolsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiHubUserConnectorsDocument = new TypedDocumentString(`
+    query aiHubUserConnectors($workspaceId: ID!, $chatId: ID) {
+  aiHubUserConnectors(workspaceId: $workspaceId, chatId: $chatId) {
+    componentName
+    componentVersion
+    connectionId
+    connectionRequired
+    description
+    enabled
+    enabledInChat
+    icon
+    id
+    title
+    tools {
+      description
+      enabled
+      name
+      parameters
+      requiresApproval
+      title
+    }
+  }
+}
+    `);
+
+export const useAiHubUserConnectorsQuery = <
+      TData = AiHubUserConnectorsQuery,
+      TError = unknown
+    >(
+      variables: AiHubUserConnectorsQueryVariables,
+      options?: Omit<UseQueryOptions<AiHubUserConnectorsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiHubUserConnectorsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiHubUserConnectorsQuery, TError, TData>(
+      {
+    queryKey: ['aiHubUserConnectors', variables],
+    queryFn: fetcher<AiHubUserConnectorsQuery, AiHubUserConnectorsQueryVariables>(AiHubUserConnectorsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AttachAiHubChatToolDocument = new TypedDocumentString(`
+    mutation attachAiHubChatTool($input: AttachAiHubChatToolInput!) {
+  attachAiHubChatTool(input: $input) {
+    clusterElementName
+    componentName
+    componentVersion
+    connectionId
+    chatComponentId
+    chatId
+    chatToolId
+    environment
+    parameters
+  }
+}
+    `);
+
+export const useAttachAiHubChatToolMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AttachAiHubChatToolMutation, TError, AttachAiHubChatToolMutationVariables, TContext>) => {
+    
+    return useMutation<AttachAiHubChatToolMutation, TError, AttachAiHubChatToolMutationVariables, TContext>(
+      {
+    mutationKey: ['attachAiHubChatTool'],
+    mutationFn: (variables?: AttachAiHubChatToolMutationVariables) => fetcher<AttachAiHubChatToolMutation, AttachAiHubChatToolMutationVariables>(AttachAiHubChatToolDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DetachAiHubChatComponentDocument = new TypedDocumentString(`
+    mutation detachAiHubChatComponent($workspaceId: ID!, $chatComponentId: ID!) {
+  detachAiHubChatComponent(
+    workspaceId: $workspaceId
+    chatComponentId: $chatComponentId
+  )
+}
+    `);
+
+export const useDetachAiHubChatComponentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DetachAiHubChatComponentMutation, TError, DetachAiHubChatComponentMutationVariables, TContext>) => {
+    
+    return useMutation<DetachAiHubChatComponentMutation, TError, DetachAiHubChatComponentMutationVariables, TContext>(
+      {
+    mutationKey: ['detachAiHubChatComponent'],
+    mutationFn: (variables?: DetachAiHubChatComponentMutationVariables) => fetcher<DetachAiHubChatComponentMutation, DetachAiHubChatComponentMutationVariables>(DetachAiHubChatComponentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RemoveAiHubChatToolDocument = new TypedDocumentString(`
+    mutation removeAiHubChatTool($workspaceId: ID!, $chatToolId: ID!) {
+  removeAiHubChatTool(workspaceId: $workspaceId, chatToolId: $chatToolId)
+}
+    `);
+
+export const useRemoveAiHubChatToolMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RemoveAiHubChatToolMutation, TError, RemoveAiHubChatToolMutationVariables, TContext>) => {
+    
+    return useMutation<RemoveAiHubChatToolMutation, TError, RemoveAiHubChatToolMutationVariables, TContext>(
+      {
+    mutationKey: ['removeAiHubChatTool'],
+    mutationFn: (variables?: RemoveAiHubChatToolMutationVariables) => fetcher<RemoveAiHubChatToolMutation, RemoveAiHubChatToolMutationVariables>(RemoveAiHubChatToolDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RemoveAiHubUserConnectorDocument = new TypedDocumentString(`
+    mutation removeAiHubUserConnector($workspaceId: ID!, $connectorId: ID!) {
+  removeAiHubUserConnector(workspaceId: $workspaceId, connectorId: $connectorId)
+}
+    `);
+
+export const useRemoveAiHubUserConnectorMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RemoveAiHubUserConnectorMutation, TError, RemoveAiHubUserConnectorMutationVariables, TContext>) => {
+    
+    return useMutation<RemoveAiHubUserConnectorMutation, TError, RemoveAiHubUserConnectorMutationVariables, TContext>(
+      {
+    mutationKey: ['removeAiHubUserConnector'],
+    mutationFn: (variables?: RemoveAiHubUserConnectorMutationVariables) => fetcher<RemoveAiHubUserConnectorMutation, RemoveAiHubUserConnectorMutationVariables>(RemoveAiHubUserConnectorDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetAiHubChatConnectorEnabledDocument = new TypedDocumentString(`
+    mutation setAiHubChatConnectorEnabled($workspaceId: ID!, $chatId: ID!, $connectorId: ID!, $enabled: Boolean!) {
+  setAiHubChatConnectorEnabled(
+    workspaceId: $workspaceId
+    chatId: $chatId
+    connectorId: $connectorId
+    enabled: $enabled
+  )
+}
+    `);
+
+export const useSetAiHubChatConnectorEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAiHubChatConnectorEnabledMutation, TError, SetAiHubChatConnectorEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<SetAiHubChatConnectorEnabledMutation, TError, SetAiHubChatConnectorEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['setAiHubChatConnectorEnabled'],
+    mutationFn: (variables?: SetAiHubChatConnectorEnabledMutationVariables) => fetcher<SetAiHubChatConnectorEnabledMutation, SetAiHubChatConnectorEnabledMutationVariables>(SetAiHubChatConnectorEnabledDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetAiHubChatToolRequiresApprovalDocument = new TypedDocumentString(`
+    mutation setAiHubChatToolRequiresApproval($workspaceId: ID!, $chatToolId: ID!, $requiresApproval: Boolean!) {
+  setAiHubChatToolRequiresApproval(
+    workspaceId: $workspaceId
+    chatToolId: $chatToolId
+    requiresApproval: $requiresApproval
+  ) {
+    chatToolId
+    requiresApproval
+  }
+}
+    `);
+
+export const useSetAiHubChatToolRequiresApprovalMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAiHubChatToolRequiresApprovalMutation, TError, SetAiHubChatToolRequiresApprovalMutationVariables, TContext>) => {
+    
+    return useMutation<SetAiHubChatToolRequiresApprovalMutation, TError, SetAiHubChatToolRequiresApprovalMutationVariables, TContext>(
+      {
+    mutationKey: ['setAiHubChatToolRequiresApproval'],
+    mutationFn: (variables?: SetAiHubChatToolRequiresApprovalMutationVariables) => fetcher<SetAiHubChatToolRequiresApprovalMutation, SetAiHubChatToolRequiresApprovalMutationVariables>(SetAiHubChatToolRequiresApprovalDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetAiHubUserConnectorEnabledDocument = new TypedDocumentString(`
+    mutation setAiHubUserConnectorEnabled($workspaceId: ID!, $connectorId: ID!, $enabled: Boolean!) {
+  setAiHubUserConnectorEnabled(
+    workspaceId: $workspaceId
+    connectorId: $connectorId
+    enabled: $enabled
+  )
+}
+    `);
+
+export const useSetAiHubUserConnectorEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAiHubUserConnectorEnabledMutation, TError, SetAiHubUserConnectorEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<SetAiHubUserConnectorEnabledMutation, TError, SetAiHubUserConnectorEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['setAiHubUserConnectorEnabled'],
+    mutationFn: (variables?: SetAiHubUserConnectorEnabledMutationVariables) => fetcher<SetAiHubUserConnectorEnabledMutation, SetAiHubUserConnectorEnabledMutationVariables>(SetAiHubUserConnectorEnabledDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetAiHubUserConnectorToolEnabledDocument = new TypedDocumentString(`
+    mutation setAiHubUserConnectorToolEnabled($workspaceId: ID!, $connectorId: ID!, $toolName: String!, $enabled: Boolean!) {
+  setAiHubUserConnectorToolEnabled(
+    workspaceId: $workspaceId
+    connectorId: $connectorId
+    toolName: $toolName
+    enabled: $enabled
+  )
+}
+    `);
+
+export const useSetAiHubUserConnectorToolEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAiHubUserConnectorToolEnabledMutation, TError, SetAiHubUserConnectorToolEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<SetAiHubUserConnectorToolEnabledMutation, TError, SetAiHubUserConnectorToolEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['setAiHubUserConnectorToolEnabled'],
+    mutationFn: (variables?: SetAiHubUserConnectorToolEnabledMutationVariables) => fetcher<SetAiHubUserConnectorToolEnabledMutation, SetAiHubUserConnectorToolEnabledMutationVariables>(SetAiHubUserConnectorToolEnabledDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetAiHubUserConnectorToolParametersDocument = new TypedDocumentString(`
+    mutation setAiHubUserConnectorToolParameters($workspaceId: ID!, $connectorId: ID!, $toolName: String!, $parameters: Any!) {
+  setAiHubUserConnectorToolParameters(
+    workspaceId: $workspaceId
+    connectorId: $connectorId
+    toolName: $toolName
+    parameters: $parameters
+  )
+}
+    `);
+
+export const useSetAiHubUserConnectorToolParametersMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAiHubUserConnectorToolParametersMutation, TError, SetAiHubUserConnectorToolParametersMutationVariables, TContext>) => {
+    
+    return useMutation<SetAiHubUserConnectorToolParametersMutation, TError, SetAiHubUserConnectorToolParametersMutationVariables, TContext>(
+      {
+    mutationKey: ['setAiHubUserConnectorToolParameters'],
+    mutationFn: (variables?: SetAiHubUserConnectorToolParametersMutationVariables) => fetcher<SetAiHubUserConnectorToolParametersMutation, SetAiHubUserConnectorToolParametersMutationVariables>(SetAiHubUserConnectorToolParametersDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetAiHubUserConnectorToolRequiresApprovalDocument = new TypedDocumentString(`
+    mutation setAiHubUserConnectorToolRequiresApproval($workspaceId: ID!, $connectorId: ID!, $toolName: String!, $requiresApproval: Boolean!) {
+  setAiHubUserConnectorToolRequiresApproval(
+    workspaceId: $workspaceId
+    connectorId: $connectorId
+    toolName: $toolName
+    requiresApproval: $requiresApproval
+  )
+}
+    `);
+
+export const useSetAiHubUserConnectorToolRequiresApprovalMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAiHubUserConnectorToolRequiresApprovalMutation, TError, SetAiHubUserConnectorToolRequiresApprovalMutationVariables, TContext>) => {
+    
+    return useMutation<SetAiHubUserConnectorToolRequiresApprovalMutation, TError, SetAiHubUserConnectorToolRequiresApprovalMutationVariables, TContext>(
+      {
+    mutationKey: ['setAiHubUserConnectorToolRequiresApproval'],
+    mutationFn: (variables?: SetAiHubUserConnectorToolRequiresApprovalMutationVariables) => fetcher<SetAiHubUserConnectorToolRequiresApprovalMutation, SetAiHubUserConnectorToolRequiresApprovalMutationVariables>(SetAiHubUserConnectorToolRequiresApprovalDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiHubChatToolParametersDocument = new TypedDocumentString(`
+    mutation updateAiHubChatToolParameters($workspaceId: ID!, $chatToolId: ID!, $parameters: Any!) {
+  updateAiHubChatToolParameters(
+    workspaceId: $workspaceId
+    chatToolId: $chatToolId
+    parameters: $parameters
+  ) {
+    clusterElementName
+    componentName
+    componentVersion
+    connectionId
+    chatComponentId
+    chatId
+    chatToolId
+    environment
+    parameters
+  }
+}
+    `);
+
+export const useUpdateAiHubChatToolParametersMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiHubChatToolParametersMutation, TError, UpdateAiHubChatToolParametersMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiHubChatToolParametersMutation, TError, UpdateAiHubChatToolParametersMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiHubChatToolParameters'],
+    mutationFn: (variables?: UpdateAiHubChatToolParametersMutationVariables) => fetcher<UpdateAiHubChatToolParametersMutation, UpdateAiHubChatToolParametersMutationVariables>(UpdateAiHubChatToolParametersDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const AiHubChatArtifactsByAiHubChatDocument = new TypedDocumentString(`
     query aiHubChatArtifactsByAiHubChat($workspaceId: ID!, $id: ID!) {
   aiHubChatArtifactsByAiHubChat(workspaceId: $workspaceId, id: $id) {
@@ -4457,6 +5042,151 @@ export const useUpdateAiHubChatMutation = <
       {
     mutationKey: ['updateAiHubChat'],
     mutationFn: (variables?: UpdateAiHubChatMutationVariables) => fetcher<UpdateAiHubChatMutation, UpdateAiHubChatMutationVariables>(UpdateAiHubChatDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AddAiHubMcpServerDocument = new TypedDocumentString(`
+    mutation addAiHubMcpServer($workspaceId: ID!, $name: String!, $url: String!, $authToken: String, $environment: Int!) {
+  addAiHubMcpServer(
+    workspaceId: $workspaceId
+    name: $name
+    url: $url
+    authToken: $authToken
+    environment: $environment
+  )
+}
+    `);
+
+export const useAddAiHubMcpServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<AddAiHubMcpServerMutation, TError, AddAiHubMcpServerMutationVariables, TContext>) => {
+    
+    return useMutation<AddAiHubMcpServerMutation, TError, AddAiHubMcpServerMutationVariables, TContext>(
+      {
+    mutationKey: ['addAiHubMcpServer'],
+    mutationFn: (variables?: AddAiHubMcpServerMutationVariables) => fetcher<AddAiHubMcpServerMutation, AddAiHubMcpServerMutationVariables>(AddAiHubMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiHubMcpServerToolsDocument = new TypedDocumentString(`
+    query aiHubMcpServerTools($workspaceId: ID!, $mcpServerId: ID!) {
+  aiHubMcpServerTools(workspaceId: $workspaceId, mcpServerId: $mcpServerId) {
+    description
+    enabled
+    name
+  }
+}
+    `);
+
+export const useAiHubMcpServerToolsQuery = <
+      TData = AiHubMcpServerToolsQuery,
+      TError = unknown
+    >(
+      variables: AiHubMcpServerToolsQueryVariables,
+      options?: Omit<UseQueryOptions<AiHubMcpServerToolsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiHubMcpServerToolsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiHubMcpServerToolsQuery, TError, TData>(
+      {
+    queryKey: ['aiHubMcpServerTools', variables],
+    queryFn: fetcher<AiHubMcpServerToolsQuery, AiHubMcpServerToolsQueryVariables>(AiHubMcpServerToolsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiHubMcpServersDocument = new TypedDocumentString(`
+    query aiHubMcpServers($workspaceId: ID!) {
+  aiHubMcpServers(workspaceId: $workspaceId) {
+    enabled
+    hasAuthToken
+    id
+    name
+    url
+  }
+}
+    `);
+
+export const useAiHubMcpServersQuery = <
+      TData = AiHubMcpServersQuery,
+      TError = unknown
+    >(
+      variables: AiHubMcpServersQueryVariables,
+      options?: Omit<UseQueryOptions<AiHubMcpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiHubMcpServersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiHubMcpServersQuery, TError, TData>(
+      {
+    queryKey: ['aiHubMcpServers', variables],
+    queryFn: fetcher<AiHubMcpServersQuery, AiHubMcpServersQueryVariables>(AiHubMcpServersDocument, variables),
+    ...options
+  }
+    )};
+
+export const RemoveAiHubMcpServerDocument = new TypedDocumentString(`
+    mutation removeAiHubMcpServer($workspaceId: ID!, $mcpServerId: ID!) {
+  removeAiHubMcpServer(workspaceId: $workspaceId, mcpServerId: $mcpServerId)
+}
+    `);
+
+export const useRemoveAiHubMcpServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RemoveAiHubMcpServerMutation, TError, RemoveAiHubMcpServerMutationVariables, TContext>) => {
+    
+    return useMutation<RemoveAiHubMcpServerMutation, TError, RemoveAiHubMcpServerMutationVariables, TContext>(
+      {
+    mutationKey: ['removeAiHubMcpServer'],
+    mutationFn: (variables?: RemoveAiHubMcpServerMutationVariables) => fetcher<RemoveAiHubMcpServerMutation, RemoveAiHubMcpServerMutationVariables>(RemoveAiHubMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetAiHubMcpServerEnabledDocument = new TypedDocumentString(`
+    mutation setAiHubMcpServerEnabled($workspaceId: ID!, $mcpServerId: ID!, $enabled: Boolean!) {
+  setAiHubMcpServerEnabled(
+    workspaceId: $workspaceId
+    mcpServerId: $mcpServerId
+    enabled: $enabled
+  )
+}
+    `);
+
+export const useSetAiHubMcpServerEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAiHubMcpServerEnabledMutation, TError, SetAiHubMcpServerEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<SetAiHubMcpServerEnabledMutation, TError, SetAiHubMcpServerEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['setAiHubMcpServerEnabled'],
+    mutationFn: (variables?: SetAiHubMcpServerEnabledMutationVariables) => fetcher<SetAiHubMcpServerEnabledMutation, SetAiHubMcpServerEnabledMutationVariables>(SetAiHubMcpServerEnabledDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SetAiHubMcpServerToolEnabledDocument = new TypedDocumentString(`
+    mutation setAiHubMcpServerToolEnabled($workspaceId: ID!, $mcpServerId: ID!, $toolName: String!, $enabled: Boolean!) {
+  setAiHubMcpServerToolEnabled(
+    workspaceId: $workspaceId
+    mcpServerId: $mcpServerId
+    toolName: $toolName
+    enabled: $enabled
+  )
+}
+    `);
+
+export const useSetAiHubMcpServerToolEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetAiHubMcpServerToolEnabledMutation, TError, SetAiHubMcpServerToolEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<SetAiHubMcpServerToolEnabledMutation, TError, SetAiHubMcpServerToolEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['setAiHubMcpServerToolEnabled'],
+    mutationFn: (variables?: SetAiHubMcpServerToolEnabledMutationVariables) => fetcher<SetAiHubMcpServerToolEnabledMutation, SetAiHubMcpServerToolEnabledMutationVariables>(SetAiHubMcpServerToolEnabledDocument, variables)(),
     ...options
   }
     )};
