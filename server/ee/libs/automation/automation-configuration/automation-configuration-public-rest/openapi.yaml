@@ -32,6 +32,9 @@ paths:
                   description: "The file of a code-native project."
                   type: "string"
                   format: "binary"
+              required:
+                - "workspaceId"
+                - "projectFile"
         required: true
       responses:
         "204":
