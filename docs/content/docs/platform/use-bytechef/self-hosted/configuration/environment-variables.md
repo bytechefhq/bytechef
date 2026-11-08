@@ -261,6 +261,7 @@ The Context Store sync engine writes records to Postgres by default (the same da
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
+| `BYTECHEF_COMPONENT_CLAUDE_CODE_ENABLED` | Register the [Claude Code](/reference/components/claude-code_v1) component. Its agent runs with full tool permissions on the server, so enable it only on trusted single-tenant installations | `false` |
 | `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED` | Enable uploading of Java (jar) custom components. When disabled, Java custom component uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java custom components continue to work. *Coming soon - upcoming release* | `true` |
 | `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_LOADER` | Loader used to run Java custom components (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java custom components inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. *Coming soon - upcoming release* | `CLASS_LOADER` |
 | `BYTECHEF_COMPONENT_REGISTRY_EXCLUDE` | List of components to exclude from registry | - |
