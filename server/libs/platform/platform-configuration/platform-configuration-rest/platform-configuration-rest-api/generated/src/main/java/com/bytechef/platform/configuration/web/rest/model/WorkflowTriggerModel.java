@@ -28,12 +28,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTrigger", description = "Represents a definition of a workflow trigger.")
 @JsonTypeName("WorkflowTrigger")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.726625+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-08T10:47:53.401505+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class WorkflowTriggerModel {
 
   private List<@Valid ComponentConnectionModel> connections = new ArrayList<>();
 
   private @Nullable String description;
+
+  private @Nullable Boolean disabled;
 
   private @Nullable String label;
 
@@ -107,6 +109,27 @@ public class WorkflowTriggerModel {
   @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
+  }
+
+  public WorkflowTriggerModel disabled(@Nullable Boolean disabled) {
+    this.disabled = disabled;
+    return this;
+  }
+
+  /**
+   * When true, the trigger is not activated and does not start workflow executions.
+   * @return disabled
+   */
+  
+  @Schema(name = "disabled", description = "When true, the trigger is not activated and does not start workflow executions.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("disabled")
+  public @Nullable Boolean getDisabled() {
+    return disabled;
+  }
+
+  @JsonProperty("disabled")
+  public void setDisabled(@Nullable Boolean disabled) {
+    this.disabled = disabled;
   }
 
   public WorkflowTriggerModel label(@Nullable String label) {
@@ -262,6 +285,7 @@ public class WorkflowTriggerModel {
     WorkflowTriggerModel workflowTrigger = (WorkflowTriggerModel) o;
     return Objects.equals(this.connections, workflowTrigger.connections) &&
         Objects.equals(this.description, workflowTrigger.description) &&
+        Objects.equals(this.disabled, workflowTrigger.disabled) &&
         Objects.equals(this.label, workflowTrigger.label) &&
         Objects.equals(this.metadata, workflowTrigger.metadata) &&
         Objects.equals(this.name, workflowTrigger.name) &&
@@ -272,7 +296,7 @@ public class WorkflowTriggerModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, description, label, metadata, name, parameters, timeout, type);
+    return Objects.hash(connections, description, disabled, label, metadata, name, parameters, timeout, type);
   }
 
   @Override
@@ -281,6 +305,7 @@ public class WorkflowTriggerModel {
     sb.append("class WorkflowTriggerModel {\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    disabled: ").append(toIndentedString(disabled)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
