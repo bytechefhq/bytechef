@@ -1,9 +1,10 @@
-import {act, render, renderHook, resetAll, screen, userEvent, waitFor} from '@/shared/util/test-utils';
+import {act, fireEvent, render, renderHook, resetAll, screen} from '@/shared/util/test-utils';
 import {
     type CellKeyDownArgs,
     type CellKeyboardEvent,
     type ColSpanArgs,
     type Column,
+    type PositionChangeArgs,
     type RenderCellProps,
     type RenderSummaryCellProps,
     type RowsChangeData,
@@ -121,6 +122,19 @@ const changeDraftRow = (result: {current: ReturnType<typeof useDataTable>}, valu
         } as RowsChangeData<GridRowType, SummaryRowType>);
     });
 };
+
+const createPositionChangeArgs = (rowId: string) =>
+    ({row: {id: rowId}, rowIdx: 0}) as unknown as PositionChangeArgs<GridRowType, SummaryRowType>;
+
+const moveActivePosition = (result: {current: ReturnType<typeof useDataTable>}, rowId: string) => {
+    act(() => {
+        result.current.handleActivePositionChange(createPositionChangeArgs(rowId));
+
+        vi.runAllTimers();
+    });
+};
+
+const getInsertRowOptions = () => hoisted.insertRowMutate.mock.calls[0][1] as InsertRowOptionsType;
 
 const addDraftRow = (result: {current: ReturnType<typeof useDataTable>}) => {
     act(() => {
@@ -254,31 +268,127 @@ describe('useDataTable', () => {
     });
 
     describe('draft row', () => {
-        it('should insert the draft row with the value of its first committed edit', () => {
+        beforeEach(() => {
+            vi.useFakeTimers({toFake: ['setTimeout']});
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
+        it('should not insert the draft row while it is being edited', () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+            changeDraftRow(result, {title: 'new'});
+            changeDraftRow(result, {count: 3});
+            moveActivePosition(result, DRAFT_ROW_ID);
+
+            expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
+            expect(getDraftRow(result.current.gridRowsWithAdd)).toEqual({count: 3, id: DRAFT_ROW_ID, title: 'new'});
+        });
+
+        it('should insert the draft row with all its values when the active cell moves to another row', () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+            changeDraftRow(result, {title: 'new'});
+            changeDraftRow(result, {count: 3});
+            moveActivePosition(result, 'row-1');
+
+            expect(hoisted.insertRowMutate).toHaveBeenCalledTimes(1);
+            expect(hoisted.insertRowMutate).toHaveBeenCalledWith(
+                {input: {environmentId: '0', tableId: 'table-1', values: {count: 3, title: 'new'}}},
+                expect.any(Object)
+            );
+        });
+
+        it('should insert the draft row with the value committed by the editor in the same event', () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+
+            act(() => {
+                result.current.handleActivePositionChange(createPositionChangeArgs('row-1'));
+            });
+
+            changeDraftRow(result, {title: 'committed on leave'});
+
+            act(() => {
+                vi.runAllTimers();
+            });
+
+            expect(hoisted.insertRowMutate).toHaveBeenCalledWith(
+                {input: {environmentId: '0', tableId: 'table-1', values: {title: 'committed on leave'}}},
+                expect.any(Object)
+            );
+        });
+
+        it('should discard an empty draft row when the active cell moves to another row', () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+            changeDraftRow(result, {title: ''});
+            moveActivePosition(result, 'row-1');
+
+            expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
+            expect(getDraftRow(result.current.gridRowsWithAdd)).toBeUndefined();
+        });
+
+        it('should insert the draft row on a mouse down outside the grid', () => {
             const {result} = renderUseDataTable();
 
             addDraftRow(result);
             changeDraftRow(result, {title: 'new'});
 
+            act(() => {
+                fireEvent.mouseDown(document.body);
+
+                vi.runAllTimers();
+            });
+
             expect(hoisted.insertRowMutate).toHaveBeenCalledTimes(1);
+        });
+
+        it('should not insert the draft row on a mouse down inside a cell editor popover', () => {
+            const {result} = renderUseDataTable();
+
+            const popoverContent = document.createElement('div');
+            const popoverInput = document.createElement('input');
+
+            popoverContent.setAttribute('data-radix-popper-content-wrapper', '');
+            popoverContent.appendChild(popoverInput);
+            document.body.appendChild(popoverContent);
+
+            addDraftRow(result);
+            changeDraftRow(result, {title: 'new'});
+
+            act(() => {
+                fireEvent.mouseDown(popoverInput);
+
+                vi.runAllTimers();
+            });
+
+            expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
+
+            popoverContent.remove();
+        });
+
+        it('should insert the draft row when the hook unmounts', () => {
+            const {result, unmount} = renderUseDataTable();
+
+            addDraftRow(result);
+            changeDraftRow(result, {title: 'new'});
+
+            unmount();
+
             expect(hoisted.insertRowMutate).toHaveBeenCalledWith(
                 {input: {environmentId: '0', tableId: 'table-1', values: {title: 'new'}}},
                 expect.any(Object)
             );
-            expect(hoisted.updateRowMutate).not.toHaveBeenCalled();
         });
 
-        it('should not insert the draft row while its values are empty', () => {
-            const {result} = renderUseDataTable();
-
-            addDraftRow(result);
-            changeDraftRow(result, {title: ''});
-
-            expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
-            expect(getDraftRow(result.current.gridRowsWithAdd)).toEqual({id: DRAFT_ROW_ID, title: ''});
-        });
-
-        it('should insert the draft row when a boolean cell of it is toggled', async () => {
+        it('should insert the draft row when a boolean cell of it is toggled and the row is left', () => {
             hoisted.dataTable.columns = [{id: 'column-3', name: 'active', type: 'BOOLEAN'}];
 
             const {result} = renderUseDataTable();
@@ -290,7 +400,13 @@ describe('useDataTable', () => {
 
             render(<>{booleanColumn.renderCell?.({row: draftRow} as RenderCellProps<GridRowType, SummaryRowType>)}</>);
 
-            await userEvent.click(screen.getByRole('checkbox', {name: 'Toggle active'}));
+            act(() => {
+                fireEvent.click(screen.getByRole('checkbox', {name: 'Toggle active'}));
+            });
+
+            expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
+
+            moveActivePosition(result, 'row-1');
 
             expect(hoisted.insertRowMutate).toHaveBeenCalledWith(
                 {input: {environmentId: '0', tableId: 'table-1', values: {active: true}}},
@@ -298,12 +414,39 @@ describe('useDataTable', () => {
             );
         });
 
+        it('should insert the draft row and add a new one when the add row cell is used again', async () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+            changeDraftRow(result, {title: 'new'});
+            addDraftRow(result);
+
+            expect(hoisted.insertRowMutate).toHaveBeenCalledTimes(1);
+
+            await act(async () => {
+                await getInsertRowOptions().onSuccess({insertDataTableRow: {id: 'row-3'}});
+            });
+
+            expect(getDraftRow(result.current.gridRowsWithAdd)).toEqual({id: DRAFT_ROW_ID});
+        });
+
+        it('should replace an empty draft row with a new one when the add row cell is used again', () => {
+            const {result} = renderUseDataTable();
+
+            addDraftRow(result);
+            addDraftRow(result);
+
+            expect(hoisted.insertRowMutate).not.toHaveBeenCalled();
+            expect(result.current.gridRowsWithAdd.filter((row) => row.id === DRAFT_ROW_ID)).toHaveLength(1);
+        });
+
         it('should not insert the draft row again while its insert is pending', () => {
             const {result} = renderUseDataTable();
 
             addDraftRow(result);
             changeDraftRow(result, {title: 'new'});
-            changeDraftRow(result, {count: 3});
+            moveActivePosition(result, 'row-1');
+            moveActivePosition(result, 'row-2');
 
             expect(hoisted.insertRowMutate).toHaveBeenCalledTimes(1);
         });
@@ -313,40 +456,36 @@ describe('useDataTable', () => {
 
             addDraftRow(result);
             changeDraftRow(result, {title: 'new'});
+            moveActivePosition(result, 'row-1');
             changeDraftRow(result, {count: 3});
 
-            const insertRowOptions = hoisted.insertRowMutate.mock.calls[0][1] as InsertRowOptionsType;
-
             await act(async () => {
-                await insertRowOptions.onSuccess({insertDataTableRow: {id: 'row-3'}});
+                await getInsertRowOptions().onSuccess({insertDataTableRow: {id: 'row-3'}});
             });
 
-            await waitFor(() => {
-                expect(getDraftRow(result.current.gridRowsWithAdd)).toBeUndefined();
-            });
-
+            expect(getDraftRow(result.current.gridRowsWithAdd)).toBeUndefined();
             expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['dataTableRowsPage']});
             expect(hoisted.updateRowMutate).toHaveBeenCalledWith({
                 input: {environmentId: '0', id: 'row-3', tableId: 'table-1', values: {count: 3}},
             });
         });
 
-        it('should insert the draft row again after a failed insert when it is edited', () => {
+        it('should keep the draft row and insert it again after a failed insert when the row is left', () => {
             const {result} = renderUseDataTable();
 
             addDraftRow(result);
             changeDraftRow(result, {title: 'new'});
-
-            const insertRowOptions = hoisted.insertRowMutate.mock.calls[0][1] as InsertRowOptionsType;
+            moveActivePosition(result, 'row-1');
 
             act(() => {
-                insertRowOptions.onError();
+                getInsertRowOptions().onError();
             });
 
-            changeDraftRow(result, {title: 'newer'});
+            expect(getDraftRow(result.current.gridRowsWithAdd)).toEqual({id: DRAFT_ROW_ID, title: 'new'});
+
+            moveActivePosition(result, 'row-2');
 
             expect(hoisted.insertRowMutate).toHaveBeenCalledTimes(2);
-            expect(getDraftRow(result.current.gridRowsWithAdd)).toEqual({id: DRAFT_ROW_ID, title: 'newer'});
         });
 
         it('should exclude the draft row from the selected rows', () => {
