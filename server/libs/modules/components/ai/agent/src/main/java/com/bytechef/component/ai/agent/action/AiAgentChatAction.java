@@ -29,6 +29,7 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.component.ComponentConnection;
@@ -70,19 +71,31 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         AgentToolCallingManagers agentToolCallingManagers, List<ComponentRuleEnforcer> componentRuleEnforcers,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
 
+        return of(
+            aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers, componentRuleEnforcers,
+            aiGuardrailsAdvisorProviderObjectProvider, null);
+    }
+
+    public static ChatActionDefinitionWrapper of(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        AgentToolCallingManagers agentToolCallingManagers, List<ComponentRuleEnforcer> componentRuleEnforcers,
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
+
         return new AiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers, componentRuleEnforcers,
-            aiGuardrailsAdvisorProviderObjectProvider).build();
+            aiGuardrailsAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider).build();
     }
 
     private AiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         AgentToolCallingManagers agentToolCallingManagers, List<ComponentRuleEnforcer> componentRuleEnforcers,
-        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
         super(
             aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers, componentRuleEnforcers,
-            aiGuardrailsAdvisorProviderObjectProvider);
+            aiGuardrailsAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider);
     }
 
     private ChatActionDefinitionWrapper build() {
@@ -127,6 +140,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
             return null;
         }
 
+        recordAgentConversationTurn(inputParameters, extensions, context);
+
         return toOutput(chatActionResult, toolExecutionEvents, context);
     }
 
@@ -149,6 +164,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
         ModelUtils.ChatActionResult chatActionResult = ModelUtils.getChatActionResult(
             call, inputParameters, context);
+
+        recordAgentConversationTurn(inputParameters, extensions, context);
 
         return toOutput(chatActionResult, toolExecutionEvents, context);
     }

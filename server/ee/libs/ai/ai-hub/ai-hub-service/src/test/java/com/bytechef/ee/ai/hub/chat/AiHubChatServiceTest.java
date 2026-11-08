@@ -34,6 +34,7 @@ import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatMessage;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatPatch;
+import com.bytechef.ee.ai.hub.chat.AiHubChatService.AiHubChatTranscriptSummary;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
@@ -260,6 +261,64 @@ class AiHubChatServiceTest {
     }
 
     @Test
+    void testCreateAgentChatStampsTheAgentChatKindAndBinding() {
+        when(chatRepository.save(any(AiHubChat.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AiHubChat chat = chatService.createAgentChat(WORKSPACE_ID, USER_ID, 0, "exec-1", 42L, "Support agent");
+
+        assertThat(chat.getKind()).isEqualTo(AiHubChatKind.AGENT_CHAT);
+        assertThat(chat.getWorkflowExecutionId()).isEqualTo("exec-1");
+        assertThat(chat.getProjectDeploymentId()).isEqualTo(42L);
+        assertThat(chat.getTitle()).isEqualTo("Support agent");
+        assertThat(chat.getAiAgentId()).isNull();
+        assertThat(chat.getWorkspaceId()).isEqualTo(WORKSPACE_ID);
+        assertThat(chat.getStatus()).isEqualTo(AiHubChatStatus.ACTIVE);
+    }
+
+    @Test
+    void testSummarizeTranscriptCountsVisibleMessagesAndKeepsTheLastOne() {
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        Instant now = Instant.parse("2026-04-23T10:00:00Z");
+
+        List<SessionEvent> events = List.of(
+            sessionEvent(MessageType.USER, "What is the status?", now),
+            sessionEvent(MessageType.ASSISTANT, "All clear", now.plusSeconds(1)));
+
+        when(sessionService.getEvents(THREAD_ID, EventFilter.all())).thenReturn(events);
+
+        AiHubChatTranscriptSummary transcriptSummary = chatService.summarizeTranscript(1L, WORKSPACE_ID, USER_ID);
+
+        assertThat(transcriptSummary.messageCount()).isEqualTo(2);
+        assertThat(transcriptSummary.lastMessageContent()).isEqualTo("All clear");
+    }
+
+    @Test
+    void testSummarizeTranscriptIsEmptyWithoutSessionMemory() {
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+        when(aiHubSessionMemoryProvider.getIfAvailable()).thenReturn(null);
+
+        AiHubChatTranscriptSummary transcriptSummary = chatService.summarizeTranscript(1L, WORKSPACE_ID, USER_ID);
+
+        assertThat(transcriptSummary.messageCount()).isZero();
+        assertThat(transcriptSummary.lastMessageContent()).isNull();
+    }
+
+    @Test
+    void testSummarizeTranscriptRejectsAnotherUsersChat() {
+        AiHubChat chat = buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE);
+
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
+
+        assertThatThrownBy(() -> chatService.summarizeTranscript(1L, WORKSPACE_ID, OTHER_USER_ID))
+            .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
     void testCancelWorkflowChatTurnGoesThroughTheRunRegistry() {
         when(chatRepository.findById(1L))
             .thenReturn(Optional.of(buildChat(1L, USER_ID, THREAD_ID, AiHubChatStatus.ACTIVE)));
@@ -277,7 +336,8 @@ class AiHubChatServiceTest {
         AiHubChat foreign = buildChat(3L, OTHER_USER_ID, "thread-3", AiHubChatStatus.ACTIVE);
 
         when(chatRepository.findByWorkspaceIdAndUserIdAndEnvironmentAndKindInAndStatus(
-            eq(WORKSPACE_ID), eq(USER_ID), eq(0), eq(List.of(AiHubChatKind.WORKFLOW_CHAT.ordinal())),
+            eq(WORKSPACE_ID), eq(USER_ID), eq(0),
+            eq(List.of(AiHubChatKind.WORKFLOW_CHAT.ordinal(), AiHubChatKind.AGENT_CHAT.ordinal())),
             eq(AiHubChatStatus.ACTIVE.ordinal()), anyInt())).thenReturn(List.of(first, second, foreign));
         when(chatRepository.updateStatusUnlessDeleted(anyLong(), anyInt(), anyInt(), any())).thenReturn(1);
 

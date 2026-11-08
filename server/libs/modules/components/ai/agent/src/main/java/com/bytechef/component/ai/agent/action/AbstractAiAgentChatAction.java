@@ -59,6 +59,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
 import com.bytechef.platform.ai.constant.ToolSuspendConstants;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder.AgentConversation;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.guardrails.GuardrailSurface;
 import com.bytechef.platform.ai.guardrails.RestorationDestination;
@@ -85,8 +87,10 @@ import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
 import com.bytechef.platform.component.rule.ComponentRuleEnforcer;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,6 +101,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -118,6 +124,8 @@ import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.tool.metadata.ToolMetadata;
 import org.springframework.beans.factory.ObjectProvider;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 import tools.jackson.core.type.TypeReference;
 
 /**
@@ -134,10 +142,13 @@ public abstract class AbstractAiAgentChatAction {
         "received from the user: the request expired or the response was empty. Treat any requested approval as not " +
         "granted and any questions as unanswered, and do not perform actions that depended on this response.\"}";
 
+    private final @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ClusterElementToolCallbacks clusterElementToolCallbacks;
     private final AgentToolCallingManagers agentToolCallingManagers;
     private final @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider;
+    private final AtomicBoolean partialIdentityStampWarned = new AtomicBoolean();
+    private final AtomicBoolean recordingFailureWarned = new AtomicBoolean();
 
     protected AbstractAiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
@@ -161,6 +172,18 @@ public abstract class AbstractAiAgentChatAction {
         AgentToolCallingManagers agentToolCallingManagers, List<ComponentRuleEnforcer> componentRuleEnforcers,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
 
+        this(
+            aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers, componentRuleEnforcers,
+            aiGuardrailsAdvisorProviderObjectProvider, null);
+    }
+
+    protected AbstractAiAgentChatAction(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        AgentToolCallingManagers agentToolCallingManagers, List<ComponentRuleEnforcer> componentRuleEnforcers,
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
+
+        this.agentConversationRecorderObjectProvider = agentConversationRecorderObjectProvider;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.clusterElementToolCallbacks = new ClusterElementToolCallbacks(
             aiAgentToolFacade, clusterElementDefinitionService, componentRuleEnforcers);
@@ -1254,6 +1277,129 @@ public abstract class AbstractAiAgentChatAction {
         int size = messages.size();
 
         return size <= 3 ? List.copyOf(messages) : List.copyOf(messages.subList(size - 3, size));
+    }
+
+    protected Runnable createAgentConversationTurnRecorder(
+        Parameters inputParameters, Parameters extensions, ActionContext context) {
+
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        return () -> {
+            Scheduler scheduler = Schedulers.boundedElastic();
+
+            try {
+                scheduler.schedule(() -> recordAgentConversationTurn(tenantId, inputParameters, extensions, context));
+            } catch (RejectedExecutionException exception) {
+                context.log(
+                    log -> log.warn(
+                        "Failed to schedule the agent conversation turn recorder for the AI Hub", exception));
+            }
+        };
+    }
+
+    protected void
+        recordAgentConversationTurn(Parameters inputParameters, Parameters extensions, ActionContext context) {
+        recordAgentConversationTurn(TenantContext.getCurrentTenantId(), inputParameters, extensions, context);
+    }
+
+    private void recordAgentConversationTurn(
+        String tenantId, Parameters inputParameters, Parameters extensions, ActionContext context) {
+
+        if (agentConversationRecorderObjectProvider == null) {
+            return;
+        }
+
+        try {
+            TenantContext.runWithTenantId(
+                tenantId, () -> doRecordAgentConversationTurn(inputParameters, extensions, context));
+        } catch (Exception exception) {
+            warnAboutRecordingFailure(exception, context);
+        }
+    }
+
+    private void doRecordAgentConversationTurn(
+        Parameters inputParameters, Parameters extensions, ActionContext context) {
+
+        AgentConversationRecorder agentConversationRecorder = Objects
+            .requireNonNull(agentConversationRecorderObjectProvider)
+            .getIfAvailable();
+
+        if (agentConversationRecorder == null || context.isEditorEnvironment()) {
+            return;
+        }
+
+        String subagentConversationId = inputParameters.getString(SUBAGENT_CONVERSATION_ID);
+
+        if (subagentConversationId != null && !subagentConversationId.isBlank()) {
+            return;
+        }
+
+        String conversationId = resolveRecordableConversationId(ClusterElementMap.of(extensions));
+
+        if (conversationId == null) {
+            return;
+        }
+
+        Long workspaceId = extensions.getLong(WorkflowExtConstants.AI_HUB_WORKSPACE_ID);
+        Long aiAgentId = extensions.getLong(WorkflowExtConstants.AI_HUB_AGENT_ID);
+        Long creatorUserId = extensions.getLong(WorkflowExtConstants.AI_HUB_CREATOR_USER_ID);
+
+        if (workspaceId == null && aiAgentId == null && creatorUserId == null) {
+            return;
+        }
+
+        if (workspaceId == null || aiAgentId == null || creatorUserId == null) {
+            warnAboutPartialIdentityStamp(workspaceId, aiAgentId, creatorUserId, context);
+
+            return;
+        }
+
+        String workflowId = null;
+        Long environmentId = null;
+
+        if (context instanceof ActionContextAware actionContextAware) {
+            workflowId = actionContextAware.getWorkflowId();
+            environmentId = actionContextAware.getEnvironmentId();
+        }
+
+        agentConversationRecorder.recordTurn(
+            new AgentConversation(
+                workspaceId, aiAgentId, creatorUserId, conversationId, null, null, workflowId, environmentId));
+    }
+
+    private void warnAboutRecordingFailure(Exception exception, ActionContext context) {
+        if (recordingFailureWarned.compareAndSet(false, true)) {
+            context.log(log -> log.warn("Failed to record agent conversation turn for the AI Hub", exception));
+        } else {
+            context.log(log -> log.debug("Failed to record agent conversation turn for the AI Hub", exception));
+        }
+    }
+
+    private void warnAboutPartialIdentityStamp(
+        @Nullable Long workspaceId, @Nullable Long aiAgentId, @Nullable Long creatorUserId, ActionContext context) {
+
+        if (!partialIdentityStampWarned.compareAndSet(false, true)) {
+            return;
+        }
+
+        context.log(
+            log -> log.warn(
+                "AI Hub visibility is off for this agent: the identity stamp on the aiAgent node is partial, so no " +
+                    "conversation turn can be reported. {}={}, {}={}, {}={}",
+                WorkflowExtConstants.AI_HUB_WORKSPACE_ID, workspaceId, WorkflowExtConstants.AI_HUB_AGENT_ID, aiAgentId,
+                WorkflowExtConstants.AI_HUB_CREATOR_USER_ID, creatorUserId));
+    }
+
+    private static @Nullable String resolveRecordableConversationId(ClusterElementMap clusterElementMap) {
+        return clusterElementMap.fetchClusterElement(CHAT_MEMORY)
+            .map(clusterElement -> {
+                Parameters chatMemoryParameters = ParametersFactory.create(clusterElement.getParameters());
+
+                String conversationId = chatMemoryParameters.getString("conversationId");
+
+                return conversationId == null || conversationId.isBlank() ? null : conversationId;
+            })
+            .orElse(null);
     }
 
     private static String resolveConversationId(Parameters inputParameters, ClusterElement chatMemoryClusterElement) {

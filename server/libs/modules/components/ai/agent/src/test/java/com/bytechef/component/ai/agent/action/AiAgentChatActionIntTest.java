@@ -740,7 +740,7 @@ class AiAgentChatActionIntTest {
 
             return new AiAgentComponentHandler(
                 aiAgentToolFacade, clusterElementDefinitionService, new AgentToolCallingManagers(toolCallingManager),
-                List.of(), aiGuardrailsAdvisorProviderObjectProvider);
+                List.of(), aiGuardrailsAdvisorProviderObjectProvider, null);
         }
 
         @Bean

@@ -28,12 +28,14 @@ import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.AiAgentComponentDefinition;
 import com.bytechef.platform.component.rule.ComponentRuleEnforcer;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
@@ -48,11 +50,12 @@ public class AiAgentComponentHandler implements ComponentHandler {
     public AiAgentComponentHandler(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         AgentToolCallingManagers agentToolCallingManagers, List<ComponentRuleEnforcer> componentRuleEnforcers,
-        ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
+        ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
         final ActionDefinition aiAgentChatActionDefinition = AiAgentChatAction.of(
             aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers, componentRuleEnforcers,
-            aiGuardrailsAdvisorProviderObjectProvider);
+            aiGuardrailsAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider);
 
         this.componentDefinition = new AiAgentComponentDefinitionImpl(
             component(AI_AGENT)
@@ -64,7 +67,8 @@ public class AiAgentComponentHandler implements ComponentHandler {
                     aiAgentChatActionDefinition,
                     AiAgentStreamChatAction.of(
                         aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
-                        componentRuleEnforcers, aiGuardrailsAdvisorProviderObjectProvider))
+                        componentRuleEnforcers, aiGuardrailsAdvisorProviderObjectProvider,
+                        agentConversationRecorderObjectProvider))
                 .clusterElements(AiAgentChatTool.of(aiAgentChatActionDefinition)));
     }
 

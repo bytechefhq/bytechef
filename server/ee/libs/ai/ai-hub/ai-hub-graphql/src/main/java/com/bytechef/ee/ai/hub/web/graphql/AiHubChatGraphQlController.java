@@ -121,24 +121,22 @@ public class AiHubChatGraphQlController {
         @Argument long workspaceId, @Argument int environment, @Argument String workflowExecutionId,
         @Argument long projectDeploymentId, @Argument @Nullable String title) {
 
-        AiHubWorkspaceAccess.verifyViewer(permissionService, workspaceId);
-
-        if (!permissionService.hasWorkspaceScope(workspaceId, "WORKFLOW_VIEW")) {
-            throw new ForbiddenException("Workflows are not viewable by the current user");
-        }
-
-        ChatWorkflow chatWorkflow = projectDeploymentFacade.findWorkspaceChatWorkflow(workspaceId, workflowExecutionId)
-            .orElseThrow(() -> new ForbiddenException("Workflow is not available to chat in this workspace"));
-
-        long listedProjectDeploymentId = chatWorkflow.projectDeploymentId();
-
-        if (listedProjectDeploymentId != projectDeploymentId && log.isDebugEnabled()) {
-            log.debug(
-                "Replacing client-supplied projectDeploymentId {} with the listed {} for workflow chat {}",
-                projectDeploymentId, listedProjectDeploymentId, workflowExecutionId);
-        }
+        long listedProjectDeploymentId = resolveListedProjectDeploymentId(
+            workspaceId, workflowExecutionId, projectDeploymentId);
 
         return chatService.createWorkflowChat(
+            workspaceId, currentUserId(), environment, workflowExecutionId, listedProjectDeploymentId, title);
+    }
+
+    @MutationMapping
+    public AiHubChat createAgentChatAiHubChat(
+        @Argument long workspaceId, @Argument int environment, @Argument String workflowExecutionId,
+        @Argument long projectDeploymentId, @Argument @Nullable String title) {
+
+        long listedProjectDeploymentId = resolveListedProjectDeploymentId(
+            workspaceId, workflowExecutionId, projectDeploymentId);
+
+        return chatService.createAgentChat(
             workspaceId, currentUserId(), environment, workflowExecutionId, listedProjectDeploymentId, title);
     }
 
@@ -285,6 +283,29 @@ public class AiHubChatGraphQlController {
     public long messageTimestamp(AiHubChatMessage message) {
         return message.timestamp()
             .toEpochMilli();
+    }
+
+    private long resolveListedProjectDeploymentId(
+        long workspaceId, String workflowExecutionId, long projectDeploymentId) {
+
+        AiHubWorkspaceAccess.verifyViewer(permissionService, workspaceId);
+
+        if (!permissionService.hasWorkspaceScope(workspaceId, "WORKFLOW_VIEW")) {
+            throw new ForbiddenException("Workflows are not viewable by the current user");
+        }
+
+        ChatWorkflow chatWorkflow = projectDeploymentFacade.findWorkspaceChatWorkflow(workspaceId, workflowExecutionId)
+            .orElseThrow(() -> new ForbiddenException("Workflow is not available to chat in this workspace"));
+
+        long listedProjectDeploymentId = chatWorkflow.projectDeploymentId();
+
+        if (listedProjectDeploymentId != projectDeploymentId && log.isDebugEnabled()) {
+            log.debug(
+                "Replacing client-supplied projectDeploymentId {} with the listed {} for chat {}",
+                projectDeploymentId, listedProjectDeploymentId, workflowExecutionId);
+        }
+
+        return listedProjectDeploymentId;
     }
 
     private long currentUserId() {

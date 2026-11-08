@@ -105,6 +105,41 @@ class AiAgentWorkflowGeneratorTest {
     }
 
     @Test
+    void testAiAgentNodeCarriesAiHubIdentityStamp() {
+        AiAgent agent = newAgent();
+
+        agent.setWorkspaceId(55L);
+
+        List<AiAgentChannel> channels = twoChannelFixtureChannels();
+
+        String definition =
+            AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS, 77L, CHANNEL_RESOLVER);
+
+        Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
+        Map<String, Object> aiAgentNode = tasks(parsed).get(1);
+
+        assertThat(aiAgentNode.get("aiHubWorkspaceId")).isEqualTo(55);
+        assertThat(aiAgentNode.get("aiHubAgentId")).isEqualTo(1);
+        assertThat(aiAgentNode.get("aiHubCreatorUserId")).isEqualTo(77);
+    }
+
+    @Test
+    void testAiAgentNodeOmitsUnresolvableIdentityStampFields() {
+        AiAgent agent = newAgent();
+        List<AiAgentChannel> channels = twoChannelFixtureChannels();
+
+        String definition =
+            AiAgentWorkflowGenerator.generate(agent, channels, List.of(), NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
+
+        Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
+        Map<String, Object> aiAgentNode = tasks(parsed).get(1);
+
+        assertThat(aiAgentNode).containsKey("aiHubAgentId")
+            .doesNotContainKey("aiHubWorkspaceId")
+            .doesNotContainKey("aiHubCreatorUserId");
+    }
+
+    @Test
     void testTriggersAreOrderedChatFirstWorkflowCallSecondThenByPosition() {
         AiAgent agent = newAgent();
         List<AiAgentChannel> channels = twoChannelFixtureChannels();

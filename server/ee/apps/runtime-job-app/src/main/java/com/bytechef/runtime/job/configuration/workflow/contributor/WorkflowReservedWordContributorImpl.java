@@ -24,6 +24,9 @@ import java.util.List;
  */
 public class WorkflowReservedWordContributorImpl implements WorkflowReservedWordContributor {
 
+    private static final String AI_HUB_AGENT_ID = "aiHubAgentId";
+    private static final String AI_HUB_CREATOR_USER_ID = "aiHubCreatorUserId";
+    private static final String AI_HUB_WORKSPACE_ID = "aiHubWorkspaceId";
     private static final String AUTHORIZATION_REQUIRED = "authorizationRequired";
     private static final String CATEGORY = "category";
     private static final String CLUSTER_ELEMENTS = "clusterElements";
@@ -39,7 +42,8 @@ public class WorkflowReservedWordContributorImpl implements WorkflowReservedWord
     @Override
     public List<String> getReservedWords() {
         return List.of(
-            AUTHORIZATION_REQUIRED, CATEGORY, CLUSTER_ELEMENTS, COMPONENT_NAME, COMPONENT_VERSION, CONNECTIONS,
+            AI_HUB_AGENT_ID, AI_HUB_CREATOR_USER_ID, AI_HUB_WORKSPACE_ID, AUTHORIZATION_REQUIRED, CATEGORY,
+            CLUSTER_ELEMENTS, COMPONENT_NAME, COMPONENT_VERSION, CONNECTIONS,
             GROUP_NAME, INTERNAL_ONLY, OBJECT_NAME, TAGS, TRIGGERS);
     }
 }

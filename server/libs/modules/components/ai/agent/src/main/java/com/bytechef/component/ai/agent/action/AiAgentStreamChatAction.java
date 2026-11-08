@@ -29,6 +29,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
+import com.bytechef.platform.ai.conversation.AgentConversationRecorder;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
 import com.bytechef.platform.ai.tool.AiAgentToolContext;
 import com.bytechef.platform.ai.tool.AiAgentToolContext.SseTransport;
@@ -88,19 +89,31 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         AgentToolCallingManagers agentToolCallingManagers, List<ComponentRuleEnforcer> componentRuleEnforcers,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
 
+        return of(
+            aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers, componentRuleEnforcers,
+            aiGuardrailsAdvisorProviderObjectProvider, null);
+    }
+
+    public static ActionDefinition of(
+        AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
+        AgentToolCallingManagers agentToolCallingManagers, List<ComponentRuleEnforcer> componentRuleEnforcers,
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
+
         return new AiAgentStreamChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers, componentRuleEnforcers,
-            aiGuardrailsAdvisorProviderObjectProvider).build();
+            aiGuardrailsAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider).build();
     }
 
     private AiAgentStreamChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
         AgentToolCallingManagers agentToolCallingManagers, List<ComponentRuleEnforcer> componentRuleEnforcers,
-        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider) {
+        @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
+        @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
         super(
             aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers, componentRuleEnforcers,
-            aiGuardrailsAdvisorProviderObjectProvider);
+            aiGuardrailsAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider);
     }
 
     @Override
@@ -150,7 +163,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             return null;
         }
 
-        return stream(chatClientRequestSpec, sseTransport, turnTextSeparator, inputParameters, context);
+        return stream(chatClientRequestSpec, sseTransport, turnTextSeparator, inputParameters, extensions, context);
     }
 
     protected SseEmitterHandler perform(
@@ -164,12 +177,12 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
             inputParameters, connectionParameters, extensions,
             createToolExecutionListener(sseTransport, turnTextSeparator, context), context);
 
-        return stream(chatClientRequestSpec, sseTransport, turnTextSeparator, inputParameters, context);
+        return stream(chatClientRequestSpec, sseTransport, turnTextSeparator, inputParameters, extensions, context);
     }
 
-    private static SseEmitterHandler stream(
+    private SseEmitterHandler stream(
         ChatClientRequestSpec chatClientRequestSpec, SseTransport sseTransport, TurnTextSeparator turnTextSeparator,
-        Parameters inputParameters, ActionContext context) {
+        Parameters inputParameters, Parameters extensions, ActionContext context) {
 
         chatClientRequestSpec.toolContext(new AiAgentToolContext(context, sseTransport).toMap());
 
@@ -185,7 +198,8 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                         guardrailMetadataReference.set(guardrailMetadata);
                     }
                 })
-                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context))));
+                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, turnTextSeparator, context)))
+                .doOnComplete(createAgentConversationTurnRecorder(inputParameters, extensions, context)));
 
         return createSseHandler(
             contentFlux, sseTransport,

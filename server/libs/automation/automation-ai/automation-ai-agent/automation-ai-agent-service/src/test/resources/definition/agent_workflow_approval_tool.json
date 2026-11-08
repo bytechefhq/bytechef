@@ -156,7 +156,8 @@
           } ]
         }
       } ]
-    }
+    },
+    "aiHubAgentId": 1
   }, {
     "name": "branch_out",
     "type": "branch/v1",

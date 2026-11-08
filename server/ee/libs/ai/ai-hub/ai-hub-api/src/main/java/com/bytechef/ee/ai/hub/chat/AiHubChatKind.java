@@ -16,7 +16,9 @@ public enum AiHubChatKind {
 
     STANDARD,
 
-    WORKFLOW_CHAT;
+    WORKFLOW_CHAT,
+
+    AGENT_CHAT;
 
     /**
      * Whether turns for this kind are served by {@code WebhookBridgeAgent} (the chat's messages are forwarded to a
@@ -30,6 +32,6 @@ public enum AiHubChatKind {
      * </p>
      */
     public boolean isWebhookBridged() {
-        return this == WORKFLOW_CHAT;
+        return this == WORKFLOW_CHAT || this == AGENT_CHAT;
     }
 }
