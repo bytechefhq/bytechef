@@ -73,7 +73,16 @@ File System Tools, Glob Tool, Grep Tool and List Directory Tool are offered only
 
 #### Agent workspace
 
-Each of these tools works only inside the agent's own **workspace** directory; files outside it are not reachable through them. Workspaces live under the server's workspace base directory ([`BYTECHEF_AI_AGENT_UTILS_WORKSPACE_BASEDIR`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)), separated by tenant and then by the run's owner: the project deployment or integration instance, its environment and its workflow.
+Each of these tools works only inside the agent's own **workspace** directory; files outside it are not reachable through them. Workspaces live under the server's workspace base directory ([`BYTECHEF_AI_AGENT_UTILS_WORKSPACE_BASEDIR`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)), separated by tenant and then by the run's owner: the project deployment or integration instance, its environment and its workflow:
+
+```
+<basedir>/<tenant>/<platform>/<deployment or instance id>/<environment>/<workflow id>/<workspace name>
+<basedir>/<tenant>/test/job-<job id>/<workspace name>
+```
+
+The second line is for editor test runs. `<platform>` is `automation` or `embedded`, and `<environment>` is the environment name in lowercase, for example `development`.
+
+A workspace belongs to the deployment, not to the person running it: everyone who runs the same deployed workflow, for example everyone chatting with a published agent, works in the same workspace and can see the files earlier runs left there. Use a separate deployment when users must not share files.
 
 The agent sees its workspace as `/workspace`, never as a path on the server. Each tool's description names the workspace, a relative path is resolved against it, and the paths the tools return start with `/workspace`.
 
@@ -90,6 +99,14 @@ By default commands run in a **Docker** container that sees only the agent's wor
 The container uses Docker's default network and runs as the image's default user, usually root. Commands can reach the internet, and they can also reach the server host, other containers and internal addresses such as a cloud metadata endpoint. The private-address rules of Smart Web Fetch do not apply to shell commands. Enable Shell Tools only where the people who build agents are trusted with that network access.
 
 The advanced **Execution Backend** option can switch a Shell Tools element to **Local**, which runs commands directly on the server. Local is offered only when the server allows it ([`BYTECHEF_AI_AGENT_UTILS_SHELL_ALLOW_LOCAL`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)). Local commands start in the workspace with a clean environment, so none of the server's environment variables reach them, but they are not confined to the workspace: allow Local only on a trusted single-tenant installation. Local commands see the workspace at its real path on the server, so refer to workspace files with relative paths.
+
+#### Multi-tenant installations
+
+Workspaces keep tenants' files apart, but the tools are not a complete sandbox. On a server shared by several tenants:
+
+- Keep Shell Tools disabled. A Local shell runs on the server itself with the server's permissions. A Docker shell runs as root on Docker's default network, shares the host's kernel and has no CPU or memory limits.
+- Keep in mind that workspaces have no disk quota, so one agent can fill the disk under the workspace base directory.
+- The file system tools setting applies to every tenant on the server, so enable it only when every tenant may store files on the server's disk.
 
 ---
 
