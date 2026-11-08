@@ -18,6 +18,7 @@ import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -28,6 +29,7 @@ import {
     AuthorizationType,
     ComponentDefinition,
     ComponentDefinitionBasic,
+    GetOAuth2AuthorizationParametersRequestTypeEnum,
     Tag,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
@@ -53,6 +55,10 @@ import {twMerge} from 'tailwind-merge';
 import ComponentSelectionInput from './ComponentSelectionInput';
 import OAuth2Button from './OAuth2Button';
 import Scopes from './Scopes';
+import ConnectionPrefillPicker from './connection-prefill/ConnectionPrefillPicker';
+import {MCP_CLIENT_COMPONENT_NAME} from './connection-prefill/mcp-client/mcpServerCatalogPrefill';
+import {ConnectionPrefillOptionI} from './connection-prefill/types';
+import useConnectionPrefillOptions from './connection-prefill/useConnectionPrefillOptions';
 
 export interface ConnectionDialogFormProps {
     authorizationType?: string;
@@ -67,6 +73,17 @@ export interface ConnectionDialogFormProps {
 }
 
 const NO_AUTHORIZATION_OPTION_VALUE = 'NONE';
+
+const PREFILL_RESET_PARAMETER_NAMES = [
+    'authorizationUrl',
+    'clientId',
+    'clientSecret',
+    'headerPrefix',
+    'scopes',
+    'token',
+    'tokenUrl',
+    'transportType',
+];
 
 interface ConnectionDialogProps {
     componentDefinition?: ComponentDefinition;
@@ -128,6 +145,7 @@ const ConnectionDialog = ({
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentType = usePlatformTypeStore((state) => state.currentType);
 
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
@@ -177,6 +195,11 @@ const ConnectionDialog = ({
     );
 
     const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetConnectionTagsQuery();
+
+    const connectionPrefillOptions = useConnectionPrefillOptions(
+        selectedComponentDefinition?.name,
+        isOpen && !connection?.id && currentType !== PlatformType.EMBEDDED
+    );
 
     const {
         data: oAuth2Properties,
@@ -287,6 +310,33 @@ const ConnectionDialog = ({
 
     const showOAuth2Step = (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) && isEnteringCredentials;
 
+    const requiresManualOAuth2Endpoints =
+        currentType === PlatformType.EMBEDDED &&
+        selectedComponentName === MCP_CLIENT_COMPONENT_NAME &&
+        getAuthorizationType() === 'OAUTH2_AUTHORIZATION_CODE_PKCE' &&
+        isEnteringCredentials;
+
+    const authorizationUrlValue = watch('parameters.authorizationUrl') as unknown as string | undefined;
+    const tokenUrlValue = watch('parameters.tokenUrl') as unknown as string | undefined;
+
+    const clientIdValue = watch('parameters.clientId') as unknown as string | undefined;
+
+    const manualOAuth2EndpointsMissing =
+        requiresManualOAuth2Endpoints && (!authorizationUrlValue?.trim() || !tokenUrlValue?.trim());
+
+    const optionalClientIdProperty = authorizations?.[0]?.properties?.find(
+        (property) => property.name === 'clientId' && !property.required
+    );
+
+    const manualOAuth2ClientIdMissing =
+        isOAuth2AuthorizationType &&
+        isEnteringCredentials &&
+        showAuthorizationProperties &&
+        !!optionalClientIdProperty &&
+        !!authorizationUrlValue?.trim() &&
+        !!tokenUrlValue?.trim() &&
+        !clientIdValue?.trim();
+
     const showRedirectUriInput =
         (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
         isEnteringCredentials &&
@@ -296,6 +346,38 @@ const ConnectionDialog = ({
     const tagNames = connection?.tags?.map((tag) => tag.name);
 
     const remainingTags = tags?.filter((tag) => !tagNames?.includes(tag.name));
+
+    function applyConnectionPrefill({prefill}: ConnectionPrefillOptionI) {
+        const authorizationTypeValues = authorizationOptions.map((authorizationOption) => authorizationOption.value);
+
+        const prefillAuthorizationType = authorizationTypeValues.includes(prefill.authorizationType)
+            ? prefill.authorizationType
+            : authorizationOptions[0]?.value;
+
+        setAuthorizationType(prefillAuthorizationType);
+        setUsePredefinedOAuthApp(false);
+        setValue('authorizationType', prefillAuthorizationType as string);
+
+        const prefillAuthorization = connectionDefinition?.authorizations?.find(
+            (authorization) => authorization.type === prefillAuthorizationType
+        );
+
+        const defaultValueProperties = [
+            ...(connectionDefinition?.properties || []),
+            ...(prefillAuthorization?.properties || []),
+        ];
+
+        for (const parameterName of PREFILL_RESET_PARAMETER_NAMES) {
+            const defaultValueProperty = defaultValueProperties.find((property) => property.name === parameterName) as
+                {defaultValue?: unknown} | undefined;
+
+            setValue(`parameters.${parameterName}`, defaultValueProperty?.defaultValue as never);
+        }
+
+        for (const [parameterName, parameterValue] of Object.entries(prefill.parameters)) {
+            setValue(`parameters.${parameterName}`, parameterValue as never, {shouldValidate: true});
+        }
+    }
 
     function closeDialog() {
         setIsOpen(false);
@@ -402,6 +484,10 @@ const ConnectionDialog = ({
             parameters: {
                 ...parameters,
             },
+            type:
+                currentType === PlatformType.EMBEDDED
+                    ? GetOAuth2AuthorizationParametersRequestTypeEnum.Embedded
+                    : GetOAuth2AuthorizationParametersRequestTypeEnum.Automation,
         };
     }
 
@@ -712,6 +798,13 @@ const ConnectionDialog = ({
                                         />
                                     )}
 
+                                    {!connection?.id && (
+                                        <ConnectionPrefillPicker
+                                            onSelect={applyConnectionPrefill}
+                                            options={connectionPrefillOptions}
+                                        />
+                                    )}
+
                                     {(!connection?.id || (canEditConnectionProperties && !isUpdatingCredentials)) &&
                                         showConnectionProperties &&
                                         !!connectionDefinition.properties && (
@@ -803,6 +896,34 @@ const ConnectionDialog = ({
                                                 />
                                             </WorkflowMockProvider>
                                         )}
+
+                                    {requiresManualOAuth2Endpoints && (
+                                        <Alert>
+                                            <InfoIcon className="size-4" />
+
+                                            <AlertTitle>Authorization URL and Token URL are required</AlertTitle>
+
+                                            <AlertDescription>
+                                                Automatic OAuth2 discovery isn&apos;t available for embedded
+                                                integrations yet. Enter the Authorization URL and Token URL of the MCP
+                                                server&apos;s OAuth app.
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+
+                                    {manualOAuth2ClientIdMissing && (
+                                        <Alert>
+                                            <InfoIcon className="size-4" />
+
+                                            <AlertTitle>Client Id is required</AlertTitle>
+
+                                            <AlertDescription>
+                                                Enter the Client Id of the OAuth app registered with the server. It is
+                                                required when the Authorization URL and Token URL are set; leave both
+                                                empty to sign in automatically.
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
 
                                     {showOAuth2AppPredefined && (
                                         <div>
@@ -967,7 +1088,11 @@ const ConnectionDialog = ({
                                     <>
                                         {wizardStep === 'configuration_step' && (
                                             <Button
-                                                disabled={!formState.isValid}
+                                                disabled={
+                                                    !formState.isValid ||
+                                                    manualOAuth2EndpointsMissing ||
+                                                    manualOAuth2ClientIdMissing
+                                                }
                                                 label="Next"
                                                 onClick={handleSubmit(() => {
                                                     setWizardStep('oauth_step');
