@@ -100,7 +100,7 @@ const ProjectHeader = ({
     });
 
     const loadingIndicator = (isSaving > 0 || !isOnline) && (
-        <LoadingIndicator isFetching={isSaving} isOnline={isOnline} showLabel />
+        <LoadingIndicator className="shrink-0" isFetching={isSaving} isOnline={isOnline} showLabel />
     );
 
     if (!project) {
@@ -115,7 +115,7 @@ const ProjectHeader = ({
                 !embedded && copilotLayoutShifted && 'pr-0'
             )}
         >
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2">
                 <LeftSidebarButton
                     onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)}
                     tooltip="See projects"
@@ -140,7 +140,7 @@ const ProjectHeader = ({
                 {loadingIndicator}
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
                 <WorkflowActionsButton
                     chatTrigger={chatTrigger ?? false}
                     onRunClick={handleRunClick}
