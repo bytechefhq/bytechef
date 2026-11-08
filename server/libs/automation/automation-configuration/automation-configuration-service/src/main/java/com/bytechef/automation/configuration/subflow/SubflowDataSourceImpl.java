@@ -146,7 +146,7 @@ class SubflowDataSourceImpl implements SubflowDataSource {
     }
 
     private @Nullable WorkflowTrigger getCallableTrigger(Workflow workflow, String triggerName) {
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.ofEnabled(workflow);
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());

@@ -28,9 +28,12 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.component.constant.WorkflowConstants;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,7 +44,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+    MockitoExtension.class, ObjectMapperSetupExtension.class
+})
 class SubflowResolverTest {
 
     private static final String DRAFT_WORKFLOW_ID = "draft-workflow-id-456";
@@ -77,7 +82,7 @@ class SubflowResolverTest {
         when(callableTrigger.getName()).thenReturn(TRIGGER_NAME);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
-            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.ofEnabled(workflow))
                 .thenReturn(List.of(callableTrigger));
 
             Subflow result = subflowResolver.resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, true);
@@ -105,7 +110,7 @@ class SubflowResolverTest {
         when(callableTrigger.getName()).thenReturn(TRIGGER_NAME);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
-            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(workflow))
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.ofEnabled(workflow))
                 .thenReturn(List.of(callableTrigger));
 
             Subflow result = subflowResolver.resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, false);
@@ -116,6 +121,29 @@ class SubflowResolverTest {
 
         verify(projectWorkflowService).getLastPublishedWorkflowId(WORKFLOW_UUID);
         verify(projectWorkflowService, never()).getLastWorkflowId(WORKFLOW_UUID);
+    }
+
+    @Test
+    void testDisabledCallableTriggerThrows() {
+        when(projectWorkflowService.getLastWorkflowId(WORKFLOW_UUID)).thenReturn(DRAFT_WORKFLOW_ID);
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getId()).thenReturn(DRAFT_WORKFLOW_ID);
+        when(workflowService.getWorkflow(DRAFT_WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getExtensions(WorkflowExtConstants.TRIGGERS, WorkflowTrigger.class, List.of()))
+            .thenReturn(
+                List.of(
+                    new WorkflowTrigger(
+                        Map.of("name", TRIGGER_NAME, "type", "workflow/v1/newWorkflowCall", "disabled", true))));
+
+        IllegalStateException illegalStateException = assertThrows(
+            IllegalStateException.class,
+            () -> subflowResolver.resolveSubflow(WORKFLOW_UUID, WorkflowConstants.NEW_WORKFLOW_CALL, true));
+
+        assertEquals(
+            "No callable trigger found in workflow '%s'".formatted(DRAFT_WORKFLOW_ID),
+            illegalStateException.getMessage());
     }
 
     @Test
