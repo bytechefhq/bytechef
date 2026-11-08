@@ -1,36 +1,31 @@
+import Button from '@/components/Button/Button';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Skeleton} from '@/components/ui/skeleton';
-import {useGetIntegrationWorkflowExecutionQuery} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
-import {WorkflowIcon} from 'lucide-react';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {SparklesIcon, WorkflowIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
-import {useCallback} from 'react';
-import {useShallow} from 'zustand/react/shallow';
 
-import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionDetail from './WorkflowExecutionDetail';
+import useWorkflowExecutionSheet from './hooks/useWorkflowExecutionSheet';
 
 const WorkflowExecutionSheet = () => {
-    const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
-        useWorkflowExecutionSheetStore(
-            useShallow((state) => ({
-                setWorkflowExecutionSheetOpen: state.setWorkflowExecutionSheetOpen,
-                workflowExecutionId: state.workflowExecutionId,
-                workflowExecutionSheetOpen: state.workflowExecutionSheetOpen,
-            }))
-        );
+    const {
+        copilotEnabled,
+        copilotPanelOpen,
+        handleCopilotClick,
+        handleCopilotClose,
+        handleOpenChange,
+        workflowExecution,
+        workflowExecutionId,
+        workflowExecutionLoading,
+        workflowExecutionSheetOpen,
+    } = useWorkflowExecutionSheet();
 
-    const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetIntegrationWorkflowExecutionQuery(
-        {
-            id: workflowExecutionId,
-        },
-        workflowExecutionSheetOpen
-    );
+    const ff_4077 = useFeatureFlagsStore()('ff-4077');
 
     const integrationVersion = workflowExecution?.integrationInstanceConfiguration?.integrationVersion;
-
-    const handleOpenChange = useCallback(() => {
-        setWorkflowExecutionSheetOpen(!workflowExecutionSheetOpen);
-    }, [workflowExecutionSheetOpen, setWorkflowExecutionSheetOpen]);
 
     return (
         <Sheet onOpenChange={handleOpenChange} open={workflowExecutionSheetOpen}>
@@ -39,35 +34,63 @@ const WorkflowExecutionSheet = () => {
             </VisuallyHidden.Root>
 
             <SheetContent
-                className="top-3 right-4 bottom-4 flex h-auto w-[90%] flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-[90%]"
+                className="top-3 right-4 bottom-4 flex h-auto w-[90%] flex-row gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-[90%]"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
-                <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
-                    <div className="flex items-center gap-x-2">
-                        <WorkflowIcon />
+                <div className="flex min-w-0 flex-1 flex-col">
+                    <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
+                        <div className="flex items-center gap-x-2">
+                            <WorkflowIcon />
 
-                        {workflowExecutionLoading ? (
-                            <Skeleton className="h-6 w-48" />
-                        ) : (
-                            <span className="flex gap-x-1 text-base text-content-neutral-secondary">
-                                {`${workflowExecution?.integration?.name ?? ''} /`}
+                            {workflowExecutionLoading ? (
+                                <Skeleton className="h-6 w-48" />
+                            ) : (
+                                <span className="flex gap-x-1 text-base text-content-neutral-secondary">
+                                    {`${workflowExecution?.integration?.name ?? ''} /`}
 
-                                <strong className="text-content-neutral-primary">
-                                    {workflowExecution?.workflow?.label}
-                                </strong>
+                                    <strong className="text-content-neutral-primary">
+                                        {workflowExecution?.workflow?.label}
+                                    </strong>
 
-                                {integrationVersion != null && <span>{`/ V${integrationVersion}`}</span>}
-                            </span>
-                        )}
-                    </div>
+                                    {integrationVersion != null && <span>{`/ V${integrationVersion}`}</span>}
+                                </span>
+                            )}
+                        </div>
 
-                    <SheetCloseButton />
-                </header>
+                        <div className="flex items-center gap-1">
+                            {ff_4077 && copilotEnabled && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            aria-label="Open Copilot panel"
+                                            className="[&_svg]:size-5"
+                                            disabled={workflowExecutionLoading}
+                                            icon={<SparklesIcon />}
+                                            onClick={handleCopilotClick}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+                                    </TooltipTrigger>
 
-                <WorkflowExecutionDetail
-                    enabled={workflowExecutionSheetOpen}
-                    workflowExecutionId={workflowExecutionId}
+                                    <TooltipContent>Open Copilot panel</TooltipContent>
+                                </Tooltip>
+                            )}
+
+                            <SheetCloseButton />
+                        </div>
+                    </header>
+
+                    <WorkflowExecutionDetail
+                        enabled={workflowExecutionSheetOpen}
+                        workflowExecutionId={workflowExecutionId}
+                    />
+                </div>
+
+                <CopilotPanel
+                    className="h-full rounded-r-md border-l border-l-border/50"
+                    onClose={handleCopilotClose}
+                    open={copilotPanelOpen}
                 />
             </SheetContent>
         </Sheet>
