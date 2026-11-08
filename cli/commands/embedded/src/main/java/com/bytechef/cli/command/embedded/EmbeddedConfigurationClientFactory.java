@@ -24,6 +24,7 @@ import com.bytechef.cli.client.embeddedconfiguration.api.ConnectedUserApi;
 import com.bytechef.cli.client.embeddedconfiguration.api.ConnectedUserProjectWorkflowApi;
 import com.bytechef.cli.client.embeddedconfiguration.api.ConnectionApi;
 import com.bytechef.cli.client.embeddedconfiguration.api.IntegrationApi;
+import com.bytechef.cli.client.embeddedconfiguration.api.IntegrationCodeWorkflowApi;
 import com.bytechef.cli.client.embeddedconfiguration.api.IntegrationInstanceApi;
 import com.bytechef.cli.client.embeddedconfiguration.api.IntegrationInstanceWorkflowApi;
 import com.bytechef.cli.core.config.CliConfig;
@@ -67,6 +68,10 @@ final class EmbeddedConfigurationClientFactory {
 
     static AutomationProjectCodeWorkflowApi automationProjectCodeWorkflowApi(CliConfig config) {
         return new AutomationProjectCodeWorkflowApi(apiClient(config));
+    }
+
+    static IntegrationCodeWorkflowApi integrationCodeWorkflowApi(CliConfig config) {
+        return new IntegrationCodeWorkflowApi(apiClient(config));
     }
 
     static ConnectedUserProjectWorkflowApi connectedUserProjectWorkflowApi(CliConfig config) {
