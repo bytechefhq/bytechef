@@ -49,6 +49,8 @@ export default function useNumberCellEditor({
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value);
+
+        commitValue(event.target.value, false);
     };
 
     const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {

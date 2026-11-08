@@ -26,6 +26,7 @@ export default function useStringCellEditor({
     const cellValue = (row as Record<string, unknown>)[columnName];
 
     const [isOpen, setIsOpen] = useState(true);
+    const [originalRow] = useState(row);
     const [text, setText] = useState<string>(String((cellValue ?? '') as string));
 
     const committedRef = useRef(false);
@@ -38,9 +39,13 @@ export default function useStringCellEditor({
     };
 
     const handleCancel = () => {
+        if (committedRef.current) {
+            return;
+        }
+
         committedRef.current = true;
 
-        onRowChange(row, true);
+        onRowChange(originalRow, true);
         setIsOpen(false);
     };
 
@@ -71,7 +76,9 @@ export default function useStringCellEditor({
 
     const handleOpenChange = (openState: boolean) => {
         if (!openState && !committedRef.current) {
-            onRowChange(row, true);
+            handleSave();
+
+            return;
         }
 
         setIsOpen(openState);
@@ -79,6 +86,8 @@ export default function useStringCellEditor({
 
     const handleTextChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         setText(event.target.value);
+
+        onRowChange({...row, [columnName]: event.target.value}, false);
     };
 
     return {

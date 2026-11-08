@@ -118,6 +118,24 @@ describe('StringEditCell', () => {
             await user.keyboard('{Escape}');
 
             expect(mockOnRowChange).toHaveBeenLastCalledWith({id: '1', name: 'Original'}, true);
+            expect(mockOnRowChange).not.toHaveBeenCalledWith({id: '1', name: 'Changed'}, true);
+        });
+
+        it('should call onRowChange with new value when the popover is closed by clicking outside', async () => {
+            const user = userEvent.setup();
+
+            render(
+                <StringEditCell columnName="name" onRowChange={mockOnRowChange} row={{id: '1', name: 'Original'}} />
+            );
+
+            const textarea = screen.getByRole('textbox');
+
+            await user.clear(textarea);
+            await user.type(textarea, 'Changed');
+            await user.click(document.body);
+
+            expect(mockOnRowChange).toHaveBeenCalledWith({id: '1', name: 'Changed'}, true);
+            expect(mockOnRowChange).not.toHaveBeenCalledWith({id: '1', name: 'Original'}, true);
         });
     });
 
