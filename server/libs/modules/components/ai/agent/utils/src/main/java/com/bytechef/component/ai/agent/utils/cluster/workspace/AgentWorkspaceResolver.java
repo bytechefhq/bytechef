@@ -69,8 +69,9 @@ public class AgentWorkspaceResolver {
         return string(WORKSPACE_NAME)
             .label("Workspace Name")
             .description(
-                "Name of the agent's workspace directory. Tools of the same agent with the same workspace name share " +
-                    "files. Letters, digits, '-' and '_' only.")
+                "Name of the workspace directory. Tools in this workflow with the same workspace name share files, " +
+                    "including tools of different AI Agents; tools with different names do not. Letters, digits, " +
+                    "'-' and '_' only.")
             .defaultValue(DEFAULT_WORKSPACE_NAME)
             .advancedOption(true);
     }
