@@ -3,4 +3,5 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:modules:components:ai:llm"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    api(project(":server:libs:platform:platform-connection:platform-connection-api"))
 }
