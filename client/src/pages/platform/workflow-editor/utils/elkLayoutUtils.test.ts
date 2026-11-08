@@ -3561,6 +3561,32 @@ describe('trigger row label separation', () => {
         expect(Math.abs(middleX - taskX)).toBeLessThanOrEqual(1);
     });
 
+    it('centers the trigger column on the first task in LR', async () => {
+        const nodes: Node[] = [
+            triggerNode('trigger_1', 'Manual'),
+            triggerNode('trigger_2', 'Webhook'),
+            taskNode('task1'),
+            taskNode('task2'),
+        ];
+
+        const edges: Edge[] = [edge('trigger_1', 'task1'), edge('trigger_2', 'task1'), edge('task1', 'task2')];
+
+        const result = await getElkLayoutElements({
+            canvasHeight: 800,
+            canvasWidth: 1400,
+            direction: 'LR',
+            edges,
+            nodes,
+        });
+
+        const firstY = positionOf(result.nodes, 'trigger_1').y;
+        const secondY = positionOf(result.nodes, 'trigger_2').y;
+        const taskY = positionOf(result.nodes, 'task1').y;
+
+        expect(secondY).toBeGreaterThan(firstY);
+        expect(Math.abs((firstY + secondY) / 2 - taskY)).toBeLessThanOrEqual(1);
+    });
+
     it('starts the chain at the same height whether or not it has tasks yet', async () => {
         const triggerPlaceholderNode: Node = {
             data: {label: '+'},
