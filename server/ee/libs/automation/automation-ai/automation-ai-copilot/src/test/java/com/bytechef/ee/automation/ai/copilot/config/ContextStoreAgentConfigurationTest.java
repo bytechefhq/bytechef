@@ -68,6 +68,36 @@ class ContextStoreAgentConfigurationTest {
         }
     }
 
+    @Test
+    void testActivatesWhenContextStoreAndOnlyAiHubAreEnabled() {
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
+            addProperties(
+                context,
+                Map.of(
+                    "bytechef.ai.hub.enabled", "true", "bytechef.context-store.enabled", "true",
+                    "bytechef.edition", "ee"));
+
+            context.register(
+                UngatedDependenciesConfiguration.class, ContextStoreDependenciesConfiguration.class,
+                ContextStoreAgentConfiguration.class);
+            context.refresh();
+
+            assertThat(context.getBeanNamesForType(ContextStoreToolCallbacksFactory.class)).hasSize(1);
+        }
+    }
+
+    @Test
+    void testBacksOffWhenNeitherAgentSurfaceIsEnabled() {
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
+            addProperties(context, Map.of("bytechef.context-store.enabled", "true", "bytechef.edition", "ee"));
+
+            context.register(UngatedDependenciesConfiguration.class, ContextStoreAgentConfiguration.class);
+            context.refresh();
+
+            assertThat(context.getBeanNamesForType(ContextStoreToolCallbacksFactory.class)).isEmpty();
+        }
+    }
+
     private static void addProperties(AnnotationConfigApplicationContext context, Map<String, Object> properties) {
         ConfigurableEnvironment environment = context.getEnvironment();
 

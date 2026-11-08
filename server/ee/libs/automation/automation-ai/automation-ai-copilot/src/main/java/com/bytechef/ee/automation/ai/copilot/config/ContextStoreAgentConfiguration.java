@@ -44,7 +44,8 @@ import org.springframework.core.io.Resource;
  */
 @Configuration
 @ConditionalOnEEVersion
-@ConditionalOnExpression("${bytechef.ai.copilot.enabled:false} and ${bytechef.context-store.enabled:false}")
+@ConditionalOnExpression("(${bytechef.ai.copilot.enabled:false} or ${bytechef.ai.hub.enabled:false})"
+    + " and ${bytechef.context-store.enabled:false}")
 public class ContextStoreAgentConfiguration {
 
     @Value("classpath:prompt_context_store_ask.txt")
