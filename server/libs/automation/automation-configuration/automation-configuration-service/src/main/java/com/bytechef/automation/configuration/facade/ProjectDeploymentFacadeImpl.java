@@ -728,7 +728,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private void disableWorkflowTriggers(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
         Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.ofEnabled(workflow);
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
@@ -803,7 +803,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         validateProjectDeploymentWorkflowInputs(projectDeploymentWorkflow.getInputs(), workflow);
 
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.ofEnabled(workflow);
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
             projectDeploymentWorkflow.getProjectDeploymentId());
