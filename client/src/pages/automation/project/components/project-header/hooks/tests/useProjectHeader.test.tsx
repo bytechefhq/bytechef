@@ -14,9 +14,9 @@ const hoisted = vi.hoisted(() => {
             captureProjectWorkflowTested: vi.fn(),
         },
         chatSpies: {
-            resetMessages: vi.fn(),
-            setChatTriggerName: vi.fn(),
-            setWorkflowTestChatPanelOpen: vi.fn(),
+            chatTriggerName: undefined as string | undefined,
+            endChatTestSession: vi.fn(),
+            startChatTestSession: vi.fn(),
             workflowTestChatPanelOpen: false,
         },
         editorSpies: {
@@ -79,9 +79,15 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore', () =
     return {
         __esModule: true,
         __spies: hoisted.chatSpies,
-        default: (selector: (s: typeof hoisted.chatSpies) => unknown) => selector(hoisted.chatSpies),
+        default: Object.assign((selector: (s: typeof hoisted.chatSpies) => unknown) => selector(hoisted.chatSpies), {
+            getState: () => hoisted.chatSpies,
+        }),
     };
 });
+
+vi.mock('@/pages/platform/workflow-editor/utils/startChatTestSession', () => ({
+    default: () => hoisted.chatSpies.startChatTestSession('trigger_1'),
+}));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => {
     const state = {currentWorkspaceId: 'ws-1'};
@@ -195,9 +201,9 @@ describe('useProjectHeader', () => {
 
     function resetIfMock(obj: Record<string, unknown>) {
         Object.values(obj).forEach((v) => {
-            const maybeMock = v as {mockReset?: () => void; mockClear?: () => void};
-            maybeMock.mockReset?.();
-            maybeMock.mockClear?.();
+            const maybeMock = v as {mockReset?: () => void; mockClear?: () => void} | undefined;
+            maybeMock?.mockReset?.();
+            maybeMock?.mockClear?.();
         });
     }
 
@@ -208,6 +214,20 @@ describe('useProjectHeader', () => {
         resetIfMock(hoisted.editorSpies as unknown as Record<string, unknown>);
         resetIfMock(hoisted.nodePanelSpies as unknown as Record<string, unknown>);
         resetIfMock(hoisted.chatSpies as unknown as Record<string, unknown>);
+
+        const chatState = hoisted.chatSpies as {chatTriggerName?: string; workflowTestChatPanelOpen: boolean};
+
+        chatState.chatTriggerName = undefined;
+        chatState.workflowTestChatPanelOpen = false;
+
+        hoisted.chatSpies.endChatTestSession.mockImplementation(() => {
+            chatState.chatTriggerName = undefined;
+            chatState.workflowTestChatPanelOpen = false;
+        });
+        hoisted.chatSpies.startChatTestSession.mockImplementation((chatTriggerName: string) => {
+            chatState.chatTriggerName = chatTriggerName;
+            chatState.workflowTestChatPanelOpen = true;
+        });
         resetIfMock(hoisted.analyticsSpies as unknown as Record<string, unknown>);
         latest.req = null;
         latest.handlers = undefined;
@@ -365,7 +385,7 @@ describe('useProjectHeader', () => {
         });
 
         // Verify chat panel was opened
-        expect(hoisted.chatSpies.setWorkflowTestChatPanelOpen).toHaveBeenCalledWith(true);
+        expect(hoisted.chatSpies.startChatTestSession).toHaveBeenCalledWith('trigger_1');
 
         // Clear mocks
         hoisted.editorSpies.setWorkflowIsRunning.mockClear();
@@ -392,15 +412,14 @@ describe('useProjectHeader', () => {
             result.current.handleRunClick();
         });
 
-        expect(hoisted.chatSpies.setChatTriggerName).toHaveBeenCalled();
-
-        hoisted.chatSpies.setWorkflowTestChatPanelOpen.mockClear();
+        expect(hoisted.chatSpies.startChatTestSession).toHaveBeenCalled();
 
         act(() => {
             result.current.handleStopClick();
         });
 
-        expect(hoisted.chatSpies.setWorkflowTestChatPanelOpen).toHaveBeenCalledWith(false);
+        expect(hoisted.chatSpies.endChatTestSession).toHaveBeenCalled();
+        expect(panelRef.current.resize).toHaveBeenCalledWith(0);
     });
 
     it('does not stop a test run when chat mode turns on while it runs', () => {
@@ -419,7 +438,6 @@ describe('useProjectHeader', () => {
 
         editorState.workflowIsRunning = true;
         hoisted.editorSpies.setWorkflowIsRunning.mockClear();
-        hoisted.chatSpies.setWorkflowTestChatPanelOpen.mockClear();
         latest.close.mockClear();
 
         try {
@@ -427,7 +445,7 @@ describe('useProjectHeader', () => {
 
             expect(latest.close).not.toHaveBeenCalled();
             expect(hoisted.editorSpies.setWorkflowIsRunning).not.toHaveBeenCalledWith(false);
-            expect(hoisted.chatSpies.setWorkflowTestChatPanelOpen).not.toHaveBeenCalled();
+            expect(hoisted.chatSpies.endChatTestSession).not.toHaveBeenCalled();
         } finally {
             delete editorState.workflowIsRunning;
         }

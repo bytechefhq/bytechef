@@ -6,7 +6,6 @@ import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embed
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import getSelectedTestRunTriggerName from '@/pages/platform/workflow-editor/utils/getSelectedTestRunTriggerName';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
@@ -143,7 +142,6 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
             const request = getTestWorkflowStreamPostRequest({
                 environmentId: currentEnvironmentId,
                 id: workflow.id,
-                testWorkflowRequest: {triggerName: getSelectedTestRunTriggerName(workflow)},
             });
             setStreamRequest(request);
         }
@@ -156,7 +154,7 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
         setStreamRequest,
         setWorkflowIsRunning,
         setWorkflowTestExecution,
-        workflow,
+        workflow.id,
     ]);
 
     const handleShowOutputClick = () => {
