@@ -48,7 +48,7 @@ public class McpTenantProtectedResourceMetadataController {
         String resource = McpProtectedResourceUrls.resolveResourceUrl(
             publicUrl, McpProtectedResourceUrls.getRequestBaseUrl(request), path.substring(WELL_KNOWN_PREFIX.length()));
 
-        return mcpTenantProtectedResourceMetadataResolver.resolveMetadata(resource)
+        return mcpTenantProtectedResourceMetadataResolver.resolveMetadata(resource, request)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound()
                 .build());

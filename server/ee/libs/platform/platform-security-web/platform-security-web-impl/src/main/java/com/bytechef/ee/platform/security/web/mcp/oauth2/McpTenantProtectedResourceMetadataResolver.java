@@ -14,6 +14,7 @@ import com.bytechef.platform.security.web.mcp.oauth2.McpProtectedResourceUrls;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -33,16 +34,19 @@ public class McpTenantProtectedResourceMetadataResolver {
 
     private final McpResourceServerProperties mcpResourceServerProperties;
     private final McpTenantIssuerResolver mcpTenantIssuerResolver;
+    private final McpTenantSecretVerifier mcpTenantSecretVerifier;
 
     @SuppressFBWarnings("EI2")
     public McpTenantProtectedResourceMetadataResolver(
-        McpResourceServerProperties mcpResourceServerProperties, McpTenantIssuerResolver mcpTenantIssuerResolver) {
+        McpResourceServerProperties mcpResourceServerProperties, McpTenantIssuerResolver mcpTenantIssuerResolver,
+        McpTenantSecretVerifier mcpTenantSecretVerifier) {
 
         this.mcpResourceServerProperties = mcpResourceServerProperties;
         this.mcpTenantIssuerResolver = mcpTenantIssuerResolver;
+        this.mcpTenantSecretVerifier = mcpTenantSecretVerifier;
     }
 
-    public Optional<McpProtectedResourceMetadata> resolveMetadata(String resource) {
+    public Optional<McpProtectedResourceMetadata> resolveMetadata(String resource, HttpServletRequest request) {
         Matcher matcher = RESOURCE_PATTERN.matcher(resource);
 
         if (!matcher.find()) {
@@ -62,8 +66,10 @@ public class McpTenantProtectedResourceMetadataResolver {
 
         Set<String> authorizationServers = new LinkedHashSet<>();
 
-        TenantContext.callWithTenantId(tenantId, () -> mcpTenantIssuerResolver.resolve(surface))
-            .forEach(mcpTenantIssuer -> authorizationServers.add(mcpTenantIssuer.issuerUri()));
+        if (mcpTenantSecretVerifier.isVerified(request, tenantId, matcher.group(0))) {
+            TenantContext.callWithTenantId(tenantId, () -> mcpTenantIssuerResolver.resolve(surface))
+                .forEach(mcpTenantIssuer -> authorizationServers.add(mcpTenantIssuer.issuerUri()));
+        }
 
         mcpResourceServerProperties.getIssuers()
             .stream()

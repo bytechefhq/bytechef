@@ -8,13 +8,16 @@
 package com.bytechef.ee.platform.security.web.config;
 
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
+import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantSecretVerifier;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.TenantIdpFederatedIssuerAuthenticator;
 import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.web.mcp.McpServerSecretVerifier;
 import com.bytechef.platform.security.web.mcp.oauth2.McpAudienceValidator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpFederatedIssuerAuthenticator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtIdentityMapper;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +33,15 @@ public class McpTenantIssuerResolverConfiguration {
     @Bean
     McpTenantIssuerResolver mcpTenantIssuerResolver(IdentityProviderService identityProviderService) {
         return new McpTenantIssuerResolver(identityProviderService);
+    }
+
+    @Bean
+    McpTenantSecretVerifier mcpTenantSecretVerifier(
+        ObjectProvider<McpServerSecretVerifier> mcpServerSecretVerifierProvider) {
+
+        return new McpTenantSecretVerifier(
+            () -> mcpServerSecretVerifierProvider.orderedStream()
+                .toList());
     }
 
     @Bean

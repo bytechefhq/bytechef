@@ -14,6 +14,8 @@ import static com.bytechef.ee.platform.security.web.mcp.config.McpOAuth2Resource
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.security.web.mcp.config.McpOAuth2ResourceServerSecurityIntTestConfiguration;
@@ -154,6 +156,35 @@ class McpOAuth2ResourceServerSecurityIntTest {
             managementPath(String.valueOf(TenantKey.of(PUBLIC_TENANT_ID))), token);
 
         assertThat(httpResponse.statusCode()).isEqualTo(401);
+
+        verify(identityProviderService, never()).getIdentityProviders();
+    }
+
+    @Test
+    void testPerTenantIdentityProviderTokenWithoutTheEndpointScopeIsForbidden() throws Exception {
+        String token = signWithPerTenantIdp(
+            federatedClaims(PER_TENANT_ISSUER_URI, FEDERATED_USER_EMAIL)
+                .claim("scope", "openid email")
+                .build());
+
+        HttpResponse<String> httpResponse = postInitialize(managementPath(PUBLIC_TENANT_SECRET_KEY), token);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(403);
+        assertThat(httpResponse.headers()
+            .firstValue("WWW-Authenticate")
+            .orElse("")).contains("insufficient_scope");
+    }
+
+    @Test
+    void testPerTenantIdentityProviderTokenScopedForAutomationIsForbiddenOnTheManagementEndpoint() throws Exception {
+        String token = signWithPerTenantIdp(
+            federatedClaims(PER_TENANT_ISSUER_URI, FEDERATED_USER_EMAIL)
+                .claim("scope", "mcp:automation")
+                .build());
+
+        HttpResponse<String> httpResponse = postInitialize(managementPath(PUBLIC_TENANT_SECRET_KEY), token);
+
+        assertThat(httpResponse.statusCode()).isEqualTo(403);
     }
 
     @Test
@@ -273,6 +304,19 @@ class McpOAuth2ResourceServerSecurityIntTest {
             .doesNotContain(PER_TENANT_ISSUER_URI);
     }
 
+    @Test
+    void testProtectedResourceMetadataForAForgedSecretKeyOmitsTheTenantIdentityProviders() throws Exception {
+        HttpResponse<String> httpResponse = getMetadata(String.valueOf(TenantKey.of(PUBLIC_TENANT_ID)));
+
+        assertThat(httpResponse.statusCode()).isEqualTo(200);
+        assertThat(httpResponse.body())
+            .contains("\"authorization_servers\":[\"" + ISSUER_URI + "\"]")
+            .doesNotContain(PER_TENANT_ISSUER_URI)
+            .doesNotContain(AUDIENCE_BOUND_ISSUER_URI);
+
+        verify(identityProviderService, never()).getIdentityProviders();
+    }
+
     private static User activeUser(String login) {
         User user = mock(User.class);
 
@@ -301,7 +345,8 @@ class McpOAuth2ResourceServerSecurityIntTest {
         return baseClaims(issuer, "external-subject")
             .claim("email", email)
             .claim("email_verified", true)
-            .claim("groups", List.of("ROLE_ADMIN"));
+            .claim("groups", List.of("ROLE_ADMIN", "SCOPE_mcp:management"))
+            .claim("scope", "mcp:management");
     }
 
     private static IdentityProvider identityProvider(String issuerUri, boolean validateMcpAudience) {

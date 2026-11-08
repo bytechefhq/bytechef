@@ -34,10 +34,14 @@ public class McpTenantTrustResolutionFilter extends OncePerRequestFilter {
     private static final Pattern MANAGEMENT_SECRET_PATTERN = Pattern.compile("/api/management/(.+)/mcp");
 
     private final McpTenantIssuerResolver mcpTenantIssuerResolver;
+    private final McpTenantSecretVerifier mcpTenantSecretVerifier;
 
     @SuppressFBWarnings("EI2")
-    public McpTenantTrustResolutionFilter(McpTenantIssuerResolver mcpTenantIssuerResolver) {
+    public McpTenantTrustResolutionFilter(
+        McpTenantIssuerResolver mcpTenantIssuerResolver, McpTenantSecretVerifier mcpTenantSecretVerifier) {
+
         this.mcpTenantIssuerResolver = mcpTenantIssuerResolver;
+        this.mcpTenantSecretVerifier = mcpTenantSecretVerifier;
     }
 
     @Override
@@ -85,6 +89,10 @@ public class McpTenantTrustResolutionFilter extends OncePerRequestFilter {
             tenantId = TenantKey.parse(matcher.group(1))
                 .getTenantId();
         } catch (RuntimeException runtimeException) {
+            return false;
+        }
+
+        if (!mcpTenantSecretVerifier.isVerified(request, tenantId, request.getServletPath())) {
             return false;
         }
 

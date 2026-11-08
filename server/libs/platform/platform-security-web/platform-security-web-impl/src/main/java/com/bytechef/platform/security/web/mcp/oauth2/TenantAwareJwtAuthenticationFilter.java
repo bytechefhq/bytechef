@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,7 +171,7 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
             mcpJwtIdentity = authenticateStaticIssuer(
                 request, response, jwtAuthenticationToken, jwt, staticIssuer.get(), urlTenantId);
         } else {
-            mcpJwtIdentity = authenticateFederatedIssuer(request, response, jwt, urlTenantId);
+            mcpJwtIdentity = authenticateFederatedIssuer(request, response, jwtAuthenticationToken, jwt, urlTenantId);
         }
 
         if (mcpJwtIdentity == null) {
@@ -193,7 +194,22 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Nullable
     private McpJwtIdentity authenticateFederatedIssuer(
-        HttpServletRequest request, HttpServletResponse response, Jwt jwt, String urlTenantId) {
+        HttpServletRequest request, HttpServletResponse response, JwtAuthenticationToken jwtAuthenticationToken,
+        Jwt jwt, String urlTenantId) {
+
+        String requiredScope = getRequiredScope(request);
+
+        if (requiredScope == null) {
+            reject(request, response, HttpServletResponse.SC_UNAUTHORIZED);
+
+            return null;
+        }
+
+        if (!hasScope(jwtAuthenticationToken, requiredScope)) {
+            reject(request, response, HttpServletResponse.SC_FORBIDDEN);
+
+            return null;
+        }
 
         Optional<McpJwtIdentity> federatedIdentity;
 
@@ -228,7 +244,9 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
 
         McpJwtIdentity mcpJwtIdentity = federatedIdentity.get();
 
-        List<GrantedAuthority> authorities = new ArrayList<>(mcpJwtIdentity.authorities());
+        List<GrantedAuthority> authorities = new ArrayList<>(getScopeAuthorities(jwtAuthenticationToken));
+
+        authorities.addAll(mcpJwtIdentity.authorities());
 
         authorities.addAll(getUserAuthorities(user, urlTenantId));
 
@@ -449,6 +467,13 @@ public class TenantAwareJwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return null;
+    }
+
+    private static List<GrantedAuthority> getScopeAuthorities(JwtAuthenticationToken jwtAuthenticationToken) {
+        return jwtAuthenticationToken.getAuthorities()
+            .stream()
+            .filter(grantedAuthority -> Strings.CS.startsWith(grantedAuthority.getAuthority(), SCOPE_AUTHORITY_PREFIX))
+            .toList();
     }
 
     private static boolean hasScope(JwtAuthenticationToken jwtAuthenticationToken, String scope) {

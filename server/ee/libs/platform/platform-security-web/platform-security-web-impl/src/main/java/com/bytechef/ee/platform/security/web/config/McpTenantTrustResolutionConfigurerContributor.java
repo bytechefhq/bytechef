@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.security.web.config;
 
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
+import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantSecretVerifier;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantTrustResolutionFilter;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.DisabledMcpOAuth2ResourceServerConfigurer;
@@ -28,13 +29,16 @@ public class McpTenantTrustResolutionConfigurerContributor implements SecurityCo
 
     private final McpResourceServerProperties mcpResourceServerProperties;
     private final McpTenantIssuerResolver mcpTenantIssuerResolver;
+    private final McpTenantSecretVerifier mcpTenantSecretVerifier;
 
     @SuppressFBWarnings("EI2")
     public McpTenantTrustResolutionConfigurerContributor(
-        McpResourceServerProperties mcpResourceServerProperties, McpTenantIssuerResolver mcpTenantIssuerResolver) {
+        McpResourceServerProperties mcpResourceServerProperties, McpTenantIssuerResolver mcpTenantIssuerResolver,
+        McpTenantSecretVerifier mcpTenantSecretVerifier) {
 
         this.mcpResourceServerProperties = mcpResourceServerProperties;
         this.mcpTenantIssuerResolver = mcpTenantIssuerResolver;
+        this.mcpTenantSecretVerifier = mcpTenantSecretVerifier;
     }
 
     @Override
@@ -47,6 +51,6 @@ public class McpTenantTrustResolutionConfigurerContributor implements SecurityCo
         }
 
         return (T) new McpTenantTrustResolutionConfigurer(
-            new McpTenantTrustResolutionFilter(mcpTenantIssuerResolver));
+            new McpTenantTrustResolutionFilter(mcpTenantIssuerResolver, mcpTenantSecretVerifier));
     }
 }

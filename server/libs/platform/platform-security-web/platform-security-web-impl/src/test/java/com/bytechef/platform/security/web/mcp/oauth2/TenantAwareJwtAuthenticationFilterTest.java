@@ -625,7 +625,7 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         when(authorityService.fetchAuthority(5L)).thenReturn(Optional.of(userAuthority));
 
-        authenticate(federatedJwt("jane@customer.test"), "SCOPE_openid");
+        authenticate(federatedJwt("jane@customer.test"), "SCOPE_mcp:automation");
 
         AtomicReference<Authentication> authentication = new AtomicReference<>();
         AtomicReference<String> tenantId = new AtomicReference<>();
@@ -645,19 +645,34 @@ class TenantAwareJwtAuthenticationFilterTest {
             .getPrincipal()).isInstanceOfSatisfying(
                 UserDetails.class,
                 userDetails -> assertThat(userDetails.getUsername()).isEqualTo("jane@customer.test"));
-        assertThat(authorityNames(authentication.get())).containsExactlyInAnyOrder("ROLE_EDITOR", "ROLE_USER");
+        assertThat(authorityNames(authentication.get()))
+            .containsExactlyInAnyOrder("SCOPE_mcp:automation", "ROLE_EDITOR", "ROLE_USER");
+    }
+
+    @Test
+    void testRejectsFederatedIssuerTokenWithoutTheEndpointScopeWithForbidden() throws Exception {
+        authenticate(federatedJwt("jane@customer.test"), "SCOPE_openid");
+
+        assertFederatedRejectedWithForbiddenBeforeAuthentication(automationPath("acme"));
+    }
+
+    @Test
+    void testRejectsFederatedIssuerTokenScopedForTheOtherEndpointWithForbidden() throws Exception {
+        authenticate(federatedJwt("jane@customer.test"), "SCOPE_mcp:management");
+
+        assertFederatedRejectedWithForbiddenBeforeAuthentication(automationPath("acme"));
     }
 
     @Test
     void testRejectsFederatedIssuerTokenOnAnotherTenantsEndpoint() throws Exception {
-        authenticate(federatedJwt("admin@localhost.com"), "SCOPE_openid");
+        authenticate(federatedJwt("admin@localhost.com"), "SCOPE_mcp:automation");
 
         assertFederatedRejectedWithUnauthorized(trustedTenantAuthenticator("acme"), automationPath("other"));
     }
 
     @Test
     void testRejectsFederatedIssuerTokenWhenNoAuthenticatorIsConfigured() throws Exception {
-        authenticate(federatedJwt("admin@localhost.com"), "SCOPE_openid");
+        authenticate(federatedJwt("admin@localhost.com"), "SCOPE_mcp:automation");
 
         assertFederatedRejectedWithUnauthorized(null, automationPath("acme"));
     }
@@ -666,7 +681,7 @@ class TenantAwareJwtAuthenticationFilterTest {
     void testRejectsFederatedIssuerTokenWithoutAMatchingByteChefUser() throws Exception {
         when(userService.fetchUserByEmail("unknown@customer.test")).thenReturn(Optional.empty());
 
-        authenticate(federatedJwt("unknown@customer.test"), "SCOPE_openid");
+        authenticate(federatedJwt("unknown@customer.test"), "SCOPE_mcp:automation");
 
         assertFederatedRejectedWithUnauthorized(trustedTenantAuthenticator("acme"), automationPath("acme"));
     }
@@ -684,14 +699,14 @@ class TenantAwareJwtAuthenticationFilterTest {
             .claim("email_verified", false)
             .build();
 
-        authenticate(jwt, "SCOPE_openid");
+        authenticate(jwt, "SCOPE_mcp:automation");
 
         assertFederatedRejectedWithUnauthorized(trustedTenantAuthenticator("acme"), automationPath("acme"));
     }
 
     @Test
     void testCanonicalManagementPathRejectsFederatedIssuer() throws Exception {
-        authenticate(federatedJwt("admin@localhost.com"), "SCOPE_openid");
+        authenticate(federatedJwt("admin@localhost.com"), "SCOPE_mcp:management");
 
         assertFederatedRejectedWithUnauthorized(
             (jwt, request, urlTenantId) -> Optional.of(new McpJwtIdentity(urlTenantId, "jane", List.of())),
@@ -956,6 +971,27 @@ class TenantAwareJwtAuthenticationFilterTest {
 
         assertThat(response.getStatus()).isEqualTo(401);
         assertThat(chainInvoked).isFalse();
+    }
+
+    private void assertFederatedRejectedWithForbiddenBeforeAuthentication(String path) throws Exception {
+        AtomicBoolean authenticatorInvoked = new AtomicBoolean();
+
+        McpFederatedIssuerAuthenticator mcpFederatedIssuerAuthenticator = (jwt, request, urlTenantId) -> {
+            authenticatorInvoked.set(true);
+
+            return Optional.of(new McpJwtIdentity(urlTenantId, "jane", List.of()));
+        };
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        AtomicBoolean chainInvoked = new AtomicBoolean();
+
+        federatedFilter(mcpFederatedIssuerAuthenticator).doFilter(
+            request(path), response, (servletRequest, servletResponse) -> chainInvoked.set(true));
+
+        assertThat(response.getStatus()).isEqualTo(403);
+        assertThat(chainInvoked).isFalse();
+        assertThat(authenticatorInvoked).isFalse();
     }
 
     private TenantAwareJwtAuthenticationFilter federatedFilter(

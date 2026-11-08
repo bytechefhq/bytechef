@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.security.web.config;
 
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantProtectedResourceMetadataResolver;
+import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantSecretVerifier;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,9 +32,11 @@ public class McpTenantDiscoverySecurityConfiguration {
 
     @Bean
     McpTenantProtectedResourceMetadataResolver mcpTenantProtectedResourceMetadataResolver(
-        McpResourceServerProperties mcpResourceServerProperties, McpTenantIssuerResolver mcpTenantIssuerResolver) {
+        McpResourceServerProperties mcpResourceServerProperties, McpTenantIssuerResolver mcpTenantIssuerResolver,
+        McpTenantSecretVerifier mcpTenantSecretVerifier) {
 
-        return new McpTenantProtectedResourceMetadataResolver(mcpResourceServerProperties, mcpTenantIssuerResolver);
+        return new McpTenantProtectedResourceMetadataResolver(
+            mcpResourceServerProperties, mcpTenantIssuerResolver, mcpTenantSecretVerifier);
     }
 
     @Bean

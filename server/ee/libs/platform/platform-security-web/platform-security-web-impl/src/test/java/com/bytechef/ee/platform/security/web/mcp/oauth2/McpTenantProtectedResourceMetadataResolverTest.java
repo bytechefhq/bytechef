@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.security.web.mcp.oauth2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.platform.user.domain.IdentityProvider;
@@ -18,7 +19,9 @@ import com.bytechef.platform.security.web.config.McpResourceServerProperties.Iss
 import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * @version ee
@@ -29,8 +32,10 @@ class McpTenantProtectedResourceMetadataResolverTest {
     private static final String SECRET = String.valueOf(TenantKey.of("public"));
 
     private final IdentityProviderService identityProviderService = mock(IdentityProviderService.class);
+    private final AtomicBoolean secretVerified = new AtomicBoolean(true);
     private final McpTenantProtectedResourceMetadataResolver resolver = new McpTenantProtectedResourceMetadataResolver(
-        mcpResourceServerProperties(), new McpTenantIssuerResolver(identityProviderService));
+        mcpResourceServerProperties(), new McpTenantIssuerResolver(identityProviderService),
+        new McpTenantSecretVerifier(() -> List.of(request -> Optional.of(secretVerified.get()))));
 
     @Test
     void testAdvertisesTenantIdentityProvidersAheadOfStaticIssuers() {
@@ -44,7 +49,8 @@ class McpTenantProtectedResourceMetadataResolverTest {
 
         String resource = "https://app.bytechef.test/api/automation/" + SECRET + "/mcp";
 
-        Optional<McpProtectedResourceMetadata> metadata = resolver.resolveMetadata(resource);
+        Optional<McpProtectedResourceMetadata> metadata =
+            resolver.resolveMetadata(resource, new MockHttpServletRequest());
 
         assertThat(metadata).isPresent();
         assertThat(metadata.get()
@@ -67,7 +73,7 @@ class McpTenantProtectedResourceMetadataResolverTest {
         when(identityProviderService.getIdentityProviders()).thenReturn(List.of(managementIdentityProvider));
 
         Optional<McpProtectedResourceMetadata> metadata = resolver.resolveMetadata(
-            "https://app.bytechef.test/api/automation/" + SECRET + "/mcp");
+            "https://app.bytechef.test/api/automation/" + SECRET + "/mcp", new MockHttpServletRequest());
 
         assertThat(metadata).isPresent();
         assertThat(metadata.get()
@@ -76,7 +82,22 @@ class McpTenantProtectedResourceMetadataResolverTest {
 
     @Test
     void testReturnsEmptyForANonMcpResource() {
-        assertThat(resolver.resolveMetadata("https://app.bytechef.test/api/other")).isEmpty();
+        assertThat(resolver.resolveMetadata("https://app.bytechef.test/api/other", new MockHttpServletRequest()))
+            .isEmpty();
+    }
+
+    @Test
+    void testAdvertisesOnlyTheStaticIssuersWhenTheSecretKeyIsNotVerified() {
+        secretVerified.set(false);
+
+        Optional<McpProtectedResourceMetadata> metadata = resolver.resolveMetadata(
+            "https://app.bytechef.test/api/automation/" + SECRET + "/mcp", new MockHttpServletRequest());
+
+        assertThat(metadata).isPresent();
+        assertThat(metadata.get()
+            .authorizationServers()).containsExactly("https://as.bytechef.test");
+
+        verifyNoInteractions(identityProviderService);
     }
 
     private static McpResourceServerProperties mcpResourceServerProperties() {

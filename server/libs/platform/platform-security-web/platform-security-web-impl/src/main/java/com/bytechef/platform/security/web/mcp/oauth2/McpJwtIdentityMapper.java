@@ -37,6 +37,7 @@ public class McpJwtIdentityMapper {
 
     private static final String DEFAULT_GROUPS_CLAIM = "groups";
     private static final List<String> RESERVED_AUTHORITY_PREFIXES = List.of("ROLE_", "SCOPE_");
+    private static final String SCOPE_AUTHORITY_PREFIX = "SCOPE_";
 
     public McpJwtIdentity map(
         Jwt jwt, Issuer issuer, Collection<GrantedAuthority> scopeAuthorities, String urlTenantId) {
@@ -85,9 +86,9 @@ public class McpJwtIdentityMapper {
             for (String group : groups) {
                 String authority = authorityMappings.get(group);
 
-                if (authority != null) {
+                if (authority != null && !Strings.CI.startsWith(authority, SCOPE_AUTHORITY_PREFIX)) {
                     authorities.add(new SimpleGrantedAuthority(authority));
-                } else if (authorityMappings.isEmpty() && isGrantableClaimValue(group)) {
+                } else if (authority == null && authorityMappings.isEmpty() && isGrantableClaimValue(group)) {
                     authorities.add(new SimpleGrantedAuthority(group));
                 }
             }

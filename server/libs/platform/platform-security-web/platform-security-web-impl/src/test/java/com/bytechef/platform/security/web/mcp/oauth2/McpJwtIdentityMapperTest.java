@@ -189,6 +189,22 @@ class McpJwtIdentityMapperTest {
     }
 
     @Test
+    void testTenantIssuerNeverGrantsAScopeAuthorityThroughAGroupMapping() {
+        Jwt jwt = jwtBuilder().subject("jane")
+            .claim("groups", List.of("admins", "editors"))
+            .build();
+
+        McpJwtIdentity mcpJwtIdentity = new McpJwtIdentityMapper().mapTenantIssuer(
+            jwt,
+            new McpTenantIssuer(
+                "https://issuer.test", false, null,
+                Map.of("admins", "scope_mcp:management", "editors", "ROLE_EDITOR")),
+            "acme");
+
+        assertThat(authorityNames(mcpJwtIdentity)).containsExactly("ROLE_EDITOR");
+    }
+
+    @Test
     void testTenantIssuerRejectsTokenWithoutSubject() {
         Jwt jwt = jwtBuilder().claim("groups", List.of("editors"))
             .build();
