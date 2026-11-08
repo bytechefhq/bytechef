@@ -73,6 +73,8 @@ A separate **List Directory** tool is on the upcoming release track and is not y
 
 Each of these tools works only inside the agent's own **workspace** directory; files outside it are not reachable through them. Workspaces live under the server's workspace base directory ([`BYTECHEF_AI_AGENT_UTILS_WORKSPACE_BASEDIR`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)), separated by tenant and then by the run's owner: the project deployment or integration instance, its environment and its workflow.
 
+The agent sees its workspace as `/workspace`, never as a path on the server. Each tool's description names the workspace, a relative path is resolved against it, and the paths the tools return start with `/workspace`.
+
 Every tool has an advanced **Workspace Name** option (letters, digits, `-` and `_`, default `default`). Tools of the same agent with the same workspace name share files, so a file written by File System Tools is visible to Grep Tool and Shell Tools. Give tools different names to keep their files apart.
 
 Editor test runs get a fresh workspace per run, removed after 24 hours. Deployed workflows keep their workspace between runs.
@@ -81,11 +83,11 @@ Editor test runs get a fresh workspace per run, removed after 24 hours. Deployed
 
 Shell Tools are offered only when the server enables them ([`BYTECHEF_AI_AGENT_UTILS_SHELL_ENABLED`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)); otherwise the tool does not appear in the Tools slot.
 
-By default commands run in a **Docker** container that sees only the agent's workspace, mounted at the same path. Each workspace gets its own container, reused by every command of the agent and removed after it has been unused for a while (10 minutes by default). The server needs a Docker-compatible CLI (`docker` or `podman`) on its `PATH`, and the container image must provide `/bin/bash` and `sleep`.
+By default commands run in a **Docker** container that sees only the agent's workspace, mounted at `/workspace`, which is also the commands' working directory and `HOME`. Each workspace gets its own container, reused by every command of the agent and removed after it has been unused for a while (10 minutes by default). The server needs a Docker-compatible CLI (`docker` or `podman`) on its `PATH`, and the container image must provide `/bin/bash` and `sleep`.
 
 The container uses Docker's default network and runs as the image's default user, usually root. Commands can reach the internet, and they can also reach the server host, other containers and internal addresses such as a cloud metadata endpoint. The private-address rules of Smart Web Fetch do not apply to shell commands. Enable Shell Tools only where the people who build agents are trusted with that network access.
 
-The advanced **Execution Backend** option can switch a Shell Tools element to **Local**, which runs commands directly on the server. Local is offered only when the server allows it ([`BYTECHEF_AI_AGENT_UTILS_SHELL_ALLOW_LOCAL`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)). Local commands start in the workspace with a clean environment, so none of the server's environment variables reach them, but they are not confined to the workspace: allow Local only on a trusted single-tenant installation.
+The advanced **Execution Backend** option can switch a Shell Tools element to **Local**, which runs commands directly on the server. Local is offered only when the server allows it ([`BYTECHEF_AI_AGENT_UTILS_SHELL_ALLOW_LOCAL`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)). Local commands start in the workspace with a clean environment, so none of the server's environment variables reach them, but they are not confined to the workspace: allow Local only on a trusted single-tenant installation. Local commands see the workspace at its real path on the server, so refer to workspace files with relative paths.
 
 ---
 
