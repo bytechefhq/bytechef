@@ -263,6 +263,10 @@ bytechef:
   cache:
     # Cache provider (CAFFEINE) default: CAFFEINE
     provider: CAFFEINE
+  component:
+    claude-code:
+      # Register the Claude Code component, which runs a Claude agent with full tool permissions on the server
+      enabled: false
   coordinator:
     # Whether this instance runs the coordinator (orchestrates job and trigger execution)
     enabled: true

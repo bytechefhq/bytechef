@@ -3573,16 +3573,48 @@ public class ApplicationProperties {
     public static class Component {
 
         /**
+         * Claude Code component configuration
+         */
+        private ClaudeCode claudeCode = new ClaudeCode();
+
+        /**
          * Component registry configuration
          */
         private Registry registry = new Registry();
+
+        public ClaudeCode getClaudeCode() {
+            return claudeCode;
+        }
 
         public Registry getRegistry() {
             return registry;
         }
 
+        public void setClaudeCode(ClaudeCode claudeCode) {
+            this.claudeCode = claudeCode;
+        }
+
         public void setRegistry(Registry registry) {
             this.registry = registry;
+        }
+
+        /**
+         * Claude Code component settings.
+         */
+        public static class ClaudeCode {
+
+            /**
+             * Whether the Claude Code component is registered
+             */
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
         }
 
         /**
