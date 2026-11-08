@@ -390,7 +390,7 @@ export type AiHubChatsQueryVariables = Exact<{
 }>;
 
 
-export type AiHubChatsQuery = { aiHubChats: Array<{ id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, ownerUserId: any, isOwner: boolean }> };
+export type AiHubChatsQuery = { aiHubChats: Array<{ id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, aiAgentId: any, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, ownerUserId: any, isOwner: boolean }> };
 
 export type AppendAiHubChatAssistantMessageMutationVariables = Exact<{
   workspaceId: string | number;
@@ -410,6 +410,17 @@ export type CancelAiHubRunMutationVariables = Exact<{
 
 export type CancelAiHubRunMutation = { cancelAiHubRun: boolean };
 
+export type CreateAgentChatAiHubChatMutationVariables = Exact<{
+  workspaceId: string | number;
+  environment: number;
+  workflowExecutionId: string;
+  projectDeploymentId: string | number;
+  title?: string | null | undefined;
+}>;
+
+
+export type CreateAgentChatAiHubChatMutation = { createAgentChatAiHubChat: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, autoTitled: boolean, aiAgentId: any, ownerUserId: any, isOwner: boolean } };
+
 export type CreateAiHubChatMutationVariables = Exact<{
   workspaceId: string | number;
   environment: number;
@@ -417,7 +428,7 @@ export type CreateAiHubChatMutationVariables = Exact<{
 }>;
 
 
-export type CreateAiHubChatMutation = { createAiHubChat: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, ownerUserId: any, isOwner: boolean } };
+export type CreateAiHubChatMutation = { createAiHubChat: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, aiAgentId: any, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, ownerUserId: any, isOwner: boolean } };
 
 export type CreateWorkflowChatAiHubChatMutationVariables = Exact<{
   workspaceId: string | number;
@@ -428,7 +439,7 @@ export type CreateWorkflowChatAiHubChatMutationVariables = Exact<{
 }>;
 
 
-export type CreateWorkflowChatAiHubChatMutation = { createWorkflowChatAiHubChat: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, autoTitled: boolean, ownerUserId: any, isOwner: boolean } };
+export type CreateWorkflowChatAiHubChatMutation = { createWorkflowChatAiHubChat: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, autoTitled: boolean, aiAgentId: any, ownerUserId: any, isOwner: boolean } };
 
 export type DeleteAiHubChatMutationVariables = Exact<{
   workspaceId: string | number;
@@ -444,7 +455,7 @@ export type GenerateAiHubChatTitleMutationVariables = Exact<{
 }>;
 
 
-export type GenerateAiHubChatTitleMutation = { generateAiHubChatTitle: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, ownerUserId: any, isOwner: boolean } };
+export type GenerateAiHubChatTitleMutation = { generateAiHubChatTitle: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, aiAgentId: any, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, ownerUserId: any, isOwner: boolean } };
 
 export type TruncateAiHubChatMessagesMutationVariables = Exact<{
   workspaceId: string | number;
@@ -461,7 +472,7 @@ export type UpdateAiHubChatMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAiHubChatMutation = { updateAiHubChat: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, ownerUserId: any, isOwner: boolean } };
+export type UpdateAiHubChatMutation = { updateAiHubChat: { id: string, workspaceId: any, userId: any, threadId: string, title: string | null, lastPreview: string | null, messageCount: number, status: Types.AiHubChatStatus, environmentId: any, createdAt: any, updatedAt: any, autoTitled: boolean, aiAgentId: any, kind: Types.AiHubChatKind, workflowExecutionId: string | null, projectDeploymentId: any, ownerUserId: any, isOwner: boolean } };
 
 export type AddAiHubMcpServerMutationVariables = Exact<{
   workspaceId: string | number;
@@ -4778,6 +4789,7 @@ export const AiHubChatsDocument = new TypedDocumentString(`
     createdAt
     updatedAt
     autoTitled
+    aiAgentId
     kind
     workflowExecutionId
     projectDeploymentId
@@ -4845,6 +4857,50 @@ export const useCancelAiHubRunMutation = <
   }
     )};
 
+export const CreateAgentChatAiHubChatDocument = new TypedDocumentString(`
+    mutation createAgentChatAiHubChat($workspaceId: ID!, $environment: Int!, $workflowExecutionId: String!, $projectDeploymentId: ID!, $title: String) {
+  createAgentChatAiHubChat(
+    workspaceId: $workspaceId
+    environment: $environment
+    workflowExecutionId: $workflowExecutionId
+    projectDeploymentId: $projectDeploymentId
+    title: $title
+  ) {
+    id
+    workspaceId
+    userId
+    threadId
+    title
+    lastPreview
+    messageCount
+    status
+    environmentId
+    createdAt
+    updatedAt
+    kind
+    workflowExecutionId
+    projectDeploymentId
+    autoTitled
+    aiAgentId
+    ownerUserId
+    isOwner
+  }
+}
+    `);
+
+export const useCreateAgentChatAiHubChatMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAgentChatAiHubChatMutation, TError, CreateAgentChatAiHubChatMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAgentChatAiHubChatMutation, TError, CreateAgentChatAiHubChatMutationVariables, TContext>(
+      {
+    mutationKey: ['createAgentChatAiHubChat'],
+    mutationFn: (variables?: CreateAgentChatAiHubChatMutationVariables) => fetcher<CreateAgentChatAiHubChatMutation, CreateAgentChatAiHubChatMutationVariables>(CreateAgentChatAiHubChatDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const CreateAiHubChatDocument = new TypedDocumentString(`
     mutation createAiHubChat($workspaceId: ID!, $environment: Int!, $threadId: String!) {
   createAiHubChat(
@@ -4864,6 +4920,7 @@ export const CreateAiHubChatDocument = new TypedDocumentString(`
     createdAt
     updatedAt
     autoTitled
+    aiAgentId
     kind
     workflowExecutionId
     projectDeploymentId
@@ -4910,6 +4967,7 @@ export const CreateWorkflowChatAiHubChatDocument = new TypedDocumentString(`
     workflowExecutionId
     projectDeploymentId
     autoTitled
+    aiAgentId
     ownerUserId
     isOwner
   }
@@ -4963,6 +5021,7 @@ export const GenerateAiHubChatTitleDocument = new TypedDocumentString(`
     createdAt
     updatedAt
     autoTitled
+    aiAgentId
     kind
     workflowExecutionId
     projectDeploymentId
@@ -5024,6 +5083,7 @@ export const UpdateAiHubChatDocument = new TypedDocumentString(`
     createdAt
     updatedAt
     autoTitled
+    aiAgentId
     kind
     workflowExecutionId
     projectDeploymentId
