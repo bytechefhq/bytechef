@@ -1,9 +1,10 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import useChatTestSession from '@/pages/platform/workflow-editor/hooks/useChatTestSession';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import getSelectedTestRunTriggerName from '@/pages/platform/workflow-editor/utils/getSelectedTestRunTriggerName';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import endChatTestSession from '@/pages/platform/workflow-editor/utils/endChatTestSession';
+import startChatTestSession from '@/pages/platform/workflow-editor/utils/startChatTestSession';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {Project} from '@/shared/middleware/automation/configuration';
@@ -47,12 +48,15 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             }))
         );
     const setCurrentNode = useWorkflowNodeDetailsPanelStore((state) => state.setCurrentNode);
+    const {chatTriggerName, workflowTestChatPanelOpen} = useWorkflowTestChatStore(
+        useShallow((state) => ({
+            chatTriggerName: state.chatTriggerName,
+            workflowTestChatPanelOpen: state.workflowTestChatPanelOpen,
+        }))
+    );
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {captureProjectPublished, captureProjectWorkflowTested} = useAnalytics();
-
-    const {chatSessionRef, endChatTestSession, startChatTestSession, workflowTestChatPanelOpen} =
-        useChatTestSession(chatTrigger);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
@@ -197,7 +201,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             captureProjectWorkflowTested();
 
             if (chatTrigger) {
-                startChatTestSession(workflow);
+                startChatTestSession();
             } else {
                 setWorkflowIsRunning(true);
                 setJobId(null);
@@ -206,7 +210,6 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
                 const request = getTestWorkflowStreamPostRequest({
                     environmentId: currentEnvironmentId,
                     id: workflow.id,
-                    testWorkflowRequest: {triggerName: getSelectedTestRunTriggerName(workflow)},
                 });
                 setStreamRequest(request);
             }
@@ -221,8 +224,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         setStreamRequest,
         setWorkflowIsRunning,
         setWorkflowTestExecution,
-        startChatTestSession,
-        workflow,
+        workflow.id,
     ]);
 
     const handleShowOutputClick = () => {
@@ -261,7 +263,6 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
     }, [
         bottomResizablePanelRef,
         closeWorkflowTestStream,
-        endChatTestSession,
         getPersistedJobId,
         jobId,
         persistJobId,
@@ -271,12 +272,12 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
     ]);
 
     // Stop the workflow execution when:
-    // - A chat test session is active (`chatSessionRef`) and the chat panel is not open (`!workflowTestChatPanelOpen`)
+    // - A chat test session is active (`chatTriggerName`) and the chat panel is not open (`!workflowTestChatPanelOpen`)
     useEffect(() => {
-        if (chatSessionRef.current && !workflowTestChatPanelOpen) {
+        if (chatTriggerName && !workflowTestChatPanelOpen) {
             handleStopClick();
         }
-    }, [chatSessionRef, handleStopClick, workflowTestChatPanelOpen]);
+    }, [chatTriggerName, handleStopClick, workflowTestChatPanelOpen]);
 
     // On mount: try to restore an ongoing workflow execution using jobId persisted in localStorage by calling
     // attach endpoint.

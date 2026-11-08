@@ -1,3 +1,5 @@
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import getSelectedTestRunTriggerName from '@/pages/platform/workflow-editor/utils/getSelectedTestRunTriggerName';
 import {BASE_PATH} from '@/shared/middleware/platform/workflow/test';
 
 export interface TestWorkflowRequestProps {
@@ -19,6 +21,12 @@ const getCookie = (name: string): string | undefined => {
     const match = document.cookie.match(new RegExp('(?:^|; )' + escapeRegExp(name) + '=([^;]*)'));
 
     return match ? decodeURIComponent(match[1]) : undefined;
+};
+
+const getEditorTestRunTriggerName = (workflowId: string): string | undefined => {
+    const {workflow} = useWorkflowDataStore.getState();
+
+    return workflow.id === workflowId ? getSelectedTestRunTriggerName(workflow) : undefined;
 };
 
 /**
@@ -72,6 +80,7 @@ export interface GetTestWorkflowStreamPostRequestProps {
  * @param {string} requestParameters.id - The unique identifier of the workflow.
  * @param {number} requestParameters.environmentId - The environment identifier for the workflow test.
  * @param {object} [requestParameters.testWorkflowRequest] - Optional payload containing the test workflow request data.
+ * Without a `triggerName`, a test of the workflow open in the editor starts from the trigger whose panel is open.
  * @throws {Error} Throws an error if `id` or `environmentId` is null or undefined.
  * @return {Object} An object containing `url` (string) for the API endpoint and `init` (RequestInit) for the request options.
  */
@@ -103,7 +112,12 @@ export function getTestWorkflowStreamPostRequest(requestParameters: GetTestWorkf
         headers['X-XSRF-TOKEN'] = xsrf;
     }
 
-    const body: BodyInit = JSON.stringify(requestParameters['testWorkflowRequest'] ?? {});
+    const testWorkflowRequest = requestParameters['testWorkflowRequest'] ?? {};
+
+    const body: BodyInit = JSON.stringify({
+        ...testWorkflowRequest,
+        triggerName: testWorkflowRequest.triggerName || getEditorTestRunTriggerName(requestParameters['id']),
+    });
 
     const init: RequestInit = {
         body,

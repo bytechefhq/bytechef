@@ -11,7 +11,8 @@ import {devtools} from 'zustand/middleware';
 
 interface WorkflowTestChatStateI {
     chatTriggerName: string | undefined;
-    setChatTriggerName: (chatTriggerName: string | undefined) => void;
+    endChatTestSession: () => void;
+    startChatTestSession: (chatTriggerName: string) => void;
 
     conversationId: string | undefined;
     generateConversationId: () => void;
@@ -30,7 +31,9 @@ const useWorkflowTestChatStore = create<WorkflowTestChatStateI>()(
     devtools(
         (set) => ({
             chatTriggerName: undefined,
-            setChatTriggerName: (chatTriggerName) => set({chatTriggerName}),
+            endChatTestSession: () => set({chatTriggerName: undefined, workflowTestChatPanelOpen: false}),
+            startChatTestSession: (chatTriggerName) =>
+                set({chatTriggerName, messages: [], workflowTestChatPanelOpen: true}),
 
             conversationId: undefined,
             generateConversationId: () => {

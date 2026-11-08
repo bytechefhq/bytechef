@@ -1,4 +1,7 @@
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {BASE_PATH} from '@/shared/middleware/platform/workflow/test';
+import {NodeDataType} from '@/shared/types';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '../testWorkflow-utils';
@@ -107,6 +110,50 @@ describe('testWorkflow-utils', () => {
             });
 
             expect(result.init.body).toBe(JSON.stringify(testWorkflowRequest));
+        });
+
+        describe('for the workflow open in the editor', () => {
+            const editorWorkflow = useWorkflowDataStore.getState().workflow;
+
+            beforeEach(() => {
+                useWorkflowDataStore.setState({
+                    workflow: {...editorWorkflow, id: '123', triggers: [{name: 'trigger_1'}, {name: 'trigger_2'}]},
+                } as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
+                useWorkflowNodeDetailsPanelStore.setState({
+                    currentNode: {name: 'trigger_2', trigger: true, workflowNodeName: 'trigger_2'} as NodeDataType,
+                    workflowNodeDetailsPanelOpen: true,
+                });
+            });
+
+            afterEach(() => {
+                useWorkflowDataStore.setState({workflow: editorWorkflow});
+                useWorkflowNodeDetailsPanelStore.setState({
+                    currentNode: undefined,
+                    workflowNodeDetailsPanelOpen: false,
+                });
+            });
+
+            it('should start the test from the trigger whose panel is open', () => {
+                const result = getTestWorkflowStreamPostRequest({environmentId: 456, id: '123'});
+
+                expect(result.init.body).toBe(JSON.stringify({triggerName: 'trigger_2'}));
+            });
+
+            it('should keep the trigger the caller names', () => {
+                const result = getTestWorkflowStreamPostRequest({
+                    environmentId: 456,
+                    id: '123',
+                    testWorkflowRequest: {triggerName: 'trigger_1'},
+                });
+
+                expect(result.init.body).toBe(JSON.stringify({triggerName: 'trigger_1'}));
+            });
+
+            it('should not name a trigger for another workflow', () => {
+                const result = getTestWorkflowStreamPostRequest({environmentId: 456, id: '999'});
+
+                expect(result.init.body).toBe(JSON.stringify({}));
+            });
         });
 
         it('should include X-XSRF-TOKEN header if XSRF-TOKEN cookie exists', () => {
