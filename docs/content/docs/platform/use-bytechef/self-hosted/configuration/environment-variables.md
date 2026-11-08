@@ -20,6 +20,8 @@ Every name below is the property path uppercased with dots **and dashes** replac
 
 ## AI Agent Utils Configuration
 
+> **Coming soon.** AI Agent Utils configuration is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
 Settings of the [Agent Utils](/platform/automation/build/workflows/ai/agent/agent-utils) tools.
 
 | Environment Variable | Description | Default Value |

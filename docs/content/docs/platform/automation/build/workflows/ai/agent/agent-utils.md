@@ -67,11 +67,51 @@ Smart Web Fetch refuses URLs whose host resolves to a private, loopback or link-
 
 A set of coding-agent-style tools for working with files and a shell: read, write, and edit files (**File System Tools**, with a **Read Only** option), match file patterns (**Glob Tool**), regex-search file contents (**Grep Tool**), and execute shell commands with timeouts and background processes (**Shell Tools**). These pair naturally with **Todo Write** and **Task** for agents that carry out multi-step, file-oriented work.
 
-A separate **List Directory** tool is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+> **Coming soon.** The server setting that turns on File System Tools, Glob Tool, Grep Tool and List
+> Directory Tool is on the upcoming release track and is not yet available in the latest released
+> version of ByteChef.
 
 File System Tools, Glob Tool, Grep Tool and List Directory Tool are offered only when the server enables them ([`BYTECHEF_AI_AGENT_UTILS_FILE_SYSTEM_ENABLED`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)); otherwise they do not appear in the Tools slot. Shell Tools has its own setting, described below.
 
+#### File System Tools
+
+Gives the agent three tools for text files: **Read**, **Write** and **Edit**.
+
+- **Read** returns a UTF-8 text file with line numbers, up to 2,000 lines by default. For longer files the agent passes an `offset` (the first line) and a `limit` (the number of lines). Lines longer than 2,000 characters are cut, and binary files such as PDFs, images and office documents are not decoded. Reading a missing file or a folder returns an error.
+- **Write** creates a file or replaces an existing one, creating missing parent folders.
+- **Edit** replaces an exact piece of text (`old_string`) with new text (`new_string`). The edit fails when `old_string` is not found, when it appears more than once and `replace_all` is not set, or when both strings are the same. With `replace_all` set, every occurrence is replaced, which is useful for renaming.
+
+The **Read Only** option *(coming soon)* offers only **Read**, so the agent can look at files but not change them.
+
+#### Glob Tool
+
+**Glob** finds files by name pattern, for example `**/*.java` or `src/**/*.ts`, and returns their paths with the most recently modified first. The agent can pass a `path` to search a subfolder instead of the whole workspace. Searching a path that does not exist, or is not a folder, returns an error.
+
+The advanced **Max Depth** (default 100 folder levels) and **Max Results** (default 1,000 files) options *(coming soon)* limit how far and how much it searches.
+
+#### Grep Tool
+
+**Grep** searches file contents with a regular expression (Java syntax). The agent can narrow the search to a `path`, to file names matching a `glob` such as `*.md`, or to a file `type` such as `java` or `py`, and choose an output mode:
+
+- `files_with_matches` (the default) lists the files that contain a match.
+- `content` shows the matching lines, with optional line numbers and lines of context before and after each match.
+- `count` shows how many matches each file has.
+
+It can also ignore case, match across lines (`multiline`), and page through long results with `head_limit` and `offset`. An invalid regular expression or a missing path returns an error.
+
+The advanced **Max Depth** (default 100 folder levels) and **Max Output Length** (default 100,000 characters) options *(coming soon)* limit how far it searches and how much it returns.
+
+#### List Directory Tool
+
+> **Coming soon.** The List Directory tool is on the upcoming release track and is not yet available
+> in the latest released version of ByteChef.
+
+**ListDirectory** lists a folder: subfolders first, then files, both alphabetically. It skips common noise folders such as `.git`, `node_modules`, `target`, `build` and `dist`. The agent can pass a `path`, a `depth` (1, the default, lists only the folder's direct contents) and a `limit` on the number of entries (default 50); when the limit is reached, the result says so.
+
 #### Agent workspace
+
+> **Coming soon.** The agent workspace, including the **Workspace Name** option, is on the upcoming
+> release track and is not yet available in the latest released version of ByteChef.
 
 Each of these tools works only inside the agent's own **workspace** directory; files outside it are not reachable through them. Workspaces live under the server's workspace base directory ([`BYTECHEF_AI_AGENT_UTILS_WORKSPACE_BASEDIR`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)), separated by tenant and then by the run's owner: the project deployment or integration instance, its environment and its workflow:
 
@@ -91,6 +131,16 @@ Every tool has an advanced **Workspace Name** option (letters, digits, `-` and `
 Editor test runs get a fresh workspace per run, removed after 24 hours. Deployed workflows keep their workspace between runs.
 
 #### Shell Tools
+
+Gives the agent three tools for running commands:
+
+- **Bash** runs a command and returns its output. A command times out after 2 minutes unless the agent asks for a longer `timeout` (up to 10 minutes), and output longer than 30,000 characters is cut. With `run_in_background` set, the command keeps running and the tool returns a shell id instead of waiting.
+- **BashOutput** returns the new output of a background command since the last check, optionally only the lines matching a regular expression.
+- **KillShell** stops a background command.
+
+> **Coming soon.** The Shell Tools setting, the Docker and Local execution backends and the setting
+> that allows Local are on the upcoming release track and are not yet available in the latest
+> released version of ByteChef.
 
 Shell Tools are offered only when the server enables them ([`BYTECHEF_AI_AGENT_UTILS_SHELL_ENABLED`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration)); otherwise the tool does not appear in the Tools slot.
 
