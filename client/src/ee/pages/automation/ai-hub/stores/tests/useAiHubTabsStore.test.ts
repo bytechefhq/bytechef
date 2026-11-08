@@ -346,14 +346,16 @@ describe('useAiHubTabsStore', () => {
             expect(aiHubTabsStore.getState().chatsSidebarCollapsed).toBe(false);
         });
 
-        it('setChatsSidebarCollapsed toggles the hidden flag', () => {
+        it('setChatsSidebarCollapsed toggles the hidden flag and clears any peek', () => {
             const {result} = renderHook(() => useAiHubTabsStore());
 
             act(() => {
+                result.current.setChatsSidebarPeeking(true);
                 result.current.setChatsSidebarCollapsed(false);
             });
 
             expect(result.current.chatsSidebarCollapsed).toBe(false);
+            expect(result.current.chatsSidebarPeeking).toBe(false);
 
             act(() => {
                 result.current.setChatsSidebarCollapsed(true);
@@ -374,10 +376,12 @@ describe('useAiHubTabsStore', () => {
 
             act(() => {
                 result.current.setChatsSidebarCollapsed(true);
+                result.current.setChatsSidebarPeeking(true);
                 result.current.setRightPanelOpen(false);
             });
 
             expect(result.current.chatsSidebarCollapsed).toBe(true);
+            expect(result.current.chatsSidebarPeeking).toBe(true);
         });
 
         it('switching chats leaves the sidebar state alone', () => {

@@ -9,11 +9,15 @@ interface SidebarContentLayoutProps {
     className?: string;
     footer?: ReactNode;
     header?: ReactNode;
+    leftSidebarAnimate?: boolean;
     leftSidebarBody?: ReactNode;
     leftSidebarClass?: string;
     leftSidebarHeader?: ReactNode;
     leftSidebarHidden?: boolean;
+    leftSidebarOnMouseEnter?: () => void;
+    leftSidebarOnMouseLeave?: () => void;
     leftSidebarOpen?: boolean;
+    leftSidebarOverlay?: boolean;
     leftSidebarWidth?: '56' | '64' | '72' | '96' | '112';
     rightSidebarBody?: ReactNode;
     rightSidebarClass?: string;
@@ -44,11 +48,15 @@ const LayoutContainer = ({
     className,
     footer,
     header,
+    leftSidebarAnimate = true,
     leftSidebarBody,
     leftSidebarClass,
     leftSidebarHeader,
     leftSidebarHidden = false,
+    leftSidebarOnMouseEnter,
+    leftSidebarOnMouseLeave,
     leftSidebarOpen,
+    leftSidebarOverlay = false,
     leftSidebarWidth = '64',
     rightSidebarBody,
     rightSidebarClass,
@@ -76,8 +84,10 @@ const LayoutContainer = ({
     const leftSidebarIsOpen =
         !leftSidebarHidden && (isLeftSidebarControlled ? leftSidebarOpen : uncontrolledLeftSidebarOpen);
 
-    const [leftAsideMounted, setLeftAsideMounted] = useState(leftSidebarIsOpen);
-    const [leftAsideSlidIn, setLeftAsideSlidIn] = useState(leftSidebarIsOpen);
+    const asideVisible = leftSidebarIsOpen || leftSidebarOverlay;
+
+    const [leftAsideMounted, setLeftAsideMounted] = useState(asideVisible);
+    const [leftAsideSlidIn, setLeftAsideSlidIn] = useState(asideVisible);
     const [leftSidebarTransitionEnabled, setLeftSidebarTransitionEnabled] = useState(!leftSidebarHidden);
 
     const ownLeftSidebarToggle = useMemo(
@@ -109,8 +119,12 @@ const LayoutContainer = ({
 
     // Keep the left sidebar mounted for 300ms after it closes so it can slide out before unmounting.
     useEffect(() => {
-        if (!leftSidebarIsOpen) {
+        if (!asideVisible) {
             setLeftAsideSlidIn(false);
+
+            if (!leftSidebarAnimate) {
+                return;
+            }
 
             const timerId = setTimeout(() => setLeftAsideMounted(false), 300);
 
@@ -119,7 +133,7 @@ const LayoutContainer = ({
 
         setLeftAsideMounted(true);
 
-        if (!leftSidebarTransitionEnabled) {
+        if (!leftSidebarAnimate || !leftSidebarTransitionEnabled) {
             setLeftAsideSlidIn(true);
 
             return;
@@ -130,7 +144,7 @@ const LayoutContainer = ({
         });
 
         return () => cancelAnimationFrame(frameId);
-    }, [leftSidebarIsOpen, leftSidebarTransitionEnabled]);
+    }, [asideVisible, leftSidebarAnimate, leftSidebarTransitionEnabled]);
 
     // A page hides its sidebar until it has loaded, so revealing it must not slide the content over. Enable the
     // padding transition only a frame after the sidebar first shows, once its padding has painted without one.
@@ -162,11 +176,14 @@ const LayoutContainer = ({
                         className={twMerge(
                             'hidden border-r border-r-border/50 bg-muted/50 lg:flex lg:flex-col',
                             'lg:fixed lg:inset-y-0',
-                            'transition-transform duration-300 ease-in-out',
-                            leftSidebarIsOpen && leftAsideSlidIn ? 'lg:translate-x-0' : 'lg:-translate-x-full',
+                            leftSidebarAnimate && 'transition-transform duration-300 ease-in-out',
+                            asideVisible && leftAsideSlidIn ? 'lg:translate-x-0' : 'lg:-translate-x-full',
+                            leftSidebarOverlay && 'z-40 bg-muted shadow-lg',
                             leftSidebarClass,
                             leftSidebarWidths[leftSidebarWidth][0]
                         )}
+                        onMouseEnter={leftSidebarOnMouseEnter}
+                        onMouseLeave={leftSidebarOnMouseLeave}
                     >
                         <LeftSidebarToggleContext.Provider value={leftAsideToggle}>
                             {leftSidebarNav}
@@ -192,6 +209,7 @@ const LayoutContainer = ({
                     className={twMerge(
                         'size-full',
                         !leftSidebarHidden &&
+                            leftSidebarAnimate &&
                             leftSidebarTransitionEnabled &&
                             'transition-[padding] duration-300 ease-in-out',
                         topHeader && 'flex flex-col',

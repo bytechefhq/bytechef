@@ -1,10 +1,10 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
-import {render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {beforeEach, describe, expect, it} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import AiHubChatsSidebarToggle from '../AiHubChatsSidebarToggle';
+import AiHubChatsSidebarToggle, {PEEK_DELAY_MS} from '../AiHubChatsSidebarToggle';
 
 const renderToggle = () =>
     render(
@@ -15,7 +15,11 @@ const renderToggle = () =>
 
 describe('AiHubChatsSidebarToggle', () => {
     beforeEach(() => {
-        aiHubTabsStore.setState({chatsSidebarCollapsed: false});
+        aiHubTabsStore.setState({chatsSidebarCollapsed: false, chatsSidebarPeeking: false});
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     it('hides the open sidebar when clicked', async () => {
@@ -29,8 +33,8 @@ describe('AiHubChatsSidebarToggle', () => {
         expect(screen.getByRole('button', {name: 'Show chats'})).toBeInTheDocument();
     });
 
-    it('shows the hidden sidebar when clicked', async () => {
-        aiHubTabsStore.setState({chatsSidebarCollapsed: true});
+    it('docks the hidden sidebar open when clicked, ending any peek', async () => {
+        aiHubTabsStore.setState({chatsSidebarCollapsed: true, chatsSidebarPeeking: true});
 
         const user = userEvent.setup();
 
@@ -39,5 +43,57 @@ describe('AiHubChatsSidebarToggle', () => {
         await user.click(screen.getByRole('button', {name: 'Show chats'}));
 
         expect(aiHubTabsStore.getState().chatsSidebarCollapsed).toBe(false);
+        expect(aiHubTabsStore.getState().chatsSidebarPeeking).toBe(false);
+    });
+
+    it('peeks the hidden sidebar after the pointer rests on the toggle', () => {
+        vi.useFakeTimers();
+
+        aiHubTabsStore.setState({chatsSidebarCollapsed: true});
+
+        renderToggle();
+
+        fireEvent.mouseEnter(screen.getByRole('button', {name: 'Show chats'}));
+
+        expect(aiHubTabsStore.getState().chatsSidebarPeeking).toBe(false);
+
+        act(() => {
+            vi.advanceTimersByTime(PEEK_DELAY_MS);
+        });
+
+        expect(aiHubTabsStore.getState().chatsSidebarPeeking).toBe(true);
+    });
+
+    it('cancels a pending peek when the pointer leaves before the delay elapses', () => {
+        vi.useFakeTimers();
+
+        aiHubTabsStore.setState({chatsSidebarCollapsed: true});
+
+        renderToggle();
+
+        const toggle = screen.getByRole('button', {name: 'Show chats'});
+
+        fireEvent.mouseEnter(toggle);
+        fireEvent.mouseLeave(toggle);
+
+        act(() => {
+            vi.advanceTimersByTime(PEEK_DELAY_MS * 2);
+        });
+
+        expect(aiHubTabsStore.getState().chatsSidebarPeeking).toBe(false);
+    });
+
+    it('does not peek while the sidebar is docked open', () => {
+        vi.useFakeTimers();
+
+        renderToggle();
+
+        fireEvent.mouseEnter(screen.getByRole('button', {name: 'Hide chats'}));
+
+        act(() => {
+            vi.advanceTimersByTime(PEEK_DELAY_MS * 2);
+        });
+
+        expect(aiHubTabsStore.getState().chatsSidebarPeeking).toBe(false);
     });
 });
