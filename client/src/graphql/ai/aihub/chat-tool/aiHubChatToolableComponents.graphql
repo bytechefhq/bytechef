@@ -1,0 +1,15 @@
+query aiHubChatToolableComponents($workspaceId: ID!) {
+    aiHubChatToolableComponents(workspaceId: $workspaceId) {
+        componentName
+        componentVersion
+        connectionRequired
+        description
+        icon
+        title
+        tools {
+            description
+            name
+            title
+        }
+    }
+}

@@ -1,0 +1,10 @@
+mutation setAiHubChatToolRequiresApproval($workspaceId: ID!, $chatToolId: ID!, $requiresApproval: Boolean!) {
+    setAiHubChatToolRequiresApproval(
+        workspaceId: $workspaceId
+        chatToolId: $chatToolId
+        requiresApproval: $requiresApproval
+    ) {
+        chatToolId
+        requiresApproval
+    }
+}

@@ -59,7 +59,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             return isFeatureFlagEnabled('ff-1040');
         }
 
-        if (navItem.href === 'ai-hub/tool-approvals') {
+        if (navItem.href === 'ai-hub/connectors' || navItem.href === 'ai-hub/tool-approvals') {
             return edition === EditionType.EE && aiHubEnabled;
         }
 

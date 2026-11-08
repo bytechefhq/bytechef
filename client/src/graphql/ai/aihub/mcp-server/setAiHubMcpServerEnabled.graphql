@@ -1,0 +1,3 @@
+mutation setAiHubMcpServerEnabled($workspaceId: ID!, $mcpServerId: ID!, $enabled: Boolean!) {
+    setAiHubMcpServerEnabled(workspaceId: $workspaceId, mcpServerId: $mcpServerId, enabled: $enabled)
+}

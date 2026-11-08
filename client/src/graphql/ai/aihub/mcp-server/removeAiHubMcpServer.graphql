@@ -1,0 +1,3 @@
+mutation removeAiHubMcpServer($workspaceId: ID!, $mcpServerId: ID!) {
+    removeAiHubMcpServer(workspaceId: $workspaceId, mcpServerId: $mcpServerId)
+}

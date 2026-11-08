@@ -1,0 +1,13 @@
+mutation attachAiHubChatTool($input: AttachAiHubChatToolInput!) {
+    attachAiHubChatTool(input: $input) {
+        clusterElementName
+        componentName
+        componentVersion
+        connectionId
+        chatComponentId
+        chatId
+        chatToolId
+        environment
+        parameters
+    }
+}

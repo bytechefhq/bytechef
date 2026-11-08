@@ -40,6 +40,7 @@ import {createBrowserRouter, redirect} from 'react-router-dom';
 const App = lazy(() => import('@/App'));
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
 const AiHub = lazy(() => import('@/ee/pages/automation/ai-hub/AiHub'));
+const AiHubConnectors = lazy(() => import('@/ee/pages/automation/ai-hub/context/AiHubConnectors'));
 const AiHubToolApprovals = lazy(() => import('@/ee/pages/automation/ai-hub/settings/ToolApprovals'));
 const AiAutoMemories = lazy(() => import('@/pages/automation/ai/memories/Memories'));
 const AiSkills = lazy(() => import('@/pages/automation/ai/skills/AiSkills'));
@@ -217,6 +218,20 @@ const currentWorkspaceSettingsRoutes = {
                     <EEVersion>
                         <AiHubEnabled>
                             <LazyLoadWrapper>
+                                <AiHubConnectors />
+                            </LazyLoadWrapper>
+                        </AiHubEnabled>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'ai-hub/connectors',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <EEVersion>
+                        <AiHubEnabled>
+                            <LazyLoadWrapper>
                                 <AiHubToolApprovals />
                             </LazyLoadWrapper>
                         </AiHubEnabled>
@@ -240,6 +255,10 @@ const currentWorkspaceSettingsRoutes = {
         },
         {
             items: [
+                {
+                    href: 'ai-hub/connectors',
+                    title: 'Connectors',
+                },
                 {
                     href: 'ai-hub/tool-approvals',
                     title: 'Tool Approvals',

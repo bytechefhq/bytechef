@@ -1,14 +1,17 @@
+import {CommandItem} from '@/components/ui/command';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import AiHubConnectorsBranch from '@/ee/pages/automation/ai-hub/composer/AiHubConnectorsBranch';
 import {
     aiHubComposerStore,
     useAiHubComposerStore,
 } from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
 import ResourcePickerMenu, {
+    ResourcePickerCustomBranchI,
     ResourcePickerSelectionI,
 } from '@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu';
 import {aiHubTabsStore, attachTab} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {PlusIcon} from 'lucide-react';
+import {ChevronRightIcon, PlugIcon, PlusIcon} from 'lucide-react';
 
 const AiHubComposer = () => {
     const referencedResources = useAiHubComposerStore((state) => state.referencedResources);
@@ -47,9 +50,26 @@ const AiHubComposer = () => {
         handleSelectWorkflow(selection.id, selection.name, selection.projectId, selection.projectWorkflowId);
     };
 
+    const customBranches: ResourcePickerCustomBranchI[] = [
+        {
+            key: 'connectors',
+            renderBranch: (onBack, onClose) => <AiHubConnectorsBranch onBack={onBack} onClose={onClose} />,
+            renderRootItem: (onEnter) => (
+                <CommandItem onSelect={onEnter} value="root-connectors">
+                    <PlugIcon className="mr-2 size-3.5" />
+
+                    <span className="flex-1">Connectors</span>
+
+                    <ChevronRightIcon className="size-3.5 text-muted-foreground" />
+                </CommandItem>
+            ),
+        },
+    ];
+
     return (
         <Tooltip>
             <ResourcePickerMenu
+                customBranches={customBranches}
                 onOpenChange={setResourcePickerOpen}
                 onSelect={handleResourceSelect}
                 open={resourcePickerOpen}

@@ -1,0 +1,13 @@
+mutation setAiHubUserConnectorToolRequiresApproval(
+    $workspaceId: ID!
+    $connectorId: ID!
+    $toolName: String!
+    $requiresApproval: Boolean!
+) {
+    setAiHubUserConnectorToolRequiresApproval(
+        workspaceId: $workspaceId
+        connectorId: $connectorId
+        toolName: $toolName
+        requiresApproval: $requiresApproval
+    )
+}

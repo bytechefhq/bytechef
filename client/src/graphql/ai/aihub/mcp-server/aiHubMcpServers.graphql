@@ -1,0 +1,9 @@
+query aiHubMcpServers($workspaceId: ID!) {
+    aiHubMcpServers(workspaceId: $workspaceId) {
+        enabled
+        hasAuthToken
+        id
+        name
+        url
+    }
+}

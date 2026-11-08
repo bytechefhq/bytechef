@@ -1,0 +1,13 @@
+mutation setAiHubUserConnectorToolParameters(
+    $workspaceId: ID!
+    $connectorId: ID!
+    $toolName: String!
+    $parameters: Any!
+) {
+    setAiHubUserConnectorToolParameters(
+        workspaceId: $workspaceId
+        connectorId: $connectorId
+        toolName: $toolName
+        parameters: $parameters
+    )
+}
