@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-20T21:59:52.099075+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-08T10:47:53.401505+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class TaskDispatcherDefinitionModel {
 
   private @Nullable Boolean deprecated;
