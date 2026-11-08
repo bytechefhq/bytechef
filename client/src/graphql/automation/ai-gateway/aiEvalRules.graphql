@@ -81,6 +81,10 @@ mutation deleteAiEvalRule($id: ID!) {
     deleteAiEvalRule(id: $id)
 }
 
+mutation runAiEvalRuleOnHistoricalTraces($ruleId: ID!, $startDate: Long!, $endDate: Long!) {
+    runAiEvalRuleOnHistoricalTraces(ruleId: $ruleId, startDate: $startDate, endDate: $endDate)
+}
+
 mutation updateAiEvalRule(
     $delaySeconds: Int
     $enabled: Boolean!
