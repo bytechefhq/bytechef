@@ -40,6 +40,10 @@ public interface AiHubChatToolFacade {
 
     List<AiHubChatToolBinding> listChatTools(long chatId);
 
+    Optional<AiHubChatToolBinding> fetchChatTool(long chatToolId);
+
+    Optional<AiHubChatComponent> fetchChatComponent(long chatComponentId);
+
     long attachUserComponent(
         long userId, long workspaceId, String componentName, int componentVersion, @Nullable Long connectionId,
         int environment);

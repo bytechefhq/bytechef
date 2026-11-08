@@ -180,6 +180,34 @@ public class AiHubChatToolFacadeImpl implements AiHubChatToolFacade {
     }
 
     @Override
+    public Optional<AiHubChatToolBinding> fetchChatTool(long chatToolId) {
+        Optional<AiHubChatTool> toolOptional = chatToolRepository.findById(chatToolId);
+
+        if (toolOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        AiHubChatTool tool = toolOptional.get();
+
+        return chatComponentRepository.findById(tool.getChatComponentId())
+            .map(component -> toChatToolBinding(tool, component));
+    }
+
+    @Override
+    public Optional<AiHubChatComponent> fetchChatComponent(long chatComponentId) {
+        return chatComponentRepository.findById(chatComponentId);
+    }
+
+    private static AiHubChatToolBinding toChatToolBinding(AiHubChatTool tool, AiHubChatComponent component) {
+        Long chatId = component.getChatId();
+
+        return new AiHubChatToolBinding(
+            tool.getId(), component.getId(), chatId == null ? 0L : chatId, component.getComponentName(),
+            component.getComponentVersion(), tool.getName(), component.getConnectionId(), component.getEnvironment(),
+            tool.getParameters(), tool.isRequiresApproval());
+    }
+
+    @Override
     public long attachUserComponent(
         long userId, long workspaceId, String componentName, int componentVersion, @Nullable Long connectionId,
         int environment) {
