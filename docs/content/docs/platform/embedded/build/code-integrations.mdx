@@ -344,6 +344,16 @@ curl -X POST "$BYTECHEF_URL/api/embedded/v1/integration-code-workflows/deploy?en
   -F "integrationFile=@src/sample_code_integration.py"
 ```
 
+The `bytechef` CLI sends the same request:
+
+```bash
+bytechef embedded integration deploy --file src/sample_code_integration.py --enable --environment DEVELOPMENT
+```
+
+`--enable` sets the `enable` query parameter, and the profile's environment (or `--environment`) is sent as
+`X-Environment`. The profile token has the same requirement as above: an Embedded API key of an administrator. An
+organization admin key is rejected with `401`.
+
 What the endpoint does:
 
 - **It saves *and* publishes.** The upload is saved as the integration's draft and published in the same call. An

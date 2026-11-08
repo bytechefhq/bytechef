@@ -195,9 +195,10 @@ inbound-call model doesn't fit a CLI.
 
 Deploy-once, reference-per-user catalog projects (the tenant-wide counterpart to the connected-user-scoped
 `embedded integration`/`embedded workflow` commands above). These hit `<host>/api/embedded/v1/automation-project-code-workflows`
-authenticated with the profile's API token (configured via `bytechef configure --token ...`) — no `--external-user-id`.
+and `<host>/api/embedded/v1/integration-code-workflows`, authenticated with the profile's API token (configured via
+`bytechef configure --token ...`) — no `--external-user-id`.
 
-Unlike the other embedded commands, these two act for your own ByteChef user rather than for a connected
+Unlike the other embedded commands, these act for your own ByteChef user rather than for a connected
 user, so the profile token must be an **API Key whose owning user holds the admin authority**. An Admin
 API Key is rejected here — it is reserved for `/api/platform/v1`.
 
@@ -205,12 +206,19 @@ API Key is rejected here — it is reserved for `/api/platform/v1`.
 bytechef embedded code-workflow deploy --file ./project.js
 bytechef embedded code-workflow deploy --file ./project.js --release
 bytechef embedded code-workflow list --output table
+bytechef embedded integration deploy --file ./integration.js
+bytechef embedded integration deploy --file ./integration.js --enable
 ```
 
 The uploaded file's extension determines the language server-side. `--release` also points the
 configuration of the profile's environment at the newly published version. A successful deploy prints
 any trigger-validation warnings for workflows that declare no request/app-event trigger (still deployed,
 just not invocable through the embedded public endpoints until fixed).
+
+`embedded integration deploy` uploads a code-native integration, with the language again taken from the file
+extension. `--enable` also makes the published integration live in the profile's environment: it creates and
+enables the instance configuration when the environment has none, or else moves the existing one to the
+published version and enables it. The deploy is sent with the profile's environment as `X-Environment`.
 
 ## Component scaffolding
 

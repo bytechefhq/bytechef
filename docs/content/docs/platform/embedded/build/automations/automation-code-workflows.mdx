@@ -40,6 +40,16 @@ header (`PRODUCTION` when absent), and the request runs as the key's own ByteChe
 successful deploy returns `200` with the import warnings, for example `{"warnings": []}`.
 `GET /api/embedded/v1/automation-project-code-workflows` lists the published catalog code projects.
 
+The `bytechef` CLI wraps both endpoints:
+
+```bash
+bytechef embedded code-workflow deploy --file src/sample_catalog_code_project.py --environment DEVELOPMENT
+bytechef embedded code-workflow list --output table
+```
+
+`--release` on `deploy` also points the configuration of the profile's environment at the published version. The
+profile token must be an Embedded API key of an administrator; an organization admin key is rejected with `401`.
+
 Uploads of Java are subject to the same
 [`BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED`](/platform/automation/build/workflows/code-workflows#restricting-java-code-workflows)
 switch as automation projects. A catalog project's name must be unique:
