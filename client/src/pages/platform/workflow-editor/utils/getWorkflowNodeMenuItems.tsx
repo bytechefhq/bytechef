@@ -117,6 +117,20 @@ export function getWorkflowNodeMenuItems({
             type: 'item',
         });
 
+        if (showDisableAction && onToggleDisabled) {
+            menuItems.push({
+                icon: data.disabled ? (
+                    <PlayIcon className="size-4 shrink-0" />
+                ) : (
+                    <BanIcon className="size-4 shrink-0" />
+                ),
+                key: 'toggle-disabled',
+                label: data.disabled ? 'Enable' : 'Disable',
+                onSelect: onToggleDisabled,
+                type: 'item',
+            });
+        }
+
         if (showInfoAction && onInfo) {
             menuItems.push({
                 icon: <InfoIcon className="size-4 shrink-0" />,
