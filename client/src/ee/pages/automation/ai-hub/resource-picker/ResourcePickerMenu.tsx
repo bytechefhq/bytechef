@@ -2,9 +2,8 @@ import {Command, CommandGroup, CommandInput, CommandItem, CommandList} from '@/c
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {ReferencedResourceKindType} from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
-import {useAiAgentsQuery, useGetAssetFilesQuery} from '@/shared/middleware/graphql';
-import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
-import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {groupWorkflowsByProject} from '@/ee/pages/automation/ai-hub/resource-picker/groupWorkflowsByProject';
+import {useAiAgentsQuery, useGetAssetFilesQuery, useWorkspaceProjectWorkflowsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {BotIcon, ChevronLeftIcon, ChevronRightIcon, FileTextIcon, WorkflowIcon} from 'lucide-react';
 import {Fragment, ReactNode, useMemo, useState} from 'react';
@@ -71,10 +70,11 @@ const ResourcePickerMenu = ({
     const open = controlledOpen ?? uncontrolledOpen;
     const selectedProjectId = menuPath.length === 2 && menuPath[0] === 'workflows' ? menuPath[1] : undefined;
 
-    const {data: projects, isLoading: projectsLoading} = useGetWorkspaceProjectsQuery(
-        {id: workspaceId},
-        open && isWorkspaceIdKnown(workspaceId)
-    );
+    const {data: workspaceProjectWorkflowsData, isLoading: workspaceProjectWorkflowsLoading} =
+        useWorkspaceProjectWorkflowsQuery(
+            {workspaceId: String(workspaceId)},
+            {enabled: open && isWorkspaceIdKnown(workspaceId)}
+        );
 
     const {data: aiAgentsData, isLoading: aiAgentsLoading} = useAiAgentsQuery(
         {workspaceId: String(workspaceId)},
@@ -86,26 +86,29 @@ const ResourcePickerMenu = ({
         {enabled: open && isWorkspaceIdKnown(workspaceId)}
     );
 
-    const {data: projectWorkflows, isLoading: projectWorkflowsLoading} = useGetProjectWorkflowsQuery(
-        Number(selectedProjectId ?? 0),
-        open && selectedProjectId != null
-    );
-
     const handleSearchChange = useDebouncedCallback((value: string) => {
         setDebouncedSearch(value);
     }, 300);
 
     const lowerSearch = debouncedSearch.toLowerCase();
 
-    const filteredWorkflowProjects = useMemo(
+    const workflowProjects = useMemo(
         () =>
-            (projects ?? []).filter(
-                (project) =>
-                    project.id != null &&
-                    (project.projectWorkflowIds?.length ?? 0) > 0 &&
-                    project.name.toLowerCase().includes(lowerSearch)
+            groupWorkflowsByProject<WorkflowItemI>(
+                (workspaceProjectWorkflowsData?.workspaceProjectWorkflows ?? []).map((workspaceProjectWorkflow) => ({
+                    id: workspaceProjectWorkflow.workflowId,
+                    name: workspaceProjectWorkflow.workflowLabel || workspaceProjectWorkflow.workflowId,
+                    projectId: workspaceProjectWorkflow.projectId,
+                    projectName: workspaceProjectWorkflow.projectName,
+                    projectWorkflowId: Number(workspaceProjectWorkflow.projectWorkflowId),
+                }))
             ),
-        [projects, lowerSearch]
+        [workspaceProjectWorkflowsData]
+    );
+
+    const filteredWorkflowProjects = useMemo(
+        () => workflowProjects.filter((project) => project.projectName.toLowerCase().includes(lowerSearch)),
+        [workflowProjects, lowerSearch]
     );
 
     const filteredAiAgents = useMemo(
@@ -126,24 +129,16 @@ const ResourcePickerMenu = ({
             return null;
         }
 
-        return projects?.find((project) => String(project.id) === selectedProjectId) ?? null;
-    }, [projects, selectedProjectId]);
+        return workflowProjects.find((project) => project.projectId === selectedProjectId) ?? null;
+    }, [workflowProjects, selectedProjectId]);
 
-    const filteredWorkflows = useMemo<WorkflowItemI[]>(() => {
-        if (selectedProjectId == null || !projectWorkflows) {
-            return [];
-        }
-
-        return projectWorkflows
-            .filter((workflow) => workflow.id != null && (workflow.label ?? '').toLowerCase().includes(lowerSearch))
-            .map((workflow) => ({
-                id: workflow.id!,
-                name: workflow.label || workflow.id!,
-                projectId: selectedProjectId,
-                projectName: selectedWorkflowProject?.name ?? '',
-                projectWorkflowId: workflow.projectWorkflowId ?? 0,
-            }));
-    }, [lowerSearch, projectWorkflows, selectedProjectId, selectedWorkflowProject]);
+    const filteredWorkflows = useMemo<WorkflowItemI[]>(
+        () =>
+            (selectedWorkflowProject?.workflows ?? []).filter((workflow) =>
+                workflow.name.toLowerCase().includes(lowerSearch)
+            ),
+        [lowerSearch, selectedWorkflowProject]
+    );
 
     const activeCustomBranch = useMemo(() => {
         if (menuPath.length !== 2 || menuPath[0] !== 'custom') {
@@ -357,22 +352,24 @@ const ResourcePickerMenu = ({
                                     <CommandGroup heading="Workflows (pick a project)">
                                         {filteredWorkflowProjects.length === 0 && (
                                             <EmptyMessage>
-                                                {projectsLoading ? 'Loading…' : 'No projects with workflows.'}
+                                                {workspaceProjectWorkflowsLoading
+                                                    ? 'Loading…'
+                                                    : 'No projects with workflows.'}
                                             </EmptyMessage>
                                         )}
 
                                         {filteredWorkflowProjects.map((project) => (
                                             <CommandItem
-                                                key={`workflow-project-${project.id}`}
-                                                onSelect={() => navigateTo(['workflows', String(project.id)])}
-                                                value={`workflow-project-${project.id}-${project.name}`}
+                                                key={`workflow-project-${project.projectId}`}
+                                                onSelect={() => navigateTo(['workflows', project.projectId])}
+                                                value={`workflow-project-${project.projectId}-${project.projectName}`}
                                             >
                                                 <WorkflowIcon className="mr-2 size-3.5" />
 
-                                                <span className="flex-1">{project.name}</span>
+                                                <span className="flex-1">{project.projectName}</span>
 
                                                 <span className="mr-2 text-xs text-muted-foreground">
-                                                    {project.projectWorkflowIds?.length ?? 0}
+                                                    {project.workflows.length}
                                                 </span>
 
                                                 <ChevronRightIcon className="size-3.5 text-muted-foreground" />
@@ -383,11 +380,11 @@ const ResourcePickerMenu = ({
 
                                 {selectedProjectId != null && (
                                     <CommandGroup
-                                        heading={`Workflows in ${selectedWorkflowProject?.name ?? selectedProjectId}`}
+                                        heading={`Workflows in ${selectedWorkflowProject?.projectName ?? selectedProjectId}`}
                                     >
                                         {filteredWorkflows.length === 0 ? (
                                             <EmptyMessage>
-                                                {projectWorkflowsLoading ? 'Loading…' : 'No workflows.'}
+                                                {workspaceProjectWorkflowsLoading ? 'Loading…' : 'No workflows.'}
                                             </EmptyMessage>
                                         ) : (
                                             <>

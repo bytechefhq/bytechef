@@ -17,32 +17,22 @@ const mockQuerySuccess = <T,>(data: T, isLoading = false): UseQueryResult<T, Err
         status: isLoading ? 'pending' : 'success',
     }) as unknown as UseQueryResult<T, Error>;
 
-vi.mock('@/shared/queries/automation/projects.queries', () => ({
-    useGetWorkspaceProjectsQuery: vi.fn(),
-}));
-
-vi.mock('@/shared/queries/automation/projectWorkflows.queries', () => ({
-    useGetProjectWorkflowsQuery: vi.fn(),
-}));
-
 vi.mock('@/shared/middleware/graphql', () => ({
     useAiAgentsQuery: vi.fn(),
     useGetAssetFilesQuery: vi.fn(),
+    useWorkspaceProjectWorkflowsQuery: vi.fn(),
 }));
 
 vi.mock('use-debounce', () => ({
     useDebouncedCallback: (fn: (value: string) => void) => fn,
 }));
 
-const {useGetWorkspaceProjectsQuery} = await import('@/shared/queries/automation/projects.queries');
-const {useGetProjectWorkflowsQuery} = await import('@/shared/queries/automation/projectWorkflows.queries');
-
-const {useAiAgentsQuery, useGetAssetFilesQuery} = await import('@/shared/middleware/graphql');
+const {useAiAgentsQuery, useGetAssetFilesQuery, useWorkspaceProjectWorkflowsQuery} =
+    await import('@/shared/middleware/graphql');
 
 const mockUseAiAgentsQuery = vi.mocked(useAiAgentsQuery);
 const mockUseGetAssetFilesQuery = vi.mocked(useGetAssetFilesQuery);
-const mockUseGetWorkspaceProjectsQuery = vi.mocked(useGetWorkspaceProjectsQuery);
-const mockUseGetProjectWorkflowsQuery = vi.mocked(useGetProjectWorkflowsQuery);
+const mockUseWorkspaceProjectWorkflowsQuery = vi.mocked(useWorkspaceProjectWorkflowsQuery);
 
 const AI_AGENTS = [
     {id: '42', title: 'Support Agent'},
@@ -54,27 +44,27 @@ const ASSET_FILES = [
     {id: '8', name: 'report.pdf'},
 ];
 
-const PROJECTS = [
-    {id: 10, name: 'Alpha Project', projectWorkflowIds: [101], workspaceId: 1},
-    {id: 20, name: 'Beta Project', projectWorkflowIds: [201, 202], workspaceId: 1},
-    {id: 30, name: 'Empty Project', projectWorkflowIds: [], workspaceId: 1},
+const workspaceProjectWorkflow = (
+    projectId: string,
+    projectName: string,
+    projectWorkflowId: string,
+    workflowId: string,
+    workflowLabel: string
+) => ({projectId, projectName, projectWorkflowId, workflowId, workflowLabel});
+
+const WORKSPACE_PROJECT_WORKFLOWS = [
+    workspaceProjectWorkflow('10', 'Alpha Project', '101', 'wf-alpha-onboarding', 'Alpha Onboarding'),
+    workspaceProjectWorkflow('20', 'Beta Project', '201', 'wf-beta-checkout', 'Beta Checkout'),
+    workspaceProjectWorkflow('20', 'Beta Project', '202', 'wf-beta-refund', 'Beta Refund'),
 ];
 
-const WORKFLOWS_BY_PROJECT: Record<number, Array<{id: string; label: string; projectWorkflowId: number}>> = {
-    10: [{id: 'wf-alpha-onboarding', label: 'Alpha Onboarding', projectWorkflowId: 101}],
-    20: [
-        {id: 'wf-beta-checkout', label: 'Beta Checkout', projectWorkflowId: 201},
-        {id: 'wf-beta-refund', label: 'Beta Refund', projectWorkflowId: 202},
-    ],
-};
+const mockWorkspaceProjectWorkflows = (workspaceProjectWorkflows: ReturnType<typeof workspaceProjectWorkflow>[]) =>
+    mockUseWorkspaceProjectWorkflowsQuery.mockReturnValue(mockQuerySuccess({workspaceProjectWorkflows}) as never);
 
 const setupMocks = () => {
     mockUseAiAgentsQuery.mockReturnValue(mockQuerySuccess({aiAgents: AI_AGENTS}) as never);
     mockUseGetAssetFilesQuery.mockReturnValue(mockQuerySuccess({assetFiles: ASSET_FILES}) as never);
-    mockUseGetWorkspaceProjectsQuery.mockReturnValue(mockQuerySuccess(PROJECTS) as never);
-    mockUseGetProjectWorkflowsQuery.mockImplementation(
-        (projectId: number) => mockQuerySuccess(WORKFLOWS_BY_PROJECT[projectId]) as never
-    );
+    mockWorkspaceProjectWorkflows(WORKSPACE_PROJECT_WORKFLOWS);
 };
 
 const renderMenu = async (extraProps?: Record<string, unknown>) => {
@@ -123,10 +113,10 @@ describe('ResourcePickerMenu', () => {
         expect(screen.queryByText('Data Tables')).not.toBeInTheDocument();
     });
 
-    it('does not fetch projects while the picker is closed', async () => {
+    it('does not fetch the workspace workflows while the picker is closed', async () => {
         await renderMenu();
 
-        expect(mockUseGetWorkspaceProjectsQuery).toHaveBeenLastCalledWith({id: 1}, false);
+        expect(mockUseWorkspaceProjectWorkflowsQuery).toHaveBeenLastCalledWith({workspaceId: '1'}, {enabled: false});
     });
 
     it('does not fetch AI Agents while the picker is closed, and fetches them once open', async () => {
@@ -205,17 +195,17 @@ describe('ResourcePickerMenu', () => {
         });
     });
 
-    it('fetches the projects of the given workspace once open', async () => {
+    it('fetches the workflows of the given workspace in one query once open', async () => {
         await renderMenu();
         await openMenu();
 
-        expect(mockUseGetWorkspaceProjectsQuery).toHaveBeenLastCalledWith({id: 1}, true);
+        expect(mockUseWorkspaceProjectWorkflowsQuery).toHaveBeenLastCalledWith({workspaceId: '1'}, {enabled: true});
     });
 
-    it('does not fetch projects for an unknown workspace', async () => {
+    it('does not fetch the workspace workflows for an unknown workspace', async () => {
         await renderMenu({open: true, workspaceId: 0});
 
-        expect(mockUseGetWorkspaceProjectsQuery).toHaveBeenLastCalledWith({id: 0}, false);
+        expect(mockUseWorkspaceProjectWorkflowsQuery).toHaveBeenLastCalledWith({workspaceId: '0'}, {enabled: false});
     });
 
     describe('workflow → project drill-down', () => {
@@ -246,7 +236,7 @@ describe('ResourcePickerMenu', () => {
             });
 
             expect(screen.queryByText('Alpha Onboarding')).not.toBeInTheDocument();
-            expect(mockUseGetProjectWorkflowsQuery).toHaveBeenLastCalledWith(20, true);
+            expect(mockUseWorkspaceProjectWorkflowsQuery).toHaveBeenLastCalledWith({workspaceId: '1'}, {enabled: true});
         });
 
         it('fires onSelect with kind=workflow and projectId/projectWorkflowId after picking a workflow', async () => {
@@ -284,13 +274,13 @@ describe('ResourcePickerMenu', () => {
             });
         });
 
-        it('shows an empty message for a project without workflows', async () => {
-            mockUseGetProjectWorkflowsQuery.mockImplementation(() => mockQuerySuccess([]) as never);
-
+        it("shows an empty message when the search matches none of the project's workflows", async () => {
             await renderMenu();
             await openMenu();
 
             await drillIntoProject('Alpha Project');
+
+            await userEvent.type(screen.getByPlaceholderText('Search resources…'), 'missing');
 
             expect(await screen.findByText('No workflows.')).toBeInTheDocument();
         });
@@ -386,13 +376,17 @@ describe('ResourcePickerMenu', () => {
 
     describe('Show-more pagination', () => {
         it('caps the workflow list and reveals more on demand', async () => {
-            const manyWorkflows = Array.from({length: 25}, (_, index) => ({
-                id: `wf-${index}`,
-                label: `Workflow ${String(index).padStart(2, '0')}`,
-                projectWorkflowId: 1000 + index,
-            }));
-
-            mockUseGetProjectWorkflowsQuery.mockImplementation(() => mockQuerySuccess(manyWorkflows) as never);
+            mockWorkspaceProjectWorkflows(
+                Array.from({length: 25}, (_, index) =>
+                    workspaceProjectWorkflow(
+                        '10',
+                        'Alpha Project',
+                        String(1000 + index),
+                        `wf-${index}`,
+                        `Workflow ${String(index).padStart(2, '0')}`
+                    )
+                )
+            );
 
             await renderMenu();
             await openMenu();
