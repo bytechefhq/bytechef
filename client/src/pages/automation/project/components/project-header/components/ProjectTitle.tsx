@@ -6,14 +6,14 @@ const ProjectTitle = ({project}: {project: Project}) => {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <div className="flex max-w-96 items-center space-x-2">
+                <div className="flex max-w-96 min-w-0 items-center space-x-2">
                     <h1 className="truncate">{project?.name}</h1>
 
                     {project.name.length > 43 && <TooltipContent>{project.name}</TooltipContent>}
 
                     {project && (
                         <Badge
-                            className="flex space-x-1 border-transparent"
+                            className="flex shrink-0 space-x-1 border-transparent"
                             styleType={
                                 project.lastStatus === ProjectStatus.Published ? 'success-outline' : 'secondary-filled'
                             }

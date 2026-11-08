@@ -10,9 +10,9 @@ export interface ProjectBreadcrumbProps {
 }
 
 const ProjectBreadcrumb = ({itemSelect, project}: ProjectBreadcrumbProps) => (
-    <Breadcrumb>
-        <BreadcrumbList>
-            <BreadcrumbItem>
+    <Breadcrumb className="min-w-0">
+        <BreadcrumbList className="flex-nowrap">
+            <BreadcrumbItem className="min-w-0">
                 <ProjectTitle project={project} />
             </BreadcrumbItem>
 
@@ -20,7 +20,7 @@ const ProjectBreadcrumb = ({itemSelect, project}: ProjectBreadcrumbProps) => (
                 <>
                     <BreadcrumbSeparator />
 
-                    <BreadcrumbItem>{itemSelect}</BreadcrumbItem>
+                    <BreadcrumbItem className="min-w-0">{itemSelect}</BreadcrumbItem>
                 </>
             )}
         </BreadcrumbList>
