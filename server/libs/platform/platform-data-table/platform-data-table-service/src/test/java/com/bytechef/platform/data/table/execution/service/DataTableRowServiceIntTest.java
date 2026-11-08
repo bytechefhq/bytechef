@@ -1277,6 +1277,56 @@ class DataTableRowServiceIntTest {
     }
 
     @Test
+    void testInsertRowPublishesCreatedEventForRowWithValues() {
+        int createdEventCount = getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size();
+
+        DataTableRow insertedDataTableRow = dataTableRowService.insertRow(
+            "rows", Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+
+        List<DataTableWebhookEvent> createdEvents = getWebhookEvents(DataTableWebhookType.RECORD_CREATED);
+
+        assertEquals(createdEventCount + 1, createdEvents.size());
+        assertEquals(
+            List.of(insertedDataTableRow), createdEvents.getLast()
+                .getRows());
+    }
+
+    @Test
+    void testInsertRowPublishesNoCreatedEventForEmptyRow() {
+        int createdEventCount = getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size();
+
+        DataTableRow insertedDataTableRow = dataTableRowService.insertRow("rows", Map.of(), DEV_ENVIRONMENT_ID);
+
+        assertStoredRow(insertedDataTableRow, null);
+        assertEquals(createdEventCount, getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size());
+    }
+
+    @Test
+    void testInsertRowsPublishesCreatedEventOnlyForRowsWithValues() {
+        int createdEventCount = getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size();
+
+        List<DataTableRow> insertedDataTableRows = dataTableRowService.insertRows(
+            "items", List.of(Map.of("title", "Pear"), nullValue("title")), DEV_ENVIRONMENT_ID);
+
+        List<DataTableWebhookEvent> createdEvents = getWebhookEvents(DataTableWebhookType.RECORD_CREATED);
+
+        assertEquals(2, insertedDataTableRows.size());
+        assertEquals(createdEventCount + 1, createdEvents.size());
+        assertEquals(
+            List.of(insertedDataTableRows.getFirst()), createdEvents.getLast()
+                .getRows());
+    }
+
+    @Test
+    void testInsertRowsPublishesNoCreatedEventWhenEveryRowIsEmpty() {
+        int createdEventCount = getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size();
+
+        dataTableRowService.insertRows("items", List.of(Map.of(), nullValue("amount")), DEV_ENVIRONMENT_ID);
+
+        assertEquals(createdEventCount, getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size());
+    }
+
+    @Test
     void testInsertRowsInsertsEveryRowAndPublishesOneEvent() {
         int createdEventCount = getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size();
 
