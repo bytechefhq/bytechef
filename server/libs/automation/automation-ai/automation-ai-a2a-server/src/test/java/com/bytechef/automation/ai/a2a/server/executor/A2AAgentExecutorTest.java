@@ -724,6 +724,25 @@ class A2AAgentExecutorTest {
     }
 
     @Test
+    void testRejectsWorkflowWhoseA2aTriggerIsDisabled() {
+        stubServer();
+        stubExposedWorkflow("wf1", 20L, Map.of());
+        stubExposedWorkflowWithTriggers(
+            "wf5", 43L, "[{\"name\": \"newWorkflowCall_1\", \"type\": \"workflow/v1/newWorkflowCall\", " +
+                "\"disabled\": true}]");
+
+        A2AAgentDescriptor agentDescriptor = a2aAgentExecutor.getAgentDescriptor(SECRET_KEY, "https://example.com/a2a");
+
+        assertThat(agentDescriptor.skills()).extracting(A2ASkill::id)
+            .containsExactly("wf1");
+
+        assertThatExceptionOfType(A2AInvalidParamsException.class)
+            .isThrownBy(() -> start(CompletableFuture.completedFuture(completedJob(100L)), "wf5"))
+            .withMessageContaining("wf5");
+        verify(principalJobFacade, never()).createJob(any(), anyLong(), any());
+    }
+
+    @Test
     void testCompletedSkillCallIsRecordedInTheExternalInvocationLog() {
         stubServer();
         stubExposedWorkflow("wf1", 20L, Map.of());
