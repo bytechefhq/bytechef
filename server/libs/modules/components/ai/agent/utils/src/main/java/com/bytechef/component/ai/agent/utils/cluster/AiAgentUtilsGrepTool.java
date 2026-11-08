@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspace;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver;
+import com.bytechef.component.ai.agent.utils.cluster.workspace.SymlinkGuardedToolCallback;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.WorkspacePathToolCallback;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -29,9 +30,11 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
 import java.util.Set;
 import org.springaicommunity.agent.tools.GrepTool;
 import org.springframework.ai.support.ToolCallbacks;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
@@ -43,6 +46,7 @@ public class AiAgentUtilsGrepTool {
     public static final String MAX_OUTPUT_LENGTH = "maxOutputLength";
 
     private static final String CLUSTER_ELEMENT_NAME = "grepTool";
+    private static final String PATH_ARGUMENT_NAME = "path";
 
     private final AgentWorkspaceResolver agentWorkspaceResolver;
 
@@ -95,8 +99,12 @@ public class AiAgentUtilsGrepTool {
             builder.maxOutputLength(maxOutputLength);
         }
 
+        ToolCallback[] toolCallbacks = Arrays.stream(ToolCallbacks.from(builder.build()))
+            .map(toolCallback -> new SymlinkGuardedToolCallback(toolCallback, PATH_ARGUMENT_NAME, workspace.root()))
+            .toArray(ToolCallback[]::new);
+
         return WorkspacePathToolCallback.wrap(
-            ToolCallbacks.from(builder.build()), workspace, WorkspacePathToolCallback.FILES_DESCRIPTION, Set.of("path"),
+            toolCallbacks, workspace, WorkspacePathToolCallback.FILES_DESCRIPTION, Set.of(PATH_ARGUMENT_NAME),
             Set.of("glob"));
     }
 }
