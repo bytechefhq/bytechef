@@ -304,6 +304,50 @@ class TestWorkflowExecutorIntTest {
     }
 
     @Test
+    void testDefaultTestRunSkipsDisabledTrigger() {
+        String workflowId = createWorkflow(getDisabledFirstTriggerWorkflowDefinition());
+
+        saveTriggerSampleOutput(workflowId, "secondTrigger", Map.of("x", "second"));
+
+        RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
+
+        testWorkflowExecutor.executeAsync(
+            workflowId, Map.of(), null, ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+            (key, future) -> future.join(), key -> {});
+
+        List<Map<String, Object>> startEvents = sseStreamBridge.getEvents("start");
+
+        assertThat(startEvents).hasSize(1);
+
+        assertThat(startEvents.getFirst()
+            .get("payload"))
+                .isInstanceOfSatisfying(Map.class, payload -> assertThat(payload.get("triggerName")).isEqualTo(
+                    "secondTrigger"));
+    }
+
+    @Test
+    void testExplicitTestRunOfDisabledTriggerAllowed() {
+        String workflowId = createWorkflow(getDisabledFirstTriggerWorkflowDefinition());
+
+        saveTriggerSampleOutput(workflowId, "firstTrigger", Map.of("x", "first"));
+
+        RecordingSseStreamBridge sseStreamBridge = new RecordingSseStreamBridge();
+
+        testWorkflowExecutor.executeAsync(
+            workflowId, Map.of(), "firstTrigger", ENVIRONMENT_ID, key -> {}, key -> sseStreamBridge,
+            (key, future) -> future.join(), key -> {});
+
+        List<Map<String, Object>> startEvents = sseStreamBridge.getEvents("start");
+
+        assertThat(startEvents).hasSize(1);
+
+        assertThat(startEvents.getFirst()
+            .get("payload"))
+                .isInstanceOfSatisfying(Map.class, payload -> assertThat(payload.get("triggerName")).isEqualTo(
+                    "firstTrigger"));
+    }
+
+    @Test
     void executeAsyncSuccessfulExecutionFlow() {
         String workflowId = createWorkflow(getEchoWorkflowDefinition());
 
@@ -1164,6 +1208,20 @@ class TestWorkflowExecutorIntTest {
             {
                 "triggers": [
                     {"name": "firstTrigger", "type": "testComponent/v1/start"},
+                    {"name": "secondTrigger", "type": "testComponent/v1/start"}
+                ],
+                "tasks": [
+                    {"name": "echo", "type": "testComponent/v1/echo", "parameters": {"x": "value"}}
+                ]
+            }
+            """;
+    }
+
+    private static String getDisabledFirstTriggerWorkflowDefinition() {
+        return """
+            {
+                "triggers": [
+                    {"name": "firstTrigger", "type": "testComponent/v1/start", "disabled": true},
                     {"name": "secondTrigger", "type": "testComponent/v1/start"}
                 ],
                 "tasks": [

@@ -485,8 +485,11 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     private static WorkflowTrigger getTestWorkflowTrigger(
         List<WorkflowTrigger> workflowTriggers, @Nullable String triggerName) {
 
-        if (triggerName == null) {
-            return workflowTriggers.getFirst();
+        if (triggerName == null || triggerName.isBlank()) {
+            return workflowTriggers.stream()
+                .filter(WorkflowTrigger::isEnabled)
+                .findFirst()
+                .orElseGet(workflowTriggers::getFirst);
         }
 
         return workflowTriggers.stream()
