@@ -141,10 +141,6 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
 
     const handleProjectWorkflowValueChange = useCallback(
         (projectWorkflowId: number) => {
-            setWorkflowTestExecution(undefined);
-            useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
-            setCurrentNode(undefined);
-
             const newSearchParams = new URLSearchParams(searchParams.toString());
 
             newSearchParams.delete('fromSubflow');
@@ -152,14 +148,22 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             newSearchParams.delete('parentProjectWorkflowId');
             newSearchParams.delete('restoreExecutionPanel');
 
+            if (useWorkflowEditorStore.getState().workflowIsRunning) {
+                navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`);
+
+                return;
+            }
+
+            setWorkflowTestExecution(undefined);
+            useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
+            setCurrentNode(undefined);
+
             navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`);
 
-            if (!useWorkflowEditorStore.getState().workflowTestExecution) {
-                setShowBottomPanelOpen(false);
+            setShowBottomPanelOpen(false);
 
-                if (bottomResizablePanelRef.current) {
-                    bottomResizablePanelRef.current.resize(0);
-                }
+            if (bottomResizablePanelRef.current) {
+                bottomResizablePanelRef.current.resize(0);
             }
         },
         [

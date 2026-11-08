@@ -26,6 +26,8 @@ const hoisted = vi.hoisted(() => {
             setWorkflowIsRunning: vi.fn(),
             setWorkflowTestExecution: vi.fn(),
             showBottomPanel: false,
+            workflowIsRunning: false,
+            workflowTestExecution: undefined as unknown,
             workflowTestNodeStates: {},
         },
         nodePanelSpies: {
@@ -219,6 +221,10 @@ describe('useProjectHeader', () => {
 
         chatState.chatTriggerName = undefined;
         chatState.workflowTestChatPanelOpen = false;
+
+        const editorState = hoisted.editorSpies as {workflowIsRunning: boolean};
+
+        editorState.workflowIsRunning = false;
 
         hoisted.chatSpies.endChatTestSession.mockImplementation(() => {
             chatState.chatTriggerName = undefined;
@@ -602,5 +608,25 @@ describe('useProjectHeader', () => {
 
         expect(hoisted.editorSpies.setWorkflowTestExecution).toHaveBeenCalledWith(undefined);
         expect(hoisted.editorSpies.resetWorkflowTestNodeStates).toHaveBeenCalledWith(undefined);
+    });
+
+    it('keeps the test output and the node colors of a running test run when switching to another workflow', () => {
+        (hoisted.editorSpies as {workflowIsRunning: boolean}).workflowIsRunning = true;
+
+        const panelRef = makePanelRef(350);
+
+        const {result} = renderHook(() =>
+            useProjectHeader({bottomResizablePanelRef: panelRef, chatTrigger: false, projectId: 42})
+        );
+
+        act(() => {
+            result.current.handleProjectWorkflowValueChange(7);
+        });
+
+        expect(hoisted.editorSpies.setWorkflowTestExecution).not.toHaveBeenCalled();
+        expect(hoisted.editorSpies.resetWorkflowTestNodeStates).not.toHaveBeenCalled();
+        expect(hoisted.nodePanelSpies.setCurrentNode).not.toHaveBeenCalled();
+        expect(hoisted.editorSpies.setShowBottomPanelOpen).not.toHaveBeenCalledWith(false);
+        expect(panelRef.current?.resize).not.toHaveBeenCalledWith(0);
     });
 });
