@@ -19,7 +19,17 @@ Type: mcpClient/v1
 Version: 1
 
 
-### OAuth2 (automatic)
+### OAuth2 (PKCE)
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client Id | STRING | The client id of an OAuth app registered with the MCP server. | false |
+| clientSecret | Client Secret | STRING | The client secret of that OAuth app; leave empty for a public client. | false |
+| authorizationUrl | Authorization URL | STRING | The authorization endpoint of the server's OAuth app. | false |
+| tokenUrl | Token URL | STRING | The token endpoint of the server's OAuth app. | false |
+| scopes | Scopes | STRING | Optional comma-delimited list of scopes | false |
 
 
 
