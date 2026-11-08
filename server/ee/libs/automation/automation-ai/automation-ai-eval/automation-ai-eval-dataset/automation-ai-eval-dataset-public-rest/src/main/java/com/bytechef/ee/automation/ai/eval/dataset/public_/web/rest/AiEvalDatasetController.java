@@ -12,9 +12,11 @@ import com.bytechef.ee.automation.ai.eval.dataset.dto.BulkAddItemsRequest;
 import com.bytechef.ee.automation.ai.eval.dataset.dto.CreateDatasetRequest;
 import com.bytechef.ee.automation.ai.eval.dataset.dto.DatasetView;
 import com.bytechef.ee.automation.ai.eval.dataset.dto.ItemView;
+import com.bytechef.ee.automation.ai.eval.dataset.dto.PromoteFromTraceRequest;
 import com.bytechef.ee.automation.ai.eval.dataset.service.WorkspaceAiEvalDatasetService;
 import com.bytechef.ee.automation.ai.gateway.public_.workspace.AiGatewayWorkspaceHeaderResolver;
 import com.bytechef.ee.automation.ai.gateway.ratelimit.AiGatewayRateLimitChecker;
+import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDataset;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDatasetItem;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDatasetVersion;
@@ -25,11 +27,14 @@ import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRateLimitResult;
 import com.bytechef.ee.platform.ai.gateway.exception.AiScoreTargetNotFoundException;
 import com.bytechef.ee.platform.ai.gateway.exception.AiScoreTargetType;
 import com.bytechef.ee.platform.ai.gateway.exception.AiScoreWorkspaceBoundaryException;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTrace;
+import com.bytechef.ee.platform.ai.observability.service.AiObservabilityTraceService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,26 +60,32 @@ import tools.jackson.databind.ObjectMapper;
 class AiEvalDatasetController {
 
     private final AiEvalDatasetService aiEvalDatasetService;
+    private final WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService;
     private final WorkspaceAiEvalDatasetService workspaceAiEvalDatasetService;
     private final AiEvalDatasetVersionService aiEvalDatasetVersionService;
     private final AiEvalDatasetItemService aiEvalDatasetItemService;
+    private final AiObservabilityTraceService aiObservabilityTraceService;
     private final AiGatewayRateLimitChecker aiGatewayRateLimitChecker;
     private final AiGatewayWorkspaceHeaderResolver workspaceHeaderResolver;
     private final ObjectMapper objectMapper;
 
     AiEvalDatasetController(
         AiEvalDatasetService aiEvalDatasetService,
+        WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService,
         WorkspaceAiEvalDatasetService workspaceAiEvalDatasetService,
         AiEvalDatasetVersionService aiEvalDatasetVersionService,
         AiEvalDatasetItemService aiEvalDatasetItemService,
+        AiObservabilityTraceService aiObservabilityTraceService,
         @Nullable AiGatewayRateLimitChecker aiGatewayRateLimitChecker,
         AiGatewayWorkspaceHeaderResolver workspaceHeaderResolver,
         ObjectMapper objectMapper) {
 
         this.aiEvalDatasetService = aiEvalDatasetService;
+        this.workspaceAiObservabilityTraceService = workspaceAiObservabilityTraceService;
         this.workspaceAiEvalDatasetService = workspaceAiEvalDatasetService;
         this.aiEvalDatasetVersionService = aiEvalDatasetVersionService;
         this.aiEvalDatasetItemService = aiEvalDatasetItemService;
+        this.aiObservabilityTraceService = aiObservabilityTraceService;
         this.aiGatewayRateLimitChecker = aiGatewayRateLimitChecker;
         this.workspaceHeaderResolver = workspaceHeaderResolver;
         this.objectMapper = objectMapper;
@@ -155,6 +166,51 @@ class AiEvalDatasetController {
         AiEvalDatasetItem item = aiEvalDatasetItemService.addItem(
             datasetId,
             serializeJson(request.input()),
+            serializeJson(request.expectedOutput()),
+            serializeMetadata(request.metadata()));
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ItemView.from(item));
+    }
+
+    @PostMapping("/{id}/items/from-trace")
+    public ResponseEntity<Object> promoteFromTrace(
+        @RequestHeader(name = "X-ByteChef-Workspace-Id", required = false) String workspaceHeader,
+        @PathVariable("id") Long datasetId,
+        @RequestBody PromoteFromTraceRequest request) {
+
+        Long workspaceId = workspaceHeaderResolver.resolveAndVerify(workspaceHeader);
+
+        if (workspaceId == null) {
+            return missingWorkspaceResponse();
+        }
+
+        ResponseEntity<Object> rateLimitResponse = checkRateLimit(workspaceId);
+
+        if (rateLimitResponse != null) {
+            return rateLimitResponse;
+        }
+
+        assertSameWorkspace(workspaceId, requireDataset(workspaceId, datasetId));
+
+        long traceId = request.traceId();
+
+        AiObservabilityTrace trace;
+
+        try {
+            trace = aiObservabilityTraceService.getTrace(traceId);
+        } catch (IllegalArgumentException notFound) {
+            throw AiScoreTargetNotFoundException.forTarget(workspaceId, AiScoreTargetType.TRACE, traceId, notFound);
+        }
+
+        if (!Objects.equals(workspaceId, workspaceAiObservabilityTraceService.getWorkspaceId(traceId))) {
+            throw AiScoreWorkspaceBoundaryException.forTarget(workspaceId, AiScoreTargetType.TRACE, traceId);
+        }
+
+        AiEvalDatasetItem item = aiEvalDatasetItemService.addItemFromTrace(
+            datasetId,
+            traceId,
+            trace.getInput(),
             serializeJson(request.expectedOutput()),
             serializeMetadata(request.metadata()));
 

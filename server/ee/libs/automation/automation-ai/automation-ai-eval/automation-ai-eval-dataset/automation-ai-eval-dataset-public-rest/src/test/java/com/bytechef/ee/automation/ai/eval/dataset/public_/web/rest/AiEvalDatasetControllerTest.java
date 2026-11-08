@@ -23,6 +23,7 @@ import com.bytechef.ee.automation.ai.eval.dataset.service.WorkspaceAiEvalDataset
 import com.bytechef.ee.automation.ai.gateway.public_.web.rest.AiGatewayExceptionHandler;
 import com.bytechef.ee.automation.ai.gateway.public_.workspace.AiGatewayWorkspaceHeaderResolver;
 import com.bytechef.ee.automation.ai.gateway.ratelimit.AiGatewayRateLimitChecker;
+import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDataset;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDatasetItem;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDatasetVersion;
@@ -32,6 +33,9 @@ import com.bytechef.ee.platform.ai.eval.dataset.service.AiEvalDatasetVersionServ
 import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayRateLimitResult;
 import com.bytechef.ee.platform.ai.gateway.exception.AiScoreTargetType;
 import com.bytechef.ee.platform.ai.gateway.exception.AiScoreWorkspaceBoundaryException;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTrace;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceSource;
+import com.bytechef.ee.platform.ai.observability.service.AiObservabilityTraceService;
 import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.List;
@@ -70,13 +74,15 @@ class AiEvalDatasetControllerTest {
             WorkspaceAiEvalDatasetService workspaceAiEvalDatasetService,
             AiEvalDatasetVersionService aiEvalDatasetVersionService,
             AiEvalDatasetItemService aiEvalDatasetItemService,
+            AiObservabilityTraceService aiObservabilityTraceService,
             AiGatewayRateLimitChecker aiGatewayRateLimitChecker,
             AiGatewayWorkspaceHeaderResolver workspaceHeaderResolver,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService) {
 
-            return new AiEvalDatasetController(
-                aiEvalDatasetService, workspaceAiEvalDatasetService, aiEvalDatasetVersionService,
-                aiEvalDatasetItemService, aiGatewayRateLimitChecker, workspaceHeaderResolver, objectMapper);
+            return new AiEvalDatasetController(aiEvalDatasetService, workspaceAiObservabilityTraceService,
+                workspaceAiEvalDatasetService, aiEvalDatasetVersionService, aiEvalDatasetItemService,
+                aiObservabilityTraceService, aiGatewayRateLimitChecker, workspaceHeaderResolver, objectMapper);
         }
 
         @Bean
@@ -92,6 +98,9 @@ class AiEvalDatasetControllerTest {
     private AiEvalDatasetService aiEvalDatasetService;
 
     @MockitoBean
+    private WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService;
+
+    @MockitoBean
     private WorkspaceAiEvalDatasetService workspaceAiEvalDatasetService;
 
     @MockitoBean
@@ -99,6 +108,9 @@ class AiEvalDatasetControllerTest {
 
     @MockitoBean
     private AiEvalDatasetItemService aiEvalDatasetItemService;
+
+    @MockitoBean
+    private AiObservabilityTraceService aiObservabilityTraceService;
 
     @MockitoBean
     private AiGatewayRateLimitChecker aiGatewayRateLimitChecker;
@@ -192,6 +204,44 @@ class AiEvalDatasetControllerTest {
             .andExpect(jsonPath("$.datasetVersionId").value(5));
 
         verify(aiEvalDatasetItemService).addItem(eq(10L), any(), any(), any());
+    }
+
+    @Test
+    void testPromoteFromTraceReturns201() throws Exception {
+        when(aiEvalDatasetService.getDataset(10L))
+            .thenReturn(buildDataset(10L, 42L, "d"));
+        when(workspaceAiEvalDatasetService.getWorkspaceId(10L)).thenReturn(42L);
+
+        AiObservabilityTrace trace = new AiObservabilityTrace(AiObservabilityTraceSource.API);
+
+        setField(trace, "id", 999L);
+        setField(trace, "input", "trace input");
+
+        when(aiObservabilityTraceService.getTrace(999L)).thenReturn(trace);
+        when(workspaceAiObservabilityTraceService.getWorkspaceId(999L)).thenReturn(42L);
+
+        AiEvalDatasetItem item = buildItem(101L, 10L, 5L, 999L);
+
+        when(aiEvalDatasetItemService.addItemFromTrace(eq(10L), eq(999L), any(), any(), any()))
+            .thenReturn(item);
+
+        mockMvc
+            .perform(
+                post("/api/ai-gateway/v1/datasets/10/items/from-trace")
+                    .header("X-ByteChef-Workspace-Id", "42")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""
+                        {
+                            "traceId": 999,
+                            "expectedOutput": "correct answer",
+                            "metadata": {"promoted_by": "curator"}
+                        }
+                        """))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").value(101))
+            .andExpect(jsonPath("$.sourceTraceId").value(999));
+
+        verify(aiEvalDatasetItemService).addItemFromTrace(eq(10L), eq(999L), any(), any(), any());
     }
 
     @Test
