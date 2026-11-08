@@ -152,7 +152,7 @@ function extendTriggerFanInGap(allNodes: Node[], edges: Edge[], direction: Layou
  * TB only: in LR the row stacks on the cross axis while labels extend along
  * the main axis, so they cannot collide.
  */
-function separateTriggerRow(allNodes: Node[], edges: Edge[], direction: LayoutDirectionType): void {
+function separateTriggerRow(allNodes: Node[], direction: LayoutDirectionType): void {
     if (direction !== 'TB') {
         return;
     }
@@ -181,10 +181,24 @@ function separateTriggerRow(allNodes: Node[], edges: Edge[], direction: LayoutDi
     triggerNodes.forEach((triggerNode, index) => {
         triggerNode.position = {...triggerNode.position, x: firstTriggerX + index * pitch};
     });
+}
 
-    // Center the row on the fan-in target's axis: the chain below is laid out
-    // around the first task, so aligning the trigger mean with it keeps the
-    // fan-in bus symmetric instead of trailing off to one side.
+/**
+ * Center the trigger row on the fan-in target's axis: the chain after the
+ * triggers is laid out around the first task, so aligning the trigger mean with
+ * it keeps the fan-in bus symmetric instead of trailing off to one side. ELK
+ * places the first task off the trigger midpoint in both directions.
+ */
+function centerTriggerRowOnFanInTarget(allNodes: Node[], edges: Edge[], direction: LayoutDirectionType): void {
+    const triggerNodes = allNodes.filter(
+        (node) => (node.data as NodeDataType).trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID
+    );
+
+    if (triggerNodes.length < 2) {
+        return;
+    }
+
+    const crossAxis = getCrossAxis(direction);
     const triggerIds = new Set(triggerNodes.map((node) => node.id));
     const fanInEdge = edges.find((edge) => triggerIds.has(edge.source) && !triggerIds.has(edge.target));
     const fanInTargetNode = fanInEdge
@@ -195,12 +209,15 @@ function separateTriggerRow(allNodes: Node[], edges: Edge[], direction: LayoutDi
         return;
     }
 
-    const rowMean = triggerNodes.reduce((sum, node) => sum + node.position.x, 0) / triggerNodes.length;
-    const rowShift = fanInTargetNode.position.x - rowMean;
+    const rowMean = triggerNodes.reduce((sum, node) => sum + node.position[crossAxis], 0) / triggerNodes.length;
+    const rowShift = fanInTargetNode.position[crossAxis] - rowMean;
 
     if (Math.abs(rowShift) >= 1) {
         triggerNodes.forEach((triggerNode) => {
-            triggerNode.position = {...triggerNode.position, x: triggerNode.position.x + rowShift};
+            triggerNode.position = {
+                ...triggerNode.position,
+                [crossAxis]: triggerNode.position[crossAxis] + rowShift,
+            };
         });
     }
 }
@@ -2111,7 +2128,9 @@ export const getElkLayoutElements = async ({
 
         extendTriggerFanInGap(allNodes, edges, direction);
 
-        separateTriggerRow(allNodes, edges, direction);
+        separateTriggerRow(allNodes, direction);
+
+        centerTriggerRowOnFanInTarget(allNodes, edges, direction);
 
         positionTriggerPlaceholder(allNodes, direction);
 
