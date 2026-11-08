@@ -5,10 +5,11 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.automation.ai.eval.facade;
+package com.bytechef.ee.automation.ai.gateway.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ee.automation.ai.eval.facade.AiEvalRuleFacade;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -53,6 +54,11 @@ class AiEvalRuleFacadeAuthorizationTest {
     @Test
     void testDeleteInWorkspaceRequiresAdmin() {
         assertExpression("deleteInWorkspace", ADMIN_EXPRESSION);
+    }
+
+    @Test
+    void testRunOnHistoricalTracesRequiresAdmin() {
+        assertExpression("runOnHistoricalTraces", ADMIN_EXPRESSION);
     }
 
     @Test

@@ -12,7 +12,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.ee.automation.ai.eval.dataset.service.WorkspaceAiEvalDatasetService;
 import com.bytechef.ee.automation.ai.eval.experiment.config.AiEvalExperimentIntTestConfiguration;
 import com.bytechef.ee.automation.ai.eval.experiment.service.WorkspaceAiEvalExperimentService;
+import com.bytechef.ee.automation.ai.gateway.evaluation.AiEvalExecutor;
 import com.bytechef.ee.automation.ai.gateway.facade.AiGatewayFacade;
+import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDataset;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDatasetItem;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDatasetVersion;
@@ -47,8 +49,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(classes = AiEvalExperimentIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {
-    AiGatewayChatModelFactory.class, AiGatewayEmbeddingModelFactory.class, AiGatewayFacade.class,
-    AiGatewayMetrics.class, FileStorageService.class, PropertyService.class
+    AiEvalExecutor.class, AiGatewayChatModelFactory.class, AiGatewayEmbeddingModelFactory.class,
+    AiGatewayFacade.class, AiGatewayMetrics.class, FileStorageService.class, PropertyService.class,
+    WorkspaceAiObservabilityTraceService.class
 })
 public class AiEvalExperimentExecutorIntTest {
 

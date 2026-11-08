@@ -98,6 +98,7 @@ class AuditDataContractTest {
         Map.entry("AiEvalRuleFacadeImpl.createInWorkspace", NO_AUDIT_EVENT),
         Map.entry("AiEvalRuleFacadeImpl.deleteInWorkspace", NO_AUDIT_EVENT),
         Map.entry("AiEvalRuleFacadeImpl.instantiateTemplate", NO_AUDIT_EVENT),
+        Map.entry("AiEvalRuleFacadeImpl.runOnHistoricalTraces", NO_AUDIT_EVENT),
         Map.entry("AiEvalRuleFacadeImpl.update", NO_AUDIT_EVENT),
         Map.entry("AiEvalScoreConfigFacadeImpl.createInWorkspace", NO_AUDIT_EVENT),
         Map.entry("AiEvalScoreConfigFacadeImpl.deleteInWorkspace", NO_AUDIT_EVENT),

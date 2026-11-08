@@ -805,6 +805,7 @@ public class ApplicationProperties {
         private AgentUtils agentUtils = new AgentUtils();
         private AutoMemory autoMemory = new AutoMemory();
         private Copilot copilot = new Copilot();
+        private Eval eval = new Eval();
         private Firecrawl firecrawl = new Firecrawl();
         private Gateway gateway = new Gateway();
         private Guardrails guardrails = new Guardrails();
@@ -825,6 +826,10 @@ public class ApplicationProperties {
 
         public Copilot getCopilot() {
             return copilot;
+        }
+
+        public Eval getEval() {
+            return eval;
         }
 
         public Firecrawl getFirecrawl() {
@@ -873,6 +878,10 @@ public class ApplicationProperties {
 
         public void setCopilot(Copilot copilot) {
             this.copilot = copilot;
+        }
+
+        public void setEval(Eval eval) {
+            this.eval = eval;
         }
 
         public void setFirecrawl(Firecrawl firecrawl) {
@@ -1394,6 +1403,32 @@ public class ApplicationProperties {
 
                 public void setApiKey(String apiKey) {
                     this.apiKey = apiKey;
+                }
+            }
+        }
+
+        public static class Eval {
+
+            private RunOnHistory runOnHistory = new RunOnHistory();
+
+            public RunOnHistory getRunOnHistory() {
+                return runOnHistory;
+            }
+
+            public void setRunOnHistory(RunOnHistory runOnHistory) {
+                this.runOnHistory = runOnHistory;
+            }
+
+            public static class RunOnHistory {
+
+                private int maxTraces;
+
+                public int getMaxTraces() {
+                    return maxTraces;
+                }
+
+                public void setMaxTraces(int maxTraces) {
+                    this.maxTraces = maxTraces;
                 }
             }
         }

@@ -28,6 +28,8 @@ extend type Mutation {
         samplingRate: Float!
     ): AiEvalRule
 
+    runAiEvalRuleOnHistoricalTraces(ruleId: ID!, startDate: Long!, endDate: Long!): Int
+
     updateAiEvalRule(
         delaySeconds: Int,
         enabled: Boolean!,

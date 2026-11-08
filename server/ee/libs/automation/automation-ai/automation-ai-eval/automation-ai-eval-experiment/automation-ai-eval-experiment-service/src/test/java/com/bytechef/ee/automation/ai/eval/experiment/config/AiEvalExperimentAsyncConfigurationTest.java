@@ -9,18 +9,91 @@ package com.bytechef.ee.automation.ai.eval.experiment.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.tenant.TenantContext;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Ivica Cardic
  * @version ee
  */
 class AiEvalExperimentAsyncConfigurationTest {
+
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
+        TenantContext.resetCurrentTenantId();
+    }
+
+    @Test
+    void testPropagatesSubmitterSecurityAndTenantContextToWorkerThread() throws InterruptedException {
+        AiEvalExperimentAsyncConfiguration configuration = new AiEvalExperimentAsyncConfiguration();
+        ThreadPoolTaskExecutor executor = configuration.aiEvalExperimentTaskExecutor();
+
+        try {
+            Authentication submitterAuthentication = UsernamePasswordAuthenticationToken.authenticated(
+                "admin@localhost.com", null, List.of());
+
+            SecurityContext submitterContext = SecurityContextHolder.createEmptyContext();
+
+            submitterContext.setAuthentication(submitterAuthentication);
+
+            SecurityContextHolder.setContext(submitterContext);
+
+            TenantContext.setCurrentTenantId("tenant_a");
+
+            CountDownLatch completedLatch = new CountDownLatch(1);
+            AtomicReference<Authentication> observedAuthentication = new AtomicReference<>();
+            AtomicReference<String> observedTenantId = new AtomicReference<>();
+            AtomicReference<Thread> observedThread = new AtomicReference<>();
+
+            executor.execute(() -> {
+                SecurityContext workerContext = SecurityContextHolder.getContext();
+
+                observedAuthentication.set(workerContext.getAuthentication());
+                observedTenantId.set(TenantContext.getCurrentTenantId());
+                observedThread.set(Thread.currentThread());
+
+                completedLatch.countDown();
+            });
+
+            assertThat(completedLatch.await(10, TimeUnit.SECONDS)).isTrue();
+
+            assertThat(observedThread.get()).isNotSameAs(Thread.currentThread());
+            assertThat(observedAuthentication.get()).isSameAs(submitterAuthentication);
+            assertThat(observedTenantId.get()).isEqualTo("tenant_a");
+
+            AtomicReference<Authentication> leftoverAuthentication = new AtomicReference<>();
+            CountDownLatch leftoverLatch = new CountDownLatch(1);
+
+            SecurityContextHolder.clearContext();
+
+            executor.execute(() -> {
+                SecurityContext workerContext = SecurityContextHolder.getContext();
+
+                leftoverAuthentication.set(workerContext.getAuthentication());
+
+                leftoverLatch.countDown();
+            });
+
+            assertThat(leftoverLatch.await(10, TimeUnit.SECONDS)).isTrue();
+
+            assertThat(leftoverAuthentication.get()).isNull();
+        } finally {
+            executor.getThreadPoolExecutor()
+                .shutdownNow();
+        }
+    }
 
     @Test
     void testRejectsExcessiveTasksByRunningOnCallerThread() throws InterruptedException {

@@ -24,6 +24,9 @@ bytechef:
       enabled: false
       # Default LLM provider of the Copilot when the user has not selected one; empty uses the catalog default
       provider:
+    eval:
+      run-on-history:
+        max-traces: 1000
     firecrawl:
       base-url: https://api.firecrawl.dev/v2
       enabled: false

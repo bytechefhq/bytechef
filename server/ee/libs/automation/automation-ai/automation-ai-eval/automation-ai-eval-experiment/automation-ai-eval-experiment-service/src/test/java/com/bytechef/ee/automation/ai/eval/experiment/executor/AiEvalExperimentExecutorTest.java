@@ -24,19 +24,28 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.automation.ai.eval.experiment.service.WorkspaceAiEvalExperimentService;
+import com.bytechef.ee.automation.ai.gateway.evaluation.AiEvalExecutor;
 import com.bytechef.ee.automation.ai.gateway.facade.AiGatewayFacade;
+import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDatasetItem;
 import com.bytechef.ee.platform.ai.eval.dataset.service.AiEvalDatasetItemService;
+import com.bytechef.ee.platform.ai.eval.domain.AiEvalRuleTarget;
 import com.bytechef.ee.platform.ai.eval.experiment.domain.AiEvalExperiment;
 import com.bytechef.ee.platform.ai.eval.experiment.domain.AiEvalExperimentRun;
 import com.bytechef.ee.platform.ai.eval.experiment.service.AiEvalExperimentRunService;
 import com.bytechef.ee.platform.ai.eval.experiment.service.AiEvalExperimentService;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionRequest;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionResponse;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTrace;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceSource;
+import com.bytechef.ee.platform.ai.observability.facade.AiObservabilityTracingHeaders;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,6 +75,9 @@ class AiEvalExperimentExecutorTest {
     private AiEvalDatasetItemService aiEvalDatasetItemService;
 
     @Mock
+    private AiEvalExecutor aiEvalExecutor;
+
+    @Mock
     private AiEvalExperimentRunService aiEvalExperimentRunService;
 
     @Mock
@@ -76,6 +88,9 @@ class AiEvalExperimentExecutorTest {
 
     @Mock
     private AiGatewayFacade aiGatewayFacade;
+
+    @Mock
+    private WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService;
 
     @Mock
     private RetryTemplate chatCompletionRetryTemplate;
@@ -96,9 +111,9 @@ class AiEvalExperimentExecutorTest {
             .thenReturn(1L);
 
         aiEvalExperimentExecutor = new AiEvalExperimentExecutor(
-            aiEvalDatasetItemService, aiEvalExperimentRunService, aiEvalExperimentService,
-            workspaceAiEvalExperimentService,
-            aiGatewayFacade, chatCompletionRetryTemplate,
+            aiEvalDatasetItemService, aiEvalExecutor, aiEvalExperimentRunService, aiEvalExperimentService,
+            workspaceAiEvalExperimentService, aiGatewayFacade,
+            workspaceAiObservabilityTraceService, chatCompletionRetryTemplate,
             new ObjectMapper(), emptyMeterRegistryProvider(), 1);
     }
 
@@ -106,6 +121,7 @@ class AiEvalExperimentExecutorTest {
     void testExecuteMarksAllItemsCompletedOnSuccess() {
         long experimentId = 7L;
         long datasetVersionId = 3L;
+        long workspaceId = 1L;
 
         AiEvalExperiment experiment = seedExperimentId(new AiEvalExperiment(datasetVersionId), experimentId);
 
@@ -126,8 +142,16 @@ class AiEvalExperimentExecutorTest {
                 return seedRunId(incoming, 100L + incoming.getDatasetItemId());
             });
 
-        when(aiGatewayFacade.chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull()))
-            .thenAnswer(invocation -> stubChatCompletionResponse());
+        AtomicLong traceIdCounter = new AtomicLong(500L);
+
+        when(aiGatewayFacade.chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull()))
+                .thenAnswer(invocation -> stubChatCompletionResponse());
+
+        when(workspaceAiObservabilityTraceService.findByExternalTraceId(eq(workspaceId), anyString()))
+            .thenAnswer(invocation -> Optional.of(seedTrace(
+                new AiObservabilityTrace(AiObservabilityTraceSource.EXPERIMENT),
+                traceIdCounter.incrementAndGet(), 123, new BigDecimal("0.0042"))));
 
         aiEvalExperimentExecutor.execute(experimentId);
 
@@ -135,10 +159,19 @@ class AiEvalExperimentExecutorTest {
         verify(aiEvalExperimentRunService, times(3)).create(any(AiEvalExperimentRun.class));
         verify(aiEvalExperimentRunService, times(3)).markRunning(any(Long.class));
 
-        verify(aiGatewayFacade, times(3)).chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull());
+        ArgumentCaptor<AiObservabilityTracingHeaders> tracingHeadersCaptor =
+            ArgumentCaptor.forClass(AiObservabilityTracingHeaders.class);
+
+        verify(aiGatewayFacade, times(3)).chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), tracingHeadersCaptor.capture(), isNull());
+
+        assertThat(tracingHeadersCaptor.getAllValues())
+            .allMatch(headers -> headers.source() == AiObservabilityTraceSource.EXPERIMENT);
 
         verify(aiEvalExperimentRunService, times(3))
-            .complete(any(Long.class), isNull(), any(Integer.class), isNull());
+            .complete(any(Long.class), any(Long.class), any(Integer.class), any(BigDecimal.class));
+        verify(aiEvalExecutor, times(3))
+            .evaluateTrace(anyLong(), eq(workspaceId), eq(AiEvalRuleTarget.EXPERIMENT_TRACE));
         verify(aiEvalExperimentRunService, never())
             .fail(any(Long.class), any(String.class));
         verify(aiEvalExperimentService).markFinished(experimentId, false);
@@ -160,7 +193,8 @@ class AiEvalExperimentExecutorTest {
         verify(aiEvalExperimentService, times(1)).markRunning(experimentId);
         verify(aiEvalDatasetItemService, times(1)).getItemsByVersion(datasetVersionId);
         verify(aiEvalExperimentRunService, never()).create(any(AiEvalExperimentRun.class));
-        verify(aiGatewayFacade, never()).chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull());
+        verify(aiGatewayFacade, never()).chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull());
         verify(aiEvalExperimentService, times(1)).markFinished(experimentId, false);
     }
 
@@ -168,6 +202,7 @@ class AiEvalExperimentExecutorTest {
     void testExecuteMarksExperimentFailedWhenAnyItemFails() {
         long experimentId = 7L;
         long datasetVersionId = 3L;
+        long workspaceId = 1L;
 
         AiEvalExperiment experiment = seedExperimentId(new AiEvalExperiment(datasetVersionId), experimentId);
 
@@ -192,8 +227,14 @@ class AiEvalExperimentExecutorTest {
         doThrow(new RuntimeException("boom")).when(aiEvalExperimentRunService)
             .markRunning(failingRunId);
 
-        when(aiGatewayFacade.chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull()))
-            .thenAnswer(invocation -> stubChatCompletionResponse());
+        when(aiGatewayFacade.chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull()))
+                .thenAnswer(invocation -> stubChatCompletionResponse());
+
+        when(workspaceAiObservabilityTraceService.findByExternalTraceId(eq(workspaceId), anyString()))
+            .thenAnswer(invocation -> Optional.of(seedTrace(
+                new AiObservabilityTrace(AiObservabilityTraceSource.EXPERIMENT),
+                501L, 100, new BigDecimal("0.0001"))));
 
         aiEvalExperimentExecutor.execute(experimentId);
 
@@ -202,9 +243,49 @@ class AiEvalExperimentExecutorTest {
     }
 
     @Test
+    void testExecuteSkipsEvalDispatchWhenTraceLookupReturnsEmpty() {
+        long experimentId = 7L;
+        long datasetVersionId = 3L;
+        long workspaceId = 1L;
+
+        AiEvalExperiment experiment = seedExperimentId(new AiEvalExperiment(datasetVersionId), experimentId);
+
+        when(aiEvalExperimentService.markRunning(experimentId)).thenReturn(experiment);
+        when(aiEvalExperimentService.getExperiment(experimentId)).thenReturn(experiment);
+
+        List<AiEvalDatasetItem> items = List.of(
+            seedDatasetItemId(new AiEvalDatasetItem(1L, datasetVersionId, SAMPLE_INPUT), 10L));
+
+        when(aiEvalDatasetItemService.getItemsByVersion(datasetVersionId)).thenReturn(items);
+
+        when(aiEvalExperimentRunService.create(any(AiEvalExperimentRun.class)))
+            .thenAnswer(invocation -> {
+                AiEvalExperimentRun incoming = invocation.getArgument(0);
+
+                return seedRunId(incoming, 100L + incoming.getDatasetItemId());
+            });
+
+        when(aiGatewayFacade.chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull()))
+                .thenAnswer(invocation -> stubChatCompletionResponse());
+
+        when(workspaceAiObservabilityTraceService.findByExternalTraceId(eq(workspaceId), anyString()))
+            .thenReturn(Optional.empty());
+
+        aiEvalExperimentExecutor.execute(experimentId);
+
+        verify(aiEvalExperimentRunService)
+            .complete(eq(110L), isNull(), any(Integer.class), isNull());
+        verify(aiEvalExecutor, never())
+            .evaluateTrace(anyLong(), any(Long.class), any(AiEvalRuleTarget.class));
+        verify(aiEvalExperimentService).markFinished(experimentId, false);
+    }
+
+    @Test
     void testExecuteHonorsStopRequest() {
         long experimentId = 7L;
         long datasetVersionId = 3L;
+        long workspaceId = 1L;
 
         AiEvalExperiment runningExperiment = seedExperimentId(
             new AiEvalExperiment(datasetVersionId), experimentId);
@@ -233,19 +314,28 @@ class AiEvalExperimentExecutorTest {
                 return seedRunId(incoming, 100L + incoming.getDatasetItemId());
             });
 
-        when(aiGatewayFacade.chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull()))
-            .thenAnswer(invocation -> stubChatCompletionResponse());
+        when(aiGatewayFacade.chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull()))
+                .thenAnswer(invocation -> stubChatCompletionResponse());
+
+        when(workspaceAiObservabilityTraceService.findByExternalTraceId(eq(workspaceId), anyString()))
+            .thenAnswer(invocation -> Optional.of(seedTrace(
+                new AiObservabilityTrace(AiObservabilityTraceSource.EXPERIMENT),
+                500L, 123, new BigDecimal("0.0042"))));
 
         aiEvalExperimentExecutor.execute(experimentId);
 
         verify(aiEvalExperimentRunService).markRunning(110L);
         verify(aiEvalExperimentRunService)
-            .complete(eq(110L), isNull(), any(Integer.class), isNull());
+            .complete(eq(110L), any(Long.class), any(Integer.class), any(BigDecimal.class));
 
         verify(aiEvalExperimentRunService, never()).markRunning(111L);
         verify(aiEvalExperimentRunService, never()).markRunning(112L);
         verify(aiEvalExperimentRunService).fail(eq(111L), anyString());
         verify(aiEvalExperimentRunService).fail(eq(112L), anyString());
+
+        verify(aiEvalExecutor, times(1))
+            .evaluateTrace(anyLong(), eq(workspaceId), eq(AiEvalRuleTarget.EXPERIMENT_TRACE));
 
         verify(aiEvalExperimentService).markFinished(experimentId, true);
     }
@@ -254,6 +344,7 @@ class AiEvalExperimentExecutorTest {
     void testStopRequestObservedDuringInFlightChatCompletionDoesNotDoubleMarkRun() {
         long experimentId = 7L;
         long datasetVersionId = 3L;
+        long workspaceId = 1L;
 
         AiEvalExperiment runningExperiment = seedExperimentId(
             new AiEvalExperiment(datasetVersionId), experimentId);
@@ -281,20 +372,29 @@ class AiEvalExperimentExecutorTest {
                 return seedRunId(incoming, 100L + incoming.getDatasetItemId());
             });
 
-        when(aiGatewayFacade.chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull()))
-            .thenAnswer(invocation -> stubChatCompletionResponse());
+        when(aiGatewayFacade.chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull()))
+                .thenAnswer(invocation -> stubChatCompletionResponse());
+
+        when(workspaceAiObservabilityTraceService.findByExternalTraceId(eq(workspaceId), anyString()))
+            .thenAnswer(invocation -> Optional.of(seedTrace(
+                new AiObservabilityTrace(AiObservabilityTraceSource.EXPERIMENT),
+                500L, 123, new BigDecimal("0.0042"))));
 
         aiEvalExperimentExecutor.execute(experimentId);
 
         verify(aiEvalExperimentRunService).markRunning(110L);
         verify(aiEvalExperimentRunService)
-            .complete(eq(110L), isNull(), any(Integer.class), isNull());
+            .complete(eq(110L), any(Long.class), any(Integer.class), any(BigDecimal.class));
 
         verify(aiEvalExperimentRunService, never())
             .fail(eq(110L), anyString());
 
         verify(aiEvalExperimentRunService, never()).markRunning(111L);
         verify(aiEvalExperimentRunService).fail(eq(111L), anyString());
+
+        verify(aiEvalExecutor, times(1))
+            .evaluateTrace(anyLong(), eq(workspaceId), eq(AiEvalRuleTarget.EXPERIMENT_TRACE));
 
         verify(aiEvalExperimentService).markFinished(experimentId, true);
     }
@@ -303,6 +403,7 @@ class AiEvalExperimentExecutorTest {
     void testBookkeepingFailureOnSuccessfulChatCompletionDoesNotMisclassifyAsRunFailure() {
         long experimentId = 7L;
         long datasetVersionId = 3L;
+        long workspaceId = 1L;
 
         AiEvalExperiment experiment = seedExperimentId(new AiEvalExperiment(datasetVersionId), experimentId);
 
@@ -321,19 +422,28 @@ class AiEvalExperimentExecutorTest {
                 return seedRunId(incoming, 100L + incoming.getDatasetItemId());
             });
 
-        when(aiGatewayFacade.chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull()))
-            .thenAnswer(invocation -> stubChatCompletionResponse());
+        when(aiGatewayFacade.chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull()))
+                .thenAnswer(invocation -> stubChatCompletionResponse());
+
+        when(workspaceAiObservabilityTraceService.findByExternalTraceId(eq(workspaceId), anyString()))
+            .thenAnswer(invocation -> Optional.of(seedTrace(
+                new AiObservabilityTrace(AiObservabilityTraceSource.EXPERIMENT),
+                500L, 123, new BigDecimal("0.0042"))));
 
         doThrow(new RuntimeException("optimistic lock contention"))
             .when(aiEvalExperimentRunService)
-            .complete(eq(110L), isNull(), any(Integer.class), isNull());
+            .complete(eq(110L), any(Long.class), any(Integer.class), any(BigDecimal.class));
 
         aiEvalExperimentExecutor.execute(experimentId);
 
         verify(aiEvalExperimentRunService)
-            .complete(eq(110L), isNull(), any(Integer.class), isNull());
+            .complete(eq(110L), any(Long.class), any(Integer.class), any(BigDecimal.class));
 
         verify(aiEvalExperimentRunService, never()).fail(eq(110L), anyString());
+
+        verify(aiEvalExecutor, never())
+            .evaluateTrace(anyLong(), any(Long.class), any(AiEvalRuleTarget.class));
 
         verify(aiEvalExperimentService).markFinished(experimentId, false);
     }
@@ -342,6 +452,7 @@ class AiEvalExperimentExecutorTest {
     void testLatencyValueIsClampedAtIntegerMaxValueForLongRunningCalls() throws Exception {
         long experimentId = 7L;
         long datasetVersionId = 3L;
+        long workspaceId = 1L;
 
         AiEvalExperiment experiment = seedExperimentId(new AiEvalExperiment(datasetVersionId), experimentId);
 
@@ -354,15 +465,21 @@ class AiEvalExperimentExecutorTest {
         when(aiEvalExperimentRunService.create(any(AiEvalExperimentRun.class)))
             .thenAnswer(invocation -> seedRunId(invocation.getArgument(0), 110L));
 
-        when(aiGatewayFacade.chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull()))
-            .thenAnswer(invocation -> stubChatCompletionResponse(((long) Integer.MAX_VALUE) + 1_000L));
+        when(aiGatewayFacade.chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull()))
+                .thenAnswer(invocation -> stubChatCompletionResponse());
+
+        when(workspaceAiObservabilityTraceService.findByExternalTraceId(eq(workspaceId), anyString()))
+            .thenAnswer(invocation -> Optional.of(seedTrace(
+                new AiObservabilityTrace(AiObservabilityTraceSource.EXPERIMENT),
+                500L, Integer.MAX_VALUE, new BigDecimal("0.0042"))));
 
         aiEvalExperimentExecutor.execute(experimentId);
 
         ArgumentCaptor<Integer> latencyCaptor = ArgumentCaptor.forClass(Integer.class);
 
         verify(aiEvalExperimentRunService)
-            .complete(eq(110L), isNull(), latencyCaptor.capture(), isNull());
+            .complete(eq(110L), any(Long.class), latencyCaptor.capture(), any(BigDecimal.class));
 
         assertThat(latencyCaptor.getValue()).isGreaterThanOrEqualTo(0);
         assertThat(latencyCaptor.getValue()).isEqualTo(Integer.MAX_VALUE);
@@ -377,7 +494,7 @@ class AiEvalExperimentExecutorTest {
             .isEqualTo(Integer.MAX_VALUE);
 
         assertThat(AiEvalExperimentExecutor.clampLatency(-42L))
-            .as("Negative input (clock skew) must clamp to zero — negative latency is never meaningful")
+            .as("Negative input (clock skew) must clamp to zero - negative latency is never meaningful")
             .isZero();
 
         assertThat(AiEvalExperimentExecutor.clampLatency(0L)).isZero();
@@ -391,6 +508,7 @@ class AiEvalExperimentExecutorTest {
     void testRetryRecoversFromTransientFailure() {
         long experimentId = 7L;
         long datasetVersionId = 3L;
+        long workspaceId = 1L;
 
         AiEvalExperiment experiment = seedExperimentId(new AiEvalExperiment(datasetVersionId), experimentId);
 
@@ -411,28 +529,35 @@ class AiEvalExperimentExecutorTest {
 
         AtomicInteger callCount = new AtomicInteger();
 
-        when(aiGatewayFacade.chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull()))
-            .thenAnswer(invocation -> {
-                if (callCount.incrementAndGet() == 1) {
-                    throw new IOException("simulated transient failure");
-                }
+        when(aiGatewayFacade.chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull()))
+                .thenAnswer(invocation -> {
+                    if (callCount.incrementAndGet() == 1) {
+                        throw new IOException("simulated transient failure");
+                    }
 
-                return stubChatCompletionResponse();
-            });
+                    return stubChatCompletionResponse();
+                });
+
+        when(workspaceAiObservabilityTraceService.findByExternalTraceId(eq(workspaceId), anyString()))
+            .thenAnswer(invocation -> Optional.of(seedTrace(
+                new AiObservabilityTrace(AiObservabilityTraceSource.EXPERIMENT),
+                500L, 123, new BigDecimal("0.0042"))));
 
         RetryTemplate realTemplate = deterministicRetryTemplate();
 
         AiEvalExperimentExecutor executorWithRealRetry = new AiEvalExperimentExecutor(
-            aiEvalDatasetItemService, aiEvalExperimentRunService, aiEvalExperimentService,
-            workspaceAiEvalExperimentService,
-            aiGatewayFacade, realTemplate,
+            aiEvalDatasetItemService, aiEvalExecutor, aiEvalExperimentRunService, aiEvalExperimentService,
+            workspaceAiEvalExperimentService, aiGatewayFacade,
+            workspaceAiObservabilityTraceService, realTemplate,
             new ObjectMapper(), emptyMeterRegistryProvider(), 1);
 
         executorWithRealRetry.execute(experimentId);
 
-        verify(aiGatewayFacade, times(2)).chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull());
+        verify(aiGatewayFacade, times(2)).chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull());
         verify(aiEvalExperimentRunService)
-            .complete(eq(110L), isNull(), any(Integer.class), isNull());
+            .complete(eq(110L), any(Long.class), any(Integer.class), any(BigDecimal.class));
         verify(aiEvalExperimentRunService, never()).fail(any(Long.class), anyString());
         verify(aiEvalExperimentService).markFinished(experimentId, false);
     }
@@ -461,24 +586,26 @@ class AiEvalExperimentExecutorTest {
 
         AtomicInteger callCount = new AtomicInteger();
 
-        when(aiGatewayFacade.chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull()))
-            .thenAnswer(invocation -> {
-                callCount.incrementAndGet();
+        when(aiGatewayFacade.chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull()))
+                .thenAnswer(invocation -> {
+                    callCount.incrementAndGet();
 
-                throw new IllegalArgumentException("bad input");
-            });
+                    throw new IllegalArgumentException("bad input");
+                });
 
         RetryTemplate realTemplate = deterministicRetryTemplate();
 
         AiEvalExperimentExecutor executorWithRealRetry = new AiEvalExperimentExecutor(
-            aiEvalDatasetItemService, aiEvalExperimentRunService, aiEvalExperimentService,
-            workspaceAiEvalExperimentService,
-            aiGatewayFacade, realTemplate,
+            aiEvalDatasetItemService, aiEvalExecutor, aiEvalExperimentRunService, aiEvalExperimentService,
+            workspaceAiEvalExperimentService, aiGatewayFacade,
+            workspaceAiObservabilityTraceService, realTemplate,
             new ObjectMapper(), emptyMeterRegistryProvider(), 1);
 
         executorWithRealRetry.execute(experimentId);
 
-        verify(aiGatewayFacade, times(1)).chatCompletion(any(AiGatewayChatCompletionRequest.class), isNull());
+        verify(aiGatewayFacade, times(1)).chatCompletion(
+            any(AiGatewayChatCompletionRequest.class), any(AiObservabilityTracingHeaders.class), isNull());
         verify(aiEvalExperimentRunService).fail(eq(110L), anyString());
         verify(aiEvalExperimentService).markFinished(experimentId, true);
 
@@ -572,14 +699,6 @@ class AiEvalExperimentExecutorTest {
             new AiGatewayChatCompletionResponse.Usage(5, 5, 10));
     }
 
-    private static AiGatewayChatCompletionResponse stubChatCompletionResponse(long gatewayLatencyMs) {
-        return new AiGatewayChatCompletionResponse(
-            "resp-1", "chat.completion", System.currentTimeMillis(), "openai/gpt-4", List.of(),
-            new AiGatewayChatCompletionResponse.Usage(5, 5, 10),
-            new AiGatewayChatCompletionResponse.GatewayMetadata(
-                "openai", "openai/gpt-4", gatewayLatencyMs, false, null, "request-1"));
-    }
-
     private static AiEvalExperiment seedExperimentId(AiEvalExperiment experiment, long id) {
         seedId(AiEvalExperiment.class, experiment, id);
 
@@ -596,6 +715,17 @@ class AiEvalExperimentExecutorTest {
         seedId(AiEvalDatasetItem.class, item, id);
 
         return item;
+    }
+
+    private static AiObservabilityTrace seedTrace(
+        AiObservabilityTrace trace, long id, Integer latencyMs, BigDecimal cost) {
+
+        seedId(AiObservabilityTrace.class, trace, id);
+
+        trace.setTotalLatencyMs(latencyMs);
+        trace.setTotalCost(cost);
+
+        return trace;
     }
 
     private static void seedId(Class<?> clazz, Object target, long id) {

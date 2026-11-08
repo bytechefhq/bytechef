@@ -31,6 +31,8 @@ public interface AiEvalRuleFacade {
 
     void deleteInWorkspace(long id);
 
+    int runOnHistoricalTraces(Long ruleId, long startDate, long endDate);
+
     AiEvalRule update(AiEvalRule evalRule);
 
     List<EvalTemplate> listTemplates();

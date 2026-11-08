@@ -50,8 +50,10 @@ import org.springframework.security.web.SecurityFilterChain;
         "com.bytechef.ee.automation.ai.eval.experiment.public_.web.rest",
         "com.bytechef.ee.automation.ai.eval.experiment.service",
         "com.bytechef.ee.automation.ai.gateway.public_.web.rest",
+        "com.bytechef.ee.automation.ai.observability.service",
         "com.bytechef.ee.platform.ai.eval.dataset.service",
         "com.bytechef.ee.platform.ai.eval.experiment.service",
+        "com.bytechef.ee.platform.ai.observability.service",
         "com.bytechef.encryption",
         "com.bytechef.file.storage"
     },
@@ -59,11 +61,19 @@ import org.springframework.security.web.SecurityFilterChain;
         @Filter(
             type = FilterType.REGEX,
             pattern = {
+                "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiExternalScoreController",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayChatCompletionApiController",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayEmbeddingApiController",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayModelApiController",
+                "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayOtlpController",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayRoutingApiController",
+                "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayRoutingPolicyTagApiController",
+                "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayScoreApiController",
+                "com\\.bytechef\\.ee\\.automation\\.ai\\.observability\\.service\\.AiObservabilityAlertEvaluator",
+                "com\\.bytechef\\.ee\\.automation\\.ai\\.observability\\.service\\.AiObservabilityExportExecutor",
+                "com\\.bytechef\\.ee\\.platform\\.ai\\.observability\\.service\\.AiObservabilityNotificationDispatcher",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.eval\\.experiment\\.public_\\.web\\.rest\\..+Test.*",
+                "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.experiment\\.public_\\.web\\.rest\\..+Test.*",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\..+Test.*"
             })
     })

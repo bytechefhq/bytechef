@@ -12,7 +12,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.automation.ai.eval.experiment.service.WorkspaceAiEvalExperimentService;
+import com.bytechef.ee.automation.ai.gateway.evaluation.AiEvalExecutor;
 import com.bytechef.ee.automation.ai.gateway.facade.AiGatewayFacade;
+import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
 import com.bytechef.ee.platform.ai.eval.dataset.service.AiEvalDatasetItemService;
 import com.bytechef.ee.platform.ai.eval.experiment.service.AiEvalExperimentRunService;
 import com.bytechef.ee.platform.ai.eval.experiment.service.AiEvalExperimentService;
@@ -80,10 +82,12 @@ class AiEvalExperimentExecutorAsyncProxyTest {
         AiEvalExperimentExecutor aiEvalExperimentExecutor() {
             return new AiEvalExperimentExecutor(
                 mock(AiEvalDatasetItemService.class),
+                mock(AiEvalExecutor.class),
                 mock(AiEvalExperimentRunService.class),
                 mock(AiEvalExperimentService.class),
                 mock(WorkspaceAiEvalExperimentService.class),
                 mock(AiGatewayFacade.class),
+                mock(WorkspaceAiObservabilityTraceService.class),
                 mock(RetryTemplate.class),
                 mock(ObjectMapper.class),
                 staticMeterRegistryProvider(),

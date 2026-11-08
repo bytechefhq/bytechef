@@ -83,6 +83,13 @@ class AiEvalRuleGraphQlController {
         return true;
     }
 
+    @MutationMapping
+    public int runAiEvalRuleOnHistoricalTraces(
+        @Argument Long ruleId, @Argument Long startDate, @Argument Long endDate) {
+
+        return aiEvalRuleFacade.runOnHistoricalTraces(ruleId, startDate, endDate);
+    }
+
     @QueryMapping
     public List<EvalTemplate> aiEvalTemplates() {
         return aiEvalRuleFacade.listTemplates();

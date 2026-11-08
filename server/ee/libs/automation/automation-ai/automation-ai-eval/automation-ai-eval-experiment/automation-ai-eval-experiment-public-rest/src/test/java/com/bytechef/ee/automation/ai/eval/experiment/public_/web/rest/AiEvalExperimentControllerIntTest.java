@@ -10,11 +10,15 @@ package com.bytechef.ee.automation.ai.eval.experiment.public_.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.automation.ai.eval.dataset.service.WorkspaceAiEvalDatasetService;
+import com.bytechef.ee.automation.ai.gateway.evaluation.AiEvalExecutor;
 import com.bytechef.ee.automation.ai.gateway.facade.AiGatewayFacade;
 import com.bytechef.ee.automation.ai.gateway.public_.workspace.AiGatewayWorkspaceHeaderResolver;
+import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDataset;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDatasetVersion;
 import com.bytechef.ee.platform.ai.eval.dataset.service.AiEvalDatasetItemService;
@@ -26,12 +30,21 @@ import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionResponse;
 import com.bytechef.ee.platform.ai.gateway.metrics.AiGatewayMetrics;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
 import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayEmbeddingModelFactory;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTrace;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceSource;
+import com.bytechef.ee.platform.ai.observability.service.AiObservabilityTraceService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.scheduler.AlertScheduler;
+import com.bytechef.platform.scheduler.ExportScheduler;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +71,9 @@ import org.springframework.web.client.RestClient;
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {
     AiGatewayChatModelFactory.class, AiGatewayEmbeddingModelFactory.class, AiGatewayMetrics.class,
-    AiGatewayWorkspaceHeaderResolver.class, FileStorageService.class, PropertyService.class
+    AiGatewayWorkspaceHeaderResolver.class, AlertScheduler.class, ExportScheduler.class, FileStorageService.class,
+    PropertyService.class,
+    WorkspaceAiObservabilityTraceService.class
 })
 public class AiEvalExperimentControllerIntTest {
 
@@ -69,6 +84,9 @@ public class AiEvalExperimentControllerIntTest {
 
     @Autowired
     private AiEvalDatasetItemService aiEvalDatasetItemService;
+
+    @Autowired
+    private WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService;
 
     @Autowired
     private WorkspaceAiEvalDatasetService workspaceAiEvalDatasetService;
@@ -83,7 +101,13 @@ public class AiEvalExperimentControllerIntTest {
     private AiGatewayWorkspaceHeaderResolver workspaceHeaderResolver;
 
     @MockitoBean
+    private AiEvalExecutor aiEvalExecutor;
+
+    @MockitoBean
     private AiGatewayFacade aiGatewayFacade;
+
+    @MockitoBean
+    private AiObservabilityTraceService aiObservabilityTraceService;
 
     @BeforeEach
     public void setUpWorkspaceResolverAndFacade() {
@@ -92,8 +116,23 @@ public class AiEvalExperimentControllerIntTest {
         when(workspaceHeaderResolver.resolveAndVerify((String) null))
             .thenReturn(null);
 
-        when(aiGatewayFacade.chatCompletion(any(), any()))
+        when(aiGatewayFacade.chatCompletion(any(), any(), any()))
             .thenAnswer(invocation -> stubChatCompletionResponse());
+
+        AtomicLong traceIdGenerator = new AtomicLong(1_000L);
+
+        when(workspaceAiObservabilityTraceService.findByExternalTraceId(eq(WORKSPACE_ID), anyString()))
+            .thenAnswer(invocation -> {
+                AiObservabilityTrace trace = new AiObservabilityTrace(AiObservabilityTraceSource.EXPERIMENT);
+
+                seedId(AiObservabilityTrace.class, trace, traceIdGenerator.incrementAndGet());
+
+                trace.setExternalTraceId(invocation.getArgument(1));
+                trace.setTotalCost(BigDecimal.ONE);
+                trace.setTotalLatencyMs(100);
+
+                return Optional.of(trace);
+            });
     }
 
     @Test
@@ -153,7 +192,7 @@ public class AiEvalExperimentControllerIntTest {
 
         assertThat(runs).hasSize(2);
         assertThat(runs).allMatch(run -> run.getStatus() == AiEvalExperimentRunStatus.COMPLETED);
-        assertThat(runs).allMatch(run -> run.getLatencyMs() != null);
+        assertThat(runs).allMatch(run -> run.getTraceId() != null);
     }
 
     @Test
@@ -223,5 +262,16 @@ public class AiEvalExperimentControllerIntTest {
         return new AiGatewayChatCompletionResponse(
             "resp-1", "chat.completion", System.currentTimeMillis(), "gpt-4o", List.of(),
             new AiGatewayChatCompletionResponse.Usage(5, 5, 10));
+    }
+
+    private static void seedId(Class<?> clazz, Object target, long id) {
+        try {
+            Field idField = clazz.getDeclaredField("id");
+
+            idField.setAccessible(true);
+            idField.set(target, id);
+        } catch (ReflectiveOperationException reflectiveOperationException) {
+            throw new AssertionError("failed to seed id on " + clazz.getSimpleName(), reflectiveOperationException);
+        }
     }
 }

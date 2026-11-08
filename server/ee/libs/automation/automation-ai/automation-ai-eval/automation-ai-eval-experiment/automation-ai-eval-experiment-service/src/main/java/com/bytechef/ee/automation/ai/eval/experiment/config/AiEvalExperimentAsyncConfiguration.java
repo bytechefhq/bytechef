@@ -8,11 +8,14 @@
 package com.bytechef.ee.automation.ai.eval.experiment.config;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.tenant.concurrent.TenantTaskDecorator;
 import java.util.concurrent.ThreadPoolExecutor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
 
 /**
  * @author Ivica Cardic
@@ -32,10 +35,17 @@ public class AiEvalExperimentAsyncConfiguration {
         executor.setQueueCapacity(100);
         executor.setThreadNamePrefix("ai-experiment-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setTaskDecorator(securityAndTenantTaskDecorator());
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(30);
         executor.initialize();
 
         return executor;
+    }
+
+    static TaskDecorator securityAndTenantTaskDecorator() {
+        TenantTaskDecorator tenantTaskDecorator = new TenantTaskDecorator();
+
+        return runnable -> DelegatingSecurityContextRunnable.create(tenantTaskDecorator.decorate(runnable), null);
     }
 }

@@ -8,28 +8,37 @@
 package com.bytechef.ee.automation.ai.eval.experiment.executor;
 
 import com.bytechef.ee.automation.ai.eval.experiment.service.WorkspaceAiEvalExperimentService;
+import com.bytechef.ee.automation.ai.gateway.evaluation.AiEvalExecutor;
 import com.bytechef.ee.automation.ai.gateway.facade.AiGatewayFacade;
+import com.bytechef.ee.automation.ai.observability.service.WorkspaceAiObservabilityTraceService;
 import com.bytechef.ee.platform.ai.eval.dataset.domain.AiEvalDatasetItem;
 import com.bytechef.ee.platform.ai.eval.dataset.service.AiEvalDatasetItemService;
+import com.bytechef.ee.platform.ai.eval.domain.AiEvalRuleTarget;
 import com.bytechef.ee.platform.ai.eval.experiment.domain.AiEvalExperiment;
 import com.bytechef.ee.platform.ai.eval.experiment.domain.AiEvalExperimentRun;
 import com.bytechef.ee.platform.ai.eval.experiment.service.AiEvalExperimentRunService;
 import com.bytechef.ee.platform.ai.eval.experiment.service.AiEvalExperimentService;
 import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionRequest;
-import com.bytechef.ee.platform.ai.gateway.dto.AiGatewayChatCompletionResponse;
 import com.bytechef.ee.platform.ai.gateway.util.AiGatewayThrowables;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTrace;
+import com.bytechef.ee.platform.ai.observability.domain.AiObservabilityTraceSource;
+import com.bytechef.ee.platform.ai.observability.facade.AiObservabilityTracingHeaders;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.task.TaskRejectedException;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -49,13 +58,17 @@ public class AiEvalExperimentExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(AiEvalExperimentExecutor.class);
 
+    private static final String EVAL_DISPATCH_FAIL_METRIC = "bytechef_ai_eval_experiment_eval_dispatch_failures";
+    private static final String TRACE_PERSIST_MISSING_METRIC = "bytechef_ai_eval_experiment_trace_persist_missing";
     private static final String BOOKKEEPING_FAILURE_METRIC = "bytechef_ai_eval_experiment_bookkeeping_failures";
 
     private final AiEvalDatasetItemService aiEvalDatasetItemService;
+    private final AiEvalExecutor aiEvalExecutor;
     private final AiEvalExperimentRunService aiEvalExperimentRunService;
     private final AiEvalExperimentService aiEvalExperimentService;
     private final WorkspaceAiEvalExperimentService workspaceAiEvalExperimentService;
     private final AiGatewayFacade aiGatewayFacade;
+    private final WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService;
     private final RetryTemplate chatCompletionRetryTemplate;
     private final ObjectMapper objectMapper;
     private final MeterRegistry meterRegistry;
@@ -63,18 +76,22 @@ public class AiEvalExperimentExecutor {
     private final int stopPollEveryN;
 
     public AiEvalExperimentExecutor(
-        AiEvalDatasetItemService aiEvalDatasetItemService, AiEvalExperimentRunService aiEvalExperimentRunService,
-        AiEvalExperimentService aiEvalExperimentService,
-        WorkspaceAiEvalExperimentService workspaceAiEvalExperimentService, AiGatewayFacade aiGatewayFacade,
+        AiEvalDatasetItemService aiEvalDatasetItemService, AiEvalExecutor aiEvalExecutor,
+        AiEvalExperimentRunService aiEvalExperimentRunService, AiEvalExperimentService aiEvalExperimentService,
+        WorkspaceAiEvalExperimentService workspaceAiEvalExperimentService,
+        AiGatewayFacade aiGatewayFacade,
+        WorkspaceAiObservabilityTraceService workspaceAiObservabilityTraceService,
         RetryTemplate chatCompletionRetryTemplate, ObjectMapper objectMapper,
         ObjectProvider<MeterRegistry> meterRegistryProvider,
         @Value("${bytechef.ai.gateway.experiment.stop-poll-every-n:1}") int stopPollEveryN) {
 
         this.aiEvalDatasetItemService = aiEvalDatasetItemService;
+        this.aiEvalExecutor = aiEvalExecutor;
         this.aiEvalExperimentRunService = aiEvalExperimentRunService;
         this.aiEvalExperimentService = aiEvalExperimentService;
         this.workspaceAiEvalExperimentService = workspaceAiEvalExperimentService;
         this.aiGatewayFacade = aiGatewayFacade;
+        this.workspaceAiObservabilityTraceService = workspaceAiObservabilityTraceService;
         this.chatCompletionRetryTemplate = chatCompletionRetryTemplate;
         this.objectMapper = objectMapper;
         this.meterRegistry = meterRegistryProvider.getIfAvailable();
@@ -210,14 +227,50 @@ public class AiEvalExperimentExecutor {
             aiEvalExperimentRunService.markRunning(run.getId());
 
             AiGatewayChatCompletionRequest request = buildRequest(experiment, item);
+            String externalTraceId = UUID.randomUUID()
+                .toString();
+            AiObservabilityTracingHeaders tracingHeaders = new AiObservabilityTracingHeaders(
+                externalTraceId, null, "experiment-replay", null, null, Map.of(), List.of(),
+                AiObservabilityTraceSource.EXPERIMENT);
 
-            AiGatewayChatCompletionResponse response = chatCompletionRetryTemplate.execute(
-                context -> aiGatewayFacade.chatCompletion(request, null));
+            chatCompletionRetryTemplate.execute(context -> {
+                aiGatewayFacade.chatCompletion(request, tracingHeaders, null);
 
-            int latencyMs = resolveLatency(response, System.currentTimeMillis() - startTime);
+                return null;
+            });
+
+            long latencyMs = System.currentTimeMillis() - startTime;
+
+            Long traceId = null;
+            BigDecimal cost = null;
+            Integer resolvedLatencyMs = clampLatency(latencyMs);
+
+            Optional<AiObservabilityTrace> trace = workspaceAiObservabilityTraceService.findByExternalTraceId(
+                workspaceAiEvalExperimentService.getWorkspaceId(experiment.getId()), externalTraceId);
+
+            if (trace.isPresent()) {
+                AiObservabilityTrace persisted = trace.get();
+
+                traceId = persisted.getId();
+
+                if (persisted.getTotalCost() != null) {
+                    cost = persisted.getTotalCost();
+                }
+
+                if (persisted.getTotalLatencyMs() != null) {
+                    resolvedLatencyMs = persisted.getTotalLatencyMs();
+                }
+            } else {
+                log.warn(
+                    "Experiment {} run {} completed chatCompletion but trace with externalTraceId={} was not " +
+                        "persisted - experiment-scoped eval will be skipped",
+                    experiment.getId(), run.getId(), externalTraceId);
+
+                incrementTracePersistMissingCounter();
+            }
 
             try {
-                aiEvalExperimentRunService.complete(run.getId(), null, latencyMs, null);
+                aiEvalExperimentRunService.complete(run.getId(), traceId, resolvedLatencyMs, cost);
             } catch (Exception bookkeepingException) {
                 log.error(
                     "Experiment {} run {} chat completion succeeded but bookkeeping write (complete) failed - " +
@@ -225,6 +278,29 @@ public class AiEvalExperimentExecutor {
                     experiment.getId(), run.getId(), bookkeepingException);
 
                 incrementBookkeepingFailureCounter();
+
+                return true;
+            }
+
+            if (traceId != null) {
+                try {
+                    aiEvalExecutor.evaluateTrace(
+                        traceId, workspaceAiEvalExperimentService.getWorkspaceId(experiment.getId()),
+                        AiEvalRuleTarget.EXPERIMENT_TRACE);
+                } catch (TaskRejectedException taskRejected) {
+                    log.error(
+                        "Eval dispatch rejected (queue saturated) for experiment {} run {} (traceId={}) - run " +
+                            "completed but no eval scores will be produced",
+                        experiment.getId(), run.getId(), traceId, taskRejected);
+
+                    incrementEvalDispatchFailureCounter("queue_saturated");
+                } catch (Exception evalException) {
+                    log.error(
+                        "Failed to dispatch experiment-scoped eval for experiment {} run {} (traceId={})",
+                        experiment.getId(), run.getId(), traceId, evalException);
+
+                    incrementEvalDispatchFailureCounter("dispatch_error");
+                }
             }
 
             return true;
@@ -242,17 +318,6 @@ public class AiEvalExperimentExecutor {
 
             return false;
         }
-    }
-
-    private static int resolveLatency(AiGatewayChatCompletionResponse response, long measuredLatencyMs) {
-        AiGatewayChatCompletionResponse.GatewayMetadata gatewayMetadata =
-            response == null ? null : response.gatewayMetadata();
-
-        if (gatewayMetadata != null && gatewayMetadata.latencyMs() != null) {
-            return clampLatency(gatewayMetadata.latencyMs());
-        }
-
-        return clampLatency(measuredLatencyMs);
     }
 
     private AiGatewayChatCompletionRequest buildRequest(AiEvalExperiment experiment, AiEvalDatasetItem item) {
@@ -276,6 +341,14 @@ public class AiEvalExperimentExecutor {
         return new AiGatewayChatCompletionRequest(
             effectiveModel, parsed.messages(), parsed.temperature(), parsed.maxTokens(), parsed.topP(),
             false, parsed.routingPolicy(), parsed.cache(), parsed.toolChoice(), parsed.tools(), tags);
+    }
+
+    private void incrementEvalDispatchFailureCounter(String reasonTag) {
+        incrementCounterQuietly(EVAL_DISPATCH_FAIL_METRIC, "reason", reasonTag);
+    }
+
+    private void incrementTracePersistMissingCounter() {
+        incrementCounterQuietly(TRACE_PERSIST_MISSING_METRIC, null, null);
     }
 
     private void incrementBookkeepingFailureCounter() {
