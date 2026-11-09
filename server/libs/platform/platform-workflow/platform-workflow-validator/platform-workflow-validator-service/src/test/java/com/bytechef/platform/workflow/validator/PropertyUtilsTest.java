@@ -109,4 +109,33 @@ class PropertyUtilsTest {
         assertThat(PropertyUtils.checkPropertyExists(ROOT_ARRAY_PROPERTY_INFO, "[0].missing")).isFalse();
         assertThat(PropertyUtils.checkPropertyExists(OUTPUT_PROPERTY_INFO, "[0]")).isFalse();
     }
+
+    @Test
+    void testGetObjectItemPropertiesReturnsThePropertiesOfAnArrayOfObjects() {
+        List<PropertyInfo> itemPropertyInfos = List.of(
+            new PropertyInfo("key", "STRING", null, false, true, null, null),
+            new PropertyInfo("tasks", "ARRAY", null, false, false, null, List.of(
+                new PropertyInfo(null, "TASK", null, false, false, null, null))));
+
+        PropertyInfo casesPropertyInfo = new PropertyInfo("cases", "ARRAY", null, false, false, null, List.of(
+            new PropertyInfo(null, "OBJECT", null, false, false, null, itemPropertyInfos)));
+
+        assertThat(PropertyUtils.getObjectItemProperties(casesPropertyInfo)).isSameAs(itemPropertyInfos);
+    }
+
+    @Test
+    void testGetObjectItemPropertiesReturnsNullForAnArrayOfTasks() {
+        PropertyInfo caseTruePropertyInfo = new PropertyInfo("caseTrue", "ARRAY", null, false, false, null, List.of(
+            new PropertyInfo(null, "TASK", null, false, false, null, null)));
+
+        assertThat(PropertyUtils.getObjectItemProperties(caseTruePropertyInfo)).isNull();
+    }
+
+    @Test
+    void testGetObjectItemPropertiesReturnsNullForAnObject() {
+        PropertyInfo objectPropertyInfo = new PropertyInfo("inputs", "OBJECT", null, false, false, null, List.of(
+            new PropertyInfo("key", "STRING", null, false, true, null, null)));
+
+        assertThat(PropertyUtils.getObjectItemProperties(objectPropertyInfo)).isNull();
+    }
 }

@@ -97,6 +97,23 @@ class PropertyUtils {
         return "TASK".equalsIgnoreCase(nestedPropertyInfo.type());
     }
 
+    @Nullable
+    public static List<PropertyInfo> getObjectItemProperties(PropertyInfo propertyInfo) {
+        List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
+
+        if (!"ARRAY".equalsIgnoreCase(propertyInfo.type()) || propertyInfos == null || propertyInfos.size() != 1) {
+            return null;
+        }
+
+        PropertyInfo propertyInfosFirst = propertyInfos.getFirst();
+
+        if (!"OBJECT".equalsIgnoreCase(propertyInfosFirst.type())) {
+            return null;
+        }
+
+        return propertyInfosFirst.nestedProperties();
+    }
+
     public static boolean checkPropertyExists(PropertyInfo outputInfo, String propertyName) {
         return checkPropertyExistsRecursive(outputInfo, propertyName.split("\\."));
     }

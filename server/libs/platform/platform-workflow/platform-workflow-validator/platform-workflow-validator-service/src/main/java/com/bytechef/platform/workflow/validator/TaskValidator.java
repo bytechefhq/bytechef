@@ -467,23 +467,6 @@ class TaskValidator {
         }
     }
 
-    @Nullable
-    private static List<PropertyInfo> getObjectItemProperties(PropertyInfo propertyInfo) {
-        List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
-
-        if (!"ARRAY".equalsIgnoreCase(propertyInfo.type()) || propertyInfos == null || propertyInfos.size() != 1) {
-            return null;
-        }
-
-        PropertyInfo propertyInfosFirst = propertyInfos.getFirst();
-
-        if (!"OBJECT".equalsIgnoreCase(propertyInfosFirst.type())) {
-            return null;
-        }
-
-        return propertyInfosFirst.nestedProperties();
-    }
-
     /**
      * Strategy to determine if a task type supports nested tasks.
      */
@@ -580,7 +563,7 @@ class TaskValidator {
             return;
         }
 
-        List<PropertyInfo> itemPropertyInfos = getObjectItemProperties(propertyInfo);
+        List<PropertyInfo> itemPropertyInfos = PropertyUtils.getObjectItemProperties(propertyInfo);
 
         if (itemPropertyInfos == null) {
             return;

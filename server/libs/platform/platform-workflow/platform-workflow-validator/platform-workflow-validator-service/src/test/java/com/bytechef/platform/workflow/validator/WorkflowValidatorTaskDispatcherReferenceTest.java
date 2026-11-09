@@ -69,7 +69,68 @@ class WorkflowValidatorTaskDispatcherReferenceTest {
             new PropertyInfo("caseTrue", "ARRAY", null, false, false, null, List.of(
                 new PropertyInfo(null, "TASK", null, false, false, null, null))),
             new PropertyInfo("caseFalse", "ARRAY", null, false, false, null, List.of(
+                new PropertyInfo(null, "TASK", null, false, false, null, null)))),
+        "branch/v1", List.of(
+            new PropertyInfo("expression", "STRING", null, false, true, null, null),
+            new PropertyInfo("cases", "ARRAY", null, false, false, null, List.of(
+                new PropertyInfo(null, "OBJECT", null, false, false, null, List.of(
+                    new PropertyInfo("key", "STRING", null, false, true, null, null),
+                    new PropertyInfo("tasks", "ARRAY", null, false, false, null, List.of(
+                        new PropertyInfo(null, "TASK", null, false, false, null, null))))))),
+            new PropertyInfo("default", "ARRAY", null, false, false, null, List.of(
                 new PropertyInfo(null, "TASK", null, false, false, null, null)))));
+
+    private static final String BRANCH_IN_CONDITION_WORKFLOW = """
+        {
+            "label": "workflow1",
+            "description": "",
+            "triggers": [
+                {"label": "Manual", "name": "trigger_1", "type": "manual/v1/manual"}
+            ],
+            "tasks": [
+                {
+                    "label": "Logger",
+                    "name": "logger_1",
+                    "type": "logger/v1/info",
+                    "parameters": {"text": "hello"}
+                },
+                {
+                    "label": "Condition",
+                    "name": "condition_1",
+                    "type": "condition/v1",
+                    "parameters": {
+                        "rawExpression": true,
+                        "expression": "true",
+                        "caseTrue": [
+                            {
+                                "label": "Branch",
+                                "name": "branch_1",
+                                "type": "branch/v1",
+                                "parameters": {
+                                    "expression": "a",
+                                    "cases": [
+                                        {
+                                            "key": "a",
+                                            "tasks": [
+                                                {
+                                                    "label": "Case logger",
+                                                    "name": "logger_2",
+                                                    "type": "logger/v1/info",
+                                                    "parameters": {"text": "${logger_1.caseValue}"}
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "default": []
+                                }
+                            }
+                        ],
+                        "caseFalse": []
+                    }
+                }
+            ]
+        }
+        """;
 
     private static final String MAP_WORKFLOW = """
         {
@@ -358,6 +419,44 @@ class WorkflowValidatorTaskDispatcherReferenceTest {
         assertEquals("", result.errors());
         assertEquals(
             "[logger_1] Property 'subflow_1.message' might not exist in the output of 'subflow/v1'",
+            result.warnings());
+    }
+
+    @Test
+    void warningsOfATaskInTheCaseOfANestedBranchBelongToThatTask() {
+        Result result = validate(BRANCH_IN_CONDITION_WORKFLOW, Map.of(), Map.of());
+
+        assertEquals("", result.errors());
+        assertEquals(
+            "[logger_2] Property 'logger_1.caseValue' might not exist in the output of 'logger/v1/info'",
+            result.warnings());
+    }
+
+    @Test
+    void aTaskInTheCaseOfANestedBranchCanReferenceAnEarlierTaskInTheSameCase() {
+        String workflow = BRANCH_IN_CONDITION_WORKFLOW.replace(
+            """
+                            }
+                        ]
+                    }
+                ],""",
+            """
+                            },
+                            {
+                                "label": "Second case logger",
+                                "name": "logger_3",
+                                "type": "logger/v1/info",
+                                "parameters": {"text": "${logger_2}"}
+                            }
+                        ]
+                    }
+                ],""");
+
+        Result result = validate(workflow, Map.of(), Map.of());
+
+        assertEquals("", result.errors());
+        assertEquals(
+            "[logger_2] Property 'logger_1.caseValue' might not exist in the output of 'logger/v1/info'",
             result.warnings());
     }
 
