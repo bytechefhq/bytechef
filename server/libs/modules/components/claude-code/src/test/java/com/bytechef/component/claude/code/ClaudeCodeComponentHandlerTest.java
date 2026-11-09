@@ -18,6 +18,7 @@ package com.bytechef.component.claude.code;
 
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ public class ClaudeCodeComponentHandlerTest {
     void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/claude-code_v1.json",
-            new ClaudeCodeComponentHandler(mock(ClusterElementDefinitionService.class)).getDefinition());
+            new ClaudeCodeComponentHandler(
+                new ApplicationProperties(), mock(ClusterElementDefinitionService.class)).getDefinition());
     }
 }

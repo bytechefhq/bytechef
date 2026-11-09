@@ -17,6 +17,8 @@
 package com.bytechef.component.claude.code.action;
 
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.SCRIPT;
+import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.WORKSPACE_NAME;
+import static com.bytechef.component.claude.code.util.ClaudeCodeWorkspaceResolver.DEFAULT_WORKSPACE_NAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
@@ -26,6 +28,7 @@ import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCod
 
 import com.bytechef.component.claude.code.util.ClaudeCodeExecutor;
 import com.bytechef.component.claude.code.util.ClaudeCodeUtil;
+import com.bytechef.component.claude.code.util.ClaudeCodeWorkspaceResolver;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
@@ -37,6 +40,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import io.github.markpollack.claude.agent.sdk.mcp.McpServerConfig;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -48,17 +52,23 @@ public class ClaudeCodeChat {
 
     private final ClaudeCodeExecutor claudeCodeExecutor;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver;
 
     ClaudeCodeChat(
-        ClusterElementDefinitionService clusterElementDefinitionService, ClaudeCodeExecutor claudeCodeExecutor) {
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver, ClaudeCodeExecutor claudeCodeExecutor) {
 
         this.claudeCodeExecutor = claudeCodeExecutor;
+        this.claudeCodeWorkspaceResolver = claudeCodeWorkspaceResolver;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
     }
 
-    public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {
+    public static ActionDefinition of(
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver) {
+
         ClaudeCodeChat claudeCodeChat = new ClaudeCodeChat(
-            clusterElementDefinitionService, ClaudeCodeUtil::execute);
+            clusterElementDefinitionService, claudeCodeWorkspaceResolver, ClaudeCodeUtil::execute);
 
         return action("chat")
             .title("Chat")
@@ -66,7 +76,8 @@ public class ClaudeCodeChat {
                 "Sends a message to Claude Code. Claude Code can use the tools of the attached MCP servers and the " +
                     "attached skills.")
             .properties(
-                messageProperty())
+                messageProperty(),
+                workspaceNameProperty())
             .output(
                 outputSchema(
                     string()
@@ -88,8 +99,10 @@ public class ClaudeCodeChat {
 
         List<ClusterElement> skills = clusterElementMap.getClusterElements(SKILLS);
 
+        Path workspace = claudeCodeWorkspaceResolver.resolve(context, inputParameters.getString(WORKSPACE_NAME));
+
         return ClaudeCodeUtil.run(
-            inputParameters.getRequiredString(SCRIPT), mcpServerConfigs,
+            inputParameters.getRequiredString(SCRIPT), workspace, mcpServerConfigs,
             skillsDirectory -> ClaudeCodeUtil.writeSkills(
                 skills, componentConnections, clusterElementDefinitionService, skillsDirectory, context),
             claudeCodeExecutor);
@@ -101,5 +114,16 @@ public class ClaudeCodeChat {
             .description("The message to send to Claude Code.")
             .controlType(ControlType.TEXT_AREA)
             .required(true);
+    }
+
+    private static ModifiableStringProperty workspaceNameProperty() {
+        return string(WORKSPACE_NAME)
+            .label("Workspace Name")
+            .description(
+                "Name of the working directory, which is kept between runs. Claude Code steps of this workflow with " +
+                    "the same workspace name share files; steps with different names do not. Letters, digits, '-' " +
+                    "and '_' only.")
+            .defaultValue(DEFAULT_WORKSPACE_NAME)
+            .advancedOption(true);
     }
 }

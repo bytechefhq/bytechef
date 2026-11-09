@@ -21,8 +21,10 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.claude.code.action.ClaudeCodeChat;
+import com.bytechef.component.claude.code.util.ClaudeCodeWorkspaceResolver;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ClaudeCodeComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -37,7 +39,16 @@ public class ClaudeCodeComponentHandler implements ComponentHandler {
 
     private final ClaudeCodeComponentDefinition componentDefinition;
 
-    public ClaudeCodeComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
+    public ClaudeCodeComponentHandler(
+        ApplicationProperties applicationProperties, ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        ApplicationProperties.Component.ClaudeCode claudeCode = applicationProperties.getComponent()
+            .getClaudeCode();
+        ApplicationProperties.Component.ClaudeCode.Workspace workspace = claudeCode.getWorkspace();
+
+        ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver = new ClaudeCodeWorkspaceResolver(
+            workspace.getBasedir());
+
         this.componentDefinition = new ClaudeCodeComponentDefinitionImpl(
             component(CLAUDE_CODE)
                 .title("Claude Code")
@@ -45,7 +56,7 @@ public class ClaudeCodeComponentHandler implements ComponentHandler {
                     "Runs Claude Code on the ByteChef server, with the MCP servers and skills you attach to it.")
                 .icon("path:assets/anthropic.svg")
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-                .actions(ClaudeCodeChat.of(clusterElementDefinitionService)));
+                .actions(ClaudeCodeChat.of(clusterElementDefinitionService, claudeCodeWorkspaceResolver)));
     }
 
     @Override
