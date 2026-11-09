@@ -291,8 +291,7 @@ public final class AiHubAgentFixtures {
                 artifactRecorder, new ClassPathResource("prompt_data_analyst.txt")),
             imageGeneratorConfiguration.imageGeneratorToolCallbackFactory(
                 chatModel, chatModelResolverProvider, new ApplicationProperties(), assetFileFacade, artifactRecorder,
-                availableProvider(toolUsageRecorder), chatService, jsonMapper,
-                new ClassPathResource("prompt_image_generator.txt")),
+                availableProvider(toolUsageRecorder), chatService, new ClassPathResource("prompt_image_generator.txt")),
             slideBuilderConfiguration.slideBuilderToolCallbackFactory(
                 chatModel, chatModelResolverProvider, assetFileFacade, artifactRecorder,
                 availableProvider(toolUsageRecorder), chatService, jsonMapper,
