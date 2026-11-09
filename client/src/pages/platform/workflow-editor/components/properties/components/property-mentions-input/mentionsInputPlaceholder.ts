@@ -1,8 +1,8 @@
 export const TOOL_PROPERTY_PLACEHOLDER = 'Click the AI button or write =fromAi(...)';
 
-export const FORMULA_MODE_PLACEHOLDER = "Ctrl+Space for all functions, e.g. concat(firstName, ' ', lastName)";
+export const FORMULA_MODE_PLACEHOLDER = 'Ctrl+Space for all functions';
 
-export const TOOL_PROPERTY_FORMULA_MODE_PLACEHOLDER = "Ctrl+Space for all functions, e.g. fromAi('name', 'STRING')";
+export const TOOL_PROPERTY_FORMULA_MODE_PLACEHOLDER = 'Ctrl+Space for all functions, e.g. fromAi()';
 
 const DEFAULT_PLACEHOLDER = "Use '$' for data pills and '=' for a formula";
 
