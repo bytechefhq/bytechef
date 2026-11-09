@@ -38,6 +38,7 @@ import com.bytechef.platform.ai.guardrails.RestorationDestination;
 import com.bytechef.platform.ai.sensitivedata.SensitiveDataMetrics;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -46,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -55,11 +57,22 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.DefaultChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.beans.factory.ObjectProvider;
 
@@ -68,6 +81,9 @@ import org.springframework.beans.factory.ObjectProvider;
  */
 @ExtendWith(MockitoExtension.class)
 class AbstractAiAgentChatActionGuardrailsTest {
+
+    private static final String MEMORY_CONVERSATION_ID = "memory-conversation";
+    private static final String MEMORY_EMAIL = "grace@example.com";
 
     @Mock
     private AiAgentToolFacade aiAgentToolFacade;
@@ -265,6 +281,99 @@ class AbstractAiAgentChatActionGuardrailsTest {
                     .isInstanceOf(RuntimeException.class)
                     .hasMessage("Blocked by AI guardrail: blocked-term");
         }
+    }
+
+    @Test
+    void testChatMemoryStoresTheRedactedReplyWhenTheProviderSuppliesARedactor() throws Exception {
+        ChatMemory chatMemory = callAgentWithChatMemory(
+            Optional.of(text -> text.replace(MEMORY_EMAIL, "[REDACTED_EMAIL_ADDRESS]")));
+
+        assertThat(storedAssistantText(chatMemory)).isEqualTo("Write to [REDACTED_EMAIL_ADDRESS]");
+    }
+
+    @Test
+    void testChatMemoryStoresTheRawReplyWhenTheProviderSuppliesNoRedactor() throws Exception {
+        ChatMemory chatMemory = callAgentWithChatMemory(Optional.empty());
+
+        assertThat(storedAssistantText(chatMemory)).isEqualTo("Write to " + MEMORY_EMAIL);
+    }
+
+    private ChatMemory callAgentWithChatMemory(Optional<UnaryOperator<String>> chatMemoryRedactor) throws Exception {
+        Parameters inputParameters = MockParametersFactory.create(Map.of());
+
+        Map<String, Object> chatMemoryElement = new HashMap<>();
+
+        chatMemoryElement.put("name", "chatMemory_1");
+        chatMemoryElement.put("type", "testComponent/v1/testChatMemory");
+        chatMemoryElement.put("parameters", Map.of("conversationId", MEMORY_CONVERSATION_ID));
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of("clusterElements", Map.of("model", buildModelElement(), "chatMemory", chatMemoryElement)));
+
+        ChatModel chatModel = stubModelLookup();
+
+        when(chatModel.getOptions()).thenReturn(ChatOptions.builder()
+            .build());
+        when(chatModel.call(any(Prompt.class))).thenReturn(
+            new ChatResponse(List.of(new Generation(new AssistantMessage("Write to " + MEMORY_EMAIL)))));
+
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+            .chatMemoryRepository(new InMemoryChatMemoryRepository())
+            .build();
+
+        ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
+
+        when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testChatMemory"))).thenReturn(chatMemoryFunction);
+        when(chatMemoryFunction.apply(any(), any(), any(), any(), any())).thenReturn(
+            ChatMemoryFunction.Result.of(
+                MessageChatMemoryAdvisor.builder(chatMemory)
+                    .build(),
+                chatMemory));
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "testComponent", 1, 1L, Map.of(), null);
+        Map<String, ComponentConnection> connectionParameters = Map.of(
+            "model_1", componentConnection, "chatMemory_1", componentConnection);
+
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        when(actionContext.getPlatformType()).thenReturn(PlatformType.AUTOMATION);
+        when(actionContext.getJobPrincipalId()).thenReturn(42L);
+
+        AiGuardrailsAdvisorProvider provider = mock(AiGuardrailsAdvisorProvider.class);
+
+        when(provider.getChatMemoryRedactor(PlatformType.AUTOMATION, 42L)).thenReturn(chatMemoryRedactor);
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            presentProvider(provider));
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of(new UserMessage("Who should I contact?")));
+
+            ChatClient.ChatClientRequestSpec spec = action.getChatClientRequestSpec(
+                inputParameters, connectionParameters, extensions, null, actionContext);
+
+            assertThat(spec.call()
+                .content()).isEqualTo("Write to " + MEMORY_EMAIL);
+        }
+
+        return chatMemory;
+    }
+
+    private static String storedAssistantText(ChatMemory chatMemory) {
+        List<Message> assistantMessages = chatMemory.get(MEMORY_CONVERSATION_ID)
+            .stream()
+            .filter(message -> message.getMessageType() == MessageType.ASSISTANT)
+            .toList();
+
+        assertThat(assistantMessages).hasSize(1);
+
+        Message assistantMessage = assistantMessages.getFirst();
+
+        return assistantMessage.getText();
     }
 
     private Parameters buildExtensions() {
