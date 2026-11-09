@@ -313,6 +313,16 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         Long projectId, Long projectDeploymentId, Long connectedUserId, String workflowId, Integer projectVersion,
         long workspaceId, int pageNumber) {
 
+        return getWorkflowExecutions(
+            embedded, environmentId, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId,
+            connectedUserId, workflowId, projectVersion, workspaceId, true, pageNumber);
+    }
+
+    private Page<WorkflowExecutionDTO> getWorkflowExecutions(
+        Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
+        Long projectId, Long projectDeploymentId, Long connectedUserId, String workflowId, Integer projectVersion,
+        long workspaceId, boolean includeTriggerExecutionRows, int pageNumber) {
+
         if (connectedUserId != null) {
             return getConnectedUserWorkflowExecutions(
                 connectedUserId, environmentId, jobStatus, jobStartDate, jobEndDate, workflowId, projectVersion,
@@ -360,7 +370,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         }
 
         return getWorkflowExecutionPage(
-            jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, workflowIds, projectId, pageNumber);
+            jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, workflowIds, projectId,
+            includeTriggerExecutionRows, pageNumber);
     }
 
     @Override
@@ -417,7 +428,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
         return getWorkflowExecutions(
             false, environmentId, jobStatus, jobStartDate, jobEndDate, projectId, projectDeploymentId, null,
-            workflowId, null, workspaceId, pageNumber);
+            workflowId, null, workspaceId, false, pageNumber);
     }
 
     private void checkProjectDeployment(ProjectDeployment projectDeployment, long workspaceId, long environmentId) {
@@ -479,17 +490,21 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
         return getWorkflowExecutionPage(
             jobStatus, jobStartDate, jobEndDate, CollectionUtils.map(projectDeployments, ProjectDeployment::getId),
-            workflowIds, null, pageNumber);
+            workflowIds, null, true, pageNumber);
     }
 
     private Page<WorkflowExecutionDTO> getWorkflowExecutionPage(
         @Nullable Status jobStatus, @Nullable Instant jobStartDate, @Nullable Instant jobEndDate,
-        List<Long> projectDeploymentIds, List<String> workflowIds, @Nullable Long projectId, int pageNumber) {
+        List<Long> projectDeploymentIds, List<String> workflowIds, @Nullable Long projectId,
+        boolean includeTriggerExecutionRows, int pageNumber) {
+
+        List<String> failedTriggerWorkflowExecutionIds = includeTriggerExecutionRows
+            ? getFailedTriggerWorkflowExecutionIds(jobStatus, projectDeploymentIds, workflowIds)
+            : List.of();
 
         Page<WorkflowExecutionRowDTO> rowsPage = workflowExecutionRowService.getWorkflowExecutionRows(
             jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, PlatformType.AUTOMATION, workflowIds,
-            true, getFailedTriggerWorkflowExecutionIds(jobStatus, projectDeploymentIds, workflowIds),
-            pageNumber);
+            true, failedTriggerWorkflowExecutionIds, pageNumber);
 
         return toWorkflowExecutionPage(rowsPage, projectId);
     }

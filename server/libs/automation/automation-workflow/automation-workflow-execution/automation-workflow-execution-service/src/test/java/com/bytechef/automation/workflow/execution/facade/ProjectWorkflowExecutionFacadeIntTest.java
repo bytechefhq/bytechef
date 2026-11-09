@@ -955,6 +955,22 @@ class ProjectWorkflowExecutionFacadeIntTest {
         }
 
         @Test
+        void testTheWorkspaceListLeavesOutTriggerExecutionsWithoutAJob() {
+            Job job = saveDeployedJob(workflowId, Job.Status.COMPLETED);
+
+            saveFailedTriggerExecution(getId(projectDeployment), workflowUuid.toString(), "trigger_1");
+
+            Page<WorkflowExecutionDTO> page = facade.getWorkspaceWorkflowExecutions(
+                getId(workspace), Environment.DEVELOPMENT.ordinal(), null, null, null, null,
+                getId(projectDeployment), workflowId, 0);
+
+            assertThat(page.getContent())
+                .extracting(WorkflowExecutionDTO::id)
+                .containsExactly(job.getId());
+            assertThat(page.getTotalElements()).isEqualTo(1);
+        }
+
+        @Test
         void testTheDetailOfATriggerExecutionWhoseWorkflowIsGoneIsNotFound() {
             TriggerExecution triggerExecution = saveFailedTriggerExecution(
                 getId(projectDeployment), UUID.randomUUID()
