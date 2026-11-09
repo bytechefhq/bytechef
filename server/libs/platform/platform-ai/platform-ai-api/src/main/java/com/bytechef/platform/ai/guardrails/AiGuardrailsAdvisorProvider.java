@@ -19,6 +19,7 @@ package com.bytechef.platform.ai.guardrails;
 import com.bytechef.platform.ai.sensitivedata.SensitiveDataMetrics;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 
@@ -36,6 +37,12 @@ public interface AiGuardrailsAdvisorProvider {
     Optional<Advisor> getAdvisor(
         @Nullable PlatformType platformType, @Nullable Long jobPrincipalId, String surface,
         RestorationDestination destination);
+
+    default Optional<UnaryOperator<String>> getChatMemoryRedactor(
+        @Nullable PlatformType platformType, @Nullable Long jobPrincipalId) {
+
+        return Optional.empty();
+    }
 
     @Nullable
     SensitiveDataMetrics getMetrics(@Nullable PlatformType platformType, @Nullable Long jobPrincipalId, String surface);
