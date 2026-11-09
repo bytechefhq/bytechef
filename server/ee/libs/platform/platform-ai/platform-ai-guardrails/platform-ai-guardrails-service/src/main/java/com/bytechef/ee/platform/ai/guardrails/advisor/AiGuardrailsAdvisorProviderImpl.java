@@ -19,6 +19,7 @@ import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.beans.factory.ObjectProvider;
@@ -63,6 +64,16 @@ public class AiGuardrailsAdvisorProviderImpl implements AiGuardrailsAdvisorProvi
         }
 
         return Optional.of(new AiGuardrailsAdvisor(aiGuardrails, target, metrics, surface, destination));
+    }
+
+    @Override
+    public Optional<UnaryOperator<String>> getChatMemoryRedactor(
+        @Nullable PlatformType platformType, @Nullable Long jobPrincipalId) {
+
+        AiGuardrailsSettingsTarget target = AiGuardrailsSettingsTarget.resolve(
+            platformType, jobPrincipalWorkspaceResolver.resolve(platformType, jobPrincipalId));
+
+        return Optional.ofNullable(aiGuardrails.newChatMemoryRedactor(target));
     }
 
     @Override
