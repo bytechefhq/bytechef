@@ -84,6 +84,7 @@ import {getClusterElementRootNames} from '../../utils/getWorkflowIssueOwnerName'
 import hasDataPillPanelContent from '../../utils/hasDataPillPanelContent';
 import {resolveClusterRootId, resolveMainClusterRootName} from '../../utils/resolveClusterRootId';
 import {getTaskDispatcherTask} from '../../utils/taskDispatcherConfig';
+import countNodeTestConfigurationConnections from './countNodeTestConfigurationConnections';
 import getMissingRequiredConnectionErrors, {
     WorkflowNodeDetailsErrorI,
     getWorkflowIssueErrors,
@@ -1267,7 +1268,11 @@ export default function useWorkflowNodeDetailsPanel({
         connectionsFetched: workflowTestConfigurationConnectionsFetched,
         nodeComponentName: currentNode?.componentName,
         onConnectionTabRequired: () => setActiveTab('connection'),
-        testConfigurationConnectionsCount: workflowTestConfigurationConnections?.length ?? 0,
+        testConfigurationConnectionsCount: countNodeTestConfigurationConnections({
+            clusterElementType: currentNode?.clusterElementType,
+            workflowNodeName: currentNode?.workflowNodeName,
+            workflowTestConfigurationConnections,
+        }),
         workflowNodeName: currentNode?.workflowNodeName,
     });
 
