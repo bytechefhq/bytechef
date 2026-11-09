@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.ai.workspace.AgentWorkspaceQuota;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.IOException;
 import java.nio.file.Files;

@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(libs.org.springaicommunity.spring.ai.agent.utils)
     implementation(libs.org.springaicommunity.spring.ai.agent.utils.docker.cli)
     implementation(project(":server:libs:config:app-config"))
@@ -12,6 +13,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-workspace"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))

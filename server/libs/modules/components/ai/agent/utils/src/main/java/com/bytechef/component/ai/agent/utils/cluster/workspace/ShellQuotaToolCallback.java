@@ -17,9 +17,9 @@
 package com.bytechef.component.ai.agent.utils.cluster.workspace;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.ai.workspace.AgentWorkspaceQuota;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
@@ -33,8 +33,6 @@ public class ShellQuotaToolCallback implements ToolCallback {
 
     static final String BASH_TOOL_NAME = "Bash";
 
-    private static final Pattern CLEANUP_COMMAND_PATTERN = Pattern.compile(
-        "^\\s*(rm|rmdir|truncate)\\s.*|^\\s*find\\s.*\\s-delete(\\s.*)?$", Pattern.DOTALL);
     private static final String COMMAND = "command";
 
     private final ToolCallback delegate;
@@ -96,11 +94,6 @@ public class ShellQuotaToolCallback implements ToolCallback {
     private static boolean isCleanupCommand(String toolInput) {
         Map<String, ?> arguments = JsonUtils.readMap(toolInput);
 
-        if (!(arguments.get(COMMAND) instanceof String command)) {
-            return false;
-        }
-
-        return CLEANUP_COMMAND_PATTERN.matcher(command)
-            .matches();
+        return arguments.get(COMMAND) instanceof String command && AgentWorkspaceQuota.isCleanupCommand(command);
     }
 }

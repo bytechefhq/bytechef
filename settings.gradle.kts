@@ -172,6 +172,7 @@ include("server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-gr
 include("server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-rest")
 include("server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-service")
 include("server:libs:platform:platform-ai:platform-ai-tool")
+include("server:libs:platform:platform-ai:platform-ai-workspace")
 include("server:libs:platform:platform-api")
 include("server:libs:platform:platform-billing:platform-billing-api")
 include("server:libs:platform:platform-billing:platform-billing-rest")

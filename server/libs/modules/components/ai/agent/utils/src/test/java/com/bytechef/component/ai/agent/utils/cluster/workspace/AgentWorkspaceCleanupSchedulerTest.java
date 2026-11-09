@@ -31,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 /**
  * @author Ivica Cardic
@@ -58,29 +59,27 @@ class AgentWorkspaceCleanupSchedulerTest {
     }
 
     @Test
-    void testCleanAgentWorkspacesDoesNothingWhenTheFileAndShellToolsAreDisabled() {
-        createScheduler().cleanAgentWorkspaces();
-
-        assertThat(expiredTestWorkspace).isDirectory();
+    void testSchedulerIsNotRegisteredWhenTheFileSystemAndShellToolsAreDisabled() {
+        createApplicationContextRunner()
+            .run(context -> assertThat(context).doesNotHaveBean(AgentWorkspaceCleanupScheduler.class));
     }
 
     @Test
-    void testCleanAgentWorkspacesRemovesExpiredTestWorkspacesWhenTheFileSystemToolsAreEnabled() {
-        ApplicationProperties.Ai.AgentUtils.FileSystem fileSystem = getAgentUtils().getFileSystem();
-
-        fileSystem.setEnabled(true);
-
-        createScheduler().cleanAgentWorkspaces();
-
-        assertThat(expiredTestWorkspace).doesNotExist();
+    void testSchedulerIsRegisteredWhenTheFileSystemToolsAreEnabled() {
+        createApplicationContextRunner()
+            .withPropertyValues("bytechef.ai.agent-utils.file-system.enabled=true")
+            .run(context -> assertThat(context).hasSingleBean(AgentWorkspaceCleanupScheduler.class));
     }
 
     @Test
-    void testCleanAgentWorkspacesRemovesExpiredTestWorkspacesWhenTheShellToolsAreEnabled() {
-        ApplicationProperties.Ai.AgentUtils.Shell shell = getAgentUtils().getShell();
+    void testSchedulerIsRegisteredWhenTheShellToolsAreEnabled() {
+        createApplicationContextRunner()
+            .withPropertyValues("bytechef.ai.agent-utils.shell.enabled=true")
+            .run(context -> assertThat(context).hasSingleBean(AgentWorkspaceCleanupScheduler.class));
+    }
 
-        shell.setEnabled(true);
-
+    @Test
+    void testCleanAgentWorkspacesRemovesExpiredTestWorkspaces() {
         createScheduler().cleanAgentWorkspaces();
 
         assertThat(expiredTestWorkspace).doesNotExist();
@@ -90,10 +89,8 @@ class AgentWorkspaceCleanupSchedulerTest {
     void testCleanAgentWorkspacesUsesTheConfiguredTestRetention() {
         ApplicationProperties.Ai.AgentUtils agentUtils = getAgentUtils();
 
-        ApplicationProperties.Ai.AgentUtils.FileSystem fileSystem = agentUtils.getFileSystem();
         ApplicationProperties.Ai.AgentUtils.Workspace workspace = agentUtils.getWorkspace();
 
-        fileSystem.setEnabled(true);
         workspace.setTestRetention(Duration.ofDays(2));
 
         createScheduler().cleanAgentWorkspaces();
@@ -105,15 +102,19 @@ class AgentWorkspaceCleanupSchedulerTest {
     void testCleanAgentWorkspacesDoesNothingWithoutABaseDirectory() {
         ApplicationProperties.Ai.AgentUtils agentUtils = getAgentUtils();
 
-        ApplicationProperties.Ai.AgentUtils.FileSystem fileSystem = agentUtils.getFileSystem();
         ApplicationProperties.Ai.AgentUtils.Workspace workspace = agentUtils.getWorkspace();
 
-        fileSystem.setEnabled(true);
         workspace.setBasedir(" ");
 
         createScheduler().cleanAgentWorkspaces();
 
         assertThat(expiredTestWorkspace).isDirectory();
+    }
+
+    private static ApplicationContextRunner createApplicationContextRunner() {
+        return new ApplicationContextRunner()
+            .withBean(ApplicationProperties.class)
+            .withUserConfiguration(AgentWorkspaceCleanupScheduler.class);
     }
 
     @SuppressWarnings("unchecked")

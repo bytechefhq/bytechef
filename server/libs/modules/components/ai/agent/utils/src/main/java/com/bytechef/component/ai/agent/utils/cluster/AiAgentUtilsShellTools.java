@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.component.ai.agent.utils.cluster.exec.DockerExecBackendRegistry;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspace;
-import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceQuota;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.AgentWorkspaceResolver;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.ShellQuotaToolCallback;
 import com.bytechef.component.ai.agent.utils.cluster.workspace.WorkspacePathToolCallback;
@@ -32,6 +31,7 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.workspace.AgentWorkspaceQuota;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Path;

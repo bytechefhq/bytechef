@@ -17,11 +17,13 @@
 package com.bytechef.component.ai.agent.utils.cluster.workspace;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.ai.workspace.AgentWorkspaceCleaner;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.tenant.service.TenantService;
 import java.nio.file.Path;
 import java.time.Duration;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnExpression("${bytechef.ai.agent-utils.file-system.enabled:false} or ${bytechef.ai.agent-utils.shell.enabled:false}")
 public class AgentWorkspaceCleanupScheduler {
 
     private static final Duration DEFAULT_TEST_RETENTION = Duration.ofHours(24);
@@ -53,13 +56,6 @@ public class AgentWorkspaceCleanupScheduler {
         initialDelayString = "PT5M",
         fixedDelayString = "${bytechef.ai.agent-utils.workspace.cleanup-interval:PT1H}")
     public void cleanAgentWorkspaces() {
-        ApplicationProperties.Ai.AgentUtils.FileSystem fileSystem = agentUtils.getFileSystem();
-        ApplicationProperties.Ai.AgentUtils.Shell shell = agentUtils.getShell();
-
-        if (!fileSystem.isEnabled() && !shell.isEnabled()) {
-            return;
-        }
-
         ApplicationProperties.Ai.AgentUtils.Workspace workspace = agentUtils.getWorkspace();
 
         String basedir = workspace.getBasedir();
@@ -73,7 +69,7 @@ public class AgentWorkspaceCleanupScheduler {
         AgentWorkspaceCleaner agentWorkspaceCleaner = new AgentWorkspaceCleaner(
             Path.of(basedir), testRetention == null ? DEFAULT_TEST_RETENTION : testRetention,
             workspace.getIdleRetention(), tenantServiceProvider.getIfAvailable(),
-            jobPrincipalAccessorRegistryProvider.getIfAvailable());
+            jobPrincipalAccessorRegistryProvider.getIfAvailable(), directory -> false);
 
         agentWorkspaceCleaner.clean();
     }

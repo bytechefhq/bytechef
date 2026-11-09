@@ -20,17 +20,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Context;
+import com.bytechef.platform.ai.workspace.AgentWorkspaceLayout;
+import com.bytechef.platform.ai.workspace.AgentWorkspaceQuota;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.JobContextAware;
-import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.tenant.TenantContext;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
-import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -38,15 +32,10 @@ import org.jspecify.annotations.Nullable;
  */
 public class AgentWorkspaceResolver {
 
-    public static final String DEFAULT_WORKSPACE_NAME = "default";
     public static final String WORKSPACE_NAME = "workspaceName";
-
-    static final String TEST_DIRECTORY = "test";
 
     private static final String COMPONENT_NAME = "aiAgentUtils";
     private static final int COMPONENT_VERSION = 1;
-    private static final Pattern UNSAFE_SEGMENT_CHARACTERS = Pattern.compile("[^A-Za-z0-9_-]");
-    private static final Pattern WORKSPACE_NAME_PATTERN = Pattern.compile("[A-Za-z0-9_-]{1,64}");
 
     private final @Nullable Path basedir;
     private final long workspaceMaxBytes;
@@ -72,7 +61,7 @@ public class AgentWorkspaceResolver {
                 "Name of the workspace directory. Tools in this workflow with the same workspace name share files, " +
                     "including tools of different AI Agents; tools with different names do not. Letters, digits, " +
                     "'-' and '_' only.")
-            .defaultValue(DEFAULT_WORKSPACE_NAME)
+            .defaultValue(AgentWorkspaceLayout.DEFAULT_WORKSPACE_NAME)
             .advancedOption(true);
     }
 
@@ -82,46 +71,9 @@ public class AgentWorkspaceResolver {
                 "Agent workspaces are not configured: set bytechef.ai.agent-utils.workspace.basedir");
         }
 
-        String name = validateWorkspaceName(workspaceName);
-
         ActionContextAware actionContextAware = toActionContextAware(context, clusterElementName);
 
-        Path tenantDirectory = basedir.resolve(toSegment(TenantContext.getCurrentTenantId()));
-
-        Path workspaceDirectory;
-
-        Long principalId = actionContextAware.getJobPrincipalId();
-
-        if (!isId(principalId)) {
-            workspaceDirectory = tenantDirectory.resolve(TEST_DIRECTORY)
-                .resolve(toTestRunSegment(actionContextAware))
-                .resolve(name);
-        } else {
-            workspaceDirectory = tenantDirectory.resolve(toPlatformSegment(actionContextAware.getPlatformType()))
-                .resolve(String.valueOf(principalId))
-                .resolve(toEnvironmentSegment(actionContextAware.getEnvironmentId()))
-                .resolve(toWorkflowSegment(actionContextAware))
-                .resolve(name);
-        }
-
-        return AgentWorkspace.sandboxed(createDirectory(basedir, workspaceDirectory));
-    }
-
-    private static Path createDirectory(Path basedir, Path workspaceDirectory) {
-        Path normalizedWorkspaceDirectory = workspaceDirectory.toAbsolutePath()
-            .normalize();
-
-        if (!normalizedWorkspaceDirectory.startsWith(basedir)) {
-            throw new IllegalStateException(
-                "Agent workspace %s is outside the workspace base directory".formatted(normalizedWorkspaceDirectory));
-        }
-
-        try {
-            return Files.createDirectories(normalizedWorkspaceDirectory);
-        } catch (IOException ioException) {
-            throw new UncheckedIOException(
-                "Failed to create the agent workspace " + normalizedWorkspaceDirectory, ioException);
-        }
+        return AgentWorkspace.sandboxed(AgentWorkspaceLayout.resolve(basedir, actionContextAware, workspaceName));
     }
 
     private static ActionContextAware toActionContextAware(Context context, String clusterElementName) {
@@ -140,75 +92,5 @@ public class AgentWorkspaceResolver {
             "The agent workspace cannot be resolved because the running workflow cannot be identified from a %s"
                 .formatted(context.getClass()
                     .getName()));
-    }
-
-    private static boolean isId(@Nullable Long id) {
-        return id != null && id > 0;
-    }
-
-    private static String toEnvironmentSegment(@Nullable Long environmentId) {
-        Environment[] environments = Environment.values();
-
-        if (environmentId == null || environmentId < 0 || environmentId >= environments.length) {
-            return "environment-" + environmentId;
-        }
-
-        Environment environment = environments[environmentId.intValue()];
-
-        return environment.name()
-            .toLowerCase(Locale.ROOT);
-    }
-
-    static String toPlatformSegment(@Nullable PlatformType platformType) {
-        if (platformType == null) {
-            return "unknown";
-        }
-
-        return platformType.name()
-            .toLowerCase(Locale.ROOT);
-    }
-
-    static String toSegment(@Nullable String value) {
-        if (value == null || value.isBlank()) {
-            return "_";
-        }
-
-        return UNSAFE_SEGMENT_CHARACTERS.matcher(value)
-            .replaceAll("_");
-    }
-
-    private static String toTestRunSegment(ActionContextAware actionContextAware) {
-        Long jobId = actionContextAware.getJobId();
-
-        if (isId(jobId)) {
-            return "job-" + jobId;
-        }
-
-        return "workflow-" + toSegment(actionContextAware.getWorkflowId());
-    }
-
-    private static String toWorkflowSegment(ActionContextAware actionContextAware) {
-        Long principalWorkflowId = actionContextAware.getJobPrincipalWorkflowId();
-
-        if (isId(principalWorkflowId)) {
-            return String.valueOf(principalWorkflowId);
-        }
-
-        return "workflow-" + toSegment(actionContextAware.getWorkflowId());
-    }
-
-    private static String validateWorkspaceName(@Nullable String workspaceName) {
-        if (workspaceName == null || workspaceName.isBlank()) {
-            return DEFAULT_WORKSPACE_NAME;
-        }
-
-        if (!WORKSPACE_NAME_PATTERN.matcher(workspaceName)
-            .matches()) {
-
-            throw new IllegalArgumentException(
-                "Workspace name '%s' is invalid: use 1 to 64 letters, digits, '-' or '_'".formatted(workspaceName));
-        }
-
-        return workspaceName;
     }
 }
