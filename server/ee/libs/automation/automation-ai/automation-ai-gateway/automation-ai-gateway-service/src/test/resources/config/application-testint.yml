@@ -7,5 +7,19 @@ bytechef:
   ai:
     gateway:
       enabled: true
+      guardrails:
+        blocked-terms: ""
+        injection-detection-enabled: false
+        moderation-enabled: false
+        pii-redaction-enabled: false
+        response-scan-enabled: false
+        response-scan-streaming-enabled: false
+        secret-redaction-enabled: false
       rate-limiting:
         enabled: true
+    guardrails:
+      detection:
+        max-unwindowable-input: 262144
+        timeout: 2s
+      violation:
+        enabled: false
