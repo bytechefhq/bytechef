@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.definition;
 
 import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction.MCP_SERVERS;
-import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeSkillsFunction.SKILLS;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import java.util.List;
@@ -29,6 +28,6 @@ public interface ClaudeCodeComponentDefinition extends ClusterRootComponentDefin
 
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
-        return List.of(MCP_SERVERS, SKILLS);
+        return List.of(MCP_SERVERS);
     }
 }

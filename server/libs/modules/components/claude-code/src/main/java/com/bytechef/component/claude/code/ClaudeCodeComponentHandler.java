@@ -21,10 +21,12 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.claude.code.action.ClaudeCodeChat;
+import com.bytechef.component.claude.code.skill.ClaudeCodeSkillWriter;
 import com.bytechef.component.claude.code.workspace.ClaudeCodeWorkspaceResolver;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ClaudeCodeComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -43,7 +45,8 @@ public class ClaudeCodeComponentHandler implements ComponentHandler {
     private final ClaudeCodeComponentDefinition componentDefinition;
 
     public ClaudeCodeComponentHandler(
-        ApplicationProperties applicationProperties, ClusterElementDefinitionService clusterElementDefinitionService) {
+        AiSkillFacade aiSkillFacade, ApplicationProperties applicationProperties,
+        ClusterElementDefinitionService clusterElementDefinitionService) {
 
         ApplicationProperties.Component component = applicationProperties.getComponent();
 
@@ -59,10 +62,14 @@ public class ClaudeCodeComponentHandler implements ComponentHandler {
             component(CLAUDE_CODE)
                 .title("Claude Code")
                 .description(
-                    "Runs Claude Code on the ByteChef server, with the MCP servers and skills you attach to it.")
+                    "Runs Claude Code on the ByteChef server, with the MCP servers you attach to it and the skills " +
+                        "you select.")
                 .icon("path:assets/anthropic.svg")
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-                .actions(ClaudeCodeChat.of(clusterElementDefinitionService, claudeCodeWorkspaceResolver)));
+                .actions(
+                    ClaudeCodeChat.of(
+                        clusterElementDefinitionService, new ClaudeCodeSkillWriter(aiSkillFacade),
+                        claudeCodeWorkspaceResolver)));
     }
 
     @Override

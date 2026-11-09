@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,8 @@ public class ClaudeCodeComponentHandlerTest {
         JsonFileAssert.assertEquals(
             "definition/claude-code_v1.json",
             new ClaudeCodeComponentHandler(
-                new ApplicationProperties(), mock(ClusterElementDefinitionService.class)).getDefinition());
+                mock(AiSkillFacade.class), new ApplicationProperties(), mock(ClusterElementDefinitionService.class))
+                    .getDefinition());
     }
 
     @Test
@@ -53,6 +55,7 @@ public class ClaudeCodeComponentHandlerTest {
 
     private static ApplicationContextRunner createApplicationContextRunner() {
         return new ApplicationContextRunner()
+            .withBean(AiSkillFacade.class, () -> mock(AiSkillFacade.class))
             .withBean(ApplicationProperties.class)
             .withBean(ClusterElementDefinitionService.class, () -> mock(ClusterElementDefinitionService.class))
             .withUserConfiguration(ClaudeCodeComponentHandler.class);

@@ -23,6 +23,8 @@ public class ClaudeCodeConstants {
 
     public static final String CLAUDE_CODE = "claudeCode";
     public static final String SCRIPT = "script";
+    public static final String SKILL_ID = "skillId";
+    public static final String SKILLS = "skills";
     public static final String WORKSPACE_NAME = "workspaceName";
 
     private ClaudeCodeConstants() {
