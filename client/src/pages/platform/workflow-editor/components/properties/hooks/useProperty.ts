@@ -508,13 +508,14 @@ export const useProperty = ({
 
     const stringSelect = isStringSelect(controlType, type);
 
-    // A select, a date or time picker, or a builder has no text entry that shows a pill, so it carries a Dynamic
-    // switch, and its pill editor stays up until that switch is turned off. An array item's object has no label row
-    // to hold the switch.
+    // A select, a date or time picker, a builder or a code editor has no text entry that shows a pill, so it carries a
+    // Dynamic switch, and its pill editor stays up until that switch is turned off. An array item's object has no label
+    // row to hold the switch.
     const hasDynamicSwitch =
         !control &&
         expressionEnabled !== false &&
         (controlType === 'SELECT' ||
+            controlType === 'CODE_EDITOR' ||
             controlType === 'DATE' ||
             controlType === 'DATE_TIME' ||
             controlType === 'TIME' ||
@@ -533,7 +534,6 @@ export const useProperty = ({
         !isFromAi &&
         controlType !== 'FORMULA_MODE' &&
         controlType !== 'NULL' &&
-        controlType !== 'CODE_EDITOR' &&
         type !== 'DYNAMIC_PROPERTIES';
 
     const isNumericalInput = useMemo(
@@ -1193,7 +1193,7 @@ export const useProperty = ({
     // `$` typed into a field carries over into the editor; the Dynamic switch opens it empty, for a pill from the panel.
     const startPillEntry = useCallback(
         (initialInput?: string) => {
-            if (controlType === 'SELECT') {
+            if (controlType === 'SELECT' || controlType === 'CODE_EDITOR') {
                 // A select always holds an option, which the pill entry replaces only once a pill is chosen.
                 pillEntryKeepsOptionRef.current = true;
 

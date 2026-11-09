@@ -14,8 +14,10 @@ import {useShallow} from 'zustand/shallow';
 interface PropertyCodeEditorProps {
     defaultValue?: string;
     description?: string;
+    dynamicSwitch?: ReactNode;
     error?: boolean;
     errorMessage?: string;
+    formulaSwitch?: ReactNode;
     fromAiButton?: ReactNode;
     label?: string;
     language: string;
@@ -33,8 +35,10 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
         {
             defaultValue,
             description,
+            dynamicSwitch,
             error,
             errorMessage,
+            formulaSwitch,
             fromAiButton,
             label,
             language,
@@ -76,7 +80,15 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                                 </Tooltip>
                             )}
 
-                            {fromAiButton && <div className="ml-auto flex items-center">{fromAiButton}</div>}
+                            {(dynamicSwitch || formulaSwitch || fromAiButton) && (
+                                <div className="ml-auto flex items-center gap-1">
+                                    {dynamicSwitch}
+
+                                    {formulaSwitch}
+
+                                    {fromAiButton}
+                                </div>
+                            )}
                         </div>
                     )}
 
