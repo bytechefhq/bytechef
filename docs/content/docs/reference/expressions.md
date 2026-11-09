@@ -245,6 +245,20 @@ When accessing nested structures, handle null fields to avoid errors. SpEL's saf
 | `var?.foo` | `{foo: 5}` | `5` | `Integer` |
 | `var?.foo` | `null` | `null` | `Null` |
 
+## Values That May Not Exist Yet
+
+A reference to a variable that is not in the run context yet, such as the output of a step that has not run, a branch that was not taken, or an optional input that was left empty, is not evaluated: the expression is passed through unchanged. On the first pass of a counter, `=${attempts} + 1` evaluates to the text `=${attempts} + 1`, not to `1`.
+
+To read such a value, pass its path as a string to `exists` or `getOrDefault`:
+
+| Expression | `attempts` missing | `attempts` is `1` |
+|------------|--------------------|-------------------|
+| `=${attempts} + 1` | `=${attempts} + 1` (unchanged) | `2` |
+| `=getOrDefault('attempts', 0) + 1` | `1` | `2` |
+| `=exists('attempts')` | `false` | `true` |
+
+A dotted path reads into maps: `=getOrDefault('judge.answers.is_plausible.isTrue', false)`. Use `exists` to guard a whole expression: `=exists('judge') ? ${judge.answers.score} : 0`.
+
 ## Invoking Static Methods
 
 ByteChef does not allow calling static Java methods directly.
@@ -387,4 +401,6 @@ Implicit conversion occurs when an input value of one type is used in a context 
 | Function | Description |
 |---|---|
 | config(propertyName) | Reads a server configuration property by name. It is gated by an allowlist of property-name prefixes (`bytechef.workflow.config.allowed-prefixes`) that is empty by default, so on a stock deployment every call fails and the function reads nothing. |
+| exists(path) | Returns `true` if the variable path resolves to a non-null value, `false` otherwise. The path is a string, such as `'attempts'` or `'judge.answers.score'`, so a missing value does not leave the formula unresolved. |
+| getOrDefault(path, defaultValue) | Returns the value at the variable path, or `defaultValue` when the path does not exist or is `null`. |
 | uuid() | Generates a random UUID (version 4). |
