@@ -19,7 +19,6 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
-import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.web.rest.model.CheckWorkflowNodeTestOutputExists200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
 import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
@@ -44,16 +43,13 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
 
     private final ConversionService conversionService;
     private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
-    private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeTestOutputApiController(
-        ConversionService conversionService, WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade,
-        WorkflowNodeTestOutputService workflowNodeTestOutputService) {
+        ConversionService conversionService, WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade) {
 
         this.conversionService = conversionService;
         this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
-        this.workflowNodeTestOutputService = workflowNodeTestOutputService;
     }
 
     @Override
@@ -64,7 +60,7 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
 
         return ResponseEntity.ok(
             new CheckWorkflowNodeTestOutputExists200ResponseModel().exists(
-                workflowNodeTestOutputService.checkWorkflowNodeTestOutputExists(
+                workflowNodeTestOutputFacade.checkWorkflowNodeTestOutputExists(
                     id, workflowNodeName, createdDate == null ? null : createdDate.toInstant(),
                     effectiveEnvironmentId)));
     }

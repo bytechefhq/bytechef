@@ -20,12 +20,17 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface WorkflowNodeTestOutputFacade {
+
+    boolean checkWorkflowNodeTestOutputExists(
+        String workflowId, String workflowNodeName, @Nullable Instant createdDate, long environmentId);
 
     void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName, long environmentId);
 

@@ -109,6 +109,7 @@ class WorkflowEditFacadeAuthorizationTest {
             Arguments.of(
                 WorkflowNodeTestOutputFacadeImpl.class,
                 Map.of(
+                    "checkWorkflowNodeTestOutputExists", VIEW_IN_REQUESTED_ENVIRONMENT,
                     "deleteWorkflowNodeTestOutput", IN_REQUESTED_ENVIRONMENT,
                     "saveClusterElementTestOutput", IN_REQUESTED_ENVIRONMENT,
                     "saveWorkflowNodeSampleFile", IN_REQUESTED_ENVIRONMENT,

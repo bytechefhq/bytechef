@@ -91,6 +91,30 @@ class WorkflowNodeTestOutputApiControllerIntTest {
     }
 
     @Test
+    void testCheckWorkflowNodeTestOutputExistsAsksTheFacade() {
+        when(workflowNodeTestOutputFacade.checkWorkflowNodeTestOutputExists(
+            "workflow-1", "dataStorage_1", null, ENVIRONMENT_ID))
+                .thenReturn(true);
+
+        webTestClient
+            .get()
+            .uri(
+                "/internal/workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/exists" +
+                    "?environmentId={environmentId}",
+                "workflow-1", "dataStorage_1", ENVIRONMENT_ID)
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.exists")
+            .isEqualTo(true);
+
+        verify(workflowNodeTestOutputFacade).checkWorkflowNodeTestOutputExists(
+            "workflow-1", "dataStorage_1", null, ENVIRONMENT_ID);
+    }
+
+    @Test
     void testSaveWorkflowNodeTestOutputReturnsTheSavedOutput() {
         when(workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput("workflow-1", "dataStorage_1", ENVIRONMENT_ID))
             .thenReturn(createWorkflowNodeTestOutput(7L, "workflow-1", "dataStorage_1"));
