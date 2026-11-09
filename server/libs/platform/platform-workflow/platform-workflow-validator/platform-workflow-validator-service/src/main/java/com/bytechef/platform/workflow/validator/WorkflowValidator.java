@@ -328,13 +328,25 @@ public class WorkflowValidator {
         TaskOutputProvider taskOutputProvider, StringBuilder errors, StringBuilder warnings) {
 
         for (PropertyInfo propertyInfo : taskDefinition) {
-            if (!PropertyUtils.isNestedTaskProperty(propertyInfo)) {
-                continue;
-            }
-
             JsonNode jsonNode = parametersJsonNode.get(propertyInfo.name());
 
             if (jsonNode == null) {
+                continue;
+            }
+
+            if (!PropertyUtils.isNestedTaskProperty(propertyInfo)) {
+                List<PropertyInfo> itemPropertyInfos = PropertyUtils.getObjectItemProperties(propertyInfo);
+
+                if (itemPropertyInfos != null && jsonNode.isArray()) {
+                    for (JsonNode itemJsonNode : jsonNode) {
+                        if (itemJsonNode.isObject()) {
+                            extractNestedTasksFromParameters(
+                                itemJsonNode, itemPropertyInfos, taskDefinitionMap, taskOutputMap, taskJsonNodes,
+                                taskDefinitionProvider, taskOutputProvider, errors, warnings);
+                        }
+                    }
+                }
+
                 continue;
             }
 
