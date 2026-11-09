@@ -75,6 +75,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
 
+    testImplementation("org.awaitility:awaitility")
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation(project(":server:libs:test:test-int-support"))
