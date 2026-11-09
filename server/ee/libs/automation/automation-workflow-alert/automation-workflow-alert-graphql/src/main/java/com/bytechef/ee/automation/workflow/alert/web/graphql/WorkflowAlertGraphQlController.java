@@ -49,13 +49,13 @@ public class WorkflowAlertGraphQlController {
     }
 
     @QueryMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<WorkflowAlertRule> workflowAlertRules(@Argument long workspaceId) {
         return workflowAlertRuleService.getWorkflowAlertRules(workspaceId);
     }
 
     @QueryMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<WorkflowAlertEvent> workflowAlertEvents(@Argument long workspaceId) {
         return workflowAlertEventService.getWorkflowAlertEvents(workspaceId);
     }
