@@ -65,6 +65,7 @@ import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JsonNode;
@@ -145,6 +146,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     public WorkflowValidationResult validateWorkflow(
         String workflow, @Nullable String workflowId, long environmentId) {
 
@@ -182,11 +184,14 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_VIEW', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public WorkflowValidationResult validateWorkflowById(String workflowId) {
         return validateWorkflowById(workflowId, Environment.DEVELOPMENT.ordinal());
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
     public WorkflowValidationResult validateWorkflowById(String workflowId, long environmentId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
