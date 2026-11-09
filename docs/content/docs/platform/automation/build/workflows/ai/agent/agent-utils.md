@@ -47,7 +47,7 @@ Persists **durable facts** the agent decides are worth keeping - preferences, le
 
 Lets the agent **consult operator-authored [skills](/platform/automation/ai/skills) on demand** - reusable packs of instructions, guidelines, and process documentation. See the [Skills](/platform/automation/ai/skills) page for authoring and the `.skill` archive format.
 
-The same skills can be given to [Claude Code](/reference/components/claude-code_v1#skills): add the Agent Utils **Skills** element to the **Skills** slot of a Claude Code node.
+The same skills can be given to [Claude Code](/reference/components/claude-code_v1#skills): select them in the **Skills** property of its **Chat** action.
 
 ---
 
