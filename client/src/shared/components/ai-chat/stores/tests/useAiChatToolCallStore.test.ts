@@ -101,6 +101,22 @@ describe('aiChatToolCallStore', () => {
         expect(entry.progressOutcome).toBe('failed');
     });
 
+    it('startProgress clears the failed outcome and the steps of the previous start of the same call', () => {
+        aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
+        aiChatToolCallStore.getState().startProgress('call-1', 'Build a Gmail to Slack workflow');
+        aiChatToolCallStore.getState().addProgress('call-1', 'Searching components');
+        aiChatToolCallStore.getState().finishProgress('call-1', 'failed');
+
+        aiChatToolCallStore.getState().startProgress('call-1', 'Build a Gmail to Slack workflow again');
+        aiChatToolCallStore.getState().addProgress('call-1', 'Saving the workflow');
+
+        const entry = aiChatToolCallStore.getState().toolCalls['call-1'];
+
+        expect(entry.progressLabel).toBe('Build a Gmail to Slack workflow again');
+        expect(entry.progressOutcome).toBeUndefined();
+        expect(entry.progress.map((step) => step.text)).toEqual(['Saving the workflow']);
+    });
+
     it('addProgress ignores steps after the delegate finished', () => {
         aiChatToolCallStore.getState().startToolCall('call-1', 'buildWorkflow', 0);
         aiChatToolCallStore.getState().addProgress('call-1', 'Searching components');

@@ -206,7 +206,7 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                     ...state,
                     toolCalls: {
                         ...state.toolCalls,
-                        [toolCallId]: {...existing, progressLabel: label, progressOutcome: undefined},
+                        [toolCallId]: {...existing, progress: [], progressLabel: label, progressOutcome: undefined},
                     },
                 };
             }),
