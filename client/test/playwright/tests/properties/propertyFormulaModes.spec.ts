@@ -484,22 +484,35 @@ test.describe('Property formula modes', () => {
     });
 
     test.describe('Data pill panel', () => {
-        for (const propertyName of ['numberPrecision', 'bool', 'optionsNoMultiselect']) {
-            test(`should open the data pill panel when ${propertyName} gets focus`, async ({
+        test('should open the data pill panel when numberPrecision gets focus', async ({authenticatedPage: page}) => {
+            const dataPillPanel = getDataPillPanel(page);
+
+            await expect(dataPillPanel).toBeHidden();
+
+            const field = getProperty(configurationPanel, 'numberPrecision').locator('input').first();
+
+            await field.scrollIntoViewIfNeeded();
+            await field.focus();
+
+            await expect(dataPillPanel).toBeVisible();
+        });
+
+        for (const propertyName of ['bool', 'optionsNoMultiselect']) {
+            test(`should leave the data pill panel closed when ${propertyName} gets focus`, async ({
                 authenticatedPage: page,
             }) => {
                 const dataPillPanel = getDataPillPanel(page);
 
                 await expect(dataPillPanel).toBeHidden();
 
-                const field = getProperty(configurationPanel, propertyName)
-                    .locator('input, button[role="combobox"]')
-                    .first();
+                const field = getProperty(configurationPanel, propertyName).locator('button[role="combobox"]').first();
 
                 await field.scrollIntoViewIfNeeded();
                 await field.focus();
 
-                await expect(dataPillPanel).toBeVisible();
+                await page.waitForTimeout(500);
+
+                await expect(dataPillPanel).toBeHidden();
             });
         }
     });
