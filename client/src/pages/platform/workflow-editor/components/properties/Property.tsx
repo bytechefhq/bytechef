@@ -366,6 +366,8 @@ const Property = ({
 
     const offersFromAi = !!isToolsClusterElement && expressionEnabled !== false;
 
+    const codeEditorShowsMentions = controlType === 'CODE_EDITOR' && offersFromAi && (isFromAi || isFormulaMode);
+
     const nativeFromAiButton =
         !control && offersFromAi && handleFromAiClick ? (
             <FromAiToggleButton isFromAi={false} onToggle={handleFromAiClick} />
@@ -435,41 +437,44 @@ const Property = ({
                     />
                 )}
 
-            {mentionInput && currentNode && type !== 'DYNAMIC_PROPERTIES' && controlType !== 'CODE_EDITOR' && (
-                <PropertyMentionsInput
-                    cancelPendingSaveRef={editorPendingSaveCancelRef}
-                    controlType={controlType || 'TEXT'}
-                    defaultValue={parameterValue !== undefined ? parameterValue : defaultValue}
-                    deletePropertyButton={deletePropertyButton}
-                    description={description}
-                    dynamicSwitch={dynamicSwitch}
-                    error={hasError}
-                    errorMessage={errorMessage}
-                    expressionEnabled={expressionEnabled}
-                    focusRequest={editorFocusRequest}
-                    handleFromAiClick={handleFromAiClick}
-                    handleInputTypeSwitchButtonClick={handleFormulaSwitch}
-                    isFormulaMode={isFormulaMode}
-                    isFromAi={isFromAi}
-                    label={label || name}
-                    leadingIcon={typeIcon}
-                    legacyMixed={inputMode.legacyMixed}
-                    onSinglePillAbandoned={handleSinglePillAbandoned}
-                    onValueChange={handleMentionInputValueChange}
-                    path={calculatedPath}
-                    pillRequired={isStringSelect(controlType, type) && !isFormulaMode}
-                    placeholder={placeholder}
-                    ref={editorRef}
-                    required={required}
-                    setIsFormulaMode={setIsFormulaMode}
-                    showInputTypeSwitchButton={showFormulaSwitch}
-                    singlePill={inputMode.singlePill}
-                    toolProperty={isToolsClusterElement}
-                    type={type}
-                    validateBeforeSave={validateMentionInputValue}
-                    value={mentionInputValue}
-                />
-            )}
+            {mentionInput &&
+                currentNode &&
+                type !== 'DYNAMIC_PROPERTIES' &&
+                (controlType !== 'CODE_EDITOR' || codeEditorShowsMentions) && (
+                    <PropertyMentionsInput
+                        cancelPendingSaveRef={editorPendingSaveCancelRef}
+                        controlType={controlType === 'CODE_EDITOR' ? 'TEXT' : controlType || 'TEXT'}
+                        defaultValue={parameterValue !== undefined ? parameterValue : defaultValue}
+                        deletePropertyButton={deletePropertyButton}
+                        description={description}
+                        dynamicSwitch={dynamicSwitch}
+                        error={hasError}
+                        errorMessage={errorMessage}
+                        expressionEnabled={expressionEnabled}
+                        focusRequest={editorFocusRequest}
+                        handleFromAiClick={handleFromAiClick}
+                        handleInputTypeSwitchButtonClick={handleFormulaSwitch}
+                        isFormulaMode={isFormulaMode}
+                        isFromAi={isFromAi}
+                        label={label || name}
+                        leadingIcon={typeIcon}
+                        legacyMixed={inputMode.legacyMixed}
+                        onSinglePillAbandoned={handleSinglePillAbandoned}
+                        onValueChange={handleMentionInputValueChange}
+                        path={calculatedPath}
+                        pillRequired={isStringSelect(controlType, type) && !isFormulaMode}
+                        placeholder={placeholder}
+                        ref={editorRef}
+                        required={required}
+                        setIsFormulaMode={setIsFormulaMode}
+                        showInputTypeSwitchButton={showFormulaSwitch}
+                        singlePill={inputMode.singlePill}
+                        toolProperty={isToolsClusterElement}
+                        type={type}
+                        validateBeforeSave={validateMentionInputValue}
+                        value={mentionInputValue}
+                    />
+                )}
 
             {!mentionInput && (
                 <div
@@ -1301,12 +1306,13 @@ const Property = ({
                 />
             )}
 
-            {controlType === 'CODE_EDITOR' && (
+            {controlType === 'CODE_EDITOR' && !codeEditorShowsMentions && (
                 <PropertyCodeEditor
                     defaultValue={defaultValue}
                     description={description}
                     error={hasError}
                     errorMessage={errorMessage}
+                    fromAiButton={nativeFromAiButton}
                     label={label || name}
                     language={languageId!}
                     leadingIcon={typeIcon}

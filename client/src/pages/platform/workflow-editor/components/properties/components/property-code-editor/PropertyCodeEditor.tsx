@@ -16,6 +16,7 @@ interface PropertyCodeEditorProps {
     description?: string;
     error?: boolean;
     errorMessage?: string;
+    fromAiButton?: ReactNode;
     label?: string;
     language: string;
     leadingIcon?: ReactNode;
@@ -34,6 +35,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
             description,
             error,
             errorMessage,
+            fromAiButton,
             label,
             language,
             leadingIcon,
@@ -73,6 +75,8 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                                     <TooltipContent>{description}</TooltipContent>
                                 </Tooltip>
                             )}
+
+                            {fromAiButton && <div className="ml-auto flex items-center">{fromAiButton}</div>}
                         </div>
                     )}
 
