@@ -62,6 +62,7 @@ import com.bytechef.platform.ai.constant.ToolSuspendConstants;
 import com.bytechef.platform.ai.conversation.AgentConversationRecorder;
 import com.bytechef.platform.ai.conversation.AgentConversationRecorder.AgentConversation;
 import com.bytechef.platform.ai.guardrails.AiGuardrailsAdvisorProvider;
+import com.bytechef.platform.ai.guardrails.ChatMemoryRedactingAdvisor;
 import com.bytechef.platform.ai.guardrails.GuardrailSurface;
 import com.bytechef.platform.ai.guardrails.RestorationDestination;
 import com.bytechef.platform.ai.sensitivedata.SensitiveDataMetrics;
@@ -106,6 +107,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -276,6 +278,7 @@ public abstract class AbstractAiAgentChatAction {
         List<Advisor> workspaceAdvisors = new ArrayList<>();
 
         SensitiveDataMetrics toolBoundaryMetrics = null;
+        UnaryOperator<String> chatMemoryRedactor = null;
 
         if (aiGuardrailsAdvisorProviderObjectProvider != null
             && context instanceof ActionContextAware actionContextAware) {
@@ -294,6 +297,13 @@ public abstract class AbstractAiAgentChatAction {
                 toolBoundaryMetrics = aiGuardrailsAdvisorProvider.getMetrics(
                     actionContextAware.getPlatformType(), actionContextAware.getJobPrincipalId(),
                     GuardrailSurface.AI_AGENT);
+
+                if (chatMemoryResult.isPresent()) {
+                    chatMemoryRedactor = aiGuardrailsAdvisorProvider
+                        .getChatMemoryRedactor(
+                            actionContextAware.getPlatformType(), actionContextAware.getJobPrincipalId())
+                        .orElse(null);
+                }
             }
         }
 
@@ -303,7 +313,8 @@ public abstract class AbstractAiAgentChatAction {
                 .advisors(
                     getAdvisors(
                         clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId,
-                        resumedTurn, toolBoundaryMetrics, inputParameters.getInteger(MAX_TOOL_CALLS)))
+                        resumedTurn, toolBoundaryMetrics, inputParameters.getInteger(MAX_TOOL_CALLS),
+                        chatMemoryRedactor))
                 .advisors(getConversationAdvisor(conversationId))
                 .advisors(new TextGenerationFirstAdvisor())
                 .messages(messages)
@@ -905,14 +916,14 @@ public abstract class AbstractAiAgentChatAction {
 
         return getAdvisors(
             clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId, false,
-            null, null);
+            null, null, null);
     }
 
     List<Advisor> getAdvisors(
         ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
         ChatModel chatModel, ActionContext context, Optional<ChatMemoryFunction.Result> chatMemoryResult,
         @Nullable String conversationId, boolean resumedTurn, @Nullable SensitiveDataMetrics toolBoundaryMetrics,
-        @Nullable Integer maxToolCalls) {
+        @Nullable Integer maxToolCalls, @Nullable UnaryOperator<String> chatMemoryRedactor) {
 
         List<Advisor> advisors = new ArrayList<>();
 
@@ -957,9 +968,7 @@ public abstract class AbstractAiAgentChatAction {
         Optional<ClusterElement> chatMemoryClusterElement = clusterElementMap.fetchClusterElement(CHAT_MEMORY);
 
         chatMemoryResult
-            .map(result -> result.supportsToolMessagePersistence() ? (Advisor) result.advisor()
-                : resumedTurn ? getResumedTurnChatMemoryAdvisor(result)
-                    : new BlankReplySkippingChatMemoryAdvisor(result.advisor()))
+            .map(result -> getChatMemoryAdvisor(result, resumedTurn, chatMemoryRedactor))
             .map(advisor -> attributeFailures(advisor, chatMemoryClusterElement, clusterElementCallTarget))
             .ifPresent(advisors::add);
 
@@ -1032,8 +1041,25 @@ public abstract class AbstractAiAgentChatAction {
         return false;
     }
 
-    private static Advisor getResumedTurnChatMemoryAdvisor(ChatMemoryFunction.Result chatMemoryResult) {
-        return new ResumedTurnChatMemoryAdvisor(chatMemoryResult.advisor());
+    private static Advisor getChatMemoryAdvisor(
+        ChatMemoryFunction.Result chatMemoryResult, boolean resumedTurn,
+        @Nullable UnaryOperator<String> chatMemoryRedactor) {
+
+        BaseAdvisor memoryAdvisor = chatMemoryResult.advisor();
+
+        if (chatMemoryRedactor != null) {
+            memoryAdvisor = new ChatMemoryRedactingAdvisor(memoryAdvisor, chatMemoryRedactor);
+        }
+
+        if (chatMemoryResult.supportsToolMessagePersistence()) {
+            return memoryAdvisor;
+        }
+
+        if (resumedTurn) {
+            return new ResumedTurnChatMemoryAdvisor(memoryAdvisor);
+        }
+
+        return new BlankReplySkippingChatMemoryAdvisor(memoryAdvisor);
     }
 
     private static Parameters getConnectionParameters(
