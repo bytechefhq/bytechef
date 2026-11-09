@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -314,6 +315,16 @@ public class AiGuardrails {
         }
 
         return restored;
+    }
+
+    public @Nullable UnaryOperator<String> newChatMemoryRedactor(AiGuardrailsSettingsTarget target) {
+        EffectivePolicy policy = resolvePolicy(target);
+
+        if (!policy.redactPii()) {
+            return null;
+        }
+
+        return text -> redactEnabledKinds(text, policy, policy.minConfidence(), null);
     }
 
     public String scanResponseText(
