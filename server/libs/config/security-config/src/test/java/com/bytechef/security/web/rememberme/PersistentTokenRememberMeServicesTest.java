@@ -124,6 +124,60 @@ class PersistentTokenRememberMeServicesTest {
     }
 
     @Test
+    void testAutoLoginWithTheOldTokenSucceedsAfterTheRefreshedTokenWasAlreadyPresented() {
+        mockStoredToken();
+
+        persistentTokenRememberMeServices.processAutoLoginCookie(
+            new String[] {
+                SERIES, TOKEN_VALUE, FIRST_TENANT_ID
+            }, createAutoLoginRequest(), new MockHttpServletResponse());
+
+        String refreshedTokenValue = savedTokens.getFirst()
+            .getTokenValue();
+
+        persistentTokenRememberMeServices.processAutoLoginCookie(
+            new String[] {
+                SERIES, refreshedTokenValue, FIRST_TENANT_ID
+            }, createAutoLoginRequest(), new MockHttpServletResponse());
+
+        UserDetails userDetails = persistentTokenRememberMeServices.processAutoLoginCookie(
+            new String[] {
+                SERIES, TOKEN_VALUE, FIRST_TENANT_ID
+            }, createAutoLoginRequest(), new MockHttpServletResponse());
+
+        assertThat(userDetails.getUsername()).isEqualTo(LOGIN);
+        verify(persistentTokenService, never()).delete(anyString());
+    }
+
+    @Test
+    void testAutoLoginWithTheRefreshedTokenWithinTheUpgradeWindowDoesNotRefreshItAgain() {
+        mockStoredToken();
+
+        MockHttpServletResponse firstResponse = new MockHttpServletResponse();
+
+        persistentTokenRememberMeServices.processAutoLoginCookie(
+            new String[] {
+                SERIES, TOKEN_VALUE, FIRST_TENANT_ID
+            }, createAutoLoginRequest(), firstResponse);
+
+        String refreshedTokenValue = savedTokens.getFirst()
+            .getTokenValue();
+
+        MockHttpServletResponse secondResponse = new MockHttpServletResponse();
+
+        UserDetails userDetails = persistentTokenRememberMeServices.processAutoLoginCookie(
+            new String[] {
+                SERIES, refreshedTokenValue, FIRST_TENANT_ID
+            }, createAutoLoginRequest(), secondResponse);
+
+        assertThat(userDetails.getUsername()).isEqualTo(LOGIN);
+        assertThat(savedTokens).hasSize(1);
+        assertThat(savedTokens.getFirst()
+            .getTokenValue()).isEqualTo(refreshedTokenValue);
+        assertThat(getRememberMeCookies(secondResponse)).isEmpty();
+    }
+
+    @Test
     void testAutoLoginReplayedWithinTheUpgradeWindowIsRejectedForAnotherTenant() {
         mockStoredToken();
 

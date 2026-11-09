@@ -124,7 +124,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
             String login = null;
             String tenantId = cookieTokens[2];
-            UpgradedRememberMeToken upgradedToken = upgradedTokenCache.get(cookieTokens[0]);
+            UpgradedRememberMeToken upgradedToken = upgradedTokenCache.get(getUpgradedTokenCacheKey(cookieTokens));
 
             if (upgradedToken != null) {
                 login = upgradedToken.getUserLoginIfValid(cookieTokens);
@@ -169,7 +169,16 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
                     throw new RememberMeAuthenticationException("Autologin failed due to data access problem", e);
                 }
 
-                upgradedTokenCache.put(cookieTokens[0], new UpgradedRememberMeToken(cookieTokens, login));
+                upgradedTokenCache.put(
+                    getUpgradedTokenCacheKey(cookieTokens), new UpgradedRememberMeToken(cookieTokens, login));
+
+                String[] refreshedCookieTokens = {
+                    token.getSeries(), token.getTokenValue(), tenantId
+                };
+
+                upgradedTokenCache.put(
+                    getUpgradedTokenCacheKey(refreshedCookieTokens),
+                    new UpgradedRememberMeToken(refreshedCookieTokens, login));
             }
 
             HttpSession session = request.getSession();
@@ -370,6 +379,14 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         }
 
         return token;
+    }
+
+    private static String getUpgradedTokenCacheKey(String[] cookieTokens) {
+        if (cookieTokens.length < 2) {
+            return cookieTokens[0];
+        }
+
+        return cookieTokens[0] + ":" + cookieTokens[1];
     }
 
     private void addCookie(
