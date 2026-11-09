@@ -15,20 +15,23 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.AiHubSubAgentToolCallbackFactory;
 import com.bytechef.ee.ai.hub.tool.GenerateImageToolCallback;
+import com.bytechef.ee.ai.hub.tool.GenerateImageToolCallback.ImageGenerationMeter;
 import com.bytechef.ee.ai.hub.tool.ImageGeneratorToolCallback;
 import com.bytechef.ee.ai.hub.usage.AiHubToolUsageContextResolver;
-import com.bytechef.ee.platform.ai.tool.usage.MeteredToolCallback;
+import com.bytechef.ee.platform.ai.tool.usage.ToolUsageContext;
 import com.bytechef.ee.platform.ai.tool.usage.ToolUsageRecorder;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -46,31 +49,37 @@ public class ImageGeneratorConfiguration {
         ChatModel chatModel, ObjectProvider<SubAgentChatModelResolver> chatModelResolverProvider,
         ApplicationProperties applicationProperties, AssetFileFacade assetFileFacade,
         AiHubChatArtifactRecorder chatArtifactRecorder, ObjectProvider<ToolUsageRecorder> toolUsageRecorderProvider,
-        AiHubChatService chatService, JsonMapper jsonMapper,
-        @Value("classpath:prompt_image_generator.txt") Resource promptResource) {
+        AiHubChatService chatService, @Value("classpath:prompt_image_generator.txt") Resource promptResource) {
 
         IntelligentToolChatClientFactory chatClientFactory = SubAgentConfigurationSupport.chatClientFactory(
             chatModel, SubAgentConfigurationSupport.readPrompt(promptResource, "image generator"));
         SubAgentChatModelResolver chatModelResolver = chatModelResolverProvider.getIfAvailable();
         List<ToolCallback> toolCallbacks = List.of(
-            meter(
-                GenerateImageToolCallback.of(applicationProperties, assetFileFacade, chatArtifactRecorder),
-                toolUsageRecorderProvider.getIfAvailable(), chatService, jsonMapper));
+            GenerateImageToolCallback.of(
+                applicationProperties, assetFileFacade, chatArtifactRecorder,
+                imageGenerationMeter(toolUsageRecorderProvider.getIfAvailable(), chatService)));
 
         return () -> new ImageGeneratorToolCallback(chatClientFactory, chatModelResolver, toolCallbacks);
     }
 
-    static ToolCallback meter(
-        ToolCallback generateImageToolCallback, @Nullable ToolUsageRecorder toolUsageRecorder,
-        AiHubChatService chatService, JsonMapper jsonMapper) {
+    static @Nullable ImageGenerationMeter imageGenerationMeter(
+        @Nullable ToolUsageRecorder toolUsageRecorder, AiHubChatService chatService) {
 
         if (toolUsageRecorder == null) {
-            return generateImageToolCallback;
+            return null;
         }
 
-        return new MeteredToolCallback(
-            generateImageToolCallback, METERED_TOOL_NAME, 1, toolUsageRecorder,
-            AiHubToolUsageContextResolver.create(chatService, METERED_TOOL_NAME),
-            MeteredToolCallback.singleStringField("size"), jsonMapper);
+        Function<ToolContext, ToolUsageContext> contextResolver = AiHubToolUsageContextResolver.create(
+            chatService, METERED_TOOL_NAME);
+
+        return (toolContext, size, durationMs) -> {
+            ToolUsageContext toolUsageContext = contextResolver.apply(toolContext);
+
+            if (toolUsageContext == null) {
+                return;
+            }
+
+            toolUsageRecorder.recordTool(toolUsageContext, METERED_TOOL_NAME, 1, durationMs, Map.of("size", size));
+        };
     }
 }

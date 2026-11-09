@@ -25,7 +25,7 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.tool.AiHubChatArtifactRecorder;
 import com.bytechef.ee.ai.hub.tool.AiHubSubAgentToolCallbackFactory;
 import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
-import com.bytechef.ee.platform.ai.tool.usage.MeteredToolCallback;
+import com.bytechef.ee.ai.hub.tool.GenerateImageToolCallback.ImageGenerationMeter;
 import com.bytechef.ee.platform.ai.tool.usage.ToolUsageContext;
 import com.bytechef.ee.platform.ai.tool.usage.ToolUsageRecorder;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -35,12 +35,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -71,37 +68,34 @@ class ImageGeneratorConfigurationTest {
     }
 
     @Test
-    void testMeterWrapsGenerateImageWhenARecorderIsPresent() {
-        ToolCallback generateImageToolCallback = toolCallback("{\"fileId\":\"1\"}");
-
-        assertThat(ImageGeneratorConfiguration.meter(
-            generateImageToolCallback, toolUsageRecorder, chatService, new JsonMapper()))
-                .isInstanceOf(MeteredToolCallback.class);
-        assertThat(ImageGeneratorConfiguration.meter(generateImageToolCallback, null, chatService, new JsonMapper()))
-            .isSameAs(generateImageToolCallback);
+    void testImageGenerationMeterIsAbsentWithoutARecorder() {
+        assertThat(ImageGeneratorConfiguration.imageGenerationMeter(null, chatService)).isNull();
     }
 
     @Test
-    void testMeteredGenerateImageRecordsAnOpenAiImageUsageRow() {
+    void testImageGenerationMeterRecordsAnOpenAiImageUsageRow() {
         when(chatService.findByThreadId("thread-1")).thenReturn(Optional.empty());
 
-        ToolCallback meteredToolCallback = ImageGeneratorConfiguration.meter(
-            toolCallback("{\"fileId\":\"1\"}"), toolUsageRecorder, chatService, new JsonMapper());
+        ImageGenerationMeter imageGenerationMeter = ImageGeneratorConfiguration.imageGenerationMeter(
+            toolUsageRecorder, chatService);
 
-        meteredToolCallback.call("{\"prompt\":\"a sunrise\",\"size\":\"1024x1792\"}", toolContext());
+        assertThat(imageGenerationMeter).isNotNull();
+
+        imageGenerationMeter.record(toolContext(), "1024x1792", 5L);
 
         verify(toolUsageRecorder).recordTool(
-            eq(new ToolUsageContext(3L, 7L, 2, null)), eq("openai_image"), eq(1), anyLong(),
+            eq(new ToolUsageContext(3L, 7L, 2, null)), eq("openai_image"), eq(1), eq(5L),
             eq(Map.of("size", "1024x1792")));
     }
 
     @Test
-    void testMeteredGenerateImageSkipsErrorResults() {
-        ToolCallback meteredToolCallback = ImageGeneratorConfiguration.meter(
-            toolCallback("{\"error\":\"OpenAI API key not configured\"}"), toolUsageRecorder, chatService,
-            new JsonMapper());
+    void testImageGenerationMeterSkipsACallWithoutAWorkspace() {
+        ImageGenerationMeter imageGenerationMeter = ImageGeneratorConfiguration.imageGenerationMeter(
+            toolUsageRecorder, chatService);
 
-        meteredToolCallback.call("{\"prompt\":\"a sunrise\"}", toolContext());
+        assertThat(imageGenerationMeter).isNotNull();
+
+        imageGenerationMeter.record(null, "1024x1024", 5L);
 
         verify(toolUsageRecorder, never()).recordTool(any(), anyString(), eq(1), anyLong(), any());
     }
@@ -113,22 +107,7 @@ class ImageGeneratorConfigurationTest {
 
         return imageGeneratorConfiguration.imageGeneratorToolCallbackFactory(
             mock(ChatModel.class), chatModelResolverProvider, new ApplicationProperties(), mock(AssetFileFacade.class),
-            mock(AiHubChatArtifactRecorder.class), toolUsageRecorderProvider, chatService, new JsonMapper(),
-            promptResource);
-    }
-
-    private static ToolCallback toolCallback(String result) {
-        ToolCallback toolCallback = mock(ToolCallback.class);
-
-        when(toolCallback.getToolDefinition()).thenReturn(
-            ToolDefinition.builder()
-                .name("generateImage")
-                .description("Generate an image")
-                .inputSchema("{}")
-                .build());
-        when(toolCallback.call(anyString(), any())).thenReturn(result);
-
-        return toolCallback;
+            mock(AiHubChatArtifactRecorder.class), toolUsageRecorderProvider, chatService, promptResource);
     }
 
     private static ToolContext toolContext() {

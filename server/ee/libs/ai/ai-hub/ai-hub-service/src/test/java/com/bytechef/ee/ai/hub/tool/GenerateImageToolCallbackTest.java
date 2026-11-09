@@ -9,7 +9,9 @@ package com.bytechef.ee.ai.hub.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -47,6 +49,8 @@ class GenerateImageToolCallbackTest {
 
     private final AiHubChatArtifactRecorder artifactRecorder = mock(AiHubChatArtifactRecorder.class);
     private final AssetFileFacade assetFileFacade = mock(AssetFileFacade.class);
+    private final GenerateImageToolCallback.ImageGenerationMeter imageGenerationMeter =
+        mock(GenerateImageToolCallback.ImageGenerationMeter.class);
     private final ImageModel imageModel = mock(ImageModel.class);
     private final JsonMapper jsonMapper = new JsonMapper();
 
@@ -101,15 +105,43 @@ class GenerateImageToolCallbackTest {
     }
 
     @Test
+    void testCallRecordsTheGeneratedImageWhenSavingItFails() {
+        ToolContext toolContext = toolContext();
+
+        when(imageModel.call(any(ImagePrompt.class))).thenReturn(imageResponse());
+        when(assetFileFacade.createBinaryFromAi(any(), eq(2), any(), any(), any(), any(), any(), any(), any()))
+            .thenThrow(new IllegalStateException("storage unavailable"));
+
+        assertThat(newCallback().call("{\"prompt\":\"a sunrise\",\"size\":\"1024x1792\"}", toolContext))
+            .contains("\"error\"");
+
+        verify(imageGenerationMeter).record(eq(toolContext), eq("1024x1792"), anyLong());
+    }
+
+    @Test
+    void testCallSavesTheImageWhenRecordingItsUsageFails() {
+        when(imageModel.call(any(ImagePrompt.class))).thenReturn(imageResponse());
+        when(assetFileFacade.createBinaryFromAi(any(), eq(2), any(), any(), any(), any(), any(), any(), any()))
+            .thenReturn(assetFile());
+        doThrow(new IllegalStateException("recorder unavailable")).when(imageGenerationMeter)
+            .record(any(), any(), anyLong());
+
+        JsonNode node = jsonMapper.readTree(newCallback().call("{\"prompt\":\"a sunrise\"}", toolContext()));
+
+        assertThat(node.get("fileId")
+            .asString()).isEqualTo("11");
+    }
+
+    @Test
     void testCallReturnsErrorWithoutAnApiKey() {
         GenerateImageToolCallback callback = GenerateImageToolCallback.of(
-            new ApplicationProperties(), assetFileFacade, artifactRecorder);
+            new ApplicationProperties(), assetFileFacade, artifactRecorder, imageGenerationMeter);
 
         assertThat(callback.call("{\"prompt\":\"a sunrise\"}", toolContext()))
             .contains("OpenAI API key not configured");
         assertThat(callback.getImageModelName()).isEqualTo("dall-e-3");
 
-        verifyNoInteractions(assetFileFacade);
+        verifyNoInteractions(assetFileFacade, imageGenerationMeter);
     }
 
     @Test
@@ -123,7 +155,7 @@ class GenerateImageToolCallbackTest {
     void testCallReturnsErrorWhenPromptIsBlank() {
         assertThat(newCallback().call("{\"prompt\":\" \"}", toolContext())).contains("prompt is required");
 
-        verifyNoInteractions(imageModel);
+        verifyNoInteractions(imageModel, imageGenerationMeter);
     }
 
     @Test
@@ -145,7 +177,8 @@ class GenerateImageToolCallbackTest {
     }
 
     private GenerateImageToolCallback newCallback() {
-        return new GenerateImageToolCallback(imageModel, "dall-e-3", assetFileFacade, artifactRecorder);
+        return new GenerateImageToolCallback(
+            imageModel, "dall-e-3", assetFileFacade, artifactRecorder, imageGenerationMeter);
     }
 
     private static AssetFile assetFile() {
