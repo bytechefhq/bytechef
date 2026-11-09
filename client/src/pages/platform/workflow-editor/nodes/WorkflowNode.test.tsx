@@ -527,6 +527,20 @@ describe('WorkflowNode', () => {
             workflowNodeName: 'aiAgent_1',
         } as unknown as NodeDataType;
 
+        it('shows its workflow node name under the operation when drawn as a box on the main canvas', () => {
+            renderNode(
+                {
+                    ...MAIN_ROOT_DATA,
+                    clusterFrame: {clusterRootId: 'draft', contentOrigin: {x: 32, y: 40}, height: 320, width: 640},
+                    name: 'draft',
+                    workflowNodeName: 'draft',
+                } as NodeDataType,
+                'draft'
+            );
+
+            expect(screen.getByText('draft')).toBeInTheDocument();
+        });
+
         it('carries the node menu when drawn as a box on the main canvas', () => {
             recordedContextMenuProps.value = undefined;
 

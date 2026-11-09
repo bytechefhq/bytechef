@@ -314,11 +314,22 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                                 )}
                                             >
                                                 {data.operationName}
+
+                                                {isMainRootClusterElement && (
+                                                    <span className="ml-2 font-sans text-content-neutral-secondary">
+                                                        {data.workflowNodeName}
+                                                    </span>
+                                                )}
                                             </pre>
                                         )}
 
-                                        {isNestedClusterRoot && (
-                                            <span className="w-full truncate text-xs text-content-neutral-secondary">
+                                        {(isNestedClusterRoot || (isMainRootClusterElement && !data.operationName)) && (
+                                            <span
+                                                className={twMerge(
+                                                    'text-sm text-content-neutral-secondary',
+                                                    isNestedClusterRoot && 'w-full truncate text-xs'
+                                                )}
+                                            >
                                                 {data.workflowNodeName}
                                             </span>
                                         )}
