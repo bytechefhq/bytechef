@@ -5,6 +5,8 @@ import {
     buildFunctionInsertion,
     filterFunctionDefinitions,
     findEnclosingFunctionCall,
+    findForcedFunctionSuggestionMatch,
+    findForcedFunctionSuggestionStart,
     findFunctionSuggestionMatch,
     formatFunctionSignature,
     formatFunctionSignatureParts,
@@ -74,6 +76,12 @@ describe('filterFunctionDefinitions', () => {
 
         expect(filterFunctionDefinitions(many, 'fn').length).toBe(50);
     });
+
+    it('returns every definition for an empty query', () => {
+        const many = Array.from({length: 100}, (_, index) => definition({name: `fn${index}`}));
+
+        expect(filterFunctionDefinitions(many, '').length).toBe(100);
+    });
 });
 
 describe('buildFunctionInsertion', () => {
@@ -115,6 +123,66 @@ describe('findFunctionSuggestionMatch', () => {
         const $position = {nodeBefore: {isText: true, text: '$conc'}, pos: 7} as never;
 
         expect(findFunctionSuggestionMatch({$position})).toBeNull();
+    });
+});
+
+describe('findForcedFunctionSuggestionStart', () => {
+    it('starts at the caret when no word is being typed', () => {
+        const $position = {nodeBefore: {isText: true, text: 'add('}, pos: 5} as never;
+
+        expect(findForcedFunctionSuggestionStart({$position})).toBe(5);
+    });
+
+    it('starts at the beginning of the word being typed', () => {
+        const $position = {nodeBefore: {isText: true, text: 'add(c'}, pos: 6} as never;
+
+        expect(findForcedFunctionSuggestionStart({$position})).toBe(5);
+    });
+
+    it('starts at the caret in an empty editor', () => {
+        const $position = {nodeBefore: null, pos: 1} as never;
+
+        expect(findForcedFunctionSuggestionStart({$position})).toBe(1);
+    });
+
+    it('returns null after a $ datapill token', () => {
+        const $position = {nodeBefore: {isText: true, text: '$co'}, pos: 4} as never;
+
+        expect(findForcedFunctionSuggestionStart({$position})).toBeNull();
+    });
+});
+
+describe('findForcedFunctionSuggestionMatch', () => {
+    it('matches an empty query at the forced start', () => {
+        const $position = {nodeBefore: null, pos: 1} as never;
+
+        expect(findForcedFunctionSuggestionMatch({$position}, 1)).toEqual({
+            query: '',
+            range: {from: 1, to: 1},
+            text: '',
+        });
+    });
+
+    it('matches a single typed character after the forced start', () => {
+        const $position = {nodeBefore: {isText: true, text: 'add(c'}, pos: 6} as never;
+
+        expect(findForcedFunctionSuggestionMatch({$position}, 5)).toEqual({
+            query: 'c',
+            range: {from: 5, to: 6},
+            text: 'c',
+        });
+    });
+
+    it('returns null once the text after the forced start is no longer a word', () => {
+        const $position = {nodeBefore: {isText: true, text: 'add(c,'}, pos: 7} as never;
+
+        expect(findForcedFunctionSuggestionMatch({$position}, 5)).toBeNull();
+    });
+
+    it('returns null when the caret moved before the forced start', () => {
+        const $position = {nodeBefore: {isText: true, text: 'ad'}, pos: 3} as never;
+
+        expect(findForcedFunctionSuggestionMatch({$position}, 5)).toBeNull();
     });
 });
 

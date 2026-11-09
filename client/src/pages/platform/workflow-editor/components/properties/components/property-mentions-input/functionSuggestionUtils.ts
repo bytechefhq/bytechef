@@ -23,6 +23,10 @@ export function filterFunctionDefinitions(
     definitions: EvaluatorFunctionDefinition[],
     query: string
 ): EvaluatorFunctionDefinition[] {
+    if (query === '') {
+        return definitions;
+    }
+
     const lowercaseQuery = query.toLowerCase();
 
     return definitions
@@ -43,6 +47,12 @@ interface SuggestionMatchResultI {
     range: {from: number; to: number};
     text: string;
 }
+
+interface SuggestionPositionI {
+    $position: {nodeBefore: {isText: boolean; text?: string | null} | null; pos: number};
+}
+
+const FORCED_QUERY = /^([A-Za-z][A-Za-z0-9]*)?$/;
 
 // The trailing run of letters and digits at the end of `text`, starting at its first letter — the
 // word the caret is typing. Scanned backwards by hand rather than with an end-anchored regex: an
@@ -65,11 +75,7 @@ function findTrailingWord(text: string): string {
 // Custom findSuggestionMatch: trigger on the trailing word before the caret (no explicit trigger char).
 // nodeBefore is the contiguous text node ending at the caret, so its trailing-word length maps 1:1 to
 // document positions even when a datapill node precedes it on the same line.
-export function findFunctionSuggestionMatch({
-    $position,
-}: {
-    $position: {nodeBefore: {isText: boolean; text?: string | null} | null; pos: number};
-}): SuggestionMatchResultI | null {
+export function findFunctionSuggestionMatch({$position}: SuggestionPositionI): SuggestionMatchResultI | null {
     const nodeBefore = $position.nodeBefore;
 
     if (!nodeBefore || !nodeBefore.isText || !nodeBefore.text) {
@@ -92,6 +98,40 @@ export function findFunctionSuggestionMatch({
     const from = to - word.length;
 
     return {query: word, range: {from, to}, text: word};
+}
+
+export function findForcedFunctionSuggestionStart({$position}: SuggestionPositionI): number | null {
+    const nodeBefore = $position.nodeBefore;
+    const text = nodeBefore?.isText && nodeBefore.text ? nodeBefore.text : '';
+    const word = findTrailingWord(text);
+
+    if (text[text.length - word.length - 1] === '$') {
+        return null;
+    }
+
+    return $position.pos - word.length;
+}
+
+export function findForcedFunctionSuggestionMatch(
+    {$position}: SuggestionPositionI,
+    forcedFrom: number
+): SuggestionMatchResultI | null {
+    const to = $position.pos;
+    const nodeBefore = $position.nodeBefore;
+    const text = nodeBefore?.isText && nodeBefore.text ? nodeBefore.text : '';
+    const textStart = to - text.length;
+
+    if (forcedFrom > to || forcedFrom < textStart) {
+        return null;
+    }
+
+    const query = text.slice(forcedFrom - textStart);
+
+    if (!FORCED_QUERY.test(query)) {
+        return null;
+    }
+
+    return {query, range: {from: forcedFrom, to}, text: query};
 }
 
 export function isFormulaModeActive(
