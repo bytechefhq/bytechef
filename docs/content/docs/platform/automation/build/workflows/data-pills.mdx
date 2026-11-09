@@ -78,6 +78,10 @@ type:
   selected option, the date or the items with a data pill, for example a list produced by an
   earlier step. Turn it off to get the regular control back. A dropdown of text values also
   accepts typed text around its pills.
+- **Code fields** that accept expressions have the **Text** and **Formula**
+  switches too. Turn **Text** on to use a data pill as the code, for example code produced by an
+  earlier step. Turn **Formula** on to build the code with an expression. With both off, the
+  field opens the regular code editor.
 
 <Callout type="warn">
 Turning the **Text** switch on for an array or object that already has items asks before it
@@ -99,6 +103,17 @@ In formula mode you can:
 - Reference data pills inside the expression, e.g. `=concat(${trigger_1.body.firstName}, ' ', ${trigger_1.body.lastName})`.
 - Call built-in functions. As you type a function name, an autocomplete list and a signature tooltip
   appear to guide you.
+
+#### Formula editor
+
+A long formula is hard to read in a one-line field. In formula mode, click the expand button
+before the **Formula** switch to open the formula in a larger editor that opens over the field. The
+editor works like the field: it has the same autocomplete, it takes data pills when you click them
+in the Data Pill Panel, and it saves as you type. Close it with its **X** button, Esc, or a click
+outside the editor.
+
+On a text area or rich text field, the same expand button opens the full-size side panel editor
+in Text mode and the formula editor in formula mode.
 
 The autocomplete offers the full set of functions as you type. The complete catalog is grouped below
 by category.

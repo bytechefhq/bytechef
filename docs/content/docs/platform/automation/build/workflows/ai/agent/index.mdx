@@ -384,6 +384,8 @@ When you attach a tool, you see its full input form, and for every parameter you
 - **Fix it yourself** - type a constant (or a data pill). The value is identical on every call and the model never sees or controls it.
 - **Let the model supply it** - set the field to a `fromAi(...)` expression. At call time the model provides the value, and the parameter is advertised to the model as part of the tool's generated JSON-schema signature.
 
+The **Generate content with AI** button (the sparkles icon) next to a field writes the `fromAi(...)` expression for you. On dropdowns, true/false fields and code editors the button is shown once the field's **Text** or **Formula** switch is on, because the expression replaces the regular control.
+
 The expression form is:
 
 ```
