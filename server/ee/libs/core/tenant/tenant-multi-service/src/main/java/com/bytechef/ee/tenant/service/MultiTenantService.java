@@ -159,6 +159,8 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
     public void loadChangelog(List<String> tenantIds, Tenancy tenancy) {
         for (String tenantId : tenantIds) {
             TenantContext.runWithTenantId(tenantId, () -> loadChangelog(tenantId, tenancy));
+
+            log.info("Completed tenant id {} change log", tenantId);
         }
     }
 
