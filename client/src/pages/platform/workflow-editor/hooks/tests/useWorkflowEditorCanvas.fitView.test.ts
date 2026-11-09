@@ -16,6 +16,8 @@ vi.mock('@xyflow/react', async (importOriginal) => ({
     useReactFlow: hoisted.useReactFlowMock,
 }));
 
+vi.mock('../useCanvasHeightViewport', () => ({default: () => undefined}));
+
 vi.mock('../useInitialViewport', () => ({default: hoisted.useInitialViewportMock}));
 
 vi.mock('../useOverlayPanelsViewport', () => ({default: () => ({getViewportOffsetX: () => 0})}));
