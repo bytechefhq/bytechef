@@ -181,7 +181,7 @@ const AutomationWorkflowProjectListItem = ({
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-x-6">
+                    <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                         <div className="flex min-w-52 flex-col items-end gap-y-2">
                             <div className="flex min-h-8 items-center space-x-2">
                                 {project.published ? (

@@ -24,7 +24,7 @@ const WorkflowGroupCardSkeleton = ({label, showWorkflowRunButton, workflowCount}
                     <Skeleton className="mt-2 h-4 w-20" />
                 </div>
 
-                <div className="flex items-center justify-end gap-x-6">
+                <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                     <Skeleton className="h-5 w-8 rounded-full" />
 
                     <div className="flex min-w-52 flex-col items-end gap-y-4">
