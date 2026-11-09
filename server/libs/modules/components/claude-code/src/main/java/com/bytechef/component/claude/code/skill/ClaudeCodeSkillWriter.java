@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils.cluster;
+package com.bytechef.component.claude.code.skill;
 
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRIES;
 import static com.bytechef.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
-import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeSkillsFunction.SKILLS;
 
-import com.bytechef.component.definition.ClusterElementContext;
-import com.bytechef.component.definition.ClusterElementDefinition;
-import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade.AiSkillDownload;
-import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeSkillsFunction;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -47,53 +40,36 @@ import java.util.zip.ZipInputStream;
 /**
  * @author Ivica Cardic
  */
-public class AiAgentUtilsClaudeCodeSkills {
+public class ClaudeCodeSkillWriter {
 
     static final long MAX_SKILL_SIZE = 100L * 1024 * 1024;
 
-    private static final String SKILL_ID = "skillId";
     private static final String SKILL_MD_FILENAME = "SKILL.md";
-    private static final String SKILLS_PROPERTY = "skills";
-
-    public final ClusterElementDefinition<ClaudeCodeSkillsFunction> clusterElementDefinition;
 
     private final AiSkillFacade aiSkillFacade;
 
     @SuppressFBWarnings("EI")
-    public AiAgentUtilsClaudeCodeSkills(AiSkillFacade aiSkillFacade) {
+    public ClaudeCodeSkillWriter(AiSkillFacade aiSkillFacade) {
         this.aiSkillFacade = aiSkillFacade;
-
-        this.clusterElementDefinition = ComponentDsl.<ClaudeCodeSkillsFunction>clusterElement("claudeCodeSkills")
-            .title("Skills")
-            .description("Gives Claude Code skills from the ByteChef skill library.")
-            .type(SKILLS)
-            .properties(
-                array(SKILLS_PROPERTY)
-                    .label("Skills")
-                    .description("Select the skills Claude Code can use.")
-                    .placeholder("Choose a skill...")
-                    .expressionEnabled(false)
-                    .items(
-                        integer(SKILL_ID)
-                            .label("Skill")
-                            .options((ClusterElementDefinition.OptionsFunction<Long>) this::getSkillOptions)
-                            .expressionEnabled(false)
-                            .required(true))
-                    .required(true))
-            .object(() -> this::apply);
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
-    private void apply(
-        Parameters inputParameters, Parameters connectionParameters, Path skillsDirectory, Context context)
-        throws IOException {
+    public List<Option<Long>> getSkillOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, ActionContext context) {
 
-        List<Long> skillIds = inputParameters.getList(SKILLS_PROPERTY, Long.class, List.of());
+        List<Option<Long>> options = new ArrayList<>();
 
-        if (skillIds.isEmpty()) {
-            throw new IllegalArgumentException("At least one skill must be configured");
+        for (AiSkill aiSkill : aiSkillFacade.getAiSkills()) {
+            Long id = aiSkill.getId();
+
+            options.add(option(aiSkill.getName(), id.longValue()));
         }
 
+        return options;
+    }
+
+    public void write(List<Long> skillIds, Path skillsDirectory) throws IOException {
         for (Long skillId : skillIds) {
             if (skillId == null) {
                 throw new IllegalArgumentException("Unexpected null skill item in configuration");
@@ -227,21 +203,5 @@ public class AiAgentUtilsClaudeCodeSkills {
         }
 
         return skillDirectory;
-    }
-
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    private List<Option<Long>> getSkillOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
-        String searchText, ClusterElementContext context) {
-
-        List<Option<Long>> options = new ArrayList<>();
-
-        for (AiSkill aiSkill : aiSkillFacade.getAiSkills()) {
-            Long id = aiSkill.getId();
-
-            options.add(option(aiSkill.getName(), id.longValue()));
-        }
-
-        return options;
     }
 }

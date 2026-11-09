@@ -25,7 +25,6 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction.McpServer;
-import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeSkillsFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import io.github.markpollack.claude.agent.sdk.ClaudeClient;
@@ -150,22 +149,6 @@ public final class ClaudeCodeUtil {
         } finally {
             WORKSPACE_LOCKS.computeIfPresent(workspace,
                 (key, existingWorkspaceLock) -> existingWorkspaceLock.release());
-        }
-    }
-
-    public static void writeSkills(
-        List<ClusterElement> clusterElements, Map<String, ComponentConnection> componentConnections,
-        ClusterElementDefinitionService clusterElementDefinitionService, Path skillsDirectory, Context context)
-        throws Exception {
-
-        for (ClusterElement clusterElement : clusterElements) {
-            ClaudeCodeSkillsFunction claudeCodeSkillsFunction = clusterElementDefinitionService.getClusterElement(
-                clusterElement.getComponentName(), clusterElement.getComponentVersion(),
-                clusterElement.getClusterElementName());
-
-            claudeCodeSkillsFunction.apply(
-                ParametersFactory.create(clusterElement.getParameters()),
-                getConnectionParameters(clusterElement, componentConnections), skillsDirectory, context);
         }
     }
 

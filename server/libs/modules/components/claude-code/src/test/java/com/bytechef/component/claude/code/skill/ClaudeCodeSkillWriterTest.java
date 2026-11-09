@@ -14,26 +14,28 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils.cluster;
+package com.bytechef.component.claude.code.skill;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Option;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade.AiSkillDownload;
-import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeSkillsFunction;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.Test;
@@ -42,7 +44,7 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * @author Ivica Cardic
  */
-class AiAgentUtilsClaudeCodeSkillsTest {
+class ClaudeCodeSkillWriterTest {
 
     private static final String SKILL_MD = """
         ---
@@ -53,13 +55,12 @@ class AiAgentUtilsClaudeCodeSkillsTest {
         """;
 
     private final AiSkillFacade aiSkillFacade = mock(AiSkillFacade.class);
-    private final Context context = mock(Context.class);
 
     @TempDir
     private Path skillsDirectory;
 
     @Test
-    void testApplyWritesEveryFileOfEachSkillIntoItsOwnDirectory() throws Exception {
+    void testWriteWritesEveryFileOfEachSkillIntoItsOwnDirectory() throws Exception {
         mockSkill(1L, "Release Notes", zip(Map.of(
             "SKILL.md", SKILL_MD, "scripts/collect.py", "print('changes')", "templates/notes.txt", "## Changes")));
         mockSkill(2L, "Code Review", zip(Map.of("code-review/SKILL.md", SKILL_MD, "code-review/rules.md", "rules")));
@@ -75,7 +76,7 @@ class AiAgentUtilsClaudeCodeSkillsTest {
     }
 
     @Test
-    void testApplyGivesSkillsWithTheSameDirectoryNameDistinctDirectories() throws Exception {
+    void testWriteGivesSkillsWithTheSameDirectoryNameDistinctDirectories() throws Exception {
         mockSkill(1L, "Notes", zip(Map.of("SKILL.md", SKILL_MD)));
         mockSkill(2L, "notes", zip(Map.of("SKILL.md", SKILL_MD)));
 
@@ -86,7 +87,7 @@ class AiAgentUtilsClaudeCodeSkillsTest {
     }
 
     @Test
-    void testApplyRejectsAnArchiveWithoutSkillMd() throws Exception {
+    void testWriteRejectsAnArchiveWithoutSkillMd() throws Exception {
         mockSkill(1L, "Broken", zip(Map.of("README.md", "no skill here")));
 
         assertThatThrownBy(() -> apply(List.of(1L)))
@@ -95,7 +96,7 @@ class AiAgentUtilsClaudeCodeSkillsTest {
     }
 
     @Test
-    void testApplyRejectsPathTraversal() throws Exception {
+    void testWriteRejectsPathTraversal() throws Exception {
         Map<String, String> entries = new LinkedHashMap<>();
 
         entries.put("SKILL.md", SKILL_MD);
@@ -111,21 +112,36 @@ class AiAgentUtilsClaudeCodeSkillsTest {
     }
 
     @Test
-    void testApplyRejectsAnEmptySelection() {
-        assertThatThrownBy(() -> apply(List.of()))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("At least one skill");
+    void testWriteWritesNothingWithoutSelectedSkills() throws Exception {
+        apply(List.of());
+
+        try (Stream<Path> paths = Files.list(skillsDirectory)) {
+            assertThat(paths).isEmpty();
+        }
+    }
+
+    @Test
+    void testGetSkillOptionsListsEverySkillOfTheLibrary() {
+        AiSkill releaseNotes = new AiSkill();
+
+        releaseNotes.setId(1L);
+        releaseNotes.setName("Release Notes");
+
+        when(aiSkillFacade.getAiSkills()).thenReturn(List.of(releaseNotes));
+
+        ClaudeCodeSkillWriter claudeCodeSkillWriter = new ClaudeCodeSkillWriter(aiSkillFacade);
+
+        List<Option<Long>> options = claudeCodeSkillWriter.getSkillOptions(
+            null, null, Map.of(), null, mock(ActionContext.class));
+
+        assertThat(options).extracting(Option::getLabel, Option::getValue)
+            .containsExactly(tuple("Release Notes", 1L));
     }
 
     private void apply(List<Long> skillIds) throws Exception {
-        AiAgentUtilsClaudeCodeSkills aiAgentUtilsClaudeCodeSkills = new AiAgentUtilsClaudeCodeSkills(aiSkillFacade);
+        ClaudeCodeSkillWriter claudeCodeSkillWriter = new ClaudeCodeSkillWriter(aiSkillFacade);
 
-        ClaudeCodeSkillsFunction claudeCodeSkillsFunction =
-            aiAgentUtilsClaudeCodeSkills.clusterElementDefinition.getElement();
-
-        claudeCodeSkillsFunction.apply(
-            MockParametersFactory.create(Map.of("skills", skillIds)), MockParametersFactory.create(Map.of()),
-            skillsDirectory, context);
+        claudeCodeSkillWriter.write(skillIds, skillsDirectory);
     }
 
     private void mockSkill(long id, String name, byte[] bytes) {

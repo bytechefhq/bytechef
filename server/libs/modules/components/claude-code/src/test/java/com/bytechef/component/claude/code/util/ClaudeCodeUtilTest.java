@@ -27,7 +27,6 @@ import com.bytechef.platform.ai.workspace.AgentWorkspaceQuota;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction.McpServer;
-import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeSkillsFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -36,6 +35,7 @@ import io.github.markpollack.claude.agent.sdk.mcp.McpServerConfig;
 import io.github.markpollack.claude.agent.sdk.transport.CLIOptions;
 import io.github.markpollack.claude.agent.sdk.types.Message;
 import io.github.markpollack.claude.agent.sdk.types.ResultMessage;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -106,22 +106,9 @@ class ClaudeCodeUtilTest {
 
     @Test
     void testRunKeepsTheWorkspaceFilesAndRebuildsTheSkillsEachRun() throws Exception {
-        ClaudeCodeSkillsFunction claudeCodeSkillsFunction = (
-            inputParameters, connectionParameters, skillsDirectory, context) -> Files.writeString(
-                Files.createDirectories(skillsDirectory.resolve(inputParameters.getRequiredString("name")))
-                    .resolve("SKILL.md"),
-                "skill");
-
-        when(clusterElementDefinitionService.getClusterElement("aiAgentUtils", 1, "claudeCodeSkills"))
-            .thenReturn(claudeCodeSkillsFunction);
-
-        List<ClusterElement> firstSkills = List.of(
-            clusterElement("skills_1", "aiAgentUtils/v1/claudeCodeSkills", Map.of("name", "release-notes")));
-
         String firstResult = ClaudeCodeUtil.run(
             "clone", new AgentWorkspaceQuota(workspace, 0), Map::of,
-            skillsDirectory -> ClaudeCodeUtil.writeSkills(
-                firstSkills, Map.of(), clusterElementDefinitionService, skillsDirectory, context),
+            skillsDirectory -> writeSkill(skillsDirectory, "release-notes"),
             (prompt, workingDirectory, mcpServerConfigs, hookRegistry) -> {
                 assertThat(workingDirectory).isEqualTo(workspace);
                 assertThat(workingDirectory.resolve(".claude/skills/release-notes/SKILL.md")).hasContent("skill");
@@ -132,13 +119,9 @@ class ClaudeCodeUtilTest {
                 return "reply to " + prompt;
             });
 
-        List<ClusterElement> secondSkills = List.of(
-            clusterElement("skills_1", "aiAgentUtils/v1/claudeCodeSkills", Map.of("name", "triage")));
-
         String secondResult = ClaudeCodeUtil.run(
             "review", new AgentWorkspaceQuota(workspace, 0), Map::of,
-            skillsDirectory -> ClaudeCodeUtil.writeSkills(
-                secondSkills, Map.of(), clusterElementDefinitionService, skillsDirectory, context),
+            skillsDirectory -> writeSkill(skillsDirectory, "triage"),
             (prompt, workingDirectory, mcpServerConfigs, hookRegistry) -> {
                 assertThat(workingDirectory.resolve("notes.md")).hasContent("kept");
                 assertThat(workingDirectory.resolve(".claude/skills/triage/SKILL.md")).hasContent("skill");
@@ -327,5 +310,11 @@ class ClaudeCodeUtilTest {
 
     private static ComponentConnection connection(Map<String, ?> parameters) {
         return new ComponentConnection("mcpClient", 1, 1L, parameters, null);
+    }
+
+    private static void writeSkill(Path skillsDirectory, String name) throws IOException {
+        Path skillDirectory = Files.createDirectories(skillsDirectory.resolve(name));
+
+        Files.writeString(skillDirectory.resolve("SKILL.md"), "skill");
     }
 }

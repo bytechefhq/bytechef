@@ -17,20 +17,25 @@
 package com.bytechef.component.claude.code.action;
 
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.SCRIPT;
+import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.SKILLS;
+import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.SKILL_ID;
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.WORKSPACE_NAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.ai.workspace.AgentWorkspaceLayout.DEFAULT_WORKSPACE_NAME;
 import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction.MCP_SERVERS;
-import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeSkillsFunction.SKILLS;
 
 import com.bytechef.component.claude.code.executor.ClaudeCodeExecutor;
+import com.bytechef.component.claude.code.skill.ClaudeCodeSkillWriter;
 import com.bytechef.component.claude.code.util.ClaudeCodeUtil;
 import com.bytechef.component.claude.code.workspace.ClaudeCodeWorkspaceResolver;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
@@ -50,32 +55,36 @@ import java.util.Map;
 public class ClaudeCodeChat {
 
     private final ClaudeCodeExecutor claudeCodeExecutor;
-    private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final ClaudeCodeSkillWriter claudeCodeSkillWriter;
     private final ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver;
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
 
     ClaudeCodeChat(
-        ClusterElementDefinitionService clusterElementDefinitionService,
+        ClusterElementDefinitionService clusterElementDefinitionService, ClaudeCodeSkillWriter claudeCodeSkillWriter,
         ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver, ClaudeCodeExecutor claudeCodeExecutor) {
 
         this.claudeCodeExecutor = claudeCodeExecutor;
+        this.claudeCodeSkillWriter = claudeCodeSkillWriter;
         this.claudeCodeWorkspaceResolver = claudeCodeWorkspaceResolver;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
     }
 
     public static ActionDefinition of(
-        ClusterElementDefinitionService clusterElementDefinitionService,
+        ClusterElementDefinitionService clusterElementDefinitionService, ClaudeCodeSkillWriter claudeCodeSkillWriter,
         ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver) {
 
         ClaudeCodeChat claudeCodeChat = new ClaudeCodeChat(
-            clusterElementDefinitionService, claudeCodeWorkspaceResolver, ClaudeCodeUtil::execute);
+            clusterElementDefinitionService, claudeCodeSkillWriter, claudeCodeWorkspaceResolver,
+            ClaudeCodeUtil::execute);
 
         return action("chat")
             .title("Chat")
             .description(
                 "Sends a message to Claude Code. Claude Code can use the tools of the attached MCP servers and the " +
-                    "attached skills.")
+                    "selected skills.")
             .properties(
                 messageProperty(),
+                skillsProperty(claudeCodeSkillWriter),
                 workspaceNameProperty())
             .output(
                 outputSchema(
@@ -93,7 +102,7 @@ public class ClaudeCodeChat {
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
         List<ClusterElement> mcpServers = clusterElementMap.getClusterElements(MCP_SERVERS);
-        List<ClusterElement> skills = clusterElementMap.getClusterElements(SKILLS);
+        List<Long> skillIds = inputParameters.getList(SKILLS, Long.class, List.of());
 
         Path workspace = claudeCodeWorkspaceResolver.resolve(context, inputParameters.getString(WORKSPACE_NAME));
 
@@ -101,8 +110,7 @@ public class ClaudeCodeChat {
             inputParameters.getRequiredString(SCRIPT), claudeCodeWorkspaceResolver.getQuota(workspace),
             () -> ClaudeCodeUtil.getMcpServerConfigs(
                 mcpServers, componentConnections, clusterElementDefinitionService, context),
-            skillsDirectory -> ClaudeCodeUtil.writeSkills(
-                skills, componentConnections, clusterElementDefinitionService, skillsDirectory, context),
+            skillsDirectory -> claudeCodeSkillWriter.write(skillIds, skillsDirectory),
             claudeCodeExecutor);
     }
 
@@ -112,6 +120,22 @@ public class ClaudeCodeChat {
             .description("The message to send to Claude Code.")
             .controlType(ControlType.TEXT_AREA)
             .required(true);
+    }
+
+    private static ModifiableArrayProperty skillsProperty(ClaudeCodeSkillWriter claudeCodeSkillWriter) {
+        return array(SKILLS)
+            .label("Skills")
+            .description(
+                "Skills from the ByteChef skill library (Settings > AI > Skills) that Claude Code can use. ByteChef " +
+                    "writes them to .claude/skills in the working directory at the start of each run.")
+            .placeholder("Choose a skill...")
+            .expressionEnabled(false)
+            .items(
+                integer(SKILL_ID)
+                    .label("Skill")
+                    .options((ActionDefinition.OptionsFunction<Long>) claudeCodeSkillWriter::getSkillOptions)
+                    .expressionEnabled(false)
+                    .required(true));
     }
 
     private static ModifiableStringProperty workspaceNameProperty() {
