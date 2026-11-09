@@ -83,6 +83,7 @@ public class InMemoryJobRepository implements JobRepository {
         return ids.stream()
             .map(id -> cache.get(TenantCacheKeyUtils.getKey(id)))
             .filter(Objects::nonNull)
+            .map(this::copy)
             .toList();
     }
 
@@ -99,6 +100,7 @@ public class InMemoryJobRepository implements JobRepository {
 
                 return parentTaskExecutionId != null && parentTaskExecutionIds.contains(parentTaskExecutionId);
             })
+            .map(this::copy)
             .toList();
     }
 
@@ -113,6 +115,7 @@ public class InMemoryJobRepository implements JobRepository {
                     job.getLastModifiedDate()
                         .isBefore(lastModifiedDate);
             })
+            .map(this::copy)
             .toList();
     }
 
@@ -143,7 +146,8 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public Optional<Job> findById(Long id) {
-        return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(id)));
+        return Optional.ofNullable(cache.get(TenantCacheKeyUtils.getKey(id)))
+            .map(this::copy);
     }
 
     @Override
@@ -186,7 +190,8 @@ public class InMemoryJobRepository implements JobRepository {
     @Override
     public Optional<Job> findByTaskExecutionId(Long taskExecutionId) {
         return inMemoryTaskExecutionRepository.findById(taskExecutionId)
-            .map(taskExecution -> cache.get(TenantCacheKeyUtils.getKey(taskExecution.getJobId())));
+            .map(taskExecution -> cache.get(TenantCacheKeyUtils.getKey(taskExecution.getJobId())))
+            .map(this::copy);
     }
 
     @Override
@@ -197,10 +202,12 @@ public class InMemoryJobRepository implements JobRepository {
 
         // Emulate identical behaviour when storing in db by serialization and deserialization
 
-        cache.put(
-            TenantCacheKeyUtils.getKey(job.getId()),
-            objectMapper.readValue(objectMapper.writeValueAsString(job), Job.class));
+        cache.put(TenantCacheKeyUtils.getKey(job.getId()), copy(job));
 
         return job;
+    }
+
+    private Job copy(Job job) {
+        return objectMapper.readValue(objectMapper.writeValueAsString(job), Job.class);
     }
 }

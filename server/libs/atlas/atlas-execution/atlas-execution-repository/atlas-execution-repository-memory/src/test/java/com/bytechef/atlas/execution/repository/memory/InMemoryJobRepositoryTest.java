@@ -74,6 +74,49 @@ class InMemoryJobRepositoryTest {
             .isEmpty());
     }
 
+    @Test
+    void testFindByIdReturnsACopyThatDoesNotChangeTheStoredJob() {
+        long jobId = saveJob(101L);
+
+        Job job = inMemoryJobRepository.findById(jobId)
+            .orElseThrow();
+
+        job.setStatus(Job.Status.STOPPED);
+
+        assertEquals(Job.Status.STARTED, getStoredStatus(jobId));
+    }
+
+    @Test
+    void testFindAllByIdInReturnsCopiesThatDoNotChangeTheStoredJobs() {
+        long jobId = saveJob(101L);
+
+        List<Job> jobs = inMemoryJobRepository.findAllByIdIn(List.of(jobId));
+
+        jobs.getFirst()
+            .setStatus(Job.Status.STOPPED);
+
+        assertEquals(Job.Status.STARTED, getStoredStatus(jobId));
+    }
+
+    @Test
+    void testFindAllByParentTaskExecutionIdInReturnsCopiesThatDoNotChangeTheStoredJobs() {
+        long jobId = saveJob(101L);
+
+        List<Job> jobs = inMemoryJobRepository.findAllByParentTaskExecutionIdIn(List.of(101L));
+
+        jobs.getFirst()
+            .setStatus(Job.Status.STOPPED);
+
+        assertEquals(Job.Status.STARTED, getStoredStatus(jobId));
+    }
+
+    private Job.Status getStoredStatus(long jobId) {
+        Job storedJob = inMemoryJobRepository.findById(jobId)
+            .orElseThrow();
+
+        return storedJob.getStatus();
+    }
+
     private long saveJob(Long parentTaskExecutionId) {
         Job job = new Job();
 
