@@ -96,6 +96,13 @@ public class AssetFilePublicDownloadController {
     private ResponseEntity<StreamingResponseBody> streamResponse(
         FileEntry fileEntry, String filename, String mimeType) {
 
+        if (!assetFileFileStorage.fileExists(fileEntry)) {
+            log.warn("Asset file download found no stored content for {}", filename);
+
+            return ResponseEntity.notFound()
+                .build();
+        }
+
         StreamingResponseBody body = out -> {
             try (InputStream in = assetFileFileStorage.getInputStream(fileEntry)) {
                 in.transferTo(out);

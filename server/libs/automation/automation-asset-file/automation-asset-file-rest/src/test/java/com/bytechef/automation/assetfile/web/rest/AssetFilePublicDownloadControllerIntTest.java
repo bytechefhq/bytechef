@@ -45,6 +45,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -93,6 +94,11 @@ class AssetFilePublicDownloadControllerIntTest {
     @Autowired
     private FileEntryTokens fileEntryTokens;
 
+    @BeforeEach
+    void beforeEach() {
+        when(assetFileFileStorage.fileExists(any())).thenReturn(true);
+    }
+
     @Test
     void testPublicDownloadStreamsContentAsAttachment() throws Exception {
         FileEntry fileEntry = new FileEntry("report.html", "asset_files/report.html");
@@ -125,6 +131,25 @@ class AssetFilePublicDownloadControllerIntTest {
 
         mockMvc.perform(get("/api/automation/asset-files/public/bad-token"))
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testPublicDownloadReturns404WhenTheStoredContentIsMissing() throws Exception {
+        FileEntry fileEntry = new FileEntry("gone.txt", "asset_files/gone.txt");
+        AssetFile assetFile = new AssetFile();
+
+        assetFile.setId(9L);
+        assetFile.setName("gone.txt");
+        assetFile.setMimeType("text/plain");
+        assetFile.setFile(fileEntry);
+
+        when(assetFileSystemFacade.fetchByPublicLinkToken("gone-token")).thenReturn(Optional.of(assetFile));
+        when(assetFileFileStorage.fileExists(fileEntry)).thenReturn(false);
+
+        mockMvc.perform(get("/api/automation/asset-files/public/gone-token"))
+            .andExpect(status().isNotFound());
+
+        verify(assetFileFileStorage, never()).getInputStream(any());
     }
 
     @Test
@@ -176,6 +201,19 @@ class AssetFilePublicDownloadControllerIntTest {
 
         verify(assetFileFileStorage).getInputStream(FILE_A);
         verifyNoInteractions(assetFileFacade, assetFileSystemFacade);
+    }
+
+    @Test
+    @WithAnonymousUser
+    void testSignedDownloadReturns404WhenTheStoredContentIsMissing() throws Exception {
+        String token = fileEntryTokens.toSignedToken(FILE_A);
+
+        when(assetFileFileStorage.fileExists(FILE_A)).thenReturn(false);
+
+        mockMvc.perform(get("/api/automation/asset-files/signed/{token}", token))
+            .andExpect(status().isNotFound());
+
+        verify(assetFileFileStorage, never()).getInputStream(any());
     }
 
     @Test
