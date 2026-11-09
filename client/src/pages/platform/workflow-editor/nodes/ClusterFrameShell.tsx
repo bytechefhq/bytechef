@@ -170,7 +170,10 @@ const ClusterFrameShell = ({children, data, nodeId, nodeMenu}: ClusterFrameShell
             style={{height: clusterFrame.height, width: clusterFrame.width}}
         >
             {nodeMenu && (
-                <div className="nodrag invisible absolute top-2 -left-7 z-10 group-hover:visible focus-within:visible">
+                <div
+                    className="nodrag invisible absolute top-0 -left-7 z-10 flex items-center group-hover:visible focus-within:visible"
+                    style={{height: CLUSTER_FRAME_HEADER_HEIGHT}}
+                >
                     {nodeMenu}
                 </div>
             )}
