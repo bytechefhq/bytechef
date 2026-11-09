@@ -173,6 +173,42 @@ describe('getPropertyInputMode', () => {
         ).toEqual({legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: true});
     });
 
+    describe('a code editor', () => {
+        it('keeps code that holds template literals in the code editor', () => {
+            expect(
+                getPropertyInputMode({
+                    controlType: 'CODE_EDITOR',
+                    formulaMode: false,
+                    isFromAi: false,
+                    value: 'const greeting = `Hello ${name}`;',
+                })
+            ).toEqual({legacyMixed: false, mode: 'text', renderer: 'native', singlePill: false});
+        });
+
+        it('shows a lone pill in the one-pill editor', () => {
+            expect(
+                getPropertyInputMode({
+                    controlType: 'CODE_EDITOR',
+                    formulaMode: false,
+                    isFromAi: false,
+                    value: '${httpClient_1.body}',
+                })
+            ).toEqual({legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: true});
+        });
+
+        it('opens the one-pill editor on pill entry', () => {
+            expect(
+                getPropertyInputMode({
+                    controlType: 'CODE_EDITOR',
+                    formulaMode: false,
+                    isFromAi: false,
+                    pillEntry: true,
+                    value: "print('hi')",
+                })
+            ).toEqual({legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: true});
+        });
+    });
+
     it('a controlled text-like field is a native input', () => {
         expect(
             getPropertyInputMode({

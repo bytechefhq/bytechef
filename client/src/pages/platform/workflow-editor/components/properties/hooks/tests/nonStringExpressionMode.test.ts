@@ -465,10 +465,13 @@ describe('non-string expression mode', () => {
             ).toBe(true);
         });
 
-        it('should NOT show for NULL or CODE_EDITOR controls', () => {
+        it('should NOT show for NULL controls', () => {
             expect(renderShowFormulaSwitch({controlType: 'NULL', expressionEnabled: true, type: 'NULL'})).toBe(false);
+        });
+
+        it('should show for CODE_EDITOR controls', () => {
             expect(renderShowFormulaSwitch({controlType: 'CODE_EDITOR', expressionEnabled: true, type: 'STRING'})).toBe(
-                false
+                true
             );
         });
     });

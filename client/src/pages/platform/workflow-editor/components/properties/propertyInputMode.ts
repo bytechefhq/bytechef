@@ -72,6 +72,10 @@ export function getPropertyInputMode({
         return TEXT_MENTIONS;
     }
 
+    if (controlType === 'CODE_EDITOR' && !pillEntry && !isSingleDataPill(value)) {
+        return {legacyMixed: false, mode: 'text', renderer: 'native', singlePill: false};
+    }
+
     const onePillLimit = !isStringSelect(controlType, type);
 
     if (isSingleDataPill(value)) {
