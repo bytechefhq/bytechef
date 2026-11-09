@@ -1519,6 +1519,117 @@ class EvaluatorFunctionDefinitions implements EvaluatorFunctionDefinitionFactory
         .example("=config('app.setting')")
         .toDefinition();
 
+    static final EvaluatorFunctionDefinition EXISTS = function(EvaluatorFunctionName.EXISTS)
+        .title("Exists")
+        .description(
+            "Returns true if a variable path resolves to a non-null value, for example the output of a step that " +
+                "may not have run yet. The path is a string, so a missing value does not leave the formula " +
+                "unresolved.")
+        .category(EvaluatorFunctionCategory.UTILITY)
+        .parameters(
+            parameter("path")
+                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
+                .type(STRING)
+                .required(true))
+        .returnType(BOOLEAN)
+        .example("=exists('judge') ? ${judge.answers.score} : 0")
+        .toDefinition();
+
+    static final EvaluatorFunctionDefinition GET_OR_DEFAULT_BOOLEAN = function(EvaluatorFunctionName.GET_OR_DEFAULT)
+        .title("Get or Default")
+        .description(
+            "Returns the value at a variable path, or the default boolean when the path does not exist or is " +
+                "null. The path is a string, so a missing value does not leave the formula unresolved.")
+        .category(EvaluatorFunctionCategory.UTILITY)
+        .parameters(
+            parameter("path")
+                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
+                .type(STRING)
+                .required(true),
+            parameter("defaultValue")
+                .description("The value to return when the path does not exist or is null")
+                .type(BOOLEAN)
+                .required(true))
+        .returnType(BOOLEAN)
+        .example("=getOrDefault('forceMistake', false)")
+        .toDefinition();
+
+    static final EvaluatorFunctionDefinition GET_OR_DEFAULT_LIST = function(EvaluatorFunctionName.GET_OR_DEFAULT)
+        .title("Get or Default")
+        .description(
+            "Returns the value at a variable path, or the default list when the path does not exist or is " +
+                "null. The path is a string, so a missing value does not leave the formula unresolved.")
+        .category(EvaluatorFunctionCategory.UTILITY)
+        .parameters(
+            parameter("path")
+                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
+                .type(STRING)
+                .required(true),
+            parameter("defaultValue")
+                .description("The value to return when the path does not exist or is null")
+                .type(LIST)
+                .required(true))
+        .returnType(LIST)
+        .example("=getOrDefault('items', {})")
+        .toDefinition();
+
+    static final EvaluatorFunctionDefinition GET_OR_DEFAULT_MAP = function(EvaluatorFunctionName.GET_OR_DEFAULT)
+        .title("Get or Default")
+        .description(
+            "Returns the value at a variable path, or the default map when the path does not exist or is " +
+                "null. The path is a string, so a missing value does not leave the formula unresolved.")
+        .category(EvaluatorFunctionCategory.UTILITY)
+        .parameters(
+            parameter("path")
+                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
+                .type(STRING)
+                .required(true),
+            parameter("defaultValue")
+                .description("The value to return when the path does not exist or is null")
+                .type(MAP)
+                .required(true))
+        .returnType(MAP)
+        .example("=getOrDefault('settings', {:})")
+        .toDefinition();
+
+    static final EvaluatorFunctionDefinition GET_OR_DEFAULT_NUMBER = function(EvaluatorFunctionName.GET_OR_DEFAULT)
+        .title("Get or Default")
+        .description(
+            "Returns the value at a variable path, or the default number when the path does not exist or is " +
+                "null. The path is a string, so a missing value does not leave the formula unresolved.")
+        .category(EvaluatorFunctionCategory.UTILITY)
+        .parameters(
+            parameter("path")
+                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
+                .type(STRING)
+                .required(true),
+            parameter("defaultValue")
+                .description("The value to return when the path does not exist or is null")
+                .type(NUMBER)
+                .required(true))
+        .returnType(NUMBER)
+        .example("=getOrDefault('attempts', 0) + 1")
+        .toDefinition();
+
+    static final EvaluatorFunctionDefinition GET_OR_DEFAULT_STRING = function(EvaluatorFunctionName.GET_OR_DEFAULT)
+        .title("Get or Default")
+        .description(
+            "Returns the value at a variable path, or the default string when the path does not exist or is " +
+                "null. The path is a string, so a missing value does not leave the formula unresolved.")
+        .category(EvaluatorFunctionCategory.UTILITY)
+        .parameters(
+            parameter("path")
+                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
+                .type(STRING)
+                .required(true),
+            parameter("defaultValue")
+                .description("The value to return when the path does not exist or is null")
+                .type(STRING)
+                .required(true))
+        .returnType(STRING)
+        .example("=${question} + getOrDefault('feedback', '')")
+        .toDefinition();
+
     static final EvaluatorFunctionDefinition UUID = function(EvaluatorFunctionName.UUID)
         .title("UUID")
         .description("Generates a random UUID (version 4).")
@@ -1628,6 +1739,12 @@ class EvaluatorFunctionDefinitions implements EvaluatorFunctionDefinitionFactory
 
         // Utility
         CONFIG,
+        EXISTS,
+        GET_OR_DEFAULT_BOOLEAN,
+        GET_OR_DEFAULT_LIST,
+        GET_OR_DEFAULT_MAP,
+        GET_OR_DEFAULT_NUMBER,
+        GET_OR_DEFAULT_STRING,
         UUID);
 
     @Override

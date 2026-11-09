@@ -1198,4 +1198,105 @@ class SpelEvaluatorTest {
         assertEquals(Map.of("currency", "EUR"), map.get("result"));
         assertEquals(Map.of("amount", 10, "currency", "EUR"), sourceMap);
     }
+
+    @Test
+    void testExistsIsFalseForAMissingVariable() {
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("result", "=exists('attempts')"), Map.of());
+
+        assertEquals(false, map.get("result"));
+    }
+
+    @Test
+    void testExistsIsTrueForAPresentVariable() {
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("result", "=exists('attempts')"), Map.of("attempts", 1));
+
+        assertEquals(true, map.get("result"));
+    }
+
+    @Test
+    void testExistsIsFalseForANullValue() {
+        Map<String, Object> context = new HashMap<>();
+
+        context.put("attempts", null);
+
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("result", "=exists('attempts')"), context);
+
+        assertEquals(false, map.get("result"));
+    }
+
+    @Test
+    void testExistsFollowsADottedPath() {
+        Map<String, Object> context = Map.of("judge", Map.of("answers", Map.of("score", 0.9)));
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "present", "=exists('judge.answers.score')", "missingLeaf", "=exists('judge.answers.other')",
+                "missingParent", "=exists('judge.verdict.score')", "notAMap", "=exists('judge.answers.score.value')"),
+            context);
+
+        assertEquals(true, map.get("present"));
+        assertEquals(false, map.get("missingLeaf"));
+        assertEquals(false, map.get("missingParent"));
+        assertEquals(false, map.get("notAMap"));
+    }
+
+    @Test
+    void testExistsGuardsAReferenceToAStepThatHasNotRun() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("result", "=exists('judge') ? ${judge.score} : 0"), Map.of());
+
+        assertEquals(0, map.get("result"));
+    }
+
+    @Test
+    void testGetOrDefaultCountsFromTheDefaultOnTheFirstPass() {
+        Map<String, Object> first = EVALUATOR.evaluate(
+            Map.of("attempts", "=getOrDefault('attempts', 0) + 1"), Map.of());
+        Map<String, Object> second = EVALUATOR.evaluate(
+            Map.of("attempts", "=getOrDefault('attempts', 0) + 1"), Map.of("attempts", 1));
+
+        assertEquals(1, first.get("attempts"));
+        assertEquals(2, second.get("attempts"));
+    }
+
+    @Test
+    void testGetOrDefaultReturnsTheDefaultForANullValue() {
+        Map<String, Object> context = new HashMap<>();
+
+        context.put("feedback", null);
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("result", "=${question} + getOrDefault('feedback', '')"),
+            withQuestion(context));
+
+        assertEquals("Why?", map.get("result"));
+    }
+
+    @Test
+    void testGetOrDefaultFollowsADottedPath() {
+        Map<String, Object> context = Map.of("judge", Map.of("answers", Map.of("ok", Map.of("isTrue", true))));
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "present", "=getOrDefault('judge.answers.ok.isTrue', false)",
+                "missing", "=getOrDefault('judge.answers.other.isTrue', false)"),
+            context);
+
+        assertEquals(true, map.get("present"));
+        assertEquals(false, map.get("missing"));
+    }
+
+    @Test
+    void testGetOrDefaultKeepsAFalseValue() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("result", "=getOrDefault('forceMistake', true)"), Map.of("forceMistake", false));
+
+        assertEquals(false, map.get("result"));
+    }
+
+    private static Map<String, Object> withQuestion(Map<String, Object> context) {
+        context.put("question", "Why?");
+
+        return context;
+    }
 }

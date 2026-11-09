@@ -104,8 +104,10 @@ public class SpelEvaluator implements Evaluator {
         map.put(EvaluatorFunctionName.CONCAT, new Concat());
         map.put(EvaluatorFunctionName.CONTAINS, new Contains());
         map.put(EvaluatorFunctionName.EQUALS_IGNORE_CASE, new EqualsIgnoreCase());
+        map.put(EvaluatorFunctionName.EXISTS, new Exists());
         map.put(EvaluatorFunctionName.FORMAT, new Format());
         map.put(EvaluatorFunctionName.FLATTEN, new Flatten());
+        map.put(EvaluatorFunctionName.GET_OR_DEFAULT, new GetOrDefault());
         map.put(EvaluatorFunctionName.FLOAT, new Cast<>(Float.class));
         map.put(EvaluatorFunctionName.DOUBLE, new Cast<>(Double.class));
         map.put(EvaluatorFunctionName.INDEX_OF, new IndexOf());
