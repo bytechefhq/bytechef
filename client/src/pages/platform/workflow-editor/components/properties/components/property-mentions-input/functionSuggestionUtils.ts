@@ -88,6 +88,10 @@ export function findFunctionSuggestionMatch({$position}: SuggestionPositionI): S
         return null;
     }
 
+    if (isInsideStringLiteral(nodeBefore.text)) {
+        return null;
+    }
+
     // Don't compete with the `$` datapill suggestion: if the matched word is the tail of a `$`-prefixed
     // token (e.g. "$conc"), let the datapill source own it so both popups don't open at once.
     if (nodeBefore.text[nodeBefore.text.length - word.length - 1] === '$') {
@@ -181,6 +185,20 @@ function maskQuotedSegments(text: string): string {
     }
 
     return masked;
+}
+
+function isInsideStringLiteral(text: string): boolean {
+    let quote: string | null = null;
+
+    for (const character of text) {
+        if (quote) {
+            quote = character === quote ? null : quote;
+        } else if (character === '"' || character === "'") {
+            quote = character;
+        }
+    }
+
+    return quote !== null;
 }
 
 // Counts closing parens in `text` that are not matched by an opening paren within `text` — i.e. the
