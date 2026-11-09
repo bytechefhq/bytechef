@@ -78,7 +78,7 @@ Claude Code runs as the Claude Code CLI on the ByteChef server. The component is
 
 Chat checks that the CLI is installed before it starts and fails with a setup message when it is not. Restart ByteChef after you install the CLI.
 
-Claude Code runs with all tool permissions on the server. Run ByteChef as a user that has access only to what Claude Code needs.
+Claude Code runs with all tool permissions on the server, and it is not confined to its working directory. It can read and write every file that the server user can, including the working directories of other workflows and tenants. Run ByteChef as a user that has access only to what Claude Code needs.
 
 #### MCP Servers
 
@@ -94,13 +94,30 @@ Add **Skills** elements from the **AI Agent Utils** component to the **Skills** 
 
 #### How a run works
 
-Each workflow has its own working directory, and it is kept between runs. Files that Claude Code writes in one run, for example a cloned repository or notes, are there in the next run. The directory is below `bytechef.component.claude-code.workspace.basedir` (default `~/bytechef/data/claude-code-workspaces`):
+Each deployed workflow has its own working directory, and it is kept between runs. Files that Claude Code writes in one run, for example a cloned repository or notes, are there in the next run. The directory is below `bytechef.component.claude-code.workspace.basedir` (default `~/bytechef/data/claude-code-workspaces`):
 
 - Deployed workflows: `<tenant>/<automation or embedded>/<deployment id>/<environment>/<workflow id>/<workspace name>`.
-- Test runs in the workflow editor: `<tenant>/test/workflow-<workflow id>/<workspace name>`.
+- Test runs in the workflow editor: `<tenant>/test/job-<job id>/<workspace name>`. Each test run gets a new, empty directory.
 
-**Workspace Name** (advanced, default `default`) selects the directory. Claude Code steps of the same workflow with the same workspace name share files. Steps with different names do not. Only one run at a time uses a directory: a second run waits until the first run ends.
+**Workspace Name** (advanced, default `default`) selects the directory. Claude Code steps of the same workflow with the same workspace name share files. Steps with different names do not. Only one run at a time uses a directory: a second run waits until the first run ends. This applies to the runs of one ByteChef node. When several nodes share the base directory, for example on a network file system, runs on different nodes can use the same directory at the same time.
 
 At the start of each run, ByteChef deletes the `.claude` directory in the working directory and writes the selected skills to `.claude/skills` again. Claude Code loads only the settings of the working directory. The settings, plugins and output styles in the home directory of the server user are not used. A `CLAUDE.md` file in the working directory is kept, so Claude Code can keep project notes in it from run to run.
 
-To start again with an empty directory, delete the directory on the server.
+#### Workspace cleanup
+
+Every `bytechef.component.claude-code.workspace.cleanup-interval` (default 1 hour), each ByteChef node removes from its own disk:
+
+- the directories of editor test runs older than `workspace.test-retention` (default 24 hours);
+- the directories of deleted tenants, deployments, integration instances and workflows;
+- deployed directories in which nothing changed for `workspace.idle-retention`. This is off by default.
+
+A directory that a run of the same node is using is not removed.
+
+#### Workspace size limit
+
+`bytechef.component.claude-code.workspace.max-size` (default 1 GB, `0` for no limit) limits the size of each working directory:
+
+- **Write**, **Edit**, **MultiEdit** and **NotebookEdit** are refused when they would make the directory larger than the limit. Claude Code is told how much space is used and to delete files.
+- A **Bash** command that makes the directory larger than the limit finishes, and Claude Code is told that the directory is over its limit. While it is over the limit, only single commands that start with `rm`, `rmdir`, `truncate -s 0` or `find ... -delete` run. Commands joined with `;`, `&&`, `|` or a newline, redirections, command substitutions and `find` with `-exec` are refused.
+
+One command can go over the limit by the amount that it writes. The skills that ByteChef writes to `.claude/skills` do not count. The limit applies to the working directory only, not to files that Claude Code writes in other directories of the server.
