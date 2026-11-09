@@ -102,7 +102,7 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                         getRequest={(id, tags) => ({
                             id: id!,
                             updateTagsRequest: {
-                                tags: tags || [],
+                                tags,
                             },
                         })}
                         id={connection.id!}

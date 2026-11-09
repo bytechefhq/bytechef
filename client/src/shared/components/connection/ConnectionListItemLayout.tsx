@@ -49,9 +49,7 @@ const ConnectionListItemLayout = ({
                     </div>
 
                     <div className="mt-2 min-h-7 sm:flex sm:items-center sm:justify-between">
-                        <div className="flex items-center" onClick={(event) => event.preventDefault()}>
-                            {tagList}
-                        </div>
+                        <div className="flex items-center">{tagList}</div>
                     </div>
                 </div>
 
