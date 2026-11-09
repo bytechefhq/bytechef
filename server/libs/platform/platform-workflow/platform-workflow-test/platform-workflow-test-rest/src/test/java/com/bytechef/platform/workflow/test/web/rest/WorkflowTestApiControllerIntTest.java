@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.test.web.rest;
 import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.COMPLETED;
 import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.STARTED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -48,6 +49,7 @@ import com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
+import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -584,6 +586,7 @@ class WorkflowTestApiControllerIntTest {
     @Test
     void testPendingEventsClearedOnStop() throws Exception {
         long jobId = 889L;
+        String key = TenantCacheKeyUtils.getKey(String.valueOf(jobId));
         CountDownLatch latch = new CountDownLatch(1);
 
         doAnswer(inv -> {
@@ -592,11 +595,11 @@ class WorkflowTestApiControllerIntTest {
             BiConsumer<String, CompletableFuture<WorkflowTestExecutionDTO>> afterFutureCallback = inv.getArgument(6);
             Consumer<String> whenCompleteCallback = inv.getArgument(7);
 
-            String key = "test-key-" + jobId;
-
             afterStartCallback.accept(key);
 
             SseStreamBridge bridge = sseStreamBridgeFactory.apply(key);
+
+            bridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId)));
 
             CompletableFuture<WorkflowTestExecutionDTO> future = CompletableFuture.supplyAsync(() -> {
                 try {
@@ -609,7 +612,6 @@ class WorkflowTestApiControllerIntTest {
 
             future.whenComplete((result, throwable) -> whenCompleteCallback.accept(key));
             afterFutureCallback.accept(key, future);
-            bridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId)));
 
             return null;
         }).when(testWorkflowExecutor)
@@ -629,92 +631,39 @@ class WorkflowTestApiControllerIntTest {
             }
         });
 
-        Thread.sleep(Duration.ofMillis(75)
-            .toMillis());
+        @SuppressWarnings("unchecked")
+        Cache<String, CompletableFuture<WorkflowTestExecutionDTO>> workflowExecutions =
+            (Cache<String, CompletableFuture<WorkflowTestExecutionDTO>>) ReflectionTestUtils.getField(
+                controller, "workflowExecutions");
+        @SuppressWarnings("unchecked")
+        Cache<String, SseEmitter> emitters = (Cache<String, SseEmitter>) ReflectionTestUtils.getField(
+            controller, "emitter");
+        @SuppressWarnings("unchecked")
+        Cache<String, List<SseEmitter.SseEventBuilder>> pendingEvents =
+            (Cache<String, List<SseEmitter.SseEventBuilder>>) ReflectionTestUtils.getField(
+                controller, "pendingEvents");
 
-        String key = waitForRunKey();
+        assertThat(workflowExecutions).isNotNull();
+        assertThat(emitters).isNotNull();
+        assertThat(pendingEvents).isNotNull();
 
-        Object emitter = ReflectionTestUtils.getField(controller, "emitter");
+        await().atMost(Duration.ofSeconds(5))
+            .until(() -> workflowExecutions.getIfPresent(key) != null);
 
-        assertThat(emitter).isNotNull();
+        emitters.invalidate(key);
 
-        if (emitter instanceof Cache<?, ?> cache) {
-            @SuppressWarnings("unchecked")
-            Cache<String, SseEmitter> emitterCache = (Cache<String, SseEmitter>) cache;
+        ReflectionTestUtils.invokeMethod(
+            controller, "sendToEmitter", key, SseEmitter.event()
+                .name("log")
+                .data("X1"));
 
-            emitterCache.invalidate(key);
-        } else if (emitter instanceof ConcurrentMap<?, ?>) {
-            @SuppressWarnings("unchecked")
-            ConcurrentMap<String, SseEmitter> emitterMap = (ConcurrentMap<String, SseEmitter>) emitter;
-
-            emitterMap.remove(key);
-        }
-
-        SseEmitter.SseEventBuilder eventBuilder = SseEmitter.event()
-            .name("log")
-            .data("X1");
-
-        ReflectionTestUtils.invokeMethod(controller, "sendToEmitter", key, eventBuilder);
-
-        Object pendingEvents2 = ReflectionTestUtils.getField(controller, "pendingEvents");
-
-        assertThat(pendingEvents2).isNotNull();
-
-        List<SseEmitter.SseEventBuilder> beforeStop = null;
-
-        if (pendingEvents2 instanceof Cache<?, ?> cache) {
-            @SuppressWarnings("unchecked")
-            Cache<String, List<SseEmitter.SseEventBuilder>> c =
-                (Cache<String, List<SseEmitter.SseEventBuilder>>) cache;
-
-            beforeStop = c.getIfPresent(key);
-        } else if (pendingEvents2 instanceof ConcurrentMap<?, ?>) {
-            @SuppressWarnings("unchecked")
-            ConcurrentMap<String, List<SseEmitter.SseEventBuilder>> m =
-                (ConcurrentMap<String, List<SseEmitter.SseEventBuilder>>) pendingEvents2;
-
-            beforeStop = m.get(key);
-        }
-
-        assertThat(beforeStop).isNotNull();
+        assertThat(pendingEvents.getIfPresent(key)).hasSize(1);
 
         mockMvc.perform(post("/internal/workflow-tests/{jobId}/stop", jobId))
             .andExpect(status().isOk());
 
-        // Give a brief moment for cleanup
-        Thread.sleep(Duration.ofMillis(100)
-            .toMillis());
-
-        // After stop, pending events should eventually be cleared (or contain only the final error event)
-        boolean clearedOrMinimal = false;
-
-        for (int i = 0; i < 5; i++) {
-            List<SseEmitter.SseEventBuilder> afterStop;
-
-            if (pendingEvents2 instanceof Cache<?, ?> cache3) {
-                @SuppressWarnings("unchecked")
-                Cache<String, List<SseEmitter.SseEventBuilder>> c3 =
-                    (Cache<String, List<SseEmitter.SseEventBuilder>>) cache3;
-
-                afterStop = c3.getIfPresent(key);
-            } else {
-                @SuppressWarnings("unchecked")
-                ConcurrentMap<String, List<SseEmitter.SseEventBuilder>> m3 =
-                    (ConcurrentMap<String, List<SseEmitter.SseEventBuilder>>) pendingEvents2;
-
-                afterStop = m3.get(key);
-            }
-
-            if (afterStop == null || afterStop.isEmpty() || afterStop.size() <= 1) {
-                clearedOrMinimal = true;
-
-                break;
-            }
-
-            Thread.sleep(20);
-        }
-
-        assertThat(clearedOrMinimal).isTrue();
+        assertThat(pendingEvents.getIfPresent(key)).isNull();
+        assertThat(workflowExecutions.getIfPresent(key)).isNull();
 
         latch.countDown();
         startFuture.get(3, TimeUnit.SECONDS);
