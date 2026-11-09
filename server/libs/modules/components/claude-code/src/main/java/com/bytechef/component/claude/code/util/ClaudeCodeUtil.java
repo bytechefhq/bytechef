@@ -16,8 +16,11 @@
 
 package com.bytechef.component.claude.code.util;
 
+import com.bytechef.component.claude.code.executor.ClaudeCodeExecutor;
+import com.bytechef.component.claude.code.workspace.ClaudeCodeWorkspaceQuotaHooks;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.workspace.AgentWorkspaceQuota;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction;
@@ -30,6 +33,7 @@ import io.github.markpollack.claude.agent.sdk.ClaudeSyncClient;
 import io.github.markpollack.claude.agent.sdk.config.ClaudeCliDiscovery;
 import io.github.markpollack.claude.agent.sdk.config.ClaudeCliDiscovery.ClaudeCliNotFoundException;
 import io.github.markpollack.claude.agent.sdk.config.PermissionMode;
+import io.github.markpollack.claude.agent.sdk.hooks.HookRegistry;
 import io.github.markpollack.claude.agent.sdk.mcp.McpServerConfig;
 import io.github.markpollack.claude.agent.sdk.transport.CLIOptions;
 import io.github.markpollack.claude.agent.sdk.types.Message;
@@ -43,10 +47,11 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Marko Kriskovic
@@ -59,18 +64,23 @@ public final class ClaudeCodeUtil {
 
     private static final String CLAUDE_DIRECTORY = ".claude";
     private static final String SKILLS_DIRECTORY = "skills";
-    private static final Map<Path, Lock> WORKSPACE_LOCKS = new ConcurrentHashMap<>();
+
+    static final Map<Path, WorkspaceLock> WORKSPACE_LOCKS = new ConcurrentHashMap<>();
 
     private ClaudeCodeUtil() {
     }
 
-    public static String execute(String prompt, Path workingDirectory, Map<String, McpServerConfig> mcpServerConfigs) {
+    public static String execute(
+        String prompt, Path workingDirectory, Map<String, McpServerConfig> mcpServerConfigs,
+        HookRegistry hookRegistry) {
+
         CLIOptions cliOptions = createCliOptions(mcpServerConfigs);
 
         try (ClaudeSyncClient claudeSyncClient = ClaudeClient.sync(cliOptions)
             .claudePath(getClaudePath())
             .workingDirectory(workingDirectory)
             .timeout(TIMEOUT)
+            .hookRegistry(hookRegistry)
             .build()) {
 
             return getResult(claudeSyncClient.connectAndReceive(prompt));
@@ -99,28 +109,47 @@ public final class ClaudeCodeUtil {
         return mcpServerConfigs;
     }
 
+    public static boolean isWorkspaceInUse(Path directory) {
+        Set<Path> workspaces = WORKSPACE_LOCKS.keySet();
+
+        return workspaces.stream()
+            .anyMatch(workspace -> workspace.startsWith(directory));
+    }
+
     public static String run(
-        String prompt, Path workspace, Map<String, McpServerConfig> mcpServerConfigs, SkillsWriter skillsWriter,
-        ClaudeCodeExecutor claudeCodeExecutor) throws Exception {
+        String prompt, AgentWorkspaceQuota workspaceQuota, McpServerConfigsSupplier mcpServerConfigsSupplier,
+        SkillsWriter skillsWriter, ClaudeCodeExecutor claudeCodeExecutor) throws Exception {
 
-        Lock workspaceLock = WORKSPACE_LOCKS.computeIfAbsent(workspace, key -> new ReentrantLock());
+        Path workspace = workspaceQuota.root();
 
-        workspaceLock.lockInterruptibly();
+        WorkspaceLock workspaceLock = WORKSPACE_LOCKS.compute(
+            workspace, (key, existingWorkspaceLock) -> WorkspaceLock.acquire(existingWorkspaceLock));
 
         try {
-            Path claudeDirectory = workspace.resolve(CLAUDE_DIRECTORY);
+            workspaceLock.lock.lockInterruptibly();
 
-            if (Files.exists(claudeDirectory, LinkOption.NOFOLLOW_LINKS)) {
-                deleteRecursively(claudeDirectory);
+            try {
+                Path claudeDirectory = workspace.resolve(CLAUDE_DIRECTORY);
+
+                if (Files.exists(claudeDirectory, LinkOption.NOFOLLOW_LINKS)) {
+                    deleteRecursively(claudeDirectory);
+                }
+
+                Path skillsDirectory = Files.createDirectories(claudeDirectory.resolve(SKILLS_DIRECTORY));
+
+                skillsWriter.write(skillsDirectory);
+
+                AgentWorkspaceQuota runWorkspaceQuota = getRunWorkspaceQuota(workspaceQuota, skillsDirectory);
+
+                return claudeCodeExecutor.execute(
+                    prompt, workspace, mcpServerConfigsSupplier.get(),
+                    ClaudeCodeWorkspaceQuotaHooks.create(runWorkspaceQuota));
+            } finally {
+                workspaceLock.lock.unlock();
             }
-
-            Path skillsDirectory = Files.createDirectories(claudeDirectory.resolve(SKILLS_DIRECTORY));
-
-            skillsWriter.write(skillsDirectory);
-
-            return claudeCodeExecutor.execute(prompt, workspace, mcpServerConfigs);
         } finally {
-            workspaceLock.unlock();
+            WORKSPACE_LOCKS.computeIfPresent(workspace,
+                (key, existingWorkspaceLock) -> existingWorkspaceLock.release());
         }
     }
 
@@ -209,6 +238,18 @@ public final class ClaudeCodeUtil {
         }
     }
 
+    static AgentWorkspaceQuota getRunWorkspaceQuota(
+        AgentWorkspaceQuota workspaceQuota, Path skillsDirectory) {
+
+        if (!workspaceQuota.isLimited()) {
+            return workspaceQuota;
+        }
+
+        return new AgentWorkspaceQuota(
+            workspaceQuota.root(),
+            workspaceQuota.maxBytes() + AgentWorkspaceQuota.getDirectorySize(skillsDirectory));
+    }
+
     private static Parameters getConnectionParameters(
         ClusterElement clusterElement, Map<String, ComponentConnection> componentConnections) {
 
@@ -219,6 +260,32 @@ public final class ClaudeCodeUtil {
         }
 
         return ParametersFactory.create(componentConnection.getParameters());
+    }
+
+    static final class WorkspaceLock {
+
+        private final ReentrantLock lock = new ReentrantLock();
+        private int users;
+
+        private static WorkspaceLock acquire(@Nullable WorkspaceLock existingWorkspaceLock) {
+            WorkspaceLock workspaceLock = existingWorkspaceLock == null ? new WorkspaceLock() : existingWorkspaceLock;
+
+            workspaceLock.users++;
+
+            return workspaceLock;
+        }
+
+        private @Nullable WorkspaceLock release() {
+            users--;
+
+            return users == 0 ? null : this;
+        }
+    }
+
+    @FunctionalInterface
+    public interface McpServerConfigsSupplier {
+
+        Map<String, McpServerConfig> get() throws Exception;
     }
 
     @FunctionalInterface

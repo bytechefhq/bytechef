@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.claude.code.util;
+package com.bytechef.component.claude.code.workspace;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.tenant.TenantContext;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -39,60 +38,54 @@ class ClaudeCodeWorkspaceResolverTest {
 
     @Test
     void testResolveGivesADeployedWorkflowTheSameDirectoryOnEveryRun() {
-        ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver = new ClaudeCodeWorkspaceResolver(basedir.toString());
+        ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver = new ClaudeCodeWorkspaceResolver(
+            basedir.toString(), 0);
 
-        ActionContextAware firstRunContext = deployedContext(11L);
-        ActionContextAware secondRunContext = deployedContext(12L);
-
-        Path firstWorkspace = claudeCodeWorkspaceResolver.resolve(firstRunContext, null);
-        Path secondWorkspace = claudeCodeWorkspaceResolver.resolve(secondRunContext, "");
+        Path firstWorkspace = claudeCodeWorkspaceResolver.resolve(deployedContext(11L), null);
+        Path secondWorkspace = claudeCodeWorkspaceResolver.resolve(deployedContext(12L), "");
 
         assertThat(firstWorkspace)
             .isEqualTo(basedir.resolve("public/automation/7/production/42/default"))
             .isDirectory();
         assertThat(secondWorkspace).isEqualTo(firstWorkspace);
-        assertThat(claudeCodeWorkspaceResolver.resolve(firstRunContext, "review"))
+        assertThat(claudeCodeWorkspaceResolver.resolve(deployedContext(11L), "review"))
             .isEqualTo(basedir.resolve("public/automation/7/production/42/review"));
     }
 
     @Test
-    void testResolveSeparatesTenants() {
-        ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver = new ClaudeCodeWorkspaceResolver(basedir.toString());
-
-        Path workspace = TenantContext.callWithTenantId(
-            "acme", () -> claudeCodeWorkspaceResolver.resolve(deployedContext(11L), null));
-
-        assertThat(workspace).isEqualTo(basedir.resolve("acme/automation/7/production/42/default"));
-    }
-
-    @Test
-    void testResolveGivesEditorTestRunsAWorkspacePerWorkflow() {
-        ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver = new ClaudeCodeWorkspaceResolver(basedir.toString());
+    void testResolveGivesEachEditorTestRunItsOwnWorkspace() {
+        ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver = new ClaudeCodeWorkspaceResolver(
+            basedir.toString(), 0);
 
         ActionContextAware actionContextAware = mock(ActionContextAware.class);
 
-        when(actionContextAware.getWorkflowId()).thenReturn("../a1b2:c3");
+        when(actionContextAware.getJobId()).thenReturn(5L);
 
         assertThat(claudeCodeWorkspaceResolver.resolve(actionContextAware, null))
-            .isEqualTo(basedir.resolve("public/test/workflow-___a1b2_c3/default"))
+            .isEqualTo(basedir.resolve("public/test/job-5/default"))
             .isDirectory();
     }
 
     @Test
-    void testResolveRejectsAnInvalidWorkspaceName() {
-        ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver = new ClaudeCodeWorkspaceResolver(basedir.toString());
+    void testGetQuotaUsesTheConfiguredMaximumSize() {
+        ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver = new ClaudeCodeWorkspaceResolver(
+            basedir.toString(), 1024);
 
-        assertThatThrownBy(() -> claudeCodeWorkspaceResolver.resolve(deployedContext(11L), "../other"))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("../other");
+        Path workspace = claudeCodeWorkspaceResolver.resolve(deployedContext(11L), null);
+
+        assertThat(claudeCodeWorkspaceResolver.getQuota(workspace))
+            .satisfies(quota -> {
+                assertThat(quota.root()).isEqualTo(workspace);
+                assertThat(quota.maxBytes()).isEqualTo(1024);
+            });
     }
 
     @Test
     void testResolveFailsWithoutABaseDirectoryOrAWorkflow() {
-        assertThatThrownBy(() -> new ClaudeCodeWorkspaceResolver(" ").resolve(deployedContext(11L), null))
+        assertThatThrownBy(() -> new ClaudeCodeWorkspaceResolver(" ", 0).resolve(deployedContext(11L), null))
             .hasMessageContaining("bytechef.component.claude-code.workspace.basedir");
         assertThatThrownBy(
-            () -> new ClaudeCodeWorkspaceResolver(basedir.toString()).resolve(mock(ActionContext.class), null))
+            () -> new ClaudeCodeWorkspaceResolver(basedir.toString(), 0).resolve(mock(ActionContext.class), null))
                 .hasMessageContaining("cannot be identified");
     }
 

@@ -21,7 +21,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.claude.code.executor.ClaudeCodeExecutor;
 import com.bytechef.component.definition.Context;
+import com.bytechef.platform.ai.workspace.AgentWorkspaceQuota;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction;
 import com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction.McpServer;
@@ -117,10 +119,10 @@ class ClaudeCodeUtilTest {
             clusterElement("skills_1", "aiAgentUtils/v1/claudeCodeSkills", Map.of("name", "release-notes")));
 
         String firstResult = ClaudeCodeUtil.run(
-            "clone", workspace, Map.of(),
+            "clone", new AgentWorkspaceQuota(workspace, 0), Map::of,
             skillsDirectory -> ClaudeCodeUtil.writeSkills(
                 firstSkills, Map.of(), clusterElementDefinitionService, skillsDirectory, context),
-            (prompt, workingDirectory, mcpServerConfigs) -> {
+            (prompt, workingDirectory, mcpServerConfigs, hookRegistry) -> {
                 assertThat(workingDirectory).isEqualTo(workspace);
                 assertThat(workingDirectory.resolve(".claude/skills/release-notes/SKILL.md")).hasContent("skill");
 
@@ -134,10 +136,10 @@ class ClaudeCodeUtilTest {
             clusterElement("skills_1", "aiAgentUtils/v1/claudeCodeSkills", Map.of("name", "triage")));
 
         String secondResult = ClaudeCodeUtil.run(
-            "review", workspace, Map.of(),
+            "review", new AgentWorkspaceQuota(workspace, 0), Map::of,
             skillsDirectory -> ClaudeCodeUtil.writeSkills(
                 secondSkills, Map.of(), clusterElementDefinitionService, skillsDirectory, context),
-            (prompt, workingDirectory, mcpServerConfigs) -> {
+            (prompt, workingDirectory, mcpServerConfigs, hookRegistry) -> {
                 assertThat(workingDirectory.resolve("notes.md")).hasContent("kept");
                 assertThat(workingDirectory.resolve(".claude/skills/triage/SKILL.md")).hasContent("skill");
                 assertThat(workingDirectory.resolve(".claude/skills/release-notes")).doesNotExist();
@@ -154,8 +156,9 @@ class ClaudeCodeUtilTest {
     @Test
     void testRunKeepsTheWorkspaceWhenClaudeCodeFails() throws Exception {
         assertThatThrownBy(() -> ClaudeCodeUtil.run(
-            "hello", workspace, Map.of(), skillsDirectory -> Files.writeString(skillsDirectory.resolve("file"), "x"),
-            (prompt, workingDirectory, mcpServerConfigs) -> {
+            "hello", new AgentWorkspaceQuota(workspace, 0), Map::of,
+            skillsDirectory -> Files.writeString(skillsDirectory.resolve("file"), "x"),
+            (prompt, workingDirectory, mcpServerConfigs, hookRegistry) -> {
                 Files.writeString(workingDirectory.resolve("partial.txt"), "work");
 
                 throw new IllegalStateException("boom");
@@ -163,6 +166,7 @@ class ClaudeCodeUtilTest {
                 .hasMessage("boom");
 
         assertThat(workspace.resolve("partial.txt")).hasContent("work");
+        assertThat(ClaudeCodeUtil.WORKSPACE_LOCKS).doesNotContainKey(workspace);
     }
 
     @Test
@@ -172,7 +176,7 @@ class ClaudeCodeUtilTest {
         AtomicInteger activeRuns = new AtomicInteger();
         AtomicInteger maxActiveRuns = new AtomicInteger();
 
-        ClaudeCodeExecutor claudeCodeExecutor = (prompt, workingDirectory, mcpServerConfigs) -> {
+        ClaudeCodeExecutor claudeCodeExecutor = (prompt, workingDirectory, mcpServerConfigs, hookRegistry) -> {
             maxActiveRuns.accumulateAndGet(activeRuns.incrementAndGet(), Math::max);
 
             if ("first".equals(prompt)) {
@@ -188,12 +192,14 @@ class ClaudeCodeUtilTest {
 
         try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
             Future<String> firstRun = executorService.submit(
-                () -> ClaudeCodeUtil.run("first", workspace, Map.of(), skillsDirectory -> {}, claudeCodeExecutor));
+                () -> ClaudeCodeUtil.run("first", new AgentWorkspaceQuota(workspace, 0), Map::of,
+                    skillsDirectory -> {}, claudeCodeExecutor));
 
             assertThat(firstRunStarted.await(10, TimeUnit.SECONDS)).isTrue();
 
             Future<String> secondRun = executorService.submit(
-                () -> ClaudeCodeUtil.run("second", workspace, Map.of(), skillsDirectory -> {}, claudeCodeExecutor));
+                () -> ClaudeCodeUtil.run("second", new AgentWorkspaceQuota(workspace, 0), Map::of,
+                    skillsDirectory -> {}, claudeCodeExecutor));
 
             assertThatThrownBy(() -> secondRun.get(200, TimeUnit.MILLISECONDS))
                 .isInstanceOf(TimeoutException.class);
@@ -205,6 +211,81 @@ class ClaudeCodeUtilTest {
         }
 
         assertThat(maxActiveRuns.get()).isEqualTo(1);
+        assertThat(ClaudeCodeUtil.WORKSPACE_LOCKS).doesNotContainKey(workspace);
+    }
+
+    @Test
+    void testRunGivesClaudeCodeTheQuotaHooksOnlyWhenTheWorkspaceIsLimited() throws Exception {
+        List<Boolean> hooksSeen = new ArrayList<>();
+
+        ClaudeCodeExecutor claudeCodeExecutor = (prompt, workingDirectory, mcpServerConfigs, hookRegistry) -> {
+            hooksSeen.add(hookRegistry.hasHooks());
+
+            return prompt;
+        };
+
+        ClaudeCodeUtil.run(
+            "limited", new AgentWorkspaceQuota(workspace, 1024), Map::of, skillsDirectory -> {}, claudeCodeExecutor);
+        ClaudeCodeUtil.run(
+            "unlimited", new AgentWorkspaceQuota(workspace, 0), Map::of, skillsDirectory -> {}, claudeCodeExecutor);
+
+        assertThat(hooksSeen).containsExactly(true, false);
+    }
+
+    @Test
+    void testRunResolvesTheMcpServersInsideTheWorkspaceLockAfterTheSkillsAreWritten() throws Exception {
+        List<String> events = new ArrayList<>();
+
+        ClaudeCodeUtil.run(
+            "hello", new AgentWorkspaceQuota(workspace, 0),
+            () -> {
+                events.add("mcp locked=" + ClaudeCodeUtil.WORKSPACE_LOCKS.containsKey(workspace));
+
+                return Map.of();
+            },
+            skillsDirectory -> events.add("skills"),
+            (prompt, workingDirectory, mcpServerConfigs, hookRegistry) -> {
+                events.add("execute");
+
+                return prompt;
+            });
+
+        assertThat(events).containsExactly("skills", "mcp locked=true", "execute");
+    }
+
+    @Test
+    void testIsWorkspaceInUseIsTrueForTheWorkspaceAndItsParentsOnlyWhileARunUsesIt() throws Exception {
+        List<Boolean> inUse = new ArrayList<>();
+
+        ClaudeCodeUtil.run(
+            "hello", new AgentWorkspaceQuota(workspace, 0), Map::of, skillsDirectory -> {},
+            (prompt, workingDirectory, mcpServerConfigs, hookRegistry) -> {
+                inUse.add(ClaudeCodeUtil.isWorkspaceInUse(workspace));
+                inUse.add(ClaudeCodeUtil.isWorkspaceInUse(workspace.getParent()));
+                inUse.add(ClaudeCodeUtil.isWorkspaceInUse(workspace.resolveSibling("other")));
+
+                return prompt;
+            });
+
+        inUse.add(ClaudeCodeUtil.isWorkspaceInUse(workspace));
+
+        assertThat(inUse).containsExactly(true, true, false, false);
+    }
+
+    @Test
+    void testGetRunWorkspaceQuotaDoesNotCountTheSkills() throws Exception {
+        Path skillsDirectory = Files.createDirectories(workspace.resolve(".claude/skills/one"));
+
+        Files.write(skillsDirectory.resolve("SKILL.md"), new byte[40]);
+
+        AgentWorkspaceQuota runWorkspaceQuota = ClaudeCodeUtil.getRunWorkspaceQuota(
+            new AgentWorkspaceQuota(workspace, 100), workspace.resolve(".claude/skills"));
+
+        AgentWorkspaceQuota unlimitedRunWorkspaceQuota = ClaudeCodeUtil.getRunWorkspaceQuota(
+            new AgentWorkspaceQuota(workspace, 0), workspace.resolve(".claude/skills"));
+
+        assertThat(runWorkspaceQuota.maxBytes()).isEqualTo(140);
+        assertThat(unlimitedRunWorkspaceQuota.maxBytes()).isZero();
     }
 
     @Test

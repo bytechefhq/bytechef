@@ -3638,13 +3638,49 @@ public class ApplicationProperties {
                  * Base directory under which each workflow gets its own Claude Code working directory
                  */
                 private String basedir;
+                private Duration cleanupInterval;
+                private Duration idleRetention;
+                private DataSize maxSize;
+                private Duration testRetention;
 
                 public String getBasedir() {
                     return basedir;
                 }
 
+                public Duration getCleanupInterval() {
+                    return cleanupInterval;
+                }
+
+                public Duration getIdleRetention() {
+                    return idleRetention;
+                }
+
+                public DataSize getMaxSize() {
+                    return maxSize;
+                }
+
+                public Duration getTestRetention() {
+                    return testRetention;
+                }
+
                 public void setBasedir(String basedir) {
                     this.basedir = basedir;
+                }
+
+                public void setCleanupInterval(Duration cleanupInterval) {
+                    this.cleanupInterval = cleanupInterval;
+                }
+
+                public void setIdleRetention(Duration idleRetention) {
+                    this.idleRetention = idleRetention;
+                }
+
+                public void setMaxSize(DataSize maxSize) {
+                    this.maxSize = maxSize;
+                }
+
+                public void setTestRetention(Duration testRetention) {
+                    this.testRetention = testRetention;
                 }
             }
         }
