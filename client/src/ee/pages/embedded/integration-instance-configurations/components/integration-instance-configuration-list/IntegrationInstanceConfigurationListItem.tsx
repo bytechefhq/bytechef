@@ -251,7 +251,7 @@ const IntegrationInstanceConfigurationListItem = ({
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-x-6">
+                    <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                         {newerVersionAvailable && <Badge label="Newer version available" styleType="warning-outline" />}
 
                         <Tooltip>

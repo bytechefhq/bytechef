@@ -91,7 +91,7 @@ const AutomationWorkflowProjectWorkflowListItem = ({
                 />
             </div>
 
-            <div className="flex justify-end gap-x-6">
+            <div className="flex justify-end gap-x-6 [&>:last-child]:-ml-3">
                 {modifiedDate && (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-muted-foreground">

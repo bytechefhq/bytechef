@@ -90,7 +90,7 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-x-6">
+                    <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                         <div className="flex min-w-52 flex-col items-end gap-y-4">
                             <div className="flex items-center">
                                 {isEnablePending && <LoadingIcon />}

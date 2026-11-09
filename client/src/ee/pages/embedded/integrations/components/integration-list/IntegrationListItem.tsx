@@ -283,7 +283,7 @@ const IntegrationListItem = ({
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-x-6">
+                    <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                         {integration.lastIntegrationVersion && (
                             <div className="flex flex-col items-end gap-y-2">
                                 <div className="flex min-h-8 items-center">

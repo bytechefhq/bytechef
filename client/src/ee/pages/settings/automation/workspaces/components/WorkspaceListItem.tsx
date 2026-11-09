@@ -76,7 +76,7 @@ const WorkspaceListItem = ({isCurrentWorkspace, onOpen, workspace}: WorkspaceLis
                     {isCurrentWorkspace && <Badge label="Current" styleType="primary-outline" weight="semibold" />}
                 </div>
 
-                <div className="relative z-10 flex items-center justify-end gap-x-6">
+                <div className="relative z-10 flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                     {workspace.createdDate && (
                         <Tooltip>
                             <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">

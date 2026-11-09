@@ -149,7 +149,7 @@ const IntegrationWorkflowListItem = ({
                 />
             </Link>
 
-            <div className="flex justify-end gap-x-6">
+            <div className="flex justify-end gap-x-6 [&>:last-child]:-ml-3">
                 <Tooltip>
                     <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
                         <span className="text-xs">

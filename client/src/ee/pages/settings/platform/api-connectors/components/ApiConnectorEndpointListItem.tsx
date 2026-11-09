@@ -42,7 +42,7 @@ const ApiConnectorEndpointListItem = ({
                 </div>
             </Button>
 
-            <div className="flex items-center justify-end gap-x-6">
+            <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                 {lastExecutionDate ? (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">

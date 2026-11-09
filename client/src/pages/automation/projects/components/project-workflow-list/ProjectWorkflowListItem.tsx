@@ -139,7 +139,7 @@ const ProjectWorkflowListItem = ({
                 />
             </Link>
 
-            <div className="flex justify-end gap-x-6">
+            <div className="flex justify-end gap-x-6 [&>:last-child]:-ml-3">
                 <Tooltip>
                     <TooltipTrigger className="hidden items-center text-sm text-content-neutral-secondary xl:block">
                         <span className="text-xs">

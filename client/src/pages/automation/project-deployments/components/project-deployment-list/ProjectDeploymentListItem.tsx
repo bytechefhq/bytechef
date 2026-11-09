@@ -194,7 +194,7 @@ const ProjectDeploymentListItem = ({
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-x-6">
+                    <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Badge

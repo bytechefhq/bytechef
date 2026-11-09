@@ -169,7 +169,7 @@ const AutomationWorkflowProjectConfigurationListItem = ({
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-x-6">
+                    <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                         {!configuration.automationHubVisible && (
                             <Badge label="Hidden from hub" styleType="secondary-outline" />
                         )}

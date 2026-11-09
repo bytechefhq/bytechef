@@ -353,7 +353,7 @@ const ProjectListItem = ({
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-x-6">
+                    <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                         <div className="flex flex-col items-end gap-y-4">
                             <div className="flex items-center space-x-2">
                                 {isPublished ? (
