@@ -25,7 +25,8 @@ Version: 1
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| token | Token | STRING | Your TypeSafe AI API key. | true |
+| token | Token | STRING | Your TypeSafe AI API key. A self-hosted System One server that does not check keys accepts any value. | true |
+| baseUrl | Base URL | STRING | The System One server that answers `POST /v1/systemone`. Keep the default for Jev, or point it at a self-hosted server of an open decision model, such as Laya (http://localhost:8000) or Ollama (http://localhost:11434). | true |
 
 
 
@@ -53,7 +54,7 @@ Name: noul
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. | true |
+| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. A self-hosted System One server takes its own model names, for example `laya` on Ollama. | true |
 | state | State | STRING | The content the question is answered against. Text, or a JSON object or array mapped from a previous step; name a field of an object in the instructions to point the question at it. | true |
 | instructions | Instructions | STRING | The yes/no question to ask, e.g. "Does this message convey urgency?" | true |
 | whenTrue | When True | STRING | What a true answer means, written as a statement about the state, e.g. "The customer needs help within the hour". | false |
@@ -123,7 +124,7 @@ Name: choice
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. | true |
+| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. A self-hosted System One server takes its own model names, for example `laya` on Ollama. | true |
 | state | State | STRING | The content the question is answered against. Text, or a JSON object or array mapped from a previous step; name a field of an object in the instructions to point the question at it. | true |
 | instructions | Instructions | STRING | The question to answer by picking an option, e.g. "Which team should handle this?" | true |
 | options | Options | ARRAY <details> <summary> Items </summary> [&#123;STRING\(label), STRING\(description)&#125;] </details> | The labels to choose from. Labels must be unique. | true |
@@ -194,7 +195,7 @@ Name: score
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. | true |
+| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. A self-hosted System One server takes its own model names, for example `laya` on Ollama. | true |
 | state | State | STRING | The content the question is answered against. Text, or a JSON object or array mapped from a previous step; name a field of an object in the instructions to point the question at it. | true |
 | instructions | Instructions | STRING | The question the rubric answers, e.g. "How frustrated is the customer?" | true |
 | levels | Levels | ARRAY <details> <summary> Items </summary> [STRING] </details> | The rubric, ordered from the lowest level (0) to the highest. Keep the levels genuine degrees of one thing; if they are alternatives, use Choice instead. | true |
@@ -268,7 +269,7 @@ Name: askQuestions
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. | true |
+| model | Model | STRING | ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a pinned version to keep answers stable across model releases. A self-hosted System One server takes its own model names, for example `laya` on Ollama. | true |
 | state | State | STRING | The content the question is answered against. Text, or a JSON object or array mapped from a previous step; name a field of an object in the instructions to point the question at it. | true |
 | questions | Questions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type), STRING\(instructions), STRING\(whenTrue), STRING\(whenFalse), NUMBER\(threshold), [&#123;STRING\(label), STRING\(description)&#125;]\(options), [STRING]\(levels)&#125;] </details> | The questions to ask. Each answer is returned under the question's name. | true |
 

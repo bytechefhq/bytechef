@@ -34,6 +34,7 @@ import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -53,12 +54,24 @@ public final class TypeSafeUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context.http(http -> http.get("/v1/models"))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
         Set<String> modelNames = new LinkedHashSet<>(MODEL_ALIASES);
+
+        Map<String, Object> body;
+
+        try {
+            body = context.http(http -> http.get("/v1/models"))
+                .configuration(responseType(ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+        } catch (Exception exception) {
+            if (exception instanceof ProviderException providerException && isUnauthorized(providerException)) {
+                throw providerException;
+            }
+
+            context.log(log -> log.debug("Listing models failed, offering only the aliases", exception));
+
+            body = null;
+        }
 
         if (body != null && body.get(MODELS) instanceof List<?> models) {
             for (Object model : models) {
@@ -128,6 +141,12 @@ public final class TypeSafeUtils {
         }
 
         return result;
+    }
+
+    private static boolean isUnauthorized(ProviderException providerException) {
+        Integer statusCode = providerException.getStatusCode();
+
+        return statusCode != null && (statusCode == 401 || statusCode == 403);
     }
 
     private static Object toState(Object state) {
