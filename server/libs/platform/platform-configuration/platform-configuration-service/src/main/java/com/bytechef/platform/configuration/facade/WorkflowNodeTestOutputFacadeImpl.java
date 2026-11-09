@@ -59,6 +59,7 @@ import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -131,6 +132,15 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         this.webhookTriggerTestFacade = webhookTriggerTestFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+    }
+
+    @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
+    public boolean checkWorkflowNodeTestOutputExists(
+        String workflowId, String workflowNodeName, @Nullable Instant createdDate, long environmentId) {
+
+        return workflowNodeTestOutputService.checkWorkflowNodeTestOutputExists(
+            workflowId, workflowNodeName, createdDate, environmentId);
     }
 
     @Override
