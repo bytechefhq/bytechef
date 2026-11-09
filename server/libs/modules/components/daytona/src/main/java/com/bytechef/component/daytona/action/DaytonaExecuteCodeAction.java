@@ -139,8 +139,10 @@ public class DaytonaExecuteCodeAction {
             body.put(TIMEOUT, timeout);
         }
 
+        String toolboxUrl = DaytonaUtils.getToolboxUrl(context, sandboxId);
+
         return context
-            .http(http -> http.post("/toolbox/" + sandboxId + "/toolbox/process/code-run"))
+            .http(http -> http.post(toolboxUrl + "/process/code-run"))
             .body(Http.Body.of(body))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()

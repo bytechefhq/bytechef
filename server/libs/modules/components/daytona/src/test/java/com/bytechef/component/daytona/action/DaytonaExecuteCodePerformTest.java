@@ -62,7 +62,9 @@ class DaytonaExecuteCodePerformTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("id", "sandbox-1"), Map.of("exitCode", 0, "result", "hi\n"));
+            .thenReturn(
+                Map.of("id", "sandbox-1", "state", "started"), Map.of("url", "https://proxy.daytona.test/toolbox/"),
+                Map.of("exitCode", 0, "result", "hi\n"));
 
         Object result = DaytonaExecuteCodeAction.perform(parameters, parameters, mockedActionContext);
 
@@ -72,13 +74,13 @@ class DaytonaExecuteCodePerformTest {
             .containsEntry("success", true)
             .containsEntry("sandboxId", "sandbox-1");
 
-        verify(mockedActionContext, times(3)).http(any());
+        verify(mockedActionContext, times(4)).http(any());
 
         List<Http.Body> bodies = bodyArgumentCaptor.getAllValues();
 
         assertThat(bodies).hasSize(2);
         assertThat((Map<String, Object>) bodies.get(0)
-            .getContent()).containsEntry(LANGUAGE, "python");
+            .getContent()).containsEntry("labels", Map.of("code-toolbox-language", "python"));
         assertThat((Map<String, Object>) bodies.get(1)
             .getContent())
                 .containsEntry(LANGUAGE, "python")
@@ -100,7 +102,8 @@ class DaytonaExecuteCodePerformTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("id", "sandbox-1"))
+            .thenReturn(
+                Map.of("id", "sandbox-1", "state", "started"), Map.of("url", "https://proxy.daytona.test/toolbox"))
             .thenThrow(new RuntimeException("run failed"));
 
         try {
@@ -109,7 +112,7 @@ class DaytonaExecuteCodePerformTest {
             assertThat(runtimeException).hasMessageContaining("run failed");
         }
 
-        verify(mockedActionContext, times(3)).http(any());
+        verify(mockedActionContext, times(4)).http(any());
     }
 
     @Test
@@ -127,12 +130,12 @@ class DaytonaExecuteCodePerformTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("exitCode", 0, "result", "hi\n"));
+            .thenReturn(Map.of("url", "https://proxy.daytona.test/toolbox"), Map.of("exitCode", 0, "result", "hi\n"));
 
         Object result = DaytonaExecuteCodeAction.perform(parameters, parameters, mockedActionContext);
 
         assertThat((Map<String, Object>) result).containsEntry("sandboxId", "existing-sandbox");
 
-        verify(mockedActionContext, times(1)).http(any());
+        verify(mockedActionContext, times(2)).http(any());
     }
 }
