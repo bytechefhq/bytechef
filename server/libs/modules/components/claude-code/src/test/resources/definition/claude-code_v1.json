@@ -6,7 +6,7 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": false,
-    "description": "Sends a message to Claude Code. Claude Code can use the tools of the attached MCP servers and the attached skills.",
+    "description": "Sends a message to Claude Code. Claude Code can use the tools of the attached MCP servers and the selected skills.",
     "help": {
       "body": "",
       "learnMoreUrl": "https://docs.bytechef.io/reference/components/claude-code_v1#chat"
@@ -92,6 +92,49 @@
       "required": true,
       "type": "STRING"
     }, {
+      "advancedOption": false,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Skills from the ByteChef skill library (Settings > AI > Skills) that Claude Code can use. ByteChef writes them to .claude/skills in the working directory at the start of each run.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": false,
+      "hidden": false,
+      "items": [ {
+        "advancedOption": false,
+        "controlType": "SELECT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": false,
+        "hidden": false,
+        "label": "Skill",
+        "maxValue": null,
+        "metadata": { },
+        "minValue": null,
+        "name": "skillId",
+        "options": [ ],
+        "optionsDataSource": {
+          "options": { },
+          "optionsLookupDependsOn": [ ]
+        },
+        "placeholder": null,
+        "required": true,
+        "type": "INTEGER"
+      } ],
+      "label": "Skills",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": true,
+      "name": "skills",
+      "options": [ ],
+      "optionsDataSource": null,
+      "placeholder": "Choose a skill...",
+      "required": false,
+      "type": "ARRAY"
+    }, {
       "advancedOption": true,
       "controlType": "TEXT",
       "defaultValue": "default",
@@ -125,12 +168,6 @@
     "label": "MCP Servers",
     "multipleElements": true,
     "required": false
-  }, {
-    "name": "SKILLS",
-    "key": "skills",
-    "label": "Skills",
-    "multipleElements": true,
-    "required": false
   } ],
   "clusterElements": [ ],
   "componentCategories": [ {
@@ -140,7 +177,7 @@
   "connection": null,
   "customAction": false,
   "customActionHelp": null,
-  "description": "Runs Claude Code on the ByteChef server, with the MCP servers and skills you attach to it.",
+  "description": "Runs Claude Code on the ByteChef server, with the MCP servers you attach to it and the skills you select.",
   "icon": "path:assets/anthropic.svg",
   "inputs": [ ],
   "metadata": { },
