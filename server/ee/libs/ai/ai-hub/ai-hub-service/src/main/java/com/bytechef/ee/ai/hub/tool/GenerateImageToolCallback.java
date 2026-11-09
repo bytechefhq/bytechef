@@ -22,6 +22,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.image.Image;
 import org.springframework.ai.image.ImageGeneration;
@@ -42,6 +44,8 @@ import tools.jackson.core.JacksonException;
 public class GenerateImageToolCallback implements ToolCallback {
 
     static final String TOOL_NAME = "generateImage";
+
+    private static final Logger log = LoggerFactory.getLogger(GenerateImageToolCallback.class);
 
     private static final String DEFAULT_IMAGE_MODEL_NAME = "dall-e-3";
     private static final String DEFAULT_SIZE = "1024x1024";
@@ -82,23 +86,25 @@ public class GenerateImageToolCallback implements ToolCallback {
 
     private final @Nullable AiHubChatArtifactRecorder artifactRecorder;
     private final AssetFileFacade assetFileFacade;
+    private final @Nullable ImageGenerationMeter imageGenerationMeter;
     private final @Nullable ImageModel imageModel;
     private final String imageModelName;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     GenerateImageToolCallback(
         @Nullable ImageModel imageModel, String imageModelName, AssetFileFacade assetFileFacade,
-        @Nullable AiHubChatArtifactRecorder artifactRecorder) {
+        @Nullable AiHubChatArtifactRecorder artifactRecorder, @Nullable ImageGenerationMeter imageGenerationMeter) {
 
         this.artifactRecorder = artifactRecorder;
         this.assetFileFacade = assetFileFacade;
+        this.imageGenerationMeter = imageGenerationMeter;
         this.imageModel = imageModel;
         this.imageModelName = imageModelName;
     }
 
     public static GenerateImageToolCallback of(
         ApplicationProperties applicationProperties, AssetFileFacade assetFileFacade,
-        @Nullable AiHubChatArtifactRecorder artifactRecorder) {
+        @Nullable AiHubChatArtifactRecorder artifactRecorder, @Nullable ImageGenerationMeter imageGenerationMeter) {
 
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
@@ -127,7 +133,7 @@ public class GenerateImageToolCallback implements ToolCallback {
 
         return new GenerateImageToolCallback(
             imageModel, model == null || model.isBlank() ? DEFAULT_IMAGE_MODEL_NAME : model, assetFileFacade,
-            artifactRecorder);
+            artifactRecorder, imageGenerationMeter);
     }
 
     String getImageModelName() {
@@ -185,8 +191,12 @@ public class GenerateImageToolCallback implements ToolCallback {
                 .quality("standard")
                 .build();
 
+            long startNanos = System.nanoTime();
+
             ImageResponse response = imageModel.call(
                 new ImagePrompt(style == null || style.isBlank() ? prompt : prompt + " - " + style, options));
+
+            recordGeneration(toolContext, size, (System.nanoTime() - startNanos) / 1_000_000L);
 
             ImageGeneration result = response.getResult();
 
@@ -231,6 +241,18 @@ public class GenerateImageToolCallback implements ToolCallback {
         }
     }
 
+    private void recordGeneration(@Nullable ToolContext toolContext, String size, long durationMs) {
+        if (imageGenerationMeter == null) {
+            return;
+        }
+
+        try {
+            imageGenerationMeter.record(toolContext, size, durationMs);
+        } catch (RuntimeException exception) {
+            log.warn("Failed to record the usage of a generated image: {}", exception.getMessage(), exception);
+        }
+    }
+
     static String resolveFilename(@Nullable String filename) {
         if (filename == null || filename.isBlank()) {
             return "generated-image-" + LocalDateTime.now()
@@ -241,6 +263,12 @@ public class GenerateImageToolCallback implements ToolCallback {
 
         return trimmedFilename.toLowerCase(Locale.ROOT)
             .endsWith(".png") ? trimmedFilename : trimmedFilename + ".png";
+    }
+
+    @FunctionalInterface
+    public interface ImageGenerationMeter {
+
+        void record(@Nullable ToolContext toolContext, String size, long durationMs);
     }
 
     public record GenerateImageInput(
