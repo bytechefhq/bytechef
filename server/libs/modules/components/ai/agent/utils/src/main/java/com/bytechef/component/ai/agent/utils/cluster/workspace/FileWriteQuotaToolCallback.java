@@ -17,10 +17,7 @@
 package com.bytechef.component.ai.agent.utils.cluster.workspace;
 
 import com.bytechef.commons.util.JsonUtils;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
+import com.bytechef.platform.ai.workspace.AgentWorkspaceQuota;
 import java.nio.file.Path;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -90,72 +87,18 @@ public class FileWriteQuotaToolCallback implements ToolCallback {
     private @Nullable String checkQuota(String toolInput) {
         Map<String, ?> arguments = JsonUtils.readMap(toolInput);
 
-        long requiredBytes = getRequiredBytes(arguments);
-
-        if (requiredBytes <= 0) {
-            return null;
-        }
-
-        long usedBytes = quota.getUsedBytes();
-
-        if (usedBytes + requiredBytes <= quota.maxBytes()) {
-            return null;
-        }
-
-        return quota.getFullMessage(usedBytes, requiredBytes);
-    }
-
-    private long getRequiredBytes(Map<String, ?> arguments) {
         ToolDefinition toolDefinition = delegate.getToolDefinition();
 
         Path file = getFile(arguments);
 
         if (WRITE_TOOL_NAME.equals(toolDefinition.name())) {
-            return getByteCount(arguments.get(CONTENT)) - getFileSize(file);
+            return quota.checkWrite(quota.getWriteRequiredBytes(file, getString(arguments, CONTENT)));
         }
 
-        long growth = getByteCount(arguments.get(NEW_STRING)) - getByteCount(arguments.get(OLD_STRING));
-
-        if (growth <= 0) {
-            return 0;
-        }
-
-        if (Boolean.TRUE.equals(arguments.get(REPLACE_ALL))) {
-            return growth * countOccurrences(file, arguments.get(OLD_STRING));
-        }
-
-        return growth;
-    }
-
-    private static long countOccurrences(@Nullable Path file, @Nullable Object oldString) {
-        if (file == null || !(oldString instanceof String text) || text.isEmpty()) {
-            return 1;
-        }
-
-        try {
-            String fileContent = Files.readString(file, StandardCharsets.UTF_8);
-
-            long count = 0;
-            int index = fileContent.indexOf(text);
-
-            while (index >= 0) {
-                count++;
-
-                index = fileContent.indexOf(text, index + text.length());
-            }
-
-            return Math.max(count, 1);
-        } catch (IOException | RuntimeException exception) {
-            return 1;
-        }
-    }
-
-    private static long getByteCount(@Nullable Object value) {
-        if (!(value instanceof String text)) {
-            return 0;
-        }
-
-        return text.getBytes(StandardCharsets.UTF_8).length;
+        return quota.checkWrite(
+            quota.getEditRequiredBytes(
+                file, getString(arguments, OLD_STRING), getString(arguments, NEW_STRING),
+                Boolean.TRUE.equals(arguments.get(REPLACE_ALL))));
     }
 
     private @Nullable Path getFile(Map<String, ?> arguments) {
@@ -172,15 +115,7 @@ public class FileWriteQuotaToolCallback implements ToolCallback {
         }
     }
 
-    private static long getFileSize(@Nullable Path file) {
-        if (file == null || !Files.isRegularFile(file, LinkOption.NOFOLLOW_LINKS)) {
-            return 0;
-        }
-
-        try {
-            return Files.size(file);
-        } catch (IOException ioException) {
-            return 0;
-        }
+    private static @Nullable String getString(Map<String, ?> arguments, String key) {
+        return arguments.get(key) instanceof String text ? text : null;
     }
 }

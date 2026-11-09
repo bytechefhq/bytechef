@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils.cluster.workspace;
+package com.bytechef.platform.ai.workspace;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -216,9 +216,32 @@ class AgentWorkspaceCleanerTest {
     void testCleanDoesNothingWithoutTheBaseDirectory() {
         Path missingBasedir = basedir.resolve("missing");
 
-        new AgentWorkspaceCleaner(missingBasedir, TEST_RETENTION, null, tenantService, null).clean();
+        new AgentWorkspaceCleaner(missingBasedir, TEST_RETENTION, null, tenantService, null, directory -> false)
+            .clean();
 
         assertThat(missingBasedir).doesNotExist();
+    }
+
+    @Test
+    void testCleanKeepsAnExpiredTestWorkspaceThatIsInUse() throws IOException {
+        Path expiredTestWorkspace = createDirectory("tenant_one/test/job-1", Instant.now()
+            .minus(Duration.ofHours(25)));
+        Path workspace = expiredTestWorkspace.resolve("default");
+
+        new AgentWorkspaceCleaner(basedir, TEST_RETENTION, null, null, null, workspace::startsWith).clean();
+
+        assertThat(expiredTestWorkspace).isDirectory();
+    }
+
+    @Test
+    void testCleanStillRemovesExpiredTestWorkspacesThatAreNotInUse() throws IOException {
+        Path expiredTestWorkspace = createDirectory("tenant_one/test/job-1", Instant.now()
+            .minus(Duration.ofHours(25)));
+        Path otherWorkspace = basedir.resolve("tenant_one/test/job-2/default");
+
+        new AgentWorkspaceCleaner(basedir, TEST_RETENTION, null, null, null, otherWorkspace::startsWith).clean();
+
+        assertThat(expiredTestWorkspace).doesNotExist();
     }
 
     private AgentWorkspaceCleaner createCleaner(
@@ -228,7 +251,7 @@ class AgentWorkspaceCleanerTest {
             ? null : new JobPrincipalAccessorRegistry(List.of(jobPrincipalAccessor));
 
         return new AgentWorkspaceCleaner(
-            basedir, TEST_RETENTION, idleRetention, tenantService, jobPrincipalAccessorRegistry);
+            basedir, TEST_RETENTION, idleRetention, tenantService, jobPrincipalAccessorRegistry, directory -> false);
     }
 
     private Path createDirectory(String relativePath, Instant lastModified) throws IOException {

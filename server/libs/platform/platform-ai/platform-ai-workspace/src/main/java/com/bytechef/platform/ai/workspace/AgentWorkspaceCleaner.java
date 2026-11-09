@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils.cluster.workspace;
+package com.bytechef.platform.ai.workspace;
 
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
@@ -52,6 +53,7 @@ public class AgentWorkspaceCleaner {
 
     private final Path basedir;
     private final @Nullable Duration idleRetention;
+    private final Predicate<Path> inUse;
     private final @Nullable JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final @Nullable TenantService tenantService;
     private final Duration testRetention;
@@ -59,11 +61,12 @@ public class AgentWorkspaceCleaner {
     @SuppressFBWarnings("EI")
     public AgentWorkspaceCleaner(
         Path basedir, Duration testRetention, @Nullable Duration idleRetention, @Nullable TenantService tenantService,
-        @Nullable JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry) {
+        @Nullable JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, Predicate<Path> inUse) {
 
         this.basedir = basedir.toAbsolutePath()
             .normalize();
         this.idleRetention = idleRetention;
+        this.inUse = inUse;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.tenantService = tenantService;
         this.testRetention = testRetention;
@@ -80,7 +83,7 @@ public class AgentWorkspaceCleaner {
 
         for (Path tenantDirectory : listDirectories(basedir)) {
             removeExpiredTestWorkspaces(
-                tenantDirectory.resolve(AgentWorkspaceResolver.TEST_DIRECTORY), now.minus(testRetention));
+                tenantDirectory.resolve(AgentWorkspaceLayout.TEST_DIRECTORY), now.minus(testRetention));
 
             if (tenantIdsByDirectoryName.isEmpty()) {
                 continue;
@@ -105,7 +108,7 @@ public class AgentWorkspaceCleaner {
 
         try {
             for (String tenantId : tenantService.getTenantIds()) {
-                tenantIdsByDirectoryName.put(AgentWorkspaceResolver.toSegment(tenantId), tenantId);
+                tenantIdsByDirectoryName.put(AgentWorkspaceLayout.toSegment(tenantId), tenantId);
             }
         } catch (RuntimeException exception) {
             log.warn("Failed to list the tenants, keeping the agent workspaces of deployed workflows", exception);
@@ -132,7 +135,7 @@ public class AgentWorkspaceCleaner {
 
     private void removeOrphanedWorkspaces(Path tenantDirectory, Instant now) {
         for (PlatformType platformType : PlatformType.values()) {
-            Path platformDirectory = tenantDirectory.resolve(AgentWorkspaceResolver.toPlatformSegment(platformType));
+            Path platformDirectory = tenantDirectory.resolve(AgentWorkspaceLayout.toPlatformSegment(platformType));
 
             Optional<JobPrincipalAccessor> jobPrincipalAccessor = fetchJobPrincipalAccessor(platformType);
 
@@ -208,7 +211,9 @@ public class AgentWorkspaceCleaner {
         Path normalizedDirectory = directory.toAbsolutePath()
             .normalize();
 
-        if (!normalizedDirectory.startsWith(basedir) || normalizedDirectory.equals(basedir)) {
+        if (!normalizedDirectory.startsWith(basedir) || normalizedDirectory.equals(basedir) ||
+            inUse.test(normalizedDirectory)) {
+
             return;
         }
 
