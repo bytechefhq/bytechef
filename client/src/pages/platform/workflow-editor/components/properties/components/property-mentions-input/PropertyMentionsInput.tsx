@@ -35,6 +35,11 @@ import {CircleQuestionMarkIcon, SquareFunctionIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
+const PropertyFormulaEditorPopover = lazy(
+    () =>
+        import('@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyFormulaEditorPopover')
+);
+
 const PropertyMentionsInputEditorSheet = lazy(
     () =>
         import('@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditorSheet')
@@ -118,6 +123,8 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         const [isFocused, setIsFocused] = useState(false);
 
         const acceptsPillRef = useRef(false);
+        const formulaEditorCancelPendingSaveRef = useRef<(() => void) | null>(null);
+        const inlineEditorCancelPendingSaveRef = useRef<(() => void) | null>(null);
         const isInitialLoadRef = useRef(true);
         const localEditorRef = useRef<Editor | null>(null);
 
@@ -246,6 +253,21 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             };
         }, [clearPillTarget]);
 
+        useEffect(() => {
+            if (!cancelPendingSaveRef) {
+                return;
+            }
+
+            cancelPendingSaveRef.current = () => {
+                inlineEditorCancelPendingSaveRef.current?.();
+                formulaEditorCancelPendingSaveRef.current?.();
+            };
+
+            return () => {
+                cancelPendingSaveRef.current = null;
+            };
+        }, [cancelPendingSaveRef]);
+
         // Check initial value for formula mode
         useEffect(() => {
             if (isInitialLoadRef.current && setIsFormulaMode && expressionEnabled !== false) {
@@ -261,9 +283,20 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
         const showLockedFormulaSwitch = controlType === 'FORMULA_MODE' && expressionEnabled !== false && !isFromAi;
 
+        const showFormulaEditor = !!isFormulaMode && expressionEnabled !== false && !isFromAi;
+
+        const showEditorSheet =
+            !showFormulaEditor &&
+            (controlType === 'RICH_TEXT' || controlType === 'TEXT_AREA' || controlType === 'FORMULA_MODE');
+
         return (
-            <fieldset className={twMerge('w-full', label && 'space-y-1')} data-pill-target="">
-                {(label || description || showInputTypeSwitchButton || showLockedFormulaSwitch || dynamicSwitch) && (
+            <fieldset className={twMerge('relative w-full', label && 'space-y-1')} data-pill-target="">
+                {(label ||
+                    description ||
+                    showInputTypeSwitchButton ||
+                    showLockedFormulaSwitch ||
+                    dynamicSwitch ||
+                    showFormulaEditor) && (
                     <div className={twMerge('flex w-full items-center justify-between', !label && 'justify-end')}>
                         {label && (
                             <div className="flex items-center">
@@ -290,9 +323,32 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                         )}
 
                         <div className="flex items-center gap-1">
-                            {(controlType === 'RICH_TEXT' ||
-                                controlType === 'TEXT_AREA' ||
-                                controlType === 'FORMULA_MODE') && (
+                            {showFormulaEditor && (
+                                <Suspense fallback={<Skeleton className="size-6" />}>
+                                    <PropertyFormulaEditorPopover
+                                        cancelPendingSaveRef={formulaEditorCancelPendingSaveRef}
+                                        componentDefinitions={componentDefinitions}
+                                        controlType={controlType}
+                                        dataPills={dataPills}
+                                        disableAutoSave={disableAutoSave}
+                                        expressionEnabled={expressionEnabled}
+                                        onEditorFocus={onFocus}
+                                        onValueChange={onValueChange}
+                                        path={path}
+                                        placeholder={placeholder}
+                                        setIsFormulaMode={setIsFormulaMode}
+                                        taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                        title={label ?? ''}
+                                        toolProperty={toolProperty}
+                                        type={type}
+                                        validateBeforeSave={validateBeforeSave}
+                                        value={value ?? defaultValue}
+                                        workflow={workflow}
+                                    />
+                                </Suspense>
+                            )}
+
+                            {showEditorSheet && (
                                 <Suspense fallback={<Skeleton className="size-6" />}>
                                     <PropertyMentionsInputEditorSheet
                                         componentDefinitions={componentDefinitions}
@@ -366,7 +422,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                     >
                         <PropertyMentionsInputEditor
                             autoFocus={autoFocus}
-                            cancelPendingSaveRef={cancelPendingSaveRef}
+                            cancelPendingSaveRef={inlineEditorCancelPendingSaveRef}
                             className={twMerge('px-2 py-2', leadingIcon && 'py-[7px]')}
                             componentDefinitions={componentDefinitions}
                             controlType={controlType}
@@ -409,7 +465,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                     </p>
                 )}
 
-                {isFormulaMode && expressionEnabled !== false && !isFromAi && <ExpressionHelpNote />}
+                {showFormulaEditor && <ExpressionHelpNote />}
             </fieldset>
         );
     }
