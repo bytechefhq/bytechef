@@ -149,7 +149,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                         getRequest={(id, tags) => ({
                             id: id!,
                             updateTagsRequest: {
-                                tags: tags || [],
+                                tags,
                             },
                         })}
                         id={connection.id!}

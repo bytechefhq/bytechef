@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {Connection} from '@/shared/middleware/automation/configuration';
 import {render, resetAll, screen, userEvent, windowResizeObserver, within} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -7,6 +8,7 @@ import ConnectionListItem from '../ConnectionListItem';
 const hoisted = vi.hoisted(() => ({
     deleteConnectionMutate: vi.fn(),
     disconnectConnectionMutate: vi.fn(),
+    updateConnectionTagsMutate: vi.fn(),
 }));
 
 vi.mock('@/shared/components/connection/ConnectionDialog', () => ({
@@ -20,7 +22,7 @@ vi.mock('@/shared/components/connection/ConnectionDialog', () => ({
 }));
 
 vi.mock('@/shared/mutations/automation/connectionTags.mutations', () => ({
-    useUpdateConnectionTagsMutation: () => ({mutate: vi.fn()}),
+    useUpdateConnectionTagsMutation: () => ({mutate: hoisted.updateConnectionTagsMutate}),
 }));
 
 vi.mock('@/shared/mutations/automation/connections.mutations', () => ({
@@ -52,9 +54,11 @@ const activeConnection: Connection = {...inactiveConnection, active: true};
 
 const renderConnectionListItem = (connection: Connection) =>
     render(
-        <ul>
-            <ConnectionListItem componentDefinitions={[]} connection={connection} />
-        </ul>
+        <TooltipProvider>
+            <ul>
+                <ConnectionListItem componentDefinitions={[]} connection={connection} />
+            </ul>
+        </TooltipProvider>
     );
 
 const openMenu = async () => {
@@ -165,5 +169,22 @@ describe('ConnectionListItem', () => {
         expect(screen.getByTitle('Disconnect from all workflows first to enable deletion')).toContainElement(
             deleteMenuItem
         );
+    });
+
+    it('should update the connection tags when removing a tag', async () => {
+        renderConnectionListItem({
+            ...inactiveConnection,
+            tags: [
+                {id: 1, name: 'first'},
+                {id: 2, name: 'second'},
+            ],
+        });
+
+        await userEvent.click(screen.getAllByRole('button', {name: 'Remove tag'})[0]);
+
+        expect(hoisted.updateConnectionTagsMutate).toHaveBeenCalledWith({
+            id: 7,
+            updateTagsRequest: {tags: [{id: 2, name: 'second'}]},
+        });
     });
 });
