@@ -21,6 +21,8 @@ import com.bytechef.ai.copilot.tool.CopilotAgentType;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolDefinition;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolVariant;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalPolicy;
 import com.bytechef.ee.ai.hub.subagent.SubAgentAdvisorContributor;
 import com.bytechef.ee.ai.hub.subagent.SubAgentSessionMemoryContributor;
@@ -36,6 +38,7 @@ import com.bytechef.platform.ai.guardrails.GuardrailSurface;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,9 +55,12 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.SessionEvent;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
  * @version ee
@@ -89,6 +95,36 @@ class AiHubDelegateGuardrailsTest {
                 assertThat(exception.getMessage()).doesNotContain(BLOCKED_TERM);
             });
 
+        assertThat(chatModel.prompts).isEmpty();
+        assertThat(sessionEvents(fixtures)).isEmpty();
+    }
+
+    @Test
+    void testWorkspaceBlockedTermBecomesADelegateToolError() throws Exception {
+        workspaceSettings(WORKSPACE_ID, null, BLOCKED_TERM, BlockingMode.BLOCK);
+
+        AiHubAgentFixtures fixtures = fixtures(guardrails());
+
+        ChatClient delegateChatClient = decorate(captureChatClientDecorator(fixtures));
+        ToolCallback delegateToolCallback = captureCallbackDecorator(fixtures).apply(
+            new ChatClientToolCallback(delegateChatClient), mock(IntelligentToolDefinition.class));
+
+        Map<String, Object> toolContext = new HashMap<>(
+            AgentToolInvocationContext.builder()
+                .workspaceId(WORKSPACE_ID)
+                .conversationId(THREAD_ID)
+                .build()
+                .toToolContext());
+
+        toolContext.put(AutomationToolInvocationContext.TOOL_CONTEXT_WORKSPACE_ID_KEY, WORKSPACE_ID);
+
+        String result = delegateToolCallback.call(
+            "{\"request\": \"Summarize the " + BLOCKED_TERM + " memo\"}", new ToolContext(toolContext));
+
+        assertThat(result)
+            .contains("\"error\"")
+            .contains(AiGuardrailViolationException.class.getSimpleName())
+            .doesNotContain(BLOCKED_TERM);
         assertThat(chatModel.prompts).isEmpty();
         assertThat(sessionEvents(fixtures)).isEmpty();
     }
@@ -224,6 +260,20 @@ class AiHubDelegateGuardrailsTest {
         return chatClientDecoratorCaptor.getValue();
     }
 
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    private static BiFunction<ToolCallback, IntelligentToolDefinition, ToolCallback> captureCallbackDecorator(
+        AiHubAgentFixtures fixtures) {
+
+        ArgumentCaptor<BiFunction> callbackDecoratorCaptor = ArgumentCaptor.forClass(BiFunction.class);
+
+        verify(fixtures.intelligentToolCatalog)
+            .getByNames(anySet(), eq(IntelligentToolVariant.BUILD), any(), callbackDecoratorCaptor.capture());
+
+        return callbackDecoratorCaptor.getValue();
+    }
+
     private ChatClient decorate(BiFunction<ChatClient, IntelligentToolDefinition, ChatClient> chatClientDecorator) {
         IntelligentToolDefinition definition = mock(IntelligentToolDefinition.class);
         AgentType agentType = CopilotAgentType.BUILD_WORKFLOW;
@@ -254,6 +304,41 @@ class AiHubDelegateGuardrailsTest {
             .toolContext(toolContext)
             .call()
             .content();
+    }
+
+    private static final class ChatClientToolCallback implements ToolCallback {
+
+        private final ChatClient chatClient;
+
+        private ChatClientToolCallback(ChatClient chatClient) {
+            this.chatClient = chatClient;
+        }
+
+        @Override
+        public ToolDefinition getToolDefinition() {
+            return ToolDefinition.builder()
+                .name("buildWorkflow")
+                .description("Builds a workflow")
+                .inputSchema(
+                    "{\"type\": \"object\", \"properties\": {\"request\": {\"type\": \"string\"}}, " +
+                        "\"required\": [\"request\"]}")
+                .build();
+        }
+
+        @Override
+        public String call(String toolInput) {
+            return call(toolInput, null);
+        }
+
+        @Override
+        public String call(String toolInput, ToolContext toolContext) {
+            Map<String, ?> input = JsonUtils.readMap(toolInput);
+
+            return chatClient.prompt((String) input.get("request"))
+                .toolContext(toolContext == null ? Map.of() : toolContext.getContext())
+                .call()
+                .content();
+        }
     }
 
     private static final class PromptCapturingChatModel implements ChatModel {
