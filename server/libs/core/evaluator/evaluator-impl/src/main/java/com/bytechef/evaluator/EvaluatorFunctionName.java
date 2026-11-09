@@ -34,9 +34,11 @@ final class EvaluatorFunctionName {
     static final String CONTAINS = "contains";
     static final String DOUBLE = "double";
     static final String EQUALS_IGNORE_CASE = "equalsIgnoreCase";
+    static final String EXISTS = "exists";
     static final String FLATTEN = "flatten";
     static final String FLOAT = "float";
     static final String FORMAT = "format";
+    static final String GET_OR_DEFAULT = "getOrDefault";
     static final String INDEX_OF = "indexOf";
     static final String INT = "int";
     static final String JOIN = "join";
