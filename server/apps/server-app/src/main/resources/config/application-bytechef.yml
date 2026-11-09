@@ -114,6 +114,14 @@ bytechef:
       provider: PGVECTOR
       pgvector:
         dimensions: 1536
+  ai-hub:
+    cost-estimation:
+      tool-rates:
+        "[brave_search]": 0.005
+        "[firecrawl_scrape]": 0.00099
+        "[firecrawl_search]": 0.00198
+        "[openai_image]": 0.04
+        "[pptx_generate]": 0
   analytics:
     enabled: false
   approval:
