@@ -164,6 +164,9 @@ bytechef:
     claude-code:
       # Register the Claude Code component, which runs a Claude agent with full tool permissions on the server
       enabled: false
+      workspace:
+        # Each workflow's Claude Code working directory lives under this directory and is kept between runs
+        basedir: ${user.home}/bytechef/data/claude-code-workspaces
   coordinator:
     # Whether this instance runs the coordinator (orchestrates job and trigger execution)
     enabled: true

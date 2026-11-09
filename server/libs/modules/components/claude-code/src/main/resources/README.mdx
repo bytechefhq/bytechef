@@ -24,4 +24,13 @@ Add **Skills** elements from the **AI Agent Utils** component to the **Skills** 
 
 ### How a run works
 
-Each Chat run gets a new, empty working directory. The selected skills are written to `.claude/skills` in that directory, and Claude Code loads only the settings of that directory. The settings, plugins and output styles in the home directory of the server user are not used. The directory is deleted when the run ends, also when it fails.
+Each workflow has its own working directory, and it is kept between runs. Files that Claude Code writes in one run, for example a cloned repository or notes, are there in the next run. The directory is below `bytechef.component.claude-code.workspace.basedir` (default `~/bytechef/data/claude-code-workspaces`):
+
+- Deployed workflows: `<tenant>/<automation or embedded>/<deployment id>/<environment>/<workflow id>/<workspace name>`.
+- Test runs in the workflow editor: `<tenant>/test/workflow-<workflow id>/<workspace name>`.
+
+**Workspace Name** (advanced, default `default`) selects the directory. Claude Code steps of the same workflow with the same workspace name share files. Steps with different names do not. Only one run at a time uses a directory: a second run waits until the first run ends.
+
+At the start of each run, ByteChef deletes the `.claude` directory in the working directory and writes the selected skills to `.claude/skills` again. Claude Code loads only the settings of the working directory. The settings, plugins and output styles in the home directory of the server user are not used. A `CLAUDE.md` file in the working directory is kept, so Claude Code can keep project notes in it from run to run.
+
+To start again with an empty directory, delete the directory on the server.

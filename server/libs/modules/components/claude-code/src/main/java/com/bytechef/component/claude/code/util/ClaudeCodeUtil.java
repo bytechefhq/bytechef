@@ -36,12 +36,16 @@ import io.github.markpollack.claude.agent.sdk.types.Message;
 import io.github.markpollack.claude.agent.sdk.types.ResultMessage;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 /**
@@ -52,6 +56,10 @@ public final class ClaudeCodeUtil {
 
     static final List<String> SETTING_SOURCES = List.of("project");
     static final Duration TIMEOUT = Duration.ofMinutes(10);
+
+    private static final String CLAUDE_DIRECTORY = ".claude";
+    private static final String SKILLS_DIRECTORY = "skills";
+    private static final Map<Path, Lock> WORKSPACE_LOCKS = new ConcurrentHashMap<>();
 
     private ClaudeCodeUtil() {
     }
@@ -92,19 +100,27 @@ public final class ClaudeCodeUtil {
     }
 
     public static String run(
-        String prompt, Map<String, McpServerConfig> mcpServerConfigs, SkillsWriter skillsWriter,
+        String prompt, Path workspace, Map<String, McpServerConfig> mcpServerConfigs, SkillsWriter skillsWriter,
         ClaudeCodeExecutor claudeCodeExecutor) throws Exception {
 
-        Path workspace = Files.createTempDirectory("bytechef-claude-code-");
+        Lock workspaceLock = WORKSPACE_LOCKS.computeIfAbsent(workspace, key -> new ReentrantLock());
+
+        workspaceLock.lockInterruptibly();
 
         try {
-            Path skillsDirectory = Files.createDirectories(workspace.resolve(".claude/skills"));
+            Path claudeDirectory = workspace.resolve(CLAUDE_DIRECTORY);
+
+            if (Files.exists(claudeDirectory, LinkOption.NOFOLLOW_LINKS)) {
+                deleteRecursively(claudeDirectory);
+            }
+
+            Path skillsDirectory = Files.createDirectories(claudeDirectory.resolve(SKILLS_DIRECTORY));
 
             skillsWriter.write(skillsDirectory);
 
             return claudeCodeExecutor.execute(prompt, workspace, mcpServerConfigs);
         } finally {
-            deleteRecursively(workspace);
+            workspaceLock.unlock();
         }
     }
 

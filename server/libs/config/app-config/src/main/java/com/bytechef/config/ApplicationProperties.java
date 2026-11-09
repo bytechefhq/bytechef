@@ -3608,12 +3608,44 @@ public class ApplicationProperties {
              */
             private boolean enabled;
 
+            /**
+             * Persistent working directories of the Claude Code runs
+             */
+            private Workspace workspace = new Workspace();
+
+            public Workspace getWorkspace() {
+                return workspace;
+            }
+
             public boolean isEnabled() {
                 return enabled;
             }
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+
+            public void setWorkspace(Workspace workspace) {
+                this.workspace = workspace;
+            }
+
+            /**
+             * Claude Code workspace configuration.
+             */
+            public static class Workspace {
+
+                /**
+                 * Base directory under which each workflow gets its own Claude Code working directory
+                 */
+                private String basedir;
+
+                public String getBasedir() {
+                    return basedir;
+                }
+
+                public void setBasedir(String basedir) {
+                    this.basedir = basedir;
+                }
             }
         }
 

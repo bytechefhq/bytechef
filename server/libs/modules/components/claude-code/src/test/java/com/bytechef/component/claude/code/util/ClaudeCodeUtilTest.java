@@ -39,9 +39,16 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * @author Ivica Cardic
@@ -52,6 +59,9 @@ class ClaudeCodeUtilTest {
     private final ClusterElementDefinitionService clusterElementDefinitionService =
         mock(ClusterElementDefinitionService.class);
     private final Context context = mock(Context.class);
+
+    @TempDir
+    private Path workspace;
 
     @Test
     void testGetMcpServerConfigsPassesEachElementItsOwnConnectionAndKeepsNamesUnique() throws Exception {
@@ -93,7 +103,7 @@ class ClaudeCodeUtilTest {
     }
 
     @Test
-    void testRunGivesClaudeCodeTheSkillsInAWorkspaceItDeletesAfterwards() throws Exception {
+    void testRunKeepsTheWorkspaceFilesAndRebuildsTheSkillsEachRun() throws Exception {
         ClaudeCodeSkillsFunction claudeCodeSkillsFunction = (
             inputParameters, connectionParameters, skillsDirectory, context) -> Files.writeString(
                 Files.createDirectories(skillsDirectory.resolve(inputParameters.getRequiredString("name")))
@@ -103,40 +113,98 @@ class ClaudeCodeUtilTest {
         when(clusterElementDefinitionService.getClusterElement("aiAgentUtils", 1, "claudeCodeSkills"))
             .thenReturn(claudeCodeSkillsFunction);
 
-        List<ClusterElement> skills = List.of(
+        List<ClusterElement> firstSkills = List.of(
             clusterElement("skills_1", "aiAgentUtils/v1/claudeCodeSkills", Map.of("name", "release-notes")));
-        AtomicReference<Path> workspaceReference = new AtomicReference<>();
 
-        String result = ClaudeCodeUtil.run(
-            "hello", Map.of(),
+        String firstResult = ClaudeCodeUtil.run(
+            "clone", workspace, Map.of(),
             skillsDirectory -> ClaudeCodeUtil.writeSkills(
-                skills, Map.of(), clusterElementDefinitionService, skillsDirectory, context),
+                firstSkills, Map.of(), clusterElementDefinitionService, skillsDirectory, context),
             (prompt, workingDirectory, mcpServerConfigs) -> {
-                workspaceReference.set(workingDirectory);
-
+                assertThat(workingDirectory).isEqualTo(workspace);
                 assertThat(workingDirectory.resolve(".claude/skills/release-notes/SKILL.md")).hasContent("skill");
+
+                Files.writeString(workingDirectory.resolve("notes.md"), "kept");
+                Files.writeString(workingDirectory.resolve(".claude/settings.json"), "{}");
 
                 return "reply to " + prompt;
             });
 
-        assertThat(result).isEqualTo("reply to hello");
-        assertThat(workspaceReference.get()).doesNotExist();
+        List<ClusterElement> secondSkills = List.of(
+            clusterElement("skills_1", "aiAgentUtils/v1/claudeCodeSkills", Map.of("name", "triage")));
+
+        String secondResult = ClaudeCodeUtil.run(
+            "review", workspace, Map.of(),
+            skillsDirectory -> ClaudeCodeUtil.writeSkills(
+                secondSkills, Map.of(), clusterElementDefinitionService, skillsDirectory, context),
+            (prompt, workingDirectory, mcpServerConfigs) -> {
+                assertThat(workingDirectory.resolve("notes.md")).hasContent("kept");
+                assertThat(workingDirectory.resolve(".claude/skills/triage/SKILL.md")).hasContent("skill");
+                assertThat(workingDirectory.resolve(".claude/skills/release-notes")).doesNotExist();
+                assertThat(workingDirectory.resolve(".claude/settings.json")).doesNotExist();
+
+                return "reply to " + prompt;
+            });
+
+        assertThat(firstResult).isEqualTo("reply to clone");
+        assertThat(secondResult).isEqualTo("reply to review");
+        assertThat(workspace.resolve("notes.md")).hasContent("kept");
     }
 
     @Test
-    void testRunDeletesTheWorkspaceWhenClaudeCodeFails() {
-        AtomicReference<Path> workspaceReference = new AtomicReference<>();
-
+    void testRunKeepsTheWorkspaceWhenClaudeCodeFails() throws Exception {
         assertThatThrownBy(() -> ClaudeCodeUtil.run(
-            "hello", Map.of(), skillsDirectory -> Files.writeString(skillsDirectory.resolve("file"), "x"),
+            "hello", workspace, Map.of(), skillsDirectory -> Files.writeString(skillsDirectory.resolve("file"), "x"),
             (prompt, workingDirectory, mcpServerConfigs) -> {
-                workspaceReference.set(workingDirectory);
+                Files.writeString(workingDirectory.resolve("partial.txt"), "work");
 
                 throw new IllegalStateException("boom");
             }))
                 .hasMessage("boom");
 
-        assertThat(workspaceReference.get()).doesNotExist();
+        assertThat(workspace.resolve("partial.txt")).hasContent("work");
+    }
+
+    @Test
+    void testRunLetsOnlyOneRunUseAWorkspaceAtATime() throws Exception {
+        CountDownLatch firstRunStarted = new CountDownLatch(1);
+        CountDownLatch releaseFirstRun = new CountDownLatch(1);
+        AtomicInteger activeRuns = new AtomicInteger();
+        AtomicInteger maxActiveRuns = new AtomicInteger();
+
+        ClaudeCodeExecutor claudeCodeExecutor = (prompt, workingDirectory, mcpServerConfigs) -> {
+            maxActiveRuns.accumulateAndGet(activeRuns.incrementAndGet(), Math::max);
+
+            if ("first".equals(prompt)) {
+                firstRunStarted.countDown();
+
+                assertThat(releaseFirstRun.await(10, TimeUnit.SECONDS)).isTrue();
+            }
+
+            activeRuns.decrementAndGet();
+
+            return prompt;
+        };
+
+        try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
+            Future<String> firstRun = executorService.submit(
+                () -> ClaudeCodeUtil.run("first", workspace, Map.of(), skillsDirectory -> {}, claudeCodeExecutor));
+
+            assertThat(firstRunStarted.await(10, TimeUnit.SECONDS)).isTrue();
+
+            Future<String> secondRun = executorService.submit(
+                () -> ClaudeCodeUtil.run("second", workspace, Map.of(), skillsDirectory -> {}, claudeCodeExecutor));
+
+            assertThatThrownBy(() -> secondRun.get(200, TimeUnit.MILLISECONDS))
+                .isInstanceOf(TimeoutException.class);
+
+            releaseFirstRun.countDown();
+
+            assertThat(firstRun.get(10, TimeUnit.SECONDS)).isEqualTo("first");
+            assertThat(secondRun.get(10, TimeUnit.SECONDS)).isEqualTo("second");
+        }
+
+        assertThat(maxActiveRuns.get()).isEqualTo(1);
     }
 
     @Test
