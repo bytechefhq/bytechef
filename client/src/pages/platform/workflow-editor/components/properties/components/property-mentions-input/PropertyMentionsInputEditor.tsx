@@ -829,6 +829,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 emitUpdate: false,
                 parseOptions: {preserveWhitespace: 'full'},
             });
+
+            lastSavedRef.current = undefined;
         }, [editor, memoizedContent, isLocalUpdate]);
 
         // Sync formula mode state with editor storage
