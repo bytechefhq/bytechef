@@ -36,7 +36,7 @@ public class WorkspaceNotificationGraphQlController {
     }
 
     @QueryMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<WorkspaceScopedNotification> workspaceNotifications(@Argument long workspaceId) {
         return workspaceNotificationService.getNotifications(workspaceId)
             .stream()

@@ -12,5 +12,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation("org.springframework.security:spring-security-config")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
