@@ -252,7 +252,7 @@ const Property = ({
         acceptsPill: acceptsNativePill,
         insertPill: insertPillValue,
         onFocusTarget: () => {
-            if (!isPillContainer && acceptsNativePill() && workflowNodeDetailsPanelOpen) {
+            if (!isPillContainer && controlType !== 'SELECT' && acceptsNativePill() && workflowNodeDetailsPanelOpen) {
                 openDataPillPanel();
             }
         },

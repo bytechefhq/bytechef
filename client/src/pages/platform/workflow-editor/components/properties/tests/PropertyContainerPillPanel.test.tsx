@@ -30,6 +30,14 @@ const arrayProperty = {
     type: 'ARRAY',
 } as PropertyAllType;
 
+const enabledProperty = {
+    controlType: 'SELECT',
+    expressionEnabled: true,
+    label: 'Enabled',
+    name: 'enabled',
+    type: 'BOOLEAN',
+} as PropertyAllType;
+
 const methodProperty = {
     controlType: 'SELECT',
     expressionEnabled: true,
@@ -151,7 +159,7 @@ describe('focusing a constant field opens the data pill panel', () => {
         expect(useDataPillPanelStore.getState().dataPillPanelOpen).toBe(true);
     });
 
-    it('opens the panel when a select gets focus', async () => {
+    it('leaves the panel closed when a select gets focus', async () => {
         setParameters({method: 'GET'});
 
         renderProperty(methodProperty);
@@ -160,7 +168,31 @@ describe('focusing a constant field opens the data pill panel', () => {
 
         fireEvent.focus(screen.getByRole('combobox'));
 
-        expect(useDataPillPanelStore.getState().dataPillPanelOpen).toBe(true);
+        expect(useDataPillPanelStore.getState().dataPillPanelOpen).toBe(false);
+    });
+
+    it('leaves the panel closed when a boolean select gets focus', async () => {
+        setParameters({enabled: true});
+
+        renderProperty(enabledProperty);
+
+        await settle();
+
+        fireEvent.focus(screen.getByRole('combobox'));
+
+        expect(useDataPillPanelStore.getState().dataPillPanelOpen).toBe(false);
+    });
+
+    it('still lets a focused select take a clicked pill', async () => {
+        setParameters({method: 'GET'});
+
+        renderProperty(methodProperty);
+
+        await settle();
+
+        fireEvent.focus(screen.getByRole('combobox'));
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().pillTarget?.acceptsPill()).toBe(true);
     });
 
     it('opens the panel when a field inside an object gets focus', async () => {
