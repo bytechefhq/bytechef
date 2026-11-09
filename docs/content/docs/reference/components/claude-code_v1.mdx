@@ -1,6 +1,6 @@
 ---
 title: "Claude Code"
-description: "Runs Claude Code on the ByteChef server, with the MCP servers and skills you attach to it."
+description: "Runs Claude Code on the ByteChef server, with the MCP servers you attach to it and the skills you select."
 ---
 
 
@@ -20,13 +20,14 @@ Type: claudeCode/v1
 ### Chat
 Name: chat
 
-`Sends a message to Claude Code. Claude Code can use the tools of the attached MCP servers and the attached skills.`
+`Sends a message to Claude Code. Claude Code can use the tools of the attached MCP servers and the selected skills.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | script | Message | STRING | The message to send to Claude Code. | true |
+| skills | Skills | ARRAY <details> <summary> Items </summary> [INTEGER\($skillId)] </details> | Skills from the ByteChef skill library (Settings &gt; AI &gt; Skills) that Claude Code can use. ByteChef writes them to .claude/skills in the working directory at the start of each run. | false |
 | workspaceName | Workspace Name | STRING | Name of the working directory, which is kept between runs. Claude Code steps of this workflow with the same workspace name share files; steps with different names do not. Letters, digits, '-' and '_' only. | false |
 
 #### Example JSON Structure
@@ -36,6 +37,7 @@ Name: chat
   "name" : "chat",
   "parameters" : {
     "script" : "",
+    "skills" : [ 1 ],
     "workspaceName" : ""
   },
   "type" : "claudeCode/v1/chat"
@@ -90,7 +92,7 @@ Add **MCP Server** elements from the **MCP Client** component to the **MCP Serve
 
 #### Skills
 
-Add **Skills** elements from the **AI Agent Utils** component to the **Skills** slot to give Claude Code skills from the ByteChef skill library (**Settings > AI > Skills**). Every file of each selected skill is available to Claude Code, including its scripts and templates.
+Select skills from the ByteChef skill library (**Settings > AI > Skills**) in the **Skills** property of **Chat**. Every file of each selected skill is available to Claude Code, including its scripts and templates.
 
 #### How a run works
 
