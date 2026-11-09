@@ -1189,7 +1189,7 @@ const Property = ({
                         <PropertyComboBox
                             arrayIndex={arrayIndex}
                             defaultValue={defaultValue}
-                            deletePropertyButton={withFromAiButton(nativeFromAiButton)}
+                            deletePropertyButton={deletePropertyButton}
                             description={description}
                             dynamicSwitch={dynamicSwitch}
                             error={hasError}
@@ -1221,7 +1221,7 @@ const Property = ({
                     {!control && controlType === 'SELECT' && type === 'BOOLEAN' && (
                         <PropertySelect
                             defaultValue={defaultValue?.toString()}
-                            deletePropertyButton={withFromAiButton(nativeFromAiButton)}
+                            deletePropertyButton={deletePropertyButton}
                             description={description}
                             dynamicSwitch={dynamicSwitch}
                             handleInputTypeSwitchButtonClick={handleFormulaSwitch}
@@ -1258,7 +1258,7 @@ const Property = ({
                     {!control && controlType === 'MULTI_SELECT' && (
                         <PropertyMultiSelect
                             defaultValue={propertyParameterValue as string[]}
-                            deletePropertyButton={withFromAiButton(nativeFromAiButton)}
+                            deletePropertyButton={deletePropertyButton}
                             handleInputTypeSwitchButtonClick={handleFormulaSwitch}
                             leadingIcon={typeIcon}
                             lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
@@ -1313,7 +1313,6 @@ const Property = ({
                             <PropertyFormulaSwitch formulaMode={false} handleClick={handleFormulaSwitchClick} />
                         ) : undefined
                     }
-                    fromAiButton={nativeFromAiButton}
                     label={label || name}
                     language={languageId!}
                     leadingIcon={typeIcon}
