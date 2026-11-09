@@ -1,10 +1,8 @@
 import AlertDialog from '@/components/AlertDialog';
-import Badge from '@/components/Badge/Badge';
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
-import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
-import ConnectionListItemDropdownMenu from '@/shared/components/connection/ConnectionListItemDropdownMenu';
+import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/connectionTags.mutations';
@@ -16,11 +14,9 @@ import {
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {ComponentIcon, Link2OffIcon, Trash2Icon} from 'lucide-react';
+import {Link2OffIcon, Trash2Icon} from 'lucide-react';
 import {memo, useMemo, useState} from 'react';
 import {toast} from 'sonner';
-
-import TagList from '../../../../../shared/components/TagList';
 
 interface ConnectionListItemProps {
     componentDefinitions: ComponentDefinitionBasic[];
@@ -112,139 +108,89 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     };
 
     return (
-        <li className="mb-2 rounded border border-border/50" key={connection.id}>
-            <>
-                <div className="group flex items-center rounded-md bg-surface-neutral-primary px-3 hover:bg-surface-neutral-primary-hover">
-                    <div className="flex flex-1 items-center py-3">
-                        <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                                <div className="relative flex items-center gap-2">
-                                    {componentDefinition?.icon ? (
-                                        <LazyLoadSVG
-                                            className="size-5 flex-none"
-                                            preloader={<ComponentIcon />}
-                                            src={componentDefinition.icon}
-                                        />
-                                    ) : (
-                                        <ComponentIcon className="size-5 flex-none" />
-                                    )}
+        <ConnectionListItemLayout
+            active={connection.active}
+            createdDate={connection.createdDate}
+            credentialStatus={connection.credentialStatus}
+            icon={componentDefinition?.icon}
+            id={connection.id}
+            menuItems={
+                <>
+                    {connection.active === true && (
+                        <DropdownMenuItem
+                            icon={<Link2OffIcon />}
+                            label="Disconnect from all"
+                            onClick={() => setShowDisconnectDialog(true)}
+                        />
+                    )}
 
-                                    <span className="text-base font-semibold">{connection.name}</span>
-                                </div>
-                            </div>
-
-                            <div className="mt-2 sm:flex sm:items-center sm:justify-between">
-                                <div className="flex items-center" onClick={(event) => event.preventDefault()}>
-                                    {connection.tags && (
-                                        <TagList
-                                            getRequest={(id, tags) => ({
-                                                id: id!,
-                                                updateTagsRequest: {
-                                                    tags: tags || [],
-                                                },
-                                            })}
-                                            id={connection.id!}
-                                            remainingTags={remainingTags}
-                                            tags={connection.tags}
-                                            updateTagsMutation={updateConnectionTagsMutation}
-                                        />
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
-                            <div className="flex min-w-52 flex-col items-end gap-y-4">
-                                {connection.credentialStatus === 'VALID' ? (
-                                    <Badge
-                                        className="border-transparent uppercase"
-                                        label={connection.active ? 'Active' : 'Not Active'}
-                                        styleType={connection.active ? 'success-outline' : 'secondary-outline'}
-                                        weight="semibold"
-                                    />
-                                ) : (
-                                    <Badge
-                                        className="border-transparent uppercase"
-                                        label={connection.credentialStatus ?? 'INVALID'}
-                                        styleType="destructive-outline"
-                                        weight="semibold"
-                                    />
-                                )}
-
-                                {connection.createdDate && (
-                                    <Tooltip>
-                                        <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary sm:mt-0">
-                                            <span className="text-xs">
-                                                {`Created at ${connection.createdDate?.toLocaleDateString()} ${connection.createdDate?.toLocaleTimeString()}`}
-                                            </span>
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>Created Date</TooltipContent>
-                                    </Tooltip>
-                                )}
-                            </div>
-
-                            <ConnectionListItemDropdownMenu onEditClick={() => setShowEditDialog(true)}>
-                                {connection.active === true && (
-                                    <DropdownMenuItem
-                                        icon={<Link2OffIcon />}
-                                        label="Disconnect from all"
-                                        onClick={() => setShowDisconnectDialog(true)}
-                                    />
-                                )}
-
-                                <div
-                                    title={
-                                        connection.active === true
-                                            ? 'Disconnect from all workflows first to enable deletion'
-                                            : 'Delete the connection'
-                                    }
-                                >
-                                    <DropdownMenuItem
-                                        disabled={connection.active}
-                                        icon={<Trash2Icon />}
-                                        label="Delete"
-                                        onClick={() => setShowDeleteDialog(true)}
-                                        variant="destructive"
-                                    />
-                                </div>
-                            </ConnectionListItemDropdownMenu>
-                        </div>
+                    <div
+                        title={
+                            connection.active === true
+                                ? 'Disconnect from all workflows first to enable deletion'
+                                : 'Delete the connection'
+                        }
+                    >
+                        <DropdownMenuItem
+                            disabled={connection.active}
+                            icon={<Trash2Icon />}
+                            label="Delete"
+                            onClick={() => setShowDeleteDialog(true)}
+                            variant="destructive"
+                        />
                     </div>
-                </div>
-
-                <AlertDialog
-                    description="This action cannot be undone. This will permanently delete the connection."
-                    isPending={deleteConnectionMutation.isPending}
-                    onCancel={() => setShowDeleteDialog(false)}
-                    onConfirm={handleAlertDeleteDialogClick}
-                    open={showDeleteDialog}
-                />
-
-                <AlertDialog
-                    confirmIcon={<Link2OffIcon />}
-                    confirmLabel="Disconnect from all"
-                    description="This action cannot be undone."
-                    isPending={disconnectConnectionMutation.isPending}
-                    onCancel={() => setShowDisconnectDialog(false)}
-                    onConfirm={handleDisconnectFromAllClick}
-                    open={showDisconnectDialog}
-                    title={`Disconnect ${connection.name} from all workflows?`}
-                />
-
-                {showEditDialog && componentDefinitions && (
-                    <ConnectionDialog
-                        componentDefinitions={componentDefinitions}
-                        connection={connection}
-                        connectionTagsQueryKey={ConnectionKeys.connectionTags}
-                        connectionsQueryKey={ConnectionKeys.connections}
-                        onClose={() => setShowEditDialog(false)}
-                        useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                        useUpdateConnectionMutation={useUpdateConnectionMutation}
+                </>
+            }
+            name={connection.name}
+            onEditClick={() => setShowEditDialog(true)}
+            tagList={
+                connection.tags && (
+                    <TagList
+                        getRequest={(id, tags) => ({
+                            id: id!,
+                            updateTagsRequest: {
+                                tags: tags || [],
+                            },
+                        })}
+                        id={connection.id!}
+                        remainingTags={remainingTags}
+                        tags={connection.tags}
+                        updateTagsMutation={updateConnectionTagsMutation}
                     />
-                )}
-            </>
-        </li>
+                )
+            }
+        >
+            <AlertDialog
+                description="This action cannot be undone. This will permanently delete the connection."
+                isPending={deleteConnectionMutation.isPending}
+                onCancel={() => setShowDeleteDialog(false)}
+                onConfirm={handleAlertDeleteDialogClick}
+                open={showDeleteDialog}
+            />
+
+            <AlertDialog
+                confirmIcon={<Link2OffIcon />}
+                confirmLabel="Disconnect from all"
+                description="This action cannot be undone."
+                isPending={disconnectConnectionMutation.isPending}
+                onCancel={() => setShowDisconnectDialog(false)}
+                onConfirm={handleDisconnectFromAllClick}
+                open={showDisconnectDialog}
+                title={`Disconnect ${connection.name} from all workflows?`}
+            />
+
+            {showEditDialog && componentDefinitions && (
+                <ConnectionDialog
+                    componentDefinitions={componentDefinitions}
+                    connection={connection}
+                    connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                    connectionsQueryKey={ConnectionKeys.connections}
+                    onClose={() => setShowEditDialog(false)}
+                    useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                    useUpdateConnectionMutation={useUpdateConnectionMutation}
+                />
+            )}
+        </ConnectionListItemLayout>
     );
 });
 
