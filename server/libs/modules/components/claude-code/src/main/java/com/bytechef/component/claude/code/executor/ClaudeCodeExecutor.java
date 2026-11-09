@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.claude.code.util;
+package com.bytechef.component.claude.code.executor;
 
+import io.github.markpollack.claude.agent.sdk.hooks.HookRegistry;
 import io.github.markpollack.claude.agent.sdk.mcp.McpServerConfig;
 import java.nio.file.Path;
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.Map;
 @FunctionalInterface
 public interface ClaudeCodeExecutor {
 
-    String execute(String prompt, Path workingDirectory, Map<String, McpServerConfig> mcpServerConfigs)
+    String execute(
+        String prompt, Path workingDirectory, Map<String, McpServerConfig> mcpServerConfigs, HookRegistry hookRegistry)
         throws Exception;
 }

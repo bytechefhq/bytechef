@@ -21,20 +21,23 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.claude.code.action.ClaudeCodeChat;
-import com.bytechef.component.claude.code.util.ClaudeCodeWorkspaceResolver;
+import com.bytechef.component.claude.code.workspace.ClaudeCodeWorkspaceResolver;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ClaudeCodeComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.util.unit.DataSize;
 
 /**
  * @author Marko Kriskovic
  * @author Ivica Cardic
  */
 @Component(CLAUDE_CODE + "_v1_ComponentHandler")
+@ConditionalOnProperty(prefix = "bytechef.component.claude-code", name = "enabled", havingValue = "true")
 public class ClaudeCodeComponentHandler implements ComponentHandler {
 
     private final ClaudeCodeComponentDefinition componentDefinition;
@@ -42,12 +45,15 @@ public class ClaudeCodeComponentHandler implements ComponentHandler {
     public ClaudeCodeComponentHandler(
         ApplicationProperties applicationProperties, ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        ApplicationProperties.Component.ClaudeCode claudeCode = applicationProperties.getComponent()
-            .getClaudeCode();
+        ApplicationProperties.Component component = applicationProperties.getComponent();
+
+        ApplicationProperties.Component.ClaudeCode claudeCode = component.getClaudeCode();
         ApplicationProperties.Component.ClaudeCode.Workspace workspace = claudeCode.getWorkspace();
 
+        DataSize maxSize = workspace.getMaxSize();
+
         ClaudeCodeWorkspaceResolver claudeCodeWorkspaceResolver = new ClaudeCodeWorkspaceResolver(
-            workspace.getBasedir());
+            workspace.getBasedir(), maxSize == null ? 0 : maxSize.toBytes());
 
         this.componentDefinition = new ClaudeCodeComponentDefinitionImpl(
             component(CLAUDE_CODE)

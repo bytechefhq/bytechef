@@ -16,12 +16,14 @@
 
 package com.bytechef.component.claude.code;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 /**
  * @author Marko Kriskovic
@@ -34,5 +36,25 @@ public class ClaudeCodeComponentHandlerTest {
             "definition/claude-code_v1.json",
             new ClaudeCodeComponentHandler(
                 new ApplicationProperties(), mock(ClusterElementDefinitionService.class)).getDefinition());
+    }
+
+    @Test
+    void testHandlerIsNotRegisteredWhenClaudeCodeIsDisabled() {
+        createApplicationContextRunner()
+            .run(context -> assertThat(context).doesNotHaveBean(ClaudeCodeComponentHandler.class));
+    }
+
+    @Test
+    void testHandlerIsRegisteredWhenClaudeCodeIsEnabled() {
+        createApplicationContextRunner()
+            .withPropertyValues("bytechef.component.claude-code.enabled=true")
+            .run(context -> assertThat(context).hasSingleBean(ClaudeCodeComponentHandler.class));
+    }
+
+    private static ApplicationContextRunner createApplicationContextRunner() {
+        return new ApplicationContextRunner()
+            .withBean(ApplicationProperties.class)
+            .withBean(ClusterElementDefinitionService.class, () -> mock(ClusterElementDefinitionService.class))
+            .withUserConfiguration(ClaudeCodeComponentHandler.class);
     }
 }

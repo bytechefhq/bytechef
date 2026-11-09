@@ -18,17 +18,17 @@ package com.bytechef.component.claude.code.action;
 
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.SCRIPT;
 import static com.bytechef.component.claude.code.constant.ClaudeCodeConstants.WORKSPACE_NAME;
-import static com.bytechef.component.claude.code.util.ClaudeCodeWorkspaceResolver.DEFAULT_WORKSPACE_NAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.platform.ai.workspace.AgentWorkspaceLayout.DEFAULT_WORKSPACE_NAME;
 import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeMcpServerFunction.MCP_SERVERS;
 import static com.bytechef.platform.component.definition.ai.claudecode.ClaudeCodeSkillsFunction.SKILLS;
 
-import com.bytechef.component.claude.code.util.ClaudeCodeExecutor;
+import com.bytechef.component.claude.code.executor.ClaudeCodeExecutor;
 import com.bytechef.component.claude.code.util.ClaudeCodeUtil;
-import com.bytechef.component.claude.code.util.ClaudeCodeWorkspaceResolver;
+import com.bytechef.component.claude.code.workspace.ClaudeCodeWorkspaceResolver;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
@@ -39,7 +39,6 @@ import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunc
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
-import io.github.markpollack.claude.agent.sdk.mcp.McpServerConfig;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -93,16 +92,15 @@ public class ClaudeCodeChat {
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
-        Map<String, McpServerConfig> mcpServerConfigs = ClaudeCodeUtil.getMcpServerConfigs(
-            clusterElementMap.getClusterElements(MCP_SERVERS), componentConnections,
-            clusterElementDefinitionService, context);
-
+        List<ClusterElement> mcpServers = clusterElementMap.getClusterElements(MCP_SERVERS);
         List<ClusterElement> skills = clusterElementMap.getClusterElements(SKILLS);
 
         Path workspace = claudeCodeWorkspaceResolver.resolve(context, inputParameters.getString(WORKSPACE_NAME));
 
         return ClaudeCodeUtil.run(
-            inputParameters.getRequiredString(SCRIPT), workspace, mcpServerConfigs,
+            inputParameters.getRequiredString(SCRIPT), claudeCodeWorkspaceResolver.getQuota(workspace),
+            () -> ClaudeCodeUtil.getMcpServerConfigs(
+                mcpServers, componentConnections, clusterElementDefinitionService, context),
             skillsDirectory -> ClaudeCodeUtil.writeSkills(
                 skills, componentConnections, clusterElementDefinitionService, skillsDirectory, context),
             claudeCodeExecutor);
