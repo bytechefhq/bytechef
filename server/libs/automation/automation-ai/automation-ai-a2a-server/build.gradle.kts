@@ -5,6 +5,7 @@ configurations.named("testRuntimeClasspath") {
 dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
+    implementation("com.google.code.gson:gson")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")

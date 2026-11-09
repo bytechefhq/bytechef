@@ -21,9 +21,13 @@ import com.bytechef.platform.ai.a2a.A2AAgentCardFactory;
 import com.bytechef.platform.ai.a2a.A2AAgentDescriptor;
 import com.bytechef.platform.ai.a2a.A2AProtocolHandler;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.a2a.json.JsonProcessingException;
+import io.a2a.json.JsonUtil;
 import io.a2a.spec.AgentCard;
 import io.a2a.spec.InvalidParamsError;
 import io.a2a.spec.InvalidRequestError;
@@ -31,9 +35,9 @@ import io.a2a.spec.JSONParseError;
 import io.a2a.spec.JSONRPCErrorResponse;
 import io.a2a.spec.JSONRPCResponse;
 import io.a2a.spec.MessageSendParams;
-import io.a2a.util.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,16 +88,16 @@ class A2AServerController {
 
         AgentCard agentCard = agentCardFactory.create(descriptor);
 
-        return ResponseEntity.ok(Utils.OBJECT_MAPPER.writeValueAsString(agentCard));
+        return ResponseEntity.ok(JsonUtil.toJson(agentCard));
     }
 
     @PostMapping(value = "/{secretKey}", consumes = MediaType.APPLICATION_JSON_VALUE)
     Object handleJsonRpc(@PathVariable String secretKey, @RequestBody String body) throws Exception {
-        JsonNode root;
+        JsonElement root;
 
         try {
-            root = Utils.OBJECT_MAPPER.readTree(body);
-        } catch (JsonProcessingException jsonProcessingException) {
+            root = JsonParser.parseString(body);
+        } catch (JsonParseException jsonParseException) {
             return toResponseEntity(new JSONRPCErrorResponse(new JSONParseError()));
         }
 
@@ -103,15 +107,18 @@ class A2AServerController {
             return toResponseEntity(new JSONRPCErrorResponse(requestId, new InvalidRequestError()));
         }
 
-        String method = root.get("method")
-            .asText();
+        JsonObject rootObject = root.getAsJsonObject();
+
+        String method = rootObject.get("method")
+            .getAsString();
 
         MessageSendParams params = null;
+        JsonElement paramsElement = rootObject.get("params");
 
-        if (isMessageMethod(method) && root.hasNonNull("params")) {
+        if (isMessageMethod(method) && paramsElement != null && !paramsElement.isJsonNull()) {
             try {
-                params = Utils.OBJECT_MAPPER.treeToValue(root.get("params"), MessageSendParams.class);
-            } catch (JsonProcessingException jsonProcessingException) {
+                params = JsonUtil.OBJECT_MAPPER.fromJson(paramsElement, MessageSendParams.class);
+            } catch (RuntimeException runtimeException) {
                 return toResponseEntity(
                     new JSONRPCErrorResponse(requestId,
                         new InvalidParamsError("The message parameters are malformed")));
@@ -122,7 +129,7 @@ class A2AServerController {
             return streamJsonRpc(secretKey, requestId, method, params);
         }
 
-        return toResponseEntity(dispatch(secretKey, requestId, method, params, root));
+        return toResponseEntity(dispatch(secretKey, requestId, method, params, rootObject));
     }
 
     private static ResponseEntity<String> toResponseEntity(JSONRPCResponse<?> response)
@@ -130,12 +137,12 @@ class A2AServerController {
 
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
-            .body(Utils.OBJECT_MAPPER.writeValueAsString(response));
+            .body(JsonUtil.toJson(response));
     }
 
     private JSONRPCResponse<?> dispatch(
         String secretKey, Object requestId, @Nullable String method, @Nullable MessageSendParams params,
-        JsonNode root) {
+        JsonObject root) {
 
         if (A2AProtocolHandler.METHOD_GET_TASK.equals(method) || A2AProtocolHandler.METHOD_CANCEL_TASK.equals(method)) {
             String taskId = extractTaskId(root);
@@ -154,20 +161,21 @@ class A2AServerController {
         return protocolHandler.handle(secretKey, requestId, method, params);
     }
 
-    private static @Nullable String extractTaskId(JsonNode root) {
-        JsonNode paramsNode = root.get("params");
+    private static @Nullable String extractTaskId(JsonObject root) {
+        JsonElement paramsElement = root.get("params");
 
-        if (paramsNode == null || !paramsNode.isObject()) {
+        if (paramsElement == null || !paramsElement.isJsonObject()) {
             return null;
         }
 
-        JsonNode idNode = paramsNode.get("id");
+        JsonElement idElement = paramsElement.getAsJsonObject()
+            .get("id");
 
-        if (idNode == null || !idNode.isTextual()) {
+        if (!isString(idElement)) {
             return null;
         }
 
-        return idNode.asText();
+        return idElement.getAsString();
     }
 
     private SseEmitter streamJsonRpc(
@@ -197,7 +205,7 @@ class A2AServerController {
 
                 sseEmitter.send(
                     SseEmitter.event()
-                        .data(Utils.OBJECT_MAPPER.writeValueAsString(event), MediaType.APPLICATION_JSON));
+                        .data(JsonUtil.toJson(event), MediaType.APPLICATION_JSON));
             }
 
             @Override
@@ -218,22 +226,33 @@ class A2AServerController {
         return sseEmitter;
     }
 
-    private static boolean isValidRequest(JsonNode root) {
-        if (!root.isObject()) {
+    private static boolean isValidRequest(JsonElement root) {
+        if (!root.isJsonObject()) {
             return false;
         }
 
-        JsonNode idNode = root.get("id");
-        JsonNode jsonRpcNode = root.get("jsonrpc");
-        JsonNode methodNode = root.get("method");
+        JsonObject rootObject = root.getAsJsonObject();
 
-        return isValidId(idNode) && jsonRpcNode != null && jsonRpcNode.isTextual() &&
-            JSON_RPC_VERSION.equals(jsonRpcNode.asText()) &&
-            methodNode != null && methodNode.isTextual();
+        JsonElement idElement = rootObject.get("id");
+        JsonElement jsonRpcElement = rootObject.get("jsonrpc");
+        JsonElement methodElement = rootObject.get("method");
+
+        return isValidId(idElement) && isString(jsonRpcElement) &&
+            JSON_RPC_VERSION.equals(jsonRpcElement.getAsString()) && isString(methodElement);
     }
 
-    private static boolean isValidId(@Nullable JsonNode idNode) {
-        return idNode == null || idNode.isNull() || idNode.isNumber() || idNode.isTextual();
+    private static boolean isValidId(@Nullable JsonElement idElement) {
+        return idElement == null || idElement.isJsonNull() || isNumber(idElement) || isString(idElement);
+    }
+
+    private static boolean isNumber(@Nullable JsonElement element) {
+        return element != null && element.isJsonPrimitive() && element.getAsJsonPrimitive()
+            .isNumber();
+    }
+
+    private static boolean isString(@Nullable JsonElement element) {
+        return element != null && element.isJsonPrimitive() && element.getAsJsonPrimitive()
+            .isString();
     }
 
     private static boolean isMessageMethod(@Nullable String method) {
@@ -241,23 +260,20 @@ class A2AServerController {
             A2AProtocolHandler.METHOD_STREAM_MESSAGE.equals(method);
     }
 
-    private static @Nullable Object extractId(JsonNode root) {
-        if (!root.isObject()) {
+    private static @Nullable Object extractId(JsonElement root) {
+        if (!root.isJsonObject()) {
             return null;
         }
 
-        JsonNode idNode = root.get("id");
+        JsonElement idElement = root.getAsJsonObject()
+            .get("id");
 
-        if (idNode == null || idNode.isNull()) {
-            return null;
+        if (isNumber(idElement)) {
+            return NumberUtils.createNumber(idElement.getAsString());
         }
 
-        if (idNode.isNumber()) {
-            return idNode.numberValue();
-        }
-
-        if (idNode.isTextual()) {
-            return idNode.asText();
+        if (isString(idElement)) {
+            return idElement.getAsString();
         }
 
         return null;

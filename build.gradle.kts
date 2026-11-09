@@ -20,7 +20,7 @@ dependencyManagement {
 
 versionCatalogUpdate {
     keep {
-        versions.addAll("anthropic-java", "checkstyle", "findsecbugs", "gradle-git-properties", "io-modelcontextprotocol-sdk", "jackson", "jacoco", "java", "openai-java", "pmd", "spotbugs", "spring-ai", "spring-boot", "spring-cloud-aws", "spring-cloud-dependencies", "spring-shell", "testcontainers")
+        versions.addAll("anthropic-java", "aws-sdk", "checkstyle", "findsecbugs", "gradle-git-properties", "io-modelcontextprotocol-sdk", "jackson", "jacoco", "java", "openai-java", "pmd", "spotbugs", "spring-ai", "spring-boot", "spring-cloud-aws", "spring-cloud-dependencies", "spring-shell", "testcontainers")
     }
 }
 

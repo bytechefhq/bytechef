@@ -38,8 +38,9 @@ import com.bytechef.platform.ai.a2a.A2AAgentResult;
 import com.bytechef.platform.ai.a2a.A2AAgentRun;
 import com.bytechef.platform.ai.a2a.A2AProtocolHandler;
 import com.bytechef.platform.ai.a2a.A2ATaskReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import io.a2a.util.Utils;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonParser;
 import jakarta.servlet.AsyncEvent;
 import jakarta.servlet.AsyncListener;
 import java.io.IOException;
@@ -169,15 +170,15 @@ class A2AServerControllerIntTest {
 
             for (String method : List.of("tasks/get", "tasks/cancel")) {
                 for (String invalidTaskId : invalidTaskIds) {
-                    JsonNode body = performJsonRpc(
+                    JsonElement body = performJsonRpc(
                         jsonRpcRequest("\"r4\"", method, "{\"id\": " + invalidTaskId + "}"));
 
-                    assertThat(body.at("/error/code")
-                        .asInt())
+                    assertThat(at(body, "/error/code")
+                        .getAsInt())
                             .as(method + " " + invalidTaskId)
                             .isEqualTo(-32602);
-                    assertThat(body.get("id")
-                        .asText())
+                    assertThat(at(body, "/id")
+                        .getAsString())
                             .as(method + " " + invalidTaskId)
                             .isEqualTo("r4");
                 }
@@ -192,10 +193,10 @@ class A2AServerControllerIntTest {
 
             for (String method : List.of("tasks/get", "tasks/cancel")) {
                 for (String invalidParam : invalidParams) {
-                    JsonNode body = performJsonRpc(jsonRpcRequest("\"r5\"", method, invalidParam));
+                    JsonElement body = performJsonRpc(jsonRpcRequest("\"r5\"", method, invalidParam));
 
-                    assertThat(body.at("/error/code")
-                        .asInt())
+                    assertThat(at(body, "/error/code")
+                        .getAsInt())
                             .as(method + " " + invalidParam)
                             .isEqualTo(-32602);
                 }
@@ -216,10 +217,10 @@ class A2AServerControllerIntTest {
 
     @Test
     void testMalformedJsonReturnsAJsonRpcParseError() throws Exception {
-        JsonNode body = performJsonRpc("{not json");
+        JsonElement body = performJsonRpc("{not json");
 
-        assertThat(body.at("/error/code")
-            .asInt()).isEqualTo(-32700);
+        assertThat(at(body, "/error/code")
+            .getAsInt()).isEqualTo(-32700);
     }
 
     @Test
@@ -234,10 +235,10 @@ class A2AServerControllerIntTest {
             "{\"jsonrpc\": \"2.0\", \"id\": 1, \"method\": 42}");
 
         for (String invalidRequest : invalidRequests) {
-            JsonNode body = performJsonRpc(invalidRequest);
+            JsonElement body = performJsonRpc(invalidRequest);
 
-            assertThat(body.at("/error/code")
-                .asInt())
+            assertThat(at(body, "/error/code")
+                .getAsInt())
                     .as(invalidRequest)
                     .isEqualTo(-32600);
         }
@@ -250,15 +251,15 @@ class A2AServerControllerIntTest {
         List<String> invalidIds = List.of("true", "{\"value\": 1}", "[1]");
 
         for (String invalidId : invalidIds) {
-            JsonNode body = performJsonRpc(jsonRpcRequest(invalidId, "tasks/get", "{\"id\": \"t1\"}"));
+            JsonElement body = performJsonRpc(jsonRpcRequest(invalidId, "tasks/get", "{\"id\": \"t1\"}"));
 
-            assertThat(body.at("/error/code")
-                .asInt())
+            assertThat(at(body, "/error/code")
+                .getAsInt())
                     .as(invalidId)
                     .isEqualTo(-32600);
-            assertThat(body.hasNonNull("id"))
+            assertThat(at(body, "/id").isJsonNull())
                 .as(invalidId)
-                .isFalse();
+                .isTrue();
         }
 
         verifyNoInteractions(protocolHandler, a2aAgentExecutor);
@@ -266,12 +267,12 @@ class A2AServerControllerIntTest {
 
     @Test
     void testMalformedMessageParamsReturnAJsonRpcInvalidParamsError() throws Exception {
-        JsonNode body = performJsonRpc(jsonRpcRequest("\"r3\"", "message/send", "{\"message\": 42}"));
+        JsonElement body = performJsonRpc(jsonRpcRequest("\"r3\"", "message/send", "{\"message\": 42}"));
 
-        assertThat(body.at("/error/code")
-            .asInt()).isEqualTo(-32602);
-        assertThat(body.get("id")
-            .asText()).isEqualTo("r3");
+        assertThat(at(body, "/error/code")
+            .getAsInt()).isEqualTo(-32602);
+        assertThat(at(body, "/id")
+            .getAsString()).isEqualTo("r3");
         verifyNoInteractions(a2aAgentExecutor);
     }
 
@@ -280,36 +281,37 @@ class A2AServerControllerIntTest {
         when(a2aAgentExecutor.start(any(A2AAgentRequest.class)))
             .thenReturn(A2AAgentRun.of(A2AAgentResult.ofInputRequired("approve at the link", TASK_REFERENCE)));
 
-        JsonNode body = performJsonRpc(jsonRpcRequest(7, "message/send", MESSAGE_PARAMS));
+        JsonElement body = performJsonRpc(jsonRpcRequest(7, "message/send", MESSAGE_PARAMS));
 
-        assertThat(body.get("jsonrpc")
-            .asText()).isEqualTo("2.0");
-        assertThat(body.get("id")
+        assertThat(at(body, "/jsonrpc")
+            .getAsString()).isEqualTo("2.0");
+        assertThat(at(body, "/id")
+            .getAsJsonPrimitive()
             .isNumber()).isTrue();
-        assertThat(body.get("id")
-            .asInt()).isEqualTo(7);
-        assertThat(body.at("/result/kind")
-            .asText()).isEqualTo("task");
-        assertThat(body.at("/result/id")
-            .asText()).isEqualTo("durable-task");
-        assertThat(body.at("/result/contextId")
-            .asText()).isEqualTo("durable-context");
-        assertThat(body.at("/result/status/state")
-            .asText()).isEqualTo("input-required");
-        assertThat(body.at("/result/status/message/parts/0/text")
-            .asText()).isEqualTo("approve at the link");
+        assertThat(at(body, "/id")
+            .getAsInt()).isEqualTo(7);
+        assertThat(at(body, "/result/kind")
+            .getAsString()).isEqualTo("task");
+        assertThat(at(body, "/result/id")
+            .getAsString()).isEqualTo("durable-task");
+        assertThat(at(body, "/result/contextId")
+            .getAsString()).isEqualTo("durable-context");
+        assertThat(at(body, "/result/status/state")
+            .getAsString()).isEqualTo("input-required");
+        assertThat(at(body, "/result/status/message/parts/0/text")
+            .getAsString()).isEqualTo("approve at the link");
     }
 
     @Test
     void testUnknownTaskIsATaskNotFoundErrorOverTheWire() throws Exception {
         when(a2aAgentExecutor.pollTask(SECRET_KEY, "missing")).thenReturn(null);
 
-        JsonNode body = performJsonRpc(jsonRpcRequest(9, "tasks/get", "{\"id\": \"missing\"}"));
+        JsonElement body = performJsonRpc(jsonRpcRequest(9, "tasks/get", "{\"id\": \"missing\"}"));
 
-        assertThat(body.get("id")
-            .asInt()).isEqualTo(9);
-        assertThat(body.at("/error/code")
-            .asInt()).isEqualTo(-32001);
+        assertThat(at(body, "/id")
+            .getAsInt()).isEqualTo(9);
+        assertThat(at(body, "/error/code")
+            .getAsInt()).isEqualTo(-32001);
         verify(a2aAgentExecutor).pollTask(SECRET_KEY, "missing");
     }
 
@@ -317,16 +319,16 @@ class A2AServerControllerIntTest {
     void testAgentCardSerializesARealCard() throws Exception {
         stubAgentDescriptor(a2aAgentExecutor);
 
-        JsonNode agentCard = getAgentCard(mockMvc);
+        JsonElement agentCard = getAgentCard(mockMvc);
 
-        assertThat(agentCard.get("protocolVersion")
-            .asText()).isEqualTo("0.3.0");
-        assertThat(agentCard.get("url")
-            .asText()).isEqualTo("http://localhost/api/automation/a2a/server-secret");
-        assertThat(agentCard.at("/capabilities/streaming")
-            .asBoolean()).isTrue();
-        assertThat(agentCard.at("/skills/0/id")
-            .asText()).isEqualTo("wf1");
+        assertThat(at(agentCard, "/protocolVersion")
+            .getAsString()).isEqualTo("0.3.0");
+        assertThat(at(agentCard, "/url")
+            .getAsString()).isEqualTo("http://localhost/api/automation/a2a/server-secret");
+        assertThat(at(agentCard, "/capabilities/streaming")
+            .getAsBoolean()).isTrue();
+        assertThat(at(agentCard, "/skills/0/id")
+            .getAsString()).isEqualTo("wf1");
     }
 
     @Test
@@ -353,10 +355,10 @@ class A2AServerControllerIntTest {
         void testAgentCardAdvertisesThePublicUrl() throws Exception {
             stubAgentDescriptor(publicUrlA2AAgentExecutor);
 
-            JsonNode agentCard = getAgentCard(publicUrlMockMvc);
+            JsonElement agentCard = getAgentCard(publicUrlMockMvc);
 
-            assertThat(agentCard.get("url")
-                .asText()).isEqualTo(PUBLIC_URL + "/api/automation/a2a/server-secret");
+            assertThat(at(agentCard, "/url")
+                .getAsString()).isEqualTo(PUBLIC_URL + "/api/automation/a2a/server-secret");
             verify(publicUrlA2AAgentExecutor).getAgentDescriptor(
                 SECRET_KEY, PUBLIC_URL + "/api/automation/a2a/server-secret");
         }
@@ -372,7 +374,7 @@ class A2AServerControllerIntTest {
             .andReturn();
     }
 
-    private JsonNode performJsonRpc(String content) throws Exception {
+    private JsonElement performJsonRpc(String content) throws Exception {
         MvcResult mvcResult = mockMvc
             .perform(
                 post(JSON_RPC_PATH, SECRET_KEY)
@@ -381,19 +383,41 @@ class A2AServerControllerIntTest {
             .andExpect(status().isOk())
             .andReturn();
 
-        return Utils.OBJECT_MAPPER.readTree(
+        return JsonParser.parseString(
             mvcResult.getResponse()
                 .getContentAsString());
     }
 
-    private static JsonNode getAgentCard(MockMvc agentCardMockMvc) throws Exception {
+    private static JsonElement getAgentCard(MockMvc agentCardMockMvc) throws Exception {
         MvcResult mvcResult = agentCardMockMvc.perform(get(AGENT_CARD_PATH, SECRET_KEY))
             .andExpect(status().isOk())
             .andReturn();
 
-        return Utils.OBJECT_MAPPER.readTree(
+        return JsonParser.parseString(
             mvcResult.getResponse()
                 .getContentAsString());
+    }
+
+    private static JsonElement at(JsonElement root, String pointer) {
+        JsonElement current = root;
+
+        for (String segment : pointer.substring(1)
+            .split("/")) {
+
+            if (current.isJsonObject()) {
+                JsonElement child = current.getAsJsonObject()
+                    .get(segment);
+
+                current = child == null ? JsonNull.INSTANCE : child;
+            } else if (current.isJsonArray()) {
+                current = current.getAsJsonArray()
+                    .get(Integer.parseInt(segment));
+            } else {
+                return JsonNull.INSTANCE;
+            }
+        }
+
+        return current;
     }
 
     private static void stubAgentDescriptor(A2AAgentExecutorImpl stubbedA2AAgentExecutor) {
