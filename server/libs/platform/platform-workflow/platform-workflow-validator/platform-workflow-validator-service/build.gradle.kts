@@ -7,6 +7,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-core")
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-impl"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))

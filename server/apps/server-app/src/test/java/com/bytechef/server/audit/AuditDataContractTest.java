@@ -94,6 +94,7 @@ class AuditDataContractTest {
     private static final String TAGS = "tag assignment";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
     private static final String TRIGGER_INTERNAL = "trigger bookkeeping of an audited enable";
+    private static final String VALIDATION = "read-only validation that saves nothing";
     private static final String WEBHOOK_TRIGGER_TEST = "editor-time webhook trigger test";
     private static final String WORKFLOW_INPUTS = "workflow input or connection values";
     private static final Map<String, String> UNAUDITED_GUARDED_CLASSES = Map.of(
@@ -183,6 +184,8 @@ class AuditDataContractTest {
         Map.entry("TriggerLogFileStorageImpl.deleteLogEntries", EXECUTION_LOGS),
         Map.entry("TriggerLogFileStorageImpl.logsExist", EXISTENCE_CHECK),
         Map.entry("WorkflowNodeOutputFacadeImpl.checkWorkflowCache", EDITOR_TEST_DATA),
+        Map.entry("WorkflowValidatorFacadeImpl.validateWorkflow", VALIDATION),
+        Map.entry("WorkflowValidatorFacadeImpl.validateWorkflowById", VALIDATION),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceConnectionFacadeImpl.updateConnectionTags", TAGS),
