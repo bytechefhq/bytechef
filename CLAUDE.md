@@ -248,6 +248,21 @@ public class ExampleComponentHandler implements ComponentHandler {
 - All `useEffect` calls go last, immediately before the `return` statement
 - Group multiple declarations of the same hook type consecutively (e.g., all `useRef` calls together, then `.current` assignments in a separate block)
 
+### Graph dispatcher canvas (Client)
+
+A `graph/v1` dispatcher renders as a free-form `graphFrame` box, not as a chain. `layoutGraphFrames`
+is a PRE-PASS: it lays each frame's members out first, hands the outer engine one sized leaf node,
+and re-appends members and their routes afterwards - so nothing the outer layout does can disturb
+them, and a nested graph must be processed innermost-first. Member positions are FRAME-relative
+(`metadata.ui.nodePosition`); `toFrameChildPosition`/`fromFrameChildPosition` in `graphFrameGeometry`
+are the only sanctioned crossing to canvas coordinates - open-coding the header offset flings the
+group. Routing is an explicit `parameters.transitions: [{from, to, condition?}]` list, never a
+per-node `next`: declaration order within a `from` IS conditional priority, so a transition's index
+is its identity. `graphTransition`/`graphStart` edges are free-form routes, not chain links - a
+cyclic pair would corrupt dagre's and ELK's ranking, so both engines strip them, and chain walkers
+(`collectChainSuccessorNodes`) must skip them. `onConnect` is scoped by handle suffix
+(`resolveGraphConnection`): only graph transition handles connect, and only within one graph.
+
 ### Client Error Handling
 - `useFetchInterceptor.ts` provides centralized error handling for all fetch requests including GraphQL
 - GraphQL errors are automatically parsed and displayed as toast notifications
@@ -382,6 +397,15 @@ Never add notification logic under `server/libs/atlas/`. See `.agents/hitl-appro
 ### Spring Boot Project Conventions
 
 - **Integration Test Naming**: All integration test classes must end with "IntTest" suffix (e.g., `WorkflowFacadeIntTest.java`)
+- **A new task dispatcher must be registered in four places, not one.** Its own `@Bean`s cover the
+  production coordinator, which autowires `List<TaskDispatcherResolverFactory>` - but
+  `WorkflowTestConfiguration` (the editor's Test button), `WebhookConfiguration` and
+  `WorkflowSubflowSyncExecutorConfiguration` (synchronous subflows) each build their chain from a
+  literal `List.of(...)`. An unregistered type matches no resolver, falls through to the worker, and
+  surfaces as `Component definition with name '<type>' ... not found`. Adding the Gradle dependency is
+  not enough - `WorkflowTestConfigurationTest`, `WebhookConfigurationTest` and
+  `WorkflowSubflowSyncExecutorConfigurationTest` scan `com.bytechef.task.dispatcher` and fail when a
+  dispatcher or completion handler on the classpath is missing from their list.
 - **Spring 7 Programmatic Bean Registration**:
     - Use `BeanRegistrar` + `@Import` instead of `BeanFactoryPostProcessor` for programmatic bean registration
     - Resolve collection dependencies via `context.beanProvider(Class).orderedStream().toList()` (replaces `beanFactory.getBeansOfType()`)
