@@ -67,17 +67,33 @@ describe('fromAi on a code editor property', () => {
         useWorkflowNodeDetailsPanelStore.setState({currentNode: undefined, pillTarget: null});
     });
 
-    it('offers the fromAi button next to the code editor of a tool', async () => {
+    it('keeps the fromAi button out of the code editor of a tool while Text and Formula are off', async () => {
         const {container} = renderCodeProperty("print('hi')");
 
         await settle();
 
         expect(screen.getByRole('button', {name: 'Open Code Editor'})).toBeInTheDocument();
+        expect(getFromAiButton(container)).toBeNull();
+    });
+
+    it('offers the fromAi button of a tool code editor once the Text switch is on', async () => {
+        const {container} = renderCodeProperty("print('hi')");
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
         expect(getFromAiButton(container)).not.toBeNull();
     });
 
     it('lets the model define the code of a tool once the fromAi button is clicked', async () => {
         const {container} = renderCodeProperty("print('hi')");
+
+        await settle();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
 
         await settle();
 

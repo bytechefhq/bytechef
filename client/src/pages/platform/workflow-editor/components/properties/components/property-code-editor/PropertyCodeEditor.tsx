@@ -18,7 +18,6 @@ interface PropertyCodeEditorProps {
     error?: boolean;
     errorMessage?: string;
     formulaSwitch?: ReactNode;
-    fromAiButton?: ReactNode;
     label?: string;
     language: string;
     leadingIcon?: ReactNode;
@@ -39,7 +38,6 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
             error,
             errorMessage,
             formulaSwitch,
-            fromAiButton,
             label,
             language,
             leadingIcon,
@@ -80,13 +78,11 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                                 </Tooltip>
                             )}
 
-                            {(dynamicSwitch || formulaSwitch || fromAiButton) && (
+                            {(dynamicSwitch || formulaSwitch) && (
                                 <div className="ml-auto flex items-center gap-1">
                                     {dynamicSwitch}
 
                                     {formulaSwitch}
-
-                                    {fromAiButton}
                                 </div>
                             )}
                         </div>

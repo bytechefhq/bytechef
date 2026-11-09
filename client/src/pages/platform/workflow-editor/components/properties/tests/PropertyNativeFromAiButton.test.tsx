@@ -110,11 +110,8 @@ describe('fromAi button on native tool fields in Text mode', () => {
         useWorkflowNodeDetailsPanelStore.setState({currentNode: undefined, pillTarget: null});
     });
 
-    it.each([
-        ['INTEGER', countProperty, 5],
-        ['BOOLEAN', enabledProperty, true],
-    ])('an uncontrolled %s tool field turns fromAi on from Text mode', async (_type, property, value) => {
-        const {container} = renderUncontrolled(property as PropertyAllType, value);
+    it('an uncontrolled INTEGER tool field turns fromAi on from Text mode', async () => {
+        const {container} = renderUncontrolled(countProperty, 5);
 
         await settle();
 
@@ -129,9 +126,30 @@ describe('fromAi button on native tool fields in Text mode', () => {
         await settle();
 
         expectFromAiRendering(container);
-        expect(saveProperty).toHaveBeenLastCalledWith(
-            expect.objectContaining({fromAi: true, path: (property as PropertyAllType).name})
-        );
+        expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({fromAi: true, path: 'count'}));
+    });
+
+    it('an uncontrolled BOOLEAN tool field offers fromAi only once the Text switch is on', async () => {
+        const {container} = renderUncontrolled(enabledProperty, true);
+
+        await settle();
+
+        expect(getFromAiButton(container)).toBeNull();
+
+        fireEvent.click(screen.getByRole('switch', {name: 'Text'}));
+
+        await settle();
+
+        const fromAiButton = getFromAiButton(container);
+
+        expect(fromAiButton).not.toBeNull();
+
+        fireEvent.click(fromAiButton!);
+
+        await settle();
+
+        expectFromAiRendering(container);
+        expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({fromAi: true, path: 'enabled'}));
     });
 
     it.each([
