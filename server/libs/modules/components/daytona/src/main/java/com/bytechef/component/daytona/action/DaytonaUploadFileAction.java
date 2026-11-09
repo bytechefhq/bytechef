@@ -25,9 +25,11 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.daytona.util.DaytonaUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
 
@@ -67,10 +69,12 @@ public class DaytonaUploadFileAction {
         String sandboxId = inputParameters.getRequiredString(SANDBOX_ID);
         String path = inputParameters.getRequiredString(PATH);
 
+        String toolboxUrl = DaytonaUtils.getToolboxUrl(context, sandboxId);
+
         context
-            .http(http -> http.post("/toolbox/" + sandboxId + "/toolbox/files/upload"))
+            .http(http -> http.post(toolboxUrl + "/files/upload-v2"))
             .queryParameters(PATH, path)
-            .body(Http.Body.of(inputParameters.getRequiredFileEntry(FILE)))
+            .body(Http.Body.of(Map.of(FILE, inputParameters.getRequiredFileEntry(FILE)), BodyContentType.FORM_DATA))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
