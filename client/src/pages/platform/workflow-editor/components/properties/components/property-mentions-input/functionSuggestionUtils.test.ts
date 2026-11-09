@@ -111,6 +111,18 @@ describe('findFunctionSuggestionMatch', () => {
         expect(findFunctionSuggestionMatch({$position})).toBeNull();
     });
 
+    it('returns null inside a string literal', () => {
+        const $position = {nodeBefore: {isText: true, text: "=getOrDefault('at"}, pos: 19} as never;
+
+        expect(findFunctionSuggestionMatch({$position})).toBeNull();
+    });
+
+    it('matches again after a closed string literal', () => {
+        const $position = {nodeBefore: {isText: true, text: "=concat('a', conc"}, pos: 19} as never;
+
+        expect(findFunctionSuggestionMatch({$position})?.query).toBe('conc');
+    });
+
     it('returns null when the word is the tail of a $ datapill token', () => {
         const $position = {nodeBefore: {isText: true, text: '$conc'}, pos: 7} as never;
 

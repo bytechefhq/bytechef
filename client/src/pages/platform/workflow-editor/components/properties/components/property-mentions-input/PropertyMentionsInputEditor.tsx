@@ -37,9 +37,10 @@ import {useShallow} from 'zustand/react/shallow';
 
 import {FormulaMode} from './FormulaMode.extension';
 import {FunctionSignature} from './FunctionSignature.extension';
-import {FunctionSuggestion, FunctionSuggestionPluginKey} from './FunctionSuggestion.extension';
+import {FunctionSuggestion} from './FunctionSuggestion.extension';
 import {MentionStorage} from './MentionStorage.extension';
 import PropertyMentionNodeView from './PropertyMentionNodeView';
+import {VariablePathSuggestion} from './VariablePathSuggestion.extension';
 import {buildToolFunctionDefinitions} from './fromAiFunctionDefinition';
 import {getDataPillIconSource} from './getDataPillIconSource';
 import {getMentionsInputPlaceholder} from './mentionsInputPlaceholder';
@@ -51,6 +52,7 @@ import {
     buildPropertyMentionsContent,
     replaceMentionNodesInHtmlWithVariables,
 } from './propertyMentionDom';
+import {isSuggestionPopupActive} from './suggestionPopupUtils';
 import {useEvaluatorFunctionDefinitions} from './useEvaluatorFunctionDefinitions';
 
 interface PropertyMentionsInputEditorProps {
@@ -235,7 +237,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     },
                 }),
                 MentionStorage,
-                ...(expressionEnabled !== false ? [FunctionSuggestion, FunctionSignature] : []),
+                ...(expressionEnabled !== false ? [FunctionSuggestion, VariablePathSuggestion, FunctionSignature] : []),
                 PropertyMention.configure({
                     HTMLAttributes: {},
                     deleteTriggerWithBackspace: true,
@@ -304,21 +306,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                         addKeyboardShortcuts() {
                             return {
                                 // Single-line inputs swallow Enter to prevent newlines. But when the
-                                // function suggestion popup is open, defer to its keydown handler so Enter
-                                // accepts the highlighted function instead of being eaten here. Tiptap
+                                // function or variable path suggestion popup is open, defer to its keydown handler so Enter
+                                // accepts the highlighted item instead of being eaten here. Tiptap
                                 // reverses extensions when building plugins, so this keymap sits ahead of
                                 // the Suggestion plugin and would otherwise consume Enter first.
-                                Enter: ({editor}) => {
-                                    const functionSuggestionActive = FunctionSuggestionPluginKey.getState(
-                                        editor.state
-                                    )?.active;
-
-                                    if (functionSuggestionActive) {
-                                        return false;
-                                    }
-
-                                    return true;
-                                },
+                                Enter: ({editor}) => !isSuggestionPopupActive(editor.state),
                             };
                         },
                     })
