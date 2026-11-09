@@ -133,9 +133,4 @@ class ValidationErrorUtils {
         return "Cluster element '" + elementKey + "' is not a slot of " + taskType + "; its slots are " +
             String.join(", ", new TreeSet<>(clusterElementKeys));
     }
-
-    public static String unknownNodeType(String type, boolean trigger) {
-        return "Field 'type' must name an existing " + (trigger ? "trigger" : "action or task dispatcher") + "; " +
-            type + " does not exist";
-    }
 }
