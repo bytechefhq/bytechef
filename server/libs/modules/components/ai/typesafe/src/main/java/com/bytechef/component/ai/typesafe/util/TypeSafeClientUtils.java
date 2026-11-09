@@ -16,7 +16,9 @@
 
 package com.bytechef.component.ai.typesafe.util;
 
+import static com.bytechef.component.ai.typesafe.constant.TypeSafeConstants.BASE_URL;
 import static com.bytechef.component.ai.typesafe.constant.TypeSafeConstants.CONCURRENCY;
+import static com.bytechef.component.ai.typesafe.constant.TypeSafeConstants.DEFAULT_BASE_URL;
 import static com.bytechef.component.ai.typesafe.constant.TypeSafeConstants.JEV_LATEST;
 import static com.bytechef.component.ai.typesafe.constant.TypeSafeConstants.MODEL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
@@ -36,6 +38,7 @@ public final class TypeSafeClientUtils {
     public static TypeSafeClient createTypeSafeClient(Parameters inputParameters, Parameters connectionParameters) {
         return TypeSafeClient.builder()
             .apiKey(connectionParameters.getRequiredString(TOKEN))
+            .baseUrl(connectionParameters.getString(BASE_URL, DEFAULT_BASE_URL))
             .defaultModel(inputParameters.getString(MODEL, JEV_LATEST))
             .build();
     }

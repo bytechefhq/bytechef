@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.typesafe.connection;
 
+import static com.bytechef.component.ai.typesafe.constant.TypeSafeConstants.BASE_URL;
+import static com.bytechef.component.ai.typesafe.constant.TypeSafeConstants.DEFAULT_BASE_URL;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
@@ -30,7 +32,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public final class TypeSafeConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://api.typesafe.ai")
+        .baseUri((connectionParameters, context) -> connectionParameters.getString(BASE_URL, DEFAULT_BASE_URL))
         .version(1)
         .help("", "https://docs.bytechef.io/reference/components/typesafe_v1#connection-setup")
         .authorizations(
@@ -39,7 +41,17 @@ public final class TypeSafeConnection {
                 .properties(
                     string(TOKEN)
                         .label("Token")
-                        .description("Your TypeSafe AI API key.")
+                        .description(
+                            "Your TypeSafe AI API key. A self-hosted System One server that does not check keys " +
+                                "accepts any value.")
+                        .required(true),
+                    string(BASE_URL)
+                        .label("Base URL")
+                        .description(
+                            "The System One server that answers `POST /v1/systemone`. Keep the default for Jev, or " +
+                                "point it at a self-hosted server of an open decision model, such as Laya " +
+                                "(http://localhost:8000) or Ollama (http://localhost:11434).")
+                        .defaultValue(DEFAULT_BASE_URL)
                         .required(true)));
 
     private TypeSafeConnection() {

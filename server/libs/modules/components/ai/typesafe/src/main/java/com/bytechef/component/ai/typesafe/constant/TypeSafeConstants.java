@@ -37,11 +37,13 @@ public final class TypeSafeConstants {
     public static final String ACTION_THRESHOLD = "actionThreshold";
     public static final String ANSWERS = "answers";
     public static final String ASK_QUESTIONS = "askQuestions";
+    public static final String BASE_URL = "baseUrl";
     public static final String CHOICE = "choice";
     public static final String CONCURRENCY = "concurrency";
     public static final String CONFIDENCE = "confidence";
     public static final String CONTRADICTION_THRESHOLD = "contradictionThreshold";
     public static final String CRITERIA = "criteria";
+    public static final String DEFAULT_BASE_URL = "https://api.typesafe.ai";
     public static final String DESCRIPTION = "description";
     public static final String EVIDENCE_THRESHOLD = "evidenceThreshold";
     public static final String INJECTION_THRESHOLD = "injectionThreshold";
@@ -85,7 +87,8 @@ public final class TypeSafeConstants {
         .label("Model")
         .description(
             "ID of the Jev model to use. The `jev-latest` and `jev-preview` aliases resolve server-side; pick a " +
-                "pinned version to keep answers stable across model releases.")
+                "pinned version to keep answers stable across model releases. A self-hosted System One server " +
+                "takes its own model names, for example `laya` on Ollama.")
         .options((OptionsFunction<String>) TypeSafeUtils::getModelOptions)
         .defaultValue(JEV_LATEST)
         .required(true);
@@ -93,7 +96,8 @@ public final class TypeSafeConstants {
     public static final ModifiableStringProperty CLUSTER_ELEMENT_MODEL_PROPERTY = string(MODEL)
         .label("Model")
         .description(
-            "ID of the Jev model to use, e.g. `jev-latest`, `jev-preview` or a pinned version such as `jev-1.13.0`.")
+            "ID of the Jev model to use, e.g. `jev-latest`, `jev-preview` or a pinned version such as `jev-1.13.0`. " +
+                "A self-hosted System One server takes its own model names, for example `laya` on Ollama.")
         .defaultValue(JEV_LATEST)
         .advancedOption(true);
 

@@ -18,6 +18,7 @@ package com.bytechef.component.ai.typesafe.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +28,7 @@ import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
@@ -58,5 +60,31 @@ class TypeSafeUtilsTest {
                 option("jev-latest", "jev-latest"), option("jev-preview", "jev-preview"),
                 option("jev-1.13.0", "jev-1.13.0")),
             options);
+    }
+
+    @Test
+    void testGetModelOptionsWhenServerDoesNotListModels(
+        Context mockedContext, Executor mockedExecutor, Http mockedHttp) {
+        when(mockedHttp.get("/v1/models"))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenThrow(new IllegalStateException("404 Not Found"));
+
+        List<Option<String>> options = TypeSafeUtils.getModelOptions(null, null, Map.of(), "", mockedContext);
+
+        assertEquals(List.of(option("jev-latest", "jev-latest"), option("jev-preview", "jev-preview")), options);
+    }
+
+    @Test
+    void testGetModelOptionsFailsWhenTheTokenIsRejected(
+        Context mockedContext, Executor mockedExecutor, Http mockedHttp) {
+        when(mockedHttp.get("/v1/models"))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenThrow(new ProviderException.UnauthorizedException("401: invalid api key"));
+
+        assertThrows(
+            ProviderException.UnauthorizedException.class,
+            () -> TypeSafeUtils.getModelOptions(null, null, Map.of(), "", mockedContext));
     }
 }
