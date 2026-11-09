@@ -256,9 +256,13 @@ The retriever stage can read from any of the supported vector backends:
 | Pinecone | [pinecone/v1](/reference/components/pinecone_v1) |
 | Qdrant | [qdrant/v1](/reference/components/qdrant_v1) |
 | Redis | [redisVectorStore/v1](/reference/components/redisVectorStore_v1) |
-| S3 Vector Store | [s3VectorStore/v1](/reference/components/s3VectorStore_v1) |
+| S3 Vector Store | [s3VectorStore/v1](/reference/components/s3VectorStore_v1), [s3VectorStore/v2](/reference/components/s3VectorStore_v2) |
 | Typesense | [typesense/v1](/reference/components/typesense_v1) |
 | Weaviate | [weaviate/v1](/reference/components/weaviate_v1) |
+
+S3 Vector Store version 1 keeps the whole store as one JSON object in a regular S3 bucket (`bucketName` and `key`).
+Version 2 uses an Amazon S3 Vectors vector bucket and index (`vectorBucketName` and `indexName`) and can create the
+index on first use. Documents loaded by version 1 are not visible to version 2.
 
 ### RAG slot vs. search tool
 
