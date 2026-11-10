@@ -686,6 +686,88 @@ Type: OBJECT
 
 
 
+### Search Invoices
+Name: searchInvoices
+
+`Searches invoices, most recent transaction date first, optionally filtered by transaction date, customer and open balance.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| txnDateFrom | Transaction Date From | DATE | Only return invoices with a transaction date on or after this date. | false |
+| txnDateTo | Transaction Date To | DATE | Only return invoices with a transaction date on or before this date. | false |
+| customer | Customer | STRING | Only return invoices for this customer. | false |
+| unpaidOnly | Unpaid Only | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Only return invoices that still have an open balance. | false |
+| maxResults | Max Results | INTEGER | Maximum number of invoices to return, between 1 and 1000. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Invoices",
+  "name" : "searchInvoices",
+  "parameters" : {
+    "txnDateFrom" : "2021-01-01",
+    "txnDateTo" : "2021-01-01",
+    "customer" : "",
+    "unpaidOnly" : false,
+    "maxResults" : 1
+  },
+  "type" : "quickbooks/v1/searchInvoices"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Id | STRING | ID of the invoice. |
+| DocNumber | STRING | Reference number of the invoice. |
+| TxnDate | DATE | Date of the transaction. |
+| DueDate | DATE | Date when the payment of the invoice is due. |
+| CustomerRef | OBJECT <details> <summary> Properties </summary> &#123;STRING\(value), STRING\(name)&#125; </details> | Customer the invoice is for. |
+| CurrencyRef | OBJECT <details> <summary> Properties </summary> &#123;STRING\(value), STRING\(name)&#125; </details> | Currency of the invoice. |
+| TotalAmt | NUMBER | Total amount of the invoice. |
+| Balance | NUMBER | Amount that is still due on the invoice. |
+| EmailStatus | STRING | Email status of the invoice. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "Id" : "",
+  "DocNumber" : "",
+  "TxnDate" : "2021-01-01",
+  "DueDate" : "2021-01-01",
+  "CustomerRef" : {
+    "value" : "",
+    "name" : ""
+  },
+  "CurrencyRef" : {
+    "value" : "",
+    "name" : ""
+  },
+  "TotalAmt" : 0.0,
+  "Balance" : 0.0,
+  "EmailStatus" : ""
+} ]
+```
+
+
+
+
 
 
 ## What to do if your action is not listed here?
