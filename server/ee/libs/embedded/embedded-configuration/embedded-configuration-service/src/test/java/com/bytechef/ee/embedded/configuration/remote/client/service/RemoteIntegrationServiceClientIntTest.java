@@ -51,7 +51,7 @@ import tools.jackson.databind.ObjectMapper;
 @SpringBootTest(
     classes = IntegrationIntTestConfiguration.class,
     properties = {
-        "bytechef.edition=EE", "spring.liquibase.contexts=configuration"
+        "bytechef.edition=EE", "spring.liquibase.contexts=configuration,execution"
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @IntegrationIntTestConfigurationSharedMocks
@@ -129,7 +129,8 @@ class RemoteIntegrationServiceClientIntTest {
                     Status status = statusRuntimeException.getStatus();
 
                     assertThat(status.getCode()).isEqualTo(Status.Code.INTERNAL);
-                    assertThat(status.getDescription()).isEqualTo("NoSuchElementException: No value present");
+                    assertThat(status.getDescription())
+                        .isEqualTo("NoSuchElementException: Integration " + Long.MAX_VALUE + " not found");
                 });
     }
 

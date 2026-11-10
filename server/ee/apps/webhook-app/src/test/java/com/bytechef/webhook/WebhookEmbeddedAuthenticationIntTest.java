@@ -21,6 +21,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.tenant.domain.TenantKey;
@@ -91,6 +92,7 @@ class WebhookEmbeddedAuthenticationIntTest {
         ApiKey apiKey = new ApiKey();
 
         apiKey.setId(1L);
+        apiKey.setType(PlatformType.EMBEDDED);
 
         when(apiKeyService.fetchApiKey(API_KEY, Environment.PRODUCTION.ordinal())).thenReturn(Optional.of(apiKey));
 

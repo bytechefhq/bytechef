@@ -380,7 +380,7 @@ class RemoteConnectionFacadeClientIntTest {
     }
 
     @Test
-    void testReplaceAuthorizationParametersKeepsTheOtherParametersAndMarksCredentialsValid() {
+    void testReplaceAuthorizationParametersKeepsTheConnectionPropertiesAndMarksCredentialsValid() {
         Connection connection = createConnection("Reauthorized", PlatformType.AUTOMATION, 0);
 
         connectionService.updateConnectionCredentialStatus(connection.getId(), Connection.CredentialStatus.INVALID);
@@ -391,10 +391,7 @@ class RemoteConnectionFacadeClientIntTest {
         Connection storedConnection = connectionService.getConnection(connection.getId());
 
         assertThat(storedConnection.getParameters())
-            .isEqualTo(
-                Map.of(
-                    Authorization.ACCESS_TOKEN, "old-access-token", Authorization.CLIENT_ID, "new-client",
-                    Authorization.REFRESH_TOKEN, "old-refresh-token", "region", "eu"));
+            .isEqualTo(Map.of(Authorization.CLIENT_ID, "new-client", "region", "eu"));
         assertThat(storedConnection.getCredentialStatus()).isEqualTo(Connection.CredentialStatus.VALID);
     }
 
