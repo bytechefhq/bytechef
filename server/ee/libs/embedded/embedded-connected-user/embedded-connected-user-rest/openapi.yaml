@@ -309,6 +309,10 @@ components:
           readOnly: true
         credentialStatus:
           $ref: "#/components/schemas/CredentialStatus"
+        provisioned:
+          description: "If a tenant admin provisioned the integration instance."
+          type: "boolean"
+          readOnly: true
     ConnectedUserImportResult:
       type: "object"
       properties:
