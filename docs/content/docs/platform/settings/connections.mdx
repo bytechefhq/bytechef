@@ -77,7 +77,7 @@ In the automation **Connections** list, choose **Edit** on the connection. The d
 - The replacement is refused when someone changed the connection after you opened it (reload and try again), and on a connection that is not active.
 - Managed connections cannot be changed this way.
 
-Only the connection's owner (the user who created it) or a tenant admin can replace its credentials. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` audit event. The event holds the connection id only; credential values are never recorded.
+Only the connection's owner (the user who created it) or a tenant admin can replace its credentials, and the **Update credentials** button is shown only to them. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` audit event. The event holds the connection id only; credential values are never recorded.
 
 ## Changing visibility
 
