@@ -41,14 +41,18 @@ import com.bytechef.component.quickbooks.constant.Entity;
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public class QuickbooksSearchBillsAction {
 
+    private static final String BILL_KEY = "Bill";
     private static final int DEFAULT_MAX_RESULTS = 100;
+    private static final String QUERY_RESPONSE = "QueryResponse";
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchBills")
         .title("Search Bills")
@@ -84,9 +88,9 @@ public class QuickbooksSearchBillsAction {
             outputSchema(
                 object()
                     .properties(
-                        object("QueryResponse")
+                        object(QUERY_RESPONSE)
                             .properties(
-                                array("Bill")
+                                array(BILL_KEY)
                                     .items(BILL_PROPERTY),
                                 string("startPosition"),
                                 string("maxResults")))))
@@ -99,12 +103,28 @@ public class QuickbooksSearchBillsAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
+        Map<String, Object> body = actionContext
             .http(http -> http.get("/query"))
             .queryParameter("query", buildQuery(inputParameters))
             .configuration(responseType(Http.ResponseType.XML))
             .execute()
             .getBody(new TypeReference<>() {});
+
+        Map<String, Object> queryResponse = new LinkedHashMap<>();
+
+        if (body != null && body.get(QUERY_RESPONSE) instanceof Map<?, ?> responseMap) {
+            for (Map.Entry<?, ?> entry : responseMap.entrySet()) {
+                queryResponse.put(String.valueOf(entry.getKey()), entry.getValue());
+            }
+        }
+
+        queryResponse.put(BILL_KEY, QuickbooksUtils.getEntityMaps(queryResponse.get(BILL_KEY)));
+
+        Map<String, Object> result = body == null ? new LinkedHashMap<>() : new LinkedHashMap<>(body);
+
+        result.put(QUERY_RESPONSE, queryResponse);
+
+        return result;
     }
 
     protected static String buildQuery(Parameters inputParameters) {
