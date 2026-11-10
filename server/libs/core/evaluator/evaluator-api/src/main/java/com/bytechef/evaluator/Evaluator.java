@@ -16,6 +16,7 @@
 
 package com.bytechef.evaluator;
 
+import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
@@ -54,5 +55,9 @@ public interface Evaluator {
      */
     default Map<String, @Nullable Object> evaluate(Map<String, ?> map, Map<String, ?> context, boolean lenient) {
         return evaluate(map, context);
+    }
+
+    default List<String> getUnknownFunctionNames(String expression) {
+        return List.of();
     }
 }

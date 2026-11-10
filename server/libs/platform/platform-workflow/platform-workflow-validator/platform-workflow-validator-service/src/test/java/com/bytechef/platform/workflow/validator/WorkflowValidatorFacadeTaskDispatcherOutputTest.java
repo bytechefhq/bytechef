@@ -52,6 +52,9 @@ import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.NodeValidationIssue;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowIssueKind;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowIssueSeverity;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.Arrays;
@@ -234,6 +237,44 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
                             }
                         ]
                     }
+                }
+            ]
+        }
+        """;
+
+    private static final String UNKNOWN_FUNCTION_WORKFLOW = """
+        {
+            "label": "workflow1",
+            "description": "",
+            "triggers": [],
+            "tasks": [
+                {
+                    "label": "Var",
+                    "name": "var_1",
+                    "type": "var/v1/set",
+                    "parameters": {"type": "STRING", "value": "=intgetOrDefault(1, 0) + 1"}
+                },
+                {
+                    "label": "Map",
+                    "name": "map_1",
+                    "type": "map/v1",
+                    "parameters": {
+                        "items": ["ee"],
+                        "iteratee": [
+                            {
+                                "label": "Var",
+                                "name": "var_2",
+                                "type": "var/v1/set",
+                                "parameters": {"type": "STRING", "value": "=lenght('ee') + concat('a', 'b')"}
+                            }
+                        ]
+                    }
+                },
+                {
+                    "label": "Logger",
+                    "name": "logger_1",
+                    "type": "logger/v1/info",
+                    "parameters": {"text": "intgetOrDefault(1, 0)"}
                 }
             ]
         }
@@ -601,6 +642,26 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(NESTED_AGENT_WORKFLOW, "wf-1", 3L);
 
         assertEquals(List.of("[openAi_2] Missing required connection: OpenAI"), result.errors());
+    }
+
+    @Test
+    void aFormulaCallingAnUnknownFunctionIsAnErrorOnItsOwnNode() {
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(UNKNOWN_FUNCTION_WORKFLOW, 3L);
+
+        assertEquals(
+            List.of(
+                "[var_1] Property 'value' calls an unknown function: intgetOrDefault",
+                "[var_2] Property 'value' calls an unknown function: lenght"),
+            result.errors());
+        assertEquals(
+            List.of(
+                new NodeValidationIssue(
+                    "var_1", "value", WorkflowIssueKind.OTHER, WorkflowIssueSeverity.ERROR,
+                    "Property 'value' calls an unknown function: intgetOrDefault"),
+                new NodeValidationIssue(
+                    "var_2", "value", WorkflowIssueKind.OTHER, WorkflowIssueSeverity.ERROR,
+                    "Property 'value' calls an unknown function: lenght")),
+            result.nodeIssues());
     }
 
     private void stubComponent(String name, String title, boolean connectionRequired) {
