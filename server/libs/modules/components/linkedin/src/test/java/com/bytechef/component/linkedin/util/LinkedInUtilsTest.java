@@ -18,6 +18,7 @@ package com.bytechef.component.linkedin.util;
 
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGE;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGES;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -51,7 +52,33 @@ class LinkedInUtilsTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+
+    @Test
+    void testGetCommentsEncodesCommentUrn(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
+        Map<String, Object> reply = Map.of("parentComment", "urn:li:comment:(urn:li:activity:1,2)");
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("elements", List.of(reply, "notAComment")));
+
+        List<Map<?, ?>> result = LinkedInUtils.getComments(
+            mockedContext, "urn:li:comment:(urn:li:activity:1,2)", 0, 100);
+
+        assertEquals(List.of(reply), result);
+        assertEquals(
+            "/rest/socialActions/urn%3Ali%3Acomment%3A%28urn%3Ali%3Aactivity%3A1%2C2%29/comments",
+            stringArgumentCaptor.getValue());
+        assertArrayEquals(new Object[] {
+            "start", 0, "count", 100
+        }, objectsArgumentCaptor.getValue());
+    }
 
     @Test
     void testUploadContent(

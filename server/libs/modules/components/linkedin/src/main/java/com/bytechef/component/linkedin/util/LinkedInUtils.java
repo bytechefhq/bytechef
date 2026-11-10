@@ -16,15 +16,22 @@
 
 package com.bytechef.component.linkedin.util;
 
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.COUNT;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.DOCUMENT;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.ELEMENTS;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGE;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.IMAGES;
+import static com.bytechef.component.linkedin.constant.LinkedInConstants.START;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,6 +40,28 @@ import java.util.Map;
 public class LinkedInUtils {
 
     private LinkedInUtils() {
+    }
+
+    public static List<Map<?, ?>> getComments(Context context, String urn, int start, int count) {
+        String encodedUrn = URLEncoder.encode(urn, StandardCharsets.UTF_8);
+
+        Map<String, Object> bodyMap = context.http(http -> http.get("/rest/socialActions/" + encodedUrn + "/comments"))
+            .queryParameters(START, start, COUNT, count)
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Map<?, ?>> comments = new ArrayList<>();
+
+        if (bodyMap != null && bodyMap.get(ELEMENTS) instanceof List<?> elements) {
+            for (Object element : elements) {
+                if (element instanceof Map<?, ?> comment) {
+                    comments.add(comment);
+                }
+            }
+        }
+
+        return comments;
     }
 
     public static String uploadContent(Context context, FileEntry fileEntry, String personUrn, String contentType) {
