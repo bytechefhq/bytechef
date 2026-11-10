@@ -1,0 +1,5 @@
+#### Things to know
+
+- Each poll reads the 10 most recent posts of the Page and their comments, and emits the comments created since the previous poll. A comment is emitted only once.
+- The first poll after the workflow is enabled emits nothing and only records the start time. In the editor, a test run looks back three hours.
+- Every emitted comment has a `post_id` field with the ID of the post it belongs to.
