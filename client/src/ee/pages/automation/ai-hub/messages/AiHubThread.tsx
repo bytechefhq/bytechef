@@ -50,7 +50,7 @@ const ThreadEmptyState: FC<ThreadEmptyStateProps> = ({showSuggestions}) => {
             </h1>
 
             <p className="mt-2 text-sm text-muted-foreground">
-                Ask about your projects and workflows, or ask me to build a workflow.
+                I'm Basil. Ask about your projects and workflows, or ask me to build a workflow.
             </p>
 
             {showSuggestions && <AiHubSuggestionChips className="mt-6" />}
