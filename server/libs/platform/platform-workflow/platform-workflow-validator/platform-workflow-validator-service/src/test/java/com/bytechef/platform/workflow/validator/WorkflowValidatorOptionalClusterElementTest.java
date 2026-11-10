@@ -65,8 +65,8 @@ class WorkflowValidatorOptionalClusterElementTest {
 
         validate(workflow, errors, warnings);
 
-        assertEquals("", errors.toString());
-        assertEquals("[aiAgent_1] Cluster element 'model' is missing from task aiAgent_1", warnings.toString());
+        assertEquals("[aiAgent_1] Cluster element 'model' is missing from task aiAgent_1", errors.toString());
+        assertEquals("", warnings.toString());
     }
 
     @Test
