@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMe
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.connected.user.constant.ConnectedUserConstants;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -116,13 +117,21 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     })
     @PreAuthorize("isTenantAdmin()")
     public long createConnectedUserConnectionAsAdmin(long connectedUserId, ConnectionDTO connectionDTO) {
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        String externalId = connectedUser.getExternalId();
+
+        if (externalId.length() > ConnectedUserConstants.MAX_EXTERNAL_ID_LENGTH) {
+            throw new IllegalArgumentException(
+                "Connected user id=%s has an externalId longer than %d characters and cannot own a connection"
+                    .formatted(connectedUserId, ConnectedUserConstants.MAX_EXTERNAL_ID_LENGTH));
+        }
+
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
         connectedUserConnectionService.create(connectedUserId, connectionId, SecurityUtils.getCurrentUserLogin());
 
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
-
-        connectionService.updateCreatedBy(connectionId, connectedUser.getExternalId());
+        connectionService.updateCreatedBy(connectionId, externalId);
 
         return connectionId;
     }

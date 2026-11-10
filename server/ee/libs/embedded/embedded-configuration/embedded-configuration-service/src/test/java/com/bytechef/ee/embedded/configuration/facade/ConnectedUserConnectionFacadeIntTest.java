@@ -46,6 +46,7 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionSer
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.connected.user.constant.ConnectedUserConstants;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
@@ -1112,8 +1113,8 @@ class ConnectedUserConnectionFacadeIntTest {
 
         @BeforeEach
         void beforeEach() {
-            externalUserAId = "external-user-a-" + UUID.randomUUID();
-            externalUserBId = "external-user-b-" + UUID.randomUUID();
+            externalUserAId = "user-a-" + UUID.randomUUID();
+            externalUserBId = "user-b-" + UUID.randomUUID();
 
             connectedUserAId = createConnectedUser(externalUserAId, Environment.PRODUCTION);
             connectedUserADevelopmentId = createConnectedUser(externalUserAId, Environment.DEVELOPMENT);
@@ -1284,6 +1285,25 @@ class ConnectedUserConnectionFacadeIntTest {
             verify(connectionService).updateCreatedBy(PROVISIONED_CONNECTION_ID, externalUserBId);
 
             assertThat(getProvisionedBy(PROVISIONED_CONNECTION_ID)).isEqualTo("admin@localhost.com");
+        }
+
+        @Test
+        void testCreateConnectedUserConnectionAsAdminRejectsExternalIdLongerThanCreatedBy() {
+            String longExternalId = "long-external-id-" + UUID.randomUUID();
+
+            assertThat(longExternalId).hasSizeGreaterThan(ConnectedUserConstants.MAX_EXTERNAL_ID_LENGTH);
+
+            long longExternalIdConnectedUserId = createConnectedUser(longExternalId, Environment.PRODUCTION);
+
+            authenticate(createTenantAdminAuthentication());
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.createConnectedUserConnectionAsAdmin(
+                    longExternalIdConnectedUserId, connectionDTO()))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("longer than " + ConnectedUserConstants.MAX_EXTERNAL_ID_LENGTH);
+
+            verify(connectionFacade, never()).create(any(), any());
         }
 
         @Test
