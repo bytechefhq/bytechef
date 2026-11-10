@@ -90,10 +90,20 @@ public class ConnectionApiController implements ConnectionApi {
 
         Set<Long> sharedConnectionIds = connectedUserConnectionFacade.getSharedConnectionIds();
 
+        List<Long> requestedConnectionIds = connectionIds == null ? List.of() : connectionIds;
+
+        List<ConnectionDTO> connectionDTOs;
+
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnections(
+                connectedUserId, componentName, requestedConnectionIds);
+        } else {
+            connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(
+                connectedUserId, componentName, requestedConnectionIds);
+        }
+
         return ResponseEntity.ok(
-            connectedUserConnectionFacade
-                .getConnectedUserConnections(connectedUserId, componentName,
-                    connectionIds == null ? List.of() : connectionIds)
+            connectionDTOs
                 .stream()
                 .map(connectionDTO -> toConnectionModel(connectionDTO, sharedConnectionIds))
                 .toList());
@@ -151,12 +161,15 @@ public class ConnectionApiController implements ConnectionApi {
         ConnectionModel connectionModel = conversionService.convert(connection, ConnectionModel.class);
 
         Objects.requireNonNull(connectionModel)
-            .shared(sharedConnectionIds.contains(connection.id()))
-            .authorizationParameters(
+            .shared(sharedConnectionIds.contains(connection.id()));
+
+        if (connectionModel.getAuthorizationParameters() != null) {
+            connectionModel.authorizationParameters(
                 MapUtils.toMap(
                     connectionModel.getAuthorizationParameters(),
                     Map.Entry::getKey,
                     entry -> ObfuscateUtils.obfuscate(String.valueOf(entry.getValue()), 28, 8)));
+        }
 
         return Validate.notNull(connectionModel, "connectionModel")
             .parameters(null);

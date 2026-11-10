@@ -87,6 +87,16 @@ public class ConnectedUserConnectionServiceImpl implements ConnectedUserConnecti
 
     @Override
     @Transactional(readOnly = true)
+    public Set<Long> getProvisionedConnectionIdsIn(Set<Long> connectionIds) {
+        if (connectionIds.isEmpty()) {
+            return Set.of();
+        }
+
+        return new LinkedHashSet<>(connectedUserConnectionRepository.findProvisionedConnectionIdsIn(connectionIds));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Set<Long> getSharedConnectionIds() {
         return connectedUserSharedConnectionRepository.findAll()
             .stream()

@@ -31,12 +31,14 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,6 +135,41 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
         return getConnections(connectedUserId, componentName, connectionIds);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public List<ConnectionDTO> getConnectedUserConnectionsForAdmin(
+        long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
+
+        List<ConnectionDTO> connectionDTOs = getConnections(connectedUserId, componentName, connectionIds);
+
+        Set<Long> listedConnectionIds = connectionDTOs.stream()
+            .map(ConnectionDTO::id)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+        Set<Long> adminEnteredConnectionIds = new HashSet<>(
+            connectedUserConnectionService.getProvisionedConnectionIdsIn(listedConnectionIds));
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        for (IntegrationInstance integrationInstance : integrationInstanceService
+            .getConnectedUserIntegrationInstances(connectedUserId, connectedUser.getEnvironment())) {
+
+            if (integrationInstance.getProvisionedBy() != null) {
+                adminEnteredConnectionIds.add(integrationInstance.getConnectionId());
+            }
+        }
+
+        return connectionDTOs.stream()
+            .map(connectionDTO -> adminEnteredConnectionIds.contains(connectionDTO.id())
+                ? connectionDTO
+                : ConnectionDTO.builder(connectionDTO)
+                    .authorizationParameters(null)
+                    .parameters(null)
+                    .build())
+            .toList();
     }
 
     @Override

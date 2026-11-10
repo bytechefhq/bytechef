@@ -32,6 +32,8 @@ public interface ConnectedUserConnectionService {
 
     Set<Long> getConnectionIdsIn(Set<Long> connectionIds);
 
+    Set<Long> getProvisionedConnectionIdsIn(Set<Long> connectionIds);
+
     Set<Long> getSharedConnectionIds();
 
     void updateShared(long connectionId, boolean shared);

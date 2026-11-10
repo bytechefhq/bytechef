@@ -30,6 +30,9 @@ public interface ConnectedUserConnectionFacade {
     List<ConnectionDTO> getConnectedUserConnections(
         long connectedUserId, @Nullable String componentName, List<Long> connectionIds);
 
+    List<ConnectionDTO> getConnectedUserConnectionsForAdmin(
+        long connectedUserId, @Nullable String componentName, List<Long> connectionIds);
+
     List<ConnectionDTO> getConnectedUserConnections(
         String externalUserId, Environment environment, @Nullable String componentName, List<Long> connectionIds);
 
