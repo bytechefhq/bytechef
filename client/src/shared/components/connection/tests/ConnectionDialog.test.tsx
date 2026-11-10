@@ -294,6 +294,32 @@ describe('ConnectionDialog', () => {
             );
         });
 
+        it('offers no app credentials choice while only the name and tags are edited', () => {
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizations: [
+                        {name: 'oauth2', properties: [{name: 'clientId'}], type: 'OAUTH2_AUTHORIZATION_CODE'},
+                    ],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+            vi.mocked(useGetOAuth2PropertiesQuery).mockReturnValue({
+                data: {predefinedApps: ['slack'], redirectUri: 'http://localhost:5173/callback'},
+                error: null,
+                isLoading: false,
+            } as never);
+
+            renderDialog({
+                connection: oAuth2Connection as never,
+                useCreateConnectionMutation: undefined,
+                useUpdateConnectionMutation: (() => ({isPending: false, mutate: vi.fn(), reset: vi.fn()})) as never,
+            });
+
+            expect(screen.queryByText(/I want to use .* app credentials/)).not.toBeInTheDocument();
+            expect(screen.queryByText('Redirect URI')).not.toBeInTheDocument();
+        });
+
         it('offers the app credentials that are not in use', async () => {
             vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
                 data: {
