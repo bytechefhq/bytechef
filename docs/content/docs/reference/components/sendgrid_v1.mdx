@@ -149,6 +149,255 @@ To find the Template ID, click [here](/reference/components/sendgrid_v1#how-to-f
 
 
 
+### List Contact Lists
+Name: listContactLists
+
+`Lists all Marketing Campaigns contact lists in the SendGrid account.`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Contact Lists",
+  "name" : "listContactLists",
+  "type" : "sendgrid/v1/listContactLists"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the contact list. |
+| name | STRING | The name of the contact list. |
+| contact_count | INTEGER | The number of contacts on the list. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "name" : "",
+  "contact_count" : 1
+} ]
+```
+
+
+
+
+### List Senders
+Name: listSenders
+
+`Lists all Marketing Campaigns senders. Only verified senders can be used to send a Single Send.`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Senders",
+  "name" : "listSenders",
+  "type" : "sendgrid/v1/listSenders"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | The ID of the sender. |
+| nickname | STRING | The nickname of the sender. |
+| from | OBJECT <details> <summary> Properties </summary> &#123;STRING\(email), STRING\(name)&#125; </details> |  |
+| reply_to | OBJECT <details> <summary> Properties </summary> &#123;STRING\(email), STRING\(name)&#125; </details> |  |
+| verified | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the sender is verified. |
+| locked | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the sender is used by a draft or scheduled send. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 1,
+  "nickname" : "",
+  "from" : {
+    "email" : "",
+    "name" : ""
+  },
+  "reply_to" : {
+    "email" : "",
+    "name" : ""
+  },
+  "verified" : false,
+  "locked" : false
+} ]
+```
+
+
+
+
+### Create Single Send
+Name: createSingleSend
+
+`Creates a draft Marketing Campaigns Single Send. Use Schedule Single Send to send it.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The name of the Single Send. | true |
+| subject | Subject | STRING | The subject line of the email. | true |
+| htmlContent | HTML Content | STRING | The HTML content of the email. | true |
+| senderId | Sender ID | INTEGER | The ID of the verified sender the email is sent from. | true |
+| listIds | List IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | The IDs of the contact lists the Single Send is sent to. | true |
+| suppressionGroupId | Unsubscribe Group ID | INTEGER | The ID of the unsubscribe group recipients can opt out of. Scheduling requires either an unsubscribe group or a custom unsubscribe URL. | false |
+| customUnsubscribeUrl | Custom Unsubscribe URL | STRING | The URL of your own unsubscribe page, used instead of an unsubscribe group. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Single Send",
+  "name" : "createSingleSend",
+  "parameters" : {
+    "name" : "",
+    "subject" : "",
+    "htmlContent" : "",
+    "senderId" : 1,
+    "listIds" : [ "" ],
+    "suppressionGroupId" : 1,
+    "customUnsubscribeUrl" : ""
+  },
+  "type" : "sendgrid/v1/createSingleSend"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the Single Send. Pass it to Schedule Single Send. |
+| name | STRING | The name of the Single Send. |
+| status | STRING | The status of the Single Send: draft, scheduled or triggered. |
+| send_at | STRING | The scheduled send time, when one is set. |
+| send_to | OBJECT <details> <summary> Properties </summary> &#123;[STRING]\(list_ids)&#125; </details> |  |
+| email_config | OBJECT <details> <summary> Properties </summary> &#123;STRING\(subject), STRING\(html_content), INTEGER\(sender_id), INTEGER\(suppression_group_id), STRING\(custom_unsubscribe_url)&#125; </details> |  |
+| created_at | STRING | The time the Single Send was created. |
+| updated_at | STRING | The time the Single Send was last updated. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "name" : "",
+  "status" : "",
+  "send_at" : "",
+  "send_to" : {
+    "list_ids" : [ "" ]
+  },
+  "email_config" : {
+    "subject" : "",
+    "html_content" : "",
+    "sender_id" : 1,
+    "suppression_group_id" : 1,
+    "custom_unsubscribe_url" : ""
+  },
+  "created_at" : "",
+  "updated_at" : ""
+}
+```
+
+#### Before you schedule
+
+SendGrid creates the Single Send as a draft. Before you schedule it with **Schedule Single Send**, make sure that:
+
+- The sender is verified. Use **List Senders** to check the `verified` flag.
+- The Single Send has either an **Unsubscribe Group ID** or a **Custom Unsubscribe URL**.
+- The API key has access to Marketing Campaigns. A key with **Full Access** permissions does.
+
+
+
+### Schedule Single Send
+Name: scheduleSingleSend
+
+`Schedules a Marketing Campaigns Single Send, or sends it immediately.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| singleSendId | Single Send ID | STRING | The ID of the Single Send, as returned by Create Single Send. | true |
+| sendAt | Send At | STRING | When to send the Single Send: a future ISO 8601 date-time such as 2026-12-01T09:00:00Z, or now to send it immediately. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Schedule Single Send",
+  "name" : "scheduleSingleSend",
+  "parameters" : {
+    "singleSendId" : "",
+    "sendAt" : ""
+  },
+  "type" : "sendgrid/v1/scheduleSingleSend"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| send_at | STRING | The time the Single Send is scheduled to be sent. |
+| status | STRING | The status of the Single Send, scheduled on success. |
+
+
+
+
+#### Output Example
+```json
+{
+  "send_at" : "",
+  "status" : ""
+}
+```
+
+
+
+
 
 
 ## What to do if your action is not listed here?
