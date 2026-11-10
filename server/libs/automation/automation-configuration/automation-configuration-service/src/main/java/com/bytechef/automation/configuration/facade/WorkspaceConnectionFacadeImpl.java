@@ -115,7 +115,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, data = {
         @AuditData(key = "connectionId", value = "#connectionId")
     })
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    @PreAuthorize("isTenantAdmin() or isResourceOwner(#connectionId, 'Connection')")
     public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
         Connection connection = connectionService.getConnection(connectionId);
 

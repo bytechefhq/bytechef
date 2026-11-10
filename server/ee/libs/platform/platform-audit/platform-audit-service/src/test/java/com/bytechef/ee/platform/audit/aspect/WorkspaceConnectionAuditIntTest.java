@@ -16,6 +16,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditEvents;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
@@ -28,6 +30,7 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -35,6 +38,7 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +47,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -67,6 +72,9 @@ class WorkspaceConnectionAuditIntTest {
 
     @MockitoBean
     private ConnectionService connectionService;
+
+    @MockitoBean
+    private PermissionService permissionService;
 
     @MockitoBean
     private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
@@ -135,6 +143,7 @@ class WorkspaceConnectionAuditIntTest {
     void testUpdateConnectionCredentialsRecordsTheConnectionWithoutTheCredentials() {
         authenticate(AuthorityConstants.ADMIN);
 
+        when(permissionService.isTenantAdmin()).thenReturn(true);
         when(connectionService.getConnection(CONNECTION_ID)).thenReturn(new Connection());
 
         workspaceConnectionFacade.updateConnectionCredentials(CONNECTION_ID, Map.of("token", "secret-token"), 0);
@@ -147,6 +156,23 @@ class WorkspaceConnectionAuditIntTest {
             .containsEntry("result", "SUCCESS")
             .containsEntry("connectionId", String.valueOf(CONNECTION_ID))
             .doesNotContainValue("secret-token");
+    }
+
+    @Test
+    void testDeniedCredentialsUpdateIsRecorded() {
+        authenticate(AuthorityConstants.USER);
+
+        assertThatThrownBy(
+            () -> workspaceConnectionFacade.updateConnectionCredentials(CONNECTION_ID, Map.of("token", "x"), 0))
+                .isInstanceOf(AccessDeniedException.class);
+
+        PersistentAuditEvent persistentAuditEvent = findSingle();
+
+        assertThat(persistentAuditEvent.getEventType())
+            .isEqualTo(WorkspaceConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "DENIED")
+            .containsEntry("connectionId", String.valueOf(CONNECTION_ID));
     }
 
     private static void authenticate(String authority) {
@@ -171,6 +197,15 @@ class WorkspaceConnectionAuditIntTest {
     @Configuration
     @EnableMethodSecurity
     static class WorkspaceConnectionFacadeConfiguration {
+
+        @Bean
+        static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+            PermissionService permissionService,
+            ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
+
+            return new AutomationMethodSecurityExpressionHandler(
+                permissionService, methodSecurityExpressionContributorProvider);
+        }
 
         @Bean
         WorkspaceConnectionFacade workspaceConnectionFacade(
