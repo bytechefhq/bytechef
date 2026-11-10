@@ -60,9 +60,24 @@ Both overrides are applied in the facade, ignoring the request body, so a hand-c
 
 ### What sharing actually exposes
 
-`WORKSPACE` grants **use plus existence**, not read plus write. Both connection REST controllers obfuscate `authorizationParameters` and return `parameters` as null, and no connection API mutates authorization parameters after creation. A colleague can run a workflow against your account; they cannot extract the credential or repoint it somewhere else.
+`WORKSPACE` grants **use plus existence**, not read plus write. Both connection REST controllers obfuscate `authorizationParameters` and return `parameters` as null, and the only connection API that changes authorization parameters after creation, `updateConnectionCredentials`, requires the `ADMIN` authority (see [Replacing credentials](#replacing-credentials)). A colleague can run a workflow against your account; they cannot extract the credential or repoint it somewhere else.
 
 Visibility is also a **precondition** of the permission check, not a filter running beside it - without that, a member holding `CONNECTION_EDIT` would pass a by-id check for a connection the list correctly hides.
+
+## Replacing credentials
+
+When a connection's credentials stop working, for example after a password change or a revoked token, you can enter new ones instead of creating a new connection. Every workflow that uses the connection keeps it.
+
+In the automation **Connections** list, choose **Edit** on the connection. The dialog opens on the credentials form by itself when the connection's credentials were rejected; otherwise click **Update credentials** in the dialog footer. Enter the new values, click **Update credentials** again, and the dialog confirms with "Credentials updated".
+
+- The new values **replace** the stored authorization parameters. A credential field you leave blank is cleared, not kept.
+- Properties outside the authorization, such as a base URL or region, are not changed, and the authorization type cannot be switched.
+- Saving stores the values; it does not test them. A wrong credential is flagged as invalid the next time the connection runs.
+- Saving clears the connection's invalid-credentials flag, so workflows that were blocked by it run again.
+- The replacement is refused when someone changed the connection after you opened it (reload and try again), and on a connection that is not active.
+- Managed connections cannot be changed this way.
+
+Replacing credentials requires the `ADMIN` authority and is recorded as a `CONNECTION_CREDENTIALS_UPDATED` audit event. The event holds the connection id only; credential values are never recorded.
 
 ## Changing visibility
 
