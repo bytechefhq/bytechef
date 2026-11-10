@@ -9,9 +9,11 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ChevronDownIcon, type LucideIcon} from 'lucide-react';
 import {ReactNode} from 'react';
+import InlineSVG from 'react-inlinesvg';
 
 export interface BreadcrumbTitleSelectItemI {
     disabled?: boolean;
+    iconSrc?: string;
     id: string;
     name: string;
     publishedVersion?: number;
@@ -85,7 +87,11 @@ const BreadcrumbTitleSelect = ({
                             title={item.name.length > 30 ? item.name : undefined}
                             value={item.id}
                         >
-                            <Icon className="size-4 shrink-0" />
+                            {item.iconSrc ? (
+                                <InlineSVG aria-hidden="true" className="size-4 shrink-0" src={item.iconSrc} />
+                            ) : (
+                                <Icon aria-hidden="true" className="size-4 shrink-0" />
+                            )}
 
                             <span className="truncate">{item.name}</span>
 

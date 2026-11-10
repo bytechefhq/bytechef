@@ -5,10 +5,14 @@ import {FolderIcon} from 'lucide-react';
 import {ComponentProps} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+vi.mock('react-inlinesvg', () => ({
+    default: ({src}: {src: string}) => <svg data-src={src} data-testid="item-icon" />,
+}));
+
 const mockOnValueChange = vi.fn();
 
 const mockItems = [
-    {id: '1', name: 'Current'},
+    {iconSrc: 'current.svg', id: '1', name: 'Current'},
     {id: '2', name: 'Published', publishedVersion: 3},
     {disabled: true, id: '3', name: 'Empty'},
 ];
@@ -86,6 +90,21 @@ describe('BreadcrumbTitleSelect', () => {
         await userEvent.click(screen.getByRole('menuitemradio', {name: /Published/}));
 
         expect(mockOnValueChange).toHaveBeenCalledWith('2');
+    });
+});
+
+describe('BreadcrumbTitleSelect item icons', () => {
+    it('draws an item with its own icon source and the fallback icon for the rest', async () => {
+        renderBreadcrumbTitleSelect();
+
+        await userEvent.click(screen.getByLabelText('Item select'));
+
+        const itemIcon = screen.getByTestId('item-icon');
+
+        expect(itemIcon).toHaveAttribute('data-src', 'current.svg');
+        expect(screen.getByRole('menuitemradio', {name: 'Current'})).toContainElement(itemIcon);
+        expect(screen.getAllByTestId('item-icon')).toHaveLength(1);
+        expect(screen.getByRole('menuitemradio', {name: 'Empty'}).querySelector('svg.lucide-folder')).not.toBeNull();
     });
 });
 
