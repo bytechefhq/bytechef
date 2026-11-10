@@ -14,6 +14,11 @@
 
 import * as runtime from '../runtime';
 import {
+    type Connection,
+    ConnectionFromJSON,
+    ConnectionToJSON,
+} from '../models/Connection';
+import {
     type IntegrationInstance,
     IntegrationInstanceFromJSON,
     IntegrationInstanceToJSON,
@@ -28,6 +33,11 @@ import {
     ProvisionableIntegrationFromJSON,
     ProvisionableIntegrationToJSON,
 } from '../models/ProvisionableIntegration';
+import {
+    type UpdateConnectionCredentialsRequest,
+    UpdateConnectionCredentialsRequestFromJSON,
+    UpdateConnectionCredentialsRequestToJSON,
+} from '../models/UpdateConnectionCredentialsRequest';
 
 export interface DeleteIntegrationInstanceRequest {
     /**
@@ -69,6 +79,13 @@ export interface GetIntegrationInstanceRequest {
     id: number;
 }
 
+export interface GetIntegrationInstanceConnectionRequest {
+    /**
+     * The id of an integration instance.
+     */
+    id: number;
+}
+
 export interface GetProvisionableIntegrationsRequest {
     /**
      * The id of a connected user.
@@ -85,6 +102,17 @@ export interface ProvisionIntegrationInstanceOperationRequest {
      * 
      */
     provisionIntegrationInstanceRequest: ProvisionIntegrationInstanceRequest;
+}
+
+export interface UpdateIntegrationInstanceCredentialsRequest {
+    /**
+     * The id of an integration instance.
+     */
+    id: number;
+    /**
+     * 
+     */
+    updateConnectionCredentialsRequest: UpdateConnectionCredentialsRequest;
 }
 
 /**
@@ -302,6 +330,53 @@ export class IntegrationInstanceApi extends runtime.BaseAPI {
     }
 
     /**
+     * Creates request options for getIntegrationInstanceConnection without sending the request
+     */
+    async getIntegrationInstanceConnectionRequestOpts(requestParameters: GetIntegrationInstanceConnectionRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getIntegrationInstanceConnection().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/integration-instances/{id}/connection`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get the connection of an integration instance provisioned by a tenant admin.
+     * Get the connection of a provisioned integration instance
+     */
+    async getIntegrationInstanceConnectionRaw(requestParameters: GetIntegrationInstanceConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Connection>> {
+        const requestOptions = await this.getIntegrationInstanceConnectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ConnectionFromJSON(jsonValue));
+    }
+
+    /**
+     * Get the connection of an integration instance provisioned by a tenant admin.
+     * Get the connection of a provisioned integration instance
+     */
+    async getIntegrationInstanceConnection(requestParameters: GetIntegrationInstanceConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Connection> {
+        const response = await this.getIntegrationInstanceConnectionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Creates request options for getProvisionableIntegrations without sending the request
      */
     async getProvisionableIntegrationsRequestOpts(requestParameters: GetProvisionableIntegrationsRequest): Promise<runtime.RequestOpts> {
@@ -407,6 +482,62 @@ export class IntegrationInstanceApi extends runtime.BaseAPI {
     async provisionIntegrationInstance(requestParameters: ProvisionIntegrationInstanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
         const response = await this.provisionIntegrationInstanceRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for updateIntegrationInstanceCredentials without sending the request
+     */
+    async updateIntegrationInstanceCredentialsRequestOpts(requestParameters: UpdateIntegrationInstanceCredentialsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateIntegrationInstanceCredentials().'
+            );
+        }
+
+        if (requestParameters['updateConnectionCredentialsRequest'] == null) {
+            throw new runtime.RequiredError(
+                'updateConnectionCredentialsRequest',
+                'Required parameter "updateConnectionCredentialsRequest" was null or undefined when calling updateIntegrationInstanceCredentials().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/integration-instances/{id}/connection/credentials`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateConnectionCredentialsRequestToJSON(requestParameters['updateConnectionCredentialsRequest']),
+        };
+    }
+
+    /**
+     * Replaces the credentials of the connection of an integration instance provisioned by a tenant admin.
+     * Replaces the credentials of a provisioned integration instance
+     */
+    async updateIntegrationInstanceCredentialsRaw(requestParameters: UpdateIntegrationInstanceCredentialsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateIntegrationInstanceCredentialsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Replaces the credentials of the connection of an integration instance provisioned by a tenant admin.
+     * Replaces the credentials of a provisioned integration instance
+     */
+    async updateIntegrationInstanceCredentials(requestParameters: UpdateIntegrationInstanceCredentialsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateIntegrationInstanceCredentialsRaw(requestParameters, initOverrides);
     }
 
 }
