@@ -1,12 +1,12 @@
 ---
-title: Automation workflows
-description: Author workflow templates in the Automation Workflow editor and let connected users refine their own workflows in the embeddable white-label Workflow Builder.
+title: Automation editor
+description: Author workflow templates in the Automation editor and let connected users refine their own workflows in the embeddable white-label Workflow Builder.
 ee: true
 comingSoon: true
 ---
 
 <Callout title="Feature flag">
-    Automation workflows and the embeddable builder are behind a deployment feature flag.
+    The Automation editor and the embeddable builder are behind a deployment feature flag.
     The surfaces below appear only where that flag is enabled.
 </Callout>
 
@@ -17,18 +17,18 @@ comingSoon: true
 
 There are two workflow-building surfaces in Embedded, and they serve different people:
 
-- The **Automation Workflow editor** is where **you** author the workflow templates that ship with your product. It is opened from the [Automations](/platform/embedded/build/automations) page and edits templates in your workspace, against your workspace connections.
+- The **Automation editor** is where **you** author the workflow templates that ship with your product. It is opened from the [Automations](/platform/embedded/build/automations) page and edits templates in your workspace, against your workspace connections.
 - The **Workflow Builder** is the **white-label, embeddable** editor you drop into your own app so a **connected user** can build and refine their own workflow against **their own** connections. It has no ByteChef chrome around it - see [White-Label Execution](/platform/embedded/get-started/white-label-execution).
 
 Both surfaces render the same drag-and-drop canvas as the standard automation editor, so the core mechanics - adding triggers and actions, wiring data pills, flow controls - are documented once under [Building workflows](/platform/automation/build/workflows/projects). This page focuses on what is specific to the two embedded surfaces.
 
 ---
 
-## The Automation Workflow editor
+## The Automation editor
 
-Open the editor by clicking a workflow template (or a project name) on the [Automations](/platform/embedded/build/automations) page. The URL is `/embedded/automation-workflows/{workflowUuid}/editor`.
+Open the editor by clicking a workflow template (or a project name) on the [Automations](/platform/embedded/build/automations) page. The URL is `/embedded/automations/{workflowUuid}/editor`.
 
-{/* TODO screenshot: the Automation Workflow editor with the left sidebar, header breadcrumb, canvas, and Publish button */}
+{/* TODO screenshot: the Automation editor with the left sidebar, header breadcrumb, canvas, and Publish button */}
 
 The screen has three regions: a collapsible **left sidebar** for navigating projects and workflows, a **header** with the breadcrumb and action buttons, and the **canvas** with a bottom **test-output** panel.
 
@@ -123,7 +123,7 @@ Values of sensitive parameters such as passwords, tokens and API keys are shown 
 
 ## The embeddable Workflow Builder
 
-The **Workflow Builder** is the white-label editor you embed inside your own product (typically in an iframe) so a connected user can build and refine their own workflow. Unlike the Automation Workflow editor, it:
+The **Workflow Builder** is the white-label editor you embed inside your own product (typically in an iframe) so a connected user can build and refine their own workflow. Unlike the Automation editor, it:
 
 - operates on a **connected user's** own connections, not your workspace connections;
 - is a **single-workflow** surface - no left sidebar, no project or workflow selector, no settings menu;
@@ -158,7 +158,7 @@ Your app can send `EMBED_INIT` again at any time, for example after refreshing t
 
 ### What the connected user sees
 
-The builder renders the same canvas as the automation editor, with two deliberate differences: the AI copilot and the workflow-inputs panel are hidden. The header contains:
+The builder renders the same canvas as the standard automation editor, with two deliberate differences: the AI copilot and the workflow-inputs panel are hidden. The header contains:
 
 | Control | Description |
 |---|---|
@@ -182,7 +182,7 @@ A toast confirms *The workflow has been published.* This publishes the connected
 
 ## Relationship between the two surfaces
 
-- You author reusable **templates** in the **Automation Workflow editor** and publish the project so those templates are available to connected users.
+- You author reusable **templates** in the **Automation editor** and publish the project so those templates are available to connected users.
 - A connected user's workflow - created from your template or from scratch - is edited in the embeddable **Workflow Builder** inside your app, against **their** connections, and published on **their** behalf.
 
 For how execution stays isolated and white-labeled, see [White-Label Execution](/platform/embedded/get-started/white-label-execution).
