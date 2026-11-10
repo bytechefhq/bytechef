@@ -138,7 +138,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                 </div>
             </div>
 
-            <div className="flex items-center gap-x-4">
+            <div className="flex items-center gap-x-3">
                 <div className="flex items-center gap-x-6">
                     {integrationInstanceConfigurationWorkflow?.lastExecutionDate ? (
                         <Tooltip>
@@ -161,7 +161,6 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
 
                         <Switch
                             checked={integrationInstanceConfigurationWorkflow.enabled}
-                            className="mr-2"
                             disabled={isMcpWorkflow || enableIntegrationInstanceConfigurationWorkflowMutation.isPending}
                             onCheckedChange={handleEnableIntegrationInstanceConfigurationWorkflow}
                         />
