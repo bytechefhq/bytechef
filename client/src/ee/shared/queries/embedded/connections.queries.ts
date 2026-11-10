@@ -11,6 +11,12 @@ import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
+    connectedUserConnections: (connectedUserId: number, filters: RequestI) => [
+        ...ConnectionKeys.connections,
+        'connectedUser',
+        connectedUserId,
+        filters,
+    ],
     connection: (id: number) => [...ConnectionKeys.connections, id],
     connectionTags: ['embedded_connectionTags'],
     connections: ['embedded_connections'],
@@ -19,7 +25,7 @@ export const ConnectionKeys = {
 
 export const getConnectedUserConnectionsQuery = (connectedUserId: number) => (request: RequestI, enabled?: boolean) =>
     useQuery<Connection[], Error>({
-        queryKey: ConnectionKeys.filteredConnections(request),
+        queryKey: ConnectionKeys.connectedUserConnections(connectedUserId, request),
         queryFn: () =>
             new ConnectionApi().getConnectedUserConnections({
                 componentName: request.componentName!,

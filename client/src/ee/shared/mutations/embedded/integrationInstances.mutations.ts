@@ -3,6 +3,7 @@ import {
     EnableIntegrationInstanceRequest,
     IntegrationInstanceApi,
     ProvisionIntegrationInstanceOperationRequest,
+    UpdateIntegrationInstanceCredentialsRequest,
 } from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
@@ -19,6 +20,11 @@ interface EnableIntegrationInstanceMutationProps {
 interface ProvisionIntegrationInstanceMutationProps {
     onError?: (error: Error, variables: ProvisionIntegrationInstanceOperationRequest) => void;
     onSuccess?: (result: number, variables: ProvisionIntegrationInstanceOperationRequest) => void;
+}
+
+interface UpdateIntegrationInstanceCredentialsMutationProps {
+    onError?: (error: Error, variables: UpdateIntegrationInstanceCredentialsRequest) => void;
+    onSuccess?: (result: void, variables: UpdateIntegrationInstanceCredentialsRequest) => void;
 }
 
 export const useDeleteIntegrationInstanceMutation = (mutationProps?: DeleteIntegrationInstanceMutationProps) =>
@@ -43,6 +49,19 @@ export const useProvisionIntegrationInstanceMutation = (mutationProps?: Provisio
     useMutation<number, Error, ProvisionIntegrationInstanceOperationRequest>({
         mutationFn: (provisionIntegrationInstanceRequest: ProvisionIntegrationInstanceOperationRequest) => {
             return new IntegrationInstanceApi().provisionIntegrationInstance(provisionIntegrationInstanceRequest);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+export const useUpdateIntegrationInstanceCredentialsMutation = (
+    mutationProps?: UpdateIntegrationInstanceCredentialsMutationProps
+) =>
+    useMutation<void, Error, UpdateIntegrationInstanceCredentialsRequest>({
+        mutationFn: (updateIntegrationInstanceCredentialsRequest: UpdateIntegrationInstanceCredentialsRequest) => {
+            return new IntegrationInstanceApi().updateIntegrationInstanceCredentials(
+                updateIntegrationInstanceCredentialsRequest
+            );
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
