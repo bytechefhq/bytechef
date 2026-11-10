@@ -106,6 +106,16 @@ describe('BreadcrumbTitleSelect item icons', () => {
         expect(screen.getAllByTestId('item-icon')).toHaveLength(1);
         expect(screen.getByRole('menuitemradio', {name: 'Empty'}).querySelector('svg.lucide-folder')).not.toBeNull();
     });
+
+    it('draws no fallback icon when none is given', async () => {
+        renderBreadcrumbTitleSelect({icon: undefined});
+
+        await userEvent.click(screen.getByLabelText('Item select'));
+
+        expect(screen.getAllByTestId('item-icon')).toHaveLength(1);
+        expect(screen.getByRole('menuitemradio', {name: /Published/}).querySelector('svg')).toBeNull();
+        expect(screen.getByRole('menuitemradio', {name: 'Empty'}).querySelector('svg')).toBeNull();
+    });
 });
 
 describe('getPublishedVersion', () => {

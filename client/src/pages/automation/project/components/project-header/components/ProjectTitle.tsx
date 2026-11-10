@@ -1,7 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import BreadcrumbTitleSelect, {getPublishedVersion} from '@/shared/components/BreadcrumbTitleSelect';
 import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';
-import {FolderIcon} from 'lucide-react';
 import {useMemo} from 'react';
 
 interface ProjectTitleProps {
@@ -41,7 +40,6 @@ const ProjectTitle = ({onProjectValueChange, project, projects}: ProjectTitlePro
                 </Badge>
             }
             currentId={project.id !== undefined ? String(project.id) : undefined}
-            icon={FolderIcon}
             items={items}
             menuLabel="Projects"
             name={project.name}
