@@ -69,6 +69,7 @@ class EmbeddedConfigurationProtoMapperTest {
         integrationInstanceConfiguration.setIntegrationId(7L);
         integrationInstanceConfiguration.setIntegrationVersion(1);
         integrationInstanceConfiguration.setName("Airtable");
+        integrationInstanceConfiguration.setPermissionExpression("hasAuthority('ADMIN')");
         integrationInstanceConfiguration.setTagIds(List.of(3L));
         integrationInstanceConfiguration.setVersion(2);
 

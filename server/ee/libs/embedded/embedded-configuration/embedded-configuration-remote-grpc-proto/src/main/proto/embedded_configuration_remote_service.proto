@@ -217,6 +217,7 @@ message RemoteIntegrationInstanceConfiguration {
   optional string name = 13;
   repeated int64 tag_ids = 14;
   optional int32 version = 15;
+  optional string permission_expression = 16;
 }
 
 message RemoteIntegrationInstanceConfigurations {
