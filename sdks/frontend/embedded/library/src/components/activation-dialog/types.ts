@@ -33,7 +33,7 @@ export interface ConnectionType {
 }
 
 export interface ConnectedUserWorkflowType {
-    automationWorkflowUuid?: string;
+    automationUuid?: string;
     kind?: 'COPY' | 'REFERENCE';
 }
 

@@ -337,7 +337,7 @@ const ActivationBody = ({
             const workflows = await fetch<ConnectedUserWorkflowType[]>('/api/embedded/v1/automation/workflows');
 
             activatedBefore = (workflows ?? []).some(
-                (workflow) => workflow.kind === 'REFERENCE' && workflow.automationWorkflowUuid === template.id
+                (workflow) => workflow.kind === 'REFERENCE' && workflow.automationUuid === template.id
             );
         } catch (error) {
             console.error('Failed to check whether the automation is already active:', error);
