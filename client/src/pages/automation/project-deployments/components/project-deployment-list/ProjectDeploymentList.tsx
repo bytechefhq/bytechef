@@ -11,6 +11,7 @@ interface ProjectDeploymentListProps {
     componentDefinitions?: ComponentDefinitionBasic[];
     expandAll?: boolean;
     hideOpenInProject?: boolean;
+    hideOpenWorkflowInProject?: boolean;
     newlyCreatedDeploymentId?: number;
     project: Project;
     projectDeployments: ProjectDeployment[];
@@ -23,6 +24,7 @@ const ProjectDeploymentList = ({
     componentDefinitions,
     expandAll = false,
     hideOpenInProject,
+    hideOpenWorkflowInProject,
     newlyCreatedDeploymentId,
     project,
     projectDeployments,
@@ -91,7 +93,7 @@ const ProjectDeploymentList = ({
                                 <ProjectDeploymentWorkflowList
                                     componentDefinitions={componentDefinitions}
                                     environmentId={projectDeployment.environmentId!}
-                                    hideOpenInProject={hideOpenInProject}
+                                    hideOpenInProject={hideOpenWorkflowInProject}
                                     projectDeploymentEnabled={
                                         projectDeploymentMap.has(projectDeployment.id!)
                                             ? projectDeploymentMap.get(projectDeployment.id!)!

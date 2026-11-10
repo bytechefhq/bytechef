@@ -45,14 +45,23 @@ vi.mock('@/shared/queries/platform/taskDispatcherDefinitions.queries', () => ({
 vi.mock('@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentList', () => ({
     default: ({
         expandAll,
+        hideOpenInProject,
+        hideOpenWorkflowInProject,
         newlyCreatedDeploymentId,
         projectDeployments,
     }: {
         expandAll?: boolean;
+        hideOpenInProject?: boolean;
+        hideOpenWorkflowInProject?: boolean;
         newlyCreatedDeploymentId?: number;
         projectDeployments: ProjectDeployment[];
     }) => (
-        <ul data-expand-all={String(!!expandAll)} data-testid="project-deployment-list">
+        <ul
+            data-expand-all={String(!!expandAll)}
+            data-hide-open-in-project={String(!!hideOpenInProject)}
+            data-hide-open-workflow-in-project={String(!!hideOpenWorkflowInProject)}
+            data-testid="project-deployment-list"
+        >
             {projectDeployments.map((projectDeployment) => (
                 <li key={projectDeployment.id}>
                     {projectDeployment.id === newlyCreatedDeploymentId
@@ -225,6 +234,33 @@ describe('ProjectDeploymentsPanel', () => {
         );
 
         expect(screen.getByTestId('project-deployment-list')).toHaveAttribute('data-expand-all', 'true');
+    });
+
+    it('shows the open workflow in project link but hides the open project link by default', () => {
+        renderProjectDeploymentsPanel();
+
+        const projectDeploymentList = screen.getByTestId('project-deployment-list');
+
+        expect(projectDeploymentList).toHaveAttribute('data-hide-open-in-project', 'true');
+        expect(projectDeploymentList).toHaveAttribute('data-hide-open-workflow-in-project', 'false');
+    });
+
+    it('hides the open workflow in project link when asked to', () => {
+        render(
+            <TooltipProvider>
+                <ProjectDeploymentsPanel
+                    enabled
+                    hideOpenWorkflowInProject
+                    onProjectDeploymentSaved={onProjectDeploymentSaved}
+                    project={project}
+                />
+            </TooltipProvider>
+        );
+
+        expect(screen.getByTestId('project-deployment-list')).toHaveAttribute(
+            'data-hide-open-workflow-in-project',
+            'true'
+        );
     });
 
     it('expands the given deployment', () => {

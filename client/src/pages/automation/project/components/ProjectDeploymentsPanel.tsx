@@ -23,6 +23,7 @@ interface ProjectDeploymentsPanelProps {
     enabled: boolean;
     expandAll?: boolean;
     expandedProjectDeploymentId?: number;
+    hideOpenWorkflowInProject?: boolean;
     onProjectDeploymentSaved: (projectDeploymentId: number) => void;
     project: Project;
 }
@@ -31,6 +32,7 @@ const ProjectDeploymentsPanel = ({
     enabled,
     expandAll = false,
     expandedProjectDeploymentId,
+    hideOpenWorkflowInProject = false,
     onProjectDeploymentSaved,
     project,
 }: ProjectDeploymentsPanelProps) => {
@@ -150,6 +152,7 @@ const ProjectDeploymentsPanel = ({
                         componentDefinitions={componentDefinitions}
                         expandAll={expandAll}
                         hideOpenInProject
+                        hideOpenWorkflowInProject={hideOpenWorkflowInProject}
                         newlyCreatedDeploymentId={expandedProjectDeploymentId}
                         project={project}
                         projectDeployments={environmentProjectDeployments}
