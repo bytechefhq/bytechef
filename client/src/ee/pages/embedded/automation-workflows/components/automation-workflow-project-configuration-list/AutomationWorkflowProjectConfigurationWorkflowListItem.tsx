@@ -17,7 +17,7 @@ import {
     useEnableAutomationWorkflowProjectConfigurationWorkflowMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon, HistoryIcon, PencilIcon, WorkflowIcon} from 'lucide-react';
+import {EllipsisVerticalIcon, HistoryIcon, PencilIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -112,8 +112,6 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
                         onClick={handleOpenExecutions}
                         type="button"
                     >
-                        <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
-
                         <span className="line-clamp-1">{workflowLabel}</span>
                     </button>
 

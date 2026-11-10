@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
-import {SquareArrowOutUpRightIcon, WorkflowIcon} from 'lucide-react';
+import {SquareArrowOutUpRightIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 
 interface WorkflowToolRowWorkflowI {
@@ -40,8 +40,6 @@ const WorkflowToolRowLabel = ({
     <div className="flex min-w-0 flex-1 items-center">
         <div className="flex w-full max-w-80 min-w-0 shrink flex-col sm:w-80 sm:shrink-0">
             <div className="flex min-w-0 items-center gap-2">
-                <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
-
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <button

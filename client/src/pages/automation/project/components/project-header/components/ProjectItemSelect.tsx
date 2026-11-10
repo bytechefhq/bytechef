@@ -9,7 +9,7 @@ import {
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Workflow} from '@/shared/middleware/automation/configuration';
-import {ChevronDownIcon, WorkflowIcon} from 'lucide-react';
+import {ChevronDownIcon} from 'lucide-react';
 
 interface ProjectItemSelectProps {
     currentLabel?: string;
@@ -60,8 +60,6 @@ const ProjectItemSelect = ({
                                 title={workflow.label!.length > 30 ? workflow.label! : undefined}
                                 value={workflow.projectWorkflowId!.toString()}
                             >
-                                <WorkflowIcon className="size-4 shrink-0" />
-
                                 <span className="truncate">{workflow.label!}</span>
                             </DropdownMenuRadioItem>
                         ))}

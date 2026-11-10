@@ -9,7 +9,7 @@ import {
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {ChevronDownIcon, WorkflowIcon} from 'lucide-react';
+import {ChevronDownIcon} from 'lucide-react';
 
 type AutomationWorkflowProjectWorkflowTemplateType =
     AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number]['workflowTemplates'][number];
@@ -71,8 +71,6 @@ const AutomationWorkflowEditorWorkflowSelect = ({
                                         title={workflowLabel.length > 30 ? workflowLabel : undefined}
                                         value={workflow.workflowUuid}
                                     >
-                                        <WorkflowIcon className="size-4 shrink-0" />
-
                                         <span className="truncate">{workflowLabel}</span>
                                     </DropdownMenuRadioItem>
                                 );

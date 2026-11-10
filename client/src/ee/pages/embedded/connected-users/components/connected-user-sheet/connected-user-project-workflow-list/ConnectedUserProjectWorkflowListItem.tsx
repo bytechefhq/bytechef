@@ -17,7 +17,7 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {ClipboardIcon, WorkflowIcon} from 'lucide-react';
+import {ClipboardIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
@@ -136,11 +136,6 @@ const ConnectedUserProjectWorkflowListItem = ({
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                     <div className="flex w-80 min-w-0 shrink-0 flex-col gap-y-1 pr-1">
                         <div className="flex min-w-0 items-center gap-2">
-                            <WorkflowIcon
-                                aria-hidden="true"
-                                className="size-4 shrink-0 text-content-neutral-secondary"
-                            />
-
                             <button
                                 className="min-w-0 cursor-pointer truncate text-left text-sm font-semibold"
                                 onClick={handleWorkflowClick}

@@ -73,12 +73,6 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
             </TooltipProvider>
         );
 
-        expect(
-            screen
-                .getByRole('button', {name: 'Notify Slack on New Email'})
-                .parentElement?.querySelector('svg.lucide-workflow')
-        ).toBeInTheDocument();
-
         await userEvent.click(screen.getByRole('button', {name: 'Notify Slack on New Email'}));
 
         const state = useIntegrationInstanceConfigurationWorkflowSheetStore.getState();
