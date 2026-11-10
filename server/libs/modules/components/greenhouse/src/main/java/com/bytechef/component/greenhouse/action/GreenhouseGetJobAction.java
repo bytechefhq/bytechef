@@ -19,15 +19,13 @@ package com.bytechef.component.greenhouse.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.greenhouse.constant.GreenhouseConstants.JOB_ID;
 import static com.bytechef.component.greenhouse.constant.GreenhouseConstants.JOB_OUTPUT_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.greenhouse.util.GreenhouseUtils;
 import java.util.Map;
 
 /**
@@ -37,7 +35,7 @@ public class GreenhouseGetJobAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getJob")
         .title("Get Job")
-        .description("Get a job by ID, including its status, departments, offices, hiring team and openings.")
+        .description("Get a job by ID, including its status, department, offices and custom fields.")
         .properties(
             string(JOB_ID)
                 .label("Job ID")
@@ -53,9 +51,6 @@ public class GreenhouseGetJobAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.http(http -> http.get("/jobs/" + inputParameters.getRequiredString(JOB_ID)))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return GreenhouseUtils.getRecordById("/jobs", inputParameters.getRequiredString(JOB_ID), "job", context);
     }
 }

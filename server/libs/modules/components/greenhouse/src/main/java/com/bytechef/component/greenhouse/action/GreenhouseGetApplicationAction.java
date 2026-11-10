@@ -19,15 +19,13 @@ package com.bytechef.component.greenhouse.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.greenhouse.constant.GreenhouseConstants.APPLICATION_ID;
 import static com.bytechef.component.greenhouse.constant.GreenhouseConstants.APPLICATION_OUTPUT_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.greenhouse.util.GreenhouseUtils;
 import java.util.Map;
 
 /**
@@ -37,7 +35,7 @@ public class GreenhouseGetApplicationAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getApplication")
         .title("Get Application")
-        .description("Get an application by ID, including its status, current stage, jobs and answers.")
+        .description("Get an application by ID, including its status, current stage, job and answers.")
         .properties(
             string(APPLICATION_ID)
                 .label("Application ID")
@@ -53,9 +51,7 @@ public class GreenhouseGetApplicationAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.http(http -> http.get("/applications/" + inputParameters.getRequiredString(APPLICATION_ID)))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return GreenhouseUtils.getRecordById("/applications", inputParameters.getRequiredString(APPLICATION_ID),
+            "application", context);
     }
 }

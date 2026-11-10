@@ -19,15 +19,13 @@ package com.bytechef.component.greenhouse.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.greenhouse.constant.GreenhouseConstants.CANDIDATE_ID;
 import static com.bytechef.component.greenhouse.constant.GreenhouseConstants.CANDIDATE_OUTPUT_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.greenhouse.util.GreenhouseUtils;
 import java.util.Map;
 
 /**
@@ -37,7 +35,7 @@ public class GreenhouseGetCandidateAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getCandidate")
         .title("Get Candidate")
-        .description("Get a candidate by ID, including contact details, applications, tags and custom fields.")
+        .description("Get a candidate by ID, including contact details, tags and custom fields.")
         .properties(
             string(CANDIDATE_ID)
                 .label("Candidate ID")
@@ -53,9 +51,7 @@ public class GreenhouseGetCandidateAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.http(http -> http.get("/candidates/" + inputParameters.getRequiredString(CANDIDATE_ID)))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return GreenhouseUtils.getRecordById("/candidates", inputParameters.getRequiredString(CANDIDATE_ID),
+            "candidate", context);
     }
 }
