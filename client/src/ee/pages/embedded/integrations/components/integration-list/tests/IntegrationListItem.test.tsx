@@ -291,6 +291,30 @@ describe('IntegrationListItem', () => {
             expect(hoisted.onTabChange).toHaveBeenCalledWith(undefined);
         });
 
+        it('should toggle the row rather than open the integration when the title is clicked', async () => {
+            renderItem();
+
+            await userEvent.click(screen.getByText('Mailchimp'));
+
+            expect(hoisted.onTabChange).toHaveBeenCalledWith('workflows');
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('should open the integration with its first workflow when Open is clicked', async () => {
+            renderItem();
+
+            await userEvent.click(screen.getByLabelText('Open Integration'));
+
+            expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/integrations/1/integration-workflows/10?');
+            expect(hoisted.onTabChange).not.toHaveBeenCalled();
+        });
+
+        it('should disable Open for an integration without workflows', () => {
+            renderItem({integrationWorkflowIds: []});
+
+            expect(screen.getByLabelText('Open Integration')).toBeDisabled();
+        });
+
         it('should keep the row as it is when a menu row is clicked', async () => {
             await openMenu();
 

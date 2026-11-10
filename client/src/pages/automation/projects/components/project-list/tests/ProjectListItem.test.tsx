@@ -103,38 +103,45 @@ it('switches tabs', async () => {
     expect(onTabChange).toHaveBeenCalledWith('deployments');
 });
 
-it('opens the project when a row with workflows is clicked', () => {
+it('opens the workflows tab when a collapsed row is clicked', () => {
     renderProjectListItem();
 
     fireEvent.click(screen.getByLabelText('Orders_container'));
+
+    expect(onTabChange).toHaveBeenCalledWith('workflows');
+    expect(hoisted.navigate).not.toHaveBeenCalled();
+});
+
+it('collapses an open row when it is clicked', () => {
+    renderProjectListItem('workflows');
+
+    fireEvent.click(screen.getByLabelText('Orders_container'));
+
+    expect(onTabChange).toHaveBeenCalledWith(undefined);
+});
+
+it('toggles the row rather than opening the project when the title is clicked', () => {
+    renderProjectListItem();
+
+    fireEvent.click(screen.getByText('Orders'));
+
+    expect(onTabChange).toHaveBeenCalledWith('workflows');
+    expect(hoisted.navigate).not.toHaveBeenCalled();
+});
+
+it('opens the project with its first workflow when Open is clicked', () => {
+    renderProjectListItem();
+
+    fireEvent.click(screen.getByLabelText('Open Project'));
 
     expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects/7/project-workflows/1?');
     expect(onTabChange).not.toHaveBeenCalled();
 });
 
-it('toggles the workflows list when the summary is clicked', () => {
-    renderProjectListItem();
-
-    fireEvent.click(screen.getByText('1 workflow'));
-
-    expect(hoisted.navigate).not.toHaveBeenCalled();
-});
-
-it('opens the workflows tab when a collapsed row without workflows is clicked', () => {
+it('disables Open for a project without workflows', () => {
     renderProjectListItem(undefined, {projectWorkflowIds: []});
 
-    fireEvent.click(screen.getByLabelText('Orders_container'));
-
-    expect(hoisted.navigate).not.toHaveBeenCalled();
-    expect(onTabChange).toHaveBeenCalledWith('workflows');
-});
-
-it('collapses an open row without workflows when it is clicked', () => {
-    renderProjectListItem('workflows', {projectWorkflowIds: []});
-
-    fireEvent.click(screen.getByLabelText('Orders_container'));
-
-    expect(onTabChange).toHaveBeenCalledWith(undefined);
+    expect(screen.getByLabelText('Open Project')).toBeDisabled();
 });
 
 it('offers New Workflow on the workflows tab', () => {
