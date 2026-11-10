@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.never;
@@ -300,7 +301,7 @@ public class WorkspaceConnectionFacadeIntTest {
 
         workspaceConnectionFacade.updateConnectionCredentials(1L, parameters, 3);
 
-        verify(connectionFacade).replaceAuthorizationParameters(1L, parameters);
+        verify(connectionFacade).replaceAuthorizationParameters(1L, parameters, 3);
     }
 
     @Test
@@ -312,7 +313,7 @@ public class WorkspaceConnectionFacadeIntTest {
                 .isInstanceOf(ConfigurationException.class)
                 .hasMessageContaining("modified by someone else");
 
-        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), anyMap());
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), anyMap(), anyInt());
     }
 
     @Test
@@ -324,7 +325,7 @@ public class WorkspaceConnectionFacadeIntTest {
                 .isInstanceOf(ConfigurationException.class)
                 .hasMessageContaining("REVOKED");
 
-        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), anyMap());
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), anyMap(), anyInt());
     }
 
     private static Connection createConnection(ConnectionStatus status, int version) {

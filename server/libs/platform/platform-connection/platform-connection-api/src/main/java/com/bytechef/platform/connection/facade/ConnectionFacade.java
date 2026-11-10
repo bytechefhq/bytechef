@@ -49,6 +49,23 @@ public interface ConnectionFacade {
 
     void update(long id, String name, List<Tag> tags, int version);
 
+    /**
+     * Updates a connection's name and tags and replaces the values of its connection properties.
+     *
+     * @param id                   the id of the connection
+     * @param name                 the new name
+     * @param connectionParameters the values of the connection properties declared by the connection definition; a
+     *                             property left out is cleared, and a key that is not a connection property is ignored
+     * @param tags                 the new tags
+     * @param version              the connection version the caller read
+     */
+    void update(long id, String name, Map<String, ?> connectionParameters, List<Tag> tags, int version);
+
     void replaceAuthorizationParameters(long id, Map<String, ?> parameters);
+
+    /**
+     * Replaces a connection's authorization parameters, rejected when {@code version} is stale.
+     */
+    void replaceAuthorizationParameters(long id, Map<String, ?> parameters, int version);
 
 }

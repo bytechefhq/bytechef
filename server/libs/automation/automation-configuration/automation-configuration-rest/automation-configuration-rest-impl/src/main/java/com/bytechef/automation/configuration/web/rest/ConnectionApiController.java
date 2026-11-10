@@ -26,8 +26,10 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -96,9 +98,14 @@ public class ConnectionApiController implements ConnectionApi {
             .map(tagModel -> conversionService.convert(tagModel, Tag.class))
             .toList();
 
-        connectionFacade.update(
-            id, updateConnectionRequestModel.getName(), list,
-            Objects.requireNonNull(updateConnectionRequestModel.getVersion()));
+        JsonNullable<Map<String, Object>> parameters = updateConnectionRequestModel.getParameters();
+        int version = Objects.requireNonNull(updateConnectionRequestModel.getVersion());
+
+        if (parameters != null && parameters.isPresent() && parameters.get() != null) {
+            connectionFacade.update(id, updateConnectionRequestModel.getName(), parameters.get(), list, version);
+        } else {
+            connectionFacade.update(id, updateConnectionRequestModel.getName(), list, version);
+        }
 
         return ResponseEntity.noContent()
             .build();

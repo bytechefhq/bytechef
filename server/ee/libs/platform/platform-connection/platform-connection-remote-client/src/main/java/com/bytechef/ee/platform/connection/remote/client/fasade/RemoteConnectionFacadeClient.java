@@ -78,7 +78,17 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
     }
 
     @Override
+    public void update(long id, String name, Map<String, ?> connectionParameters, List<Tag> tags, int version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void replaceAuthorizationParameters(long id, Map<String, ?> parameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void replaceAuthorizationParameters(long id, Map<String, ?> parameters, int version) {
         throw new UnsupportedOperationException();
     }
 }

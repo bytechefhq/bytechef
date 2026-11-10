@@ -108,6 +108,11 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
+    public Connection update(long id, String name, List<Long> tagIds, Map<String, ?> parameters, int version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Connection updateConnectionCredentialStatus(long connectionId, Connection.CredentialStatus status) {
         throw new UnsupportedOperationException();
     }
@@ -129,6 +134,11 @@ public class RemoteConnectionServiceClient implements ConnectionService {
 
     @Override
     public Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters, int version) {
         throw new UnsupportedOperationException();
     }
 }

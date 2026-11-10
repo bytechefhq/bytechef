@@ -18,34 +18,42 @@ package com.bytechef.automation.configuration.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.facade.ProjectCategoryFacade;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.facade.ProjectTagFacade;
+import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestConfigurationSharedMocks;
-import com.bytechef.automation.configuration.web.rest.mapper.WorkspaceConnectionMapper;
+import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestTestConfiguration;
 import com.bytechef.automation.configuration.web.rest.model.ConnectionModel;
-import com.bytechef.automation.configuration.web.rest.model.TagModel;
-import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.automation.configuration.web.rest.model.UpdateConnectionRequestModel;
+import com.bytechef.platform.category.service.CategoryService;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.tag.domain.Tag;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.Validate;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
@@ -54,255 +62,147 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 /**
  * @author Ivica Cardic
  */
-@Disabled
+@ContextConfiguration(classes = AutomationConfigurationRestTestConfiguration.class)
 @WebMvcTest(value = ConnectionApiController.class)
 @AutomationConfigurationRestConfigurationSharedMocks
-public class ConnectionApiControllerIntTest {
-
-    @MockitoBean
-    private ConnectionFacade connectionFacade;
-
-    @MockitoBean
-    private ConnectionService connectionService;
+@MockitoBean(types = {
+    CategoryService.class, ProjectCategoryFacade.class, ProjectDeploymentFacade.class, ProjectFacade.class,
+    ProjectService.class, ProjectTagFacade.class, ProjectWorkflowFacade.class, WorkflowService.class,
+    WorkspaceFacade.class
+})
+class ConnectionApiControllerIntTest {
 
     @Autowired
-    private WorkspaceConnectionMapper workspaceConnectionMapper;
+    private ConnectionFacade connectionFacade;
 
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private WorkspaceConnectionFacade workspaceConnectionFacade;
+
     private WebTestClient webTestClient;
 
     @BeforeEach
-    public void beforeEach() {
-        this.webTestClient = MockMvcWebTestClient
-            .bindTo(mockMvc)
+    void beforeEach() {
+        webTestClient = MockMvcWebTestClient.bindTo(mockMvc)
             .build();
     }
 
     @Test
-    public void testDeleteConnection() {
-        try {
-            this.webTestClient
-                .delete()
-                .uri("/internal/connections/1")
-                .exchange()
-                .expectStatus()
-                .isOk();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+    void testCreateConnection() {
+        when(workspaceConnectionFacade.create(eq(5L), any())).thenReturn(1L);
 
-        ArgumentCaptor<Long> argument = ArgumentCaptor.forClass(Long.class);
-
-        verify(connectionFacade).delete(argument.capture());
-
-        Assertions.assertEquals(1L, argument.getValue());
-    }
-
-    @Test
-    public void testGetConnection() {
-        try {
-            ConnectionDTO connectionDTO = getConnection();
-
-            when(connectionFacade.getConnection(1L))
-                .thenReturn(connectionDTO);
-
-            this.webTestClient
-                .get()
-                .uri("/internal/connections/1")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(ConnectionModel.class)
-                .isEqualTo(Validate.notNull(workspaceConnectionMapper.convert(connectionDTO), "connectionModel")
-                    .parameters(null));
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
-    public void testGetConnectionTags() {
-        when(connectionFacade.getConnectionTags(PlatformType.AUTOMATION))
-            .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
-
-        try {
-            this.webTestClient
-                .get()
-                .uri("/internal/connections/tags")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.[0].id")
-                .isEqualTo(1)
-                .jsonPath("$.[1].id")
-                .isEqualTo(2)
-                .jsonPath("$.[0].name")
-                .isEqualTo("tag1")
-                .jsonPath("$.[1].name")
-                .isEqualTo("tag2");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
-    public void testGetConnections() {
-        ConnectionDTO connectionDTO = getConnection();
-
-        when(connectionFacade.getConnections(null, null, List.of(), null, null, PlatformType.AUTOMATION))
-            .thenReturn(List.of(connectionDTO));
-
-        this.webTestClient
-            .get()
+        webTestClient.post()
             .uri("/internal/connections")
-            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(
+                new ConnectionModel().componentName("componentName")
+                    .name("name")
+                    .parameters(Map.of("key1", "value1"))
+                    .workspaceId(5L))
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBodyList(ConnectionModel.class)
-            .contains(Validate.notNull(workspaceConnectionMapper.convert(connectionDTO), "connectionMapper")
-                .parameters(null))
-            .hasSize(1);
+            .expectBody(Long.class)
+            .isEqualTo(1L);
 
-        when(connectionFacade.getConnections("component1", null, List.of(), null, null, PlatformType.AUTOMATION))
-            .thenReturn(List.of(connectionDTO));
+        ArgumentCaptor<ConnectionDTO> connectionDTOArgumentCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
 
-        this.webTestClient
-            .get()
-            .uri("/internal/connections?componentNames=component1")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBodyList(ConnectionModel.class)
-            .hasSize(1);
+        verify(workspaceConnectionFacade).create(eq(5L), connectionDTOArgumentCaptor.capture());
 
-        when(connectionFacade.getConnections(null, 1, List.of(), null, null, PlatformType.AUTOMATION))
-            .thenReturn(List.of(connectionDTO));
-
-        this.webTestClient
-            .get()
-            .uri("/internal/connections?tagIds=1")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBodyList(ConnectionModel.class)
-            .hasSize(1);
-
-        when(connectionFacade.getConnections("component1", 1, List.of(), null, null, PlatformType.AUTOMATION))
-            .thenReturn(List.of(connectionDTO));
-
-        this.webTestClient
-            .get()
-            .uri("/internal/connections?componentNames=component1&tagIds=1")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus()
-            .is2xxSuccessful();
-    }
-
-    @Test
-    public void testPostConnection() {
-        ConnectionDTO connectionDTO = getConnection();
-        ConnectionModel connectionModel = new ConnectionModel().componentName("componentName")
-            .name("name")
-            .parameters(Map.of("key1", "value1"));
-
-        when(connectionFacade.create(any(), PlatformType.AUTOMATION))
-            .thenReturn(getConnection().id());
-
-        try {
-            assert connectionDTO.id() != null;
-            this.webTestClient
-                .post()
-                .uri("/internal/connections")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(connectionModel)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-
-        ArgumentCaptor<ConnectionDTO> connectionArgumentCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
-
-        verify(connectionFacade).create(connectionArgumentCaptor.capture(), PlatformType.AUTOMATION);
-
-        assertThat(connectionArgumentCaptor.getValue())
+        assertThat(connectionDTOArgumentCaptor.getValue())
             .hasFieldOrPropertyWithValue("componentName", "componentName")
             .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("parameters", Map.of("key1", "value1"));
     }
 
     @Test
-    public void testPutConnection() {
-        ConnectionModel connectionModel = new ConnectionModel().name("name2");
+    void testDeleteConnection() {
+        webTestClient.delete()
+            .uri("/internal/connections/1")
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
-        try {
-            this.webTestClient
-                .put()
-                .uri("/internal/connections/1")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(connectionModel)
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        verify(workspaceConnectionFacade).delete(1L);
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testPutConnectionTags() {
-        try {
-            this.webTestClient
-                .put()
-                .uri("/project-connections/1/tags")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UpdateTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+    void testGetConnection() {
+        when(connectionFacade.getConnection(1L)).thenReturn(createConnectionDTO());
 
-        ArgumentCaptor<List<Long>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
-
-        verify(connectionService).update(anyLong(), tagsArgumentCaptor.capture());
-
-        List<Long> capturedTagIds = tagsArgumentCaptor.getValue();
-
-        Iterator<Long> tagIterator = capturedTagIds.iterator();
-
-        Long capturedTagId = tagIterator.next();
-
-        Assertions.assertEquals(2, capturedTagId);
+        webTestClient.get()
+            .uri("/internal/connections/1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.id")
+            .isEqualTo(1)
+            .jsonPath("$.name")
+            .isEqualTo("name")
+            .jsonPath("$.parameters")
+            .doesNotExist();
     }
 
-    private static ConnectionDTO getConnection() {
+    @Test
+    void testGetWorkspaceConnections() {
+        when(workspaceConnectionFacade.getConnections(5L, "componentName", null, null, null))
+            .thenReturn(List.of(createConnectionDTO()));
+
+        webTestClient.get()
+            .uri("/internal/workspaces/5/connections?componentName=componentName")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(ConnectionModel.class)
+            .hasSize(1);
+    }
+
+    @Test
+    void testUpdateConnectionWithoutParametersKeepsTheConnectionProperties() {
+        webTestClient.patch()
+            .uri("/internal/connections/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UpdateConnectionRequestModel().name("renamed")
+                .tags(List.of())
+                .version(3))
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(connectionFacade).update(1L, "renamed", List.of(), 3);
+        verify(connectionFacade, never()).update(anyLong(), anyString(), anyMap(), anyList(), anyInt());
+    }
+
+    @Test
+    void testUpdateConnectionWithParametersReplacesTheConnectionProperties() {
+        webTestClient.patch()
+            .uri("/internal/connections/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UpdateConnectionRequestModel().name("renamed")
+                .parameters(Map.of("baseUri", "https://new.example.com"))
+                .tags(List.of())
+                .version(3))
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(connectionFacade).update(1L, "renamed", Map.of("baseUri", "https://new.example.com"), List.of(), 3);
+        verify(connectionFacade, never()).update(anyLong(), anyString(), anyList(), anyInt());
+    }
+
+    private static ConnectionDTO createConnectionDTO() {
         return ConnectionDTO.builder()
             .componentName("componentName")
             .id(1L)
             .name("name")
             .parameters(Map.of("key1", "value1"))
+            .status(ConnectionStatus.ACTIVE)
             .version(1)
             .build();
-    }
-
-    @ComponentScan(basePackages = "com.bytechef.automation.configuration.web.rest")
-    @Configuration
-    public static class ConnectionRestTestConfiguration {
     }
 }

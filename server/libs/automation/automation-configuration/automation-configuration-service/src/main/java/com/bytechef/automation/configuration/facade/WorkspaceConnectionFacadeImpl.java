@@ -131,6 +131,6 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
                 ConnectionErrorType.INVALID_CONNECTION);
         }
 
-        connectionFacade.replaceAuthorizationParameters(connectionId, parameters);
+        connectionFacade.replaceAuthorizationParameters(connectionId, parameters, version);
     }
 }

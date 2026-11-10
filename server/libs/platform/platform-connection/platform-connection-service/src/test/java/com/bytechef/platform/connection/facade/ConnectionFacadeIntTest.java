@@ -18,6 +18,8 @@ package com.bytechef.platform.connection.facade;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.CollectionUtils;
@@ -42,6 +44,8 @@ import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalSummary;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,6 +61,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -380,6 +385,161 @@ class ConnectionFacadeIntTest {
     }
 
     @Test
+    void testUpdateReplacesTheConnectionPropertiesAndKeepsTheAuthorization() {
+        stubConnectionDefinitionWithProperties("propertiesComponent", "baseUri", "region");
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BEARER_TOKEN)
+            .componentName("propertiesComponent")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .parameters(Map.of("baseUri", "https://old.example.com", "region", "eu", "token", "secret"))
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        connectionFacade.update(
+            connectionId, "renamed",
+            Map.of("baseUri", "https://new.example.com", "token", "replaced", "unknown", "value"), List.of(),
+            connection.getVersion());
+
+        Connection updatedConnection = connectionService.getConnection(connectionId);
+
+        Map<String, Object> updatedParameters = new HashMap<>(updatedConnection.getParameters());
+
+        Assertions.assertThat(updatedConnection.getName())
+            .isEqualTo("renamed");
+        Assertions.assertThat(updatedParameters)
+            .containsEntry("baseUri", "https://new.example.com")
+            .containsEntry("token", "secret")
+            .doesNotContainKeys("region", "unknown");
+    }
+
+    @Test
+    void testUpdateWithConnectionPropertiesRejectsAStaleVersion() {
+        stubConnectionDefinitionWithProperties("propertiesComponent", "baseUri");
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BEARER_TOKEN)
+            .componentName("propertiesComponent")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .parameters(Map.of("baseUri", "https://old.example.com"))
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        int readVersion = connection.getVersion();
+
+        connectionService.update(connectionId, "concurrent", List.of(), readVersion);
+
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.update(
+                connectionId, "renamed", Map.of("baseUri", "https://new.example.com"), List.of(), readVersion))
+            .isInstanceOf(OptimisticLockingFailureException.class);
+
+        Connection unchangedConnection = connectionService.getConnection(connectionId);
+
+        Assertions.assertThat(unchangedConnection.getName())
+            .isEqualTo("concurrent");
+        Assertions.assertThat(new HashMap<String, Object>(unchangedConnection.getParameters()))
+            .containsEntry("baseUri", "https://old.example.com");
+    }
+
+    @Test
+    void testReplaceAuthorizationParametersRejectsAStaleVersion() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .parameters(Map.of("key", "original"))
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        int readVersion = connection.getVersion();
+
+        connectionService.update(connectionId, "concurrent", List.of(), readVersion);
+
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "stale"), readVersion))
+            .isInstanceOf(OptimisticLockingFailureException.class);
+
+        Connection unchangedConnection = connectionService.getConnection(connectionId);
+
+        Assertions.assertThat(new HashMap<String, Object>(unchangedConnection.getParameters()))
+            .containsEntry("key", "original");
+    }
+
+    @Test
+    void testReplaceAuthorizationParametersDropsTheStoredTokensAndKeepsTheConnectionProperties() {
+        stubConnectionDefinitionWithProperties("propertiesComponent", "baseUri");
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+            .componentName("propertiesComponent")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .parameters(
+                Map.of(
+                    "baseUri", "https://api.example.com", "clientId", "old-client", "access_token", "old-access",
+                    "refresh_token", "old-refresh"))
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        connectionFacade.replaceAuthorizationParameters(
+            connectionId, Map.of("clientId", "new-client", "access_token", "new-access"), connection.getVersion());
+
+        Connection updatedConnection = connectionService.getConnection(connectionId);
+
+        Assertions.assertThat(new HashMap<String, Object>(updatedConnection.getParameters()))
+            .containsEntry("baseUri", "https://api.example.com")
+            .containsEntry("clientId", "new-client")
+            .containsEntry("access_token", "new-access")
+            .doesNotContainKey("refresh_token");
+    }
+
+    @Test
+    void testReplaceAuthorizationParametersWithTheCurrentVersionReplacesThem() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .parameters(Map.of("key", "original"))
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        connectionFacade.replaceAuthorizationParameters(connectionId, Map.of("key", "replaced"),
+            connection.getVersion());
+
+        Connection updatedConnection = connectionService.getConnection(connectionId);
+
+        Assertions.assertThat(new HashMap<String, Object>(updatedConnection.getParameters()))
+            .containsEntry("key", "replaced");
+        Assertions.assertThat(updatedConnection.getCredentialStatus())
+            .isEqualTo(Connection.CredentialStatus.VALID);
+    }
+
+    @Test
     void testUpdateAndDeleteByNonOwnerNonAdminAreDenied() {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .authorizationType(AuthorizationType.BASIC_AUTH)
@@ -400,6 +560,11 @@ class ConnectionFacadeIntTest {
 
         Assertions.assertThatThrownBy(
             () -> connectionFacade.update(connectionId, "renamed", List.of(), createdConnectionDTO.version()))
+            .isInstanceOf(AccessDeniedException.class);
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.update(
+                connectionId, "renamed", Map.of("baseUri", "https://attacker.example.com"), List.of(),
+                createdConnectionDTO.version()))
             .isInstanceOf(AccessDeniedException.class);
         Assertions.assertThatThrownBy(() -> connectionFacade.delete(connectionId))
             .isInstanceOf(AccessDeniedException.class);
@@ -445,6 +610,29 @@ class ConnectionFacadeIntTest {
 
         Assertions.assertThat(connectionRepository.findById(connectionId))
             .isEmpty();
+    }
+
+    private void stubConnectionDefinitionWithProperties(String componentName, String... propertyNames) {
+        List<com.bytechef.platform.component.domain.Property> properties = new ArrayList<>();
+
+        for (String propertyName : propertyNames) {
+            com.bytechef.platform.component.domain.Property property =
+                mock(com.bytechef.platform.component.domain.Property.class);
+
+            when(property.getName()).thenReturn(propertyName);
+
+            properties.add(property);
+        }
+
+        ConnectionDefinition connectionDefinition = mock(ConnectionDefinition.class);
+
+        doReturn(properties).when(connectionDefinition)
+            .getProperties();
+        doReturn(List.of()).when(connectionDefinition)
+            .getAuthorizations();
+
+        when(connectionDefinitionService.getConnectionConnectionDefinition(componentName, 1))
+            .thenReturn(connectionDefinition);
     }
 
     @ComponentScan(basePackages = {
