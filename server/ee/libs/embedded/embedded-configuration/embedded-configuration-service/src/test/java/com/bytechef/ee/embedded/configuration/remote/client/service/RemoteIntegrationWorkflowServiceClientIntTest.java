@@ -49,7 +49,7 @@ import tools.jackson.databind.ObjectMapper;
 @SpringBootTest(
     classes = IntegrationIntTestConfiguration.class,
     properties = {
-        "bytechef.edition=EE", "spring.liquibase.contexts=configuration"
+        "bytechef.edition=EE", "spring.liquibase.contexts=configuration,execution"
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @IntegrationIntTestConfigurationSharedMocks

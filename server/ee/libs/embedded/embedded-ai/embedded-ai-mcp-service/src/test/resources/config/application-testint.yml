@@ -1,6 +1,6 @@
 spring:
   liquibase:
-    contexts: configuration,connection,user
+    contexts: configuration,connection,execution,user
 
 bytechef:
   edition: EE

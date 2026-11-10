@@ -42,7 +42,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @SpringBootTest(
     classes = IntegrationIntTestConfiguration.class,
     properties = {
-        "bytechef.edition=EE", "spring.liquibase.contexts=configuration,user"
+        "bytechef.edition=EE", "spring.liquibase.contexts=configuration,user,execution"
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @IntegrationIntTestConfigurationSharedMocks

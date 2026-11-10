@@ -65,7 +65,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
         "bytechef.edition=ee",
         "bytechef.audit.enabled=true",
         "spring.liquibase.change-log=classpath:config/liquibase/embedded-security-audit-testint.xml",
-        "spring.liquibase.contexts=configuration"
+        "spring.liquibase.contexts=configuration,execution"
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {

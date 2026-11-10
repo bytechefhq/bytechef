@@ -14,7 +14,7 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.ee.embedded.security.config.EmbeddedSecurityIntTestConfiguration;
 import com.bytechef.ee.embedded.security.domain.SigningKey;
 import com.bytechef.ee.embedded.security.remote.grpc.SigningKeyRemoteServiceGrpcServer;
@@ -54,11 +54,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     classes = EmbeddedSecurityIntTestConfiguration.class,
     properties = {
         "bytechef.edition=ee", "spring.liquibase.change-log=classpath:config/liquibase/embedded-security-testint.xml",
-        "spring.liquibase.contexts=configuration"
+        "spring.liquibase.contexts=configuration,execution"
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {
-    PermissionScopeRegistry.class, ProjectRepository.class, UserService.class, WorkspaceScopeCacheService.class,
+    PermissionScopeRegistry.class, ProjectRepository.class, UserService.class, WorkspaceScopeCache.class,
     WorkspaceUserRepository.class
 })
 class RemoteSigningKeyServiceClientIntTest {
@@ -161,6 +161,32 @@ class RemoteSigningKeyServiceClientIntTest {
         assertThatThrownBy(
             () -> remoteSigningKeyServiceClient.getPublicKey(signingKey.getKeyId(), Environment.PRODUCTION.ordinal()))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testUpdateLastUsedDateSetsTheLastUsedDateOfTheKeyInItsEnvironment() {
+        SigningKey signingKey = newSigningKey(Environment.PRODUCTION);
+
+        signingKeyService.create(signingKey);
+
+        remoteSigningKeyServiceClient.updateLastUsedDate(signingKey.getKeyId(), Environment.PRODUCTION.ordinal());
+
+        SigningKey updatedSigningKey = signingKeyService.getSigningKey(signingKey.getId());
+
+        assertThat(updatedSigningKey.getLastUsedDate()).isNotNull();
+    }
+
+    @Test
+    void testUpdateLastUsedDateInAnotherEnvironmentLeavesTheKeyUnchanged() {
+        SigningKey signingKey = newSigningKey(Environment.STAGING);
+
+        signingKeyService.create(signingKey);
+
+        remoteSigningKeyServiceClient.updateLastUsedDate(signingKey.getKeyId(), Environment.PRODUCTION.ordinal());
+
+        SigningKey updatedSigningKey = signingKeyService.getSigningKey(signingKey.getId());
+
+        assertThat(updatedSigningKey.getLastUsedDate()).isNull();
     }
 
     private static PrivateKey decodePrivateKey(String pemPrivateKey) throws Exception {
