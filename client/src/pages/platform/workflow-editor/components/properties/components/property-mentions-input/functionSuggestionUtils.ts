@@ -6,9 +6,25 @@ const MINIMUM_QUERY_LENGTH = 2;
 const ALPHABETIC_CHARACTER = /[A-Za-z]/;
 const ALPHANUMERIC_CHARACTER = /[A-Za-z0-9]/;
 
-// SCREAMING_SNAKE enum value (e.g. "STRING", "INTEGER") -> readable label (e.g. "String", "Integer").
+const FUNCTION_TYPE_LABELS: Record<EvaluatorFunctionType, string> = {
+    [EvaluatorFunctionType.Any]: 'Any',
+    [EvaluatorFunctionType.Boolean]: 'Boolean',
+    [EvaluatorFunctionType.Byte]: 'Integer',
+    [EvaluatorFunctionType.Character]: 'String',
+    [EvaluatorFunctionType.Datetime]: 'Date Time',
+    [EvaluatorFunctionType.Double]: 'Number',
+    [EvaluatorFunctionType.Float]: 'Number',
+    [EvaluatorFunctionType.Integer]: 'Integer',
+    [EvaluatorFunctionType.List]: 'Array',
+    [EvaluatorFunctionType.Long]: 'Integer',
+    [EvaluatorFunctionType.Map]: 'Object',
+    [EvaluatorFunctionType.Number]: 'Number',
+    [EvaluatorFunctionType.Short]: 'Integer',
+    [EvaluatorFunctionType.String]: 'String',
+};
+
 function formatFunctionType(type: EvaluatorFunctionType): string {
-    return type.charAt(0) + type.slice(1).toLowerCase();
+    return FUNCTION_TYPE_LABELS[type] ?? type;
 }
 
 export function formatFunctionSignature(definition: EvaluatorFunctionDefinition): string {
@@ -38,8 +54,123 @@ export function filterFunctionDefinitions(
         .slice(0, MAX_RESULTS);
 }
 
-export function buildFunctionInsertion(name: string): {caretOffset: number; content: string} {
+export function buildFunctionInsertion(name: string, textAfterRange = ''): {caretOffset: number; content: string} {
+    if (textAfterRange.startsWith('(')) {
+        return {caretOffset: name.length + 1, content: name};
+    }
+
     return {caretOffset: name.length + 1, content: `${name}()`};
+}
+
+const NUMERIC_FUNCTION_TYPES: string[] = [
+    EvaluatorFunctionType.Byte,
+    EvaluatorFunctionType.Double,
+    EvaluatorFunctionType.Float,
+    EvaluatorFunctionType.Integer,
+    EvaluatorFunctionType.Long,
+    EvaluatorFunctionType.Number,
+    EvaluatorFunctionType.Short,
+];
+
+const TEXT_FUNCTION_TYPES: string[] = [EvaluatorFunctionType.Character, EvaluatorFunctionType.String];
+
+function getFunctionTypeFamily(type: EvaluatorFunctionType): string {
+    if (NUMERIC_FUNCTION_TYPES.includes(type)) {
+        return EvaluatorFunctionType.Number;
+    }
+
+    if (TEXT_FUNCTION_TYPES.includes(type)) {
+        return EvaluatorFunctionType.String;
+    }
+
+    return type;
+}
+
+export function isFunctionTypeCompatible(expectedType: EvaluatorFunctionType, actualType: EvaluatorFunctionType) {
+    if (expectedType === EvaluatorFunctionType.Any || actualType === EvaluatorFunctionType.Any) {
+        return true;
+    }
+
+    return getFunctionTypeFamily(expectedType) === getFunctionTypeFamily(actualType);
+}
+
+const PROPERTY_FUNCTION_TYPES: Record<string, EvaluatorFunctionType> = {
+    ARRAY: EvaluatorFunctionType.List,
+    BOOLEAN: EvaluatorFunctionType.Boolean,
+    DATE: EvaluatorFunctionType.Datetime,
+    DATE_TIME: EvaluatorFunctionType.Datetime,
+    INTEGER: EvaluatorFunctionType.Integer,
+    NUMBER: EvaluatorFunctionType.Number,
+    OBJECT: EvaluatorFunctionType.Map,
+    STRING: EvaluatorFunctionType.String,
+    TIME: EvaluatorFunctionType.Datetime,
+};
+
+export function getPropertyFunctionType(propertyType?: string): EvaluatorFunctionType | null {
+    return (propertyType && PROPERTY_FUNCTION_TYPES[propertyType]) || null;
+}
+
+function findExpectedArgumentTypes(
+    definitions: EvaluatorFunctionDefinition[],
+    enclosingCalls: EnclosingFunctionCallI[],
+    expressionType: EvaluatorFunctionType | null
+): EvaluatorFunctionType[] | null {
+    let expectedTypes: EvaluatorFunctionType[] | null = expressionType ? [expressionType] : null;
+
+    for (const enclosingCall of enclosingCalls) {
+        if (!enclosingCall.name) {
+            continue;
+        }
+
+        const overloads = definitions.filter(
+            (definition) =>
+                definition.name === enclosingCall.name && definition.parameters.length > enclosingCall.argIndex
+        );
+
+        if (overloads.length === 0) {
+            expectedTypes = null;
+
+            continue;
+        }
+
+        const currentExpectedTypes = expectedTypes;
+
+        const fittingOverloads = currentExpectedTypes
+            ? overloads.filter((overload) =>
+                  currentExpectedTypes.some((expectedType) =>
+                      isFunctionTypeCompatible(expectedType, overload.returnType)
+                  )
+              )
+            : overloads;
+
+        const parameterTypes = (fittingOverloads.length > 0 ? fittingOverloads : overloads).map(
+            (overload) => overload.parameters[enclosingCall.argIndex].type
+        );
+
+        expectedTypes = parameterTypes.includes(EvaluatorFunctionType.Any) ? null : parameterTypes;
+    }
+
+    return expectedTypes;
+}
+
+export function filterFunctionDefinitionsForArgument(
+    definitions: EvaluatorFunctionDefinition[],
+    enclosingCalls: EnclosingFunctionCallI[],
+    expressionType: EvaluatorFunctionType | null = null
+): EvaluatorFunctionDefinition[] {
+    if (!enclosingCalls.some((enclosingCall) => enclosingCall.name)) {
+        return definitions;
+    }
+
+    const expectedTypes = findExpectedArgumentTypes(definitions, enclosingCalls, expressionType);
+
+    if (!expectedTypes) {
+        return definitions;
+    }
+
+    return definitions.filter((definition) =>
+        expectedTypes.some((expectedType) => isFunctionTypeCompatible(expectedType, definition.returnType))
+    );
 }
 
 interface SuggestionMatchResultI {
@@ -48,8 +179,13 @@ interface SuggestionMatchResultI {
     text: string;
 }
 
+interface SuggestionTextNodeI {
+    isText: boolean;
+    text?: string | null;
+}
+
 interface SuggestionPositionI {
-    $position: {nodeBefore: {isText: boolean; text?: string | null} | null; pos: number};
+    $position: {nodeAfter?: SuggestionTextNodeI | null; nodeBefore: SuggestionTextNodeI | null; pos: number};
 }
 
 const FORCED_QUERY = /^([A-Za-z][A-Za-z0-9]*)?$/;
@@ -70,6 +206,19 @@ function findTrailingWord(text: string): string {
     }
 
     return text.slice(start);
+}
+
+function findLeadingWordRest({$position}: SuggestionPositionI): string {
+    const nodeAfter = $position.nodeAfter;
+    const text = nodeAfter?.isText && nodeAfter.text ? nodeAfter.text : '';
+
+    let end = 0;
+
+    while (end < text.length && ALPHANUMERIC_CHARACTER.test(text[end])) {
+        end += 1;
+    }
+
+    return text.slice(0, end);
 }
 
 // Custom findSuggestionMatch: trigger on the trailing word before the caret (no explicit trigger char).
@@ -98,10 +247,10 @@ export function findFunctionSuggestionMatch({$position}: SuggestionPositionI): S
         return null;
     }
 
-    const to = $position.pos;
-    const from = to - word.length;
+    const from = $position.pos - word.length;
+    const wordRest = findLeadingWordRest({$position});
 
-    return {query: word, range: {from, to}, text: word};
+    return {query: word, range: {from, to: $position.pos + wordRest.length}, text: word + wordRest};
 }
 
 export function findForcedFunctionSuggestionStart({$position}: SuggestionPositionI): number | null {
@@ -120,12 +269,12 @@ export function findForcedFunctionSuggestionMatch(
     {$position}: SuggestionPositionI,
     forcedFrom: number
 ): SuggestionMatchResultI | null {
-    const to = $position.pos;
+    const caret = $position.pos;
     const nodeBefore = $position.nodeBefore;
     const text = nodeBefore?.isText && nodeBefore.text ? nodeBefore.text : '';
-    const textStart = to - text.length;
+    const textStart = caret - text.length;
 
-    if (forcedFrom > to || forcedFrom < textStart) {
+    if (forcedFrom > caret || forcedFrom < textStart) {
         return null;
     }
 
@@ -135,7 +284,9 @@ export function findForcedFunctionSuggestionMatch(
         return null;
     }
 
-    return {query, range: {from: forcedFrom, to}, text: query};
+    const wordRest = query ? findLeadingWordRest({$position}) : '';
+
+    return {query, range: {from: forcedFrom, to: caret + wordRest.length}, text: query + wordRest};
 }
 
 export function isFormulaModeActive(
@@ -253,6 +404,22 @@ function collectOpenFunctionCalls(text: string): EnclosingFunctionCallI[] {
     }
 
     return stack;
+}
+
+export interface EnclosingFunctionCallChainI {
+    calls: EnclosingFunctionCallI[];
+    isOutermostCallIncluded: boolean;
+}
+
+export function findEnclosingFunctionCallChain(
+    textBeforeCaret: string,
+    textAfterCaret = ''
+): EnclosingFunctionCallChainI {
+    const stack = collectOpenFunctionCalls(textBeforeCaret);
+    const unmatchedClosesAfterCaret = countUnmatchedClosingParens(textAfterCaret);
+    const firstClosedIndex = Math.max(stack.length - unmatchedClosesAfterCaret, 0);
+
+    return {calls: stack.slice(firstClosedIndex), isOutermostCallIncluded: firstClosedIndex === 0};
 }
 
 export function findEnclosingFunctionCall(textBeforeCaret: string, textAfterCaret = ''): EnclosingFunctionCallI | null {

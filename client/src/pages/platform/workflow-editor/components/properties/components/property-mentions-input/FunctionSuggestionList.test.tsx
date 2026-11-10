@@ -63,7 +63,7 @@ describe('FunctionSuggestionList', () => {
         expect(screen.getAllByRole('listitem')).toHaveLength(2);
         expect(screen.getByText('2 variations')).toBeInTheDocument();
         expect(screen.getByText('(element: Boolean): String')).toBeInTheDocument();
-        expect(screen.getByText('(element: Map): String')).toBeInTheDocument();
+        expect(screen.getByText('(element: Object): String')).toBeInTheDocument();
         expect(screen.getByText('Checks for a boolean element.')).toBeInTheDocument();
         expect(screen.getByText('Checks for a map element.')).toBeInTheDocument();
 
@@ -71,7 +71,7 @@ describe('FunctionSuggestionList', () => {
             ref.current!.onKeyDown({event: new KeyboardEvent('keydown', {key: 'ArrowDown'})} as never);
         });
 
-        expect(screen.queryByText('(element: Map): String')).not.toBeInTheDocument();
+        expect(screen.queryByText('(element: Object): String')).not.toBeInTheDocument();
 
         act(() => {
             ref.current!.onKeyDown({event: new KeyboardEvent('keydown', {key: 'Enter'})} as never);

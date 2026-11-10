@@ -3,7 +3,7 @@ import {Extension} from '@tiptap/core';
 import {PluginKey} from '@tiptap/pm/state';
 import {Suggestion} from '@tiptap/suggestion';
 
-import {getFunctionSuggestionOptions} from './functionSuggestionOptions';
+import {FORCED_FUNCTION_SUGGESTION_META, getFunctionSuggestionOptions} from './functionSuggestionOptions';
 import {findForcedFunctionSuggestionStart, isFormulaModeActive} from './functionSuggestionUtils';
 
 export const FunctionSuggestionPluginKey = new PluginKey('functionSuggestion');
@@ -34,9 +34,13 @@ export const FunctionSuggestion = Extension.create({
                     return false;
                 }
 
+                if (FunctionSuggestionPluginKey.getState(editor.state)?.active) {
+                    editor.view.dispatch(editor.state.tr.setMeta(FunctionSuggestionPluginKey, {exit: true}));
+                }
+
                 this.storage.forcedFrom = forcedFrom;
 
-                editor.view.dispatch(editor.state.tr);
+                editor.view.dispatch(editor.state.tr.setMeta(FORCED_FUNCTION_SUGGESTION_META, true));
 
                 return true;
             },

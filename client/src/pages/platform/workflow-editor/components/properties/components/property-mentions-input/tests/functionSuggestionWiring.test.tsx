@@ -76,8 +76,10 @@ describe('FunctionSuggestion wiring', () => {
 
         const options = getFunctionSuggestionOptions();
 
-        expect(options.shouldShow!({editor, query: 'conc'} as never)).toBe(true);
-        expect(options.shouldShow!({editor, query: 'true'} as never)).toBe(false);
+        const context = {editor, range: {from: 1, to: 1}, transaction: editor.state.tr};
+
+        expect(options.shouldShow!({...context, query: 'conc'} as never)).toBe(true);
+        expect(options.shouldShow!({...context, query: 'true'} as never)).toBe(false);
     });
 
     it('command() inserts the call and parks the caret between the parentheses', () => {
@@ -90,5 +92,16 @@ describe('FunctionSuggestion wiring', () => {
         expect(editor.state.doc.textContent).toBe('concat()');
         // from + 'concat'.length + 1 -> inside the parentheses.
         expect(editor.state.selection.from).toBe(8);
+    });
+
+    it('command() replaces the name of an existing call and keeps its arguments', () => {
+        editor.commands.insertContent('getOrDefault(x, 0)');
+
+        const options = getFunctionSuggestionOptions();
+
+        options.command!({editor, props: {name: 'coalesce'}, range: {from: 1, to: 13}} as never);
+
+        expect(editor.state.doc.textContent).toBe('coalesce(x, 0)');
+        expect(editor.state.selection.from).toBe(10);
     });
 });
