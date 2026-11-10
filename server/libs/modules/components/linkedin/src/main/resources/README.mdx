@@ -4,3 +4,9 @@
 2. Look at the URL in your web browser's address bar.
 3. Find the numeric value that appears immediately after `/company/` or `/organization/` in the URL. For example: in `https://www.linkedin.com/company/12345678/` the Organization Number is `12345678`.
 4. Copy this number and paste it into the **Organization Number** field in ByteChef.
+
+### Comments on organization posts
+
+The **Get Comments** action and the **New Comment** trigger work only for organization (company page) posts. They require your LinkedIn app to have access to the **Community Management API** and the `r_organization_social_feed` scope to be enabled for the connection.
+
+Comments on personal profile posts are not supported, because reading them requires the restricted `r_member_social_feed` permission, which LinkedIn grants only to select developers.
