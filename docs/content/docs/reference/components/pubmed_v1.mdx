@@ -1,0 +1,189 @@
+---
+title: "PubMed"
+description: "PubMed is a free search engine maintained by the U.S. National Library of Medicine that indexes more than 35 million citations and abstracts of biomedical and life sciences literature."
+---
+
+
+Categories: Helpers
+
+
+Type: pubmed/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| api_key | API Key | STRING | NCBI API key. Raises the E-utilities rate limit from 3 to 10 requests per second. Create it under Account settings -&gt; API Key Management on NCBI. | true |
+| tool | Tool | STRING | Name of the application making the E-utilities calls, sent to NCBI as the tool parameter. | false |
+| email | Email | STRING | Email address of the developer of the application, sent to NCBI as the email parameter so NCBI can get in touch about problems. | false |
+
+
+
+## Connection Setup
+
+The connection is optional. Without one, PubMed accepts up to 3 requests per second from your server. With an NCBI API key the limit is 10 requests per second.
+
+### Create an NCBI API Key
+
+1. Sign in to your [NCBI account](https://account.ncbi.nlm.nih.gov/) or create one.
+2. Click your account name in the top right corner and select *Account settings*.
+3. Scroll to *API Key Management* and click *Create an API Key*.
+4. Copy the generated key and paste it into the *API Key* field of the connection.
+
+### Tool and Email
+
+*Tool* and *Email* are optional. NCBI asks applications that make many requests to identify themselves with the name of the application and a contact email address, so it can reach the developer before blocking traffic that causes problems. They are sent only when you fill them in.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Get Article Abstract
+Name: getArticleAbstract
+
+`Get the abstract of a PubMed article as plain text.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| pmid | PMID | STRING | PubMed identifier of the article, for example 25315507. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Article Abstract",
+  "name" : "getArticleAbstract",
+  "parameters" : {
+    "pmid" : ""
+  },
+  "type" : "pubmed/v1/getArticleAbstract"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| pmid | STRING | PubMed identifier of the article. |
+| abstract | STRING | Abstract of the article in plain text, including the citation, title, authors and author information. |
+
+
+
+
+#### Output Example
+```json
+{
+  "pmid" : "",
+  "abstract" : ""
+}
+```
+
+
+
+
+### Search Articles
+Name: searchArticles
+
+`Search PubMed for articles matching a query and return their PMIDs with title, authors, journal, publication date, DOI and URL.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| term | Query | STRING | PubMed search query. Supports the PubMed search syntax, for example field tags such as [Title], [Author] or [MeSH Terms] and the boolean operators AND, OR and NOT. | true |
+| maxResults | Max Results | INTEGER | Maximum number of articles to return. | false |
+| sort | Sort | STRING <details> <summary> Options </summary> <span>relevance</span>, <span>pub_date</span>, <span>Author</span>, <span>JournalName</span> </details> | Order in which the matching articles are returned. | false |
+| minDate | From Date | DATE | Return only articles whose date, of the type selected in Date Type, is on or after this date. | false |
+| maxDate | To Date | DATE | Return only articles whose date, of the type selected in Date Type, is on or before this date. | false |
+| dateType | Date Type | STRING <details> <summary> Options </summary> <span>pdat</span>, <span>edat</span>, <span>mdat</span> </details> | Type of date that From Date and To Date are applied to. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Articles",
+  "name" : "searchArticles",
+  "parameters" : {
+    "term" : "",
+    "maxResults" : 1,
+    "sort" : "",
+    "minDate" : "2021-01-01",
+    "maxDate" : "2021-01-01",
+    "dateType" : ""
+  },
+  "type" : "pubmed/v1/searchArticles"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| pmid | STRING | PubMed identifier of the article. |
+| title | STRING | Title of the article. |
+| authors | ARRAY <details> <summary> Items </summary> [STRING] </details> | Names of the article authors. |
+| journal | STRING | Full name of the journal the article was published in. |
+| pubDate | STRING | Publication date of the article as reported by PubMed. |
+| doi | STRING | Digital Object Identifier of the article, if available. |
+| url | STRING | URL of the article on PubMed. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "pmid" : "",
+  "title" : "",
+  "authors" : [ "" ],
+  "journal" : "",
+  "pubDate" : "",
+  "doi" : "",
+  "url" : ""
+} ]
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
