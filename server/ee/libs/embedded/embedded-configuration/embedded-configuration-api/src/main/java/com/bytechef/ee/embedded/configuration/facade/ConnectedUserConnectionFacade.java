@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,8 @@ public interface ConnectedUserConnectionFacade {
     long createConnectedUserConnectionAsAdmin(long connectedUserId, ConnectionDTO connectionDTO);
 
     void deleteConnectedUserConnection(long connectedUserId, long connectionId);
+
+    List<Tag> getConnectedUserConnectionTags(long connectedUserId);
 
     List<ConnectionDTO> getConnectedUserConnections(
         long connectedUserId, @Nullable String componentName, List<Long> connectionIds);
@@ -46,4 +49,9 @@ public interface ConnectedUserConnectionFacade {
     Set<Long> getSharedConnectionIds();
 
     void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters);
+
+    void updateConnectedUserConnectionTags(long connectedUserId, long connectionId, List<Tag> tags);
+
+    void updateIntegrationInstanceConnectionCredentials(
+        long connectedUserId, long connectionId, Map<String, ?> parameters, int version);
 }

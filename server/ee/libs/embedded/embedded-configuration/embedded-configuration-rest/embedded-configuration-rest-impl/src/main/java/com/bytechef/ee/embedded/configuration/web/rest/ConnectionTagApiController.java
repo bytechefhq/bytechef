@@ -8,13 +8,17 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectionAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentication;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,20 +35,32 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 public class ConnectionTagApiController implements ConnectionTagApi {
 
+    private final ConnectedUserConnectionFacade connectedUserConnectionFacade;
     private final ConnectionAdminFacade connectionAdminFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ConnectionTagApiController(ConnectionAdminFacade connectionAdminFacade,
+    public ConnectionTagApiController(
+        ConnectedUserConnectionFacade connectedUserConnectionFacade, ConnectionAdminFacade connectionAdminFacade,
         ConversionService conversionService) {
+
+        this.connectedUserConnectionFacade = connectedUserConnectionFacade;
         this.connectionAdminFacade = connectionAdminFacade;
         this.conversionService = conversionService;
     }
 
     @Override
     public ResponseEntity<List<TagModel>> getConnectionTags() {
+        Optional<ConnectedUserAuthentication> connectedUserAuthenticationOptional =
+            ConnectedUserAuthentications.fetchCurrent();
+
+        List<Tag> tags = connectedUserAuthenticationOptional
+            .map(connectedUserAuthentication -> connectedUserConnectionFacade.getConnectedUserConnectionTags(
+                connectedUserAuthentication.connectedUserId()))
+            .orElseGet(connectionAdminFacade::getConnectionTags);
+
         return ResponseEntity.ok(
-            connectionAdminFacade.getConnectionTags()
+            tags
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());
@@ -57,7 +73,17 @@ public class ConnectionTagApiController implements ConnectionTagApi {
             .map(tagModel -> conversionService.convert(tagModel, Tag.class))
             .toList();
 
-        connectionAdminFacade.updateConnectionTags(id, tags);
+        Optional<ConnectedUserAuthentication> connectedUserAuthenticationOptional =
+            ConnectedUserAuthentications.fetchCurrent();
+
+        if (connectedUserAuthenticationOptional.isPresent()) {
+            ConnectedUserAuthentication connectedUserAuthentication = connectedUserAuthenticationOptional.get();
+
+            connectedUserConnectionFacade.updateConnectedUserConnectionTags(
+                connectedUserAuthentication.connectedUserId(), id, tags);
+        } else {
+            connectionAdminFacade.updateConnectionTags(id, tags);
+        }
 
         return ResponseEntity.noContent()
             .build();

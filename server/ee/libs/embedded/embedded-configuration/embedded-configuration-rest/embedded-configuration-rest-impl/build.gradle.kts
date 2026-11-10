@@ -71,6 +71,7 @@ dependencies {
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service")) {
         exclude(module = "logback-config")
     }
+    testImplementation(project(":server:libs:core:rest:rest-impl"))
     testImplementation(project(":server:libs:test:test-int-support"))
 
     testImplementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-service")) {

@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFaca
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +39,11 @@ public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserC
 
     @Override
     public void deleteConnectedUserConnection(long connectedUserId, long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Tag> getConnectedUserConnectionTags(long connectedUserId) {
         throw new UnsupportedOperationException();
     }
 
@@ -89,4 +95,15 @@ public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserC
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public void updateConnectedUserConnectionTags(long connectedUserId, long connectionId, List<Tag> tags) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateIntegrationInstanceConnectionCredentials(
+        long connectedUserId, long connectionId, Map<String, ?> parameters, int version) {
+
+        throw new UnsupportedOperationException();
+    }
 }

@@ -190,6 +190,32 @@ class ConnectionApiControllerIntTest {
             .isEqualTo("tag1")
             .jsonPath("$.[1].name")
             .isEqualTo("tag2");
+
+        verify(connectedUserConnectionFacade, never()).getConnectedUserConnectionTags(anyLong());
+    }
+
+    @Test
+    void testGetConnectionTagsListsAConnectedUsersOwnConnectionTags() {
+        authenticateConnectedUser(5L);
+
+        when(connectedUserConnectionFacade.getConnectedUserConnectionTags(5L))
+            .thenReturn(List.of(new Tag(3L, "tag3")));
+
+        this.webTestClient
+            .get()
+            .uri("/internal/connections/tags")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.length()")
+            .isEqualTo(1)
+            .jsonPath("$.[0].id")
+            .isEqualTo(3)
+            .jsonPath("$.[0].name")
+            .isEqualTo("tag3");
+
+        verify(connectionAdminFacade, never()).getConnectionTags();
     }
 
     @Test
@@ -427,10 +453,46 @@ class ConnectionApiControllerIntTest {
         ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
         verify(connectionAdminFacade).updateConnectionTags(eq(1L), tagsArgumentCaptor.capture());
+        verify(connectedUserConnectionFacade, never()).updateConnectedUserConnectionTags(anyLong(), anyLong(),
+            anyList());
 
         assertThat(tagsArgumentCaptor.getValue())
             .singleElement()
             .hasFieldOrPropertyWithValue("name", "tag1");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testPutConnectionTagsKeepsAConnectedUserUpdatingTheirOwnConnectionTags() {
+        authenticateConnectedUser(5L);
+
+        this.webTestClient
+            .put()
+            .uri("/internal/connections/1/tags")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UpdateTagsRequestModel().tags(List.of(new TagModel().name("tag1"))))
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
+
+        verify(connectedUserConnectionFacade).updateConnectedUserConnectionTags(
+            eq(5L), eq(1L), tagsArgumentCaptor.capture());
+        verify(connectionAdminFacade, never()).updateConnectionTags(anyLong(), anyList());
+
+        assertThat(tagsArgumentCaptor.getValue())
+            .singleElement()
+            .hasFieldOrPropertyWithValue("name", "tag1");
+    }
+
+    private static void authenticateConnectedUser(long connectedUserId) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new EmbeddedApiKeyAuthenticationToken(
+                    Environment.PRODUCTION.ordinal(), connectedUserId,
+                    new User("external-user-" + connectedUserId, "", List.of()), false));
     }
 
     private void postConnectedUserConnection(long connectedUserId, long expectedConnectionId) {
