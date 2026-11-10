@@ -39,7 +39,7 @@ const IntegrationTabButtons = ({
 
     return (
         <>
-            <div className="flex flex-col" onClick={handleButtonClick}>
+            <div className="flex flex-col" onClick={handleButtonClick} role="presentation">
                 <Button
                     aria-label="Edit Integration Button"
                     className="dropdown-menu-item"

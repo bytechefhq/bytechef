@@ -13,6 +13,7 @@ import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import useCreateKnowledgeBaseDialog from '@/pages/automation/knowledge-bases/components/hooks/useCreateKnowledgeBaseDialog';
 import {cn} from '@/shared/util/cn-utils';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {Loader2, X} from 'lucide-react';
 import {ReactNode} from 'react';
 
@@ -132,6 +133,9 @@ const CreateKnowledgeBaseDialog = ({trigger, workspaceId}: CreateKnowledgeBaseDi
                                             : 'cursor-pointer hover:bg-surface-neutral-primary-hover'
                                     )}
                                     onClick={() => !uploading && document.getElementById('file-upload')?.click()}
+                                    onKeyDown={handleActivationKeyDown}
+                                    role="button"
+                                    tabIndex={0}
                                 >
                                     <p className="text-sm text-content-neutral-secondary">
                                         Drop files here or click to browse

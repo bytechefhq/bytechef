@@ -190,6 +190,7 @@ const IntegrationInstanceConfigurationListItem = ({
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleIntegrationInstanceConfigurationListItemClick(event)}
+                role="presentation"
             >
                 <ListItemExpandButton disabled={workflowCount === 0} label="Toggle instance configuration" />
 
@@ -231,7 +232,7 @@ const IntegrationInstanceConfigurationListItem = ({
                                     </CollapsibleTrigger>
                                 )}
 
-                                <div onClick={(event) => event.preventDefault()}>
+                                <div onClick={(event) => event.preventDefault()} role="presentation">
                                     {showTags && integrationInstanceConfiguration.tags && (
                                         <TagList
                                             getRequest={(id, tags) => ({

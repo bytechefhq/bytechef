@@ -10,6 +10,7 @@ import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {ClickedOperationType, NodeDataType, PropertyAllType} from '@/shared/types';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {paintMonochromeSvgWithCurrentColor} from '@/shared/util/svg-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, Loader2Icon} from 'lucide-react';
@@ -522,6 +523,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
                                     version: version,
                                 });
                             }}
+                            onKeyDown={handleActivationKeyDown}
+                            tabIndex={0}
                         >
                             <div className="flex items-center gap-2">
                                 <div className="min-w-0 flex-1 space-y-1">

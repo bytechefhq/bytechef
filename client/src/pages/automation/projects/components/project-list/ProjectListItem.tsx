@@ -272,6 +272,7 @@ const ProjectListItem = ({
                 aria-label={`${project.name}_container`}
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleProjectListItemClick(event)}
+                role="presentation"
             >
                 <ListItemExpandButton label="Toggle project" />
 
@@ -330,7 +331,7 @@ const ProjectListItem = ({
                                     </span>
                                 </CollapsibleTrigger>
 
-                                <div onClick={(event) => event.stopPropagation()}>
+                                <div onClick={(event) => event.stopPropagation()} role="presentation">
                                     {project.tags && (
                                         <TagList
                                             getRequest={(id, tags) => ({

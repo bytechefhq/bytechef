@@ -45,6 +45,7 @@ export default function ApprovalTaskSearch() {
                             )}
                             key={suggestion.text}
                             onClick={() => handleSuggestionClick(suggestion.text)}
+                            role="presentation"
                         >
                             <div className="flex items-center gap-2">
                                 <SearchIcon className="size-3 shrink-0" />

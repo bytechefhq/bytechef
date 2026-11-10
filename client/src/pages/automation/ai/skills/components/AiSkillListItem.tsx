@@ -12,6 +12,7 @@ import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEd
 import AiSkillListItemTagList from '@/pages/automation/ai/skills/components/AiSkillListItemTagList';
 import useAiSkillListItem from '@/pages/automation/ai/skills/hooks/useAiSkillListItem';
 import {AiSkill} from '@/shared/middleware/graphql';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon} from 'lucide-react';
 
 interface AiSkillListItemProps {
@@ -39,6 +40,9 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
             <div
                 className="mb-2 flex cursor-pointer items-center justify-between gap-6 rounded border border-border/50 px-2 py-3 hover:bg-surface-neutral-primary-hover"
                 onClick={handleClick}
+                onKeyDown={handleActivationKeyDown}
+                role="button"
+                tabIndex={0}
             >
                 <div className="min-w-0 flex-1">
                     <div className="text-sm font-semibold">{skill.name}</div>

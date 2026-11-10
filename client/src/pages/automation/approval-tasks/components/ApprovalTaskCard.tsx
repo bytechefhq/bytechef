@@ -1,4 +1,5 @@
 import Badge from '@/components/Badge/Badge';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {AlertTriangleIcon, CalendarIcon, LinkIcon, MessageSquareIcon, PaperclipIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
@@ -41,11 +42,17 @@ export default function ApprovalTaskCard({approvalTask, isSelected, onSelect, on
                 isSelected ? 'border-primary bg-muted' : 'border-border bg-background'
             )}
             onClick={onSelect}
+            onKeyDown={handleActivationKeyDown}
+            role="button"
+            tabIndex={0}
         >
             <div className="flex w-full min-w-0 items-start gap-3">
                 <div
                     className="mt-0.5 shrink-0 cursor-pointer rounded-full p-1 transition-colors hover:bg-muted"
                     onClick={onStatusToggle}
+                    onKeyDown={handleActivationKeyDown}
+                    role="button"
+                    tabIndex={0}
                     title={`Click to change status (currently: ${approvalTask.status.replace('-', ' ')})`}
                 >
                     {statusIcon}

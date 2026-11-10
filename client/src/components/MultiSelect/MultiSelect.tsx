@@ -156,6 +156,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                                         event.stopPropagation();
                                                         toggleOption(value);
                                                     }}
+                                                    role="presentation"
                                                 >
                                                     <XIcon className="size-4" />
                                                 </span>
@@ -178,6 +179,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                                     event.stopPropagation();
                                                     clearExtraOptions();
                                                 }}
+                                                role="presentation"
                                             >
                                                 <XIcon className="size-4" />
                                             </span>

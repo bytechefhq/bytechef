@@ -40,6 +40,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleMcpServerListItemClick(event)}
+                role="presentation"
             >
                 <ListItemExpandButton label="Toggle MCP server" />
 
@@ -65,7 +66,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                                     />
                                 </CollapsibleTrigger>
 
-                                <div onClick={(event) => event.preventDefault()}>
+                                <div onClick={(event) => event.preventDefault()} role="presentation">
                                     <TagList
                                         getRequest={(id, tags) => ({
                                             id: id!,

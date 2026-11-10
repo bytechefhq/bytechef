@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {BrainIcon, ComponentIcon, SettingsIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -59,7 +60,9 @@ export default function AiAgentModelSelectField() {
                                                 event.stopPropagation();
                                                 void handleConfigureModel(model);
                                             }}
+                                            onKeyDown={handleActivationKeyDown}
                                             role="button"
+                                            tabIndex={0}
                                         >
                                             <SettingsIcon className="size-4" />
                                         </span>

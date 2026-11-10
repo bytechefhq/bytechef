@@ -19,6 +19,7 @@ import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-depl
 import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {
     CloudDownloadIcon,
@@ -144,7 +145,13 @@ const ApiCollectionEndpointListItem = ({
 
     return (
         <>
-            <div className="flex flex-1 items-center" onClick={handleWorkflowClick}>
+            <div
+                className="flex flex-1 items-center"
+                onClick={handleWorkflowClick}
+                onKeyDown={handleActivationKeyDown}
+                role="button"
+                tabIndex={0}
+            >
                 <Badge
                     className={twMerge('mr-4 w-20', textColor)}
                     icon={icon}

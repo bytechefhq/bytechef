@@ -13,6 +13,7 @@ import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/share
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, FormIcon, MessageCircleMoreIcon, PlayIcon, SquareArrowOutUpRightIcon} from 'lucide-react';
@@ -150,7 +151,13 @@ const ProjectDeploymentWorkflowListItem = ({
 
     return (
         <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
-            <div className="flex min-w-0 flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
+            <div
+                className="flex min-w-0 flex-1 cursor-pointer items-center"
+                onClick={handleWorkflowClick}
+                onKeyDown={handleActivationKeyDown}
+                role="button"
+                tabIndex={0}
+            >
                 <div className="flex w-full max-w-80 min-w-0 shrink flex-col gap-1 sm:w-80 sm:shrink-0">
                     <div className="flex min-w-0 items-center gap-2">
                         <Tooltip>
