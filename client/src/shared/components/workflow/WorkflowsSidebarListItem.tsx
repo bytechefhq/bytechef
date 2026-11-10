@@ -4,7 +4,6 @@ import {twMerge} from 'tailwind-merge';
 
 interface WorkflowsSidebarListItemProps {
     active: boolean;
-    components: ReactNode;
     editedTimeAgo?: string;
     label?: string | null;
     menu?: ReactNode;
@@ -13,7 +12,6 @@ interface WorkflowsSidebarListItemProps {
 
 const WorkflowsSidebarListItem = ({
     active,
-    components,
     editedTimeAgo,
     label,
     menu,
@@ -36,14 +34,12 @@ const WorkflowsSidebarListItem = ({
         >
             <div
                 aria-current={active || undefined}
-                className="flex min-w-0 flex-1 cursor-pointer flex-col gap-3 overflow-hidden rounded-md py-3 pl-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="flex min-w-0 flex-1 cursor-pointer flex-col overflow-hidden rounded-md py-3 pl-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                 onClick={onClick}
                 onKeyDown={handleKeyDown}
                 role="button"
                 tabIndex={0}
             >
-                {components}
-
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <div className="flex flex-col gap-1 text-start">

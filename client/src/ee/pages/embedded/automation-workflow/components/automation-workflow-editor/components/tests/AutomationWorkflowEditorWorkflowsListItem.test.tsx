@@ -38,7 +38,7 @@ const project = {
 };
 
 describe('AutomationWorkflowEditorWorkflowsListItem', () => {
-    it('renders the workflow label, the edited date, and a component icon', () => {
+    it('renders the workflow label and the edited date without component icons', () => {
         render(
             <MemoryRouter>
                 <TooltipProvider>
@@ -58,7 +58,7 @@ describe('AutomationWorkflowEditorWorkflowsListItem', () => {
         expect(screen.getByText('Edited')).toBeInTheDocument();
         expect(screen.getByText(`on ${new Date('2026-02-11T09:30:00Z').toLocaleDateString()}`)).toBeInTheDocument();
         expect(screen.queryByText(/Edited on/)).not.toBeInTheDocument();
-        expect(screen.getAllByLabelText('Workflow component icon')).toHaveLength(1);
+        expect(screen.queryByLabelText('Workflow component icon')).not.toBeInTheDocument();
     });
 
     it('shows how long ago a recently edited workflow was edited', () => {
