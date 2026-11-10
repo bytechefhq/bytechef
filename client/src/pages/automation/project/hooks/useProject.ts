@@ -11,6 +11,7 @@ import useWorkflowDataStore, {
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import invalidateWorkflowNodeParameterQueries from '@/pages/platform/workflow-editor/utils/invalidateWorkflowNodeParameterQueries';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {
@@ -31,9 +32,6 @@ import {
 } from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
-import {WorkflowNodeDescriptionKeys} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {WorkflowNodeParameterKeys} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useRef, useState} from 'react';
@@ -169,25 +167,7 @@ export const useProject = () => {
                 workflowId: variables.id,
             });
 
-            void queryClient.invalidateQueries({
-                queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription({
-                    environmentId: variables.environmentId,
-                    id: variables.id,
-                    workflowNodeName: variables.workflowNodeName,
-                }),
-            });
-
-            void queryClient.invalidateQueries({
-                queryKey: WorkflowNodeParameterKeys.propertyWorkflowNodeParameterDisplayConditions({
-                    environmentId: variables.environmentId,
-                    id: variables.id,
-                    workflowNodeName: variables.workflowNodeName,
-                }),
-            });
-
-            void queryClient.invalidateQueries({
-                queryKey: WorkflowNodeOutputKeys.workflowNodeOutputs,
-            });
+            invalidateWorkflowNodeParameterQueries(queryClient, variables);
         },
     });
 

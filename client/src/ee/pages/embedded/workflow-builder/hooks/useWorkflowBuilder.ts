@@ -10,6 +10,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import invalidateWorkflowNodeParameterQueries from '@/pages/platform/workflow-editor/utils/invalidateWorkflowNodeParameterQueries';
 import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {
     useDeleteClusterElementParameterMutation,
@@ -19,9 +20,6 @@ import {
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
-import {WorkflowNodeDescriptionKeys} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {WorkflowNodeParameterKeys} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useContext, useEffect, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
@@ -96,25 +94,7 @@ export const useWorkflowBuilder = () => {
 
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
         onSuccess: (_result, variables) => {
-            void queryClient.invalidateQueries({
-                queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription({
-                    environmentId: variables.environmentId,
-                    id: variables.id,
-                    workflowNodeName: variables.workflowNodeName,
-                }),
-            });
-
-            void queryClient.invalidateQueries({
-                queryKey: WorkflowNodeParameterKeys.propertyWorkflowNodeParameterDisplayConditions({
-                    environmentId: variables.environmentId,
-                    id: variables.id,
-                    workflowNodeName: variables.workflowNodeName,
-                }),
-            });
-
-            void queryClient.invalidateQueries({
-                queryKey: WorkflowNodeOutputKeys.workflowNodeOutputs,
-            });
+            invalidateWorkflowNodeParameterQueries(queryClient, variables);
         },
     });
 
