@@ -1,5 +1,7 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
-import {render, screen} from '@testing-library/react';
+import {render as testingLibraryRender, screen} from '@testing-library/react';
+import {ReactElement} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionsTabsPanel from '../WorkflowExecutionsTabsPanel';
@@ -53,6 +55,8 @@ const renderPanel = (props: Partial<Parameters<typeof WorkflowExecutionsTabsPane
             {...props}
         />
     );
+
+const render = (ui: ReactElement) => testingLibraryRender(ui, {wrapper: TooltipProvider});
 
 describe('WorkflowExecutionsTabsPanel', () => {
     it('reads the trigger execution logs for a row that never produced a job', () => {

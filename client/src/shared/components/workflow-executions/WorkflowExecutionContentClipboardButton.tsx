@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {SPACE} from '@/shared/constants';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {CheckIcon, CopyIcon} from 'lucide-react';
@@ -40,14 +41,20 @@ const WorkflowExecutionContentClipboardButton = ({value}: {value: any}) => {
     return (
         value &&
         (typeof value !== 'object' || Object.keys(value).length > 0) && (
-            <Button
-                aria-label="Copy to clipboard"
-                disabled={isCurrentlyCopied}
-                icon={isCurrentlyCopied ? <CheckIcon className="text-success" /> : <CopyIcon />}
-                onClick={handleCopyText}
-                size="iconXs"
-                variant="ghost"
-            />
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        aria-label="Copy to clipboard"
+                        disabled={isCurrentlyCopied}
+                        icon={isCurrentlyCopied ? <CheckIcon className="text-success" /> : <CopyIcon />}
+                        onClick={handleCopyText}
+                        size="iconXs"
+                        variant="ghost"
+                    />
+                </TooltipTrigger>
+
+                <TooltipContent>Copy to clipboard</TooltipContent>
+            </Tooltip>
         )
     );
 };

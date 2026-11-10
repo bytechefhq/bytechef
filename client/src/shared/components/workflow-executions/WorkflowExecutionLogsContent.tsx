@@ -3,6 +3,7 @@ import Button from '@/components/Button/Button';
 import {Input} from '@/components/ui/input';
 import JsonView, {useJsonViewLoaded} from '@/shared/components/JsonView';
 import WorkflowExecutionContentClipboardButton from '@/shared/components/workflow-executions/WorkflowExecutionContentClipboardButton';
+import WorkflowExecutionExpandToggleButton from '@/shared/components/workflow-executions/WorkflowExecutionExpandToggleButton';
 import {
     type EditorJobFileLogsQuery,
     type JobFileLogsQuery,
@@ -14,16 +15,7 @@ import {
     useTriggerExecutionFileLogsQuery,
 } from '@/shared/middleware/graphql';
 import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
-import {
-    AlertCircleIcon,
-    AlertTriangleIcon,
-    BugIcon,
-    ChevronsDownUpIcon,
-    ChevronsUpDownIcon,
-    InfoIcon,
-    MessageSquareIcon,
-    SearchIcon,
-} from 'lucide-react';
+import {AlertCircleIcon, AlertTriangleIcon, BugIcon, InfoIcon, MessageSquareIcon, SearchIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {twMerge} from 'tailwind-merge';
@@ -432,14 +424,10 @@ const WorkflowExecutionLogsContent = ({
                 />
             </div>
 
-            <Button
-                aria-label={allExpanded ? 'Collapse all' : 'Expand all'}
+            <WorkflowExecutionExpandToggleButton
                 className="ml-3"
-                icon={allExpanded ? <ChevronsDownUpIcon /> : <ChevronsUpDownIcon />}
-                onClick={() => handleCollapsedChange(allExpanded)}
-                size="iconXs"
-                title={allExpanded ? 'Collapse all' : 'Expand all'}
-                variant="ghost"
+                expanded={allExpanded}
+                onToggle={() => handleCollapsedChange(allExpanded)}
             />
 
             <WorkflowExecutionContentClipboardButton value={visibleLogsText} />

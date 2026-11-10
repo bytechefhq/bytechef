@@ -1,5 +1,7 @@
-import {render, screen} from '@testing-library/react';
+import {TooltipProvider} from '@/components/ui/tooltip';
+import {render as testingLibraryRender, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {ReactElement} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionContent from '../WorkflowExecutionContent';
@@ -13,6 +15,8 @@ vi.mock('@uidotdev/usehooks', () => ({
 vi.mock('@/shared/components/JsonView', () => ({
     default: () => <div data-testid="json-view" />,
 }));
+
+const render = (ui: ReactElement) => testingLibraryRender(ui, {wrapper: TooltipProvider});
 
 describe('WorkflowExecutionContent', () => {
     it('copies a failure message with its stack trace as plain text when asked to offer a copy button', async () => {
