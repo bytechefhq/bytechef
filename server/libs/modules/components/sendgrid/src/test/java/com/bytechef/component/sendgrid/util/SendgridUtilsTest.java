@@ -17,13 +17,16 @@
 package com.bytechef.component.sendgrid.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.sendgrid.constant.SendgridConstants.FROM;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.ID;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
@@ -46,6 +49,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Marija Horvat
@@ -164,5 +168,110 @@ class SendgridUtilsTest {
 
         assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
         assertEquals(List.of("/templates", "generations", "dynamic"), stringArgumentCaptor.getAllValues());
+    }
+
+    @Test
+    void testGetContactLists(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(
+                Map.of(
+                    "result", List.of(Map.of(ID, "list-1", NAME, "Newsletter")),
+                    "_metadata", Map.of(
+                        "next", "https://api.sendgrid.com/v3/marketing/lists?page_size=1000&page_token=token%3D2")),
+                Map.of(
+                    "result", List.of(Map.of(ID, "list-2", NAME, "Customers")),
+                    "_metadata", Map.of("self", "https://api.sendgrid.com/v3/marketing/lists?page_token=token%3D2")));
+
+        List<Map<?, ?>> result = SendgridUtils.getContactLists(mockedContext);
+
+        assertEquals(
+            List.of(Map.of(ID, "list-1", NAME, "Newsletter"), Map.of(ID, "list-2", NAME, "Customers")), result);
+        assertEquals(
+            List.of(
+                "/marketing/lists", "page_size", "1000", "/marketing/lists", "page_size", "1000", "page_token",
+                "token=2"),
+            stringArgumentCaptor.getAllValues());
+    }
+
+    @Test
+    void testGetSenders(Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(Map.of("results", List.of(Map.of(ID, 1, "nickname", "Orders"))));
+
+        List<Map<?, ?>> result = SendgridUtils.getSenders(mockedContext);
+
+        assertEquals(List.of(Map.of(ID, 1, "nickname", "Orders")), result);
+        assertEquals("/marketing/senders", stringArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testGetSendersFromArrayResponse(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(List.of(Map.of(ID, 1, "nickname", "Orders")));
+
+        List<Map<?, ?>> result = SendgridUtils.getSenders(mockedContext);
+
+        assertEquals(List.of(Map.of(ID, 1, "nickname", "Orders")), result);
+    }
+
+    @Test
+    void testGetListIdOptions(Context mockedContext) {
+        try (MockedStatic<SendgridUtils> sendgridUtilsMockedStatic =
+            mockStatic(SendgridUtils.class, CALLS_REAL_METHODS)) {
+
+            sendgridUtilsMockedStatic
+                .when(() -> SendgridUtils.getContactLists(mockedContext))
+                .thenReturn(List.of(Map.of(ID, "list-1", NAME, "Newsletter")));
+
+            List<Option<String>> result = SendgridUtils.getListIdOptions(null, null, null, null, mockedContext);
+
+            assertEquals(List.of(option("Newsletter", "list-1")), result);
+        }
+    }
+
+    @Test
+    void testGetSenderIdOptions(Context mockedContext) {
+        try (MockedStatic<SendgridUtils> sendgridUtilsMockedStatic =
+            mockStatic(SendgridUtils.class, CALLS_REAL_METHODS)) {
+
+            sendgridUtilsMockedStatic
+                .when(() -> SendgridUtils.getSenders(mockedContext))
+                .thenReturn(
+                    List.of(
+                        Map.of(ID, 1, "nickname", "Orders", FROM, Map.of("email", "orders@example.com")),
+                        Map.of(ID, 2, "nickname", "Support")));
+
+            List<Option<Long>> result = SendgridUtils.getSenderIdOptions(null, null, null, null, mockedContext);
+
+            assertEquals(List.of(option("Orders (orders@example.com)", 1L), option("Support", 2L)), result);
+        }
+    }
+
+    @Test
+    void testGetSuppressionGroupIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(List.of(Map.of(ID, 1234, NAME, "Newsletter Unsubscribes")));
+
+        List<Option<Long>> result = SendgridUtils.getSuppressionGroupIdOptions(
+            null, null, null, null, mockedContext);
+
+        assertEquals(List.of(option("Newsletter Unsubscribes", 1234L)), result);
+        assertEquals("/asm/groups", stringArgumentCaptor.getValue());
     }
 }

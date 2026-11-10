@@ -22,6 +22,10 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.sendgrid.action.SendgridCreateSingleSendAction;
+import com.bytechef.component.sendgrid.action.SendgridListContactListsAction;
+import com.bytechef.component.sendgrid.action.SendgridListSendersAction;
+import com.bytechef.component.sendgrid.action.SendgridScheduleSingleSendAction;
 import com.bytechef.component.sendgrid.action.SendgridSendDynamicTemplateAction;
 import com.bytechef.component.sendgrid.action.SendgridSendEmailAction;
 import com.bytechef.component.sendgrid.connection.SendgridConnection;
@@ -43,10 +47,18 @@ public class SendgridComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.MARKETING_AUTOMATION)
         .actions(
             SendgridSendEmailAction.ACTION_DEFINITION,
-            SendgridSendDynamicTemplateAction.ACTION_DEFINITION)
+            SendgridSendDynamicTemplateAction.ACTION_DEFINITION,
+            SendgridListContactListsAction.ACTION_DEFINITION,
+            SendgridListSendersAction.ACTION_DEFINITION,
+            SendgridCreateSingleSendAction.ACTION_DEFINITION,
+            SendgridScheduleSingleSendAction.ACTION_DEFINITION)
         .clusterElements(
             tool(SendgridSendEmailAction.ACTION_DEFINITION),
-            tool(SendgridSendDynamicTemplateAction.ACTION_DEFINITION))
+            tool(SendgridSendDynamicTemplateAction.ACTION_DEFINITION),
+            tool(SendgridListContactListsAction.ACTION_DEFINITION),
+            tool(SendgridListSendersAction.ACTION_DEFINITION),
+            tool(SendgridCreateSingleSendAction.ACTION_DEFINITION),
+            tool(SendgridScheduleSingleSendAction.ACTION_DEFINITION))
         .version(1);
 
     @Override
