@@ -35,13 +35,13 @@ const WorkflowsSidebarListItem = ({
         >
             <div
                 aria-current={active || undefined}
-                className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 overflow-hidden rounded-md py-3 pl-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md py-3 pl-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                 onClick={onClick}
                 onKeyDown={handleKeyDown}
                 role="button"
                 tabIndex={0}
             >
-                <WorkflowIcon aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-content-neutral-secondary" />
+                <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
 
                 <Tooltip>
                     <TooltipTrigger asChild>
