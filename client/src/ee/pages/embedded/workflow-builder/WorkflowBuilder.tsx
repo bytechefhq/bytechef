@@ -105,7 +105,7 @@ const WorkflowBuilder = () => {
                                 webhookTriggerTestApi: new WebhookTriggerTestApi(),
                             }}
                         >
-                            {projectId && (
+                            {!!projectId && (
                                 <WorkflowEditorLayout
                                     includeComponents={includeComponents}
                                     runDisabled={runDisabled}

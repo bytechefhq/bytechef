@@ -79,7 +79,7 @@ const Integration = () => {
             </div>
 
             <div className="flex w-full flex-col">
-                {integrationId && (
+                {!!integrationId && (
                     <IntegrationHeader
                         bottomResizablePanelRef={bottomResizablePanelRef}
                         chatTrigger={chatTrigger}
@@ -111,7 +111,7 @@ const Integration = () => {
                                     webhookTriggerTestApi: new WebhookTriggerTestApi(),
                                 }}
                             >
-                                {integrationId && (
+                                {!!integrationId && (
                                     <WorkflowEditorLayout
                                         internalOnlyVisible={true}
                                         leftSidebarOpen={leftSidebarOpen}

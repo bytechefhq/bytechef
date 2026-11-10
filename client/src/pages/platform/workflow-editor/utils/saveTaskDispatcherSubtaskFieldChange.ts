@@ -54,8 +54,8 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
 
     const {componentName, workflowNodeName} = currentNode;
 
-    const taskDispatcherDataKey = Object.values(TASK_DISPATCHER_DATA_KEY_MAP).find(
-        (dataKey) => dataKey && dataKey in currentNode && currentNode[dataKey as keyof typeof currentNode]
+    const taskDispatcherDataKey = Object.values(TASK_DISPATCHER_DATA_KEY_MAP).find((dataKey) =>
+        Boolean(dataKey && dataKey in currentNode && currentNode[dataKey as keyof typeof currentNode])
     );
 
     let taskDispatcherContext: TaskDispatcherContextType | undefined = undefined;

@@ -80,7 +80,7 @@ const Project = () => {
             </div>
 
             <div className="flex w-full flex-col">
-                {projectId && (
+                {!!projectId && (
                     <ProjectHeader
                         bottomResizablePanelRef={bottomResizablePanelRef}
                         chatTrigger={chatTrigger}
@@ -112,7 +112,7 @@ const Project = () => {
                                     webhookTriggerTestApi: new WebhookTriggerTestApi(),
                                 }}
                             >
-                                {projectId && (
+                                {!!projectId && (
                                     <WorkflowEditorLayout
                                         enableUndoRedo={true}
                                         leftSidebarOpen={projectLeftSidebarOpen}
