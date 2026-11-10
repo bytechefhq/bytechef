@@ -17,10 +17,15 @@
 package com.bytechef.component.facebook.pages;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.facebook.pages.action.FacebookPagesCreatePhotoPostAction;
+import com.bytechef.component.facebook.pages.action.FacebookPagesCreatePostAction;
+import com.bytechef.component.facebook.pages.action.FacebookPagesCreateVideoPostAction;
+import com.bytechef.component.facebook.pages.action.FacebookPagesGetCommentsAction;
 import com.bytechef.component.facebook.pages.connection.FacebookPagesConnection;
 import com.google.auto.service.AutoService;
 
@@ -40,6 +45,16 @@ public final class FacebookPagesComponentHandler implements ComponentHandler {
         .icon("path:assets/facebook-pages.svg")
         .categories(ComponentCategory.SOCIAL_MEDIA, ComponentCategory.MARKETING_AUTOMATION)
         .connection(FacebookPagesConnection.CONNECTION_DEFINITION)
+        .actions(
+            FacebookPagesCreatePostAction.ACTION_DEFINITION,
+            FacebookPagesCreatePhotoPostAction.ACTION_DEFINITION,
+            FacebookPagesCreateVideoPostAction.ACTION_DEFINITION,
+            FacebookPagesGetCommentsAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(FacebookPagesCreatePostAction.ACTION_DEFINITION),
+            tool(FacebookPagesCreatePhotoPostAction.ACTION_DEFINITION),
+            tool(FacebookPagesCreateVideoPostAction.ACTION_DEFINITION),
+            tool(FacebookPagesGetCommentsAction.ACTION_DEFINITION))
         .version(1);
 
     @Override

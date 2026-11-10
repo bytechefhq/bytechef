@@ -115,8 +115,8 @@ public class FacebookPagesUtils {
     }
 
     private static String getErrorMessage(Map<String, Object> body) {
-        if (body != null && body.get("error") instanceof Map<?, ?> error && error.get(MESSAGE) instanceof String
-            message) {
+        if (body != null && body.get("error") instanceof Map<?, ?> error
+            && error.get(MESSAGE) instanceof String message) {
 
             return message;
         }
