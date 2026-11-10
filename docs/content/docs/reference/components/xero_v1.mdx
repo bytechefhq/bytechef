@@ -109,6 +109,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| InvoiceID | STRING | ID of the invoice. |
+| InvoiceNumber | STRING | Number of the invoice. |
 | Type | STRING | Type of the invoice. |
 | Contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)&#125; </details> | Contact associated with the invoice. |
 | DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
@@ -117,6 +119,13 @@ Type: OBJECT
 | LineAmountTypes | STRING | Line Amount Type |
 | LineItems | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)&#125;] </details> | Line items on the invoice. |
 | CurrencyCode | STRING | The currency that invoice has been raised in. |
+| Reference | STRING | Reference number of the invoice. |
+| SubTotal | NUMBER | Total of the invoice excluding taxes. |
+| TotalTax | NUMBER | Total tax on the invoice. |
+| Total | NUMBER | Total of the invoice including taxes. |
+| AmountDue | NUMBER | Amount remaining to be paid on the invoice. |
+| AmountPaid | NUMBER | Sum of payments received for the invoice. |
+| UpdatedDateUTC | STRING | Last modified date of the invoice in UTC. |
 
 
 
@@ -124,6 +133,8 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "InvoiceID" : "",
+  "InvoiceNumber" : "",
   "Type" : "",
   "Contact" : {
     "ContactID" : "",
@@ -139,7 +150,14 @@ Type: OBJECT
     "Quantity" : 1,
     "UnitAmount" : 0.0
   } ],
-  "CurrencyCode" : ""
+  "CurrencyCode" : "",
+  "Reference" : "",
+  "SubTotal" : 0.0,
+  "TotalTax" : 0.0,
+  "Total" : 0.0,
+  "AmountDue" : 0.0,
+  "AmountPaid" : 0.0,
+  "UpdatedDateUTC" : ""
 }
 ```
 
@@ -310,6 +328,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| InvoiceID | STRING | ID of the invoice. |
+| InvoiceNumber | STRING | Number of the invoice. |
 | Type | STRING | Type of the invoice. |
 | Contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)&#125; </details> | Contact associated with the invoice. |
 | DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
@@ -318,6 +338,13 @@ Type: OBJECT
 | LineAmountTypes | STRING | Line Amount Type |
 | LineItems | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)&#125;] </details> | Line items on the invoice. |
 | CurrencyCode | STRING | The currency that invoice has been raised in. |
+| Reference | STRING | Reference number of the invoice. |
+| SubTotal | NUMBER | Total of the invoice excluding taxes. |
+| TotalTax | NUMBER | Total tax on the invoice. |
+| Total | NUMBER | Total of the invoice including taxes. |
+| AmountDue | NUMBER | Amount remaining to be paid on the invoice. |
+| AmountPaid | NUMBER | Sum of payments received for the invoice. |
+| UpdatedDateUTC | STRING | Last modified date of the invoice in UTC. |
 
 
 
@@ -325,6 +352,8 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "InvoiceID" : "",
+  "InvoiceNumber" : "",
   "Type" : "",
   "Contact" : {
     "ContactID" : "",
@@ -340,7 +369,14 @@ Type: OBJECT
     "Quantity" : 1,
     "UnitAmount" : 0.0
   } ],
-  "CurrencyCode" : ""
+  "CurrencyCode" : "",
+  "Reference" : "",
+  "SubTotal" : 0.0,
+  "TotalTax" : 0.0,
+  "Total" : 0.0,
+  "AmountDue" : 0.0,
+  "AmountPaid" : 0.0,
+  "UpdatedDateUTC" : ""
 }
 ```
 
@@ -459,6 +495,197 @@ Type: OBJECT
 
 
 
+### Get Invoice
+Name: getInvoice
+
+`Gets an invoice by its ID or number.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| InvoiceID | Invoice ID | STRING | ID or number of the invoice to get. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Invoice",
+  "name" : "getInvoice",
+  "parameters" : {
+    "InvoiceID" : ""
+  },
+  "type" : "xero/v1/getInvoice"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| InvoiceID | STRING | ID of the invoice. |
+| InvoiceNumber | STRING | Number of the invoice. |
+| Type | STRING | Type of the invoice. |
+| Contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)&#125; </details> | Contact associated with the invoice. |
+| DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
+| DueDateString | STRING | Due date of the invoice – YYYY-MM-DDThh-mm-ss |
+| Status | STRING | Status of the invoice. |
+| LineAmountTypes | STRING | Line Amount Type |
+| LineItems | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)&#125;] </details> | Line items on the invoice. |
+| CurrencyCode | STRING | The currency that invoice has been raised in. |
+| Reference | STRING | Reference number of the invoice. |
+| SubTotal | NUMBER | Total of the invoice excluding taxes. |
+| TotalTax | NUMBER | Total tax on the invoice. |
+| Total | NUMBER | Total of the invoice including taxes. |
+| AmountDue | NUMBER | Amount remaining to be paid on the invoice. |
+| AmountPaid | NUMBER | Sum of payments received for the invoice. |
+| UpdatedDateUTC | STRING | Last modified date of the invoice in UTC. |
+
+
+
+
+#### Output Example
+```json
+{
+  "InvoiceID" : "",
+  "InvoiceNumber" : "",
+  "Type" : "",
+  "Contact" : {
+    "ContactID" : "",
+    "Name" : "",
+    "EmailAddress" : ""
+  },
+  "DateString" : "",
+  "DueDateString" : "",
+  "Status" : "",
+  "LineAmountTypes" : "",
+  "LineItems" : [ {
+    "Description" : "",
+    "Quantity" : 1,
+    "UnitAmount" : 0.0
+  } ],
+  "CurrencyCode" : "",
+  "Reference" : "",
+  "SubTotal" : 0.0,
+  "TotalTax" : 0.0,
+  "Total" : 0.0,
+  "AmountDue" : 0.0,
+  "AmountPaid" : 0.0,
+  "UpdatedDateUTC" : ""
+}
+```
+
+
+
+
+### List Invoices
+Name: listInvoices
+
+`Lists invoices, optionally filtered by status, contact, date range and modification date.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| Statuses | Statuses | ARRAY <details> <summary> Items </summary> [STRING] </details> | Only return invoices with one of these statuses. | false |
+| ContactIDs | Contact IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | Only return invoices for these contacts. | false |
+| dateFrom | Date From | DATE | Only return invoices dated on or after this date. | false |
+| dateTo | Date To | DATE | Only return invoices dated on or before this date. | false |
+| modifiedSince | Modified Since | DATE_TIME | Only return invoices created or modified since this date and time (UTC). | false |
+| page | Page | INTEGER | Page of results to return. Each page contains up to 100 invoices. Defaults to 1. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Invoices",
+  "name" : "listInvoices",
+  "parameters" : {
+    "Statuses" : [ "" ],
+    "ContactIDs" : [ "" ],
+    "dateFrom" : "2021-01-01",
+    "dateTo" : "2021-01-01",
+    "modifiedSince" : "2021-01-01T00:00:00",
+    "page" : 1
+  },
+  "type" : "xero/v1/listInvoices"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| InvoiceID | STRING | ID of the invoice. |
+| InvoiceNumber | STRING | Number of the invoice. |
+| Type | STRING | Type of the invoice. |
+| Contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)&#125; </details> | Contact associated with the invoice. |
+| DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
+| DueDateString | STRING | Due date of the invoice – YYYY-MM-DDThh-mm-ss |
+| Status | STRING | Status of the invoice. |
+| LineAmountTypes | STRING | Line Amount Type |
+| LineItems | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)&#125;] </details> | Line items on the invoice. |
+| CurrencyCode | STRING | The currency that invoice has been raised in. |
+| Reference | STRING | Reference number of the invoice. |
+| SubTotal | NUMBER | Total of the invoice excluding taxes. |
+| TotalTax | NUMBER | Total tax on the invoice. |
+| Total | NUMBER | Total of the invoice including taxes. |
+| AmountDue | NUMBER | Amount remaining to be paid on the invoice. |
+| AmountPaid | NUMBER | Sum of payments received for the invoice. |
+| UpdatedDateUTC | STRING | Last modified date of the invoice in UTC. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "InvoiceID" : "",
+  "InvoiceNumber" : "",
+  "Type" : "",
+  "Contact" : {
+    "ContactID" : "",
+    "Name" : "",
+    "EmailAddress" : ""
+  },
+  "DateString" : "",
+  "DueDateString" : "",
+  "Status" : "",
+  "LineAmountTypes" : "",
+  "LineItems" : [ {
+    "Description" : "",
+    "Quantity" : 1,
+    "UnitAmount" : 0.0
+  } ],
+  "CurrencyCode" : "",
+  "Reference" : "",
+  "SubTotal" : 0.0,
+  "TotalTax" : 0.0,
+  "Total" : 0.0,
+  "AmountDue" : 0.0,
+  "AmountPaid" : 0.0,
+  "UpdatedDateUTC" : ""
+} ]
+```
+
+
+
+
 
 ## Triggers
 
@@ -488,6 +715,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| InvoiceID | STRING | ID of the invoice. |
+| InvoiceNumber | STRING | Number of the invoice. |
 | Type | STRING | Type of the invoice. |
 | Contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)&#125; </details> | Contact associated with the invoice. |
 | DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
@@ -496,6 +725,13 @@ Type: OBJECT
 | LineAmountTypes | STRING | Line Amount Type |
 | LineItems | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)&#125;] </details> | Line items on the invoice. |
 | CurrencyCode | STRING | The currency that invoice has been raised in. |
+| Reference | STRING | Reference number of the invoice. |
+| SubTotal | NUMBER | Total of the invoice excluding taxes. |
+| TotalTax | NUMBER | Total tax on the invoice. |
+| Total | NUMBER | Total of the invoice including taxes. |
+| AmountDue | NUMBER | Amount remaining to be paid on the invoice. |
+| AmountPaid | NUMBER | Sum of payments received for the invoice. |
+| UpdatedDateUTC | STRING | Last modified date of the invoice in UTC. |
 
 
 
@@ -594,6 +830,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
+| InvoiceID | STRING | ID of the invoice. |
+| InvoiceNumber | STRING | Number of the invoice. |
 | Type | STRING | Type of the invoice. |
 | Contact | OBJECT <details> <summary> Properties </summary> &#123;STRING\(ContactID), STRING\(Name), STRING\(EmailAddress)&#125; </details> | Contact associated with the invoice. |
 | DateString | STRING | Date of the invoice – YYYY-MM-DDThh-mm-ss |
@@ -602,6 +840,13 @@ Type: OBJECT
 | LineAmountTypes | STRING | Line Amount Type |
 | LineItems | ARRAY <details> <summary> Items </summary> [&#123;STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount)&#125;] </details> | Line items on the invoice. |
 | CurrencyCode | STRING | The currency that invoice has been raised in. |
+| Reference | STRING | Reference number of the invoice. |
+| SubTotal | NUMBER | Total of the invoice excluding taxes. |
+| TotalTax | NUMBER | Total tax on the invoice. |
+| Total | NUMBER | Total of the invoice including taxes. |
+| AmountDue | NUMBER | Amount remaining to be paid on the invoice. |
+| AmountPaid | NUMBER | Sum of payments received for the invoice. |
+| UpdatedDateUTC | STRING | Last modified date of the invoice in UTC. |
 
 
 
