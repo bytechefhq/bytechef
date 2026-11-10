@@ -1,4 +1,5 @@
 import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
+import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import KnowledgeBaseHeader from '../KnowledgeBaseHeader';
@@ -18,21 +19,37 @@ afterEach(() => {
     vi.clearAllMocks();
 });
 
+const renderKnowledgeBaseHeader = (knowledgeBaseName: string | undefined) =>
+    render(
+        <MemoryRouter>
+            <KnowledgeBaseHeader knowledgeBaseName={knowledgeBaseName} />
+        </MemoryRouter>
+    );
+
 describe('KnowledgeBaseHeader', () => {
+    it('renders a breadcrumb link to the knowledge bases list page', () => {
+        renderKnowledgeBaseHeader('Test KB');
+
+        expect(screen.getByRole('link', {name: 'Knowledge Bases'})).toHaveAttribute(
+            'href',
+            '/automation/knowledge-bases'
+        );
+    });
+
     it('renders header component', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" />);
+        renderKnowledgeBaseHeader('Test KB');
 
         expect(screen.getByTestId('header')).toBeInTheDocument();
     });
 
     it('renders knowledge base name', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" />);
+        renderKnowledgeBaseHeader('Test KB');
 
         expect(screen.getByText('Test KB')).toBeInTheDocument();
     });
 
     it('renders Loading... when name is undefined', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName={undefined} />);
+        renderKnowledgeBaseHeader(undefined);
 
         expect(screen.getByText('Loading...')).toBeInTheDocument();
     });
@@ -40,7 +57,7 @@ describe('KnowledgeBaseHeader', () => {
     // The sidebar lists every knowledge base and the header carries the sidebar toggle, so a back arrow would
     // only duplicate a one-click way back.
     it('renders no back button', () => {
-        render(<KnowledgeBaseHeader knowledgeBaseName="Test KB" />);
+        renderKnowledgeBaseHeader('Test KB');
 
         expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });

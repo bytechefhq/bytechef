@@ -1,4 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Breadcrumb, BreadcrumbItem, BreadcrumbList} from '@/components/ui/breadcrumb';
+import ListPageBreadcrumbItem from '@/shared/components/ListPageBreadcrumbItem';
 import Header from '@/shared/layout/Header';
 import {Trash2} from 'lucide-react';
 
@@ -36,9 +38,15 @@ const DataTableHeader = () => {
                 </div>
             }
             title={
-                <div className="flex items-center gap-2">
-                    <span className="font-semibold">{dataTable?.baseName}</span>
-                </div>
+                <Breadcrumb className="min-w-0">
+                    <BreadcrumbList className="flex-nowrap">
+                        <ListPageBreadcrumbItem label="Data Tables" to="/automation/datatables" />
+
+                        <BreadcrumbItem className="min-w-0 text-content-neutral-primary">
+                            <h1 className="truncate font-semibold">{dataTable?.baseName}</h1>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
             }
         />
     );
