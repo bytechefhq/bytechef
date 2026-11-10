@@ -1,8 +1,9 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import AutomationWorkflowEditorBreadcrumb from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorBreadcrumb';
-import {render, screen} from '@/shared/util/test-utils';
+import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {ComponentProps} from 'react';
-import {expect, it} from 'vitest';
+import {MemoryRouter} from 'react-router-dom';
+import {expect, it, vi} from 'vitest';
 
 type ProjectPropType = ComponentProps<typeof AutomationWorkflowEditorBreadcrumb>['project'];
 
@@ -17,9 +18,11 @@ const draftProject = {
 
 it('shows the project title with its draft version and status', () => {
     render(
-        <TooltipProvider>
-            <AutomationWorkflowEditorBreadcrumb project={draftProject} />
-        </TooltipProvider>
+        <MemoryRouter>
+            <TooltipProvider>
+                <AutomationWorkflowEditorBreadcrumb project={draftProject} />
+            </TooltipProvider>
+        </MemoryRouter>
     );
 
     expect(screen.getByRole('heading', {name: 'Mailing'})).toBeInTheDocument();
@@ -27,36 +30,101 @@ it('shows the project title with its draft version and status', () => {
     expect(screen.getByText('DRAFT')).toBeInTheDocument();
 });
 
-it('shows the last published version of a published project', () => {
+it('shows the draft being edited, not the last published version, of a published project', () => {
     render(
-        <TooltipProvider>
-            <AutomationWorkflowEditorBreadcrumb
-                project={{...draftProject, lastPublishedVersion: 2, published: true} as never as ProjectPropType}
-            />
-        </TooltipProvider>
+        <MemoryRouter>
+            <TooltipProvider>
+                <AutomationWorkflowEditorBreadcrumb
+                    project={{...draftProject, lastPublishedVersion: 2, published: true} as never as ProjectPropType}
+                />
+            </TooltipProvider>
+        </MemoryRouter>
     );
 
-    expect(screen.getByText('V2')).toBeInTheDocument();
-    expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+    expect(screen.getByText('V3')).toBeInTheDocument();
+    expect(screen.getByText('DRAFT')).toBeInTheDocument();
+    expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
 });
 
 it('shows the item switcher after a separator when one is given', () => {
     render(
-        <TooltipProvider>
-            <AutomationWorkflowEditorBreadcrumb itemSelect={<button>Mailer</button>} project={draftProject} />
-        </TooltipProvider>
+        <MemoryRouter>
+            <TooltipProvider>
+                <AutomationWorkflowEditorBreadcrumb itemSelect={<button>Mailer</button>} project={draftProject} />
+            </TooltipProvider>
+        </MemoryRouter>
     );
 
     expect(screen.getByRole('button', {name: 'Mailer'})).toBeInTheDocument();
-    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
 });
 
 it('omits the separator and switcher without an item switcher', () => {
     render(
-        <TooltipProvider>
-            <AutomationWorkflowEditorBreadcrumb project={draftProject} />
-        </TooltipProvider>
+        <MemoryRouter>
+            <TooltipProvider>
+                <AutomationWorkflowEditorBreadcrumb project={draftProject} />
+            </TooltipProvider>
+        </MemoryRouter>
     );
 
-    expect(screen.getAllByRole('listitem')).toHaveLength(1);
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+});
+
+it('links back to the Automations list page first', () => {
+    render(
+        <MemoryRouter>
+            <TooltipProvider>
+                <AutomationWorkflowEditorBreadcrumb project={draftProject} />
+            </TooltipProvider>
+        </MemoryRouter>
+    );
+
+    expect(screen.getByRole('link', {name: 'Automations'})).toHaveAttribute('href', '/embedded/automation-workflows');
+    expect(screen.getAllByRole('listitem')[0]).toHaveTextContent('Automations');
+});
+
+it('switches to another project from the title select', async () => {
+    const onProjectValueChange = vi.fn();
+
+    render(
+        <MemoryRouter>
+            <TooltipProvider>
+                <AutomationWorkflowEditorBreadcrumb
+                    onProjectValueChange={onProjectValueChange}
+                    project={draftProject}
+                    projects={[
+                        {...draftProject, workflowTemplates: [{workflowUuid: 'uuid-1'}]} as never as ProjectPropType,
+                        {
+                            ...draftProject,
+                            id: 'project-2',
+                            lastPublishedVersion: 4,
+                            name: 'Billing',
+                            workflowTemplates: [{workflowUuid: 'uuid-2'}],
+                        } as never as ProjectPropType,
+                        {
+                            ...draftProject,
+                            id: 'project-3',
+                            name: 'Empty',
+                            workflowTemplates: [],
+                        } as never as ProjectPropType,
+                    ]}
+                />
+            </TooltipProvider>
+        </MemoryRouter>
+    );
+
+    await userEvent.click(screen.getByLabelText('Project select'));
+
+    expect(screen.getByRole('menuitemradio', {name: 'Mailing'})).toHaveAttribute('data-state', 'checked');
+    expect(screen.getByRole('menuitemradio', {name: 'Empty'})).toHaveAttribute('data-disabled');
+
+    expect(screen.getByRole('menuitemradio', {name: /Billing/})).toContainElement(
+        screen.getByRole('img', {name: 'Published V4'})
+    );
+    expect(screen.getAllByRole('img', {name: /Published/})).toHaveLength(1);
+
+    await userEvent.click(screen.getByRole('menuitemradio', {name: /Billing/}));
+
+    expect(onProjectValueChange).toHaveBeenCalledWith('project-2');
 });

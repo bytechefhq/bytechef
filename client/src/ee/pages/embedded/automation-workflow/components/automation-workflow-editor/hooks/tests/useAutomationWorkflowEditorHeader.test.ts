@@ -14,7 +14,17 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useAutomationWorkflowProjectsQuery: () => ({
-        data: {automationWorkflowProjects: [{id: 'project-1', name: 'Mailing', workflowTemplates: []}]},
+        data: {
+            automationWorkflowProjects: [
+                {id: 'project-1', name: 'Mailing', workflowTemplates: [{workflowUuid: 'workflow-1'}]},
+                {
+                    id: 'project-2',
+                    name: 'Billing',
+                    workflowTemplates: [{workflowUuid: 'workflow-21'}, {workflowUuid: 'workflow-22'}],
+                },
+                {id: 'project-3', name: 'Empty', workflowTemplates: []},
+            ],
+        },
     }),
     usePublishAutomationWorkflowProjectMutation: () => ({isPending: false, mutate: hoisted.publishMutate}),
 }));
@@ -91,5 +101,32 @@ describe('useAutomationWorkflowEditorHeader', () => {
         expect(useWorkflowEditorStore.getState().workflowTestExecution).toBe(runningExecution);
         expect(useWorkflowEditorStore.getState().workflowTestNodeStates).toEqual({aiAgent_1: {status: 'RUNNING'}});
         expect(useWorkflowNodeDetailsPanelStore.getState().currentNode).toBe(currentNode);
+    });
+
+    it('opens the first workflow of the selected project', () => {
+        const {result} = renderHook(
+            () => useAutomationWorkflowEditorHeader({bottomResizablePanelRef: {current: null}, projectId: 'project-1'}),
+            {wrapper: createTestQueryClientWrapper()}
+        );
+
+        act(() => {
+            result.current.handleProjectValueChange('project-2');
+        });
+
+        expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/automation-workflows/workflow-21/editor');
+    });
+
+    it('stays on the current workflow when the current project or a project without workflows is selected', () => {
+        const {result} = renderHook(
+            () => useAutomationWorkflowEditorHeader({bottomResizablePanelRef: {current: null}, projectId: 'project-1'}),
+            {wrapper: createTestQueryClientWrapper()}
+        );
+
+        act(() => {
+            result.current.handleProjectValueChange('project-1');
+            result.current.handleProjectValueChange('project-3');
+        });
+
+        expect(hoisted.navigate).not.toHaveBeenCalled();
     });
 });

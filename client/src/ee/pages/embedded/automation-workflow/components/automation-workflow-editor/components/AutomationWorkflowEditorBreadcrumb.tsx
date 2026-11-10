@@ -1,50 +1,75 @@
 import Badge from '@/components/Badge/Badge';
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator} from '@/components/ui/breadcrumb';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import BreadcrumbTitleSelect from '@/shared/components/BreadcrumbTitleSelect';
+import ListPageBreadcrumbItem from '@/shared/components/ListPageBreadcrumbItem';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {ReactNode} from 'react';
+import {FolderIcon} from 'lucide-react';
+import {ReactNode, useMemo} from 'react';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
 
 interface AutomationWorkflowEditorBreadcrumbProps {
     itemSelect?: ReactNode;
+    onProjectValueChange?: (projectId: string) => void;
     project: AutomationWorkflowProjectType;
+    projects?: AutomationWorkflowProjectType[];
 }
 
-const AutomationWorkflowEditorBreadcrumb = ({itemSelect, project}: AutomationWorkflowEditorBreadcrumbProps) => (
-    <Breadcrumb>
-        <BreadcrumbList>
-            <BreadcrumbItem>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <div className="flex max-w-96 items-center space-x-2">
-                            <h1 className="truncate">{project.name}</h1>
+const AutomationWorkflowEditorBreadcrumb = ({
+    itemSelect,
+    onProjectValueChange,
+    project,
+    projects,
+}: AutomationWorkflowEditorBreadcrumbProps) => {
+    const items = useMemo(
+        () =>
+            projects?.map((automationWorkflowProject) => ({
+                disabled: automationWorkflowProject.workflowTemplates.length === 0,
+                id: automationWorkflowProject.id,
+                name: automationWorkflowProject.name,
+                publishedVersion: automationWorkflowProject.lastPublishedVersion ?? undefined,
+            })),
+        [projects]
+    );
 
+    return (
+        <Breadcrumb className="min-w-0">
+            <BreadcrumbList className="flex-nowrap">
+                <ListPageBreadcrumbItem label="Automations" to="/embedded/automation-workflows" />
+
+                <BreadcrumbItem className="min-w-0">
+                    <BreadcrumbTitleSelect
+                        ariaLabel="Project select"
+                        badge={
                             <Badge
-                                className="flex space-x-1 border-transparent"
-                                styleType={project.published ? 'success-outline' : 'secondary-filled'}
+                                className="flex shrink-0 space-x-1 border-transparent"
+                                styleType="secondary-filled"
                                 weight="semibold"
                             >
-                                <span>V{project.published ? project.lastPublishedVersion : project.version}</span>
+                                <span>V{project.version}</span>
 
-                                <span>{project.published ? 'PUBLISHED' : 'DRAFT'}</span>
+                                <span>DRAFT</span>
                             </Badge>
-                        </div>
-                    </TooltipTrigger>
+                        }
+                        currentId={project.id}
+                        icon={FolderIcon}
+                        items={items}
+                        menuLabel="Projects"
+                        name={project.name}
+                        onValueChange={onProjectValueChange}
+                    />
+                </BreadcrumbItem>
 
-                    {project.name.length > 43 && <TooltipContent>{project.name}</TooltipContent>}
-                </Tooltip>
-            </BreadcrumbItem>
+                {itemSelect && (
+                    <>
+                        <BreadcrumbSeparator />
 
-            {itemSelect && (
-                <>
-                    <BreadcrumbSeparator />
-
-                    <BreadcrumbItem>{itemSelect}</BreadcrumbItem>
-                </>
-            )}
-        </BreadcrumbList>
-    </Breadcrumb>
-);
+                        <BreadcrumbItem className="min-w-0">{itemSelect}</BreadcrumbItem>
+                    </>
+                )}
+            </BreadcrumbList>
+        </Breadcrumb>
+    );
+};
 
 export default AutomationWorkflowEditorBreadcrumb;

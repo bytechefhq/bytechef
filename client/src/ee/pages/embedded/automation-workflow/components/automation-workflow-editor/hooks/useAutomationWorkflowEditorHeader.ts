@@ -94,6 +94,23 @@ export const useAutomationWorkflowEditorHeader = ({
         navigate('/embedded/automation-workflows/' + workflowUuid + '/editor');
     };
 
+    const handleProjectValueChange = (selectedProjectId: string) => {
+        if (selectedProjectId === projectId) {
+            return;
+        }
+
+        const selectedProject = projects.find(
+            (automationWorkflowProject) => automationWorkflowProject.id === selectedProjectId
+        );
+        const firstWorkflowUuid = selectedProject?.workflowTemplates[0]?.workflowUuid;
+
+        if (!firstWorkflowUuid) {
+            return;
+        }
+
+        handleWorkflowValueChange(firstWorkflowUuid);
+    };
+
     const handleRunClick = useCallback(() => {
         setShowBottomPanelOpen(true);
         setWorkflowTestExecution(undefined);
@@ -196,12 +213,14 @@ export const useAutomationWorkflowEditorHeader = ({
     }, [workflowTestStreamError, persistJobId, setWorkflowIsRunning, setStreamRequest]);
 
     return {
+        handleProjectValueChange,
         handlePublishProjectSubmit,
         handleRunClick,
         handleShowOutputClick,
         handleStopClick,
         handleWorkflowValueChange,
         project,
+        projects,
         publishProjectMutationIsPending: publishProjectMutation.isPending,
     };
 };

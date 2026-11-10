@@ -55,7 +55,7 @@ const AutomationWorkflowEditorWorkflowSelect = ({
                 )}
             </Tooltip>
 
-            <DropdownMenuContent align="start" className="max-w-lg min-w-64">
+            <DropdownMenuContent align="start" className="w-80">
                 <DropdownMenuRadioGroup onValueChange={onValueChange} value={currentWorkflowId}>
                     {workflows.length > 0 && (
                         <>
@@ -68,7 +68,7 @@ const AutomationWorkflowEditorWorkflowSelect = ({
                                     <DropdownMenuRadioItem
                                         className="cursor-pointer pl-2 data-[state=checked]:bg-surface-brand-secondary data-[state=checked]:text-content-brand-primary [&>span:first-child]:hidden"
                                         key={workflow.workflowUuid}
-                                        title={workflowLabel.length > 55 ? workflowLabel : undefined}
+                                        title={workflowLabel.length > 30 ? workflowLabel : undefined}
                                         value={workflow.workflowUuid}
                                     >
                                         <WorkflowIcon className="size-4 shrink-0" />
