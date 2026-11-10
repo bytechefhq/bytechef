@@ -28,13 +28,13 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
-import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowTemplateNotVisibleException;
+import com.bytechef.ee.embedded.configuration.exception.AutomationTemplateNotVisibleException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectionNotEntitledException;
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.exception.ProvidedValueLockedException;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
@@ -87,9 +87,9 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 class ConnectedUserProjectWorkflowApiControllerIntTest {
 
     private static final String EXTERNAL_USER_ID = "ext-user-1";
-    private static final String HIDDEN_WORKFLOW_UUID = "hidden-automation-workflow-uuid";
+    private static final String HIDDEN_WORKFLOW_UUID = "hidden-automation-uuid";
     private static final String UNKNOWN_WORKFLOW_UUID = "no-such-uuid";
-    private static final String WORKFLOW_UUID = "automation-workflow-uuid-1";
+    private static final String WORKFLOW_UUID = "automation-uuid-1";
 
     @Autowired
     private ConnectedUserProjectFacade connectedUserProjectFacade;
@@ -98,7 +98,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
 
     @MockitoBean
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @MockitoBean
     private EnvironmentService environmentService;
@@ -355,11 +355,11 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(HIDDEN_WORKFLOW_UUID), any(Environment.class), any(), any()))
                 .thenThrow(
-                    new AutomationWorkflowTemplateNotVisibleException(HIDDEN_WORKFLOW_UUID));
+                    new AutomationTemplateNotVisibleException(HIDDEN_WORKFLOW_UUID));
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(UNKNOWN_WORKFLOW_UUID), any(Environment.class), any(), any()))
                 .thenThrow(
-                    new AutomationWorkflowTemplateNotVisibleException(UNKNOWN_WORKFLOW_UUID));
+                    new AutomationTemplateNotVisibleException(UNKNOWN_WORKFLOW_UUID));
 
         expectFrontendProvisionNotFoundWithoutBody(HIDDEN_WORKFLOW_UUID);
         expectFrontendProvisionNotFoundWithoutBody(UNKNOWN_WORKFLOW_UUID);
@@ -442,11 +442,11 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(HIDDEN_WORKFLOW_UUID), any(Environment.class), any(), any()))
                 .thenThrow(
-                    new AutomationWorkflowTemplateNotVisibleException(HIDDEN_WORKFLOW_UUID));
+                    new AutomationTemplateNotVisibleException(HIDDEN_WORKFLOW_UUID));
         when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
             eq(EXTERNAL_USER_ID), eq(UNKNOWN_WORKFLOW_UUID), any(Environment.class), any(), any()))
                 .thenThrow(
-                    new AutomationWorkflowTemplateNotVisibleException(UNKNOWN_WORKFLOW_UUID));
+                    new AutomationTemplateNotVisibleException(UNKNOWN_WORKFLOW_UUID));
 
         expectProvisionNotFoundWithoutBody(HIDDEN_WORKFLOW_UUID);
         expectProvisionNotFoundWithoutBody(UNKNOWN_WORKFLOW_UUID);
@@ -641,7 +641,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
         ConnectedUserProjectWorkflow reference = new ConnectedUserProjectWorkflow();
 
         reference.setId(1L);
-        reference.setAutomationWorkflowUuid(WORKFLOW_UUID);
+        reference.setAutomationUuid(WORKFLOW_UUID);
 
         Workflow workflow = new Workflow(
             WORKFLOW_UUID, JsonUtils.write(Map.of("label", "Sync leads", "description", "d")), Workflow.Format.JSON);
@@ -874,7 +874,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
         ConnectedUserProjectWorkflow reference = new ConnectedUserProjectWorkflow();
 
         reference.setId(1L);
-        reference.setAutomationWorkflowUuid(WORKFLOW_UUID);
+        reference.setAutomationUuid(WORKFLOW_UUID);
 
         Workflow workflow = new Workflow(
             WORKFLOW_UUID, JsonUtils.write(Map.of("label", "Summarize Email", "description", "d")),

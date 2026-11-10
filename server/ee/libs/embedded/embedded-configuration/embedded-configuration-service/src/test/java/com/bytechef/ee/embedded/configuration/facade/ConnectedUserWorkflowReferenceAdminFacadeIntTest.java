@@ -33,10 +33,10 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceDTO;
-import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
+import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
-import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -103,7 +103,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
  */
 @SpringBootTest(
     classes = {
-        AutomationWorkflowProjectFacadeIntTestConfiguration.class,
+        AutomationProjectFacadeIntTestConfiguration.class,
         ConnectedUserWorkflowReferenceAdminFacadeIntTest.ConnectedUserServiceConfiguration.class
     },
     properties = {
@@ -142,13 +142,13 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
         """;
 
     @Autowired
-    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private AutomationProjectConfigurationService automationProjectConfigurationService;
 
     @Autowired
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @MockitoBean
-    private AutomationWorkflowProjectConfigurationUpdatedEventListener automationWorkflowProjectConfigurationUpdatedEventListener;
+    private AutomationProjectConfigurationUpdatedEventListener automationProjectConfigurationUpdatedEventListener;
 
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
@@ -187,17 +187,17 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
 
     @Test
     void testGetReferencesJoinsBackToTheOwningConnectedUserInBatch() {
-        givenSlackAutomationWorkflowEnvironment();
+        givenSlackAutomationEnvironment();
 
-        long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
+        long automationProjectId = automationProjectFacade.createProject(
             "Admin References " + UUID.randomUUID(), "", null, List.of(), null);
 
-        String firstWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
-            automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION, null);
-        String secondWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
-            automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION, null);
+        String firstWorkflowUuid = automationProjectFacade.createProjectWorkflow(
+            automationProjectId, SLACK_WORKFLOW_DEFINITION, null);
+        String secondWorkflowUuid = automationProjectFacade.createProjectWorkflow(
+            automationProjectId, SLACK_WORKFLOW_DEFINITION, null);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser firstConnectedUser = createConnectedUserWithConnection();
         ConnectedUser secondConnectedUser = createConnectedUserWithConnection();
@@ -216,7 +216,7 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
 
         assertThat(result)
             .extracting(
-                ConnectedUserWorkflowReferenceDTO::automationWorkflowUuid,
+                ConnectedUserWorkflowReferenceDTO::automationUuid,
                 ConnectedUserWorkflowReferenceDTO::externalUserId, ConnectedUserWorkflowReferenceDTO::environment,
                 ConnectedUserWorkflowReferenceDTO::enabled, ConnectedUserWorkflowReferenceDTO::dangling,
                 ConnectedUserWorkflowReferenceDTO::danglingReason)
@@ -226,7 +226,7 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
                     null),
                 tuple(
                     secondWorkflowUuid, secondConnectedUser.getExternalId(), Environment.PRODUCTION.name(), false,
-                    true, "Removed from the automation workflow project on redeploy"));
+                    true, "Removed from the automation project on redeploy"));
 
         verify(connectedUserProjectService, times(1)).getConnectedUserProjects(anyList());
         verify(connectedUserService, times(1)).getConnectedUsers(anyList());
@@ -255,7 +255,7 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
         embeddedConnections.put(connectionId, connection);
     }
 
-    private void givenSlackAutomationWorkflowEnvironment() {
+    private void givenSlackAutomationEnvironment() {
         ComponentConnection slot = new ComponentConnection("slack", 1, "postMessage1", "slack", true);
 
         when(componentDefinitionService.getComponentDefinition(anyString(), anyInt()))
@@ -311,14 +311,14 @@ class ConnectedUserWorkflowReferenceAdminFacadeIntTest {
                 .orElseThrow();
 
         storedReference.setDangling(true);
-        storedReference.setDanglingReason("Removed from the automation workflow project on redeploy");
+        storedReference.setDanglingReason("Removed from the automation project on redeploy");
         storedReference.setEnabled(false);
 
         connectedUserProjectWorkflowRepository.save(storedReference);
     }
 
     private void publishAndPinProject(long projectId) {
-        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
-            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, projectId);
+        AutomationProjectConfigurationTestSupport.publishAndPinProject(
+            automationProjectFacade, automationProjectConfigurationService, projectId);
     }
 }

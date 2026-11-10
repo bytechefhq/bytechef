@@ -731,11 +731,11 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testGetWorkflowRejectsAWorkflowOfAnEmbeddedAutomationWorkflowProject() {
+        void testGetWorkflowRejectsAWorkflowOfAnEmbeddedAutomationProject() {
             resolveWorkspace(WORKSPACE_ID);
             mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
 
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
 
             ProjectWorkflowTools tools = newTools();
 
@@ -747,12 +747,12 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testGetWorkflowReadsAWorkflowOfAnEmbeddedAutomationWorkflowProjectWhenTheRunDeclaresItsOwner() {
+        void testGetWorkflowReadsAWorkflowOfAnEmbeddedAutomationProjectWhenTheRunDeclaresItsOwner() {
             resolveWorkspace(WORKSPACE_ID);
             mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
 
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
-            declareProjectOwner(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT.name());
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
+            declareProjectOwner(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT.name());
             when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-1")).thenReturn(buildDto("wf-uuid-1", 55L, 1));
 
             WorkflowInfo workflowInfo = newTools().getWorkflow("wf-uuid-1", null, toolContext);
@@ -778,11 +778,11 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testGetWorkflowRejectsAWorkflowOfAnEmbeddedAutomationWorkflowProjectWhenTheDeclaredOwnerIsUnknown() {
+        void testGetWorkflowRejectsAWorkflowOfAnEmbeddedAutomationProjectWhenTheDeclaredOwnerIsUnknown() {
             resolveWorkspace(WORKSPACE_ID);
             mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
 
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
             declareProjectOwner("UNKNOWN_OWNER");
 
             ProjectWorkflowTools tools = newTools();
@@ -868,10 +868,10 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testListWorkflowsRejectsAnEmbeddedAutomationWorkflowProject() {
+        void testListWorkflowsRejectsAnEmbeddedAutomationProject() {
             resolveWorkspace(WORKSPACE_ID);
             mockProject(7L, WORKSPACE_ID);
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
 
             ProjectWorkflowTools tools = newTools();
 
@@ -883,11 +883,11 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testListWorkflowsListsAnEmbeddedAutomationWorkflowProjectWhenTheRunDeclaresItsOwner() {
+        void testListWorkflowsListsAnEmbeddedAutomationProjectWhenTheRunDeclaresItsOwner() {
             resolveWorkspace(WORKSPACE_ID);
             mockProject(7L, WORKSPACE_ID);
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
-            declareProjectOwner(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT.name());
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
+            declareProjectOwner(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT.name());
 
             when(projectWorkflowFacade.getProjectWorkflows(7L)).thenReturn(List.of(buildDto("wf-1", 1L, 1)));
 
@@ -912,10 +912,10 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testCreateProjectWorkflowRejectsAnEmbeddedAutomationWorkflowProject() {
+        void testCreateProjectWorkflowRejectsAnEmbeddedAutomationProject() {
             resolveWorkspace(WORKSPACE_ID);
             mockProject(7L, WORKSPACE_ID);
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
 
             ProjectWorkflowTools tools = newTools();
 
@@ -926,11 +926,11 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testCreateProjectWorkflowCreatesAWorkflowInAnEmbeddedAutomationWorkflowProjectWhenTheRunDeclaresItsOwner() {
+        void testCreateProjectWorkflowCreatesAWorkflowInAnEmbeddedAutomationProjectWhenTheRunDeclaresItsOwner() {
             resolveWorkspace(WORKSPACE_ID);
             mockProject(7L, WORKSPACE_ID);
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
-            declareProjectOwner(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT.name());
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
+            declareProjectOwner(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT.name());
 
             when(projectWorkflowFacade.addWorkflow(7L, DEFINITION))
                 .thenReturn(buildProjectWorkflow(55L, 7L, "wf-uuid-1"));
@@ -941,10 +941,10 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testUpdateWorkflowRejectsAWorkflowOfAnEmbeddedAutomationWorkflowProject() {
+        void testUpdateWorkflowRejectsAWorkflowOfAnEmbeddedAutomationProject() {
             resolveWorkspace(WORKSPACE_ID);
             mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
 
             ProjectWorkflowTools tools = newTools();
 
@@ -955,11 +955,11 @@ class ProjectWorkflowToolsTest {
         }
 
         @Test
-        void testUpdateWorkflowUpdatesAWorkflowOfAnEmbeddedAutomationWorkflowProjectWhenTheRunDeclaresItsOwner() {
+        void testUpdateWorkflowUpdatesAWorkflowOfAnEmbeddedAutomationProjectWhenTheRunDeclaresItsOwner() {
             resolveWorkspace(WORKSPACE_ID);
             mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
-            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
-            declareProjectOwner(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT.name());
+            givenOwnedProject(7L, ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
+            declareProjectOwner(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT.name());
 
             when(projectWorkflowFacade.getProjectWorkflow("wf-uuid-1")).thenReturn(buildDto("wf-uuid-1", 55L, 3));
 

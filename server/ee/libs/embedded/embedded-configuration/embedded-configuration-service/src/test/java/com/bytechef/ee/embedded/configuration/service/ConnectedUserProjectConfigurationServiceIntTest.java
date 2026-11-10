@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
-import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -37,7 +37,7 @@ class ConnectedUserProjectConfigurationServiceIntTest {
     private static final long ENVIRONMENT_ID = 0L;
 
     @Autowired
-    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private AutomationProjectConfigurationService automationProjectConfigurationService;
 
     @Autowired
     private ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
@@ -48,8 +48,8 @@ class ConnectedUserProjectConfigurationServiceIntTest {
     @AfterEach
     void afterEach() {
         jdbcTemplate.update("DELETE FROM connected_user_project_configuration");
-        jdbcTemplate.update("DELETE FROM automation_workflow_project_configuration_workflow");
-        jdbcTemplate.update("DELETE FROM automation_workflow_project_configuration");
+        jdbcTemplate.update("DELETE FROM automation_project_configuration_workflow");
+        jdbcTemplate.update("DELETE FROM automation_project_configuration");
         jdbcTemplate.update("DELETE FROM project");
         jdbcTemplate.update("DELETE FROM workspace");
     }
@@ -112,7 +112,7 @@ class ConnectedUserProjectConfigurationServiceIntTest {
     }
 
     private long createConfiguration(long projectId, String name) {
-        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService.create(
+        AutomationProjectConfiguration configuration = automationProjectConfigurationService.create(
             projectId, ENVIRONMENT_ID, name, null, 1, true, true);
 
         return Objects.requireNonNull(configuration.getId());

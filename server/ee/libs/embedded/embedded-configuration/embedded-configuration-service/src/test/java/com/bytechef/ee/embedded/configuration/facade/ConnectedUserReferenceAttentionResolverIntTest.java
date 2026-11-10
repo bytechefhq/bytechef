@@ -33,10 +33,10 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
-import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
+import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
-import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -96,7 +96,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @SpringBootTest(
     classes = {
-        AutomationWorkflowProjectFacadeIntTestConfiguration.class,
+        AutomationProjectFacadeIntTestConfiguration.class,
         ConnectedUserReferenceRolloutManagerIntTest.ConnectedUserServiceConfiguration.class
     },
     properties = {
@@ -137,13 +137,13 @@ class ConnectedUserReferenceAttentionResolverIntTest {
         """;
 
     @Autowired
-    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private AutomationProjectConfigurationService automationProjectConfigurationService;
 
     @Autowired
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @MockitoBean
-    private AutomationWorkflowProjectConfigurationUpdatedEventListener automationWorkflowProjectConfigurationUpdatedEventListener;
+    private AutomationProjectConfigurationUpdatedEventListener automationProjectConfigurationUpdatedEventListener;
 
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
@@ -202,11 +202,11 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
     @Test
     void testDanglingReferenceHasNoInputsAndNoAttentionReason() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Attention Dangling");
+        long automationProjectId = createAutomationProject("Attention Dangling");
 
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUserProjectWorkflow reference = provisionWithInputs(workflowUuid, Map.of("channel", "#a"));
 
@@ -226,15 +226,15 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
     @Test
     void testDeploymentBehindPublishedVersionIsUpdatePendingAndKeepsItsInputs() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Attention Update Pending");
+        long automationProjectId = createAutomationProject("Attention Update Pending");
 
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUserProjectWorkflow reference = provisionWithInputs(workflowUuid, Map.of("channel", "#a"));
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ReferenceState referenceState = connectedUserReferenceAttentionResolver.resolve(reload(reference));
 
@@ -244,11 +244,11 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
     @Test
     void testRequiredSlotWithoutConnectionIsMissingConnection() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Attention Missing Connection");
+        long automationProjectId = createAutomationProject("Attention Missing Connection");
 
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         when(connectedUserConnectionFacade.getConnections(anyLong(), eq("slack"), eq(List.of())))
             .thenReturn(List.of());
@@ -264,11 +264,11 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
     @Test
     void testMissingRequiredInputIsInputRequired() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Attention Missing Input");
+        long automationProjectId = createAutomationProject("Attention Missing Input");
 
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             externalUserId, workflowUuid, Environment.PRODUCTION);
@@ -284,11 +284,11 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
     @Test
     void testMissingDeploymentHasNoInputsAndNoAttentionReason() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Attention Missing Deployment");
+        long automationProjectId = createAutomationProject("Attention Missing Deployment");
 
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUserProjectWorkflow reference = provisionWithInputs(workflowUuid, Map.of("channel", "#a"));
 
@@ -302,11 +302,11 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
     @Test
     void testCompleteReferenceHasNoAttentionReason() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Attention Complete");
+        long automationProjectId = createAutomationProject("Attention Complete");
 
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUserProjectWorkflow reference = provisionWithInputs(workflowUuid, Map.of("channel", "#a"));
 
@@ -316,12 +316,12 @@ class ConnectedUserReferenceAttentionResolverIntTest {
         assertThat(referenceState.inputs()).isEqualTo(Map.of("channel", "#a"));
     }
 
-    private String addWorkflow(long automationWorkflowProjectId, String definition) {
-        return automationWorkflowProjectFacade.createProjectWorkflow(automationWorkflowProjectId, definition, null);
+    private String addWorkflow(long automationProjectId, String definition) {
+        return automationProjectFacade.createProjectWorkflow(automationProjectId, definition, null);
     }
 
-    private long createAutomationWorkflowProject(String name) {
-        return automationWorkflowProjectFacade.createProject(
+    private long createAutomationProject(String name) {
+        return automationProjectFacade.createProject(
             name + " " + UUID.randomUUID(), "", null, List.of(), null);
     }
 
@@ -330,7 +330,7 @@ class ConnectedUserReferenceAttentionResolverIntTest {
 
         return connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())
             .stream()
-            .filter(reference -> Objects.equals(reference.getAutomationWorkflowUuid(), workflowUuid))
+            .filter(reference -> Objects.equals(reference.getAutomationUuid(), workflowUuid))
             .findFirst()
             .orElseThrow();
     }
@@ -378,14 +378,14 @@ class ConnectedUserReferenceAttentionResolverIntTest {
                 .orElseThrow();
 
         storedReference.setDangling(true);
-        storedReference.setDanglingReason("Removed from the automation workflow project on redeploy");
+        storedReference.setDanglingReason("Removed from the automation project on redeploy");
         storedReference.setEnabled(false);
 
         connectedUserProjectWorkflowRepository.save(storedReference);
     }
 
     private void publishAndPinProject(long projectId) {
-        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
-            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, projectId);
+        AutomationProjectConfigurationTestSupport.publishAndPinProject(
+            automationProjectFacade, automationProjectConfigurationService, projectId);
     }
 }

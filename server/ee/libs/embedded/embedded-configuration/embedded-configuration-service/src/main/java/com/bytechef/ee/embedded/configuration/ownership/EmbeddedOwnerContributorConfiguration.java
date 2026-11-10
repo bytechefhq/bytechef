@@ -22,8 +22,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class EmbeddedOwnerContributorConfiguration {
 
-    private static final String AUTOMATION_WORKFLOW_PROJECT_CLAIM_CONDITION =
-        "EXISTS (SELECT 1 FROM automation_workflow_project WHERE automation_workflow_project.project_id = %1$s)";
+    private static final String AUTOMATION_PROJECT_CLAIM_CONDITION =
+        "EXISTS (SELECT 1 FROM automation_project WHERE automation_project.project_id = %1$s)";
     private static final String CONNECTED_USER_CLAIM_CONDITION =
         "EXISTS (SELECT 1 FROM connected_user_project WHERE connected_user_project.project_id = %1$s)";
     private static final String CONNECTED_USER_DEPLOYMENT_CLAIM_CONDITION =
@@ -34,9 +34,9 @@ public class EmbeddedOwnerContributorConfiguration {
             "connected_user_reference_deployment.project_deployment_id = %1$s)";
 
     @Bean
-    ProjectOwnerContributor embeddedAutomationWorkflowProjectOwnerContributor() {
-        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
-            AUTOMATION_WORKFLOW_PROJECT_CLAIM_CONDITION);
+    ProjectOwnerContributor embeddedAutomationProjectOwnerContributor() {
+        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
+            AUTOMATION_PROJECT_CLAIM_CONDITION);
     }
 
     @Bean

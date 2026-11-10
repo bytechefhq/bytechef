@@ -123,8 +123,8 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
             EmbeddedWorkflowExecutionModel.SourceEnum.fromValue(source.name()));
 
         if (source == EmbeddedWorkflowExecutionDTO.Source.AUTOMATION) {
-            embeddedWorkflowExecutionModel.setAutomationWorkflowExecution(
-                embeddedWorkflowExecutionDTO.automationWorkflowExecution());
+            embeddedWorkflowExecutionModel.setAutomationExecution(
+                embeddedWorkflowExecutionDTO.automationExecution());
         } else {
             embeddedWorkflowExecutionModel.setIntegrationWorkflowExecution(
                 conversionService.convert(

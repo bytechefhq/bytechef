@@ -1,5 +1,5 @@
 type ConnectedUserCodeWorkflowReference {
-    automationWorkflowUuid: ID!
+    automationUuid: ID!
     externalUserId: String!
     environment: String!
     enabled: Boolean!
@@ -8,5 +8,5 @@ type ConnectedUserCodeWorkflowReference {
 }
 
 extend type Query {
-    connectedUserCodeWorkflowReferences(automationWorkflowUuids: [ID!]!): [ConnectedUserCodeWorkflowReference!]!
+    connectedUserCodeWorkflowReferences(automationUuids: [ID!]!): [ConnectedUserCodeWorkflowReference!]!
 }

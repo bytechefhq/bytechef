@@ -34,8 +34,8 @@ public class ConnectedUserIntTestConfiguration {
     private static final String MATCH_NOTHING = "%1$s = 0";
 
     @Bean
-    ProjectOwnerContributor embeddedAutomationWorkflowProjectOwnerContributor() {
-        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, MATCH_NOTHING);
+    ProjectOwnerContributor embeddedAutomationProjectOwnerContributor() {
+        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, MATCH_NOTHING);
     }
 
     @Bean

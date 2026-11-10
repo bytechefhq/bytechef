@@ -23,7 +23,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
@@ -1303,7 +1303,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         return StringUtils.isBlank(workflow.getLabel()) ? workflowMapping.workflowUuid() : workflow.getLabel();
     }
 
-    private List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> getMoveImpactWorkflows(
+    private List<AutomationProjectConfigurationVersionImpactDTO.Workflow> getMoveImpactWorkflows(
         List<WorkflowMapping> movingWorkflowMappings, IntegrationInstanceConfiguration targetConfiguration) {
 
         Integration integration = integrationService.getIntegration(targetConfiguration.getIntegrationId());
@@ -1314,7 +1314,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             .filter(workflowMapping -> workflowMapping.targetWorkflow() != null)
             .collect(Collectors.groupingBy(WorkflowMapping::workflowUuid));
 
-        List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> impactedWorkflows = new ArrayList<>();
+        List<AutomationProjectConfigurationVersionImpactDTO.Workflow> impactedWorkflows = new ArrayList<>();
 
         for (Map.Entry<String, List<WorkflowMapping>> entry : workflowMappingsByUuid.entrySet()) {
             List<WorkflowMapping> workflowMappings = entry.getValue();
@@ -1367,7 +1367,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
             if (!affectedConnectedUserIds.isEmpty()) {
                 impactedWorkflows.add(
-                    new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                    new AutomationProjectConfigurationVersionImpactDTO.Workflow(
                         entry.getKey(),
                         StringUtils.isBlank(workflow.getLabel()) ? entry.getKey() : workflow.getLabel(),
                         newRequiredInputs.stream()
@@ -1378,7 +1378,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         }
 
         impactedWorkflows.sort(
-            Comparator.comparing(AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow::label));
+            Comparator.comparing(AutomationProjectConfigurationVersionImpactDTO.Workflow::label));
 
         return impactedWorkflows;
     }

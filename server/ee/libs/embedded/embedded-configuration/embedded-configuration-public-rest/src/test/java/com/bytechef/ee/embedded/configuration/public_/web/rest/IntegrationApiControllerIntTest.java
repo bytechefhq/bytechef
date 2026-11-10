@@ -14,7 +14,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
@@ -50,7 +50,7 @@ class IntegrationApiControllerIntTest {
     private static final String INTEGRATION_PATH = "/v1/{externalUserId}/integrations/{id}";
 
     @MockitoBean
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @Autowired
     private ConnectedUserIntegrationFacade connectedUserIntegrationFacade;

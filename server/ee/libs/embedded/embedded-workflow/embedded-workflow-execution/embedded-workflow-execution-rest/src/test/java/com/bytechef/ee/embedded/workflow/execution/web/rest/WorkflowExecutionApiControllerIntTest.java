@@ -114,13 +114,13 @@ class WorkflowExecutionApiControllerIntTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.totalElements").value(2))
             .andExpect(jsonPath("$.content[0].source").value("AUTOMATION"))
-            .andExpect(jsonPath("$.content[0].automationWorkflowExecution.id").value(5))
-            .andExpect(jsonPath("$.content[0].automationWorkflowExecution.projectVersion").value(2))
+            .andExpect(jsonPath("$.content[0].automationExecution.id").value(5))
+            .andExpect(jsonPath("$.content[0].automationExecution.projectVersion").value(2))
             .andExpect(jsonPath("$.content[0].integrationWorkflowExecution").doesNotExist())
             .andExpect(jsonPath("$.content[1].source").value("INTEGRATION"))
             .andExpect(jsonPath("$.content[1].integrationWorkflowExecution.id").value(6))
             .andExpect(jsonPath("$.content[1].integrationWorkflowExecution.job.status").value("FAILED"))
-            .andExpect(jsonPath("$.content[1].automationWorkflowExecution").doesNotExist());
+            .andExpect(jsonPath("$.content[1].automationExecution").doesNotExist());
     }
 
     @Test

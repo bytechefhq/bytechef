@@ -240,7 +240,7 @@ class RequestTriggerApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "user-1")
-    void testExistingReferenceDispatchesAgainstTheAutomationWorkflowWithAutomationWorkflowExecutionId() {
+    void testExistingReferenceDispatchesAgainstTheAutomationWithAutomationExecutionId() {
         stubConnectedUser("user-1", 1L);
 
         when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("uuid-3"), any()))
@@ -248,8 +248,8 @@ class RequestTriggerApiControllerIntTest {
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor("uuid-3", 42L, true, false)));
         when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("uuid-3")))
-            .thenReturn(Optional.of("automation-workflow-3"));
-        when(workflowService.getWorkflow("automation-workflow-3"))
+            .thenReturn(Optional.of("automation-3"));
+        when(workflowService.getWorkflow("automation-3"))
             .thenReturn(requestTriggerWorkflow("trigger_3"));
 
         expectDispatched(WORKFLOW_PATH, "uuid-3");
@@ -276,12 +276,12 @@ class RequestTriggerApiControllerIntTest {
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor("uuid-30", 44L, true, false)));
         when(projectWorkflowService.getLastPublishedWorkflowId("uuid-30"))
-            .thenReturn("automation-workflow-30-v2");
-        when(workflowService.getWorkflow("automation-workflow-30-v2"))
+            .thenReturn("automation-30-v2");
+        when(workflowService.getWorkflow("automation-30-v2"))
             .thenReturn(new Workflow("{\"label\":\"No Trigger\",\"triggers\":[],\"tasks\":[]}", Workflow.Format.JSON));
         when(projectWorkflowService.fetchProjectWorkflowWorkflowId(44L, "uuid-30"))
-            .thenReturn(Optional.of("automation-workflow-30-v1"));
-        when(workflowService.getWorkflow("automation-workflow-30-v1"))
+            .thenReturn(Optional.of("automation-30-v1"));
+        when(workflowService.getWorkflow("automation-30-v1"))
             .thenReturn(requestTriggerWorkflow("trigger_30"));
 
         expectDispatched(WORKFLOW_PATH, "uuid-30");
@@ -359,8 +359,8 @@ class RequestTriggerApiControllerIntTest {
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
             .thenReturn(List.of(referenceFor("uuid-40", 46L, true, false), referenceFor("uuid-41", 46L, false, false)));
         when(projectWorkflowService.fetchProjectWorkflowWorkflowId(46L, "uuid-40"))
-            .thenReturn(Optional.of("automation-workflow-40"));
-        when(workflowService.getWorkflow("automation-workflow-40"))
+            .thenReturn(Optional.of("automation-40"));
+        when(workflowService.getWorkflow("automation-40"))
             .thenReturn(requestTriggerWorkflow("trigger_40"));
         when(webhookWorkflowExecutor.isWorkflowDisabled(any()))
             .thenReturn(true);
@@ -383,8 +383,8 @@ class RequestTriggerApiControllerIntTest {
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(10L))
             .thenReturn(List.of(referenceFor("uuid-9", 42L, true, false)));
         when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("uuid-9")))
-            .thenReturn(Optional.of("automation-workflow-9"));
-        when(workflowService.getWorkflow("automation-workflow-9"))
+            .thenReturn(Optional.of("automation-9"));
+        when(workflowService.getWorkflow("automation-9"))
             .thenReturn(requestTriggerWorkflow("trigger_9"));
 
         expectDispatched(WORKFLOW_PATH, "uuid-9");
@@ -525,8 +525,8 @@ class RequestTriggerApiControllerIntTest {
             .thenReturn(
                 new ProjectWorkflow(12L, 2, "copy-wf-5", UUID.fromString("00000000-0000-0000-0000-000000000501")));
         when(projectWorkflowService.fetchProjectWorkflowWorkflowId(anyLong(), eq("template-uuid-5")))
-            .thenReturn(Optional.of("automation-workflow-5"));
-        when(workflowService.getWorkflow("automation-workflow-5"))
+            .thenReturn(Optional.of("automation-5"));
+        when(workflowService.getWorkflow("automation-5"))
             .thenReturn(requestTriggerWorkflow("trigger_reference"));
 
         expectDispatched(WORKFLOW_PATH, "template-uuid-5");
@@ -542,7 +542,7 @@ class RequestTriggerApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "user-1")
-    void testAutomationWorkflowUuidOfAnExistingCopyDispatchesThatCopy() {
+    void testAutomationUuidOfAnExistingCopyDispatchesThatCopy() {
         stubConnectedUser("user-1", 1L);
 
         when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("template-uuid-2"), any()))
@@ -583,7 +583,7 @@ class RequestTriggerApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "user-1")
-    void testUnactivatedAutomationWorkflowTemplateReturnsTheSameNotFoundAsAnUnknownUuidAndProvisionsNothing() {
+    void testUnactivatedAutomationTemplateReturnsTheSameNotFoundAsAnUnknownUuidAndProvisionsNothing() {
         stubConnectedUser("user-1", 1L);
 
         when(integrationInstanceService.getIntegrationInstancesByWorkflowUuid(anyLong(), eq("template-uuid-3"), any()))
@@ -596,7 +596,7 @@ class RequestTriggerApiControllerIntTest {
         unrelatedCopy.setCopiedFromWorkflowUuid("other-template-uuid");
 
         when(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(1L))
-            .thenReturn(List.of(referenceFor("other-automation-workflow-uuid", 42L, true, false), unrelatedCopy));
+            .thenReturn(List.of(referenceFor("other-automation-uuid", 42L, true, false), unrelatedCopy));
         when(projectWorkflowService.getProjectWorkflow(303L))
             .thenReturn(
                 new ProjectWorkflow(
@@ -905,10 +905,10 @@ class RequestTriggerApiControllerIntTest {
     }
 
     private static ConnectedUserProjectWorkflow referenceFor(
-        String automationWorkflowUuid, Long projectDeploymentId, boolean enabled, boolean dangling) {
+        String automationUuid, Long projectDeploymentId, boolean enabled, boolean dangling) {
 
         return new ConnectedUserProjectWorkflow(
-            1L, 5L, null, 1, automationWorkflowUuid, projectDeploymentId, enabled, dangling, null, 0);
+            1L, 5L, null, 1, automationUuid, projectDeploymentId, enabled, dangling, null, 0);
     }
 
     private static Workflow requestTriggerWorkflow(String triggerName) {

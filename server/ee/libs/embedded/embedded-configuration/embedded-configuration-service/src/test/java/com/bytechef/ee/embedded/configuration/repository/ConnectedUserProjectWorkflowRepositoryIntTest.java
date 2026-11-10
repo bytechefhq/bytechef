@@ -56,7 +56,7 @@ class ConnectedUserProjectWorkflowRepositoryIntTest {
         ConnectedUserProjectWorkflow connectedUserProjectWorkflow = new ConnectedUserProjectWorkflow();
 
         connectedUserProjectWorkflow.setConnectedUserProjectId(connectedUserProjectId);
-        connectedUserProjectWorkflow.setAutomationWorkflowUuid("11111111-1111-1111-1111-111111111111");
+        connectedUserProjectWorkflow.setAutomationUuid("11111111-1111-1111-1111-111111111111");
         connectedUserProjectWorkflow.setProjectDeploymentId(42L);
         connectedUserProjectWorkflow.setEnabled(true);
         connectedUserProjectWorkflow.setDangling(false);
@@ -66,7 +66,7 @@ class ConnectedUserProjectWorkflowRepositoryIntTest {
         ConnectedUserProjectWorkflow reloaded = connectedUserProjectWorkflowRepository.findById(saved.getId())
             .orElseThrow();
 
-        assertThat(reloaded.getAutomationWorkflowUuid()).isEqualTo("11111111-1111-1111-1111-111111111111");
+        assertThat(reloaded.getAutomationUuid()).isEqualTo("11111111-1111-1111-1111-111111111111");
         assertThat(reloaded.getProjectDeploymentId()).isEqualTo(42L);
         assertThat(reloaded.isEnabled()).isTrue();
         assertThat(reloaded.isDangling()).isFalse();
@@ -90,31 +90,31 @@ class ConnectedUserProjectWorkflowRepositoryIntTest {
         ConnectedUserProjectWorkflow reloaded = connectedUserProjectWorkflowRepository.findById(saved.getId())
             .orElseThrow();
 
-        assertThat(reloaded.getAutomationWorkflowUuid()).isNull();
+        assertThat(reloaded.getAutomationUuid()).isNull();
         assertThat(reloaded.isEnabled()).isTrue();
         assertThat(reloaded.isDangling()).isFalse();
     }
 
     @Test
-    void testFindByConnectedUserProjectIdAndAutomationWorkflowUuid() {
+    void testFindByConnectedUserProjectIdAndAutomationUuid() {
         long connectedUserProjectId = insertConnectedUserProject(insertProject(insertWorkspace()));
 
         ConnectedUserProjectWorkflow connectedUserProjectWorkflow = new ConnectedUserProjectWorkflow();
 
         connectedUserProjectWorkflow.setConnectedUserProjectId(connectedUserProjectId);
-        connectedUserProjectWorkflow.setAutomationWorkflowUuid("22222222-2222-2222-2222-222222222222");
+        connectedUserProjectWorkflow.setAutomationUuid("22222222-2222-2222-2222-222222222222");
 
         connectedUserProjectWorkflowRepository.save(connectedUserProjectWorkflow);
 
         Optional<ConnectedUserProjectWorkflow> found = connectedUserProjectWorkflowRepository
-            .findByConnectedUserProjectIdAndAutomationWorkflowUuid(
+            .findByConnectedUserProjectIdAndAutomationUuid(
                 connectedUserProjectId, "22222222-2222-2222-2222-222222222222");
 
         assertThat(found).isPresent();
     }
 
     @Test
-    void testConstraintRejectsBothProjectWorkflowIdAndAutomationWorkflowUuid() {
+    void testConstraintRejectsBothProjectWorkflowIdAndAutomationUuid() {
         long workspaceId = insertWorkspace();
         long projectId = insertProject(workspaceId);
         long connectedUserProjectId = insertConnectedUserProject(projectId);
@@ -124,7 +124,7 @@ class ConnectedUserProjectWorkflowRepositoryIntTest {
             jdbcTemplate.update(
                 """
                     INSERT INTO connected_user_project_workflow
-                        (connected_user_project_id, project_workflow_id, automation_workflow_uuid)
+                        (connected_user_project_id, project_workflow_id, automation_uuid)
                     VALUES (?, ?, ?)
                     """,
                 connectedUserProjectId, projectWorkflowId, "33333333-3333-3333-3333-333333333333");
@@ -132,7 +132,7 @@ class ConnectedUserProjectWorkflowRepositoryIntTest {
     }
 
     @Test
-    void testConstraintRejectsNeitherProjectWorkflowIdNorAutomationWorkflowUuid() {
+    void testConstraintRejectsNeitherProjectWorkflowIdNorAutomationUuid() {
         long connectedUserProjectId = insertConnectedUserProject(insertProject(insertWorkspace()));
 
         assertThatThrownBy(() -> {
@@ -149,22 +149,22 @@ class ConnectedUserProjectWorkflowRepositoryIntTest {
     void testPartialUniqueIndexRejectsDuplicateReferenceRow() {
         long connectedUserProjectId = insertConnectedUserProject(insertProject(insertWorkspace()));
 
-        String automationWorkflowUuid = "44444444-4444-4444-4444-444444444444";
+        String automationUuid = "44444444-4444-4444-4444-444444444444";
 
         jdbcTemplate.update(
             """
-                INSERT INTO connected_user_project_workflow (connected_user_project_id, automation_workflow_uuid)
+                INSERT INTO connected_user_project_workflow (connected_user_project_id, automation_uuid)
                 VALUES (?, ?)
                 """,
-            connectedUserProjectId, automationWorkflowUuid);
+            connectedUserProjectId, automationUuid);
 
         assertThatThrownBy(() -> {
             jdbcTemplate.update(
                 """
-                    INSERT INTO connected_user_project_workflow (connected_user_project_id, automation_workflow_uuid)
+                    INSERT INTO connected_user_project_workflow (connected_user_project_id, automation_uuid)
                     VALUES (?, ?)
                     """,
-                connectedUserProjectId, automationWorkflowUuid);
+                connectedUserProjectId, automationUuid);
         }).isInstanceOf(DataIntegrityViolationException.class);
     }
 

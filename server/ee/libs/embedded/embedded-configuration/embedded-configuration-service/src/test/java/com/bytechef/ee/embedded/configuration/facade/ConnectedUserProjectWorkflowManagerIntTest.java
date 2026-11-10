@@ -23,7 +23,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
-import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
+import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -84,7 +84,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
  */
 @SpringBootTest(
     classes = {
-        AutomationWorkflowProjectFacadeIntTestConfiguration.class,
+        AutomationProjectFacadeIntTestConfiguration.class,
         ConnectedUserProjectWorkflowManagerIntTest.ConnectedUserServiceConfiguration.class
     },
     properties = {
@@ -114,7 +114,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 class ConnectedUserProjectWorkflowManagerIntTest {
 
     @MockitoBean
-    private AutomationWorkflowProjectConfigurationUpdatedEventListener automationWorkflowProjectConfigurationUpdatedEventListener;
+    private AutomationProjectConfigurationUpdatedEventListener automationProjectConfigurationUpdatedEventListener;
 
     @MockitoBean
     private ConnectedUserConnectionFacade connectedUserConnectionFacade;

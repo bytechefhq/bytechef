@@ -24,7 +24,7 @@ import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
@@ -74,7 +74,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
     private static final String WORKFLOW_UUID = "uuid-1";
 
     @MockitoBean
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @MockitoBean
     private EnvironmentService environmentService;

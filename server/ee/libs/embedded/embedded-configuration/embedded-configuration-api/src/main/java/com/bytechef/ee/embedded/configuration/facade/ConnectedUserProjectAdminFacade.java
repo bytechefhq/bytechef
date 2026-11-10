@@ -10,7 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
-import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 
@@ -29,14 +29,13 @@ public interface ConnectedUserProjectAdminFacade {
      * Returns the connected user's configuration assignments.
      *
      * @param connectedUserId the connected user id
-     * @return the configuration the connected user is assigned to in each automation workflow project, in project id
-     *         order
+     * @return the configuration the connected user is assigned to in each automation project, in project id order
      */
     List<ConnectedUserAutomationProjectConfigurationDTO> getConnectedUserProjectConfigurations(long connectedUserId);
 
     List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment);
 
-    List<ProvisionableAutomationWorkflowProjectDTO> getProvisionableProjects(long connectedUserId);
+    List<ProvisionableAutomationProjectDTO> getProvisionableProjects(long connectedUserId);
 
     /**
      * Assigns the connected user to the configuration, whatever its permission expression says, and provisions the

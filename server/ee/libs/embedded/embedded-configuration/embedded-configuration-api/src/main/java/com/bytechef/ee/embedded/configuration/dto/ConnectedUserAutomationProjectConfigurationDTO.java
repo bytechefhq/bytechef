@@ -8,9 +8,9 @@
 package com.bytechef.ee.embedded.configuration.dto;
 
 /**
- * The automation workflow configuration a connected user is assigned to in one automation workflow project.
+ * The automation workflow configuration a connected user is assigned to in one automation project.
  *
- * @param projectId                   the automation workflow project id
+ * @param projectId                   the automation project id
  * @param configurationId             the assigned configuration id
  * @param configurationName           the assigned configuration name
  * @param configurationProjectVersion the project version the assigned configuration pins

@@ -15,7 +15,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
-import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
@@ -54,7 +54,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @ExtendWith(ObjectMapperSetupExtension.class)
 class ConnectedUserProjectGraphQlControllerIntTest {
 
-    private static final String AUTOMATION_WORKFLOW_UUID = "4a1b2c3d-5e6f-4789-8a9b-0c1d2e3f4a5b";
+    private static final String AUTOMATION_UUID = "4a1b2c3d-5e6f-4789-8a9b-0c1d2e3f4a5b";
     private static final String COPIED_FROM_WORKFLOW_UUID = "7d8e9f0a-1b2c-4d3e-8f4a-5b6c7d8e9f0a";
 
     @MockitoBean
@@ -78,7 +78,7 @@ class ConnectedUserProjectGraphQlControllerIntTest {
                     connectedUserProjects(connectedUserId: "7", environmentId: "0") {
                         connectedUserProjectWorkflows {
                             id
-                            automationWorkflowUuid
+                            automationUuid
                             copiedFromWorkflowUuid
                         }
                     }
@@ -88,12 +88,12 @@ class ConnectedUserProjectGraphQlControllerIntTest {
             .path("connectedUserProjects[0].connectedUserProjectWorkflows[*].id")
             .entityList(String.class)
             .containsExactly("1", "2")
-            .path("connectedUserProjects[0].connectedUserProjectWorkflows[0].automationWorkflowUuid")
+            .path("connectedUserProjects[0].connectedUserProjectWorkflows[0].automationUuid")
             .entity(String.class)
-            .isEqualTo(AUTOMATION_WORKFLOW_UUID)
+            .isEqualTo(AUTOMATION_UUID)
             .path("connectedUserProjects[0].connectedUserProjectWorkflows[0].copiedFromWorkflowUuid")
             .valueIsNull()
-            .path("connectedUserProjects[0].connectedUserProjectWorkflows[1].automationWorkflowUuid")
+            .path("connectedUserProjects[0].connectedUserProjectWorkflows[1].automationUuid")
             .valueIsNull()
             .path("connectedUserProjects[0].connectedUserProjectWorkflows[1].copiedFromWorkflowUuid")
             .entity(String.class)
@@ -143,21 +143,21 @@ class ConnectedUserProjectGraphQlControllerIntTest {
 
     @Test
     void testProvisionableConnectedUserProjects() {
-        List<ProvisionableAutomationWorkflowProjectDTO.Workflow> alphaWorkflows = List.of(
-            new ProvisionableAutomationWorkflowProjectDTO.Workflow(
+        List<ProvisionableAutomationProjectDTO.Workflow> alphaWorkflows = List.of(
+            new ProvisionableAutomationProjectDTO.Workflow(
                 "uuid-1", "Label", List.of(new ConnectedUserWorkflowTemplateDTO.Input("name", "Name", "STRING", true)),
                 true, false));
 
         when(connectedUserProjectAdminFacade.getProvisionableProjects(7L))
             .thenReturn(List.of(
-                new ProvisionableAutomationWorkflowProjectDTO(
+                new ProvisionableAutomationProjectDTO(
                     5L, "Project", 2, alphaWorkflows,
                     List.of(
-                        new ProvisionableAutomationWorkflowProjectDTO.Configuration(11L, "Alpha", 2, true,
+                        new ProvisionableAutomationProjectDTO.Configuration(11L, "Alpha", 2, true,
                             alphaWorkflows),
-                        new ProvisionableAutomationWorkflowProjectDTO.Configuration(
+                        new ProvisionableAutomationProjectDTO.Configuration(
                             12L, "Beta", 3, false,
-                            List.of(new ProvisionableAutomationWorkflowProjectDTO.Workflow(
+                            List.of(new ProvisionableAutomationProjectDTO.Workflow(
                                 "uuid-2", "Other", List.of(), false, false)))),
                     11L)));
 
@@ -241,7 +241,7 @@ class ConnectedUserProjectGraphQlControllerIntTest {
     @Test
     void testProvisionableConnectedUserProjectsWithoutAssignment() {
         when(connectedUserProjectAdminFacade.getProvisionableProjects(7L))
-            .thenReturn(List.of(new ProvisionableAutomationWorkflowProjectDTO(5L, "Project", 2, List.of(), List.of(),
+            .thenReturn(List.of(new ProvisionableAutomationProjectDTO(5L, "Project", 2, List.of(), List.of(),
                 null)));
 
         this.graphQlTester
@@ -285,8 +285,8 @@ class ConnectedUserProjectGraphQlControllerIntTest {
 
     private static ConnectedUserProjectDTO createConnectedUserProjectDTO(@Nullable ConnectedUser connectedUser) {
         ConnectedUserProjectWorkflowDTO referenceWorkflow = new ConnectedUserProjectWorkflowDTO(
-            1L, 7L, true, null, 0L, null, AUTOMATION_WORKFLOW_UUID, 1, ConnectedUserProjectWorkflowDTO.Kind.REFERENCE,
-            AUTOMATION_WORKFLOW_UUID, null, false, List.of(), List.of(), Map.of(), null, null);
+            1L, 7L, true, null, 0L, null, AUTOMATION_UUID, 1, ConnectedUserProjectWorkflowDTO.Kind.REFERENCE,
+            AUTOMATION_UUID, null, false, List.of(), List.of(), Map.of(), null, null);
 
         ConnectedUserProjectWorkflowDTO copyWorkflow = new ConnectedUserProjectWorkflowDTO(
             2L, 7L, true, null, 3L, null, "copy-workflow-uuid", 1, ConnectedUserProjectWorkflowDTO.Kind.COPY, null,

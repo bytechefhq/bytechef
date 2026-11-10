@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Identifies a connected user's reference deployment of an automation workflow project by relation rather than by the
+ * Identifies a connected user's reference deployment of an automation project by relation rather than by the
  * deployment's name.
  *
  * @version ee

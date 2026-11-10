@@ -178,9 +178,9 @@ public class ProjectServiceIntTest {
                 .workspaceId(workspace.getId())
                 .build());
 
-        Project automationWorkflowProject = projectRepository.save(
+        Project automationProject = projectRepository.save(
             Project.builder()
-                .name("Automation Workflow Project")
+                .name("Automation Project")
                 .workspaceId(workspace.getId())
                 .build());
 
@@ -196,7 +196,7 @@ public class ProjectServiceIntTest {
                 .workspaceId(workspace.getId())
                 .build());
 
-        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProject.getId());
+        testOwnerContributors.addAutomationProjectId(automationProject.getId());
         testOwnerContributors.addConnectedUserId(connectedUserProject.getId());
 
         List<Project> projects = projectService.getProjects(null, null, null, null, null, workspace.getId());
@@ -223,7 +223,7 @@ public class ProjectServiceIntTest {
 
         projectRepository.save(project);
 
-        testOwnerContributors.addAutomationWorkflowProjectId(ownedProject.getId());
+        testOwnerContributors.addAutomationProjectId(ownedProject.getId());
 
         TagService tagService = mock(TagService.class);
 
@@ -249,7 +249,7 @@ public class ProjectServiceIntTest {
 
         projectRepository.save(getProject());
 
-        testOwnerContributors.addAutomationWorkflowProjectId(ownedProject.getId());
+        testOwnerContributors.addAutomationProjectId(ownedProject.getId());
 
         CategoryService categoryService = mock(CategoryService.class);
 
@@ -273,7 +273,7 @@ public class ProjectServiceIntTest {
 
         ownedProject = projectRepository.save(ownedProject);
 
-        testOwnerContributors.addAutomationWorkflowProjectId(ownedProject.getId());
+        testOwnerContributors.addAutomationProjectId(ownedProject.getId());
 
         assertThat(
             projectService.getProjects(null, category.getId(), null, tag.getId(), Status.DRAFT, workspace.getId()))
@@ -300,7 +300,7 @@ public class ProjectServiceIntTest {
                 .workspaceId(workspace.getId())
                 .build());
 
-        testOwnerContributors.addAutomationWorkflowProjectId(ownedProject.getId());
+        testOwnerContributors.addAutomationProjectId(ownedProject.getId());
 
         assertThat(projectService.getProjects(null, null, null, null, null, workspace.getId()))
             .extracting(Project::getId)
@@ -343,9 +343,9 @@ public class ProjectServiceIntTest {
                 .workspaceId(workspace.getId())
                 .build());
 
-        Project automationWorkflowProject = projectRepository.save(
+        Project automationProject = projectRepository.save(
             Project.builder()
-                .name("Automation Workflow Project")
+                .name("Automation Project")
                 .workspaceId(workspace.getId())
                 .build());
 
@@ -355,7 +355,7 @@ public class ProjectServiceIntTest {
                 .workspaceId(workspace.getId())
                 .build());
 
-        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProject.getId());
+        testOwnerContributors.addAutomationProjectId(automationProject.getId());
         testOwnerContributors.addConnectedUserId(connectedUserProject.getId());
 
         assertThat(projectService.getWorkspaceProjectIds(workspace.getId()))
@@ -364,20 +364,20 @@ public class ProjectServiceIntTest {
 
     @Test
     public void testFetchProjectByNameIgnoresOwnedProjects() {
-        Project automationWorkflowProject = projectRepository.save(
+        Project automationProject = projectRepository.save(
             Project.builder()
                 .name("Sales")
                 .workspaceId(workspace.getId())
                 .build());
 
-        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProject.getId());
+        testOwnerContributors.addAutomationProjectId(automationProject.getId());
 
         assertThat(projectService.fetchProject("sales", workspace.getId())).isEmpty();
     }
 
     @Test
     public void testFetchProjectByNameReturnsTheUnownedProjectWhenAnOwnedOneSharesItsName() {
-        Project automationWorkflowProject = projectRepository.save(
+        Project automationProject = projectRepository.save(
             Project.builder()
                 .name("Sales")
                 .workspaceId(workspace.getId())
@@ -389,7 +389,7 @@ public class ProjectServiceIntTest {
                 .workspaceId(workspace.getId())
                 .build());
 
-        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProject.getId());
+        testOwnerContributors.addAutomationProjectId(automationProject.getId());
 
         assertThat(projectService.fetchProject("SALES", workspace.getId()))
             .isPresent()

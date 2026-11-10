@@ -47,19 +47,19 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
-import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
-import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowTemplateNotVisibleException;
+import com.bytechef.ee.embedded.configuration.exception.AutomationTemplateNotVisibleException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
-import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
+import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
-import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
@@ -141,7 +141,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 @SpringBootTest(
     classes = {
-        AutomationWorkflowProjectFacadeIntTestConfiguration.class,
+        AutomationProjectFacadeIntTestConfiguration.class,
         ConnectedUserWorkflowReferenceFacadeIntTest.ConnectedUserServiceConfiguration.class
     },
     properties = {
@@ -184,13 +184,13 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         """;
 
     @Autowired
-    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private AutomationProjectConfigurationService automationProjectConfigurationService;
 
     @MockitoSpyBean
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @MockitoBean
-    private AutomationWorkflowProjectConfigurationUpdatedEventListener automationWorkflowProjectConfigurationUpdatedEventListener;
+    private AutomationProjectConfigurationUpdatedEventListener automationProjectConfigurationUpdatedEventListener;
 
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
@@ -319,12 +319,12 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     }
 
     @Test
-    void testTwoUsersReferencingTheSameAutomationWorkflowGetIndependentWiring() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Two Users");
+    void testTwoUsersReferencingTheSameAutomationGetIndependentWiring() {
+        long automationProjectId = createAutomationProject("Two Users");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser userA = createConnectedUser(Environment.PRODUCTION);
         ConnectedUser userB = createConnectedUser(Environment.PRODUCTION);
@@ -362,13 +362,13 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testGetOrCreateReferenceProvisionsDistinctDeploymentsPerEnvironment() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Per Environment");
+        long automationProjectId = createAutomationProject("Per Environment");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
-        automationWorkflowProjectConfigurationService.create(automationWorkflowProjectId,
+        automationProjectConfigurationService.create(automationProjectId,
             Environment.DEVELOPMENT.ordinal(), "Default", null, 1, true, true);
 
         String externalUserId = newExternalUserId();
@@ -389,11 +389,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testGetOrCreateReferenceReturnsExistingRowWithoutReprovisioning() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Existing Reference");
+        long automationProjectId = createAutomationProject("Existing Reference");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -402,7 +402,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         ConnectedUserProjectWorkflow existingReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
 
-        clearInvocations(automationWorkflowProjectFacade, connectedUserReferenceDeploymentManager,
+        clearInvocations(automationProjectFacade, connectedUserReferenceDeploymentManager,
             connectedUserService);
 
         ConnectedUserProjectWorkflow result = connectedUserWorkflowReferenceFacade.getOrCreateReference(
@@ -412,23 +412,23 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         assertThat(result.getProjectDeploymentId()).isEqualTo(existingReference.getProjectDeploymentId());
         assertThat(getReference(existingReference.getId()).getVersion()).isEqualTo(existingReference.getVersion());
 
-        verifyNoInteractions(automationWorkflowProjectFacade, connectedUserService);
+        verifyNoInteractions(automationProjectFacade, connectedUserService);
 
         verify(connectedUserReferenceDeploymentManager).getDeployment(existingReference.getProjectDeploymentId());
         verify(connectedUserReferenceDeploymentManager).fetchConnectedUserId(
             existingReference.getProjectDeploymentId());
         verify(connectedUserReferenceDeploymentManager).fetchReleasedVersion(
-            connectedUser.getId(), automationWorkflowProjectId);
+            connectedUser.getId(), automationProjectId);
         verifyNoMoreInteractions(connectedUserReferenceDeploymentManager);
     }
 
     @Test
     void testGetOrCreateReferenceReResolvesAnExistingReferenceWithRequestedConnections() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Requested Connections");
+        long automationProjectId = createAutomationProject("Requested Connections");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -441,7 +441,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         long wiredConnectionId = getConnectionIds(reference).getFirst();
         long requestedConnectionId = wiredConnectionId == firstConnectionId ? secondConnectionId : firstConnectionId;
 
-        clearInvocations(automationWorkflowProjectFacade);
+        clearInvocations(automationProjectFacade);
 
         ConnectedUserProjectWorkflow updatedReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION,
@@ -456,16 +456,16 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
                     new ProjectDeploymentWorkflowConnection(requestedConnectionId, "slack", "postMessage1"));
             });
 
-        verifyNoInteractions(automationWorkflowProjectFacade);
+        verifyNoInteractions(automationProjectFacade);
     }
 
     @Test
     void testMissingConnectionStillCreatesDisabledReferenceAndRethrows() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Missing Connection");
+        long automationProjectId = createAutomationProject("Missing Connection");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -478,7 +478,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         ConnectedUserProjectWorkflow savedReference = getOnlyReference(connectedUser);
 
         assertThat(savedReference.isEnabled()).isFalse();
-        assertThat(savedReference.getAutomationWorkflowUuid()).isEqualTo(workflowUuid);
+        assertThat(savedReference.getAutomationUuid()).isEqualTo(workflowUuid);
         assertThat(savedReference.getProjectWorkflowId()).isNull();
         assertThat(fetchRow(savedReference))
             .get()
@@ -490,12 +490,12 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testGetOrCreateReferenceLeavesReferenceDisabledWithoutErrorWhenARequiredInputHasNoValue() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Missing Input Provisioning");
+        long automationProjectId = createAutomationProject("Missing Input Provisioning");
 
         String workflowUuid =
-            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -517,11 +517,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testEnableReferenceTogglesEnabledFlagAndProjectDeploymentWorkflow() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Enable Toggle");
+        long automationProjectId = createAutomationProject("Enable Toggle");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -554,30 +554,30 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testHiddenProjectStaysProvisionableByWorkflowUuid() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Hidden From Hub");
+        long automationProjectId = createAutomationProject("Hidden From Hub");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
-        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+        AutomationProjectConfiguration configuration = automationProjectConfigurationService
+            .getConfigurations(automationProjectId, Environment.PRODUCTION.ordinal())
             .stream()
             .findFirst()
             .orElseThrow();
 
-        automationWorkflowProjectConfigurationService.update(configuration.getId(), configuration.getName(),
+        automationProjectConfigurationService.update(configuration.getId(), configuration.getName(),
             configuration.getPermissionExpression(), configuration.getProjectVersion(), true, false);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
         givenOwnedConnection(connectedUser);
 
-        List<AutomationWorkflowProjectDTO> publishedProjects = automationWorkflowProjectFacade.getPublishedProjects(
+        List<AutomationProjectDTO> publishedProjects = automationProjectFacade.getPublishedProjects(
             connectedUser.getExternalId(), Environment.PRODUCTION);
 
-        AutomationWorkflowProjectDTO hiddenProject = publishedProjects.stream()
-            .filter(project -> project.id() == automationWorkflowProjectId)
+        AutomationProjectDTO hiddenProject = publishedProjects.stream()
+            .filter(project -> project.id() == automationProjectId)
             .findFirst()
             .orElseThrow();
 
@@ -595,11 +595,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testEnableReferenceWhileAdministrativelyOffSavesTheIntentButKeepsTheRowOff() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Enable Administratively Off");
+        long automationProjectId = createAutomationProject("Enable Administratively Off");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -611,13 +611,13 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         connectedUserWorkflowReferenceFacade.enableReference(
             connectedUser.getExternalId(), workflowUuid, false, Environment.PRODUCTION);
 
-        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+        AutomationProjectConfiguration configuration = automationProjectConfigurationService
+            .getConfigurations(automationProjectId, Environment.PRODUCTION.ordinal())
             .stream()
             .findFirst()
             .orElseThrow();
 
-        automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), false);
+        automationProjectConfigurationService.updateEnabled(configuration.getId(), false);
 
         connectedUserWorkflowReferenceFacade.enableReference(
             connectedUser.getExternalId(), workflowUuid, true, Environment.PRODUCTION);
@@ -631,12 +631,12 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testEnableReferenceRewiresConnectionsWhenPreviouslyMissingConnectionWasFixed() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Rewire");
+        long automationProjectId = createAutomationProject("Rewire");
 
         String workflowUuid =
-            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -667,11 +667,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testEnableReferenceStillThrowsWhenConnectionIsStillMissing() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Still Missing");
+        long automationProjectId = createAutomationProject("Still Missing");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -698,12 +698,12 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testEnableReferenceThrowsMissingInputWhenARequiredInputHasNoValue() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Missing Input Enable");
+        long automationProjectId = createAutomationProject("Missing Input Enable");
 
         String workflowUuid =
-            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -730,11 +730,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testEnableReferenceRefusesToEnableADanglingReference() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Enable Dangling");
+        long automationProjectId = createAutomationProject("Enable Dangling");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -761,13 +761,13 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testEnableReferenceRefusedBecauseTheCatchUpLeftItDanglingKeepsTheCatchUp() throws NoSuchMethodException {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Catch Up Dangling");
+        long automationProjectId = createAutomationProject("Catch Up Dangling");
 
-        addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -779,8 +779,8 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         connectedUserWorkflowReferenceFacade.enableReference(
             connectedUser.getExternalId(), workflowUuid, false, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.deleteProjectWorkflow(workflowUuid);
-        publishAndPinProject(automationWorkflowProjectId);
+        automationProjectFacade.deleteProjectWorkflow(workflowUuid);
+        publishAndPinProject(automationProjectId);
 
         clearInvocations(connectedUserReferenceDeploymentManager);
 
@@ -807,11 +807,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testDisableReferenceSkipsTheCatchUpAndDisablesTheRowAtTheCurrentVersion() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Disable Behind");
+        long automationProjectId = createAutomationProject("Disable Behind");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -822,7 +822,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         assertThat(reference.isEnabled()).isTrue();
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         doThrow(new IllegalStateException("Trigger registration failed"))
             .when(connectedUserReferenceRolloutManager)
@@ -841,19 +841,19 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         assertThat(fetchRow(reference))
             .get()
             .satisfies(row -> {
-                assertThat(row.getWorkflowId()).isEqualTo(getWorkflowId(automationWorkflowProjectId, 1, workflowUuid));
+                assertThat(row.getWorkflowId()).isEqualTo(getWorkflowId(automationProjectId, 1, workflowUuid));
                 assertThat(row.isEnabled()).isFalse();
             });
     }
 
     @Test
     void testDisableDanglingReferenceRemovesItsRow() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Disable Dangling");
+        long automationProjectId = createAutomationProject("Disable Dangling");
 
-        String siblingWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String siblingWorkflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -885,7 +885,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         });
         assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(reference.getProjectDeploymentId()))
             .extracting(ProjectDeploymentWorkflow::getWorkflowId)
-            .containsExactly(getWorkflowId(automationWorkflowProjectId, 1, siblingWorkflowUuid));
+            .containsExactly(getWorkflowId(automationProjectId, 1, siblingWorkflowUuid));
     }
 
     @Test
@@ -902,12 +902,12 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testDeleteReferenceRemovesItsDeploymentRowAndTheReferenceRow() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Delete Reference");
+        long automationProjectId = createAutomationProject("Delete Reference");
 
-        String siblingWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String siblingWorkflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -925,17 +925,17 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId())).isEmpty();
         assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(reference.getProjectDeploymentId()))
             .extracting(ProjectDeploymentWorkflow::getWorkflowId)
-            .containsExactly(getWorkflowId(automationWorkflowProjectId, 1, siblingWorkflowUuid));
+            .containsExactly(getWorkflowId(automationProjectId, 1, siblingWorkflowUuid));
     }
 
     @Test
     void testDeleteDanglingReferenceAlsoRemovesItsRow() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Delete Dangling");
+        long automationProjectId = createAutomationProject("Delete Dangling");
 
-        String siblingWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String siblingWorkflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -957,17 +957,17 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId())).isEmpty();
         assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(reference.getProjectDeploymentId()))
             .extracting(ProjectDeploymentWorkflow::getWorkflowId)
-            .containsExactly(getWorkflowId(automationWorkflowProjectId, 1, siblingWorkflowUuid));
+            .containsExactly(getWorkflowId(automationProjectId, 1, siblingWorkflowUuid));
     }
 
     @Test
     void testUpdateReferenceInputsWritesTheRowUnderTheConnectedUsersLock() throws Exception {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Inputs Lock");
+        long automationProjectId = createAutomationProject("Inputs Lock");
 
         String workflowUuid =
-            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -992,11 +992,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testFillingTheMissingInputResumesTheWorkflow() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Resume On Input");
+        long automationProjectId = createAutomationProject("Resume On Input");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1011,10 +1011,10 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         workflowService.update(
             draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         connectedUserReferenceRolloutManager.rollOutAndApply(
-            automationWorkflowProjectId, Environment.PRODUCTION.ordinal());
+            automationProjectId, Environment.PRODUCTION.ordinal());
 
         assertThat(fetchRow(reference))
             .get()
@@ -1040,11 +1040,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testEnablingAPausedWorkflowKeepsTheSwitchOn() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Enable Paused");
+        long automationProjectId = createAutomationProject("Enable Paused");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1059,10 +1059,10 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         workflowService.update(
             draftWorkflowId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION, draftWorkflow.getVersion());
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         connectedUserReferenceRolloutManager.rollOutAndApply(
-            automationWorkflowProjectId, Environment.PRODUCTION.ordinal());
+            automationProjectId, Environment.PRODUCTION.ordinal());
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.enableReference(
             connectedUser.getExternalId(), workflowUuid, true, Environment.PRODUCTION))
@@ -1088,12 +1088,12 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testUpdateReferenceInputsRefusesADanglingReference() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Inputs Dangling");
+        long automationProjectId = createAutomationProject("Inputs Dangling");
 
         String workflowUuid =
-            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1124,11 +1124,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testReferenceWritesLockTheConnectedUsersProjectRow() throws Exception {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Delete Lock");
+        long automationProjectId = createAutomationProject("Delete Lock");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1148,13 +1148,13 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testGetOrCreateReferenceProvisionsATemplateTheConnectedUserIsPermittedToSee() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Visible Template");
+        long automationProjectId = createAutomationProject("Visible Template");
 
-        String visibleWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String visibleWorkflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        addHiddenAutomationWorkflow(automationWorkflowProjectId);
+        addHiddenAutomation(automationProjectId);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1163,19 +1163,19 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             connectedUser.getExternalId(), visibleWorkflowUuid, Environment.PRODUCTION);
 
-        assertThat(reference.getAutomationWorkflowUuid()).isEqualTo(visibleWorkflowUuid);
+        assertThat(reference.getAutomationUuid()).isEqualTo(visibleWorkflowUuid);
         assertThat(reference.isEnabled()).isTrue();
     }
 
     @Test
     void testGetOrCreateReferenceRejectsATemplateHiddenByThePermissionExpression() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Hidden Template");
+        long automationProjectId = createAutomationProject("Hidden Template");
 
-        addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        String hiddenWorkflowUuid = addHiddenAutomationWorkflow(automationWorkflowProjectId);
+        String hiddenWorkflowUuid = addHiddenAutomation(automationProjectId);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1185,23 +1185,23 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
             connectedUser.getExternalId(), hiddenWorkflowUuid, Environment.PRODUCTION))
-                .isInstanceOf(AutomationWorkflowTemplateNotVisibleException.class);
+                .isInstanceOf(AutomationTemplateNotVisibleException.class);
 
         verify(connectedUserReferenceDeploymentManager, never()).getOrCreateDeployment(anyLong(), anyString(), any());
         verify(connectedUserReferenceDeploymentManager, never()).putWorkflows(anyLong(), anyInt(), anyMap());
 
         assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())).isEmpty();
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
-            connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
+            connectedUser.getId(), automationProjectId)).isEmpty();
     }
 
     @Test
     void testProvisionReferenceThrowsWhenTheProjectIsNotReleasedInTheUsersEnvironment() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Not Released");
+        long automationProjectId = createAutomationProject("Not Released");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.DEVELOPMENT);
 
@@ -1216,7 +1216,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         assertThat(connectedUserWorkflowReferenceFacade.getConnectedUserWorkflows(connectedUser.getId())).isEmpty();
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
-            connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
+            connectedUser.getId(), automationProjectId)).isEmpty();
     }
 
     @Test
@@ -1228,14 +1228,14 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
             .thenAnswer(invocation -> realEmbeddedPermissionEvaluator.evaluate(
                 invocation.getArgument(0), invocation.getArgument(1)));
 
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Beta Only");
+        long automationProjectId = createAutomationProject("Beta Only");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationProjectFacade.publishProject(automationProjectId);
 
-        automationWorkflowProjectConfigurationService.create(
-            automationWorkflowProjectId, Environment.PRODUCTION.ordinal(), "Beta", "metadata['beta'] == 'true'", 1,
+        automationProjectConfigurationService.create(
+            automationProjectId, Environment.PRODUCTION.ordinal(), "Beta", "metadata['beta'] == 'true'", 1,
             true, true);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
@@ -1250,22 +1250,22 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
                             .getErrorKey()));
 
         assertThat(connectedUserProjectConfigurationService.fetchAssignment(
-            connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
+            connectedUser.getId(), automationProjectId)).isEmpty();
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
-            connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
+            connectedUser.getId(), automationProjectId)).isEmpty();
     }
 
     @Test
     void testProvisionReferenceThrowsWhenTemplateIsNotInThePinnedVersion() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Template Not Pinned");
+        long automationProjectId = createAutomationProject("Template Not Pinned");
 
-        addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
-        String newerWorkflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String newerWorkflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationProjectFacade.publishProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1279,18 +1279,18 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
                             .getErrorKey()));
 
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
-            connectedUser.getId(), automationWorkflowProjectId)).isEmpty();
+            connectedUser.getId(), automationProjectId)).isEmpty();
     }
 
     @Test
     void testProvisionReferencePinsTheDeploymentToTheConfiguredVersion() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Pinned Deployment");
+        long automationProjectId = createAutomationProject("Pinned Deployment");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationProjectFacade.publishProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1304,13 +1304,13 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testHiddenTemplateRejectionIsIndistinguishableFromAnUnknownUuid() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Indistinguishable");
+        long automationProjectId = createAutomationProject("Indistinguishable");
 
-        addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        String hiddenWorkflowUuid = addHiddenAutomationWorkflow(automationWorkflowProjectId);
+        String hiddenWorkflowUuid = addHiddenAutomation(automationProjectId);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1322,19 +1322,19 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         Throwable unknownThrowable = catchThrowable(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
             connectedUser.getExternalId(), unknownWorkflowUuid, Environment.PRODUCTION));
 
-        assertThat(hiddenThrowable).isExactlyInstanceOf(AutomationWorkflowTemplateNotVisibleException.class);
-        assertThat(unknownThrowable).isExactlyInstanceOf(AutomationWorkflowTemplateNotVisibleException.class);
+        assertThat(hiddenThrowable).isExactlyInstanceOf(AutomationTemplateNotVisibleException.class);
+        assertThat(unknownThrowable).isExactlyInstanceOf(AutomationTemplateNotVisibleException.class);
         assertThat(hiddenThrowable).hasMessage("Not a published automation workflow template: " + hiddenWorkflowUuid);
         assertThat(unknownThrowable).hasMessage("Not a published automation workflow template: " + unknownWorkflowUuid);
     }
 
     @Test
-    void testAlreadyProvisionedReferenceIsReturnedWithoutConsultingTheAutomationWorkflows() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Narrowed Template");
+    void testAlreadyProvisionedReferenceIsReturnedWithoutConsultingTheAutomations() {
+        long automationProjectId = createAutomationProject("Narrowed Template");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1346,7 +1346,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         when(embeddedPermissionEvaluator.evaluate(any(), any()))
             .thenReturn(false);
 
-        clearInvocations(automationWorkflowProjectFacade);
+        clearInvocations(automationProjectFacade);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
@@ -1354,22 +1354,22 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         assertThat(reference.getId()).isEqualTo(existingReference.getId());
         assertThat(reference.isEnabled()).isTrue();
 
-        verifyNoInteractions(automationWorkflowProjectFacade);
+        verifyNoInteractions(automationProjectFacade);
 
-        assertThat(automationWorkflowProjectFacade.getPublishedProjects(
+        assertThat(automationProjectFacade.getPublishedProjects(
             connectedUser.getExternalId(), Environment.PRODUCTION))
-                .flatMap(AutomationWorkflowProjectDTO::workflowTemplates)
+                .flatMap(AutomationProjectDTO::workflowTemplates)
                 .extracting(ConnectedUserWorkflowTemplateDTO::workflowUuid)
                 .doesNotContain(workflowUuid);
     }
 
     @Test
     void testEnableReferenceUsesAConnectionTheConfigurationProvides() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Connection Enable");
+        long automationProjectId = createAutomationProject("Provided Connection Enable");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1380,7 +1380,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         long administratorConnectionId = givenAdministratorConnection();
 
         provideValues(
-            automationWorkflowProjectId, workflowUuid, Map.of("slack", administratorConnectionId), Map.of());
+            automationProjectId, workflowUuid, Map.of("slack", administratorConnectionId), Map.of());
 
         connectedUserWorkflowReferenceFacade.enableReference(
             connectedUser.getExternalId(), workflowUuid, true, Environment.PRODUCTION);
@@ -1400,12 +1400,12 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testEnableReferenceIsSatisfiedByAnInputTheConfigurationProvides() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Input Enable");
+        long automationProjectId = createAutomationProject("Provided Input Enable");
 
         String workflowUuid =
-            addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1416,7 +1416,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         assertThat(reference.isEnabled()).isFalse();
 
-        provideValues(automationWorkflowProjectId, workflowUuid, Map.of(), Map.of("channel", "#administrator"));
+        provideValues(automationProjectId, workflowUuid, Map.of(), Map.of("channel", "#administrator"));
 
         connectedUserWorkflowReferenceFacade.enableReference(
             connectedUser.getExternalId(), workflowUuid, true, Environment.PRODUCTION);
@@ -1432,11 +1432,11 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Test
     void testAProvidedConnectionIsNeverAmongTheConnectedUsersConnections() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Provided Connection Not Listed");
+        long automationProjectId = createAutomationProject("Provided Connection Not Listed");
 
-        String workflowUuid = addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
 
@@ -1444,7 +1444,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         long administratorConnectionId = givenAdministratorConnection();
 
         provideValues(
-            automationWorkflowProjectId, workflowUuid, Map.of("slack", administratorConnectionId), Map.of());
+            automationProjectId, workflowUuid, Map.of("slack", administratorConnectionId), Map.of());
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
             connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
@@ -1477,30 +1477,30 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     }
 
     private void provideValues(
-        long automationWorkflowProjectId, String workflowUuid, Map<String, Long> providedConnections,
+        long automationProjectId, String workflowUuid, Map<String, Long> providedConnections,
         Map<String, Object> providedInputs) {
 
-        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+        AutomationProjectConfiguration configuration = automationProjectConfigurationService
+            .getConfigurations(automationProjectId, Environment.PRODUCTION.ordinal())
             .stream()
             .findFirst()
             .orElseThrow();
 
-        automationWorkflowProjectConfigurationService.updateWorkflowProvidedValues(
+        automationProjectConfigurationService.updateWorkflowProvidedValues(
             configuration.getId(), UUID.fromString(workflowUuid), providedConnections, providedInputs);
     }
 
-    private String addAutomationWorkflow(long automationWorkflowProjectId, String definition) {
-        return automationWorkflowProjectFacade.createProjectWorkflow(automationWorkflowProjectId, definition, null);
+    private String addAutomation(long automationProjectId, String definition) {
+        return automationProjectFacade.createProjectWorkflow(automationProjectId, definition, null);
     }
 
-    private String addHiddenAutomationWorkflow(long automationWorkflowProjectId) {
-        return automationWorkflowProjectFacade.createProjectWorkflow(
-            automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION, HIDDEN_PERMISSION_EXPRESSION);
+    private String addHiddenAutomation(long automationProjectId) {
+        return automationProjectFacade.createProjectWorkflow(
+            automationProjectId, SLACK_WORKFLOW_DEFINITION, HIDDEN_PERMISSION_EXPRESSION);
     }
 
-    private long createAutomationWorkflowProject(String name) {
-        return automationWorkflowProjectFacade.createProject(
+    private long createAutomationProject(String name) {
+        return automationProjectFacade.createProject(
             name + " " + UUID.randomUUID(), "", null, List.of(), null);
     }
 
@@ -1514,7 +1514,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         return projectWorkflowService
             .fetchProjectWorkflow(
                 projectDeployment.getProjectId(), projectDeployment.getProjectVersion(),
-                reference.getAutomationWorkflowUuid())
+                reference.getAutomationUuid())
             .flatMap(projectWorkflow -> projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(
                 projectDeployment.getId(), projectWorkflow.getWorkflowId()));
     }
@@ -1546,8 +1546,8 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
             .orElseThrow();
     }
 
-    private String getWorkflowId(long automationWorkflowProjectId, int projectVersion, String workflowUuid) {
-        return projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, projectVersion, workflowUuid)
+    private String getWorkflowId(long automationProjectId, int projectVersion, String workflowUuid) {
+        return projectWorkflowService.fetchProjectWorkflow(automationProjectId, projectVersion, workflowUuid)
             .map(ProjectWorkflow::getWorkflowId)
             .orElseThrow();
     }
@@ -1637,7 +1637,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
                 .orElseThrow();
 
         storedReference.setDangling(true);
-        storedReference.setDanglingReason("Removed from the automation workflow project on redeploy");
+        storedReference.setDanglingReason("Removed from the automation project on redeploy");
         storedReference.setEnabled(false);
 
         connectedUserProjectWorkflowRepository.save(storedReference);
@@ -1678,10 +1678,10 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         @Test
         void testProvisionWithTheRequiredInputsEnablesTheReferenceAndStoresThem() {
-            String automationWorkflowUuid = publishChannelInputWorkflow("Provision With Inputs");
+            String automationUuid = publishChannelInputWorkflow("Provision With Inputs");
 
             ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
-                externalUserId, automationWorkflowUuid, Environment.PRODUCTION, Map.of(), Map.of("channel", "#alerts"));
+                externalUserId, automationUuid, Environment.PRODUCTION, Map.of(), Map.of("channel", "#alerts"));
 
             assertThat(reference.isEnabled()).isTrue();
             assertThat(getReferenceRow(reference)).satisfies(projectDeploymentWorkflow -> {
@@ -1692,10 +1692,10 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         @Test
         void testProvisionWithoutTheRequiredInputLeavesTheReferenceDisabled() {
-            String automationWorkflowUuid = publishChannelInputWorkflow("Provision Without Inputs");
+            String automationUuid = publishChannelInputWorkflow("Provision Without Inputs");
 
             ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
-                externalUserId, automationWorkflowUuid, Environment.PRODUCTION, Map.of(), null);
+                externalUserId, automationUuid, Environment.PRODUCTION, Map.of(), null);
 
             assertThat(reference.isEnabled()).isFalse();
             assertThat(getReferenceRow(reference).isEnabled()).isFalse();
@@ -1703,15 +1703,15 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
         @Test
         void testProvisioningAnExistingReferenceAgainReplacesItsInputsAndKeepsItsEnabledState() {
-            String automationWorkflowUuid = publishChannelInputWorkflow("Provision Again");
+            String automationUuid = publishChannelInputWorkflow("Provision Again");
 
             ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
-                externalUserId, automationWorkflowUuid, Environment.PRODUCTION, Map.of(), null);
+                externalUserId, automationUuid, Environment.PRODUCTION, Map.of(), null);
 
             assertThat(reference.isEnabled()).isFalse();
 
             ConnectedUserProjectWorkflow provisionedAgain = connectedUserWorkflowReferenceFacade.getOrCreateReference(
-                externalUserId, automationWorkflowUuid, Environment.PRODUCTION, Map.of(),
+                externalUserId, automationUuid, Environment.PRODUCTION, Map.of(),
                 Map.of("channel", "#general"));
 
             assertThat(provisionedAgain.getId()).isEqualTo(reference.getId());
@@ -1719,7 +1719,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
             assertThat(getReferenceRow(provisionedAgain).getInputs()).isEqualTo(Map.of("channel", "#general"));
 
             connectedUserWorkflowReferenceFacade.getOrCreateReference(
-                externalUserId, automationWorkflowUuid, Environment.PRODUCTION, Map.of(), Map.of("channel", "#ops"));
+                externalUserId, automationUuid, Environment.PRODUCTION, Map.of(), Map.of("channel", "#ops"));
 
             assertThat(getReferenceRow(provisionedAgain).getInputs()).isEqualTo(Map.of("channel", "#ops"));
         }
@@ -1734,28 +1734,28 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
         }
 
         private String publishChannelInputWorkflow(String projectName) {
-            long automationWorkflowProjectId = createAutomationWorkflowProject(projectName);
+            long automationProjectId = createAutomationProject(projectName);
 
-            String automationWorkflowUuid =
-                addAutomationWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            String automationUuid =
+                addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-            publishAndPinProject(automationWorkflowProjectId);
+            publishAndPinProject(automationProjectId);
 
-            return automationWorkflowUuid;
+            return automationUuid;
         }
 
-        private String addAutomationWorkflow(long automationWorkflowProjectId, String definition) {
-            return addAutomationWorkflow(automationWorkflowProjectId, definition, null);
+        private String addAutomation(long automationProjectId, String definition) {
+            return addAutomation(automationProjectId, definition, null);
         }
 
         private String
-            addAutomationWorkflow(long automationWorkflowProjectId, String definition, String permissionExpression) {
-            return automationWorkflowProjectFacade.createProjectWorkflow(
-                automationWorkflowProjectId, definition, permissionExpression);
+            addAutomation(long automationProjectId, String definition, String permissionExpression) {
+            return automationProjectFacade.createProjectWorkflow(
+                automationProjectId, definition, permissionExpression);
         }
 
-        private long createAutomationWorkflowProject(String name) {
-            return automationWorkflowProjectFacade.createProject(
+        private long createAutomationProject(String name) {
+            return automationProjectFacade.createProject(
                 name + " " + UUID.randomUUID(), "", null, List.of(), null);
         }
 
@@ -1789,7 +1789,7 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
     }
 
     private void publishAndPinProject(long projectId) {
-        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
-            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, projectId);
+        AutomationProjectConfigurationTestSupport.publishAndPinProject(
+            automationProjectFacade, automationProjectConfigurationService, projectId);
     }
 }

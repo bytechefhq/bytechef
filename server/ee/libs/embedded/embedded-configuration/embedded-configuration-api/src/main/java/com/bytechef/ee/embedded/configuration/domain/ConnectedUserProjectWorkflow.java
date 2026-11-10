@@ -43,8 +43,8 @@ public class ConnectedUserProjectWorkflow {
     @Column("workflow_version")
     private Integer workflowVersion;
 
-    @Column("automation_workflow_uuid")
-    private String automationWorkflowUuid;
+    @Column("automation_uuid")
+    private String automationUuid;
 
     @Column("copied_from_workflow_uuid")
     private String copiedFromWorkflowUuid;
@@ -86,13 +86,13 @@ public class ConnectedUserProjectWorkflow {
     @PersistenceCreator
     public ConnectedUserProjectWorkflow(
         Long id, Long connectedUserProjectId, @Nullable Long projectWorkflowId, Integer workflowVersion,
-        @Nullable String automationWorkflowUuid, @Nullable Long projectDeploymentId, boolean enabled, boolean dangling,
+        @Nullable String automationUuid, @Nullable Long projectDeploymentId, boolean enabled, boolean dangling,
         @Nullable String danglingReason, int version) {
         this.id = id;
         this.connectedUserProjectId = AggregateReference.to(connectedUserProjectId);
         this.projectWorkflowId = projectWorkflowId == null ? null : AggregateReference.to(projectWorkflowId);
         this.workflowVersion = workflowVersion;
-        this.automationWorkflowUuid = automationWorkflowUuid;
+        this.automationUuid = automationUuid;
         this.projectDeploymentId = projectDeploymentId;
         this.enabled = enabled;
         this.dangling = dangling;
@@ -132,12 +132,12 @@ public class ConnectedUserProjectWorkflow {
     }
 
     @Nullable
-    public String getAutomationWorkflowUuid() {
-        return automationWorkflowUuid;
+    public String getAutomationUuid() {
+        return automationUuid;
     }
 
-    public void setAutomationWorkflowUuid(@Nullable String automationWorkflowUuid) {
-        this.automationWorkflowUuid = automationWorkflowUuid;
+    public void setAutomationUuid(@Nullable String automationUuid) {
+        this.automationUuid = automationUuid;
     }
 
     @Nullable
@@ -234,7 +234,7 @@ public class ConnectedUserProjectWorkflow {
             ", connectedUserProjectId=" + connectedUserProjectId +
             ", projectWorkflowId=" + projectWorkflowId +
             ", workflowVersion=" + workflowVersion +
-            ", automationWorkflowUuid='" + automationWorkflowUuid + '\'' +
+            ", automationUuid='" + automationUuid + '\'' +
             ", copiedFromWorkflowUuid='" + copiedFromWorkflowUuid + '\'' +
             ", projectDeploymentId=" + projectDeploymentId +
             ", enabled=" + enabled +

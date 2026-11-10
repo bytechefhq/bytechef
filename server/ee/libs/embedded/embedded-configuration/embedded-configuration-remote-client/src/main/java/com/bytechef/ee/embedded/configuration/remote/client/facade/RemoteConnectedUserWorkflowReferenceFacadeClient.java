@@ -26,13 +26,13 @@ import org.springframework.stereotype.Component;
 public class RemoteConnectedUserWorkflowReferenceFacadeClient implements ConnectedUserWorkflowReferenceFacade {
 
     @Override
-    public void deleteReference(String externalUserId, String automationWorkflowUuid, Environment environment) {
+    public void deleteReference(String externalUserId, String automationUuid, Environment environment) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public ConnectedUserProjectWorkflow enableReference(
-        String externalUserId, String automationWorkflowUuid, boolean enable, Environment environment) {
+        String externalUserId, String automationUuid, boolean enable, Environment environment) {
 
         throw new UnsupportedOperationException();
     }
@@ -44,14 +44,14 @@ public class RemoteConnectedUserWorkflowReferenceFacadeClient implements Connect
 
     @Override
     public ConnectedUserProjectWorkflow getOrCreateReference(
-        String externalUserId, String automationWorkflowUuid, Environment environment) {
+        String externalUserId, String automationUuid, Environment environment) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public ConnectedUserProjectWorkflow getOrCreateReference(
-        String externalUserId, String automationWorkflowUuid, Environment environment,
+        String externalUserId, String automationUuid, Environment environment,
         Map<String, Long> requestedConnectionIds) {
 
         throw new UnsupportedOperationException();
@@ -59,7 +59,7 @@ public class RemoteConnectedUserWorkflowReferenceFacadeClient implements Connect
 
     @Override
     public ConnectedUserProjectWorkflow getOrCreateReference(
-        String externalUserId, String automationWorkflowUuid, Environment environment,
+        String externalUserId, String automationUuid, Environment environment,
         Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs) {
 
         throw new UnsupportedOperationException();
@@ -67,7 +67,7 @@ public class RemoteConnectedUserWorkflowReferenceFacadeClient implements Connect
 
     @Override
     public void updateReferenceInputs(
-        String externalUserId, String automationWorkflowUuid, Map<String, ?> inputs, Environment environment) {
+        String externalUserId, String automationUuid, Map<String, ?> inputs, Environment environment) {
 
         throw new UnsupportedOperationException();
     }

@@ -1,0 +1,71 @@
+type AutomationProject {
+    id: ID!
+    name: String!
+    description: String
+    categoryId: ID
+    tagIds: [ID!]!
+    published: Boolean!
+    version: Int!
+    lastPublishedVersion: Int
+    permissionExpression: String
+    configurationCount: Int!
+    lastPublishedDate: String
+    workflowTemplates: [AutomationProjectWorkflowTemplate!]!
+}
+
+type AutomationProjectWorkflowTemplate {
+    workflowUuid: ID!
+    workflowId: ID!
+    label: String
+    description: String
+    permissionExpression: String
+    lastModifiedDate: String
+    triggers: [AutomationProjectComponent!]!
+    components: [AutomationProjectComponent!]!
+}
+
+type AutomationProjectComponent {
+    name: String!
+    title: String
+    icon: String
+}
+
+type AutomationProjectCategory {
+    id: ID!
+    name: String!
+}
+
+type AutomationProjectTag {
+    id: ID!
+    name: String!
+}
+
+type AutomationProjectVersion {
+    version: Int!
+    status: String!
+    publishedDate: String
+    description: String
+}
+
+extend type Query {
+    automationProjects(environmentId: ID): [AutomationProject!]!
+    automationProjectCategories: [AutomationProjectCategory!]!
+    automationProjectTags: [AutomationProjectTag!]!
+    automationProjectVersions(id: ID!): [AutomationProjectVersion!]!
+    automationProjectVersionWorkflowChanges(id: ID!, projectVersion: Int!): VersionWorkflowChanges!
+    automationProjectVersionWorkflowChange(
+        id: ID!, projectVersion: Int!, workflowUuid: String!): VersionWorkflowChange!
+}
+
+extend type Mutation {
+    createAutomationProject(name: String!, description: String, category: String, tags: [String!], permissionExpression: String): ID!
+    updateAutomationProject(id: ID!, name: String!, description: String, category: String, tags: [String!], permissionExpression: String): Boolean!
+    deleteAutomationProject(id: ID!): Boolean!
+    publishAutomationProject(id: ID!, description: String): Boolean!
+    createAutomationProjectWorkflow(projectId: ID!, definition: String, permissionExpression: String): ID!
+    updateAutomationProjectWorkflow(workflowUuid: ID!, label: String!, description: String): Boolean!
+    updateAutomationProjectWorkflowPermissionExpression(workflowUuid: ID!, permissionExpression: String): Boolean!
+    deleteAutomationProjectWorkflow(workflowUuid: ID!): Boolean!
+    duplicateAutomationProjectWorkflow(workflowUuid: ID!): ID!
+    duplicateAutomationProject(id: ID!): ID!
+}

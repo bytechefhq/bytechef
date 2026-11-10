@@ -24,7 +24,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Relates a connected user to their reference deployment of an automation workflow project.
+ * Relates a connected user to their reference deployment of an automation project.
  *
  * @version ee
  *

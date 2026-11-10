@@ -36,7 +36,7 @@ type ConnectedUserAutomationProjectConfiguration {
 
 type ConnectedUserProjectWorkflow {
     id: ID!
-    automationWorkflowUuid: ID
+    automationUuid: ID
     connectedUserId: ID!
     copiedFromWorkflowUuid: ID
     enabled: Boolean!

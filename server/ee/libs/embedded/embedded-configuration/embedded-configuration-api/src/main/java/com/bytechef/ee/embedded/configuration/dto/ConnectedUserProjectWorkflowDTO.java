@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
 @SuppressFBWarnings("EI")
 public record ConnectedUserProjectWorkflowDTO(
     long id, long connectedUserId, boolean enabled, Instant lastExecutionDate, long projectId, WorkflowDTO workflow,
-    String workflowUuid, Integer workflowVersion, Kind kind, String automationWorkflowUuid,
+    String workflowUuid, Integer workflowVersion, Kind kind, String automationUuid,
     String copiedFromWorkflowUuid, boolean dangling, List<ConnectedUserWorkflowTemplateDTO.Component> components,
     List<ConnectedUserWorkflowTemplateDTO.Input> inputs, Map<String, ?> inputValues,
     @Nullable String attentionReason, @Nullable String staticWebhookUrl) {
@@ -55,27 +55,27 @@ public record ConnectedUserProjectWorkflowDTO(
     }
 
     public static ConnectedUserProjectWorkflowDTO ofReference(
-        long connectedUserId, ConnectedUserProjectWorkflow reference, WorkflowDTO automationWorkflow,
+        long connectedUserId, ConnectedUserProjectWorkflow reference, WorkflowDTO automation,
         List<ConnectedUserWorkflowTemplateDTO.Component> components) {
-        return ofReference(connectedUserId, reference, automationWorkflow, components, List.of(), Map.of(), null);
+        return ofReference(connectedUserId, reference, automation, components, List.of(), Map.of(), null);
     }
 
     public static ConnectedUserProjectWorkflowDTO ofReference(
-        long connectedUserId, ConnectedUserProjectWorkflow reference, WorkflowDTO automationWorkflow,
+        long connectedUserId, ConnectedUserProjectWorkflow reference, WorkflowDTO automation,
         List<ConnectedUserWorkflowTemplateDTO.Component> components,
         List<ConnectedUserWorkflowTemplateDTO.Input> inputs, Map<String, ?> inputValues,
         @Nullable String attentionReason) {
         return new ConnectedUserProjectWorkflowDTO(
-            reference.getId(), connectedUserId, reference.isEnabled(), null, 0L, automationWorkflow,
-            reference.getAutomationWorkflowUuid(), reference.getWorkflowVersion(), Kind.REFERENCE,
-            reference.getAutomationWorkflowUuid(), null, reference.isDangling(), components, inputs, inputValues,
+            reference.getId(), connectedUserId, reference.isEnabled(), null, 0L, automation,
+            reference.getAutomationUuid(), reference.getWorkflowVersion(), Kind.REFERENCE,
+            reference.getAutomationUuid(), null, reference.isDangling(), components, inputs, inputValues,
             attentionReason, null);
     }
 
     public ConnectedUserProjectWorkflowDTO withAttentionReason(@Nullable String attentionReason) {
         return new ConnectedUserProjectWorkflowDTO(
             id, connectedUserId, enabled, lastExecutionDate, projectId, workflow, workflowUuid, workflowVersion, kind,
-            automationWorkflowUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues,
+            automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues,
             attentionReason, staticWebhookUrl);
     }
 
@@ -87,7 +87,7 @@ public record ConnectedUserProjectWorkflowDTO(
     public ConnectedUserProjectWorkflowDTO withStaticWebhookUrl(@Nullable String staticWebhookUrl) {
         return new ConnectedUserProjectWorkflowDTO(
             id, connectedUserId, enabled, lastExecutionDate, projectId, workflow, workflowUuid, workflowVersion, kind,
-            automationWorkflowUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues,
+            automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues,
             attentionReason, staticWebhookUrl);
     }
 }

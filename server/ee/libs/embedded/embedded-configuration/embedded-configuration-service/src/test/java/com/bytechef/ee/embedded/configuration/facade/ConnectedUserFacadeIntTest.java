@@ -37,13 +37,13 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
-import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
+import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
-import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.facade.ConnectedUserFacade;
@@ -110,7 +110,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @SpringBootTest(
     classes = {
-        AutomationWorkflowProjectFacadeIntTestConfiguration.class,
+        AutomationProjectFacadeIntTestConfiguration.class,
         ConnectedUserFacadeIntTest.ConnectedUserConfiguration.class
     },
     properties = {
@@ -148,13 +148,13 @@ class ConnectedUserFacadeIntTest {
         """;
 
     @Autowired
-    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private AutomationProjectConfigurationService automationProjectConfigurationService;
 
     @Autowired
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @MockitoBean
-    private AutomationWorkflowProjectConfigurationUpdatedEventListener automationWorkflowProjectConfigurationUpdatedEventListener;
+    private AutomationProjectConfigurationUpdatedEventListener automationProjectConfigurationUpdatedEventListener;
 
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
@@ -244,23 +244,23 @@ class ConnectedUserFacadeIntTest {
                 .name("Slack")
                 .build());
 
-        long automationWorkflowProjectId = automationWorkflowProjectFacade.createProject(
+        long automationProjectId = automationProjectFacade.createProject(
             "Delete Connected User " + UUID.randomUUID(), "", null, List.of(), null);
 
-        String automationWorkflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(
-            automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION, null);
+        String automationUuid = automationProjectFacade.createProjectWorkflow(
+            automationProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION, null);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
-            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
+            externalUserId, automationUuid, Environment.PRODUCTION);
 
         assertThat(reference.isEnabled()).isTrue();
 
-        String referenceWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(automationWorkflowUuid);
+        String referenceWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(automationUuid);
 
         String copyWorkflowUuid = connectedUserProjectFacade.copyWorkflowTemplate(
-            externalUserId, automationWorkflowUuid, Environment.PRODUCTION);
+            externalUserId, automationUuid, Environment.PRODUCTION);
 
         connectedUserProjectFacade.publishProjectWorkflow(externalUserId, copyWorkflowUuid, "v1", ENVIRONMENT_ID);
         connectedUserProjectFacade.enableProjectWorkflow(externalUserId, copyWorkflowUuid, true, ENVIRONMENT_ID);
@@ -373,7 +373,7 @@ class ConnectedUserFacadeIntTest {
     }
 
     private void publishAndPinProject(long projectId) {
-        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
-            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, projectId);
+        AutomationProjectConfigurationTestSupport.publishAndPinProject(
+            automationProjectFacade, automationProjectConfigurationService, projectId);
     }
 }

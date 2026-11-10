@@ -20,33 +20,33 @@ import org.jspecify.annotations.Nullable;
  */
 public interface ConnectedUserWorkflowReferenceFacade {
 
-    void deleteReference(String externalUserId, String automationWorkflowUuid, Environment environment);
+    void deleteReference(String externalUserId, String automationUuid, Environment environment);
 
     /**
      * Turns the connected user's workflow on or off.
      *
-     * @param externalUserId         the connected user's external id
-     * @param automationWorkflowUuid the automation workflow uuid
-     * @param enable                 whether to turn the workflow on
-     * @param environment            the environment
+     * @param externalUserId the connected user's external id
+     * @param automationUuid the automation workflow uuid
+     * @param enable         whether to turn the workflow on
+     * @param environment    the environment
      * @return the stored reference after the change
      */
     ConnectedUserProjectWorkflow enableReference(
-        String externalUserId, String automationWorkflowUuid, boolean enable, Environment environment);
+        String externalUserId, String automationUuid, boolean enable, Environment environment);
 
     List<ConnectedUserProjectWorkflow> getConnectedUserWorkflows(long connectedUserId);
 
     ConnectedUserProjectWorkflow getOrCreateReference(
-        String externalUserId, String automationWorkflowUuid, Environment environment);
+        String externalUserId, String automationUuid, Environment environment);
 
     ConnectedUserProjectWorkflow getOrCreateReference(
-        String externalUserId, String automationWorkflowUuid, Environment environment,
+        String externalUserId, String automationUuid, Environment environment,
         Map<String, Long> requestedConnectionIds);
 
     ConnectedUserProjectWorkflow getOrCreateReference(
-        String externalUserId, String automationWorkflowUuid, Environment environment,
+        String externalUserId, String automationUuid, Environment environment,
         Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs);
 
     void updateReferenceInputs(
-        String externalUserId, String automationWorkflowUuid, Map<String, ?> inputs, Environment environment);
+        String externalUserId, String automationUuid, Map<String, ?> inputs, Environment environment);
 }
