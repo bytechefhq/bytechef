@@ -2,8 +2,8 @@ import {SetAutomationEnabledRequestI} from '@/ee/pages/embedded/automation-hub/m
 import AutomationCard from '@/ee/pages/embedded/automation-hub/views/components/AutomationCard';
 import TemplateCard from '@/ee/pages/embedded/automation-hub/views/components/TemplateCard';
 import {
-    AutomationWorkflowProject,
-    AutomationWorkflowProjectWorkflowTemplate,
+    AutomationProject,
+    AutomationProjectWorkflowTemplate,
     ConnectedUserProjectWorkflow,
 } from '@/ee/shared/middleware/embedded/public';
 import {useMemo} from 'react';
@@ -21,9 +21,9 @@ interface TemplateGridSectionProps {
     onDeleteAutomation: (workflowUuid: string) => Promise<unknown>;
     onDeprovisionReference: (workflowUuid: string) => Promise<unknown>;
     onSetEnabled: (request: SetAutomationEnabledRequestI) => Promise<unknown>;
-    onUseTemplate: (template: AutomationWorkflowProjectWorkflowTemplate) => void;
+    onUseTemplate: (template: AutomationProjectWorkflowTemplate) => void;
     newWorkflowEnabled: boolean;
-    projects: AutomationWorkflowProject[];
+    projects: AutomationProject[];
     search: string;
     unmatchedAutomations: ConnectedUserProjectWorkflow[];
 }

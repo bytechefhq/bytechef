@@ -13,13 +13,13 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
-    useAutomationWorkflowProjectConfigurationsQuery: () => ({
-        data: hoisted.configurations ? {automationWorkflowProjectConfigurations: hoisted.configurations} : undefined,
+    useAutomationProjectConfigurationsQuery: () => ({
+        data: hoisted.configurations ? {automationProjectConfigurations: hoisted.configurations} : undefined,
     }),
 }));
 
 vi.mock(
-    '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-configuration-list/AutomationWorkflowProjectConfigurationMoveUsersDialog',
+    '@/ee/pages/embedded/automations/components/automation-project-configuration-list/AutomationProjectConfigurationMoveUsersDialog',
     () => ({
         default: (props: Record<string, unknown>) => {
             hoisted.dialogProps.push(props);

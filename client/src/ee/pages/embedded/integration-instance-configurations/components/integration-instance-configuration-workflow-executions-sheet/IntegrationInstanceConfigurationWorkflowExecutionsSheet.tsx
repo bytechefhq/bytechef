@@ -10,7 +10,7 @@ import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/comp
 import {useGetIntegrationWorkflowExecutionsQuery} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
 import ProjectDeploymentWorkflowPanel from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowPanel';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {Workflow as AutomationWorkflow} from '@/shared/middleware/automation/configuration';
+import {Workflow as Automation} from '@/shared/middleware/automation/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {VisuallyHidden} from 'radix-ui';
 import {useMemo, useState} from 'react';
@@ -97,7 +97,7 @@ const IntegrationInstanceConfigurationWorkflowExecutionsContent = ({
             workflowLabel={workflow.label}
             workflowPanel={
                 <WorkflowReadOnlyProvider value={{useGetComponentDefinitionsQuery}}>
-                    <ProjectDeploymentWorkflowPanel workflow={workflow as AutomationWorkflow} />
+                    <ProjectDeploymentWorkflowPanel workflow={workflow as Automation} />
                 </WorkflowReadOnlyProvider>
             }
         />

@@ -46,8 +46,7 @@ const ConnectedUserProjectWorkflowList = ({
 
         for (const connectedUserProjectWorkflow of connectedUserProjectWorkflows) {
             const sourceWorkflowUuid =
-                connectedUserProjectWorkflow.automationWorkflowUuid ??
-                connectedUserProjectWorkflow.copiedFromWorkflowUuid;
+                connectedUserProjectWorkflow.automationUuid ?? connectedUserProjectWorkflow.copiedFromWorkflowUuid;
 
             const projectName = sourceWorkflowUuid
                 ? workflowTemplateSourcesByWorkflowUuid.get(sourceWorkflowUuid)?.projectName
@@ -162,7 +161,7 @@ const ConnectedUserProjectWorkflowList = ({
                                     <ul className="divide-y divide-stroke-neutral-primary">
                                         {group.connectedUserProjectWorkflows.map((connectedUserProjectWorkflow) => {
                                             const sourceWorkflowUuid =
-                                                connectedUserProjectWorkflow.automationWorkflowUuid ??
+                                                connectedUserProjectWorkflow.automationUuid ??
                                                 connectedUserProjectWorkflow.copiedFromWorkflowUuid;
 
                                             const workflowTemplate = sourceWorkflowUuid

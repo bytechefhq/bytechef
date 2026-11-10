@@ -26,7 +26,7 @@ export default function useOpenInEmbeddedEditor() {
         [currentEnvironmentId, navigate, setCurrentEnvironmentId]
     );
 
-    const openAutomationWorkflow = useCallback(
+    const openAutomation = useCallback(
         (workflowUuid?: string) => {
             if (!workflowUuid) {
                 toast('The project has no workflows to open.');
@@ -34,7 +34,7 @@ export default function useOpenInEmbeddedEditor() {
                 return;
             }
 
-            navigateInDevelopment(`/embedded/automation-workflows/${workflowUuid}/editor`);
+            navigateInDevelopment(`/embedded/automations/${workflowUuid}/editor`);
         },
         [navigateInDevelopment]
     );
@@ -84,5 +84,5 @@ export default function useOpenInEmbeddedEditor() {
         [navigateInDevelopment, queryClient]
     );
 
-    return {openAutomationWorkflow, openIntegration, openIntegrationWorkflow};
+    return {openAutomation, openIntegration, openIntegrationWorkflow};
 }

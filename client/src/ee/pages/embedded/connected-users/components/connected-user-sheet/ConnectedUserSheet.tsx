@@ -1,5 +1,5 @@
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
-import AutomationWorkflowExecutionsSheet from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-executions-sheet/AutomationWorkflowExecutionsSheet';
+import AutomationExecutionsSheet from '@/ee/pages/embedded/automations/components/automation-executions-sheet/AutomationExecutionsSheet';
 import ConnectedUserSheetActions from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetActions';
 import ConnectedUserSheetPanel from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanel';
 import ConnectedUserSheetTitle from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetTitle';
@@ -56,7 +56,7 @@ const ConnectedUserSheet = () => {
 
                 <IntegrationInstanceConfigurationWorkflowExecutionsSheet />
 
-                <AutomationWorkflowExecutionsSheet />
+                <AutomationExecutionsSheet />
             </SheetContent>
         </Sheet>
     );

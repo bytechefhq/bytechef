@@ -1,9 +1,5 @@
 import {useAutomationHubStore} from '@/ee/pages/embedded/automation-hub/stores/useAutomationHubStore';
-import {
-    AutomationWorkflowProject,
-    ConnectedUserProjectWorkflow,
-    ResponseError,
-} from '@/ee/shared/middleware/embedded/public';
+import {AutomationProject, ConnectedUserProjectWorkflow, ResponseError} from '@/ee/shared/middleware/embedded/public';
 import {render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router-dom';
@@ -103,7 +99,7 @@ vi.mock('react-inlinesvg', () => ({
     default: ({src}: {src: string}) => <img alt="component icon" src={src} />,
 }));
 
-const salesProject: AutomationWorkflowProject = {
+const salesProject: AutomationProject = {
     description: 'Templates for the sales team',
     id: 1,
     name: 'Sales',
@@ -123,7 +119,7 @@ const salesProject: AutomationWorkflowProject = {
     ],
 };
 
-const supportProject: AutomationWorkflowProject = {
+const supportProject: AutomationProject = {
     description: 'Templates for the support team',
     id: 2,
     name: 'Support',
@@ -149,7 +145,7 @@ const copyAutomation: ConnectedUserProjectWorkflow = {
 };
 
 const referenceAutomation: ConnectedUserProjectWorkflow = {
-    automationWorkflowUuid: 'wf-3',
+    automationUuid: 'wf-3',
     components: [],
     dangling: false,
     enabled: false,
@@ -174,7 +170,7 @@ const referenceAutomationNeedingAttention: ConnectedUserProjectWorkflow = {
 };
 
 const danglingReferenceAutomation: ConnectedUserProjectWorkflow = {
-    automationWorkflowUuid: 'withdrawn-uuid',
+    automationUuid: 'withdrawn-uuid',
     components: [],
     dangling: true,
     enabled: true,

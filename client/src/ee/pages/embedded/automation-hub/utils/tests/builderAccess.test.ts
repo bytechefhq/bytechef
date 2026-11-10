@@ -3,7 +3,7 @@ import {describe, expect, it} from 'vitest';
 
 const templateCopy = {copiedFromWorkflowUuid: 'tpl-1', kind: 'COPY', workflowUuid: 'copy-1'} as const;
 const blankAutomation = {kind: 'COPY', workflowUuid: 'blank-1'} as const;
-const reference = {automationWorkflowUuid: 'tpl-1', kind: 'REFERENCE', workflowUuid: 'tpl-1'} as const;
+const reference = {automationUuid: 'tpl-1', kind: 'REFERENCE', workflowUuid: 'tpl-1'} as const;
 
 describe('canOpenInBuilder', () => {
     it('opens any copy when editing is allowed', () => {

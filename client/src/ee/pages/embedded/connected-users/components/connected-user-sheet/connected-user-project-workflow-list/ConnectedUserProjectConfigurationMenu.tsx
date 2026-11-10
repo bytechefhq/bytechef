@@ -6,9 +6,9 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import AutomationWorkflowProjectConfigurationMoveUsersDialog from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-configuration-list/AutomationWorkflowProjectConfigurationMoveUsersDialog';
+import AutomationProjectConfigurationMoveUsersDialog from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/AutomationProjectConfigurationMoveUsersDialog';
 import {NO_OTHER_CONFIGURATION_REASON} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
-import {useAutomationWorkflowProjectConfigurationsQuery} from '@/shared/middleware/graphql';
+import {useAutomationProjectConfigurationsQuery} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon, RefreshCcwIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
@@ -31,10 +31,10 @@ const ConnectedUserProjectConfigurationMenu = ({
 }: ConnectedUserProjectConfigurationMenuProps) => {
     const [showChangeDialog, setShowChangeDialog] = useState(false);
 
-    const {data} = useAutomationWorkflowProjectConfigurationsQuery({projectId});
+    const {data} = useAutomationProjectConfigurationsQuery({projectId});
 
     const targetConfigurations = useMemo(() => {
-        const configurations = data?.automationWorkflowProjectConfigurations ?? [];
+        const configurations = data?.automationProjectConfigurations ?? [];
 
         const currentConfigurationEnvironmentId = configurations.find(
             (configuration) => configuration.id === currentConfiguration.configurationId
@@ -92,7 +92,7 @@ const ConnectedUserProjectConfigurationMenu = ({
             </DropdownMenu>
 
             {showChangeDialog && (
-                <AutomationWorkflowProjectConfigurationMoveUsersDialog
+                <AutomationProjectConfigurationMoveUsersDialog
                     configuration={configuration}
                     connectedUsers={connectedUsers}
                     initialSelectedConnectedUserIds={[connectedUser.connectedUserId]}

@@ -50,15 +50,15 @@ describe('useOpenInEmbeddedEditor', () => {
 
         const {result} = renderHook(() => useOpenInEmbeddedEditor());
 
-        act(() => result.current.openAutomationWorkflow('workflow-uuid'));
+        act(() => result.current.openAutomation('workflow-uuid'));
 
-        expect(navigateMock).toHaveBeenCalledWith('/embedded/automation-workflows/workflow-uuid/editor');
+        expect(navigateMock).toHaveBeenCalledWith('/embedded/automations/workflow-uuid/editor');
     });
 
     it('stays put with a toast when the project has no workflows', () => {
         const {result} = renderHook(() => useOpenInEmbeddedEditor());
 
-        act(() => result.current.openAutomationWorkflow(undefined));
+        act(() => result.current.openAutomation(undefined));
 
         expect(toastMock).toHaveBeenCalledWith('The project has no workflows to open.');
         expect(navigateMock).not.toHaveBeenCalled();

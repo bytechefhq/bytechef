@@ -11,7 +11,7 @@ import {
 import {Label} from '@/components/ui/label';
 import {useUpdateAutomationInputsMutation} from '@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations';
 import {toInputValueText} from '@/ee/pages/embedded/automation-hub/utils/inputValue';
-import {AutomationWorkflowProjectWorkflowInput} from '@/ee/shared/middleware/embedded/public';
+import {AutomationProjectWorkflowInput} from '@/ee/shared/middleware/embedded/public';
 import {useState} from 'react';
 
 const INPUT_TYPE_ATTRIBUTES: Record<string, string> = {
@@ -26,7 +26,7 @@ const INPUT_TYPE_ATTRIBUTES: Record<string, string> = {
 
 interface AutomationInputsDialogProps {
     inputValues: Record<string, unknown>;
-    inputs: AutomationWorkflowProjectWorkflowInput[];
+    inputs: AutomationProjectWorkflowInput[];
     label: string;
     onClose: () => void;
     workflowUuid: string;

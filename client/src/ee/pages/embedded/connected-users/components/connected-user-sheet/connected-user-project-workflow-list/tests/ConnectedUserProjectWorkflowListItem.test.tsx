@@ -1,5 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore';
+import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -44,7 +44,7 @@ const createConnectedUserProjectWorkflow = (
     staticWebhookUrl: string | null,
     overrides: Partial<ConnectedUserProjectWorkflowType> = {}
 ): ConnectedUserProjectWorkflowType => ({
-    automationWorkflowUuid: null,
+    automationUuid: null,
     connectedUserId: '1050',
     copiedFromWorkflowUuid: null,
     enabled: true,
@@ -85,8 +85,8 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
     beforeEach(() => {
         hoisted.copyToClipboard.mockClear();
 
-        useAutomationWorkflowExecutionsSheetStore.setState({
-            automationWorkflowExecutionsSheetOpen: false,
+        useAutomationExecutionsSheetStore.setState({
+            automationExecutionsSheetOpen: false,
             connectedUserId: undefined,
             projectName: undefined,
             workflow: undefined,
@@ -98,9 +98,9 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
 
         await userEvent.click(screen.getByRole('button', {name: 'WhatsApp Agent - Human reply'}));
 
-        const state = useAutomationWorkflowExecutionsSheetStore.getState();
+        const state = useAutomationExecutionsSheetStore.getState();
 
-        expect(state.automationWorkflowExecutionsSheetOpen).toBe(true);
+        expect(state.automationExecutionsSheetOpen).toBe(true);
         expect(state.connectedUserId).toBe(1050);
         expect(state.projectName).toBe('Automation Playground');
         expect(state.workflow).toEqual({

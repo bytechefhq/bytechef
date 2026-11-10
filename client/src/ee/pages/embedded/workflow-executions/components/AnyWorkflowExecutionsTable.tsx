@@ -5,7 +5,7 @@ import {getWorkflowExecutionColumns} from '@/ee/pages/embedded/workflow-executio
 import useEmbeddedWorkflowExecutionSheetStore from '@/ee/pages/embedded/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {AnyWorkflowExecutionRowI} from '@/ee/pages/embedded/workflow-executions/utils/anyWorkflowExecutions';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
-import useAutomationWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
+import useAutomationExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {getProjectVersion} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
 import {coreTableFeatures} from '@/shared/util/table-features';
 import {createColumnHelper} from '@tanstack/react-table';
@@ -19,7 +19,7 @@ const SourceCell = ({row}: {row: AnyWorkflowExecutionRowI}) => {
         !!row.integrationWorkflowExecution
     );
 
-    const automation = !!row.automationWorkflowExecution;
+    const automation = !!row.automationExecution;
 
     const SourceIcon = automation ? WorkflowIcon : SquareIcon;
     const sourceLabel = automation ? 'Automation' : 'Integration';
@@ -31,7 +31,7 @@ const SourceCell = ({row}: {row: AnyWorkflowExecutionRowI}) => {
     );
 
     const name = automation
-        ? row.automationWorkflowExecution?.project?.name
+        ? row.automationExecution?.project?.name
         : componentDefinition?.title || row.integrationWorkflowExecution?.integration?.name || componentName;
 
     return (
@@ -52,8 +52,8 @@ const SourceCell = ({row}: {row: AnyWorkflowExecutionRowI}) => {
 };
 
 const getVersion = (row: AnyWorkflowExecutionRowI) => {
-    if (row.automationWorkflowExecution) {
-        const projectVersion = getProjectVersion(row.automationWorkflowExecution);
+    if (row.automationExecution) {
+        const projectVersion = getProjectVersion(row.automationExecution);
 
         return projectVersion != null ? `V${projectVersion}` : '';
     }
@@ -64,10 +64,8 @@ const getVersion = (row: AnyWorkflowExecutionRowI) => {
 };
 
 const AnyWorkflowExecutionsTable = ({data}: {data: AnyWorkflowExecutionRowI[]}) => {
-    const setAutomationWorkflowExecutionId = useAutomationWorkflowExecutionSheetStore(
-        (state) => state.setWorkflowExecutionId
-    );
-    const setAutomationWorkflowExecutionSheetOpen = useAutomationWorkflowExecutionSheetStore(
+    const setAutomationExecutionId = useAutomationExecutionSheetStore((state) => state.setWorkflowExecutionId);
+    const setAutomationExecutionSheetOpen = useAutomationExecutionSheetStore(
         (state) => state.setWorkflowExecutionSheetOpen
     );
     const setEmbeddedWorkflowExecutionId = useEmbeddedWorkflowExecutionSheetStore(
@@ -78,17 +76,14 @@ const AnyWorkflowExecutionsTable = ({data}: {data: AnyWorkflowExecutionRowI[]}) 
     );
 
     const handleRowClick = (index: number) => {
-        const {automationWorkflowExecution, integrationWorkflowExecution} = data[index];
+        const {automationExecution, integrationWorkflowExecution} = data[index];
 
-        if (automationWorkflowExecution?.id != null) {
+        if (automationExecution?.id != null) {
             setEmbeddedWorkflowExecutionSheetOpen(false);
-            setAutomationWorkflowExecutionId(
-                automationWorkflowExecution.id,
-                automationWorkflowExecution.job ? 'JOB' : 'TRIGGER_EXECUTION'
-            );
-            setAutomationWorkflowExecutionSheetOpen(true);
+            setAutomationExecutionId(automationExecution.id, automationExecution.job ? 'JOB' : 'TRIGGER_EXECUTION');
+            setAutomationExecutionSheetOpen(true);
         } else if (integrationWorkflowExecution?.id != null) {
-            setAutomationWorkflowExecutionSheetOpen(false);
+            setAutomationExecutionSheetOpen(false);
             setEmbeddedWorkflowExecutionId(integrationWorkflowExecution.id);
             setEmbeddedWorkflowExecutionSheetOpen(true);
         }
@@ -105,8 +100,8 @@ const AnyWorkflowExecutionsTable = ({data}: {data: AnyWorkflowExecutionRowI[]}) 
                 cell: ({row}) => (
                     <EmbeddedWorkflowExecutionConnectedUser
                         connectedUserId={
-                            row.original.automationWorkflowExecution
-                                ? row.original.automationWorkflowExecution.connectedUserId
+                            row.original.automationExecution
+                                ? row.original.automationExecution.connectedUserId
                                 : row.original.integrationWorkflowExecution?.integrationInstance?.connectedUserId
                         }
                     />

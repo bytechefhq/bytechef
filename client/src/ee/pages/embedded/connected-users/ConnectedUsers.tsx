@@ -222,9 +222,9 @@ const ConnectedUsers = () => {
         void queryClient.invalidateQueries({
             queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
         });
-        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectConfigurations']});
-        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectConfigurationConnectedUsers']});
-        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+        void queryClient.invalidateQueries({queryKey: ['automationProjectConfigurations']});
+        void queryClient.invalidateQueries({queryKey: ['automationProjectConfigurationConnectedUsers']});
+        void queryClient.invalidateQueries({queryKey: ['automationProjects']});
         void queryClient.invalidateQueries({queryKey: ['connectedUserProjects']});
 
         setSelectedConnectedUserIds([]);

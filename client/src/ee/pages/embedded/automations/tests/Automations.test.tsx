@@ -1,0 +1,543 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
+import {createTestQueryClientWrapper, screen, userEvent} from '@/shared/util/test-utils';
+import {render} from '@testing-library/react';
+import {ReactElement, ReactNode} from 'react';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+
+import Automations from '../Automations';
+import useAutomationExecutionsSheetStore from '../stores/useAutomationExecutionsSheetStore';
+
+const renderWithProviders = (ui: ReactElement) => {
+    const QueryClientWrapper = createTestQueryClientWrapper();
+
+    const wrapper = ({children}: {children: ReactNode}) => (
+        <QueryClientWrapper>
+            <TooltipProvider>{children}</TooltipProvider>
+        </QueryClientWrapper>
+    );
+
+    return render(ui, {wrapper});
+};
+
+const hoisted = vi.hoisted(() => {
+    return {
+        categories: [] as Array<{id: string; name: string}>,
+        categoriesIsLoading: false,
+        configurations: [] as Array<{
+            automationHubVisible: boolean;
+            enabled: boolean;
+            environmentId: string;
+            id: string;
+            lastModifiedDate: string | null;
+            projectId: string;
+            projectVersion: number;
+            workflows: Array<{enabled: boolean; label: string | null; workflowUuid: string}>;
+        }>,
+        createProjectMutate: vi.fn(),
+        createWorkflowMutate: vi.fn(),
+        deleteProjectMutate: vi.fn(),
+        deleteWorkflowMutate: vi.fn(),
+        navigateMock: vi.fn(),
+        projects: [] as Array<{
+            categoryId: string | null;
+            description: string | null;
+            id: string;
+            lastPublishedVersion: number | null;
+            name: string;
+            published: boolean;
+            tagIds: Array<string>;
+            workflowTemplates: Array<{description: string | null; label: string | null; workflowUuid: string}>;
+        }>,
+        publishProjectMutate: vi.fn(),
+        tags: [] as Array<{id: string; name: string}>,
+        updateProjectMutate: vi.fn(),
+        updateWorkflowMutate: vi.fn(),
+        updateWorkflowPermissionExpressionMutate: vi.fn(),
+    };
+});
+
+vi.mock('@/shared/queries/platform/environments.queries', () => ({
+    useGetEnvironmentsQuery: () => ({data: [{id: 2, name: 'Staging'}]}),
+}));
+
+vi.mock('@/shared/middleware/graphql', () => ({
+    useAutomationProjectCategoriesQuery: () => ({
+        data: {automationProjectCategories: hoisted.categories},
+        error: null,
+        isLoading: hoisted.categoriesIsLoading,
+    }),
+    useAutomationProjectConfigurationDeleteImpactQuery: () => ({data: undefined}),
+    useAutomationProjectConfigurationsQuery: () => ({
+        data: {automationProjectConfigurations: hoisted.configurations},
+    }),
+    useAutomationProjectTagsQuery: () => ({
+        data: {automationProjectTags: hoisted.tags},
+        error: null,
+        isLoading: false,
+    }),
+    useAutomationProjectsQuery: () => ({
+        data: {automationProjects: hoisted.projects},
+        error: null,
+        isLoading: false,
+    }),
+    useCreateAutomationProjectMutation: () => ({
+        isPending: false,
+        mutate: hoisted.createProjectMutate,
+    }),
+    useCreateAutomationProjectWorkflowMutation: () => ({
+        isPending: false,
+        mutate: hoisted.createWorkflowMutate,
+    }),
+    useDeleteAutomationProjectConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useDeleteAutomationProjectMutation: () => ({
+        isPending: false,
+        mutate: hoisted.deleteProjectMutate,
+    }),
+    useDeleteAutomationProjectWorkflowMutation: () => ({
+        isPending: false,
+        mutate: hoisted.deleteWorkflowMutate,
+    }),
+    useEnableAutomationProjectConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useEnableAutomationProjectConfigurationWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
+    usePublishAutomationProjectMutation: () => ({
+        isPending: false,
+        mutate: hoisted.publishProjectMutate,
+    }),
+    useUpdateAutomationProjectMutation: () => ({
+        isPending: false,
+        mutate: hoisted.updateProjectMutate,
+    }),
+    useUpdateAutomationProjectWorkflowMutation: () => ({
+        isPending: false,
+        mutate: hoisted.updateWorkflowMutate,
+    }),
+    useUpdateAutomationProjectWorkflowPermissionExpressionMutation: () => ({
+        isPending: false,
+        mutate: hoisted.updateWorkflowPermissionExpressionMutate,
+    }),
+}));
+
+vi.mock(
+    '@/ee/pages/embedded/automations/components/automation-executions-sheet/AutomationExecutionsSheet',
+    async () => {
+        const {default: useAutomationExecutionsSheetStore} =
+            await import('@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore');
+
+        const AutomationExecutionsSheetMock = () => {
+            const {automationExecutionsSheetOpen, projectName, workflow} = useAutomationExecutionsSheetStore();
+
+            return automationExecutionsSheetOpen ? (
+                <div>{`Executions sheet ${projectName} ${workflow?.workflowUuid}`}</div>
+            ) : null;
+        };
+
+        return {default: AutomationExecutionsSheetMock};
+    }
+);
+
+vi.mock('react-router-dom', () => ({
+    Link: ({children}: {children: React.ReactNode}) => <a>{children}</a>,
+    useNavigate: () => hoisted.navigateMock,
+    useSearchParams: () => [new URLSearchParams(), vi.fn()],
+}));
+
+vi.mock(import('@tanstack/react-query'), async (importOriginal) => {
+    const actual = await importOriginal();
+
+    return {
+        ...actual,
+        useQueryClient: () => ({invalidateQueries: vi.fn()}) as unknown as ReturnType<typeof actual.useQueryClient>,
+    };
+});
+
+beforeEach(() => {
+    hoisted.categories = [];
+    hoisted.categoriesIsLoading = false;
+    hoisted.configurations = [];
+    hoisted.createProjectMutate.mockReset();
+    hoisted.createWorkflowMutate.mockReset();
+    hoisted.deleteProjectMutate.mockReset();
+    hoisted.deleteWorkflowMutate.mockReset();
+    hoisted.navigateMock.mockReset();
+    hoisted.projects = [];
+    hoisted.publishProjectMutate.mockReset();
+    hoisted.tags = [];
+    hoisted.updateProjectMutate.mockReset();
+    hoisted.updateWorkflowMutate.mockReset();
+    hoisted.updateWorkflowPermissionExpressionMutate.mockReset();
+
+    useAutomationExecutionsSheetStore.setState({
+        automationExecutionsSheetOpen: false,
+        environmentId: undefined,
+        projectName: undefined,
+        workflow: undefined,
+    });
+});
+
+describe('Automations', () => {
+    it('renders the empty state when there are no projects', () => {
+        hoisted.projects = [];
+
+        renderWithProviders(<Automations />);
+
+        expect(screen.getByText('Create your first project')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: /create project/i})).toBeInTheDocument();
+    });
+
+    it('renders the project list from the query', () => {
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: 'CRM project',
+                id: 'project-1',
+                lastPublishedVersion: null,
+                name: 'CRM Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [{description: null, label: 'Sync Contacts', workflowUuid: 'wf-1'}],
+            },
+        ];
+
+        renderWithProviders(<Automations />);
+
+        expect(screen.getByText('CRM Project')).toBeInTheDocument();
+        expect(screen.getByText('DRAFT')).toBeInTheDocument();
+    });
+
+    it('renders the Categories and Tags filter sidebar sections', () => {
+        hoisted.categories = [{id: '1', name: 'CRM'}];
+        hoisted.tags = [{id: '2', name: 'lead'}];
+        hoisted.projects = [
+            {
+                categoryId: '1',
+                description: null,
+                id: 'project-1',
+                lastPublishedVersion: null,
+                name: 'CRM Project',
+                published: false,
+                tagIds: ['2'],
+                workflowTemplates: [],
+            },
+        ];
+
+        renderWithProviders(<Automations />);
+
+        expect(screen.getByText('Categories')).toBeInTheDocument();
+        expect(screen.getByText('Tags')).toBeInTheDocument();
+        expect(screen.getByText('CRM')).toBeInTheDocument();
+        expect(screen.getAllByText('lead').length).toBeGreaterThan(0);
+    });
+
+    it('shows only categories returned by the embedded categories query in the filter sidebar', () => {
+        hoisted.categories = [{id: '1', name: 'Used'}];
+        hoisted.projects = [
+            {
+                categoryId: '1',
+                description: null,
+                id: 'project-1',
+                lastPublishedVersion: null,
+                name: 'Used Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [],
+            },
+        ];
+
+        renderWithProviders(<Automations />);
+
+        expect(screen.getByText('Used')).toBeInTheDocument();
+        expect(screen.queryByText('Unused')).toBeNull();
+    });
+
+    it('hides the left sidebar and shows the page title in the main header on first run', () => {
+        hoisted.projects = [];
+
+        renderWithProviders(<Automations />);
+
+        expect(screen.getByText('Create your first project')).toBeInTheDocument();
+        expect(screen.getAllByText('Automations')).toHaveLength(1);
+        expect(screen.queryByRole('button', {name: /^new project$/i})).toBeNull();
+        expect(screen.queryByText('Categories')).toBeNull();
+    });
+
+    it('keeps the left sidebar hidden until the categories and tags have loaded', () => {
+        hoisted.categoriesIsLoading = true;
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: null,
+                id: 'project-1',
+                lastPublishedVersion: null,
+                name: 'Loaded Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [],
+            },
+        ];
+
+        renderWithProviders(<Automations />);
+
+        expect(screen.getByText('Loaded Project')).toBeInTheDocument();
+        expect(screen.queryByText('Categories')).toBeNull();
+    });
+
+    it('opens the project dialog when New Project is clicked', async () => {
+        const user = userEvent.setup();
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByRole('button', {name: /create project/i}));
+
+        expect(await screen.findByPlaceholderText('My CRM Project')).toBeInTheDocument();
+        expect(screen.getByText('Use this to create a project which will contain workflows')).toBeInTheDocument();
+    });
+
+    it('calls the create project mutation when the dialog is submitted', async () => {
+        const user = userEvent.setup();
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByRole('button', {name: /create project/i}));
+
+        const nameInput = await screen.findByPlaceholderText('My CRM Project');
+
+        await user.type(nameInput, 'New Project');
+
+        await user.click(screen.getByRole('button', {name: /^save$/i}));
+
+        expect(hoisted.createProjectMutate).toHaveBeenCalledTimes(1);
+        expect(hoisted.createProjectMutate.mock.calls[0][0]).toMatchObject({name: 'New Project'});
+    });
+
+    it('calls the update mutation with tag names when a tag is removed from the inline tag list', async () => {
+        const user = userEvent.setup();
+
+        hoisted.tags = [{id: '1', name: 'sales'}];
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: null,
+                id: 'project-tag-1',
+                lastPublishedVersion: null,
+                name: 'Tagged Project',
+                published: false,
+                tagIds: ['1'],
+                workflowTemplates: [],
+            },
+        ];
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByRole('button', {name: 'Remove tag'}));
+
+        expect(hoisted.updateProjectMutate).toHaveBeenCalledTimes(1);
+
+        const mutateArg = hoisted.updateProjectMutate.mock.calls[0][0];
+
+        expect(mutateArg).toMatchObject({
+            category: undefined,
+            description: undefined,
+            id: 'project-tag-1',
+            name: 'Tagged Project',
+            tags: [],
+        });
+    });
+
+    it('calls the publish mutation when Publish is selected from the project menu', async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: null,
+                id: 'project-9',
+                lastPublishedVersion: null,
+                name: 'Publishable Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [],
+            },
+        ];
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByTestId('project-9-moreProjectActionsButton'));
+
+        await user.click(await screen.findByRole('menuitem', {name: /publish/i}));
+
+        expect(hoisted.publishProjectMutate).toHaveBeenCalledTimes(1);
+        expect(hoisted.publishProjectMutate.mock.calls[0][0]).toMatchObject({id: 'project-9'});
+    });
+
+    it('opens the Create Workflow dialog when New Workflow is picked from the project menu', async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: null,
+                id: 'project-10',
+                lastPublishedVersion: null,
+                name: 'My Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [],
+            },
+        ];
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByRole('button', {name: 'More Project Actions'}));
+
+        await user.click(await screen.findByRole('menuitem', {name: 'New Workflow'}));
+
+        expect(await screen.findByRole('heading', {name: 'Create Workflow'})).toBeInTheDocument();
+        expect(screen.getByText('Create a new workflow by filling out the form below.')).toBeInTheDocument();
+    });
+
+    it('calls the create workflow mutation with label and definition on dialog save', async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: null,
+                id: 'project-11',
+                lastPublishedVersion: null,
+                name: 'My Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [],
+            },
+        ];
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByRole('button', {name: 'More Project Actions'}));
+
+        await user.click(await screen.findByRole('menuitem', {name: 'New Workflow'}));
+
+        const labelInput = await screen.findByRole('textbox', {name: /label/i});
+
+        await user.type(labelInput, 'My New Workflow');
+
+        await user.click(screen.getByRole('button', {name: /^save$/i}));
+
+        expect(hoisted.createWorkflowMutate).toHaveBeenCalledTimes(1);
+
+        const {definition, projectId} = hoisted.createWorkflowMutate.mock.calls[0][0];
+
+        expect(projectId).toBe('project-11');
+
+        const parsed = JSON.parse(definition);
+
+        expect(parsed.label).toBe('My New Workflow');
+    });
+
+    it("opens a workflow's executions from its configuration without opening the editor", async () => {
+        const user = userEvent.setup();
+
+        hoisted.configurations = [
+            {
+                automationHubVisible: true,
+                enabled: true,
+                environmentId: '2',
+                id: 'configuration-13',
+                lastModifiedDate: null,
+                projectId: 'project-13',
+                projectVersion: 1,
+                workflows: [{enabled: true, label: 'Mailer', workflowUuid: 'wf-uuid-13'}],
+            },
+        ];
+
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: null,
+                id: 'project-13',
+                lastPublishedVersion: 1,
+                name: 'Mail Project',
+                published: true,
+                tagIds: [],
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: null,
+                        label: 'Mailer',
+                        lastModifiedDate: null,
+                        permissionExpression: null,
+                        triggers: [],
+                        workflowId: 'draft-wf-13',
+                        workflowUuid: 'wf-uuid-13',
+                    } as unknown as {description: string | null; label: string | null; workflowUuid: string},
+                ],
+            },
+        ];
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByText('1 workflow'));
+        await user.click(screen.getByRole('tab', {name: 'Configurations'}));
+
+        await user.click(await screen.findByRole('button', {name: 'Mailer'}));
+
+        expect(await screen.findByText('Executions sheet Mail Project wf-uuid-13')).toBeInTheDocument();
+        expect(hoisted.navigateMock).not.toHaveBeenCalled();
+    });
+
+    it('updates the workflow and then its permission expression when the edit dialog is saved', async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: null,
+                id: 'project-12',
+                lastPublishedVersion: null,
+                name: 'My Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: 'Keeps contacts in sync',
+                        label: 'Sync Contacts',
+                        lastModifiedDate: null,
+                        permissionExpression: null,
+                        triggers: [],
+                        workflowUuid: 'wf-uuid-12',
+                    } as unknown as {description: string | null; label: string | null; workflowUuid: string},
+                ],
+            },
+        ];
+
+        hoisted.updateWorkflowMutate.mockImplementation((_variables, options) => options?.onSuccess?.());
+        hoisted.updateWorkflowPermissionExpressionMutate.mockImplementation((_variables, options) =>
+            options?.onSuccess?.()
+        );
+
+        renderWithProviders(<Automations />);
+
+        await user.click(screen.getByText('1 workflow'));
+        await user.click(await screen.findByRole('button', {name: 'Workflow Actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Edit Workflow'}));
+
+        const labelInput = await screen.findByRole('textbox', {name: /label/i});
+
+        await user.clear(labelInput);
+        await user.type(labelInput, 'Sync All Contacts');
+
+        await user.click(screen.getByRole('button', {name: /^save$/i}));
+
+        expect(hoisted.createWorkflowMutate).not.toHaveBeenCalled();
+        expect(hoisted.updateWorkflowMutate).toHaveBeenCalledWith(
+            expect.objectContaining({label: 'Sync All Contacts', workflowUuid: 'wf-uuid-12'}),
+            expect.anything()
+        );
+        expect(hoisted.updateWorkflowPermissionExpressionMutate).toHaveBeenCalledWith(
+            expect.objectContaining({workflowUuid: 'wf-uuid-12'}),
+            expect.anything()
+        );
+        expect(screen.queryByRole('textbox', {name: /label/i})).not.toBeInTheDocument();
+    });
+});

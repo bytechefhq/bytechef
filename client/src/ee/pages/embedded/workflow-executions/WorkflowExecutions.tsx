@@ -8,7 +8,7 @@ import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AnyWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AnyWorkflowExecutionsTable';
-import AutomationWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AutomationWorkflowExecutionsTable';
+import AutomationExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AutomationExecutionsTable';
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
 import useEmbeddedWorkflowExecutionSheetStore from '@/ee/pages/embedded/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {
@@ -41,8 +41,8 @@ import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integ
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
-import useAutomationWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
+import AutomationExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
+import useAutomationExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import FilterTitle from '@/shared/components/filters/FilterTitle';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
@@ -50,8 +50,8 @@ import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
-    WorkflowExecution as AutomationWorkflowExecution,
-    WorkflowExecutionFromJSON as AutomationWorkflowExecutionFromJSON,
+    WorkflowExecution as AutomationExecution,
+    WorkflowExecutionFromJSON as AutomationExecutionFromJSON,
 } from '@/shared/middleware/automation/workflow/execution';
 import {ConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -154,10 +154,8 @@ export const WorkflowExecutions = () => {
 
     const navigate = useNavigate();
 
-    const setAutomationWorkflowExecutionId = useAutomationWorkflowExecutionSheetStore(
-        (state) => state.setWorkflowExecutionId
-    );
-    const setAutomationWorkflowExecutionSheetOpen = useAutomationWorkflowExecutionSheetStore(
+    const setAutomationExecutionId = useAutomationExecutionSheetStore((state) => state.setWorkflowExecutionId);
+    const setAutomationExecutionSheetOpen = useAutomationExecutionSheetStore(
         (state) => state.setWorkflowExecutionSheetOpen
     );
     const setEmbeddedWorkflowExecutionId = useEmbeddedWorkflowExecutionSheetStore(
@@ -229,7 +227,7 @@ export const WorkflowExecutions = () => {
         !!filterIntegrationId && !integrationInstanceConfiguration
     );
 
-    const automationWorkflows = useMemo(() => {
+    const automations = useMemo(() => {
         const workflowsById = new Map<string, {id: string; label?: string | null}>();
 
         connectedUserProjects
@@ -302,7 +300,7 @@ export const WorkflowExecutions = () => {
         }
 
         return filterSource === WorkflowExecutionsSource.Automations
-            ? AutomationWorkflowExecutionFromJSON(workflowExecution)
+            ? AutomationExecutionFromJSON(workflowExecution)
             : EmbeddedWorkflowExecutionFromJSON(workflowExecution);
     });
 
@@ -324,11 +322,11 @@ export const WorkflowExecutions = () => {
                 workflowId: filterWorkflowId,
                 workflows:
                     filterSource === WorkflowExecutionsSource.Automations
-                        ? automationWorkflows.map((workflow) => ({id: workflow.id, label: workflow.label ?? undefined}))
+                        ? automations.map((workflow) => ({id: workflow.id, label: workflow.label ?? undefined}))
                         : workflows,
             }),
         [
-            automationWorkflows,
+            automations,
             connectedUserProjects,
             connectedUsers,
             filterConnectedUserId,
@@ -596,18 +594,18 @@ export const WorkflowExecutions = () => {
 
         if (linkedExecutionSource === WorkflowExecutionsSource.Automations) {
             setEmbeddedWorkflowExecutionSheetOpen(false);
-            setAutomationWorkflowExecutionId(linkedExecutionId, 'JOB');
-            setAutomationWorkflowExecutionSheetOpen(true);
+            setAutomationExecutionId(linkedExecutionId, 'JOB');
+            setAutomationExecutionSheetOpen(true);
         } else {
-            setAutomationWorkflowExecutionSheetOpen(false);
+            setAutomationExecutionSheetOpen(false);
             setEmbeddedWorkflowExecutionId(linkedExecutionId);
             setEmbeddedWorkflowExecutionSheetOpen(true);
         }
     }, [
         linkedExecutionIdParameter,
         linkedExecutionSource,
-        setAutomationWorkflowExecutionId,
-        setAutomationWorkflowExecutionSheetOpen,
+        setAutomationExecutionId,
+        setAutomationExecutionSheetOpen,
         setEmbeddedWorkflowExecutionId,
         setEmbeddedWorkflowExecutionSheetOpen,
     ]);
@@ -799,7 +797,7 @@ export const WorkflowExecutions = () => {
                             <ComboBox
                                 items={[
                                     ANY_FILTER_OPTION,
-                                    ...automationWorkflows.map((workflow) => ({
+                                    ...automations.map((workflow) => ({
                                         label: workflow.label || 'undefined label',
                                         value: workflow.id,
                                     })),
@@ -842,7 +840,7 @@ export const WorkflowExecutions = () => {
                     filterSource === WorkflowExecutionsSource.Any ? (
                         <AnyWorkflowExecutionsTable data={workflowExecutions as AnyWorkflowExecutionRowI[]} />
                     ) : filterSource === WorkflowExecutionsSource.Automations ? (
-                        <AutomationWorkflowExecutionsTable data={workflowExecutions as AutomationWorkflowExecution[]} />
+                        <AutomationExecutionsTable data={workflowExecutions as AutomationExecution[]} />
                     ) : (
                         <EmbeddedWorkflowExecutionsTable
                             data={workflowExecutions as EmbeddedWorkflowExecution[]}
@@ -858,7 +856,7 @@ export const WorkflowExecutions = () => {
                 )}
             </PageLoader>
 
-            <AutomationWorkflowExecutionSheet />
+            <AutomationExecutionSheet />
 
             <EmbeddedWorkflowExecutionSheet />
         </LayoutContainer>

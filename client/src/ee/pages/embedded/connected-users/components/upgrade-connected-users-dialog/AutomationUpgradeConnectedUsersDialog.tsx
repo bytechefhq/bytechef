@@ -4,10 +4,10 @@ import UpgradeConnectedUsersDialogView, {
 import useUpgradeSelection from '@/ee/pages/embedded/connected-users/components/upgrade-connected-users-dialog/useUpgradeSelection';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 import {
-    useAutomationWorkflowProjectConfigurationUpgradeImpactQuery,
-    useAutomationWorkflowProjectConfigurationsQuery,
-    useAutomationWorkflowProjectsQuery,
-    useUpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation,
+    useAutomationProjectConfigurationUpgradeImpactQuery,
+    useAutomationProjectConfigurationsQuery,
+    useAutomationProjectsQuery,
+    useUpgradeAutomationProjectConfigurationConnectedUsersMutation,
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
@@ -27,7 +27,7 @@ const AutomationUpgradeConnectedUsersDialog = ({
 }: AutomationUpgradeConnectedUsersDialogProps) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const {data: projectsData} = useAutomationWorkflowProjectsQuery({environmentId: String(currentEnvironmentId)});
+    const {data: projectsData} = useAutomationProjectsQuery({environmentId: String(currentEnvironmentId)});
 
     const connectedUserIds = useMemo(
         () => connectedUsers.map((connectedUser) => String(connectedUser.id)),
@@ -36,7 +36,7 @@ const AutomationUpgradeConnectedUsersDialog = ({
 
     const parentOptions = useMemo<UpgradeOptionI[]>(
         () =>
-            (projectsData?.automationWorkflowProjects || [])
+            (projectsData?.automationProjects || [])
                 .filter((project) => project.published && project.configurationCount > 0)
                 .map((project) => ({id: project.id, label: project.name})),
         [projectsData]
@@ -49,13 +49,13 @@ const AutomationUpgradeConnectedUsersDialog = ({
         targetId: selectedTargetId,
     } = useUpgradeSelection(parentOptions.map((option) => option.id));
 
-    const {data: configurationsData} = useAutomationWorkflowProjectConfigurationsQuery(
+    const {data: configurationsData} = useAutomationProjectConfigurationsQuery(
         {environmentId: String(currentEnvironmentId), projectId: parentId || ''},
         {enabled: !!parentId}
     );
 
     const targetOptions = useMemo<UpgradeOptionI[]>(() => {
-        const configurations = configurationsData?.automationWorkflowProjectConfigurations || [];
+        const configurations = configurationsData?.automationProjectConfigurations || [];
         const versions = configurations.map((configuration) => configuration.projectVersion);
         const highestVersion = Math.max(...versions);
         const lowestVersion = Math.min(...versions);
@@ -76,25 +76,24 @@ const AutomationUpgradeConnectedUsersDialog = ({
         data: impactData,
         isError: impactError,
         isLoading: impactLoading,
-    } = useAutomationWorkflowProjectConfigurationUpgradeImpactQuery(
+    } = useAutomationProjectConfigurationUpgradeImpactQuery(
         {connectedUserIds, targetId: targetId || ''},
         {enabled: !!targetId && connectedUserIds.length > 0}
     );
 
-    const {mutateAsync: upgradeConnectedUsers} =
-        useUpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation();
+    const {mutateAsync: upgradeConnectedUsers} = useUpgradeAutomationProjectConfigurationConnectedUsersMutation();
 
     const handleUpgrade = async (): Promise<MoveConnectedUsersResultI> => {
         const response = await upgradeConnectedUsers({connectedUserIds, targetId: targetId!});
 
-        return response.upgradeAutomationWorkflowProjectConfigurationConnectedUsers;
+        return response.upgradeAutomationProjectConfigurationConnectedUsers;
     };
 
     return (
         <UpgradeConnectedUsersDialogView
             connectedUsers={connectedUsers}
             emptyParentMessage="No published project has configurations in this environment."
-            impact={targetId ? impactData?.automationWorkflowProjectConfigurationUpgradeImpact : undefined}
+            impact={targetId ? impactData?.automationProjectConfigurationUpgradeImpact : undefined}
             notOnSourceReason="Doesn't have this project"
             onClose={onClose}
             onParentChange={selectParent}

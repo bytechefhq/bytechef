@@ -12,8 +12,8 @@ import {act, renderHook, waitFor} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {automationWorkflowProjectApiMock, connectedUserProjectWorkflowApiMock, connectionApiMock} = vi.hoisted(() => ({
-    automationWorkflowProjectApiMock: {getFrontendProjects: vi.fn()},
+const {automationProjectApiMock, connectedUserProjectWorkflowApiMock, connectionApiMock} = vi.hoisted(() => ({
+    automationProjectApiMock: {getFrontendProjects: vi.fn()},
     connectedUserProjectWorkflowApiMock: {
         getFrontendProjectWorkflow: vi.fn(),
         getFrontendProjectWorkflows: vi.fn(),
@@ -25,9 +25,9 @@ const {automationWorkflowProjectApiMock, connectedUserProjectWorkflowApiMock, co
 }));
 
 vi.mock('@/ee/shared/middleware/embedded/public', () => ({
-    AutomationWorkflowProjectApi: class {
+    AutomationProjectApi: class {
         constructor() {
-            return automationWorkflowProjectApiMock;
+            return automationProjectApiMock;
         }
     },
     ConnectedUserProjectWorkflowApi: class {
@@ -63,16 +63,16 @@ describe('automationHub.queries', () => {
     });
 
     it('loads the template projects', async () => {
-        automationWorkflowProjectApiMock.getFrontendProjects.mockResolvedValue([{id: 1}]);
+        automationProjectApiMock.getFrontendProjects.mockResolvedValue([{id: 1}]);
 
         const {result} = renderQueryHook(useGetTemplateProjectsQuery);
 
         await waitFor(() => expect(result.current.data).toEqual([{id: 1}]));
-        expect(automationWorkflowProjectApiMock.getFrontendProjects).toHaveBeenCalledWith({});
+        expect(automationProjectApiMock.getFrontendProjects).toHaveBeenCalledWith({});
     });
 
     it('returns the template projects the API returns, hidden flag or not', async () => {
-        automationWorkflowProjectApiMock.getFrontendProjects.mockResolvedValue([
+        automationProjectApiMock.getFrontendProjects.mockResolvedValue([
             {automationHubVisible: true, id: 1},
             {automationHubVisible: false, id: 2},
             {id: 3},

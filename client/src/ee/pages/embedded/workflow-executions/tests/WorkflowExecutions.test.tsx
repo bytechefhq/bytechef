@@ -1,7 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {WorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/WorkflowExecutions';
 import useEmbeddedWorkflowExecutionSheetStore from '@/ee/pages/embedded/workflow-executions/stores/useWorkflowExecutionSheetStore';
-import useAutomationWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
+import useAutomationExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {act, mockScrollIntoView, render, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
 import {MemoryRouter, RouterProvider, createMemoryRouter, useLocation} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -75,14 +75,12 @@ vi.mock('@/ee/pages/embedded/workflow-executions/components/AnyWorkflowExecution
     default: ({
         data,
     }: {
-        data: Array<{automationWorkflowExecution?: {id: number}; integrationWorkflowExecution?: {id: number}}>;
+        data: Array<{automationExecution?: {id: number}; integrationWorkflowExecution?: {id: number}}>;
     }) => (
         <ul aria-label="Any workflow executions">
             {data.map((row) =>
-                row.automationWorkflowExecution ? (
-                    <li key={`automation-${row.automationWorkflowExecution.id}`}>
-                        automation {row.automationWorkflowExecution.id}
-                    </li>
+                row.automationExecution ? (
+                    <li key={`automation-${row.automationExecution.id}`}>automation {row.automationExecution.id}</li>
                 ) : (
                     <li key={`integration-${row.integrationWorkflowExecution?.id}`}>
                         integration {row.integrationWorkflowExecution?.id}
@@ -168,7 +166,7 @@ describe('WorkflowExecutions', () => {
 
         mockScrollIntoView();
 
-        useAutomationWorkflowExecutionSheetStore.setState({
+        useAutomationExecutionSheetStore.setState({
             workflowExecutionId: 0,
             workflowExecutionKind: 'JOB',
             workflowExecutionSheetOpen: false,
@@ -208,15 +206,15 @@ describe('WorkflowExecutions', () => {
 
         expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(42);
         expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
-        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+        expect(useAutomationExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
     });
 
     it('opens the automation execution sheet when the source is automations', () => {
         renderWorkflowExecutions('source=AUTOMATIONS&id=42');
 
-        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(42);
-        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionKind).toBe('JOB');
-        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
+        expect(useAutomationExecutionSheetStore.getState().workflowExecutionId).toBe(42);
+        expect(useAutomationExecutionSheetStore.getState().workflowExecutionKind).toBe('JOB');
+        expect(useAutomationExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
         expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
     });
 
@@ -243,8 +241,8 @@ describe('WorkflowExecutions', () => {
             await router.navigate('/embedded/workflow-executions?source=AUTOMATIONS&id=43');
         });
 
-        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(43);
-        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
+        expect(useAutomationExecutionSheetStore.getState().workflowExecutionId).toBe(43);
+        expect(useAutomationExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(true);
         expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
     });
 
@@ -275,7 +273,7 @@ describe('WorkflowExecutions', () => {
             refetchWorkflowExecutions: vi.fn(),
             workflowExecutionPage: {
                 content: [
-                    {automationWorkflowExecution: {id: 3}, source: 'AUTOMATION'},
+                    {automationExecution: {id: 3}, source: 'AUTOMATION'},
                     {integrationWorkflowExecution: {id: 1}, source: 'INTEGRATION'},
                 ],
                 size: 20,
@@ -312,7 +310,7 @@ describe('WorkflowExecutions', () => {
         renderWorkflowExecutions('id=abc');
 
         expect(useEmbeddedWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
-        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+        expect(useAutomationExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
     });
 
     it('requests the executions of the connected user named in the URL', () => {

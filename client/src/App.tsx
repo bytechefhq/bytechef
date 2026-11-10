@@ -131,7 +131,7 @@ const embeddedNavigation: NavigationType[] = [
     },
     {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
     {
-        href: '/embedded/automation-workflows',
+        href: '/embedded/automations',
         icon: Workflow,
         name: 'Automations',
     },
@@ -243,7 +243,7 @@ function App() {
             return false;
         }
 
-        if (currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT && navItem.href === '/embedded/automation-workflows') {
+        if (currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT && navItem.href === '/embedded/automations') {
             return false;
         }
 

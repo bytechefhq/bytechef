@@ -80,7 +80,7 @@ export function AppSidebar({navigation}: AppSidebarProps) {
             void navigate('/automation/deployments');
         } else if (isOnPath('/embedded/integrations')) {
             void navigate('/embedded/configurations');
-        } else if (isOnPath('/embedded/automation-workflows')) {
+        } else if (isOnPath('/embedded/automations')) {
             void navigate('/embedded/automation-configurations');
         }
     };
