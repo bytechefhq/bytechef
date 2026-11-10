@@ -249,7 +249,13 @@ const ProjectListItem = ({
 
             const target = event.target as HTMLElement;
 
+            if (!event.currentTarget.contains(target)) {
+                return;
+            }
+
             const interactiveSelectors = [
+                'a',
+                'button:not([data-slot="tooltip-trigger"])',
                 '[data-interactive]',
                 '[role="menu"]',
                 '[data-radix-dropdown-menu-item]',
@@ -261,9 +267,26 @@ const ProjectListItem = ({
                 return;
             }
 
+            if (hasWorkflows) {
+                void navigate(
+                    `/automation/projects/${project.id}/project-workflows/${project.projectWorkflowIds![0]}?${searchParams}`
+                );
+
+                return;
+            }
+
             onTabChange(activeTab ? undefined : 'workflows');
         },
-        [activeTab, onTabChange, showProjectDeploymentDialog]
+        [
+            activeTab,
+            hasWorkflows,
+            navigate,
+            onTabChange,
+            project.id,
+            project.projectWorkflowIds,
+            searchParams,
+            showProjectDeploymentDialog,
+        ]
     );
 
     return (

@@ -16,8 +16,11 @@ vi.mock('@tanstack/react-query', async () => {
     };
 });
 
+const mockNavigate = vi.hoisted(() => vi.fn());
+
 vi.mock('react-router-dom', () => ({
     Link: ({children, to}: {children: React.ReactNode; to: string}) => <a href={to}>{children}</a>,
+    useNavigate: () => mockNavigate,
     useSearchParams: () => [new URLSearchParams(''), vi.fn()],
 }));
 
@@ -165,6 +168,22 @@ describe('ProjectWorkflowListItem', () => {
         const link = screen.getByRole('link');
 
         expect(link).toHaveAttribute('href', '/automation/projects/1/project-workflows/101?');
+    });
+
+    it('should open the workflow when the row outside the link is clicked', async () => {
+        renderProjectWorkflowListItem();
+
+        await userEvent.click(screen.getAllByText(/Modified at/)[1]);
+
+        expect(mockNavigate).toHaveBeenCalledWith('/automation/projects/1/project-workflows/101?');
+    });
+
+    it('should not open the workflow when the row menu is clicked', async () => {
+        renderProjectWorkflowListItem();
+
+        await userEvent.click(document.querySelector('[aria-haspopup="menu"]')!);
+
+        expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     describe('menu', () => {

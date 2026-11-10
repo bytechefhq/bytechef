@@ -68,6 +68,7 @@ const renderProjectListItem = (activeTab?: ProjectListItemTabType, projectOverri
     );
 
 beforeEach(() => {
+    hoisted.navigate.mockReset();
     onTabChange.mockReset();
 });
 
@@ -102,16 +103,34 @@ it('switches tabs', async () => {
     expect(onTabChange).toHaveBeenCalledWith('deployments');
 });
 
-it('opens the workflows tab when a collapsed row is clicked', () => {
+it('opens the project when a row with workflows is clicked', () => {
     renderProjectListItem();
 
     fireEvent.click(screen.getByLabelText('Orders_container'));
 
+    expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects/7/project-workflows/1?');
+    expect(onTabChange).not.toHaveBeenCalled();
+});
+
+it('toggles the workflows list when the summary is clicked', () => {
+    renderProjectListItem();
+
+    fireEvent.click(screen.getByText('1 workflow'));
+
+    expect(hoisted.navigate).not.toHaveBeenCalled();
+});
+
+it('opens the workflows tab when a collapsed row without workflows is clicked', () => {
+    renderProjectListItem(undefined, {projectWorkflowIds: []});
+
+    fireEvent.click(screen.getByLabelText('Orders_container'));
+
+    expect(hoisted.navigate).not.toHaveBeenCalled();
     expect(onTabChange).toHaveBeenCalledWith('workflows');
 });
 
-it('collapses an open row when it is clicked', () => {
-    renderProjectListItem('workflows');
+it('collapses an open row without workflows when it is clicked', () => {
+    renderProjectListItem('workflows', {projectWorkflowIds: []});
 
     fireEvent.click(screen.getByLabelText('Orders_container'));
 
