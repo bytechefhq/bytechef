@@ -101,4 +101,22 @@ class QuickbooksSearchBillsActionTest {
             "SELECT * FROM Bill WHERE VendorRef = '5\\' OR \\'1\\'=\\'1' MAXRESULTS 100",
             QuickbooksSearchBillsAction.buildQuery(parameters));
     }
+
+    @Test
+    void testBuildQueryEscapesTrailingBackslash() {
+        Parameters parameters = MockParametersFactory.create(Map.of(VENDOR_ID, "56\\"));
+
+        assertEquals(
+            "SELECT * FROM Bill WHERE VendorRef = '56\\\\' MAXRESULTS 100",
+            QuickbooksSearchBillsAction.buildQuery(parameters));
+    }
+
+    @Test
+    void testBuildQueryEscapesBackslashBeforeSingleQuote() {
+        Parameters parameters = MockParametersFactory.create(Map.of(VENDOR_ID, "56\\' OR '1'='1"));
+
+        assertEquals(
+            "SELECT * FROM Bill WHERE VendorRef = '56\\\\\\' OR \\'1\\'=\\'1' MAXRESULTS 100",
+            QuickbooksSearchBillsAction.buildQuery(parameters));
+    }
 }
