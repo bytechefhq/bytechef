@@ -41,7 +41,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
         }))
     );
 
-    const handleLabelChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const saveFieldChange = (field: 'description' | 'label', value: string) => {
         if (!currentNode) {
             return;
         }
@@ -59,10 +59,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
             saveTaskDispatcherSubtaskFieldChange({
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,
                 currentNodeIndex: nodes.findIndex((node) => node.data.name === currentNode.workflowNodeName),
-                fieldUpdate: {
-                    field: 'label',
-                    value: event.target.value,
-                },
+                fieldUpdate: {field, value},
                 updateWorkflowMutation,
             });
 
@@ -72,10 +69,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
         if (currentNode.clusterElementType || currentNode.clusterRoot) {
             saveClusterElementFieldChange({
                 currentComponentDefinition: nodeDefinition as ComponentDefinition,
-                fieldUpdate: {
-                    field: 'label',
-                    value: event.target.value,
-                },
+                fieldUpdate: {field, value},
                 updateWorkflowMutation,
             });
 
@@ -86,78 +80,29 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
             decorative: true,
             nodeData: {
                 ...currentNode,
-                label: event.target.value,
+                [field]: value,
                 name: currentNode.workflowNodeName,
                 version: 'version' in nodeDefinition ? nodeDefinition.version : 1,
             },
             onSuccess: () => {
                 setCurrentNode({
                     ...currentNode,
-                    label: event.target.value,
+                    [field]: value,
                 });
             },
             updateWorkflowMutation,
         });
-    }, 600);
+    };
 
-    const handleNotesChange = useDebouncedCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
-        if (!currentNode) {
-            return;
-        }
+    const handleLabelChange = useDebouncedCallback(
+        (event: ChangeEvent<HTMLInputElement>) => saveFieldChange('label', event.target.value),
+        600
+    );
 
-        if (
-            currentNode.conditionData ||
-            currentNode.loopData ||
-            currentNode.branchData ||
-            currentNode.parallelData ||
-            currentNode.eachData ||
-            currentNode.forkJoinData ||
-            currentNode.graphData ||
-            currentNode.onErrorData
-        ) {
-            saveTaskDispatcherSubtaskFieldChange({
-                currentComponentDefinition: nodeDefinition as ComponentDefinition,
-                currentNodeIndex: nodes.findIndex((node) => node.data.name === currentNode.workflowNodeName),
-                fieldUpdate: {
-                    field: 'description',
-                    value: event.target.value,
-                },
-                updateWorkflowMutation,
-            });
-
-            return;
-        }
-
-        if (currentNode.clusterElementType || currentNode.clusterRoot) {
-            saveClusterElementFieldChange({
-                currentComponentDefinition: nodeDefinition as ComponentDefinition,
-                fieldUpdate: {
-                    field: 'description',
-                    value: event.target.value,
-                },
-                updateWorkflowMutation,
-            });
-
-            return;
-        }
-
-        void saveWorkflowDefinition({
-            decorative: true,
-            nodeData: {
-                ...currentNode,
-                description: event.target.value,
-                name: currentNode.workflowNodeName,
-                version: 'version' in nodeDefinition ? nodeDefinition.version : 1,
-            },
-            onSuccess: () => {
-                setCurrentNode({
-                    ...currentNode,
-                    description: event.target.value,
-                });
-            },
-            updateWorkflowMutation,
-        });
-    }, 600);
+    const handleNotesChange = useDebouncedCallback(
+        (event: ChangeEvent<HTMLTextAreaElement>) => saveFieldChange('description', event.target.value),
+        600
+    );
 
     let workflowTaskOrTrigger =
         workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName) ||
