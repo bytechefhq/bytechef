@@ -33,7 +33,11 @@ vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries'
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationInstances.queries', () => ({
-    IntegrationInstanceKeys: {integrationInstance: (id: number) => ['integrationInstance', id]},
+    IntegrationInstanceKeys: {
+        integrationInstance: (id: number) => ['integrationInstance', id],
+        integrationInstanceConnection: (id: number) => ['integrationInstance', id, 'connection'],
+    },
+    useGetIntegrationInstanceConnectionQuery: () => ({data: undefined}),
     useGetIntegrationInstanceQuery: () => ({data: undefined}),
 }));
 
@@ -44,6 +48,7 @@ vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
 vi.mock('@/ee/shared/mutations/embedded/integrationInstances.mutations', () => ({
     useDeleteIntegrationInstanceMutation: () => ({isPending: false, mutate: vi.fn()}),
     useEnableIntegrationInstanceMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useUpdateIntegrationInstanceCredentialsMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
@@ -65,14 +70,18 @@ const connectedUserIntegrationInstance = {
     integrationVersion: 1,
 };
 
-const renderItem = () =>
+const renderItem = (
+    integrationInstance: typeof connectedUserIntegrationInstance & {
+        provisioned?: boolean;
+    } = connectedUserIntegrationInstance
+) =>
     render(
         <TooltipProvider>
             <ConnectedUserSheetPanelIntegrationListItem
                 componentDefinition={componentDefinition}
                 connectedUser={{email: 'jane@example.com', externalId: 'ext-9', name: 'Jane'}}
                 connectedUserId={9}
-                connectedUserIntegrationInstance={connectedUserIntegrationInstance}
+                connectedUserIntegrationInstance={integrationInstance}
             />
         </TooltipProvider>
     );
@@ -115,6 +124,18 @@ describe('ConnectedUserSheetPanelIntegrationListItem', () => {
 
         expect(screen.getByTestId('integration-icon')).toBeInTheDocument();
         expect(container.querySelector('svg.lucide-component')).not.toBeInTheDocument();
+    });
+
+    it('shows the Credentials action only for provisioned integrations', () => {
+        const {unmount} = renderItem({...connectedUserIntegrationInstance, provisioned: true});
+
+        expect(screen.getByRole('button', {name: 'Credentials'})).toBeInTheDocument();
+
+        unmount();
+
+        renderItem({...connectedUserIntegrationInstance, provisioned: false});
+
+        expect(screen.queryByRole('button', {name: 'Credentials'})).not.toBeInTheDocument();
     });
 
     it('sheet integration row offers Change configuration', async () => {

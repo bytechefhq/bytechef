@@ -1,10 +1,12 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
+import ConnectedUserIntegrationCredentialsDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserIntegrationCredentialsDialog';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import ConnectedUserSheetPanelIntegrationWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflowList';
 import {
@@ -29,7 +31,7 @@ import {
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
-import {ComponentIcon} from 'lucide-react';
+import {ComponentIcon, KeyRoundIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -57,6 +59,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
     const {data: integrationInstance} = useGetIntegrationInstanceQuery(connectedUserIntegrationInstance.id!);
 
     const [showChangeConfigurationDialog, setShowChangeConfigurationDialog] = useState(false);
+    const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const queryClient = useQueryClient();
@@ -235,6 +238,22 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </div>
                         </div>
 
+                        {connectedUserIntegrationInstance.provisioned && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        aria-label="Credentials"
+                                        icon={<KeyRoundIcon />}
+                                        onClick={() => setShowCredentialsDialog(true)}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </TooltipTrigger>
+
+                                <TooltipContent>Credentials</TooltipContent>
+                            </Tooltip>
+                        )}
+
                         <ConnectedUserSheetDeleteDropdownMenu
                             changeConfigurationDisabled={!integrationConfigurations}
                             changeConfigurationDisabledReason={changeConfigurationDisabledReason}
@@ -263,6 +282,14 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                     onClose={() => setShowChangeConfigurationDialog(false)}
                     targetConfigurations={targetConfigurations}
                     title="Change configuration"
+                />
+            )}
+
+            {showCredentialsDialog && (
+                <ConnectedUserIntegrationCredentialsDialog
+                    connectedUserId={connectedUserId}
+                    integrationInstance={connectedUserIntegrationInstance}
+                    onClose={() => setShowCredentialsDialog(false)}
                 />
             )}
 
