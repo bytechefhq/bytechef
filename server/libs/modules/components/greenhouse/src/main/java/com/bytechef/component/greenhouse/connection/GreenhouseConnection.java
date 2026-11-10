@@ -16,18 +16,15 @@
 
 package com.bytechef.component.greenhouse.connection;
 
-import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
-import static com.bytechef.component.definition.Authorization.USERNAME;
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
+import static com.bytechef.component.definition.Authorization.TOKEN_URL;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -35,27 +32,26 @@ import java.util.Map;
 public class GreenhouseConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://harvest.greenhouse.io/v1")
+        .baseUri((connectionParameters, context) -> "https://harvest.greenhouse.io/v3")
         .help("", "https://docs.bytechef.io/reference/components/greenhouse_v1#connection-setup")
         .version(1)
         .authorizations(
-            authorization(AuthorizationType.BASIC_AUTH)
-                .title("Harvest API Key")
+            authorization(AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
+                .title("Harvest V3 (OAuth)")
                 .properties(
-                    string(USERNAME)
-                        .label("Harvest API Key")
-                        .description(
-                            "The Harvest API key created in Greenhouse under Configure -> Dev Center -> API " +
-                                "Credential Management.")
-                        .required(true))
-                .apply((connectionParameters, context) -> {
-                    String credentials = connectionParameters.getRequiredString(USERNAME) + ":";
-
-                    String encodedCredentials = context.encoder(
-                        encoder -> encoder.base64Encode(credentials.getBytes(StandardCharsets.UTF_8)));
-
-                    return ApplyResponse.ofHeaders(Map.of(AUTHORIZATION, List.of("Basic " + encodedCredentials)));
-                }));
+                    string(CLIENT_ID)
+                        .label("Client ID")
+                        .description("The Client ID of your Harvest V3 (OAuth) API credentials.")
+                        .required(true),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .description("The Client Secret of your Harvest V3 (OAuth) API credentials.")
+                        .required(true),
+                    string(TOKEN_URL)
+                        .label("Token URL")
+                        .description("The Greenhouse OAuth token endpoint.")
+                        .defaultValue("https://auth.greenhouse.io/token")
+                        .required(true)));
 
     private GreenhouseConnection() {
     }

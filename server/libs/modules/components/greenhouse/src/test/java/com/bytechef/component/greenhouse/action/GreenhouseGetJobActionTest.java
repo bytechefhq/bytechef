@@ -18,13 +18,11 @@ package com.bytechef.component.greenhouse.action;
 
 import static com.bytechef.component.greenhouse.constant.GreenhouseConstants.JOB_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -34,6 +32,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,25 +45,29 @@ import org.mockito.ArgumentCaptor;
 class GreenhouseGetJobActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(JOB_ID, "6404"));
-    private final Map<String, Object> responseBody = Map.of("id", 6404);
-    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final Map<String, Object> record = Map.of("id", 6404);
+    private final ArgumentCaptor<String> pathArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<String> queryNameArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<String> queryValueArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
         ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedHttp.get(stringArgumentCaptor.capture()))
+        when(mockedHttp.get(pathArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(queryNameArgumentCaptor.capture(), queryValueArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseBody);
+            .thenReturn(List.of(record));
 
         Map<String, Object> result = GreenhouseGetJobAction.perform(mockedParameters, null, mockedContext);
 
-        assertEquals(responseBody, result);
-        assertNotNull(httpFunctionArgumentCaptor.getValue());
-        assertEquals("/jobs/6404", stringArgumentCaptor.getValue());
+        assertEquals(record, result);
+        assertEquals("/jobs", pathArgumentCaptor.getValue());
+        assertEquals("ids", queryNameArgumentCaptor.getValue());
+        assertEquals("6404", queryValueArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
 

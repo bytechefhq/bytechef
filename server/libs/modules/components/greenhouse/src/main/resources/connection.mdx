@@ -1,12 +1,13 @@
 ## Connection Setup
 
-### Create a Harvest API Key
+### Create Harvest V3 (OAuth) Credentials
 
-1. Log in to [Greenhouse](https://app.greenhouse.io/) as a user with Developer permissions.
-2. Click the *Configure* icon and select *Dev Center*.
-3. Click *API Credential Management*.
-4. Click *Create New API Key*.
-5. Select *Harvest* as the API type, enter a description, and click *Manage permissions*.
-6. Copy the API key.
-7. Under *Candidates*, *Applications*, *Scorecards* and *Jobs*, enable the GET endpoints this component calls, then click *Save*.
-8. In ByteChef, paste the key into the *Harvest API Key* field. ByteChef sends it as the Basic Auth username with an empty password.
+1. Log in to [Greenhouse](https://app.greenhouse.io/) as a user who can manage API credentials.
+2. Open *API Credentials*.
+3. Click *Create new API credentials*.
+4. Select *Harvest V3 (OAuth)* and save the credential.
+5. Configure the scopes of the credential. This component needs `harvest:candidates:list`, `harvest:applications:list`, `harvest:scorecards:list` and `harvest:jobs:list`.
+6. Copy the *Client ID* and the *Client Secret*.
+7. In ByteChef, paste them into the *Client ID* and *Client Secret* fields. Keep the default *Token URL*, `https://auth.greenhouse.io/token`.
+
+ByteChef requests an access token with the OAuth 2.0 client credentials grant and sends it as a Bearer token to `https://harvest.greenhouse.io/v3`. Requests run as the integration service user that Greenhouse creates for the credentials.

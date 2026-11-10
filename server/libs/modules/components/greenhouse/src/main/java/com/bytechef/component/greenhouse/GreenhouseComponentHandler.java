@@ -49,7 +49,7 @@ public class GreenhouseComponentHandler implements ComponentHandler {
             GreenhouseListApplicationScorecardsAction.ACTION_DEFINITION)
         .version(1)
         .customAction(true)
-        .customActionHelp("", "https://developers.greenhouse.io/harvest.html");
+        .customActionHelp("", "https://harvestdocs.greenhouse.io/");
 
     @Override
     public ComponentDefinition getDefinition() {
