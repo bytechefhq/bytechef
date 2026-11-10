@@ -1,0 +1,479 @@
+---
+title: "Sentry"
+description: "Sentry is an application monitoring platform that helps developers find, triage and fix errors and performance problems in their code."
+---
+
+
+Categories: Developer Tools
+
+
+Type: sentry/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Auth Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Auth Token | STRING | A Sentry auth token. Create one in Sentry under Settings -&gt; Developer Settings -&gt; Personal Tokens or Organization Tokens, with the event:read, event:write and project:read scopes. | true |
+| baseUrl | Base URL | STRING | The URL of your Sentry instance: https://sentry.io, a regional URL such as https://us.sentry.io or https://de.sentry.io, or the URL of a self-hosted Sentry. | true |
+| organization | Organization Slug | STRING | The slug of your Sentry organization, as shown in its URL, for example my-org in https://my-org.sentry.io or https://sentry.io/organizations/my-org/. | true |
+
+
+
+## Connection Setup
+
+### Create an Auth Token
+
+1. Log in to your [Sentry](https://sentry.io/) account.
+2. Go to *Settings* and open *Developer Settings*.
+3. Click *Personal Tokens* (or *Organization Tokens*) and create a new token.
+4. Give the token the *event:read*, *event:write* and *project:read* scopes.
+5. Copy the token and paste it into the *Auth Token* field.
+
+### Base URL and Organization Slug
+
+- *Base URL* is `https://sentry.io` for Sentry SaaS. Organizations whose data is stored in a specific region can use `https://us.sentry.io` or `https://de.sentry.io`. For self-hosted Sentry, enter the URL of your installation, for example `https://sentry.example.com`.
+- *Organization Slug* is shown in your organization's URL, for example `my-org` in `https://my-org.sentry.io` or `https://sentry.io/organizations/my-org/`. You can also find it under *Settings* -> *General Settings*.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Get Issue
+Name: getIssue
+
+`Get the details of an issue, such as its title, status, assignee, event count and project.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| issueId | Issue ID | STRING | The numeric ID of the issue, as shown in the issue URL in Sentry. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Issue",
+  "name" : "getIssue",
+  "parameters" : {
+    "issueId" : ""
+  },
+  "type" : "sentry/v1/getIssue"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the issue. |
+| shortId | STRING | The short ID of the issue, for example PROJECT-1A. |
+| title | STRING | The title of the issue. |
+| culprit | STRING | The location in code where the issue originated. |
+| permalink | STRING | The URL of the issue in Sentry. |
+| level | STRING | The level of the issue, for example error or warning. |
+| status | STRING | The status of the issue: resolved, unresolved or ignored. |
+| substatus | STRING | The substatus of the issue, for example ongoing, new or regressed. |
+| priority | STRING | The priority of the issue: low, medium or high. |
+| platform | STRING | The platform of the issue. |
+| type | STRING | The type of the issue. |
+| count | STRING | The number of events of the issue. |
+| userCount | STRING | The number of users affected by the issue. |
+| firstSeen | STRING | ISO 8601 timestamp for when the issue was first seen. |
+| lastSeen | STRING | ISO 8601 timestamp for when the issue was last seen. |
+| isBookmarked | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the issue is bookmarked by the requester. |
+| hasSeen | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the requester has seen the issue. |
+| assignedTo | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(type)&#125; </details> | The user or team the issue is assigned to. |
+| project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(slug), STRING\(platform)&#125; </details> | The project the issue belongs to. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(value), STRING\(filename), STRING\(function)&#125; </details> | The error type, value and location of the issue. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "shortId" : "",
+  "title" : "",
+  "culprit" : "",
+  "permalink" : "",
+  "level" : "",
+  "status" : "",
+  "substatus" : "",
+  "priority" : "",
+  "platform" : "",
+  "type" : "",
+  "count" : "",
+  "userCount" : "",
+  "firstSeen" : "",
+  "lastSeen" : "",
+  "isBookmarked" : false,
+  "hasSeen" : false,
+  "assignedTo" : {
+    "id" : "",
+    "name" : "",
+    "type" : ""
+  },
+  "project" : {
+    "id" : "",
+    "name" : "",
+    "slug" : "",
+    "platform" : ""
+  },
+  "metadata" : {
+    "type" : "",
+    "value" : "",
+    "filename" : "",
+    "function" : ""
+  }
+}
+```
+
+
+
+
+### Get Latest Event for Issue
+Name: getLatestEventForIssue
+
+`Get the most recent event of an issue, including its stack trace, tags, user and context details.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| issueId | Issue ID | STRING | The numeric ID of the issue, as shown in the issue URL in Sentry. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Latest Event for Issue",
+  "name" : "getLatestEventForIssue",
+  "parameters" : {
+    "issueId" : ""
+  },
+  "type" : "sentry/v1/getLatestEventForIssue"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the event. |
+| eventID | STRING | The ID of the event. |
+| groupID | STRING | The ID of the issue the event belongs to. |
+| projectID | STRING | The ID of the project the event belongs to. |
+| title | STRING | The title of the event. |
+| message | STRING | The message of the event. |
+| culprit | STRING | The location in code where the event originated. |
+| location | STRING | The location of the event. |
+| platform | STRING | The platform of the event. |
+| type | STRING | The type of the event. |
+| dateCreated | STRING | ISO 8601 timestamp for when the event was created. |
+| dateReceived | STRING | ISO 8601 timestamp for when Sentry received the event. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(value)&#125; </details> | The error type and value of the event. |
+| tags | ARRAY <details> <summary> Items </summary> [&#123;STRING\(key), STRING\(value)&#125;] </details> | The tags of the event, such as browser, environment and level. |
+| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(email), STRING\(username), STRING\(ip_address)&#125; </details> | The user the event was captured for. |
+| entries | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), &#123;&#125;\(data)&#125;] </details> | The event data, such as exception stack traces, breadcrumbs and request details. |
+| contexts | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The context of the event, such as browser, OS and runtime. |
+| nextEventID | STRING | The ID of the next event of the issue. |
+| previousEventID | STRING | The ID of the previous event of the issue. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "eventID" : "",
+  "groupID" : "",
+  "projectID" : "",
+  "title" : "",
+  "message" : "",
+  "culprit" : "",
+  "location" : "",
+  "platform" : "",
+  "type" : "",
+  "dateCreated" : "",
+  "dateReceived" : "",
+  "metadata" : {
+    "type" : "",
+    "value" : ""
+  },
+  "tags" : [ {
+    "key" : "",
+    "value" : ""
+  } ],
+  "user" : {
+    "id" : "",
+    "email" : "",
+    "username" : "",
+    "ip_address" : ""
+  },
+  "entries" : [ {
+    "type" : "",
+    "data" : { }
+  } ],
+  "contexts" : { },
+  "nextEventID" : "",
+  "previousEventID" : ""
+}
+```
+
+
+
+
+### List Project Issues
+Name: listProjectIssues
+
+`List the issues of a project. Without a query, only unresolved issues are returned.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| project | Project | STRING | The slug of the project to list issues for. | true |
+| query | Query | STRING | A Sentry search query, for example is:unresolved level:error. If empty, is:unresolved is used. Use is:resolved or is:ignored to list issues with another status. | false |
+| statsPeriod | Stats Period | STRING <details> <summary> Options </summary> <span>24h</span>, <span>14d</span> </details> | The period of the event counts returned for each issue. | false |
+| limit | Limit | INTEGER | The maximum number of issues to return, up to 100. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Project Issues",
+  "name" : "listProjectIssues",
+  "parameters" : {
+    "project" : "",
+    "query" : "",
+    "statsPeriod" : "",
+    "limit" : 1
+  },
+  "type" : "sentry/v1/listProjectIssues"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the issue. |
+| shortId | STRING | The short ID of the issue, for example PROJECT-1A. |
+| title | STRING | The title of the issue. |
+| culprit | STRING | The location in code where the issue originated. |
+| permalink | STRING | The URL of the issue in Sentry. |
+| level | STRING | The level of the issue, for example error or warning. |
+| status | STRING | The status of the issue: resolved, unresolved or ignored. |
+| substatus | STRING | The substatus of the issue, for example ongoing, new or regressed. |
+| priority | STRING | The priority of the issue: low, medium or high. |
+| platform | STRING | The platform of the issue. |
+| type | STRING | The type of the issue. |
+| count | STRING | The number of events of the issue. |
+| userCount | STRING | The number of users affected by the issue. |
+| firstSeen | STRING | ISO 8601 timestamp for when the issue was first seen. |
+| lastSeen | STRING | ISO 8601 timestamp for when the issue was last seen. |
+| isBookmarked | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the issue is bookmarked by the requester. |
+| hasSeen | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the requester has seen the issue. |
+| assignedTo | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(type)&#125; </details> | The user or team the issue is assigned to. |
+| project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(slug), STRING\(platform)&#125; </details> | The project the issue belongs to. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(value), STRING\(filename), STRING\(function)&#125; </details> | The error type, value and location of the issue. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "shortId" : "",
+  "title" : "",
+  "culprit" : "",
+  "permalink" : "",
+  "level" : "",
+  "status" : "",
+  "substatus" : "",
+  "priority" : "",
+  "platform" : "",
+  "type" : "",
+  "count" : "",
+  "userCount" : "",
+  "firstSeen" : "",
+  "lastSeen" : "",
+  "isBookmarked" : false,
+  "hasSeen" : false,
+  "assignedTo" : {
+    "id" : "",
+    "name" : "",
+    "type" : ""
+  },
+  "project" : {
+    "id" : "",
+    "name" : "",
+    "slug" : "",
+    "platform" : ""
+  },
+  "metadata" : {
+    "type" : "",
+    "value" : "",
+    "filename" : "",
+    "function" : ""
+  }
+} ]
+```
+
+
+
+
+### Update Issue
+Name: updateIssue
+
+`Update the status or assignee of an issue. Only the fields you fill in are changed.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| issueId | Issue ID | STRING | The numeric ID of the issue, as shown in the issue URL in Sentry. | true |
+| status | Status | STRING <details> <summary> Options </summary> <span>resolved</span>, <span>resolvedInNextRelease</span>, <span>unresolved</span>, <span>ignored</span> </details> | The new status of the issue. | false |
+| assignedTo | Assigned To | STRING | The user or team to assign the issue to: a user ID, user:&lt;user_id&gt;, a username, a user's primary email, or team:&lt;team_id&gt;. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Issue",
+  "name" : "updateIssue",
+  "parameters" : {
+    "issueId" : "",
+    "status" : "",
+    "assignedTo" : ""
+  },
+  "type" : "sentry/v1/updateIssue"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the issue. |
+| shortId | STRING | The short ID of the issue, for example PROJECT-1A. |
+| title | STRING | The title of the issue. |
+| culprit | STRING | The location in code where the issue originated. |
+| permalink | STRING | The URL of the issue in Sentry. |
+| level | STRING | The level of the issue, for example error or warning. |
+| status | STRING | The status of the issue: resolved, unresolved or ignored. |
+| substatus | STRING | The substatus of the issue, for example ongoing, new or regressed. |
+| priority | STRING | The priority of the issue: low, medium or high. |
+| platform | STRING | The platform of the issue. |
+| type | STRING | The type of the issue. |
+| count | STRING | The number of events of the issue. |
+| userCount | STRING | The number of users affected by the issue. |
+| firstSeen | STRING | ISO 8601 timestamp for when the issue was first seen. |
+| lastSeen | STRING | ISO 8601 timestamp for when the issue was last seen. |
+| isBookmarked | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the issue is bookmarked by the requester. |
+| hasSeen | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the requester has seen the issue. |
+| assignedTo | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(type)&#125; </details> | The user or team the issue is assigned to. |
+| project | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name), STRING\(slug), STRING\(platform)&#125; </details> | The project the issue belongs to. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;STRING\(type), STRING\(value), STRING\(filename), STRING\(function)&#125; </details> | The error type, value and location of the issue. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "shortId" : "",
+  "title" : "",
+  "culprit" : "",
+  "permalink" : "",
+  "level" : "",
+  "status" : "",
+  "substatus" : "",
+  "priority" : "",
+  "platform" : "",
+  "type" : "",
+  "count" : "",
+  "userCount" : "",
+  "firstSeen" : "",
+  "lastSeen" : "",
+  "isBookmarked" : false,
+  "hasSeen" : false,
+  "assignedTo" : {
+    "id" : "",
+    "name" : "",
+    "type" : ""
+  },
+  "project" : {
+    "id" : "",
+    "name" : "",
+    "slug" : "",
+    "platform" : ""
+  },
+  "metadata" : {
+    "type" : "",
+    "value" : "",
+    "filename" : "",
+    "function" : ""
+  }
+}
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
