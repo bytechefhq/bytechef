@@ -25,7 +25,7 @@ import {
     useUpdateA2aServerTagsMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {EditIcon, EllipsisVerticalIcon, NetworkIcon, PlusIcon, Trash2Icon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, PlusIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 import A2aServerConnect from './A2aServerConnect';
@@ -102,8 +102,6 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                         <div className="flex min-h-8 items-center gap-2">
                             <CollapsibleTrigger className="text-base font-semibold">
                                 <div className="flex items-center">
-                                    <NetworkIcon className="mr-2 size-4 text-content-neutral-secondary" />
-
                                     <span>{a2aServer.name}</span>
                                 </div>
                             </CollapsibleTrigger>

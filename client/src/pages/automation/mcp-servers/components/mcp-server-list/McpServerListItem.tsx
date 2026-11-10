@@ -9,7 +9,6 @@ import TagList from '@/shared/components/TagList';
 import McpServerListItemDropdownMenu from '@/shared/components/mcp-server/McpServerListItemDropdownMenu';
 import McpServerToolCounts from '@/shared/components/mcp-server/McpServerToolCounts';
 import {McpServer, Tag} from '@/shared/middleware/graphql';
-import {ServerIcon} from 'lucide-react';
 
 import {McpProjectWorkflowItemType} from '../mcp-project-workflow-list/hooks/useMcpProjectList';
 import useMcpServerListItem from './hooks/useMcpServerListItem';
@@ -49,8 +48,6 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                         <div className="flex min-h-8 items-center justify-between">
                             <CollapsibleTrigger className="text-base font-semibold">
                                 <div className="flex items-center">
-                                    <ServerIcon className="mr-2 size-4 text-content-neutral-secondary" />
-
                                     <span>{mcpServer.name}</span>
                                 </div>
                             </CollapsibleTrigger>

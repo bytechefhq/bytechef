@@ -98,12 +98,6 @@ describe('ProjectDeploymentListItem', () => {
         hoisted.openProjectMock.mockReset();
     });
 
-    it('shows the deployment icon before the name', () => {
-        const {container} = render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
-
-        expect(container.querySelector('svg.lucide-layers-3')).toBeInTheDocument();
-    });
-
     it('closes the delete dialog without deleting when cancelled', async () => {
         const user = userEvent.setup();
 
