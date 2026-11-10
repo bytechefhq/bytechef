@@ -6,8 +6,8 @@ comingSoon: true
 
 An **automation code workflow** lets you author a [code workflow](/platform/automation/build/workflows/code-workflows)
 - a `ProjectHandler` artifact, the same contract a standalone automation project uses - and make it
-invocable by your connected users, without hand-authoring it in the visual [Automation Workflow
-editor](/platform/embedded/build/automations) and without giving every connected user their own private copy.
+invocable by your connected users, without hand-authoring it in the visual [Automation
+editor](/platform/embedded/build/automations/automation-workflows) and without giving every connected user their own private copy.
 A deployed workflow reaches connected users only through an enabled configuration in their environment.
 
 The artifact itself says nothing about being "embedded". What makes it embedded-servable is **which
@@ -152,7 +152,7 @@ against a nonexistent workflow. It flips to a **dangling** state and is disabled
 - Invisible to both invocation endpoints - a dangling reference behaves exactly like a disabled one
   to a caller (same `404`, no existence leak).
 - Still listed for the connected user, carrying a reason: `"Not in the version released to this
-  environment"` when the version drops the workflow, or `"The automation workflow project was
+  environment"` when the version drops the workflow, or `"The automation project was
   deleted"`. A rollback counts too: moving the configuration back to an older version dangles
   references to templates that version lacks.
 - The connected user's connection configuration is preserved on the row, so nothing is lost even

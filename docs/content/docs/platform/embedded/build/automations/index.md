@@ -165,7 +165,7 @@ The buttons are there whenever the project is expanded, including when it has no
 
 Open the project's ⋮ menu and pick **Edit** (reopens the project dialog with current values) or **Delete** (confirms via dialog, then removes the project and its templates).
 
-Deleting a project marks every connected user's reference to its workflows as dangling and disabled, with the reason "The automation workflow project was deleted". See [Dangling references](/platform/embedded/build/automations/automation-code-workflows#dangling-references).
+Deleting a project marks every connected user's reference to its workflows as dangling and disabled, with the reason "The automation project was deleted". See [Dangling references](/platform/embedded/build/automations/automation-code-workflows#dangling-references).
 
 ### Publishing
 
