@@ -1,0 +1,39 @@
+## Connection Setup
+
+This component uses the Instagram API with Instagram Login. It works only with Instagram professional accounts (business or creator). Personal accounts cannot publish through the API.
+
+### Switch your Instagram account to a professional account
+
+1. In the Instagram app, open your profile and go to **Settings and activity**.
+2. Open **Account type and tools** and choose **Switch to professional account**.
+3. Pick **Business** or **Creator** and finish the steps.
+
+### Create a Meta app
+
+1. Go to [Meta for Developers](https://developers.facebook.com/apps) and click **Create App**.
+2. Choose the **Business** app type, or the use case **Manage messaging and content on Instagram**, and finish the steps.
+3. In the app dashboard, add the **Instagram** product and open **API setup with Instagram login**.
+4. Under **Set up Instagram business login**, add the ByteChef OAuth redirect URL as a valid redirect URL, for example `https://app.bytechef.io/callback`. For a self-hosted instance use `https://<your ByteChef host>/callback`.
+5. Copy the **Instagram app ID** and the **Instagram app secret**. Do not use the Facebook app ID and secret shown on the basic settings page.
+6. While the app is in development mode, add your Instagram account as an **Instagram Tester** under **App roles**, then accept the invitation in the Instagram app or on the Instagram website under **Apps and websites**.
+
+### Create the connection in ByteChef
+
+1. Paste the Instagram app ID into **Instagram App ID** and the Instagram app secret into **Instagram App Secret**.
+2. Keep the default scopes:
+    - `instagram_business_basic` to read the account and its media.
+    - `instagram_business_content_publish` to publish images, carousels and reels.
+    - `instagram_business_manage_comments` to read comments and reply to them.
+3. Click **Connect** and log in with your Instagram professional account.
+
+### Tokens
+
+ByteChef exchanges the short-lived token from the login for a long-lived token that is valid for 60 days. Instagram does not issue a refresh token. To keep the connection working, reconnect it before the 60 days run out. Meta describes how long-lived tokens can be refreshed in [its documentation](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login#refresh-a-long-lived-token).
+
+### App review
+
+To use the connection with Instagram accounts that are not testers of your app, submit the app for App Review and request advanced access for the three permissions above.
+
+Helpful links:
+- Instagram API with Instagram Login: https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login
+- Content publishing: https://developers.facebook.com/docs/instagram-platform/content-publishing

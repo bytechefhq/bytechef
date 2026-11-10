@@ -1,0 +1,5 @@
+#### Things to know
+
+- The trigger checks the comments on the 10 most recent media items of the account. Comments on older posts are not picked up.
+- Each comment fires the workflow once. The first check after the workflow is enabled only remembers the time, so comments written before that are skipped. When you test the trigger in the workflow editor, it returns the comments from the last three hours.
+- Each comment in the output has a `media_id` value with the ID of the post it belongs to.
