@@ -1,3 +1,0 @@
-mutation enableAutomationWorkflowProjectConfigurationWorkflow($id: ID!, $workflowUuid: ID!, $enable: Boolean!) {
-    enableAutomationWorkflowProjectConfigurationWorkflow(id: $id, workflowUuid: $workflowUuid, enable: $enable)
-}

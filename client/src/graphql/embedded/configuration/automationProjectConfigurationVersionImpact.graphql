@@ -1,0 +1,11 @@
+query automationProjectConfigurationVersionImpact($id: ID!, $projectVersion: Int!) {
+    automationProjectConfigurationVersionImpact(id: $id, projectVersion: $projectVersion) {
+        workflows {
+            workflowUuid
+            label
+            newRequiredInputs
+            newRequiredConnections
+            affectedConnectedUserCount
+        }
+    }
+}

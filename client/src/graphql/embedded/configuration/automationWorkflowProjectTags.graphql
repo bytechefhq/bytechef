@@ -1,6 +1,0 @@
-query automationWorkflowProjectTags {
-    automationWorkflowProjectTags {
-        id
-        name
-    }
-}

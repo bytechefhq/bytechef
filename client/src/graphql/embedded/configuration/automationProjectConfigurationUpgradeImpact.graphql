@@ -1,5 +1,5 @@
-query automationWorkflowProjectConfigurationUpgradeImpact($targetId: ID!, $connectedUserIds: [ID!]!) {
-    automationWorkflowProjectConfigurationUpgradeImpact(targetId: $targetId, connectedUserIds: $connectedUserIds) {
+query automationProjectConfigurationUpgradeImpact($targetId: ID!, $connectedUserIds: [ID!]!) {
+    automationProjectConfigurationUpgradeImpact(targetId: $targetId, connectedUserIds: $connectedUserIds) {
         workflows {
             workflowUuid
             label

@@ -1,5 +1,5 @@
-query automationWorkflowProjects($environmentId: ID) {
-    automationWorkflowProjects(environmentId: $environmentId) {
+query automationProjects($environmentId: ID) {
+    automationProjects(environmentId: $environmentId) {
         id
         name
         description
@@ -32,14 +32,14 @@ query automationWorkflowProjects($environmentId: ID) {
     }
 }
 
-mutation createAutomationWorkflowProject(
+mutation createAutomationProject(
     $name: String!
     $description: String
     $category: String
     $tags: [String!]
     $permissionExpression: String
 ) {
-    createAutomationWorkflowProject(
+    createAutomationProject(
         name: $name
         description: $description
         category: $category
@@ -48,7 +48,7 @@ mutation createAutomationWorkflowProject(
     )
 }
 
-mutation updateAutomationWorkflowProject(
+mutation updateAutomationProject(
     $id: ID!
     $name: String!
     $description: String
@@ -56,7 +56,7 @@ mutation updateAutomationWorkflowProject(
     $tags: [String!]
     $permissionExpression: String
 ) {
-    updateAutomationWorkflowProject(
+    updateAutomationProject(
         id: $id
         name: $name
         description: $description
@@ -66,36 +66,36 @@ mutation updateAutomationWorkflowProject(
     )
 }
 
-mutation deleteAutomationWorkflowProject($id: ID!) {
-    deleteAutomationWorkflowProject(id: $id)
+mutation deleteAutomationProject($id: ID!) {
+    deleteAutomationProject(id: $id)
 }
 
-mutation createAutomationWorkflowProjectWorkflow($projectId: ID!, $definition: String, $permissionExpression: String) {
-    createAutomationWorkflowProjectWorkflow(
+mutation createAutomationProjectWorkflow($projectId: ID!, $definition: String, $permissionExpression: String) {
+    createAutomationProjectWorkflow(
         projectId: $projectId
         definition: $definition
         permissionExpression: $permissionExpression
     )
 }
 
-mutation updateAutomationWorkflowProjectWorkflow($workflowUuid: ID!, $label: String!, $description: String) {
-    updateAutomationWorkflowProjectWorkflow(workflowUuid: $workflowUuid, label: $label, description: $description)
+mutation updateAutomationProjectWorkflow($workflowUuid: ID!, $label: String!, $description: String) {
+    updateAutomationProjectWorkflow(workflowUuid: $workflowUuid, label: $label, description: $description)
 }
 
-mutation updateAutomationWorkflowProjectWorkflowPermissionExpression(
+mutation updateAutomationProjectWorkflowPermissionExpression(
     $workflowUuid: ID!
     $permissionExpression: String
 ) {
-    updateAutomationWorkflowProjectWorkflowPermissionExpression(
+    updateAutomationProjectWorkflowPermissionExpression(
         workflowUuid: $workflowUuid
         permissionExpression: $permissionExpression
     )
 }
 
-mutation deleteAutomationWorkflowProjectWorkflow($workflowUuid: ID!) {
-    deleteAutomationWorkflowProjectWorkflow(workflowUuid: $workflowUuid)
+mutation deleteAutomationProjectWorkflow($workflowUuid: ID!) {
+    deleteAutomationProjectWorkflow(workflowUuid: $workflowUuid)
 }
 
-mutation publishAutomationWorkflowProject($id: ID!, $description: String) {
-    publishAutomationWorkflowProject(id: $id, description: $description)
+mutation publishAutomationProject($id: ID!, $description: String) {
+    publishAutomationProject(id: $id, description: $description)
 }
