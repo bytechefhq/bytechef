@@ -32,6 +32,10 @@ export interface UpdateConnectionRequest {
      */
     name: string;
     /**
+     * The values of the connection's own properties, excluding its authorization. When present, they replace the stored values and a property left out is cleared; when absent, the stored values are kept.
+     */
+    parameters?: { [key: string]: any; } | null;
+    /**
      * 
      */
     tags: Array<Tag>;
@@ -61,6 +65,7 @@ export function UpdateConnectionRequestFromJSONTyped(json: any, ignoreDiscrimina
     return {
         
         'name': json['name'],
+        'parameters': json['parameters'] === undefined ? undefined : json['parameters'] === null ? null : json['parameters'],
         'tags': ((json['tags'] as Array<any>).map(TagFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
     };
@@ -78,6 +83,7 @@ export function UpdateConnectionRequestToJSONTyped(value?: UpdateConnectionReque
     return {
         
         'name': value['name'],
+        'parameters': value['parameters'],
         'tags': ((value['tags'] as Array<any>).map(TagToJSON)),
         '__version': value['version'],
     };
