@@ -1068,6 +1068,52 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+  /integration-instances/{id}/connection:
+    get:
+      description: "Get the connection of an integration instance provisioned by a tenant admin."
+      summary: "Get the connection of a provisioned integration instance"
+      tags:
+        - "integration-instance"
+      operationId: "getIntegrationInstanceConnection"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The connection object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Connection"
+  /integration-instances/{id}/connection/credentials:
+    put:
+      description: "Replaces the credentials of the connection of an integration instance provisioned by a tenant admin."
+      summary: "Replaces the credentials of a provisioned integration instance"
+      tags:
+        - "integration-instance"
+      operationId: "updateIntegrationInstanceCredentials"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateConnectionCredentialsRequest"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /integration-instances/{id}/enable/{enable}:
     patch:
       description: "Enable/disable an integration instance."
