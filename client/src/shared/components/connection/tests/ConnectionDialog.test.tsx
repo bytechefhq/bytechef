@@ -1,7 +1,10 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
-import {useGetOAuth2AuthorizationParametersQuery} from '@/shared/queries/platform/oauth2.queries';
+import {
+    useGetOAuth2AuthorizationParametersQuery,
+    useGetOAuth2PropertiesQuery,
+} from '@/shared/queries/platform/oauth2.queries';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -88,6 +91,11 @@ const renderDialog = (props: Partial<ComponentProps<typeof ConnectionDialog>> = 
 describe('ConnectionDialog', () => {
     beforeEach(() => {
         vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+            data: undefined,
+            error: null,
+            isLoading: false,
+        } as never);
+        vi.mocked(useGetOAuth2PropertiesQuery).mockReturnValue({
             data: undefined,
             error: null,
             isLoading: false,
@@ -284,6 +292,40 @@ describe('ConnectionDialog', () => {
                 expect.objectContaining({componentName: 'slack', connectionVersion: 2}),
                 false
             );
+        });
+
+        it('offers the app credentials that are not in use', async () => {
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizations: [
+                        {name: 'oauth2', properties: [{name: 'clientId'}], type: 'OAUTH2_AUTHORIZATION_CODE'},
+                    ],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+            vi.mocked(useGetOAuth2PropertiesQuery).mockReturnValue({
+                data: {predefinedApps: ['slack'], redirectUri: 'http://localhost:5173/callback'},
+                error: null,
+                isLoading: false,
+            } as never);
+
+            renderDialog({
+                connection: oAuth2Connection as never,
+                startInCredentialsMode: true,
+                useCreateConnectionMutation: undefined,
+                useUpdateConnectionCredentialsMutation: (() => ({
+                    isPending: false,
+                    mutateAsync: vi.fn(),
+                    reset: vi.fn(),
+                })) as never,
+                useUpdateConnectionMutation: (() => ({isPending: false, mutate: vi.fn(), reset: vi.fn()})) as never,
+            });
+
+            await userEvent.click(await screen.findByText('I want to use my own app credentials'));
+
+            expect(screen.getByText('Redirect URI')).toBeInTheDocument();
+            expect(screen.getByText('I want to use predefined app credentials')).toBeInTheDocument();
         });
 
         it('shows why a credentials update was rejected', () => {
