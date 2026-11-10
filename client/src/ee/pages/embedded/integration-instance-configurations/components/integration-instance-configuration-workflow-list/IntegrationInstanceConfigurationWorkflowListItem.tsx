@@ -12,7 +12,6 @@ import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -102,20 +101,20 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
             )}
             key={workflow.id}
         >
-            <div
-                className="flex flex-1 cursor-pointer items-center"
-                onClick={handleWorkflowClick}
-                onKeyDown={handleActivationKeyDown}
-                role="button"
-                tabIndex={0}
-            >
+            <div className="relative flex flex-1 items-center">
                 <div
                     className={twMerge(
                         'flex w-80 items-center gap-2 text-sm font-semibold',
                         !integrationInstanceConfigurationWorkflow.enabled && 'text-muted-foreground'
                     )}
                 >
-                    {workflow.label}
+                    <button
+                        className="cursor-pointer text-left after:absolute after:inset-0"
+                        onClick={handleWorkflowClick}
+                        type="button"
+                    >
+                        {workflow.label}
+                    </button>
 
                     {showOpenInIntegration && (
                         <OpenIntegrationWorkflowButton
@@ -127,7 +126,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                     {isMcpWorkflow && <Badge label="MCP" styleType="secondary-outline" />}
                 </div>
 
-                <div className="ml-6 flex items-center gap-1">
+                <div className="relative z-10 ml-6 flex items-center gap-1">
                     <WorkflowTriggerAndComponentsRow
                         className="hidden sm:flex"
                         filteredComponentNames={filteredComponentNames}

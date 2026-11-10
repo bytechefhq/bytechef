@@ -8,15 +8,15 @@ import {getPageUrl} from '@/pages/automation/project-deployments/components/proj
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
+import OpenInButton from '@/shared/components/OpenInButton';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
-import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {ClipboardIcon, FormIcon, MessageCircleMoreIcon, PlayIcon, SquareArrowOutUpRightIcon} from 'lucide-react';
+import {ClipboardIcon, FormIcon, MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
 import {MouseEvent, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -151,51 +151,34 @@ const ProjectDeploymentWorkflowListItem = ({
 
     return (
         <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
-            <div
-                className="flex min-w-0 flex-1 cursor-pointer items-center"
-                onClick={handleWorkflowClick}
-                onKeyDown={handleActivationKeyDown}
-                role="button"
-                tabIndex={0}
-            >
+            <div className="relative flex min-w-0 flex-1 items-center">
                 <div className="flex w-full max-w-80 min-w-0 shrink flex-col gap-1 sm:w-80 sm:shrink-0">
                     <div className="flex min-w-0 items-center gap-2">
-                        <Tooltip>
-                            <TooltipTrigger className="line-clamp-1 min-w-0 truncate text-start">
-                                <span
-                                    className={twMerge(
-                                        'block truncate text-sm font-semibold',
-                                        !enabled && 'text-content-neutral-secondary'
-                                    )}
-                                >
-                                    {workflow.label}
-                                </span>
-                            </TooltipTrigger>
-
-                            <TooltipContent align="start" className="max-w-md break-all">
-                                {workflow.label}
-                            </TooltipContent>
-                        </Tooltip>
-
-                        {showOpenInProject && (
+                        <button
+                            className="line-clamp-1 min-w-0 cursor-pointer truncate text-start after:absolute after:inset-0"
+                            onClick={handleWorkflowClick}
+                            type="button"
+                        >
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
-                                        aria-label="Open in project"
-                                        className="-ml-1.5 size-5 shrink-0 [&_svg]:size-3"
-                                        icon={<SquareArrowOutUpRightIcon className="size-3" />}
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-
-                                            handleOpenInProjectClick();
-                                        }}
-                                        size="icon"
-                                        variant="ghost"
-                                    />
+                                    <span
+                                        className={twMerge(
+                                            'relative z-10 block truncate text-sm font-semibold',
+                                            !enabled && 'text-content-neutral-secondary'
+                                        )}
+                                    >
+                                        {workflow.label}
+                                    </span>
                                 </TooltipTrigger>
 
-                                <TooltipContent>Open in project</TooltipContent>
+                                <TooltipContent align="start" className="max-w-md break-all">
+                                    {workflow.label}
+                                </TooltipContent>
                             </Tooltip>
+                        </button>
+
+                        {showOpenInProject && (
+                            <OpenInButton label="Open in project" onClick={handleOpenInProjectClick} />
                         )}
                     </div>
 
@@ -204,7 +187,7 @@ const ProjectDeploymentWorkflowListItem = ({
                             <Tooltip>
                                 <TooltipTrigger
                                     className={twMerge(
-                                        'flex items-center text-xs text-content-neutral-secondary',
+                                        'relative z-10 flex items-center text-xs text-content-neutral-secondary',
                                         lastExecutionStatus === 'FAILED' && 'text-content-destructive-primary'
                                     )}
                                 >
@@ -227,7 +210,7 @@ const ProjectDeploymentWorkflowListItem = ({
                     </div>
                 </div>
 
-                <div className="ml-6 flex min-w-0 items-center gap-1 overflow-hidden">
+                <div className="relative z-10 ml-6 flex min-w-0 items-center gap-1 overflow-hidden">
                     <WorkflowTriggerAndComponentsRow
                         className="hidden sm:flex"
                         filteredComponentNames={filteredComponentNames}
