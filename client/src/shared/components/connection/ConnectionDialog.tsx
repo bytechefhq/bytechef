@@ -801,7 +801,7 @@ const ConnectionDialog = ({
                                                 onClick={() => setUsePredefinedOAuthApp(!usePredefinedOAuthApp)}
                                             >
                                                 <span>
-                                                    I want to use {usePredefinedOAuthApp ? 'predefined' : 'my own'} app
+                                                    I want to use {usePredefinedOAuthApp ? 'my own' : 'predefined'} app
                                                     credentials
                                                 </span>
                                             </a>
