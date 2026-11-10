@@ -249,15 +249,17 @@ When accessing nested structures, handle null fields to avoid errors. SpEL's saf
 
 A reference to a variable that is not in the run context yet, such as the output of a step that has not run, a branch that was not taken, or an optional input that was left empty, is not evaluated: the expression is passed through unchanged. On the first pass of a counter, `=${attempts} + 1` evaluates to the text `=${attempts} + 1`, not to `1`.
 
-To read such a value, pass its path as a string to `exists` or `getOrDefault`:
+To read such a value, pass its data pill to `exists` or `getOrDefault`. The data pill is not evaluated before the call, so a missing value does not leave the formula unresolved, and the editor still checks that the step it points to can run before this one:
 
 | Expression | `attempts` missing | `attempts` is `1` |
 |------------|--------------------|-------------------|
 | `=${attempts} + 1` | `=${attempts} + 1` (unchanged) | `2` |
-| `=getOrDefault('attempts', 0) + 1` | `1` | `2` |
-| `=exists('attempts')` | `false` | `true` |
+| `=getOrDefault(${attempts}, 0) + 1` | `1` | `2` |
+| `=exists(${attempts})` | `false` | `true` |
 
-A dotted path reads into maps: `=getOrDefault('judge.answers.is_plausible.isTrue', false)`. Use `exists` to guard a whole expression: `=exists('judge') ? ${judge.answers.score} : 0`.
+A data pill can point into a map or a list: `=getOrDefault(${judge.answers.is_plausible.isTrue}, false)` or `=getOrDefault(${items[0].name}, '')`. Use `exists` to guard a whole expression: `=exists(${judge}) ? ${judge.answers.score} : 0`. Both functions only take a data pill as their whole first argument - a path typed as a string, such as `getOrDefault('attempts', 0)`, fails, and so does a pill with more after it, such as `getOrDefault(${judge}.score, 0)`; write `getOrDefault(${judge.score}, 0)` instead. The path inside the pill uses names, `[index]` and `['key']` joined by dots; any other form, such as `${judge?.score}`, fails instead of returning the default. Inside a selection or projection, such as `=${items}.?[getOrDefault(${active}, false)]`, the pill reads each item, the same way a bare `${active}` does there.
+
+Inside a **Loop**, a step can read the output of any step in the same loop body, its own included, because on every iteration after the first that output comes from the previous iteration. A counter step inside a Loop can therefore set itself to `=getOrDefault(${counter}, 0) + 1`. This only applies to **Loop**: **Map** and **Each** run their iterations in parallel, each on its own copy of the context, so an iteration never sees another iteration's outputs and a step there can still only reference the steps before it.
 
 ## Invoking Static Methods
 
@@ -401,6 +403,6 @@ Implicit conversion occurs when an input value of one type is used in a context 
 | Function | Description |
 |---|---|
 | config(propertyName) | Reads a server configuration property by name. It is gated by an allowlist of property-name prefixes (`bytechef.workflow.config.allowed-prefixes`) that is empty by default, so on a stock deployment every call fails and the function reads nothing. |
-| exists(path) | Returns `true` if the variable path resolves to a non-null value, `false` otherwise. The path is a string, such as `'attempts'` or `'judge.answers.score'`, so a missing value does not leave the formula unresolved. |
-| getOrDefault(path, defaultValue) | Returns the value at the variable path, or `defaultValue` when the path does not exist or is `null`. |
+| exists(dataPill) | Returns `true` if the data pill, such as `${attempts}` or `${judge.answers.score}`, resolves to a non-null value, `false` otherwise. A missing value does not leave the formula unresolved. |
+| getOrDefault(dataPill, defaultValue) | Returns the value of the data pill, or `defaultValue` when it does not resolve or is `null`. |
 | uuid() | Generates a random UUID (version 4). |
