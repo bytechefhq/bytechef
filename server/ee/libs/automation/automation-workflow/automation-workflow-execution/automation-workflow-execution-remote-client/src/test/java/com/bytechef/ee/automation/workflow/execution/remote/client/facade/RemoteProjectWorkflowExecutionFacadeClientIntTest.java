@@ -49,6 +49,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionSource;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacadeImpl;
 import com.bytechef.cache.config.CacheConfiguration;
@@ -144,7 +145,10 @@ class RemoteProjectWorkflowExecutionFacadeClientIntTest {
     private ComponentDefinitionService componentDefinitionService;
 
     @Autowired
-    private EmbeddedProjectDeploymentIds embeddedProjectDeploymentIds;
+    private OwnedProjectDeploymentIds embeddedProjectDeploymentIds;
+
+    @Autowired
+    private OwnedProjectDeploymentIds mcpProjectDeploymentIds;
 
     @Autowired
     private ProjectWorkflowExecutionFacade facade;
@@ -228,6 +232,7 @@ class RemoteProjectWorkflowExecutionFacadeClientIntTest {
         server.shutdownNow();
 
         embeddedProjectDeploymentIds.clear();
+        mcpProjectDeploymentIds.clear();
     }
 
     @Test
@@ -282,6 +287,32 @@ class RemoteProjectWorkflowExecutionFacadeClientIntTest {
             .containsExactly(job.getId());
         assertThat(page.getTotalElements()).isEqualTo(1);
         assertThat(page.getNumber()).isZero();
+    }
+
+    @Test
+    void testGetWorkflowExecutionsOfASourceReturnsOnlyTheExecutionsOfItsDeployments() {
+        Project project = createProject();
+
+        String workflowId = createWorkflowId(project);
+
+        Job projectJob = saveJob(workflowId);
+        Job mcpJob = saveJob(workflowId);
+
+        ProjectDeployment projectDeployment = createProjectDeployment(project);
+        ProjectDeployment mcpProjectDeployment = createProjectDeployment(project);
+
+        mcpProjectDeploymentIds.add(getId(mcpProjectDeployment));
+
+        principalJobService.create(getId(projectJob), getId(projectDeployment), PlatformType.AUTOMATION);
+        principalJobService.create(getId(mcpJob), getId(mcpProjectDeployment), PlatformType.AUTOMATION);
+
+        Page<WorkflowExecutionDTO> page = remoteProjectWorkflowExecutionFacadeClient.getWorkflowExecutions(
+            false, null, WorkflowExecutionSource.MCP_SERVER, null, null, null, getId(project), null, null, null,
+            null, getId(workspace), 0);
+
+        assertThat(page.getContent())
+            .extracting(WorkflowExecutionDTO::id)
+            .containsExactly(mcpJob.getId());
     }
 
     @Test
@@ -357,7 +388,7 @@ class RemoteProjectWorkflowExecutionFacadeClientIntTest {
         return taskExecutionRepository.save(taskExecution);
     }
 
-    static class EmbeddedProjectDeploymentIds {
+    static class OwnedProjectDeploymentIds {
 
         private final Set<Long> projectDeploymentIds = ConcurrentHashMap.newKeySet();
 
@@ -395,16 +426,29 @@ class RemoteProjectWorkflowExecutionFacadeClientIntTest {
     static class RemoteProjectWorkflowExecutionFacadeClientIntTestConfiguration {
 
         @Bean
-        EmbeddedProjectDeploymentIds embeddedProjectDeploymentIds() {
-            return new EmbeddedProjectDeploymentIds();
+        OwnedProjectDeploymentIds embeddedProjectDeploymentIds() {
+            return new OwnedProjectDeploymentIds();
         }
 
         @Bean
         ProjectDeploymentOwnerContributor embeddedProjectDeploymentOwnerContributor(
-            EmbeddedProjectDeploymentIds embeddedProjectDeploymentIds) {
+            OwnedProjectDeploymentIds embeddedProjectDeploymentIds) {
 
             return ProjectDeploymentOwnerContributor.of(
                 ProjectDeploymentOwner.EMBEDDED, embeddedProjectDeploymentIds::getConditionTemplate);
+        }
+
+        @Bean
+        OwnedProjectDeploymentIds mcpProjectDeploymentIds() {
+            return new OwnedProjectDeploymentIds();
+        }
+
+        @Bean
+        ProjectDeploymentOwnerContributor mcpProjectDeploymentOwnerContributor(
+            OwnedProjectDeploymentIds mcpProjectDeploymentIds) {
+
+            return ProjectDeploymentOwnerContributor.of(
+                ProjectDeploymentOwner.MCP_SERVER, mcpProjectDeploymentIds::getConditionTemplate);
         }
 
         @Bean

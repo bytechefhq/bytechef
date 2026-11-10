@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.workflow.execution.remote.grpc;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionSource;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.ee.automation.workflow.execution.remote.grpc.proto.GetTriggerExecutionWorkflowExecutionRequest;
 import com.bytechef.ee.automation.workflow.execution.remote.grpc.proto.GetWorkflowExecutionRequest;
@@ -70,6 +71,9 @@ public class ProjectWorkflowExecutionRemoteServiceGrpcServer
         Page<WorkflowExecutionDTO> page = projectWorkflowExecutionFacade.getWorkflowExecutions(
             request.hasEmbedded() ? request.getEmbedded() : null,
             request.hasEnvironmentId() ? request.getEnvironmentId() : null,
+            request.hasWorkflowExecutionSource()
+                ? WorkflowExecutionSource.valueOf(request.getWorkflowExecutionSource())
+                : WorkflowExecutionSource.PROJECT_DEPLOYMENT,
             request.hasJobStatus() ? Job.Status.valueOf(request.getJobStatus()) : null,
             workflowExecutionProtoMapper.toInstant(request.hasJobStartDate(), request.getJobStartDate()),
             workflowExecutionProtoMapper.toInstant(request.hasJobEndDate(), request.getJobEndDate()),
