@@ -8,8 +8,9 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
 import {writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import {findAvailableRememberedModel} from '@/shared/components/ai/model-picker/resolveRememberedModel';
-import {AI_PROVIDERS_LINK_LABEL, AI_PROVIDERS_SETTINGS_PATH} from '@/shared/constants';
+import {AI_PROVIDERS_LINK_LABEL} from '@/shared/constants';
 import {useAiDefaultModelQuery, useAiProviderCatalogQuery} from '@/shared/middleware/graphql';
+import {AI_PROVIDERS_SETTINGS_PATH} from '@/shared/navigation/settingsPaths';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {BrainCircuitIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
@@ -56,7 +57,7 @@ const AiHubHomePanel = () => {
                             <p className="text-sm font-medium text-content-neutral-primary">No AI providers enabled</p>
 
                             <p className="text-sm text-content-neutral-secondary">
-                                Enable an AI provider to chat with the AI Hub assistant.
+                                Enable an AI provider to chat with Basil.
                             </p>
                         </div>
 
@@ -92,7 +93,7 @@ const AiHubHomePanel = () => {
                             <h2 className="text-2xl font-semibold text-foreground">What should we get done?</h2>
 
                             <p className="mt-2 text-sm text-muted-foreground">
-                                Ask about your projects and workflows, or ask me to build a workflow.
+                                I'm Basil. Ask about your projects and workflows, or ask me to build a workflow.
                             </p>
                         </div>
 
