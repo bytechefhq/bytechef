@@ -13,20 +13,20 @@
  */
 
 import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime';
-import type { AutomationWorkflowProjectWorkflowInput } from './AutomationWorkflowProjectWorkflowInput';
+import type { AutomationProjectComponent } from './AutomationProjectComponent';
 import {
-    AutomationWorkflowProjectWorkflowInputFromJSON,
-    AutomationWorkflowProjectWorkflowInputFromJSONTyped,
-    AutomationWorkflowProjectWorkflowInputToJSON,
-    AutomationWorkflowProjectWorkflowInputToJSONTyped,
-} from './AutomationWorkflowProjectWorkflowInput';
-import type { AutomationWorkflowProjectComponent } from './AutomationWorkflowProjectComponent';
+    AutomationProjectComponentFromJSON,
+    AutomationProjectComponentFromJSONTyped,
+    AutomationProjectComponentToJSON,
+    AutomationProjectComponentToJSONTyped,
+} from './AutomationProjectComponent';
+import type { AutomationProjectWorkflowInput } from './AutomationProjectWorkflowInput';
 import {
-    AutomationWorkflowProjectComponentFromJSON,
-    AutomationWorkflowProjectComponentFromJSONTyped,
-    AutomationWorkflowProjectComponentToJSON,
-    AutomationWorkflowProjectComponentToJSONTyped,
-} from './AutomationWorkflowProjectComponent';
+    AutomationProjectWorkflowInputFromJSON,
+    AutomationProjectWorkflowInputFromJSONTyped,
+    AutomationProjectWorkflowInputToJSON,
+    AutomationProjectWorkflowInputToJSONTyped,
+} from './AutomationProjectWorkflowInput';
 
 /**
  * A group of tasks that make one logical workflow.
@@ -73,7 +73,7 @@ export interface ConnectedUserProjectWorkflow {
     /**
      * For REFERENCE rows, the uuid of the automation workflow being referenced.
      */
-    automationWorkflowUuid?: string;
+    automationUuid?: string;
     /**
      * For COPY rows, the uuid of the automation workflow template the copy was created from. Null otherwise.
      */
@@ -85,11 +85,11 @@ export interface ConnectedUserProjectWorkflow {
     /**
      * The components used by the workflow.
      */
-    components?: Array<AutomationWorkflowProjectComponent>;
+    components?: Array<AutomationProjectComponent>;
     /**
      * The values the connected user is asked for before this workflow runs.
      */
-    inputs?: Array<AutomationWorkflowProjectWorkflowInput>;
+    inputs?: Array<AutomationProjectWorkflowInput>;
     /**
      * The values the connected user has already supplied, keyed by input name. Values of inputs the configuration provides are left out.
      */
@@ -137,11 +137,11 @@ export function ConnectedUserProjectWorkflowFromJSONTyped(json: any, ignoreDiscr
         'workflowUuid': json['workflowUuid'] == null ? undefined : json['workflowUuid'],
         'workflowVersion': json['workflowVersion'] == null ? undefined : json['workflowVersion'],
         'kind': json['kind'] == null ? undefined : json['kind'],
-        'automationWorkflowUuid': json['automationWorkflowUuid'] == null ? undefined : json['automationWorkflowUuid'],
+        'automationUuid': json['automationUuid'] == null ? undefined : json['automationUuid'],
         'copiedFromWorkflowUuid': json['copiedFromWorkflowUuid'] == null ? undefined : json['copiedFromWorkflowUuid'],
         'dangling': json['dangling'] == null ? undefined : json['dangling'],
-        'components': json['components'] == null ? undefined : ((json['components'] as Array<any>).map(AutomationWorkflowProjectComponentFromJSON)),
-        'inputs': json['inputs'] == null ? undefined : ((json['inputs'] as Array<any>).map(AutomationWorkflowProjectWorkflowInputFromJSON)),
+        'components': json['components'] == null ? undefined : ((json['components'] as Array<any>).map(AutomationProjectComponentFromJSON)),
+        'inputs': json['inputs'] == null ? undefined : ((json['inputs'] as Array<any>).map(AutomationProjectWorkflowInputFromJSON)),
         'inputValues': json['inputValues'] == null ? undefined : json['inputValues'],
         'attentionReason': json['attentionReason'] == null ? undefined : json['attentionReason'],
     };
@@ -167,11 +167,11 @@ export function ConnectedUserProjectWorkflowToJSONTyped(value?: ConnectedUserPro
         'workflowUuid': value['workflowUuid'],
         'workflowVersion': value['workflowVersion'],
         'kind': value['kind'],
-        'automationWorkflowUuid': value['automationWorkflowUuid'],
+        'automationUuid': value['automationUuid'],
         'copiedFromWorkflowUuid': value['copiedFromWorkflowUuid'],
         'dangling': value['dangling'],
-        'components': value['components'] == null ? undefined : ((value['components'] as Array<any>).map(AutomationWorkflowProjectComponentToJSON)),
-        'inputs': value['inputs'] == null ? undefined : ((value['inputs'] as Array<any>).map(AutomationWorkflowProjectWorkflowInputToJSON)),
+        'components': value['components'] == null ? undefined : ((value['components'] as Array<any>).map(AutomationProjectComponentToJSON)),
+        'inputs': value['inputs'] == null ? undefined : ((value['inputs'] as Array<any>).map(AutomationProjectWorkflowInputToJSON)),
         'inputValues': value['inputValues'],
         'attentionReason': value['attentionReason'],
     };

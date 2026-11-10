@@ -1,31 +1,33 @@
 
-# AutomationWorkflowProjectWorkflowInput
+# AutomationProjectComponent
 
-A value the connected user supplies before an automation workflow runs.
+A component used in an automation workflow.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
 `name` | string
-`label` | string
-`type` | string
-`required` | boolean
+`title` | string
+`icon` | string
+`connectionRequired` | boolean
+`integrationId` | number
 `provided` | boolean
 
 ## Example
 
 ```typescript
-import type { AutomationWorkflowProjectWorkflowInput } from ''
+import type { AutomationProjectComponent } from ''
 
 // TODO: Update the object below with actual values
 const example = {
   "name": null,
-  "label": null,
-  "type": null,
-  "required": null,
+  "title": null,
+  "icon": null,
+  "connectionRequired": null,
+  "integrationId": null,
   "provided": null,
-} satisfies AutomationWorkflowProjectWorkflowInput
+} satisfies AutomationProjectComponent
 
 console.log(example)
 
@@ -34,7 +36,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as AutomationWorkflowProjectWorkflowInput
+const exampleParsed = JSON.parse(exampleJSON) as AutomationProjectComponent
 console.log(exampleParsed)
 ```
 

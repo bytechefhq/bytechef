@@ -1,4 +1,4 @@
-apis/AutomationWorkflowProjectApi.ts
+apis/AutomationProjectApi.ts
 apis/ConnectedUserApi.ts
 apis/ConnectedUserProjectWorkflowApi.ts
 apis/ConnectionApi.ts
@@ -7,11 +7,11 @@ apis/IntegrationInstanceApi.ts
 apis/IntegrationInstanceWorkflowApi.ts
 apis/index.ts
 docs/AuthorizationType.md
-docs/AutomationWorkflowProject.md
-docs/AutomationWorkflowProjectApi.md
-docs/AutomationWorkflowProjectComponent.md
-docs/AutomationWorkflowProjectWorkflowInput.md
-docs/AutomationWorkflowProjectWorkflowTemplate.md
+docs/AutomationProject.md
+docs/AutomationProjectApi.md
+docs/AutomationProjectComponent.md
+docs/AutomationProjectWorkflowInput.md
+docs/AutomationProjectWorkflowTemplate.md
 docs/ComponentInputOptionsRequest.md
 docs/ComponentInputReference.md
 docs/ComponentProperty.md
@@ -63,10 +63,10 @@ docs/UpdateWorkflowInputsRequest.md
 docs/Workflow.md
 index.ts
 models/AuthorizationType.ts
-models/AutomationWorkflowProject.ts
-models/AutomationWorkflowProjectComponent.ts
-models/AutomationWorkflowProjectWorkflowInput.ts
-models/AutomationWorkflowProjectWorkflowTemplate.ts
+models/AutomationProject.ts
+models/AutomationProjectComponent.ts
+models/AutomationProjectWorkflowInput.ts
+models/AutomationProjectWorkflowTemplate.ts
 models/ComponentInputOptionsRequest.ts
 models/ComponentInputReference.ts
 models/ComponentProperty.ts

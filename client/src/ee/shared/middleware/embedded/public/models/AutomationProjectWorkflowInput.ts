@@ -16,9 +16,9 @@ import { mapValues } from '../runtime';
 /**
  * A value the connected user supplies before an automation workflow runs.
  * @export
- * @interface AutomationWorkflowProjectWorkflowInput
+ * @interface AutomationProjectWorkflowInput
  */
-export interface AutomationWorkflowProjectWorkflowInput {
+export interface AutomationProjectWorkflowInput {
     /**
      * The name of the input, and the key its value is stored under.
      */
@@ -42,17 +42,17 @@ export interface AutomationWorkflowProjectWorkflowInput {
 }
 
 /**
- * Check if a given object implements the AutomationWorkflowProjectWorkflowInput interface.
+ * Check if a given object implements the AutomationProjectWorkflowInput interface.
  */
-export function instanceOfAutomationWorkflowProjectWorkflowInput(value: object): value is AutomationWorkflowProjectWorkflowInput {
+export function instanceOfAutomationProjectWorkflowInput(value: object): value is AutomationProjectWorkflowInput {
     return true;
 }
 
-export function AutomationWorkflowProjectWorkflowInputFromJSON(json: any): AutomationWorkflowProjectWorkflowInput {
-    return AutomationWorkflowProjectWorkflowInputFromJSONTyped(json, false);
+export function AutomationProjectWorkflowInputFromJSON(json: any): AutomationProjectWorkflowInput {
+    return AutomationProjectWorkflowInputFromJSONTyped(json, false);
 }
 
-export function AutomationWorkflowProjectWorkflowInputFromJSONTyped(json: any, ignoreDiscriminator: boolean): AutomationWorkflowProjectWorkflowInput {
+export function AutomationProjectWorkflowInputFromJSONTyped(json: any, ignoreDiscriminator: boolean): AutomationProjectWorkflowInput {
     if (json == null) {
         return json;
     }
@@ -66,11 +66,11 @@ export function AutomationWorkflowProjectWorkflowInputFromJSONTyped(json: any, i
     };
 }
 
-export function AutomationWorkflowProjectWorkflowInputToJSON(json: any): AutomationWorkflowProjectWorkflowInput {
-    return AutomationWorkflowProjectWorkflowInputToJSONTyped(json, false);
+export function AutomationProjectWorkflowInputToJSON(json: any): AutomationProjectWorkflowInput {
+    return AutomationProjectWorkflowInputToJSONTyped(json, false);
 }
 
-export function AutomationWorkflowProjectWorkflowInputToJSONTyped(value?: AutomationWorkflowProjectWorkflowInput | null, ignoreDiscriminator: boolean = false): any {
+export function AutomationProjectWorkflowInputToJSONTyped(value?: AutomationProjectWorkflowInput | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

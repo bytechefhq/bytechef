@@ -30,7 +30,7 @@ export interface EmbeddedWorkflowExecution {
     /**
      * The automation workflow execution, set when the source is AUTOMATION.
      */
-    automationWorkflowExecution?: object;
+    automationExecution?: object;
     /**
      * 
      */
@@ -70,7 +70,7 @@ export function EmbeddedWorkflowExecutionFromJSONTyped(json: any, ignoreDiscrimi
     }
     return {
         
-        'automationWorkflowExecution': json['automationWorkflowExecution'] == null ? undefined : json['automationWorkflowExecution'],
+        'automationExecution': json['automationExecution'] == null ? undefined : json['automationExecution'],
         'integrationWorkflowExecution': json['integrationWorkflowExecution'] == null ? undefined : WorkflowExecutionBasicFromJSON(json['integrationWorkflowExecution']),
         'source': json['source'],
     };
@@ -87,7 +87,7 @@ export function EmbeddedWorkflowExecutionToJSONTyped(value?: EmbeddedWorkflowExe
 
     return {
         
-        'automationWorkflowExecution': value['automationWorkflowExecution'],
+        'automationExecution': value['automationExecution'],
         'integrationWorkflowExecution': WorkflowExecutionBasicToJSON(value['integrationWorkflowExecution']),
         'source': value['source'],
     };

@@ -1,10 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AuthorizationType';
-export * from './AutomationWorkflowProject';
-export * from './AutomationWorkflowProjectComponent';
-export * from './AutomationWorkflowProjectWorkflowInput';
-export * from './AutomationWorkflowProjectWorkflowTemplate';
+export * from './AutomationProject';
+export * from './AutomationProjectComponent';
+export * from './AutomationProjectWorkflowInput';
+export * from './AutomationProjectWorkflowTemplate';
 export * from './ComponentInputOptionsRequest';
 export * from './ComponentInputReference';
 export * from './ComponentProperty';
