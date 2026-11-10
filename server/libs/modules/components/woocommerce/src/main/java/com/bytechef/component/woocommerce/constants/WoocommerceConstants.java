@@ -31,13 +31,16 @@ public class WoocommerceConstants {
 
     public static final String ADDRESS_1 = "address_1";
     public static final String ADDRESS_2 = "address_2";
+    public static final String AFTER = "after";
     public static final String AMOUNT = "amount";
+    public static final String BEFORE = "before";
     public static final String BILLING = "billing";
     public static final String CATEGORIES = "categories";
     public static final String CITY = "city";
     public static final String CODE = "code";
     public static final String COMPANY = "company";
     public static final String COUNTRY = "country";
+    public static final String CUSTOMER = "customer";
     public static final String CUSTOMER_ID = "customer_id";
     public static final String CUSTOMER_NOTE = "customer_note";
     public static final String DATE_EXPIRES = "date_expires";
@@ -60,12 +63,14 @@ public class WoocommerceConstants {
     public static final String MINIMUM_AMOUNT = "minimum_amount";
     public static final String NAME = "name";
     public static final String PAYMENT_METHOD = "payment_method";
+    public static final String PER_PAGE = "per_page";
     public static final String PHONE = "phone";
     public static final String POSTCODE = "postcode";
     public static final String PRODUCT_ID = "product_id";
     public static final String PRODUCT_IDS = "product_ids";
     public static final String QUANTITY = "quantity";
     public static final String REGULAR_PRICE = "regular_price";
+    public static final String SEARCH = "search";
     public static final String SET_PAID = "set_paid";
     public static final String SHIPPING = "shipping";
     public static final String SRC = "src";
