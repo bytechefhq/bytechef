@@ -8,12 +8,24 @@ import ConnectionListItem from '../ConnectionListItem';
 const hoisted = vi.hoisted(() => ({
     deleteConnectionMutate: vi.fn(),
     disconnectConnectionMutate: vi.fn(),
+    updateConnectionCredentialsMutation: vi.fn(),
     updateConnectionTagsMutate: vi.fn(),
 }));
 
 vi.mock('@/shared/components/connection/ConnectionDialog', () => ({
-    default: ({onClose}: {onClose: () => void}) => (
-        <div data-testid="connection-dialog">
+    default: ({
+        onClose,
+        useUpdateConnectionCredentialsMutation,
+    }: {
+        onClose: () => void;
+        useUpdateConnectionCredentialsMutation?: unknown;
+    }) => (
+        <div
+            data-credentials-replaceable={
+                useUpdateConnectionCredentialsMutation === hoisted.updateConnectionCredentialsMutation
+            }
+            data-testid="connection-dialog"
+        >
             <button onClick={onClose} type="button">
                 Close connection dialog
             </button>
@@ -28,6 +40,7 @@ vi.mock('@/shared/mutations/automation/connectionTags.mutations', () => ({
 vi.mock('@/shared/mutations/automation/connections.mutations', () => ({
     useDeleteConnectionMutation: () => ({isPending: false, mutate: hoisted.deleteConnectionMutate}),
     useDisconnectConnectionMutation: () => ({isPending: false, mutate: hoisted.disconnectConnectionMutate}),
+    useUpdateConnectionCredentialsMutation: hoisted.updateConnectionCredentialsMutation,
     useUpdateConnectionMutation: vi.fn(),
 }));
 
@@ -96,6 +109,16 @@ describe('ConnectionListItem', () => {
         await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
 
         expect(screen.getByTestId('connection-dialog')).toBeInTheDocument();
+    });
+
+    it('should let the edit dialog replace the connection credentials', async () => {
+        renderConnectionListItem(inactiveConnection);
+
+        await openMenu();
+
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
+
+        expect(screen.getByTestId('connection-dialog')).toHaveAttribute('data-credentials-replaceable', 'true');
     });
 
     it('should open the delete dialog and delete the connection when clicking Delete', async () => {
