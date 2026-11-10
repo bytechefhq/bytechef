@@ -16,6 +16,7 @@ import TagList from '@/shared/components/TagList';
 import {AutomationProjectTagsQuery, AutomationProjectsQuery} from '@/shared/middleware/graphql';
 import {DownloadIcon, EditIcon, EllipsisVerticalIcon, PlusIcon, SendIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 import {MouseEvent, useCallback, useMemo, useRef, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
 type EmbeddedTagType = AutomationProjectTagsQuery['automationProjectTags'][number];
@@ -46,6 +47,11 @@ const AutomationProjectListItem = ({
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
+
+    const titleClassName = twMerge(
+        'text-base font-semibold',
+        project.workflowTemplates.length > 0 && 'underline-offset-4 hover:text-content-brand-primary hover:underline'
+    );
 
     const projectTags = tags
         .filter((tag) => project.tagIds.includes(tag.id))
@@ -100,7 +106,7 @@ const AutomationProjectListItem = ({
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <button
-                                            className="text-base font-semibold"
+                                            className={titleClassName}
                                             onClick={(event) => {
                                                 event.stopPropagation();
 
@@ -120,7 +126,7 @@ const AutomationProjectListItem = ({
                                 </Tooltip>
                             ) : (
                                 <button
-                                    className="text-base font-semibold"
+                                    className={titleClassName}
                                     onClick={(event) => {
                                         event.stopPropagation();
 

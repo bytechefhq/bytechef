@@ -182,6 +182,28 @@ describe('AutomationProjectListItem', () => {
         });
     });
 
+    describe('title', () => {
+        it('should open the first workflow when the title is clicked', async () => {
+            renderItem({description: null});
+
+            await userEvent.click(screen.getByRole('button', {name: project.name}));
+
+            expect(handlers.onSelectWorkflow).toHaveBeenCalledWith('wf-uuid-1');
+        });
+
+        it('should underline the title on hover when the project has workflows', () => {
+            renderItem({description: null});
+
+            expect(screen.getByRole('button', {name: project.name})).toHaveClass('hover:underline');
+        });
+
+        it('should keep a plain title for a project without workflows', () => {
+            renderItem({description: null, workflowTemplates: []});
+
+            expect(screen.getByRole('button', {name: project.name})).not.toHaveClass('hover:underline');
+        });
+    });
+
     describe('row click', () => {
         it('should expand the workflows when the row is clicked', async () => {
             renderItem();
