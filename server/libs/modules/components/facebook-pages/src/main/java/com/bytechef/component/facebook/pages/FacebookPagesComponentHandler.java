@@ -27,6 +27,7 @@ import com.bytechef.component.facebook.pages.action.FacebookPagesCreatePostActio
 import com.bytechef.component.facebook.pages.action.FacebookPagesCreateVideoPostAction;
 import com.bytechef.component.facebook.pages.action.FacebookPagesGetCommentsAction;
 import com.bytechef.component.facebook.pages.connection.FacebookPagesConnection;
+import com.bytechef.component.facebook.pages.trigger.FacebookPagesNewCommentTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -50,6 +51,7 @@ public final class FacebookPagesComponentHandler implements ComponentHandler {
             FacebookPagesCreatePhotoPostAction.ACTION_DEFINITION,
             FacebookPagesCreateVideoPostAction.ACTION_DEFINITION,
             FacebookPagesGetCommentsAction.ACTION_DEFINITION)
+        .triggers(FacebookPagesNewCommentTrigger.TRIGGER_DEFINITION)
         .clusterElements(
             tool(FacebookPagesCreatePostAction.ACTION_DEFINITION),
             tool(FacebookPagesCreatePhotoPostAction.ACTION_DEFINITION),
