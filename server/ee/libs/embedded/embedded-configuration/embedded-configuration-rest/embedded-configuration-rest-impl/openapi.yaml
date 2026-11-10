@@ -318,6 +318,30 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+  /connections/{id}/credentials:
+    put:
+      description: "Replaces the credentials of an existing connection."
+      summary: "Replaces the credentials of an existing connection"
+      tags:
+        - "connection"
+      operationId: "updateConnectionCredentials"
+      parameters:
+        - name: "id"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateConnectionCredentialsRequest"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /connections/{id}/tags:
     put:
       description: "Updates tags of an existing connection."
@@ -1656,6 +1680,20 @@ components:
                 - "PENDING_REASSIGNMENT"
                 - "REVOKED"
               readOnly: true
+    UpdateConnectionCredentialsRequest:
+      description: "Contains the replacement credentials of a connection."
+      type: "object"
+      required:
+        - "parameters"
+        - "version"
+      properties:
+        parameters:
+          description: "The replacement authorization parameters."
+          type: "object"
+          additionalProperties: true
+        version:
+          type: "integer"
+          format: "int32"
     UpdateConnectionRequest:
       description: "Contains all connection parameters that can be updated."
       type: "object"
