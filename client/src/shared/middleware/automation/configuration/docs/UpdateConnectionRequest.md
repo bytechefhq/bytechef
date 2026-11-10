@@ -8,6 +8,7 @@ Contains all connection parameters that can be updated.
 Name | Type
 ------------ | -------------
 `name` | string
+`parameters` | { [key: string]: any; }
 `tags` | [Array&lt;Tag&gt;](Tag.md)
 `version` | number
 
@@ -19,6 +20,7 @@ import type { UpdateConnectionRequest } from ''
 // TODO: Update the object below with actual values
 const example = {
   "name": null,
+  "parameters": null,
   "tags": null,
   "version": null,
 } satisfies UpdateConnectionRequest
