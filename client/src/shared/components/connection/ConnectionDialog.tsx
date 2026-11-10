@@ -18,7 +18,6 @@ import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -126,10 +125,6 @@ const ConnectionDialog = ({
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const currentType = usePlatformTypeStore((state) => state.currentType);
-
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    const [_, copyToClipboard] = useCopyToClipboard();
 
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
@@ -559,41 +554,6 @@ const ConnectionDialog = ({
 
                         <DialogBody className="flex min-w-0 flex-col">
                             {errors?.length > 0 && <Errors errors={errors} />}
-
-                            {connection?.id && currentType === PlatformType.EMBEDDED && (
-                                <FormField
-                                    control={control}
-                                    name="id"
-                                    render={({field}) => (
-                                        <FormControl>
-                                            <div className="flex">
-                                                <div className="relative flex grow items-stretch focus-within:z-10">
-                                                    <Input
-                                                        {...field}
-                                                        className="rounded-r-none bg-surface-neutral-primary text-content-neutral-secondary"
-                                                        readOnly
-                                                        value={connection?.id}
-                                                    />
-                                                </div>
-
-                                                <Button
-                                                    className="-ml-px rounded-l-none rounded-r-md border border-stroke-neutral-secondary bg-surface-neutral-primary shadow-xs hover:bg-surface-neutral-primary-hover"
-                                                    icon={
-                                                        <ClipboardIcon
-                                                            aria-hidden="true"
-                                                            className="size-4 text-content-neutral-tertiary"
-                                                        />
-                                                    }
-                                                    onClick={() => copyToClipboard(connection?.id?.toString() ?? '')}
-                                                    size="icon"
-                                                    type="button"
-                                                    variant="ghost"
-                                                />
-                                            </div>
-                                        </FormControl>
-                                    )}
-                                />
-                            )}
 
                             {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
                                 <>
