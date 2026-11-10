@@ -15,7 +15,7 @@ export const Note = ({className, content, icon}: NoteProps) => (
             className
         )}
     >
-        {icon && icon}
+        {icon}
 
         <p className="text-sm font-medium">{content}</p>
     </div>

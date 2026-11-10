@@ -166,7 +166,11 @@ export function extractClusterElementComponentOperations(
     // Process all elements in the clusterElements object
     return Object.values(clusterElements).reduce((collectedOperations, element) => {
         if (Array.isArray(element)) {
-            return element.reduce(processClusterElement, collectedOperations);
+            return element.reduce(
+                (operations: WorkflowNodeType[], clusterElement: ClusterElementItemType) =>
+                    processClusterElement(operations, clusterElement),
+                collectedOperations
+            );
         } else if (element && isPlainObject(element)) {
             return processClusterElement(collectedOperations, element);
         }

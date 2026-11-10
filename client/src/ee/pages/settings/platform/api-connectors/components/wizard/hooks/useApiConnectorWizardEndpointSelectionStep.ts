@@ -42,7 +42,10 @@ export default function useApiConnectorWizardEndpointSelectionStep(): UseApiConn
         }, {});
     }, [discoveredEndpoints]);
 
-    const resourceNames = useMemo(() => Object.keys(endpointsByResource).sort(), [endpointsByResource]);
+    const resourceNames = useMemo(
+        () => Object.keys(endpointsByResource).sort((first, second) => first.localeCompare(second)),
+        [endpointsByResource]
+    );
 
     const allSelected = selectedEndpointIds.length === discoveredEndpoints.length;
     const noneSelected = selectedEndpointIds.length === 0;
