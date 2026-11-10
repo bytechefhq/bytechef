@@ -23,6 +23,13 @@ vi.mock('@/ee/shared/queries/embedded/integrations.queries', () => ({
         integration: (id: number) => ['integration', id],
     },
     useGetIntegrationQuery: () => ({data: {id: 5}}),
+    useGetIntegrationsQuery: () => ({
+        data: [
+            {id: 5, integrationWorkflowIds: [7]},
+            {id: 6, integrationWorkflowIds: [61, 62]},
+            {id: 8, integrationWorkflowIds: []},
+        ],
+    }),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
@@ -97,5 +104,32 @@ describe('useIntegrationHeader', () => {
         expect(useWorkflowEditorStore.getState().workflowTestExecution).toBe(runningExecution);
         expect(useWorkflowEditorStore.getState().workflowTestNodeStates).toEqual({aiAgent_1: {status: 'RUNNING'}});
         expect(useWorkflowNodeDetailsPanelStore.getState().currentNode).toBe(currentNode);
+    });
+
+    it('opens the first workflow of the selected integration', () => {
+        const {result} = renderHook(
+            () => useIntegrationHeader({bottomResizablePanelRef: {current: null}, integrationId: 5}),
+            {wrapper: createTestQueryClientWrapper()}
+        );
+
+        act(() => {
+            result.current.handleIntegrationValueChange(6);
+        });
+
+        expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/integrations/6/integration-workflows/61?');
+    });
+
+    it('stays on the current workflow when the current integration or one without workflows is selected', () => {
+        const {result} = renderHook(
+            () => useIntegrationHeader({bottomResizablePanelRef: {current: null}, integrationId: 5}),
+            {wrapper: createTestQueryClientWrapper()}
+        );
+
+        act(() => {
+            result.current.handleIntegrationValueChange(5);
+            result.current.handleIntegrationValueChange(8);
+        });
+
+        expect(hoisted.navigate).not.toHaveBeenCalled();
     });
 });
