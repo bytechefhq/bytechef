@@ -27,7 +27,6 @@ const renderContent = (selectedItem: object) =>
     render(
         <WorkflowExecutionSheetContent
             activeTab="input"
-            dialogOpen={false}
             handleBreadcrumbNavigate={vi.fn()}
             handleSeeExecutions={vi.fn()}
             handleTaskClick={vi.fn()}
@@ -37,7 +36,6 @@ const renderContent = (selectedItem: object) =>
             lazy={{workflowExecutionId: 7}}
             selectedItem={selectedItem as never}
             setActiveTab={vi.fn()}
-            setDialogOpen={vi.fn()}
             subflowStack={[]}
             taskExecutionAttempts={[]}
         />

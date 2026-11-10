@@ -22,7 +22,7 @@ import {twMerge} from 'tailwind-merge';
 
 interface WorkflowExecutionsTabsPanelProps {
     activeTab: TabValueType;
-    dialogOpen: boolean;
+    dialogOpen?: boolean;
     isEditorEnvironment?: boolean;
     job?: Job;
     onEditSubflowClick?: (workflowUuid: string) => void;
@@ -32,13 +32,13 @@ interface WorkflowExecutionsTabsPanelProps {
     selectedItemInput?: TaskExecution['input'];
     selectedItemOutput?: TaskExecution['output'];
     setActiveTab: (value: TabValueType) => void;
-    setDialogOpen: (open: boolean) => void;
+    setDialogOpen?: (open: boolean) => void;
     triggerExecution?: TriggerExecution;
 }
 
 const WorkflowExecutionsTabsPanel = ({
     activeTab,
-    dialogOpen,
+    dialogOpen = false,
     isEditorEnvironment = false,
     job,
     onEditSubflowClick,
@@ -72,28 +72,36 @@ const WorkflowExecutionsTabsPanel = ({
     const resolvedOutput = selectedItemOutput !== undefined ? selectedItemOutput : displayedItem?.output;
     const resolvedDataLoading = selectedItemDataLoading || callValues.isLoading;
 
+    const resolvedItem = useMemo(
+        () =>
+            displayedItem
+                ? ({...displayedItem, input: resolvedInput, output: resolvedOutput} as TaskExecution)
+                : undefined,
+        [displayedItem, resolvedInput, resolvedOutput]
+    );
+
     const handleValueChange = useCallback((value: string) => setActiveTab(value as TabValueType), [setActiveTab]);
 
     const displayValue = useMemo(
         () =>
             getDisplayValue({
                 job,
-                selectedItem: displayedItem,
+                selectedItem: resolvedItem,
                 tab: activeTab,
                 triggerExecution,
             }),
-        [job, displayedItem, activeTab, triggerExecution]
+        [job, resolvedItem, activeTab, triggerExecution]
     );
 
     const hasDialogContent = useMemo(
         () =>
             hasDialogContentValue({
                 job,
-                selectedItem: displayedItem,
+                selectedItem: resolvedItem,
                 tab: activeTab,
                 triggerExecution,
             }),
-        [job, displayedItem, activeTab, triggerExecution]
+        [job, resolvedItem, activeTab, triggerExecution]
     );
 
     const hasOutcome = callExecution?.clusterElementCallOutcome !== undefined;
@@ -165,7 +173,7 @@ const WorkflowExecutionsTabsPanel = ({
                     )}
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2 pr-2 text-xs text-muted-foreground">
                     <span>
                         {activeTab === 'input'
                             ? selectedItem?.startDate &&
@@ -226,41 +234,47 @@ const WorkflowExecutionsTabsPanel = ({
                 {activeTab === 'logs' && <div className="ml-6 min-w-0 flex-1" ref={setLogsToolbarContainer} />}
 
                 {hasDialogContent && (
-                    <div className="flex items-center gap-x-2">
-                        <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
-                            <DialogTrigger asChild>
-                                <Button icon={<ExpandIcon />} size="iconXs" variant="ghost" />
-                            </DialogTrigger>
+                    <div className="flex items-center gap-x-2 pr-1">
+                        {setDialogOpen && (
+                            <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button icon={<ExpandIcon />} size="iconXs" variant="ghost" />
+                                </DialogTrigger>
 
-                            <DialogContent size="xl">
-                                <DialogMain>
-                                    <DialogHeader
-                                        endContent={<WorkflowExecutionContentClipboardButton value={displayValue} />}
-                                        title={activeTab.toUpperCase()}
-                                    />
-
-                                    <DialogBody>
-                                        <WorkflowExecutionContent
-                                            error={activeTab === 'error' ? selectedItem?.error : undefined}
-                                            input={activeTab === 'input' ? displayedItem?.input : undefined}
-                                            jobInputs={
-                                                activeTab === 'output' && isTriggerExecution ? job?.inputs : undefined
+                                <DialogContent size="xl">
+                                    <DialogMain>
+                                        <DialogHeader
+                                            endContent={
+                                                <WorkflowExecutionContentClipboardButton value={displayValue} />
                                             }
-                                            output={
-                                                activeTab === 'output' && !isTriggerExecution
-                                                    ? displayedItem?.output
-                                                    : undefined
-                                            }
-                                            workflowTriggerName={
-                                                activeTab === 'output' && isTriggerExecution
-                                                    ? triggerExecution?.workflowTrigger?.name
-                                                    : undefined
-                                            }
+                                            title={activeTab.toUpperCase()}
                                         />
-                                    </DialogBody>
-                                </DialogMain>
-                            </DialogContent>
-                        </Dialog>
+
+                                        <DialogBody>
+                                            <WorkflowExecutionContent
+                                                error={activeTab === 'error' ? selectedItem?.error : undefined}
+                                                input={activeTab === 'input' ? resolvedInput : undefined}
+                                                jobInputs={
+                                                    activeTab === 'output' && isTriggerExecution
+                                                        ? job?.inputs
+                                                        : undefined
+                                                }
+                                                output={
+                                                    activeTab === 'output' && !isTriggerExecution
+                                                        ? resolvedOutput
+                                                        : undefined
+                                                }
+                                                workflowTriggerName={
+                                                    activeTab === 'output' && isTriggerExecution
+                                                        ? triggerExecution?.workflowTrigger?.name
+                                                        : undefined
+                                                }
+                                            />
+                                        </DialogBody>
+                                    </DialogMain>
+                                </DialogContent>
+                            </Dialog>
+                        )}
 
                         <WorkflowExecutionContentClipboardButton value={displayValue} />
                     </div>
