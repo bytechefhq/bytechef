@@ -1,4 +1,6 @@
-import {fireEvent, render, screen, within} from '@testing-library/react';
+import {TooltipProvider} from '@/components/ui/tooltip';
+import {fireEvent, render as testingLibraryRender, screen, within} from '@testing-library/react';
+import {ReactElement} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionLogsContent from '../WorkflowExecutionLogsContent';
@@ -78,6 +80,8 @@ const logEntry = (level: string, message: string) => ({
     taskExecutionId: '10',
     timestamp: '2026-10-09T12:00:00Z',
 });
+
+const render = (ui: ReactElement) => testingLibraryRender(ui, {wrapper: TooltipProvider});
 
 describe('WorkflowExecutionLogsContent', () => {
     beforeEach(() => {
