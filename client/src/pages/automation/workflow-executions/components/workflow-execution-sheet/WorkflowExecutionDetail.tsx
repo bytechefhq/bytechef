@@ -23,7 +23,6 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
 
     const {
         activeTab,
-        dialogOpen,
         focusedExecution,
         focusedTaskExecutionError,
         handleBreadcrumbNavigate,
@@ -39,7 +38,6 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
         rootJob,
         selectedItem,
         setActiveTab,
-        setDialogOpen,
         subflowStack,
         taskExecutionAttempts,
         taskExecutionCount,
@@ -91,7 +89,6 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                     {(job || triggerExecution) && (
                         <WorkflowExecutionSheetContent
                             activeTab={activeTab}
-                            dialogOpen={dialogOpen}
                             focusedExecution={focusedExecution}
                             focusedTaskExecutionError={focusedTaskExecutionError}
                             handleBreadcrumbNavigate={handleBreadcrumbNavigate}
@@ -125,7 +122,6 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                             rootJob={rootJob}
                             selectedItem={selectedItem}
                             setActiveTab={setActiveTab}
-                            setDialogOpen={setDialogOpen}
                             subflowStack={subflowStack}
                             taskExecutionAttempts={taskExecutionAttempts}
                             taskExecutionCount={taskExecutionCount}

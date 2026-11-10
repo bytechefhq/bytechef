@@ -26,7 +26,6 @@ import {type FocusedExecutionI} from './hooks/useWorkflowExecutionDetail';
 
 interface WorkflowExecutionSheetContentProps {
     activeTab: TabValueType;
-    dialogOpen: boolean;
     focusedExecution?: FocusedExecutionI;
     focusedTaskExecutionError?: boolean;
     handleBreadcrumbNavigate: (index: number) => void;
@@ -44,7 +43,6 @@ interface WorkflowExecutionSheetContentProps {
     rootJob?: Job;
     selectedItem: TaskExecution | TriggerExecution | undefined;
     setActiveTab: (tab: TabValueType) => void;
-    setDialogOpen: (open: boolean) => void;
     subflowStack: Array<{jobId: number; label: string}>;
     taskExecutionAttempts: TaskExecutionAttemptsI<TaskExecution>[];
     taskExecutionCount?: number;
@@ -53,7 +51,6 @@ interface WorkflowExecutionSheetContentProps {
 
 const WorkflowExecutionSheetContent = ({
     activeTab,
-    dialogOpen,
     focusedExecution,
     focusedTaskExecutionError,
     handleBreadcrumbNavigate,
@@ -71,7 +68,6 @@ const WorkflowExecutionSheetContent = ({
     rootJob,
     selectedItem,
     setActiveTab,
-    setDialogOpen,
     subflowStack,
     taskExecutionAttempts,
     taskExecutionCount,
@@ -124,7 +120,7 @@ const WorkflowExecutionSheetContent = ({
 
             {jobFailedWithNoExecutions ? (
                 <div className="flex-1 p-4">
-                    <WorkflowExecutionContent error={jobFailureError} />
+                    <WorkflowExecutionContent error={jobFailureError} showErrorClipboardButton />
                 </div>
             ) : (
                 <ResizablePanelGroup orientation="horizontal">
@@ -228,7 +224,6 @@ const WorkflowExecutionSheetContent = ({
                     <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={66} minSize={20}>
                         <WorkflowExecutionsTabsPanel
                             activeTab={activeTab}
-                            dialogOpen={dialogOpen}
                             job={job}
                             onSeeExecutionsClick={handleSeeExecutions}
                             selectedItem={selectedItem}
@@ -236,7 +231,6 @@ const WorkflowExecutionSheetContent = ({
                             selectedItemInput={selectedTaskExecution?.input}
                             selectedItemOutput={selectedTaskExecution?.output}
                             setActiveTab={setActiveTab}
-                            setDialogOpen={setDialogOpen}
                             triggerExecution={triggerExecution}
                         />
                     </ResizablePanel>

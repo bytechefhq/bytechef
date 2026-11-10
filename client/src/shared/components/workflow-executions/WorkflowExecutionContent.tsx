@@ -1,5 +1,6 @@
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import JsonView from '@/shared/components/JsonView';
+import WorkflowExecutionContentClipboardButton from '@/shared/components/workflow-executions/WorkflowExecutionContentClipboardButton';
 import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
 import {ChevronRightIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
@@ -12,6 +13,7 @@ interface WorkflowExecutionContentProps {
     input?: {[key: string]: string};
     output?: object;
     jobInputs?: {[key: string]: object};
+    showErrorClipboardButton?: boolean;
     workflowTriggerName?: string;
 }
 
@@ -20,6 +22,7 @@ const WorkflowExecutionContent = ({
     input,
     jobInputs,
     output,
+    showErrorClipboardButton = false,
     workflowTriggerName,
 }: WorkflowExecutionContentProps) => {
     const filteredOutput = useMemo(
@@ -27,14 +30,23 @@ const WorkflowExecutionContent = ({
         [output, jobInputs, workflowTriggerName]
     );
 
+    const errorText = useMemo(
+        () => (error ? [error.message || 'No message.', ...(error.stackTrace || [])].join('\n') : undefined),
+        [error]
+    );
+
     const [stackTraceOpen, setStackTraceOpen] = useState(false);
 
     if (error !== undefined) {
         return (
             <div className="flex flex-col gap-4 overflow-hidden">
-                <span className="w-fit max-w-full rounded-md border border-stroke-destructive-secondary p-2 text-sm font-semibold break-words whitespace-pre-wrap text-content-destructive-primary">
-                    {error.message || 'No message.'}
-                </span>
+                <div className="flex items-start justify-between gap-2">
+                    <span className="w-fit max-w-full rounded-md border border-stroke-destructive-secondary p-2 text-sm font-semibold break-words whitespace-pre-wrap text-content-destructive-primary">
+                        {error.message || 'No message.'}
+                    </span>
+
+                    {showErrorClipboardButton && <WorkflowExecutionContentClipboardButton value={errorText} />}
+                </div>
 
                 {error.stackTrace && error.stackTrace.length > 0 && (
                     <Collapsible onOpenChange={setStackTraceOpen} open={stackTraceOpen}>

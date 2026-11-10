@@ -2,6 +2,7 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {Input} from '@/components/ui/input';
 import JsonView, {useJsonViewLoaded} from '@/shared/components/JsonView';
+import WorkflowExecutionContentClipboardButton from '@/shared/components/workflow-executions/WorkflowExecutionContentClipboardButton';
 import {
     type EditorJobFileLogsQuery,
     type JobFileLogsQuery,
@@ -144,6 +145,26 @@ const tryParseJson = (message: string): object | null => {
         return null;
     }
 };
+
+const formatLogEntries = (logEntries: LogEntry[], showComponentName: boolean) =>
+    logEntries
+        .map((logEntry) => {
+            const componentLabel =
+                showComponentName && logEntry.componentName
+                    ? ` [${logEntry.componentName}${logEntry.componentOperationName ? `:${logEntry.componentOperationName}` : ''}]`
+                    : '';
+
+            return [
+                `${logEntry.timestamp} ${logEntry.level}${componentLabel} ${logEntry.message}`,
+                logEntry.exceptionType &&
+                    `${logEntry.exceptionType}${logEntry.exceptionMessage ? `: ${logEntry.exceptionMessage}` : ''}`,
+                !logEntry.exceptionType && logEntry.exceptionMessage,
+                logEntry.stackTrace,
+            ]
+                .filter(Boolean)
+                .join('\n');
+        })
+        .join('\n');
 
 const LogEntryMessage = ({collapsed, message}: {collapsed?: boolean; message: string}) => {
     const parsedJson = useMemo(() => tryParseJson(message), [message]);
@@ -325,6 +346,13 @@ const WorkflowExecutionLogsContent = ({
         );
     }, [hiddenLevels, logs, searchText]);
 
+    const showComponentName = !taskExecutionId && !isTriggerLogs;
+
+    const visibleLogsText = useMemo(
+        () => formatLogEntries(visibleLogs, showComponentName),
+        [showComponentName, visibleLogs]
+    );
+
     const allExpanded = collapsed === false;
 
     const handleCollapsedChange = (nextCollapsed: boolean) => {
@@ -368,7 +396,7 @@ const WorkflowExecutionLogsContent = ({
         <div
             className={twMerge(
                 'flex shrink-0 items-center justify-end gap-1',
-                !toolbarContainer && 'border-b border-stroke-neutral-secondary p-2'
+                toolbarContainer ? 'pr-1' : 'border-b border-stroke-neutral-secondary p-2'
             )}
         >
             {levelCounts.map(({count, level}) => {
@@ -413,6 +441,8 @@ const WorkflowExecutionLogsContent = ({
                 title={allExpanded ? 'Collapse all' : 'Expand all'}
                 variant="ghost"
             />
+
+            <WorkflowExecutionContentClipboardButton value={visibleLogsText} />
         </div>
     );
 
@@ -426,7 +456,7 @@ const WorkflowExecutionLogsContent = ({
                         collapsed={collapsed}
                         entry={logEntry}
                         key={`${logEntry.timestamp}-${index}-${expansionVersion}`}
-                        showComponentName={!taskExecutionId && !isTriggerLogs}
+                        showComponentName={showComponentName}
                     />
                 ))}
             </div>

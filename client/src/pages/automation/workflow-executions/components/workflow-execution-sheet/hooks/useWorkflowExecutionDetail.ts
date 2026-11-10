@@ -27,7 +27,6 @@ export interface FocusedExecutionI {
 
 const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolean) => {
     const [activeTab, setActiveTab] = useState<TabValueType>('output');
-    const [dialogOpen, setDialogOpen] = useState(false);
     const [appliedFocus, setAppliedFocus] = useState<{focusPath: FocusPathElement[]; jobId: number} | undefined>(
         undefined
     );
@@ -232,7 +231,6 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
 
     return {
         activeTab,
-        dialogOpen,
         focusedExecution,
         focusedTaskExecutionError: focusedTaskExecutionError && !focusedTaskExecution && !triggerExecutionFailed,
         handleBreadcrumbNavigate,
@@ -248,7 +246,6 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
         rootJob,
         selectedItem,
         setActiveTab,
-        setDialogOpen,
         subflowStack,
         taskExecutionAttempts,
         taskExecutionCount,

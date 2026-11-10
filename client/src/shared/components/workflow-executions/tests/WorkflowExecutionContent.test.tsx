@@ -1,13 +1,39 @@
 import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionContent from '../WorkflowExecutionContent';
+
+const {copyToClipboardMock} = vi.hoisted(() => ({copyToClipboardMock: vi.fn()}));
+
+vi.mock('@uidotdev/usehooks', () => ({
+    useCopyToClipboard: () => [null, copyToClipboardMock],
+}));
 
 vi.mock('@/shared/components/JsonView', () => ({
     default: () => <div data-testid="json-view" />,
 }));
 
 describe('WorkflowExecutionContent', () => {
+    it('copies a failure message with its stack trace as plain text when asked to offer a copy button', async () => {
+        render(
+            <WorkflowExecutionContent
+                error={{message: 'Unable to perform oauth token refresh', stackTrace: ['at A.run(A.java:1)']}}
+                showErrorClipboardButton
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'Copy to clipboard'}));
+
+        expect(copyToClipboardMock).toHaveBeenCalledWith('Unable to perform oauth token refresh\nat A.run(A.java:1)');
+    });
+
+    it('offers no copy button for a failure unless asked to', () => {
+        render(<WorkflowExecutionContent error={{message: 'failed', stackTrace: []}} />);
+
+        expect(screen.queryByRole('button', {name: 'Copy to clipboard'})).not.toBeInTheDocument();
+    });
+
     it('says so when a trigger ran with no input rather than rendering an empty viewer', () => {
         render(<WorkflowExecutionContent input={{}} />);
 

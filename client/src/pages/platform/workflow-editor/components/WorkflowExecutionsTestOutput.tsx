@@ -175,7 +175,7 @@ const WorkflowExecutionsTestOutput = ({
                         <>
                             {workflowTestExecution?.job && jobFailedWithNoExecutions && (
                                 <div className="flex-1 p-4">
-                                    <WorkflowExecutionContent error={jobFailureError} />
+                                    <WorkflowExecutionContent error={jobFailureError} showErrorClipboardButton />
                                 </div>
                             )}
 

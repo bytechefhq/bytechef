@@ -47,10 +47,8 @@ const renderPanel = (props: Partial<Parameters<typeof WorkflowExecutionsTabsPane
     render(
         <WorkflowExecutionsTabsPanel
             activeTab="logs"
-            dialogOpen={false}
             selectedItem={triggerExecution}
             setActiveTab={vi.fn()}
-            setDialogOpen={vi.fn()}
             triggerExecution={triggerExecution}
             {...props}
         />
@@ -214,7 +212,7 @@ describe('WorkflowExecutionsTabsPanel', () => {
     });
 
     it('widens the expanded output dialog past the default dialog width', () => {
-        renderPanel({activeTab: 'output', dialogOpen: true, job, selectedItem: taskExecution});
+        renderPanel({activeTab: 'output', dialogOpen: true, job, selectedItem: taskExecution, setDialogOpen: vi.fn()});
 
         const dialog = screen.getByRole('dialog');
 
@@ -224,7 +222,7 @@ describe('WorkflowExecutionsTabsPanel', () => {
     });
 
     it('gives the expanded output dialog a close control', () => {
-        renderPanel({activeTab: 'output', dialogOpen: true, job, selectedItem: taskExecution});
+        renderPanel({activeTab: 'output', dialogOpen: true, job, selectedItem: taskExecution, setDialogOpen: vi.fn()});
 
         expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument();
     });
@@ -239,6 +237,30 @@ describe('WorkflowExecutionsTabsPanel', () => {
         renderPanel({activeTab: 'output', job, selectedItem: taskExecution});
 
         expect(screen.getByTestId('json-view')).toHaveTextContent('rows');
+    });
+
+    it('keeps the expand and copy controls for a task whose output is loaded separately from its row', () => {
+        const rowWithoutValues = {...taskExecution, input: undefined, output: undefined} as TaskExecution;
+
+        renderPanel({
+            activeTab: 'output',
+            dialogOpen: true,
+            job,
+            selectedItem: rowWithoutValues,
+            selectedItemInput: {table: 'orders'},
+            selectedItemOutput: {loadedRows: 21},
+            setDialogOpen: vi.fn(),
+        });
+
+        expect(screen.getByRole('dialog')).toHaveTextContent('loadedRows');
+    });
+
+    it('offers no expand dialog when the caller does not manage one', () => {
+        renderPanel({activeTab: 'output', job, selectedItem: taskExecution});
+
+        expect(screen.getByRole('button', {name: 'Copy to clipboard'})).toBeInTheDocument();
+        expect(screen.getAllByRole('button')).toHaveLength(1);
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     describe('cluster element call rows', () => {

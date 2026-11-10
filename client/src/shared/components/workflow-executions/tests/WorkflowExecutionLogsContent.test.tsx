@@ -3,13 +3,19 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowExecutionLogsContent from '../WorkflowExecutionLogsContent';
 
-const {editorJobFileLogsQueryMock, jobFileLogsQueryMock, jsonViewLoadedMock, triggerExecutionFileLogsQueryMock} =
-    vi.hoisted(() => ({
-        editorJobFileLogsQueryMock: vi.fn(),
-        jobFileLogsQueryMock: vi.fn(),
-        jsonViewLoadedMock: vi.fn(),
-        triggerExecutionFileLogsQueryMock: vi.fn(),
-    }));
+const {
+    copyToClipboardMock,
+    editorJobFileLogsQueryMock,
+    jobFileLogsQueryMock,
+    jsonViewLoadedMock,
+    triggerExecutionFileLogsQueryMock,
+} = vi.hoisted(() => ({
+    copyToClipboardMock: vi.fn(),
+    editorJobFileLogsQueryMock: vi.fn(),
+    jobFileLogsQueryMock: vi.fn(),
+    jsonViewLoadedMock: vi.fn(),
+    triggerExecutionFileLogsQueryMock: vi.fn(),
+}));
 
 vi.mock('@/shared/middleware/graphql', () => ({
     LogLevel: {
@@ -22,6 +28,10 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useEditorJobFileLogsQuery: editorJobFileLogsQueryMock,
     useJobFileLogsQuery: jobFileLogsQueryMock,
     useTriggerExecutionFileLogsQuery: triggerExecutionFileLogsQueryMock,
+}));
+
+vi.mock('@uidotdev/usehooks', () => ({
+    useCopyToClipboard: () => [null, copyToClipboardMock],
 }));
 
 vi.mock('@/shared/components/JsonView', () => ({
@@ -176,6 +186,41 @@ describe('WorkflowExecutionLogsContent', () => {
         fireEvent.click(screen.getByRole('button', {name: 'DEBUG (1)'}));
 
         expect(screen.getByText('debug message')).toBeInTheDocument();
+    });
+
+    it('copies the entries left after filtering as plain log lines', () => {
+        jobFileLogsQueryMock.mockReturnValue({
+            data: {
+                jobFileLogs: {
+                    content: [
+                        logEntry('INFO', 'info message'),
+                        logEntry('DEBUG', 'debug message'),
+                        {
+                            ...logEntry('ERROR', 'request failed'),
+                            exceptionMessage: 'Connection refused',
+                            exceptionType: 'java.net.ConnectException',
+                            stackTrace: 'at A.run(A.java:1)',
+                        },
+                    ],
+                },
+            },
+            error: undefined,
+            isLoading: false,
+        });
+
+        render(<WorkflowExecutionLogsContent jobId="1" taskExecutionId="10" />);
+
+        fireEvent.click(screen.getByRole('button', {name: 'DEBUG (1)'}));
+        fireEvent.click(screen.getByRole('button', {name: 'Copy to clipboard'}));
+
+        expect(copyToClipboardMock).toHaveBeenCalledWith(
+            [
+                '2026-10-09T12:00:00Z INFO info message',
+                '2026-10-09T12:00:00Z ERROR request failed',
+                'java.net.ConnectException: Connection refused',
+                'at A.run(A.java:1)',
+            ].join('\n')
+        );
     });
 
     it('shows only the entries whose message contains the search text, ignoring case', () => {
