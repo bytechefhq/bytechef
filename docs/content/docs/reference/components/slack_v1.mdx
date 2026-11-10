@@ -54,8 +54,10 @@ Version: 1
     - reactions:read
     - mpim:read
     - users:read
+    - users:read.email
     - incoming-webhook
-12. Under OAuth tokens click on **Install to ...**.
+12. Under **User Token Scopes**, click on **Add an OAuth Scope** and add `search:read`. The **Search Messages** action works only with a user token.
+13. Under OAuth tokens click on **Install to ...**.
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/893e27e9-f6f7-4a07-bae8-b08169858c43?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
@@ -130,6 +132,167 @@ Type: OBJECT
 To find the Channel ID, click [here](/reference/components/slack_v1#how-to-find-the-channel-id)
 
 To find the Timestamp, click [here](/reference/components/slack_v1#how-to-find-the-timestamp)
+
+
+
+### Find User by Email
+Name: findUserByEmail
+
+`Finds a user in the Slack workspace by their email address.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| email | Email | STRING | Email address of the user to find. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Find User by Email",
+  "name" : "findUserByEmail",
+  "parameters" : {
+    "email" : ""
+  },
+  "type" : "slack/v1/findUserByEmail"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the user. |
+| team_id | STRING | ID of the workspace the user belongs to. |
+| name | STRING | Username of the user. |
+| real_name | STRING | Real name of the user. |
+| deleted | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user has been deactivated. |
+| is_admin | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user is an admin of the workspace. |
+| is_owner | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user is an owner of the workspace. |
+| is_bot | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Indicates if the user is a bot user. |
+| tz | STRING | Time zone of the user. |
+| profile | OBJECT <details> <summary> Properties </summary> &#123;STRING\(real_name), STRING\(display_name), STRING\(email), STRING\(title), STRING\(phone), STRING\(status_text), STRING\(status_emoji)&#125; </details> | Profile of the user. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "team_id" : "",
+  "name" : "",
+  "real_name" : "",
+  "deleted" : false,
+  "is_admin" : false,
+  "is_owner" : false,
+  "is_bot" : false,
+  "tz" : "",
+  "profile" : {
+    "real_name" : "",
+    "display_name" : "",
+    "email" : "",
+    "title" : "",
+    "phone" : "",
+    "status_text" : "",
+    "status_emoji" : ""
+  }
+}
+```
+
+
+
+
+### Search Messages
+Name: searchMessages
+
+`Searches for messages matching a query. Requires a user token with the search:read scope.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Query | STRING | Search query. Supports Slack search modifiers such as in:#channel, from:@user, before:YYYY-MM-DD and after:YYYY-MM-DD. | true |
+| sort | Sort | STRING <details> <summary> Options </summary> <span>score</span>, <span>timestamp</span> </details> | Field to sort the results by. | false |
+| sortDirection | Sort Direction | STRING <details> <summary> Options </summary> <span>asc</span>, <span>desc</span> </details> | Direction to sort the results in. | false |
+| count | Count | INTEGER | Number of results to return. Maximum is 100. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Messages",
+  "name" : "searchMessages",
+  "parameters" : {
+    "query" : "",
+    "sort" : "",
+    "sortDirection" : "",
+    "count" : 1
+  },
+  "type" : "slack/v1/searchMessages"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| total | INTEGER | Total number of messages matching the query. |
+| matches | ARRAY <details> <summary> Items </summary> [&#123;&#123;STRING\(id), STRING\(name)&#125;\(channel), STRING\(iid), STRING\(permalink), STRING\(team), STRING\(text), STRING\(ts), STRING\(type), STRING\(user), STRING\(username)&#125;] </details> | Messages matching the query. |
+| pagination | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(first), INTEGER\(last), INTEGER\(page), INTEGER\(page_count), INTEGER\(per_page), INTEGER\(total_count)&#125; </details> | Pagination details of the results. |
+| paging | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(count), INTEGER\(page), INTEGER\(pages), INTEGER\(total)&#125; </details> | Paging details of the results. |
+
+
+
+
+#### Output Example
+```json
+{
+  "total" : 1,
+  "matches" : [ {
+    "channel" : {
+      "id" : "",
+      "name" : ""
+    },
+    "iid" : "",
+    "permalink" : "",
+    "team" : "",
+    "text" : "",
+    "ts" : "",
+    "type" : "",
+    "user" : "",
+    "username" : ""
+  } ],
+  "pagination" : {
+    "first" : 1,
+    "last" : 1,
+    "page" : 1,
+    "page_count" : 1,
+    "per_page" : 1,
+    "total_count" : 1
+  },
+  "paging" : {
+    "count" : 1,
+    "page" : 1,
+    "pages" : 1,
+    "total" : 1
+  }
+}
+```
+
 
 
 
