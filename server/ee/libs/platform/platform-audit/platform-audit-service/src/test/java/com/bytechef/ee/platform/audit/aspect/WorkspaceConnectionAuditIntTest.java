@@ -88,6 +88,8 @@ class WorkspaceConnectionAuditIntTest {
     @BeforeEach
     void beforeEach() {
         persistenceAuditEventRepository.deleteAll();
+
+        when(connectionService.getConnection(CONNECTION_ID)).thenReturn(new Connection());
     }
 
     @AfterEach
@@ -144,7 +146,6 @@ class WorkspaceConnectionAuditIntTest {
         authenticate(AuthorityConstants.ADMIN);
 
         when(permissionService.isTenantAdmin()).thenReturn(true);
-        when(connectionService.getConnection(CONNECTION_ID)).thenReturn(new Connection());
 
         workspaceConnectionFacade.updateConnectionCredentials(CONNECTION_ID, Map.of("token", "secret-token"), 0);
 

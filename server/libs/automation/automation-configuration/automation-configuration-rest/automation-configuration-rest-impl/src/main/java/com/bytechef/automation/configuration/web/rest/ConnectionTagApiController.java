@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.web.rest.model.TagModel;
 import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -39,11 +40,16 @@ public class ConnectionTagApiController implements ConnectionTagApi {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
+    private final WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @SuppressFBWarnings("EI")
-    public ConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
+    public ConnectionTagApiController(
+        ConnectionFacade connectionFacade, ConversionService conversionService,
+        WorkspaceConnectionFacade workspaceConnectionFacade) {
+
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
+        this.workspaceConnectionFacade = workspaceConnectionFacade;
     }
 
     @Override
@@ -62,7 +68,7 @@ public class ConnectionTagApiController implements ConnectionTagApi {
             .map(tagModel -> conversionService.convert(tagModel, Tag.class))
             .toList();
 
-        connectionFacade.update(id, tags);
+        workspaceConnectionFacade.updateConnectionTags(id, tags);
 
         return ResponseEntity.noContent()
             .build();

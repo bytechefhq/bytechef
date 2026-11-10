@@ -20,8 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -41,21 +43,23 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
-import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -187,6 +191,8 @@ public class WorkspaceConnectionFacadeIntTest {
             .getConnectionId())
                 .isEqualTo(connectionId);
 
+        when(connectionService.getConnection(connectionId)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+
         // When - Disconnect the connection
         workspaceConnectionFacade.disconnectConnection(connectionId);
 
@@ -224,6 +230,8 @@ public class WorkspaceConnectionFacadeIntTest {
             .getFirst()
             .getConnectionId())
                 .isEqualTo(connectionId);
+
+        when(connectionService.getConnection(connectionId)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
 
         // When - Disconnect the connection
         workspaceConnectionFacade.disconnectConnection(connectionId);
@@ -267,6 +275,8 @@ public class WorkspaceConnectionFacadeIntTest {
 
         workflowTestConfigurationRepository.save(testConfiguration);
 
+        when(connectionService.getConnection(connectionId)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+
         // When - Disconnect the connection
         workspaceConnectionFacade.disconnectConnection(connectionId);
 
@@ -284,14 +294,15 @@ public class WorkspaceConnectionFacadeIntTest {
     }
 
     @Test
-    public void testDisconnectConnectionWithNonExistentConnectionIdDoesNothing() {
-        // Given - No connections exist with this ID
-        long nonExistentConnectionId = 11111L;
+    public void testDisconnectConnectionRejectsUnknownConnection() {
+        long unknownConnectionId = 11111L;
 
-        // When - Disconnect a non-existent connection
-        workspaceConnectionFacade.disconnectConnection(nonExistentConnectionId);
+        when(connectionService.getConnection(unknownConnectionId))
+            .thenThrow(new NoSuchElementException("Connection does not exist for id=" + unknownConnectionId));
 
-        // Then - No exception should be thrown (method completes successfully)
+        assertThatThrownBy(() -> workspaceConnectionFacade.disconnectConnection(unknownConnectionId))
+            .isInstanceOf(NoSuchElementException.class)
+            .hasMessage("Connection does not exist for id=" + unknownConnectionId);
     }
 
     @Test
@@ -315,10 +326,113 @@ public class WorkspaceConnectionFacadeIntTest {
 
         assertThatThrownBy(
             () -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of("token", "new-token"), 3))
-                .isInstanceOf(ConfigurationException.class)
-                .hasMessageContaining("automation connections");
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("Connection does not exist for id=1");
 
         verify(connectionFacade, never()).updateCredentials(anyLong(), anyMap(), anyInt());
+    }
+
+    @Test
+    public void testGetConnectionReturnsAutomationConnection() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .id(1L)
+            .build();
+
+        when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+        when(connectionFacade.getConnection(1L)).thenReturn(connectionDTO);
+
+        assertThat(workspaceConnectionFacade.getConnection(1L)).isSameAs(connectionDTO);
+    }
+
+    @Test
+    public void testGetConnectionRejectsEmbeddedConnection() {
+        Connection connection = createConnection(ConnectionStatus.ACTIVE, 3);
+
+        connection.setType(PlatformType.EMBEDDED);
+
+        when(connectionService.getConnection(1L)).thenReturn(connection);
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.getConnection(1L))
+            .isInstanceOf(NoSuchElementException.class);
+
+        verify(connectionFacade, never()).getConnection(anyLong());
+    }
+
+    @Test
+    public void testDeleteDelegatesForAutomationConnection() {
+        when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+
+        workspaceConnectionFacade.delete(1L);
+
+        verify(connectionFacade).delete(1L);
+    }
+
+    @Test
+    public void testDeleteRejectsEmbeddedConnection() {
+        when(connectionService.getConnection(1L)).thenReturn(createEmbeddedConnection());
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.delete(1L))
+            .isInstanceOf(NoSuchElementException.class);
+
+        verify(connectionFacade, never()).delete(anyLong());
+    }
+
+    @Test
+    public void testDisconnectConnectionRejectsEmbeddedConnection() {
+        when(connectionService.getConnection(1L)).thenReturn(createEmbeddedConnection());
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.disconnectConnection(1L))
+            .isInstanceOf(NoSuchElementException.class)
+            .hasMessage("Connection does not exist for id=1");
+    }
+
+    @Test
+    public void testUpdateDelegatesForAutomationConnection() {
+        List<Tag> tags = List.of(new Tag("tag1"));
+
+        when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+
+        workspaceConnectionFacade.update(1L, "renamed", tags, 3);
+        workspaceConnectionFacade.update(1L, "renamed", Map.of("baseUri", "https://new.example.com"), tags, 3);
+
+        verify(connectionFacade).update(1L, "renamed", tags, 3);
+        verify(connectionFacade).update(1L, "renamed", Map.of("baseUri", "https://new.example.com"), tags, 3);
+    }
+
+    @Test
+    public void testUpdateRejectsEmbeddedConnection() {
+        when(connectionService.getConnection(1L)).thenReturn(createEmbeddedConnection());
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.update(1L, "renamed", List.of(), 3))
+            .isInstanceOf(NoSuchElementException.class);
+        assertThatThrownBy(
+            () -> workspaceConnectionFacade.update(
+                1L, "renamed", Map.of("baseUri", "https://attacker.example.com"), List.of(), 3))
+                    .isInstanceOf(NoSuchElementException.class);
+
+        verify(connectionFacade, never()).update(anyLong(), anyString(), anyList(), anyInt());
+        verify(connectionFacade, never()).update(anyLong(), anyString(), anyMap(), anyList(), anyInt());
+    }
+
+    @Test
+    public void testUpdateConnectionTagsDelegatesForAutomationConnection() {
+        List<Tag> tags = List.of(new Tag("tag1"));
+
+        when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+
+        workspaceConnectionFacade.updateConnectionTags(1L, tags);
+
+        verify(connectionFacade).update(1L, tags);
+    }
+
+    @Test
+    public void testUpdateConnectionTagsRejectsEmbeddedConnection() {
+        when(connectionService.getConnection(1L)).thenReturn(createEmbeddedConnection());
+
+        assertThatThrownBy(() -> workspaceConnectionFacade.updateConnectionTags(1L, List.of(new Tag("tag1"))))
+            .isInstanceOf(NoSuchElementException.class);
+
+        verify(connectionFacade, never()).update(anyLong(), anyList());
     }
 
     private static Connection createConnection(ConnectionStatus status, int version) {
@@ -327,6 +441,14 @@ public class WorkspaceConnectionFacadeIntTest {
         connection.setId(1L);
         connection.setStatus(status);
         connection.setVersion(version);
+
+        return connection;
+    }
+
+    private static Connection createEmbeddedConnection() {
+        Connection connection = createConnection(ConnectionStatus.ACTIVE, 3);
+
+        connection.setType(PlatformType.EMBEDDED);
 
         return connection;
     }
