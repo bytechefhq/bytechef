@@ -30,12 +30,17 @@ import com.bytechef.component.github.action.GithubCommitFilesToNewBranchAction;
 import com.bytechef.component.github.action.GithubCreateCommentOnIssueAction;
 import com.bytechef.component.github.action.GithubCreateForkAction;
 import com.bytechef.component.github.action.GithubCreateIssueAction;
+import com.bytechef.component.github.action.GithubCreateReleaseAction;
 import com.bytechef.component.github.action.GithubGetIssueAction;
+import com.bytechef.component.github.action.GithubGetPullRequestAction;
 import com.bytechef.component.github.action.GithubGetReleaseByTagAction;
 import com.bytechef.component.github.action.GithubGetRepositoryContentAction;
 import com.bytechef.component.github.action.GithubListIssuesAction;
+import com.bytechef.component.github.action.GithubListPullRequestReviewsAction;
+import com.bytechef.component.github.action.GithubListPullRequestsAction;
 import com.bytechef.component.github.action.GithubListRepositoryIssuesAction;
 import com.bytechef.component.github.action.GithubSearchCodeAction;
+import com.bytechef.component.github.action.GithubSearchIssuesAndPullRequestsAction;
 import com.bytechef.component.github.action.GithubStarRepositoryAction;
 import com.bytechef.component.github.action.GithubTriggerWorkflowDispatchAction;
 import com.bytechef.component.github.action.GithubUpdateIssueAction;
@@ -65,12 +70,17 @@ public class GithubComponentHandler implements ComponentHandler {
             GithubCreateForkAction.ACTION_DEFINITION,
             GithubCreateIssueAction.ACTION_DEFINITION,
             GitHubCreatePullRequestAction.ACTION_DEFINITION,
+            GithubCreateReleaseAction.ACTION_DEFINITION,
             GithubGetIssueAction.ACTION_DEFINITION,
+            GithubGetPullRequestAction.ACTION_DEFINITION,
             GithubGetReleaseByTagAction.ACTION_DEFINITION,
             GithubGetRepositoryContentAction.ACTION_DEFINITION,
             GithubListIssuesAction.ACTION_DEFINITION,
+            GithubListPullRequestReviewsAction.ACTION_DEFINITION,
+            GithubListPullRequestsAction.ACTION_DEFINITION,
             GithubListRepositoryIssuesAction.ACTION_DEFINITION,
             GithubSearchCodeAction.ACTION_DEFINITION,
+            GithubSearchIssuesAndPullRequestsAction.ACTION_DEFINITION,
             GithubStarRepositoryAction.ACTION_DEFINITION,
             GithubTriggerWorkflowDispatchAction.ACTION_DEFINITION,
             GithubUpdateIssueAction.ACTION_DEFINITION)
@@ -83,12 +93,17 @@ public class GithubComponentHandler implements ComponentHandler {
             tool(GithubCreateForkAction.ACTION_DEFINITION),
             tool(GithubCreateIssueAction.ACTION_DEFINITION),
             tool(GitHubCreatePullRequestAction.ACTION_DEFINITION),
+            tool(GithubCreateReleaseAction.ACTION_DEFINITION),
             tool(GithubGetIssueAction.ACTION_DEFINITION),
+            tool(GithubGetPullRequestAction.ACTION_DEFINITION),
             tool(GithubGetReleaseByTagAction.ACTION_DEFINITION),
             tool(GithubGetRepositoryContentAction.ACTION_DEFINITION),
             tool(GithubListIssuesAction.ACTION_DEFINITION),
+            tool(GithubListPullRequestReviewsAction.ACTION_DEFINITION),
+            tool(GithubListPullRequestsAction.ACTION_DEFINITION),
             tool(GithubListRepositoryIssuesAction.ACTION_DEFINITION),
             tool(GithubSearchCodeAction.ACTION_DEFINITION),
+            tool(GithubSearchIssuesAndPullRequestsAction.ACTION_DEFINITION),
             tool(GithubStarRepositoryAction.ACTION_DEFINITION),
             tool(GithubTriggerWorkflowDispatchAction.ACTION_DEFINITION),
             tool(GithubUpdateIssueAction.ACTION_DEFINITION))
