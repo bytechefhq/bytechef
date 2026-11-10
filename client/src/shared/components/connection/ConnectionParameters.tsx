@@ -39,68 +39,81 @@ const ConnectionParameters = ({
         return <></>;
     }
 
+    const showConnectionSection = showBaseUri || hasConnectionParameters;
+
     return (
-        <div className="w-full space-y-2 overflow-hidden">
-            {showBaseUri && (
-                <div className="mb-8 flex">
-                    <span className="w-1/3 text-sm font-medium text-muted-foreground">Base URI:</span>
+        <div className="w-full space-y-6 overflow-hidden">
+            {showConnectionSection && (
+                <section className="space-y-2">
+                    <h2 className="text-sm heading-tertiary">Connection Parameters</h2>
 
-                    <span className="text-sm">{baseUri}</span>
-                </div>
-            )}
+                    <ul className="flex w-full flex-col space-y-1 text-sm">
+                        {showBaseUri && (
+                            <li className="flex w-full">
+                                <span className="w-1/3 shrink-0 font-medium text-muted-foreground">Base URI:</span>
 
-            {(hasConnectionParameters || hasAuthorizationParameters) && (
-                <h2 className="text-sm heading-tertiary">
-                    {hasConnectionParameters ? 'Connection' : 'Authorization'} Parameters
-                </h2>
-            )}
-
-            <ul className="flex w-full flex-col space-y-1 text-sm">
-                {hasConnectionParameters &&
-                    connectionProperties!
-                        .filter((property) => !!connectionParameters![property.name!])
-                        .map((property) => (
-                            <li className="flex w-full" key={property.name}>
-                                <span className="w-1/3 shrink-0 text-muted-foreground">{property.name}:</span>
-
-                                <pre
-                                    className="min-w-0 flex-1 self-end truncate text-xs"
-                                    title={String(connectionParameters![property.name!])}
-                                >
-                                    {connectionParameters![property.name!]}
-                                </pre>
+                                <span className="min-w-0 flex-1 truncate" title={baseUri}>
+                                    {baseUri}
+                                </span>
                             </li>
+                        )}
+
+                        {hasConnectionParameters &&
+                            connectionProperties!
+                                .filter((property) => !!connectionParameters![property.name!])
+                                .map((property) => (
+                                    <li className="flex w-full" key={property.name}>
+                                        <span className="w-1/3 shrink-0 text-muted-foreground">{property.name}:</span>
+
+                                        <pre
+                                            className="min-w-0 flex-1 self-end truncate text-xs"
+                                            title={String(connectionParameters![property.name!])}
+                                        >
+                                            {connectionParameters![property.name!]}
+                                        </pre>
+                                    </li>
+                                ))}
+                    </ul>
+                </section>
+            )}
+
+            {hasAuthorizationParameters && (
+                <section className="space-y-2">
+                    <h2 className="text-sm heading-tertiary">Authorization Parameters</h2>
+
+                    <ul className="flex w-full flex-col space-y-1 text-sm">
+                        {existingAuthorizations.map((authorization) => (
+                            <Fragment key={authorization.name}>
+                                <li className="flex">
+                                    <span className="w-1/3 shrink-0 font-medium text-muted-foreground">
+                                        Authorization:
+                                    </span>
+
+                                    <span>{authorization.title}</span>
+                                </li>
+
+                                {authorization.properties &&
+                                    authorization.properties
+                                        .filter((property) => !!authorizationParameters![property.name!])
+                                        .map((property) => (
+                                            <li className="flex w-full" key={property.name}>
+                                                <span className="w-1/3 shrink-0 text-muted-foreground">
+                                                    {property.name}:
+                                                </span>
+
+                                                <pre
+                                                    className="min-w-0 flex-1 self-end truncate text-xs"
+                                                    title={String(authorizationParameters![property.name!])}
+                                                >
+                                                    {authorizationParameters![property.name!]}
+                                                </pre>
+                                            </li>
+                                        ))}
+                            </Fragment>
                         ))}
-
-                {hasAuthorizationParameters &&
-                    existingAuthorizations.map((authorization) => (
-                        <Fragment key={authorization.name}>
-                            <li className="flex">
-                                <span className="w-1/3 shrink-0 font-medium text-muted-foreground">Authorization:</span>
-
-                                <span>{authorization.title}</span>
-                            </li>
-
-                            {authorization.properties &&
-                                authorization.properties
-                                    .filter((property) => !!authorizationParameters![property.name!])
-                                    .map((property) => (
-                                        <li className="flex w-full" key={property.name}>
-                                            <span className="w-1/3 shrink-0 text-muted-foreground">
-                                                {property.name}:
-                                            </span>
-
-                                            <pre
-                                                className="min-w-0 flex-1 self-end truncate text-xs"
-                                                title={String(authorizationParameters![property.name!])}
-                                            >
-                                                {authorizationParameters![property.name!]}
-                                            </pre>
-                                        </li>
-                                    ))}
-                        </Fragment>
-                    ))}
-            </ul>
+                    </ul>
+                </section>
+            )}
         </div>
     );
 };

@@ -67,6 +67,36 @@ describe('ConnectionParameters', () => {
         expect(screen.getByText('https://api.example.com')).toBeInTheDocument();
     });
 
+    it('puts the base URI under the Connection Parameters heading', () => {
+        render(<ConnectionParameters baseUri="https://api.example.com" connectionDefinition={connectionDefinition} />);
+
+        const connectionSection = screen.getByRole('heading', {name: 'Connection Parameters'}).closest('section')!;
+
+        expect(connectionSection).toHaveTextContent('Base URI:https://api.example.com');
+    });
+
+    it('gives connection and authorization parameters their own headings when both are present', () => {
+        render(
+            <ConnectionParameters
+                authorizationParameters={{clientId: 'my-client-id'}}
+                authorizationType={AuthorizationType.Oauth2AuthorizationCode}
+                connectionDefinition={
+                    {...connectionDefinition, properties: [{name: 'region'}]} as unknown as ConnectionDefinition
+                }
+                connectionParameters={{region: 'eu'}}
+            />
+        );
+
+        const connectionSection = screen.getByRole('heading', {name: 'Connection Parameters'}).closest('section')!;
+        const authorizationSection = screen
+            .getByRole('heading', {name: 'Authorization Parameters'})
+            .closest('section')!;
+
+        expect(connectionSection).toHaveTextContent('region:eu');
+        expect(connectionSection).not.toHaveTextContent('my-client-id');
+        expect(authorizationSection).toHaveTextContent('my-client-id');
+    });
+
     it('hides the heading when parameters are missing entirely', () => {
         render(<ConnectionParameters connectionDefinition={connectionDefinition} />);
 
