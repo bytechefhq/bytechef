@@ -17,20 +17,12 @@
 package com.bytechef.component.github.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.github.constant.GithubConstants.BODY;
-import static com.bytechef.component.github.constant.GithubConstants.DRAFT;
-import static com.bytechef.component.github.constant.GithubConstants.ID;
-import static com.bytechef.component.github.constant.GithubConstants.NAME;
 import static com.bytechef.component.github.constant.GithubConstants.OWNER;
 import static com.bytechef.component.github.constant.GithubConstants.OWNER_PROPERTY;
+import static com.bytechef.component.github.constant.GithubConstants.RELEASE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TAG;
 
@@ -60,50 +52,7 @@ public class GithubGetReleaseByTagAction {
                 .label("Tag")
                 .description("The tag name of the release, for example v1.0.0.")
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        number(ID)
-                            .description("ID of the release."),
-                        string("tag_name")
-                            .description("The name of the tag."),
-                        string("target_commitish")
-                            .description("The branch or commit SHA the tag was created from."),
-                        string(NAME)
-                            .description("The name of the release."),
-                        string(BODY)
-                            .description("The release notes."),
-                        bool(DRAFT)
-                            .description("Whether the release is a draft."),
-                        bool("prerelease")
-                            .description("Whether the release is a prerelease."),
-                        string("created_at")
-                            .description("When the release was created."),
-                        string("published_at")
-                            .description("When the release was published."),
-                        string("html_url")
-                            .description("The URL of the release on GitHub."),
-                        string("tarball_url"),
-                        string("zipball_url"),
-                        object("author")
-                            .description("The user who created the release.")
-                            .properties(
-                                string("login"),
-                                number(ID),
-                                string("html_url")),
-                        array("assets")
-                            .description("Files attached to the release.")
-                            .items(
-                                object()
-                                    .properties(
-                                        number(ID),
-                                        string(NAME),
-                                        string("label"),
-                                        string("content_type"),
-                                        integer("size"),
-                                        integer("download_count"),
-                                        string("browser_download_url"))))))
+        .output(outputSchema(RELEASE_OUTPUT_PROPERTY))
         .perform(GithubGetReleaseByTagAction::perform);
 
     private GithubGetReleaseByTagAction() {
