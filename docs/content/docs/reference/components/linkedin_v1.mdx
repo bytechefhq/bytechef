@@ -179,8 +179,143 @@ This action does not produce any output.
 
 
 
+### Get Comments
+Name: getComments
+
+`Get the comments on an organization post, or the replies to a comment when a comment URN is given.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| urn | URN | STRING | URN of the post (urn:li:share:&#123;id&#125; or urn:li:ugcPost:&#123;id&#125;) to get the comments of, or URN of the comment (urn:li:comment:(&#123;activityUrn&#125;,&#123;commentId&#125;)) to get the replies to. | true |
+| start | Start | INTEGER | Index of the first comment to return. | false |
+| count | Count | INTEGER | Number of comments to return. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Comments",
+  "name" : "getComments",
+  "parameters" : {
+    "urn" : "",
+    "start" : 1,
+    "count" : 1
+  },
+  "type" : "linkedin/v1/getComments"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| actor | STRING | URN of the person or organization that created the comment. |
+| commentUrn | STRING | URN of the comment. |
+| id | STRING | ID of the comment. |
+| message | OBJECT <details> <summary> Properties </summary> &#123;STRING\(text)&#125; </details> | The message of the comment. |
+| created | OBJECT <details> <summary> Properties </summary> &#123;STRING\(actor), INTEGER\(time)&#125; </details> | The time and the actor that created the comment. |
+| lastModified | OBJECT <details> <summary> Properties </summary> &#123;STRING\(actor), INTEGER\(time)&#125; </details> | The time and the actor that last modified the comment. |
+| object | STRING | URN of the activity, post or comment the comment was made on. |
+| parentComment | STRING | URN of the parent comment when the comment is a reply. |
+| content | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(url)&#125;] </details> | Media attached to the comment. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "actor" : "",
+  "commentUrn" : "",
+  "id" : "",
+  "message" : {
+    "text" : ""
+  },
+  "created" : {
+    "actor" : "",
+    "time" : 1
+  },
+  "lastModified" : {
+    "actor" : "",
+    "time" : 1
+  },
+  "object" : "",
+  "parentComment" : "",
+  "content" : [ {
+    "type" : "",
+    "url" : ""
+  } ]
+} ]
+```
+
+
+
+
 
 ## Triggers
+
+
+### New Comment
+Name: newComment
+
+`Triggers when a new comment is added to one of the recent posts of a specific organization.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| urn | Organization Number | STRING | Number of the organization whose recent posts are monitored for new comments. | true |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| actor | STRING | URN of the person or organization that created the comment. |
+| commentUrn | STRING | URN of the comment. |
+| id | STRING | ID of the comment. |
+| message | OBJECT <details> <summary> Properties </summary> &#123;STRING\(text)&#125; </details> | The message of the comment. |
+| created | OBJECT <details> <summary> Properties </summary> &#123;STRING\(actor), INTEGER\(time)&#125; </details> | The time and the actor that created the comment. |
+| lastModified | OBJECT <details> <summary> Properties </summary> &#123;STRING\(actor), INTEGER\(time)&#125; </details> | The time and the actor that last modified the comment. |
+| object | STRING | URN of the activity, post or comment the comment was made on. |
+| parentComment | STRING | URN of the parent comment when the comment is a reply. |
+| content | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), STRING\(url)&#125;] </details> | Media attached to the comment. |
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Comment",
+  "name" : "newComment",
+  "parameters" : {
+    "urn" : ""
+  },
+  "type" : "linkedin/v1/newComment"
+}
+```
+
 
 
 ### New Post
@@ -262,3 +397,9 @@ To create a Custom Action, simply specify the desired HTTP method, path, and any
 2. Look at the URL in your web browser's address bar.
 3. Find the numeric value that appears immediately after `/company/` or `/organization/` in the URL. For example: in `https://www.linkedin.com/company/12345678/` the Organization Number is `12345678`.
 4. Copy this number and paste it into the **Organization Number** field in ByteChef.
+
+#### Comments on organization posts
+
+The **Get Comments** action and the **New Comment** trigger work only for organization (company page) posts. They require your LinkedIn app to have access to the **Community Management API** and the `r_organization_social_feed` scope to be enabled for the connection.
+
+Comments on personal profile posts are not supported, because reading them requires the restricted `r_member_social_feed` permission, which LinkedIn grants only to select developers.
