@@ -20,10 +20,10 @@ import jakarta.annotation.Generated;
  * A component used in an automation workflow.
  */
 
-@Schema(name = "AutomationWorkflowProjectComponent", description = "A component used in an automation workflow.")
-@JsonTypeName("AutomationWorkflowProjectComponent")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T16:19:24.084130+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public class AutomationWorkflowProjectComponentModel {
+@Schema(name = "AutomationProjectComponent", description = "A component used in an automation workflow.")
+@JsonTypeName("AutomationProjectComponent")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T16:12:12.795950+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+public class AutomationProjectComponentModel {
 
   private @Nullable String name;
 
@@ -37,7 +37,7 @@ public class AutomationWorkflowProjectComponentModel {
 
   private @Nullable Boolean provided;
 
-  public AutomationWorkflowProjectComponentModel name(@Nullable String name) {
+  public AutomationProjectComponentModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
@@ -58,7 +58,7 @@ public class AutomationWorkflowProjectComponentModel {
     this.name = name;
   }
 
-  public AutomationWorkflowProjectComponentModel title(@Nullable String title) {
+  public AutomationProjectComponentModel title(@Nullable String title) {
     this.title = title;
     return this;
   }
@@ -79,7 +79,7 @@ public class AutomationWorkflowProjectComponentModel {
     this.title = title;
   }
 
-  public AutomationWorkflowProjectComponentModel icon(@Nullable String icon) {
+  public AutomationProjectComponentModel icon(@Nullable String icon) {
     this.icon = icon;
     return this;
   }
@@ -100,7 +100,7 @@ public class AutomationWorkflowProjectComponentModel {
     this.icon = icon;
   }
 
-  public AutomationWorkflowProjectComponentModel connectionRequired(@Nullable Boolean connectionRequired) {
+  public AutomationProjectComponentModel connectionRequired(@Nullable Boolean connectionRequired) {
     this.connectionRequired = connectionRequired;
     return this;
   }
@@ -121,7 +121,7 @@ public class AutomationWorkflowProjectComponentModel {
     this.connectionRequired = connectionRequired;
   }
 
-  public AutomationWorkflowProjectComponentModel integrationId(@Nullable Long integrationId) {
+  public AutomationProjectComponentModel integrationId(@Nullable Long integrationId) {
     this.integrationId = integrationId;
     return this;
   }
@@ -142,7 +142,7 @@ public class AutomationWorkflowProjectComponentModel {
     this.integrationId = integrationId;
   }
 
-  public AutomationWorkflowProjectComponentModel provided(@Nullable Boolean provided) {
+  public AutomationProjectComponentModel provided(@Nullable Boolean provided) {
     this.provided = provided;
     return this;
   }
@@ -171,13 +171,13 @@ public class AutomationWorkflowProjectComponentModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AutomationWorkflowProjectComponentModel automationWorkflowProjectComponent = (AutomationWorkflowProjectComponentModel) o;
-    return Objects.equals(this.name, automationWorkflowProjectComponent.name) &&
-        Objects.equals(this.title, automationWorkflowProjectComponent.title) &&
-        Objects.equals(this.icon, automationWorkflowProjectComponent.icon) &&
-        Objects.equals(this.connectionRequired, automationWorkflowProjectComponent.connectionRequired) &&
-        Objects.equals(this.integrationId, automationWorkflowProjectComponent.integrationId) &&
-        Objects.equals(this.provided, automationWorkflowProjectComponent.provided);
+    AutomationProjectComponentModel automationProjectComponent = (AutomationProjectComponentModel) o;
+    return Objects.equals(this.name, automationProjectComponent.name) &&
+        Objects.equals(this.title, automationProjectComponent.title) &&
+        Objects.equals(this.icon, automationProjectComponent.icon) &&
+        Objects.equals(this.connectionRequired, automationProjectComponent.connectionRequired) &&
+        Objects.equals(this.integrationId, automationProjectComponent.integrationId) &&
+        Objects.equals(this.provided, automationProjectComponent.provided);
   }
 
   @Override
@@ -188,7 +188,7 @@ public class AutomationWorkflowProjectComponentModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class AutomationWorkflowProjectComponentModel {\n");
+    sb.append("class AutomationProjectComponentModel {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");

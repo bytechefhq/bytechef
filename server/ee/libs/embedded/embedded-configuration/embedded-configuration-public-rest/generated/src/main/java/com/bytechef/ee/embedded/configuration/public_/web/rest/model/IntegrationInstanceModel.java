@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstance", description = "The integration instance represents a configured integration for a specific user, containing connection and status information")
 @JsonTypeName("IntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T16:12:12.795950+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class IntegrationInstanceModel {
 
   private @Nullable Long id;
@@ -168,7 +168,7 @@ public class IntegrationInstanceModel {
    * The workflows of the integration instance configuration this instance belongs to.
    * @return availableWorkflows
    */
-  @Valid 
+  
   @Schema(name = "availableWorkflows", accessMode = Schema.AccessMode.READ_ONLY, description = "The workflows of the integration instance configuration this instance belongs to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("availableWorkflows")
   public List<@Valid IntegrationWorkflowModel> getAvailableWorkflows() {
@@ -260,7 +260,7 @@ public class IntegrationInstanceModel {
    * The array of MCP tools for this integration instance.
    * @return mcpTools
    */
-  @Valid 
+  
   @Schema(name = "mcpTools", accessMode = Schema.AccessMode.READ_ONLY, description = "The array of MCP tools for this integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("mcpTools")
   public List<@Valid McpIntegrationInstanceToolModel> getMcpTools() {
@@ -289,7 +289,7 @@ public class IntegrationInstanceModel {
    * The array of MCP workflows for this integration instance.
    * @return mcpWorkflows
    */
-  @Valid 
+  
   @Schema(name = "mcpWorkflows", accessMode = Schema.AccessMode.READ_ONLY, description = "The array of MCP workflows for this integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("mcpWorkflows")
   public List<@Valid IntegrationInstanceWorkflowModel> getMcpWorkflows() {
@@ -318,7 +318,7 @@ public class IntegrationInstanceModel {
    * Get workflows
    * @return workflows
    */
-  @Valid 
+  
   @Schema(name = "workflows", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflows")
   public List<@Valid IntegrationInstanceWorkflowModel> getWorkflows() {

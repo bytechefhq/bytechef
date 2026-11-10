@@ -24,10 +24,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "EmbeddedWorkflowExecution", description = "An integration or an automation workflow execution of a connected user.")
 @JsonTypeName("EmbeddedWorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T15:21:13.860543+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T16:12:21.248204+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class EmbeddedWorkflowExecutionModel {
 
-  private @Nullable Object automationWorkflowExecution;
+  private @Nullable Object automationExecution;
 
   private @Nullable WorkflowExecutionBasicModel integrationWorkflowExecution;
 
@@ -79,25 +79,25 @@ public class EmbeddedWorkflowExecutionModel {
     this.source = source;
   }
 
-  public EmbeddedWorkflowExecutionModel automationWorkflowExecution(@Nullable Object automationWorkflowExecution) {
-    this.automationWorkflowExecution = automationWorkflowExecution;
+  public EmbeddedWorkflowExecutionModel automationExecution(@Nullable Object automationExecution) {
+    this.automationExecution = automationExecution;
     return this;
   }
 
   /**
    * The automation workflow execution, set when the source is AUTOMATION.
-   * @return automationWorkflowExecution
+   * @return automationExecution
    */
   
-  @Schema(name = "automationWorkflowExecution", description = "The automation workflow execution, set when the source is AUTOMATION.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("automationWorkflowExecution")
-  public @Nullable Object getAutomationWorkflowExecution() {
-    return automationWorkflowExecution;
+  @Schema(name = "automationExecution", description = "The automation workflow execution, set when the source is AUTOMATION.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("automationExecution")
+  public @Nullable Object getAutomationExecution() {
+    return automationExecution;
   }
 
-  @JsonProperty("automationWorkflowExecution")
-  public void setAutomationWorkflowExecution(@Nullable Object automationWorkflowExecution) {
-    this.automationWorkflowExecution = automationWorkflowExecution;
+  @JsonProperty("automationExecution")
+  public void setAutomationExecution(@Nullable Object automationExecution) {
+    this.automationExecution = automationExecution;
   }
 
   public EmbeddedWorkflowExecutionModel integrationWorkflowExecution(@Nullable WorkflowExecutionBasicModel integrationWorkflowExecution) {
@@ -151,21 +151,21 @@ public class EmbeddedWorkflowExecutionModel {
       return false;
     }
     EmbeddedWorkflowExecutionModel embeddedWorkflowExecution = (EmbeddedWorkflowExecutionModel) o;
-    return Objects.equals(this.automationWorkflowExecution, embeddedWorkflowExecution.automationWorkflowExecution) &&
+    return Objects.equals(this.automationExecution, embeddedWorkflowExecution.automationExecution) &&
         Objects.equals(this.integrationWorkflowExecution, embeddedWorkflowExecution.integrationWorkflowExecution) &&
         Objects.equals(this.source, embeddedWorkflowExecution.source);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(automationWorkflowExecution, integrationWorkflowExecution, source);
+    return Objects.hash(automationExecution, integrationWorkflowExecution, source);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class EmbeddedWorkflowExecutionModel {\n");
-    sb.append("    automationWorkflowExecution: ").append(toIndentedString(automationWorkflowExecution)).append("\n");
+    sb.append("    automationExecution: ").append(toIndentedString(automationExecution)).append("\n");
     sb.append("    integrationWorkflowExecution: ").append(toIndentedString(integrationWorkflowExecution)).append("\n");
     sb.append("    source: ").append(toIndentedString(source)).append("\n");
     sb.append("}");
