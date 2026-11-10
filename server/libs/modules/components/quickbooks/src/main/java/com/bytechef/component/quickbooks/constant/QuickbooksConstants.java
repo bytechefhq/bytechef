@@ -16,6 +16,8 @@
 
 package com.bytechef.component.quickbooks.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
@@ -58,7 +60,10 @@ public class QuickbooksConstants {
     public static final String SUFFIX = "suffix";
     public static final String TITLE = "title";
     public static final String TOTAL_AMT = "totalAmt";
+    public static final String TXN_DATE_FROM = "txnDateFrom";
+    public static final String TXN_DATE_TO = "txnDateTo";
     public static final String TYPE = "type";
+    public static final String UNPAID_ONLY = "unpaidOnly";
     public static final String VALUE = "value";
     public static final String VENDOR_ID = "vendorId";
 
@@ -95,6 +100,37 @@ public class QuickbooksConstants {
                     string(FULLY_QUALIFIED_NAME),
                     string(DISPLAY_NAME),
                     string(ACTIVE)));
+
+    public static final ModifiableObjectProperty INVOICE_OUTPUT_PROPERTY = object()
+        .properties(
+            string("Id")
+                .description("ID of the invoice."),
+            string("DocNumber")
+                .description("Reference number of the invoice."),
+            date("TxnDate")
+                .description("Date of the transaction."),
+            date("DueDate")
+                .description("Date when the payment of the invoice is due."),
+            object("CustomerRef")
+                .description("Customer the invoice is for.")
+                .properties(
+                    string("value")
+                        .description("ID of the customer."),
+                    string("name")
+                        .description("Display name of the customer.")),
+            object("CurrencyRef")
+                .description("Currency of the invoice.")
+                .properties(
+                    string("value")
+                        .description("Currency code."),
+                    string("name")
+                        .description("Currency name.")),
+            number("TotalAmt")
+                .description("Total amount of the invoice."),
+            number("Balance")
+                .description("Amount that is still due on the invoice."),
+            string("EmailStatus")
+                .description("Email status of the invoice."));
 
     public static final ModifiableObjectProperty ITEM_OUTPUT_PROPERTY =
         object()
