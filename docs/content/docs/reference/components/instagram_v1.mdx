@@ -1,0 +1,437 @@
+---
+title: "Instagram"
+description: "Instagram is a photo and video sharing social network. Publish posts and reels and manage comments on an Instagram professional account."
+---
+
+
+Categories: Social Media, Marketing Automation
+
+
+Type: instagram/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Instagram App ID | STRING |  | true |
+| clientSecret | Instagram App Secret | STRING |  | true |
+
+
+
+## Connection Setup
+
+This component uses the Instagram API with Instagram Login. It works only with Instagram professional accounts (business or creator). Personal accounts cannot publish through the API.
+
+### Switch your Instagram account to a professional account
+
+1. In the Instagram app, open your profile and go to **Settings and activity**.
+2. Open **Account type and tools** and choose **Switch to professional account**.
+3. Pick **Business** or **Creator** and finish the steps.
+
+### Create a Meta app
+
+1. Go to [Meta for Developers](https://developers.facebook.com/apps) and click **Create App**.
+2. Choose the **Business** app type, or the use case **Manage messaging and content on Instagram**, and finish the steps.
+3. In the app dashboard, add the **Instagram** product and open **API setup with Instagram login**.
+4. Under **Set up Instagram business login**, add the ByteChef OAuth redirect URL as a valid redirect URL, for example `https://app.bytechef.io/callback`. For a self-hosted instance use `https://<your ByteChef host>/callback`.
+5. Copy the **Instagram app ID** and the **Instagram app secret**. Do not use the Facebook app ID and secret shown on the basic settings page.
+6. While the app is in development mode, add your Instagram account as an **Instagram Tester** under **App roles**, then accept the invitation in the Instagram app or on the Instagram website under **Apps and websites**.
+
+### Create the connection in ByteChef
+
+1. Paste the Instagram app ID into **Instagram App ID** and the Instagram app secret into **Instagram App Secret**.
+2. Keep the default scopes:
+    - `instagram_business_basic` to read the account and its media.
+    - `instagram_business_content_publish` to publish images, carousels and reels.
+    - `instagram_business_manage_comments` to read comments and reply to them.
+3. Click **Connect** and log in with your Instagram professional account.
+
+### Tokens
+
+ByteChef exchanges the short-lived token from the login for a long-lived token that is valid for 60 days. Instagram does not issue a refresh token. To keep the connection working, reconnect it before the 60 days run out. Meta describes how long-lived tokens can be refreshed in [its documentation](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login#refresh-a-long-lived-token).
+
+### App review
+
+To use the connection with Instagram accounts that are not testers of your app, submit the app for App Review and request advanced access for the three permissions above.
+
+Helpful links:
+- Instagram API with Instagram Login: https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login
+- Content publishing: https://developers.facebook.com/docs/instagram-platform/content-publishing
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Image Post
+Name: createImagePost
+
+`Publishes a single image post to the connected Instagram professional account.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| imageUrl | Image URL | STRING | Public URL of the JPEG image to publish. Instagram downloads the image from this URL. | true |
+| caption | Caption | STRING | Caption of the post. It can include hashtags and mentions. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Image Post",
+  "name" : "createImagePost",
+  "parameters" : {
+    "imageUrl" : "",
+    "caption" : ""
+  },
+  "type" : "instagram/v1/createImagePost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the published Instagram media. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : ""
+}
+```
+
+
+
+
+### Create Carousel Post
+Name: createCarouselPost
+
+`Publishes a carousel post with 2 to 10 images to the connected Instagram professional account.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| imageUrls | Image URLs | ARRAY <details> <summary> Items </summary> [STRING] </details> | Public URLs of the JPEG images to publish, in the order they appear in the carousel. Instagram downloads each image from its URL. | true |
+| caption | Caption | STRING | Caption of the post. It can include hashtags and mentions. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Carousel Post",
+  "name" : "createCarouselPost",
+  "parameters" : {
+    "imageUrls" : [ "" ],
+    "caption" : ""
+  },
+  "type" : "instagram/v1/createCarouselPost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the published Instagram media. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : ""
+}
+```
+
+
+
+
+### Create Reel
+Name: createReel
+
+`Publishes a reel to the connected Instagram professional account. Waits until Instagram has finished processing the video, for up to about five minutes.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| videoUrl | Video URL | STRING | Public URL of the video to publish. Instagram downloads the video from this URL. | true |
+| caption | Caption | STRING | Caption of the reel. It can include hashtags and mentions. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Reel",
+  "name" : "createReel",
+  "parameters" : {
+    "videoUrl" : "",
+    "caption" : ""
+  },
+  "type" : "instagram/v1/createReel"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the published Instagram media. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : ""
+}
+```
+
+#### Things to know
+
+- Instagram processes the video before it can be published. The action checks the processing status every 30 seconds, up to 10 times, and publishes the reel as soon as it is ready.
+- If Instagram reports an error or the video is still not ready after about five minutes, the action fails and nothing is published.
+
+
+
+### Get Comments
+Name: getComments
+
+`Lists the comments on an Instagram media item of the connected account.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| mediaId | Media ID | STRING | ID of the Instagram media item whose comments to list. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Comments",
+  "name" : "getComments",
+  "parameters" : {
+    "mediaId" : ""
+  },
+  "type" : "instagram/v1/getComments"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the comment. |
+| text | STRING | Text of the comment. |
+| username | STRING | Username of the Instagram user who wrote the comment. |
+| timestamp | STRING | ISO 8601 date and time when the comment was created. |
+| like_count | INTEGER | Number of likes on the comment. |
+| replies | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(id), STRING\(text), STRING\(username), STRING\(timestamp)&#125;]\(data)&#125; </details> | Replies to the comment. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "text" : "",
+  "username" : "",
+  "timestamp" : "",
+  "like_count" : 1,
+  "replies" : {
+    "data" : [ {
+      "id" : "",
+      "text" : "",
+      "username" : "",
+      "timestamp" : ""
+    } ]
+  }
+} ]
+```
+
+
+
+
+### Reply to Comment
+Name: replyToComment
+
+`Replies to a comment on a media item of the connected Instagram professional account.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| commentId | Comment ID | STRING | ID of the comment to reply to. | true |
+| message | Message | STRING | Text of the reply. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Reply to Comment",
+  "name" : "replyToComment",
+  "parameters" : {
+    "commentId" : "",
+    "message" : ""
+  },
+  "type" : "instagram/v1/replyToComment"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | ID of the reply comment. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : ""
+}
+```
+
+
+
+
+
+## Triggers
+
+
+### New Comment
+Name: newComment
+
+`Triggers when someone comments on one of the 10 most recent media items of the connected Instagram professional account.`
+
+Type: POLLING
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| media_id | STRING | ID of the media item the comment was posted on. |
+| id | STRING | ID of the comment. |
+| text | STRING | Text of the comment. |
+| username | STRING | Username of the Instagram user who wrote the comment. |
+| timestamp | STRING | ISO 8601 date and time when the comment was created. |
+| like_count | INTEGER | Number of likes on the comment. |
+| replies | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(id), STRING\(text), STRING\(username), STRING\(timestamp)&#125;]\(data)&#125; </details> | Replies to the comment. |
+
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Comment",
+  "name" : "newComment",
+  "type" : "instagram/v1/newComment"
+}
+```
+#### Things to know
+
+- The trigger checks the comments on the 10 most recent media items of the account. Comments on older posts are not picked up.
+- Each comment fires the workflow once. The first check after the workflow is enabled only remembers the time, so comments written before that are skipped. When you test the trigger in the workflow editor, it returns the comments from the last three hours.
+- Each comment in the output has a `media_id` value with the ID of the post it belongs to.
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+## Additional Instructions
+
+#### Before you start
+
+- Only Instagram professional accounts (business or creator) are supported.
+- Images must be JPEG files and videos must be reachable at a public URL. Instagram downloads the media from the URL, so links that need a login or that expire quickly do not work.
+- Instagram allows up to 100 posts published through the API in a 24 hour period. A carousel counts as one post.
+- Every action works on the Instagram account that was used to create the connection.
+
+#### How to find a Media ID
+
+1. Use the **New Comment** trigger and look at the `media_id` value in its output, or
+2. Use the `id` value returned by **Create Image Post**, **Create Carousel Post** or **Create Reel**.
+
+#### How to find a Comment ID
+
+Use the `id` value of a comment returned by **Get Comments** or by the **New Comment** trigger.
