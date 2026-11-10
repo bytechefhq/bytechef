@@ -772,7 +772,7 @@ const ConnectionDialog = ({
                                     )}
 
                                     {showRedirectUriInput && oAuth2Properties?.redirectUri && (
-                                        <div>
+                                        <div className="space-y-2">
                                             <Label>Redirect URI</Label>
 
                                             <RedirectUriInput redirectUri={oAuth2Properties.redirectUri} />
