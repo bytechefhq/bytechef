@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.workflow.execution.remote.grpc;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionSource;
 import com.bytechef.ee.automation.configuration.remote.grpc.AutomationConfigurationProtoMapper;
 import com.bytechef.ee.automation.workflow.execution.remote.grpc.proto.GetWorkflowExecutionsRequest;
 import com.bytechef.ee.automation.workflow.execution.remote.grpc.proto.RemoteWorkflowExecution;
@@ -119,7 +120,8 @@ public class WorkflowExecutionProtoMapper {
     }
 
     public GetWorkflowExecutionsRequest toProto(
-        @Nullable Boolean embedded, @Nullable Long environmentId, Job.@Nullable Status jobStatus,
+        @Nullable Boolean embedded, @Nullable Long environmentId,
+        @Nullable WorkflowExecutionSource workflowExecutionSource, Job.@Nullable Status jobStatus,
         @Nullable Instant jobStartDate, @Nullable Instant jobEndDate, @Nullable Long projectId,
         @Nullable Long projectDeploymentId, @Nullable Long connectedUserId, @Nullable String workflowId,
         @Nullable Integer projectVersion, long workspaceId, int pageNumber) {
@@ -134,6 +136,10 @@ public class WorkflowExecutionProtoMapper {
 
         if (environmentId != null) {
             builder.setEnvironmentId(environmentId);
+        }
+
+        if (workflowExecutionSource != null) {
+            builder.setWorkflowExecutionSource(workflowExecutionSource.name());
         }
 
         if (jobStatus != null) {

@@ -38,6 +38,7 @@ message GetWorkflowExecutionsRequest {
   optional int32 project_version = 10;
   int64 workspace_id = 11;
   int32 page_number = 12;
+  optional string workflow_execution_source = 13;
 }
 
 message RemoteWorkflowExecution {
