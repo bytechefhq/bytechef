@@ -45,7 +45,6 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
-    ArrowRightIcon,
     ChevronDownIcon,
     CopyIcon,
     DownloadIcon,
@@ -289,7 +288,7 @@ const ProjectListItem = ({
                             {hasWorkflows ? (
                                 <Link
                                     aria-label="Project title link"
-                                    className="group/title flex items-center gap-1"
+                                    className="group/title"
                                     onClick={(event) => event.stopPropagation()}
                                     to={projectUrl}
                                 >
@@ -308,11 +307,6 @@ const ProjectListItem = ({
                                             {project.name}
                                         </span>
                                     )}
-
-                                    <ArrowRightIcon
-                                        aria-hidden="true"
-                                        className="size-4 shrink-0 -translate-x-1 text-content-brand-primary opacity-0 transition group-hover/title:translate-x-0 group-hover/title:opacity-100"
-                                    />
                                 </Link>
                             ) : project.description ? (
                                 <Tooltip>
