@@ -86,6 +86,31 @@ public class FreshdeskUpdateTicketAction {
                 .label("Status")
                 .description("Status of the ticket.")
                 .options(option("2", 2), option("3", 3), option("4", 4), option("5", 5))
+                .required(false),
+            integer("group_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Group ID")
+                .description("ID of the group to which the ticket will be assigned.")
+                .required(false),
+            integer("responder_id").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Responder ID")
+                .description("ID of the agent to whom the ticket will be assigned.")
+                .required(false),
+            array("tags").items(string().metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .description(
+                    "Tags to associate with the ticket. The provided tags replace all existing tags of the ticket."))
+                .placeholder("Add to Tags")
+                .metadata(
+                    Map.of(
+                        "type", PropertyType.BODY))
+                .label("Tags")
+                .description(
+                    "Tags to associate with the ticket. The provided tags replace all existing tags of the ticket.")
                 .required(false))
         .output(outputSchema(object()
             .properties(
