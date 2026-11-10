@@ -26,6 +26,8 @@ import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.slack.action.SlackAddReactionAction;
+import com.bytechef.component.slack.action.SlackFindUserByEmailAction;
+import com.bytechef.component.slack.action.SlackSearchMessagesAction;
 import com.bytechef.component.slack.action.SlackSendApprovalMessageAction;
 import com.bytechef.component.slack.action.SlackSendChannelMessageAction;
 import com.bytechef.component.slack.action.SlackSendDirectMessageAction;
@@ -57,12 +59,16 @@ public final class SlackComponentHandler implements ComponentHandler {
                 .required(true))
         .actions(
             SlackAddReactionAction.ACTION_DEFINITION,
+            SlackFindUserByEmailAction.ACTION_DEFINITION,
+            SlackSearchMessagesAction.ACTION_DEFINITION,
             SlackSendApprovalMessageAction.ACTION_DEFINITION,
             SlackSendChannelMessageAction.ACTION_DEFINITION,
             SlackSendDirectMessageAction.ACTION_DEFINITION)
         .clusterElements(
             SlackApprovalChannel.CLUSTER_ELEMENT_DEFINITION,
             tool(SlackAddReactionAction.ACTION_DEFINITION),
+            tool(SlackFindUserByEmailAction.ACTION_DEFINITION),
+            tool(SlackSearchMessagesAction.ACTION_DEFINITION),
             tool(SlackSendApprovalMessageAction.ACTION_DEFINITION),
             tool(SlackSendChannelMessageAction.ACTION_DEFINITION),
             tool(SlackSendDirectMessageAction.ACTION_DEFINITION))

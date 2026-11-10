@@ -157,7 +157,7 @@ public class SlackConnection {
                     scopeMap.put("remote_files:read", false);
                     scopeMap.put("remote_files:share", false);
                     scopeMap.put("remote_files:write", false);
-                    scopeMap.put("search:read", false);
+                    scopeMap.put("search:read", true);
                     scopeMap.put("search:read.enterprise", false);
                     scopeMap.put("search:read.files", false);
                     scopeMap.put("search:read.im", false);
@@ -176,7 +176,7 @@ public class SlackConnection {
                     scopeMap.put("usergroups:read", false);
                     scopeMap.put("usergroups:write", false);
                     scopeMap.put("users:read", true);
-                    scopeMap.put("users:read.email", false);
+                    scopeMap.put("users:read.email", true);
                     scopeMap.put("users:write", false);
                     scopeMap.put("users.profile:read", false);
                     scopeMap.put("users.profile:write", false);
