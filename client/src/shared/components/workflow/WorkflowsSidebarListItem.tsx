@@ -1,4 +1,5 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {WorkflowIcon} from 'lucide-react';
 import {KeyboardEvent, ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -34,15 +35,17 @@ const WorkflowsSidebarListItem = ({
         >
             <div
                 aria-current={active || undefined}
-                className="flex min-w-0 flex-1 cursor-pointer flex-col overflow-hidden rounded-md py-3 pl-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 overflow-hidden rounded-md py-3 pl-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                 onClick={onClick}
                 onKeyDown={handleKeyDown}
                 role="button"
                 tabIndex={0}
             >
+                <WorkflowIcon aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-content-neutral-secondary" />
+
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <div className="flex flex-col gap-1 text-start">
+                        <div className="flex min-w-0 flex-col gap-1 text-start">
                             <span className="truncate overflow-hidden text-sm font-medium">{label}</span>
 
                             {editedTimeAgo && (
