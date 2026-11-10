@@ -194,6 +194,26 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
+    public Connection update(long id, String name, List<Long> tagIds, Map<String, ?> parameters, int version) {
+        Assert.notNull(parameters, "'parameters' must not be null");
+
+        Connection curConnection = getConnection(id);
+
+        if (name != null) {
+            curConnection.setName(name);
+        }
+
+        if (tagIds != null) {
+            curConnection.setTagIds(tagIds);
+        }
+
+        curConnection.setParameters(new HashMap<>(parameters));
+        curConnection.setVersion(version);
+
+        return connectionRepository.save(curConnection);
+    }
+
+    @Override
     public Connection updateConnectionCredentialStatus(long connectionId, CredentialStatus status) {
         Assert.notNull(status, "'status' must not be null");
 
@@ -265,6 +285,18 @@ public class ConnectionServiceImpl implements ConnectionService {
         Connection connection = getConnection(connectionId);
 
         connection.setParameters(new HashMap<>(parameters));
+
+        return connectionRepository.save(connection);
+    }
+
+    @Override
+    public Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters, int version) {
+        Assert.notNull(parameters, "'parameters' must not be null");
+
+        Connection connection = getConnection(connectionId);
+
+        connection.setParameters(new HashMap<>(parameters));
+        connection.setVersion(version);
 
         return connectionRepository.save(connection);
     }

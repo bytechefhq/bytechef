@@ -54,6 +54,11 @@ public interface ConnectionService {
 
     Connection update(long id, String name, List<Long> tagIds, int version);
 
+    /**
+     * Updates a connection's name, tags and parameters in one write, rejected when {@code version} is stale.
+     */
+    Connection update(long id, String name, List<Long> tagIds, Map<String, ?> parameters, int version);
+
     Connection updateConnectionCredentialStatus(long connectionId, Connection.CredentialStatus status);
 
     Connection updateConnectionStatus(long connectionId, ConnectionStatus status);
@@ -63,5 +68,10 @@ public interface ConnectionService {
     Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters);
 
     Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters);
+
+    /**
+     * Replaces a connection's parameters, rejected when {@code version} is stale.
+     */
+    Connection replaceConnectionParameters(long connectionId, Map<String, ?> parameters, int version);
 
 }

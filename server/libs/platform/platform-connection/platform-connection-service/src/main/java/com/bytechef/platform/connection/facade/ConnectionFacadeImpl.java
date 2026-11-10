@@ -130,6 +130,23 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     public void replaceAuthorizationParameters(long id, Map<String, ?> parameters) {
         validateOwnerOrAdmin(connectionService.getConnection(id));
 
+        connectionService.replaceConnectionParameters(
+            id, getResolvedAuthorizationParameters(id, parameters));
+
+        connectionService.updateConnectionCredentialStatus(id, Connection.CredentialStatus.VALID);
+    }
+
+    @Override
+    public void replaceAuthorizationParameters(long id, Map<String, ?> parameters, int version) {
+        validateOwnerOrAdmin(connectionService.getConnection(id));
+
+        connectionService.replaceConnectionParameters(
+            id, getResolvedAuthorizationParameters(id, parameters), version);
+
+        connectionService.updateConnectionCredentialStatus(id, Connection.CredentialStatus.VALID);
+    }
+
+    private Map<String, ?> getResolvedAuthorizationParameters(long id, Map<String, ?> parameters) {
         Connection connection = getConnectionWithReplacedAuthorizationParameters(id, parameters);
 
         resolveOAuth2AuthorizationCode(connection);
@@ -138,9 +155,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         updatedParameters.remove("state");
 
-        connectionService.replaceConnectionParameters(id, updatedParameters);
-
-        connectionService.updateConnectionCredentialStatus(id, Connection.CredentialStatus.VALID);
+        return updatedParameters;
     }
 
     private Connection getConnectionWithReplacedAuthorizationParameters(long id, Map<String, ?> parameters) {
@@ -149,15 +164,18 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
             connection.getComponentName(), connection.getConnectionVersion());
 
-        List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
-            .stream()
-            .flatMap(authorization -> CollectionUtils.stream(authorization.getProperties()))
+        List<String> connectionPropertyNames = CollectionUtils.stream(connectionDefinition.getProperties())
             .map(BaseProperty::getName)
             .toList();
 
-        Map<String, Object> replacedParameters = new HashMap<>(connection.getParameters());
+        Map<String, ?> storedParameters = connection.getParameters();
+        Map<String, Object> replacedParameters = new HashMap<>();
 
-        authorizationPropertyNames.forEach(replacedParameters::remove);
+        for (String connectionPropertyName : connectionPropertyNames) {
+            if (storedParameters.containsKey(connectionPropertyName)) {
+                replacedParameters.put(connectionPropertyName, storedParameters.get(connectionPropertyName));
+            }
+        }
 
         replacedParameters.putAll(parameters);
 
@@ -292,6 +310,36 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         tags = checkTags(tags);
 
         connectionService.update(id, name, CollectionUtils.map(tags, Tag::getId), version);
+    }
+
+    @Override
+    public void update(long id, String name, Map<String, ?> connectionParameters, List<Tag> tags, int version) {
+        Connection connection = connectionService.getConnection(id);
+
+        validateOwnerOrAdmin(connection);
+
+        tags = checkTags(tags);
+
+        ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionConnectionDefinition(
+            connection.getComponentName(), connection.getConnectionVersion());
+
+        List<String> connectionPropertyNames = CollectionUtils.stream(connectionDefinition.getProperties())
+            .map(BaseProperty::getName)
+            .toList();
+
+        Map<String, Object> replacedParameters = new HashMap<>(connection.getParameters());
+
+        connectionPropertyNames.forEach(replacedParameters::remove);
+
+        for (String connectionPropertyName : connectionPropertyNames) {
+            Object value = connectionParameters.get(connectionPropertyName);
+
+            if (value != null && !"".equals(value)) {
+                replacedParameters.put(connectionPropertyName, value);
+            }
+        }
+
+        connectionService.update(id, name, CollectionUtils.map(tags, Tag::getId), replacedParameters, version);
     }
 
     private static void validateOwnerOrAdmin(Connection connection) {
