@@ -90,7 +90,7 @@ const AiHubResourcePanel = () => {
                     </div>
                 ) : (
                     <div className="flex flex-1 items-center justify-center px-4 text-center text-sm text-muted-foreground">
-                        Workflows you or the assistant open appear here.
+                        Workflows you or Basil open appear here.
                     </div>
                 )}
             </div>
