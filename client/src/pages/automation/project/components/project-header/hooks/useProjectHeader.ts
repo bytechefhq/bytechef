@@ -15,7 +15,11 @@ import {
     useGetProjectVersionWorkflowsQuery,
     useGetProjectWorkflowsQuery,
 } from '@/shared/queries/automation/projectWorkflows.queries';
-import {ProjectKeys, useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
+import {
+    ProjectKeys,
+    useGetProjectQuery,
+    useGetWorkspaceProjectsQuery,
+} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {useQueryClient} from '@tanstack/react-query';
@@ -63,6 +67,8 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
     const {data: project} = useGetProjectQuery(projectId, useLoaderData() as Project);
 
     const {data: projectWorkflows} = useGetProjectWorkflowsQuery(projectId, !!projectId);
+
+    const {data: workspaceProjects} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId!}, !!currentWorkspaceId);
 
     const lastPublishedProjectVersion = (project?.lastProjectVersion ?? 0) - 1;
 
@@ -139,8 +145,8 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         );
     }, [lastPublishedProjectWorkflows, project?.lastPublishedDate, projectWorkflows]);
 
-    const handleProjectWorkflowValueChange = useCallback(
-        (projectWorkflowId: number) => {
+    const navigateToProjectWorkflow = useCallback(
+        (targetProjectId: number, projectWorkflowId: number) => {
             const newSearchParams = new URLSearchParams(searchParams.toString());
 
             newSearchParams.delete('fromSubflow');
@@ -150,7 +156,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
 
             if (useWorkflowEditorStore.getState().workflowIsRunning) {
                 void navigate(
-                    `/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`
+                    `/automation/projects/${targetProjectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`
                 );
 
                 return;
@@ -161,7 +167,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             setCurrentNode(undefined);
 
             void navigate(
-                `/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`
+                `/automation/projects/${targetProjectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`
             );
 
             setShowBottomPanelOpen(false);
@@ -173,12 +179,36 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         [
             bottomResizablePanelRef,
             navigate,
-            projectId,
             searchParams,
             setCurrentNode,
             setShowBottomPanelOpen,
             setWorkflowTestExecution,
         ]
+    );
+
+    const handleProjectWorkflowValueChange = useCallback(
+        (projectWorkflowId: number) => navigateToProjectWorkflow(projectId, projectWorkflowId),
+        [navigateToProjectWorkflow, projectId]
+    );
+
+    const handleProjectValueChange = useCallback(
+        (selectedProjectId: number) => {
+            if (selectedProjectId === projectId) {
+                return;
+            }
+
+            const selectedProject = workspaceProjects?.find(
+                (workspaceProject) => workspaceProject.id === selectedProjectId
+            );
+            const firstProjectWorkflowId = selectedProject?.projectWorkflowIds?.[0];
+
+            if (firstProjectWorkflowId === undefined) {
+                return;
+            }
+
+            navigateToProjectWorkflow(selectedProjectId, firstProjectWorkflowId);
+        },
+        [navigateToProjectWorkflow, projectId, workspaceProjects]
     );
 
     const handlePublishProjectSubmit = ({description, onSuccess}: {description?: string; onSuccess: () => void}) => {
@@ -325,6 +355,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
     }, [project?.name, setProjectName]);
 
     return {
+        handleProjectValueChange,
         handleProjectWorkflowValueChange,
         handlePublishProjectSubmit,
         handleRunClick,
@@ -334,5 +365,6 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         project,
         projectWorkflows,
         publishProjectMutationIsPending: publishProjectMutation.isPending,
+        workspaceProjects,
     };
 };
