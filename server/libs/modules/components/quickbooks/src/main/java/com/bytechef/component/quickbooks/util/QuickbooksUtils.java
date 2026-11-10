@@ -119,9 +119,9 @@ public class QuickbooksUtils {
     private static String getDisplayValue(Entity entity, Map<?, ?> entityMap) {
         return switch (entity) {
             case ACCOUNT, ITEM -> (String) entityMap.get(NAME);
-            case CUSTOMER -> (String) entityMap.get(DISPLAY_NAME);
+            case CUSTOMER, VENDOR -> (String) entityMap.get(DISPLAY_NAME);
             case INVOICE -> (String) entityMap.get("DocNumber");
-            case PAYMENT -> (String) entityMap.get(ID);
+            case BILL, PAYMENT -> (String) entityMap.get(ID);
         };
     }
 }

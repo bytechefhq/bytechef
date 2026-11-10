@@ -21,7 +21,8 @@ package com.bytechef.component.quickbooks.constant;
  */
 public enum Entity {
 
-    ACCOUNT("Account"), CUSTOMER("Customer"), INVOICE("Invoice"), ITEM("Item"), PAYMENT("Payment");
+    ACCOUNT("Account"), BILL("Bill"), CUSTOMER("Customer"), INVOICE("Invoice"), ITEM("Item"), PAYMENT("Payment"),
+    VENDOR("Vendor");
 
     private final String name;
 
