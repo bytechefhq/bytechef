@@ -53,6 +53,55 @@ export function createSuggestionPopupRenderer<ItemType>(
         // for a suggestion `onStart` declined to show, where there is nothing to clear.
         let openedEditor: Editor | undefined;
 
+        const openPopup = (props: SuggestionProps<ItemType>) => {
+            if (!props.editor.isFocused) {
+                return;
+            }
+
+            component = new ReactRenderer(listComponent, {
+                editor: props.editor,
+                props,
+            });
+
+            const initialRect = props.clientRect?.();
+
+            if (!initialRect) {
+                component.destroy();
+                component = undefined;
+
+                return;
+            }
+
+            lastValidRect = initialRect;
+
+            popup = tippy('body', {
+                appendTo: () => document.body,
+                content: component.element,
+                getReferenceClientRect: () => lastValidRect,
+                interactive: true,
+                maxWidth: 'none',
+                placement: 'bottom-start',
+                showOnCreate: true,
+                trigger: 'manual',
+            })[0];
+
+            // Inside a Radix modal dialog, react-remove-scroll blocks wheel events outside the
+            // dialog content. Intercept them on the popup before they reach the document
+            // listener that would preventDefault on them. Pointer events are re-enabled by the
+            // menu's own stylesheet, since tippy resets the popper's inline value on setProps.
+            wheelAbortController = new AbortController();
+
+            popup.popper.addEventListener('wheel', (event) => event.stopPropagation(), {
+                capture: true,
+                passive: true,
+                signal: wheelAbortController.signal,
+            });
+
+            openedEditor = props.editor;
+
+            setMentionSuggestionOpen(props.editor, true);
+        };
+
         return {
             onExit() {
                 if (openedEditor) {
@@ -64,6 +113,9 @@ export function createSuggestionPopupRenderer<ItemType>(
                 wheelAbortController?.abort();
                 popup?.destroy();
                 component?.destroy();
+
+                popup = undefined;
+                component = undefined;
             },
 
             onKeyDown(props) {
@@ -81,56 +133,21 @@ export function createSuggestionPopupRenderer<ItemType>(
             },
 
             onStart(props) {
-                if (!props.editor.isFocused) {
-                    return;
-                }
-
-                component = new ReactRenderer(listComponent, {
-                    editor: props.editor,
-                    props,
-                });
-
-                const initialRect = props.clientRect?.();
-
-                if (!initialRect) {
-                    component.destroy();
-                    component = undefined;
-
-                    return;
-                }
-
-                lastValidRect = initialRect;
-
-                popup = tippy('body', {
-                    appendTo: () => document.body,
-                    content: component.element,
-                    getReferenceClientRect: () => lastValidRect,
-                    interactive: true,
-                    maxWidth: 'none',
-                    placement: 'bottom-start',
-                    showOnCreate: true,
-                    trigger: 'manual',
-                })[0];
-
-                // Inside a Radix modal dialog, react-remove-scroll blocks wheel events outside the
-                // dialog content. Intercept them on the popup before they reach the document
-                // listener that would preventDefault on them. Pointer events are re-enabled by the
-                // menu's own stylesheet, since tippy resets the popper's inline value on setProps.
-                wheelAbortController = new AbortController();
-
-                popup.popper.addEventListener('wheel', (event) => event.stopPropagation(), {
-                    capture: true,
-                    passive: true,
-                    signal: wheelAbortController.signal,
-                });
-
-                openedEditor = props.editor;
-
-                setMentionSuggestionOpen(props.editor, true);
+                openPopup(props);
             },
 
             onUpdate(props) {
+                if (!popup) {
+                    openPopup(props);
+
+                    return;
+                }
+
                 component?.updateProps(props);
+
+                if (!popup.state.isVisible && props.editor.isFocused) {
+                    popup.show();
+                }
 
                 const updatedRect = props.clientRect?.();
 

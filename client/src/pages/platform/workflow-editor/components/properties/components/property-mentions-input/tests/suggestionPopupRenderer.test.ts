@@ -13,6 +13,8 @@ const tippyInstances: Array<{
     hide: ReturnType<typeof vi.fn>;
     popper: {addEventListener: ReturnType<typeof vi.fn>};
     setProps: ReturnType<typeof vi.fn>;
+    show: ReturnType<typeof vi.fn>;
+    state: {isVisible: boolean};
 }> = [];
 
 vi.mock('@tiptap/react', () => ({
@@ -41,6 +43,8 @@ vi.mock('tippy.js', () => ({
             hide: vi.fn(),
             popper: {addEventListener: vi.fn()},
             setProps: vi.fn(),
+            show: vi.fn(),
+            state: {isVisible: true},
         };
 
         tippyInstances.push(instance);
@@ -159,6 +163,39 @@ describe('createSuggestionPopupRenderer', () => {
         expect(editor.storage.MentionStorage.suggestionOpen).toBe(false);
         expect(tippyInstances[0].destroy).toHaveBeenCalled();
         expect(reactRendererInstances[0].destroy).toHaveBeenCalled();
+    });
+
+    it('opens the popup on update when the suggestion started before the editor had focus', () => {
+        const renderer = createSuggestionPopupRenderer(listComponent)();
+
+        renderer.onStart!(createStartProps(createEditor(false)));
+        renderer.onUpdate!(createStartProps(createEditor()));
+
+        expect(tippyInstances).toHaveLength(1);
+    });
+
+    it('shows a popup again that a click hid while the suggestion stayed active', () => {
+        const renderer = createSuggestionPopupRenderer(listComponent)();
+
+        renderer.onStart!(createStartProps(createEditor()));
+
+        tippyInstances[0].state.isVisible = false;
+
+        renderer.onUpdate!(createStartProps(createEditor()));
+
+        expect(tippyInstances[0].show).toHaveBeenCalled();
+    });
+
+    it('opens a new popup on update after an exit', () => {
+        const editor = createEditor();
+        const renderer = createSuggestionPopupRenderer(listComponent)();
+
+        renderer.onStart!(createStartProps(editor));
+        renderer.onExit!(createStartProps(editor));
+        renderer.onUpdate!(createStartProps(editor));
+
+        expect(tippyInstances).toHaveLength(2);
+        expect(tippyInstances[0].show).not.toHaveBeenCalled();
     });
 
     it('exits cleanly when the popup was never opened', () => {
