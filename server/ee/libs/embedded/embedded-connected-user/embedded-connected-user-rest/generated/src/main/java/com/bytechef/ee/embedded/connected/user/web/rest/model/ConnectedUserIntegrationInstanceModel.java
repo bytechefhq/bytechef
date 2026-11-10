@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserIntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.229961+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T19:14:25.422184+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ConnectedUserIntegrationInstanceModel {
 
   private @Nullable String componentName;
@@ -41,6 +41,8 @@ public class ConnectedUserIntegrationInstanceModel {
   private @Nullable Long connectionId;
 
   private @Nullable CredentialStatusModel credentialStatus;
+
+  private @Nullable Boolean provisioned;
 
   public ConnectedUserIntegrationInstanceModel componentName(@Nullable String componentName) {
     this.componentName = componentName;
@@ -210,6 +212,27 @@ public class ConnectedUserIntegrationInstanceModel {
     this.credentialStatus = credentialStatus;
   }
 
+  public ConnectedUserIntegrationInstanceModel provisioned(@Nullable Boolean provisioned) {
+    this.provisioned = provisioned;
+    return this;
+  }
+
+  /**
+   * If a tenant admin provisioned the integration instance.
+   * @return provisioned
+   */
+  
+  @Schema(name = "provisioned", accessMode = Schema.AccessMode.READ_ONLY, description = "If a tenant admin provisioned the integration instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("provisioned")
+  public @Nullable Boolean getProvisioned() {
+    return provisioned;
+  }
+
+  @JsonProperty("provisioned")
+  public void setProvisioned(@Nullable Boolean provisioned) {
+    this.provisioned = provisioned;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -226,12 +249,13 @@ public class ConnectedUserIntegrationInstanceModel {
         Objects.equals(this.integrationInstanceConfigurationId, connectedUserIntegrationInstance.integrationInstanceConfigurationId) &&
         Objects.equals(this.integrationVersion, connectedUserIntegrationInstance.integrationVersion) &&
         Objects.equals(this.connectionId, connectedUserIntegrationInstance.connectionId) &&
-        Objects.equals(this.credentialStatus, connectedUserIntegrationInstance.credentialStatus);
+        Objects.equals(this.credentialStatus, connectedUserIntegrationInstance.credentialStatus) &&
+        Objects.equals(this.provisioned, connectedUserIntegrationInstance.provisioned);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, enabled, id, integrationId, integrationInstanceConfigurationId, integrationVersion, connectionId, credentialStatus);
+    return Objects.hash(componentName, enabled, id, integrationId, integrationInstanceConfigurationId, integrationVersion, connectionId, credentialStatus, provisioned);
   }
 
   @Override
@@ -246,6 +270,7 @@ public class ConnectedUserIntegrationInstanceModel {
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
+    sb.append("    provisioned: ").append(toIndentedString(provisioned)).append("\n");
     sb.append("}");
     return sb.toString();
   }
