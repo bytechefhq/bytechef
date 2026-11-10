@@ -4,16 +4,16 @@ import {
     WorkflowExecution as EmbeddedWorkflowExecution,
 } from '@/ee/shared/middleware/embedded/workflow/execution';
 import {
-    WorkflowExecution as AutomationWorkflowExecution,
-    WorkflowExecutionFromJSON as AutomationWorkflowExecutionFromJSON,
+    WorkflowExecution as AutomationExecution,
+    WorkflowExecutionFromJSON as AutomationExecutionFromJSON,
 } from '@/shared/middleware/automation/workflow/execution';
 
 export interface AnyWorkflowExecutionRowI {
-    automationWorkflowExecution?: AutomationWorkflowExecution;
+    automationExecution?: AutomationExecution;
     integrationWorkflowExecution?: EmbeddedWorkflowExecution;
-    job?: AutomationWorkflowExecution['job'] | EmbeddedWorkflowExecution['job'];
-    triggerExecution?: AutomationWorkflowExecution['triggerExecution'] | EmbeddedWorkflowExecution['triggerExecution'];
-    workflow?: AutomationWorkflowExecution['workflow'] | EmbeddedWorkflowExecution['workflow'];
+    job?: AutomationExecution['job'] | EmbeddedWorkflowExecution['job'];
+    triggerExecution?: AutomationExecution['triggerExecution'] | EmbeddedWorkflowExecution['triggerExecution'];
+    workflow?: AutomationExecution['workflow'] | EmbeddedWorkflowExecution['workflow'];
 }
 
 export const toAnyWorkflowExecutionRow = (json: object): AnyWorkflowExecutionRowI => {
@@ -21,17 +21,15 @@ export const toAnyWorkflowExecutionRow = (json: object): AnyWorkflowExecutionRow
 
     if (
         embeddedWorkflowExecution.source === EmbeddedWorkflowExecutionSourceEnum.Automation &&
-        embeddedWorkflowExecution.automationWorkflowExecution
+        embeddedWorkflowExecution.automationExecution
     ) {
-        const automationWorkflowExecution = AutomationWorkflowExecutionFromJSON(
-            embeddedWorkflowExecution.automationWorkflowExecution
-        );
+        const automationExecution = AutomationExecutionFromJSON(embeddedWorkflowExecution.automationExecution);
 
         return {
-            automationWorkflowExecution,
-            job: automationWorkflowExecution.job,
-            triggerExecution: automationWorkflowExecution.triggerExecution,
-            workflow: automationWorkflowExecution.workflow,
+            automationExecution,
+            job: automationExecution.job,
+            triggerExecution: automationExecution.triggerExecution,
+            workflow: automationExecution.workflow,
         };
     }
 

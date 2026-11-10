@@ -1,0 +1,332 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
+import {AutomationProjectTagsQuery, AutomationProjectsQuery} from '@/shared/middleware/graphql';
+import {createTestQueryClientWrapper, screen, userEvent} from '@/shared/util/test-utils';
+import {render} from '@testing-library/react';
+import {ReactElement, ReactNode} from 'react';
+import {MemoryRouter} from 'react-router-dom';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+
+import AutomationProjectList from '../components/automation-project-list/AutomationProjectList';
+
+vi.mock('@/shared/queries/platform/environments.queries', () => ({
+    useGetEnvironmentsQuery: () => ({data: [{id: 1, name: 'Development'}]}),
+}));
+
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
+    useAutomationProjectConfigurationsQuery: () => ({
+        data: {automationProjectConfigurations: []},
+    }),
+}));
+
+const renderWithProviders = (ui: ReactElement, initialEntries = ['/embedded/automations']) => {
+    const QueryClientWrapper = createTestQueryClientWrapper();
+
+    const wrapper = ({children}: {children: ReactNode}) => (
+        <MemoryRouter initialEntries={initialEntries}>
+            <QueryClientWrapper>
+                <TooltipProvider>{children}</TooltipProvider>
+            </QueryClientWrapper>
+        </MemoryRouter>
+    );
+
+    return render(ui, {wrapper});
+};
+
+type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
+type EmbeddedTagType = AutomationProjectTagsQuery['automationProjectTags'][number];
+
+const makeProject = (
+    overrides: Partial<AutomationProjectType> & Pick<AutomationProjectType, 'id' | 'name'>
+): AutomationProjectType => ({
+    categoryId: null,
+    configurationCount: 0,
+    description: null,
+    lastPublishedDate: null,
+    lastPublishedVersion: null,
+    permissionExpression: null,
+    published: false,
+    tagIds: [],
+    version: 1,
+    workflowTemplates: [],
+    ...overrides,
+});
+
+describe('AutomationProjectList', () => {
+    const onCreateWorkflow = vi.fn();
+    const onDeleteProject = vi.fn();
+    const onDeleteWorkflow = vi.fn();
+    const onEditProject = vi.fn();
+    const onEditWorkflow = vi.fn();
+    const onImportWorkflow = vi.fn();
+    const onPublishProject = vi.fn();
+    const onSelectWorkflow = vi.fn();
+    const onUpdateTags = vi.fn();
+
+    const tags: EmbeddedTagType[] = [{id: '1', name: 'sales'}];
+
+    const defaultProps = {
+        onCreateWorkflow,
+        onDeleteProject,
+        onDeleteWorkflow,
+        onEditProject,
+        onEditWorkflow,
+        onImportWorkflow,
+        onPublishProject,
+        onSelectWorkflow,
+        onUpdateTags,
+        tags,
+    };
+
+    beforeEach(() => {
+        onCreateWorkflow.mockReset();
+        onDeleteProject.mockReset();
+        onDeleteWorkflow.mockReset();
+        onEditProject.mockReset();
+        onEditWorkflow.mockReset();
+        onImportWorkflow.mockReset();
+        onPublishProject.mockReset();
+        onSelectWorkflow.mockReset();
+        onUpdateTags.mockReset();
+    });
+
+    it('renders project names and a draft badge', () => {
+        const projects = [makeProject({id: 'p1', name: 'Alpha Project'})];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
+
+        expect(screen.getByText('Alpha Project')).toBeInTheDocument();
+        expect(screen.getByText('DRAFT')).toBeInTheDocument();
+    });
+
+    it('renders a published badge with the published version', () => {
+        const projects = [makeProject({id: 'p1', lastPublishedVersion: 3, name: 'Published Project', published: true})];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
+
+        expect(screen.getByText('V3')).toBeInTheDocument();
+        expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+    });
+
+    it('renders the project tags as interactive chips', () => {
+        const projects = [makeProject({id: 'p1', name: 'Tagged Project', tagIds: ['1']})];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
+
+        expect(screen.getByText('sales')).toBeInTheDocument();
+    });
+
+    it('calls onUpdateTags with remaining tags when a tag chip is removed', async () => {
+        const user = userEvent.setup();
+
+        const projects = [makeProject({id: 'p1', name: 'Tagged Project', tagIds: ['1']})];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
+
+        expect(screen.getByText('sales')).toBeInTheDocument();
+
+        // The remove button is a small icon button inside the tag chip — find by its container
+        const tagChip = screen.getByText('sales').closest('div');
+
+        const removeButton = tagChip!.querySelector('button');
+
+        await user.click(removeButton!);
+
+        expect(onUpdateTags).toHaveBeenCalledTimes(1);
+        expect(onUpdateTags.mock.calls[0][0]).toMatchObject({id: 'p1'});
+        expect(onUpdateTags.mock.calls[0][1]).toEqual([]);
+    });
+
+    it('calls onUpdateTags with new tag name when a tag is added via the Add tag button', async () => {
+        const user = userEvent.setup();
+
+        const allTags: EmbeddedTagType[] = [
+            {id: '1', name: 'sales'},
+            {id: '2', name: 'finance'},
+        ];
+
+        const projects = [makeProject({id: 'p1', name: 'Tagged Project', tagIds: []})];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} tags={allTags} />);
+
+        await user.click(screen.getByRole('button', {name: 'Add tag'}));
+
+        const input = await screen.findByRole('combobox');
+
+        await user.type(input, 'sales');
+
+        const option = await screen.findByText('sales', {selector: '[class*="option"]'});
+
+        await user.click(option);
+
+        expect(onUpdateTags).toHaveBeenCalledTimes(1);
+        expect(onUpdateTags.mock.calls[0][1]).toContain('sales');
+    });
+
+    it('calls onPublishProject when Publish is selected', async () => {
+        const user = userEvent.setup();
+
+        const projects = [makeProject({id: 'project-7', name: 'My Project'})];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
+
+        await user.click(screen.getByTestId('project-7-moreProjectActionsButton'));
+
+        await user.click(await screen.findByRole('menuitem', {name: /publish/i}));
+
+        expect(onPublishProject).toHaveBeenCalledWith('project-7');
+    });
+
+    it('calls onCreateWorkflow from the New Workflow button next to the Workflows heading', async () => {
+        const user = userEvent.setup();
+
+        const projects = [
+            makeProject({
+                id: 'project-3',
+                name: 'My Project',
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: null,
+                        label: 'Sync Contacts',
+                        lastModifiedDate: null,
+                        permissionExpression: null,
+                        triggers: [],
+                        workflowId: 'draft-wf-uuid-3',
+                        workflowUuid: 'wf-uuid-3',
+                    },
+                ],
+            }),
+        ];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
+
+        await user.click(screen.getByText('1 workflow'));
+
+        await user.click(await screen.findByRole('button', {name: /create workflow/i}));
+
+        expect(onCreateWorkflow).toHaveBeenCalledWith('project-3');
+    });
+
+    it('calls onImportWorkflow from the New Workflow chevron dropdown', async () => {
+        const user = userEvent.setup();
+
+        const projects = [
+            makeProject({
+                id: 'project-4',
+                name: 'My Project',
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: null,
+                        label: 'Sync Contacts',
+                        lastModifiedDate: null,
+                        permissionExpression: null,
+                        triggers: [],
+                        workflowId: 'draft-wf-uuid-4',
+                        workflowUuid: 'wf-uuid-4',
+                    },
+                ],
+            }),
+        ];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
+
+        await user.click(screen.getByText('1 workflow'));
+
+        await user.click(await screen.findByRole('button', {name: /more workflow creation actions/i}));
+
+        await user.click(await screen.findByRole('menuitem', {name: /import workflow/i}));
+
+        expect(onImportWorkflow).toHaveBeenCalledWith('project-4');
+    });
+
+    it('offers configuration creation only once the project is published and has configurations', async () => {
+        const user = userEvent.setup();
+
+        const projects = [
+            makeProject({id: 'draft', name: 'Draft Project'}),
+            makeProject({
+                configurationCount: 1,
+                id: 'live',
+                lastPublishedVersion: 1,
+                name: 'Live Project',
+                published: true,
+            }),
+        ];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
+
+        const [draftTrigger, liveTrigger] = screen.getAllByText('0 workflows');
+
+        await user.click(draftTrigger);
+        await user.click(screen.getByRole('tab', {name: 'Configurations'}));
+
+        expect(await screen.findByText('Publish the project to configure it')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
+
+        await user.click(liveTrigger);
+
+        const liveTabs = screen.getAllByRole('tab', {name: 'Configurations'});
+
+        await user.click(liveTabs[liveTabs.length - 1]);
+
+        expect(await screen.findByRole('button', {name: 'New Configuration'})).toBeEnabled();
+    });
+
+    it('opens the project on its Configurations tab from the projectId and tab parameters', () => {
+        const projects = [
+            makeProject({id: 'other', name: 'Other Project'}),
+            makeProject({
+                configurationCount: 1,
+                id: 'live',
+                lastPublishedVersion: 1,
+                name: 'Live Project',
+                published: true,
+            }),
+        ];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />, [
+            '/embedded/automations?projectId=live&tab=configurations',
+        ]);
+
+        const configurationsTabs = screen.getAllByRole('tab', {name: 'Configurations'});
+
+        expect(configurationsTabs).toHaveLength(1);
+        expect(configurationsTabs[0]).toHaveAttribute('aria-selected', 'true');
+        expect(screen.getByRole('button', {name: 'New Configuration'})).toBeInTheDocument();
+    });
+
+    it('expands a project to show its workflows and navigates on click', async () => {
+        const user = userEvent.setup();
+
+        const projects = [
+            makeProject({
+                id: 'project-5',
+                name: 'My Project',
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: null,
+                        label: 'Sync Contacts',
+                        lastModifiedDate: null,
+                        permissionExpression: null,
+                        triggers: [],
+                        workflowId: 'draft-wf-uuid-5',
+                        workflowUuid: 'wf-uuid-5',
+                    },
+                ],
+            }),
+        ];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
+
+        await user.click(screen.getByText('1 workflow'));
+
+        const workflowItem = await screen.findByText('Sync Contacts');
+
+        await user.click(workflowItem);
+
+        expect(onSelectWorkflow).toHaveBeenCalledWith('wf-uuid-5');
+    });
+});

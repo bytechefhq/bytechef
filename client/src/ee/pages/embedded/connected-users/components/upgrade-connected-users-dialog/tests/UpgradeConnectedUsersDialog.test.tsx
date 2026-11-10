@@ -73,7 +73,7 @@ vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutati
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
-    useAutomationWorkflowProjectConfigurationUpgradeImpactQuery: (
+    useAutomationProjectConfigurationUpgradeImpactQuery: (
         variables: {connectedUserIds: string[]; targetId: string},
         options?: {enabled?: boolean}
     ) => {
@@ -83,7 +83,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
             data:
                 options?.enabled && !mocks.impactLoading && !mocks.impactError
                     ? {
-                          automationWorkflowProjectConfigurationUpgradeImpact: {
+                          automationProjectConfigurationUpgradeImpact: {
                               skipped: mocks.automationSkipped,
                               workflows: [],
                           },
@@ -93,13 +93,13 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
             isLoading: mocks.impactLoading,
         };
     },
-    useAutomationWorkflowProjectConfigurationsQuery: (
+    useAutomationProjectConfigurationsQuery: (
         variables: {environmentId: string; projectId: string},
         options?: {enabled?: boolean}
     ) => ({
         data: options?.enabled
             ? {
-                  automationWorkflowProjectConfigurations: [
+                  automationProjectConfigurations: [
                       {
                           id: '200',
                           name: 'Gamma',
@@ -116,9 +116,9 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
               }
             : undefined,
     }),
-    useAutomationWorkflowProjectsQuery: () => ({
+    useAutomationProjectsQuery: () => ({
         data: {
-            automationWorkflowProjects: [
+            automationProjects: [
                 {configurationCount: 2, id: '30', name: 'Onboarding', published: true},
                 {configurationCount: 1, id: '33', name: 'Billing', published: true},
                 {configurationCount: 0, id: '31', name: 'Unconfigured', published: true},
@@ -126,7 +126,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
             ],
         },
     }),
-    useUpgradeAutomationWorkflowProjectConfigurationConnectedUsersMutation: () => ({
+    useUpgradeAutomationProjectConfigurationConnectedUsersMutation: () => ({
         mutateAsync: mocks.automationMutateAsync,
     }),
 }));
@@ -495,7 +495,7 @@ describe('UpgradeConnectedUsersDialog', () => {
             const onUpgraded = vi.fn();
 
             mocks.automationMutateAsync.mockResolvedValue({
-                upgradeAutomationWorkflowProjectConfigurationConnectedUsers: {
+                upgradeAutomationProjectConfigurationConnectedUsers: {
                     movedConnectedUserIds: ['1'],
                     needsAttentionConnectedUserIds: [],
                     skipped: [{connectedUserId: '2', reason: 'NOT_ON_SOURCE', workflowLabels: []}],

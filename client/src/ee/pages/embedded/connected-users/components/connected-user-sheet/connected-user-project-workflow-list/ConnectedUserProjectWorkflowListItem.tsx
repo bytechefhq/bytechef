@@ -4,12 +4,12 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import useAutomationWorkflowExecutionsSheetStore from '@/ee/pages/embedded/automation-workflows/stores/useAutomationWorkflowExecutionsSheetStore';
+import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {
-    AutomationWorkflowProjectsQuery,
+    AutomationProjectsQuery,
     ConnectedUserProjectsQuery,
     useDeleteConnectedUserProjectWorkflowMutation,
     useEnableConnectedUserProjectWorkflowMutation,
@@ -25,7 +25,7 @@ export type ConnectedUserProjectWorkflowType =
     ConnectedUserProjectsQuery['connectedUserProjects'][number]['connectedUserProjectWorkflows'][number];
 
 export type ConnectedUserWorkflowTemplateType =
-    AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number]['workflowTemplates'][number];
+    AutomationProjectsQuery['automationProjects'][number]['workflowTemplates'][number];
 
 export interface ConnectedUserWorkflowTemplateSourceI {
     projectName: string;
@@ -43,8 +43,8 @@ const ConnectedUserProjectWorkflowListItem = ({
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const openAutomationWorkflowExecutionsSheet = useAutomationWorkflowExecutionsSheetStore(
-        (state) => state.openAutomationWorkflowExecutionsSheet
+    const openAutomationExecutionsSheet = useAutomationExecutionsSheetStore(
+        (state) => state.openAutomationExecutionsSheet
     );
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -110,7 +110,7 @@ const ConnectedUserProjectWorkflowListItem = ({
     const {staticWebhookUrl} = connectedUserProjectWorkflow;
 
     const handleWorkflowClick = () => {
-        openAutomationWorkflowExecutionsSheet({
+        openAutomationExecutionsSheet({
             connectedUserId: Number(connectedUserProjectWorkflow.connectedUserId),
             environmentId: currentEnvironmentId,
             projectName,

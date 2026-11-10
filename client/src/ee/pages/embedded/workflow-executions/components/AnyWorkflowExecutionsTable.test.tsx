@@ -1,7 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import useEmbeddedWorkflowExecutionSheetStore from '@/ee/pages/embedded/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {AnyWorkflowExecutionRowI} from '@/ee/pages/embedded/workflow-executions/utils/anyWorkflowExecutions';
-import useAutomationWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
+import useAutomationExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -24,7 +24,7 @@ vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
 }));
 
 const automationJobRow = {
-    automationWorkflowExecution: {
+    automationExecution: {
         connectedUserId: 5,
         id: 3,
         job: {id: '3', startDate: new Date('2026-10-20T10:00:00Z'), status: 'COMPLETED'},
@@ -44,7 +44,7 @@ const failedTriggerExecution = {
 };
 
 const automationTriggerRow = {
-    automationWorkflowExecution: {
+    automationExecution: {
         id: 4,
         project: {name: 'Sales Sync'},
         projectDeployment: {name: '__EMBEDDED__user-5__DEVELOPMENT'},
@@ -77,7 +77,7 @@ const renderTable = (data: AnyWorkflowExecutionRowI[]) =>
 
 describe('AnyWorkflowExecutionsTable', () => {
     beforeEach(() => {
-        useAutomationWorkflowExecutionSheetStore.setState({
+        useAutomationExecutionSheetStore.setState({
             workflowExecutionId: 0,
             workflowExecutionKind: 'JOB',
             workflowExecutionSheetOpen: false,
@@ -139,7 +139,7 @@ describe('AnyWorkflowExecutionsTable', () => {
 
         await userEvent.click(screen.getByText('Sync contacts'));
 
-        expect(useAutomationWorkflowExecutionSheetStore.getState()).toEqual(
+        expect(useAutomationExecutionSheetStore.getState()).toEqual(
             expect.objectContaining({
                 workflowExecutionId: 3,
                 workflowExecutionKind: 'JOB',
@@ -154,7 +154,7 @@ describe('AnyWorkflowExecutionsTable', () => {
 
         await userEvent.click(screen.getByText('Failed trigger'));
 
-        expect(useAutomationWorkflowExecutionSheetStore.getState()).toEqual(
+        expect(useAutomationExecutionSheetStore.getState()).toEqual(
             expect.objectContaining({
                 workflowExecutionId: 4,
                 workflowExecutionKind: 'TRIGGER_EXECUTION',
@@ -164,7 +164,7 @@ describe('AnyWorkflowExecutionsTable', () => {
     });
 
     it('opens the integration execution sheet for an integration run', async () => {
-        useAutomationWorkflowExecutionSheetStore.setState({workflowExecutionSheetOpen: true});
+        useAutomationExecutionSheetStore.setState({workflowExecutionSheetOpen: true});
 
         renderTable([automationJobRow, integrationRow]);
 
@@ -173,6 +173,6 @@ describe('AnyWorkflowExecutionsTable', () => {
         expect(useEmbeddedWorkflowExecutionSheetStore.getState()).toEqual(
             expect.objectContaining({workflowExecutionId: 1, workflowExecutionSheetOpen: true})
         );
-        expect(useAutomationWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+        expect(useAutomationExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
     });
 });

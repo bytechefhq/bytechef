@@ -140,7 +140,7 @@ describe('HubBuilderView', () => {
 
         it('turns a reference away even when editing is allowed', async () => {
             useGetWorkflowQueryMock.mockReturnValue({
-                data: {automationWorkflowUuid: 'tpl-1', kind: 'REFERENCE', label: 'Triage ticket'},
+                data: {automationUuid: 'tpl-1', kind: 'REFERENCE', label: 'Triage ticket'},
             });
 
             renderBuilder();

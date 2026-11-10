@@ -196,7 +196,7 @@ describe('AppSidebar', () => {
         });
 
         it('moves from automations to automation configurations when switching away from development', () => {
-            renderSidebar(true, '/embedded/automation-workflows');
+            renderSidebar(true, '/embedded/automations');
 
             fireEvent.click(screen.getByRole('button', {name: 'Switch to production'}));
 
@@ -204,7 +204,7 @@ describe('AppSidebar', () => {
         });
 
         it('redirects the automation workflow editor to automation configurations when switching away from development', () => {
-            renderSidebar(true, '/embedded/automation-workflows/workflow-uuid/editor');
+            renderSidebar(true, '/embedded/automations/workflow-uuid/editor');
 
             fireEvent.click(screen.getByRole('button', {name: 'Switch to production'}));
 

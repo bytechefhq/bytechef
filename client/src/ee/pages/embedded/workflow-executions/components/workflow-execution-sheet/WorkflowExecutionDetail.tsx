@@ -7,7 +7,7 @@ import {
     useGetWorkflowExecutionTaskExecutionQuery,
 } from '@/ee/shared/queries/embedded/workflowExecutions.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
-import AutomationWorkflowExecutionDetail from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionDetail';
+import AutomationExecutionDetail from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionDetail';
 import {
     WorkflowExecutionDetailQueriesI,
     WorkflowExecutionDetailQueriesProvider,
@@ -35,7 +35,7 @@ interface WorkflowExecutionDetailProps {
 
 const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: WorkflowExecutionDetailProps) => (
     <WorkflowExecutionDetailQueriesProvider value={embeddedWorkflowExecutionDetailQueries}>
-        <AutomationWorkflowExecutionDetail enabled={enabled} workflowExecutionId={workflowExecutionId} />
+        <AutomationExecutionDetail enabled={enabled} workflowExecutionId={workflowExecutionId} />
     </WorkflowExecutionDetailQueriesProvider>
 );
 

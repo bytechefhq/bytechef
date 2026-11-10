@@ -1,5 +1,5 @@
 import AutomationInputsDialog from '@/ee/pages/embedded/automation-hub/views/components/AutomationInputsDialog';
-import {AutomationWorkflowProjectWorkflowInput} from '@/ee/shared/middleware/embedded/public';
+import {AutomationProjectWorkflowInput} from '@/ee/shared/middleware/embedded/public';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -12,7 +12,7 @@ vi.mock('@/ee/pages/embedded/automation-hub/mutations/automationHub.mutations', 
     useUpdateAutomationInputsMutation: () => ({isPending: false, mutateAsync: updateInputsMutateAsyncMock}),
 }));
 
-const INPUTS: AutomationWorkflowProjectWorkflowInput[] = [
+const INPUTS: AutomationProjectWorkflowInput[] = [
     {label: 'Spreadsheet name', name: 'sheetName', required: true, type: 'STRING'},
     {label: 'API region', name: 'region', provided: true, required: true, type: 'STRING'},
 ];

@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import ConnectedUserProjectWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowList';
 import {ConnectedUserWorkflowTemplateSourceI} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowListItem';
 import ProvisionProjectWorkflowDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/provision-project-workflow-dialog/ProvisionProjectWorkflowDialog';
-import {useAutomationWorkflowProjectsQuery, useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
+import {useAutomationProjectsQuery, useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PlusIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
@@ -27,27 +27,25 @@ const ConnectedUserSheetPanelWorkflowList = ({
         environmentId: currentEnvironmentId?.toString(),
     });
 
-    const {data: automationWorkflowProjectsData, isLoading: automationWorkflowProjectsIsLoading} =
-        useAutomationWorkflowProjectsQuery();
+    const {data: automationProjectsData, isLoading: automationProjectsIsLoading} = useAutomationProjectsQuery();
 
     const workflowTemplateSourcesByWorkflowUuid = useMemo(
         () =>
             new Map<string, ConnectedUserWorkflowTemplateSourceI>(
-                (automationWorkflowProjectsData?.automationWorkflowProjects ?? []).flatMap(
-                    (automationWorkflowProject) =>
-                        automationWorkflowProject.workflowTemplates.map(
-                            (workflowTemplate) =>
-                                [
-                                    workflowTemplate.workflowUuid,
-                                    {projectName: automationWorkflowProject.name, workflowTemplate},
-                                ] as const
-                        )
+                (automationProjectsData?.automationProjects ?? []).flatMap((automationProject) =>
+                    automationProject.workflowTemplates.map(
+                        (workflowTemplate) =>
+                            [
+                                workflowTemplate.workflowUuid,
+                                {projectName: automationProject.name, workflowTemplate},
+                            ] as const
+                    )
                 )
             ),
-        [automationWorkflowProjectsData]
+        [automationProjectsData]
     );
 
-    if (isLoading || automationWorkflowProjectsIsLoading) {
+    if (isLoading || automationProjectsIsLoading) {
         return <div className="py-4 text-sm text-muted-foreground">Loading...</div>;
     }
 

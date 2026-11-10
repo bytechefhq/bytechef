@@ -6,14 +6,14 @@ import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
-    automationWorkflowProjectsQuery: vi.fn(),
+    automationProjectsQuery: vi.fn(),
     connectedUserProjectsQuery: vi.fn(),
     workflowListConnectedUsers: [] as unknown[],
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
-    useAutomationWorkflowProjectsQuery: hoisted.automationWorkflowProjectsQuery,
+    useAutomationProjectsQuery: hoisted.automationProjectsQuery,
     useConnectedUserProjectsQuery: hoisted.connectedUserProjectsQuery,
 }));
 
@@ -59,9 +59,9 @@ vi.mock(
 describe('ConnectedUserSheetPanelWorkflowList', () => {
     beforeEach(() => {
         hoisted.workflowListConnectedUsers = [];
-        hoisted.automationWorkflowProjectsQuery.mockReturnValue({
+        hoisted.automationProjectsQuery.mockReturnValue({
             data: {
-                automationWorkflowProjects: [
+                automationProjects: [
                     {name: 'Automation Playground', workflowTemplates: [{workflowUuid: 'template-greeting'}]},
                 ],
             },

@@ -14,7 +14,7 @@ vi.mock('@/ee/shared/queries/embedded/workflowExecutions.queries', async (import
 }));
 
 vi.mock('@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionDetail', () => ({
-    default: function AutomationWorkflowExecutionDetailMock({
+    default: function AutomationExecutionDetailMock({
         enabled,
         workflowExecutionId,
     }: {

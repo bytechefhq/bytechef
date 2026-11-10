@@ -13,5 +13,5 @@ export const removeAutomation = (
         return onDeleteAutomation(automation.workflowUuid!);
     }
 
-    return onDeprovisionReference(automation.automationWorkflowUuid ?? automation.workflowUuid!);
+    return onDeprovisionReference(automation.automationUuid ?? automation.workflowUuid!);
 };

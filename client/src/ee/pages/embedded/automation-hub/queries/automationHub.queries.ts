@@ -1,6 +1,6 @@
 import {
-    AutomationWorkflowProject,
-    AutomationWorkflowProjectApi,
+    AutomationProject,
+    AutomationProjectApi,
     ConnectedUserProjectWorkflow,
     ConnectedUserProjectWorkflowApi,
     Connection,
@@ -21,8 +21,8 @@ export const AutomationHubKeys = {
 };
 
 export const useGetTemplateProjectsQuery = () =>
-    useQuery<AutomationWorkflowProject[]>({
-        queryFn: () => new AutomationWorkflowProjectApi().getFrontendProjects({}),
+    useQuery<AutomationProject[]>({
+        queryFn: () => new AutomationProjectApi().getFrontendProjects({}),
         queryKey: AutomationHubKeys.templates,
     });
 

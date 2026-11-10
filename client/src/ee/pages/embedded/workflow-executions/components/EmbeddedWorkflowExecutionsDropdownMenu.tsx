@@ -7,7 +7,7 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import {WorkflowExecutionKeys as EmbeddedWorkflowExecutionKeys} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
 import {useStopJobMutation} from '@/shared/mutations/platform/jobs.mutations';
-import {WorkflowExecutionKeys as AutomationWorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
+import {WorkflowExecutionKeys as AutomationExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {CircleStopIcon, EllipsisVerticalIcon, ViewIcon} from 'lucide-react';
 import {toast} from 'sonner';
@@ -34,7 +34,7 @@ const EmbeddedWorkflowExecutionsDropdownMenu = ({
             });
 
             void queryClient.invalidateQueries({
-                queryKey: AutomationWorkflowExecutionKeys.workflowExecutions,
+                queryKey: AutomationExecutionKeys.workflowExecutions,
             });
         },
     });

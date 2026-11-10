@@ -20,10 +20,7 @@ import TemplateGridSection, {
     CatalogLayoutType,
 } from '@/ee/pages/embedded/automation-hub/views/components/TemplateGridSection';
 import {getEmbedCredentials} from '@/ee/pages/embedded/shared/embedCredentials';
-import {
-    AutomationWorkflowProjectWorkflowTemplate,
-    ConnectedUserProjectWorkflow,
-} from '@/ee/shared/middleware/embedded/public';
+import {AutomationProjectWorkflowTemplate, ConnectedUserProjectWorkflow} from '@/ee/shared/middleware/embedded/public';
 import {ActivationDialog} from '@bytechef/embedded';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useMemo, useState} from 'react';
@@ -39,11 +36,11 @@ const readStoredLayout = (): string | undefined => {
 };
 
 interface AutomationsViewProps {
-    onActivate?: (template: AutomationWorkflowProjectWorkflowTemplate) => void;
+    onActivate?: (template: AutomationProjectWorkflowTemplate) => void;
 }
 
 const AutomationsView = ({onActivate}: AutomationsViewProps) => {
-    const [activeTemplate, setActiveTemplate] = useState<AutomationWorkflowProjectWorkflowTemplate>();
+    const [activeTemplate, setActiveTemplate] = useState<AutomationProjectWorkflowTemplate>();
     const [storedLayout, setStoredLayout] = useState<CatalogLayoutType | undefined>(
         () => readStoredLayout() as CatalogLayoutType | undefined
     );
@@ -101,7 +98,7 @@ const AutomationsView = ({onActivate}: AutomationsViewProps) => {
 
         for (const automation of automations || []) {
             const templateId =
-                automation.kind === 'REFERENCE' ? automation.automationWorkflowUuid : automation.copiedFromWorkflowUuid;
+                automation.kind === 'REFERENCE' ? automation.automationUuid : automation.copiedFromWorkflowUuid;
 
             if (!templateId || automation.dangling || !publishedTemplateIds.has(templateId)) {
                 unmatched.push(automation);
@@ -137,7 +134,7 @@ const AutomationsView = ({onActivate}: AutomationsViewProps) => {
         });
     };
 
-    const handleUseTemplate = (template: AutomationWorkflowProjectWorkflowTemplate) => {
+    const handleUseTemplate = (template: AutomationProjectWorkflowTemplate) => {
         if (onActivate) {
             onActivate(template);
 

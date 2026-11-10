@@ -57,9 +57,9 @@ const createWorkflowTemplate = (workflowUuid: string): ConnectedUserWorkflowTemp
 const createConnectedUserProjectWorkflow = (
     id: string,
     label: string,
-    sourceWorkflowUuids: {automationWorkflowUuid?: string; copiedFromWorkflowUuid?: string} = {}
+    sourceWorkflowUuids: {automationUuid?: string; copiedFromWorkflowUuid?: string} = {}
 ): ConnectedUserProjectWorkflowType => ({
-    automationWorkflowUuid: sourceWorkflowUuids.automationWorkflowUuid ?? null,
+    automationUuid: sourceWorkflowUuids.automationUuid ?? null,
     connectedUserId: '1050',
     copiedFromWorkflowUuid: sourceWorkflowUuids.copiedFromWorkflowUuid ?? null,
     enabled: true,
@@ -104,7 +104,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                     },
                     {
                         ...createConnectedUserProjectWorkflow('3', 'Greet on Request', {
-                            automationWorkflowUuid: 'template-greeting',
+                            automationUuid: 'template-greeting',
                         }),
                         projectId: '10',
                     },
@@ -146,7 +146,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                 connectedUserProjectWorkflows={[
                     {
                         ...createConnectedUserProjectWorkflow('1', 'Greet on Request', {
-                            automationWorkflowUuid: 'template-greeting',
+                            automationUuid: 'template-greeting',
                         }),
                         lastExecutionDate: '2026-10-28T10:00:00Z',
                     },
@@ -204,7 +204,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                 connectedUserProjectWorkflows={[
                     {
                         ...createConnectedUserProjectWorkflow('1', 'Greet on Request', {
-                            automationWorkflowUuid: 'template-greeting',
+                            automationUuid: 'template-greeting',
                         }),
                         projectId: '10',
                     },
@@ -250,13 +250,13 @@ describe('ConnectedUserProjectWorkflowList', () => {
                 connectedUserProjectWorkflows={[
                     {
                         ...createConnectedUserProjectWorkflow('1', 'First Workflow', {
-                            automationWorkflowUuid: 'template-first',
+                            automationUuid: 'template-first',
                         }),
                         projectId: '10',
                     },
                     {
                         ...createConnectedUserProjectWorkflow('2', 'Second Workflow', {
-                            automationWorkflowUuid: 'template-second',
+                            automationUuid: 'template-second',
                         }),
                         projectId: '20',
                     },

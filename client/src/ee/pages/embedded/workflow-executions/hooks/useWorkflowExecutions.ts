@@ -7,10 +7,10 @@ import {
     WorkflowExecutionApi as EmbeddedWorkflowExecutionApi,
 } from '@/ee/shared/middleware/embedded/workflow/execution';
 import {WorkflowExecutionKeys as EmbeddedWorkflowExecutionKeys} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
-import {WorkflowExecutionApi as AutomationWorkflowExecutionApi} from '@/shared/middleware/automation/workflow/execution';
+import {WorkflowExecutionApi as AutomationExecutionApi} from '@/shared/middleware/automation/workflow/execution';
 import {useConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
 import {Page} from '@/shared/middleware/platform/workflow/execution';
-import {WorkflowExecutionKeys as AutomationWorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
+import {WorkflowExecutionKeys as AutomationExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useQuery} from '@tanstack/react-query';
 import {useCallback, useMemo} from 'react';
 
@@ -65,8 +65,8 @@ export const useWorkflowExecutions = (
         if (source === WorkflowExecutionsSource.Automations) {
             return {
                 queryFn: (): Promise<Page> =>
-                    new AutomationWorkflowExecutionApi().getWorkflowExecutionsPage({...request, embedded: true}),
-                queryKey: AutomationWorkflowExecutionKeys.filteredWorkflowExecutions({...request, embedded: true}),
+                    new AutomationExecutionApi().getWorkflowExecutionsPage({...request, embedded: true}),
+                queryKey: AutomationExecutionKeys.filteredWorkflowExecutions({...request, embedded: true}),
             };
         }
 

@@ -1,0 +1,80 @@
+import Button from '@/components/Button/Button';
+import EmptyList from '@/components/EmptyList';
+import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
+import {AutomationProjectsQuery} from '@/shared/middleware/graphql';
+import {WorkflowIcon} from 'lucide-react';
+import {useState} from 'react';
+
+import AutomationProjectWorkflowListItem from './AutomationProjectWorkflowListItem';
+
+type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
+type AutomationProjectWorkflowTemplateType =
+    AutomationProjectsQuery['automationProjects'][number]['workflowTemplates'][number];
+
+interface AutomationProjectWorkflowListProps {
+    onCreateWorkflow: (projectId: string) => void;
+    onDeleteWorkflow: (workflowUuid: string) => void;
+    onEditWorkflow: (workflow: AutomationProjectWorkflowTemplateType) => void;
+    onSelectWorkflow: (workflowUuid: string) => void;
+    project: AutomationProjectType;
+}
+
+const AutomationProjectWorkflowList = ({
+    onCreateWorkflow,
+    onDeleteWorkflow,
+    onEditWorkflow,
+    onSelectWorkflow,
+    project,
+}: AutomationProjectWorkflowListProps) => {
+    const [workflowUuidToDelete, setWorkflowUuidToDelete] = useState<string | null>(null);
+
+    const workflows = [...project.workflowTemplates].sort((firstWorkflow, secondWorkflow) =>
+        (firstWorkflow.label || firstWorkflow.workflowUuid).localeCompare(
+            secondWorkflow.label || secondWorkflow.workflowUuid
+        )
+    );
+
+    return (
+        <div className="pt-3">
+            {workflows.length > 0 ? (
+                <>
+                    <h3 className="flex justify-start pl-3 text-sm heading-tertiary">Workflows</h3>
+
+                    <ul className="divide-y divide-stroke-neutral-primary">
+                        {workflows.map((workflow) => (
+                            <AutomationProjectWorkflowListItem
+                                key={workflow.workflowUuid}
+                                onDeleteWorkflow={setWorkflowUuidToDelete}
+                                onEditWorkflow={onEditWorkflow}
+                                onSelectWorkflow={onSelectWorkflow}
+                                workflow={workflow}
+                            />
+                        ))}
+                    </ul>
+                </>
+            ) : (
+                <div className="flex justify-center py-8">
+                    <EmptyList
+                        button={<Button label="Create Workflow" onClick={() => onCreateWorkflow(project.id)} />}
+                        icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
+                        message="Get started by creating a new workflow."
+                        title="No Workflows"
+                    />
+                </div>
+            )}
+
+            {workflowUuidToDelete !== null && (
+                <DeleteWorkflowAlertDialog
+                    onClose={() => setWorkflowUuidToDelete(null)}
+                    onDelete={() => {
+                        onDeleteWorkflow(workflowUuidToDelete);
+
+                        setWorkflowUuidToDelete(null);
+                    }}
+                />
+            )}
+        </div>
+    );
+};
+
+export default AutomationProjectWorkflowList;
