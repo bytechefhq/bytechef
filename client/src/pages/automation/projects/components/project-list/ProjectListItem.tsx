@@ -45,6 +45,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
+    ArrowRightIcon,
     ChevronDownIcon,
     CopyIcon,
     DownloadIcon,
@@ -61,7 +62,7 @@ import {
     WorkflowIcon,
 } from 'lucide-react';
 import {MouseEvent, ReactNode, Suspense, lazy, useCallback, useRef, useState} from 'react';
-import {Link, useNavigate, useSearchParams} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
 import TagList from '../../../../../shared/components/TagList';
@@ -241,6 +242,14 @@ const ProjectListItem = ({
         void projectDeploymentsQuery.refetch();
     };
 
+    const handleOpenProjectClick = (event: MouseEvent) => {
+        event.stopPropagation();
+
+        void navigate(
+            `/automation/projects/${project.id}/project-workflows/${project.projectWorkflowIds![0]}?${searchParams}`
+        );
+    };
+
     const handleProjectListItemClick = useCallback(
         (event: MouseEvent) => {
             if (showProjectDeploymentDialog) {
@@ -249,13 +258,7 @@ const ProjectListItem = ({
 
             const target = event.target as HTMLElement;
 
-            if (!event.currentTarget.contains(target)) {
-                return;
-            }
-
             const interactiveSelectors = [
-                'a',
-                'button:not([data-slot="tooltip-trigger"])',
                 '[data-interactive]',
                 '[role="menu"]',
                 '[data-radix-dropdown-menu-item]',
@@ -267,26 +270,9 @@ const ProjectListItem = ({
                 return;
             }
 
-            if (hasWorkflows) {
-                void navigate(
-                    `/automation/projects/${project.id}/project-workflows/${project.projectWorkflowIds![0]}?${searchParams}`
-                );
-
-                return;
-            }
-
             onTabChange(activeTab ? undefined : 'workflows');
         },
-        [
-            activeTab,
-            hasWorkflows,
-            navigate,
-            onTabChange,
-            project.id,
-            project.projectWorkflowIds,
-            searchParams,
-            showProjectDeploymentDialog,
-        ]
+        [activeTab, onTabChange, showProjectDeploymentDialog]
     );
 
     return (
@@ -306,24 +292,7 @@ const ProjectListItem = ({
                         data-testid="project-item"
                     >
                         <div className="flex items-center gap-2">
-                            {project.projectWorkflowIds && project.projectWorkflowIds.length > 0 ? (
-                                <Link
-                                    onClick={(event) => event.stopPropagation()}
-                                    to={`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}?${searchParams}`}
-                                >
-                                    {project.description ? (
-                                        <Tooltip>
-                                            <TooltipTrigger>
-                                                <span className="text-base font-semibold">{project.name}</span>
-                                            </TooltipTrigger>
-
-                                            <TooltipContent>{project.description}</TooltipContent>
-                                        </Tooltip>
-                                    ) : (
-                                        <span className="text-base font-semibold">{project.name}</span>
-                                    )}
-                                </Link>
-                            ) : project.description ? (
+                            {project.description ? (
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <span className="text-base font-semibold">{project.name}</span>
@@ -412,6 +381,17 @@ const ProjectListItem = ({
                                 <TooltipContent side="left">Last Published Date</TooltipContent>
                             </Tooltip>
                         </div>
+
+                        <Button
+                            aria-label="Open Project"
+                            data-interactive
+                            disabled={!hasWorkflows}
+                            icon={<ArrowRightIcon />}
+                            label="Open"
+                            onClick={handleOpenProjectClick}
+                            size="sm"
+                            variant="outline"
+                        />
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
