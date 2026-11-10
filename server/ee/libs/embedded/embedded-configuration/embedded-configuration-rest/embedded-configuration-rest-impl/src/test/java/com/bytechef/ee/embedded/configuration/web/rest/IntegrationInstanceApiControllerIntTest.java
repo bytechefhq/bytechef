@@ -9,7 +9,9 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,13 +43,17 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.web.rest.error.GlobalResponseEntityExceptionHandler;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -61,6 +67,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
+@Import(GlobalResponseEntityExceptionHandler.class)
 @WebMvcTest({
     IntegrationInstanceApiController.class, IntegrationInstanceConfigurationApiController.class
 })
@@ -119,6 +126,85 @@ class IntegrationInstanceApiControllerIntTest {
         this.webTestClient = MockMvcWebTestClient
             .bindTo(mockMvc)
             .build();
+    }
+
+    @Test
+    void testGetIntegrationInstanceConnectionObfuscatesTheCredentials() {
+        String rawToken = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGH";
+
+        when(integrationInstanceAdminFacade.getIntegrationInstanceConnection(7L))
+            .thenReturn(
+                ConnectionDTO.builder()
+                    .authorizationParameters(Map.of("token", rawToken))
+                    .componentName("slack")
+                    .id(11L)
+                    .name("name")
+                    .parameters(Map.of("key1", "value1"))
+                    .version(1)
+                    .build());
+
+        this.webTestClient
+            .get()
+            .uri("/internal/integration-instances/7/connection")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.id")
+            .isEqualTo(11)
+            .jsonPath("$.authorizationParameters.token")
+            .value(token -> assertThat(token).isNotEqualTo(rawToken))
+            .jsonPath("$.parameters")
+            .doesNotExist();
+    }
+
+    @Test
+    void testGetIntegrationInstanceConnectionAnswersNotFoundForAnUnknownOrSelfActivatedInstance() {
+        when(integrationInstanceAdminFacade.getIntegrationInstanceConnection(8L))
+            .thenThrow(new NoSuchElementException("Integration instance id=8 not found"));
+
+        this.webTestClient
+            .get()
+            .uri("/internal/integration-instances/8/connection")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isNotFound();
+    }
+
+    @Test
+    void testPutIntegrationInstanceCredentials() {
+        this.webTestClient
+            .put()
+            .uri("/internal/integration-instances/7/connection/credentials")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(
+                """
+                    {"parameters":{"token":"new"},"version":3}""")
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(integrationInstanceAdminFacade).updateIntegrationInstanceCredentials(7L, Map.of("token", "new"), 3);
+    }
+
+    @Test
+    void testPutIntegrationInstanceCredentialsAnswersNotFoundForAnUnknownOrSelfActivatedInstance() {
+        doThrow(new NoSuchElementException("Integration instance id=8 not found"))
+            .when(integrationInstanceAdminFacade)
+            .updateIntegrationInstanceCredentials(eq(8L), any(), anyInt());
+
+        this.webTestClient
+            .put()
+            .uri("/internal/integration-instances/8/connection/credentials")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(
+                """
+                    {"parameters":{"token":"new"},"version":3}""")
+            .exchange()
+            .expectStatus()
+            .isNotFound();
     }
 
     @Test

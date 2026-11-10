@@ -13,16 +13,19 @@ import com.bytechef.ee.embedded.configuration.dto.ProvisionIntegrationInstanceWo
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceAdminFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionIntegrationInstanceRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionIntegrationInstanceWorkflowModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionableIntegrationInstanceConfigurationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ProvisionableIntegrationModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionCredentialsRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -86,6 +89,17 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     }
 
     @Override
+    public ResponseEntity<ConnectionModel> getIntegrationInstanceConnection(Long id) {
+        ConnectionModel connectionModel = Validate.notNull(
+            conversionService.convert(
+                integrationInstanceAdminFacade.getIntegrationInstanceConnection(Validate.notNull(id, "id")),
+                ConnectionModel.class),
+            "connectionModel");
+
+        return ResponseEntity.ok(ConnectionModelObfuscator.obfuscate(connectionModel));
+    }
+
+    @Override
     public ResponseEntity<List<ProvisionableIntegrationModel>> getProvisionableIntegrations(Long connectedUserId) {
         return ResponseEntity.ok(
             integrationInstanceAdminFacade.getProvisionableIntegrations(connectedUserId)
@@ -118,6 +132,18 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
             integrationInstanceAdminFacade.provisionIntegrationInstance(
                 connectedUserId, provisionIntegrationInstanceRequestModel.getIntegrationInstanceConfigurationId(),
                 connectionParameters, workflows));
+    }
+
+    @Override
+    public ResponseEntity<Void> updateIntegrationInstanceCredentials(
+        Long id, UpdateConnectionCredentialsRequestModel updateConnectionCredentialsRequestModel) {
+
+        integrationInstanceAdminFacade.updateIntegrationInstanceCredentials(
+            id, updateConnectionCredentialsRequestModel.getParameters(),
+            Objects.requireNonNull(updateConnectionCredentialsRequestModel.getVersion()));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     private ProvisionableIntegrationModel toProvisionableIntegrationModel(

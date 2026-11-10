@@ -25,9 +25,12 @@ import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,24 +66,29 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     private final ConnectedUserService connectedUserService;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionFacade connectionFacade;
+    private final ConnectionService connectionService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
+    private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserConnectionFacadeImpl(
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserConnectionService connectedUserConnectionService, ConnectedUserService connectedUserService,
         ConnectionDefinitionService connectionDefinitionService, ConnectionFacade connectionFacade,
+        ConnectionService connectionService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
-        IntegrationInstanceService integrationInstanceService) {
+        IntegrationInstanceService integrationInstanceService, TagService tagService) {
 
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectedUserService = connectedUserService;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionFacade = connectionFacade;
+        this.connectionService = connectionService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
+        this.tagService = tagService;
     }
 
     @Override
@@ -112,6 +120,10 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
 
         connectedUserConnectionService.create(connectedUserId, connectionId, SecurityUtils.getCurrentUserLogin());
 
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        connectionService.updateCreatedBy(connectionId, connectedUser.getExternalId());
+
         return connectionId;
     }
 
@@ -127,6 +139,20 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         connectedUserConnectionService.deleteByConnectionId(connectionId);
 
         connectionFacade.delete(connectionId);
+    }
+
+    @Override
+    @PreAuthorize("isCurrentConnectedUser(#connectedUserId)")
+    public List<Tag> getConnectedUserConnectionTags(long connectedUserId) {
+        Set<Long> ownedConnectionIds = getOwnedConnectionIds(connectedUserId);
+
+        List<Long> tagIds = connectionService.getConnections(new ArrayList<>(ownedConnectionIds))
+            .stream()
+            .flatMap(connection -> CollectionUtils.stream(connection.getTagIds()))
+            .distinct()
+            .toList();
+
+        return tagService.getTags(tagIds);
     }
 
     @Override
@@ -223,6 +249,27 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
+    @PreAuthorize("isCurrentConnectedUser(#connectedUserId)")
+    public void updateConnectedUserConnectionTags(long connectedUserId, long connectionId, List<Tag> tags) {
+        requireOwned(connectedUserId, connectionId);
+
+        connectionFacade.update(connectionId, tags);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public void updateIntegrationInstanceConnectionCredentials(
+        long connectedUserId, long connectionId, Map<String, ?> parameters, int version) {
+
+        requireProvisionedIntegrationInstanceConnection(connectedUserId, connectionId);
+
+        ConnectionDTO connectionDTO = requireOwned(connectedUserId, connectionId);
+
+        connectionFacade.updateCredentials(
+            connectionId, withIntegrationCredentials(connectedUserId, connectionDTO, parameters), version);
+    }
+
+    @Override
     public Set<Long> getOwnedConnectionIds(long connectedUserId) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -241,6 +288,21 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     @Override
     public Set<Long> getSharedConnectionIds() {
         return connectedUserConnectionService.getSharedConnectionIds();
+    }
+
+    private void requireProvisionedIntegrationInstanceConnection(long connectedUserId, long connectionId) {
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        List<IntegrationInstance> integrationInstances = integrationInstanceService
+            .getConnectedUserIntegrationInstances(connectedUserId, connectedUser.getEnvironment());
+
+        boolean provisioned = integrationInstances.stream()
+            .anyMatch(integrationInstance -> integrationInstance.getConnectionId() == connectionId &&
+                integrationInstance.getProvisionedBy() != null);
+
+        if (!provisioned) {
+            throw new NoSuchElementException("Connection id=%s not found".formatted(connectionId));
+        }
     }
 
     private ConnectionDTO requireOwned(long connectedUserId, long connectionId) {

@@ -85,6 +85,8 @@ import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -95,12 +97,14 @@ import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -758,6 +762,116 @@ class ConnectedUserConnectionFacadeIntTest {
     }
 
     @Test
+    void testUpdateIntegrationInstanceCredentialsKeepsConfigurationParameters() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createIntegrationInstance(
+            connectedUserId, 83731L, Environment.PRODUCTION,
+            Map.of("clientId", "app-id", "clientSecret", "app-secret"), "admin@localhost.com");
+        stubOwnedConnectionDTOs(List.of(83731L));
+
+        ConnectionDefinition connectionDefinition = new ConnectionDefinition(
+            ComponentDsl.connection()
+                .authorizations(
+                    ComponentDsl.authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                        .properties(
+                            ComponentDsl.string("clientId"), ComponentDsl.string("clientSecret"),
+                            ComponentDsl.string("token"))),
+            "componentName", "Component", null);
+
+        when(connectionDefinitionService.getConnectionConnectionDefinition(any(), anyInt()))
+            .thenReturn(connectionDefinition);
+
+        connectedUserConnectionFacade.updateIntegrationInstanceConnectionCredentials(
+            connectedUserId, 83731L, Map.of("token", "new"), 6);
+
+        verify(connectionFacade).updateCredentials(
+            83731L, Map.of("clientId", "app-id", "clientSecret", "app-secret", "token", "new"), 6);
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceCredentialsRejectsForeignConnection() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createOwnership(connectedUserId, List.of(83741L), List.of());
+        stubOwnedConnectionDTOs(List.of(83741L));
+
+        Map<String, Object> parameters = Map.of("token", "new");
+
+        assertThrows(
+            NoSuchElementException.class,
+            () -> connectedUserConnectionFacade.updateIntegrationInstanceConnectionCredentials(
+                connectedUserId, 83749L, parameters, 0));
+
+        verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceCredentialsRejectsSelfActivatedInstanceConnection() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createIntegrationInstance(connectedUserId, 83751L, Environment.PRODUCTION);
+        stubOwnedConnectionDTOs(List.of(83751L));
+
+        Map<String, Object> parameters = Map.of("token", "new");
+
+        assertThrows(
+            NoSuchElementException.class,
+            () -> connectedUserConnectionFacade.updateIntegrationInstanceConnectionCredentials(
+                connectedUserId, 83751L, parameters, 0));
+
+        verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+    }
+
+    @Test
+    void testUpdateIntegrationInstanceCredentialsRejectsConnectionNotBackingAnInstance() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        registerConnection(83761L, Environment.PRODUCTION, PlatformType.EMBEDDED);
+
+        connectedUserConnectionService.create(connectedUserId, 83761L, "admin@localhost.com");
+
+        stubOwnedConnectionDTOs(List.of(83761L));
+
+        Map<String, Object> parameters = Map.of("token", "new");
+
+        assertThrows(
+            NoSuchElementException.class,
+            () -> connectedUserConnectionFacade.updateIntegrationInstanceConnectionCredentials(
+                connectedUserId, 83761L, parameters, 0));
+
+        verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+    }
+
+    @Test
+    void testGetConnectedUserConnectionsForAdminStripsSelfActivatedInstanceCredentials() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createIntegrationInstance(connectedUserId, 84041L, Environment.PRODUCTION);
+        createProvisionedIntegrationInstance(connectedUserId, 84042L, Environment.PRODUCTION);
+
+        stubConnectionsWithCredentials();
+
+        List<ConnectionDTO> connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(
+            connectedUserId, null, List.of());
+
+        assertThat(connectionDTOs)
+            .extracting(ConnectionDTO::id)
+            .containsExactlyInAnyOrder(84041L, 84042L);
+
+        for (ConnectionDTO connectionDTO : connectionDTOs) {
+            if (Objects.equals(connectionDTO.id(), 84041L)) {
+                assertThat(connectionDTO.authorizationParameters()).isNull();
+                assertThat(connectionDTO.baseUri()).isNull();
+                assertThat(connectionDTO.connectionParameters()).isNull();
+                assertThat(connectionDTO.parameters()).isNull();
+            } else {
+                assertThat(connectionDTO.authorizationParameters()).isEqualTo(Map.of("secret", "value"));
+            }
+        }
+    }
+
+    @Test
     void testReauthorizeRejectsForeignId() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
 
@@ -836,6 +950,13 @@ class ConnectedUserConnectionFacadeIntTest {
     private void createIntegrationInstance(
         long connectedUserId, long connectionId, Environment environment, Map<String, ?> connectionParameters) {
 
+        createIntegrationInstance(connectedUserId, connectionId, environment, connectionParameters, null);
+    }
+
+    private void createIntegrationInstance(
+        long connectedUserId, long connectionId, Environment environment, Map<String, ?> connectionParameters,
+        @Nullable String provisionedBy) {
+
         registerConnection(connectionId, environment, PlatformType.EMBEDDED);
 
         String componentName = "integration-" + UUID.randomUUID();
@@ -858,36 +979,14 @@ class ConnectedUserConnectionFacadeIntTest {
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
             integrationInstanceConfiguration);
 
-        integrationInstanceService.create(connectedUserId, connectionId, integrationInstanceConfiguration.getId());
+        integrationInstanceService.create(
+            connectedUserId, connectionId, integrationInstanceConfiguration.getId(), provisionedBy);
     }
 
     private void createProvisionedIntegrationInstance(
         long connectedUserId, long connectionId, Environment environment) {
 
-        registerConnection(connectionId, environment, PlatformType.EMBEDDED);
-
-        String componentName = "integration-" + UUID.randomUUID();
-
-        Integration integration = new Integration();
-
-        integration.setComponentName(componentName);
-        integration.setName(componentName);
-
-        integration = integrationService.create(integration);
-
-        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
-
-        integrationInstanceConfiguration.setConnectionParameters(Map.of());
-        integrationInstanceConfiguration.setEnvironment(environment);
-        integrationInstanceConfiguration.setIntegrationId(integration.getId());
-        integrationInstanceConfiguration.setIntegrationVersion(1);
-        integrationInstanceConfiguration.setName(componentName);
-
-        integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
-            integrationInstanceConfiguration);
-
-        integrationInstanceService.create(
-            connectedUserId, connectionId, integrationInstanceConfiguration.getId(), "admin@localhost.com");
+        createIntegrationInstance(connectedUserId, connectionId, environment, Map.of(), "admin@localhost.com");
     }
 
     private void stubConnectionsWithCredentials() {
@@ -1001,6 +1100,9 @@ class ConnectedUserConnectionFacadeIntTest {
 
         @Autowired
         private PermissionService permissionService;
+
+        @Autowired
+        private TagService tagService;
 
         private long connectedUserADevelopmentId;
         private long connectedUserAId;
@@ -1171,6 +1273,32 @@ class ConnectedUserConnectionFacadeIntTest {
         }
 
         @Test
+        void testCreateConnectedUserConnectionAsAdminHandsTheConnectionToTheConnectedUser() {
+            authenticate(createTenantAdminAuthentication());
+
+            when(connectionFacade.create(any(ConnectionDTO.class), eq(PlatformType.EMBEDDED)))
+                .thenReturn(PROVISIONED_CONNECTION_ID);
+
+            connectedUserConnectionFacade.createConnectedUserConnectionAsAdmin(connectedUserBId, connectionDTO());
+
+            verify(connectionService).updateCreatedBy(PROVISIONED_CONNECTION_ID, externalUserBId);
+
+            assertThat(getProvisionedBy(PROVISIONED_CONNECTION_ID)).isEqualTo("admin@localhost.com");
+        }
+
+        @Test
+        void testCreateConnectedUserConnectionLeavesCreatedByToTheConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            when(connectionFacade.create(any(ConnectionDTO.class), eq(PlatformType.EMBEDDED)))
+                .thenReturn(SELF_CREATED_CONNECTION_ID);
+
+            connectedUserConnectionFacade.createConnectedUserConnection(connectedUserAId, connectionDTO());
+
+            verify(connectionService, never()).updateCreatedBy(anyLong(), any());
+        }
+
+        @Test
         void testCreateConnectedUserConnectionAsAdminDeniesConnectedUser() {
             authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
 
@@ -1314,6 +1442,25 @@ class ConnectedUserConnectionFacadeIntTest {
         }
 
         @Test
+        void testUpdateIntegrationInstanceConnectionCredentialsDeniesConnectedUserAndNonAdmin() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.updateIntegrationInstanceConnectionCredentials(
+                    connectedUserAId, CONNECTED_USER_A_CONNECTION_ID, Map.of("token", "new"), 0))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            authenticate(createRegularUserAuthentication());
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.updateIntegrationInstanceConnectionCredentials(
+                    connectedUserAId, CONNECTED_USER_A_CONNECTION_ID, Map.of("token", "new"), 0))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+        }
+
+        @Test
         void testReauthorizeConnectedUserConnectionAllowsConnectedUserOnOwnConnectedUser() {
             authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
 
@@ -1360,6 +1507,101 @@ class ConnectedUserConnectionFacadeIntTest {
                     .isInstanceOf(AccessDeniedException.class);
 
             verify(connectedUserService, never()).getConnectedUser(externalUserBId, Environment.PRODUCTION);
+        }
+
+        @Test
+        void testGetConnectedUserConnectionTagsListsOnlyTheConnectedUsersOwnConnectionTags() {
+            long sharedConnectionId = 91045L;
+
+            stubSharedConnections(Environment.PRODUCTION, sharedConnectionId);
+
+            Tag zetaTag = tagService.create(new Tag("zeta-" + UUID.randomUUID()));
+            Tag alphaTag = tagService.create(new Tag("alpha-" + UUID.randomUUID()));
+            Tag otherUserTag = tagService.create(new Tag("other-" + UUID.randomUUID()));
+            Tag sharedTag = tagService.create(new Tag("shared-" + UUID.randomUUID()));
+
+            setTagIds(CONNECTED_USER_A_CONNECTION_ID, zetaTag, alphaTag);
+            setTagIds(CONNECTED_USER_B_CONNECTION_ID, otherUserTag);
+            setTagIds(sharedConnectionId, sharedTag);
+
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThat(connectedUserConnectionFacade.getConnectedUserConnectionTags(connectedUserAId))
+                .extracting(Tag::getName)
+                .containsExactly(alphaTag.getName(), zetaTag.getName());
+        }
+
+        @Test
+        void testGetConnectedUserConnectionTagsDeniesConnectedUserOnAnotherConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(() -> connectedUserConnectionFacade.getConnectedUserConnectionTags(connectedUserBId))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateConnectedUserConnectionTagsUpdatesTheConnectedUsersOwnConnection() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            List<Tag> tags = List.of(new Tag("tag1"));
+
+            connectedUserConnectionFacade.updateConnectedUserConnectionTags(
+                connectedUserAId, CONNECTED_USER_A_CONNECTION_ID, tags);
+
+            verify(connectionFacade).update(CONNECTED_USER_A_CONNECTION_ID, tags);
+        }
+
+        @Test
+        void testUpdateConnectedUserConnectionTagsRejectsAConnectionTheConnectedUserDoesNotOwn() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.updateConnectedUserConnectionTags(
+                    connectedUserAId, CONNECTED_USER_B_CONNECTION_ID, List.of(new Tag("tag1"))))
+                        .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).update(anyLong(), anyList());
+        }
+
+        @Test
+        void testUpdateConnectedUserConnectionTagsDeniesConnectedUserOnAnotherConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.updateConnectedUserConnectionTags(
+                    connectedUserBId, CONNECTED_USER_B_CONNECTION_ID, List.of(new Tag("tag1"))))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).update(anyLong(), anyList());
+        }
+
+        @Test
+        void testGetConnectedUserConnectionTagsDeniesTenantAdmin() {
+            authenticate(createTenantAdminAuthentication());
+
+            assertThatThrownBy(() -> connectedUserConnectionFacade.getConnectedUserConnectionTags(connectedUserAId))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateConnectedUserConnectionTagsDeniesTenantAdmin() {
+            authenticate(createTenantAdminAuthentication());
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.updateConnectedUserConnectionTags(
+                    connectedUserAId, CONNECTED_USER_A_CONNECTION_ID, List.of(new Tag("tag1"))))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).update(anyLong(), anyList());
+        }
+
+        private void setTagIds(long connectionId, Tag... tags) {
+            Connection connection = connections.get(connectionId);
+
+            connection.setTagIds(
+                Arrays.stream(tags)
+                    .map(Tag::getId)
+                    .toList());
         }
 
         private String getProvisionedBy(long connectionId) {

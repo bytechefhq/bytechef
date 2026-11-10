@@ -10,14 +10,20 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.configuration.audit.AppEventAuditEvents;
 import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvents;
 import com.bytechef.ee.embedded.configuration.audit.WorkflowAuditEvents;
@@ -52,7 +58,14 @@ import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -115,7 +128,19 @@ class IntegrationFacadesAuditIntTest {
     private ConnectedUserService connectedUserService;
 
     @Autowired
+    private ConnectionDefinitionService connectionDefinitionService;
+
+    @Autowired
+    private ConnectionFacade connectionFacade;
+
+    @Autowired
+    private ConnectionService connectionService;
+
+    @Autowired
     private IntegrationFacade integrationFacade;
+
+    @Autowired
+    private IntegrationInstanceAdminFacade integrationInstanceAdminFacade;
 
     @Autowired
     private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
@@ -705,6 +730,93 @@ class IntegrationFacadesAuditIntTest {
                 .containsEntry("integrationInstanceConfigurationId", "7")
                 .doesNotContainKey("integrationInstanceId")
                 .doesNotContainValue("s3cr3t");
+        }
+
+        @Test
+        void testUpdateIntegrationInstanceCredentialsRecordsTheInstanceConnectionAndConnectedUser() {
+            long connectionId = 41L;
+
+            IntegrationInstance integrationInstance = integrationInstanceService.create(
+                CONNECTED_USER_ID, connectionId, createIntegrationInstanceConfiguration().getId(), ADMIN_LOGIN);
+
+            persistenceAuditEventRepository.deleteAll();
+
+            stubOwnedConnection(connectionId);
+
+            integrationInstanceAdminFacade.updateIntegrationInstanceCredentials(
+                integrationInstance.getId(), Map.of("token", "s3cr3t"), 2);
+
+            verify(connectionFacade).updateCredentials(eq(connectionId), any(), eq(2));
+
+            assertThat(
+                findSingleEvent(IntegrationAuditEvents.INTEGRATION_INSTANCE_CREDENTIALS_UPDATED).getData())
+                    .containsEntry("result", "SUCCESS")
+                    .containsEntry("integrationInstanceId", String.valueOf(integrationInstance.getId()))
+                    .containsEntry("connectionId", String.valueOf(connectionId))
+                    .containsEntry("connectedUserId", String.valueOf(CONNECTED_USER_ID))
+                    .doesNotContainKey("parameters")
+                    .doesNotContainValue("s3cr3t");
+        }
+
+        @Test
+        void testUpdateIntegrationInstanceCredentialsRecordsAFailureWhenTheCredentialsAreRejected() {
+            long connectionId = 42L;
+
+            IntegrationInstance integrationInstance = integrationInstanceService.create(
+                CONNECTED_USER_ID, connectionId, createIntegrationInstanceConfiguration().getId(), ADMIN_LOGIN);
+
+            persistenceAuditEventRepository.deleteAll();
+
+            stubOwnedConnection(connectionId);
+
+            doThrow(new ConfigurationException("rejected", ConnectionErrorType.INVALID_CONNECTION))
+                .when(connectionFacade)
+                .updateCredentials(eq(connectionId), any(), anyInt());
+
+            assertThatThrownBy(
+                () -> integrationInstanceAdminFacade.updateIntegrationInstanceCredentials(
+                    integrationInstance.getId(), Map.of("token", "s3cr3t"), 2))
+                        .isInstanceOf(ConfigurationException.class);
+
+            assertThat(
+                findSingleEvent(IntegrationAuditEvents.INTEGRATION_INSTANCE_CREDENTIALS_UPDATED).getData())
+                    .containsEntry("result", "ERROR")
+                    .containsEntry("integrationInstanceId", String.valueOf(integrationInstance.getId()))
+                    .containsEntry("connectionId", String.valueOf(connectionId))
+                    .containsEntry("connectedUserId", String.valueOf(CONNECTED_USER_ID))
+                    .doesNotContainValue("s3cr3t");
+        }
+
+        private void stubOwnedConnection(long connectionId) {
+            ConnectedUser connectedUser = mock(ConnectedUser.class);
+
+            when(connectedUser.getId()).thenReturn(CONNECTED_USER_ID);
+            when(connectedUser.getEnvironment()).thenReturn(Environment.STAGING);
+            when(connectedUserService.getConnectedUser(CONNECTED_USER_ID)).thenReturn(connectedUser);
+
+            Connection connection = new Connection();
+
+            connection.setEnvironmentId(Environment.STAGING.ordinal());
+            connection.setId(connectionId);
+            connection.setType(PlatformType.EMBEDDED);
+
+            when(connectionService.getConnections(anyList())).thenReturn(List.of(connection));
+            when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED)))
+                .thenReturn(
+                    List.of(
+                        ConnectionDTO.builder()
+                            .componentName("componentName")
+                            .connectionVersion(1)
+                            .id(connectionId)
+                            .build()));
+            when(connectionDefinitionService.getConnectionConnectionDefinition(any(), anyInt()))
+                .thenReturn(
+                    new ConnectionDefinition(
+                        ComponentDsl.connection()
+                            .authorizations(
+                                ComponentDsl.authorization(AuthorizationType.BEARER_TOKEN)
+                                    .properties(ComponentDsl.string("token"))),
+                        "componentName", "Component", null));
         }
 
         private IntegrationInstance createIntegrationInstance() {
