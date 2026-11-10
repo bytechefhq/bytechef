@@ -8,6 +8,9 @@ import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
+import deleteProperty from '../../../utils/deleteProperty';
+import {getPropertySaveOverride} from '../../../utils/propertySaveOverrides';
+import saveProperty from '../../../utils/saveProperty';
 import GraphTransitionPopover from './GraphTransitionPopover';
 
 const {recordedProperties, saveGraphTransitionsMock, taskDispatcherDefinitionQueryMock, updateWorkflowMutationMock} =
@@ -368,5 +371,95 @@ describe('GraphTransitionPopover', () => {
         expect(useWorkflowNodeDetailsPanelStore.getState().currentNode?.workflowNodeName).toBe('task_1');
         expect(screen.queryByTestId('condition-property')).not.toBeInTheDocument();
         expect(screen.getByText('Select a single transition to edit its condition.')).toBeInTheDocument();
+    });
+
+    it('saves a condition edit through the guarded graph queue, never as a by-index node parameter write', () => {
+        const transitions: GraphTransitionType[] = [
+            {from: 'task_1', to: 'task_2'},
+            {condition: '=x > 1', from: 'task_2', to: 'task_3'},
+        ];
+        const mutateAsync = vi.fn();
+
+        renderPopover({index: 1, transitions});
+
+        saveProperty({
+            path: 'transitions[1].condition',
+            type: 'STRING',
+            updateWorkflowNodeParameterMutation: {mutateAsync} as never,
+            value: '=x > 2',
+            workflowId: 'workflow-1',
+        });
+
+        expect(mutateAsync).not.toHaveBeenCalled();
+        expect(saveGraphTransitionsMock).toHaveBeenCalledTimes(1);
+        expect(applyLastSavedMutation(transitions)).toEqual([
+            {from: 'task_1', to: 'task_2'},
+            {condition: '=x > 2', from: 'task_2', to: 'task_3'},
+        ]);
+    });
+
+    it('drops a condition edit that runs after a delete shifted another transition into its index', () => {
+        const transitions: GraphTransitionType[] = [
+            {from: 'task_1', to: 'task_2'},
+            {condition: '=x > 1', from: 'task_2', to: 'task_3'},
+            {condition: '=y', from: 'task_3', to: 'task_1'},
+        ];
+
+        renderPopover({index: 1, transitions});
+
+        getPropertySaveOverride(GRAPH_ID, 'transitions[1].condition')!('=x > 2');
+
+        const transitionsAfterDelete = [transitions[0], transitions[2]];
+
+        expect(applyLastSavedMutation(transitionsAfterDelete)).toBe(transitionsAfterDelete);
+    });
+
+    it('keeps every keystroke of a condition typed faster than the saves land', () => {
+        const transitions: GraphTransitionType[] = [{condition: '=x', from: 'task_1', to: 'task_2'}];
+
+        renderPopover({transitions});
+
+        const saveCondition = getPropertySaveOverride(GRAPH_ID, 'transitions[0].condition')!;
+
+        saveCondition('=x1');
+        saveCondition('=x12');
+
+        const [[firstSave], [secondSave]] = saveGraphTransitionsMock.mock.calls as Array<
+            [{mutate: (currentTransitions: Array<GraphTransitionType>) => Array<GraphTransitionType>}]
+        >;
+
+        const transitionsAfterFirstSave = firstSave.mutate(transitions);
+
+        expect(transitionsAfterFirstSave).toEqual([{condition: '=x1', from: 'task_1', to: 'task_2'}]);
+        expect(secondSave.mutate(transitionsAfterFirstSave)).toEqual([
+            {condition: '=x12', from: 'task_1', to: 'task_2'},
+        ]);
+    });
+
+    it('saves an expression To and a cleared condition through the guarded graph queue', () => {
+        const transitions: GraphTransitionType[] = [{condition: '=x', from: 'task_1', to: 'task_2'}];
+        const deleteMutateAsync = vi.fn();
+
+        renderPopover({transitions});
+
+        getPropertySaveOverride(GRAPH_ID, 'transitions[0].to')!('=${next}');
+
+        expect(applyLastSavedMutation(transitions)).toEqual([{condition: '=x', from: 'task_1', to: '=${next}'}]);
+
+        deleteProperty('workflow-1', 'transitions[0].condition', {mutateAsync: deleteMutateAsync} as never);
+
+        expect(deleteMutateAsync).not.toHaveBeenCalled();
+        expect(applyLastSavedMutation(transitions)).toEqual([{condition: undefined, from: 'task_1', to: 'task_2'}]);
+    });
+
+    it('stops intercepting the transition paths once it closes', () => {
+        const {unmount} = renderPopover({transitions: [{from: 'task_1', to: 'task_2'}]});
+
+        expect(getPropertySaveOverride(GRAPH_ID, 'transitions[0].condition')).toBeDefined();
+
+        unmount();
+
+        expect(getPropertySaveOverride(GRAPH_ID, 'transitions[0].condition')).toBeUndefined();
+        expect(getPropertySaveOverride(GRAPH_ID, 'transitions[0].to')).toBeUndefined();
     });
 });
