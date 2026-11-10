@@ -32,11 +32,14 @@ public class QuickbooksConstants {
     public static final String ACTIVE = "active";
     public static final String ASSET_ACCOUNT_REF = "assetAccountRef";
     public static final String BASE = "base";
+    public static final String BILL = "bill";
     public static final String COMPANY_ID = "companyId";
     public static final String CUSTOMER = "customer";
     public static final String CUSTOMER_REF = "customerRef";
     public static final String DISPLAY_NAME = "displayName";
     public static final String DOMAIN = "domain";
+    public static final String DUE_DATE_FROM = "dueDateFrom";
+    public static final String DUE_DATE_TO = "dueDateTo";
     public static final String EXPENSE_ACCOUNT_REF = "expenseAccountRef";
     public static final String FAMILY_NAME = "familyName";
     public static final String FULLY_QUALIFIED_NAME = "fullyQualifiedName";
@@ -46,8 +49,10 @@ public class QuickbooksConstants {
     public static final String INVOICE = "invoice";
     public static final String INV_START_DATE = "invStartDate";
     public static final String ITEM = "item";
+    public static final String MAX_RESULTS = "maxResults";
     public static final String MIDDLE_NAME = "middleName";
     public static final String NAME = "name";
+    public static final String OPEN_BALANCE_ONLY = "openBalanceOnly";
     public static final String PAYMENT = "payment";
     public static final String QTY_ON_HAND = "qtyOnHand";
     public static final String SUFFIX = "suffix";
@@ -55,6 +60,26 @@ public class QuickbooksConstants {
     public static final String TOTAL_AMT = "totalAmt";
     public static final String TYPE = "type";
     public static final String VALUE = "value";
+    public static final String VENDOR_ID = "vendorId";
+
+    public static final ModifiableObjectProperty BILL_PROPERTY = object("Bill")
+        .properties(
+            string("domain"),
+            string("Id"),
+            string("DocNumber"),
+            string("TxnDate"),
+            string("DueDate"),
+            object("VendorRef")
+                .properties(
+                    string("name"),
+                    string("value")),
+            object("CurrencyRef")
+                .properties(
+                    string("name"),
+                    string("value")),
+            string("TotalAmt"),
+            string("Balance"),
+            string("PrivateNote"));
 
     public static final ModifiableObjectProperty CUSTOMER_OUTPUT_PROPERTY = object()
         .properties(
