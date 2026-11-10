@@ -133,7 +133,7 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
                 )}
             </div>
 
-            <div className="flex items-center gap-x-4">
+            <div className="flex items-center gap-x-3">
                 {lastExecutionDate ? (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
@@ -151,7 +151,6 @@ const AutomationWorkflowProjectConfigurationWorkflowListItem = ({
                 <Switch
                     aria-label={`Enable ${workflowLabel}`}
                     checked={workflow.enabled}
-                    className="mr-2"
                     disabled={enableWorkflowMutation.isPending}
                     onCheckedChange={(enable) =>
                         enableWorkflowMutation.mutate(
