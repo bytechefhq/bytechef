@@ -119,10 +119,8 @@ it('switches to another project from the title select', async () => {
     expect(screen.getByRole('menuitemradio', {name: 'Mailing'})).toHaveAttribute('data-state', 'checked');
     expect(screen.getByRole('menuitemradio', {name: 'Empty'})).toHaveAttribute('data-disabled');
 
-    expect(screen.getByRole('menuitemradio', {name: /Billing/})).toContainElement(
-        screen.getByRole('img', {name: 'Published V4'})
-    );
-    expect(screen.getAllByRole('img', {name: /Published/})).toHaveLength(1);
+    expect(screen.getByRole('menuitemradio', {name: /Billing/})).toContainElement(screen.getByText('Published V4'));
+    expect(screen.getAllByText(/Published/)).toHaveLength(1);
 
     await userEvent.click(screen.getByRole('menuitemradio', {name: /Billing/}));
 

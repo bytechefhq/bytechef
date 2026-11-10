@@ -114,7 +114,7 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
             return;
         }
 
-        navigate(
+        void navigate(
             `/embedded/integrations/${selectedIntegrationId}/integration-workflows/${firstIntegrationWorkflowId}?${searchParams}`
         );
     };

@@ -74,9 +74,9 @@ describe('BreadcrumbTitleSelect', () => {
         await userEvent.click(screen.getByLabelText('Item select'));
 
         expect(screen.getByRole('menuitemradio', {name: /Published/})).toContainElement(
-            screen.getByRole('img', {name: 'Published V3'})
+            screen.getByText('Published V3')
         );
-        expect(screen.getAllByRole('img', {name: /Published V/})).toHaveLength(1);
+        expect(screen.getAllByText(/Published V/)).toHaveLength(1);
     });
 
     it('calls the change handler with the selected item id', async () => {
