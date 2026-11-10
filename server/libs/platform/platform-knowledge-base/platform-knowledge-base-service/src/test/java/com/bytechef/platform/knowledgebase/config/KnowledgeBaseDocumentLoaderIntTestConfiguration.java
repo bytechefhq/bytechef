@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -45,6 +46,7 @@ import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -79,6 +81,7 @@ import tools.jackson.databind.json.JsonMapper;
     "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationAutoConfiguration",
     "org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration"
 })
+@EnableConfigurationProperties(ApplicationProperties.class)
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class KnowledgeBaseDocumentLoaderIntTestConfiguration {
