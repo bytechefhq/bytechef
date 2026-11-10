@@ -19,8 +19,8 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, Share2Icon} from 'lucide-react';
-import {useState} from 'react';
-import {Link, useSearchParams} from 'react-router-dom';
+import {MouseEvent, useState} from 'react';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
 const ProjectWorkflowListItem = ({
@@ -47,6 +47,8 @@ const ProjectWorkflowListItem = ({
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.workflows);
 
     const [searchParams] = useSearchParams();
+
+    const navigate = useNavigate();
 
     const queryClient = useQueryClient();
 
@@ -91,16 +93,35 @@ const ProjectWorkflowListItem = ({
         },
     });
 
+    const workflowUrl = `/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}?${searchParams}`;
+
+    const handleWorkflowListItemClick = (event: MouseEvent<HTMLLIElement>) => {
+        const target = event.target as HTMLElement;
+
+        // Clicks inside portaled dialogs and menus bubble through React but are not DOM descendants of the row.
+        if (!event.currentTarget.contains(target)) {
+            return;
+        }
+
+        if (target.closest('a, button:not([data-slot="tooltip-trigger"]), [role="menu"], [role="menuitem"]')) {
+            return;
+        }
+
+        void navigate(workflowUrl);
+    };
+
     return (
         <li
-            className="flex items-center justify-between rounded-md py-1 pl-3 hover:bg-surface-neutral-primary-hover"
+            className="flex cursor-pointer items-center justify-between rounded-md py-1 pl-3 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
+            onClick={handleWorkflowListItemClick}
+            role="presentation"
         >
             <Link
                 aria-label={`Link to workflow ${workflow.label}`}
                 className="flex min-w-0 flex-1 items-center gap-2"
                 data-testid={`${workflow.projectWorkflowId}-link`}
-                to={`/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}?${searchParams}`}
+                to={workflowUrl}
             >
                 <div className="flex w-80 min-w-0 shrink-0 flex-col gap-1 pr-1 text-sm font-semibold">
                     <div className="flex min-w-0 items-center gap-2">
