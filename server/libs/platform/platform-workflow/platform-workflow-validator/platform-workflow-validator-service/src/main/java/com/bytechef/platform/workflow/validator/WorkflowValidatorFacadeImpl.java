@@ -160,6 +160,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             warnings);
 
         appendMissingDefinitions(workflow, errors);
+        appendUnknownFunctions(workflow, errors);
 
         if (workflowId != null) {
             appendMissingConnections(workflow, workflowId, environmentId, errors);
@@ -318,6 +319,75 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                 .append("\n");
 
             return null;
+        }
+    }
+
+    private void appendUnknownFunctions(String workflow, StringBuilder errors) {
+        try {
+            JsonNode workflowJsonNode = JsonUtils.readTree(workflow);
+
+            appendNodesUnknownFunctions(workflowJsonNode.get("triggers"), errors);
+            appendNodesUnknownFunctions(workflowJsonNode.get("tasks"), errors);
+        } catch (Exception e) {
+            log.debug("Failed to check the formula functions of the workflow", e);
+        }
+    }
+
+    private void appendNodesUnknownFunctions(@Nullable JsonNode nodesJsonNode, StringBuilder errors) {
+        if (nodesJsonNode == null || !nodesJsonNode.isArray()) {
+            return;
+        }
+
+        for (JsonNode nodeJsonNode : nodesJsonNode) {
+            appendNodeUnknownFunctions(nodeJsonNode, errors);
+        }
+    }
+
+    private void appendNodeUnknownFunctions(JsonNode nodeJsonNode, StringBuilder errors) {
+        if (!nodeJsonNode.isObject() || !nodeJsonNode.has("name")) {
+            return;
+        }
+
+        JsonNode nameJsonNode = nodeJsonNode.get("name");
+        JsonNode parametersJsonNode = nodeJsonNode.get("parameters");
+
+        appendUnknownFunctions(parametersJsonNode, "", nameJsonNode.asString(), errors);
+
+        WorkflowValidator.forEachNestedTask(
+            parametersJsonNode, nestedTaskJsonNode -> appendNodeUnknownFunctions(nestedTaskJsonNode, errors));
+    }
+
+    private void appendUnknownFunctions(
+        @Nullable JsonNode jsonNode, String propertyPath, String nodeName, StringBuilder errors) {
+
+        if (jsonNode == null) {
+            return;
+        }
+
+        if (jsonNode.isObject()) {
+            if (!propertyPath.isEmpty() && jsonNode.has("name") && jsonNode.has("type")) {
+                return;
+            }
+
+            for (Map.Entry<String, JsonNode> entry : jsonNode.properties()) {
+                String fieldName = entry.getKey();
+
+                appendUnknownFunctions(
+                    entry.getValue(), propertyPath.isEmpty() ? fieldName : propertyPath + "." + fieldName, nodeName,
+                    errors);
+            }
+        } else if (jsonNode.isArray()) {
+            for (int index = 0; index < jsonNode.size(); index++) {
+                appendUnknownFunctions(jsonNode.get(index), propertyPath + "[" + index + "]", nodeName, errors);
+            }
+        } else if (jsonNode.isString()) {
+            List<String> unknownFunctionNames = evaluator.getUnknownFunctionNames(jsonNode.asString());
+
+            if (!unknownFunctionNames.isEmpty()) {
+                StringUtils.appendWithNewline(
+                    "[" + nodeName + "] " + ValidationErrorUtils.unknownFunctions(propertyPath, unknownFunctionNames),
+                    errors);
+            }
         }
     }
 

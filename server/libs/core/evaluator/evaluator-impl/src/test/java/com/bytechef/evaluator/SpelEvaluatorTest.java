@@ -522,6 +522,32 @@ class SpelEvaluatorTest {
     }
 
     @Test
+    void testGetUnknownFunctionNamesListsEachUnknownFunctionOnce() {
+        assertEquals(
+            List.of("intgetOrDefault", "lenght"),
+            EVALUATOR.getUnknownFunctionNames(
+                "=intgetOrDefault(${attempt}, 0) + lenght(${name}) + intgetOrDefault(${retry}, 0)"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "=getOrDefault(${attempt}, 0) + 1", "=exists(${judge.answers[0]['first name']})", "=${score} >= 80",
+        "intgetOrDefault(${attempt}, 0)", "=", "=intgetOrDefault(", "='intgetOrDefault(1)'"
+    })
+    void testGetUnknownFunctionNamesIsEmptyForKnownFunctionsAndNonFormulas(String expression) {
+        assertEquals(List.of(), EVALUATOR.getUnknownFunctionNames(expression));
+    }
+
+    @Test
+    void testGetUnknownFunctionNamesKnowsBuilderRegisteredFunctions() {
+        Evaluator evaluator = SpelEvaluator.builder()
+            .methodExecutor("fromAi", (context, target, arguments) -> null)
+            .build();
+
+        assertEquals(List.of(), evaluator.getUnknownFunctionNames("=fromAi('name')"));
+    }
+
+    @Test
     void testConcatJoinsAllStringArguments() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of(

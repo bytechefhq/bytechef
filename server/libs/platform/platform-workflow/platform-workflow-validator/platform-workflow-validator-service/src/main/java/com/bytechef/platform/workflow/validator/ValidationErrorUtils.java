@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.workflow.validator;
 
+import java.util.List;
+
 /**
  * Utility class for building validation messages with consistent formatting.
  *
@@ -71,6 +73,10 @@ class ValidationErrorUtils {
 
     public static String missingTaskDispatcher(String taskDispatcherName, int taskDispatcherVersion) {
         return "Task dispatcher '" + taskDispatcherName + "' (version " + taskDispatcherVersion + ") is not available";
+    }
+
+    public static String unknownFunctions(String propertyPath, List<String> functionNames) {
+        return "Property '" + propertyPath + "' calls an unknown function: " + String.join(", ", functionNames);
     }
 
     public static String missingConnection(String componentTitle) {

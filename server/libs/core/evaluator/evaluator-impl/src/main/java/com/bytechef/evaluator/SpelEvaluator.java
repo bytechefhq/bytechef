@@ -44,6 +44,8 @@ import org.springframework.expression.common.LiteralExpression;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.SpelMessage;
+import org.springframework.expression.spel.SpelNode;
+import org.springframework.expression.spel.ast.MethodReference;
 import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -167,6 +169,33 @@ public class SpelEvaluator implements Evaluator {
     @Override
     public Map<String, @Nullable Object> evaluate(Map<String, ?> map, Map<String, ?> context, boolean lenient) {
         return evaluateInternal(map, context, lenient);
+    }
+
+    @Override
+    public List<String> getUnknownFunctionNames(String expression) {
+        String trimmedExpression = expression.trim();
+
+        if (!trimmedExpression.startsWith(FORMULA_PREFIX) || trimmedExpression.equals(FORMULA_PREFIX)) {
+            return List.of();
+        }
+
+        SpelExpression spelExpression;
+
+        try {
+            String formula = replaceDataPillPathArguments(trimmedExpression, new HashMap<>());
+
+            formula = formula.replaceAll("\\$\\{([^}]*)}", "$1");
+
+            spelExpression = (SpelExpression) expressionParser.parseExpression(formula.substring(1));
+        } catch (IllegalArgumentException | ParseException exception) {
+            return List.of();
+        }
+
+        List<String> unknownFunctionNames = new ArrayList<>();
+
+        collectUnknownFunctionNames(spelExpression.getAST(), unknownFunctionNames);
+
+        return unknownFunctionNames;
     }
 
     StandardEvaluationContext createEvaluationContext(Map<String, ?> context, boolean formulaExpression) {
@@ -372,6 +401,20 @@ public class SpelEvaluator implements Evaluator {
         }
 
         return newMap;
+    }
+
+    private void collectUnknownFunctionNames(SpelNode spelNode, List<String> unknownFunctionNames) {
+        if (spelNode instanceof MethodReference methodReference) {
+            String name = methodReference.getName();
+
+            if (!methodExecutorMap.containsKey(name) && !unknownFunctionNames.contains(name)) {
+                unknownFunctionNames.add(name);
+            }
+        }
+
+        for (int index = 0; index < spelNode.getChildCount(); index++) {
+            collectUnknownFunctionNames(spelNode.getChild(index), unknownFunctionNames);
+        }
     }
 
     private MethodResolver methodResolver() {
