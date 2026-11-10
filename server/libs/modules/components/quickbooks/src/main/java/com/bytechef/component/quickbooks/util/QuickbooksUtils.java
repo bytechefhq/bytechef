@@ -104,7 +104,7 @@ public class QuickbooksUtils {
         };
     }
 
-    private static List<Map<?, ?>> getEntityMaps(Object entities) {
+    public static List<Map<?, ?>> getEntityMaps(Object entities) {
         List<Map<?, ?>> entityMaps = new ArrayList<>();
 
         if (entities instanceof Map<?, ?> entityMap) {

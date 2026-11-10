@@ -34,6 +34,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -49,7 +50,6 @@ class QuickbooksSearchBillsActionTest {
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http mockedHttp = mock(Http.class);
-    private final Object mockedObject = mock(Object.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> queryArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -69,11 +69,12 @@ class QuickbooksSearchBillsActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(mockedObject);
+            .thenReturn(Map.of("QueryResponse", Map.of("Bill", List.of(Map.of("Id", "1"), Map.of("Id", "2")))));
 
         Object result = QuickbooksSearchBillsAction.perform(parameters, parameters, mockedActionContext);
 
-        assertEquals(mockedObject, result);
+        assertEquals(
+            Map.of("QueryResponse", Map.of("Bill", List.of(Map.of("Id", "1"), Map.of("Id", "2")))), result);
         assertEquals(
             "SELECT * FROM Bill WHERE VendorRef = '56' AND DueDate >= '2026-01-01' AND DueDate <= '2026-01-31' " +
                 "AND Balance > '0' MAXRESULTS 25",
@@ -118,5 +119,58 @@ class QuickbooksSearchBillsActionTest {
         assertEquals(
             "SELECT * FROM Bill WHERE VendorRef = '56\\\\\\' OR \\'1\\'=\\'1' MAXRESULTS 100",
             QuickbooksSearchBillsAction.buildQuery(parameters));
+    }
+
+    @Test
+    void testPerformWrapsSingleBillInList() {
+        Parameters parameters = MockParametersFactory.create(Map.of());
+
+        mockResponseBody(
+            Map.of(
+                "time", "2026-01-01T00:00:00-07:00",
+                "QueryResponse", Map.of("startPosition", "1", "maxResults", "1", "Bill", Map.of("Id", "1"))));
+
+        Object result = QuickbooksSearchBillsAction.perform(parameters, parameters, mockedActionContext);
+
+        assertEquals(
+            Map.of(
+                "time", "2026-01-01T00:00:00-07:00",
+                "QueryResponse", Map.of("startPosition", "1", "maxResults", "1", "Bill", List.of(Map.of("Id", "1")))),
+            result);
+    }
+
+    @Test
+    void testPerformReturnsEmptyListWhenNoBillMatches() {
+        Parameters parameters = MockParametersFactory.create(Map.of());
+
+        mockResponseBody(Map.of("QueryResponse", Map.of()));
+
+        Object result = QuickbooksSearchBillsAction.perform(parameters, parameters, mockedActionContext);
+
+        assertEquals(Map.of("QueryResponse", Map.of("Bill", List.of())), result);
+    }
+
+    @Test
+    void testPerformReturnsEmptyListWhenQueryResponseIsMissing() {
+        Parameters parameters = MockParametersFactory.create(Map.of());
+
+        mockResponseBody(Map.of());
+
+        Object result = QuickbooksSearchBillsAction.perform(parameters, parameters, mockedActionContext);
+
+        assertEquals(Map.of("QueryResponse", Map.of("Bill", List.of())), result);
+    }
+
+    private void mockResponseBody(Map<String, Object> responseBody) {
+        when(mockedActionContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameter(anyString(), anyString()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseBody);
     }
 }
