@@ -98,6 +98,7 @@ const ProjectDeploymentsSheet = ({
                     <ProjectDeploymentsPanel
                         enabled={sheetOpen}
                         expandedProjectDeploymentId={expandedProjectDeploymentId}
+                        hideOpenWorkflowInProject
                         onProjectDeploymentSaved={setExpandedProjectDeploymentId}
                         project={project}
                     />
