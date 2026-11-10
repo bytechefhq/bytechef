@@ -2003,6 +2003,11 @@ export type Mutation = {
   updateAutomationWorkflowProjectConfigurationWorkflow: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
   updateAutomationWorkflowProjectWorkflowPermissionExpression: Scalars['Boolean']['output'];
+  /**
+   * Replace an existing connection's authorization parameters. A parameter that is not submitted is cleared.
+   * Succeeding means the values were stored, not that they work.
+   */
+  updateConnectionCredentials: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
   updateEmbeddedMcpComponent?: Maybe<McpComponent>;
@@ -2855,6 +2860,11 @@ export type MutationUpdateAutomationWorkflowProjectWorkflowArgs = {
 export type MutationUpdateAutomationWorkflowProjectWorkflowPermissionExpressionArgs = {
   permissionExpression?: InputMaybe<Scalars['String']['input']>;
   workflowUuid: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateConnectionCredentialsArgs = {
+  input: UpdateConnectionCredentialsInput;
 };
 
 
@@ -4721,6 +4731,12 @@ export type UpdateApiConnectorInput = {
   icon?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateConnectionCredentialsInput = {
+  connectionId: Scalars['ID']['input'];
+  parameters: Scalars['Map']['input'];
+  version: Scalars['Int']['input'];
 };
 
 export type UpdateDataTableTagsInput = {
