@@ -56,7 +56,7 @@ const AiHubHomePanel = () => {
                             <p className="text-sm font-medium text-content-neutral-primary">No AI providers enabled</p>
 
                             <p className="text-sm text-content-neutral-secondary">
-                                Enable an AI provider to chat with the AI Hub assistant.
+                                Enable an AI provider to chat with Basil.
                             </p>
                         </div>
 
@@ -92,7 +92,7 @@ const AiHubHomePanel = () => {
                             <h2 className="text-2xl font-semibold text-foreground">What should we get done?</h2>
 
                             <p className="mt-2 text-sm text-muted-foreground">
-                                Ask about your projects and workflows, or ask me to build a workflow.
+                                I'm Basil. Ask about your projects and workflows, or ask me to build a workflow.
                             </p>
                         </div>
 
