@@ -51,6 +51,81 @@ Version: 1
 ## Actions
 
 
+### Create Campaign
+Name: createCampaign
+
+`Create a draft campaign. Loops creates an empty email message for it; set its subject and content with Update Email Message.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The campaign name. | true |
+| campaignGroupId | Campaign Group ID | STRING | The ID of the group to add this campaign to. Defaults to the team's Unsorted group when empty. | false |
+| mailingListId | Mailing List ID | STRING | The ID of the mailing list to send to. | false |
+| audienceSegmentId | Audience Segment ID | STRING | The ID of an audience segment to send to. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Campaign",
+  "name" : "createCampaign",
+  "parameters" : {
+    "name" : "",
+    "campaignGroupId" : "",
+    "mailingListId" : "",
+    "audienceSegmentId" : ""
+  },
+  "type" : "loops/v1/createCampaign"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the campaign. |
+| url | STRING | The URL of the campaign in the Loops app. |
+| name | STRING | The name of the campaign. |
+| status | STRING | The status of the campaign, for example Draft or Sent. |
+| createdAt | STRING | ISO 8601 timestamp for when the campaign was created. |
+| updatedAt | STRING | ISO 8601 timestamp for when the campaign was last updated. |
+| emailMessageId | STRING | The ID of the campaign's email message. |
+| campaignGroupId | STRING | The ID of the campaign group this campaign belongs to, if set. |
+| mailingListId | STRING | The ID of the mailing list this campaign sends to, if set. |
+| audienceSegmentId | STRING | The ID of the audience segment this campaign targets, if set. |
+| emailMessageContentRevisionId | STRING | The content revision of the new email message. Pass it as Expected Revision ID on the first Update Email Message. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "url" : "",
+  "name" : "",
+  "status" : "",
+  "createdAt" : "",
+  "updatedAt" : "",
+  "emailMessageId" : "",
+  "campaignGroupId" : "",
+  "mailingListId" : "",
+  "audienceSegmentId" : "",
+  "emailMessageContentRevisionId" : ""
+}
+```
+
+
+
+
 ### Create Contact
 Name: createContact
 
@@ -115,6 +190,243 @@ Type: OBJECT
 2. Click on *Lists*.
 3. There you will see your *Mailing lists*.
 4. Copy ID of the desired mailing list.
+
+
+
+### Get Campaign
+Name: getCampaign
+
+`Get a campaign, including the ID of its email message.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| campaignId | Campaign ID | STRING | The ID of the campaign to get. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Campaign",
+  "name" : "getCampaign",
+  "parameters" : {
+    "campaignId" : ""
+  },
+  "type" : "loops/v1/getCampaign"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the campaign. |
+| url | STRING | The URL of the campaign in the Loops app. |
+| name | STRING | The name of the campaign. |
+| status | STRING | The status of the campaign, for example Draft or Sent. |
+| createdAt | STRING | ISO 8601 timestamp for when the campaign was created. |
+| updatedAt | STRING | ISO 8601 timestamp for when the campaign was last updated. |
+| emailMessageId | STRING | The ID of the campaign's email message. |
+| campaignGroupId | STRING | The ID of the campaign group this campaign belongs to, if set. |
+| mailingListId | STRING | The ID of the mailing list this campaign sends to, if set. |
+| audienceSegmentId | STRING | The ID of the audience segment this campaign targets, if set. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "url" : "",
+  "name" : "",
+  "status" : "",
+  "createdAt" : "",
+  "updatedAt" : "",
+  "emailMessageId" : "",
+  "campaignGroupId" : "",
+  "mailingListId" : "",
+  "audienceSegmentId" : ""
+}
+```
+
+
+
+
+### Get Email Message
+Name: getEmailMessage
+
+`Get an email message, including its subject, preview text, LMX body and current content revision.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| emailMessageId | Email Message ID | STRING | The ID of the email message, for example the Email Message ID of a campaign. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Email Message",
+  "name" : "getEmailMessage",
+  "parameters" : {
+    "emailMessageId" : ""
+  },
+  "type" : "loops/v1/getEmailMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the email message. |
+| campaignId | STRING | The campaign this email message belongs to, if any. |
+| transactionalId | STRING | The transactional email this email message belongs to, if any. |
+| subject | STRING | The email subject. |
+| previewText | STRING | The email preview text. |
+| fromName | STRING | The email sender name. |
+| fromEmail | STRING | The sender email address, without the team's sending domain. |
+| replyToEmail | STRING | The email reply-to address. |
+| emailFormat | STRING | The rendering format of the email: styled or plain. |
+| lmx | STRING | The email body serialized as LMX. |
+| contentRevisionId | STRING | The current content revision. Pass it as Expected Revision ID on the next update. |
+| updatedAt | STRING | ISO 8601 timestamp for when the email message was last updated. |
+| warnings | ARRAY <details> <summary> Items </summary> [&#123;STRING\(rule), STRING\(severity), STRING\(message), STRING\(path)&#125;] </details> | Non-fatal issues raised while compiling the submitted LMX. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "campaignId" : "",
+  "transactionalId" : "",
+  "subject" : "",
+  "previewText" : "",
+  "fromName" : "",
+  "fromEmail" : "",
+  "replyToEmail" : "",
+  "emailFormat" : "",
+  "lmx" : "",
+  "contentRevisionId" : "",
+  "updatedAt" : "",
+  "warnings" : [ {
+    "rule" : "",
+    "severity" : "",
+    "message" : "",
+    "path" : ""
+  } ]
+}
+```
+
+
+
+
+### Update Email Message
+Name: updateEmailMessage
+
+`Update the subject, preview text, sender or LMX body of an email message. Only the fields you fill in are changed. A campaign's email message can be updated only while the campaign is a draft.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| emailMessageId | Email Message ID | STRING | The ID of the email message to update. | true |
+| expectedRevisionId | Expected Revision ID | STRING | The content revision you last read: the Content Revision ID from Get Email Message, or the Email Message Content Revision ID from Create Campaign. The update is applied only if the email is still at this revision, so a newer edit is never overwritten. | true |
+| subject | Subject | STRING | The email subject. | false |
+| previewText | Preview Text | STRING | The email preview text. | false |
+| fromName | From Name | STRING | The email sender name. | false |
+| fromEmail | From Email | STRING | The sender email address without the team's sending domain, for example hello for hello@yourdomain.com. | false |
+| replyToEmail | Reply-To Email | STRING | The reply-to email address. | false |
+| lmx | LMX | STRING | The email body in LMX, Loops' XML-like email markup, for example &lt;Paragraph&gt;Hello, &#123;firstName&#125;!&lt;/Paragraph&gt;. Styles go in the LMX &lt;Style /&gt; tag. The payload is limited to 100KB. See https://loops.so/docs/creating-emails/lmx for the format. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Email Message",
+  "name" : "updateEmailMessage",
+  "parameters" : {
+    "emailMessageId" : "",
+    "expectedRevisionId" : "",
+    "subject" : "",
+    "previewText" : "",
+    "fromName" : "",
+    "fromEmail" : "",
+    "replyToEmail" : "",
+    "lmx" : ""
+  },
+  "type" : "loops/v1/updateEmailMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the email message. |
+| campaignId | STRING | The campaign this email message belongs to, if any. |
+| transactionalId | STRING | The transactional email this email message belongs to, if any. |
+| subject | STRING | The email subject. |
+| previewText | STRING | The email preview text. |
+| fromName | STRING | The email sender name. |
+| fromEmail | STRING | The sender email address, without the team's sending domain. |
+| replyToEmail | STRING | The email reply-to address. |
+| emailFormat | STRING | The rendering format of the email: styled or plain. |
+| lmx | STRING | The email body serialized as LMX. |
+| contentRevisionId | STRING | The current content revision. Pass it as Expected Revision ID on the next update. |
+| updatedAt | STRING | ISO 8601 timestamp for when the email message was last updated. |
+| warnings | ARRAY <details> <summary> Items </summary> [&#123;STRING\(rule), STRING\(severity), STRING\(message), STRING\(path)&#125;] </details> | Non-fatal issues raised while compiling the submitted LMX. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "campaignId" : "",
+  "transactionalId" : "",
+  "subject" : "",
+  "previewText" : "",
+  "fromName" : "",
+  "fromEmail" : "",
+  "replyToEmail" : "",
+  "emailFormat" : "",
+  "lmx" : "",
+  "contentRevisionId" : "",
+  "updatedAt" : "",
+  "warnings" : [ {
+    "rule" : "",
+    "severity" : "",
+    "message" : "",
+    "path" : ""
+  } ]
+}
+```
+
 
 
 
