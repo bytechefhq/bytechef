@@ -14,16 +14,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
 import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {
-    DownloadIcon,
-    EditIcon,
-    EllipsisVerticalIcon,
-    FolderIcon,
-    PlusIcon,
-    SendIcon,
-    Trash2Icon,
-    UploadIcon,
-} from 'lucide-react';
+import {DownloadIcon, EditIcon, EllipsisVerticalIcon, PlusIcon, SendIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 import {MouseEvent, useCallback, useMemo, useRef, useState} from 'react';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
@@ -104,8 +95,6 @@ const AutomationWorkflowProjectListItem = ({
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div aria-label={project.name} className="flex-1" data-testid="project-item">
                         <div className="flex items-center gap-2">
-                            <FolderIcon aria-hidden="true" className="size-6 shrink-0 text-content-neutral-secondary" />
-
                             {project.description ? (
                                 <Tooltip>
                                     <TooltipTrigger asChild>

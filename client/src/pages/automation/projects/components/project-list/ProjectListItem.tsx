@@ -50,7 +50,6 @@ import {
     DownloadIcon,
     EditIcon,
     EllipsisVerticalIcon,
-    FolderIcon,
     GitBranchIcon,
     GitPullRequestArrowIcon,
     LayoutTemplateIcon,
@@ -283,8 +282,6 @@ const ProjectListItem = ({
                         data-testid="project-item"
                     >
                         <div className="flex items-center gap-2">
-                            <FolderIcon aria-hidden="true" className="size-6 shrink-0 text-content-neutral-secondary" />
-
                             {project.projectWorkflowIds && project.projectWorkflowIds.length > 0 ? (
                                 <Link
                                     onClick={(event) => event.stopPropagation()}

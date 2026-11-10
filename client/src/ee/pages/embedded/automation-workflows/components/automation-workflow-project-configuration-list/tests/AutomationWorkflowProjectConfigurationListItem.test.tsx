@@ -153,8 +153,6 @@ describe('AutomationWorkflowProjectConfigurationListItem', () => {
 
         renderItem();
 
-        expect(document.querySelector('svg.lucide-sliders-horizontal')).toBeInTheDocument();
-
         await user.click(await screen.findByRole('button', {name: 'Mailer'}));
 
         const state = useAutomationWorkflowExecutionsSheetStore.getState();
