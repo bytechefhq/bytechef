@@ -307,20 +307,10 @@ describe('IntegrationListItem', () => {
             expect(hoisted.onTabChange).not.toHaveBeenCalled();
         });
 
-        it('should open the integration with its first workflow when the open button is clicked', async () => {
-            renderItem();
-
-            await userEvent.click(screen.getByLabelText('Open integration'));
-
-            expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/integrations/1/integration-workflows/10?');
-            expect(hoisted.onTabChange).not.toHaveBeenCalled();
-        });
-
-        it('should show a plain title without the open button for an integration without workflows', () => {
+        it('should show a plain title for an integration without workflows', () => {
             renderItem({integrationWorkflowIds: []});
 
             expect(screen.queryByLabelText('Integration title link')).not.toBeInTheDocument();
-            expect(screen.queryByLabelText('Open integration')).not.toBeInTheDocument();
         });
 
         it('should keep the row as it is when a menu row is clicked', async () => {

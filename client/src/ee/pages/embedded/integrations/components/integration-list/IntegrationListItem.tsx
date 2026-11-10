@@ -28,7 +28,6 @@ import {IntegrationCategoryKeys} from '@/ee/shared/queries/embedded/integrationC
 import {IntegrationTagKeys} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
-import OpenInButton from '@/shared/components/OpenInButton';
 import TagList from '@/shared/components/TagList';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
@@ -36,6 +35,7 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {
+    ArrowRightIcon,
     ChevronDownIcon,
     ComponentIcon,
     EditIcon,
@@ -204,36 +204,34 @@ const IntegrationListItem = ({
                         <div className="flex min-h-8 items-center justify-between">
                             <div className="relative flex items-center gap-2">
                                 {hasWorkflows ? (
-                                    <>
-                                        <Link
-                                            aria-label="Integration title link"
-                                            className="group/title flex items-center gap-2"
-                                            onClick={(event) => event.stopPropagation()}
-                                            to={integrationUrl}
-                                        >
-                                            {integration?.icon ? (
-                                                <InlineSVG
-                                                    aria-hidden="true"
-                                                    className="size-6 shrink-0"
-                                                    src={integration.icon}
-                                                />
-                                            ) : (
-                                                <ComponentIcon
-                                                    aria-hidden="true"
-                                                    className="size-6 shrink-0 text-content-neutral-secondary"
-                                                />
-                                            )}
+                                    <Link
+                                        aria-label="Integration title link"
+                                        className="group/title flex items-center gap-2"
+                                        onClick={(event) => event.stopPropagation()}
+                                        to={integrationUrl}
+                                    >
+                                        {integration?.icon ? (
+                                            <InlineSVG
+                                                aria-hidden="true"
+                                                className="size-6 shrink-0"
+                                                src={integration.icon}
+                                            />
+                                        ) : (
+                                            <ComponentIcon
+                                                aria-hidden="true"
+                                                className="size-6 shrink-0 text-content-neutral-secondary"
+                                            />
+                                        )}
 
-                                            <span className="text-base font-semibold text-content-neutral-primary group-hover/title:underline">
-                                                {integration?.name}
-                                            </span>
-                                        </Link>
+                                        <span className="text-base font-semibold text-content-neutral-primary underline-offset-4 group-hover/title:text-content-brand-primary group-hover/title:underline">
+                                            {integration?.name}
+                                        </span>
 
-                                        <OpenInButton
-                                            label="Open integration"
-                                            onClick={() => navigate(integrationUrl)}
+                                        <ArrowRightIcon
+                                            aria-hidden="true"
+                                            className="size-4 shrink-0 -translate-x-1 text-content-brand-primary opacity-0 transition group-hover/title:translate-x-0 group-hover/title:opacity-100"
                                         />
-                                    </>
+                                    </Link>
                                 ) : (
                                     <div className="flex items-center gap-2">
                                         {integration?.icon ? (
