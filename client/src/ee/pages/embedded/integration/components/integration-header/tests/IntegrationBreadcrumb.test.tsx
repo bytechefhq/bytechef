@@ -5,6 +5,10 @@ import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {MemoryRouter} from 'react-router-dom';
 import {expect, it, vi} from 'vitest';
 
+vi.mock('react-inlinesvg', () => ({
+    default: ({src}: {src: string}) => <svg data-src={src} data-testid="integration-icon" />,
+}));
+
 const mockIntegration = {
     componentName: 'gmail',
     id: 1,
@@ -76,7 +80,7 @@ it('switches to another integration from the title select', async () => {
                     integration={mockIntegration}
                     integrations={[
                         {...mockIntegration, integrationWorkflowIds: [11]},
-                        {...mockIntegration, id: 2, integrationWorkflowIds: [21], name: 'Slack'},
+                        {...mockIntegration, icon: 'slack.svg', id: 2, integrationWorkflowIds: [21], name: 'Slack'},
                         {...mockIntegration, id: 3, integrationWorkflowIds: [], name: 'Jira'},
                     ]}
                     onIntegrationValueChange={onIntegrationValueChange}
@@ -89,6 +93,9 @@ it('switches to another integration from the title select', async () => {
 
     expect(screen.getByRole('menuitemradio', {name: 'Gmail'})).toHaveAttribute('data-state', 'checked');
     expect(screen.getByRole('menuitemradio', {name: 'Jira'})).toHaveAttribute('data-disabled');
+
+    expect(screen.getByRole('menuitemradio', {name: 'Slack'})).toContainElement(screen.getByTestId('integration-icon'));
+    expect(screen.getByTestId('integration-icon')).toHaveAttribute('data-src', 'slack.svg');
 
     await userEvent.click(screen.getByRole('menuitemradio', {name: 'Slack'}));
 

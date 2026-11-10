@@ -1,7 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import {Integration, IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
 import BreadcrumbTitleSelect, {getPublishedVersion} from '@/shared/components/BreadcrumbTitleSelect';
-import {PuzzleIcon} from 'lucide-react';
+import {ComponentIcon} from 'lucide-react';
 import {useMemo} from 'react';
 
 interface IntegrationTitleProps {
@@ -15,6 +15,7 @@ const IntegrationTitle = ({integration, integrations, onIntegrationValueChange}:
         () =>
             integrations?.map((workspaceIntegration) => ({
                 disabled: !workspaceIntegration.integrationWorkflowIds?.length,
+                iconSrc: workspaceIntegration.icon,
                 id: String(workspaceIntegration.id),
                 name: workspaceIntegration.name ?? workspaceIntegration.componentName,
                 publishedVersion: getPublishedVersion(
@@ -43,7 +44,7 @@ const IntegrationTitle = ({integration, integrations, onIntegrationValueChange}:
                 </Badge>
             }
             currentId={integration.id !== undefined ? String(integration.id) : undefined}
-            icon={PuzzleIcon}
+            icon={ComponentIcon}
             items={items}
             menuLabel="Integrations"
             name={integration.name ?? integration.componentName}
