@@ -99,7 +99,7 @@ describe('ConnectedUserSheetPanelWorkflowList', () => {
 
         rerender(<ConnectedUserSheetPanelWorkflowList connectedUserId={1050} />);
 
-        expect(screen.getByText('No automation workflows.')).toBeInTheDocument();
+        expect(screen.getByText('No automations.')).toBeInTheDocument();
     });
 
     it('opens the provisioning dialog from the New Workflow button', async () => {
@@ -109,7 +109,7 @@ describe('ConnectedUserSheetPanelWorkflowList', () => {
             </QueryClientProvider>
         );
 
-        expect(screen.getByRole('heading', {name: 'Automation Workflows'})).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'Automations'})).toBeInTheDocument();
         expect(screen.queryByText('provision dialog 1050')).not.toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('button', {name: 'New Workflow'}));

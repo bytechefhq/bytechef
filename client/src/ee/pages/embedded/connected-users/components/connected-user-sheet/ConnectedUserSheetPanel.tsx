@@ -33,7 +33,7 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                     </TabsTrigger>
 
                     <TabsTrigger className={tabsTriggerClassName} value="workflows">
-                        Automation Workflows
+                        Automations
                     </TabsTrigger>
 
                     <TabsTrigger className={tabsTriggerClassName} value="external-invocations">

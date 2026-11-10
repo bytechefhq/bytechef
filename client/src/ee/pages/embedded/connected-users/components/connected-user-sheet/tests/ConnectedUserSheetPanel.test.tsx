@@ -62,7 +62,7 @@ describe('ConnectedUserSheetPanel', () => {
             />
         );
 
-        await userEvent.click(screen.getByRole('tab', {name: 'Automation Workflows'}));
+        await userEvent.click(screen.getByRole('tab', {name: 'Automations'}));
 
         expect(screen.getByText('workflow list 7 Jane jane@example.com')).toBeInTheDocument();
     });

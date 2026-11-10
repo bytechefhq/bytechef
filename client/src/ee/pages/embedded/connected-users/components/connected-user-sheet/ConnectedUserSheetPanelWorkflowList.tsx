@@ -69,7 +69,7 @@ const ConnectedUserSheetPanelWorkflowList = ({
     return (
         <div>
             <div className="flex items-center justify-between pb-2">
-                <h3 className="text-sm font-semibold">Automation Workflows</h3>
+                <h3 className="text-sm font-semibold">Automations</h3>
 
                 <Button
                     icon={<PlusIcon />}
@@ -88,7 +88,7 @@ const ConnectedUserSheetPanelWorkflowList = ({
                     workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
                 />
             ) : (
-                <div className="py-4 text-sm">No automation workflows.</div>
+                <div className="py-4 text-sm">No automations.</div>
             )}
 
             {showProvisionDialog && (
