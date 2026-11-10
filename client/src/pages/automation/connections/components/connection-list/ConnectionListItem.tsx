@@ -3,6 +3,7 @@ import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/connectionTags.mutations';
@@ -14,6 +15,7 @@ import {
 } from '@/shared/mutations/automation/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
+import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {Link2OffIcon, Trash2Icon} from 'lucide-react';
 import {memo, useMemo, useState} from 'react';
@@ -30,6 +32,9 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
 
+    const currentUserLogin = useAuthenticationStore((state) => state.account?.login);
+
+    const isTenantAdmin = useIsTenantAdmin();
     const queryClient = useQueryClient();
 
     const deleteConnectionMutation = useDeleteConnectionMutation({
@@ -95,6 +100,9 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
             undefined
         );
     }, [componentDefinitions, connection.componentName]);
+
+    const canReplaceCredentials =
+        isTenantAdmin || (!!connection.createdBy && connection.createdBy === currentUserLogin);
 
     const handleAlertDeleteDialogClick = () => {
         if (connection.id) {
@@ -188,7 +196,9 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                     connectionsQueryKey={ConnectionKeys.connections}
                     onClose={() => setShowEditDialog(false)}
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
-                    useUpdateConnectionCredentialsMutation={useUpdateConnectionCredentialsMutation}
+                    useUpdateConnectionCredentialsMutation={
+                        canReplaceCredentials ? useUpdateConnectionCredentialsMutation : undefined
+                    }
                     useUpdateConnectionMutation={useUpdateConnectionMutation}
                 />
             )}

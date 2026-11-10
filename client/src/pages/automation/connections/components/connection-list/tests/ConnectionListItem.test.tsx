@@ -6,6 +6,10 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import ConnectionListItem from '../ConnectionListItem';
 
 const hoisted = vi.hoisted(() => ({
+    authenticationState: {
+        account: {authorities: ['ROLE_USER'], login: 'owner@localhost.com'},
+        authenticated: true,
+    },
     deleteConnectionMutate: vi.fn(),
     disconnectConnectionMutate: vi.fn(),
     updateConnectionCredentialsMutation: vi.fn(),
@@ -44,6 +48,11 @@ vi.mock('@/shared/mutations/automation/connections.mutations', () => ({
     useUpdateConnectionMutation: vi.fn(),
 }));
 
+vi.mock('@/shared/stores/useAuthenticationStore', () => ({
+    useAuthenticationStore: (selector: (state: typeof hoisted.authenticationState) => unknown) =>
+        selector(hoisted.authenticationState),
+}));
+
 vi.mock('@/shared/queries/automation/connections.queries', () => ({
     ConnectionKeys: {connectionTags: ['connectionTags'], connections: ['connections']},
     useGetConnectionTagsQuery: () => ({data: [], error: null, isLoading: false}),
@@ -79,7 +88,17 @@ const openMenu = async () => {
     await userEvent.click(screen.getByRole('button'));
 };
 
+const openEditDialog = async () => {
+    await openMenu();
+
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
+};
+
 beforeEach(() => {
+    hoisted.authenticationState = {
+        account: {authorities: ['ROLE_USER'], login: 'owner@localhost.com'},
+        authenticated: true,
+    };
     windowResizeObserver();
 });
 
@@ -111,14 +130,41 @@ describe('ConnectionListItem', () => {
         expect(screen.getByTestId('connection-dialog')).toBeInTheDocument();
     });
 
-    it('should let the edit dialog replace the connection credentials', async () => {
-        renderConnectionListItem(inactiveConnection);
+    it('should let the owner replace the connection credentials', async () => {
+        renderConnectionListItem({...inactiveConnection, createdBy: 'owner@localhost.com'});
 
-        await openMenu();
-
-        await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
+        await openEditDialog();
 
         expect(screen.getByTestId('connection-dialog')).toHaveAttribute('data-credentials-replaceable', 'true');
+    });
+
+    it('should let a tenant admin replace the credentials of a connection someone else created', async () => {
+        hoisted.authenticationState = {
+            account: {authorities: ['ROLE_ADMIN'], login: 'admin@localhost.com'},
+            authenticated: true,
+        };
+
+        renderConnectionListItem({...inactiveConnection, createdBy: 'owner@localhost.com'});
+
+        await openEditDialog();
+
+        expect(screen.getByTestId('connection-dialog')).toHaveAttribute('data-credentials-replaceable', 'true');
+    });
+
+    it('should not let another user replace the connection credentials', async () => {
+        renderConnectionListItem({...inactiveConnection, createdBy: 'someone-else@localhost.com'});
+
+        await openEditDialog();
+
+        expect(screen.getByTestId('connection-dialog')).toHaveAttribute('data-credentials-replaceable', 'false');
+    });
+
+    it('should not let anyone but a tenant admin replace the credentials of a connection without a creator', async () => {
+        renderConnectionListItem(inactiveConnection);
+
+        await openEditDialog();
+
+        expect(screen.getByTestId('connection-dialog')).toHaveAttribute('data-credentials-replaceable', 'false');
     });
 
     it('should open the delete dialog and delete the connection when clicking Delete', async () => {
