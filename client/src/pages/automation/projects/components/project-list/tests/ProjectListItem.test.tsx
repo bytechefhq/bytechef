@@ -120,28 +120,32 @@ it('collapses an open row when it is clicked', () => {
     expect(onTabChange).toHaveBeenCalledWith(undefined);
 });
 
-it('toggles the row rather than opening the project when the title is clicked', () => {
+it('links the title to the project with its first workflow without toggling the row', () => {
     renderProjectListItem();
 
-    fireEvent.click(screen.getByText('Orders'));
+    const titleLink = screen.getByLabelText('Project title link');
 
-    expect(onTabChange).toHaveBeenCalledWith('workflows');
-    expect(hoisted.navigate).not.toHaveBeenCalled();
+    expect(titleLink).toHaveAttribute('href', '/automation/projects/7/project-workflows/1');
+
+    fireEvent.click(titleLink);
+
+    expect(onTabChange).not.toHaveBeenCalled();
 });
 
-it('opens the project with its first workflow when Open is clicked', () => {
+it('opens the project with its first workflow when the open button is clicked', () => {
     renderProjectListItem();
 
-    fireEvent.click(screen.getByLabelText('Open Project'));
+    fireEvent.click(screen.getByLabelText('Open project'));
 
     expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects/7/project-workflows/1?');
     expect(onTabChange).not.toHaveBeenCalled();
 });
 
-it('disables Open for a project without workflows', () => {
+it('shows a plain title without the open button for a project without workflows', () => {
     renderProjectListItem(undefined, {projectWorkflowIds: []});
 
-    expect(screen.getByLabelText('Open Project')).toBeDisabled();
+    expect(screen.queryByLabelText('Project title link')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Open project')).not.toBeInTheDocument();
 });
 
 it('offers New Workflow on the workflows tab', () => {

@@ -26,6 +26,7 @@ import ProjectListItemTabs, {
 } from '@/pages/automation/projects/components/project-list/ProjectListItemTabs';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
+import OpenInButton from '@/shared/components/OpenInButton';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import EEVersion from '@/shared/edition/EEVersion';
@@ -45,7 +46,6 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
-    ArrowRightIcon,
     ChevronDownIcon,
     CopyIcon,
     DownloadIcon,
@@ -62,7 +62,7 @@ import {
     WorkflowIcon,
 } from 'lucide-react';
 import {MouseEvent, ReactNode, Suspense, lazy, useCallback, useRef, useState} from 'react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
 import TagList from '../../../../../shared/components/TagList';
@@ -242,13 +242,7 @@ const ProjectListItem = ({
         void projectDeploymentsQuery.refetch();
     };
 
-    const handleOpenProjectClick = (event: MouseEvent) => {
-        event.stopPropagation();
-
-        void navigate(
-            `/automation/projects/${project.id}/project-workflows/${project.projectWorkflowIds![0]}?${searchParams}`
-        );
-    };
+    const projectUrl = `/automation/projects/${project.id}/project-workflows/${project.projectWorkflowIds?.[0]}?${searchParams}`;
 
     const handleProjectListItemClick = useCallback(
         (event: MouseEvent) => {
@@ -292,7 +286,34 @@ const ProjectListItem = ({
                         data-testid="project-item"
                     >
                         <div className="flex items-center gap-2">
-                            {project.description ? (
+                            {hasWorkflows ? (
+                                <>
+                                    <Link
+                                        aria-label="Project title link"
+                                        className="group/title"
+                                        onClick={(event) => event.stopPropagation()}
+                                        to={projectUrl}
+                                    >
+                                        {project.description ? (
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span className="text-base font-semibold group-hover/title:underline">
+                                                        {project.name}
+                                                    </span>
+                                                </TooltipTrigger>
+
+                                                <TooltipContent>{project.description}</TooltipContent>
+                                            </Tooltip>
+                                        ) : (
+                                            <span className="text-base font-semibold group-hover/title:underline">
+                                                {project.name}
+                                            </span>
+                                        )}
+                                    </Link>
+
+                                    <OpenInButton label="Open project" onClick={() => navigate(projectUrl)} />
+                                </>
+                            ) : project.description ? (
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <span className="text-base font-semibold">{project.name}</span>
@@ -381,17 +402,6 @@ const ProjectListItem = ({
                                 <TooltipContent side="left">Last Published Date</TooltipContent>
                             </Tooltip>
                         </div>
-
-                        <Button
-                            aria-label="Open Project"
-                            data-interactive
-                            disabled={!hasWorkflows}
-                            icon={<ArrowRightIcon />}
-                            label="Open"
-                            onClick={handleOpenProjectClick}
-                            size="sm"
-                            variant="outline"
-                        />
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

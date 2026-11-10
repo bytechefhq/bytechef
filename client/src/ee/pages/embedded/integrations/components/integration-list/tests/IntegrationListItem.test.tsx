@@ -21,7 +21,11 @@ vi.mock('@tanstack/react-query', async () => {
 });
 
 vi.mock('react-router-dom', () => ({
-    Link: ({children, to}: {children: React.ReactNode; to: string}) => <a href={to}>{children}</a>,
+    Link: ({children, to, ...props}: React.AnchorHTMLAttributes<HTMLAnchorElement> & {to: string}) => (
+        <a href={to} {...props}>
+            {children}
+        </a>
+    ),
     useNavigate: () => hoisted.navigate,
     useSearchParams: () => [new URLSearchParams(''), vi.fn()],
 }));
@@ -291,28 +295,32 @@ describe('IntegrationListItem', () => {
             expect(hoisted.onTabChange).toHaveBeenCalledWith(undefined);
         });
 
-        it('should toggle the row rather than open the integration when the title is clicked', async () => {
+        it('should link the title to the integration with its first workflow without toggling the row', async () => {
             renderItem();
+
+            const titleLink = screen.getByLabelText('Integration title link');
+
+            expect(titleLink).toHaveAttribute('href', '/embedded/integrations/1/integration-workflows/10?');
 
             await userEvent.click(screen.getByText('Mailchimp'));
 
-            expect(hoisted.onTabChange).toHaveBeenCalledWith('workflows');
-            expect(hoisted.navigate).not.toHaveBeenCalled();
+            expect(hoisted.onTabChange).not.toHaveBeenCalled();
         });
 
-        it('should open the integration with its first workflow when Open is clicked', async () => {
+        it('should open the integration with its first workflow when the open button is clicked', async () => {
             renderItem();
 
-            await userEvent.click(screen.getByLabelText('Open Integration'));
+            await userEvent.click(screen.getByLabelText('Open integration'));
 
             expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/integrations/1/integration-workflows/10?');
             expect(hoisted.onTabChange).not.toHaveBeenCalled();
         });
 
-        it('should disable Open for an integration without workflows', () => {
+        it('should show a plain title without the open button for an integration without workflows', () => {
             renderItem({integrationWorkflowIds: []});
 
-            expect(screen.getByLabelText('Open Integration')).toBeDisabled();
+            expect(screen.queryByLabelText('Integration title link')).not.toBeInTheDocument();
+            expect(screen.queryByLabelText('Open integration')).not.toBeInTheDocument();
         });
 
         it('should keep the row as it is when a menu row is clicked', async () => {

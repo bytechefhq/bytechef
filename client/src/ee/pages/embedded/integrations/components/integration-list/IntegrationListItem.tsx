@@ -28,6 +28,7 @@ import {IntegrationCategoryKeys} from '@/ee/shared/queries/embedded/integrationC
 import {IntegrationTagKeys} from '@/ee/shared/queries/embedded/integrationTags.quries';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
+import OpenInButton from '@/shared/components/OpenInButton';
 import TagList from '@/shared/components/TagList';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
@@ -35,7 +36,6 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {
-    ArrowRightIcon,
     ChevronDownIcon,
     ComponentIcon,
     EditIcon,
@@ -49,7 +49,7 @@ import {
 } from 'lucide-react';
 import {ChangeEvent, ReactNode, useCallback, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
 interface IntegrationItemProps {
@@ -87,6 +87,7 @@ const IntegrationListItem = ({
 
     const configurationCount = integration.developmentConfigurationCount;
     const workflowCount = integration.integrationWorkflowIds?.length ?? 0;
+    const hasWorkflows = workflowCount > 0;
     const isPublished = !!(integration.lastPublishedDate && integration.lastIntegrationVersion);
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
@@ -163,13 +164,7 @@ const IntegrationListItem = ({
         }
     };
 
-    const handleOpenIntegrationClick = (event: React.MouseEvent) => {
-        event.stopPropagation();
-
-        void navigate(
-            `/embedded/integrations/${integration.id}/integration-workflows/${integration.integrationWorkflowIds![0]}?${searchParams}`
-        );
-    };
+    const integrationUrl = `/embedded/integrations/${integration.id}/integration-workflows/${integration.integrationWorkflowIds?.[0]}?${searchParams}`;
 
     const handleIntegrationListItemClick = useCallback(
         (event: React.MouseEvent) => {
@@ -208,24 +203,57 @@ const IntegrationListItem = ({
                     <div className="flex-1">
                         <div className="flex min-h-8 items-center justify-between">
                             <div className="relative flex items-center gap-2">
-                                <div className="flex items-center gap-2">
-                                    {integration?.icon ? (
-                                        <InlineSVG
-                                            aria-hidden="true"
-                                            className="size-6 shrink-0"
-                                            src={integration.icon}
-                                        />
-                                    ) : (
-                                        <ComponentIcon
-                                            aria-hidden="true"
-                                            className="size-6 shrink-0 text-content-neutral-secondary"
-                                        />
-                                    )}
+                                {hasWorkflows ? (
+                                    <>
+                                        <Link
+                                            aria-label="Integration title link"
+                                            className="group/title flex items-center gap-2"
+                                            onClick={(event) => event.stopPropagation()}
+                                            to={integrationUrl}
+                                        >
+                                            {integration?.icon ? (
+                                                <InlineSVG
+                                                    aria-hidden="true"
+                                                    className="size-6 shrink-0"
+                                                    src={integration.icon}
+                                                />
+                                            ) : (
+                                                <ComponentIcon
+                                                    aria-hidden="true"
+                                                    className="size-6 shrink-0 text-content-neutral-secondary"
+                                                />
+                                            )}
 
-                                    <span className="text-base font-semibold text-content-neutral-primary">
-                                        {integration?.name}
-                                    </span>
-                                </div>
+                                            <span className="text-base font-semibold text-content-neutral-primary group-hover/title:underline">
+                                                {integration?.name}
+                                            </span>
+                                        </Link>
+
+                                        <OpenInButton
+                                            label="Open integration"
+                                            onClick={() => navigate(integrationUrl)}
+                                        />
+                                    </>
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        {integration?.icon ? (
+                                            <InlineSVG
+                                                aria-hidden="true"
+                                                className="size-6 shrink-0"
+                                                src={integration.icon}
+                                            />
+                                        ) : (
+                                            <ComponentIcon
+                                                aria-hidden="true"
+                                                className="size-6 shrink-0 text-content-neutral-secondary"
+                                            />
+                                        )}
+
+                                        <span className="text-base font-semibold text-content-neutral-primary">
+                                            {integration?.name}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -311,17 +339,6 @@ const IntegrationListItem = ({
                                 </Tooltip>
                             </div>
                         )}
-
-                        <Button
-                            aria-label="Open Integration"
-                            data-interactive
-                            disabled={workflowCount === 0}
-                            icon={<ArrowRightIcon />}
-                            label="Open"
-                            onClick={handleOpenIntegrationClick}
-                            size="sm"
-                            variant="outline"
-                        />
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
