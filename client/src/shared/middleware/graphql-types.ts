@@ -1286,6 +1286,7 @@ export type EvaluatorFunctionParameter = {
 };
 
 export enum EvaluatorFunctionType {
+  Any = 'ANY',
   Boolean = 'BOOLEAN',
   Byte = 'BYTE',
   Character = 'CHARACTER',
