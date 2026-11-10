@@ -12,7 +12,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -41,10 +43,12 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
+import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -286,6 +290,137 @@ class ConnectionAdminFacadeIntTest {
                 .hasMessage("Connection id=%s not found".formatted(AUTOMATION_CONNECTION_ID));
 
             verify(connectionFacade, never()).delete(anyLong());
+        }
+    }
+
+    @Nested
+    class ConnectedUserOwnership {
+
+        private static final long ADMIN_CONNECTION_ID = 1L;
+        private static final long CONNECTED_USER_CONNECTION_ID = 2L;
+        private static final long INTEGRATION_INSTANCE_CONNECTION_ID = 3L;
+        private static final long SHARED_CONNECTION_ID = 4L;
+
+        @BeforeEach
+        void beforeEach() {
+            authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    "admin", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+
+            when(permissionService.isTenantAdmin()).thenReturn(true);
+            when(connectedUserConnectionService.getConnectionIdsIn(anySet())).thenAnswer(invocation -> {
+                Set<Long> requestedConnectionIds = invocation.getArgument(0);
+
+                return requestedConnectionIds.contains(CONNECTED_USER_CONNECTION_ID)
+                    ? Set.of(CONNECTED_USER_CONNECTION_ID) : Set.of();
+            });
+            when(connectedUserConnectionService.existsByConnectionId(CONNECTED_USER_CONNECTION_ID)).thenReturn(true);
+        }
+
+        @Test
+        void testGetConnectionsExcludesConnectedUserConnections() {
+            stubConnections(
+                connectionDTO(ADMIN_CONNECTION_ID, List.of()), connectionDTO(CONNECTED_USER_CONNECTION_ID, List.of()));
+
+            List<ConnectionDTO> connectionDTOs = connectionAdminFacade.getConnections(null, null, null, null);
+
+            assertThat(connectionDTOs).extracting(ConnectionDTO::id)
+                .containsExactly(ADMIN_CONNECTION_ID);
+        }
+
+        @Test
+        void testGetConnectionsKeepsSharedAdminConnections() {
+            stubConnections(
+                connectionDTO(ADMIN_CONNECTION_ID, List.of()), connectionDTO(SHARED_CONNECTION_ID, List.of()));
+
+            when(connectedUserConnectionService.getSharedConnectionIds()).thenReturn(Set.of(SHARED_CONNECTION_ID));
+
+            List<ConnectionDTO> connectionDTOs = connectionAdminFacade.getConnections(null, null, null, null);
+
+            assertThat(connectionDTOs).extracting(ConnectionDTO::id)
+                .containsExactly(ADMIN_CONNECTION_ID, SHARED_CONNECTION_ID);
+        }
+
+        @Test
+        void testGetConnectionThrowsForConnectedUserConnection() {
+            stubEmbedded(CONNECTED_USER_CONNECTION_ID);
+
+            assertThatThrownBy(() -> connectionAdminFacade.getConnection(CONNECTED_USER_CONNECTION_ID))
+                .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).getConnection(anyLong());
+        }
+
+        @Test
+        void testUpdateConnectionThrowsForConnectedUserConnection() {
+            stubEmbedded(CONNECTED_USER_CONNECTION_ID);
+
+            assertThatThrownBy(
+                () -> connectionAdminFacade.updateConnection(
+                    CONNECTED_USER_CONNECTION_ID, "name", List.of(), null, 0))
+                        .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).update(anyLong(), anyString(), any(), anyInt());
+        }
+
+        @Test
+        void testDeleteConnectionThrowsForConnectedUserConnection() {
+            stubEmbedded(CONNECTED_USER_CONNECTION_ID);
+
+            assertThatThrownBy(() -> connectionAdminFacade.deleteConnection(CONNECTED_USER_CONNECTION_ID))
+                .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).delete(anyLong());
+            verify(connectedUserConnectionService, never()).deleteByConnectionId(anyLong());
+        }
+
+        @Test
+        void testUpdateConnectionTagsThrowsForConnectedUserConnection() {
+            stubEmbedded(CONNECTED_USER_CONNECTION_ID);
+
+            assertThatThrownBy(
+                () -> connectionAdminFacade.updateConnectionTags(CONNECTED_USER_CONNECTION_ID, List.of()))
+                    .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).update(anyLong(), anyList());
+        }
+
+        @Test
+        void testUpdateConnectionTagsUpdatesAdminConnection() {
+            stubEmbedded(ADMIN_CONNECTION_ID);
+
+            List<Tag> tags = List.of(new Tag(11L, "admin"));
+
+            connectionAdminFacade.updateConnectionTags(ADMIN_CONNECTION_ID, tags);
+
+            verify(connectionFacade).update(ADMIN_CONNECTION_ID, tags);
+        }
+
+        @Test
+        void testGetConnectionTagsReturnsOnlyAdminConnectionTags() {
+            Tag adminTag = new Tag(11L, "admin");
+
+            stubConnections(
+                connectionDTO(ADMIN_CONNECTION_ID, List.of(adminTag)),
+                connectionDTO(CONNECTED_USER_CONNECTION_ID, List.of(new Tag(12L, "customer"))));
+
+            assertThat(connectionAdminFacade.getConnectionTags()).containsExactly(adminTag);
+        }
+
+        private ConnectionDTO connectionDTO(long id, List<Tag> tags) {
+            return ConnectionDTO.builder()
+                .id(id)
+                .tags(tags)
+                .build();
+        }
+
+        private void stubConnections(ConnectionDTO... connectionDTOs) {
+            when(connectionFacade.getConnections(any(), any(), anyList(), any(), any(), any(PlatformType.class)))
+                .thenReturn(List.of(connectionDTOs));
+        }
+
+        private void stubEmbedded(long id) {
+            when(connectionService.fetchConnection(id)).thenReturn(Optional.of(connection(id, PlatformType.EMBEDDED)));
         }
     }
 
