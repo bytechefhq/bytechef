@@ -25,8 +25,8 @@ import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.tenant.single.SingleTenantService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -118,7 +118,7 @@ class RemoteExternalInvocationEventListenerIntTest {
                 .mcpServerId(3L)
                 .workspaceId(4L)
                 .jobId(11L)
-                .outcome(ExternalInvocationOutcome.ERROR)
+                .status(ExternalInvocationStatus.ERROR)
                 .errorType("IllegalStateException")
                 .errorMessage("failed")
                 .durationMs(42)
@@ -133,11 +133,11 @@ class RemoteExternalInvocationEventListenerIntTest {
         assertThat(externalInvocationLog.getType()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(externalInvocationLog.getSource()).isEqualTo(ExternalInvocationSource.MCP_SERVER);
         assertThat(externalInvocationLog.getKind()).isEqualTo(ExternalInvocationKind.WORKFLOW);
-        assertThat(externalInvocationLog.getToolName()).isEqualTo("send_report");
+        assertThat(externalInvocationLog.getInvocationName()).isEqualTo("send_report");
         assertThat(externalInvocationLog.getMcpServerId()).isEqualTo(3L);
         assertThat(externalInvocationLog.getWorkspaceId()).isEqualTo(4L);
         assertThat(externalInvocationLog.getJobId()).isEqualTo(11L);
-        assertThat(externalInvocationLog.getOutcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(externalInvocationLog.getStatus()).isEqualTo(ExternalInvocationStatus.ERROR);
         assertThat(externalInvocationLog.getErrorMessage()).isEqualTo("failed");
         assertThat(externalInvocationLog.getDurationMs()).isEqualTo(42);
     }
@@ -164,7 +164,7 @@ class RemoteExternalInvocationEventListenerIntTest {
             @ComponentScan.Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class),
             @ComponentScan.Filter(
                 type = FilterType.REGEX,
-                pattern = "com\\.bytechef\\.ee\\.platform\\.tool\\.invocation\\.log\\.remote\\..*")
+                pattern = "com\\.bytechef\\.ee\\.platform\\.external\\.invocation\\.log\\.remote\\.client\\.service\\..*")
         })
     @Import({
         LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class, SingleTenantService.class
@@ -185,7 +185,8 @@ class RemoteExternalInvocationEventListenerIntTest {
         }
 
         @Configuration
-        static class RemoteExternalInvocationEventListenerIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
+        static class RemoteExternalInvocationEventListenerIntTestJdbcConfiguration
+            extends AbstractIntTestJdbcConfiguration {
 
             @Override
             protected List<?> userConverters() {

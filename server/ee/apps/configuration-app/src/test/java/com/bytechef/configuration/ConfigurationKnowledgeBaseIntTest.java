@@ -14,6 +14,7 @@ import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import io.grpc.BindableService;
@@ -34,6 +35,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.convention.TestBean;
@@ -56,6 +61,8 @@ import org.testcontainers.utility.DockerImageName;
 class ConfigurationKnowledgeBaseIntTest {
 
     private static final int DIMENSIONS = 1536;
+    private static final byte[] INVOICE_TERMS = "Invoices are due within thirty days of issue.".getBytes(
+        StandardCharsets.UTF_8);
 
     private static final PostgreSQLContainer<?> PG_VECTOR_CONTAINER = new PostgreSQLContainer<>(
         DockerImageName.parse("pgvector/pgvector:pg16")
@@ -116,10 +123,21 @@ class ConfigurationKnowledgeBaseIntTest {
         long knowledgeBaseId = knowledgeBaseService.createKnowledgeBase(knowledgeBase)
             .getId();
 
-        KnowledgeBaseDocument knowledgeBaseDocument = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            knowledgeBaseId, "notes.txt", "text/plain",
-            new ByteArrayInputStream(
-                "Invoices are due within thirty days of issue.".getBytes(StandardCharsets.UTF_8)));
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                "admin", "n/a", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+
+        KnowledgeBaseDocument knowledgeBaseDocument;
+
+        try {
+            knowledgeBaseDocument = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
+                knowledgeBaseId, "notes.txt", "text/plain", INVOICE_TERMS.length,
+                new ByteArrayInputStream(INVOICE_TERMS));
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
 
         assertThat(awaitStatus(knowledgeBaseDocument.getId(), Duration.ofSeconds(30)))
             .isEqualTo(KnowledgeBaseDocument.STATUS_READY);

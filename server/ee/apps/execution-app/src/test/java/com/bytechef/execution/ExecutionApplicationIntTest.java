@@ -24,9 +24,9 @@ import com.bytechef.message.broker.memory.MemoryMessageBroker;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -300,7 +300,8 @@ public class ExecutionApplicationIntTest {
 
         assertThat(
             jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM public.shedlock WHERE name = 'purgeExpiredExternalInvocationLogs'", Integer.class))
+                "SELECT COUNT(*) FROM public.shedlock WHERE name = 'purgeExpiredExternalInvocationLogs'",
+                Integer.class))
                     .isEqualTo(1);
     }
 
@@ -320,7 +321,7 @@ public class ExecutionApplicationIntTest {
                 externalInvocationLogService.getExternalInvocationLogs(
                     PlatformType.EMBEDDED, null, ExternalInvocationSource.MCP_SERVER, null, null, null, null, null,
                     null, null, 0))
-                        .extracting(ExternalInvocationLog::getToolName, ExternalInvocationLog::getOutcome)
-                        .contains(tuple(toolName, ExternalInvocationOutcome.SUCCESS)));
+                        .extracting(ExternalInvocationLog::getInvocationName, ExternalInvocationLog::getStatus)
+                        .contains(tuple(toolName, ExternalInvocationStatus.SUCCESS)));
     }
 }

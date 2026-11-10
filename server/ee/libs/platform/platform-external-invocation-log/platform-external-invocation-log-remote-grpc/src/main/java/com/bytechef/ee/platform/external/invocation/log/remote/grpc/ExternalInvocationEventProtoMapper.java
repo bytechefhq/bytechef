@@ -36,8 +36,10 @@ public class ExternalInvocationEventProtoMapper {
             .build();
     }
 
-    public ExternalInvocationEvent toExternalInvocationEvent(RecordExternalInvocationRequest recordExternalInvocationRequest) {
+    public ExternalInvocationEvent
+        toExternalInvocationEvent(RecordExternalInvocationRequest recordExternalInvocationRequest) {
         return Objects.requireNonNull(
-            jsonBytes.read(recordExternalInvocationRequest.getExternalInvocationEvent(), EXTERNAL_INVOCATION_EVENT_TYPE_REFERENCE));
+            jsonBytes.read(recordExternalInvocationRequest.getExternalInvocationEvent(),
+                EXTERNAL_INVOCATION_EVENT_TYPE_REFERENCE));
     }
 }

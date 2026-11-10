@@ -36,6 +36,7 @@ import com.bytechef.automation.configuration.callback.ProjectWorkflowCallback;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacadeImpl;
+import com.bytechef.automation.configuration.facade.ProjectVersionWorkflowChangeFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
@@ -45,12 +46,15 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentReposit
 import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflowRepository;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
+import com.bytechef.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
+import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -66,10 +70,9 @@ import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
-import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCache;
 import com.bytechef.ee.platform.user.remote.client.service.RemoteUserServiceClient;
 import com.bytechef.ee.platform.user.remote.grpc.UserRemoteServiceGrpcServer;
 import com.bytechef.ee.remote.grpc.FixedGrpcChannels;
@@ -113,6 +116,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cache.CacheManager;
@@ -124,6 +128,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tools.jackson.databind.ObjectMapper;
@@ -151,7 +156,7 @@ import tools.jackson.databind.ObjectMapper;
 @Import({
     AutomationConfigurationIntTestData.class, JacksonConfiguration.class, LiquibaseConfiguration.class,
     PermissionScopeRegistry.class, PermissionServiceImpl.class, PostgreSQLContainerConfiguration.class,
-    ProjectCallback.class, ProjectWorkflowCallback.class, UserCallback.class, WorkspaceScopeCacheService.class,
+    ProjectCallback.class, ProjectWorkflowCallback.class, UserCallback.class, WorkspaceScopeCache.class,
     AutomationConfigurationRemoteClientIntTestConfiguration.AutomationConfigurationJdbcConfiguration.class
 })
 @SpringBootConfiguration
@@ -172,9 +177,9 @@ public class AutomationConfigurationRemoteClientIntTestConfiguration {
     }
 
     @Bean
-    ProjectOwnerContributor embeddedAutomationWorkflowProjectOwnerContributor() {
+    ProjectOwnerContributor embeddedAutomationProjectOwnerContributor() {
         return ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, EMBEDDED_AUTOMATION_PROJECT_NAME_CONDITION);
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, EMBEDDED_AUTOMATION_PROJECT_NAME_CONDITION);
     }
 
     @Bean
@@ -254,8 +259,23 @@ public class AutomationConfigurationRemoteClientIntTestConfiguration {
     }
 
     @Bean
-    ProjectDeploymentService projectDeploymentService(ProjectDeploymentRepository projectDeploymentRepository) {
+    ProjectDeploymentService projectDeploymentService(
+        ProjectDeploymentRepository projectDeploymentRepository) {
+
         return new ProjectDeploymentServiceImpl(projectDeploymentRepository);
+    }
+
+    @Bean
+    ProjectOwnershipService projectOwnershipService(
+        JdbcClient jdbcClient,
+        ObjectProvider<ProjectDeploymentOwnerContributor> projectDeploymentOwnerContributorProvider,
+        ObjectProvider<ProjectOwnerContributor> projectOwnerContributorProvider) {
+
+        return new ProjectOwnershipServiceImpl(
+            jdbcClient, projectDeploymentOwnerContributorProvider.orderedStream()
+                .toList(),
+            projectOwnerContributorProvider.orderedStream()
+                .toList());
     }
 
     @Bean
@@ -267,14 +287,17 @@ public class AutomationConfigurationRemoteClientIntTestConfiguration {
 
     @Bean
     ProjectFacade projectFacade(
+        ObjectProvider<ProjectCodeWorkflowInfoSupplier> projectCodeWorkflowInfoSupplierProvider,
         ProjectDeploymentService projectDeploymentService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
         return new ProjectFacadeImpl(
             new ApplicationProperties(), Mockito.mock(CategoryService.class),
             Mockito.mock(ComponentDefinitionHelper.class), Mockito.mock(PreBuiltTemplateService.class),
-            projectWorkflowService, projectDeploymentService, Mockito.mock(ProjectOwnershipService.class),
-            projectService, Mockito.mock(ProjectDeploymentFacade.class), Mockito.mock(ProjectWorkflowFacade.class),
+            projectCodeWorkflowInfoSupplierProvider, projectWorkflowService, projectDeploymentService,
+            Mockito.mock(ProjectOwnershipService.class), projectService,
+            Mockito.mock(ProjectVersionWorkflowChangeFacade.class), Mockito.mock(ProjectDeploymentFacade.class),
+            Mockito.mock(ProjectWorkflowFacade.class),
             Mockito.mock(SharedTemplateFileStorage.class), Mockito.mock(SharedTemplateService.class),
             Mockito.mock(TagService.class), workflowService, Mockito.mock(WorkflowTestConfigurationService.class),
             Mockito.mock(WorkflowNodeTestOutputService.class), List.of());

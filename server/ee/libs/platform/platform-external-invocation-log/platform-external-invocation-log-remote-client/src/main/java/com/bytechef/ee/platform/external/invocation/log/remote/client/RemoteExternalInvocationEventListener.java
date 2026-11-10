@@ -49,8 +49,9 @@ public class RemoteExternalInvocationEventListener {
                 .recordExternalInvocation(externalInvocationEventProtoMapper.toProto(externalInvocationEvent));
         } catch (RuntimeException exception) {
             log.warn(
-                "Failed to send external invocation log for source={} tool={} to {}: {}", externalInvocationEvent.source(),
-                externalInvocationEvent.toolName(), SERVICE_ID, exception.getMessage());
+                "Failed to send external invocation log for source={} invocation={} to {}: {}",
+                externalInvocationEvent.source(),
+                externalInvocationEvent.invocationName(), SERVICE_ID, exception.getMessage());
         }
     }
 }

@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.platform.external.invocation.log.remote.grpc;
 
-import com.bytechef.ee.platform.external.invocation.log.remote.grpc.proto.RecordExternalInvocationRequest;
 import com.bytechef.ee.platform.external.invocation.log.remote.grpc.proto.ExternalInvocationLogRemoteServiceGrpc;
+import com.bytechef.ee.platform.external.invocation.log.remote.grpc.proto.RecordExternalInvocationRequest;
 import com.google.protobuf.Empty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
@@ -35,7 +35,8 @@ public class ExternalInvocationLogRemoteServiceGrpcServer
     }
 
     @Override
-    public void recordExternalInvocation(RecordExternalInvocationRequest request, StreamObserver<Empty> responseObserver) {
+    public void
+        recordExternalInvocation(RecordExternalInvocationRequest request, StreamObserver<Empty> responseObserver) {
         applicationEventPublisher.publishEvent(externalInvocationEventProtoMapper.toExternalInvocationEvent(request));
 
         responseObserver.onNext(Empty.getDefaultInstance());
