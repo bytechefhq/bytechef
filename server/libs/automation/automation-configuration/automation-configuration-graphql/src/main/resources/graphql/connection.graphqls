@@ -1,3 +1,12 @@
 extend type Mutation {
     disconnectConnection(connectionId: ID!): Boolean!
+    """Replace an existing connection's authorization parameters. A parameter that is not submitted is cleared.
+    Succeeding means the values were stored, not that they work."""
+    updateConnectionCredentials(input: UpdateConnectionCredentialsInput!): Boolean!
+}
+
+input UpdateConnectionCredentialsInput {
+    connectionId: ID!
+    parameters: Map!
+    version: Int!
 }

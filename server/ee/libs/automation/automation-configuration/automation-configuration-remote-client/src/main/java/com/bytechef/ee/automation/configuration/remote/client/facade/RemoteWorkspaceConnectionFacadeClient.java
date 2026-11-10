@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.remote.client.facade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,6 +42,11 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
         long workspaceId, String componentName, Integer connectionVersion, Long connectionEnvironment,
         Long tagId) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
         throw new UnsupportedOperationException();
     }
 }

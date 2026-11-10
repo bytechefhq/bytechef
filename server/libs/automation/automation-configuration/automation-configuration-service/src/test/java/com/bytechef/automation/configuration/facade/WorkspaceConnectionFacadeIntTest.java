@@ -19,7 +19,12 @@ package com.bytechef.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
@@ -35,14 +40,20 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,6 +84,12 @@ public class WorkspaceConnectionFacadeIntTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ConnectionFacade connectionFacade;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @Autowired
     private ProjectFacade projectFacade;
@@ -275,6 +292,51 @@ public class WorkspaceConnectionFacadeIntTest {
         // Then - No exception should be thrown (method completes successfully)
     }
 
+    @Test
+    public void testUpdateConnectionCredentialsReplacesAuthorizationParameters() {
+        Map<String, String> parameters = Map.of("token", "new-token");
+
+        when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
+
+        workspaceConnectionFacade.updateConnectionCredentials(1L, parameters, 3);
+
+        verify(connectionFacade).replaceAuthorizationParameters(1L, parameters);
+    }
+
+    @Test
+    public void testUpdateConnectionCredentialsRejectsStaleVersion() {
+        when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 4));
+
+        assertThatThrownBy(
+            () -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of("token", "new-token"), 3))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("modified by someone else");
+
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), anyMap());
+    }
+
+    @Test
+    public void testUpdateConnectionCredentialsRejectsInactiveConnection() {
+        when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.REVOKED, 3));
+
+        assertThatThrownBy(
+            () -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of("token", "new-token"), 3))
+                .isInstanceOf(ConfigurationException.class)
+                .hasMessageContaining("REVOKED");
+
+        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), anyMap());
+    }
+
+    private static Connection createConnection(ConnectionStatus status, int version) {
+        Connection connection = new Connection();
+
+        connection.setId(1L);
+        connection.setStatus(status);
+        connection.setVersion(version);
+
+        return connection;
+    }
+
     @Nested
     @ContextConfiguration(classes = PreAuthorizeEnforcement.MethodSecurityConfiguration.class)
     class PreAuthorizeEnforcement {
@@ -297,6 +359,12 @@ public class WorkspaceConnectionFacadeIntTest {
         @Test
         void testDisconnectIsAdminOnly() {
             assertRequiresAdminAuthority(() -> workspaceConnectionFacade.disconnectConnection(1L));
+        }
+
+        @Test
+        void testUpdateConnectionCredentialsIsAdminOnly() {
+            assertRequiresAdminAuthority(
+                () -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of(), 0));
         }
 
         private void assertRequiresAdminAuthority(ThrowingCallable call) {

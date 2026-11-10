@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -32,4 +33,13 @@ public interface WorkspaceConnectionFacade {
 
     List<ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long environmentId, Long tagId);
+
+    /**
+     * Replaces the authorization parameters of an existing connection wholesale.
+     *
+     * @param connectionId the id of the connection
+     * @param parameters   the new authorization parameters; a parameter that is not submitted is cleared
+     * @param version      the connection version the caller read, checked against the stored one
+     */
+    void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version);
 }
