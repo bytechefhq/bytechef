@@ -26,7 +26,6 @@ import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -119,18 +118,11 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
         Connection connection = connectionService.getConnection(connectionId);
 
-        if (connection.getStatus() != ConnectionStatus.ACTIVE) {
+        if (connection.getType() != PlatformType.AUTOMATION) {
             throw new ConfigurationException(
-                "Credentials cannot be replaced on a connection with status %s".formatted(connection.getStatus()),
-                ConnectionErrorType.INVALID_CONNECTION);
+                "Credentials can only be replaced on automation connections", ConnectionErrorType.INVALID_CONNECTION);
         }
 
-        if (connection.getVersion() != version) {
-            throw new ConfigurationException(
-                "Connection id=%s was modified by someone else; reload and try again".formatted(connectionId),
-                ConnectionErrorType.INVALID_CONNECTION);
-        }
-
-        connectionFacade.replaceAuthorizationParameters(connectionId, parameters, version);
+        connectionFacade.updateCredentials(connectionId, parameters, version);
     }
 }

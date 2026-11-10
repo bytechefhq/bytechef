@@ -50,6 +50,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -294,38 +295,30 @@ public class WorkspaceConnectionFacadeIntTest {
     }
 
     @Test
-    public void testUpdateConnectionCredentialsReplacesAuthorizationParameters() {
+    public void testUpdateConnectionCredentialsDelegatesForAutomationConnection() {
         Map<String, String> parameters = Map.of("token", "new-token");
 
         when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 3));
 
         workspaceConnectionFacade.updateConnectionCredentials(1L, parameters, 3);
 
-        verify(connectionFacade).replaceAuthorizationParameters(1L, parameters, 3);
+        verify(connectionFacade).updateCredentials(1L, parameters, 3);
     }
 
     @Test
-    public void testUpdateConnectionCredentialsRejectsStaleVersion() {
-        when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.ACTIVE, 4));
+    public void testUpdateConnectionCredentialsRejectsEmbeddedConnection() {
+        Connection connection = createConnection(ConnectionStatus.ACTIVE, 3);
+
+        connection.setType(PlatformType.EMBEDDED);
+
+        when(connectionService.getConnection(1L)).thenReturn(connection);
 
         assertThatThrownBy(
             () -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of("token", "new-token"), 3))
                 .isInstanceOf(ConfigurationException.class)
-                .hasMessageContaining("modified by someone else");
+                .hasMessageContaining("automation connections");
 
-        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), anyMap(), anyInt());
-    }
-
-    @Test
-    public void testUpdateConnectionCredentialsRejectsInactiveConnection() {
-        when(connectionService.getConnection(1L)).thenReturn(createConnection(ConnectionStatus.REVOKED, 3));
-
-        assertThatThrownBy(
-            () -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of("token", "new-token"), 3))
-                .isInstanceOf(ConfigurationException.class)
-                .hasMessageContaining("REVOKED");
-
-        verify(connectionFacade, never()).replaceAuthorizationParameters(anyLong(), anyMap(), anyInt());
+        verify(connectionFacade, never()).updateCredentials(anyLong(), anyMap(), anyInt());
     }
 
     private static Connection createConnection(ConnectionStatus status, int version) {

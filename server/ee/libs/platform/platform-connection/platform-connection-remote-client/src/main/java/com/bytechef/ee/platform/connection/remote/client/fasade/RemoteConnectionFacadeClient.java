@@ -91,4 +91,9 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
     public void replaceAuthorizationParameters(long id, Map<String, ?> parameters, int version) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void updateCredentials(long id, Map<String, ?> parameters, int version) {
+        throw new UnsupportedOperationException();
+    }
 }
