@@ -698,6 +698,107 @@ To find the repository name, click [here](/reference/components/github_v1#how-to
 
 
 
+### Create Release
+Name: createRelease
+
+`Creates a release in a repository. The tag is created from the default branch if it does not exist.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
+| repository | Repository | STRING | Repository where the release will be created. | true |
+| tagName | Tag Name | STRING | The name of the tag for the release, for example v1.0.0. | true |
+| name | Name | STRING | The title of the release. | false |
+| body | Body | STRING | The release notes. When Generate Release Notes is enabled, this text is prepended to the generated notes. | false |
+| draft | Draft | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to create an unpublished draft release. | false |
+| prerelease | Prerelease | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to mark the release as a prerelease. | false |
+| generateReleaseNotes | Generate Release Notes | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether GitHub should generate the release name and notes from the merged pull requests since the previous release. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Release",
+  "name" : "createRelease",
+  "parameters" : {
+    "owner" : "",
+    "repository" : "",
+    "tagName" : "",
+    "name" : "",
+    "body" : "",
+    "draft" : false,
+    "prerelease" : false,
+    "generateReleaseNotes" : false
+  },
+  "type" : "github/v1/createRelease"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | NUMBER | ID of the release. |
+| tag_name | STRING | The name of the tag. |
+| target_commitish | STRING | The branch or commit SHA the tag was created from. |
+| name | STRING | The name of the release. |
+| body | STRING | The release notes. |
+| draft | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the release is a draft. |
+| prerelease | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the release is a prerelease. |
+| created_at | STRING | When the release was created. |
+| published_at | STRING | When the release was published. |
+| html_url | STRING | The URL of the release on GitHub. |
+| tarball_url | STRING |  |
+| zipball_url | STRING |  |
+| author | OBJECT <details> <summary> Properties </summary> &#123;STRING\(login), NUMBER\(id), STRING\(html_url)&#125; </details> | The user who created the release. |
+| assets | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), STRING\(name), STRING\(label), STRING\(content_type), INTEGER\(size), INTEGER\(download_count), STRING\(browser_download_url)&#125;] </details> | Files attached to the release. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 0.0,
+  "tag_name" : "",
+  "target_commitish" : "",
+  "name" : "",
+  "body" : "",
+  "draft" : false,
+  "prerelease" : false,
+  "created_at" : "",
+  "published_at" : "",
+  "html_url" : "",
+  "tarball_url" : "",
+  "zipball_url" : "",
+  "author" : {
+    "login" : "",
+    "id" : 0.0,
+    "html_url" : ""
+  },
+  "assets" : [ {
+    "id" : 0.0,
+    "name" : "",
+    "label" : "",
+    "content_type" : "",
+    "size" : 1,
+    "download_count" : 1,
+    "browser_download_url" : ""
+  } ]
+}
+```
+
+
+
+
 ### Get Issue
 Name: getIssue
 
@@ -784,6 +885,146 @@ To find the repository name, click [here](/reference/components/github_v1#how-to
 #### Find issue number
 
 To find the issue number, click [here](/reference/components/github_v1#how-to-find-your-issue-number).
+
+
+
+
+### Get Pull Request
+Name: getPullRequest
+
+`Gets a pull request by its number, including its requested reviewers.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
+| repository | Repository | STRING | Repository the pull request belongs to. | true |
+| pullNumber | Pull Request Number | INTEGER | The number that identifies the pull request within the repository. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Pull Request",
+  "name" : "getPullRequest",
+  "parameters" : {
+    "owner" : "",
+    "repository" : "",
+    "pullNumber" : 1
+  },
+  "type" : "github/v1/getPullRequest"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | NUMBER | ID of the pull request. |
+| number | INTEGER | Number uniquely identifying the pull request within its repository. |
+| url | STRING | The API URL of the pull request. |
+| html_url | STRING | The URL of the pull request on GitHub. |
+| diff_url | STRING | The URL of the pull request diff. |
+| state | STRING | The state of the pull request. Either open or closed. |
+| locked | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the pull request conversation is locked. |
+| title | STRING | The title of the pull request. |
+| body | STRING | The contents of the pull request. |
+| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(login), NUMBER\(id), STRING\(html_url), STRING\(type)&#125; </details> | The user who opened the pull request. |
+| labels | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), STRING\(name), STRING\(description)&#125;] </details> | Labels associated with the pull request. |
+| assignees | ARRAY <details> <summary> Items </summary> [&#123;STRING\(login), NUMBER\(id), STRING\(html_url)&#125;] </details> | Users assigned to the pull request. |
+| requested_reviewers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(login), NUMBER\(id), STRING\(html_url)&#125;] </details> | Users whose review is requested on the pull request. |
+| requested_teams | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), STRING\(name), STRING\(slug)&#125;] </details> | Teams whose review is requested on the pull request. |
+| head | OBJECT <details> <summary> Properties </summary> &#123;STRING\(label), STRING\(ref), STRING\(sha)&#125; </details> | The branch where the changes are implemented. |
+| base | OBJECT <details> <summary> Properties </summary> &#123;STRING\(label), STRING\(ref), STRING\(sha)&#125; </details> | The branch the changes are pulled into. |
+| draft | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the pull request is a draft. |
+| merged | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the pull request has been merged. |
+| mergeable_state | STRING | The mergeable state of the pull request. |
+| merge_commit_sha | STRING | The SHA of the merge commit. |
+| created_at | STRING | When the pull request was created. |
+| updated_at | STRING | When the pull request was last updated. |
+| closed_at | STRING | When the pull request was closed. |
+| merged_at | STRING | When the pull request was merged. |
+| comments | INTEGER | The number of comments on the pull request. |
+| review_comments | INTEGER | The number of review comments on the pull request. |
+| commits | INTEGER | The number of commits in the pull request. |
+| additions | INTEGER | The number of additions in the pull request. |
+| deletions | INTEGER | The number of deletions in the pull request. |
+| changed_files | INTEGER | The number of changed files in the pull request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 0.0,
+  "number" : 1,
+  "url" : "",
+  "html_url" : "",
+  "diff_url" : "",
+  "state" : "",
+  "locked" : false,
+  "title" : "",
+  "body" : "",
+  "user" : {
+    "login" : "",
+    "id" : 0.0,
+    "html_url" : "",
+    "type" : ""
+  },
+  "labels" : [ {
+    "id" : 0.0,
+    "name" : "",
+    "description" : ""
+  } ],
+  "assignees" : [ {
+    "login" : "",
+    "id" : 0.0,
+    "html_url" : ""
+  } ],
+  "requested_reviewers" : [ {
+    "login" : "",
+    "id" : 0.0,
+    "html_url" : ""
+  } ],
+  "requested_teams" : [ {
+    "id" : 0.0,
+    "name" : "",
+    "slug" : ""
+  } ],
+  "head" : {
+    "label" : "",
+    "ref" : "",
+    "sha" : ""
+  },
+  "base" : {
+    "label" : "",
+    "ref" : "",
+    "sha" : ""
+  },
+  "draft" : false,
+  "merged" : false,
+  "mergeable_state" : "",
+  "merge_commit_sha" : "",
+  "created_at" : "",
+  "updated_at" : "",
+  "closed_at" : "",
+  "merged_at" : "",
+  "comments" : 1,
+  "review_comments" : 1,
+  "commits" : 1,
+  "additions" : 1,
+  "deletions" : 1,
+  "changed_files" : 1
+}
+```
 
 
 
@@ -1010,6 +1251,229 @@ Items Type: OBJECT
 
 
 
+### List Pull Request Reviews
+Name: listPullRequestReviews
+
+`Lists the reviews of a pull request in chronological order.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
+| repository | Repository | STRING | Repository the pull request belongs to. | true |
+| pullNumber | Pull Request Number | INTEGER | The number that identifies the pull request within the repository. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Pull Request Reviews",
+  "name" : "listPullRequestReviews",
+  "parameters" : {
+    "owner" : "",
+    "repository" : "",
+    "pullNumber" : 1
+  },
+  "type" : "github/v1/listPullRequestReviews"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | NUMBER | ID of the review. |
+| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(login), NUMBER\(id), STRING\(html_url)&#125; </details> | The user who submitted the review. |
+| body | STRING | The body text of the review. |
+| state | STRING | The state of the review, such as APPROVED, CHANGES_REQUESTED, COMMENTED, DISMISSED or PENDING. |
+| submitted_at | STRING | When the review was submitted. |
+| commit_id | STRING | The SHA of the commit the review was made on. |
+| author_association | STRING | How the reviewer is associated with the repository. |
+| html_url | STRING | The URL of the review on GitHub. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 0.0,
+  "user" : {
+    "login" : "",
+    "id" : 0.0,
+    "html_url" : ""
+  },
+  "body" : "",
+  "state" : "",
+  "submitted_at" : "",
+  "commit_id" : "",
+  "author_association" : "",
+  "html_url" : ""
+} ]
+```
+
+
+
+
+### List Pull Requests
+Name: listPullRequests
+
+`Lists pull requests in a repository, optionally filtered by state and base branch.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
+| repository | Repository | STRING | Repository whose pull requests are listed. | true |
+| state | State | STRING <details> <summary> Options </summary> <span>open</span>, <span>closed</span>, <span>all</span> </details> | Filters pull requests by state. | false |
+| base | Base | STRING | Filters pull requests by the name of the branch they are merged into, for example main. | false |
+| sort | Sort | STRING <details> <summary> Options </summary> <span>created</span>, <span>updated</span>, <span>popularity</span>, <span>long-running</span> </details> | What to sort results by. Popularity sorts by the number of comments. Long-running sorts by creation date and only includes pull requests open for more than a month with activity in the past month. | false |
+| direction | Direction | STRING <details> <summary> Options </summary> <span>asc</span>, <span>desc</span> </details> | The direction of the sort. Defaults to descending when sorting by created date or when no sort is given, otherwise ascending. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Pull Requests",
+  "name" : "listPullRequests",
+  "parameters" : {
+    "owner" : "",
+    "repository" : "",
+    "state" : "",
+    "base" : "",
+    "sort" : "",
+    "direction" : ""
+  },
+  "type" : "github/v1/listPullRequests"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | NUMBER | ID of the pull request. |
+| number | INTEGER | Number uniquely identifying the pull request within its repository. |
+| url | STRING | The API URL of the pull request. |
+| html_url | STRING | The URL of the pull request on GitHub. |
+| diff_url | STRING | The URL of the pull request diff. |
+| state | STRING | The state of the pull request. Either open or closed. |
+| locked | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the pull request conversation is locked. |
+| title | STRING | The title of the pull request. |
+| body | STRING | The contents of the pull request. |
+| user | OBJECT <details> <summary> Properties </summary> &#123;STRING\(login), NUMBER\(id), STRING\(html_url), STRING\(type)&#125; </details> | The user who opened the pull request. |
+| labels | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), STRING\(name), STRING\(description)&#125;] </details> | Labels associated with the pull request. |
+| assignees | ARRAY <details> <summary> Items </summary> [&#123;STRING\(login), NUMBER\(id), STRING\(html_url)&#125;] </details> | Users assigned to the pull request. |
+| requested_reviewers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(login), NUMBER\(id), STRING\(html_url)&#125;] </details> | Users whose review is requested on the pull request. |
+| requested_teams | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), STRING\(name), STRING\(slug)&#125;] </details> | Teams whose review is requested on the pull request. |
+| head | OBJECT <details> <summary> Properties </summary> &#123;STRING\(label), STRING\(ref), STRING\(sha)&#125; </details> | The branch where the changes are implemented. |
+| base | OBJECT <details> <summary> Properties </summary> &#123;STRING\(label), STRING\(ref), STRING\(sha)&#125; </details> | The branch the changes are pulled into. |
+| draft | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the pull request is a draft. |
+| merged | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the pull request has been merged. |
+| mergeable_state | STRING | The mergeable state of the pull request. |
+| merge_commit_sha | STRING | The SHA of the merge commit. |
+| created_at | STRING | When the pull request was created. |
+| updated_at | STRING | When the pull request was last updated. |
+| closed_at | STRING | When the pull request was closed. |
+| merged_at | STRING | When the pull request was merged. |
+| comments | INTEGER | The number of comments on the pull request. |
+| review_comments | INTEGER | The number of review comments on the pull request. |
+| commits | INTEGER | The number of commits in the pull request. |
+| additions | INTEGER | The number of additions in the pull request. |
+| deletions | INTEGER | The number of deletions in the pull request. |
+| changed_files | INTEGER | The number of changed files in the pull request. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 0.0,
+  "number" : 1,
+  "url" : "",
+  "html_url" : "",
+  "diff_url" : "",
+  "state" : "",
+  "locked" : false,
+  "title" : "",
+  "body" : "",
+  "user" : {
+    "login" : "",
+    "id" : 0.0,
+    "html_url" : "",
+    "type" : ""
+  },
+  "labels" : [ {
+    "id" : 0.0,
+    "name" : "",
+    "description" : ""
+  } ],
+  "assignees" : [ {
+    "login" : "",
+    "id" : 0.0,
+    "html_url" : ""
+  } ],
+  "requested_reviewers" : [ {
+    "login" : "",
+    "id" : 0.0,
+    "html_url" : ""
+  } ],
+  "requested_teams" : [ {
+    "id" : 0.0,
+    "name" : "",
+    "slug" : ""
+  } ],
+  "head" : {
+    "label" : "",
+    "ref" : "",
+    "sha" : ""
+  },
+  "base" : {
+    "label" : "",
+    "ref" : "",
+    "sha" : ""
+  },
+  "draft" : false,
+  "merged" : false,
+  "mergeable_state" : "",
+  "merge_commit_sha" : "",
+  "created_at" : "",
+  "updated_at" : "",
+  "closed_at" : "",
+  "merged_at" : "",
+  "comments" : 1,
+  "review_comments" : 1,
+  "commits" : 1,
+  "additions" : 1,
+  "deletions" : 1,
+  "changed_files" : 1
+} ]
+```
+
+
+
+
 ### List Repository Issues
 Name: listRepositoryIssues
 
@@ -1188,6 +1652,94 @@ To find the repository name, click [here](/reference/components/github_v1#how-to
 #### Find path
 
 To find the path, click [here](/reference/components/github_v1#how-to-find-file-path).
+
+
+
+
+### Search Issues and Pull Requests
+Name: searchIssuesAndPullRequests
+
+`Searches issues and pull requests across GitHub using GitHub search syntax and returns up to 100 results per page.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Query | STRING | The search keywords and qualifiers, for example 'repo:bytechefhq/bytechef is:pr is:open review:required'. Use is:issue or is:pr to limit results to issues or pull requests. | true |
+| sort | Sort | STRING <details> <summary> Options </summary> <span>comments</span>, <span>reactions</span>, <span>interactions</span>, <span>created</span>, <span>updated</span> </details> | What to sort results by. Results are sorted by best match when not set. | false |
+| order | Order | STRING <details> <summary> Options </summary> <span>desc</span>, <span>asc</span> </details> | The order of the results. Only used when Sort is set. | false |
+| page | Page | INTEGER | The page number of the results to fetch. | false |
+| per_page | Per Page | INTEGER | The number of results per page (max 100). | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Issues and Pull Requests",
+  "name" : "searchIssuesAndPullRequests",
+  "parameters" : {
+    "query" : "",
+    "sort" : "",
+    "order" : "",
+    "page" : 1,
+    "per_page" : 1
+  },
+  "type" : "github/v1/searchIssuesAndPullRequests"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| total_count | INTEGER | Total number of matching results. |
+| incomplete_results | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the results are incomplete. |
+| items | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), STRING\(body), STRING\(html_url), STRING\(repository_url), &#123;STRING\(login), NUMBER\(id), STRING\(html_url)&#125;\(user), [&#123;NUMBER\(id), STRING\(name)&#125;]\(labels), &#123;STRING\(url), STRING\(html_url), STRING\(merged_at)&#125;\(pull_request), INTEGER\(comments), STRING\(created_at), STRING\(updated_at), STRING\(closed_at), NUMBER\(score)&#125;] </details> | Issues and pull requests that match the query. |
+
+
+
+
+#### Output Example
+```json
+{
+  "total_count" : 1,
+  "incomplete_results" : false,
+  "items" : [ {
+    "id" : 0.0,
+    "number" : 1,
+    "title" : "",
+    "state" : "",
+    "body" : "",
+    "html_url" : "",
+    "repository_url" : "",
+    "user" : {
+      "login" : "",
+      "id" : 0.0,
+      "html_url" : ""
+    },
+    "labels" : [ {
+      "id" : 0.0,
+      "name" : ""
+    } ],
+    "pull_request" : {
+      "url" : "",
+      "html_url" : "",
+      "merged_at" : ""
+    },
+    "comments" : 1,
+    "created_at" : "",
+    "updated_at" : "",
+    "closed_at" : "",
+    "score" : 0.0
+  } ]
+}
+```
 
 
 
