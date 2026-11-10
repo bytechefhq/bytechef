@@ -57,10 +57,10 @@ const WorkflowRightSidebar = ({
                                 {issueCount > 0 && (
                                     <span
                                         className={twMerge(
-                                            'absolute -top-1.5 -right-2 min-w-4 rounded-full px-1 text-center text-[10px] leading-4 font-semibold text-white',
+                                            'absolute -top-1.5 -right-2 min-w-4 rounded-full px-1 text-center text-[10px] leading-4 font-semibold',
                                             issueSeverity === 'ERROR'
-                                                ? 'bg-content-destructive'
-                                                : 'bg-content-onwarning'
+                                                ? 'bg-content-destructive text-white'
+                                                : 'bg-surface-warning-primary text-content-onwarning'
                                         )}
                                     >
                                         {issueCount}
