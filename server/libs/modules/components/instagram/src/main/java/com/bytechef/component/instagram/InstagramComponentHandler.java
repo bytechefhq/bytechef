@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 ByteChef
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,18 @@
 package com.bytechef.component.instagram;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.instagram.action.InstagramCreateCarouselPostAction;
+import com.bytechef.component.instagram.action.InstagramCreateImagePostAction;
+import com.bytechef.component.instagram.action.InstagramCreateReelAction;
+import com.bytechef.component.instagram.action.InstagramGetCommentsAction;
+import com.bytechef.component.instagram.action.InstagramReplyToCommentAction;
 import com.bytechef.component.instagram.connection.InstagramConnection;
+import com.bytechef.component.instagram.trigger.InstagramNewCommentTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -41,6 +48,19 @@ public final class InstagramComponentHandler implements ComponentHandler {
         .icon("path:assets/instagram.svg")
         .categories(ComponentCategory.SOCIAL_MEDIA, ComponentCategory.MARKETING_AUTOMATION)
         .connection(InstagramConnection.CONNECTION_DEFINITION)
+        .actions(
+            InstagramCreateImagePostAction.ACTION_DEFINITION,
+            InstagramCreateCarouselPostAction.ACTION_DEFINITION,
+            InstagramCreateReelAction.ACTION_DEFINITION,
+            InstagramGetCommentsAction.ACTION_DEFINITION,
+            InstagramReplyToCommentAction.ACTION_DEFINITION)
+        .triggers(InstagramNewCommentTrigger.TRIGGER_DEFINITION)
+        .clusterElements(
+            tool(InstagramCreateImagePostAction.ACTION_DEFINITION),
+            tool(InstagramCreateCarouselPostAction.ACTION_DEFINITION),
+            tool(InstagramCreateReelAction.ACTION_DEFINITION),
+            tool(InstagramGetCommentsAction.ACTION_DEFINITION),
+            tool(InstagramReplyToCommentAction.ACTION_DEFINITION))
         .version(1);
 
     @Override
