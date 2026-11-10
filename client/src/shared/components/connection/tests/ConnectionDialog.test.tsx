@@ -1,6 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
+import {useGetOAuth2AuthorizationParametersQuery} from '@/shared/queries/platform/oauth2.queries';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -242,6 +243,231 @@ describe('ConnectionDialog', () => {
 
             expect(await screen.findByText('These credentials were rejected')).toBeInTheDocument();
             expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
+        });
+    });
+
+    describe('replacing the credentials of an existing connection', () => {
+        const oAuth2Connection = {
+            authorizationType: 'OAUTH2_AUTHORIZATION_CODE',
+            componentName: 'slack',
+            connectionVersion: 2,
+            id: 11,
+            name: 'Slack',
+            tags: [],
+            version: 4,
+        };
+
+        it('requests the OAuth2 authorization parameters for the connection component and version', () => {
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizations: [
+                        {name: 'oauth2', properties: [{name: 'clientId'}], type: 'OAUTH2_AUTHORIZATION_CODE'},
+                    ],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+
+            renderDialog({
+                connection: oAuth2Connection as never,
+                startInCredentialsMode: true,
+                useCreateConnectionMutation: undefined,
+                useUpdateConnectionCredentialsMutation: (() => ({
+                    isPending: false,
+                    mutateAsync: vi.fn(),
+                    reset: vi.fn(),
+                })) as never,
+                useUpdateConnectionMutation: (() => ({isPending: false, mutate: vi.fn(), reset: vi.fn()})) as never,
+            });
+
+            expect(vi.mocked(useGetOAuth2AuthorizationParametersQuery)).toHaveBeenLastCalledWith(
+                expect.objectContaining({componentName: 'slack', connectionVersion: 2}),
+                false
+            );
+        });
+
+        it('shows why a credentials update was rejected', () => {
+            renderDialog({
+                connection: oAuth2Connection as never,
+                startInCredentialsMode: true,
+                useCreateConnectionMutation: undefined,
+                useUpdateConnectionCredentialsMutation: (() => ({
+                    error: new Error('Connection id=11 was modified by someone else; reload and try again'),
+                    isPending: false,
+                    mutateAsync: vi.fn(),
+                    reset: vi.fn(),
+                })) as never,
+                useUpdateConnectionMutation: (() => ({isPending: false, mutate: vi.fn(), reset: vi.fn()})) as never,
+            });
+
+            expect(
+                screen.getByText(/Connection id=11 was modified by someone else; reload and try again/)
+            ).toBeInTheDocument();
+        });
+    });
+
+    describe('editing the connection properties of an existing connection', () => {
+        const connection = {
+            componentName: 'httpClient',
+            connectionParameters: {baseUri: 'https://old.example.com', token: '****'},
+            id: 9,
+            name: 'HTTP',
+            tags: [],
+            version: 3,
+        };
+
+        const renderPropertiesDialog = (props: Partial<ComponentProps<typeof ConnectionDialog>> = {}) => {
+            const credentialsMutateAsync = vi.fn().mockResolvedValue(undefined);
+            const updateConnectionMutate = vi.fn();
+
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizations: [{name: 'bearer', properties: [{name: 'token'}], type: 'BEARER_TOKEN'}],
+                    properties: [{name: 'baseUri', type: 'STRING'}],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+
+            renderDialog({
+                connection: connection as never,
+                useCreateConnectionMutation: undefined,
+                useUpdateConnectionCredentialsMutation: (() => ({
+                    isPending: false,
+                    mutateAsync: credentialsMutateAsync,
+                    reset: vi.fn(),
+                })) as never,
+                useUpdateConnectionMutation: (() => ({
+                    isPending: false,
+                    mutate: updateConnectionMutate,
+                    reset: vi.fn(),
+                })) as never,
+                ...props,
+            });
+
+            return {credentialsMutateAsync, updateConnectionMutate};
+        };
+
+        it('hides the connection properties unless the page makes them editable', () => {
+            renderPropertiesDialog();
+
+            expect(screen.queryByTestId('connection-properties')).not.toBeInTheDocument();
+        });
+
+        it('shows the connection properties when the page makes them editable', () => {
+            renderPropertiesDialog({connectionPropertiesEditable: true});
+
+            expect(screen.getByTestId('connection-properties')).toBeInTheDocument();
+        });
+
+        it('saves only the connection property values with the name and tags', async () => {
+            const {updateConnectionMutate} = renderPropertiesDialog({connectionPropertiesEditable: true});
+
+            await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => {
+                expect(updateConnectionMutate).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        id: 9,
+                        name: 'HTTP',
+                        parameters: {baseUri: 'https://old.example.com'},
+                        version: 3,
+                    })
+                );
+            });
+        });
+
+        it('saves no parameters while the connection definition is still loading', async () => {
+            const {updateConnectionMutate} = renderPropertiesDialog({connectionPropertiesEditable: true});
+
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: undefined,
+                error: null,
+                isLoading: true,
+            } as never);
+
+            await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => {
+                expect(updateConnectionMutate).toHaveBeenCalled();
+            });
+
+            expect(updateConnectionMutate.mock.calls[0][0]).not.toHaveProperty('parameters');
+        });
+
+        it('saves no parameters when the connection definition failed to load', async () => {
+            const {updateConnectionMutate} = renderPropertiesDialog({connectionPropertiesEditable: true});
+
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: undefined,
+                error: new Error('Definition unavailable'),
+                isLoading: false,
+            } as never);
+
+            await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => {
+                expect(updateConnectionMutate).toHaveBeenCalled();
+            });
+
+            expect(updateConnectionMutate.mock.calls[0][0]).not.toHaveProperty('parameters');
+        });
+
+        it('saves no parameters when the page does not make the connection properties editable', async () => {
+            const {updateConnectionMutate} = renderPropertiesDialog();
+
+            await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => {
+                expect(updateConnectionMutate).toHaveBeenCalled();
+            });
+
+            expect(updateConnectionMutate.mock.calls[0][0]).not.toHaveProperty('parameters');
+        });
+
+        it('keeps the connection authorization type once an optional-authorization definition loads', async () => {
+            vi.mocked(useGetConnectionDefinitionQuery)
+                .mockReturnValueOnce({data: undefined, error: null, isLoading: true} as never)
+                .mockReturnValue({
+                    data: {
+                        authorizationRequired: false,
+                        authorizations: [{name: 'api_key', properties: [{name: 'key'}], type: 'API_KEY'}],
+                        properties: [{name: 'baseUri', type: 'STRING'}],
+                    },
+                    error: null,
+                    isLoading: false,
+                } as never);
+
+            renderDialog({
+                connection: {...connection, authorizationType: 'API_KEY'} as never,
+                startInCredentialsMode: true,
+                useCreateConnectionMutation: undefined,
+                useUpdateConnectionCredentialsMutation: (() => ({
+                    isPending: false,
+                    mutateAsync: vi.fn(),
+                    reset: vi.fn(),
+                })) as never,
+                useUpdateConnectionMutation: (() => ({isPending: false, mutate: vi.fn(), reset: vi.fn()})) as never,
+            });
+
+            expect(await screen.findByTestId('connection-properties')).toBeInTheDocument();
+        });
+
+        it('leaves the connection properties out of a credentials update', async () => {
+            const {credentialsMutateAsync} = renderPropertiesDialog({
+                connectionPropertiesEditable: true,
+                startInCredentialsMode: true,
+            });
+
+            expect(screen.getAllByTestId('connection-properties')).toHaveLength(1);
+
+            await userEvent.click(screen.getByRole('button', {name: 'Update credentials'}));
+
+            await waitFor(() => {
+                expect(credentialsMutateAsync).toHaveBeenCalled();
+            });
+
+            expect(credentialsMutateAsync.mock.calls[0][0].parameters).not.toHaveProperty('baseUri');
         });
     });
 

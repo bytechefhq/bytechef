@@ -33,13 +33,15 @@ const ConnectionParameters = ({
 
     const hasAuthorizationParameters = !!authorizationParameters && existingAuthorizations.length > 0;
 
-    if (!hasConnectionParameters && !hasAuthorizationParameters && !baseUri) {
+    const showBaseUri = !!baseUri && !(hasConnectionParameters && connectionParameters?.baseUri === baseUri);
+
+    if (!hasConnectionParameters && !hasAuthorizationParameters && !showBaseUri) {
         return <></>;
     }
 
     return (
         <div className="w-full space-y-2 overflow-hidden">
-            {baseUri && (
+            {showBaseUri && (
                 <div className="mb-8 flex">
                     <span className="w-1/3 text-sm font-medium text-muted-foreground">Base URI:</span>
 

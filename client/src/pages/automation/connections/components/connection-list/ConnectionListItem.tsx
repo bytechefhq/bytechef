@@ -192,6 +192,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                 <ConnectionDialog
                     componentDefinitions={componentDefinitions}
                     connection={connection}
+                    connectionPropertiesEditable
                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
                     onClose={() => setShowEditDialog(false)}

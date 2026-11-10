@@ -45,6 +45,28 @@ describe('ConnectionParameters', () => {
         expect(screen.queryByText('Authorization Parameters')).not.toBeInTheDocument();
     });
 
+    it('lists the base URI once when it is also a connection parameter', () => {
+        render(
+            <ConnectionParameters
+                baseUri="https://api.example.com"
+                connectionDefinition={
+                    {...connectionDefinition, properties: [{name: 'baseUri'}]} as unknown as ConnectionDefinition
+                }
+                connectionParameters={{baseUri: 'https://api.example.com'}}
+            />
+        );
+
+        expect(screen.queryByText('Base URI:')).not.toBeInTheDocument();
+        expect(screen.getAllByText('https://api.example.com')).toHaveLength(1);
+    });
+
+    it('shows the base URI line when no connection parameter lists it', () => {
+        render(<ConnectionParameters baseUri="https://api.example.com" connectionDefinition={connectionDefinition} />);
+
+        expect(screen.getByText('Base URI:')).toBeInTheDocument();
+        expect(screen.getByText('https://api.example.com')).toBeInTheDocument();
+    });
+
     it('hides the heading when parameters are missing entirely', () => {
         render(<ConnectionParameters connectionDefinition={connectionDefinition} />);
 
