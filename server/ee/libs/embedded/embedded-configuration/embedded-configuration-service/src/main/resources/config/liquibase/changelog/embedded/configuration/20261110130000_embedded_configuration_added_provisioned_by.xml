@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261110130000-1" author="ivicac">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="integration_instance" columnName="provisioned_by"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="integration_instance">
+            <column name="provisioned_by" type="VARCHAR(50)"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="integration_instance" columnName="provisioned_by"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261110130000-2" author="ivicac">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="connected_user_connection" columnName="provisioned_by"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="connected_user_connection">
+            <column name="provisioned_by" type="VARCHAR(50)"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="connected_user_connection" columnName="provisioned_by"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
