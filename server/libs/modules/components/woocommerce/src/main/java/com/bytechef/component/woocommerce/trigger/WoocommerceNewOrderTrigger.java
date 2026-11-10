@@ -19,7 +19,7 @@ package com.bytechef.component.woocommerce.trigger;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.ID;
-import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.TRIGGER_OUTPUT_PROPERTY;
+import static com.bytechef.component.woocommerce.constants.WoocommerceConstants.ORDER_OUTPUT_PROPERTY;
 import static com.bytechef.component.woocommerce.util.WoocommerceUtils.createWebhook;
 import static com.bytechef.component.woocommerce.util.WoocommerceUtils.deleteWebhook;
 
@@ -42,7 +42,7 @@ public class WoocommerceNewOrderTrigger {
         .title("New Order")
         .description("Triggers when any order is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .output(outputSchema(TRIGGER_OUTPUT_PROPERTY))
+        .output(outputSchema(ORDER_OUTPUT_PROPERTY))
         .help("", "https://docs.bytechef.io/reference/components/woocommerce_v1#new-order")
         .webhookEnable(WoocommerceNewOrderTrigger::webhookEnable)
         .webhookDisable(WoocommerceNewOrderTrigger::webhookDisable)

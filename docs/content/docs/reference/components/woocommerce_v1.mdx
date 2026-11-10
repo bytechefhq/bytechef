@@ -878,17 +878,46 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | id | INTEGER | Unique identifier for the resource. |
-| name | STRING | A friendly name for the webhook. |
-| status | STRING | Webhook status. |
-| topic | STRING | Webhook topic. |
-| resource | STRING | Webhook resource. |
-| event | STRING | Webhook event. |
-| hooks | ARRAY <details> <summary> Items </summary> [STRING] </details> | WooCommerce action names associated with the webhook. |
-| delivery_url | STRING | The URL where the webhook payload is delivered. |
-| date_created | STRING | The date the webhook was created, in the site's timezone. |
-| date_created_gmt | STRING | The date the webhook was created, as GMT. |
-| date_modified | STRING | The date the webhook was last modified, in the site's timezone. |
-| date_modified_gmt | STRING | The date the webhook was last modified, as GMT. |
+| parent_id | STRING | Parent order ID. |
+| number | STRING | Order number. |
+| order_key | STRING | Order key. |
+| created_via | STRING | Shows where the order was created. |
+| version | STRING | Version of WooCommerce which last updated the order. |
+| status | STRING | Order status. |
+| currency | STRING | Currency the order was created with, in ISO format. |
+| date_created | STRING | The date the order was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the order was created, as GMT. |
+| date_modified | STRING | The date the order was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the order was last modified, as GMT. |
+| discount_total | STRING | Total discount amount for the order. |
+| discount_tax | STRING | Total discount tax amount for the order. |
+| shipping_total | STRING | Total shipping amount for the order. |
+| shipping_tax | STRING | Total shipping tax amount for the order. |
+| cart_tax | STRING | Sum of line item taxes only. |
+| total | STRING | Grand total. |
+| total_tax | STRING | Sum of all taxes. |
+| prices_include_tax | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | True the prices included tax during checkout. |
+| customer_id | INTEGER | User ID who owns the order. 0 for guests. Default is 0. |
+| customer_ip_address | STRING | Customer's IP address. |
+| customer_user_agent | STRING | User agent of the customer. |
+| customer_note | STRING | Note left by customer during checkout. |
+| billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | Billing address. |
+| shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country)&#125; </details> | Shipping address. |
+| payment_methods | STRING | Payment method ID. |
+| payment_method_title | STRING | Payment method title. |
+| transaction_id | STRING | Unique transaction ID. |
+| date_paid | STRING | The date the order was paid, in the site's timezone. |
+| date_paid_gmt | STRING | The date the order was paid, as GMT. |
+| date_completed | STRING | The date the order was completed, in the site's timezone. |
+| date_completed_gmt | STRING | The date the order was completed, as GMT. |
+| cart_hash | STRING | Sum of line item taxes only. |
+| meta_data | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(key), STRING\(value)&#125;] </details> | Meta data. |
+| line_items | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), INTEGER\(product_id), INTEGER\(variation_id), INTEGER\(quantity), STRING\(tax_class), STRING\(subtotal), STRING\(subtotal_tax), STRING\(total), STRING\(total_tax), []\(taxes), []\(meta_data), STRING\(sku), STRING\(price)&#125;] </details> | Line items data. |
+| tax_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(rate_code), INTEGER\(rate_id), STRING\(label), BOOLEAN\(compound), STRING\(tax_total), STRING\(shipping_tax_total), []\(mata_data)&#125;] </details> | Tax lines data. |
+| shipping_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(method_title), STRING\(method_id), STRING\(total), STRING\(total_tax), []\(taxes), []\(meta_data)&#125;] </details> | Shipping lines data. |
+| fee_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(tax_class), STRING\(tax_status), STRING\(total), STRING\(total_tax), []\(taxes), []\(mata_data)&#125;] </details> | Fee lines data. |
+| coupon_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(code), STRING\(discount), STRING\(discount_tax), []\(meta_data)&#125;] </details> | Coupons line data. |
+| refunds | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(reason), STRING\(total)&#125;] </details> | List of refunds. |
 | _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
 
 
@@ -924,18 +953,33 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| id | INTEGER | Unique identifier for the resource. |
-| name | STRING | A friendly name for the webhook. |
-| status | STRING | Webhook status. |
-| topic | STRING | Webhook topic. |
-| resource | STRING | Webhook resource. |
-| event | STRING | Webhook event. |
-| hooks | ARRAY <details> <summary> Items </summary> [STRING] </details> | WooCommerce action names associated with the webhook. |
-| delivery_url | STRING | The URL where the webhook payload is delivered. |
-| date_created | STRING | The date the webhook was created, in the site's timezone. |
-| date_created_gmt | STRING | The date the webhook was created, as GMT. |
-| date_modified | STRING | The date the webhook was last modified, in the site's timezone. |
-| date_modified_gmt | STRING | The date the webhook was last modified, as GMT. |
+| id | INTEGER | Unique identifier for the object. |
+| code | STRING | Coupon code. |
+| amount | STRING | The amount of discount. |
+| date_created | STRING | The date the coupon was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the coupon was created, as GMT. |
+| date_modified | STRING | The date the coupon was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the coupon was last modified, as GMT. |
+| discount_type | STRING | Determines the type of discount that will be applied. |
+| description | STRING | Coupon description. |
+| date_expires | STRING | The date the coupon expires, in the site's timezone. |
+| date_expires_gmt | STRING | The date the coupon expires, as GMT. |
+| usage_count | INTEGER | Number of times the coupon has been used already. |
+| individual_use | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, the coupon can only be used individually. |
+| product_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of product IDs the coupon can be used on. |
+| excluded_product_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of product IDs the coupon cannot be used on. |
+| usage_limit | INTEGER | How many times the coupon can be used in total. |
+| usage_limit_per_user | INTEGER | How many times the coupon can be used per customer. |
+| limit_usage_to_x_items | INTEGER | Max number of items in the cart the coupon can be applied to. |
+| free_shipping | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true and if the free shipping method requires a coupon, this coupon will enable free shipping. |
+| product_categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of category IDs the coupon applies to. |
+| excluded_product_categories | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | List of category IDs the coupon does not apply to. |
+| exclude_sale_items | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, this coupon will not be applied to items that have sale prices. |
+| minimum_amount | STRING | Minimum order amount that needs to be in the cart before coupon applies. |
+| maximum_amount | STRING | Maximum order amount allowed when using the coupon. |
+| email_restrictions | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of email addresses that can use this coupon. |
+| used_by | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of user IDs (or guest email addresses) that have used the coupon. |
+| meta_data | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(key), STRING\(value)&#125;] </details> | Meta data. |
 | _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
 
 

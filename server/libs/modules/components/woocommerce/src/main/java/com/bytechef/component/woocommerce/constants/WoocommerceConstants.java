@@ -600,40 +600,6 @@ public class WoocommerceConstants {
                         array("self").items(object().properties(string("href"))),
                         array("collection").items(object().properties(string("href")))));
 
-    public static final ModifiableObjectProperty TRIGGER_OUTPUT_PROPERTY =
-        object()
-            .properties(
-                integer("id")
-                    .description("Unique identifier for the resource."),
-                string("name")
-                    .description("A friendly name for the webhook."),
-                string("status")
-                    .description("Webhook status."),
-                string("topic")
-                    .description("Webhook topic."),
-                string("resource")
-                    .description("Webhook resource."),
-                string("event")
-                    .description("Webhook event."),
-                array("hooks")
-                    .description("WooCommerce action names associated with the webhook.")
-                    .items(string()),
-                string("delivery_url")
-                    .description("The URL where the webhook payload is delivered."),
-                string("date_created")
-                    .description("The date the webhook was created, in the site's timezone."),
-                string("date_created_gmt")
-                    .description("The date the webhook was created, as GMT."),
-                string("date_modified")
-                    .description("The date the webhook was last modified, in the site's timezone."),
-                string("date_modified_gmt")
-                    .description("The date the webhook was last modified, as GMT."),
-                object("_links")
-                    .description("")
-                    .properties(
-                        array("self").items(object().properties(string("href"))),
-                        array("collection").items(object().properties(string("href")))));
-
     private WoocommerceConstants() {
     }
 
