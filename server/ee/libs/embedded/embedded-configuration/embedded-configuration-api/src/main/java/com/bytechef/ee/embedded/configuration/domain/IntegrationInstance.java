@@ -60,6 +60,9 @@ public class IntegrationInstance {
     @Column("integration_instance_configuration_id")
     private AggregateReference<IntegrationInstanceConfiguration, Long> integrationInstanceConfigurationId;
 
+    @Column("provisioned_by")
+    private String provisionedBy;
+
     @Version
     private int version;
 
@@ -118,6 +121,10 @@ public class IntegrationInstance {
         return lastModifiedDate;
     }
 
+    public String getProvisionedBy() {
+        return provisionedBy;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -146,6 +153,10 @@ public class IntegrationInstance {
         this.integrationInstanceConfigurationId = AggregateReference.to(integrationInstanceConfigurationId);
     }
 
+    public void setProvisionedBy(String provisionedBy) {
+        this.provisionedBy = provisionedBy;
+    }
+
     public void setVersion(int version) {
         this.version = version;
     }
@@ -161,6 +172,7 @@ public class IntegrationInstance {
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
+            ", provisionedBy='" + provisionedBy + '\'' +
             ", version=" + version +
             '}';
     }

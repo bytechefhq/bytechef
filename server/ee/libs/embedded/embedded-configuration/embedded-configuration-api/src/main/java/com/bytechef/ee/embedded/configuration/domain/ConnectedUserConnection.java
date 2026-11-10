@@ -35,6 +35,9 @@ public class ConnectedUserConnection {
     @Column("connection_id")
     private AggregateReference<Connection, Long> connectionId;
 
+    @Column("provisioned_by")
+    private String provisionedBy;
+
     public ConnectedUserConnection() {
     }
 
@@ -75,6 +78,10 @@ public class ConnectedUserConnection {
         return connectionId.getId();
     }
 
+    public String getProvisionedBy() {
+        return provisionedBy;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -87,12 +94,17 @@ public class ConnectedUserConnection {
         this.connectionId = AggregateReference.to(connectionId);
     }
 
+    public void setProvisionedBy(String provisionedBy) {
+        this.provisionedBy = provisionedBy;
+    }
+
     @Override
     public String toString() {
         return "ConnectedUserConnection{" +
             "id=" + id +
             ", connectedUserId=" + connectedUserId +
             ", connectionId=" + connectionId +
+            ", provisionedBy='" + provisionedBy + '\'' +
             '}';
     }
 }
