@@ -80,12 +80,16 @@ public class SpelEvaluator implements Evaluator {
 
     private static final String ACCESSOR_PREFIX = "${";
     private static final String ACCESSOR_SUFFIX = "}";
+    private static final Pattern DATA_PILL_PATH_ARGUMENT_PATTERN = Pattern.compile(
+        "(?<![\\w.#])(" + EvaluatorFunctionName.EXISTS + "|" + EvaluatorFunctionName.GET_OR_DEFAULT +
+            ")\\(\\s*\\$\\{([^}]*)}(?=\\s*[,)])");
+    private static final String DATA_PILL_PATH_VARIABLE_PREFIX = "dataPillPath";
     private static final String FORMULA_PREFIX = "=";
     private static final Pattern FORMULA_EXPRESSION_PATTERN =
         Pattern.compile(
             "^(?!.*\\bT\\s*\\()(?!.*\\.\\s*\\w+\\s*\\()(?!.*\\bnew\\s+[\\w.]+(?:<[^>]*>)?\\s*[\\[(]).*$");
     private static final Pattern INVALID_ACCESSOR_PATTERN = Pattern.compile(
-        "\\$\\{(?!(?!T\\()[a-zA-Z_][a-zA-Z0-9_]*(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*(?:\\.(?:[a-zA-Z_][a-zA-Z0-9_]*(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*|\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')]))*})");
+        "\\$\\{(?!(?!T\\()" + DataPillPath.PATH_REGEX + "})");
 
     private final ExpressionParser expressionParser = new SpelExpressionParser();
 
@@ -218,6 +222,7 @@ public class SpelEvaluator implements Evaluator {
             case String string -> {
                 Expression expression;
                 boolean formulaExpression = false;
+                Map<String, DataPillPath> dataPillPaths = new HashMap<>();
 
                 String trimmedString = string.trim();
 
@@ -229,6 +234,8 @@ public class SpelEvaluator implements Evaluator {
                     formulaExpression = true;
 
                     try {
+                        string = replaceDataPillPathArguments(string, dataPillPaths);
+
                         string = string.replaceAll("\\$\\{([^}]*)}", "$1");
 
                         if (!validateFormulaExpression(string)) {
@@ -306,7 +313,12 @@ public class SpelEvaluator implements Evaluator {
                     return expression.getValue();
                 } else {
                     try {
-                        return expression.getValue(createEvaluationContext(context, formulaExpression));
+                        StandardEvaluationContext evaluationContext = createEvaluationContext(
+                            context, formulaExpression);
+
+                        dataPillPaths.forEach(evaluationContext::setVariable);
+
+                        return expression.getValue(evaluationContext);
                     } catch (SpelEvaluationException spelEvaluationException) {
                         if (isUnresolvedReference(spelEvaluationException)) {
                             return value;
@@ -398,6 +410,44 @@ public class SpelEvaluator implements Evaluator {
 
         return messageCode == SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE ||
             messageCode == SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE_ON_NULL;
+    }
+
+    private static String replaceDataPillPathArguments(String formula, Map<String, DataPillPath> dataPillPaths) {
+        Matcher matcher = DATA_PILL_PATH_ARGUMENT_PATTERN.matcher(formula);
+
+        StringBuilder sb = new StringBuilder();
+
+        while (matcher.find()) {
+            if (isInsideStringLiteral(formula, matcher.start())) {
+                continue;
+            }
+
+            String variableName = DATA_PILL_PATH_VARIABLE_PREFIX + dataPillPaths.size();
+
+            dataPillPaths.put(variableName, new DataPillPath(matcher.group(2)));
+
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(1) + "(#" + variableName));
+        }
+
+        matcher.appendTail(sb);
+
+        return sb.toString();
+    }
+
+    private static boolean isInsideStringLiteral(String formula, int position) {
+        char openQuote = 0;
+
+        for (int index = 0; index < position; index++) {
+            char character = formula.charAt(index);
+
+            if (openQuote == 0 && (character == '\'' || character == '"')) {
+                openQuote = character;
+            } else if (character == openQuote) {
+                openQuote = 0;
+            }
+        }
+
+        return openQuote != 0;
     }
 
     private static boolean validateTextExpression(String expression) {

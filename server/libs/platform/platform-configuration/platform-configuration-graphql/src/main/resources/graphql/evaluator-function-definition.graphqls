@@ -13,6 +13,7 @@ enum EvaluatorFunctionCategory {
 }
 
 enum EvaluatorFunctionType {
+    ANY
     BOOLEAN
     BYTE
     CHARACTER

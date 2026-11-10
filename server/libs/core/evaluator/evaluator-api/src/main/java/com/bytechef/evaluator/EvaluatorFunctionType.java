@@ -23,6 +23,7 @@ package com.bytechef.evaluator;
  */
 public enum EvaluatorFunctionType {
 
+    ANY,
     BOOLEAN,
     BYTE,
     CHARACTER,

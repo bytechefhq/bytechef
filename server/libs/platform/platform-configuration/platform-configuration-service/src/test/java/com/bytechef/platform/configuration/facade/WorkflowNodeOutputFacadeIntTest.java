@@ -101,6 +101,18 @@ class WorkflowNodeOutputFacadeIntTest {
         }
         """;
 
+    private static final String LOOP_BODY_WORKFLOW = """
+        {
+            "tasks": [
+                {"name": "action1", "type": "component/v1/action1", "parameters": {}},
+                {"name": "loop1", "type": "loop/v1", "parameters": {"iteratee": [
+                    {"name": "action2", "type": "component/v1/action2", "parameters": {}},
+                    {"name": "action3", "type": "component/v1/action3", "parameters": {}}
+                ]}}
+            ]
+        }
+        """;
+
     @Autowired
     private ActionDefinitionFacade actionDefinitionFacade;
 
@@ -204,6 +216,55 @@ class WorkflowNodeOutputFacadeIntTest {
 
         assertThat(workflowNodeOutputDTO.workflowNodeName()).isEqualTo("loop1");
         assertThat(workflowNodeOutputDTO.taskDispatcherDefinition()).isSameAs(taskDispatcherDefinition);
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsIncludesEveryTaskOfTheLoopBodyForATaskInside() {
+        String workflowId = createWorkflow(LOOP_BODY_WORKFLOW);
+
+        stubStaticActionOutput("action1", new OutputResponse(null, Map.of("key", "value1"), null));
+        stubStaticActionOutput("action2", new OutputResponse(null, Map.of("key", "value2"), null));
+        stubStaticActionOutput("action3", new OutputResponse(null, Map.of("key", "value3"), null));
+        stubLoopDispatcher();
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "action2", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly("action1", "loop1", "action2", "action3");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeSampleOutputsKeepsOnlyEarlierTasksOfTheLoopBody() {
+        String workflowId = createWorkflow(LOOP_BODY_WORKFLOW);
+
+        stubStaticActionOutput("action1", new OutputResponse(null, Map.of("key", "value1"), null));
+        stubStaticActionOutput("action2", new OutputResponse(null, Map.of("key", "value2"), null));
+        stubLoopDispatcher();
+
+        Map<String, ?> sampleOutputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+            workflowId, "action2", ENVIRONMENT_ID);
+
+        assertThat(sampleOutputs).doesNotContainKeys("action2", "action3");
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsTerminatesForALoopBodyWithDynamicTasks() {
+        String workflowId = createWorkflow(LOOP_BODY_WORKFLOW);
+
+        stubStaticActionOutput("action1", new OutputResponse(null, Map.of("key", "value1"), null));
+        stubDynamicAction("action2");
+        stubDynamicAction("action3");
+        stubLoopDispatcher();
+
+        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), any(), anyMap(), anyMap()))
+            .thenReturn(new OutputResponse(null, Map.of("key", "value"), null));
+
+        List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+            workflowId, "action3", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTOs).extracting(WorkflowNodeOutputDTO::workflowNodeName)
+            .containsExactly("action1", "loop1", "action2", "action3");
     }
 
     @Test
@@ -898,6 +959,14 @@ class WorkflowNodeOutputFacadeIntTest {
         doReturn(List.of(stringProperty)).when(actionDefinition)
             .getProperties();
         when(actionDefinitionService.isDynamicOutputDefined("dataStorage", 1, "getValue")).thenReturn(true);
+    }
+
+    private void stubLoopDispatcher() {
+        TaskDispatcherDefinition taskDispatcherDefinition = mock(TaskDispatcherDefinition.class);
+
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("loop", 1))
+            .thenReturn(taskDispatcherDefinition);
+        when(taskDispatcherDefinition.getOutputResponse()).thenReturn(mock(OutputResponse.class));
     }
 
     private void stubDynamicAction(String actionName) {

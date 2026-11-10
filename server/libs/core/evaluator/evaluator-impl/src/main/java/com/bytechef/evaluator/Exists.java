@@ -28,10 +28,10 @@ class Exists implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        if (arguments.length != 1 || !(arguments[0] instanceof String path)) {
-            throw new AccessException("exists takes one argument, the variable path as a string, e.g. exists('x')");
+        if (arguments.length != 1 || !(arguments[0] instanceof DataPillPath dataPillPath)) {
+            throw new AccessException("exists takes one argument, a data pill, e.g. exists(${x})");
         }
 
-        return new TypedValue(ContextPaths.get(context, path) != null);
+        return new TypedValue(dataPillPath.resolve(target) != null);
     }
 }

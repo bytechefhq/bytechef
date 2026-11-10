@@ -18,6 +18,7 @@ package com.bytechef.evaluator;
 
 import static com.bytechef.evaluator.EvaluatorFunctionDsl.function;
 import static com.bytechef.evaluator.EvaluatorFunctionDsl.parameter;
+import static com.bytechef.evaluator.EvaluatorFunctionType.ANY;
 import static com.bytechef.evaluator.EvaluatorFunctionType.BOOLEAN;
 import static com.bytechef.evaluator.EvaluatorFunctionType.BYTE;
 import static com.bytechef.evaluator.EvaluatorFunctionType.CHARACTER;
@@ -1522,112 +1523,111 @@ class EvaluatorFunctionDefinitions implements EvaluatorFunctionDefinitionFactory
     static final EvaluatorFunctionDefinition EXISTS = function(EvaluatorFunctionName.EXISTS)
         .title("Exists")
         .description(
-            "Returns true if a variable path resolves to a non-null value, for example the output of a step that " +
-                "may not have run yet. The path is a string, so a missing value does not leave the formula " +
-                "unresolved.")
+            "Returns true if a data pill resolves to a non-null value, for example the output of a step that " +
+                "may not have run yet. A missing value does not leave the formula unresolved.")
         .category(EvaluatorFunctionCategory.UTILITY)
         .parameters(
-            parameter("path")
-                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
-                .type(STRING)
+            parameter("dataPill")
+                .description("A data pill, such as ${attempts} or ${judge.answers.score}")
+                .type(ANY)
                 .required(true))
         .returnType(BOOLEAN)
-        .example("=exists('judge') ? ${judge.answers.score} : 0")
+        .example("=exists(${judge}) ? ${judge.answers.score} : 0")
         .toDefinition();
 
     static final EvaluatorFunctionDefinition GET_OR_DEFAULT_BOOLEAN = function(EvaluatorFunctionName.GET_OR_DEFAULT)
         .title("Get or Default")
         .description(
-            "Returns the value at a variable path, or the default boolean when the path does not exist or is " +
-                "null. The path is a string, so a missing value does not leave the formula unresolved.")
+            "Returns the value of a data pill, or the default boolean when the data pill does not " +
+                "resolve or is null. A missing value does not leave the formula unresolved.")
         .category(EvaluatorFunctionCategory.UTILITY)
         .parameters(
-            parameter("path")
-                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
-                .type(STRING)
+            parameter("dataPill")
+                .description("A data pill, such as ${attempts} or ${judge.answers.score}")
+                .type(ANY)
                 .required(true),
             parameter("defaultValue")
-                .description("The value to return when the path does not exist or is null")
+                .description("The value to return when the data pill does not resolve or is null")
                 .type(BOOLEAN)
                 .required(true))
         .returnType(BOOLEAN)
-        .example("=getOrDefault('forceMistake', false)")
+        .example("=getOrDefault(${forceMistake}, false)")
         .toDefinition();
 
     static final EvaluatorFunctionDefinition GET_OR_DEFAULT_LIST = function(EvaluatorFunctionName.GET_OR_DEFAULT)
         .title("Get or Default")
         .description(
-            "Returns the value at a variable path, or the default list when the path does not exist or is " +
-                "null. The path is a string, so a missing value does not leave the formula unresolved.")
+            "Returns the value of a data pill, or the default list when the data pill does not " +
+                "resolve or is null. A missing value does not leave the formula unresolved.")
         .category(EvaluatorFunctionCategory.UTILITY)
         .parameters(
-            parameter("path")
-                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
-                .type(STRING)
+            parameter("dataPill")
+                .description("A data pill, such as ${attempts} or ${judge.answers.score}")
+                .type(ANY)
                 .required(true),
             parameter("defaultValue")
-                .description("The value to return when the path does not exist or is null")
+                .description("The value to return when the data pill does not resolve or is null")
                 .type(LIST)
                 .required(true))
         .returnType(LIST)
-        .example("=getOrDefault('items', {})")
+        .example("=getOrDefault(${items}, {})")
         .toDefinition();
 
     static final EvaluatorFunctionDefinition GET_OR_DEFAULT_MAP = function(EvaluatorFunctionName.GET_OR_DEFAULT)
         .title("Get or Default")
         .description(
-            "Returns the value at a variable path, or the default map when the path does not exist or is " +
-                "null. The path is a string, so a missing value does not leave the formula unresolved.")
+            "Returns the value of a data pill, or the default map when the data pill does not " +
+                "resolve or is null. A missing value does not leave the formula unresolved.")
         .category(EvaluatorFunctionCategory.UTILITY)
         .parameters(
-            parameter("path")
-                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
-                .type(STRING)
+            parameter("dataPill")
+                .description("A data pill, such as ${attempts} or ${judge.answers.score}")
+                .type(ANY)
                 .required(true),
             parameter("defaultValue")
-                .description("The value to return when the path does not exist or is null")
+                .description("The value to return when the data pill does not resolve or is null")
                 .type(MAP)
                 .required(true))
         .returnType(MAP)
-        .example("=getOrDefault('settings', {:})")
+        .example("=getOrDefault(${settings}, {:})")
         .toDefinition();
 
     static final EvaluatorFunctionDefinition GET_OR_DEFAULT_NUMBER = function(EvaluatorFunctionName.GET_OR_DEFAULT)
         .title("Get or Default")
         .description(
-            "Returns the value at a variable path, or the default number when the path does not exist or is " +
-                "null. The path is a string, so a missing value does not leave the formula unresolved.")
+            "Returns the value of a data pill, or the default number when the data pill does not " +
+                "resolve or is null. A missing value does not leave the formula unresolved.")
         .category(EvaluatorFunctionCategory.UTILITY)
         .parameters(
-            parameter("path")
-                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
-                .type(STRING)
+            parameter("dataPill")
+                .description("A data pill, such as ${attempts} or ${judge.answers.score}")
+                .type(ANY)
                 .required(true),
             parameter("defaultValue")
-                .description("The value to return when the path does not exist or is null")
+                .description("The value to return when the data pill does not resolve or is null")
                 .type(NUMBER)
                 .required(true))
         .returnType(NUMBER)
-        .example("=getOrDefault('attempts', 0) + 1")
+        .example("=getOrDefault(${attempts}, 0) + 1")
         .toDefinition();
 
     static final EvaluatorFunctionDefinition GET_OR_DEFAULT_STRING = function(EvaluatorFunctionName.GET_OR_DEFAULT)
         .title("Get or Default")
         .description(
-            "Returns the value at a variable path, or the default string when the path does not exist or is " +
-                "null. The path is a string, so a missing value does not leave the formula unresolved.")
+            "Returns the value of a data pill, or the default string when the data pill does not " +
+                "resolve or is null. A missing value does not leave the formula unresolved.")
         .category(EvaluatorFunctionCategory.UTILITY)
         .parameters(
-            parameter("path")
-                .description("The variable path, such as 'attempts' or 'judge.answers.score'")
-                .type(STRING)
+            parameter("dataPill")
+                .description("A data pill, such as ${attempts} or ${judge.answers.score}")
+                .type(ANY)
                 .required(true),
             parameter("defaultValue")
-                .description("The value to return when the path does not exist or is null")
+                .description("The value to return when the data pill does not resolve or is null")
                 .type(STRING)
                 .required(true))
         .returnType(STRING)
-        .example("=${question} + getOrDefault('feedback', '')")
+        .example("=${question} + getOrDefault(${feedback}, '')")
         .toDefinition();
 
     static final EvaluatorFunctionDefinition UUID = function(EvaluatorFunctionName.UUID)
