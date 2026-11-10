@@ -343,9 +343,10 @@ class WorkflowValidatorClusterElementsTest {
             WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, clusterElements,
                 errors, warnings);
 
-            assertEquals("", errors.toString());
             assertEquals("""
-                [aiAgent_1] Cluster element 'guardrails' is missing from task aiAgent_1
+                [aiAgent_1] Cluster element 'guardrails' is missing from task aiAgent_1""",
+                errors.toString());
+            assertEquals("""
                 [aiAgent_1] Cluster element 'guardsnails' are not defined in task aiAgent_1""",
                 warnings.toString());
         } catch (Exception e) {
@@ -449,9 +450,10 @@ class WorkflowValidatorClusterElementsTest {
             WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, clusterElements,
                 errors, warnings);
 
-            assertEquals("", errors.toString());
             assertEquals("""
-                [aiAgent_1] Cluster element 'embedding' is missing from task couchbase_1
+                [aiAgent_1] Cluster element 'embedding' is missing from task couchbase_1""",
+                errors.toString());
+            assertEquals("""
                 [aiAgent_1] Cluster element 'model' are not defined in task couchbase_1""",
                 warnings.toString());
 
@@ -461,7 +463,7 @@ class WorkflowValidatorClusterElementsTest {
     }
 
     @Test
-    void validateWorkflowTasksClusterElementsInConditionNoError() {
+    void validateWorkflowTasksClusterElementsInConditionReportsMissingClusterElements() {
         String tasksJson = """
             [
                 {
@@ -553,14 +555,14 @@ class WorkflowValidatorClusterElementsTest {
             WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, clusterElements,
                 errors, warnings);
 
-            assertEquals("", errors.toString());
             assertEquals("""
                 [condition_1] Cluster element 'model' is missing from task aiAgent_1
                 [condition_1] Cluster element 'chatMemory' is missing from task aiAgent_1
                 [condition_1] Cluster element 'rag' is missing from task aiAgent_1
                 [condition_1] Cluster element 'guardrails' is missing from task aiAgent_1
                 [condition_1] Cluster element 'tools' is missing from task aiAgent_1""",
-                warnings.toString());
+                errors.toString());
+            assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -795,14 +797,14 @@ class WorkflowValidatorClusterElementsTest {
 
         assertEquals("{aiAgent/v1/chat=[model, chatMemory, rag, guardrails, tools]}",
             clusterElementTypesMap.toString());
-        assertEquals("", errors.toString());
         assertEquals("""
             [aiAgent_1] Cluster element 'model' is missing from task aiAgent_1
             [aiAgent_1] Cluster element 'chatMemory' is missing from task aiAgent_1
             [aiAgent_1] Cluster element 'rag' is missing from task aiAgent_1
             [aiAgent_1] Cluster element 'guardrails' is missing from task aiAgent_1
             [aiAgent_1] Cluster element 'tools' is missing from task aiAgent_1""",
-            warnings.toString());
+            errors.toString());
+        assertEquals("", warnings.toString());
     }
 
     @Test
