@@ -100,6 +100,7 @@ export const useUpdateConnectionMutation = (mutationProps?: UpdateConnectionMuta
                 id: connection.id!,
                 updateConnectionRequest: {
                     name: connection.name,
+                    parameters: connection.parameters,
                     tags: connection.tags!,
                     version: connection.version!,
                 },

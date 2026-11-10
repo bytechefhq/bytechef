@@ -70,6 +70,7 @@ interface ConnectionDialogProps {
     componentDefinition?: ComponentDefinition;
     componentDefinitions: ComponentDefinitionBasic[];
     connection?: ConnectionI | undefined;
+    connectionPropertiesEditable?: boolean;
     connectionTagsQueryKey: QueryKey;
     connectionsQueryKey: QueryKey;
     description?: string;
@@ -98,6 +99,7 @@ const ConnectionDialog = ({
     componentDefinition,
     componentDefinitions,
     connection,
+    connectionPropertiesEditable,
     connectionTagsQueryKey,
     connectionsQueryKey,
     description,
@@ -113,7 +115,7 @@ const ConnectionDialog = ({
     useUpdateConnectionMutation,
 }: ConnectionDialogProps) => {
     const [authorizationType, setAuthorizationType] = useState<string>();
-    const [connectionVersion, setConnectionVersion] = useState(1);
+    const [connectionVersion, setConnectionVersion] = useState(connection?.connectionVersion || 1);
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [isUpdatingCredentials, setIsUpdatingCredentials] = useState(false);
     const [oAuth2Error, setOAuth2Error] = useState<string>();
@@ -132,10 +134,11 @@ const ConnectionDialog = ({
     const form = useForm<ConnectionDialogFormProps>({
         defaultValues: {
             authorizationType: undefined,
-            componentName: componentDefinition?.name,
+            componentName: componentDefinition?.name || connection?.componentName,
             environmentId: connection?.environmentId || currentEnvironmentId,
             id: connection?.id,
             name: connection?.name || componentDefinition?.title || '',
+            parameters: connectionPropertiesEditable ? {...connection?.connectionParameters} : undefined,
             shared: connection?.shared ?? false,
             tags:
                 connection?.tags?.map((tag) => ({
@@ -184,7 +187,17 @@ const ConnectionDialog = ({
 
     const isEdit = !!connection?.id;
 
+    const selectedComponentName = selectedComponentDefinition?.name || connection?.componentName;
+
     const canUpdateCredentials = isEdit && !!useUpdateConnectionCredentialsMutation && !connection?.managed;
+
+    const canEditConnectionProperties = isEdit && !!connectionPropertiesEditable;
+
+    const canSaveConnectionProperties =
+        canEditConnectionProperties &&
+        !!connectionDefinition &&
+        !connectionDefinitionLoading &&
+        !connectionDefinitionError;
 
     const handleConnectionSuccess = (connectionId: number | void) => {
         void queryClient.invalidateQueries({
@@ -261,7 +274,7 @@ const ConnectionDialog = ({
     const showOAuth2AppPredefined =
         (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
         !oAuth2PropertiesLoading &&
-        oAuth2Properties?.predefinedApps?.includes(selectedComponentDefinition?.name || '');
+        oAuth2Properties?.predefinedApps?.includes(selectedComponentName || '');
 
     const showAuthorizationProperties =
         !showOAuth2AppPredefined || !(isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) || !usePredefinedOAuthApp;
@@ -296,6 +309,7 @@ const ConnectionDialog = ({
             }
 
             connectionMutation.reset();
+            credentialsMutation?.reset();
 
             if (onClose) {
                 onClose();
@@ -373,6 +387,10 @@ const ConnectionDialog = ({
             errors.push(connectionMutation.error?.message);
         }
 
+        if (credentialsMutation?.error && !credentialsMutation.isPending) {
+            errors.push(credentialsMutation.error.message);
+        }
+
         if (tagsError && !tagsLoading) {
             errors.push(tagsError.message);
         }
@@ -392,14 +410,28 @@ const ConnectionDialog = ({
         return errors;
     }
 
+    function getConnectionPropertyValues(parameters?: {[key: string]: object}) {
+        const connectionPropertyNames = (connectionDefinition?.properties || []).map((property) => property.name);
+
+        return Object.fromEntries(
+            Object.entries(parameters || {}).filter(([name]) => connectionPropertyNames.includes(name))
+        );
+    }
+
     function saveConnection(additionalParameters?: object) {
         if (isUpdatingCredentials && credentialsMutation) {
             const {parameters} = getValues();
 
+            const connectionPropertyNames = (connectionDefinition?.properties || []).map((property) => property.name);
+
+            const authorizationParameters = Object.fromEntries(
+                Object.entries(parameters || {}).filter(([name]) => !connectionPropertyNames.includes(name))
+            );
+
             return credentialsMutation.mutateAsync({
                 id: connection!.id,
                 parameters: {
-                    ...parameters,
+                    ...authorizationParameters,
                     ...additionalParameters,
                 },
                 version: connection!.version,
@@ -407,13 +439,14 @@ const ConnectionDialog = ({
         }
 
         if (connection?.id) {
-            const {name, shared, tags} = getValues();
+            const {name, parameters, shared, tags} = getValues();
 
             connectionMutation.mutate({
                 id: connection?.id,
                 name,
                 tags,
                 version: connection.version,
+                ...(canSaveConnectionProperties ? {parameters: getConnectionPropertyValues(parameters)} : {}),
                 ...(showSharedOption ? {shared} : {}),
             } as ConnectionI);
         } else {
@@ -457,14 +490,22 @@ const ConnectionDialog = ({
 
     useEffect(() => {
         const initialAuthorizationType =
-            authorizationOptions && authorizationOptions.length > 0 ? authorizationOptions[0].value : undefined;
+            (isEdit && connection?.authorizationType) ||
+            (authorizationOptions && authorizationOptions.length > 0 ? authorizationOptions[0].value : undefined);
 
         setAuthorizationType(initialAuthorizationType);
 
         if (initialAuthorizationType) {
             setValue('authorizationType', initialAuthorizationType);
         }
-    }, [authorizationsExists, authorizationOptions, selectedComponentDefinition, setValue]);
+    }, [
+        authorizationsExists,
+        authorizationOptions,
+        connection?.authorizationType,
+        isEdit,
+        selectedComponentDefinition,
+        setValue,
+    ]);
 
     useEffect(() => {
         if (!isEdit) {
@@ -677,7 +718,7 @@ const ConnectionDialog = ({
                                         />
                                     )}
 
-                                    {!connection?.id &&
+                                    {(!connection?.id || (canEditConnectionProperties && !isUpdatingCredentials)) &&
                                         showConnectionProperties &&
                                         !!connectionDefinition.properties && (
                                             <WorkflowMockProvider>
@@ -855,9 +896,11 @@ const ConnectionDialog = ({
                                     <ConnectionParameters
                                         authorizationParameters={connection.authorizationParameters}
                                         authorizationType={connection.authorizationType}
-                                        baseUri={connection.baseUri}
+                                        baseUri={canEditConnectionProperties ? undefined : connection.baseUri}
                                         connectionDefinition={connectionDefinition}
-                                        connectionParameters={connection.connectionParameters}
+                                        connectionParameters={
+                                            canEditConnectionProperties ? undefined : connection.connectionParameters
+                                        }
                                     />
                                 </div>
                             )}
@@ -883,7 +926,7 @@ const ConnectionDialog = ({
                                         <SelectValue placeholder="Choose version..." />
                                     </SelectTrigger>
 
-                                    <SelectContent>
+                                    <SelectContent align="start" position="popper">
                                         <SelectItem value={String(connectionDefinition?.version ?? 1)}>
                                             v{connectionDefinition?.version ?? 1}
                                         </SelectItem>
@@ -928,7 +971,7 @@ const ConnectionDialog = ({
                                                 <OAuth2Button
                                                     authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
                                                     clientId={oAuth2AuthorizationParameters.clientId}
-                                                    componentName={selectedComponentDefinition?.name}
+                                                    componentName={selectedComponentName}
                                                     extraQueryParameters={
                                                         oAuth2AuthorizationParameters?.extraQueryParameters
                                                     }
