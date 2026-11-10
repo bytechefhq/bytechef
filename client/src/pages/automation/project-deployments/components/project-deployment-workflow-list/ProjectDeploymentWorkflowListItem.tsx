@@ -238,7 +238,7 @@ const ProjectDeploymentWorkflowListItem = ({
                 </div>
             </div>
 
-            <div className="flex shrink-0 items-center gap-x-4">
+            <div className="flex shrink-0 items-center gap-x-3">
                 <div className="hidden xl:block">
                     {projectDeploymentWorkflow?.lastExecutionDate ? (
                         <Tooltip>
@@ -363,7 +363,6 @@ const ProjectDeploymentWorkflowListItem = ({
 
                         <Switch
                             checked={enabled}
-                            className="mr-2"
                             disabled={enableProjectDeploymentWorkflowMutation.isPending}
                             onCheckedChange={(value) =>
                                 handleEnableProjectDeploymentWorkflow({
