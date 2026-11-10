@@ -16,6 +16,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,7 +45,8 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
 
     @Override
     public IntegrationInstance create(
-        long connectedUserId, long connectionId, long integrationInstanceConfigurationId) {
+        long connectedUserId, long connectionId, long integrationInstanceConfigurationId,
+        @Nullable String provisionedBy) {
 
         throw new UnsupportedOperationException();
     }

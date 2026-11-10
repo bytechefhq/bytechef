@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionIntegrationInstanceWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,7 @@ public class IntegrationInstanceAdminFacadeImpl implements IntegrationInstanceAd
         List<ProvisionIntegrationInstanceWorkflowDTO> workflows) {
 
         return connectedUserIntegrationFacade.provisionIntegrationInstance(
-            connectedUserId, integrationInstanceConfigurationId, connectionParameters, workflows);
+            connectedUserId, integrationInstanceConfigurationId, connectionParameters, workflows,
+            SecurityUtils.getCurrentUserLogin());
     }
 }

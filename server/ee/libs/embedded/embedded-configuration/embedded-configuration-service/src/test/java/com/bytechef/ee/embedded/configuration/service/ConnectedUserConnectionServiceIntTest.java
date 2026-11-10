@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
@@ -46,6 +47,16 @@ class ConnectedUserConnectionServiceIntTest {
     void afterEach() {
         connectedUserConnectionRepository.deleteAll();
         connectedUserSharedConnectionRepository.deleteAll();
+    }
+
+    @Test
+    void testCreateRecordsProvisionedBy() {
+        connectedUserConnectionService.create(1L, 5L, "admin@localhost.com");
+        connectedUserConnectionService.create(1L, 6L);
+
+        assertThat(connectedUserConnectionRepository.findAll())
+            .extracting(ConnectedUserConnection::getConnectionId, ConnectedUserConnection::getProvisionedBy)
+            .containsExactlyInAnyOrder(tuple(5L, "admin@localhost.com"), tuple(6L, null));
     }
 
     @Test

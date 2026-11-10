@@ -9,8 +9,15 @@ package com.bytechef.ee.embedded.connected.user.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
@@ -26,6 +33,7 @@ import com.bytechef.ee.embedded.connected.user.repository.ConnectedUserRepositor
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -257,6 +265,39 @@ class ConnectedUserFacadeIntTest {
     }
 
     @Test
+    void testGetConnectedUserDTOMarksProvisionedIntegrationInstances() {
+        ConnectedUser connectedUser =
+            connectedUserService.createConnectedUser("provisioned-user", Environment.PRODUCTION);
+
+        IntegrationInstance provisionedInstance = createIntegrationInstance(1L, connectedUser.getId(), "admin");
+        IntegrationInstance selfActivatedInstance = createIntegrationInstance(2L, connectedUser.getId(), null);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setId(1L);
+        integrationInstanceConfiguration.setIntegrationId(1L);
+        integrationInstanceConfiguration.setIntegrationVersion(1);
+
+        Integration integration = new Integration();
+
+        integration.setComponentName("slack");
+        integration.setId(1L);
+
+        when(connectionService.getConnection(anyLong())).thenReturn(new Connection());
+        when(integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(anyList()))
+            .thenReturn(List.of(integrationInstanceConfiguration));
+        when(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUser.getId()))
+            .thenReturn(List.of(provisionedInstance, selfActivatedInstance));
+        when(integrationService.getIntegrations(anyList())).thenReturn(List.of(integration));
+
+        ConnectedUserDTO connectedUserDTO = connectedUserFacade.getConnectedUserDTO(connectedUser.getId());
+
+        assertThat(connectedUserDTO.integrationInstances())
+            .extracting(ConnectedUserDTO.IntegrationInstance::id, ConnectedUserDTO.IntegrationInstance::provisioned)
+            .containsExactly(tuple(1L, true), tuple(2L, false));
+    }
+
+    @Test
     void testEveryFacadeMethodRequiresTenantAdmin() throws NoSuchMethodException {
         Method[] facadeMethods = ConnectedUserFacade.class.getMethods();
 
@@ -302,5 +343,20 @@ class ConnectedUserFacadeIntTest {
         assertThat(connectedUserOptional).isPresent();
 
         return connectedUserOptional.get();
+    }
+
+    private static IntegrationInstance createIntegrationInstance(
+        long id, long connectedUserId, String provisionedBy) {
+
+        IntegrationInstance integrationInstance = new IntegrationInstance();
+
+        integrationInstance.setConnectedUserId(connectedUserId);
+        integrationInstance.setConnectionId(id);
+        integrationInstance.setEnabled(true);
+        integrationInstance.setId(id);
+        integrationInstance.setIntegrationInstanceConfigurationId(1L);
+        integrationInstance.setProvisionedBy(provisionedBy);
+
+        return integrationInstance;
     }
 }

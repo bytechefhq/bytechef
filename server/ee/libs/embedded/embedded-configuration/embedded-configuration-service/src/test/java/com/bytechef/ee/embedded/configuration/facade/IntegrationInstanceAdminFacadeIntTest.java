@@ -149,7 +149,8 @@ class IntegrationInstanceAdminFacadeIntTest {
 
         integrationInstanceAdminFacade.provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of());
 
-        verify(connectedUserIntegrationFacade).provisionIntegrationInstance(1L, 2L, Map.of("key", "v"), List.of());
+        verify(connectedUserIntegrationFacade).provisionIntegrationInstance(
+            1L, 2L, Map.of("key", "v"), List.of(), "admin");
     }
 
     @Test

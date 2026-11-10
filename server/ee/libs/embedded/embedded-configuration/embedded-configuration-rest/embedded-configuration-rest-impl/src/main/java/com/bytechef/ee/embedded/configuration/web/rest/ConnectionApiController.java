@@ -65,7 +65,7 @@ public class ConnectionApiController implements ConnectionApi {
     @Override
     public ResponseEntity<Long> createConnectedUserConnection(Long connectedUserId, ConnectionModel connectionModel) {
         return ResponseEntity.ok(
-            connectedUserConnectionFacade.createConnectedUserConnection(
+            connectedUserConnectionFacade.createConnectedUserConnectionAsAdmin(
                 connectedUserId, conversionService.convert(connectionModel, ConnectionDTO.class)));
     }
 

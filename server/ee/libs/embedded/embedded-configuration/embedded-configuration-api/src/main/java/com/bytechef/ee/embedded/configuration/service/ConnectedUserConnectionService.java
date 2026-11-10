@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.service;
 
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -17,7 +18,11 @@ import java.util.Set;
  */
 public interface ConnectedUserConnectionService {
 
-    void create(long connectedUserId, long connectionId);
+    default void create(long connectedUserId, long connectionId) {
+        create(connectedUserId, connectionId, null);
+    }
+
+    void create(long connectedUserId, long connectionId, @Nullable String provisionedBy);
 
     void deleteByConnectionId(long connectionId);
 

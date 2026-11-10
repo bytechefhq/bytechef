@@ -589,6 +589,23 @@ class ConnectedUserIntegrationFacadeIntTest {
         }
 
         @Test
+        void testSelfActivatedIntegrationInstanceHasNoProvisionedBy() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long integrationId = createIntegrationRow(null);
+
+            createIntegrationInstanceConfiguration(integrationId, 1, AuthorizationType.API_KEY);
+
+            stubConnectionCreation();
+
+            IntegrationInstance integrationInstance = connectedUserIntegrationFacade.createIntegrationInstance(
+                externalUserId, integrationId, Map.of(), Environment.PRODUCTION);
+
+            assertThat(integrationInstanceService.getIntegrationInstance(integrationInstance.getId())
+                .getProvisionedBy()).isNull();
+        }
+
+        @Test
         void testSelfServeConnectionCarriesTheConfigurationAuthorizationType() {
             String externalUserId = createConnectedUser(Map.of());
 
@@ -1381,7 +1398,8 @@ class ConnectedUserIntegrationFacadeIntTest {
         void testProvisioningCreatesConnectionInstanceAndEnabledWorkflowsWithInputs() {
             long instanceId = connectedUserIntegrationFacade.provisionIntegrationInstance(
                 connectedUserId, version1ConfigurationId, Map.of("token", "t"),
-                List.of(new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of("channel", "#ops"))));
+                List.of(new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of("channel", "#ops"))),
+                "admin");
 
             IntegrationInstance instance = integrationInstanceService.getIntegrationInstance(instanceId);
 
@@ -1419,6 +1437,15 @@ class ConnectedUserIntegrationFacadeIntTest {
         }
 
         @Test
+        void testProvisionIntegrationInstanceRecordsProvisioningAdmin() {
+            long instanceId = connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of("token", "t"), List.of(), "admin@localhost.com");
+
+            assertThat(integrationInstanceService.getIntegrationInstance(instanceId)
+                .getProvisionedBy()).isEqualTo("admin@localhost.com");
+        }
+
+        @Test
         void testProvisioningRefusesAConnectedUserWhoseExternalIdIsTooLongToOwnAConnection() {
             String externalUserId = "x".repeat(51);
 
@@ -1428,7 +1455,7 @@ class ConnectedUserIntegrationFacadeIntTest {
             long longExternalIdConnectedUserId = connectedUser.getId();
 
             assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
-                longExternalIdConnectedUserId, version1ConfigurationId, Map.of("token", "t"), List.of()))
+                longExternalIdConnectedUserId, version1ConfigurationId, Map.of("token", "t"), List.of(), "admin"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("50");
 
@@ -1438,7 +1465,7 @@ class ConnectedUserIntegrationFacadeIntTest {
         @Test
         void testProvisionedConnectionIsOwnedByTheConnectedUserLogin() {
             connectedUserIntegrationFacade.provisionIntegrationInstance(
-                connectedUserId, version1ConfigurationId, Map.of("token", "t"), List.of());
+                connectedUserId, version1ConfigurationId, Map.of("token", "t"), List.of(), "admin");
 
             ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -1448,7 +1475,7 @@ class ConnectedUserIntegrationFacadeIntTest {
         @Test
         void testProvisioningTreatsNullConnectionParametersAndWorkflowsAsEmpty() {
             long instanceId = connectedUserIntegrationFacade.provisionIntegrationInstance(
-                connectedUserId, version1ConfigurationId, null, null);
+                connectedUserId, version1ConfigurationId, null, null, "admin");
 
             assertThat(integrationInstanceService.getIntegrationInstance(instanceId)
                 .getIntegrationInstanceConfigurationId()).isEqualTo(version1ConfigurationId);
@@ -1472,11 +1499,12 @@ class ConnectedUserIntegrationFacadeIntTest {
             assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
                 connectedUserId, version1ConfigurationId, Map.of(),
                 List.of(
-                    new ProvisionIntegrationInstanceWorkflowDTO(mcpIntegrationWorkflow.getUuidAsString(), Map.of()))))
-                        .isInstanceOf(ConfigurationException.class)
-                        .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
-                        .isEqualTo(
-                            IntegrationInstanceConfigurationErrorType.WORKFLOW_NOT_IN_CONFIGURATION.getErrorKey());
+                    new ProvisionIntegrationInstanceWorkflowDTO(mcpIntegrationWorkflow.getUuidAsString(), Map.of())),
+                "admin"))
+                    .isInstanceOf(ConfigurationException.class)
+                    .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
+                    .isEqualTo(
+                        IntegrationInstanceConfigurationErrorType.WORKFLOW_NOT_IN_CONFIGURATION.getErrorKey());
 
             verifyNoInteractions(connectionFacade);
         }
@@ -1487,7 +1515,7 @@ class ConnectedUserIntegrationFacadeIntTest {
                 provisioningIntegrationId, 2, Environment.PRODUCTION, false, Map.of());
 
             assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
-                connectedUserId, disabledConfigurationId, Map.of(), List.of()))
+                connectedUserId, disabledConfigurationId, Map.of(), List.of(), "admin"))
                     .isInstanceOf(ConfigurationException.class)
                     .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
                     .isEqualTo(IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_DISABLED.getErrorKey());
@@ -1503,7 +1531,7 @@ class ConnectedUserIntegrationFacadeIntTest {
                 provisioningIntegrationId, 1, Environment.STAGING, true, Map.of());
 
             assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
-                connectedUserId, stagingConfigurationId, Map.of(), List.of()))
+                connectedUserId, stagingConfigurationId, Map.of(), List.of(), "admin"))
                     .isInstanceOf(ConfigurationException.class)
                     .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
                     .isEqualTo(
@@ -1525,11 +1553,12 @@ class ConnectedUserIntegrationFacadeIntTest {
             assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
                 connectedUserId, version1ConfigurationId, Map.of(),
                 List.of(
-                    new ProvisionIntegrationInstanceWorkflowDTO(version2OnlyWorkflow.getUuidAsString(), Map.of()))))
-                        .isInstanceOf(ConfigurationException.class)
-                        .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
-                        .isEqualTo(
-                            IntegrationInstanceConfigurationErrorType.WORKFLOW_NOT_IN_CONFIGURATION.getErrorKey());
+                    new ProvisionIntegrationInstanceWorkflowDTO(version2OnlyWorkflow.getUuidAsString(), Map.of())),
+                "admin"))
+                    .isInstanceOf(ConfigurationException.class)
+                    .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
+                    .isEqualTo(
+                        IntegrationInstanceConfigurationErrorType.WORKFLOW_NOT_IN_CONFIGURATION.getErrorKey());
 
             assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId)).isEmpty();
 
@@ -1543,7 +1572,8 @@ class ConnectedUserIntegrationFacadeIntTest {
 
             assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
                 connectedUserId, version1ConfigurationId, Map.of(),
-                List.of(new ProvisionIntegrationInstanceWorkflowDTO(disabledWorkflow.getUuidAsString(), Map.of()))))
+                List.of(new ProvisionIntegrationInstanceWorkflowDTO(disabledWorkflow.getUuidAsString(), Map.of())),
+                "admin"))
                     .isInstanceOf(ConfigurationException.class)
                     .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
                     .isEqualTo(IntegrationInstanceConfigurationErrorType.WORKFLOW_NOT_IN_CONFIGURATION.getErrorKey());
@@ -1560,7 +1590,7 @@ class ConnectedUserIntegrationFacadeIntTest {
             long freeConnectedUserId = createConnectedUser(Map.of("plan", "free"));
 
             assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
-                freeConnectedUserId, hiddenConfigurationId, Map.of(), List.of()))
+                freeConnectedUserId, hiddenConfigurationId, Map.of(), List.of(), "admin"))
                     .isInstanceOf(EmbeddedIntegrationNotVisibleException.class);
 
             assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(freeConnectedUserId))
@@ -1578,7 +1608,8 @@ class ConnectedUserIntegrationFacadeIntTest {
 
             assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
                 freeConnectedUserId, version1ConfigurationId, Map.of(),
-                List.of(new ProvisionIntegrationInstanceWorkflowDTO(gatedWorkflow.getUuidAsString(), Map.of()))))
+                List.of(new ProvisionIntegrationInstanceWorkflowDTO(gatedWorkflow.getUuidAsString(), Map.of())),
+                "admin"))
                     .isInstanceOf(EmbeddedIntegrationNotVisibleException.class);
 
             assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(freeConnectedUserId))
@@ -1590,9 +1621,9 @@ class ConnectedUserIntegrationFacadeIntTest {
         @Test
         void testProvisioningAllowsASecondInstanceOnTheSameConfiguration() {
             long firstInstanceId = connectedUserIntegrationFacade.provisionIntegrationInstance(
-                connectedUserId, version1ConfigurationId, Map.of(), List.of());
+                connectedUserId, version1ConfigurationId, Map.of(), List.of(), "admin");
             long secondInstanceId = connectedUserIntegrationFacade.provisionIntegrationInstance(
-                connectedUserId, version1ConfigurationId, Map.of(), List.of());
+                connectedUserId, version1ConfigurationId, Map.of(), List.of(), "admin");
 
             assertThat(secondInstanceId).isNotEqualTo(firstInstanceId);
             assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId))
@@ -1611,9 +1642,10 @@ class ConnectedUserIntegrationFacadeIntTest {
                 connectedUserId, version1ConfigurationId, Map.of(),
                 List.of(
                     new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of()),
-                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidB, Map.of()))))
-                        .isInstanceOf(IllegalStateException.class)
-                        .hasMessage("trigger registration failed");
+                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidB, Map.of())),
+                "admin"))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage("trigger registration failed");
 
             assertThat(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUserId)).isEmpty();
 
@@ -1632,8 +1664,9 @@ class ConnectedUserIntegrationFacadeIntTest {
                 connectedUserId, version1ConfigurationId, Map.of(),
                 List.of(
                     new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of()),
-                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidB, Map.of()))))
-                        .isInstanceOf(IllegalStateException.class);
+                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidB, Map.of())),
+                "admin"))
+                    .isInstanceOf(IllegalStateException.class);
 
             List<ScopeData> deletedScopeDataList = recordingDataStorage.getDeletedScopeDataList();
 
@@ -1662,8 +1695,9 @@ class ConnectedUserIntegrationFacadeIntTest {
                 connectedUserId, version1ConfigurationId, Map.of(),
                 List.of(
                     new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of()),
-                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidB, Map.of()))))
-                        .isSameAs(enableFailure);
+                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidB, Map.of())),
+                "admin"))
+                    .isSameAs(enableFailure);
 
             verify(triggerLifecycleFacade).executeTriggerDisable(
                 eq(workflowIdB), any(), any(), any(), eq(CONNECTION_ID));
@@ -1685,7 +1719,7 @@ class ConnectedUserIntegrationFacadeIntTest {
 
             assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
                 connectedUserId, version1ConfigurationId, Map.of(),
-                List.of(new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of()))))
+                List.of(new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of())), "admin"))
                     .isSameAs(enableFailure)
                     .hasSuppressedException(disableFailure);
 
@@ -1973,6 +2007,8 @@ class ConnectedUserIntegrationFacadeIntTest {
                 assertThat(workflowA.isEnabled()).isTrue();
                 assertThat(integrationInstanceService.getIntegrationInstance(instanceId)
                     .getConnectedUserId()).isEqualTo(connectedUserId);
+                assertThat(integrationInstanceService.getIntegrationInstance(instanceId)
+                    .getProvisionedBy()).isEqualTo("admin");
             }
 
             @Test
@@ -1991,7 +2027,7 @@ class ConnectedUserIntegrationFacadeIntTest {
                 assertThatThrownBy(() -> integrationInstanceAdminFacade.getProvisionableIntegrations(connectedUserId))
                     .isInstanceOf(AccessDeniedException.class);
                 assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
-                    connectedUserId, version1ConfigurationId, Map.of(), List.of()))
+                    connectedUserId, version1ConfigurationId, Map.of(), List.of(), "admin"))
                         .isInstanceOf(AccessDeniedException.class);
                 assertThatThrownBy(() -> connectedUserIntegrationFacade.getProvisionableIntegrations(connectedUserId))
                     .isInstanceOf(AccessDeniedException.class);

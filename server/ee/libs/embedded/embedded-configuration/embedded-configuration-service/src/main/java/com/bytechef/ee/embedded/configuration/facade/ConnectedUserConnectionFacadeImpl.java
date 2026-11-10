@@ -27,6 +27,7 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -92,6 +93,22 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
         connectedUserConnectionService.create(connectedUserId, connectionId);
+
+        return connectionId;
+    }
+
+    @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_CREATED, data = {
+        @AuditData(key = "connectionId", value = "#result"),
+        @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+        @AuditData(key = "name", value = "#connectionDTO.name"),
+        @AuditData(key = "componentName", value = "#connectionDTO.componentName")
+    })
+    @PreAuthorize("isTenantAdmin()")
+    public long createConnectedUserConnectionAsAdmin(long connectedUserId, ConnectionDTO connectionDTO) {
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
+
+        connectedUserConnectionService.create(connectedUserId, connectionId, SecurityUtils.getCurrentUserLogin());
 
         return connectionId;
     }

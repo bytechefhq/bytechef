@@ -394,7 +394,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     public long provisionIntegrationInstance(
         long connectedUserId, long integrationInstanceConfigurationId,
         @Nullable Map<String, Object> connectionParameters,
-        @Nullable List<ProvisionIntegrationInstanceWorkflowDTO> workflows) {
+        @Nullable List<ProvisionIntegrationInstanceWorkflowDTO> workflows, @Nullable String provisionedBy) {
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
@@ -443,7 +443,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             connectionService.updateCreatedBy(connectionId, connectedUser.getExternalId());
 
             integrationInstance = integrationInstanceService.create(
-                connectedUser.getId(), connectionId, integrationInstanceConfiguration.getId());
+                connectedUser.getId(), connectionId, integrationInstanceConfiguration.getId(), provisionedBy);
 
             long integrationInstanceId = integrationInstance.getId();
 
