@@ -1623,6 +1623,11 @@ components:
         name:
           description: "The name of a connection."
           type: "string"
+        parameters:
+          description: "The values of the connection's own properties, excluding its authorization. When present, they replace the stored values and a property left out is cleared; when absent, the stored values are kept."
+          type: "object"
+          additionalProperties: true
+          nullable: true
         tags:
           type: "array"
           items:
