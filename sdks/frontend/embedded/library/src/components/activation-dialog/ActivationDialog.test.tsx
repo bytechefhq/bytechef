@@ -349,8 +349,8 @@ describe('ActivationDialog', () => {
         provisionResponse = {body: {missingConnectionComponentName: 'slack'}, status: 409};
         workflowsResponse = {
             body: [
-                {automationWorkflowUuid: 'wf-other', kind: 'REFERENCE', name: 'Other', tasks: []},
-                {automationWorkflowUuid: 'wf-plain', kind: 'REFERENCE', name: 'Plain', tasks: []},
+                {automationUuid: 'wf-other', kind: 'REFERENCE', name: 'Other', tasks: []},
+                {automationUuid: 'wf-plain', kind: 'REFERENCE', name: 'Plain', tasks: []},
             ],
             status: 200,
         };
@@ -381,7 +381,7 @@ describe('ActivationDialog', () => {
     it('removes a first activation when only another template was activated before', async () => {
         enableResponse = {body: {}, status: 500};
         workflowsResponse = {
-            body: [{automationWorkflowUuid: 'wf-other', kind: 'REFERENCE', name: 'Other', tasks: []}],
+            body: [{automationUuid: 'wf-other', kind: 'REFERENCE', name: 'Other', tasks: []}],
             status: 200,
         };
 
@@ -417,7 +417,7 @@ describe('ActivationDialog', () => {
     it('says the settings were saved when re-activating an existing automation fails to enable', async () => {
         enableResponse = {body: {}, status: 500};
         workflowsResponse = {
-            body: [{automationWorkflowUuid: 'wf-plain', kind: 'REFERENCE', name: 'Plain', tasks: []}],
+            body: [{automationUuid: 'wf-plain', kind: 'REFERENCE', name: 'Plain', tasks: []}],
             status: 200,
         };
 
