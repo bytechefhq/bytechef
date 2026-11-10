@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinit
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.google.auto.service.AutoService;
 import java.util.Objects;
 
@@ -91,6 +92,25 @@ public class FreshdeskComponentHandler extends AbstractFreshdeskComponentHandler
                     option("Resolved", 4),
                     option("Closed", 5))
                 .defaultValue(2);
+        } else if (Objects.equals(modifiableProperty.getName(), "filter")) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .options(
+                    option("New and My Open", "new_and_my_open"),
+                    option("Watching", "watching"),
+                    option("Spam", "spam"),
+                    option("Deleted", "deleted"));
+        } else if (Objects.equals(modifiableProperty.getName(), "order_by")) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .options(
+                    option("Created At", "created_at"),
+                    option("Due By", "due_by"),
+                    option("Updated At", "updated_at"),
+                    option("Status", "status"));
+        } else if (Objects.equals(modifiableProperty.getName(), "order_type")) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .options(
+                    option("Ascending", "asc"),
+                    option("Descending", "desc"));
         }
 
         return modifiableProperty;
