@@ -1,0 +1,21 @@
+## Connection Setup
+
+### Find your Okta domain
+
+Your Okta domain is the host name of your Okta organization, for example `your-org.okta.com` or `your-org.oktapreview.com`. You can see it in the address bar after you sign in to the Okta Admin Console (without the `-admin` part), or in the upper-right corner of the Admin Console under your user name.
+
+### Create an API token
+
+1. Sign in to the Okta Admin Console as an administrator.
+2. Go to *Security* -> *API*.
+3. Open the *Tokens* tab.
+4. Click *Create token*.
+5. Enter a name for the token and click *Create token*.
+6. Copy the token value. Okta shows it only once.
+
+An API token has the permissions of the administrator who created it, so create it with an administrator account that can read users, groups and apps.
+
+### Configure the connection
+
+1. Enter your Okta domain in *Okta Domain*.
+2. Paste the token into *API Token*. ByteChef sends it in the `Authorization: SSWS <token>` header.
