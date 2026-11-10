@@ -103,7 +103,7 @@ class WorkflowValidatorClusterElementsTest {
                     "name": "aiAgent_1",
                     "label": "AI Agent",
                     "parameters": {
-                        "userPrompt": "${trigger_1.propString}"
+                        "userPrompt": "Hello"
                     },
                     "type": "aiAgent/v1/chat"
                 }
@@ -203,7 +203,7 @@ class WorkflowValidatorClusterElementsTest {
                     "name": "aiAgent_1",
                     "label": "AI Agent",
                     "parameters": {
-                        "userPrompt": "${trigger_1.propString}"
+                        "userPrompt": "Hello"
                     },
                     "type": "aiAgent/v1/chat"
                 }
@@ -303,7 +303,7 @@ class WorkflowValidatorClusterElementsTest {
                     "name": "aiAgent_1",
                     "label": "AI Agent",
                     "parameters": {
-                        "userPrompt": "${trigger_1.propString}"
+                        "userPrompt": "Hello"
                     },
                     "type": "aiAgent/v1/chat"
                 }
@@ -410,7 +410,7 @@ class WorkflowValidatorClusterElementsTest {
                     "name": "aiAgent_1",
                     "label": "AI Agent",
                     "parameters": {
-                        "userPrompt": "${trigger_1.propString}"
+                        "userPrompt": "Hello"
                     },
                     "type": "aiAgent/v1/chat"
                 }
@@ -577,7 +577,7 @@ class WorkflowValidatorClusterElementsTest {
                 "triggers": [
                     {
                         "label": "Task 1",
-                        "name": "task1",
+                        "name": "trigger_1",
                         "type": "component/v1/trigger1",
                         "parameters": {
                             "name": "John"

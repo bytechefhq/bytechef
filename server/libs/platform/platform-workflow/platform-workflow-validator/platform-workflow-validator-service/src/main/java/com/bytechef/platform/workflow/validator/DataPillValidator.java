@@ -35,6 +35,7 @@ import tools.jackson.databind.JsonNode;
 class DataPillValidator {
 
     private static final Pattern DATA_PILL_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
+    private static final Set<String> INPUT_PREFIXES = Set.of("input", "inputs");
     private static final Pattern LOOP_ITEM_SEGMENT_PATTERN = Pattern.compile("\\.item(?!\\w)");
 
     private static final Pattern ACCESSOR_PATH_PATTERN = Pattern.compile(
@@ -568,6 +569,13 @@ class DataPillValidator {
         String referencedTaskName = getReferencedTaskName(dataPillExpression);
         String propertyName = getPropertyPath(dataPillExpression);
 
+        if (!allTasksMap.containsKey(referencedTaskName) && isAccessorPath(dataPillExpression)) {
+            appendUnknownNodeError(
+                dataPillExpression, referencedTaskName, propertyName, allTasksMap, taskNameToTypeMap, errors);
+
+            return;
+        }
+
         // Skip task order validation for nested tasks (e.g., condition flow tasks)
         if (!context.skipTaskOrderValidation) {
             // Check task order
@@ -605,6 +613,33 @@ class DataPillValidator {
                 getNodeOutputInfo(referencedTaskName, context), getVariableOutputInfo(referencedTaskName, context),
                 errors, warnings, text, referencedTaskName, allTasksMap, taskDefinition, rootParametersJsonNode);
         }
+    }
+
+    private static void appendUnknownNodeError(
+        String dataPillExpression, String referencedTaskName, String propertyName, Map<String, JsonNode> allTasksMap,
+        Map<String, String> taskNameToTypeMap, StringBuilder errors) {
+
+        String inputName = getReferencedTaskName(propertyName);
+
+        if (INPUT_PREFIXES.contains(referencedTaskName) && inputName.equals(propertyName) &&
+            allTasksMap.containsKey(inputName) &&
+            WorkflowValidator.VALID_INPUT_TYPES.contains(taskNameToTypeMap.get(inputName))) {
+
+            StringUtils.appendWithNewline(
+                "Input '" + inputName + "' is referenced as '${" + dataPillExpression + "}'; use '${" + inputName +
+                    "}' instead.",
+                errors);
+
+            return;
+        }
+
+        StringUtils.appendWithNewline("Task '" + referencedTaskName + "' doesn't exist.", errors);
+    }
+
+    private static boolean isAccessorPath(String dataPillExpression) {
+        Matcher matcher = ACCESSOR_PATH_PATTERN.matcher(dataPillExpression);
+
+        return matcher.matches();
     }
 
     private static String getReferencedTaskName(String dataPillExpression) {
