@@ -23,11 +23,8 @@ import static com.bytechef.component.quickbooks.constant.Entity.ACCOUNT;
 import static com.bytechef.component.quickbooks.constant.ItemType.INVENTORY;
 import static com.bytechef.component.quickbooks.constant.ItemType.SERVICE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ASSET_ACCOUNT_REF;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INCOME_ACCOUNT_REF;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INV_START_DATE;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
@@ -41,11 +38,10 @@ import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.quickbooks.constant.Entity;
 import com.bytechef.component.quickbooks.constant.ItemType;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Monika Kušter
@@ -85,29 +81,21 @@ public class QuickbooksUtils {
 
     public static OptionsFunction<String> getOptions(Entity entity, String accountType) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, actionContext) -> {
-
-            String encodeQuery = URLEncoder.encode("SELECT * FROM " + entity.getName(), StandardCharsets.UTF_8);
-
             Map<String, Object> body = actionContext
                 .http(http -> http.get("/query"))
-                .queryParameter("query", encodeQuery)
+                .queryParameter("query", "SELECT * FROM " + entity.getName())
                 .configuration(Http.responseType(Http.ResponseType.XML))
                 .execute()
                 .getBody(new TypeReference<>() {});
 
             List<Option<String>> options = new ArrayList<>();
 
-            if (body.get("QueryResponse") instanceof Map<?, ?> map &&
-                map.get(entity.getName()) instanceof List<?> list) {
+            if (body.get("QueryResponse") instanceof Map<?, ?> queryResponse) {
+                for (Map<?, ?> entityMap : getEntityMaps(queryResponse.get(entity.getName()))) {
+                    if (!entity.equals(ACCOUNT) || Objects.equals(accountType, entityMap.get("AccountType"))) {
+                        String displayValue = getDisplayValue(entity, entityMap);
 
-                for (Object o : list) {
-                    if (o instanceof Map<?, ?> entityMap) {
-                        String entityAccountType = (String) entityMap.get("AccountType");
-                        if (!entity.equals(ACCOUNT) || entityAccountType.equals(accountType)) {
-                            String displayValue = getDisplayValue(entity, entityMap);
-
-                            options.add(option(displayValue, (String) entityMap.get(ID)));
-                        }
+                        options.add(option(displayValue, (String) entityMap.get("Id")));
                     }
                 }
             }
@@ -116,12 +104,28 @@ public class QuickbooksUtils {
         };
     }
 
+    private static List<Map<?, ?>> getEntityMaps(Object entities) {
+        List<Map<?, ?>> entityMaps = new ArrayList<>();
+
+        if (entities instanceof Map<?, ?> entityMap) {
+            entityMaps.add(entityMap);
+        } else if (entities instanceof List<?> entityList) {
+            for (Object entity : entityList) {
+                if (entity instanceof Map<?, ?> entityMap) {
+                    entityMaps.add(entityMap);
+                }
+            }
+        }
+
+        return entityMaps;
+    }
+
     private static String getDisplayValue(Entity entity, Map<?, ?> entityMap) {
         return switch (entity) {
-            case ACCOUNT, ITEM -> (String) entityMap.get(NAME);
-            case CUSTOMER, VENDOR -> (String) entityMap.get(DISPLAY_NAME);
+            case ACCOUNT, ITEM -> (String) entityMap.get("Name");
+            case CUSTOMER, VENDOR -> (String) entityMap.get("DisplayName");
             case INVOICE -> (String) entityMap.get("DocNumber");
-            case BILL, PAYMENT -> (String) entityMap.get(ID);
+            case BILL, PAYMENT -> (String) entityMap.get("Id");
         };
     }
 }

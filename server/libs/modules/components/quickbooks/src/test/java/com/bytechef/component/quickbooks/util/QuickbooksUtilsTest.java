@@ -17,9 +17,6 @@
 package com.bytechef.component.quickbooks.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ID;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
 import static com.bytechef.component.quickbooks.util.QuickbooksUtils.getPropertiesForItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,8 +33,6 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.quickbooks.constant.Entity;
 import com.bytechef.component.quickbooks.constant.ItemType;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -102,7 +97,7 @@ class QuickbooksUtilsTest {
 
     private void verifyQuery(Entity expectedEntity) {
         assertEquals(
-            List.of("query", URLEncoder.encode("SELECT * FROM " + expectedEntity.getName(), StandardCharsets.UTF_8)),
+            List.of("query", "SELECT * FROM " + expectedEntity.getName()),
             stringArgumentCaptor.getAllValues());
     }
 
@@ -110,7 +105,8 @@ class QuickbooksUtilsTest {
     void testGetOptionsForCustomer() throws Exception {
         setupHttpMock(
             Map.of(
-                "QueryResponse", Map.of(Entity.CUSTOMER.getName(), List.of(Map.of(DISPLAY_NAME, "abc", ID, "123")))));
+                "QueryResponse",
+                Map.of(Entity.CUSTOMER.getName(), List.of(Map.of("DisplayName", "abc", "Id", "123")))));
 
         List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.CUSTOMER, null)
             .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
@@ -122,7 +118,8 @@ class QuickbooksUtilsTest {
     @Test
     void testGetOptionsForInvoice() throws Exception {
         setupHttpMock(
-            Map.of("QueryResponse", Map.of(Entity.INVOICE.getName(), List.of(Map.of("DocNumber", "abc", ID, "123")))));
+            Map.of("QueryResponse",
+                Map.of(Entity.INVOICE.getName(), List.of(Map.of("DocNumber", "abc", "Id", "123")))));
 
         List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.INVOICE, null)
             .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
@@ -133,7 +130,7 @@ class QuickbooksUtilsTest {
 
     @Test
     void testGetOptionsForPayment() throws Exception {
-        setupHttpMock(Map.of("QueryResponse", Map.of(Entity.PAYMENT.getName(), List.of(Map.of(ID, "123")))));
+        setupHttpMock(Map.of("QueryResponse", Map.of(Entity.PAYMENT.getName(), List.of(Map.of("Id", "123")))));
 
         List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.PAYMENT, null)
             .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
@@ -144,7 +141,8 @@ class QuickbooksUtilsTest {
 
     @Test
     void testGetOptionsForItem() throws Exception {
-        setupHttpMock(Map.of("QueryResponse", Map.of(Entity.ITEM.getName(), List.of(Map.of(NAME, "abc", ID, "123")))));
+        setupHttpMock(
+            Map.of("QueryResponse", Map.of(Entity.ITEM.getName(), List.of(Map.of("Name", "abc", "Id", "123")))));
 
         List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.ITEM, null)
             .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
@@ -158,12 +156,69 @@ class QuickbooksUtilsTest {
         setupHttpMock(
             Map.of(
                 "QueryResponse",
-                Map.of(Entity.ACCOUNT.getName(), List.of(Map.of(NAME, "abc", ID, "123", "AccountType", "Income")))));
+                Map.of(Entity.ACCOUNT.getName(),
+                    List.of(Map.of("Name", "abc", "Id", "123", "AccountType", "Income")))));
 
         List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.ACCOUNT, "Income")
             .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
         verifyQuery(Entity.ACCOUNT);
+    }
+
+    @Test
+    void testGetOptionsForVendorWithSingleResult() throws Exception {
+        setupHttpMock(
+            Map.of(
+                "QueryResponse",
+                Map.of(Entity.VENDOR.getName(), Map.of("domain", "QBO", "DisplayName", "abc", "Id", "123"))));
+
+        List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.VENDOR, null)
+            .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
+
+        assertEquals(expectedOptions, result);
+        verifyQuery(Entity.VENDOR);
+    }
+
+    @Test
+    void testGetOptionsForBill() throws Exception {
+        setupHttpMock(
+            Map.of(
+                "QueryResponse",
+                Map.of(Entity.BILL.getName(), List.of(Map.of("Id", "123"), Map.of("Id", "124")))));
+
+        List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.BILL, null)
+            .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
+
+        assertEquals(List.of(option("123", "123"), option("124", "124")), result);
+        verifyQuery(Entity.BILL);
+    }
+
+    @Test
+    void testGetOptionsForAccountSkipsOtherAndMissingAccountTypes() throws Exception {
+        setupHttpMock(
+            Map.of(
+                "QueryResponse",
+                Map.of(
+                    Entity.ACCOUNT.getName(),
+                    List.of(
+                        Map.of("Name", "abc", "Id", "123", "AccountType", "Income"),
+                        Map.of("Name", "def", "Id", "456", "AccountType", "Expense"),
+                        Map.of("Name", "ghi", "Id", "789")))));
+
+        List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.ACCOUNT, "Income")
+            .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
+
+        assertEquals(expectedOptions, result);
+    }
+
+    @Test
+    void testGetOptionsWithEmptyQueryResponse() throws Exception {
+        setupHttpMock(Map.of("QueryResponse", Map.of()));
+
+        List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.VENDOR, null)
+            .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
+
+        assertEquals(List.of(), result);
     }
 }
