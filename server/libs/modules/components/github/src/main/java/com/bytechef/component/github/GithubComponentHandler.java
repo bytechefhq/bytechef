@@ -26,15 +26,18 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.github.action.GitHubCreatePullRequestAction;
 import com.bytechef.component.github.action.GithubAddAssigneesToIssueAction;
 import com.bytechef.component.github.action.GithubAddLabelsToIssueAction;
+import com.bytechef.component.github.action.GithubCommitFilesToNewBranchAction;
 import com.bytechef.component.github.action.GithubCreateCommentOnIssueAction;
 import com.bytechef.component.github.action.GithubCreateForkAction;
 import com.bytechef.component.github.action.GithubCreateIssueAction;
 import com.bytechef.component.github.action.GithubGetIssueAction;
+import com.bytechef.component.github.action.GithubGetReleaseByTagAction;
 import com.bytechef.component.github.action.GithubGetRepositoryContentAction;
 import com.bytechef.component.github.action.GithubListIssuesAction;
 import com.bytechef.component.github.action.GithubListRepositoryIssuesAction;
 import com.bytechef.component.github.action.GithubSearchCodeAction;
 import com.bytechef.component.github.action.GithubStarRepositoryAction;
+import com.bytechef.component.github.action.GithubTriggerWorkflowDispatchAction;
 import com.bytechef.component.github.action.GithubUpdateIssueAction;
 import com.bytechef.component.github.trigger.GithubEventsTrigger;
 import com.bytechef.component.github.trigger.GithubNewIssueTrigger;
@@ -57,31 +60,37 @@ public class GithubComponentHandler implements ComponentHandler {
         .actions(
             GithubAddAssigneesToIssueAction.ACTION_DEFINITION,
             GithubAddLabelsToIssueAction.ACTION_DEFINITION,
+            GithubCommitFilesToNewBranchAction.ACTION_DEFINITION,
             GithubCreateCommentOnIssueAction.ACTION_DEFINITION,
             GithubCreateForkAction.ACTION_DEFINITION,
             GithubCreateIssueAction.ACTION_DEFINITION,
             GitHubCreatePullRequestAction.ACTION_DEFINITION,
             GithubGetIssueAction.ACTION_DEFINITION,
+            GithubGetReleaseByTagAction.ACTION_DEFINITION,
             GithubGetRepositoryContentAction.ACTION_DEFINITION,
             GithubListIssuesAction.ACTION_DEFINITION,
             GithubListRepositoryIssuesAction.ACTION_DEFINITION,
             GithubSearchCodeAction.ACTION_DEFINITION,
             GithubStarRepositoryAction.ACTION_DEFINITION,
+            GithubTriggerWorkflowDispatchAction.ACTION_DEFINITION,
             GithubUpdateIssueAction.ACTION_DEFINITION)
         .icon("path:assets/github.svg")
         .clusterElements(
             tool(GithubAddAssigneesToIssueAction.ACTION_DEFINITION),
             tool(GithubAddLabelsToIssueAction.ACTION_DEFINITION),
+            tool(GithubCommitFilesToNewBranchAction.ACTION_DEFINITION),
             tool(GithubCreateCommentOnIssueAction.ACTION_DEFINITION),
             tool(GithubCreateForkAction.ACTION_DEFINITION),
             tool(GithubCreateIssueAction.ACTION_DEFINITION),
             tool(GitHubCreatePullRequestAction.ACTION_DEFINITION),
             tool(GithubGetIssueAction.ACTION_DEFINITION),
+            tool(GithubGetReleaseByTagAction.ACTION_DEFINITION),
             tool(GithubGetRepositoryContentAction.ACTION_DEFINITION),
             tool(GithubListIssuesAction.ACTION_DEFINITION),
             tool(GithubListRepositoryIssuesAction.ACTION_DEFINITION),
             tool(GithubSearchCodeAction.ACTION_DEFINITION),
             tool(GithubStarRepositoryAction.ACTION_DEFINITION),
+            tool(GithubTriggerWorkflowDispatchAction.ACTION_DEFINITION),
             tool(GithubUpdateIssueAction.ACTION_DEFINITION))
         .triggers(
             GithubEventsTrigger.TRIGGER_DEFINITION,

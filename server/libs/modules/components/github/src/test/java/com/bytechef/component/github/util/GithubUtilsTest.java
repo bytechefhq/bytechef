@@ -247,4 +247,28 @@ class GithubUtilsTest {
 
         assertArrayEquals(expectedQuery, objectsArgumentCaptor.getValue());
     }
+
+    @Test
+    void testGetWorkflowOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(
+                Map.of(
+                    "workflows",
+                    List.of(Map.of(NAME, "Changelog media", "path", ".github/workflows/changelog-media.yml"))));
+
+        List<Option<String>> result = GithubUtils.getWorkflowOptions(
+            mockedParameters, null, Map.of(), "", mockedContext);
+
+        assertEquals(List.of(option("Changelog media (changelog-media.yml)", "changelog-media.yml")), result);
+        assertEquals("/repos/testOwner/testRepo/actions/workflows", stringArgumentCaptor.getValue());
+        assertArrayEquals(new Object[] {
+            "per_page", 100
+        }, objectsArgumentCaptor.getValue());
+    }
 }

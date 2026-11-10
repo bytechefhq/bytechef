@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.NAME;
 import static com.bytechef.component.github.constant.GithubConstants.OWNER;
+import static com.bytechef.component.github.constant.GithubConstants.PATH;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 
@@ -95,6 +96,15 @@ public class GithubUtils {
         return getOptions(labels, NAME);
     }
 
+    public static String getDefaultBranch(String owner, String repository, Context context) {
+        Map<String, Object> body = context.http(http -> http.get("/repos/%s/%s".formatted(owner, repository)))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return (String) body.get("default_branch");
+    }
+
     public static String getOwnerName(Context context) {
         Map<String, Object> body = context.http(http -> http.get("/user"))
             .configuration(responseType(Http.ResponseType.JSON))
@@ -111,6 +121,38 @@ public class GithubUtils {
         List<Map<String, ?>> repos = getItems(context, "/user/repos", false);
 
         return getOptions(repos, NAME);
+    }
+
+    public static List<Option<String>> getWorkflowOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        if (!inputParameters.containsKey(REPOSITORY)) {
+            return List.of();
+        }
+
+        String url = "/repos/%s/%s/actions/workflows".formatted(
+            inputParameters.getString(OWNER, getOwnerName(context)), inputParameters.getRequiredString(REPOSITORY));
+
+        Map<String, Object> body = context.http(http -> http.get(url))
+            .queryParameters("per_page", 100)
+            .configuration(responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body != null && body.get("workflows") instanceof List<?> workflows) {
+            for (Object workflow : workflows) {
+                if (workflow instanceof Map<?, ?> workflowMap && workflowMap.get(PATH) instanceof String path) {
+                    String fileName = path.substring(path.lastIndexOf('/') + 1);
+
+                    options.add(option(workflowMap.get(NAME) + " (" + fileName + ")", fileName));
+                }
+            }
+        }
+
+        return options;
     }
 
     private static List<Option<String>> getOptions(List<Map<String, ?>> body, String value) {
