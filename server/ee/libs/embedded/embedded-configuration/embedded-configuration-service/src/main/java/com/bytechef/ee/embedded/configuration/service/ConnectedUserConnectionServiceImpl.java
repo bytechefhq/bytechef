@@ -17,6 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,11 +44,12 @@ public class ConnectedUserConnectionServiceImpl implements ConnectedUserConnecti
     }
 
     @Override
-    public void create(long connectedUserId, long connectionId) {
+    public void create(long connectedUserId, long connectionId, @Nullable String provisionedBy) {
         ConnectedUserConnection connectedUserConnection = new ConnectedUserConnection();
 
         connectedUserConnection.setConnectedUserId(connectedUserId);
         connectedUserConnection.setConnectionId(connectionId);
+        connectedUserConnection.setProvisionedBy(provisionedBy);
 
         connectedUserConnectionRepository.save(connectedUserConnection);
     }

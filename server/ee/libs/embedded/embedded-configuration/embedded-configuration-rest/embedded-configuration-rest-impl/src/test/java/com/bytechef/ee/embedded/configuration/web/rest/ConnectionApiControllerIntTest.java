@@ -10,13 +10,16 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectionAdminFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
@@ -105,6 +108,9 @@ class ConnectionApiControllerIntTest {
 
     @Autowired
     private ConnectionAdminFacade connectionAdminFacade;
+
+    @Autowired
+    private ConnectedUserConnectionFacade connectedUserConnectionFacade;
 
     @Autowired
     private ConnectionMapper connectionMapper;
@@ -261,6 +267,27 @@ class ConnectionApiControllerIntTest {
             .hasFieldOrPropertyWithValue("componentName", "componentName")
             .hasFieldOrPropertyWithValue("name", "name")
             .hasFieldOrPropertyWithValue("parameters", Map.of("key1", "value1"));
+    }
+
+    @Test
+    void testPostConnectedUserConnectionCreatesTheConnectionAsAdmin() {
+        when(connectedUserConnectionFacade.createConnectedUserConnectionAsAdmin(eq(5L), any())).thenReturn(77L);
+
+        this.webTestClient
+            .post()
+            .uri("/internal/connected-users/5/connections")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new ConnectionModel().componentName("componentName")
+                .name("name"))
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(Long.class)
+            .isEqualTo(77L);
+
+        verify(connectedUserConnectionFacade).createConnectedUserConnectionAsAdmin(eq(5L), any());
+        verify(connectedUserConnectionFacade, never()).createConnectedUserConnection(anyLong(), any());
     }
 
     @SuppressWarnings("unchecked")

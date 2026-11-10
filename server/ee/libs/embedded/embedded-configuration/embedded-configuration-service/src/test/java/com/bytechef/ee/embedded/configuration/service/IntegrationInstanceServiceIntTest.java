@@ -83,6 +83,23 @@ class IntegrationInstanceServiceIntTest {
     }
 
     @Test
+    void testCreateRecordsProvisionedBy() {
+        long configurationId = createConfiguration(createIntegration(), 1);
+
+        IntegrationInstance provisionedInstance = integrationInstanceService.create(
+            USER_A_ID, CONNECTION_ID, configurationId, "admin@localhost.com");
+        IntegrationInstance selfActivatedInstance = integrationInstanceService.create(
+            USER_B_ID, CONNECTION_ID, configurationId);
+
+        assertThat(
+            integrationInstanceService.getIntegrationInstance(provisionedInstance.getId())
+                .getProvisionedBy()).isEqualTo("admin@localhost.com");
+        assertThat(
+            integrationInstanceService.getIntegrationInstance(selfActivatedInstance.getId())
+                .getProvisionedBy()).isNull();
+    }
+
+    @Test
     void testGetIntegrationInstancesByWorkflowUuidReturnsOnlyInstancesWhoseVersionHasThatWorkflow() {
         long integrationId = createIntegration();
 

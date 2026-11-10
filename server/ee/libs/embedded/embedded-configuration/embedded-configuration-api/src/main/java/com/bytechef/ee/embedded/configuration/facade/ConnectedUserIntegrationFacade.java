@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -42,9 +43,10 @@ public interface ConnectedUserIntegrationFacade {
      * @param integrationInstanceConfigurationId the integration instance configuration to provision onto
      * @param connectionParameters               the connection parameters
      * @param workflows                          the workflows to enable with their inputs
+     * @param provisionedBy                      the login of the tenant admin provisioning the instance
      * @return the id of the new integration instance
      */
     long provisionIntegrationInstance(
         long connectedUserId, long integrationInstanceConfigurationId, Map<String, Object> connectionParameters,
-        List<ProvisionIntegrationInstanceWorkflowDTO> workflows);
+        List<ProvisionIntegrationInstanceWorkflowDTO> workflows, @Nullable String provisionedBy);
 }

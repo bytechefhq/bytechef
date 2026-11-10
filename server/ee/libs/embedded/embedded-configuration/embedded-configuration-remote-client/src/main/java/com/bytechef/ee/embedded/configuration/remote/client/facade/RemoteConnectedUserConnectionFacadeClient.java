@@ -32,6 +32,11 @@ public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserC
     }
 
     @Override
+    public long createConnectedUserConnectionAsAdmin(long connectedUserId, ConnectionDTO connectionDTO) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void deleteConnectedUserConnection(long connectedUserId, long connectionId) {
         throw new UnsupportedOperationException();
     }

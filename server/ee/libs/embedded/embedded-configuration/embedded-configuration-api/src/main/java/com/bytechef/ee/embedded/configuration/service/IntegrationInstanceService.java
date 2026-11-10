@@ -12,6 +12,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -22,7 +23,15 @@ public interface IntegrationInstanceService {
 
     IntegrationInstance create(IntegrationInstance integrationInstance);
 
-    IntegrationInstance create(long connectedUserId, long connectionId, long integrationInstanceConfigurationId);
+    default IntegrationInstance create(
+        long connectedUserId, long connectionId, long integrationInstanceConfigurationId) {
+
+        return create(connectedUserId, connectionId, integrationInstanceConfigurationId, null);
+    }
+
+    IntegrationInstance create(
+        long connectedUserId, long connectionId, long integrationInstanceConfigurationId,
+        @Nullable String provisionedBy);
 
     void delete(long id);
 

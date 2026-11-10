@@ -263,6 +263,30 @@ class ConnectedUserApiControllerIntTest {
         verify(connectedUserFacade, never()).importConnectedUsers(any(Environment.class), any(InputStream.class));
     }
 
+    @Test
+    void testGetConnectedUserExposesProvisionedPerIntegrationInstance() {
+        when(connectedUserFacade.getConnectedUserDTO(9L))
+            .thenReturn(
+                new ConnectedUserDTO(
+                    null, Instant.now(), null, true, Environment.STAGING, "user-9", 9L,
+                    List.of(
+                        new ConnectedUserDTO.IntegrationInstance("slack", null, true, 1L, 2L, 3L, 1, 4L, true),
+                        new ConnectedUserDTO.IntegrationInstance("jira", null, true, 5L, 6L, 7L, 1, 8L, false)),
+                    Map.of(), null, Instant.now(), null, 0));
+
+        this.webTestClient
+            .get()
+            .uri("/internal/connected-users/9")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.integrationInstances[0].provisioned")
+            .isEqualTo(true)
+            .jsonPath("$.integrationInstances[1].provisioned")
+            .isEqualTo(false);
+    }
+
     private static ConnectedUserDTO connectedUserDTO(long id, int version) {
         return new ConnectedUserDTO(
             null, Instant.now(), null, true, Environment.STAGING, id == 5L ? "user-1" : "user-x", id, List.of(),

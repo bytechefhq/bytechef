@@ -696,7 +696,7 @@ class IntegrationFacadesAuditIntTest {
 
             assertThatThrownBy(
                 () -> connectedUserIntegrationFacade.provisionIntegrationInstance(
-                    CONNECTED_USER_ID, 7L, Map.of("token", "s3cr3t"), null))
+                    CONNECTED_USER_ID, 7L, Map.of("token", "s3cr3t"), null, "admin"))
                         .isInstanceOf(NoSuchElementException.class);
 
             assertThat(findSingleEvent(IntegrationAuditEvents.INTEGRATION_INSTANCE_PROVISIONED).getData())

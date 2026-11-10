@@ -38,6 +38,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService
 import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserSharedConnectionRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
@@ -165,6 +166,9 @@ class ConnectedUserConnectionFacadeIntTest {
 
     @Autowired
     private ConnectedUserConnectionFacade connectedUserConnectionFacade;
+
+    @Autowired
+    private ConnectedUserConnectionRepository connectedUserConnectionRepository;
 
     @Autowired
     private ConnectedUserConnectionService connectedUserConnectionService;
@@ -861,6 +865,8 @@ class ConnectedUserConnectionFacadeIntTest {
         private static final long CONNECTED_USER_A_CONNECTION_ID = 91001L;
         private static final long CONNECTED_USER_B_CONNECTION_ID = 91002L;
         private static final long CONNECTION_ID = 91042L;
+        private static final long PROVISIONED_CONNECTION_ID = 91043L;
+        private static final long SELF_CREATED_CONNECTION_ID = 91044L;
         private static final long UNKNOWN_CONNECTED_USER_ID = Long.MAX_VALUE;
 
         @Autowired
@@ -1017,6 +1023,45 @@ class ConnectedUserConnectionFacadeIntTest {
 
             assertThat(connectedUserConnectionService.getConnectionIds(connectedUserBId))
                 .containsExactlyInAnyOrder(CONNECTED_USER_B_CONNECTION_ID, CONNECTION_ID);
+        }
+
+        @Test
+        void testCreateConnectedUserConnectionAsAdminRecordsAdmin() {
+            authenticate(createTenantAdminAuthentication());
+
+            when(connectionFacade.create(any(ConnectionDTO.class), eq(PlatformType.EMBEDDED)))
+                .thenReturn(PROVISIONED_CONNECTION_ID);
+
+            assertThat(
+                connectedUserConnectionFacade.createConnectedUserConnectionAsAdmin(connectedUserBId, connectionDTO()))
+                    .isEqualTo(PROVISIONED_CONNECTION_ID);
+
+            assertThat(getProvisionedBy(PROVISIONED_CONNECTION_ID)).isEqualTo("admin@localhost.com");
+            assertThat(getProvisionedBy(CONNECTED_USER_B_CONNECTION_ID)).isNull();
+        }
+
+        @Test
+        void testCreateConnectedUserConnectionAsAdminDeniesConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.createConnectedUserConnectionAsAdmin(
+                    connectedUserAId, connectionDTO()))
+                        .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).create(any(), any());
+        }
+
+        @Test
+        void testCreateConnectedUserConnectionLeavesProvisionedByEmpty() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            when(connectionFacade.create(any(ConnectionDTO.class), eq(PlatformType.EMBEDDED)))
+                .thenReturn(SELF_CREATED_CONNECTION_ID);
+
+            connectedUserConnectionFacade.createConnectedUserConnection(connectedUserAId, connectionDTO());
+
+            assertThat(getProvisionedBy(SELF_CREATED_CONNECTION_ID)).isNull();
         }
 
         @Test
@@ -1185,6 +1230,15 @@ class ConnectedUserConnectionFacadeIntTest {
                     .isInstanceOf(AccessDeniedException.class);
 
             verify(connectedUserService, never()).getConnectedUser(externalUserBId, Environment.PRODUCTION);
+        }
+
+        private String getProvisionedBy(long connectionId) {
+            return connectedUserConnectionRepository.findAll()
+                .stream()
+                .filter(connectedUserConnection -> connectedUserConnection.getConnectionId() == connectionId)
+                .findFirst()
+                .orElseThrow()
+                .getProvisionedBy();
         }
 
         private static ConnectionDTO connectionDTO() {

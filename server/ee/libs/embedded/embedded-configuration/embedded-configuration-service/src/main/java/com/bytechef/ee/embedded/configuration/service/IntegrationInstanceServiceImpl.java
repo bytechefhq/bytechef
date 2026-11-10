@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +47,8 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
 
     @Override
     public IntegrationInstance create(
-        long connectedUserId, long connectionId, long integrationInstanceConfigurationId) {
+        long connectedUserId, long connectionId, long integrationInstanceConfigurationId,
+        @Nullable String provisionedBy) {
 
         IntegrationInstance integrationInstance = new IntegrationInstance();
 
@@ -54,6 +56,7 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
         integrationInstance.setConnectionId(connectionId);
         integrationInstance.setIntegrationInstanceConfigurationId(integrationInstanceConfigurationId);
         integrationInstance.setEnabled(true);
+        integrationInstance.setProvisionedBy(provisionedBy);
 
         return integrationInstanceRepository.save(integrationInstance);
     }

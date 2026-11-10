@@ -37,6 +37,7 @@ public record ConnectedUserDTO(
 
     public record IntegrationInstance(
         String componentName, CredentialStatus credentialStatus, boolean enabled, long id, long integrationId,
-        long integrationInstanceConfigurationId, int integrationVersion, Long connectionId) {
+        long integrationInstanceConfigurationId, int integrationVersion, Long connectionId,
+        boolean provisioned) {
     }
 }

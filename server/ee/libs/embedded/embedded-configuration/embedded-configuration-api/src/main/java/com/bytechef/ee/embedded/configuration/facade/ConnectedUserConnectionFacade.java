@@ -23,6 +23,8 @@ public interface ConnectedUserConnectionFacade {
 
     long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO);
 
+    long createConnectedUserConnectionAsAdmin(long connectedUserId, ConnectionDTO connectionDTO);
+
     void deleteConnectedUserConnection(long connectedUserId, long connectionId);
 
     List<ConnectionDTO> getConnectedUserConnections(
