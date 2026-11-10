@@ -1,36 +1,54 @@
 import Badge from '@/components/Badge/Badge';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Integration, IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
+import BreadcrumbTitleSelect, {getPublishedVersion} from '@/shared/components/BreadcrumbTitleSelect';
+import {PuzzleIcon} from 'lucide-react';
+import {useMemo} from 'react';
 
-const IntegrationTitle = ({integration}: {integration: Integration}) => {
+interface IntegrationTitleProps {
+    integration: Integration;
+    integrations?: Integration[];
+    onIntegrationValueChange?: (integrationId: number) => void;
+}
+
+const IntegrationTitle = ({integration, integrations, onIntegrationValueChange}: IntegrationTitleProps) => {
+    const items = useMemo(
+        () =>
+            integrations?.map((workspaceIntegration) => ({
+                disabled: !workspaceIntegration.integrationWorkflowIds?.length,
+                id: String(workspaceIntegration.id),
+                name: workspaceIntegration.name ?? workspaceIntegration.componentName,
+                publishedVersion: getPublishedVersion(
+                    workspaceIntegration.lastPublishedDate,
+                    workspaceIntegration.lastIntegrationVersion,
+                    workspaceIntegration.lastStatus === IntegrationStatus.Published
+                ),
+            })),
+        [integrations]
+    );
+
     return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <div className="flex max-w-96 items-center space-x-2">
-                    <h1 className="truncate">{integration?.name}</h1>
+        <BreadcrumbTitleSelect
+            ariaLabel="Integration select"
+            badge={
+                <Badge
+                    className="flex shrink-0 space-x-1 border-transparent"
+                    styleType={
+                        integration.lastStatus === IntegrationStatus.Published ? 'success-outline' : 'secondary-filled'
+                    }
+                    weight="semibold"
+                >
+                    <span>V{integration.lastIntegrationVersion}</span>
 
-                    {integration.name && integration.name.length > 43 && (
-                        <TooltipContent>{integration.name}</TooltipContent>
-                    )}
-
-                    {integration && (
-                        <Badge
-                            className="flex space-x-1 border-transparent"
-                            styleType={
-                                integration.lastStatus === IntegrationStatus.Published
-                                    ? 'success-outline'
-                                    : 'secondary-filled'
-                            }
-                            weight="semibold"
-                        >
-                            <span>V{integration.lastIntegrationVersion}</span>
-
-                            <span>{integration.lastStatus}</span>
-                        </Badge>
-                    )}
-                </div>
-            </TooltipTrigger>
-        </Tooltip>
+                    <span>{integration.lastStatus}</span>
+                </Badge>
+            }
+            currentId={integration.id !== undefined ? String(integration.id) : undefined}
+            icon={PuzzleIcon}
+            items={items}
+            menuLabel="Integrations"
+            name={integration.name ?? integration.componentName}
+            onValueChange={onIntegrationValueChange && ((value) => onIntegrationValueChange(Number(value)))}
+        />
     );
 };
 

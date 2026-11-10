@@ -66,6 +66,7 @@ const IntegrationHeader = ({
     const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
     const isSaving = useIsMutating();
     const {
+        handleIntegrationValueChange,
         handleIntegrationWorkflowValueChange,
         handlePublishIntegrationSubmit,
         handleRunClick,
@@ -73,6 +74,7 @@ const IntegrationHeader = ({
         handleStopClick,
         integration,
         integrationWorkflows,
+        integrations,
         publishIntegrationMutationIsPending,
     } = useIntegrationHeader({
         bottomResizablePanelRef,
@@ -104,6 +106,7 @@ const IntegrationHeader = ({
                 {integrationWorkflows ? (
                     <IntegrationBreadcrumb
                         integration={integration}
+                        integrations={integrations}
                         itemSelect={
                             <IntegrationItemSelect
                                 currentIntegrationWorkflowId={integrationWorkflowId}
@@ -112,6 +115,7 @@ const IntegrationHeader = ({
                                 onWorkflowValueChange={handleIntegrationWorkflowValueChange}
                             />
                         }
+                        onIntegrationValueChange={handleIntegrationValueChange}
                     />
                 ) : (
                     <IntegrationBreadcrumbSkeleton />

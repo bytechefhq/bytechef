@@ -44,7 +44,7 @@ const IntegrationItemSelect = ({
             {currentLabel && currentLabel.length > 30 && <TooltipContent>{currentLabel}</TooltipContent>}
         </Tooltip>
 
-        <DropdownMenuContent align="start" className="max-w-lg min-w-64">
+        <DropdownMenuContent align="start" className="w-80">
             <DropdownMenuRadioGroup
                 onValueChange={(value) => onWorkflowValueChange(Number(value))}
                 value={currentIntegrationWorkflowId !== undefined ? currentIntegrationWorkflowId.toString() : ''}
@@ -57,7 +57,7 @@ const IntegrationItemSelect = ({
                             <DropdownMenuRadioItem
                                 className="pl-2 data-[state=checked]:bg-surface-brand-secondary data-[state=checked]:text-content-brand-primary [&>span:first-child]:hidden"
                                 key={workflow.integrationWorkflowId!}
-                                title={workflow.label!.length > 55 ? workflow.label! : undefined}
+                                title={workflow.label!.length > 30 ? workflow.label! : undefined}
                                 value={workflow.integrationWorkflowId!.toString()}
                             >
                                 <WorkflowIcon className="size-4 shrink-0" />

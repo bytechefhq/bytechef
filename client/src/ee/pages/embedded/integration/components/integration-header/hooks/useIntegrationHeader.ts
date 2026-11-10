@@ -2,7 +2,11 @@ import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/ee/shared/mutations/embedded/integrations.mutations';
 import {IntegrationVersionKeys} from '@/ee/shared/queries/embedded/integrationVersions.queries';
 import {useGetIntegrationWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
-import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
+import {
+    IntegrationKeys,
+    useGetIntegrationQuery,
+    useGetIntegrationsQuery,
+} from '@/ee/shared/queries/embedded/integrations.queries';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -46,6 +50,8 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
     const {data: integration} = useGetIntegrationQuery(integrationId, useLoaderData() as Integration);
 
     const {data: integrationWorkflows} = useGetIntegrationWorkflowsQuery(integrationId, !!integrationId);
+
+    const {data: integrations} = useGetIntegrationsQuery();
 
     const queryClient = useQueryClient();
 
@@ -93,6 +99,23 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
     const handleIntegrationWorkflowValueChange = (integrationWorkflowId: number) => {
         navigate(
             `/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowId}?${searchParams}`
+        );
+    };
+
+    const handleIntegrationValueChange = (selectedIntegrationId: number) => {
+        if (selectedIntegrationId === integrationId) {
+            return;
+        }
+
+        const selectedIntegration = integrations?.find((integration) => integration.id === selectedIntegrationId);
+        const firstIntegrationWorkflowId = selectedIntegration?.integrationWorkflowIds?.[0];
+
+        if (firstIntegrationWorkflowId === undefined) {
+            return;
+        }
+
+        navigate(
+            `/embedded/integrations/${selectedIntegrationId}/integration-workflows/${firstIntegrationWorkflowId}?${searchParams}`
         );
     };
 
@@ -219,6 +242,7 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
     }, [workflowTestStreamError, persistJobId, setWorkflowIsRunning, setStreamRequest]);
 
     return {
+        handleIntegrationValueChange,
         handleIntegrationWorkflowValueChange,
         handlePublishIntegrationSubmit,
         handleRunClick,
@@ -226,6 +250,7 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
         handleStopClick,
         integration,
         integrationWorkflows,
+        integrations,
         publishIntegrationMutationIsPending: publishIntegrationMutation.isPending,
     };
 };
