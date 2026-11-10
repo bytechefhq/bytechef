@@ -28,6 +28,7 @@ import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
@@ -44,11 +45,14 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -100,8 +104,14 @@ class ConnectionAdminFacadeIntTest {
     @MockitoBean
     private ConnectedUserConnectionService connectedUserConnectionService;
 
+    @MockitoBean
+    private IntegrationInstanceService integrationInstanceService;
+
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+    @Autowired
+    private TagService tagService;
 
     @MockitoBean
     private PermissionService permissionService;
@@ -157,7 +167,9 @@ class ConnectionAdminFacadeIntTest {
         connectionAdminFacade.getConnections("slack", 1, 2L, 3L);
         connectionAdminFacade.getSharedConnectionIds();
         connectionAdminFacade.updateConnection(7L, "name", List.of(), true, 0);
+        connectionAdminFacade.updateConnectionCredentials(7L, Map.of("token", "secret"), 0);
 
+        verify(connectionFacade).updateCredentials(7L, Map.of("token", "secret"), 0);
         verify(connectionFacade).delete(7L);
         verify(connectionFacade).getConnection(7L);
         verify(connectionFacade).getConnections("slack", 1, List.of(), 3L, 2L, PlatformType.EMBEDDED);
@@ -180,6 +192,22 @@ class ConnectionAdminFacadeIntTest {
             .containsEntry("connectionId", "7")
             .containsEntry("name", "name")
             .containsEntry("shared", "true");
+
+        PersistentAuditEvent credentialsUpdatedEvent =
+            findSingleEvent(ConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED);
+
+        assertThat(credentialsUpdatedEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectionId", "7");
+
+        assertNoDataValueContains(credentialsUpdatedEvent, "secret");
+    }
+
+    private void assertNoDataValueContains(PersistentAuditEvent persistentAuditEvent, String text) {
+        assertThat(persistentAuditEvent.getData()
+            .values()).noneMatch(
+                value -> String.valueOf(value)
+                    .contains(text));
     }
 
     private PersistentAuditEvent findSingleEvent(String eventType) {
@@ -315,6 +343,35 @@ class ConnectionAdminFacadeIntTest {
                     ? Set.of(CONNECTED_USER_CONNECTION_ID) : Set.of();
             });
             when(connectedUserConnectionService.existsByConnectionId(CONNECTED_USER_CONNECTION_ID)).thenReturn(true);
+            when(integrationInstanceService.getConnectionIdsIn(anySet())).thenAnswer(invocation -> {
+                Set<Long> requestedConnectionIds = invocation.getArgument(0);
+
+                return requestedConnectionIds.contains(INTEGRATION_INSTANCE_CONNECTION_ID)
+                    ? Set.of(INTEGRATION_INSTANCE_CONNECTION_ID) : Set.of();
+            });
+            when(integrationInstanceService.existsByConnectionId(INTEGRATION_INSTANCE_CONNECTION_ID)).thenReturn(true);
+        }
+
+        @Test
+        void testGetConnectionsExcludesIntegrationInstanceConnections() {
+            stubConnections(
+                connectionDTO(ADMIN_CONNECTION_ID, List.of()),
+                connectionDTO(INTEGRATION_INSTANCE_CONNECTION_ID, List.of()));
+
+            List<ConnectionDTO> connectionDTOs = connectionAdminFacade.getConnections(null, null, null, null);
+
+            assertThat(connectionDTOs).extracting(ConnectionDTO::id)
+                .containsExactly(ADMIN_CONNECTION_ID);
+        }
+
+        @Test
+        void testGetConnectionThrowsForIntegrationInstanceConnection() {
+            stubEmbedded(INTEGRATION_INSTANCE_CONNECTION_ID);
+
+            assertThatThrownBy(() -> connectionAdminFacade.getConnection(INTEGRATION_INSTANCE_CONNECTION_ID))
+                .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).getConnection(anyLong());
         }
 
         @Test
@@ -375,6 +432,29 @@ class ConnectionAdminFacadeIntTest {
         }
 
         @Test
+        void testUpdateConnectionCredentialsDelegatesForAdminConnection() {
+            stubEmbedded(ADMIN_CONNECTION_ID);
+
+            Map<String, Object> parameters = Map.of("token", "secret");
+
+            connectionAdminFacade.updateConnectionCredentials(ADMIN_CONNECTION_ID, parameters, 2);
+
+            verify(connectionFacade).updateCredentials(ADMIN_CONNECTION_ID, parameters, 2);
+        }
+
+        @Test
+        void testUpdateConnectionCredentialsThrowsForConnectedUserConnection() {
+            stubEmbedded(CONNECTED_USER_CONNECTION_ID);
+
+            assertThatThrownBy(
+                () -> connectionAdminFacade.updateConnectionCredentials(
+                    CONNECTED_USER_CONNECTION_ID, Map.of("token", "secret"), 0))
+                        .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+        }
+
+        @Test
         void testUpdateConnectionTagsThrowsForConnectedUserConnection() {
             stubEmbedded(CONNECTED_USER_CONNECTION_ID);
 
@@ -397,14 +477,31 @@ class ConnectionAdminFacadeIntTest {
         }
 
         @Test
-        void testGetConnectionTagsReturnsOnlyAdminConnectionTags() {
-            Tag adminTag = new Tag(11L, "admin");
+        void testGetConnectionTagsReturnsOnlyAdminConnectionTagsSortedByName() {
+            Tag zetaTag = tagService.create(new Tag("zeta-" + UUID.randomUUID()));
+            Tag alphaTag = tagService.create(new Tag("alpha-" + UUID.randomUUID()));
+            Tag customerTag = tagService.create(new Tag("customer-" + UUID.randomUUID()));
 
-            stubConnections(
-                connectionDTO(ADMIN_CONNECTION_ID, List.of(adminTag)),
-                connectionDTO(CONNECTED_USER_CONNECTION_ID, List.of(new Tag(12L, "customer"))));
+            Connection adminConnection = connection(ADMIN_CONNECTION_ID, PlatformType.EMBEDDED);
 
-            assertThat(connectionAdminFacade.getConnectionTags()).containsExactly(adminTag);
+            adminConnection.setTagIds(List.of(zetaTag.getId(), alphaTag.getId()));
+
+            Connection sharedConnection = connection(SHARED_CONNECTION_ID, PlatformType.EMBEDDED);
+
+            sharedConnection.setTagIds(List.of(alphaTag.getId()));
+
+            Connection connectedUserConnection = connection(CONNECTED_USER_CONNECTION_ID, PlatformType.EMBEDDED);
+
+            connectedUserConnection.setTagIds(List.of(customerTag.getId()));
+
+            when(connectionService.getConnections(PlatformType.EMBEDDED))
+                .thenReturn(List.of(adminConnection, sharedConnection, connectedUserConnection));
+
+            assertThat(connectionAdminFacade.getConnectionTags())
+                .extracting(Tag::getName)
+                .containsExactly(alphaTag.getName(), zetaTag.getName());
+
+            verify(connectionFacade, never()).getConnections(any(), any(), anyList(), any(), any(), any());
         }
 
         private ConnectionDTO connectionDTO(long id, List<Tag> tags) {

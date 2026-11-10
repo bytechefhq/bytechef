@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
@@ -19,10 +20,8 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -47,17 +46,19 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
     private final ConnectedUserConnectionService connectedUserConnectionService;
     private final ConnectionFacade connectionFacade;
     private final ConnectionService connectionService;
+    private final TagService tagService;
 
     @SuppressFBWarnings("EI")
     public ConnectionAdminFacadeImpl(
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserConnectionService connectedUserConnectionService, ConnectionFacade connectionFacade,
-        ConnectionService connectionService) {
+        ConnectionService connectionService, TagService tagService) {
 
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectionFacade = connectionFacade;
         this.connectionService = connectionService;
+        this.tagService = tagService;
     }
 
     @Override
@@ -120,19 +121,22 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
 
     @Override
     public List<Tag> getConnectionTags() {
-        Map<Long, Tag> tagsById = new LinkedHashMap<>();
+        List<Connection> connections = connectionService.getConnections(PlatformType.EMBEDDED);
 
-        for (ConnectionDTO connectionDTO : getConnections(null, null, null, null)) {
-            for (Tag tag : connectionDTO.tags()) {
-                tagsById.putIfAbsent(tag.getId(), tag);
-            }
-        }
+        Set<Long> connectionIds = connections.stream()
+            .map(Connection::getId)
+            .collect(Collectors.toSet());
 
-        List<Tag> tags = new ArrayList<>(tagsById.values());
+        Set<Long> connectedUserOwnedConnectionIds =
+            connectedUserConnectionMembership.getConnectedUserOwnedConnectionIds(connectionIds);
 
-        tags.sort(Comparator.comparing(Tag::getName));
+        List<Long> tagIds = connections.stream()
+            .filter(connection -> !connectedUserOwnedConnectionIds.contains(connection.getId()))
+            .flatMap(connection -> CollectionUtils.stream(connection.getTagIds()))
+            .distinct()
+            .toList();
 
-        return tags;
+        return tagService.getTags(tagIds);
     }
 
     @Override
@@ -155,6 +159,17 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
         if (shared != null) {
             connectedUserConnectionService.updateShared(id, shared);
         }
+    }
+
+    @Override
+    @Transactional
+    @Audited(event = ConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, data = {
+        @AuditData(key = "connectionId", value = "#id")
+    })
+    public void updateConnectionCredentials(long id, Map<String, ?> parameters, int version) {
+        requireAdminConnection(id);
+
+        connectionFacade.updateCredentials(id, parameters, version);
     }
 
     @Override

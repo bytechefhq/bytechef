@@ -31,6 +31,7 @@ import com.bytechef.ee.embedded.configuration.web.rest.config.EmbeddedConfigurat
 import com.bytechef.ee.embedded.configuration.web.rest.mapper.ConnectionMapper;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionCredentialsRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
@@ -288,6 +289,22 @@ class ConnectionApiControllerIntTest {
         assertThat(tagsArgumentCaptor.getValue())
             .singleElement()
             .hasFieldOrPropertyWithValue("name", "tag1");
+    }
+
+    @Test
+    void testPutConnectionCredentials() {
+        this.webTestClient
+            .put()
+            .uri("/internal/connections/1/credentials")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UpdateConnectionCredentialsRequestModel().parameters(Map.of("token", "secret"))
+                .version(3))
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(connectionAdminFacade).updateConnectionCredentials(1L, Map.of("token", "secret"), 3);
     }
 
     @Test

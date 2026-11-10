@@ -13,6 +13,7 @@ import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectionAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionCredentialsRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
@@ -122,6 +123,18 @@ public class ConnectionApiController implements ConnectionApi {
         connectionAdminFacade.updateConnection(
             id, updateConnectionRequestModel.getName(), list, updateConnectionRequestModel.getShared(),
             Objects.requireNonNull(updateConnectionRequestModel.getVersion()));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateConnectionCredentials(
+        Long id, UpdateConnectionCredentialsRequestModel updateConnectionCredentialsRequestModel) {
+
+        connectionAdminFacade.updateConnectionCredentials(
+            id, updateConnectionCredentialsRequestModel.getParameters(),
+            Objects.requireNonNull(updateConnectionCredentialsRequestModel.getVersion()));
 
         return ResponseEntity.noContent()
             .build();

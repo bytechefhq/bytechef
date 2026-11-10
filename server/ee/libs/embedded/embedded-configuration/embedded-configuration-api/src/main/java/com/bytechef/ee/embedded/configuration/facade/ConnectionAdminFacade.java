@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
@@ -35,6 +36,8 @@ public interface ConnectionAdminFacade {
     Set<Long> getSharedConnectionIds();
 
     void updateConnection(long id, String name, List<Tag> tags, @Nullable Boolean shared, int version);
+
+    void updateConnectionCredentials(long id, Map<String, ?> parameters, int version);
 
     void updateConnectionTags(long id, List<Tag> tags);
 }
