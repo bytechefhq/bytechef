@@ -278,7 +278,7 @@ components:
       required:
         - "source"
       properties:
-        automationWorkflowExecution:
+        automationExecution:
           description: "The automation workflow execution, set when the source is AUTOMATION."
           type: "object"
         integrationWorkflowExecution:
