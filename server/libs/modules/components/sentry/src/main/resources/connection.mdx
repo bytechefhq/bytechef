@@ -1,0 +1,14 @@
+## Connection Setup
+
+### Create an Auth Token
+
+1. Log in to your [Sentry](https://sentry.io/) account.
+2. Go to *Settings* and open *Developer Settings*.
+3. Click *Personal Tokens* (or *Organization Tokens*) and create a new token.
+4. Give the token the *event:read*, *event:write* and *project:read* scopes.
+5. Copy the token and paste it into the *Auth Token* field.
+
+### Base URL and Organization Slug
+
+- *Base URL* is `https://sentry.io` for Sentry SaaS. Organizations whose data is stored in a specific region can use `https://us.sentry.io` or `https://de.sentry.io`. For self-hosted Sentry, enter the URL of your installation, for example `https://sentry.example.com`.
+- *Organization Slug* is shown in your organization's URL, for example `my-org` in `https://my-org.sentry.io` or `https://sentry.io/organizations/my-org/`. You can also find it under *Settings* -> *General Settings*.
