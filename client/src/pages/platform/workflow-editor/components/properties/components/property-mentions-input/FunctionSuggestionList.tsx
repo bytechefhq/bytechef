@@ -66,20 +66,35 @@ const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, Functio
 
                                     {index === selectedIndex && (
                                         <span className="mt-1 text-xs whitespace-normal text-muted-foreground">
-                                            {hasVariations && (
-                                                <span className="mb-1 block border-l border-border pl-2 font-mono">
-                                                    {group.overloads.map((overload) => (
-                                                        <span className="block" key={formatFunctionSignature(overload)}>
+                                            {hasVariations ? (
+                                                group.overloads.map((overload) => (
+                                                    <span
+                                                        className="mt-1 block border-l border-border pl-2 first:mt-0"
+                                                        key={formatFunctionSignature(overload)}
+                                                    >
+                                                        <span className="block font-mono">
                                                             {formatFunctionSignature(overload)}
                                                         </span>
-                                                    ))}
-                                                </span>
-                                            )}
 
-                                            {firstOverload.description}
+                                                        {overload.description}
 
-                                            {firstOverload.example && (
-                                                <span className="mt-0.5 block font-mono">{firstOverload.example}</span>
+                                                        {overload.example && (
+                                                            <span className="mt-0.5 block font-mono">
+                                                                {overload.example}
+                                                            </span>
+                                                        )}
+                                                    </span>
+                                                ))
+                                            ) : (
+                                                <>
+                                                    {firstOverload.description}
+
+                                                    {firstOverload.example && (
+                                                        <span className="mt-0.5 block font-mono">
+                                                            {firstOverload.example}
+                                                        </span>
+                                                    )}
+                                                </>
                                             )}
                                         </span>
                                     )}
