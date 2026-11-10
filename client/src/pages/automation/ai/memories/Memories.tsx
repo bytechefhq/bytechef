@@ -296,7 +296,7 @@ const Memories = () => {
             leftSidebarOpen={false}
         >
             <PageLoader className="min-h-full" loading={isLoading}>
-                <div className="flex w-full flex-1 flex-col p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
+                <div className="flex w-full flex-col p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                     {filtersActive && (
                         <div className="flex flex-wrap items-center gap-2 pb-4">
                             <FilterBadges groups={filterGroups} />
