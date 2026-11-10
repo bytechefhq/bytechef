@@ -46,7 +46,7 @@ const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, Functio
                                     onClick={() => selectItem(index)}
                                     type="button"
                                 >
-                                    <span className="flex w-full items-baseline gap-2">
+                                    <span className="flex w-full items-baseline gap-2 break-normal wrap-break-word">
                                         <span className="font-mono">
                                             <span className="text-primary">{group.name}</span>
 
@@ -65,7 +65,7 @@ const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, Functio
                                     </span>
 
                                     {index === selectedIndex && (
-                                        <span className="mt-1 text-xs whitespace-normal text-muted-foreground">
+                                        <span className="mt-1 text-xs break-normal wrap-break-word whitespace-normal text-muted-foreground">
                                             {hasVariations ? (
                                                 group.overloads.map((overload) => (
                                                     <span
