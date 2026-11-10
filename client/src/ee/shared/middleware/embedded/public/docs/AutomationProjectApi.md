@@ -1,30 +1,30 @@
-# AutomationWorkflowProjectApi
+# AutomationProjectApi
 
 All URIs are relative to */api/embedded/v1*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**getFrontendProjects**](AutomationWorkflowProjectApi.md#getfrontendprojects) | **GET** /automation/projects | Get automation workflow projects available to the connected user |
-| [**getFrontendWorkflowTemplate**](AutomationWorkflowProjectApi.md#getfrontendworkflowtemplate) | **GET** /automation/workflow-templates/{workflowUuid} | Get an automation workflow template available to the connected user |
-| [**getProjects**](AutomationWorkflowProjectApi.md#getprojects) | **GET** /{externalUserId}/automation/projects | Get automation workflow projects available to a connected user identified by external user id |
-| [**getWorkflowTemplate**](AutomationWorkflowProjectApi.md#getworkflowtemplate) | **GET** /{externalUserId}/automation/workflow-templates/{workflowUuid} | Get an automation workflow template available to a connected user identified by external user id |
+| [**getFrontendProjects**](AutomationProjectApi.md#getfrontendprojects) | **GET** /automation/projects | Get automation projects available to the connected user |
+| [**getFrontendWorkflowTemplate**](AutomationProjectApi.md#getfrontendworkflowtemplate) | **GET** /automation/workflow-templates/{workflowUuid} | Get an automation workflow template available to the connected user |
+| [**getProjects**](AutomationProjectApi.md#getprojects) | **GET** /{externalUserId}/automation/projects | Get automation projects available to a connected user identified by external user id |
+| [**getWorkflowTemplate**](AutomationProjectApi.md#getworkflowtemplate) | **GET** /{externalUserId}/automation/workflow-templates/{workflowUuid} | Get an automation workflow template available to a connected user identified by external user id |
 
 
 
 ## getFrontendProjects
 
-> Array&lt;AutomationWorkflowProject&gt; getFrontendProjects(xEnvironment)
+> Array&lt;AutomationProject&gt; getFrontendProjects(xEnvironment)
 
-Get automation workflow projects available to the connected user
+Get automation projects available to the connected user
 
-Get automation workflow projects available to the connected user.
+Get automation projects available to the connected user.
 
 ### Example
 
 ```ts
 import {
   Configuration,
-  AutomationWorkflowProjectApi,
+  AutomationProjectApi,
 } from '';
 import type { GetFrontendProjectsRequest } from '';
 
@@ -34,7 +34,7 @@ async function example() {
     // Configure HTTP bearer authorization: jwtBearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new AutomationWorkflowProjectApi(config);
+  const api = new AutomationProjectApi(config);
 
   const body = {
     // Environment | The environment. (optional)
@@ -62,7 +62,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**Array&lt;AutomationWorkflowProject&gt;**](AutomationWorkflowProject.md)
+[**Array&lt;AutomationProject&gt;**](AutomationProject.md)
 
 ### Authorization
 
@@ -77,14 +77,14 @@ example().catch(console.error);
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **200** | The list of automation workflow projects. |  -  |
+| **200** | The list of automation projects. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
 ## getFrontendWorkflowTemplate
 
-> AutomationWorkflowProjectWorkflowTemplate getFrontendWorkflowTemplate(workflowUuid, xEnvironment)
+> AutomationProjectWorkflowTemplate getFrontendWorkflowTemplate(workflowUuid, xEnvironment)
 
 Get an automation workflow template available to the connected user
 
@@ -95,7 +95,7 @@ Get an automation workflow template available to the connected user by its workf
 ```ts
 import {
   Configuration,
-  AutomationWorkflowProjectApi,
+  AutomationProjectApi,
 } from '';
 import type { GetFrontendWorkflowTemplateRequest } from '';
 
@@ -105,7 +105,7 @@ async function example() {
     // Configure HTTP bearer authorization: jwtBearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new AutomationWorkflowProjectApi(config);
+  const api = new AutomationProjectApi(config);
 
   const body = {
     // string | The workflow template uuid.
@@ -136,7 +136,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**AutomationWorkflowProjectWorkflowTemplate**](AutomationWorkflowProjectWorkflowTemplate.md)
+[**AutomationProjectWorkflowTemplate**](AutomationProjectWorkflowTemplate.md)
 
 ### Authorization
 
@@ -159,18 +159,18 @@ example().catch(console.error);
 
 ## getProjects
 
-> Array&lt;AutomationWorkflowProject&gt; getProjects(externalUserId, xEnvironment)
+> Array&lt;AutomationProject&gt; getProjects(externalUserId, xEnvironment)
 
-Get automation workflow projects available to a connected user identified by external user id
+Get automation projects available to a connected user identified by external user id
 
-Get automation workflow projects available to a connected user identified by external user id.
+Get automation projects available to a connected user identified by external user id.
 
 ### Example
 
 ```ts
 import {
   Configuration,
-  AutomationWorkflowProjectApi,
+  AutomationProjectApi,
 } from '';
 import type { GetProjectsRequest } from '';
 
@@ -180,7 +180,7 @@ async function example() {
     // Configure HTTP bearer authorization: bearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new AutomationWorkflowProjectApi(config);
+  const api = new AutomationProjectApi(config);
 
   const body = {
     // string | The external user id.
@@ -211,7 +211,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**Array&lt;AutomationWorkflowProject&gt;**](AutomationWorkflowProject.md)
+[**Array&lt;AutomationProject&gt;**](AutomationProject.md)
 
 ### Authorization
 
@@ -226,14 +226,14 @@ example().catch(console.error);
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **200** | The list of automation workflow projects. |  -  |
+| **200** | The list of automation projects. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
 
 ## getWorkflowTemplate
 
-> AutomationWorkflowProjectWorkflowTemplate getWorkflowTemplate(externalUserId, workflowUuid, xEnvironment)
+> AutomationProjectWorkflowTemplate getWorkflowTemplate(externalUserId, workflowUuid, xEnvironment)
 
 Get an automation workflow template available to a connected user identified by external user id
 
@@ -244,7 +244,7 @@ Get an automation workflow template available to a connected user identified by 
 ```ts
 import {
   Configuration,
-  AutomationWorkflowProjectApi,
+  AutomationProjectApi,
 } from '';
 import type { GetWorkflowTemplateRequest } from '';
 
@@ -254,7 +254,7 @@ async function example() {
     // Configure HTTP bearer authorization: bearerAuth
     accessToken: "YOUR BEARER TOKEN",
   });
-  const api = new AutomationWorkflowProjectApi(config);
+  const api = new AutomationProjectApi(config);
 
   const body = {
     // string | The external user id.
@@ -288,7 +288,7 @@ example().catch(console.error);
 
 ### Return type
 
-[**AutomationWorkflowProjectWorkflowTemplate**](AutomationWorkflowProjectWorkflowTemplate.md)
+[**AutomationProjectWorkflowTemplate**](AutomationProjectWorkflowTemplate.md)
 
 ### Authorization
 

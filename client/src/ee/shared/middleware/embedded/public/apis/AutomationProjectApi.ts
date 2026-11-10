@@ -14,15 +14,15 @@
 
 import * as runtime from '../runtime';
 import {
-    type AutomationWorkflowProject,
-    AutomationWorkflowProjectFromJSON,
-    AutomationWorkflowProjectToJSON,
-} from '../models/AutomationWorkflowProject';
+    type AutomationProject,
+    AutomationProjectFromJSON,
+    AutomationProjectToJSON,
+} from '../models/AutomationProject';
 import {
-    type AutomationWorkflowProjectWorkflowTemplate,
-    AutomationWorkflowProjectWorkflowTemplateFromJSON,
-    AutomationWorkflowProjectWorkflowTemplateToJSON,
-} from '../models/AutomationWorkflowProjectWorkflowTemplate';
+    type AutomationProjectWorkflowTemplate,
+    AutomationProjectWorkflowTemplateFromJSON,
+    AutomationProjectWorkflowTemplateToJSON,
+} from '../models/AutomationProjectWorkflowTemplate';
 import {
     type Environment,
     EnvironmentFromJSON,
@@ -76,7 +76,7 @@ export interface GetWorkflowTemplateRequest {
 /**
  * 
  */
-export class AutomationWorkflowProjectApi extends runtime.BaseAPI {
+export class AutomationProjectApi extends runtime.BaseAPI {
 
     /**
      * Creates request options for getFrontendProjects without sending the request
@@ -110,21 +110,21 @@ export class AutomationWorkflowProjectApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get automation workflow projects available to the connected user.
-     * Get automation workflow projects available to the connected user
+     * Get automation projects available to the connected user.
+     * Get automation projects available to the connected user
      */
-    async getFrontendProjectsRaw(requestParameters: GetFrontendProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AutomationWorkflowProject>>> {
+    async getFrontendProjectsRaw(requestParameters: GetFrontendProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AutomationProject>>> {
         const requestOptions = await this.getFrontendProjectsRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AutomationWorkflowProjectFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AutomationProjectFromJSON));
     }
 
     /**
-     * Get automation workflow projects available to the connected user.
-     * Get automation workflow projects available to the connected user
+     * Get automation projects available to the connected user.
+     * Get automation projects available to the connected user
      */
-    async getFrontendProjects(requestParameters: GetFrontendProjectsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AutomationWorkflowProject>> {
+    async getFrontendProjects(requestParameters: GetFrontendProjectsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AutomationProject>> {
         const response = await this.getFrontendProjectsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -172,18 +172,18 @@ export class AutomationWorkflowProjectApi extends runtime.BaseAPI {
      * Get an automation workflow template available to the connected user by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
      * Get an automation workflow template available to the connected user
      */
-    async getFrontendWorkflowTemplateRaw(requestParameters: GetFrontendWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AutomationWorkflowProjectWorkflowTemplate>> {
+    async getFrontendWorkflowTemplateRaw(requestParameters: GetFrontendWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AutomationProjectWorkflowTemplate>> {
         const requestOptions = await this.getFrontendWorkflowTemplateRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AutomationWorkflowProjectWorkflowTemplateFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AutomationProjectWorkflowTemplateFromJSON(jsonValue));
     }
 
     /**
      * Get an automation workflow template available to the connected user by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
      * Get an automation workflow template available to the connected user
      */
-    async getFrontendWorkflowTemplate(requestParameters: GetFrontendWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AutomationWorkflowProjectWorkflowTemplate> {
+    async getFrontendWorkflowTemplate(requestParameters: GetFrontendWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AutomationProjectWorkflowTemplate> {
         const response = await this.getFrontendWorkflowTemplateRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -228,21 +228,21 @@ export class AutomationWorkflowProjectApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get automation workflow projects available to a connected user identified by external user id.
-     * Get automation workflow projects available to a connected user identified by external user id
+     * Get automation projects available to a connected user identified by external user id.
+     * Get automation projects available to a connected user identified by external user id
      */
-    async getProjectsRaw(requestParameters: GetProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AutomationWorkflowProject>>> {
+    async getProjectsRaw(requestParameters: GetProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<AutomationProject>>> {
         const requestOptions = await this.getProjectsRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AutomationWorkflowProjectFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(AutomationProjectFromJSON));
     }
 
     /**
-     * Get automation workflow projects available to a connected user identified by external user id.
-     * Get automation workflow projects available to a connected user identified by external user id
+     * Get automation projects available to a connected user identified by external user id.
+     * Get automation projects available to a connected user identified by external user id
      */
-    async getProjects(requestParameters: GetProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AutomationWorkflowProject>> {
+    async getProjects(requestParameters: GetProjectsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<AutomationProject>> {
         const response = await this.getProjectsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -298,18 +298,18 @@ export class AutomationWorkflowProjectApi extends runtime.BaseAPI {
      * Get an automation workflow template available to a connected user identified by external user id by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
      * Get an automation workflow template available to a connected user identified by external user id
      */
-    async getWorkflowTemplateRaw(requestParameters: GetWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AutomationWorkflowProjectWorkflowTemplate>> {
+    async getWorkflowTemplateRaw(requestParameters: GetWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AutomationProjectWorkflowTemplate>> {
         const requestOptions = await this.getWorkflowTemplateRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AutomationWorkflowProjectWorkflowTemplateFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => AutomationProjectWorkflowTemplateFromJSON(jsonValue));
     }
 
     /**
      * Get an automation workflow template available to a connected user identified by external user id by its workflow uuid. Unlike the project listing, it also returns a template of a project not listed in the Automation Hub.
      * Get an automation workflow template available to a connected user identified by external user id
      */
-    async getWorkflowTemplate(requestParameters: GetWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AutomationWorkflowProjectWorkflowTemplate> {
+    async getWorkflowTemplate(requestParameters: GetWorkflowTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AutomationProjectWorkflowTemplate> {
         const response = await this.getWorkflowTemplateRaw(requestParameters, initOverrides);
         return await response.value();
     }

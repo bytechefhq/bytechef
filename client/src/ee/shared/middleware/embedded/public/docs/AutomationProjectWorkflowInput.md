@@ -1,31 +1,31 @@
 
-# AutomationWorkflowProject
+# AutomationProjectWorkflowInput
 
-An automation workflow automation workflow project.
+A value the connected user supplies before an automation workflow runs.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`id` | number
 `name` | string
-`description` | string
-`automationHubVisible` | boolean
-`workflowTemplates` | [Array&lt;AutomationWorkflowProjectWorkflowTemplate&gt;](AutomationWorkflowProjectWorkflowTemplate.md)
+`label` | string
+`type` | string
+`required` | boolean
+`provided` | boolean
 
 ## Example
 
 ```typescript
-import type { AutomationWorkflowProject } from ''
+import type { AutomationProjectWorkflowInput } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "id": null,
   "name": null,
-  "description": null,
-  "automationHubVisible": null,
-  "workflowTemplates": null,
-} satisfies AutomationWorkflowProject
+  "label": null,
+  "type": null,
+  "required": null,
+  "provided": null,
+} satisfies AutomationProjectWorkflowInput
 
 console.log(example)
 
@@ -34,7 +34,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as AutomationWorkflowProject
+const exampleParsed = JSON.parse(exampleJSON) as AutomationProjectWorkflowInput
 console.log(exampleParsed)
 ```
 

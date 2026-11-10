@@ -16,11 +16,11 @@ Name | Type
 `workflowUuid` | string
 `workflowVersion` | number
 `kind` | string
-`automationWorkflowUuid` | string
+`automationUuid` | string
 `copiedFromWorkflowUuid` | string
 `dangling` | boolean
-`components` | [Array&lt;AutomationWorkflowProjectComponent&gt;](AutomationWorkflowProjectComponent.md)
-`inputs` | [Array&lt;AutomationWorkflowProjectWorkflowInput&gt;](AutomationWorkflowProjectWorkflowInput.md)
+`components` | [Array&lt;AutomationProjectComponent&gt;](AutomationProjectComponent.md)
+`inputs` | [Array&lt;AutomationProjectWorkflowInput&gt;](AutomationProjectWorkflowInput.md)
 `inputValues` | { [key: string]: any; }
 `attentionReason` | string
 
@@ -40,7 +40,7 @@ const example = {
   "workflowUuid": null,
   "workflowVersion": null,
   "kind": null,
-  "automationWorkflowUuid": null,
+  "automationUuid": null,
   "copiedFromWorkflowUuid": null,
   "dangling": null,
   "components": null,

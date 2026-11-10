@@ -1,7 +1,7 @@
 
-# AutomationWorkflowProjectWorkflowTemplate
+# AutomationProjectWorkflowTemplate
 
-An automation workflow template within an automation workflow project.
+An automation workflow template within an automation project.
 
 ## Properties
 
@@ -10,13 +10,13 @@ Name | Type
 `id` | string
 `label` | string
 `description` | string
-`components` | [Array&lt;AutomationWorkflowProjectComponent&gt;](AutomationWorkflowProjectComponent.md)
-`inputs` | [Array&lt;AutomationWorkflowProjectWorkflowInput&gt;](AutomationWorkflowProjectWorkflowInput.md)
+`components` | [Array&lt;AutomationProjectComponent&gt;](AutomationProjectComponent.md)
+`inputs` | [Array&lt;AutomationProjectWorkflowInput&gt;](AutomationProjectWorkflowInput.md)
 
 ## Example
 
 ```typescript
-import type { AutomationWorkflowProjectWorkflowTemplate } from ''
+import type { AutomationProjectWorkflowTemplate } from ''
 
 // TODO: Update the object below with actual values
 const example = {
@@ -25,7 +25,7 @@ const example = {
   "description": null,
   "components": null,
   "inputs": null,
-} satisfies AutomationWorkflowProjectWorkflowTemplate
+} satisfies AutomationProjectWorkflowTemplate
 
 console.log(example)
 
@@ -34,7 +34,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as AutomationWorkflowProjectWorkflowTemplate
+const exampleParsed = JSON.parse(exampleJSON) as AutomationProjectWorkflowTemplate
 console.log(exampleParsed)
 ```
 

@@ -7,7 +7,7 @@ An integration or an automation workflow execution of a connected user.
 
 Name | Type
 ------------ | -------------
-`automationWorkflowExecution` | object
+`automationExecution` | object
 `integrationWorkflowExecution` | [WorkflowExecutionBasic](WorkflowExecutionBasic.md)
 `source` | string
 
@@ -18,7 +18,7 @@ import type { EmbeddedWorkflowExecution } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "automationWorkflowExecution": null,
+  "automationExecution": null,
   "integrationWorkflowExecution": null,
   "source": null,
 } satisfies EmbeddedWorkflowExecution

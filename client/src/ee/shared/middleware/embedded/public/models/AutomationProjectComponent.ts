@@ -16,9 +16,9 @@ import { mapValues } from '../runtime';
 /**
  * A component used in an automation workflow.
  * @export
- * @interface AutomationWorkflowProjectComponent
+ * @interface AutomationProjectComponent
  */
-export interface AutomationWorkflowProjectComponent {
+export interface AutomationProjectComponent {
     /**
      * The name of the component.
      */
@@ -46,17 +46,17 @@ export interface AutomationWorkflowProjectComponent {
 }
 
 /**
- * Check if a given object implements the AutomationWorkflowProjectComponent interface.
+ * Check if a given object implements the AutomationProjectComponent interface.
  */
-export function instanceOfAutomationWorkflowProjectComponent(value: object): value is AutomationWorkflowProjectComponent {
+export function instanceOfAutomationProjectComponent(value: object): value is AutomationProjectComponent {
     return true;
 }
 
-export function AutomationWorkflowProjectComponentFromJSON(json: any): AutomationWorkflowProjectComponent {
-    return AutomationWorkflowProjectComponentFromJSONTyped(json, false);
+export function AutomationProjectComponentFromJSON(json: any): AutomationProjectComponent {
+    return AutomationProjectComponentFromJSONTyped(json, false);
 }
 
-export function AutomationWorkflowProjectComponentFromJSONTyped(json: any, ignoreDiscriminator: boolean): AutomationWorkflowProjectComponent {
+export function AutomationProjectComponentFromJSONTyped(json: any, ignoreDiscriminator: boolean): AutomationProjectComponent {
     if (json == null) {
         return json;
     }
@@ -71,11 +71,11 @@ export function AutomationWorkflowProjectComponentFromJSONTyped(json: any, ignor
     };
 }
 
-export function AutomationWorkflowProjectComponentToJSON(json: any): AutomationWorkflowProjectComponent {
-    return AutomationWorkflowProjectComponentToJSONTyped(json, false);
+export function AutomationProjectComponentToJSON(json: any): AutomationProjectComponent {
+    return AutomationProjectComponentToJSONTyped(json, false);
 }
 
-export function AutomationWorkflowProjectComponentToJSONTyped(value?: AutomationWorkflowProjectComponent | null, ignoreDiscriminator: boolean = false): any {
+export function AutomationProjectComponentToJSONTyped(value?: AutomationProjectComponent | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
