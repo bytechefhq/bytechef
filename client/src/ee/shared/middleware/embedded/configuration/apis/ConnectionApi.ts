@@ -19,6 +19,11 @@ import {
     ConnectionToJSON,
 } from '../models/Connection';
 import {
+    type UpdateConnectionCredentialsRequest,
+    UpdateConnectionCredentialsRequestFromJSON,
+    UpdateConnectionCredentialsRequestToJSON,
+} from '../models/UpdateConnectionCredentialsRequest';
+import {
     type UpdateConnectionRequest,
     UpdateConnectionRequestFromJSON,
     UpdateConnectionRequestToJSON,
@@ -99,6 +104,17 @@ export interface UpdateConnectionOperationRequest {
      * 
      */
     updateConnectionRequest: UpdateConnectionRequest;
+}
+
+export interface UpdateConnectionCredentialsOperationRequest {
+    /**
+     * The id of a connection.
+     */
+    id: number;
+    /**
+     * 
+     */
+    updateConnectionCredentialsRequest: UpdateConnectionCredentialsRequest;
 }
 
 /**
@@ -481,6 +497,62 @@ export class ConnectionApi extends runtime.BaseAPI {
      */
     async updateConnection(requestParameters: UpdateConnectionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.updateConnectionRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for updateConnectionCredentials without sending the request
+     */
+    async updateConnectionCredentialsRequestOpts(requestParameters: UpdateConnectionCredentialsOperationRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateConnectionCredentials().'
+            );
+        }
+
+        if (requestParameters['updateConnectionCredentialsRequest'] == null) {
+            throw new runtime.RequiredError(
+                'updateConnectionCredentialsRequest',
+                'Required parameter "updateConnectionCredentialsRequest" was null or undefined when calling updateConnectionCredentials().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/connections/{id}/credentials`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateConnectionCredentialsRequestToJSON(requestParameters['updateConnectionCredentialsRequest']),
+        };
+    }
+
+    /**
+     * Replaces the credentials of an existing connection.
+     * Replaces the credentials of an existing connection
+     */
+    async updateConnectionCredentialsRaw(requestParameters: UpdateConnectionCredentialsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateConnectionCredentialsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Replaces the credentials of an existing connection.
+     * Replaces the credentials of an existing connection
+     */
+    async updateConnectionCredentials(requestParameters: UpdateConnectionCredentialsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateConnectionCredentialsRaw(requestParameters, initOverrides);
     }
 
 }

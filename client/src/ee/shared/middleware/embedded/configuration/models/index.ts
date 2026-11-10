@@ -41,6 +41,7 @@ export * from './PublishConnectedUserProjectWorkflowRequest';
 export * from './PublishIntegrationRequest';
 export * from './StartWebhookTriggerTest200Response';
 export * from './Tag';
+export * from './UpdateConnectionCredentialsRequest';
 export * from './UpdateConnectionRequest';
 export * from './UpdateTagsRequest';
 export * from './Workflow';

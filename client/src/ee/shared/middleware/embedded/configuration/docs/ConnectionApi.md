@@ -11,6 +11,7 @@ All URIs are relative to */api/embedded/internal*
 | [**getConnection**](ConnectionApi.md#getconnection) | **GET** /connections/{id} | Get a connection by id |
 | [**getConnections**](ConnectionApi.md#getconnections) | **GET** /connections | Get all connections |
 | [**updateConnection**](ConnectionApi.md#updateconnectionoperation) | **PATCH** /connections/{id} | Update an existing connection |
+| [**updateConnectionCredentials**](ConnectionApi.md#updateconnectioncredentialsoperation) | **PUT** /connections/{id}/credentials | Replaces the credentials of an existing connection |
 
 
 
@@ -481,6 +482,76 @@ example().catch(console.error);
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | The id of a connection. | [Defaults to `undefined`] |
 | **updateConnectionRequest** | [UpdateConnectionRequest](UpdateConnectionRequest.md) |  | |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Successful operation. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## updateConnectionCredentials
+
+> updateConnectionCredentials(id, updateConnectionCredentialsRequest)
+
+Replaces the credentials of an existing connection
+
+Replaces the credentials of an existing connection.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ConnectionApi,
+} from '';
+import type { UpdateConnectionCredentialsOperationRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ConnectionApi();
+
+  const body = {
+    // number | The id of a connection.
+    id: 789,
+    // UpdateConnectionCredentialsRequest
+    updateConnectionCredentialsRequest: ...,
+  } satisfies UpdateConnectionCredentialsOperationRequest;
+
+  try {
+    const data = await api.updateConnectionCredentials(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a connection. | [Defaults to `undefined`] |
+| **updateConnectionCredentialsRequest** | [UpdateConnectionCredentialsRequest](UpdateConnectionCredentialsRequest.md) |  | |
 
 ### Return type
 
