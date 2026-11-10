@@ -8,8 +8,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.lang.Nullable;
+import java.util.NoSuchElementException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -26,10 +30,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "UpdateConnectionRequest", description = "Contains all connection parameters that can be updated.")
 @JsonTypeName("UpdateConnectionRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T14:37:43.821704+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T14:37:46.870052+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
 public class UpdateConnectionRequestModel {
 
   private String name;
+
+  private JsonNullable<Map<String, Object>> parameters = JsonNullable.<Map<String, Object>>undefined();
 
   private List<@Valid TagModel> tags = new ArrayList<>();
 
@@ -66,6 +72,34 @@ public class UpdateConnectionRequestModel {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
+  }
+
+  public UpdateConnectionRequestModel parameters(Map<String, Object> parameters) {
+    this.parameters = JsonNullable.of(parameters);
+    return this;
+  }
+
+  public UpdateConnectionRequestModel putParametersItem(String key, Object parametersItem) {
+    if (this.parameters == null || !this.parameters.isPresent() || this.parameters.get() == null) {
+      this.parameters = JsonNullable.of(new HashMap<>());
+    }
+    this.parameters.get().put(key, parametersItem);
+    return this;
+  }
+
+  /**
+   * The values of the connection's own properties, excluding its authorization. When present, they replace the stored values and a property left out is cleared; when absent, the stored values are kept.
+   * @return parameters
+   */
+  
+  @Schema(name = "parameters", description = "The values of the connection's own properties, excluding its authorization. When present, they replace the stored values and a property left out is cleared; when absent, the stored values are kept.", requiredMode = Schema.RequiredMode.NOT_REQUIRED, nullable = true)
+  @JsonProperty("parameters")
+  public JsonNullable<Map<String, Object>> getParameters() {
+    return parameters;
+  }
+
+  public void setParameters(JsonNullable<Map<String, Object>> parameters) {
+    this.parameters = parameters;
   }
 
   public UpdateConnectionRequestModel tags(List<@Valid TagModel> tags) {
@@ -128,13 +162,25 @@ public class UpdateConnectionRequestModel {
     }
     UpdateConnectionRequestModel updateConnectionRequest = (UpdateConnectionRequestModel) o;
     return Objects.equals(this.name, updateConnectionRequest.name) &&
+        equalsNullable(this.parameters, updateConnectionRequest.parameters) &&
         Objects.equals(this.tags, updateConnectionRequest.tags) &&
         Objects.equals(this.version, updateConnectionRequest.version);
   }
 
+  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
+    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(name, tags, version);
+    return Objects.hash(name, hashCodeNullable(parameters), tags, version);
+  }
+
+  private static <T> int hashCodeNullable(JsonNullable<T> a) {
+    if (a == null) {
+      return 1;
+    }
+    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
   }
 
   @Override
@@ -142,6 +188,7 @@ public class UpdateConnectionRequestModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class UpdateConnectionRequestModel {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
