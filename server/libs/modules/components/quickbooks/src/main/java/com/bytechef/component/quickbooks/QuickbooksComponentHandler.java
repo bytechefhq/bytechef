@@ -32,12 +32,14 @@ import com.bytechef.component.quickbooks.action.QuickbooksGetInvoiceAction;
 import com.bytechef.component.quickbooks.action.QuickbooksGetItemAction;
 import com.bytechef.component.quickbooks.action.QuickbooksGetPaymentAction;
 import com.bytechef.component.quickbooks.action.QuickbooksSearchBillsAction;
+import com.bytechef.component.quickbooks.action.QuickbooksSearchInvoicesAction;
 import com.bytechef.component.quickbooks.connection.QuickbooksConnection;
 import com.google.auto.service.AutoService;
 
 /**
  * @author Mario Cvjetojevic
  * @author Luka Ljubić
+ * @author Ivica Cardic
  */
 @AutoService(ComponentHandler.class)
 public class QuickbooksComponentHandler implements ComponentHandler {
@@ -62,7 +64,8 @@ public class QuickbooksComponentHandler implements ComponentHandler {
             QuickbooksGetInvoiceAction.ACTION_DEFINITION,
             QuickbooksGetItemAction.ACTION_DEFINITION,
             QuickbooksGetPaymentAction.ACTION_DEFINITION,
-            QuickbooksSearchBillsAction.ACTION_DEFINITION)
+            QuickbooksSearchBillsAction.ACTION_DEFINITION,
+            QuickbooksSearchInvoicesAction.ACTION_DEFINITION)
         .clusterElements(
             tool(QuickbooksCreateCategoryAction.ACTION_DEFINITION),
             tool(QuickbooksCreateCustomerAction.ACTION_DEFINITION),
@@ -73,7 +76,8 @@ public class QuickbooksComponentHandler implements ComponentHandler {
             tool(QuickbooksGetInvoiceAction.ACTION_DEFINITION),
             tool(QuickbooksGetItemAction.ACTION_DEFINITION),
             tool(QuickbooksGetPaymentAction.ACTION_DEFINITION),
-            tool(QuickbooksSearchBillsAction.ACTION_DEFINITION));
+            tool(QuickbooksSearchBillsAction.ACTION_DEFINITION),
+            tool(QuickbooksSearchInvoicesAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
