@@ -1,0 +1,47 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.configuration.audit;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+public final class AutomationProjectAuditEvents {
+
+    public static final String AUTOMATION_CREATED = "AUTOMATION_CREATED";
+    public static final String AUTOMATION_DELETED = "AUTOMATION_DELETED";
+    public static final String AUTOMATION_DUPLICATED = "AUTOMATION_DUPLICATED";
+    public static final String AUTOMATION_PROJECT_CONFIGURATION_CONNECTED_USERS_MOVED =
+        "AUTOMATION_PROJECT_CONFIGURATION_CONNECTED_USERS_MOVED";
+    public static final String AUTOMATION_PROJECT_CONFIGURATION_CONNECTED_USERS_UPGRADED =
+        "AUTOMATION_PROJECT_CONFIGURATION_CONNECTED_USERS_UPGRADED";
+    public static final String AUTOMATION_PROJECT_CONFIGURATION_CREATED =
+        "AUTOMATION_PROJECT_CONFIGURATION_CREATED";
+    public static final String AUTOMATION_PROJECT_CONFIGURATION_DELETED =
+        "AUTOMATION_PROJECT_CONFIGURATION_DELETED";
+    public static final String AUTOMATION_PROJECT_CONFIGURATION_ENABLED_UPDATED =
+        "AUTOMATION_PROJECT_CONFIGURATION_ENABLED_UPDATED";
+    public static final String AUTOMATION_PROJECT_CONFIGURATION_UPDATED =
+        "AUTOMATION_PROJECT_CONFIGURATION_UPDATED";
+    public static final String AUTOMATION_PROJECT_CONFIGURATION_WORKFLOW_ENABLED_UPDATED =
+        "AUTOMATION_PROJECT_CONFIGURATION_WORKFLOW_ENABLED_UPDATED";
+    public static final String AUTOMATION_PROJECT_CREATED = "AUTOMATION_PROJECT_CREATED";
+    public static final String AUTOMATION_PROJECT_DELETED = "AUTOMATION_PROJECT_DELETED";
+    public static final String AUTOMATION_PROJECT_DUPLICATED = "AUTOMATION_PROJECT_DUPLICATED";
+    public static final String AUTOMATION_PROJECT_PUBLISHED = "AUTOMATION_PROJECT_PUBLISHED";
+    public static final String AUTOMATION_PROJECT_UPDATED = "AUTOMATION_PROJECT_UPDATED";
+    public static final String CONNECTED_USER_PROJECT_WORKFLOW_DELETED = "CONNECTED_USER_PROJECT_WORKFLOW_DELETED";
+    public static final String CONNECTED_USER_PROJECT_WORKFLOW_ENABLED_UPDATED =
+        "CONNECTED_USER_PROJECT_WORKFLOW_ENABLED_UPDATED";
+    public static final String CONNECTED_USER_PROJECT_WORKFLOWS_PROVISIONED =
+        "CONNECTED_USER_PROJECT_WORKFLOWS_PROVISIONED";
+
+    private AutomationProjectAuditEvents() {
+    }
+}

@@ -27,10 +27,10 @@ public interface ConnectedUserProjectConfigurationRepository
     extends ListCrudRepository<ConnectedUserProjectConfiguration, Long> {
 
     @Query("""
-        SELECT automation_workflow_project_configuration_id AS configuration_id, COUNT(*) AS assignment_count
+        SELECT automation_project_configuration_id AS configuration_id, COUNT(*) AS assignment_count
         FROM connected_user_project_configuration
-        WHERE automation_workflow_project_configuration_id IN (:configurationIds)
-        GROUP BY automation_workflow_project_configuration_id
+        WHERE automation_project_configuration_id IN (:configurationIds)
+        GROUP BY automation_project_configuration_id
         """)
     List<ConfigurationAssignmentCount> countByConfigurationIds(
         @Param("configurationIds") Collection<Long> configurationIds);
@@ -38,7 +38,7 @@ public interface ConnectedUserProjectConfigurationRepository
     @Modifying
     @Query("""
         DELETE FROM connected_user_project_configuration
-        WHERE automation_workflow_project_configuration_id = :configurationId
+        WHERE automation_project_configuration_id = :configurationId
         """)
     void deleteByConfigurationId(@Param("configurationId") long configurationId);
 

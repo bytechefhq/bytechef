@@ -53,7 +53,7 @@ class ConnectedUserReferenceAttentionResolverTest {
     }
 
     @Test
-    void testUnresolvableAutomationWorkflowProjectYieldsNoAttentionReasonButKeepsTheInputs() {
+    void testUnresolvableAutomationProjectYieldsNoAttentionReasonButKeepsTheInputs() {
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
         projectDeployment.setEnvironment(Environment.PRODUCTION);
@@ -67,9 +67,9 @@ class ConnectedUserReferenceAttentionResolverTest {
         row.setInputs(Map.of("channel", "#a"));
 
         when(connectedUserReferenceDeploymentManager.fetchDeployment(900L)).thenReturn(Optional.of(projectDeployment));
-        when(connectedUserReferenceDeploymentManager.fetchWorkflowId(500L, 1, "automation-workflow-uuid"))
-            .thenReturn(Optional.of("automation-workflow-1"));
-        when(connectedUserReferenceDeploymentManager.fetchWorkflowRow(900L, "automation-workflow-1"))
+        when(connectedUserReferenceDeploymentManager.fetchWorkflowId(500L, 1, "automation-uuid"))
+            .thenReturn(Optional.of("automation-1"));
+        when(connectedUserReferenceDeploymentManager.fetchWorkflowRow(900L, "automation-1"))
             .thenReturn(Optional.of(row));
         stubAdministrativelyEnabled(true);
 
@@ -80,7 +80,7 @@ class ConnectedUserReferenceAttentionResolverTest {
 
         reference.setId(1L);
         reference.setConnectedUserProjectId(10L);
-        reference.setAutomationWorkflowUuid("automation-workflow-uuid");
+        reference.setAutomationUuid("automation-uuid");
         reference.setProjectDeploymentId(900L);
 
         ReferenceState referenceState = resolver.resolve(reference);
@@ -159,7 +159,7 @@ class ConnectedUserReferenceAttentionResolverTest {
         when(connectedUserReferenceDeploymentManager.fetchConnectedUserId(900L))
             .thenReturn(Optional.of(CONNECTED_USER_ID));
         when(connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
-            CONNECTED_USER_ID, 500L, "automation-workflow-uuid")).thenReturn(administrativelyEnabled);
+            CONNECTED_USER_ID, 500L, "automation-uuid")).thenReturn(administrativelyEnabled);
     }
 
     private ProjectDeployment stubReference(int projectVersion) {
@@ -171,7 +171,7 @@ class ConnectedUserReferenceAttentionResolverTest {
         projectDeployment.setProjectVersion(projectVersion);
 
         when(connectedUserReferenceDeploymentManager.fetchDeployment(900L)).thenReturn(Optional.of(projectDeployment));
-        when(connectedUserReferenceDeploymentManager.fetchWorkflowId(500L, projectVersion, "automation-workflow-uuid"))
+        when(connectedUserReferenceDeploymentManager.fetchWorkflowId(500L, projectVersion, "automation-uuid"))
             .thenReturn(Optional.empty());
 
         return projectDeployment;
@@ -182,7 +182,7 @@ class ConnectedUserReferenceAttentionResolverTest {
 
         reference.setId(1L);
         reference.setConnectedUserProjectId(10L);
-        reference.setAutomationWorkflowUuid("automation-workflow-uuid");
+        reference.setAutomationUuid("automation-uuid");
         reference.setProjectDeploymentId(900L);
 
         return reference;

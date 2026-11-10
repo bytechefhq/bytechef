@@ -24,11 +24,11 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ConfigurationMoveImpactDTO(
-    List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> workflows,
+    List<AutomationProjectConfigurationVersionImpactDTO.Workflow> workflows,
     List<ConfigurationMoveResultDTO.Skipped> skipped, int mcpServerCount) {
 
     public ConfigurationMoveImpactDTO(
-        List<AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow> workflows,
+        List<AutomationProjectConfigurationVersionImpactDTO.Workflow> workflows,
         List<ConfigurationMoveResultDTO.Skipped> skipped) {
 
         this(workflows, skipped, 0);

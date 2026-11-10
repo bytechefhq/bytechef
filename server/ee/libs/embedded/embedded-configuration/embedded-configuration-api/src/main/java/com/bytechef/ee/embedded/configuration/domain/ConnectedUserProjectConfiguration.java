@@ -22,7 +22,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Assigns a connected user to one automation workflow project configuration of a project.
+ * Assigns a connected user to one automation project configuration of a project.
  *
  * @version ee
  *
@@ -40,8 +40,8 @@ public class ConnectedUserProjectConfiguration {
     @Column("project_id")
     private AggregateReference<Project, Long> projectId;
 
-    @Column("automation_workflow_project_configuration_id")
-    private AggregateReference<AutomationWorkflowProjectConfiguration, Long> configurationId;
+    @Column("automation_project_configuration_id")
+    private AggregateReference<AutomationProjectConfiguration, Long> configurationId;
 
     @CreatedBy
     @Column("created_by")

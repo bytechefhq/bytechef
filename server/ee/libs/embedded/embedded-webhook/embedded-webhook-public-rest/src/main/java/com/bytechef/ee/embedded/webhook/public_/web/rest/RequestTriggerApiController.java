@@ -230,7 +230,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         }
 
         Optional<ConnectedUserProjectWorkflow> reference = connectedUserProjectWorkflows.stream()
-            .filter(row -> Objects.equals(row.getAutomationWorkflowUuid(), workflowUuid))
+            .filter(row -> Objects.equals(row.getAutomationUuid(), workflowUuid))
             .findFirst();
 
         if (reference.isPresent()) {
@@ -251,26 +251,26 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
                 .build();
         }
 
-        String automationWorkflowUuid = reference.getAutomationWorkflowUuid();
+        String automationUuid = reference.getAutomationUuid();
 
-        Optional<String> automationWorkflowIdOptional = projectWorkflowService.fetchProjectWorkflowWorkflowId(
-            projectDeploymentId, automationWorkflowUuid);
+        Optional<String> automationIdOptional = projectWorkflowService.fetchProjectWorkflowWorkflowId(
+            projectDeploymentId, automationUuid);
 
-        if (automationWorkflowIdOptional.isEmpty()) {
+        if (automationIdOptional.isEmpty()) {
             return ResponseEntity.notFound()
                 .build();
         }
 
-        Workflow workflow = workflowService.getWorkflow(automationWorkflowIdOptional.get());
+        Workflow workflow = workflowService.getWorkflow(automationIdOptional.get());
 
         Optional<String> requestTriggerName = findRequestTriggerName(workflow);
 
         if (requestTriggerName.isEmpty()) {
-            return noRequestTrigger(automationWorkflowUuid);
+            return noRequestTrigger(automationUuid);
         }
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.AUTOMATION, projectDeploymentId, automationWorkflowUuid, requestTriggerName.get());
+            PlatformType.AUTOMATION, projectDeploymentId, automationUuid, requestTriggerName.get());
 
         return dispatch(workflowExecutionId);
     }
@@ -311,7 +311,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         List<ConnectedUserProjectWorkflow> connectedUserProjectWorkflows, String workflowUuid) {
 
         return connectedUserProjectWorkflows.stream()
-            .filter(row -> row.getAutomationWorkflowUuid() == null)
+            .filter(row -> row.getAutomationUuid() == null)
             .filter(row -> {
                 ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(
                     row.getProjectWorkflowId());
@@ -322,11 +322,11 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
     }
 
     private static Optional<ConnectedUserProjectWorkflow> findExistingCopyOfTemplate(
-        List<ConnectedUserProjectWorkflow> connectedUserProjectWorkflows, String automationWorkflowUuid) {
+        List<ConnectedUserProjectWorkflow> connectedUserProjectWorkflows, String automationUuid) {
 
         return connectedUserProjectWorkflows.stream()
-            .filter(row -> row.getAutomationWorkflowUuid() == null)
-            .filter(row -> Objects.equals(row.getCopiedFromWorkflowUuid(), automationWorkflowUuid))
+            .filter(row -> row.getAutomationUuid() == null)
+            .filter(row -> Objects.equals(row.getCopiedFromWorkflowUuid(), automationUuid))
             .findFirst();
     }
 

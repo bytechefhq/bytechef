@@ -29,16 +29,16 @@ class OwnerContributorTest {
     @Test
     void testProjectOwnerContributorFormatsTheColumnIntoTheTemplate() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
-            "EXISTS (SELECT 1 FROM automation_workflow_project WHERE automation_workflow_project.project_id = %1$s OR automation_workflow_project.parent_id = %1$s)");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
+            "EXISTS (SELECT 1 FROM automation_project WHERE automation_project.project_id = %1$s OR automation_project.parent_id = %1$s)");
 
         assertThat(projectOwnerContributor.getProjectOwner())
-            .isEqualTo(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+            .isEqualTo(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
         assertThat(projectOwnerContributor.getProjectClaimCondition("project.id"))
             .isEqualTo(
-                "EXISTS (SELECT 1 FROM automation_workflow_project WHERE automation_workflow_project.project_id = project.id OR "
+                "EXISTS (SELECT 1 FROM automation_project WHERE automation_project.project_id = project.id OR "
                     +
-                    "automation_workflow_project.parent_id = project.id)");
+                    "automation_project.parent_id = project.id)");
     }
 
     @Test
@@ -88,7 +88,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesRejectAPositionalPlaceholder() {
         assertThatThrownBy(
-            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "%1$s = ?"))
+            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "%1$s = ?"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("must not contain placeholders");
         assertThatThrownBy(() -> ProjectDeploymentOwnerContributor.of(ProjectDeploymentOwner.EMBEDDED, "%1$s = ?"))
@@ -99,7 +99,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesRejectANamedPlaceholder() {
         assertThatThrownBy(
-            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "%1$s = :projectId"))
+            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "%1$s = :projectId"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("must not contain placeholders");
         assertThatThrownBy(
@@ -111,7 +111,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesAcceptACast() {
         assertThatCode(
-            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "%1$s::text = '1'"))
+            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "%1$s::text = '1'"))
                 .doesNotThrowAnyException();
         assertThatCode(
             () -> ProjectDeploymentOwnerContributor.of(ProjectDeploymentOwner.EMBEDDED, "%1$s::text = '1'"))
@@ -120,7 +120,7 @@ class OwnerContributorTest {
 
     @Test
     void testFactoriesRejectATemplateWithoutTheIdColumn() {
-        assertThatThrownBy(() -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "1 = 1"))
+        assertThatThrownBy(() -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "1 = 1"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("outside string literals");
         assertThatThrownBy(() -> ProjectDeploymentOwnerContributor.of(ProjectDeploymentOwner.EMBEDDED, "1 = 1"))
@@ -131,7 +131,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesRejectATemplateThatOnlyReferencesTheIdColumnInsideAStringLiteral() {
         assertThatThrownBy(
-            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "'%1$s' IS NOT NULL"))
+            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "'%1$s' IS NOT NULL"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("outside string literals");
         assertThatThrownBy(
@@ -146,8 +146,8 @@ class OwnerContributorTest {
             ProjectDeploymentOwner.EMBEDDED,
             "EXISTS (SELECT 1 FROM project_deployment WHERE project_deployment.id = %1$s)");
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
-            "EXISTS (SELECT 1 FROM automation_workflow_project, project WHERE project.id = %1$s)");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
+            "EXISTS (SELECT 1 FROM automation_project, project WHERE project.id = %1$s)");
 
         assertThatThrownBy(
             () -> projectDeploymentOwnerContributor.getProjectDeploymentClaimCondition("project_deployment.id"))
@@ -161,7 +161,7 @@ class OwnerContributorTest {
     @Test
     void testContributorsRejectASchemaQualifiedSubqueryThatShadowsTheIdColumnTable() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
             "EXISTS (SELECT 1 FROM public.project WHERE project.id = %1$s)");
 
         assertThatThrownBy(() -> projectOwnerContributor.getProjectClaimCondition("project.id"))
@@ -172,7 +172,7 @@ class OwnerContributorTest {
     @Test
     void testContributorsRejectASchemaQualifiedOnlyTableThatShadowsTheIdColumnTable() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
             "EXISTS (SELECT 1 FROM ONLY public.project WHERE project.id = %1$s)");
 
         assertThatThrownBy(() -> projectOwnerContributor.getProjectClaimCondition("project.id"))
@@ -183,8 +183,8 @@ class OwnerContributorTest {
     @Test
     void testContributorsRejectAParenthesizedSchemaQualifiedJoinThatShadowsTheIdColumnTable() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
-            "EXISTS (SELECT 1 FROM (public.project CROSS JOIN automation_workflow_project) WHERE project.id = %1$s)");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
+            "EXISTS (SELECT 1 FROM (public.project CROSS JOIN automation_project) WHERE project.id = %1$s)");
 
         assertThatThrownBy(() -> projectOwnerContributor.getProjectClaimCondition("project.id"))
             .isInstanceOf(IllegalArgumentException.class)
@@ -194,7 +194,7 @@ class OwnerContributorTest {
     @Test
     void testContributorsAcceptASchemaQualifiedOnlyTableThatAliasesTheIdColumnTable() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
             "EXISTS (SELECT 1 FROM ONLY public.project owned_project WHERE owned_project.id = %1$s)");
 
         assertThat(projectOwnerContributor.getProjectClaimCondition("project.id"))
@@ -205,19 +205,19 @@ class OwnerContributorTest {
     @Test
     void testContributorsAcceptAParenthesizedColumnNamedLikeTheIdColumnTable() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
-            "EXISTS (SELECT 1 FROM automation_workflow_project WHERE (automation_workflow_project.project = %1$s))");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
+            "EXISTS (SELECT 1 FROM automation_project WHERE (automation_project.project = %1$s))");
 
         assertThat(projectOwnerContributor.getProjectClaimCondition("project.id"))
             .isEqualTo(
-                "EXISTS (SELECT 1 FROM automation_workflow_project WHERE (automation_workflow_project.project = project.id))");
+                "EXISTS (SELECT 1 FROM automation_project WHERE (automation_project.project = project.id))");
     }
 
     @Test
     void testContributorsRejectAnUnaliasedJoinThatShadowsTheIdColumnTable() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
-            "EXISTS (SELECT 1 FROM automation_workflow_project JOIN project ON project.automation_workflow_project_id = automation_workflow_project.id WHERE project.id = %1$s)");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
+            "EXISTS (SELECT 1 FROM automation_project JOIN project ON project.automation_project_id = automation_project.id WHERE project.id = %1$s)");
 
         assertThatThrownBy(() -> projectOwnerContributor.getProjectClaimCondition("project.id"))
             .isInstanceOf(IllegalArgumentException.class)
@@ -227,8 +227,8 @@ class OwnerContributorTest {
     @Test
     void testContributorsRejectAnAliasThatShadowsTheIdColumnTable() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
-            "EXISTS (SELECT 1 FROM automation_workflow_project project WHERE project.id = %1$s)");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
+            "EXISTS (SELECT 1 FROM automation_project project WHERE project.id = %1$s)");
         ProjectDeploymentOwnerContributor projectDeploymentOwnerContributor = ProjectDeploymentOwnerContributor.of(
             ProjectDeploymentOwner.EMBEDDED,
             "EXISTS (SELECT 1 FROM mcp_project AS project_deployment WHERE project_deployment.id = %1$s)");
@@ -246,7 +246,7 @@ class OwnerContributorTest {
     void testContributorsRejectALockingClauseAfterAnUnaliasedIdColumnTable() {
         for (String lockingClause : List.of("FOR UPDATE", "FOR SHARE", "FOR KEY SHARE")) {
             ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-                ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+                ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
                 "(SELECT %1$s FROM project " + lockingClause + ") IS NOT NULL");
 
             assertThatThrownBy(() -> projectOwnerContributor.getProjectClaimCondition("project.id"))
@@ -258,7 +258,7 @@ class OwnerContributorTest {
     @Test
     void testContributorsRejectADerivedTableAliasThatShadowsTheIdColumnTable() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
             "EXISTS (SELECT 1 FROM (SELECT 1 AS id) project WHERE project.id = %1$s)");
 
         assertThatThrownBy(() -> projectOwnerContributor.getProjectClaimCondition("project.id"))
@@ -269,18 +269,18 @@ class OwnerContributorTest {
     @Test
     void testContributorsAcceptAColumnNamedLikeTheIdColumnTable() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
-            "EXISTS (SELECT 1 FROM automation_workflow_project WHERE automation_workflow_project.project = %1$s)");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
+            "EXISTS (SELECT 1 FROM automation_project WHERE automation_project.project = %1$s)");
 
         assertThat(projectOwnerContributor.getProjectClaimCondition("project.id"))
             .isEqualTo(
-                "EXISTS (SELECT 1 FROM automation_workflow_project WHERE automation_workflow_project.project = project.id)");
+                "EXISTS (SELECT 1 FROM automation_project WHERE automation_project.project = project.id)");
     }
 
     @Test
     void testContributorsAcceptTheIdColumnTableNameInsideAStringLiteral() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "%1$s = 1 AND name = 'FROM project'");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "%1$s = 1 AND name = 'FROM project'");
 
         assertThat(projectOwnerContributor.getProjectClaimCondition("project.id"))
             .isEqualTo("project.id = 1 AND name = 'FROM project'");
@@ -303,11 +303,11 @@ class OwnerContributorTest {
     @Test
     void testContributorsRejectAnUppercaseTableOrMixedCaseAliasThatShadowsTheIdColumnTable() {
         ProjectOwnerContributor uppercaseTableProjectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
             "EXISTS (SELECT 1 FROM PROJECT WHERE PROJECT.id = %1$s)");
         ProjectOwnerContributor mixedCaseAliasProjectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
-            "EXISTS (SELECT 1 FROM automation_workflow_project Project WHERE Project.id = %1$s)");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
+            "EXISTS (SELECT 1 FROM automation_project Project WHERE Project.id = %1$s)");
 
         assertThatThrownBy(() -> uppercaseTableProjectOwnerContributor.getProjectClaimCondition("project.id"))
             .isInstanceOf(IllegalArgumentException.class)
@@ -320,7 +320,7 @@ class OwnerContributorTest {
     @Test
     void testContributorsAcceptASchemaQualifiedSubqueryThatAliasesTheIdColumnTable() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
             "EXISTS (SELECT 1 FROM public.project owned_project WHERE owned_project.id = %1$s)");
 
         assertThat(projectOwnerContributor.getProjectClaimCondition("project.id"))
@@ -333,7 +333,7 @@ class OwnerContributorTest {
             ProjectDeploymentOwner.EMBEDDED,
             "EXISTS (SELECT 1 FROM project_deployment owned_deployment WHERE owned_deployment.id = %1$s)");
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
             "EXISTS (SELECT 1 FROM project AS owned_project WHERE owned_project.id = %1$s)");
 
         assertThat(projectDeploymentOwnerContributor.getProjectDeploymentClaimCondition("project_deployment.id"))
@@ -347,7 +347,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesRejectATemplateWithAStrayPercentSign() {
         assertThatThrownBy(
-            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
                 "%1$s = 1 AND name LIKE 'a%'"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("format specifiers");
@@ -361,7 +361,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesRejectAFormatSpecifierOtherThanTheIdColumn() {
         assertThatThrownBy(
-            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
                 "%1$s = 1 AND name LIKE '%name'"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("format specifiers");
@@ -373,7 +373,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesAcceptAnEscapedPercentSign() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "%1$s = 1 AND name LIKE 'a%%'");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "%1$s = 1 AND name LIKE 'a%%'");
 
         assertThat(projectOwnerContributor.getProjectClaimCondition("project.id"))
             .isEqualTo("project.id = 1 AND name LIKE 'a%'");
@@ -382,7 +382,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesRejectAComment() {
         assertThatThrownBy(
-            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "%1$s = 1 -- note"))
+            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "%1$s = 1 -- note"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("balanced parentheses and string literals");
         assertThatThrownBy(
@@ -394,7 +394,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesRejectAStatementSeparator() {
         assertThatThrownBy(
-            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
                 "%1$s = 1; DELETE FROM project"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("balanced parentheses and string literals");
@@ -404,7 +404,7 @@ class OwnerContributorTest {
     void testFactoriesRejectAQuotedIdentifier() {
         assertThatThrownBy(
             () -> ProjectOwnerContributor.of(
-                ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+                ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
                 "EXISTS (SELECT 1 FROM \"project\" WHERE project.id = %1$s)"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("dollar quoted strings");
@@ -418,7 +418,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesRejectABackslashEscape() {
         assertThatThrownBy(
-            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
                 "%1$s::text = E'\\'' OR 1 = 1 --'"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("dollar quoted strings");
@@ -428,7 +428,7 @@ class OwnerContributorTest {
     void testFactoriesRejectADollarQuotedString() {
         assertThatThrownBy(
             () -> ProjectOwnerContributor.of(
-                ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+                ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
                 "%1$s = 1 AND $$'$$ IS NOT NULL) OR (1 = 1 AND $$'$$ IS NOT NULL"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("dollar quoted strings");
@@ -437,7 +437,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesRejectUnbalancedParentheses() {
         assertThatThrownBy(
-            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "a = %1$s) OR (1 = 1"))
+            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "a = %1$s) OR (1 = 1"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("balanced parentheses and string literals");
         assertThatThrownBy(
@@ -450,7 +450,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesRejectAnUnterminatedStringLiteral() {
         assertThatThrownBy(
-            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "%1$s::text = 'a"))
+            () -> ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "%1$s::text = 'a"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("balanced parentheses and string literals");
     }
@@ -458,7 +458,7 @@ class OwnerContributorTest {
     @Test
     void testFactoriesAcceptSeparatorsAndParenthesesInsideAStringLiteral() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "%1$s = 1 AND name = 'it''s (a; -- b /* c'");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "%1$s = 1 AND name = 'it''s (a; -- b /* c'");
 
         assertThat(projectOwnerContributor.getProjectClaimCondition("project.id"))
             .isEqualTo("project.id = 1 AND name = 'it''s (a; -- b /* c'");
@@ -467,7 +467,7 @@ class OwnerContributorTest {
     @Test
     void testContributorsRejectAnInvalidIdColumn() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "%1$s = 1");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "%1$s = 1");
         ProjectDeploymentOwnerContributor projectDeploymentOwnerContributor = ProjectDeploymentOwnerContributor.of(
             ProjectDeploymentOwner.EMBEDDED, "%1$s = 1");
 
@@ -488,8 +488,8 @@ class OwnerContributorTest {
     @Test
     void testContributorsRejectAnUnqualifiedIdColumn() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
-            "EXISTS (SELECT 1 FROM automation_workflow_project WHERE automation_workflow_project.project_id = %1$s)");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
+            "EXISTS (SELECT 1 FROM automation_project WHERE automation_project.project_id = %1$s)");
         ProjectDeploymentOwnerContributor projectDeploymentOwnerContributor = ProjectDeploymentOwnerContributor.of(
             ProjectDeploymentOwner.MCP_SERVER,
             "EXISTS (SELECT 1 FROM mcp_project WHERE mcp_project.project_deployment_id = %1$s)");
@@ -505,7 +505,7 @@ class OwnerContributorTest {
     @Test
     void testContributorsAcceptAQualifiedIdColumn() {
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, "%1$s = 1");
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, "%1$s = 1");
 
         assertThat(projectOwnerContributor.getProjectClaimCondition("project.id")).isEqualTo("project.id = 1");
         assertThat(projectOwnerContributor.getProjectClaimCondition("project_deployment.project_id"))
@@ -517,7 +517,7 @@ class OwnerContributorTest {
         List<String> conditionTemplates = new ArrayList<>(List.of("%1$s = 1", "%1$s = 1; DELETE FROM project"));
 
         ProjectOwnerContributor projectOwnerContributor = ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, () -> conditionTemplates.remove(0));
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, () -> conditionTemplates.remove(0));
 
         assertThat(projectOwnerContributor.getProjectClaimCondition("project.id")).isEqualTo("project.id = 1");
         assertThatThrownBy(() -> projectOwnerContributor.getProjectClaimCondition("project.id"))

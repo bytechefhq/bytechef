@@ -11,7 +11,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
-import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectAdminFacade;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -56,7 +56,7 @@ public class ConnectedUserProjectGraphQlController {
     }
 
     @QueryMapping
-    public List<ProvisionableAutomationWorkflowProjectDTO> provisionableConnectedUserProjects(
+    public List<ProvisionableAutomationProjectDTO> provisionableConnectedUserProjects(
         @Argument long connectedUserId) {
 
         return connectedUserProjectFacade.getProvisionableProjects(connectedUserId);

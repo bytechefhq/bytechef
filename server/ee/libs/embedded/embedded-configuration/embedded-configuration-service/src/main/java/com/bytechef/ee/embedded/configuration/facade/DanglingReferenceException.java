@@ -17,9 +17,9 @@ import com.bytechef.exception.ConfigurationException;
  */
 final class DanglingReferenceException extends ConfigurationException {
 
-    DanglingReferenceException(String automationWorkflowUuid) {
+    DanglingReferenceException(String automationUuid) {
         super(
-            "Reference to automation workflow %s is dangling".formatted(automationWorkflowUuid),
+            "Reference to automation workflow %s is dangling".formatted(automationUuid),
             WorkflowErrorType.WORKFLOW_NOT_FOUND);
     }
 }

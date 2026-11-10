@@ -251,7 +251,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
     private Optional<WorkflowExecutionId> resolveAutomationBridgeWorkflowExecutionId(
         ConnectedUserProjectWorkflow connectedUserProjectWorkflow, Environment environment) {
 
-        if (connectedUserProjectWorkflow.getAutomationWorkflowUuid() == null) {
+        if (connectedUserProjectWorkflow.getAutomationUuid() == null) {
             return resolveCopyModeWorkflowExecutionId(connectedUserProjectWorkflow, environment);
         }
 
@@ -267,14 +267,14 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
             return Optional.empty();
         }
 
-        Optional<String> automationWorkflowIdOptional = projectWorkflowService.fetchProjectWorkflowWorkflowId(
-            projectDeploymentId, reference.getAutomationWorkflowUuid());
+        Optional<String> automationIdOptional = projectWorkflowService.fetchProjectWorkflowWorkflowId(
+            projectDeploymentId, reference.getAutomationUuid());
 
-        if (automationWorkflowIdOptional.isEmpty()) {
+        if (automationIdOptional.isEmpty()) {
             return Optional.empty();
         }
 
-        Workflow workflow = workflowService.getWorkflow(automationWorkflowIdOptional.get());
+        Workflow workflow = workflowService.getWorkflow(automationIdOptional.get());
 
         String appEventTriggerName = findAppEventTriggerName(workflow);
 
@@ -283,7 +283,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
         }
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.AUTOMATION, projectDeploymentId, reference.getAutomationWorkflowUuid(), appEventTriggerName);
+            PlatformType.AUTOMATION, projectDeploymentId, reference.getAutomationUuid(), appEventTriggerName);
 
         if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
             return Optional.empty();
@@ -366,8 +366,8 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
     }
 
     private static String getWorkflowLabel(ConnectedUserProjectWorkflow connectedUserProjectWorkflow) {
-        if (connectedUserProjectWorkflow.getAutomationWorkflowUuid() != null) {
-            return connectedUserProjectWorkflow.getAutomationWorkflowUuid();
+        if (connectedUserProjectWorkflow.getAutomationUuid() != null) {
+            return connectedUserProjectWorkflow.getAutomationUuid();
         }
 
         if (connectedUserProjectWorkflow.getCopiedFromWorkflowUuid() != null) {

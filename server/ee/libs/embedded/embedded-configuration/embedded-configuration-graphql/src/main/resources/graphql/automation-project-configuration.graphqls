@@ -1,0 +1,123 @@
+type AutomationProjectConfiguration {
+    id: ID!
+    projectId: ID!
+    environmentId: ID!
+    name: String!
+    permissionExpression: String
+    connectedUserCount: Int!
+    projectVersion: Int!
+    enabled: Boolean!
+    automationHubVisible: Boolean!
+    lastModifiedDate: String
+    lastExecutionDate: String
+    workflows: [AutomationProjectConfigurationWorkflow!]!
+}
+
+type AutomationProjectConfigurationWorkflow {
+    workflowUuid: ID!
+    workflowId: ID!
+    label: String
+    enabled: Boolean!
+    lastExecutionDate: String
+    providedConnections: Map
+    providedInputs: Map
+}
+
+type AutomationProjectConfigurationWorkflowProvidableValues {
+    connectionSlots: [AutomationProjectConfigurationConnectionSlot!]!
+    inputs: [AutomationProjectConfigurationInput!]!
+    providedConnections: Map
+    providedInputs: Map
+}
+
+type AutomationProjectConfigurationConnectionSlot {
+    componentName: String!
+    title: String!
+    required: Boolean!
+    providableConnections: [AutomationProjectConfigurationProvidableConnection!]!
+}
+
+type AutomationProjectConfigurationProvidableConnection {
+    id: ID!
+    name: String!
+}
+
+type AutomationProjectConfigurationInput {
+    name: String!
+    label: String
+    type: String
+    required: Boolean!
+    componentName: String
+    componentVersion: Int
+    groupName: String
+    optionConnections: [AutomationProjectConfigurationProvidableConnection!]!
+}
+
+type AutomationProjectConfigurationInputOption {
+    label: String
+    value: String!
+    description: String
+}
+
+type AutomationProjectConfigurationVersionImpact {
+    workflows: [AutomationProjectConfigurationVersionImpactWorkflow!]!
+}
+
+type AutomationProjectConfigurationVersionImpactWorkflow {
+    workflowUuid: ID!
+    label: String!
+    newRequiredInputs: [String!]!
+    newRequiredConnections: [String!]!
+    affectedConnectedUserCount: Int!
+}
+
+type AutomationProjectConfigurationDeleteImpact {
+    connectedUserCount: Int!
+    referenceWorkflowCount: Int!
+}
+
+type AutomationProjectConfigurationConnectedUser {
+    connectedUserId: ID!
+    externalId: String!
+    name: String
+    email: String
+}
+
+type AutomationProjectConfigurationMoveImpact {
+    workflows: [AutomationProjectConfigurationVersionImpactWorkflow!]!
+    skipped: [ConfigurationMoveSkipped!]!
+}
+
+type ConfigurationMoveResult {
+    movedConnectedUserIds: [ID!]!
+    needsAttentionConnectedUserIds: [ID!]!
+    skipped: [ConfigurationMoveSkipped!]!
+}
+
+type ConfigurationMoveSkipped {
+    connectedUserId: ID!
+    reason: String!
+    workflowLabels: [String!]!
+}
+
+extend type Query {
+    automationProjectConfigurations(projectId: ID!, environmentId: ID): [AutomationProjectConfiguration!]!
+    automationProjectConfigurationWorkflowProvidableValues(id: ID!, workflowUuid: ID!): AutomationProjectConfigurationWorkflowProvidableValues!
+    automationProjectConfigurationWorkflowInputOptions(id: ID!, workflowUuid: ID!, inputName: String!, propertyName: String!, connectionId: ID!, lookupDependsOnValues: Map, searchText: String): [AutomationProjectConfigurationInputOption!]!
+    automationProjectConfigurationVersionImpact(id: ID!, projectVersion: Int!): AutomationProjectConfigurationVersionImpact!
+    automationProjectConfigurationDeleteImpact(id: ID!): AutomationProjectConfigurationDeleteImpact!
+    automationProjectConfigurationConnectedUsers(id: ID!): [AutomationProjectConfigurationConnectedUser!]!
+    automationProjectConfigurationMoveImpact(sourceId: ID!, targetId: ID!, connectedUserIds: [ID!]!): AutomationProjectConfigurationMoveImpact!
+    automationProjectConfigurationUpgradeImpact(targetId: ID!, connectedUserIds: [ID!]!): AutomationProjectConfigurationMoveImpact!
+}
+
+extend type Mutation {
+    createAutomationProjectConfiguration(projectId: ID!, environmentId: ID!, name: String!, permissionExpression: String, projectVersion: Int!, enabled: Boolean!, automationHubVisible: Boolean!): ID!
+    updateAutomationProjectConfiguration(id: ID!, name: String!, permissionExpression: String, projectVersion: Int!, enabled: Boolean!, automationHubVisible: Boolean!): Boolean!
+    deleteAutomationProjectConfiguration(id: ID!): Boolean!
+    enableAutomationProjectConfiguration(id: ID!, enable: Boolean!): Boolean!
+    enableAutomationProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, enable: Boolean!): Boolean!
+    moveAutomationProjectConfigurationConnectedUsers(sourceId: ID!, targetId: ID!, connectedUserIds: [ID!]!): ConfigurationMoveResult!
+    upgradeAutomationProjectConfigurationConnectedUsers(targetId: ID!, connectedUserIds: [ID!]!): ConfigurationMoveResult!
+    updateAutomationProjectConfigurationWorkflow(id: ID!, workflowUuid: ID!, providedConnections: Map, providedInputs: Map): Boolean!
+}

@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowTemplateNotVisibleException;
+import com.bytechef.ee.embedded.configuration.exception.AutomationTemplateNotVisibleException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectionNotEntitledException;
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
@@ -412,8 +412,8 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
                 externalUserId, workflowUuid, getEnvironment(xEnvironment),
                 getRequestedConnectionIds(provisionWorkflowReferenceRequestModel),
                 getRequestedInputs(provisionWorkflowReferenceRequestModel));
-        } catch (AutomationWorkflowTemplateNotVisibleException automationWorkflowTemplateNotVisibleException) {
-            return notFoundForRejectedProvisioning(workflowUuid, automationWorkflowTemplateNotVisibleException);
+        } catch (AutomationTemplateNotVisibleException automationTemplateNotVisibleException) {
+            return notFoundForRejectedProvisioning(workflowUuid, automationTemplateNotVisibleException);
         }
 
         return ResponseEntity.noContent()
@@ -429,8 +429,8 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
                 externalUserId, workflowUuid, getEnvironment(xEnvironment),
                 getRequestedConnectionIds(provisionWorkflowReferenceRequestModel),
                 getRequestedInputs(provisionWorkflowReferenceRequestModel));
-        } catch (AutomationWorkflowTemplateNotVisibleException automationWorkflowTemplateNotVisibleException) {
-            return notFoundForRejectedProvisioning(workflowUuid, automationWorkflowTemplateNotVisibleException);
+        } catch (AutomationTemplateNotVisibleException automationTemplateNotVisibleException) {
+            return notFoundForRejectedProvisioning(workflowUuid, automationTemplateNotVisibleException);
         }
 
         return ResponseEntity.noContent()
@@ -490,11 +490,11 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
     private <T> ResponseEntity<T> notFoundForRejectedProvisioning(
         String workflowUuid,
-        AutomationWorkflowTemplateNotVisibleException automationWorkflowTemplateNotVisibleException) {
+        AutomationTemplateNotVisibleException automationTemplateNotVisibleException) {
         if (log.isDebugEnabled()) {
             log.debug(
                 "Provisioning of automation workflow {} was rejected for the connected user; returning 404: {}",
-                workflowUuid, automationWorkflowTemplateNotVisibleException.getMessage());
+                workflowUuid, automationTemplateNotVisibleException.getMessage());
         }
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)

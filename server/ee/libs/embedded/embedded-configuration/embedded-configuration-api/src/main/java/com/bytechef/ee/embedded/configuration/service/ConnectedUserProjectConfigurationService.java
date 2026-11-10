@@ -26,7 +26,7 @@ public interface ConnectedUserProjectConfigurationService {
      *
      * @param connectedUserId the connected user id
      * @param projectId       the project id
-     * @param configurationId the automation workflow project configuration id
+     * @param configurationId the automation project configuration id
      * @return the saved assignment
      */
     ConnectedUserProjectConfiguration assign(long connectedUserId, long projectId, long configurationId);
@@ -45,7 +45,7 @@ public interface ConnectedUserProjectConfigurationService {
      * Returns the connected user's assignments.
      *
      * @param connectedUserId the connected user id
-     * @return the connected user's assignments, one per automation workflow project
+     * @return the connected user's assignments, one per automation project
      */
     List<ConnectedUserProjectConfiguration> getConnectedUserAssignments(long connectedUserId);
 }

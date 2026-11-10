@@ -75,7 +75,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @SpringBootTest(
     classes = {
-        AutomationWorkflowProjectFacadeIntTestConfiguration.class,
+        AutomationProjectFacadeIntTestConfiguration.class,
         WorkflowConnectionSlotIntTest.ConnectedUserServiceConfiguration.class
     },
     properties = {

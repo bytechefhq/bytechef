@@ -18,13 +18,13 @@ import org.jspecify.annotations.Nullable;
 @SuppressFBWarnings("EI")
 public record EmbeddedWorkflowExecutionDTO(
     Source source,
-    com.bytechef.automation.workflow.execution.dto.@Nullable WorkflowExecutionDTO automationWorkflowExecution,
+    com.bytechef.automation.workflow.execution.dto.@Nullable WorkflowExecutionDTO automationExecution,
     @Nullable WorkflowExecutionDTO integrationWorkflowExecution) {
 
     public static EmbeddedWorkflowExecutionDTO of(
-        com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO automationWorkflowExecution) {
+        com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO automationExecution) {
 
-        return new EmbeddedWorkflowExecutionDTO(Source.AUTOMATION, automationWorkflowExecution, null);
+        return new EmbeddedWorkflowExecutionDTO(Source.AUTOMATION, automationExecution, null);
     }
 
     public static EmbeddedWorkflowExecutionDTO of(WorkflowExecutionDTO integrationWorkflowExecution) {

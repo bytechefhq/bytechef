@@ -7,22 +7,22 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
-import com.bytechef.ee.embedded.configuration.audit.AutomationWorkflowProjectAuditEvents;
-import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.audit.AutomationProjectAuditEvents;
+import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationReleaseDTO;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfigurationReleaseDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
-import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationWorkflowProjectDTO;
-import com.bytechef.ee.embedded.configuration.exception.AutomationWorkflowProjectConfigurationErrorType;
+import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
+import com.bytechef.ee.embedded.configuration.exception.AutomationProjectConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
-import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -62,9 +62,9 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
 
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserProjectAdminFacadeImpl.class);
 
-    private final AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver;
-    private final AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
-    private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private final AutomationProjectConfigurationResolver automationProjectConfigurationResolver;
+    private final AutomationProjectConfigurationService automationProjectConfigurationService;
+    private final AutomationProjectFacade automationProjectFacade;
     private final ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService;
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final ConnectedUserProjectService connectedUserProjectService;
@@ -75,9 +75,9 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectAdminFacadeImpl(
-        AutomationWorkflowProjectConfigurationResolver automationWorkflowProjectConfigurationResolver,
-        AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService,
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
+        AutomationProjectConfigurationResolver automationProjectConfigurationResolver,
+        AutomationProjectConfigurationService automationProjectConfigurationService,
+        AutomationProjectFacade automationProjectFacade,
         ConnectedUserProjectConfigurationService connectedUserProjectConfigurationService,
         ConnectedUserProjectFacade connectedUserProjectFacade, ConnectedUserProjectService connectedUserProjectService,
         ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager,
@@ -85,9 +85,9 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
         ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade,
         PlatformTransactionManager platformTransactionManager) {
 
-        this.automationWorkflowProjectConfigurationResolver = automationWorkflowProjectConfigurationResolver;
-        this.automationWorkflowProjectConfigurationService = automationWorkflowProjectConfigurationService;
-        this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
+        this.automationProjectConfigurationResolver = automationProjectConfigurationResolver;
+        this.automationProjectConfigurationService = automationProjectConfigurationService;
+        this.automationProjectFacade = automationProjectFacade;
         this.connectedUserProjectConfigurationService = connectedUserProjectConfigurationService;
         this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.connectedUserProjectService = connectedUserProjectService;
@@ -98,7 +98,7 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     }
 
     @Override
-    @Audited(event = AutomationWorkflowProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOW_DELETED, data = {
+    @Audited(event = AutomationProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOW_DELETED, data = {
         @AuditData(key = "connectedUserProjectWorkflowId", value = "#connectedUserProjectWorkflowId")
     })
     public void deleteProjectWorkflow(long connectedUserProjectWorkflowId) {
@@ -106,7 +106,7 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     }
 
     @Override
-    @Audited(event = AutomationWorkflowProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOW_ENABLED_UPDATED, data = {
+    @Audited(event = AutomationProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOW_ENABLED_UPDATED, data = {
         @AuditData(key = "connectedUserProjectWorkflowId", value = "#connectedUserProjectWorkflowId"),
         @AuditData(key = "enabled", value = "#enable")
     })
@@ -131,7 +131,7 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     }
 
     @Override
-    public List<ProvisionableAutomationWorkflowProjectDTO> getProvisionableProjects(long connectedUserId) {
+    public List<ProvisionableAutomationProjectDTO> getProvisionableProjects(long connectedUserId) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
         Map<String, ConnectedUserProjectWorkflow> referencesByWorkflowUuid = connectedUserWorkflowReferenceFacade
@@ -139,11 +139,11 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
             .stream()
             .collect(
                 Collectors.toMap(
-                    ConnectedUserProjectWorkflow::getAutomationWorkflowUuid, Function.identity(),
+                    ConnectedUserProjectWorkflow::getAutomationUuid, Function.identity(),
                     (firstReference, secondReference) -> firstReference));
 
-        Map<Long, List<AutomationWorkflowProjectConfigurationReleaseDTO>> releasesByProjectId =
-            automationWorkflowProjectFacade
+        Map<Long, List<AutomationProjectConfigurationReleaseDTO>> releasesByProjectId =
+            automationProjectFacade
                 .getPublishedProjectConfigurations(connectedUser.getExternalId(), connectedUser.getEnvironment())
                 .stream()
                 .collect(
@@ -156,12 +156,12 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
             .stream()
             .map(releases -> toProvisionableProject(connectedUser, releases, referencesByWorkflowUuid))
             .sorted(
-                Comparator.comparing(ProvisionableAutomationWorkflowProjectDTO::name, String.CASE_INSENSITIVE_ORDER))
+                Comparator.comparing(ProvisionableAutomationProjectDTO::name, String.CASE_INSENSITIVE_ORDER))
             .toList();
     }
 
     @Override
-    @Audited(event = AutomationWorkflowProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOWS_PROVISIONED, data = {
+    @Audited(event = AutomationProjectAuditEvents.CONNECTED_USER_PROJECT_WORKFLOWS_PROVISIONED, data = {
         @AuditData(key = "connectedUserId", value = "#connectedUserId"),
         @AuditData(key = "configurationId", value = "#configurationId"),
         @AuditData(key = "workflowUuids", value = "#workflows.![workflowUuid]")
@@ -201,8 +201,8 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     private void assignConfiguration(
         ConnectedUser connectedUser, long configurationId, List<ProvisionConnectedUserProjectWorkflowDTO> workflows) {
 
-        AutomationWorkflowProjectConfiguration configuration =
-            automationWorkflowProjectConfigurationService.getConfiguration(configurationId);
+        AutomationProjectConfiguration configuration =
+            automationProjectConfigurationService.getConfiguration(configurationId);
 
         long projectId = configuration.getProjectId();
 
@@ -211,7 +211,7 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
 
         connectedUserProjectService.lockConnectedUserProject(Objects.requireNonNull(connectedUserProject.getId()));
 
-        ProvisionableAutomationWorkflowProjectDTO.Configuration provisionableConfiguration =
+        ProvisionableAutomationProjectDTO.Configuration provisionableConfiguration =
             getProvisionableConfiguration(connectedUser, projectId, configurationId);
 
         Optional<ConnectedUserProjectConfiguration> assignmentOptional =
@@ -225,15 +225,15 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
                     ("Connected user id=%s is assigned to configuration id=%s of project id=%s; move the connected " +
                         "user to configuration id=%s instead").formatted(
                             connectedUser.getId(), assignment.getConfigurationId(), projectId, configurationId),
-                    AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_PROJECT_MISMATCH);
+                    AutomationProjectConfigurationErrorType.CONFIGURATION_PROJECT_MISMATCH);
             }
         } else {
-            automationWorkflowProjectConfigurationResolver.assign(connectedUser, projectId, configurationId);
+            automationProjectConfigurationResolver.assign(connectedUser, projectId, configurationId);
         }
 
         Set<String> provisionableWorkflowUuids = provisionableConfiguration.workflows()
             .stream()
-            .map(ProvisionableAutomationWorkflowProjectDTO.Workflow::workflowUuid)
+            .map(ProvisionableAutomationProjectDTO.Workflow::workflowUuid)
             .collect(Collectors.toSet());
 
         for (ProvisionConnectedUserProjectWorkflowDTO workflow : workflows) {
@@ -246,7 +246,7 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
         }
     }
 
-    private ProvisionableAutomationWorkflowProjectDTO.Configuration getProvisionableConfiguration(
+    private ProvisionableAutomationProjectDTO.Configuration getProvisionableConfiguration(
         ConnectedUser connectedUser, long projectId, long configurationId) {
 
         return getProvisionableProjects(connectedUser.getId()).stream()
@@ -259,25 +259,25 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
                 ("Configuration id=%s of project id=%s cannot be provisioned for connected user id=%s: it is " +
                     "disabled, in another environment, or the project is not released to the connected user")
                         .formatted(configurationId, projectId, connectedUser.getId()),
-                AutomationWorkflowProjectConfigurationErrorType.CONFIGURATION_PROJECT_MISMATCH));
+                AutomationProjectConfigurationErrorType.CONFIGURATION_PROJECT_MISMATCH));
     }
 
     private ConnectedUserAutomationProjectConfigurationDTO toConnectedUserAutomationProjectConfiguration(
         ConnectedUserProjectConfiguration assignment) {
 
-        AutomationWorkflowProjectConfiguration configuration =
-            automationWorkflowProjectConfigurationService.getConfiguration(assignment.getConfigurationId());
+        AutomationProjectConfiguration configuration =
+            automationProjectConfigurationService.getConfiguration(assignment.getConfigurationId());
 
         return new ConnectedUserAutomationProjectConfigurationDTO(
             assignment.getProjectId(), configuration.getId(), configuration.getName(),
             configuration.getProjectVersion());
     }
 
-    private ProvisionableAutomationWorkflowProjectDTO toProvisionableProject(
-        ConnectedUser connectedUser, List<AutomationWorkflowProjectConfigurationReleaseDTO> releases,
+    private ProvisionableAutomationProjectDTO toProvisionableProject(
+        ConnectedUser connectedUser, List<AutomationProjectConfigurationReleaseDTO> releases,
         Map<String, ConnectedUserProjectWorkflow> referencesByWorkflowUuid) {
 
-        AutomationWorkflowProjectDTO project = releases.getFirst()
+        AutomationProjectDTO project = releases.getFirst()
             .project();
 
         Long assignedConfigurationId = connectedUserProjectConfigurationService
@@ -285,27 +285,27 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
             .map(ConnectedUserProjectConfiguration::getConfigurationId)
             .orElse(null);
 
-        Long selfServeConfigurationId = automationWorkflowProjectConfigurationResolver
+        Long selfServeConfigurationId = automationProjectConfigurationResolver
             .resolve(connectedUser, project.id())
-            .map(AutomationWorkflowProjectConfiguration::getId)
+            .map(AutomationProjectConfiguration::getId)
             .orElse(null);
 
-        List<ProvisionableAutomationWorkflowProjectDTO.Configuration> configurations = releases.stream()
+        List<ProvisionableAutomationProjectDTO.Configuration> configurations = releases.stream()
             .map(release -> toProvisionableConfiguration(release, selfServeConfigurationId, referencesByWorkflowUuid))
             .toList();
 
-        ProvisionableAutomationWorkflowProjectDTO.Configuration preselectedConfiguration = findConfiguration(
+        ProvisionableAutomationProjectDTO.Configuration preselectedConfiguration = findConfiguration(
             configurations, assignedConfigurationId)
                 .or(() -> findConfiguration(configurations, selfServeConfigurationId))
                 .orElse(configurations.getFirst());
 
-        return new ProvisionableAutomationWorkflowProjectDTO(
+        return new ProvisionableAutomationProjectDTO(
             project.id(), project.name(), preselectedConfiguration.projectVersion(),
             preselectedConfiguration.workflows(), configurations, assignedConfigurationId);
     }
 
-    private static Optional<ProvisionableAutomationWorkflowProjectDTO.Configuration> findConfiguration(
-        List<ProvisionableAutomationWorkflowProjectDTO.Configuration> configurations,
+    private static Optional<ProvisionableAutomationProjectDTO.Configuration> findConfiguration(
+        List<ProvisionableAutomationProjectDTO.Configuration> configurations,
         @Nullable Long configurationId) {
 
         return configurations.stream()
@@ -313,27 +313,27 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
             .findFirst();
     }
 
-    private static ProvisionableAutomationWorkflowProjectDTO.Configuration toProvisionableConfiguration(
-        AutomationWorkflowProjectConfigurationReleaseDTO release, @Nullable Long selfServeConfigurationId,
+    private static ProvisionableAutomationProjectDTO.Configuration toProvisionableConfiguration(
+        AutomationProjectConfigurationReleaseDTO release, @Nullable Long selfServeConfigurationId,
         Map<String, ConnectedUserProjectWorkflow> referencesByWorkflowUuid) {
 
-        AutomationWorkflowProjectDTO project = release.project();
+        AutomationProjectDTO project = release.project();
 
-        List<ProvisionableAutomationWorkflowProjectDTO.Workflow> workflows = project.workflowTemplates()
+        List<ProvisionableAutomationProjectDTO.Workflow> workflows = project.workflowTemplates()
             .stream()
             .map(template -> toProvisionableWorkflow(template, referencesByWorkflowUuid.get(template.workflowUuid())))
             .toList();
 
-        return new ProvisionableAutomationWorkflowProjectDTO.Configuration(
+        return new ProvisionableAutomationProjectDTO.Configuration(
             release.configurationId(), release.configurationName(),
             Objects.requireNonNull(project.lastPublishedVersion()),
             Objects.equals(release.configurationId(), selfServeConfigurationId), workflows);
     }
 
-    private static ProvisionableAutomationWorkflowProjectDTO.Workflow toProvisionableWorkflow(
+    private static ProvisionableAutomationProjectDTO.Workflow toProvisionableWorkflow(
         ConnectedUserWorkflowTemplateDTO template, @Nullable ConnectedUserProjectWorkflow reference) {
 
-        return new ProvisionableAutomationWorkflowProjectDTO.Workflow(
+        return new ProvisionableAutomationProjectDTO.Workflow(
             template.workflowUuid(), template.label(), template.inputs(), reference != null,
             reference != null && reference.isDangling());
     }

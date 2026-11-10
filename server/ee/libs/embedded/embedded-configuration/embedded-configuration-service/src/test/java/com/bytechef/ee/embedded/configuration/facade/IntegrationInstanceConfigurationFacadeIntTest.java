@@ -41,7 +41,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationConnectedUserDTO;
@@ -1031,7 +1031,7 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         assertThat(configurationMoveImpactDTO.skipped()).isEmpty();
         assertThat(configurationMoveImpactDTO.workflows()).hasSize(1);
 
-        AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow impactWorkflow =
+        AutomationProjectConfigurationVersionImpactDTO.Workflow impactWorkflow =
             configurationMoveImpactDTO.workflows()
                 .getFirst();
 

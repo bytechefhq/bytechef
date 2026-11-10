@@ -54,9 +54,9 @@ public class ConnectedUserWorkflowReferenceAdminFacadeImpl
     }
 
     @Override
-    public List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationWorkflowUuids) {
+    public List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationUuids) {
         List<ConnectedUserProjectWorkflow> references =
-            connectedUserProjectWorkflowRepository.findAllByAutomationWorkflowUuidIn(automationWorkflowUuids);
+            connectedUserProjectWorkflowRepository.findAllByAutomationUuidIn(automationUuids);
 
         List<Long> connectedUserProjectIds = references.stream()
             .map(ConnectedUserProjectWorkflow::getConnectedUserProjectId)
@@ -104,7 +104,7 @@ public class ConnectedUserWorkflowReferenceAdminFacadeImpl
         Environment environment = connectedUser.getEnvironment();
 
         return new ConnectedUserWorkflowReferenceDTO(
-            reference.getAutomationWorkflowUuid(), connectedUser.getId(), connectedUser.getExternalId(),
+            reference.getAutomationUuid(), connectedUser.getId(), connectedUser.getExternalId(),
             environment.name(),
             reference.isEnabled(), reference.isDangling(), reference.getDanglingReason(),
             workflowIds.get(reference.getProjectWorkflowId()), reference.getProjectDeploymentId());

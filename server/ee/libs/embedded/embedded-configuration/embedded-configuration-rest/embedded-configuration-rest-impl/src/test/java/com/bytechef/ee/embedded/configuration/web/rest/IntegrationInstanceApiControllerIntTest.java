@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectConfigurationVersionImpactDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfigurationVersionImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
@@ -236,7 +236,7 @@ class IntegrationInstanceApiControllerIntTest {
             .thenReturn(
                 new ConfigurationMoveImpactDTO(
                     List.of(
-                        new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                        new AutomationProjectConfigurationVersionImpactDTO.Workflow(
                             "uuid-1", "Cron", List.of("cronExpression"), List.of("slack"), 1)),
                     List.of(
                         new ConfigurationMoveResultDTO.Skipped(
@@ -308,7 +308,7 @@ class IntegrationInstanceApiControllerIntTest {
             .thenReturn(
                 new ConfigurationMoveImpactDTO(
                     List.of(
-                        new AutomationWorkflowProjectConfigurationVersionImpactDTO.Workflow(
+                        new AutomationProjectConfigurationVersionImpactDTO.Workflow(
                             "uuid-1", "Cron", List.of("cronExpression"), List.of("slack"), 1)),
                     List.of(
                         new ConfigurationMoveResultDTO.Skipped(

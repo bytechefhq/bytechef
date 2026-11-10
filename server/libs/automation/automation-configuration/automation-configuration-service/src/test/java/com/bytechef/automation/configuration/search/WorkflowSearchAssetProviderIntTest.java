@@ -101,16 +101,16 @@ class WorkflowSearchAssetProviderIntTest {
 
     @Test
     void testHidesWorkflowsOfEmbeddedOwnedProjects() {
-        ProjectDTO automationWorkflowProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+        ProjectDTO automationProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
         ProjectDTO connectedUserProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
         ProjectDTO plainProjectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
 
-        addWorkflow(automationWorkflowProjectDTO);
+        addWorkflow(automationProjectDTO);
         addWorkflow(connectedUserProjectDTO);
 
         long plainProjectWorkflowId = addWorkflow(plainProjectDTO);
 
-        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProjectDTO.id());
+        testOwnerContributors.addAutomationProjectId(automationProjectDTO.id());
         testOwnerContributors.addConnectedUserId(connectedUserProjectDTO.id());
 
         assertThat(search()).containsExactly(plainProjectWorkflowId);

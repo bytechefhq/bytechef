@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
  */
 
 public record ConnectedUserWorkflowReferenceDTO(
-    String automationWorkflowUuid, long connectedUserId, String externalUserId, String environment, boolean enabled,
+    String automationUuid, long connectedUserId, String externalUserId, String environment, boolean enabled,
     boolean dangling,
     String danglingReason, @Nullable String workflowId, @Nullable Long projectDeploymentId) {
 }

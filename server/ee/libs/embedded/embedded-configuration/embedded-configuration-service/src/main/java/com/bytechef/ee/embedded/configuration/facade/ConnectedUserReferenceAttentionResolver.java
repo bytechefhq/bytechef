@@ -72,7 +72,7 @@ class ConnectedUserReferenceAttentionResolver {
 
         Optional<String> workflowId = connectedUserReferenceDeploymentManager.fetchWorkflowId(
             projectDeployment.getProjectId(), projectDeployment.getProjectVersion(),
-            reference.getAutomationWorkflowUuid());
+            reference.getAutomationUuid());
 
         Optional<ProjectDeploymentWorkflow> row = workflowId.flatMap(
             id -> connectedUserReferenceDeploymentManager.fetchWorkflowRow(projectDeploymentId, id));
@@ -82,7 +82,7 @@ class ConnectedUserReferenceAttentionResolver {
 
         try {
             return new ReferenceState(inputs, resolveAttentionReason(
-                projectDeployment, reference.getAutomationWorkflowUuid(), workflowId, row));
+                projectDeployment, reference.getAutomationUuid(), workflowId, row));
         } catch (RuntimeException exception) {
             log.warn(
                 "Attention reason of reference id={} could not be derived: {}", reference.getId(),
@@ -98,7 +98,7 @@ class ConnectedUserReferenceAttentionResolver {
 
     @Nullable
     private String resolveAttentionReason(
-        ProjectDeployment projectDeployment, String automationWorkflowUuid, Optional<String> workflowId,
+        ProjectDeployment projectDeployment, String automationUuid, Optional<String> workflowId,
         Optional<ProjectDeploymentWorkflow> row) {
 
         Optional<Long> connectedUserIdOptional = connectedUserReferenceDeploymentManager.fetchConnectedUserId(
@@ -111,7 +111,7 @@ class ConnectedUserReferenceAttentionResolver {
         long connectedUserId = connectedUserIdOptional.get();
 
         if (!connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
-            connectedUserId, projectDeployment.getProjectId(), automationWorkflowUuid)) {
+            connectedUserId, projectDeployment.getProjectId(), automationUuid)) {
 
             return TURNED_OFF_BY_ADMINISTRATOR;
         }

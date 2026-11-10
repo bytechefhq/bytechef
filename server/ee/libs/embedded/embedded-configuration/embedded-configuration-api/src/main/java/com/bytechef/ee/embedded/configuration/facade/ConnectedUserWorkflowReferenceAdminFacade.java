@@ -17,5 +17,5 @@ import java.util.Set;
  * @author Ivica Cardic
  */
 public interface ConnectedUserWorkflowReferenceAdminFacade {
-    List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationWorkflowUuids);
+    List<ConnectedUserWorkflowReferenceDTO> getReferences(Set<String> automationUuids);
 }

@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceToolFacade;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
@@ -52,7 +52,7 @@ class McpIntegrationInstanceToolApiControllerIntTest {
         "/v1/{externalUserId}/integration-instances/{id}/mcp-tools/{mcpToolId}/enable";
 
     @MockitoBean
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @Autowired
     private ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade;

@@ -61,7 +61,7 @@ class ConnectedUserWorkflowWebhookUrlResolver {
 
     /**
      * @param projectDeploymentId the deployment the workflow runs on, the connected user's own for a copy, the
-     *                            automation workflow project's for a reference
+     *                            automation project's for a reference
      * @param workflowUuid        the workflow uuid
      * @return the static webhook url, or {@code null} if the workflow is not deployed or does not start with a static
      *         webhook trigger

@@ -14,8 +14,8 @@ package com.bytechef.ee.embedded.configuration.audit;
  */
 public final class WorkflowAuditEvents {
 
-    public static final String AUTOMATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED =
-        "AUTOMATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED";
+    public static final String AUTOMATION_PERMISSION_EXPRESSION_UPDATED =
+        "AUTOMATION_PERMISSION_EXPRESSION_UPDATED";
     public static final String INTEGRATION_WORKFLOW_CREATED = "INTEGRATION_WORKFLOW_CREATED";
     public static final String INTEGRATION_WORKFLOW_DELETED = "INTEGRATION_WORKFLOW_DELETED";
     public static final String INTEGRATION_WORKFLOW_PERMISSION_EXPRESSION_UPDATED =

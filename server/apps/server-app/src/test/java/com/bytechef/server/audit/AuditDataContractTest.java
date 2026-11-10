@@ -92,8 +92,8 @@ class AuditDataContractTest {
     private static final Map<String, String> UNAUDITED_GUARDED_METHODS = Map.ofEntries(
         Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
-        Map.entry("AutomationWorkflowProjectFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
-        Map.entry("AutomationWorkflowProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
+        Map.entry("AutomationProjectFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
+        Map.entry("AutomationProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpServer", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpComponent", DELEGATES),

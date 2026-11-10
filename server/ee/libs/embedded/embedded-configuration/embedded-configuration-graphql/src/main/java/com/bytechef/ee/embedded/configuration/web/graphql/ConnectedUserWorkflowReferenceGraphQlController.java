@@ -37,7 +37,7 @@ public class ConnectedUserWorkflowReferenceGraphQlController {
 
     @QueryMapping
     public List<ConnectedUserWorkflowReferenceDTO> connectedUserCodeWorkflowReferences(
-        @Argument List<String> automationWorkflowUuids) {
-        return connectedUserWorkflowReferenceAdminFacade.getReferences(Set.copyOf(automationWorkflowUuids));
+        @Argument List<String> automationUuids) {
+        return connectedUserWorkflowReferenceAdminFacade.getReferences(Set.copyOf(automationUuids));
     }
 }

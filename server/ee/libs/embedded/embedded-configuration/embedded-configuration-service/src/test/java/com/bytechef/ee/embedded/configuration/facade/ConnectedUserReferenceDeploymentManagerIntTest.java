@@ -44,7 +44,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
-import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProjectConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserReferenceDeployment;
@@ -52,9 +52,9 @@ import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWork
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.RowSpec;
-import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectConfigurationUpdatedEventListener;
+import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
-import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserReferenceDeploymentService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -120,7 +120,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @SpringBootTest(
     classes = {
-        AutomationWorkflowProjectFacadeIntTestConfiguration.class,
+        AutomationProjectFacadeIntTestConfiguration.class,
         ConnectedUserReferenceRolloutManagerIntTest.ConnectedUserServiceConfiguration.class
     },
     properties = {
@@ -189,13 +189,13 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         """;
 
     @Autowired
-    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private AutomationProjectConfigurationService automationProjectConfigurationService;
 
     @Autowired
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @MockitoBean
-    private AutomationWorkflowProjectConfigurationUpdatedEventListener automationWorkflowProjectConfigurationUpdatedEventListener;
+    private AutomationProjectConfigurationUpdatedEventListener automationProjectConfigurationUpdatedEventListener;
 
     @Autowired
     private ComponentConnectionFacade componentConnectionFacade;
@@ -355,22 +355,22 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testGetOrCreateDeploymentKeepsDevelopmentAndProductionConnectedUsersApart() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Deployment Name");
+        long automationProjectId = createAutomationProject("Deployment Name");
 
-        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
-        automationWorkflowProjectConfigurationService.create(automationWorkflowProjectId,
+        automationProjectConfigurationService.create(automationProjectId,
             Environment.DEVELOPMENT.ordinal(), "Default", null, 1, true, true);
 
         ConnectedUser developmentConnectedUser = connectedUserService.createConnectedUser(
             externalUserId, Environment.DEVELOPMENT);
 
         long productionDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+            automationProjectId, externalUserId, Environment.PRODUCTION);
         long developmentDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.DEVELOPMENT);
+            automationProjectId, externalUserId, Environment.DEVELOPMENT);
 
         assertThat(developmentDeploymentId).isNotEqualTo(productionDeploymentId);
         assertThat(projectDeploymentService.getProjectDeployment(productionDeploymentId))
@@ -384,41 +384,41 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
                 assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.DEVELOPMENT);
             });
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
-            connectedUserId, automationWorkflowProjectId))
+            connectedUserId, automationProjectId))
                 .map(ConnectedUserReferenceDeployment::getProjectDeploymentId)
                 .contains(productionDeploymentId);
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
-            developmentConnectedUser.getId(), automationWorkflowProjectId))
+            developmentConnectedUser.getId(), automationProjectId))
                 .map(ConnectedUserReferenceDeployment::getProjectDeploymentId)
                 .contains(developmentDeploymentId);
     }
 
     @Test
     void testFirstActivationAssignsSelfServeConfiguration() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Self Serve Assignment");
+        long automationProjectId = createAutomationProject("Self Serve Assignment");
 
-        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationProjectFacade.publishProject(automationProjectId);
+        automationProjectFacade.publishProject(automationProjectId);
 
-        automationWorkflowProjectConfigurationService.create(
-            automationWorkflowProjectId, Environment.PRODUCTION.ordinal(), "Newest", null, 2, true, true);
-        automationWorkflowProjectConfigurationService.create(
-            automationWorkflowProjectId, Environment.PRODUCTION.ordinal(), "Oldest", null, 1, true, true);
+        automationProjectConfigurationService.create(
+            automationProjectId, Environment.PRODUCTION.ordinal(), "Newest", null, 2, true, true);
+        automationProjectConfigurationService.create(
+            automationProjectId, Environment.PRODUCTION.ordinal(), "Oldest", null, 1, true, true);
 
-        AutomationWorkflowProjectConfiguration selfServeConfiguration = automationWorkflowProjectConfigurationService
-            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+        AutomationProjectConfiguration selfServeConfiguration = automationProjectConfigurationService
+            .getConfigurations(automationProjectId, Environment.PRODUCTION.ordinal())
             .stream()
             .filter(configuration -> configuration.getProjectVersion() == 2)
             .findFirst()
             .orElseThrow();
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+            automationProjectId, externalUserId, Environment.PRODUCTION);
 
         assertThat(
-            connectedUserProjectConfigurationService.fetchAssignment(connectedUserId, automationWorkflowProjectId))
+            connectedUserProjectConfigurationService.fetchAssignment(connectedUserId, automationProjectId))
                 .map(ConnectedUserProjectConfiguration::getConfigurationId)
                 .contains(selfServeConfiguration.getId());
         assertThat(projectDeploymentService.getProjectDeployment(projectDeploymentId)
@@ -427,41 +427,41 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testGetOrCreateDeploymentRecordsTheConnectedUserReferenceDeploymentOnce() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Record Relation");
+        long automationProjectId = createAutomationProject("Record Relation");
 
-        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+            automationProjectId, externalUserId, Environment.PRODUCTION);
 
         ConnectedUserReferenceDeployment connectedUserReferenceDeployment = connectedUserReferenceDeploymentService
-            .fetchConnectedUserReferenceDeployment(connectedUserId, automationWorkflowProjectId)
+            .fetchConnectedUserReferenceDeployment(connectedUserId, automationProjectId)
             .orElseThrow();
 
         assertThat(connectedUserReferenceDeployment.getProjectDeploymentId()).isEqualTo(projectDeploymentId);
-        assertThat(connectedUserReferenceDeployment.getProjectId()).isEqualTo(automationWorkflowProjectId);
+        assertThat(connectedUserReferenceDeployment.getProjectId()).isEqualTo(automationProjectId);
         assertThat(connectedUserReferenceDeploymentManager.isReferenceDeployment(projectDeploymentId)).isTrue();
 
         assertThat(connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION)).isEqualTo(projectDeploymentId);
+            automationProjectId, externalUserId, Environment.PRODUCTION)).isEqualTo(projectDeploymentId);
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
-            connectedUserId, automationWorkflowProjectId))
+            connectedUserId, automationProjectId))
                 .map(ConnectedUserReferenceDeployment::getId)
                 .contains(connectedUserReferenceDeployment.getId());
     }
 
     @Test
     void testGetOrCreateDeploymentFindsTheDeploymentByItsRelationAfterARename() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Renamed Deployment");
+        long automationProjectId = createAutomationProject("Renamed Deployment");
 
-        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+            automationProjectId, externalUserId, Environment.PRODUCTION);
 
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(projectDeploymentId);
 
@@ -470,8 +470,8 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         projectDeploymentService.update(projectDeployment);
 
         assertThat(connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION)).isEqualTo(projectDeploymentId);
-        assertThat(projectDeploymentService.getAllProjectDeployments(automationWorkflowProjectId))
+            automationProjectId, externalUserId, Environment.PRODUCTION)).isEqualTo(projectDeploymentId);
+        assertThat(projectDeploymentService.getAllProjectDeployments(automationProjectId))
             .singleElement()
             .extracting(ProjectDeployment::getId)
             .isEqualTo(projectDeploymentId);
@@ -479,25 +479,25 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testGetOrCreateDeploymentDoesNotAdoptALegacyNamedDeploymentThatOnlyMatchesByName() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Name Only Deployment");
+        long automationProjectId = createAutomationProject("Name Only Deployment");
 
-        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ProjectDeployment nameOnlyProjectDeployment = new ProjectDeployment();
 
         nameOnlyProjectDeployment.setEnabled(false);
         nameOnlyProjectDeployment.setEnvironment(Environment.PRODUCTION);
         nameOnlyProjectDeployment.setName("__EMBEDDED__" + externalUserId + "__PRODUCTION");
-        nameOnlyProjectDeployment.setProjectId(automationWorkflowProjectId);
+        nameOnlyProjectDeployment.setProjectId(automationProjectId);
         nameOnlyProjectDeployment.setProjectVersion(1);
 
         long nameOnlyProjectDeploymentId = projectDeploymentService.create(nameOnlyProjectDeployment)
             .getId();
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+            automationProjectId, externalUserId, Environment.PRODUCTION);
 
         assertThat(projectDeploymentId).isNotEqualTo(nameOnlyProjectDeploymentId);
         assertThat(connectedUserReferenceDeploymentManager.isReferenceDeployment(nameOnlyProjectDeploymentId))
@@ -507,40 +507,40 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testDeleteDeploymentRemovesTheConnectedUserReferenceDeployment() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Delete Relation");
+        long automationProjectId = createAutomationProject("Delete Relation");
 
-        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+            automationProjectId, externalUserId, Environment.PRODUCTION);
 
         connectedUserReferenceDeploymentManager.deleteDeployment(projectDeploymentId);
 
         assertThat(connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(
-            connectedUserId, automationWorkflowProjectId)).isEmpty();
+            connectedUserId, automationProjectId)).isEmpty();
         assertThat(connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION)).isNotEqualTo(projectDeploymentId);
+            automationProjectId, externalUserId, Environment.PRODUCTION)).isNotEqualTo(projectDeploymentId);
     }
 
     @Test
     void testGetOrCreateDeploymentCreatesAnEnabledDeploymentAtTheLastPublishedVersion() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Create Deployment");
+        long automationProjectId = createAutomationProject("Create Deployment");
 
-        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
-        publishAndPinProject(automationWorkflowProjectId);
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
+        publishAndPinProject(automationProjectId);
+        publishAndPinProject(automationProjectId);
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+            automationProjectId, externalUserId, Environment.PRODUCTION);
 
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(projectDeploymentId);
 
         assertThat(projectDeployment.getProjectVersion()).isEqualTo(3);
-        assertThat(projectDeployment.getProjectId()).isEqualTo(automationWorkflowProjectId);
+        assertThat(projectDeployment.getProjectId()).isEqualTo(automationProjectId);
         assertThat(projectDeployment.getEnvironment()).isEqualTo(Environment.PRODUCTION);
         assertThat(projectDeployment.getName()).isEqualTo(externalUserId);
         assertThat(projectDeployment.isEnabled()).isTrue();
@@ -548,18 +548,18 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testGetOrCreateDeploymentReusesTheExistingDeployment() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Reuse Deployment");
+        long automationProjectId = createAutomationProject("Reuse Deployment");
 
-        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+            automationProjectId, externalUserId, Environment.PRODUCTION);
 
         assertThat(connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION)).isEqualTo(projectDeploymentId);
-        assertThat(projectDeploymentService.getAllProjectDeployments(automationWorkflowProjectId))
+            automationProjectId, externalUserId, Environment.PRODUCTION)).isEqualTo(projectDeploymentId);
+        assertThat(projectDeploymentService.getAllProjectDeployments(automationProjectId))
             .singleElement()
             .extracting(ProjectDeployment::getId)
             .isEqualTo(projectDeploymentId);
@@ -567,13 +567,13 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testGetReleasedVersionRejectsAProjectWithoutAConfiguration() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Unreleased");
+        long automationProjectId = createAutomationProject("Unreleased");
 
-        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
         assertThatThrownBy(
             () -> connectedUserReferenceDeploymentManager.getReleasedVersion(
-                connectedUserId, automationWorkflowProjectId))
+                connectedUserId, automationProjectId))
                     .isInstanceOfSatisfying(ConfigurationException.class, configurationException -> assertThat(
                         configurationException.getErrorKey())
                             .isEqualTo(ConnectedUserProjectWorkflowErrorType.WORKFLOW_TEMPLATE_NOT_RELEASED
@@ -582,62 +582,62 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testGetReleasedVersionRejectsADisabledConfiguration() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Disabled Release");
+        long automationProjectId = createAutomationProject("Disabled Release");
 
-        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+            automationProjectId, externalUserId, Environment.PRODUCTION);
 
-        AutomationWorkflowProjectConfiguration configuration = automationWorkflowProjectConfigurationService
-            .getConfigurations(automationWorkflowProjectId, Environment.PRODUCTION.ordinal())
+        AutomationProjectConfiguration configuration = automationProjectConfigurationService
+            .getConfigurations(automationProjectId, Environment.PRODUCTION.ordinal())
             .stream()
             .findFirst()
             .orElseThrow();
 
-        automationWorkflowProjectConfigurationService.updateEnabled(configuration.getId(), false);
+        automationProjectConfigurationService.updateEnabled(configuration.getId(), false);
 
         assertThatThrownBy(
             () -> connectedUserReferenceDeploymentManager.getReleasedVersion(
-                connectedUserId, automationWorkflowProjectId))
+                connectedUserId, automationProjectId))
                     .isInstanceOf(ConfigurationException.class);
     }
 
     @Test
     void testGetReleasedVersionReturnsThePinnedVersionOfTheEnvironment() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Pinned Release");
+        long automationProjectId = createAutomationProject("Pinned Release");
 
-        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+        addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         connectedUserReferenceDeploymentManager.getOrCreateDeployment(
-            automationWorkflowProjectId, externalUserId, Environment.PRODUCTION);
+            automationProjectId, externalUserId, Environment.PRODUCTION);
 
-        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+        automationProjectFacade.publishProject(automationProjectId);
 
         assertThat(connectedUserReferenceDeploymentManager.getReleasedVersion(
-            connectedUserId, automationWorkflowProjectId)).isEqualTo(1);
+            connectedUserId, automationProjectId)).isEqualTo(1);
     }
 
     @Test
     void testPutWorkflowsAtTheSameVersionRewritesAnEnabledRowAloneDisablingItFirst() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Rewrite Enabled Row");
+        long automationProjectId = createAutomationProject("Rewrite Enabled Row");
 
-        String siblingUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
+        String siblingUuid = addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
         String workflowUuid =
-            addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         provision(siblingUuid);
 
         long projectDeploymentId = provisionEnabled(workflowUuid, Map.of("channel", "general"));
 
-        String workflowId = getWorkflowId(automationWorkflowProjectId, 1, workflowUuid);
-        String siblingWorkflowId = getWorkflowId(automationWorkflowProjectId, 1, siblingUuid);
+        String workflowId = getWorkflowId(automationProjectId, 1, workflowUuid);
+        String siblingWorkflowId = getWorkflowId(automationProjectId, 1, siblingUuid);
 
         ProjectDeploymentWorkflow existingRow = getRow(projectDeploymentId, workflowId);
         ProjectDeploymentWorkflow existingSiblingRow = getRow(projectDeploymentId, siblingWorkflowId);
@@ -668,13 +668,13 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testPutWorkflowsAtTheSameVersionWritesADisabledRowWithoutTogglingTriggers() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Rewrite Disabled Row");
+        long automationProjectId = createAutomationProject("Rewrite Disabled Row");
 
-        String siblingUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
+        String siblingUuid = addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
         String workflowUuid =
-            addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         provision(siblingUuid);
 
@@ -685,8 +685,8 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         connectedUserReferenceDeploymentManager.updateInputs(
             projectDeploymentId, workflowUuid, Map.of("channel", "general"));
 
-        String workflowId = getWorkflowId(automationWorkflowProjectId, 1, workflowUuid);
-        String siblingWorkflowId = getWorkflowId(automationWorkflowProjectId, 1, siblingUuid);
+        String workflowId = getWorkflowId(automationProjectId, 1, workflowUuid);
+        String siblingWorkflowId = getWorkflowId(automationProjectId, 1, siblingUuid);
 
         ProjectDeploymentWorkflow existingRow = getRow(projectDeploymentId, workflowId);
         ProjectDeploymentWorkflow existingSiblingRow = getRow(projectDeploymentId, siblingWorkflowId);
@@ -713,16 +713,16 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testPutWorkflowsAtTheSameVersionLeavesAnUnchangedRowAlone() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Unchanged Row");
+        long automationProjectId = createAutomationProject("Unchanged Row");
 
         String workflowUuid = addWorkflow(
-            automationWorkflowProjectId, SLACK_AND_JIRA_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            automationProjectId, SLACK_AND_JIRA_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         long projectDeploymentId = provisionEnabled(workflowUuid, Map.of("channel", "general"));
 
-        String workflowId = getWorkflowId(automationWorkflowProjectId, 1, workflowUuid);
+        String workflowId = getWorkflowId(automationProjectId, 1, workflowUuid);
 
         ProjectDeploymentWorkflow existingRow = getRow(projectDeploymentId, workflowId);
 
@@ -754,19 +754,19 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testPutWorkflowsAtTheSameVersionCreatesANewRowDisabledThenEnablesIt() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Create Row");
+        long automationProjectId = createAutomationProject("Create Row");
 
-        String siblingUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
+        String siblingUuid = addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUserProjectWorkflow siblingReference = provision(siblingUuid);
 
         long projectDeploymentId = siblingReference.getProjectDeploymentId();
 
-        String workflowId = getWorkflowId(automationWorkflowProjectId, 1, workflowUuid);
-        String siblingWorkflowId = getWorkflowId(automationWorkflowProjectId, 1, siblingUuid);
+        String workflowId = getWorkflowId(automationProjectId, 1, workflowUuid);
+        String siblingWorkflowId = getWorkflowId(automationProjectId, 1, siblingUuid);
 
         ProjectDeploymentWorkflow existingSiblingRow = getRow(projectDeploymentId, siblingWorkflowId);
 
@@ -794,12 +794,12 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testPutWorkflowsAtANewVersionWritesTheCompleteListAndDropsRowsNotPassed() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("New Version");
+        long automationProjectId = createAutomationProject("New Version");
 
-        String otherUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+        String otherUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         provision(otherUuid);
 
@@ -807,7 +807,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(projectDeploymentId)).hasSize(2);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         RowSpec rowSpec = new RowSpec(new ResolvedWorkflowConnections(List.of(), List.of()), false, null);
 
@@ -819,7 +819,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
             .singleElement()
             .satisfies(writtenRow -> {
                 assertThat(writtenRow.getWorkflowId())
-                    .isEqualTo(getWorkflowId(automationWorkflowProjectId, 2, workflowUuid));
+                    .isEqualTo(getWorkflowId(automationProjectId, 2, workflowUuid));
                 assertThat(writtenRow.getInputs()).isEqualTo(Map.of("channel", "general"));
                 assertThat(writtenRow.isEnabled()).isFalse();
             });
@@ -827,16 +827,16 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testUpdateInputsRefusesAnEnabledRowMissingARequiredInput() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Refuse Inputs");
+        long automationProjectId = createAutomationProject("Refuse Inputs");
 
         String workflowUuid =
-            addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         long projectDeploymentId = provisionEnabled(workflowUuid, Map.of("channel", "general"));
 
-        String workflowId = getWorkflowId(automationWorkflowProjectId, 1, workflowUuid);
+        String workflowId = getWorkflowId(automationProjectId, 1, workflowUuid);
 
         ProjectDeploymentWorkflow existingRow = getRow(projectDeploymentId, workflowId);
 
@@ -860,17 +860,17 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testUpdateInputsSavesADisabledRowWithIncompleteInputs() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Incomplete Inputs");
+        long automationProjectId = createAutomationProject("Incomplete Inputs");
 
         String workflowUuid =
-            addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+            addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUserProjectWorkflow reference = provision(workflowUuid);
 
         long projectDeploymentId = reference.getProjectDeploymentId();
-        String workflowId = getWorkflowId(automationWorkflowProjectId, 1, workflowUuid);
+        String workflowId = getWorkflowId(automationProjectId, 1, workflowUuid);
 
         clearInvocations(triggerLifecycleFacade);
 
@@ -887,12 +887,12 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testRemoveWorkflowDisablesAndDeletesAnEnabledRowAloneKeepingTheDeployment() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Remove Enabled Row");
+        long automationProjectId = createAutomationProject("Remove Enabled Row");
 
-        String siblingUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
+        String siblingUuid = addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         provision(siblingUuid);
 
@@ -900,8 +900,8 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
         long projectDeploymentId = reference.getProjectDeploymentId();
 
-        String workflowId = getWorkflowId(automationWorkflowProjectId, 1, workflowUuid);
-        String siblingWorkflowId = getWorkflowId(automationWorkflowProjectId, 1, siblingUuid);
+        String workflowId = getWorkflowId(automationProjectId, 1, workflowUuid);
+        String siblingWorkflowId = getWorkflowId(automationProjectId, 1, siblingUuid);
 
         ProjectDeploymentWorkflow existingSiblingRow = getRow(projectDeploymentId, siblingWorkflowId);
 
@@ -921,12 +921,12 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testRemoveWorkflowOfADisabledRowSkipsDisabling() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Remove Disabled Row");
+        long automationProjectId = createAutomationProject("Remove Disabled Row");
 
-        String siblingUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
+        String siblingUuid = addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         provision(siblingUuid);
 
@@ -936,7 +936,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
             externalUserId, workflowUuid, false, Environment.PRODUCTION);
 
         long projectDeploymentId = reference.getProjectDeploymentId();
-        String workflowId = getWorkflowId(automationWorkflowProjectId, 1, workflowUuid);
+        String workflowId = getWorkflowId(automationProjectId, 1, workflowUuid);
 
         assertThat(getRow(projectDeploymentId, workflowId).isEnabled()).isFalse();
 
@@ -953,11 +953,11 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testRemoveWorkflowOfADeploymentThatNoLongerExistsDoesNothing() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Remove Missing Deployment");
+        long automationProjectId = createAutomationProject("Remove Missing Deployment");
 
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUserProjectWorkflow reference = provision(workflowUuid);
 
@@ -977,16 +977,16 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
 
     @Test
     void testRemoveWorkflowDeletesTheDeploymentWithItsLastRow() {
-        long automationWorkflowProjectId = createAutomationWorkflowProject("Remove Last Row");
+        long automationProjectId = createAutomationProject("Remove Last Row");
 
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
 
-        publishAndPinProject(automationWorkflowProjectId);
+        publishAndPinProject(automationProjectId);
 
         ConnectedUserProjectWorkflow reference = provision(workflowUuid);
 
         long projectDeploymentId = reference.getProjectDeploymentId();
-        String workflowId = getWorkflowId(automationWorkflowProjectId, 1, workflowUuid);
+        String workflowId = getWorkflowId(automationProjectId, 1, workflowUuid);
 
         assertThat(getRow(projectDeploymentId, workflowId).isEnabled()).isTrue();
 
@@ -1000,19 +1000,19 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         assertThat(projectDeploymentService.fetchProjectDeployment(projectDeploymentId)).isEmpty();
     }
 
-    private String addWorkflow(long automationWorkflowProjectId, String definition) {
-        return automationWorkflowProjectFacade.createProjectWorkflow(automationWorkflowProjectId, definition, null);
+    private String addWorkflow(long automationProjectId, String definition) {
+        return automationProjectFacade.createProjectWorkflow(automationProjectId, definition, null);
     }
 
-    private long createAutomationWorkflowProject(String name) {
-        return automationWorkflowProjectFacade.createProject(
+    private long createAutomationProject(String name) {
+        return automationProjectFacade.createProject(
             name + " " + UUID.randomUUID(), "", null, List.of(), null);
     }
 
     private String createDraftWorkflow(String projectName, String definition) {
-        long automationWorkflowProjectId = createAutomationWorkflowProject(projectName);
+        long automationProjectId = createAutomationProject(projectName);
 
-        String workflowUuid = addWorkflow(automationWorkflowProjectId, definition);
+        String workflowUuid = addWorkflow(automationProjectId, definition);
 
         return projectWorkflowService.getLastWorkflowId(workflowUuid);
     }
@@ -1021,8 +1021,8 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
         return projectDeploymentWorkflowService.getProjectDeploymentWorkflow(projectDeploymentId, workflowId);
     }
 
-    private String getWorkflowId(long automationWorkflowProjectId, int projectVersion, String workflowUuid) {
-        return projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, projectVersion, workflowUuid)
+    private String getWorkflowId(long automationProjectId, int projectVersion, String workflowUuid) {
+        return projectWorkflowService.fetchProjectWorkflow(automationProjectId, projectVersion, workflowUuid)
             .map(ProjectWorkflow::getWorkflowId)
             .orElseThrow();
     }
@@ -1122,7 +1122,7 @@ class ConnectedUserReferenceDeploymentManagerIntTest {
     }
 
     private void publishAndPinProject(long projectId) {
-        AutomationWorkflowProjectConfigurationTestSupport.publishAndPinProject(
-            automationWorkflowProjectFacade, automationWorkflowProjectConfigurationService, projectId);
+        AutomationProjectConfigurationTestSupport.publishAndPinProject(
+            automationProjectFacade, automationProjectConfigurationService, projectId);
     }
 }

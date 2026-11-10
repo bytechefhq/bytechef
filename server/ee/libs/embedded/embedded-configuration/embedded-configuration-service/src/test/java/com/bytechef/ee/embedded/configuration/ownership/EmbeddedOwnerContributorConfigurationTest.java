@@ -43,7 +43,7 @@ class EmbeddedOwnerContributorConfigurationTest {
         assertThat(context.getBeansOfType(ProjectOwnerContributor.class)
             .values())
                 .extracting(ProjectOwnerContributor::getProjectOwner)
-                .containsExactlyInAnyOrder(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT,
+                .containsExactlyInAnyOrder(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
                     ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
         assertThat(context.getBeansOfType(ProjectDeploymentOwnerContributor.class)
             .values())

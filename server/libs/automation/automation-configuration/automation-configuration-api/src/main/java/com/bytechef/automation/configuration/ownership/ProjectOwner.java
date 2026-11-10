@@ -23,7 +23,7 @@ import java.util.List;
  */
 public enum ProjectOwner {
 
-    EMBEDDED_AUTOMATION_WORKFLOW_PROJECT("automation_workflow_project"),
+    EMBEDDED_AUTOMATION_PROJECT("automation_project"),
     EMBEDDED_CONNECTED_USER_PROJECT("connected_user_project");
 
     private final List<String> ownerTables;

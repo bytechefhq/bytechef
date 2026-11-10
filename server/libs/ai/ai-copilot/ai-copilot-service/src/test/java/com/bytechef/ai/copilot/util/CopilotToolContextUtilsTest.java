@@ -76,13 +76,13 @@ class CopilotToolContextUtilsTest {
         Map<String, Object> stateMap = new HashMap<>();
 
         stateMap.put(CopilotConstants.STATE_WORKSPACE_ID, "7");
-        stateMap.put(CopilotConstants.STATE_PROJECT_OWNER, "EMBEDDED_AUTOMATION_WORKFLOW_PROJECT");
+        stateMap.put(CopilotConstants.STATE_PROJECT_OWNER, "EMBEDDED_AUTOMATION_PROJECT");
 
         Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
 
         assertThat(toolContext)
             .containsEntry(
-                AutomationToolInvocationContext.TOOL_CONTEXT_PROJECT_OWNER_KEY, "EMBEDDED_AUTOMATION_WORKFLOW_PROJECT");
+                AutomationToolInvocationContext.TOOL_CONTEXT_PROJECT_OWNER_KEY, "EMBEDDED_AUTOMATION_PROJECT");
     }
 
     @Test

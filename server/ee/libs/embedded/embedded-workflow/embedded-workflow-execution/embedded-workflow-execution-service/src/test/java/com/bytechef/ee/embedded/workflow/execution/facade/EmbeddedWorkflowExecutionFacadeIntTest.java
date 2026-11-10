@@ -140,7 +140,7 @@ class EmbeddedWorkflowExecutionFacadeIntTest {
             List<WorkflowExecutionRowDTO> workflowExecutionRowDTOs = invocation.getArgument(0);
 
             return workflowExecutionRowDTOs.stream()
-                .map(EmbeddedWorkflowExecutionFacadeIntTest::createAutomationWorkflowExecutionDTO)
+                .map(EmbeddedWorkflowExecutionFacadeIntTest::createAutomationExecutionDTO)
                 .toList();
         });
     }
@@ -162,17 +162,17 @@ class EmbeddedWorkflowExecutionFacadeIntTest {
     void testGetWorkflowExecutionsPagesIntegrationAndAutomationRunsTogetherNewestFirst() {
         IntegrationInstance integrationInstance = createIntegrationInstance();
         String integrationWorkflowId = getIntegrationWorkflowId(integrationInstance);
-        String automationWorkflowId = createWorkflowId();
+        String automationId = createWorkflowId();
 
         Job newestIntegrationJob = createJob(
             integrationWorkflowId, NOW.minus(1, ChronoUnit.HOURS), integrationInstance.getId(), PlatformType.EMBEDDED);
         Job automationJob = createJob(
-            automationWorkflowId, NOW.minus(2, ChronoUnit.HOURS), AUTOMATION_PROJECT_DEPLOYMENT_ID,
+            automationId, NOW.minus(2, ChronoUnit.HOURS), AUTOMATION_PROJECT_DEPLOYMENT_ID,
             PlatformType.AUTOMATION);
         Job oldestIntegrationJob = createJob(
             integrationWorkflowId, NOW.minus(3, ChronoUnit.HOURS), integrationInstance.getId(), PlatformType.EMBEDDED);
 
-        stubAutomationScope(automationWorkflowId);
+        stubAutomationScope(automationId);
 
         Page<EmbeddedWorkflowExecutionDTO> page = embeddedWorkflowExecutionFacade.getWorkflowExecutions(
             (long) Environment.DEVELOPMENT.ordinal(), null, null, null, null, 1L, 0);
@@ -242,7 +242,7 @@ class EmbeddedWorkflowExecutionFacadeIntTest {
     }
 
     private static com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO
-        createAutomationWorkflowExecutionDTO(WorkflowExecutionRowDTO workflowExecutionRowDTO) {
+        createAutomationExecutionDTO(WorkflowExecutionRowDTO workflowExecutionRowDTO) {
 
         com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO workflowExecutionDTO = mock(
             com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO.class);
@@ -255,7 +255,7 @@ class EmbeddedWorkflowExecutionFacadeIntTest {
 
     private static Long getId(EmbeddedWorkflowExecutionDTO embeddedWorkflowExecutionDTO) {
         if (embeddedWorkflowExecutionDTO.source() == Source.AUTOMATION) {
-            return Objects.requireNonNull(embeddedWorkflowExecutionDTO.automationWorkflowExecution())
+            return Objects.requireNonNull(embeddedWorkflowExecutionDTO.automationExecution())
                 .id();
         }
 
@@ -338,11 +338,11 @@ class EmbeddedWorkflowExecutionFacadeIntTest {
             .getWorkflowId();
     }
 
-    private void stubAutomationScope(String automationWorkflowId) {
+    private void stubAutomationScope(String automationId) {
         when(projectWorkflowExecutionFacade.getEmbeddedWorkflowExecutionScope(any(), any(), any(), anyLong()))
             .thenReturn(
                 new WorkflowExecutionScopeDTO(
-                    PlatformType.AUTOMATION, List.of(AUTOMATION_PROJECT_DEPLOYMENT_ID), List.of(automationWorkflowId),
+                    PlatformType.AUTOMATION, List.of(AUTOMATION_PROJECT_DEPLOYMENT_ID), List.of(automationId),
                     List.of()));
     }
 }

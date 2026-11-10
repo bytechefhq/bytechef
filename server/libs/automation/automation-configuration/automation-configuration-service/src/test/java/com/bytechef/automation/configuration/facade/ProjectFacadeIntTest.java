@@ -730,11 +730,11 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
-    public void testGetWorkspaceProjectsHidesEmbeddedAutomationWorkflowProjects() {
-        ProjectDTO automationWorkflowProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+    public void testGetWorkspaceProjectsHidesEmbeddedAutomationProjects() {
+        ProjectDTO automationProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
         ProjectDTO plainProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
 
-        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProjectDTO.id());
+        testOwnerContributors.addAutomationProjectId(automationProjectDTO.id());
 
         List<ProjectDTO> workspaceProjects = projectFacade.getWorkspaceProjects(
             null, null, false, null, null, null, workspace.getId());
@@ -745,14 +745,14 @@ public class ProjectFacadeIntTest {
 
     @Test
     public void testGetWorkspaceProjectWorkflowsHidesEmbeddedOwnedProjects() {
-        ProjectDTO automationWorkflowProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+        ProjectDTO automationProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
         ProjectDTO plainProjectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
 
-        projectFacadeInstanceHelper.addTestWorkflow(automationWorkflowProjectDTO);
+        projectFacadeInstanceHelper.addTestWorkflow(automationProjectDTO);
 
         ProjectWorkflowDTO plainProjectWorkflowDTO = projectFacadeInstanceHelper.addTestWorkflow(plainProjectDTO);
 
-        testOwnerContributors.addAutomationWorkflowProjectId(automationWorkflowProjectDTO.id());
+        testOwnerContributors.addAutomationProjectId(automationProjectDTO.id());
 
         assertThat(projectFacade.getWorkspaceProjectWorkflows(workspace.getId()))
             .extracting(ProjectWorkflowDTO::getId)
