@@ -42,27 +42,38 @@ describe('FunctionSuggestionList', () => {
         expect(screen.queryByText('contains description')).not.toBeInTheDocument();
     });
 
-    it('renders every overload of a function without duplicate keys', () => {
-        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    it('shows a function with overloads once and lists its variations under the highlighted row', () => {
+        const command = vi.fn();
+        const items = [
+            definition('contains', {
+                parameters: [{description: '', name: 'element', required: true, type: EvaluatorFunctionType.Boolean}],
+            }),
+            definition('contains', {
+                parameters: [{description: '', name: 'element', required: true, type: EvaluatorFunctionType.Map}],
+            }),
+            definition('concat'),
+        ];
+        const ref = createRef<FunctionSuggestionListRefType>();
 
-        renderFunctionSuggestionList(
-            [
-                definition('contains', {
-                    parameters: [
-                        {description: '', name: 'element', required: true, type: EvaluatorFunctionType.Boolean},
-                    ],
-                }),
-                definition('contains', {
-                    parameters: [{description: '', name: 'element', required: true, type: EvaluatorFunctionType.Map}],
-                }),
-            ],
-            vi.fn()
-        );
+        renderFunctionSuggestionList(items, command, ref);
 
-        expect(screen.getAllByText('contains')).toHaveLength(2);
-        expect(consoleErrorSpy).not.toHaveBeenCalledWith(expect.stringContaining('same key'), expect.anything());
+        expect(screen.getAllByText('contains')).toHaveLength(1);
+        expect(screen.getAllByRole('listitem')).toHaveLength(2);
+        expect(screen.getByText('2 variations')).toBeInTheDocument();
+        expect(screen.getByText('(element: Boolean): String')).toBeInTheDocument();
+        expect(screen.getByText('(element: Map): String')).toBeInTheDocument();
 
-        consoleErrorSpy.mockRestore();
+        act(() => {
+            ref.current!.onKeyDown({event: new KeyboardEvent('keydown', {key: 'ArrowDown'})} as never);
+        });
+
+        expect(screen.queryByText('(element: Map): String')).not.toBeInTheDocument();
+
+        act(() => {
+            ref.current!.onKeyDown({event: new KeyboardEvent('keydown', {key: 'Enter'})} as never);
+        });
+
+        expect(command).toHaveBeenCalledWith(items[2]);
     });
 
     it('renders an empty state when there are no items', () => {

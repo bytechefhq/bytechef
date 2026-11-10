@@ -292,3 +292,25 @@ export function formatFunctionSignatureParts(definition: EvaluatorFunctionDefini
         returnType: formatFunctionType(definition.returnType),
     };
 }
+
+export interface FunctionOverloadGroupI {
+    name: string;
+    overloads: EvaluatorFunctionDefinition[];
+}
+
+// Collapses overloads (definitions sharing a name) into one entry, in order of each name's first appearance.
+export function groupFunctionOverloads(definitions: EvaluatorFunctionDefinition[]): FunctionOverloadGroupI[] {
+    const groupsByName = new Map<string, FunctionOverloadGroupI>();
+
+    for (const definition of definitions) {
+        const group = groupsByName.get(definition.name);
+
+        if (group) {
+            group.overloads.push(definition);
+        } else {
+            groupsByName.set(definition.name, {name: definition.name, overloads: [definition]});
+        }
+    }
+
+    return [...groupsByName.values()];
+}

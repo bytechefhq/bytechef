@@ -2,10 +2,10 @@ import './PropertyMentionsInputEditorSuggestionList.css';
 
 import {EvaluatorFunctionDefinition} from '@/shared/middleware/graphql';
 import {SuggestionProps} from '@tiptap/suggestion';
-import {forwardRef, useRef} from 'react';
+import {forwardRef, useMemo, useRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import {formatFunctionSignature} from './functionSuggestionUtils';
+import {formatFunctionSignature, groupFunctionOverloads} from './functionSuggestionUtils';
 import {SuggestionListRefType} from './suggestionPopupRenderer';
 import {useSuggestionListNavigation} from './useSuggestionListNavigation';
 
@@ -17,42 +17,76 @@ const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, Functio
     ({command, items}, ref) => {
         const listRef = useRef<HTMLUListElement>(null);
 
-        const selectItem = (index: number) => {
-            const item = items[index];
+        const groups = useMemo(() => groupFunctionOverloads(items), [items]);
 
-            if (item) {
-                command(item);
+        const selectItem = (index: number) => {
+            const group = groups[index];
+
+            if (group) {
+                command(group.overloads[0]);
             }
         };
 
-        const selectedIndex = useSuggestionListNavigation(items, ref, selectItem, listRef);
+        const selectedIndex = useSuggestionListNavigation(groups, ref, selectItem, listRef);
 
         return (
             <ul className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto" ref={listRef}>
-                {items.length ? (
-                    items.map((item, index) => (
-                        <li key={`${item.name}${formatFunctionSignature(item)}`}>
-                            <button
-                                className={twMerge('flex-col items-start', index === selectedIndex && 'is-selected')}
-                                onClick={() => selectItem(index)}
-                                type="button"
-                            >
-                                <span className="font-mono">
-                                    <span className="text-primary">{item.name}</span>
+                {groups.length ? (
+                    groups.map((group, index) => {
+                        const [firstOverload] = group.overloads;
+                        const hasVariations = group.overloads.length > 1;
 
-                                    <span className="text-muted-foreground">{formatFunctionSignature(item)}</span>
-                                </span>
+                        return (
+                            <li key={group.name}>
+                                <button
+                                    className={twMerge(
+                                        'flex-col items-start',
+                                        index === selectedIndex && 'is-selected'
+                                    )}
+                                    onClick={() => selectItem(index)}
+                                    type="button"
+                                >
+                                    <span className="flex w-full items-baseline gap-2">
+                                        <span className="font-mono">
+                                            <span className="text-primary">{group.name}</span>
 
-                                {index === selectedIndex && (
-                                    <span className="mt-1 text-xs whitespace-normal text-muted-foreground">
-                                        {item.description}
+                                            {!hasVariations && (
+                                                <span className="text-muted-foreground">
+                                                    {formatFunctionSignature(firstOverload)}
+                                                </span>
+                                            )}
+                                        </span>
 
-                                        {item.example && <span className="mt-0.5 block font-mono">{item.example}</span>}
+                                        {hasVariations && (
+                                            <span className="ml-auto shrink-0 text-xs text-muted-foreground">
+                                                {group.overloads.length} variations
+                                            </span>
+                                        )}
                                     </span>
-                                )}
-                            </button>
-                        </li>
-                    ))
+
+                                    {index === selectedIndex && (
+                                        <span className="mt-1 text-xs whitespace-normal text-muted-foreground">
+                                            {hasVariations && (
+                                                <span className="mb-1 block border-l border-border pl-2 font-mono">
+                                                    {group.overloads.map((overload) => (
+                                                        <span className="block" key={formatFunctionSignature(overload)}>
+                                                            {formatFunctionSignature(overload)}
+                                                        </span>
+                                                    ))}
+                                                </span>
+                                            )}
+
+                                            {firstOverload.description}
+
+                                            {firstOverload.example && (
+                                                <span className="mt-0.5 block font-mono">{firstOverload.example}</span>
+                                            )}
+                                        </span>
+                                    )}
+                                </button>
+                            </li>
+                        );
+                    })
                 ) : (
                     <span className="text-sm">No functions found.</span>
                 )}

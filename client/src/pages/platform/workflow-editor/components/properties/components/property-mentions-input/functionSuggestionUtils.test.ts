@@ -10,6 +10,7 @@ import {
     findFunctionSuggestionMatch,
     formatFunctionSignature,
     formatFunctionSignatureParts,
+    groupFunctionOverloads,
     isFormulaModeActive,
 } from './functionSuggestionUtils';
 
@@ -277,5 +278,18 @@ describe('formatFunctionSignatureParts', () => {
 
         expect(result.params).toEqual(['value: String', 'beginIndex: Integer']);
         expect(result.returnType).toBe('String');
+    });
+});
+
+describe('groupFunctionOverloads', () => {
+    it('collapses definitions sharing a name in first-appearance order', () => {
+        const first = {name: 'getOrDefault'} as EvaluatorFunctionDefinition;
+        const other = {name: 'concat'} as EvaluatorFunctionDefinition;
+        const second = {name: 'getOrDefault'} as EvaluatorFunctionDefinition;
+
+        expect(groupFunctionOverloads([first, other, second])).toEqual([
+            {name: 'getOrDefault', overloads: [first, second]},
+            {name: 'concat', overloads: [other]},
+        ]);
     });
 });
