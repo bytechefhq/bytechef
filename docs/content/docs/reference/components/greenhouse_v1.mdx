@@ -19,28 +19,31 @@ Type: greenhouse/v1
 Version: 1
 
 
-### Harvest API Key
+### Harvest V3 (OAuth)
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| username | Harvest API Key | STRING | The Harvest API key created in Greenhouse under Configure -&gt; Dev Center -&gt; API Credential Management. | true |
+| clientId | Client ID | STRING | The Client ID of your Harvest V3 (OAuth) API credentials. | true |
+| clientSecret | Client Secret | STRING | The Client Secret of your Harvest V3 (OAuth) API credentials. | true |
+| tokenUrl | Token URL | STRING | The Greenhouse OAuth token endpoint. | true |
 
 
 
 ## Connection Setup
 
-### Create a Harvest API Key
+### Create Harvest V3 (OAuth) Credentials
 
-1. Log in to [Greenhouse](https://app.greenhouse.io/) as a user with Developer permissions.
-2. Click the *Configure* icon and select *Dev Center*.
-3. Click *API Credential Management*.
-4. Click *Create New API Key*.
-5. Select *Harvest* as the API type, enter a description, and click *Manage permissions*.
-6. Copy the API key.
-7. Under *Candidates*, *Applications*, *Scorecards* and *Jobs*, enable the GET endpoints this component calls, then click *Save*.
-8. In ByteChef, paste the key into the *Harvest API Key* field. ByteChef sends it as the Basic Auth username with an empty password.
+1. Log in to [Greenhouse](https://app.greenhouse.io/) as a user who can manage API credentials.
+2. Open *API Credentials*.
+3. Click *Create new API credentials*.
+4. Select *Harvest V3 (OAuth)* and save the credential.
+5. Configure the scopes of the credential. This component needs `harvest:candidates:list`, `harvest:applications:list`, `harvest:scorecards:list` and `harvest:jobs:list`.
+6. Copy the *Client ID* and the *Client Secret*.
+7. In ByteChef, paste them into the *Client ID* and *Client Secret* fields. Keep the default *Token URL*, `https://auth.greenhouse.io/token`.
+
+ByteChef requests an access token with the OAuth 2.0 client credentials grant and sends it as a Bearer token to `https://harvest.greenhouse.io/v3`. Requests run as the integration service user that Greenhouse creates for the credentials.
 
 
 
@@ -53,7 +56,7 @@ Version: 1
 ### Get Application
 Name: getApplication
 
-`Get an application by ID, including its status, current stage, jobs and answers.`
+`Get an application by ID, including its status, current stage, job and answers.`
 
 #### Properties
 
@@ -85,21 +88,28 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | id | INTEGER | The ID of the application. |
-| candidate_id | INTEGER | The ID of the candidate who submitted the application. |
-| prospect | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the application is a prospect application rather than a candidate one. |
-| applied_at | STRING | ISO 8601 timestamp for when the application was submitted. |
-| rejected_at | STRING | ISO 8601 timestamp for when the application was rejected, if it was. |
-| last_activity_at | STRING | ISO 8601 timestamp of the last activity on the application. |
-| status | STRING | The status of the application: active, rejected, hired or converted. |
-| source | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(public_name)&#125; </details> | The source of the application. |
-| credited_to | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125; </details> | The user credited with sourcing the application. |
-| current_stage | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> | The current interview stage of the application. |
-| jobs | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> | The jobs the application is for. |
-| job_post_id | INTEGER | The ID of the job post the application was submitted through. |
-| rejection_reason | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The reason the application was rejected, if it was. |
-| answers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(question), STRING\(answer)&#125;] </details> | The answers to the job post application questions. |
-| attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(filename), STRING\(url), STRING\(type), STRING\(created_at)&#125;] </details> | Files attached to the application. Attachment URLs expire after 7 days. |
-| custom_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom field values of the application, keyed by field name. |
+| created_at | STRING | ISO 8601 timestamp for when the application was created. |
+| updated_at | STRING | ISO 8601 timestamp for when the application was last updated. |
+| candidate_id | INTEGER | The ID of the candidate this application belongs to. |
+| job_id | INTEGER | The ID of the job this application is on. Null for jobless prospect applications. |
+| job_post_id | INTEGER | The ID of the job post the candidate applied through. |
+| recruiter_id | INTEGER | The ID of the user assigned as recruiter on the application's job. |
+| coordinator_id | INTEGER | The ID of the user assigned as coordinator on the application's job. |
+| referrer_id | INTEGER | The ID of the referrer credited with this application. |
+| source_id | INTEGER | The ID of the source the application is attributed to. |
+| rejection_reason_id | INTEGER | The ID of the rejection reason selected for the application. |
+| stage_id | INTEGER | The ID of the interview stage the candidate is currently in. |
+| job_interview_stage_id | INTEGER | The ID of the job interview stage definition of the current stage. |
+| stage_name | STRING | The display name of the current interview stage. |
+| status | STRING | The lifecycle status of the application: in_process, rejected, hired or converted. |
+| needs_decision | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the application is waiting on a hiring team decision. |
+| prospect | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether this is a prospect application. |
+| rejected_at | STRING | ISO 8601 timestamp for when the application was rejected. |
+| last_activity_at | STRING | ISO 8601 timestamp of recent activity for the application's candidate. |
+| location_address | STRING | The free-form location captured on the application. |
+| answers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(question), STRING\(answer)&#125;] </details> | The answers the candidate provided on the job post application form. |
+| prospective_job_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | For prospect applications, the IDs of the jobs the prospect is considered for. |
+| custom_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom field values of the application. |
 
 
 
@@ -108,43 +118,30 @@ Type: OBJECT
 ```json
 {
   "id" : 1,
+  "created_at" : "",
+  "updated_at" : "",
   "candidate_id" : 1,
+  "job_id" : 1,
+  "job_post_id" : 1,
+  "recruiter_id" : 1,
+  "coordinator_id" : 1,
+  "referrer_id" : 1,
+  "source_id" : 1,
+  "rejection_reason_id" : 1,
+  "stage_id" : 1,
+  "job_interview_stage_id" : 1,
+  "stage_name" : "",
+  "status" : "",
+  "needs_decision" : false,
   "prospect" : false,
-  "applied_at" : "",
   "rejected_at" : "",
   "last_activity_at" : "",
-  "status" : "",
-  "source" : {
-    "id" : 1,
-    "public_name" : ""
-  },
-  "credited_to" : {
-    "id" : 1,
-    "first_name" : "",
-    "last_name" : "",
-    "name" : "",
-    "employee_id" : ""
-  },
-  "current_stage" : {
-    "id" : 1,
-    "name" : ""
-  },
-  "jobs" : [ {
-    "id" : 1,
-    "name" : ""
-  } ],
-  "job_post_id" : 1,
-  "rejection_reason" : { },
+  "location_address" : "",
   "answers" : [ {
     "question" : "",
     "answer" : ""
   } ],
-  "attachments" : [ {
-    "filename" : "",
-    "url" : "",
-    "type" : "",
-    "created_at" : ""
-  } ],
+  "prospective_job_ids" : [ 1 ],
   "custom_fields" : { }
 }
 ```
@@ -155,7 +152,7 @@ Type: OBJECT
 ### Get Candidate
 Name: getCandidate
 
-`Get a candidate by ID, including contact details, applications, tags and custom fields.`
+`Get a candidate by ID, including contact details, tags and custom fields.`
 
 #### Properties
 
@@ -187,26 +184,25 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | id | INTEGER | The ID of the candidate. |
-| first_name | STRING | The first name of the candidate. |
-| last_name | STRING | The last name of the candidate. |
-| company | STRING | The current company of the candidate. |
-| title | STRING | The current job title of the candidate. |
 | created_at | STRING | ISO 8601 timestamp for when the candidate was created. |
 | updated_at | STRING | ISO 8601 timestamp for when the candidate was last updated. |
-| last_activity | STRING | ISO 8601 timestamp of the last activity on the candidate. |
-| is_private | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the candidate is private. |
-| can_email | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the candidate can be emailed. |
-| application_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | The IDs of the applications of the candidate. |
+| first_name | STRING | The first name of the candidate. |
+| last_name | STRING | The last name of the candidate. |
+| preferred_name | STRING | The preferred name of the candidate. |
+| company | STRING | The current company of the candidate. |
+| title | STRING | The current job title of the candidate. |
+| last_activity_at | STRING | ISO 8601 timestamp of the most recent activity on the candidate's applications. |
+| private | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the candidate is private. |
+| can_email | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the candidate has consented to receive email. |
+| time_zone | STRING | The time zone of the candidate. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | The tag names applied to the candidate. |
+| linked_user_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | The IDs of Greenhouse users linked to the candidate. |
 | phone_numbers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), STRING\(type)&#125;] </details> | The phone numbers of the candidate. |
+| addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), STRING\(type)&#125;] </details> | The postal addresses of the candidate. |
 | email_addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), STRING\(type)&#125;] </details> | The email addresses of the candidate. |
-| addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), STRING\(type)&#125;] </details> | The addresses of the candidate. |
 | website_addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), STRING\(type)&#125;] </details> | The website addresses of the candidate. |
 | social_media_addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value)&#125;] </details> | The social media addresses of the candidate. |
-| recruiter | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125; </details> | The recruiter assigned to the candidate. |
-| coordinator | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125; </details> | The coordinator assigned to the candidate. |
-| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | The tags of the candidate. |
-| applications | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), INTEGER\(candidate_id), BOOLEAN\(prospect), STRING\(applied_at), STRING\(rejected_at), STRING\(last_activity_at), STRING\(status), &#123;INTEGER\(id), STRING\(public_name)&#125;\(source), &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125;\(credited_to), &#123;INTEGER\(id), STRING\(name)&#125;\(current_stage), [&#123;INTEGER\(id), STRING\(name)&#125;]\(jobs), INTEGER\(job_post_id), &#123;&#125;\(rejection_reason), [&#123;STRING\(question), STRING\(answer)&#125;]\(answers), [&#123;STRING\(filename), STRING\(url), STRING\(type), STRING\(created_at)&#125;]\(attachments), &#123;&#125;\(custom_fields)&#125;] </details> | The applications of the candidate. |
-| custom_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom field values of the candidate, keyed by field name. |
+| custom_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom field values of the candidate. |
 
 
 
@@ -215,25 +211,28 @@ Type: OBJECT
 ```json
 {
   "id" : 1,
-  "first_name" : "",
-  "last_name" : "",
-  "company" : "",
-  "title" : "",
   "created_at" : "",
   "updated_at" : "",
-  "last_activity" : "",
-  "is_private" : false,
+  "first_name" : "",
+  "last_name" : "",
+  "preferred_name" : "",
+  "company" : "",
+  "title" : "",
+  "last_activity_at" : "",
+  "private" : false,
   "can_email" : false,
-  "application_ids" : [ 1 ],
+  "time_zone" : "",
+  "tags" : [ "" ],
+  "linked_user_ids" : [ 1 ],
   "phone_numbers" : [ {
     "value" : "",
     "type" : ""
   } ],
-  "email_addresses" : [ {
+  "addresses" : [ {
     "value" : "",
     "type" : ""
   } ],
-  "addresses" : [ {
+  "email_addresses" : [ {
     "value" : "",
     "type" : ""
   } ],
@@ -243,62 +242,6 @@ Type: OBJECT
   } ],
   "social_media_addresses" : [ {
     "value" : ""
-  } ],
-  "recruiter" : {
-    "id" : 1,
-    "first_name" : "",
-    "last_name" : "",
-    "name" : "",
-    "employee_id" : ""
-  },
-  "coordinator" : {
-    "id" : 1,
-    "first_name" : "",
-    "last_name" : "",
-    "name" : "",
-    "employee_id" : ""
-  },
-  "tags" : [ "" ],
-  "applications" : [ {
-    "id" : 1,
-    "candidate_id" : 1,
-    "prospect" : false,
-    "applied_at" : "",
-    "rejected_at" : "",
-    "last_activity_at" : "",
-    "status" : "",
-    "source" : {
-      "id" : 1,
-      "public_name" : ""
-    },
-    "credited_to" : {
-      "id" : 1,
-      "first_name" : "",
-      "last_name" : "",
-      "name" : "",
-      "employee_id" : ""
-    },
-    "current_stage" : {
-      "id" : 1,
-      "name" : ""
-    },
-    "jobs" : [ {
-      "id" : 1,
-      "name" : ""
-    } ],
-    "job_post_id" : 1,
-    "rejection_reason" : { },
-    "answers" : [ {
-      "question" : "",
-      "answer" : ""
-    } ],
-    "attachments" : [ {
-      "filename" : "",
-      "url" : "",
-      "type" : "",
-      "created_at" : ""
-    } ],
-    "custom_fields" : { }
   } ],
   "custom_fields" : { }
 }
@@ -310,7 +253,7 @@ Type: OBJECT
 ### Get Job
 Name: getJob
 
-`Get a job by ID, including its status, departments, offices, hiring team and openings.`
+`Get a job by ID, including its status, department, offices and custom fields.`
 
 #### Properties
 
@@ -342,22 +285,22 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | id | INTEGER | The ID of the job. |
-| name | STRING | The name of the job. |
-| requisition_id | STRING | The requisition ID of the job. |
-| notes | STRING | Notes on the job. |
-| confidential | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the job is confidential. |
-| status | STRING | The status of the job: open, closed or draft. |
 | created_at | STRING | ISO 8601 timestamp for when the job was created. |
-| opened_at | STRING | ISO 8601 timestamp for when the job was opened. |
-| closed_at | STRING | ISO 8601 timestamp for when the job was closed. |
 | updated_at | STRING | ISO 8601 timestamp for when the job was last updated. |
+| name | STRING | The internal job title. |
+| requisition_id | STRING | The external requisition identifier of the job. |
+| notes | STRING | Internal HTML notes about the job. |
+| confidential | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the job is confidential. |
+| status | STRING | The lifecycle status of the job: draft, open or closed. |
+| opened_at | STRING | ISO 8601 timestamp for when the job first transitioned to open. |
+| closed_at | STRING | ISO 8601 timestamp for when the job most recently transitioned to closed. |
 | is_template | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the job is a template. |
 | copied_from_id | INTEGER | The ID of the job this job was copied from. |
-| departments | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> | The departments of the job. |
-| offices | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> | The offices of the job. |
-| hiring_team | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The hiring team of the job: hiring managers, recruiters, coordinators and sourcers. |
-| openings | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(opening_id), STRING\(status), STRING\(opened_at), STRING\(closed_at), INTEGER\(application_id)&#125;] </details> | The openings of the job. |
-| custom_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom field values of the job, keyed by field name. |
+| department_id | INTEGER | The ID of the department the job is assigned to. |
+| external_department_id | STRING | The external ID of the department the job is assigned to. |
+| office_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | The IDs of the offices the job is assigned to. |
+| external_office_ids | ARRAY <details> <summary> Items </summary> [STRING] </details> | The external IDs of the offices the job is assigned to. |
+| custom_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom field values of the job. |
 
 
 
@@ -366,34 +309,21 @@ Type: OBJECT
 ```json
 {
   "id" : 1,
+  "created_at" : "",
+  "updated_at" : "",
   "name" : "",
   "requisition_id" : "",
   "notes" : "",
   "confidential" : false,
   "status" : "",
-  "created_at" : "",
   "opened_at" : "",
   "closed_at" : "",
-  "updated_at" : "",
   "is_template" : false,
   "copied_from_id" : 1,
-  "departments" : [ {
-    "id" : 1,
-    "name" : ""
-  } ],
-  "offices" : [ {
-    "id" : 1,
-    "name" : ""
-  } ],
-  "hiring_team" : { },
-  "openings" : [ {
-    "id" : 1,
-    "opening_id" : "",
-    "status" : "",
-    "opened_at" : "",
-    "closed_at" : "",
-    "application_id" : 1
-  } ],
+  "department_id" : 1,
+  "external_department_id" : "",
+  "office_ids" : [ 1 ],
+  "external_office_ids" : [ "" ],
   "custom_fields" : { }
 }
 ```
@@ -404,13 +334,14 @@ Type: OBJECT
 ### List Scorecards for Application
 Name: listApplicationScorecards
 
-`List all submitted scorecards for an application, including ratings, recommendations and question answers.`
+`List the scorecards of an application, including the overall recommendation, notes and interviewer.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | applicationId | Application ID | STRING | The ID of the application whose scorecards to list. | true |
+| status | Status | STRING <details> <summary> Options </summary> <span>complete</span>, <span>draft</span> </details> | Return only scorecards with this status. Complete scorecards are submitted feedback, draft scorecards are autosaved working copies. Leave empty to return both. | false |
 
 #### Example JSON Structure
 ```json
@@ -418,7 +349,8 @@ Name: listApplicationScorecards
   "label" : "List Scorecards for Application",
   "name" : "listApplicationScorecards",
   "parameters" : {
-    "applicationId" : ""
+    "applicationId" : "",
+    "status" : ""
   },
   "type" : "greenhouse/v1/listApplicationScorecards"
 }
@@ -440,18 +372,17 @@ Items Type: OBJECT
 | id | INTEGER | The ID of the scorecard. |
 | created_at | STRING | ISO 8601 timestamp for when the scorecard was created. |
 | updated_at | STRING | ISO 8601 timestamp for when the scorecard was last updated. |
-| interview | STRING | The name of the interview. |
-| interview_step | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> | The interview step the scorecard was submitted for. |
-| candidate_id | INTEGER | The ID of the candidate. |
-| application_id | INTEGER | The ID of the application. |
+| application_id | INTEGER | The ID of the application the scorecard belongs to. |
+| interview_kit_id | INTEGER | The ID of the interview kit the scorecard was filled out against. |
+| interviewer_id | INTEGER | The ID of the user who participated in the interview. |
+| submitter_id | INTEGER | The ID of the user who submitted the scorecard. |
 | interviewed_at | STRING | ISO 8601 timestamp for when the interview took place. |
-| submitted_by | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125; </details> | The user who submitted the scorecard. |
-| interviewer | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125; </details> | The user who conducted the interview. |
 | submitted_at | STRING | ISO 8601 timestamp for when the scorecard was submitted. |
-| overall_recommendation | STRING | The overall recommendation: definitely_not, no, mixed, yes, strong_yes or no_decision. |
-| attributes | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type), STRING\(note), STRING\(rating)&#125;] </details> | The rated attributes of the scorecard. |
-| ratings | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The attribute names grouped by rating. |
-| questions | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(question), STRING\(answer)&#125;] </details> | The scorecard questions and their answers. |
+| status | STRING | The lifecycle status of the scorecard: draft or complete. |
+| candidate_rating | STRING | The interviewer's overall recommendation. |
+| notes | STRING | The key takeaways the interviewer recorded. |
+| public_notes | STRING | The note the interviewer left for other interviewers. |
+| private_notes | STRING | The private notes, visible only to users allowed to see private notes. |
 
 
 
@@ -463,42 +394,17 @@ Items Type: OBJECT
   "id" : 1,
   "created_at" : "",
   "updated_at" : "",
-  "interview" : "",
-  "interview_step" : {
-    "id" : 1,
-    "name" : ""
-  },
-  "candidate_id" : 1,
   "application_id" : 1,
+  "interview_kit_id" : 1,
+  "interviewer_id" : 1,
+  "submitter_id" : 1,
   "interviewed_at" : "",
-  "submitted_by" : {
-    "id" : 1,
-    "first_name" : "",
-    "last_name" : "",
-    "name" : "",
-    "employee_id" : ""
-  },
-  "interviewer" : {
-    "id" : 1,
-    "first_name" : "",
-    "last_name" : "",
-    "name" : "",
-    "employee_id" : ""
-  },
   "submitted_at" : "",
-  "overall_recommendation" : "",
-  "attributes" : [ {
-    "name" : "",
-    "type" : "",
-    "note" : "",
-    "rating" : ""
-  } ],
-  "ratings" : { },
-  "questions" : [ {
-    "id" : 1,
-    "question" : "",
-    "answer" : ""
-  } ]
+  "status" : "",
+  "candidate_rating" : "",
+  "notes" : "",
+  "public_notes" : "",
+  "private_notes" : ""
 } ]
 ```
 
