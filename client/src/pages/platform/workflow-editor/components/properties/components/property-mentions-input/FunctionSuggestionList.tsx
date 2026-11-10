@@ -69,17 +69,17 @@ const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, Functio
                                             {hasVariations ? (
                                                 group.overloads.map((overload) => (
                                                     <span
-                                                        className="mt-1 block border-l border-border pl-2 first:mt-0"
+                                                        className="mt-3 block border-l border-border pl-2 first:mt-0"
                                                         key={formatFunctionSignature(overload)}
                                                     >
-                                                        <span className="block font-mono">
+                                                        <span className="block font-mono text-foreground">
                                                             {formatFunctionSignature(overload)}
                                                         </span>
 
                                                         {overload.description}
 
                                                         {overload.example && (
-                                                            <span className="mt-0.5 block font-mono">
+                                                            <span className="mt-0.5 block font-mono text-primary">
                                                                 {overload.example}
                                                             </span>
                                                         )}
@@ -90,7 +90,7 @@ const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, Functio
                                                     {firstOverload.description}
 
                                                     {firstOverload.example && (
-                                                        <span className="mt-0.5 block font-mono">
+                                                        <span className="mt-0.5 block font-mono text-primary">
                                                             {firstOverload.example}
                                                         </span>
                                                     )}

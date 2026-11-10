@@ -9,6 +9,7 @@ declare module '@tiptap/core' {
         MentionStorage: {
             controlType?: string;
             dataPills: DataPillType[];
+            propertyType?: string;
             /** Whether a `$` data-pill or `=` function suggestion popup is showing over this editor. */
             suggestionOpen: boolean;
         };

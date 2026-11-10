@@ -4,14 +4,18 @@ import {describe, expect, it} from 'vitest';
 import {
     buildFunctionInsertion,
     filterFunctionDefinitions,
+    filterFunctionDefinitionsForArgument,
     findEnclosingFunctionCall,
+    findEnclosingFunctionCallChain,
     findForcedFunctionSuggestionMatch,
     findForcedFunctionSuggestionStart,
     findFunctionSuggestionMatch,
     formatFunctionSignature,
     formatFunctionSignatureParts,
+    getPropertyFunctionType,
     groupFunctionOverloads,
     isFormulaModeActive,
+    isFunctionTypeCompatible,
 } from './functionSuggestionUtils';
 
 function definition(overrides: Partial<EvaluatorFunctionDefinition>): EvaluatorFunctionDefinition {
@@ -41,6 +45,24 @@ describe('formatFunctionSignature', () => {
         );
 
         expect(result).toBe('(value: String, beginIndex: Integer): String');
+    });
+
+    it('names types the way data pills do', () => {
+        const result = formatFunctionSignature(
+            definition({
+                name: 'convert',
+                parameters: [
+                    {description: '', name: 'list', required: true, type: EvaluatorFunctionType.List},
+                    {description: '', name: 'map', required: true, type: EvaluatorFunctionType.Map},
+                    {description: '', name: 'long', required: true, type: EvaluatorFunctionType.Long},
+                    {description: '', name: 'double', required: true, type: EvaluatorFunctionType.Double},
+                    {description: '', name: 'character', required: true, type: EvaluatorFunctionType.Character},
+                ],
+                returnType: EvaluatorFunctionType.Datetime,
+            })
+        );
+
+        expect(result).toBe('(list: Array, map: Object, long: Integer, double: Number, character: String): Date Time');
     });
 
     it('formats a zero-argument signature', () => {
@@ -89,6 +111,156 @@ describe('buildFunctionInsertion', () => {
     it('builds the call text and the caret offset between the parens', () => {
         expect(buildFunctionInsertion('concat')).toEqual({caretOffset: 7, content: 'concat()'});
     });
+
+    it('inserts only the name when an argument list already follows', () => {
+        expect(buildFunctionInsertion('concat', '(a, b)')).toEqual({caretOffset: 7, content: 'concat'});
+    });
+});
+
+describe('isFunctionTypeCompatible', () => {
+    it('accepts any type for an Any parameter or an Any return type', () => {
+        expect(isFunctionTypeCompatible(EvaluatorFunctionType.Any, EvaluatorFunctionType.Map)).toBe(true);
+        expect(isFunctionTypeCompatible(EvaluatorFunctionType.List, EvaluatorFunctionType.Any)).toBe(true);
+    });
+
+    it('treats every numeric type as one family', () => {
+        expect(isFunctionTypeCompatible(EvaluatorFunctionType.Number, EvaluatorFunctionType.Integer)).toBe(true);
+        expect(isFunctionTypeCompatible(EvaluatorFunctionType.Long, EvaluatorFunctionType.Double)).toBe(true);
+    });
+
+    it('treats a character as a string', () => {
+        expect(isFunctionTypeCompatible(EvaluatorFunctionType.String, EvaluatorFunctionType.Character)).toBe(true);
+    });
+
+    it('rejects a different type', () => {
+        expect(isFunctionTypeCompatible(EvaluatorFunctionType.Number, EvaluatorFunctionType.String)).toBe(false);
+    });
+});
+
+describe('filterFunctionDefinitionsForArgument', () => {
+    const definitions = [
+        definition({name: 'concat', returnType: EvaluatorFunctionType.String}),
+        definition({name: 'size', returnType: EvaluatorFunctionType.Integer}),
+        definition({name: 'contains', returnType: EvaluatorFunctionType.Boolean}),
+        definition({
+            name: 'lower',
+            parameters: [{description: '', name: 'text', required: true, type: EvaluatorFunctionType.String}],
+            returnType: EvaluatorFunctionType.String,
+        }),
+        definition({
+            name: 'getOrDefault',
+            parameters: [
+                {description: '', name: 'dataPill', required: true, type: EvaluatorFunctionType.Any},
+                {description: '', name: 'defaultValue', required: true, type: EvaluatorFunctionType.Number},
+            ],
+            returnType: EvaluatorFunctionType.Number,
+        }),
+        definition({
+            name: 'getOrDefault',
+            parameters: [
+                {description: '', name: 'dataPill', required: true, type: EvaluatorFunctionType.Any},
+                {description: '', name: 'defaultValue', required: true, type: EvaluatorFunctionType.String},
+            ],
+            returnType: EvaluatorFunctionType.String,
+        }),
+    ];
+
+    it('keeps every function outside a call', () => {
+        expect(filterFunctionDefinitionsForArgument(definitions, [])).toBe(definitions);
+    });
+
+    it('keeps every function for an Any parameter', () => {
+        expect(filterFunctionDefinitionsForArgument(definitions, [{argIndex: 0, name: 'getOrDefault'}])).toBe(
+            definitions
+        );
+    });
+
+    it('keeps every function inside an unknown call', () => {
+        expect(filterFunctionDefinitionsForArgument(definitions, [{argIndex: 0, name: 'unknown'}])).toBe(definitions);
+    });
+
+    it('keeps the functions that fit the parameter of any overload', () => {
+        const result = filterFunctionDefinitionsForArgument(definitions, [{argIndex: 1, name: 'getOrDefault'}]);
+
+        expect(result.map((item) => item.name)).toEqual(['concat', 'size', 'lower', 'getOrDefault', 'getOrDefault']);
+    });
+
+    it('picks the overload whose return type fits the expression type', () => {
+        const result = filterFunctionDefinitionsForArgument(
+            definitions,
+            [{argIndex: 1, name: 'getOrDefault'}],
+            EvaluatorFunctionType.Integer
+        );
+
+        expect(result.map((item) => item.name)).toEqual(['size', 'getOrDefault']);
+    });
+
+    it('keeps every overload when none fits the expression type', () => {
+        const result = filterFunctionDefinitionsForArgument(
+            definitions,
+            [{argIndex: 1, name: 'getOrDefault'}],
+            EvaluatorFunctionType.Boolean
+        );
+
+        expect(result.map((item) => item.name)).toEqual(['concat', 'size', 'lower', 'getOrDefault', 'getOrDefault']);
+    });
+
+    it('narrows a nested call by the parameter of the call around it', () => {
+        const result = filterFunctionDefinitionsForArgument(definitions, [
+            {argIndex: 0, name: 'lower'},
+            {argIndex: 1, name: 'getOrDefault'},
+        ]);
+
+        expect(result.map((item) => item.name)).toEqual(['concat', 'lower', 'getOrDefault']);
+    });
+
+    it('passes the expected type through a grouping paren', () => {
+        const result = filterFunctionDefinitionsForArgument(definitions, [
+            {argIndex: 0, name: 'lower'},
+            {argIndex: 0, name: ''},
+        ]);
+
+        expect(result.map((item) => item.name)).toEqual(['concat', 'lower', 'getOrDefault']);
+    });
+
+    it('keeps every function past the last parameter', () => {
+        expect(filterFunctionDefinitionsForArgument(definitions, [{argIndex: 2, name: 'getOrDefault'}])).toBe(
+            definitions
+        );
+    });
+});
+
+describe('getPropertyFunctionType', () => {
+    it('maps a property type to the function type its value must have', () => {
+        expect(getPropertyFunctionType('INTEGER')).toBe(EvaluatorFunctionType.Integer);
+        expect(getPropertyFunctionType('ARRAY')).toBe(EvaluatorFunctionType.List);
+        expect(getPropertyFunctionType('OBJECT')).toBe(EvaluatorFunctionType.Map);
+        expect(getPropertyFunctionType('DATE_TIME')).toBe(EvaluatorFunctionType.Datetime);
+    });
+
+    it('returns null for a type without a function type', () => {
+        expect(getPropertyFunctionType('FILE_ENTRY')).toBeNull();
+        expect(getPropertyFunctionType(undefined)).toBeNull();
+    });
+});
+
+describe('findEnclosingFunctionCallChain', () => {
+    it('lists the closed calls around the caret, outermost first', () => {
+        expect(findEnclosingFunctionCallChain('getOrDefault(x, lower(', ')) + 1')).toEqual({
+            calls: [
+                {argIndex: 1, name: 'getOrDefault'},
+                {argIndex: 0, name: 'lower'},
+            ],
+            isOutermostCallIncluded: true,
+        });
+    });
+
+    it('leaves out an outer call that is not closed yet', () => {
+        expect(findEnclosingFunctionCallChain('getOrDefault(x, lower(', ')')).toEqual({
+            calls: [{argIndex: 0, name: 'lower'}],
+            isOutermostCallIncluded: false,
+        });
+    });
 });
 
 describe('findFunctionSuggestionMatch', () => {
@@ -130,6 +302,20 @@ describe('findFunctionSuggestionMatch', () => {
         const $position = {nodeBefore: {isText: true, text: "=concat('a', conc"}, pos: 19} as never;
 
         expect(findFunctionSuggestionMatch({$position})?.query).toBe('conc');
+    });
+
+    it('covers the rest of the word after the caret', () => {
+        const $position = {
+            nodeAfter: {isText: true, text: 'cat(a)'},
+            nodeBefore: {isText: true, text: 'con'},
+            pos: 4,
+        } as never;
+
+        expect(findFunctionSuggestionMatch({$position})).toEqual({
+            query: 'con',
+            range: {from: 1, to: 7},
+            text: 'concat',
+        });
     });
 
     it('returns null when the word is the tail of a $ datapill token', () => {
@@ -190,6 +376,34 @@ describe('findForcedFunctionSuggestionMatch', () => {
         const $position = {nodeBefore: {isText: true, text: 'add(c,'}, pos: 7} as never;
 
         expect(findForcedFunctionSuggestionMatch({$position}, 5)).toBeNull();
+    });
+
+    it('covers the rest of the word after the caret', () => {
+        const $position = {
+            nodeAfter: {isText: true, text: 'Default(x)'},
+            nodeBefore: {isText: true, text: 'getOr'},
+            pos: 6,
+        } as never;
+
+        expect(findForcedFunctionSuggestionMatch({$position}, 1)).toEqual({
+            query: 'getOr',
+            range: {from: 1, to: 13},
+            text: 'getOrDefault',
+        });
+    });
+
+    it('does not cover a value that starts right after the caret', () => {
+        const $position = {
+            nodeAfter: {isText: true, text: '0)'},
+            nodeBefore: {isText: true, text: 'add(x, '},
+            pos: 8,
+        } as never;
+
+        expect(findForcedFunctionSuggestionMatch({$position}, 8)).toEqual({
+            query: '',
+            range: {from: 8, to: 8},
+            text: '',
+        });
     });
 
     it('returns null when the caret moved before the forced start', () => {

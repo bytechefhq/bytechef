@@ -1,4 +1,5 @@
 import {EvaluatorFunctionDefinition} from '@/shared/middleware/graphql';
+import {Node as ProseMirrorNode} from '@tiptap/pm/model';
 import {Editor} from '@tiptap/react';
 import {SuggestionOptions} from '@tiptap/suggestion';
 
@@ -6,11 +7,44 @@ import FunctionSuggestionList from './FunctionSuggestionList';
 import {
     buildFunctionInsertion,
     filterFunctionDefinitions,
+    filterFunctionDefinitionsForArgument,
+    findEnclosingFunctionCallChain,
     findForcedFunctionSuggestionMatch,
     findFunctionSuggestionMatch,
+    getPropertyFunctionType,
     isFormulaModeActive,
 } from './functionSuggestionUtils';
 import {createSuggestionPopupRenderer} from './suggestionPopupRenderer';
+
+export const FORCED_FUNCTION_SUGGESTION_META = 'forcedFunctionSuggestion';
+
+interface ContextFunctionDefinitionsPropsI {
+    caret: number;
+    document: ProseMirrorNode;
+    editor: Editor;
+    query: string;
+    wordFrom: number;
+}
+
+function getContextFunctionDefinitions({
+    caret,
+    document,
+    editor,
+    query,
+    wordFrom,
+}: ContextFunctionDefinitionsPropsI): EvaluatorFunctionDefinition[] {
+    const definitions: EvaluatorFunctionDefinition[] = editor.storage.FunctionSuggestion?.functionDefinitions ?? [];
+    const $caret = document.resolve(caret);
+    const textBeforeWord = document.textBetween($caret.start(), wordFrom, '\n', '');
+    const textAfterCaret = document.textBetween(caret, $caret.end(), '\n', '');
+
+    const {calls, isOutermostCallIncluded} = findEnclosingFunctionCallChain(textBeforeWord, textAfterCaret);
+    const expressionType = isOutermostCallIncluded
+        ? getPropertyFunctionType(editor.storage.MentionStorage?.propertyType)
+        : null;
+
+    return filterFunctionDefinitions(filterFunctionDefinitionsForArgument(definitions, calls, expressionType), query);
+}
 
 export interface ForcedFunctionSuggestionI {
     clear: () => void;
@@ -29,7 +63,8 @@ export function getFunctionSuggestionOptions(
         allow: ({editor, isActive}) => (editor.isFocused || isActive === true) && isFormulaModeActive(editor),
         char: '',
         command: ({editor, props, range}) => {
-            const {caretOffset, content} = buildFunctionInsertion(props.name);
+            const textAfterRange = editor.state.doc.resolve(range.to).nodeAfter?.text ?? '';
+            const {caretOffset, content} = buildFunctionInsertion(props.name, textAfterRange);
 
             editor.chain().focus().insertContentAt(range, content).run();
 
@@ -51,10 +86,15 @@ export function getFunctionSuggestionOptions(
             return findFunctionSuggestionMatch(config);
         },
         items: ({editor, query}): EvaluatorFunctionDefinition[] => {
-            const definitions: EvaluatorFunctionDefinition[] =
-                editor.storage.FunctionSuggestion?.functionDefinitions ?? [];
+            const {doc, selection} = editor.state;
 
-            return filterFunctionDefinitions(definitions, query);
+            return getContextFunctionDefinitions({
+                caret: selection.from,
+                document: doc,
+                editor,
+                query,
+                wordFrom: selection.from - query.length,
+            });
         },
         render: () => {
             const popupLifecycle = renderPopup();
@@ -68,15 +108,14 @@ export function getFunctionSuggestionOptions(
                 },
             };
         },
-        // Don't activate the suggestion (and therefore don't open a popup) unless at least one function
-        // matches. The trailing-word match fires on any word — including plain argument values like
-        // "true" — so without this the popup would appear empty ("No functions found.") next to the
-        // signature tooltip.
-        shouldShow: ({editor, query}: {editor: Editor; query: string}) => {
-            const definitions: EvaluatorFunctionDefinition[] =
-                editor.storage.FunctionSuggestion?.functionDefinitions ?? [];
-
-            return filterFunctionDefinitions(definitions, query).length > 0;
-        },
+        shouldResetDismissed: ({transaction}) => transaction.getMeta(FORCED_FUNCTION_SUGGESTION_META) === true,
+        shouldShow: ({editor, query, range, transaction}) =>
+            getContextFunctionDefinitions({
+                caret: transaction.selection.from,
+                document: transaction.doc,
+                editor,
+                query,
+                wordFrom: range.from,
+            }).length > 0,
     };
 }

@@ -734,7 +734,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
             editor.storage.MentionStorage.dataPills = dataPills;
             editor.storage.MentionStorage.controlType = controlType;
-        }, [controlType, dataPills, editor]);
+            editor.storage.MentionStorage.propertyType = type;
+        }, [controlType, dataPills, editor, type]);
 
         useEffect(() => {
             if (!editor || !focusRequest || appliedFocusTokenRef.current === focusRequest.token) {
