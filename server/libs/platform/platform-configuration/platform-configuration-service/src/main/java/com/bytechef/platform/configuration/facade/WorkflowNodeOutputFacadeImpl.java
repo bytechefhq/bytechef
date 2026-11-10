@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.configuration.util.WorkflowTaskUtils;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
@@ -55,6 +56,7 @@ import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefi
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -176,7 +178,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     public List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(
         String workflowId, String lastWorkflowNodeName, long environmentId) {
 
-        return doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName, environmentId, new HashMap<>());
+        return doGetPreviousWorkflowNodeOutputs(
+            workflowId, lastWorkflowNodeName, environmentId, true, new HashMap<>());
     }
 
     @Override
@@ -310,6 +313,55 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
     }
 
+    private static @Nullable List<WorkflowTask> getRepeatedWorkflowTasks(
+        Workflow workflow, @Nullable String workflowNodeName) {
+
+        if (workflowNodeName == null) {
+            return null;
+        }
+
+        List<WorkflowTask> repeatedScopeWorkflowTasks = null;
+        int repeatedScopeSize = Integer.MAX_VALUE;
+
+        for (WorkflowTask workflowTask : workflow.getTasks(true)) {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+            if (!Objects.equals(workflowNodeType.name(), "loop")) {
+                continue;
+            }
+
+            List<WorkflowTask> iterateeWorkflowTasks = getWorkflowTaskList(workflowTask.getParameters(), "iteratee");
+
+            List<WorkflowTask> iterateeSubtreeWorkflowTasks = WorkflowTaskUtils.getTasks(iterateeWorkflowTasks, null);
+
+            boolean containsWorkflowNode = iterateeSubtreeWorkflowTasks.stream()
+                .anyMatch(iterateeWorkflowTask -> Objects.equals(iterateeWorkflowTask.getName(), workflowNodeName));
+
+            if (containsWorkflowNode && iterateeSubtreeWorkflowTasks.size() < repeatedScopeSize) {
+                repeatedScopeWorkflowTasks = iterateeWorkflowTasks;
+                repeatedScopeSize = iterateeSubtreeWorkflowTasks.size();
+            }
+        }
+
+        if (repeatedScopeWorkflowTasks == null || repeatedScopeWorkflowTasks.isEmpty()) {
+            return null;
+        }
+
+        WorkflowTask lastRepeatedWorkflowTask = repeatedScopeWorkflowTasks.getLast();
+
+        Map<String, WorkflowTask> workflowTaskMap = new LinkedHashMap<>();
+
+        for (WorkflowTask workflowTask : workflow.getTasks(workflowNodeName)) {
+            workflowTaskMap.putIfAbsent(workflowTask.getName(), workflowTask);
+        }
+
+        for (WorkflowTask workflowTask : workflow.getTasks(lastRepeatedWorkflowTask.getName())) {
+            workflowTaskMap.putIfAbsent(workflowTask.getName(), workflowTask);
+        }
+
+        return new ArrayList<>(workflowTaskMap.values());
+    }
+
     private static List<WorkflowTask> getWorkflowTaskList(Map<String, ?> parameters, String key) {
         return MapUtils.getList(parameters, key, new TypeReference<Map<String, ?>>() {}, List.of())
             .stream()
@@ -318,7 +370,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     private List<WorkflowNodeOutputDTO> doGetPreviousWorkflowNodeOutputs(
-        String workflowId, String lastWorkflowNodeName, long environmentId,
+        String workflowId, String lastWorkflowNodeName, long environmentId, boolean includeRepeatedTasks,
         Map<String, Map<String, ?>> sampleOutputsCache) {
 
         List<WorkflowNodeOutputDTO> workflowNodeOutputDTOs = new ArrayList<>();
@@ -340,10 +392,16 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             }
         }
 
-        List<WorkflowTask> workflowTasks = workflow.getTasks(lastWorkflowNodeName);
+        List<WorkflowTask> repeatedWorkflowTasks = includeRepeatedTasks
+            ? getRepeatedWorkflowTasks(workflow, lastWorkflowNodeName) : null;
+
+        List<WorkflowTask> workflowTasks = repeatedWorkflowTasks == null
+            ? workflow.getTasks(lastWorkflowNodeName) : repeatedWorkflowTasks;
 
         for (WorkflowTask workflowTask : workflowTasks) {
-            if (lastWorkflowNodeName != null && Objects.equals(workflowTask.getName(), lastWorkflowNodeName)) {
+            if (repeatedWorkflowTasks == null && lastWorkflowNodeName != null &&
+                Objects.equals(workflowTask.getName(), lastWorkflowNodeName)) {
+
                 break;
             }
 
@@ -383,7 +441,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
 
         Map<String, ?> result =
-            doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName, environmentId, sampleOutputsCache)
+            doGetPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName, environmentId, false, sampleOutputsCache)
                 .stream()
                 .filter(workflowNodeOutputDTO -> workflowNodeOutputDTO.getSampleOutput() != null ||
                     workflowNodeOutputDTO.getVariableSampleOutput() != null)

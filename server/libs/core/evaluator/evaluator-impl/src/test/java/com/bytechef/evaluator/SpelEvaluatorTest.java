@@ -1201,14 +1201,14 @@ class SpelEvaluatorTest {
 
     @Test
     void testExistsIsFalseForAMissingVariable() {
-        Map<String, Object> map = EVALUATOR.evaluate(Map.of("result", "=exists('attempts')"), Map.of());
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("result", "=exists(${attempts})"), Map.of());
 
         assertEquals(false, map.get("result"));
     }
 
     @Test
     void testExistsIsTrueForAPresentVariable() {
-        Map<String, Object> map = EVALUATOR.evaluate(Map.of("result", "=exists('attempts')"), Map.of("attempts", 1));
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("result", "=exists(${attempts})"), Map.of("attempts", 1));
 
         assertEquals(true, map.get("result"));
     }
@@ -1219,7 +1219,7 @@ class SpelEvaluatorTest {
 
         context.put("attempts", null);
 
-        Map<String, Object> map = EVALUATOR.evaluate(Map.of("result", "=exists('attempts')"), context);
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("result", "=exists(${attempts})"), context);
 
         assertEquals(false, map.get("result"));
     }
@@ -1230,8 +1230,8 @@ class SpelEvaluatorTest {
 
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of(
-                "present", "=exists('judge.answers.score')", "missingLeaf", "=exists('judge.answers.other')",
-                "missingParent", "=exists('judge.verdict.score')", "notAMap", "=exists('judge.answers.score.value')"),
+                "present", "=exists(${judge.answers.score})", "missingLeaf", "=exists(${judge.answers.other})",
+                "missingParent", "=exists(${judge.verdict.score})", "notAMap", "=exists(${judge.answers.score.value})"),
             context);
 
         assertEquals(true, map.get("present"));
@@ -1243,7 +1243,7 @@ class SpelEvaluatorTest {
     @Test
     void testExistsGuardsAReferenceToAStepThatHasNotRun() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("result", "=exists('judge') ? ${judge.score} : 0"), Map.of());
+            Map.of("result", "=exists(${judge}) ? ${judge.score} : 0"), Map.of());
 
         assertEquals(0, map.get("result"));
     }
@@ -1251,9 +1251,9 @@ class SpelEvaluatorTest {
     @Test
     void testGetOrDefaultCountsFromTheDefaultOnTheFirstPass() {
         Map<String, Object> first = EVALUATOR.evaluate(
-            Map.of("attempts", "=getOrDefault('attempts', 0) + 1"), Map.of());
+            Map.of("attempts", "=getOrDefault(${attempts}, 0) + 1"), Map.of());
         Map<String, Object> second = EVALUATOR.evaluate(
-            Map.of("attempts", "=getOrDefault('attempts', 0) + 1"), Map.of("attempts", 1));
+            Map.of("attempts", "=getOrDefault(${attempts}, 0) + 1"), Map.of("attempts", 1));
 
         assertEquals(1, first.get("attempts"));
         assertEquals(2, second.get("attempts"));
@@ -1266,7 +1266,7 @@ class SpelEvaluatorTest {
         context.put("feedback", null);
 
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("result", "=${question} + getOrDefault('feedback', '')"),
+            Map.of("result", "=${question} + getOrDefault(${feedback}, '')"),
             withQuestion(context));
 
         assertEquals("Why?", map.get("result"));
@@ -1278,8 +1278,8 @@ class SpelEvaluatorTest {
 
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of(
-                "present", "=getOrDefault('judge.answers.ok.isTrue', false)",
-                "missing", "=getOrDefault('judge.answers.other.isTrue', false)"),
+                "present", "=getOrDefault(${judge.answers.ok.isTrue}, false)",
+                "missing", "=getOrDefault(${judge.answers.other.isTrue}, false)"),
             context);
 
         assertEquals(true, map.get("present"));
@@ -1289,9 +1289,158 @@ class SpelEvaluatorTest {
     @Test
     void testGetOrDefaultKeepsAFalseValue() {
         Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("result", "=getOrDefault('forceMistake', true)"), Map.of("forceMistake", false));
+            Map.of("result", "=getOrDefault(${forceMistake}, true)"), Map.of("forceMistake", false));
 
         assertEquals(false, map.get("result"));
+    }
+
+    @Test
+    void testGetOrDefaultFollowsListIndexesAndQuotedKeys() {
+        Map<String, Object> context = Map.of(
+            "items", List.of(Map.of("name", "first")), "judge", Map.of("first name", "Ana"));
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "indexed", "=getOrDefault(${items[0].name}, '')",
+                "outOfRange", "=getOrDefault(${items[1].name}, 'none')",
+                "quoted", "=getOrDefault(${judge['first name']}, '')",
+                "notAList", "=getOrDefault(${judge[0]}, 'none')"),
+            context);
+
+        assertEquals("first", map.get("indexed"));
+        assertEquals("none", map.get("outOfRange"));
+        assertEquals("Ana", map.get("quoted"));
+        assertEquals("none", map.get("notAList"));
+    }
+
+    @Test
+    void testGetOrDefaultReadsADataPillDefault() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("result", "=getOrDefault(${feedback}, ${question})"), withQuestion(new HashMap<>()));
+
+        assertEquals("Why?", map.get("result"));
+    }
+
+    @Test
+    void testGetOrDefaultAndExistsCombineInOneFormula() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("result", "=exists(${judge}) ? getOrDefault(${judge.score}, 0) : getOrDefault(${attempts}, 1)"),
+            Map.of());
+
+        assertEquals(1, map.get("result"));
+    }
+
+    @Test
+    void testExistsRejectsATypedPath() {
+        Map<String, String> map = Map.of("result", "=exists('attempts')");
+        Map<String, Object> context = Map.of();
+
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(map, context));
+
+        String message = expressionEvaluationException.getMessage();
+
+        assertTrue(message.contains("exists takes one argument, a data pill"), message);
+    }
+
+    @Test
+    void testGetOrDefaultRejectsATypedPath() {
+        Map<String, String> map = Map.of("result", "=getOrDefault('attempts', 0)");
+        Map<String, Object> context = Map.of();
+
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(map, context));
+
+        String message = expressionEvaluationException.getMessage();
+
+        assertTrue(message.contains("getOrDefault takes two arguments, a data pill and the default value"), message);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "=getOrDefault(${judge}.score, 0)", "=getOrDefault(${count} + 1, 0)", "=getOrDefault(${items}[0], 0)"
+    })
+    void testGetOrDefaultRejectsADataPillThatIsNotTheWholeArgument(String formula) {
+        Map<String, String> map = Map.of("result", formula);
+        Map<String, Object> context = Map.of("count", 1, "items", List.of(5), "judge", Map.of("score", 0.9));
+
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(map, context));
+
+        String message = expressionEvaluationException.getMessage();
+
+        assertTrue(message.contains("getOrDefault takes two arguments, a data pill and the default value"), message);
+    }
+
+    @Test
+    void testExistsRejectsADataPillThatIsNotTheWholeArgument() {
+        Map<String, String> map = Map.of("result", "=exists(${judge}.score)");
+        Map<String, Object> context = Map.of("judge", Map.of("score", 0.9));
+
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(map, context));
+
+        String message = expressionEvaluationException.getMessage();
+
+        assertTrue(message.contains("exists takes one argument, a data pill"), message);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "=getOrDefault(${judge[\"first name\"]}, 'none')", "=getOrDefault(${judge?.score}, 0)",
+        "=getOrDefault(${judge . score}, 0)", "=exists(${judge[\"first name\"]})", "=getOrDefault(${}, 0)",
+        "=exists(${})", "=exists(${ })"
+    })
+    void testDataPillFunctionsRejectAnUnsupportedPath(String formula) {
+        Map<String, String> map = Map.of("result", formula);
+        Map<String, Object> context = Map.of("judge", Map.of("first name", "Ana", "score", 0.9));
+
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class, () -> EVALUATOR.evaluate(map, context));
+
+        String message = expressionEvaluationException.getMessage();
+        String path = formula.substring(formula.indexOf("${") + 2, formula.indexOf('}'));
+
+        assertTrue(message.contains("Unsupported data pill ${" + path.strip() + "}"), message);
+    }
+
+    @Test
+    void testDataPillFunctionsTrimWhitespaceInsideThePill() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("counted", "=getOrDefault(${ attempts }, 0) + 1", "present", "=exists(${ judge.score })"),
+            Map.of("attempts", 1, "judge", Map.of("score", 0.9)));
+
+        assertEquals(2, map.get("counted"));
+        assertEquals(true, map.get("present"));
+    }
+
+    @Test
+    void testDataPillFunctionsLeaveAStringLiteralUnchanged() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "single", "=concat('Use getOrDefault(${attempts}, 0) for ''exists(${attempts})'': ', ${attempts})",
+                "double", "=concat(\"Use exists(${attempts}): \", getOrDefault(${attempts}, 0))"),
+            Map.of("attempts", 2));
+
+        assertEquals("Use getOrDefault(attempts, 0) for 'exists(attempts)': 2", map.get("single"));
+        assertEquals("Use exists(attempts): 2", map.get("double"));
+    }
+
+    @Test
+    void testDataPillFunctionsReadEachItemInsideASelectionOrProjection() {
+        List<Map<String, Object>> items = List.of(
+            Map.of("active", true, "name", "a"), Map.of("active", false, "name", "b"), Map.of("name", "c"));
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of(
+                "selected", "=${items}.?[getOrDefault(${active}, false)].![name]",
+                "projected", "=${items}.![exists(${active})]",
+                "bare", "=${items}.?[${active} == true].![name]"),
+            Map.of("active", false, "items", items));
+
+        assertEquals(List.of("a"), map.get("selected"));
+        assertEquals(List.of(true, true, false), map.get("projected"));
+        assertEquals(List.of("a"), map.get("bare"));
     }
 
     private static Map<String, Object> withQuestion(Map<String, Object> context) {

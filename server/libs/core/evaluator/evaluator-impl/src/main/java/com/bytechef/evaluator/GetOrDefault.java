@@ -28,13 +28,12 @@ class GetOrDefault implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
-        if (arguments.length != 2 || !(arguments[0] instanceof String path)) {
+        if (arguments.length != 2 || !(arguments[0] instanceof DataPillPath dataPillPath)) {
             throw new AccessException(
-                "getOrDefault takes two arguments, the variable path as a string and the default value, " +
-                    "e.g. getOrDefault('x', 0)");
+                "getOrDefault takes two arguments, a data pill and the default value, e.g. getOrDefault(${x}, 0)");
         }
 
-        Object value = ContextPaths.get(context, path);
+        Object value = dataPillPath.resolve(target);
 
         return new TypedValue(value == null ? arguments[1] : value);
     }
