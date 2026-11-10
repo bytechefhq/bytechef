@@ -29,23 +29,18 @@ const WorkflowsSidebarListItem = ({active, editedTimeAgo, label, menu, onClick}:
         >
             <div
                 aria-current={active || undefined}
-                className="flex min-w-0 flex-1 cursor-pointer flex-col overflow-hidden rounded-md py-3 pl-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-md py-3 pl-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                 onClick={onClick}
                 onKeyDown={handleKeyDown}
                 role="button"
                 tabIndex={0}
             >
+                <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
+
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <div className="flex min-w-0 flex-col gap-1 text-start">
-                            <div className="flex min-w-0 items-center gap-2">
-                                <WorkflowIcon
-                                    aria-hidden="true"
-                                    className="size-4 shrink-0 text-content-neutral-secondary"
-                                />
-
-                                <span className="truncate overflow-hidden text-sm font-medium">{label}</span>
-                            </div>
+                            <span className="truncate overflow-hidden text-sm font-medium">{label}</span>
 
                             {editedTimeAgo && (
                                 <div className="flex gap-1 text-xs text-content-neutral-secondary">
