@@ -9,7 +9,6 @@ const renderItem = (onClick = vi.fn()) => {
             <ul>
                 <WorkflowsSidebarListItem
                     active={false}
-                    components={<span>components</span>}
                     editedTimeAgo="2 hours ago"
                     label="Review and Respond"
                     menu={<button type="button">Workflow menu</button>}
