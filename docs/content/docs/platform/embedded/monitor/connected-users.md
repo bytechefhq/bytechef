@@ -133,6 +133,18 @@ ByteChef creates the connection, the integration instance on the chosen configur
 
 The instance is created in the connected user's own environment. Provisioning always adds a new instance, even when the user already has one for the same integration (for example, two accounts of the same service). The user's own embedded UI then shows that instance's configuration and workflows, not the self-serve one.
 
+### Credentials of provisioned integrations
+
+On the **Integrations** tab, a row an admin provisioned shows a key icon with a **Credentials** action. Integrations provisioned before this release, and integrations the connected user activated themselves, have no **Credentials** action.
+
+- **View** -- the dialog shows the connection's credentials obfuscated and read-only. Viewing is not audited.
+- **Replace** -- click **Update credentials** and enter the new values. ByteChef reuses the integration configuration's OAuth2 app and shared values, so you do not retype the client id and secret. If the integration's configuration can no longer be provisioned for this user, the dialog is view-only and explains that the credentials cannot be replaced.
+- **After the user reauthorizes** -- if the connected user reauthorizes the connection, you can still view and replace it.
+
+Each replacement is recorded as an `INTEGRATION_INSTANCE_CREDENTIALS_UPDATED` audit event with the integration instance, connection and connected user ids, never the credential values.
+
+In the embedded workflow builder, an admin still sees a connected user's own connections so they can pick one, but listed by name without their credentials. Connections an admin entered keep their obfuscated credentials.
+
 ### Upgrading Several Users at Once
 
 Use a batch upgrade to put many connected users on a newer configuration in one go, without opening each one.

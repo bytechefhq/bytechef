@@ -46,11 +46,15 @@ A newly created connection shows **Not Active** until a workflow, integration in
 
 ### Managing Connections
 
-- **Edit** -- change the connection's name, tags, or **Shared Connection** setting. Credentials cannot be changed here.
+- **Edit** -- change the connection's name, tags, or **Shared Connection** setting, or replace its credentials.
 - **Delete** -- remove a connection (confirmed via an alert dialog). Deletion fails while a workflow still uses the connection.
 - **Tag** -- add or remove tags to organize connections.
 
 Only the user who created a connection, or an admin, can edit, tag, or delete it. Anyone else gets an access-denied error.
+
+This page lists only your own connections, including the ones you shared with connected users. Connections a connected user owns, whether they created them or they belong to the user's integration instances, are not shown to admins, and opening, changing, tagging or deleting one answers "not found". To manage the credentials of an integration you provisioned for a user, see [Credentials of provisioned integrations](/platform/embedded/monitor/connected-users#credentials-of-provisioned-integrations).
+
+To replace the credentials of one of your connections, choose **Edit** and click **Update credentials** in the **Edit Connection** dialog. This is refused for a revoked connection and for one waiting to be reassigned to a new owner; the **Not Active** usage badge does not matter. If someone else changed the connection in the meantime, the save is refused and you reload before trying again. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` audit event that holds the connection id only, never the credential values.
 
 ### Shared connections
 
