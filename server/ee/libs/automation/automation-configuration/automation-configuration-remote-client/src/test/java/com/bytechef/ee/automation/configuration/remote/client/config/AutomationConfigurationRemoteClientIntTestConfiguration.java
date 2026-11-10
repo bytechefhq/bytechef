@@ -51,6 +51,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentServiceImp
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
+import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectServiceImpl;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -113,6 +114,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cache.CacheManager;
@@ -124,6 +126,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tools.jackson.databind.ObjectMapper;
@@ -172,9 +175,9 @@ public class AutomationConfigurationRemoteClientIntTestConfiguration {
     }
 
     @Bean
-    ProjectOwnerContributor embeddedAutomationWorkflowProjectOwnerContributor() {
+    ProjectOwnerContributor embeddedAutomationProjectOwnerContributor() {
         return ProjectOwnerContributor.of(
-            ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT, EMBEDDED_AUTOMATION_PROJECT_NAME_CONDITION);
+            ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, EMBEDDED_AUTOMATION_PROJECT_NAME_CONDITION);
     }
 
     @Bean
@@ -254,8 +257,23 @@ public class AutomationConfigurationRemoteClientIntTestConfiguration {
     }
 
     @Bean
-    ProjectDeploymentService projectDeploymentService(ProjectDeploymentRepository projectDeploymentRepository) {
-        return new ProjectDeploymentServiceImpl(projectDeploymentRepository);
+    ProjectDeploymentService projectDeploymentService(
+        ProjectDeploymentRepository projectDeploymentRepository, ProjectOwnershipService projectOwnershipService) {
+
+        return new ProjectDeploymentServiceImpl(projectDeploymentRepository, projectOwnershipService);
+    }
+
+    @Bean
+    ProjectOwnershipService projectOwnershipService(
+        JdbcClient jdbcClient,
+        ObjectProvider<ProjectDeploymentOwnerContributor> projectDeploymentOwnerContributorProvider,
+        ObjectProvider<ProjectOwnerContributor> projectOwnerContributorProvider) {
+
+        return new ProjectOwnershipServiceImpl(
+            jdbcClient, projectDeploymentOwnerContributorProvider.orderedStream()
+                .toList(),
+            projectOwnerContributorProvider.orderedStream()
+                .toList());
     }
 
     @Bean

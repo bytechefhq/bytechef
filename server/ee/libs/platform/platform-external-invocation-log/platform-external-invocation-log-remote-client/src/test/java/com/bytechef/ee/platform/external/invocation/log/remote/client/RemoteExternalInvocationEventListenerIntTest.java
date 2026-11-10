@@ -185,7 +185,8 @@ class RemoteExternalInvocationEventListenerIntTest {
         }
 
         @Configuration
-        static class RemoteExternalInvocationEventListenerIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
+        static class RemoteExternalInvocationEventListenerIntTestJdbcConfiguration
+            extends AbstractIntTestJdbcConfiguration {
 
             @Override
             protected List<?> userConverters() {

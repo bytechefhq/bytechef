@@ -102,7 +102,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security:platform-security-service"))
     implementation(project(":server:libs:platform:platform-swagger"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
-    implementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-service"))
+    implementation(project(":server:libs:platform:platform-external-invocation:platform-external-invocation-service"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-job-completion-awaiter"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-service"))

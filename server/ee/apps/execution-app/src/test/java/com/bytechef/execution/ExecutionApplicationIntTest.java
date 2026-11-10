@@ -300,7 +300,8 @@ public class ExecutionApplicationIntTest {
 
         assertThat(
             jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM public.shedlock WHERE name = 'purgeExpiredExternalInvocationLogs'", Integer.class))
+                "SELECT COUNT(*) FROM public.shedlock WHERE name = 'purgeExpiredExternalInvocationLogs'",
+                Integer.class))
                     .isEqualTo(1);
     }
 

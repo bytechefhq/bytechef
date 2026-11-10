@@ -56,6 +56,8 @@ import org.testcontainers.utility.DockerImageName;
 class ConfigurationKnowledgeBaseIntTest {
 
     private static final int DIMENSIONS = 1536;
+    private static final byte[] INVOICE_TERMS = "Invoices are due within thirty days of issue.".getBytes(
+        StandardCharsets.UTF_8);
 
     private static final PostgreSQLContainer<?> PG_VECTOR_CONTAINER = new PostgreSQLContainer<>(
         DockerImageName.parse("pgvector/pgvector:pg16")
@@ -117,9 +119,7 @@ class ConfigurationKnowledgeBaseIntTest {
             .getId();
 
         KnowledgeBaseDocument knowledgeBaseDocument = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            knowledgeBaseId, "notes.txt", "text/plain",
-            new ByteArrayInputStream(
-                "Invoices are due within thirty days of issue.".getBytes(StandardCharsets.UTF_8)));
+            knowledgeBaseId, "notes.txt", "text/plain", INVOICE_TERMS.length, new ByteArrayInputStream(INVOICE_TERMS));
 
         assertThat(awaitStatus(knowledgeBaseDocument.getId(), Duration.ofSeconds(30)))
             .isEqualTo(KnowledgeBaseDocument.STATUS_READY);
