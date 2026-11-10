@@ -28,12 +28,14 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Property;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -450,6 +452,75 @@ class ConnectionFacadeIntTest {
             .isEqualTo("concurrent");
         Assertions.assertThat(new HashMap<String, Object>(unchangedConnection.getParameters()))
             .containsEntry("baseUri", "https://old.example.com");
+    }
+
+    @Test
+    void testUpdateCredentialsReplacesAuthorizationParameters() {
+        long connectionId = createBasicAuthConnection();
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        connectionFacade.updateCredentials(connectionId, Map.of("key", "replaced"), connection.getVersion());
+
+        Connection updatedConnection = connectionService.getConnection(connectionId);
+
+        Assertions.assertThat(new HashMap<String, Object>(updatedConnection.getParameters()))
+            .containsEntry("key", "replaced");
+        Assertions.assertThat(updatedConnection.getCredentialStatus())
+            .isEqualTo(Connection.CredentialStatus.VALID);
+    }
+
+    @Test
+    void testUpdateCredentialsRejectsInactiveConnection() {
+        long connectionId = createBasicAuthConnection();
+
+        Connection connection = connectionService.updateConnectionStatus(connectionId, ConnectionStatus.REVOKED);
+
+        int version = connection.getVersion();
+
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.updateCredentials(connectionId, Map.of("key", "replaced"), version))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("REVOKED");
+
+        Connection unchangedConnection = connectionService.getConnection(connectionId);
+
+        Assertions.assertThat(new HashMap<String, Object>(unchangedConnection.getParameters()))
+            .containsEntry("key", "original");
+    }
+
+    @Test
+    void testUpdateCredentialsRejectsStaleVersion() {
+        long connectionId = createBasicAuthConnection();
+
+        Connection connection = connectionService.getConnection(connectionId);
+
+        int readVersion = connection.getVersion();
+
+        connectionService.update(connectionId, "concurrent", List.of(), readVersion);
+
+        Assertions.assertThatThrownBy(
+            () -> connectionFacade.updateCredentials(connectionId, Map.of("key", "stale"), readVersion))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("modified by someone else");
+
+        Connection unchangedConnection = connectionService.getConnection(connectionId);
+
+        Assertions.assertThat(new HashMap<String, Object>(unchangedConnection.getParameters()))
+            .containsEntry("key", "original");
+    }
+
+    private long createBasicAuthConnection() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name")
+            .parameters(Map.of("key", "original"))
+            .build();
+
+        return connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
     }
 
     @Test

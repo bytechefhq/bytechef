@@ -68,4 +68,5 @@ public interface ConnectionFacade {
      */
     void replaceAuthorizationParameters(long id, Map<String, ?> parameters, int version);
 
+    void updateCredentials(long id, Map<String, ?> parameters, int version);
 }
