@@ -50,7 +50,7 @@ public class KnowledgeBaseStorageServiceImpl implements KnowledgeBaseStorageServ
         long used = currentUsageBytes();
 
         if (limit <= 0) {
-            return new KnowledgeBaseStorageUsage(currentUsageBytes(), limit, 0.0, true);
+            return new KnowledgeBaseStorageUsage(used, limit, 0.0, true);
         }
 
         return new KnowledgeBaseStorageUsage(used, limit, used * 100.0 / limit, false);
