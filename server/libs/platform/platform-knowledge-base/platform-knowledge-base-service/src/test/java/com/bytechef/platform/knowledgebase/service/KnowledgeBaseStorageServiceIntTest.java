@@ -51,6 +51,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 class KnowledgeBaseStorageServiceIntTest {
 
     private static final long DEFAULT_MAX_SIZE_BYTES = new ApplicationProperties.Ai.KnowledgeBase().getMaxSizeBytes();
+    private static final String DOCUMENT_SCAN_COUNT_SQL =
+        "SELECT COALESCE(SUM(seq_scan + COALESCE(idx_scan, 0)), 0) FROM pg_stat_xact_all_tables " +
+            "WHERE relname = 'knowledge_base_document' AND schemaname = current_schema()";
     private static final String TRY_LOCK_SQL =
         "SELECT pg_try_advisory_xact_lock(hashtext('knowledge_base_storage'), hashtext(current_schema()))";
 
@@ -125,6 +128,24 @@ class KnowledgeBaseStorageServiceIntTest {
     }
 
     @Test
+    void testGetUsageReadsStoredSizesOnceWhenUnlimited() {
+        setLimit(0L);
+
+        saveDocument("a.txt", 300L);
+
+        assertThat(countDocumentScansDuringGetUsage()).isEqualTo(1L);
+    }
+
+    @Test
+    void testGetUsageReadsStoredSizesOnceWhenLimited() {
+        setLimit(1_000L);
+
+        saveDocument("a.txt", 300L);
+
+        assertThat(countDocumentScansDuringGetUsage()).isEqualTo(1L);
+    }
+
+    @Test
     void testCheckLimitThrowsWhenIncomingExceeds() {
         setLimit(1_000L);
 
@@ -192,6 +213,24 @@ class KnowledgeBaseStorageServiceIntTest {
 
         assertThat(lockFreeWhileHeld.get()).isFalse();
         assertThat(jdbcTemplate.queryForObject(TRY_LOCK_SQL, Boolean.class)).isTrue();
+    }
+
+    private long countDocumentScansDuringGetUsage() {
+        Long scanCount = transactionTemplate.execute(status -> {
+            long scanCountBefore = getDocumentScanCount();
+
+            knowledgeBaseStorageService.getUsage();
+
+            return getDocumentScanCount() - scanCountBefore;
+        });
+
+        return scanCount == null ? 0 : scanCount;
+    }
+
+    private long getDocumentScanCount() {
+        Long scanCount = jdbcTemplate.queryForObject(DOCUMENT_SCAN_COUNT_SQL, Long.class);
+
+        return scanCount == null ? 0 : scanCount;
     }
 
     private void checkLimitInTransaction(long incomingBytes) {
