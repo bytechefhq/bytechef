@@ -1,0 +1,365 @@
+---
+title: "Facebook Pages"
+description: "Facebook Pages lets businesses, brands and public figures publish posts, photos and videos and engage with their audience through comments."
+---
+
+
+Categories: Social Media, Marketing Automation
+
+
+Type: facebookPages/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | App ID | STRING | The App ID of your Meta app. | true |
+| clientSecret | App Secret | STRING | The App Secret of your Meta app. | true |
+
+
+
+## Connection Setup
+
+To connect Facebook Pages to ByteChef, you need a Meta developer account, a Meta app and a Facebook user that manages at least one Facebook Page.
+
+1. Go to `https://developers.facebook.com/apps` and click **Create App**.
+2. Enter an app name and a contact email.
+3. Under **Use cases**, select **Manage everything on your Page** and finish creating the app.
+4. Open the use case and add these permissions: `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`, `pages_read_user_content` and `pages_manage_engagement`.
+5. Go to **App settings** > **Basic** and copy the **App ID** and the **App Secret**.
+6. Go to **Facebook Login** > **Settings** and add the ByteChef OAuth redirect URL (for example `https://app.bytechef.io/callback`) to **Valid OAuth Redirect URIs**.
+7. In ByteChef, create a Facebook Pages connection, paste the **App ID** and the **App Secret**, and click **Connect**.
+8. Sign in with Facebook and select the Pages that ByteChef may use.
+
+#### Things to know
+
+- While the app is in development mode, only people with a role on the app (administrators, developers and testers) can connect. To let anyone connect, the app must pass Meta App Review for the permissions above.
+- ByteChef exchanges the login for a long-lived user token. Every action reads the Page access token of the selected Page from the Graph API and uses it for the call, so the connected user must manage that Page.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Post
+Name: createPost
+
+`Publishes a text post, optionally with a link, to a Facebook Page.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| pageId | Page ID | STRING | The Facebook Page to use. | true |
+| message | Message | STRING | The text of the post. | true |
+| link | Link | STRING | The URL to attach to the post. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Post",
+  "name" : "createPost",
+  "parameters" : {
+    "pageId" : "",
+    "message" : "",
+    "link" : ""
+  },
+  "type" : "facebookPages/v1/createPost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the created post. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : ""
+}
+```
+
+
+
+
+### Create Photo Post
+Name: createPhotoPost
+
+`Publishes a photo from a public URL to a Facebook Page.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| pageId | Page ID | STRING | The Facebook Page to use. | true |
+| url | Image URL | STRING | The public URL of the image to publish. | true |
+| caption | Caption | STRING | The text that accompanies the photo. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Photo Post",
+  "name" : "createPhotoPost",
+  "parameters" : {
+    "pageId" : "",
+    "url" : "",
+    "caption" : ""
+  },
+  "type" : "facebookPages/v1/createPhotoPost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the uploaded photo. |
+| post_id | STRING | The ID of the Page post that contains the photo. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "post_id" : ""
+}
+```
+
+
+
+
+### Create Video Post
+Name: createVideoPost
+
+`Publishes a video from a public URL to a Facebook Page.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| pageId | Page ID | STRING | The Facebook Page to use. | true |
+| file_url | Video URL | STRING | The public URL of the video file to publish. | true |
+| title | Title | STRING | The title of the video. | false |
+| description | Description | STRING | The text that accompanies the video. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Video Post",
+  "name" : "createVideoPost",
+  "parameters" : {
+    "pageId" : "",
+    "file_url" : "",
+    "title" : "",
+    "description" : ""
+  },
+  "type" : "facebookPages/v1/createVideoPost"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the uploaded video. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : ""
+}
+```
+
+
+
+
+### Get Comments
+Name: getComments
+
+`Gets the comments on a post of a Facebook Page.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| pageId | Page ID | STRING | The Facebook Page to use. | true |
+| postId | Post ID | STRING | The ID of the post, in the &#123;page-id&#125;_&#123;post-id&#125; format returned by Create Post. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Comments",
+  "name" : "getComments",
+  "parameters" : {
+    "pageId" : "",
+    "postId" : ""
+  },
+  "type" : "facebookPages/v1/getComments"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the comment. |
+| message | STRING | The text of the comment. |
+| created_time | STRING | The time the comment was created. |
+| from | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The person or Page that made the comment. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "message" : "",
+  "created_time" : "",
+  "from" : {
+    "id" : "",
+    "name" : ""
+  }
+} ]
+```
+
+#### Things to know
+
+- Use the `id` returned by Create Post, or the `post_id` returned by Create Photo Post, as the Post ID.
+- The action returns up to 100 comments.
+
+
+
+
+## Triggers
+
+
+### New Comment
+Name: newComment
+
+`Triggers when a new comment is added to one of the recent posts of a Facebook Page.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| pageId | Page ID | STRING | The Facebook Page to use. | true |
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the comment. |
+| message | STRING | The text of the comment. |
+| created_time | STRING | The time the comment was created. |
+| from | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(name)&#125; </details> | The person or Page that made the comment. |
+| post_id | STRING | The ID of the post that was commented on. |
+
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Comment",
+  "name" : "newComment",
+  "parameters" : {
+    "pageId" : ""
+  },
+  "type" : "facebookPages/v1/newComment"
+}
+```
+#### Things to know
+
+- Each poll reads the 10 most recent posts of the Page and their comments, and emits the comments created since the previous poll. A comment is emitted only once.
+- The first poll after the workflow is enabled emits nothing and only records the start time. In the editor, a test run looks back three hours.
+- Every emitted comment has a `post_id` field with the ID of the post it belongs to.
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+## Additional Instructions
+
+#### Before you start
+
+- The connected Facebook user must manage the Page that you select in an action or trigger. The Page list shows the Pages that the user granted to ByteChef during login.
+- Photos and videos are published from a public URL. Facebook downloads the file, so the URL must be reachable from the internet.
+- New Comment checks the 10 most recent posts of the Page. Comments on older posts do not start the workflow.
