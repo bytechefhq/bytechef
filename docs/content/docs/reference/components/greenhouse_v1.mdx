@@ -1,0 +1,515 @@
+---
+title: "Greenhouse"
+description: "Greenhouse is an applicant tracking system and hiring platform that helps companies manage job openings, candidates, applications and structured interview feedback."
+---
+
+
+Categories: Human Resources Information System
+
+
+Type: greenhouse/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Harvest API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| username | Harvest API Key | STRING | The Harvest API key created in Greenhouse under Configure -&gt; Dev Center -&gt; API Credential Management. | true |
+
+
+
+## Connection Setup
+
+### Create a Harvest API Key
+
+1. Log in to [Greenhouse](https://app.greenhouse.io/) as a user with Developer permissions.
+2. Click the *Configure* icon and select *Dev Center*.
+3. Click *API Credential Management*.
+4. Click *Create New API Key*.
+5. Select *Harvest* as the API type, enter a description, and click *Manage permissions*.
+6. Copy the API key.
+7. Under *Candidates*, *Applications*, *Scorecards* and *Jobs*, enable the GET endpoints this component calls, then click *Save*.
+8. In ByteChef, paste the key into the *Harvest API Key* field. ByteChef sends it as the Basic Auth username with an empty password.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Get Application
+Name: getApplication
+
+`Get an application by ID, including its status, current stage, jobs and answers.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| applicationId | Application ID | STRING | The ID of the application to get. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Application",
+  "name" : "getApplication",
+  "parameters" : {
+    "applicationId" : ""
+  },
+  "type" : "greenhouse/v1/getApplication"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | The ID of the application. |
+| candidate_id | INTEGER | The ID of the candidate who submitted the application. |
+| prospect | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the application is a prospect application rather than a candidate one. |
+| applied_at | STRING | ISO 8601 timestamp for when the application was submitted. |
+| rejected_at | STRING | ISO 8601 timestamp for when the application was rejected, if it was. |
+| last_activity_at | STRING | ISO 8601 timestamp of the last activity on the application. |
+| status | STRING | The status of the application: active, rejected, hired or converted. |
+| source | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(public_name)&#125; </details> | The source of the application. |
+| credited_to | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125; </details> | The user credited with sourcing the application. |
+| current_stage | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> | The current interview stage of the application. |
+| jobs | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> | The jobs the application is for. |
+| job_post_id | INTEGER | The ID of the job post the application was submitted through. |
+| rejection_reason | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The reason the application was rejected, if it was. |
+| answers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(question), STRING\(answer)&#125;] </details> | The answers to the job post application questions. |
+| attachments | ARRAY <details> <summary> Items </summary> [&#123;STRING\(filename), STRING\(url), STRING\(type), STRING\(created_at)&#125;] </details> | Files attached to the application. Attachment URLs expire after 7 days. |
+| custom_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom field values of the application, keyed by field name. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "candidate_id" : 1,
+  "prospect" : false,
+  "applied_at" : "",
+  "rejected_at" : "",
+  "last_activity_at" : "",
+  "status" : "",
+  "source" : {
+    "id" : 1,
+    "public_name" : ""
+  },
+  "credited_to" : {
+    "id" : 1,
+    "first_name" : "",
+    "last_name" : "",
+    "name" : "",
+    "employee_id" : ""
+  },
+  "current_stage" : {
+    "id" : 1,
+    "name" : ""
+  },
+  "jobs" : [ {
+    "id" : 1,
+    "name" : ""
+  } ],
+  "job_post_id" : 1,
+  "rejection_reason" : { },
+  "answers" : [ {
+    "question" : "",
+    "answer" : ""
+  } ],
+  "attachments" : [ {
+    "filename" : "",
+    "url" : "",
+    "type" : "",
+    "created_at" : ""
+  } ],
+  "custom_fields" : { }
+}
+```
+
+
+
+
+### Get Candidate
+Name: getCandidate
+
+`Get a candidate by ID, including contact details, applications, tags and custom fields.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| candidateId | Candidate ID | STRING | The ID of the candidate to get. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Candidate",
+  "name" : "getCandidate",
+  "parameters" : {
+    "candidateId" : ""
+  },
+  "type" : "greenhouse/v1/getCandidate"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | The ID of the candidate. |
+| first_name | STRING | The first name of the candidate. |
+| last_name | STRING | The last name of the candidate. |
+| company | STRING | The current company of the candidate. |
+| title | STRING | The current job title of the candidate. |
+| created_at | STRING | ISO 8601 timestamp for when the candidate was created. |
+| updated_at | STRING | ISO 8601 timestamp for when the candidate was last updated. |
+| last_activity | STRING | ISO 8601 timestamp of the last activity on the candidate. |
+| is_private | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the candidate is private. |
+| can_email | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the candidate can be emailed. |
+| application_ids | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | The IDs of the applications of the candidate. |
+| phone_numbers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), STRING\(type)&#125;] </details> | The phone numbers of the candidate. |
+| email_addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), STRING\(type)&#125;] </details> | The email addresses of the candidate. |
+| addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), STRING\(type)&#125;] </details> | The addresses of the candidate. |
+| website_addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value), STRING\(type)&#125;] </details> | The website addresses of the candidate. |
+| social_media_addresses | ARRAY <details> <summary> Items </summary> [&#123;STRING\(value)&#125;] </details> | The social media addresses of the candidate. |
+| recruiter | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125; </details> | The recruiter assigned to the candidate. |
+| coordinator | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125; </details> | The coordinator assigned to the candidate. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | The tags of the candidate. |
+| applications | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), INTEGER\(candidate_id), BOOLEAN\(prospect), STRING\(applied_at), STRING\(rejected_at), STRING\(last_activity_at), STRING\(status), &#123;INTEGER\(id), STRING\(public_name)&#125;\(source), &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125;\(credited_to), &#123;INTEGER\(id), STRING\(name)&#125;\(current_stage), [&#123;INTEGER\(id), STRING\(name)&#125;]\(jobs), INTEGER\(job_post_id), &#123;&#125;\(rejection_reason), [&#123;STRING\(question), STRING\(answer)&#125;]\(answers), [&#123;STRING\(filename), STRING\(url), STRING\(type), STRING\(created_at)&#125;]\(attachments), &#123;&#125;\(custom_fields)&#125;] </details> | The applications of the candidate. |
+| custom_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom field values of the candidate, keyed by field name. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "first_name" : "",
+  "last_name" : "",
+  "company" : "",
+  "title" : "",
+  "created_at" : "",
+  "updated_at" : "",
+  "last_activity" : "",
+  "is_private" : false,
+  "can_email" : false,
+  "application_ids" : [ 1 ],
+  "phone_numbers" : [ {
+    "value" : "",
+    "type" : ""
+  } ],
+  "email_addresses" : [ {
+    "value" : "",
+    "type" : ""
+  } ],
+  "addresses" : [ {
+    "value" : "",
+    "type" : ""
+  } ],
+  "website_addresses" : [ {
+    "value" : "",
+    "type" : ""
+  } ],
+  "social_media_addresses" : [ {
+    "value" : ""
+  } ],
+  "recruiter" : {
+    "id" : 1,
+    "first_name" : "",
+    "last_name" : "",
+    "name" : "",
+    "employee_id" : ""
+  },
+  "coordinator" : {
+    "id" : 1,
+    "first_name" : "",
+    "last_name" : "",
+    "name" : "",
+    "employee_id" : ""
+  },
+  "tags" : [ "" ],
+  "applications" : [ {
+    "id" : 1,
+    "candidate_id" : 1,
+    "prospect" : false,
+    "applied_at" : "",
+    "rejected_at" : "",
+    "last_activity_at" : "",
+    "status" : "",
+    "source" : {
+      "id" : 1,
+      "public_name" : ""
+    },
+    "credited_to" : {
+      "id" : 1,
+      "first_name" : "",
+      "last_name" : "",
+      "name" : "",
+      "employee_id" : ""
+    },
+    "current_stage" : {
+      "id" : 1,
+      "name" : ""
+    },
+    "jobs" : [ {
+      "id" : 1,
+      "name" : ""
+    } ],
+    "job_post_id" : 1,
+    "rejection_reason" : { },
+    "answers" : [ {
+      "question" : "",
+      "answer" : ""
+    } ],
+    "attachments" : [ {
+      "filename" : "",
+      "url" : "",
+      "type" : "",
+      "created_at" : ""
+    } ],
+    "custom_fields" : { }
+  } ],
+  "custom_fields" : { }
+}
+```
+
+
+
+
+### Get Job
+Name: getJob
+
+`Get a job by ID, including its status, departments, offices, hiring team and openings.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| jobId | Job ID | STRING | The ID of the job to get. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Job",
+  "name" : "getJob",
+  "parameters" : {
+    "jobId" : ""
+  },
+  "type" : "greenhouse/v1/getJob"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | The ID of the job. |
+| name | STRING | The name of the job. |
+| requisition_id | STRING | The requisition ID of the job. |
+| notes | STRING | Notes on the job. |
+| confidential | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the job is confidential. |
+| status | STRING | The status of the job: open, closed or draft. |
+| created_at | STRING | ISO 8601 timestamp for when the job was created. |
+| opened_at | STRING | ISO 8601 timestamp for when the job was opened. |
+| closed_at | STRING | ISO 8601 timestamp for when the job was closed. |
+| updated_at | STRING | ISO 8601 timestamp for when the job was last updated. |
+| is_template | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the job is a template. |
+| copied_from_id | INTEGER | The ID of the job this job was copied from. |
+| departments | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> | The departments of the job. |
+| offices | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name)&#125;] </details> | The offices of the job. |
+| hiring_team | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The hiring team of the job: hiring managers, recruiters, coordinators and sourcers. |
+| openings | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(opening_id), STRING\(status), STRING\(opened_at), STRING\(closed_at), INTEGER\(application_id)&#125;] </details> | The openings of the job. |
+| custom_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Custom field values of the job, keyed by field name. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "requisition_id" : "",
+  "notes" : "",
+  "confidential" : false,
+  "status" : "",
+  "created_at" : "",
+  "opened_at" : "",
+  "closed_at" : "",
+  "updated_at" : "",
+  "is_template" : false,
+  "copied_from_id" : 1,
+  "departments" : [ {
+    "id" : 1,
+    "name" : ""
+  } ],
+  "offices" : [ {
+    "id" : 1,
+    "name" : ""
+  } ],
+  "hiring_team" : { },
+  "openings" : [ {
+    "id" : 1,
+    "opening_id" : "",
+    "status" : "",
+    "opened_at" : "",
+    "closed_at" : "",
+    "application_id" : 1
+  } ],
+  "custom_fields" : { }
+}
+```
+
+
+
+
+### List Scorecards for Application
+Name: listApplicationScorecards
+
+`List all submitted scorecards for an application, including ratings, recommendations and question answers.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| applicationId | Application ID | STRING | The ID of the application whose scorecards to list. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Scorecards for Application",
+  "name" : "listApplicationScorecards",
+  "parameters" : {
+    "applicationId" : ""
+  },
+  "type" : "greenhouse/v1/listApplicationScorecards"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | The ID of the scorecard. |
+| created_at | STRING | ISO 8601 timestamp for when the scorecard was created. |
+| updated_at | STRING | ISO 8601 timestamp for when the scorecard was last updated. |
+| interview | STRING | The name of the interview. |
+| interview_step | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name)&#125; </details> | The interview step the scorecard was submitted for. |
+| candidate_id | INTEGER | The ID of the candidate. |
+| application_id | INTEGER | The ID of the application. |
+| interviewed_at | STRING | ISO 8601 timestamp for when the interview took place. |
+| submitted_by | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125; </details> | The user who submitted the scorecard. |
+| interviewer | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(first_name), STRING\(last_name), STRING\(name), STRING\(employee_id)&#125; </details> | The user who conducted the interview. |
+| submitted_at | STRING | ISO 8601 timestamp for when the scorecard was submitted. |
+| overall_recommendation | STRING | The overall recommendation: definitely_not, no, mixed, yes, strong_yes or no_decision. |
+| attributes | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(type), STRING\(note), STRING\(rating)&#125;] </details> | The rated attributes of the scorecard. |
+| ratings | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The attribute names grouped by rating. |
+| questions | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(question), STRING\(answer)&#125;] </details> | The scorecard questions and their answers. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 1,
+  "created_at" : "",
+  "updated_at" : "",
+  "interview" : "",
+  "interview_step" : {
+    "id" : 1,
+    "name" : ""
+  },
+  "candidate_id" : 1,
+  "application_id" : 1,
+  "interviewed_at" : "",
+  "submitted_by" : {
+    "id" : 1,
+    "first_name" : "",
+    "last_name" : "",
+    "name" : "",
+    "employee_id" : ""
+  },
+  "interviewer" : {
+    "id" : 1,
+    "first_name" : "",
+    "last_name" : "",
+    "name" : "",
+    "employee_id" : ""
+  },
+  "submitted_at" : "",
+  "overall_recommendation" : "",
+  "attributes" : [ {
+    "name" : "",
+    "type" : "",
+    "note" : "",
+    "rating" : ""
+  } ],
+  "ratings" : { },
+  "questions" : [ {
+    "id" : 1,
+    "question" : "",
+    "answer" : ""
+  } ]
+} ]
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
