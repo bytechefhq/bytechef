@@ -20,10 +20,10 @@ import jakarta.annotation.Generated;
  * A value the connected user supplies before an automation workflow runs.
  */
 
-@Schema(name = "AutomationWorkflowProjectWorkflowInput", description = "A value the connected user supplies before an automation workflow runs.")
-@JsonTypeName("AutomationWorkflowProjectWorkflowInput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T16:19:24.084130+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public class AutomationWorkflowProjectWorkflowInputModel {
+@Schema(name = "AutomationProjectWorkflowInput", description = "A value the connected user supplies before an automation workflow runs.")
+@JsonTypeName("AutomationProjectWorkflowInput")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T16:12:12.795950+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+public class AutomationProjectWorkflowInputModel {
 
   private @Nullable String name;
 
@@ -35,7 +35,7 @@ public class AutomationWorkflowProjectWorkflowInputModel {
 
   private @Nullable Boolean provided;
 
-  public AutomationWorkflowProjectWorkflowInputModel name(@Nullable String name) {
+  public AutomationProjectWorkflowInputModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
@@ -56,7 +56,7 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     this.name = name;
   }
 
-  public AutomationWorkflowProjectWorkflowInputModel label(@Nullable String label) {
+  public AutomationProjectWorkflowInputModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -77,7 +77,7 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     this.label = label;
   }
 
-  public AutomationWorkflowProjectWorkflowInputModel type(@Nullable String type) {
+  public AutomationProjectWorkflowInputModel type(@Nullable String type) {
     this.type = type;
     return this;
   }
@@ -98,7 +98,7 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     this.type = type;
   }
 
-  public AutomationWorkflowProjectWorkflowInputModel required(@Nullable Boolean required) {
+  public AutomationProjectWorkflowInputModel required(@Nullable Boolean required) {
     this.required = required;
     return this;
   }
@@ -119,7 +119,7 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     this.required = required;
   }
 
-  public AutomationWorkflowProjectWorkflowInputModel provided(@Nullable Boolean provided) {
+  public AutomationProjectWorkflowInputModel provided(@Nullable Boolean provided) {
     this.provided = provided;
     return this;
   }
@@ -148,12 +148,12 @@ public class AutomationWorkflowProjectWorkflowInputModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AutomationWorkflowProjectWorkflowInputModel automationWorkflowProjectWorkflowInput = (AutomationWorkflowProjectWorkflowInputModel) o;
-    return Objects.equals(this.name, automationWorkflowProjectWorkflowInput.name) &&
-        Objects.equals(this.label, automationWorkflowProjectWorkflowInput.label) &&
-        Objects.equals(this.type, automationWorkflowProjectWorkflowInput.type) &&
-        Objects.equals(this.required, automationWorkflowProjectWorkflowInput.required) &&
-        Objects.equals(this.provided, automationWorkflowProjectWorkflowInput.provided);
+    AutomationProjectWorkflowInputModel automationProjectWorkflowInput = (AutomationProjectWorkflowInputModel) o;
+    return Objects.equals(this.name, automationProjectWorkflowInput.name) &&
+        Objects.equals(this.label, automationProjectWorkflowInput.label) &&
+        Objects.equals(this.type, automationProjectWorkflowInput.type) &&
+        Objects.equals(this.required, automationProjectWorkflowInput.required) &&
+        Objects.equals(this.provided, automationProjectWorkflowInput.provided);
   }
 
   @Override
@@ -164,7 +164,7 @@ public class AutomationWorkflowProjectWorkflowInputModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class AutomationWorkflowProjectWorkflowInputModel {\n");
+    sb.append("class AutomationProjectWorkflowInputModel {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");

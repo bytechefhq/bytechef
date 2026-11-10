@@ -2,8 +2,8 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectComponentModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectWorkflowInputModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectComponentModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectWorkflowInputModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -22,13 +22,13 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * An automation workflow template within an automation workflow project.
+ * An automation workflow template within an automation project.
  */
 
-@Schema(name = "AutomationWorkflowProjectWorkflowTemplate", description = "An automation workflow template within an automation workflow project.")
-@JsonTypeName("AutomationWorkflowProjectWorkflowTemplate")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.941318+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public class AutomationWorkflowProjectWorkflowTemplateModel {
+@Schema(name = "AutomationProjectWorkflowTemplate", description = "An automation workflow template within an automation project.")
+@JsonTypeName("AutomationProjectWorkflowTemplate")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T16:12:12.795950+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+public class AutomationProjectWorkflowTemplateModel {
 
   private @Nullable String id;
 
@@ -36,11 +36,11 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
 
   private @Nullable String description;
 
-  private List<@Valid AutomationWorkflowProjectComponentModel> components = new ArrayList<>();
+  private List<@Valid AutomationProjectComponentModel> components = new ArrayList<>();
 
-  private List<@Valid AutomationWorkflowProjectWorkflowInputModel> inputs = new ArrayList<>();
+  private List<@Valid AutomationProjectWorkflowInputModel> inputs = new ArrayList<>();
 
-  public AutomationWorkflowProjectWorkflowTemplateModel id(@Nullable String id) {
+  public AutomationProjectWorkflowTemplateModel id(@Nullable String id) {
     this.id = id;
     return this;
   }
@@ -61,7 +61,7 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
     this.id = id;
   }
 
-  public AutomationWorkflowProjectWorkflowTemplateModel label(@Nullable String label) {
+  public AutomationProjectWorkflowTemplateModel label(@Nullable String label) {
     this.label = label;
     return this;
   }
@@ -82,7 +82,7 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
     this.label = label;
   }
 
-  public AutomationWorkflowProjectWorkflowTemplateModel description(@Nullable String description) {
+  public AutomationProjectWorkflowTemplateModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
@@ -103,12 +103,12 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
     this.description = description;
   }
 
-  public AutomationWorkflowProjectWorkflowTemplateModel components(List<@Valid AutomationWorkflowProjectComponentModel> components) {
+  public AutomationProjectWorkflowTemplateModel components(List<@Valid AutomationProjectComponentModel> components) {
     this.components = components;
     return this;
   }
 
-  public AutomationWorkflowProjectWorkflowTemplateModel addComponentsItem(AutomationWorkflowProjectComponentModel componentsItem) {
+  public AutomationProjectWorkflowTemplateModel addComponentsItem(AutomationProjectComponentModel componentsItem) {
     if (this.components == null) {
       this.components = new ArrayList<>();
     }
@@ -123,21 +123,21 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
   
   @Schema(name = "components", description = "The list of components used in this workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("components")
-  public List<@Valid AutomationWorkflowProjectComponentModel> getComponents() {
+  public List<@Valid AutomationProjectComponentModel> getComponents() {
     return components;
   }
 
   @JsonProperty("components")
-  public void setComponents(List<@Valid AutomationWorkflowProjectComponentModel> components) {
+  public void setComponents(List<@Valid AutomationProjectComponentModel> components) {
     this.components = components;
   }
 
-  public AutomationWorkflowProjectWorkflowTemplateModel inputs(List<@Valid AutomationWorkflowProjectWorkflowInputModel> inputs) {
+  public AutomationProjectWorkflowTemplateModel inputs(List<@Valid AutomationProjectWorkflowInputModel> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public AutomationWorkflowProjectWorkflowTemplateModel addInputsItem(AutomationWorkflowProjectWorkflowInputModel inputsItem) {
+  public AutomationProjectWorkflowTemplateModel addInputsItem(AutomationProjectWorkflowInputModel inputsItem) {
     if (this.inputs == null) {
       this.inputs = new ArrayList<>();
     }
@@ -152,12 +152,12 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
   
   @Schema(name = "inputs", description = "The values the connected user is asked for before this workflow runs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
-  public List<@Valid AutomationWorkflowProjectWorkflowInputModel> getInputs() {
+  public List<@Valid AutomationProjectWorkflowInputModel> getInputs() {
     return inputs;
   }
 
   @JsonProperty("inputs")
-  public void setInputs(List<@Valid AutomationWorkflowProjectWorkflowInputModel> inputs) {
+  public void setInputs(List<@Valid AutomationProjectWorkflowInputModel> inputs) {
     this.inputs = inputs;
   }
 
@@ -169,12 +169,12 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AutomationWorkflowProjectWorkflowTemplateModel automationWorkflowProjectWorkflowTemplate = (AutomationWorkflowProjectWorkflowTemplateModel) o;
-    return Objects.equals(this.id, automationWorkflowProjectWorkflowTemplate.id) &&
-        Objects.equals(this.label, automationWorkflowProjectWorkflowTemplate.label) &&
-        Objects.equals(this.description, automationWorkflowProjectWorkflowTemplate.description) &&
-        Objects.equals(this.components, automationWorkflowProjectWorkflowTemplate.components) &&
-        Objects.equals(this.inputs, automationWorkflowProjectWorkflowTemplate.inputs);
+    AutomationProjectWorkflowTemplateModel automationProjectWorkflowTemplate = (AutomationProjectWorkflowTemplateModel) o;
+    return Objects.equals(this.id, automationProjectWorkflowTemplate.id) &&
+        Objects.equals(this.label, automationProjectWorkflowTemplate.label) &&
+        Objects.equals(this.description, automationProjectWorkflowTemplate.description) &&
+        Objects.equals(this.components, automationProjectWorkflowTemplate.components) &&
+        Objects.equals(this.inputs, automationProjectWorkflowTemplate.inputs);
   }
 
   @Override
@@ -185,7 +185,7 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class AutomationWorkflowProjectWorkflowTemplateModel {\n");
+    sb.append("class AutomationProjectWorkflowTemplateModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");

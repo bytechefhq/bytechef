@@ -2,8 +2,8 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectComponentModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectWorkflowInputModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectComponentModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectWorkflowInputModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T16:19:24.084130+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T16:12:12.795950+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ConnectedUserProjectWorkflowModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -90,15 +90,15 @@ public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable KindEnum kind;
 
-  private @Nullable String automationWorkflowUuid;
+  private @Nullable String automationUuid;
 
   private @Nullable String copiedFromWorkflowUuid;
 
   private @Nullable Boolean dangling;
 
-  private List<@Valid AutomationWorkflowProjectComponentModel> components = new ArrayList<>();
+  private List<@Valid AutomationProjectComponentModel> components = new ArrayList<>();
 
-  private List<@Valid AutomationWorkflowProjectWorkflowInputModel> inputs = new ArrayList<>();
+  private List<@Valid AutomationProjectWorkflowInputModel> inputs = new ArrayList<>();
 
   private Map<String, Object> inputValues = new HashMap<>();
 
@@ -293,25 +293,25 @@ public class ConnectedUserProjectWorkflowModel {
     this.kind = kind;
   }
 
-  public ConnectedUserProjectWorkflowModel automationWorkflowUuid(@Nullable String automationWorkflowUuid) {
-    this.automationWorkflowUuid = automationWorkflowUuid;
+  public ConnectedUserProjectWorkflowModel automationUuid(@Nullable String automationUuid) {
+    this.automationUuid = automationUuid;
     return this;
   }
 
   /**
    * For REFERENCE rows, the uuid of the automation workflow being referenced.
-   * @return automationWorkflowUuid
+   * @return automationUuid
    */
   
-  @Schema(name = "automationWorkflowUuid", description = "For REFERENCE rows, the uuid of the automation workflow being referenced.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("automationWorkflowUuid")
-  public @Nullable String getAutomationWorkflowUuid() {
-    return automationWorkflowUuid;
+  @Schema(name = "automationUuid", description = "For REFERENCE rows, the uuid of the automation workflow being referenced.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("automationUuid")
+  public @Nullable String getAutomationUuid() {
+    return automationUuid;
   }
 
-  @JsonProperty("automationWorkflowUuid")
-  public void setAutomationWorkflowUuid(@Nullable String automationWorkflowUuid) {
-    this.automationWorkflowUuid = automationWorkflowUuid;
+  @JsonProperty("automationUuid")
+  public void setAutomationUuid(@Nullable String automationUuid) {
+    this.automationUuid = automationUuid;
   }
 
   public ConnectedUserProjectWorkflowModel copiedFromWorkflowUuid(@Nullable String copiedFromWorkflowUuid) {
@@ -356,12 +356,12 @@ public class ConnectedUserProjectWorkflowModel {
     this.dangling = dangling;
   }
 
-  public ConnectedUserProjectWorkflowModel components(List<@Valid AutomationWorkflowProjectComponentModel> components) {
+  public ConnectedUserProjectWorkflowModel components(List<@Valid AutomationProjectComponentModel> components) {
     this.components = components;
     return this;
   }
 
-  public ConnectedUserProjectWorkflowModel addComponentsItem(AutomationWorkflowProjectComponentModel componentsItem) {
+  public ConnectedUserProjectWorkflowModel addComponentsItem(AutomationProjectComponentModel componentsItem) {
     if (this.components == null) {
       this.components = new ArrayList<>();
     }
@@ -376,21 +376,21 @@ public class ConnectedUserProjectWorkflowModel {
   
   @Schema(name = "components", description = "The components used by the workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("components")
-  public List<@Valid AutomationWorkflowProjectComponentModel> getComponents() {
+  public List<@Valid AutomationProjectComponentModel> getComponents() {
     return components;
   }
 
   @JsonProperty("components")
-  public void setComponents(List<@Valid AutomationWorkflowProjectComponentModel> components) {
+  public void setComponents(List<@Valid AutomationProjectComponentModel> components) {
     this.components = components;
   }
 
-  public ConnectedUserProjectWorkflowModel inputs(List<@Valid AutomationWorkflowProjectWorkflowInputModel> inputs) {
+  public ConnectedUserProjectWorkflowModel inputs(List<@Valid AutomationProjectWorkflowInputModel> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public ConnectedUserProjectWorkflowModel addInputsItem(AutomationWorkflowProjectWorkflowInputModel inputsItem) {
+  public ConnectedUserProjectWorkflowModel addInputsItem(AutomationProjectWorkflowInputModel inputsItem) {
     if (this.inputs == null) {
       this.inputs = new ArrayList<>();
     }
@@ -405,12 +405,12 @@ public class ConnectedUserProjectWorkflowModel {
   
   @Schema(name = "inputs", description = "The values the connected user is asked for before this workflow runs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
-  public List<@Valid AutomationWorkflowProjectWorkflowInputModel> getInputs() {
+  public List<@Valid AutomationProjectWorkflowInputModel> getInputs() {
     return inputs;
   }
 
   @JsonProperty("inputs")
-  public void setInputs(List<@Valid AutomationWorkflowProjectWorkflowInputModel> inputs) {
+  public void setInputs(List<@Valid AutomationProjectWorkflowInputModel> inputs) {
     this.inputs = inputs;
   }
 
@@ -482,7 +482,7 @@ public class ConnectedUserProjectWorkflowModel {
         Objects.equals(this.workflowUuid, connectedUserProjectWorkflow.workflowUuid) &&
         Objects.equals(this.workflowVersion, connectedUserProjectWorkflow.workflowVersion) &&
         Objects.equals(this.kind, connectedUserProjectWorkflow.kind) &&
-        Objects.equals(this.automationWorkflowUuid, connectedUserProjectWorkflow.automationWorkflowUuid) &&
+        Objects.equals(this.automationUuid, connectedUserProjectWorkflow.automationUuid) &&
         Objects.equals(this.copiedFromWorkflowUuid, connectedUserProjectWorkflow.copiedFromWorkflowUuid) &&
         Objects.equals(this.dangling, connectedUserProjectWorkflow.dangling) &&
         Objects.equals(this.components, connectedUserProjectWorkflow.components) &&
@@ -493,7 +493,7 @@ public class ConnectedUserProjectWorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion, kind, automationWorkflowUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, attentionReason);
+    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion, kind, automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, attentionReason);
   }
 
   @Override
@@ -509,7 +509,7 @@ public class ConnectedUserProjectWorkflowModel {
     sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
     sb.append("    workflowVersion: ").append(toIndentedString(workflowVersion)).append("\n");
     sb.append("    kind: ").append(toIndentedString(kind)).append("\n");
-    sb.append("    automationWorkflowUuid: ").append(toIndentedString(automationWorkflowUuid)).append("\n");
+    sb.append("    automationUuid: ").append(toIndentedString(automationUuid)).append("\n");
     sb.append("    copiedFromWorkflowUuid: ").append(toIndentedString(copiedFromWorkflowUuid)).append("\n");
     sb.append("    dangling: ").append(toIndentedString(dangling)).append("\n");
     sb.append("    components: ").append(toIndentedString(components)).append("\n");

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "InvalidWorkflowError", description = "Returned when an automation cannot be enabled because the workflow that would run has validation errors.")
 @JsonTypeName("InvalidWorkflowError")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-18T21:40:49.864360+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T16:12:12.795950+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class InvalidWorkflowErrorModel implements EnableFrontendProjectWorkflow409ResponseModel {
 
   private @Nullable Integer invalidWorkflowErrorCount;

@@ -2,7 +2,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectWorkflowTemplateModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectWorkflowTemplateModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -21,13 +21,13 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * An automation workflow automation workflow project.
+ * An automation workflow automation project.
  */
 
-@Schema(name = "AutomationWorkflowProject", description = "An automation workflow automation workflow project.")
-@JsonTypeName("AutomationWorkflowProject")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-29T18:00:54.064737+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public class AutomationWorkflowProjectModel {
+@Schema(name = "AutomationProject", description = "An automation workflow automation project.")
+@JsonTypeName("AutomationProject")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T16:12:12.795950+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+public class AutomationProjectModel {
 
   private @Nullable Long id;
 
@@ -37,19 +37,19 @@ public class AutomationWorkflowProjectModel {
 
   private @Nullable Boolean automationHubVisible;
 
-  private List<@Valid AutomationWorkflowProjectWorkflowTemplateModel> workflowTemplates = new ArrayList<>();
+  private List<@Valid AutomationProjectWorkflowTemplateModel> workflowTemplates = new ArrayList<>();
 
-  public AutomationWorkflowProjectModel id(@Nullable Long id) {
+  public AutomationProjectModel id(@Nullable Long id) {
     this.id = id;
     return this;
   }
 
   /**
-   * The id of the automation workflow project.
+   * The id of the automation project.
    * @return id
    */
   
-  @Schema(name = "id", description = "The id of the automation workflow project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", description = "The id of the automation project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public @Nullable Long getId() {
     return id;
@@ -60,17 +60,17 @@ public class AutomationWorkflowProjectModel {
     this.id = id;
   }
 
-  public AutomationWorkflowProjectModel name(@Nullable String name) {
+  public AutomationProjectModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
 
   /**
-   * The name of the automation workflow project.
+   * The name of the automation project.
    * @return name
    */
   
-  @Schema(name = "name", description = "The name of the automation workflow project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "name", description = "The name of the automation project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
   public @Nullable String getName() {
     return name;
@@ -81,17 +81,17 @@ public class AutomationWorkflowProjectModel {
     this.name = name;
   }
 
-  public AutomationWorkflowProjectModel description(@Nullable String description) {
+  public AutomationProjectModel description(@Nullable String description) {
     this.description = description;
     return this;
   }
 
   /**
-   * The description of the automation workflow project.
+   * The description of the automation project.
    * @return description
    */
   
-  @Schema(name = "description", description = "The description of the automation workflow project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "description", description = "The description of the automation project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public @Nullable String getDescription() {
     return description;
@@ -102,7 +102,7 @@ public class AutomationWorkflowProjectModel {
     this.description = description;
   }
 
-  public AutomationWorkflowProjectModel automationHubVisible(@Nullable Boolean automationHubVisible) {
+  public AutomationProjectModel automationHubVisible(@Nullable Boolean automationHubVisible) {
     this.automationHubVisible = automationHubVisible;
     return this;
   }
@@ -123,12 +123,12 @@ public class AutomationWorkflowProjectModel {
     this.automationHubVisible = automationHubVisible;
   }
 
-  public AutomationWorkflowProjectModel workflowTemplates(List<@Valid AutomationWorkflowProjectWorkflowTemplateModel> workflowTemplates) {
+  public AutomationProjectModel workflowTemplates(List<@Valid AutomationProjectWorkflowTemplateModel> workflowTemplates) {
     this.workflowTemplates = workflowTemplates;
     return this;
   }
 
-  public AutomationWorkflowProjectModel addWorkflowTemplatesItem(AutomationWorkflowProjectWorkflowTemplateModel workflowTemplatesItem) {
+  public AutomationProjectModel addWorkflowTemplatesItem(AutomationProjectWorkflowTemplateModel workflowTemplatesItem) {
     if (this.workflowTemplates == null) {
       this.workflowTemplates = new ArrayList<>();
     }
@@ -143,12 +143,12 @@ public class AutomationWorkflowProjectModel {
   
   @Schema(name = "workflowTemplates", description = "The list of automation workflow templates belonging to this project.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("workflowTemplates")
-  public List<@Valid AutomationWorkflowProjectWorkflowTemplateModel> getWorkflowTemplates() {
+  public List<@Valid AutomationProjectWorkflowTemplateModel> getWorkflowTemplates() {
     return workflowTemplates;
   }
 
   @JsonProperty("workflowTemplates")
-  public void setWorkflowTemplates(List<@Valid AutomationWorkflowProjectWorkflowTemplateModel> workflowTemplates) {
+  public void setWorkflowTemplates(List<@Valid AutomationProjectWorkflowTemplateModel> workflowTemplates) {
     this.workflowTemplates = workflowTemplates;
   }
 
@@ -160,12 +160,12 @@ public class AutomationWorkflowProjectModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AutomationWorkflowProjectModel automationWorkflowProject = (AutomationWorkflowProjectModel) o;
-    return Objects.equals(this.id, automationWorkflowProject.id) &&
-        Objects.equals(this.name, automationWorkflowProject.name) &&
-        Objects.equals(this.description, automationWorkflowProject.description) &&
-        Objects.equals(this.automationHubVisible, automationWorkflowProject.automationHubVisible) &&
-        Objects.equals(this.workflowTemplates, automationWorkflowProject.workflowTemplates);
+    AutomationProjectModel automationProject = (AutomationProjectModel) o;
+    return Objects.equals(this.id, automationProject.id) &&
+        Objects.equals(this.name, automationProject.name) &&
+        Objects.equals(this.description, automationProject.description) &&
+        Objects.equals(this.automationHubVisible, automationProject.automationHubVisible) &&
+        Objects.equals(this.workflowTemplates, automationProject.workflowTemplates);
   }
 
   @Override
@@ -176,7 +176,7 @@ public class AutomationWorkflowProjectModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class AutomationWorkflowProjectModel {\n");
+    sb.append("class AutomationProjectModel {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
