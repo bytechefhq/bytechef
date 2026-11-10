@@ -17,6 +17,7 @@
 package com.bytechef.component.xero;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -25,6 +26,8 @@ import com.bytechef.component.xero.action.XeroCreateBillAction;
 import com.bytechef.component.xero.action.XeroCreateContactAction;
 import com.bytechef.component.xero.action.XeroCreateInvoiceAction;
 import com.bytechef.component.xero.action.XeroCreateQuoteAction;
+import com.bytechef.component.xero.action.XeroGetInvoiceAction;
+import com.bytechef.component.xero.action.XeroListInvoicesAction;
 import com.bytechef.component.xero.connection.XeroConnection;
 import com.bytechef.component.xero.trigger.XeroNewBillTrigger;
 import com.bytechef.component.xero.trigger.XeroNewContactTrigger;
@@ -51,7 +54,12 @@ public class XeroComponentHandler implements ComponentHandler {
             XeroCreateBillAction.ACTION_DEFINITION,
             XeroCreateContactAction.ACTION_DEFINITION,
             XeroCreateInvoiceAction.ACTION_DEFINITION,
-            XeroCreateQuoteAction.ACTION_DEFINITION)
+            XeroCreateQuoteAction.ACTION_DEFINITION,
+            XeroGetInvoiceAction.ACTION_DEFINITION,
+            XeroListInvoicesAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(XeroGetInvoiceAction.ACTION_DEFINITION),
+            tool(XeroListInvoicesAction.ACTION_DEFINITION))
         .triggers(
             XeroNewBillTrigger.TRIGGER_DEFINITION,
             XeroNewContactTrigger.TRIGGER_DEFINITION,

@@ -38,18 +38,23 @@ public final class XeroConstants {
     public static final String ACCREC = "ACCREC";
     public static final String ADDRESSES = "Addresses";
     public static final String ADDRESS_TYPE = "AddressType";
+    public static final String AMOUNT_DUE = "AmountDue";
+    public static final String AMOUNT_PAID = "AmountPaid";
     public static final String BANK_ACCOUNT_DETAILS = "BankAccountDetails";
     public static final String BRANDING_THEME_ID = "BrandingThemeID";
     public static final String CITY = "City";
     public static final String CODE = "Code";
     public static final String COMPANY_NUMBER = "CompanyNumber";
     public static final String CONTACT_ID = "ContactID";
+    public static final String CONTACT_IDS = "ContactIDs";
     public static final String CONTACT_STATUS = "ContactStatus";
     public static final String CONTACT = "Contact";
     public static final String CONTACTS = "Contacts";
     public static final String COUNTRY = "Country";
     public static final String CURRENCY_CODE = "CurrencyCode";
     public static final String DATE = "Date";
+    public static final String DATE_FROM = "dateFrom";
+    public static final String DATE_TO = "dateTo";
     public static final String DESCRIPTION = "Description";
     public static final String DISCOUNT_RATE = "DiscountRate";
     public static final String DUE_DATE = "DueDate";
@@ -57,12 +62,16 @@ public final class XeroConstants {
     public static final String EXPIRY_DATE = "ExpiryDate";
     public static final String FIRST_NAME = "FirstName";
     public static final String INVOICE = "INVOICE";
+    public static final String INVOICE_ID = "InvoiceID";
+    public static final String INVOICE_NUMBER = "InvoiceNumber";
     public static final String INVOICES = "Invoices";
     public static final String LAST_NAME = "LastName";
     public static final String LINE_AMOUNT_TYPES = "LineAmountTypes";
     public static final String LINE_ITEMS = "LineItems";
     public static final String MESSAGE = "Message";
+    public static final String MODIFIED_SINCE = "modifiedSince";
     public static final String NAME = "Name";
+    public static final String PAGE = "page";
     public static final String PHONES = "Phones";
     public static final String PHONE_TYPE = "PhoneType";
     public static final String PHONE_NUMBER = "PhoneNumber";
@@ -74,12 +83,17 @@ public final class XeroConstants {
     public static final String REFERENCE = "Reference";
     public static final String REGION = "Region";
     public static final String STATUS = "Status";
+    public static final String STATUSES = "Statuses";
+    public static final String SUB_TOTAL = "SubTotal";
     public static final String SUMMARY = "Summary";
     public static final String TAX_NUMBER = "TaxNumber";
     public static final String TERMS = "Terms";
+    public static final String TOTAL = "Total";
+    public static final String TOTAL_TAX = "TotalTax";
     public static final String TITLE = "Title";
     public static final String TYPE = "Type";
     public static final String UNIT_AMOUNT = "UnitAmount";
+    public static final String UPDATED_DATE_UTC = "UpdatedDateUTC";
     public static final String WEBHOOK_KEY = "webhookKey";
 
     public static final ModifiableObjectProperty CONTACT_OUTPUT_PROPERTY = object()
@@ -125,6 +139,10 @@ public final class XeroConstants {
 
     public static final ModifiableObjectProperty INVOICE_OUTPUT_PROPERTY = object()
         .properties(
+            string(INVOICE_ID)
+                .description("ID of the invoice."),
+            string(INVOICE_NUMBER)
+                .description("Number of the invoice."),
             string(TYPE)
                 .description("Type of the invoice."),
             object(CONTACT)
@@ -156,7 +174,21 @@ public final class XeroConstants {
                             number(UNIT_AMOUNT)
                                 .description("Line item unit amount."))),
             string(CURRENCY_CODE)
-                .description("The currency that invoice has been raised in."));
+                .description("The currency that invoice has been raised in."),
+            string(REFERENCE)
+                .description("Reference number of the invoice."),
+            number(SUB_TOTAL)
+                .description("Total of the invoice excluding taxes."),
+            number(TOTAL_TAX)
+                .description("Total tax on the invoice."),
+            number(TOTAL)
+                .description("Total of the invoice including taxes."),
+            number(AMOUNT_DUE)
+                .description("Amount remaining to be paid on the invoice."),
+            number(AMOUNT_PAID)
+                .description("Sum of payments received for the invoice."),
+            string(UPDATED_DATE_UTC)
+                .description("Last modified date of the invoice in UTC."));
 
     public static final ModifiableStringProperty LINE_AMOUNT_TYPE_PROPERTY = string(LINE_AMOUNT_TYPES)
         .label("Line Amount Type")
