@@ -271,8 +271,11 @@ const ConnectionDialog = ({
 
     const showAuthorizations = authorizationsExists && authorizationOptions.length > 1;
 
+    const isEnteringCredentials = !connection?.id || isUpdatingCredentials;
+
     const showOAuth2AppPredefined =
         (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
+        isEnteringCredentials &&
         !oAuth2PropertiesLoading &&
         oAuth2Properties?.predefinedApps?.includes(selectedComponentName || '');
 
@@ -281,11 +284,11 @@ const ConnectionDialog = ({
 
     const showConnectionProperties = !connectionDefinitionLoading && !!connectionDefinition?.properties?.length;
 
-    const showOAuth2Step =
-        (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) && (!connection?.id || isUpdatingCredentials);
+    const showOAuth2Step = (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) && isEnteringCredentials;
 
     const showRedirectUriInput =
         (isOAuth2AuthorizationType || isOAuth2ImplicitCodeType) &&
+        isEnteringCredentials &&
         !usePredefinedOAuthApp &&
         oAuth2Properties?.redirectUri;
 
@@ -779,7 +782,7 @@ const ConnectionDialog = ({
                                         </div>
                                     )}
 
-                                    {(!connection?.id || isUpdatingCredentials) &&
+                                    {isEnteringCredentials &&
                                         showAuthorizationProperties &&
                                         !!authorizations?.length &&
                                         authorizations[0]?.properties && (
