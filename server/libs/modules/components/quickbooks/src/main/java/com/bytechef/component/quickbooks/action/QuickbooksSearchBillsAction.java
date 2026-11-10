@@ -146,6 +146,8 @@ public class QuickbooksSearchBillsAction {
     }
 
     private static String escape(String value) {
-        return value.replace("'", "\\'");
+        String escapedBackslashes = value.replace("\\", "\\\\");
+
+        return escapedBackslashes.replace("'", "\\'");
     }
 }
