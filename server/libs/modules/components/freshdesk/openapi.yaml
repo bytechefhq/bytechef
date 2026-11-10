@@ -209,6 +209,161 @@ paths:
                     type: "string"
                     description: "Avatar of the contact."
   /tickets:
+    get:
+      tags:
+        - "Tickets"
+      summary: "List Tickets"
+      description: "Lists tickets. By default, only tickets created within the past 30 days are returned; use Updated Since to return older tickets."
+      operationId: "listTickets"
+      x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/freshdesk_v1#list-tickets"
+      parameters:
+        - name: "filter"
+          in: "query"
+          description: "Predefined filter to apply to the tickets."
+          schema:
+            type: "string"
+            title: "Filter"
+            enum:
+              - "new_and_my_open"
+              - "watching"
+              - "spam"
+              - "deleted"
+        - name: "updated_since"
+          in: "query"
+          description: "Only return tickets updated since this date or timestamp, in UTC, for example 2015-01-19T02:00:00Z or 2015-08-17."
+          schema:
+            type: "string"
+            title: "Updated Since"
+        - name: "order_by"
+          in: "query"
+          description: "Ticket field to sort the tickets by."
+          schema:
+            type: "string"
+            title: "Order By"
+            default: "created_at"
+            enum:
+              - "created_at"
+              - "due_by"
+              - "updated_at"
+              - "status"
+        - name: "order_type"
+          in: "query"
+          description: "Sort direction of the tickets."
+          schema:
+            type: "string"
+            title: "Order Type"
+            default: "desc"
+            enum:
+              - "asc"
+              - "desc"
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                description: "List of tickets."
+                items:
+                  type: "object"
+                  properties:
+                    cc_emails:
+                      type: "array"
+                      description: "List of email addresses added in the cc field of the ticket."
+                      items:
+                        type: "string"
+                    fwd_emails:
+                      type: "array"
+                      description: "List of email addresses added while forwarding a ticket."
+                      items:
+                        type: "string"
+                    reply_cc_emails:
+                      type: "array"
+                      description: "List of email addresses added while replying to a ticket."
+                      items:
+                        type: "string"
+                    email_config_id:
+                      type: "integer"
+                      description: "ID of the email config used for the ticket."
+                    group_id:
+                      type: "integer"
+                      description: "ID of the group the ticket is assigned to."
+                    priority:
+                      type: "integer"
+                      description: "Priority of the ticket."
+                    requester_id:
+                      type: "integer"
+                      description: "ID of the requester of the ticket."
+                    responder_id:
+                      type: "integer"
+                      description: "ID of the agent the ticket is assigned to."
+                    source:
+                      type: "integer"
+                      description: "Channel through which the ticket was created."
+                    status:
+                      type: "integer"
+                      description: "Status of the ticket."
+                    subject:
+                      type: "string"
+                      description: "Subject of the ticket."
+                    company_id:
+                      type: "integer"
+                      description: "ID of the company the ticket belongs to."
+                    id:
+                      type: "integer"
+                      description: "ID of the ticket."
+                    type:
+                      type: "string"
+                      description: "Type of the ticket."
+                    to_emails:
+                      type: "array"
+                      description: "List of email addresses the ticket was sent to."
+                      items:
+                        type: "string"
+                    product_id:
+                      type: "integer"
+                      description: "ID of the product the ticket belongs to."
+                    fr_escalated:
+                      type: "boolean"
+                      description: "Whether the ticket has been escalated as the result of first response time being breached."
+                    spam:
+                      type: "boolean"
+                      description: "Whether the ticket has been marked as spam."
+                    urgent:
+                      type: "boolean"
+                      description: "Whether the ticket is marked as urgent."
+                    is_escalated:
+                      type: "boolean"
+                      description: "Whether the ticket has been escalated."
+                    created_at:
+                      type: "string"
+                      description: "Timestamp when the ticket was created."
+                    updated_at:
+                      type: "string"
+                      description: "Timestamp when the ticket was last updated."
+                    due_by:
+                      type: "string"
+                      description: "Timestamp when the ticket is due to be resolved."
+                    fr_due_by:
+                      type: "string"
+                      description: "Timestamp when the first response is due."
+                    description_text:
+                      type: "string"
+                      description: "Plain text version of the ticket description."
+                    description:
+                      type: "string"
+                      description: "HTML content of the ticket description."
+                    tags:
+                      type: "array"
+                      description: "List of tags associated with the ticket."
+                      items:
+                        type: "string"
+                    attachments:
+                      type: "array"
+                      description: "List of attachments associated with the ticket."
+                      items:
+                        type: "object"
     post:
       tags:
         - "Tickets"
@@ -412,6 +567,19 @@ paths:
                     - "3"
                     - "4"
                     - "5"
+                group_id:
+                  type: "integer"
+                  title: "Group ID"
+                  description: "ID of the group to which the ticket will be assigned."
+                responder_id:
+                  type: "integer"
+                  title: "Responder ID"
+                  description: "ID of the agent to whom the ticket will be assigned."
+                tags:
+                  type: "array"
+                  description: "Tags to associate with the ticket. The provided tags replace all existing tags of the ticket."
+                  items:
+                    type: "string"
       responses:
         201:
           description: "Successful operation."
