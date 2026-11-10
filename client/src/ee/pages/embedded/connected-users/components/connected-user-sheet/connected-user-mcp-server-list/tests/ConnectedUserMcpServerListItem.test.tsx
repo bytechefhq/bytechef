@@ -253,7 +253,7 @@ describe('ConnectedUserMcpServerListItem', () => {
 
         expect(
             screen.getByRole('button', {name: 'Send Email'}).closest('li')?.querySelector('svg.lucide-workflow')
-        ).toBeInTheDocument();
+        ).toBeNull();
 
         await userEvent.click(screen.getByRole('button', {name: 'Send Email'}));
 

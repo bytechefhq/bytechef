@@ -343,7 +343,7 @@ describe('A2aProjectList', () => {
         await user.click(screen.getAllByRole('button', {name: 'Expand project'})[0]);
 
         expect(screen.getByText('Lead intake')).toBeInTheDocument();
-        expect(container.querySelectorAll('svg.lucide-workflow')).toHaveLength(2);
+        expect(container.querySelectorAll('svg.lucide-workflow')).toHaveLength(0);
         expect(screen.getByText('Skill: Qualify lead')).toBeInTheDocument();
         expect(screen.getByText('Follow up')).toBeInTheDocument();
         expect(screen.queryByText('Triage')).not.toBeInTheDocument();
