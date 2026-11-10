@@ -224,6 +224,77 @@ To find the labels, click [here](/reference/components/github_v1#how-to-find-lab
 
 
 
+### Commit Files to New Branch
+Name: commitFilesToNewBranch
+
+`Creates a branch from a base branch and commits a set of file changes to it in a single commit, ready for Create Pull Request.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
+| repository | Repository | STRING | Repository to commit to. | true |
+| baseBranch | Base Branch | STRING | The branch to start from. Defaults to the repository's default branch. | false |
+| newBranch | New Branch | STRING | The name of the branch to create, for example docs/release-1.0. | true |
+| commitMessage | Commit Message | STRING | The commit message. | true |
+| files | Files | ARRAY <details> <summary> Items </summary> [&#123;STRING\(path), STRING\(content), BOOLEAN\(delete)&#125;] </details> | The files to add, change or delete. | true |
+| updateExistingBranch | Update Existing Branch | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When the new branch already exists, add the commit on top of it instead of failing. The branch is only fast-forwarded, never force-updated. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Commit Files to New Branch",
+  "name" : "commitFilesToNewBranch",
+  "parameters" : {
+    "owner" : "",
+    "repository" : "",
+    "baseBranch" : "",
+    "newBranch" : "",
+    "commitMessage" : "",
+    "files" : [ {
+      "path" : "",
+      "content" : "",
+      "delete" : false
+    } ],
+    "updateExistingBranch" : false
+  },
+  "type" : "github/v1/commitFilesToNewBranch"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| branch | STRING | The branch the commit was written to. |
+| commitSha | STRING | The SHA of the new commit. |
+| treeSha | STRING | The SHA of the new commit's tree. |
+| commitUrl | STRING | The URL of the new commit on GitHub. |
+
+
+
+
+#### Output Example
+```json
+{
+  "branch" : "",
+  "commitSha" : "",
+  "treeSha" : "",
+  "commitUrl" : ""
+}
+```
+
+
+
+
 ### Create Comment on Issue
 Name: createCommentOnIssue
 
@@ -717,10 +788,101 @@ To find the issue number, click [here](/reference/components/github_v1#how-to-fi
 
 
 
+### Get Release by Tag
+Name: getReleaseByTag
+
+`Gets a published release by its tag name.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
+| repository | Repository | STRING | Repository the release belongs to. | true |
+| tag | Tag | STRING | The tag name of the release, for example v1.0.0. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Release by Tag",
+  "name" : "getReleaseByTag",
+  "parameters" : {
+    "owner" : "",
+    "repository" : "",
+    "tag" : ""
+  },
+  "type" : "github/v1/getReleaseByTag"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | NUMBER | ID of the release. |
+| tag_name | STRING | The name of the tag. |
+| target_commitish | STRING | The branch or commit SHA the tag was created from. |
+| name | STRING | The name of the release. |
+| body | STRING | The release notes. |
+| draft | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the release is a draft. |
+| prerelease | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the release is a prerelease. |
+| created_at | STRING | When the release was created. |
+| published_at | STRING | When the release was published. |
+| html_url | STRING | The URL of the release on GitHub. |
+| tarball_url | STRING |  |
+| zipball_url | STRING |  |
+| author | OBJECT <details> <summary> Properties </summary> &#123;STRING\(login), NUMBER\(id), STRING\(html_url)&#125; </details> | The user who created the release. |
+| assets | ARRAY <details> <summary> Items </summary> [&#123;NUMBER\(id), STRING\(name), STRING\(label), STRING\(content_type), INTEGER\(size), INTEGER\(download_count), STRING\(browser_download_url)&#125;] </details> | Files attached to the release. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 0.0,
+  "tag_name" : "",
+  "target_commitish" : "",
+  "name" : "",
+  "body" : "",
+  "draft" : false,
+  "prerelease" : false,
+  "created_at" : "",
+  "published_at" : "",
+  "html_url" : "",
+  "tarball_url" : "",
+  "zipball_url" : "",
+  "author" : {
+    "login" : "",
+    "id" : 0.0,
+    "html_url" : ""
+  },
+  "assets" : [ {
+    "id" : 0.0,
+    "name" : "",
+    "label" : "",
+    "content_type" : "",
+    "size" : 1,
+    "download_count" : 1,
+    "browser_download_url" : ""
+  } ]
+}
+```
+
+
+
+
 ### Get Repository Content
 Name: getRepositoryContent
 
-`Gets the contents of a file or directory in a repository. If the content is a directory, the response will be each item in the directory and if the content is a file, the response will be file as a string.`
+`Gets the contents of a file or directory in a repository. With the Text output format a directory returns its entry names, one per line, and a file returns its content as a string. With the Structured output format a directory returns a list of entries and a file returns an object with its metadata and decoded content.`
 
 #### Properties
 
@@ -729,6 +891,8 @@ Name: getRepositoryContent
 | owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
 | repository | Repository | STRING | Repository where the content is located. | true |
 | path | Path | STRING | Path to the file or the directory. | true |
+| ref | Ref | STRING | The branch, tag or commit SHA to read from. Defaults to the repository's default branch. | false |
+| outputFormat | Output Format | STRING <details> <summary> Options </summary> <span title="A string: entry names for a directory, the content for a file.">TEXT</span>, <span title="Entries with name, path, type, size and URLs.">STRUCTURED</span> </details> | Text returns a single string. Structured returns the entries of a directory, or the metadata and decoded content of a file. | false |
 
 #### Example JSON Structure
 ```json
@@ -738,7 +902,9 @@ Name: getRepositoryContent
   "parameters" : {
     "owner" : "",
     "repository" : "",
-    "path" : ""
+    "path" : "",
+    "ref" : "",
+    "outputFormat" : ""
   },
   "type" : "github/v1/getRepositoryContent"
 }
@@ -746,13 +912,7 @@ Name: getRepositoryContent
 
 #### Output
 
-
-
-Type: STRING
-
-
-
-
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
 
 
 
@@ -1070,6 +1230,67 @@ To find the user or organization, click [here](/reference/components/github_v1#h
 #### Find repository name
 
 To find the repository name, click [here](/reference/components/github_v1#how-to-find-your-repository-name).
+
+
+
+
+### Trigger Workflow Dispatch
+Name: triggerWorkflowDispatch
+
+`Starts a GitHub Actions workflow that has a workflow_dispatch trigger. With a classic OAuth token the connection needs the repo scope; a fine-grained token needs the Actions: write permission.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| owner | User/Organization | STRING | The owner of the repository (user or organization). | true |
+| repository | Repository | STRING | Repository that contains the workflow. | true |
+| workflow | Workflow | STRING <details> <summary> Depends On </summary> repository, owner </details> | The workflow file name, for example build.yml, or the workflow ID. | true |
+| ref | Ref | STRING | The branch or tag to run the workflow on. Defaults to the repository's default branch. | false |
+| inputs | Inputs | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Values for the workflow's workflow_dispatch inputs, keyed by input name. GitHub accepts at most 25 inputs. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Trigger Workflow Dispatch",
+  "name" : "triggerWorkflowDispatch",
+  "parameters" : {
+    "owner" : "",
+    "repository" : "",
+    "workflow" : "",
+    "ref" : "",
+    "inputs" : { }
+  },
+  "type" : "github/v1/triggerWorkflowDispatch"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| workflow | STRING | The workflow that was dispatched. |
+| ref | STRING | The branch or tag the workflow runs on. |
+| dispatched | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | True when GitHub accepted the dispatch. |
+
+
+
+
+#### Output Example
+```json
+{
+  "workflow" : "",
+  "ref" : "",
+  "dispatched" : false
+}
+```
 
 
 
