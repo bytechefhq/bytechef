@@ -51,4 +51,11 @@ public interface ConnectedUserConnectionRepository extends ListCrudRepository<Co
         WHERE connection_id IN (:connectionIds)
         """)
     List<Long> findConnectionIdsIn(@Param("connectionIds") Collection<Long> connectionIds);
+
+    @Query("""
+        SELECT connection_id
+        FROM connected_user_connection
+        WHERE connection_id IN (:connectionIds) AND provisioned_by IS NOT NULL
+        """)
+    List<Long> findProvisionedConnectionIdsIn(@Param("connectionIds") Collection<Long> connectionIds);
 }

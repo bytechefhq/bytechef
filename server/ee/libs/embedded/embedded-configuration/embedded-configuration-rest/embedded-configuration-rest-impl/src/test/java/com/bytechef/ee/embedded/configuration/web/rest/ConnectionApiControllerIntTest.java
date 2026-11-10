@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -46,6 +47,7 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -302,6 +304,60 @@ class ConnectionApiControllerIntTest {
 
         verify(connectedUserConnectionFacade).createConnectedUserConnection(eq(5L), any());
         verify(connectedUserConnectionFacade, never()).createConnectedUserConnectionAsAdmin(anyLong(), any());
+    }
+
+    @Test
+    void testGetConnectedUserConnectionsListsThemForAdminWithoutCredentials() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationParameters(null)
+            .componentName("componentName")
+            .id(1L)
+            .name("name")
+            .parameters(null)
+            .version(1)
+            .build();
+
+        when(connectedUserConnectionFacade.getSharedConnectionIds()).thenReturn(Set.of());
+        when(connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(eq(5L), any(), anyList()))
+            .thenReturn(List.of(connectionDTO));
+
+        this.webTestClient
+            .get()
+            .uri("/internal/connected-users/5/components/componentName/connections")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(ConnectionModel.class)
+            .hasSize(1);
+
+        verify(connectedUserConnectionFacade).getConnectedUserConnectionsForAdmin(eq(5L), any(), anyList());
+        verify(connectedUserConnectionFacade, never()).getConnectedUserConnections(anyLong(), any(), anyList());
+    }
+
+    @Test
+    void testGetConnectedUserConnectionsKeepsAConnectedUserListingTheirOwnConnections() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new EmbeddedApiKeyAuthenticationToken(
+                    Environment.PRODUCTION.ordinal(), 5L, new User("external-user-5", "", List.of()), false));
+
+        when(connectedUserConnectionFacade.getSharedConnectionIds()).thenReturn(Set.of());
+        when(connectedUserConnectionFacade.getConnectedUserConnections(eq(5L), any(), anyList()))
+            .thenReturn(List.of(getConnection()));
+
+        this.webTestClient
+            .get()
+            .uri("/internal/connected-users/5/components/componentName/connections")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(ConnectionModel.class)
+            .hasSize(1);
+
+        verify(connectedUserConnectionFacade).getConnectedUserConnections(eq(5L), any(), anyList());
+        verify(connectedUserConnectionFacade, never()).getConnectedUserConnectionsForAdmin(anyLong(), any(), anyList());
     }
 
     @SuppressWarnings("unchecked")

@@ -537,6 +537,65 @@ class ConnectedUserConnectionFacadeIntTest {
     }
 
     @Test
+    void testGetConnectedUserConnectionsForAdminKeepsUserConnectionsWithoutCredentials() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createConnectedUserConnection(connectedUserId, 84001L, Environment.PRODUCTION);
+
+        stubConnectionsWithCredentials();
+
+        List<ConnectionDTO> connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(
+            connectedUserId, null, List.of());
+
+        assertThat(connectionDTOs).hasSize(1);
+
+        ConnectionDTO connectionDTO = connectionDTOs.getFirst();
+
+        assertThat(connectionDTO.id()).isEqualTo(84001L);
+        assertThat(connectionDTO.authorizationParameters()).isNull();
+        assertThat(connectionDTO.parameters()).isNull();
+    }
+
+    @Test
+    void testGetConnectedUserConnectionsForAdminKeepsAdminEnteredCredentials() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        registerConnection(84011L, Environment.PRODUCTION, PlatformType.EMBEDDED);
+
+        connectedUserConnectionService.create(connectedUserId, 84011L, "admin@localhost.com");
+
+        createProvisionedIntegrationInstance(connectedUserId, 84012L, Environment.PRODUCTION);
+
+        stubConnectionsWithCredentials();
+
+        List<ConnectionDTO> connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(
+            connectedUserId, null, List.of());
+
+        assertThat(connectionDTOs).hasSize(2);
+
+        for (ConnectionDTO connectionDTO : connectionDTOs) {
+            assertThat(connectionDTO.authorizationParameters()).isEqualTo(Map.of("secret", "value"));
+            assertThat(connectionDTO.parameters()).isEqualTo(Map.of("region", "eu"));
+        }
+    }
+
+    @Test
+    void testGetConnectedUserConnectionsKeepsCredentialsForTheConnectedUser() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createConnectedUserConnection(connectedUserId, 84021L, Environment.PRODUCTION);
+
+        stubConnectionsWithCredentials();
+
+        List<ConnectionDTO> connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnections(
+            connectedUserId, null, List.of());
+
+        assertThat(connectionDTOs).hasSize(1);
+        assertThat(connectionDTOs.getFirst()
+            .authorizationParameters()).isEqualTo(Map.of("secret", "value"));
+    }
+
+    @Test
     void testDeleteConnectedUserConnectionRejectsForeignId() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
 
@@ -776,6 +835,50 @@ class ConnectedUserConnectionFacadeIntTest {
             integrationInstanceConfiguration);
 
         integrationInstanceService.create(connectedUserId, connectionId, integrationInstanceConfiguration.getId());
+    }
+
+    private void createProvisionedIntegrationInstance(
+        long connectedUserId, long connectionId, Environment environment) {
+
+        registerConnection(connectionId, environment, PlatformType.EMBEDDED);
+
+        String componentName = "integration-" + UUID.randomUUID();
+
+        Integration integration = new Integration();
+
+        integration.setComponentName(componentName);
+        integration.setName(componentName);
+
+        integration = integrationService.create(integration);
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
+
+        integrationInstanceConfiguration.setConnectionParameters(Map.of());
+        integrationInstanceConfiguration.setEnvironment(environment);
+        integrationInstanceConfiguration.setIntegrationId(integration.getId());
+        integrationInstanceConfiguration.setIntegrationVersion(1);
+        integrationInstanceConfiguration.setName(componentName);
+
+        integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
+            integrationInstanceConfiguration);
+
+        integrationInstanceService.create(
+            connectedUserId, connectionId, integrationInstanceConfiguration.getId(), "admin@localhost.com");
+    }
+
+    private void stubConnectionsWithCredentials() {
+        when(connectionFacade.getConnections(any(), eq(PlatformType.EMBEDDED)))
+            .thenAnswer(invocation -> {
+                List<Long> requestedConnectionIds = invocation.getArgument(0);
+
+                return requestedConnectionIds.stream()
+                    .map(requestedConnectionId -> ConnectionDTO.builder()
+                        .authorizationParameters(Map.of("secret", "value"))
+                        .id(requestedConnectionId)
+                        .parameters(Map.of("region", "eu"))
+                        .build())
+                    .toList();
+            });
     }
 
     private void createOwnership(
