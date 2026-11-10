@@ -82,9 +82,9 @@ it('marks projects that have been published with their last published version', 
     await userEvent.click(screen.getByLabelText('Project select'));
 
     expect(screen.getByRole('menuitemradio', {name: /Other Project/})).toContainElement(
-        screen.getByRole('img', {name: 'Published V2'})
+        screen.getByText('Published V2')
     );
-    expect(screen.getAllByRole('img', {name: /Published/})).toHaveLength(1);
+    expect(screen.getAllByText(/Published/)).toHaveLength(1);
 });
 
 it('shows the published version in a tooltip when hovering the dot', async () => {
@@ -99,7 +99,7 @@ it('shows the published version in a tooltip when hovering the dot', async () =>
     );
 
     await userEvent.click(screen.getByLabelText('Project select'));
-    await userEvent.hover(screen.getByRole('img', {name: 'Published V2'}));
+    await userEvent.hover(screen.getByText('Published V2').parentElement!);
 
     expect(await screen.findByRole('tooltip')).toHaveTextContent('Published V2');
 });

@@ -92,11 +92,14 @@ const BreadcrumbTitleSelect = ({
                             {item.publishedVersion !== undefined && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <span
-                                            aria-label={`Published V${item.publishedVersion}`}
-                                            className="ml-auto size-2 shrink-0 rounded-full bg-surface-success-primary"
-                                            role="img"
-                                        />
+                                        <span className="ml-auto flex size-4 shrink-0 items-center justify-center">
+                                            <span
+                                                aria-hidden="true"
+                                                className="size-2 rounded-full bg-surface-success-primary"
+                                            />
+
+                                            <span className="sr-only">Published V{item.publishedVersion}</span>
+                                        </span>
                                     </TooltipTrigger>
 
                                     <TooltipContent side="right">Published V{item.publishedVersion}</TooltipContent>
