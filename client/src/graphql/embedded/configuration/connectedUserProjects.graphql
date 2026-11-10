@@ -8,7 +8,7 @@ query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
         }
         connectedUserProjectWorkflows {
             id
-            automationWorkflowUuid
+            automationUuid
             connectedUserId
             copiedFromWorkflowUuid
             enabled

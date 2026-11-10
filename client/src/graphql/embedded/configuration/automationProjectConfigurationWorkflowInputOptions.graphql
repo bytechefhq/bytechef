@@ -1,4 +1,4 @@
-query automationWorkflowProjectConfigurationWorkflowInputOptions(
+query automationProjectConfigurationWorkflowInputOptions(
     $id: ID!
     $workflowUuid: ID!
     $inputName: String!
@@ -7,7 +7,7 @@ query automationWorkflowProjectConfigurationWorkflowInputOptions(
     $lookupDependsOnValues: Map
     $searchText: String
 ) {
-    automationWorkflowProjectConfigurationWorkflowInputOptions(
+    automationProjectConfigurationWorkflowInputOptions(
         id: $id
         workflowUuid: $workflowUuid
         inputName: $inputName

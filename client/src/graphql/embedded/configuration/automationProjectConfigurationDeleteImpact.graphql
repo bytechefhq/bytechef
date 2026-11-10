@@ -1,0 +1,6 @@
+query automationProjectConfigurationDeleteImpact($id: ID!) {
+    automationProjectConfigurationDeleteImpact(id: $id) {
+        connectedUserCount
+        referenceWorkflowCount
+    }
+}

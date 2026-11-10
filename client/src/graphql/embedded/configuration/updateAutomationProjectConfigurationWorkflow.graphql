@@ -1,10 +1,10 @@
-mutation updateAutomationWorkflowProjectConfigurationWorkflow(
+mutation updateAutomationProjectConfigurationWorkflow(
     $id: ID!
     $workflowUuid: ID!
     $providedConnections: Map
     $providedInputs: Map
 ) {
-    updateAutomationWorkflowProjectConfigurationWorkflow(
+    updateAutomationProjectConfigurationWorkflow(
         id: $id
         workflowUuid: $workflowUuid
         providedConnections: $providedConnections

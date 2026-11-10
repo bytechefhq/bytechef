@@ -1,5 +1,5 @@
-query automationWorkflowProjectVersionWorkflowChange($id: ID!, $projectVersion: Int!, $workflowUuid: String!) {
-    automationWorkflowProjectVersionWorkflowChange(id: $id, projectVersion: $projectVersion, workflowUuid: $workflowUuid) {
+query automationProjectVersionWorkflowChange($id: ID!, $projectVersion: Int!, $workflowUuid: String!) {
+    automationProjectVersionWorkflowChange(id: $id, projectVersion: $projectVersion, workflowUuid: $workflowUuid) {
         workflowUuid
         label
         changeType

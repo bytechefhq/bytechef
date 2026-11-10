@@ -1,0 +1,3 @@
+mutation enableAutomationProjectConfiguration($id: ID!, $enable: Boolean!) {
+    enableAutomationProjectConfiguration(id: $id, enable: $enable)
+}

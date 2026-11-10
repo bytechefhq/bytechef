@@ -1,0 +1,6 @@
+query automationProjectTags {
+    automationProjectTags {
+        id
+        name
+    }
+}
