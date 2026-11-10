@@ -33,12 +33,17 @@ public class SlackConstants {
 
     public static final String CHANNEL = "channel";
     public static final String CHALLENGE = "challenge";
+    public static final String COUNT = "count";
+    public static final String EMAIL = "email";
     public static final String SIGNING_SECRET = "signingSecret";
     public static final String ERROR = "error";
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String OK = "ok";
     public static final String POST_AT = "post_at";
+    public static final String QUERY = "query";
+    public static final String SORT = "sort";
+    public static final String SORT_DIRECTION = "sortDirection";
     public static final String TEXT = "text";
     public static final String TIMESTAMP = "timestamp";
     public static final String TYPE = "type";
