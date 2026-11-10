@@ -18,6 +18,7 @@ vi.mock('@/ee/shared/mutations/embedded/connectionTags.mutations', () => ({
 
 vi.mock('@/ee/shared/mutations/embedded/connections.mutations', () => ({
     useDeleteConnectionMutation: () => ({mutate: hoisted.deleteConnectionMutate}),
+    useUpdateConnectionCredentialsMutation: vi.fn(),
     useUpdateConnectionMutation: vi.fn(),
 }));
 
@@ -27,8 +28,17 @@ vi.mock('@/ee/shared/queries/embedded/connections.queries', () => ({
 }));
 
 vi.mock('@/shared/components/connection/ConnectionDialog', () => ({
-    default: ({onClose}: {onClose: () => void}) => (
-        <div data-testid="connection-dialog">
+    default: ({
+        onClose,
+        useUpdateConnectionCredentialsMutation,
+    }: {
+        onClose: () => void;
+        useUpdateConnectionCredentialsMutation?: unknown;
+    }) => (
+        <div
+            data-has-credentials-mutation={String(useUpdateConnectionCredentialsMutation !== undefined)}
+            data-testid="connection-dialog"
+        >
             <button onClick={onClose} type="button">
                 Close connection dialog
             </button>
@@ -110,5 +120,15 @@ describe('ConnectionListItem', () => {
         expect(hoisted.deleteConnectionMutate).toHaveBeenCalledWith(7);
 
         await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    });
+
+    it('passes the credentials mutation to the edit dialog', async () => {
+        renderConnectionListItem();
+
+        await openMenu();
+
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
+
+        expect(screen.getByTestId('connection-dialog')).toHaveAttribute('data-has-credentials-mutation', 'true');
     });
 });

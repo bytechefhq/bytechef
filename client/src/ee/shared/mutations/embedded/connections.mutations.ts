@@ -46,6 +46,26 @@ export const useDeleteConnectionMutation = (mutationProps?: DeleteConnectionMuta
         onSuccess: mutationProps?.onSuccess,
     });
 
+interface UpdateConnectionCredentialsMutationProps {
+    onSuccess?: (result: void, variables: Connection) => void;
+    onError?: (error: Error, variables: Connection) => void;
+}
+
+export const useUpdateConnectionCredentialsMutation = (mutationProps?: UpdateConnectionCredentialsMutationProps) =>
+    useMutation<void, Error, Connection>({
+        mutationFn: (connection: Connection) => {
+            return new ConnectionApi().updateConnectionCredentials({
+                id: connection.id!,
+                updateConnectionCredentialsRequest: {
+                    parameters: connection.parameters!,
+                    version: connection.version!,
+                },
+            });
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
 interface UpdateConnectionMutationProps {
     onSuccess?: (result: void, variables: Connection) => void;
     onError?: (error: Error, variables: Connection) => void;
