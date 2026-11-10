@@ -1,0 +1,190 @@
+---
+title: "Gamma"
+description: "Gamma is an AI-powered platform for creating presentations, documents, and social posts from text prompts, outlines, or existing content."
+---
+
+
+Categories: Artificial Intelligence, Productivity and Collaboration
+
+
+Type: gamma/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| key | Key | STRING |  | true |
+| value | API Key | STRING | To create an API key go to Settings -&gt; API Keys in Gamma. | true |
+
+
+
+## Connection Setup
+
+API keys are available on all Gamma plans. Generations consume workspace credits. If you cannot create a key, ask your workspace admin, who can restrict API key access.
+
+### Create API Key
+
+1. Log in to [Gamma](https://gamma.app/).
+2. Go to *Settings*.
+3. Click on *API Keys* (or open [gamma.app/settings/api-keys](https://gamma.app/settings/api-keys) directly).
+4. Click on *Create API key*.
+5. Copy the generated key and paste it into the *API Key* field of the ByteChef connection.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Generate Presentation
+Name: generatePresentation
+
+`Start generating a presentation, document, or social post from text. Generation runs asynchronously; pass the returned generation ID to Get Generation to check its status and get the gamma URL and export URL.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| inputText | Input Text | STRING | The text to generate from: a topic, an outline, or full content. | true |
+| textMode | Text Mode | STRING <details> <summary> Options </summary> <span>generate</span>, <span>condense</span>, <span>preserve</span> </details> | How to interpret the input text: generate expands it into new content, condense summarizes it, and preserve keeps it as written. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span>presentation</span>, <span>document</span>, <span>social</span> </details> | The output format of the generated gamma. | false |
+| themeId | Theme ID | STRING | The ID of the theme to apply. Uses the workspace default theme when empty. | false |
+| numCards | Number of Cards | INTEGER | The target number of cards or slides to generate. | false |
+| additionalInstructions | Additional Instructions | STRING | Additional instructions for the AI, for example about tone, layout or content focus. | false |
+| exportAs | Export As | STRING <details> <summary> Options </summary> <span>pdf</span>, <span>pptx</span> </details> | The file format to export the gamma to after generation. Get Generation returns the download URL as the export URL. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Generate Presentation",
+  "name" : "generatePresentation",
+  "parameters" : {
+    "inputText" : "",
+    "textMode" : "",
+    "format" : "",
+    "themeId" : "",
+    "numCards" : 1,
+    "additionalInstructions" : "",
+    "exportAs" : ""
+  },
+  "type" : "gamma/v1/generatePresentation"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| generationId | STRING | The ID of the generation. Pass it to Get Generation. |
+| warnings | STRING | Warnings about the request, for example ignored options. |
+
+
+
+
+#### Output Example
+```json
+{
+  "generationId" : "",
+  "warnings" : ""
+}
+```
+
+
+
+
+### Get Generation
+Name: getGeneration
+
+`Get the status of a generation. When the status is completed, the result includes the gamma URL and, if an export was requested, the export URL.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| generationId | Generation ID | STRING | The ID of the generation returned by Generate Presentation. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Generation",
+  "name" : "getGeneration",
+  "parameters" : {
+    "generationId" : ""
+  },
+  "type" : "gamma/v1/getGeneration"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| generationId | STRING | The ID of the generation. |
+| status | STRING | The status of the generation: pending, completed or failed. |
+| gammaId | STRING | The ID of the generated gamma, present when the generation is completed. |
+| gammaUrl | STRING | The URL of the generated gamma, present when the generation is completed. |
+| exportUrl | STRING | The download URL of the exported file, present when Export As was set and the generation is completed. Anyone with this URL can download the file until it expires. |
+| error | OBJECT <details> <summary> Properties </summary> &#123;STRING\(message), NUMBER\(statusCode)&#125; </details> | The error details, present when the generation failed. |
+| credits | OBJECT <details> <summary> Properties </summary> &#123;NUMBER\(deducted), NUMBER\(remaining)&#125; </details> | The credit usage of the generation. |
+
+
+
+
+#### Output Example
+```json
+{
+  "generationId" : "",
+  "status" : "",
+  "gammaId" : "",
+  "gammaUrl" : "",
+  "exportUrl" : "",
+  "error" : {
+    "message" : "",
+    "statusCode" : 0.0
+  },
+  "credits" : {
+    "deducted" : 0.0,
+    "remaining" : 0.0
+  }
+}
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
