@@ -1,3 +1,4 @@
+import RequiredMark from '@/components/RequiredMark';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {CLUSTER_ELEMENT_EDGE_LABEL_GAP} from '@/shared/constants';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath} from '@xyflow/react';
@@ -80,7 +81,15 @@ export default function LabeledClusterElementsEdge({
                         transform: getEdgeLabelPosition(),
                     }}
                 >
-                    {nodeLabel ? <span>{node?.data?.clusterElementLabel as string}</span> : ''}
+                    {nodeLabel ? (
+                        <span>
+                            {node?.data?.clusterElementLabel as string}
+
+                            {!!node?.data?.clusterElementRequired && <RequiredMark />}
+                        </span>
+                    ) : (
+                        ''
+                    )}
                 </div>
             </EdgeLabelRenderer>
         </>

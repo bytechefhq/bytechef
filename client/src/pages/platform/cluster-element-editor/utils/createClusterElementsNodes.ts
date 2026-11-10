@@ -47,6 +47,7 @@ export default function createClusterElementNodes({
     filteredClusterElementTypes.forEach((clusterElementType, clusterElementTypeIndex) => {
         const clusterElementTypeName = convertNameToCamelCase(clusterElementType.name || '');
         const clusterElementTypeLabel = clusterElementType.label || '';
+        const clusterElementTypeRequired = !!clusterElementType.required;
         const isMultipleClusterElementsNode = clusterElementType.multipleElements;
         const clusterElementValue = clusterElements[clusterElementTypeName];
 
@@ -108,6 +109,7 @@ export default function createClusterElementNodes({
                 clusterElementTypeIndex,
                 clusterElementTypeLabel,
                 clusterElementTypeName,
+                clusterElementTypeRequired,
                 clusterRootId,
                 isMultipleClusterElementsNode,
                 parentClusterRootElementsTypeCount,
@@ -131,6 +133,7 @@ export default function createClusterElementNodes({
                     clusterElementTypeIndex,
                     clusterElementTypeLabel,
                     clusterElementTypeName,
+                    clusterElementTypeRequired,
                     clusterRootId,
                     currentNestedRootElementTypesCount: isNestedClusterRoot
                         ? filteredClusterElementTypes.length
@@ -170,6 +173,7 @@ export default function createClusterElementNodes({
                     clusterElementTypeIndex,
                     clusterElementTypeLabel,
                     clusterElementTypeName,
+                    clusterElementTypeRequired,
                     clusterRootId,
                     parentClusterRootElementsTypeCount,
                 });

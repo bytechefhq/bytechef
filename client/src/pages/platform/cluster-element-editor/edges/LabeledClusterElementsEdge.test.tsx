@@ -98,6 +98,24 @@ describe('LabeledClusterElementsEdge', () => {
         expect(edge).not.toHaveClass('stroke-red-500');
     });
 
+    it('marks the label of a required cluster element slot', () => {
+        useWorkflowDataStore.setState({
+            nodes: [{...MODEL_PLACEHOLDER_NODE, data: {...MODEL_PLACEHOLDER_NODE.data, clusterElementRequired: true}}],
+        });
+
+        renderEdge();
+
+        expect(screen.getByText('Model')).toHaveTextContent('Model*');
+    });
+
+    it('leaves the label of an optional cluster element slot unmarked', () => {
+        useWorkflowDataStore.setState({nodes: [MODEL_PLACEHOLDER_NODE]});
+
+        renderEdge();
+
+        expect(screen.getByText('Model')).toHaveTextContent(/^Model$/);
+    });
+
     it('labels an edge whose target sits on the main workflow canvas', () => {
         useWorkflowDataStore.setState({nodes: [MODEL_PLACEHOLDER_NODE]});
 

@@ -32,6 +32,7 @@ describe('createPlaceholderNode', () => {
         expect(node).toEqual({
             data: {
                 clusterElementLabel: 'Model',
+                clusterElementRequired: false,
                 clusterElementType: 'model',
                 label: '+',
                 multipleClusterElementsNode: false,
@@ -67,6 +68,17 @@ describe('createPlaceholderNode', () => {
         });
 
         expect(node.position).toEqual({x: 16, y: 140});
+    });
+
+    it('flags the placeholder of a required cluster element slot', () => {
+        const node = createPlaceholderNode({
+            clusterElementTypeLabel: 'Document Retriever',
+            clusterElementTypeName: 'documentRetriever',
+            clusterElementTypeRequired: true,
+            clusterRootId: ROOT_ID,
+        });
+
+        expect(node.data.clusterElementRequired).toBe(true);
     });
 });
 

@@ -12,6 +12,7 @@ interface CreatePlaceholderNodeProps {
     clusterRootId: string;
     clusterElementTypeLabel: string;
     clusterElementTypeName: string;
+    clusterElementTypeRequired?: boolean;
     isMultipleClusterElementsNode?: boolean;
     parentClusterRootElementsTypeCount?: number;
 }
@@ -20,6 +21,7 @@ export function createPlaceholderNode({
     clusterElementTypeIndex = 0,
     clusterElementTypeLabel,
     clusterElementTypeName,
+    clusterElementTypeRequired = false,
     clusterRootId,
     isMultipleClusterElementsNode = false,
     parentClusterRootElementsTypeCount = 1,
@@ -42,6 +44,7 @@ export function createPlaceholderNode({
     return {
         data: {
             clusterElementLabel: clusterElementTypeLabel,
+            clusterElementRequired: clusterElementTypeRequired,
             clusterElementType: clusterElementTypeName,
             label: '+',
             multipleClusterElementsNode: isMultipleClusterElementsNode,
@@ -59,6 +62,7 @@ interface CreateSingleElementsNodeProps {
     clusterRootId: string;
     clusterElementTypeLabel: string;
     clusterElementTypeName: string;
+    clusterElementTypeRequired?: boolean;
     currentNestedRootElementTypesCount?: number;
     parentClusterRootElementsTypeCount: number;
 }
@@ -68,6 +72,7 @@ export function createSingleElementsNode({
     clusterElementTypeIndex,
     clusterElementTypeLabel,
     clusterElementTypeName,
+    clusterElementTypeRequired = false,
     clusterRootId,
     currentNestedRootElementTypesCount,
     parentClusterRootElementsTypeCount,
@@ -90,6 +95,7 @@ export function createSingleElementsNode({
             ...clusterElementItem,
             clusterElementLabel: clusterElementTypeLabel,
             clusterElementName: typeSegments[2],
+            clusterElementRequired: clusterElementTypeRequired,
             clusterElementType: clusterElementTypeName,
             clusterElementTypeIndex,
             clusterElementTypesCount: currentNestedRootElementTypesCount,
