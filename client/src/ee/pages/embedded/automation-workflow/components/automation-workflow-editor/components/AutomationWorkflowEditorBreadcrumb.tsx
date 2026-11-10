@@ -3,7 +3,6 @@ import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator} from '@
 import BreadcrumbTitleSelect from '@/shared/components/BreadcrumbTitleSelect';
 import ListPageBreadcrumbItem from '@/shared/components/ListPageBreadcrumbItem';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {FolderIcon} from 'lucide-react';
 import {ReactNode, useMemo} from 'react';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
@@ -52,7 +51,6 @@ const AutomationWorkflowEditorBreadcrumb = ({
                             </Badge>
                         }
                         currentId={project.id}
-                        icon={FolderIcon}
                         items={items}
                         menuLabel="Projects"
                         name={project.name}

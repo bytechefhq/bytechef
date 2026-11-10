@@ -23,7 +23,7 @@ interface BreadcrumbTitleSelectProps {
     ariaLabel: string;
     badge: ReactNode;
     currentId?: string;
-    icon: LucideIcon;
+    icon?: LucideIcon;
     items?: BreadcrumbTitleSelectItemI[];
     menuLabel: string;
     name: string;
@@ -90,7 +90,7 @@ const BreadcrumbTitleSelect = ({
                             {item.iconSrc ? (
                                 <InlineSVG aria-hidden="true" className="size-4 shrink-0" src={item.iconSrc} />
                             ) : (
-                                <Icon aria-hidden="true" className="size-4 shrink-0" />
+                                Icon && <Icon aria-hidden="true" className="size-4 shrink-0" />
                             )}
 
                             <span className="truncate">{item.name}</span>
