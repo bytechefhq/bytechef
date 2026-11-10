@@ -1,0 +1,602 @@
+---
+title: "Okta"
+description: "Okta is an identity and access management platform that manages users, groups and application assignments, providing single sign-on and lifecycle management for workforce and customer identities."
+---
+
+
+Categories: Developer Tools
+
+
+Type: okta/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| domain | Okta Domain | STRING | The domain of your Okta organization, for example your-org.okta.com. | true |
+| token | API Token | STRING | To create an API token, go to Security -&gt; API -&gt; Tokens in the Okta Admin Console and click Create token. | true |
+
+
+
+## Connection Setup
+
+### Find your Okta domain
+
+Your Okta domain is the host name of your Okta organization, for example `your-org.okta.com` or `your-org.oktapreview.com`. You can see it in the address bar after you sign in to the Okta Admin Console (without the `-admin` part), or in the upper-right corner of the Admin Console under your user name.
+
+### Create an API token
+
+1. Sign in to the Okta Admin Console as an administrator.
+2. Go to *Security* -> *API*.
+3. Open the *Tokens* tab.
+4. Click *Create token*.
+5. Enter a name for the token and click *Create token*.
+6. Copy the token value. Okta shows it only once.
+
+An API token has the permissions of the administrator who created it, so create it with an administrator account that can read users, groups and apps.
+
+### Configure the connection
+
+1. Enter your Okta domain in *Okta Domain*.
+2. Paste the token into *API Token*. ByteChef sends it in the `Authorization: SSWS <token>` header.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Get User
+Name: getUser
+
+`Get a user by ID, login or login shortname.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| userId | User ID | STRING | The ID, login or login shortname of the user. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get User",
+  "name" : "getUser",
+  "parameters" : {
+    "userId" : ""
+  },
+  "type" : "okta/v1/getUser"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The unique ID of the user. |
+| status | STRING | The status of the user, for example ACTIVE, STAGED, PROVISIONED, SUSPENDED, LOCKED_OUT, PASSWORD_EXPIRED, RECOVERY or DEPROVISIONED. |
+| created | STRING | ISO 8601 timestamp for when the user was created. |
+| activated | STRING | ISO 8601 timestamp for when the user was activated. |
+| statusChanged | STRING | ISO 8601 timestamp for when the status of the user last changed. |
+| lastLogin | STRING | ISO 8601 timestamp of the last login of the user. |
+| lastUpdated | STRING | ISO 8601 timestamp for when the user was last updated. |
+| passwordChanged | STRING | ISO 8601 timestamp for when the password of the user last changed. |
+| type | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id)&#125; </details> | The user type. |
+| profile | OBJECT <details> <summary> Properties </summary> &#123;STRING\(login), STRING\(email), STRING\(secondEmail), STRING\(firstName), STRING\(lastName), STRING\(displayName), STRING\(mobilePhone), STRING\(title), STRING\(department)&#125; </details> | The profile properties of the user. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "status" : "",
+  "created" : "",
+  "activated" : "",
+  "statusChanged" : "",
+  "lastLogin" : "",
+  "lastUpdated" : "",
+  "passwordChanged" : "",
+  "type" : {
+    "id" : ""
+  },
+  "profile" : {
+    "login" : "",
+    "email" : "",
+    "secondEmail" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "displayName" : "",
+    "mobilePhone" : "",
+    "title" : "",
+    "department" : ""
+  }
+}
+```
+
+
+
+
+### List Users
+Name: listUsers
+
+`List users in the Okta organization, optionally narrowed by a search expression, a filter expression or a simple query.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| search | Search | STRING | Search expression that matches most user properties, for example profile.department eq "Engineering" or status eq "ACTIVE". Recommended over Filter and Query. | false |
+| filter | Filter | STRING | Filter expression on a limited set of properties (status, lastUpdated, id, profile.login, profile.email, profile.firstName, profile.lastName), for example status eq "ACTIVE". | false |
+| q | Query | STRING | Matches the beginning of the first name, last name or email of users. Doesn't return deprovisioned users and doesn't support pagination. | false |
+| limit | Limit | INTEGER | Maximum number of results to return. Results are fetched page by page until this number is reached. Leave empty to return all results. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Users",
+  "name" : "listUsers",
+  "parameters" : {
+    "search" : "",
+    "filter" : "",
+    "q" : "",
+    "limit" : 1
+  },
+  "type" : "okta/v1/listUsers"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The unique ID of the user. |
+| status | STRING | The status of the user, for example ACTIVE, STAGED, PROVISIONED, SUSPENDED, LOCKED_OUT, PASSWORD_EXPIRED, RECOVERY or DEPROVISIONED. |
+| created | STRING | ISO 8601 timestamp for when the user was created. |
+| activated | STRING | ISO 8601 timestamp for when the user was activated. |
+| statusChanged | STRING | ISO 8601 timestamp for when the status of the user last changed. |
+| lastLogin | STRING | ISO 8601 timestamp of the last login of the user. |
+| lastUpdated | STRING | ISO 8601 timestamp for when the user was last updated. |
+| passwordChanged | STRING | ISO 8601 timestamp for when the password of the user last changed. |
+| type | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id)&#125; </details> | The user type. |
+| profile | OBJECT <details> <summary> Properties </summary> &#123;STRING\(login), STRING\(email), STRING\(secondEmail), STRING\(firstName), STRING\(lastName), STRING\(displayName), STRING\(mobilePhone), STRING\(title), STRING\(department)&#125; </details> | The profile properties of the user. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "status" : "",
+  "created" : "",
+  "activated" : "",
+  "statusChanged" : "",
+  "lastLogin" : "",
+  "lastUpdated" : "",
+  "passwordChanged" : "",
+  "type" : {
+    "id" : ""
+  },
+  "profile" : {
+    "login" : "",
+    "email" : "",
+    "secondEmail" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "displayName" : "",
+    "mobilePhone" : "",
+    "title" : "",
+    "department" : ""
+  }
+} ]
+```
+
+
+
+
+### List User Groups
+Name: listUserGroups
+
+`List the groups the user is a member of.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| userId | User ID | STRING | The ID, login or login shortname of the user. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List User Groups",
+  "name" : "listUserGroups",
+  "parameters" : {
+    "userId" : ""
+  },
+  "type" : "okta/v1/listUserGroups"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The unique ID of the group. |
+| type | STRING | The type of the group: OKTA_GROUP, APP_GROUP or BUILT_IN. |
+| created | STRING | ISO 8601 timestamp for when the group was created. |
+| lastUpdated | STRING | ISO 8601 timestamp for when the group profile was last updated. |
+| lastMembershipUpdated | STRING | ISO 8601 timestamp for when the group memberships were last updated. |
+| objectClass | ARRAY <details> <summary> Items </summary> [STRING] </details> | The object classes of the group. |
+| profile | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), STRING\(description)&#125; </details> | The profile properties of the group. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "type" : "",
+  "created" : "",
+  "lastUpdated" : "",
+  "lastMembershipUpdated" : "",
+  "objectClass" : [ "" ],
+  "profile" : {
+    "name" : "",
+    "description" : ""
+  }
+} ]
+```
+
+
+
+
+### List User App Links
+Name: listUserAppLinks
+
+`List the app links of all apps assigned to the user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| userId | User ID | STRING | The ID, login or login shortname of the user. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List User App Links",
+  "name" : "listUserAppLinks",
+  "parameters" : {
+    "userId" : ""
+  },
+  "type" : "okta/v1/listUserAppLinks"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The ID of the app link. |
+| label | STRING | The display name of the app link. |
+| linkUrl | STRING | The URL of the app link. |
+| logoUrl | STRING | The URL of the app logo. |
+| appName | STRING | The name of the app. |
+| appInstanceId | STRING | The ID of the app instance. |
+| appAssignmentId | STRING | The ID of the app assignment. |
+| credentialsSetup | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether credentials setup is required. |
+| hidden | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the app link is hidden. |
+| sortOrder | INTEGER | The position of the app link in the sort order. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "label" : "",
+  "linkUrl" : "",
+  "logoUrl" : "",
+  "appName" : "",
+  "appInstanceId" : "",
+  "appAssignmentId" : "",
+  "credentialsSetup" : false,
+  "hidden" : false,
+  "sortOrder" : 1
+} ]
+```
+
+
+
+
+### List Group Members
+Name: listGroupMembers
+
+`List the users that are members of the group.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| groupId | Group ID | STRING | The ID of the group. | true |
+| limit | Limit | INTEGER | Maximum number of results to return. Results are fetched page by page until this number is reached. Leave empty to return all results. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Group Members",
+  "name" : "listGroupMembers",
+  "parameters" : {
+    "groupId" : "",
+    "limit" : 1
+  },
+  "type" : "okta/v1/listGroupMembers"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The unique ID of the user. |
+| status | STRING | The status of the user, for example ACTIVE, STAGED, PROVISIONED, SUSPENDED, LOCKED_OUT, PASSWORD_EXPIRED, RECOVERY or DEPROVISIONED. |
+| created | STRING | ISO 8601 timestamp for when the user was created. |
+| activated | STRING | ISO 8601 timestamp for when the user was activated. |
+| statusChanged | STRING | ISO 8601 timestamp for when the status of the user last changed. |
+| lastLogin | STRING | ISO 8601 timestamp of the last login of the user. |
+| lastUpdated | STRING | ISO 8601 timestamp for when the user was last updated. |
+| passwordChanged | STRING | ISO 8601 timestamp for when the password of the user last changed. |
+| type | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id)&#125; </details> | The user type. |
+| profile | OBJECT <details> <summary> Properties </summary> &#123;STRING\(login), STRING\(email), STRING\(secondEmail), STRING\(firstName), STRING\(lastName), STRING\(displayName), STRING\(mobilePhone), STRING\(title), STRING\(department)&#125; </details> | The profile properties of the user. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "status" : "",
+  "created" : "",
+  "activated" : "",
+  "statusChanged" : "",
+  "lastLogin" : "",
+  "lastUpdated" : "",
+  "passwordChanged" : "",
+  "type" : {
+    "id" : ""
+  },
+  "profile" : {
+    "login" : "",
+    "email" : "",
+    "secondEmail" : "",
+    "firstName" : "",
+    "lastName" : "",
+    "displayName" : "",
+    "mobilePhone" : "",
+    "title" : "",
+    "department" : ""
+  }
+} ]
+```
+
+
+
+
+### List Group Apps
+Name: listGroupApps
+
+`List the apps assigned to the group.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| groupId | Group ID | STRING | The ID of the group. | true |
+| limit | Limit | INTEGER | Maximum number of results to return. Results are fetched page by page until this number is reached. Leave empty to return all results. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Group Apps",
+  "name" : "listGroupApps",
+  "parameters" : {
+    "groupId" : "",
+    "limit" : 1
+  },
+  "type" : "okta/v1/listGroupApps"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The unique ID of the app instance. |
+| name | STRING | The key name of the app. |
+| label | STRING | The user-defined display name of the app. |
+| status | STRING | The status of the app: ACTIVE or INACTIVE. |
+| signOnMode | STRING | The authentication mode of the app. |
+| created | STRING | ISO 8601 timestamp for when the app was created. |
+| lastUpdated | STRING | ISO 8601 timestamp for when the app was last updated. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "name" : "",
+  "label" : "",
+  "status" : "",
+  "signOnMode" : "",
+  "created" : "",
+  "lastUpdated" : ""
+} ]
+```
+
+
+
+
+### List Application Users
+Name: listApplicationUsers
+
+`List the users assigned to the app.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| appId | App ID | STRING | The ID of the app. | true |
+| q | Query | STRING | Matches the beginning of the username, first name, last name or email of the assigned users. | false |
+| limit | Limit | INTEGER | Maximum number of results to return. Results are fetched page by page until this number is reached. Leave empty to return all results. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Application Users",
+  "name" : "listApplicationUsers",
+  "parameters" : {
+    "appId" : "",
+    "q" : "",
+    "limit" : 1
+  },
+  "type" : "okta/v1/listApplicationUsers"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The Okta ID of the user. |
+| externalId | STRING | The ID of the user in the target app. |
+| scope | STRING | USER for a direct assignment or GROUP for an assignment through group membership. |
+| status | STRING | The status of the app user. |
+| syncState | STRING | The synchronization state of the app user. |
+| created | STRING | ISO 8601 timestamp for when the app user was created. |
+| lastUpdated | STRING | ISO 8601 timestamp for when the app user was last updated. |
+| lastSync | STRING | ISO 8601 timestamp of the last synchronization of the app user. |
+| statusChanged | STRING | ISO 8601 timestamp for when the status of the app user last changed. |
+| credentials | OBJECT <details> <summary> Properties </summary> &#123;STRING\(userName)&#125; </details> | The app credentials of the user. |
+| profile | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The app-specific profile properties of the user. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : "",
+  "externalId" : "",
+  "scope" : "",
+  "status" : "",
+  "syncState" : "",
+  "created" : "",
+  "lastUpdated" : "",
+  "lastSync" : "",
+  "statusChanged" : "",
+  "credentials" : {
+    "userName" : ""
+  },
+  "profile" : { }
+} ]
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
