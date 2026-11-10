@@ -36,6 +36,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserConnection;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
@@ -1233,12 +1234,14 @@ class ConnectedUserConnectionFacadeIntTest {
         }
 
         private String getProvisionedBy(long connectionId) {
-            return connectedUserConnectionRepository.findAll()
-                .stream()
-                .filter(connectedUserConnection -> connectedUserConnection.getConnectionId() == connectionId)
-                .findFirst()
-                .orElseThrow()
-                .getProvisionedBy();
+            ConnectedUserConnection connectedUserConnection =
+                connectedUserConnectionRepository.findAll()
+                    .stream()
+                    .filter(curConnectedUserConnection -> curConnectedUserConnection.getConnectionId() == connectionId)
+                    .findFirst()
+                    .orElseThrow();
+
+            return connectedUserConnection.getProvisionedBy();
         }
 
         private static ConnectionDTO connectionDTO() {
