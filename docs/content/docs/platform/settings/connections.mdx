@@ -88,6 +88,8 @@ In the automation **Connections** list, choose **Edit** on the connection. The d
 
 Only the connection's owner (the user who created it) or a tenant admin can replace its credentials, and the **Update credentials** button is shown only to them. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` audit event. The event holds the connection id only; credential values are never recorded.
 
+This applies to automation connections only. Embedded connections are covered in [Embedded connections](/platform/embedded/build/connections).
+
 ## Changing visibility
 
 Every connection in the automation **Connections** list carries a **scope badge** next to its name, showing where the connection currently reaches:
