@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.audit.WorkspaceConnectionAuditEvents;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
@@ -22,12 +23,15 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +64,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class WorkspaceConnectionAuditIntTest {
 
     private static final long CONNECTION_ID = 42L;
+
+    @MockitoBean
+    private ConnectionService connectionService;
 
     @MockitoBean
     private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
@@ -124,6 +131,24 @@ class WorkspaceConnectionAuditIntTest {
             .containsEntry("connectionId", String.valueOf(CONNECTION_ID));
     }
 
+    @Test
+    void testUpdateConnectionCredentialsRecordsTheConnectionWithoutTheCredentials() {
+        authenticate(AuthorityConstants.ADMIN);
+
+        when(connectionService.getConnection(CONNECTION_ID)).thenReturn(new Connection());
+
+        workspaceConnectionFacade.updateConnectionCredentials(CONNECTION_ID, Map.of("token", "secret-token"), 0);
+
+        PersistentAuditEvent persistentAuditEvent = findSingle();
+
+        assertThat(persistentAuditEvent.getEventType())
+            .isEqualTo(WorkspaceConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED);
+        assertThat(persistentAuditEvent.getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectionId", String.valueOf(CONNECTION_ID))
+            .doesNotContainValue("secret-token");
+    }
+
     private static void authenticate(String authority) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
@@ -149,11 +174,12 @@ class WorkspaceConnectionAuditIntTest {
 
         @Bean
         WorkspaceConnectionFacade workspaceConnectionFacade(
-            ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
+            ConnectionService connectionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
             return new WorkspaceConnectionFacadeImpl(
-                mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), projectDeploymentWorkflowService,
-                mock(WorkflowTestConfigurationService.class), mock(WorkspaceConnectionService.class));
+                mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), connectionService,
+                projectDeploymentWorkflowService, mock(WorkflowTestConfigurationService.class),
+                mock(WorkspaceConnectionService.class));
         }
     }
 }

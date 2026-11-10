@@ -16,13 +16,16 @@
 
 package com.bytechef.automation.configuration.web.graphql;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
@@ -96,5 +99,25 @@ public class ConnectionGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(workspaceConnectionFacade).disconnectConnection(connectionId);
+    }
+
+    @Test
+    void testUpdateConnectionCredentials() {
+        doNothing().when(workspaceConnectionFacade)
+            .updateConnectionCredentials(anyLong(), anyMap(), anyInt());
+
+        this.graphQlTester
+            .document("""
+                mutation UpdateConnectionCredentials($input: UpdateConnectionCredentialsInput!) {
+                    updateConnectionCredentials(input: $input)
+                }
+                """)
+            .variable("input", Map.of("connectionId", 789, "parameters", Map.of("token", "new-token"), "version", 3))
+            .execute()
+            .path("updateConnectionCredentials")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(workspaceConnectionFacade).updateConnectionCredentials(789L, Map.of("token", "new-token"), 3);
     }
 }

@@ -21,16 +21,22 @@ import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +50,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
     private final ConnectionFacade connectionFacade;
     private final ConnectionLifecycleFacade connectionLifecycleFacade;
+    private final ConnectionService connectionService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkspaceConnectionService workspaceConnectionService;
@@ -51,12 +58,13 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @SuppressFBWarnings("EI")
     public WorkspaceConnectionFacadeImpl(
         ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
-        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ConnectionService connectionService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService) {
 
         this.connectionFacade = connectionFacade;
         this.connectionLifecycleFacade = connectionLifecycleFacade;
+        this.connectionService = connectionService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
@@ -101,5 +109,28 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
         return connectionFacade.getConnections(
             componentName, connectionVersion, connectionIds, tagId, environmentId, PlatformType.AUTOMATION);
+    }
+
+    @Override
+    @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId")
+    })
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
+        Connection connection = connectionService.getConnection(connectionId);
+
+        if (connection.getStatus() != ConnectionStatus.ACTIVE) {
+            throw new ConfigurationException(
+                "Credentials cannot be replaced on a connection with status %s".formatted(connection.getStatus()),
+                ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        if (connection.getVersion() != version) {
+            throw new ConfigurationException(
+                "Connection id=%s was modified by someone else; reload and try again".formatted(connectionId),
+                ConnectionErrorType.INVALID_CONNECTION);
+        }
+
+        connectionFacade.replaceAuthorizationParameters(connectionId, parameters);
     }
 }

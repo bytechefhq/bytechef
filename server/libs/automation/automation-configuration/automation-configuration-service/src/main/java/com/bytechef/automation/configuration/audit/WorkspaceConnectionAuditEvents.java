@@ -21,6 +21,7 @@ package com.bytechef.automation.configuration.audit;
  */
 public final class WorkspaceConnectionAuditEvents {
 
+    public static final String CONNECTION_CREDENTIALS_UPDATED = "CONNECTION_CREDENTIALS_UPDATED";
     public static final String CONNECTION_DISCONNECTED = "CONNECTION_DISCONNECTED";
 
     private WorkspaceConnectionAuditEvents() {
