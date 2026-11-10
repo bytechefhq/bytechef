@@ -16,6 +16,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-core")
     testImplementation("org.testcontainers:postgresql")
     testImplementation(testFixtures(project(":server:ee:libs:core:remote:remote-grpc")))
+    testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
