@@ -1,0 +1,15 @@
+### Before you start
+
+- Only Instagram professional accounts (business or creator) are supported.
+- Images must be JPEG files and videos must be reachable at a public URL. Instagram downloads the media from the URL, so links that need a login or that expire quickly do not work.
+- Instagram allows up to 100 posts published through the API in a 24 hour period. A carousel counts as one post.
+- Every action works on the Instagram account that was used to create the connection.
+
+### How to find a Media ID
+
+1. Use the **New Comment** trigger and look at the `media_id` value in its output, or
+2. Use the `id` value returned by **Create Image Post**, **Create Carousel Post** or **Create Reel**.
+
+### How to find a Comment ID
+
+Use the `id` value of a comment returned by **Get Comments** or by the **New Comment** trigger.
