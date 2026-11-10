@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261110120000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="automation_workflow_project"/>
+        </preConditions>
+
+        <renameTable oldTableName="automation_workflow_project" newTableName="automation_project"/>
+    </changeSet>
+
+    <changeSet id="20261110120000-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="automation_workflow_project_workflow"/>
+        </preConditions>
+
+        <renameTable oldTableName="automation_workflow_project_workflow" newTableName="automation_project_workflow"/>
+    </changeSet>
+
+    <changeSet id="20261110120000-3" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="automation_workflow_project_configuration"/>
+        </preConditions>
+
+        <renameTable oldTableName="automation_workflow_project_configuration" newTableName="automation_project_configuration"/>
+    </changeSet>
+
+    <changeSet id="20261110120000-4" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="automation_workflow_project_configuration_workflow"/>
+        </preConditions>
+
+        <renameTable oldTableName="automation_workflow_project_configuration_workflow" newTableName="automation_project_configuration_workflow"/>
+    </changeSet>
+
+    <changeSet id="20261110120000-5" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="automation_project_configuration_workflow" columnName="automation_workflow_project_configuration_id"/>
+        </preConditions>
+
+        <renameColumn tableName="automation_project_configuration_workflow" oldColumnName="automation_workflow_project_configuration_id" newColumnName="automation_project_configuration_id"
+                      columnDataType="BIGINT"/>
+    </changeSet>
+
+    <changeSet id="20261110120000-6" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="connected_user_project_configuration" columnName="automation_workflow_project_configuration_id"/>
+        </preConditions>
+
+        <renameColumn tableName="connected_user_project_configuration" oldColumnName="automation_workflow_project_configuration_id" newColumnName="automation_project_configuration_id"
+                      columnDataType="BIGINT"/>
+    </changeSet>
+
+    <changeSet id="20261110120000-7" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="connected_user_project_workflow" columnName="automation_workflow_uuid"/>
+        </preConditions>
+
+        <renameColumn tableName="connected_user_project_workflow" oldColumnName="automation_workflow_uuid" newColumnName="automation_uuid"
+                      columnDataType="VARCHAR(36)"/>
+    </changeSet>
+
+    <changeSet id="20261110120000-8" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.table_constraints
+                WHERE LOWER(constraint_name) = 'uk_automation_workflow_project_project_id'
+                AND LOWER(table_schema) = LOWER(current_schema())
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE automation_project
+            RENAME CONSTRAINT uk_automation_workflow_project_project_id TO uk_automation_project_project_id
+        </sql>
+
+        <rollback>
+            <sql>
+                ALTER TABLE automation_project
+                RENAME CONSTRAINT uk_automation_project_project_id TO uk_automation_workflow_project_project_id
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261110120000-9" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.table_constraints
+                WHERE LOWER(constraint_name) = 'fk_automation_workflow_project_project'
+                AND LOWER(table_schema) = LOWER(current_schema())
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE automation_project
+            RENAME CONSTRAINT fk_automation_workflow_project_project TO fk_automation_project_project
+        </sql>
+
+        <rollback>
+            <sql>
+                ALTER TABLE automation_project
+                RENAME CONSTRAINT fk_automation_project_project TO fk_automation_workflow_project_project
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261110120000-10" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.table_constraints
+                WHERE LOWER(constraint_name) = 'uk_automation_workflow_project_workflow_workflow_uuid'
+                AND LOWER(table_schema) = LOWER(current_schema())
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE automation_project_workflow
+            RENAME CONSTRAINT uk_automation_workflow_project_workflow_workflow_uuid TO uk_automation_project_workflow_workflow_uuid
+        </sql>
+
+        <rollback>
+            <sql>
+                ALTER TABLE automation_project_workflow
+                RENAME CONSTRAINT uk_automation_project_workflow_workflow_uuid TO uk_automation_workflow_project_workflow_workflow_uuid
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261110120000-11" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.table_constraints
+                WHERE LOWER(constraint_name) = 'fk_automation_workflow_project_workflow_project'
+                AND LOWER(table_schema) = LOWER(current_schema())
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE automation_project_workflow
+            RENAME CONSTRAINT fk_automation_workflow_project_workflow_project TO fk_automation_project_workflow_project
+        </sql>
+
+        <rollback>
+            <sql>
+                ALTER TABLE automation_project_workflow
+                RENAME CONSTRAINT fk_automation_project_workflow_project TO fk_automation_workflow_project_workflow_project
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261110120000-12" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.table_constraints
+                WHERE LOWER(constraint_name) = 'fk_automation_workflow_project_configuration_project'
+                AND LOWER(table_schema) = LOWER(current_schema())
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE automation_project_configuration
+            RENAME CONSTRAINT fk_automation_workflow_project_configuration_project TO fk_automation_project_configuration_project
+        </sql>
+
+        <rollback>
+            <sql>
+                ALTER TABLE automation_project_configuration
+                RENAME CONSTRAINT fk_automation_project_configuration_project TO fk_automation_workflow_project_configuration_project
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261110120000-13" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.table_constraints
+                WHERE LOWER(constraint_name) = 'fk_automation_workflow_project_configuration_workflow_configuration'
+                AND LOWER(table_schema) = LOWER(current_schema())
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE automation_project_configuration_workflow
+            RENAME CONSTRAINT fk_automation_workflow_project_configuration_workflow_configuration TO fk_automation_project_configuration_workflow_configuration
+        </sql>
+
+        <rollback>
+            <sql>
+                ALTER TABLE automation_project_configuration_workflow
+                RENAME CONSTRAINT fk_automation_project_configuration_workflow_configuration TO fk_automation_workflow_project_configuration_workflow_configuration
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261110120000-14" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.table_constraints
+                WHERE LOWER(constraint_name) = 'uk_automation_workflow_project_configuration_workflow_uuid'
+                AND LOWER(table_schema) = LOWER(current_schema())
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE automation_project_configuration_workflow
+            RENAME CONSTRAINT uk_automation_workflow_project_configuration_workflow_uuid TO uk_automation_project_configuration_workflow_uuid
+        </sql>
+
+        <rollback>
+            <sql>
+                ALTER TABLE automation_project_configuration_workflow
+                RENAME CONSTRAINT uk_automation_project_configuration_workflow_uuid TO uk_automation_workflow_project_configuration_workflow_uuid
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261110120000-15" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.table_constraints
+                WHERE LOWER(constraint_name) = 'ck_cupw_project_or_automation_workflow_not_both'
+                AND LOWER(table_schema) = LOWER(current_schema())
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE connected_user_project_workflow
+            RENAME CONSTRAINT ck_cupw_project_or_automation_workflow_not_both TO ck_cupw_project_or_automation_not_both
+        </sql>
+
+        <rollback>
+            <sql>
+                ALTER TABLE connected_user_project_workflow
+                RENAME CONSTRAINT ck_cupw_project_or_automation_not_both TO ck_cupw_project_or_automation_workflow_not_both
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261110120000-16" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <indexExists tableName="automation_project_configuration" indexName="uk_automation_workflow_project_configuration_name"/>
+        </preConditions>
+
+        <sql>
+            ALTER INDEX uk_automation_workflow_project_configuration_name
+            RENAME TO uk_automation_project_configuration_name
+        </sql>
+
+        <rollback>
+            <sql>
+                ALTER INDEX uk_automation_project_configuration_name
+                RENAME TO uk_automation_workflow_project_configuration_name
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261110120000-17" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <indexExists tableName="connected_user_project_workflow" indexName="uk_cupw_connected_user_project_id_automation_workflow_uuid"/>
+        </preConditions>
+
+        <sql>
+            ALTER INDEX uk_cupw_connected_user_project_id_automation_workflow_uuid
+            RENAME TO uk_cupw_connected_user_project_id_automation_uuid
+        </sql>
+
+        <rollback>
+            <sql>
+                ALTER INDEX uk_cupw_connected_user_project_id_automation_uuid
+                RENAME TO uk_cupw_connected_user_project_id_automation_workflow_uuid
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
