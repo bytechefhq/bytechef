@@ -141,7 +141,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
         "bytechef.audit.enabled=true",
         "bytechef.workflow.repository.jdbc.enabled=true",
         "bytechef.webhook-url=/webhooks/{id}",
-        "spring.liquibase.contexts=configuration,user",
+        "spring.liquibase.contexts=configuration,user,execution",
         "spring.main.allow-bean-definition-overriding=true"
     })
 @Import(PostgreSQLContainerConfiguration.class)

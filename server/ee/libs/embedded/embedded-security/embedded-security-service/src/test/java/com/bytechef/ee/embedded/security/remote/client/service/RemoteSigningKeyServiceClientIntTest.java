@@ -54,7 +54,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     classes = EmbeddedSecurityIntTestConfiguration.class,
     properties = {
         "bytechef.edition=ee", "spring.liquibase.change-log=classpath:config/liquibase/embedded-security-testint.xml",
-        "spring.liquibase.contexts=configuration"
+        "spring.liquibase.contexts=configuration,execution"
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {

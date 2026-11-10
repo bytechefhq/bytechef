@@ -30,7 +30,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = IntegrationIntTestConfiguration.class, properties = "spring.liquibase.contexts=configuration,user")
+    classes = IntegrationIntTestConfiguration.class,
+    properties = "spring.liquibase.contexts=configuration,user,execution")
 @Import(PostgreSQLContainerConfiguration.class)
 @IntegrationIntTestConfigurationSharedMocks
 class ConnectedUserProjectDeploymentResolverIntTest {
