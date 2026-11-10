@@ -1,5 +1,5 @@
 import {render, screen} from '@testing-library/react';
-import {describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import FunctionSignatureTooltip from './FunctionSignatureTooltip';
 
@@ -43,6 +43,10 @@ const containsMapDefinition = {
 } as never;
 
 describe('FunctionSignatureTooltip', () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
     it('renders the function name and return type', () => {
         render(<FunctionSignatureTooltip activeArgIndex={0} definitions={[definition]} />);
 
@@ -66,7 +70,7 @@ describe('FunctionSignatureTooltip', () => {
 
         expect(screen.getAllByText('contains')).toHaveLength(2);
         expect(screen.getByText('element: Boolean')).toBeInTheDocument();
-        expect(screen.getByText('element: Map')).toBeInTheDocument();
+        expect(screen.getByText('element: Object')).toBeInTheDocument();
         expect(screen.getByText('The boolean element to search for')).toBeInTheDocument();
         expect(screen.getByText('The map element to search for')).toBeInTheDocument();
     });
@@ -80,5 +84,27 @@ describe('FunctionSignatureTooltip', () => {
         );
 
         expect(screen.getAllByText('The list to search in')).toHaveLength(1);
+    });
+
+    it('keeps each signature on one line when it fits', () => {
+        render(<FunctionSignatureTooltip activeArgIndex={0} definitions={[definition]} />);
+
+        expect(screen.getByTestId('signature-parameters')).not.toHaveClass('block');
+    });
+
+    it('moves the parameters onto their own line when a signature does not fit', () => {
+        vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(500);
+        vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(300);
+
+        render(
+            <FunctionSignatureTooltip
+                activeArgIndex={0}
+                definitions={[containsBooleanDefinition, containsMapDefinition]}
+            />
+        );
+
+        for (const parameters of screen.getAllByTestId('signature-parameters')) {
+            expect(parameters).toHaveClass('block', 'pl-4');
+        }
     });
 });
