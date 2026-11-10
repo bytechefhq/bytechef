@@ -30,6 +30,7 @@ const hoisted = vi.hoisted(() => {
             workflowTestExecution: undefined as unknown,
             workflowTestNodeStates: {},
         },
+        navigate: vi.fn(),
         nodePanelSpies: {
             setCurrentNode: vi.fn(),
             setWorkflowNodeDetailsPanelOpen: vi.fn(),
@@ -43,6 +44,7 @@ const queryMocks = vi.hoisted(() => ({
     projectQuery: {data: {id: 42}} as {data?: {id: number; lastProjectVersion?: number; lastPublishedDate?: Date}},
     projectVersionWorkflowsQueryArguments: [] as unknown[],
     projectWorkflowsQuery: {data: []} as {data?: {version?: number; workflowUuid?: string}[]},
+    workspaceProjectsQuery: {data: undefined} as {data?: {id: number; projectWorkflowIds?: number[]}[]},
 }));
 
 // Mocks for Zustand stores used inside the hook
@@ -105,7 +107,7 @@ vi.mock('sonner', () => ({toast: vi.fn()}));
 // React Router hooks used inside the hook
 vi.mock('react-router-dom', () => ({
     useLoaderData: () => ({}),
-    useNavigate: () => vi.fn(),
+    useNavigate: () => hoisted.navigate,
     useSearchParams: () => [new URLSearchParams(''), vi.fn()],
 }));
 
@@ -113,6 +115,7 @@ vi.mock('react-router-dom', () => ({
 vi.mock('@/shared/queries/automation/projects.queries', () => ({
     ProjectKeys: {filteredProjects: (_: unknown) => ['filtered', _], project: (_: number) => ['project', _]},
     useGetProjectQuery: () => queryMocks.projectQuery,
+    useGetWorkspaceProjectsQuery: () => queryMocks.workspaceProjectsQuery,
 }));
 vi.mock('@/shared/queries/automation/projectWorkflows.queries', () => ({
     useGetProjectVersionWorkflowsQuery: (...queryArguments: unknown[]) => {
@@ -216,6 +219,8 @@ describe('useProjectHeader', () => {
         resetIfMock(hoisted.editorSpies as unknown as Record<string, unknown>);
         resetIfMock(hoisted.nodePanelSpies as unknown as Record<string, unknown>);
         resetIfMock(hoisted.chatSpies as unknown as Record<string, unknown>);
+        hoisted.navigate.mockReset();
+        queryMocks.workspaceProjectsQuery = {data: undefined};
 
         const chatState = hoisted.chatSpies as {chatTriggerName?: string; workflowTestChatPanelOpen: boolean};
 
@@ -628,5 +633,44 @@ describe('useProjectHeader', () => {
         expect(hoisted.nodePanelSpies.setCurrentNode).not.toHaveBeenCalled();
         expect(hoisted.editorSpies.setShowBottomPanelOpen).not.toHaveBeenCalledWith(false);
         expect(panelRef.current?.resize).not.toHaveBeenCalledWith(0);
+    });
+
+    it('opens the first workflow of the selected project', () => {
+        queryMocks.workspaceProjectsQuery = {
+            data: [
+                {id: 42, projectWorkflowIds: [7]},
+                {id: 43, projectWorkflowIds: [31, 32]},
+            ],
+        };
+
+        const {result} = renderHook(() =>
+            useProjectHeader({bottomResizablePanelRef: makePanelRef(0), chatTrigger: false, projectId: 42})
+        );
+
+        act(() => {
+            result.current.handleProjectValueChange(43);
+        });
+
+        expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects/43/project-workflows/31?');
+    });
+
+    it('stays on the current workflow when the current project or a project without workflows is selected', () => {
+        queryMocks.workspaceProjectsQuery = {
+            data: [
+                {id: 42, projectWorkflowIds: [7]},
+                {id: 44, projectWorkflowIds: []},
+            ],
+        };
+
+        const {result} = renderHook(() =>
+            useProjectHeader({bottomResizablePanelRef: makePanelRef(0), chatTrigger: false, projectId: 42})
+        );
+
+        act(() => {
+            result.current.handleProjectValueChange(42);
+            result.current.handleProjectValueChange(44);
+        });
+
+        expect(hoisted.navigate).not.toHaveBeenCalled();
     });
 });

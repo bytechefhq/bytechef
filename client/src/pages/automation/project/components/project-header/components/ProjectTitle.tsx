@@ -1,32 +1,52 @@
 import Badge from '@/components/Badge/Badge';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import BreadcrumbTitleSelect, {getPublishedVersion} from '@/shared/components/BreadcrumbTitleSelect';
 import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';
+import {FolderIcon} from 'lucide-react';
+import {useMemo} from 'react';
 
-const ProjectTitle = ({project}: {project: Project}) => {
+interface ProjectTitleProps {
+    onProjectValueChange?: (projectId: number) => void;
+    project: Project;
+    projects?: Project[];
+}
+
+const ProjectTitle = ({onProjectValueChange, project, projects}: ProjectTitleProps) => {
+    const items = useMemo(
+        () =>
+            projects?.map((workspaceProject) => ({
+                disabled: !workspaceProject.projectWorkflowIds?.length,
+                id: String(workspaceProject.id),
+                name: workspaceProject.name,
+                publishedVersion: getPublishedVersion(
+                    workspaceProject.lastPublishedDate,
+                    workspaceProject.lastProjectVersion,
+                    workspaceProject.lastStatus === ProjectStatus.Published
+                ),
+            })),
+        [projects]
+    );
+
     return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <div className="flex max-w-96 min-w-0 items-center space-x-2">
-                    <h1 className="truncate">{project?.name}</h1>
+        <BreadcrumbTitleSelect
+            ariaLabel="Project select"
+            badge={
+                <Badge
+                    className="flex shrink-0 space-x-1 border-transparent"
+                    styleType={project.lastStatus === ProjectStatus.Published ? 'success-outline' : 'secondary-filled'}
+                    weight="semibold"
+                >
+                    <span>V{project.lastProjectVersion}</span>
 
-                    {project.name.length > 43 && <TooltipContent>{project.name}</TooltipContent>}
-
-                    {project && (
-                        <Badge
-                            className="flex shrink-0 space-x-1 border-transparent"
-                            styleType={
-                                project.lastStatus === ProjectStatus.Published ? 'success-outline' : 'secondary-filled'
-                            }
-                            weight="semibold"
-                        >
-                            <span>V{project.lastProjectVersion}</span>
-
-                            <span>{project.lastStatus}</span>
-                        </Badge>
-                    )}
-                </div>
-            </TooltipTrigger>
-        </Tooltip>
+                    <span>{project.lastStatus}</span>
+                </Badge>
+            }
+            currentId={project.id !== undefined ? String(project.id) : undefined}
+            icon={FolderIcon}
+            items={items}
+            menuLabel="Projects"
+            name={project.name}
+            onValueChange={onProjectValueChange && ((value) => onProjectValueChange(Number(value)))}
+        />
     );
 };
 

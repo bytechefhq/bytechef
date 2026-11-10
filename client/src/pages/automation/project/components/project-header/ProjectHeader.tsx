@@ -84,6 +84,7 @@ const ProjectHeader = ({
     const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
     const isSaving = useIsMutating();
     const {
+        handleProjectValueChange,
         handleProjectWorkflowValueChange,
         handlePublishProjectSubmit,
         handleRunClick,
@@ -93,6 +94,7 @@ const ProjectHeader = ({
         project,
         projectWorkflows,
         publishProjectMutationIsPending,
+        workspaceProjects,
     } = useProjectHeader({
         bottomResizablePanelRef,
         chatTrigger,
@@ -131,7 +133,9 @@ const ProjectHeader = ({
                                 projectWorkflows={projectWorkflows}
                             />
                         }
+                        onProjectValueChange={handleProjectValueChange}
                         project={project}
+                        projects={workspaceProjects}
                     />
                 ) : (
                     <ProjectBreadcrumbSkeleton />
