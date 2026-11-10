@@ -2,16 +2,25 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 
 import {forEachNestedTaskGroup} from './taskTraversalUtils';
 
-function visitTasks(
-    tasks: Array<WorkflowTask>,
-    inheritedTaskNames: Set<string>,
-    availableTaskNamesByTaskName: Map<string, Set<string>>
-): void {
+interface VisitTasksProps {
+    availableTaskNamesByTaskName: Map<string, Set<string>>;
+    inheritedTaskNames: Set<string>;
+    repeated: boolean;
+    tasks: Array<WorkflowTask>;
+}
+
+function isLoopTask(task: WorkflowTask): boolean {
+    return !!task.type?.startsWith('loop/');
+}
+
+function visitTasks({availableTaskNamesByTaskName, inheritedTaskNames, repeated, tasks}: VisitTasksProps): void {
     tasks.forEach((currentTask, index) => {
         const availableTaskNames = new Set(inheritedTaskNames);
 
-        for (const precedingTask of tasks.slice(0, index)) {
-            availableTaskNames.add(precedingTask.name);
+        const candidateTasks = repeated ? tasks : tasks.slice(0, index);
+
+        for (const candidateTask of candidateTasks) {
+            availableTaskNames.add(candidateTask.name);
         }
 
         if (!availableTaskNamesByTaskName.has(currentTask.name)) {
@@ -23,9 +32,15 @@ function visitTasks(
         }
 
         const nestedInheritedTaskNames = new Set([...availableTaskNames, currentTask.name]);
+        const nestedTasksRepeated = isLoopTask(currentTask);
 
         forEachNestedTaskGroup(currentTask.parameters as Record<string, unknown>, (nestedTasks) =>
-            visitTasks(nestedTasks, nestedInheritedTaskNames, availableTaskNamesByTaskName)
+            visitTasks({
+                availableTaskNamesByTaskName,
+                inheritedTaskNames: nestedInheritedTaskNames,
+                repeated: nestedTasksRepeated,
+                tasks: nestedTasks,
+            })
         );
     });
 }
@@ -45,11 +60,14 @@ export default function getAvailableTaskNamesByTaskName(tasks: Array<WorkflowTas
 
     const availableTaskNamesByTaskName = new Map<string, Set<string>>();
 
-    visitTasks(
-        tasks.filter((currentTask) => !nestedTaskNames.has(currentTask.name)),
-        new Set(),
-        availableTaskNamesByTaskName
-    );
+    const topLevelTasks = tasks.filter((currentTask) => !nestedTaskNames.has(currentTask.name));
+
+    visitTasks({
+        availableTaskNamesByTaskName,
+        inheritedTaskNames: new Set(),
+        repeated: false,
+        tasks: topLevelTasks,
+    });
 
     return availableTaskNamesByTaskName;
 }
