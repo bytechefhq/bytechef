@@ -362,9 +362,22 @@ public class WorkspaceConnectionFacadeIntTest {
         }
 
         @Test
-        void testUpdateConnectionCredentialsIsAdminOnly() {
-            assertRequiresAdminAuthority(
-                () -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of(), 0));
+        void testUpdateConnectionCredentialsDeniesAUserWhoIsNeitherOwnerNorAdmin() {
+            assertDenied(() -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of(), 0));
+        }
+
+        @Test
+        void testUpdateConnectionCredentialsAdmitsTheConnectionOwner() {
+            when(permissionService.isResourceOwner("Connection", 1L)).thenReturn(true);
+
+            assertNotDenied(() -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of(), 0));
+        }
+
+        @Test
+        void testUpdateConnectionCredentialsAdmitsATenantAdmin() {
+            when(permissionService.isTenantAdmin()).thenReturn(true);
+
+            assertNotDenied(() -> workspaceConnectionFacade.updateConnectionCredentials(1L, Map.of(), 0));
         }
 
         private void assertRequiresAdminAuthority(ThrowingCallable call) {
