@@ -79,6 +79,15 @@ The detail opens as two panes:
 - **Right** - the workflow rendered read-only on the canvas, so the selected task is visible in the
   context of the whole workflow.
 
+The copy button at the end of the tabs row (tooltip: "Copy to clipboard") copies what the open tab
+shows: the task's Input or Output as JSON, or its error.
+
+> **Coming soon.** The **Logs** tab gets a copy button next to **Expand all** / **Collapse all**. It
+> copies only the entries that pass the level filters and the search, one line per entry (time,
+> level, message), followed by any exception and stack trace. A run that failed before any task ran,
+> for example because its trigger could not refresh an OAuth2 token, shows its error message and stack
+> trace in place of the two panes, with a copy button that copies both as plain text.
+
 The read-only canvas is coloured from the stored run: each task that ran is green
 with its duration or red if it failed, the wires along the path the run took follow, and tasks the
 run never reached stay grey. A task that ran more than once shows its total time. Each AI Agent is

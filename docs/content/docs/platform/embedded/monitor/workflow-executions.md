@@ -81,6 +81,9 @@ Click on any execution row to open a detail sheet that shows:
 - Error messages and stack traces for failed steps.
 - The data passed between steps in the workflow.
 
+A step's Input, Output and error can be copied with the copy button at the end of its tabs row,
+the same way as in the [automation execution detail](/platform/automation/monitor/workflow-executions#what-the-detail-view-shows).
+
 <!-- TODO screenshot: Workflow execution detail sheet open, showing the workflow panel with a selected step and its Input / Output / Error tabs -->
 
 For an automation execution, the detail sheet reuses the automation execution view and carries an [AI Copilot](/platform/automation/build/ai-copilot): it analyzes the finished or failed execution and helps debug errors. Copilot is an Enterprise Edition feature and is disabled by default _(the AI Copilot is coming soon - not yet available in the latest released version)_.
