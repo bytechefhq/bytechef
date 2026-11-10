@@ -60,9 +60,18 @@ Both overrides are applied in the facade, ignoring the request body, so a hand-c
 
 ### What sharing actually exposes
 
-`WORKSPACE` grants **use plus existence**, not read plus write. Both connection REST controllers obfuscate `authorizationParameters` and return `parameters` as null, and the only connection API that changes authorization parameters after creation, `updateConnectionCredentials`, is limited to the connection's owner and tenant admins (see [Replacing credentials](#replacing-credentials)). A colleague can run a workflow against your account; they cannot extract the credential or repoint it somewhere else.
+`WORKSPACE` grants **use plus existence**, not read plus write. Both connection REST controllers obfuscate `authorizationParameters` and return `parameters` as null, and the only connection API that changes authorization parameters after creation, `updateConnectionCredentials`, is limited to the connection's owner and tenant admins (see [Replacing credentials](#replacing-credentials)). Editing a connection's properties, such as its base URI, is limited to the same people (see [Editing connection properties](#editing-connection-properties)). A colleague can run a workflow against your account; they cannot extract the credential or repoint it somewhere else.
 
 Visibility is also a **precondition** of the permission check, not a filter running beside it - without that, a member holding `CONNECTION_EDIT` would pass a by-id check for a connection the list correctly hides.
+
+## Editing connection properties
+
+Some connections have properties besides their credentials, for example the base URI of an HTTP Client connection. In the automation **Connections** list, choose **Edit** on the connection. The dialog shows the connection's name, its properties filled in with the stored values, and its tags. Change what you need and click **Save**.
+
+- Only the connection's properties are changed. The stored credentials are kept; replace them with **Update credentials** (see [Replacing credentials](#replacing-credentials)).
+- A property you clear is removed from the connection.
+- Only the connection's owner (the user who created it) or a tenant admin can save the changes.
+- If someone else changed the connection after you opened it, the save is rejected. Reload and try again.
 
 ## Replacing credentials
 
@@ -70,7 +79,7 @@ When a connection's credentials stop working, for example after a password chang
 
 In the automation **Connections** list, choose **Edit** on the connection. The dialog opens on the credentials form by itself when the connection's credentials were rejected; otherwise click **Update credentials** in the dialog footer. Enter the new values, click **Update credentials** again, and the dialog confirms with "Credentials updated".
 
-- The new values **replace** the stored authorization parameters. A credential field you leave blank is cleared, not kept.
+- The new values **replace** the stored authorization parameters. A credential field you leave blank is cleared, not kept, and tokens saved for the previous credentials, such as an OAuth2 refresh token, are discarded.
 - Properties outside the authorization, such as a base URL or region, are not changed, and the authorization type cannot be switched.
 - Saving stores the values; it does not test them. A wrong credential is flagged as invalid the next time the connection runs.
 - Saving clears the connection's invalid-credentials flag, so workflows that were blocked by it run again.
