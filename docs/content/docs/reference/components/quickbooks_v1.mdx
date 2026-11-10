@@ -301,6 +301,72 @@ Type: OBJECT
 
 
 
+### Get Bill
+Name: getBill
+
+`Gets details about a specific vendor bill.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| bill | Bill ID | STRING | ID of the bill to get. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Bill",
+  "name" : "getBill",
+  "parameters" : {
+    "bill" : ""
+  },
+  "type" : "quickbooks/v1/getBill"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| Bill | OBJECT <details> <summary> Properties </summary> &#123;STRING\(domain), STRING\(Id), STRING\(DocNumber), STRING\(TxnDate), STRING\(DueDate), &#123;STRING\(name), STRING\(value)&#125;\(VendorRef), &#123;STRING\(name), STRING\(value)&#125;\(CurrencyRef), STRING\(TotalAmt), STRING\(Balance), STRING\(PrivateNote)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "Bill" : {
+    "domain" : "",
+    "Id" : "",
+    "DocNumber" : "",
+    "TxnDate" : "",
+    "DueDate" : "",
+    "VendorRef" : {
+      "name" : "",
+      "value" : ""
+    },
+    "CurrencyRef" : {
+      "name" : "",
+      "value" : ""
+    },
+    "TotalAmt" : "",
+    "Balance" : "",
+    "PrivateNote" : ""
+  }
+}
+```
+
+
+
+
 ### Get Customer
 Name: getCustomer
 
@@ -535,6 +601,84 @@ Type: OBJECT
       "name" : ""
     },
     "totalAmt" : ""
+  }
+}
+```
+
+
+
+
+### Search Bills
+Name: searchBills
+
+`Searches vendor bills, optionally filtered by vendor, due date range and open balance.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| vendorId | Vendor ID | STRING | ID of the vendor whose bills should be returned. | false |
+| dueDateFrom | Due Date From | DATE | Return only bills due on or after this date. | false |
+| dueDateTo | Due Date To | DATE | Return only bills due on or before this date. | false |
+| openBalanceOnly | Open Balance Only | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, return only bills with a balance greater than zero. | false |
+| maxResults | Max Results | INTEGER | Maximum number of bills to return. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Bills",
+  "name" : "searchBills",
+  "parameters" : {
+    "vendorId" : "",
+    "dueDateFrom" : "2021-01-01",
+    "dueDateTo" : "2021-01-01",
+    "openBalanceOnly" : false,
+    "maxResults" : 1
+  },
+  "type" : "quickbooks/v1/searchBills"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| QueryResponse | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(domain), STRING\(Id), STRING\(DocNumber), STRING\(TxnDate), STRING\(DueDate), &#123;STRING\(name), STRING\(value)&#125;\(VendorRef), &#123;STRING\(name), STRING\(value)&#125;\(CurrencyRef), STRING\(TotalAmt), STRING\(Balance), STRING\(PrivateNote)&#125;\($Bill)]\(Bill), STRING\(startPosition), STRING\(maxResults)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "QueryResponse" : {
+    "Bill" : [ {
+      "domain" : "",
+      "Id" : "",
+      "DocNumber" : "",
+      "TxnDate" : "",
+      "DueDate" : "",
+      "VendorRef" : {
+        "name" : "",
+        "value" : ""
+      },
+      "CurrencyRef" : {
+        "name" : "",
+        "value" : ""
+      },
+      "TotalAmt" : "",
+      "Balance" : "",
+      "PrivateNote" : ""
+    } ],
+    "startPosition" : "",
+    "maxResults" : ""
   }
 }
 ```
