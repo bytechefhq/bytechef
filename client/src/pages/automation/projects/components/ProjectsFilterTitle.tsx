@@ -1,26 +1,28 @@
 import Badge from '@/components/Badge/Badge';
-import {Type} from '@/pages/automation/projects/Projects';
-import {Category, Tag} from '@/shared/middleware/automation/configuration';
 import {ReactNode} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
-const ProjectsFilterTitle = ({
-    categories,
-    filterData,
-    tags,
-}: {
-    categories: Category[] | undefined;
-    filterData: {id?: number; type: Type};
-    tags: Tag[] | undefined;
-}) => {
+interface ProjectsFilterTitleItemI {
+    id?: number | string;
+    name?: string;
+}
+
+interface ProjectsFilterTitleProps {
+    categories: ProjectsFilterTitleItemI[] | undefined;
+    filterByTag: boolean;
+    filterId?: number | string;
+    tags: ProjectsFilterTitleItemI[] | undefined;
+}
+
+const ProjectsFilterTitle = ({categories, filterByTag, filterId, tags}: ProjectsFilterTitleProps) => {
     const [searchParams] = useSearchParams();
 
     let pageTitle: string | ReactNode | undefined;
 
-    if (filterData.type === Type.Category) {
-        pageTitle = categories?.find((category) => category.id === filterData.id)?.name;
+    if (filterByTag) {
+        pageTitle = tags?.find((tag) => tag.id === filterId)?.name;
     } else {
-        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
+        pageTitle = categories?.find((category) => category.id === filterId)?.name;
     }
 
     return (
