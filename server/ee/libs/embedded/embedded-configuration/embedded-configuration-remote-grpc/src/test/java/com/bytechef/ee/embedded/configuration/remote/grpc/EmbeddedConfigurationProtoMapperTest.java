@@ -20,6 +20,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +70,7 @@ class EmbeddedConfigurationProtoMapperTest {
         integrationInstanceConfiguration.setIntegrationId(7L);
         integrationInstanceConfiguration.setIntegrationVersion(1);
         integrationInstanceConfiguration.setName("Airtable");
+        integrationInstanceConfiguration.setPermissionExpression("hasAuthority('ADMIN')");
         integrationInstanceConfiguration.setTagIds(List.of(3L));
         integrationInstanceConfiguration.setVersion(2);
 
@@ -157,9 +159,11 @@ class EmbeddedConfigurationProtoMapperTest {
                             new ConnectedUserWorkflowTemplateDTO.Component("airtable", "Airtable", "icon", true, 4L,
                                 true)),
                         List.of(new ConnectedUserWorkflowTemplateDTO.Component("httpClient", "HTTP", "icon")),
-                        List.of(new ConnectedUserWorkflowTemplateDTO.Input("name", "Name", "STRING", true, true)),
+                        List.of(new ConnectedUserWorkflowTemplateDTO.Input(
+                            "name", "Name", "STRING", true,
+                            new WorkflowInput.ComponentInputReference("airtable", 1, "Credentials"))),
                         "hasAuthority('ADMIN')", "workflow-1")),
-                "hasAuthority('ADMIN')", true, 3, Instant.parse("2026-10-26T10:00:00Z")));
+                "hasAuthority('ADMIN')", true, true, 3, Instant.parse("2026-10-26T10:00:00Z"), true));
 
         assertThat(embeddedConfigurationProtoMapper.toAutomationProjectDTOs(
             embeddedConfigurationProtoMapper.toRemoteAutomationProjects(automationProjectDTOs)))

@@ -217,6 +217,7 @@ message RemoteIntegrationInstanceConfiguration {
   optional string name = 13;
   repeated int64 tag_ids = 14;
   optional int32 version = 15;
+  optional string permission_expression = 16;
 }
 
 message RemoteIntegrationInstanceConfigurations {
@@ -294,6 +295,7 @@ message RemoteIntegrationInstance {
   optional string last_modified_by = 8;
   optional google.protobuf.Timestamp last_modified_date = 9;
   optional int32 version = 10;
+  optional string provisioned_by = 11;
 }
 
 message RemoteIntegrationInstances {
@@ -375,6 +377,8 @@ message RemoteAutomationProject {
   repeated RemoteWorkflowTemplate workflow_templates = 11;
   optional int32 configuration_count = 12;
   optional google.protobuf.Timestamp last_published_date = 13;
+  optional bool code_workflow_project = 14;
+  optional bool unpublished_changes = 15;
 }
 
 message RemoteAutomationProjects {
@@ -403,9 +407,17 @@ message RemoteWorkflowTemplateComponent {
 }
 
 message RemoteWorkflowTemplateInput {
+  reserved 5;
+  reserved "provided";
   optional string label = 1;
   optional string name = 2;
   optional bool required = 3;
   optional string type = 4;
-  optional bool provided = 5;
+  optional RemoteComponentInputReference component_reference = 6;
+}
+
+message RemoteComponentInputReference {
+  optional string component_name = 1;
+  optional int32 component_version = 2;
+  optional string group_name = 3;
 }
