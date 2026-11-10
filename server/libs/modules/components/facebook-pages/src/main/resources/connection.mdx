@@ -1,0 +1,17 @@
+## Connection Setup
+
+To connect Facebook Pages to ByteChef, you need a Meta developer account, a Meta app and a Facebook user that manages at least one Facebook Page.
+
+1. Go to `https://developers.facebook.com/apps` and click **Create App**.
+2. Enter an app name and a contact email.
+3. Under **Use cases**, select **Manage everything on your Page** and finish creating the app.
+4. Open the use case and add these permissions: `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`, `pages_read_user_content` and `pages_manage_engagement`.
+5. Go to **App settings** > **Basic** and copy the **App ID** and the **App Secret**.
+6. Go to **Facebook Login** > **Settings** and add the ByteChef OAuth redirect URL (for example `https://app.bytechef.io/callback`) to **Valid OAuth Redirect URIs**.
+7. In ByteChef, create a Facebook Pages connection, paste the **App ID** and the **App Secret**, and click **Connect**.
+8. Sign in with Facebook and select the Pages that ByteChef may use.
+
+#### Things to know
+
+- While the app is in development mode, only people with a role on the app (administrators, developers and testers) can connect. To let anyone connect, the app must pass Meta App Review for the permissions above.
+- ByteChef exchanges the login for a long-lived user token. Every action reads the Page access token of the selected Page from the Graph API and uses it for the call, so the connected user must manage that Page.
