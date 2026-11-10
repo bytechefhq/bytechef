@@ -37,7 +37,8 @@ public class ConnectedUserProjectDeploymentResolverRemoteServiceGrpcServer exten
     public void getConnectedUserIds(IdsRequest request, StreamObserver<ConnectedUserIdsResponse> responseObserver) {
         responseObserver.onNext(
             ConnectedUserIdsResponse.newBuilder()
-                .putAllConnectedUserIds(connectedUserProjectDeploymentResolver.getConnectedUserIds(request.getIdsList()))
+                .putAllConnectedUserIds(
+                    connectedUserProjectDeploymentResolver.getConnectedUserIds(request.getIdsList()))
                 .build());
         responseObserver.onCompleted();
     }

@@ -15,7 +15,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateD
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.remote.client.ConnectedUserProjectRemoteClientIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.remote.client.EmbeddedConfigurationGrpcTestServer;
-import com.bytechef.ee.embedded.configuration.remote.grpc.AutomationWorkflowProjectFacadeRemoteServiceGrpcServer;
+import com.bytechef.ee.embedded.configuration.remote.grpc.AutomationProjectFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
 import java.io.IOException;
 import java.util.List;
@@ -32,7 +32,7 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ivica Cardic
  */
 @ConnectedUserProjectRemoteClientIntTestConfiguration
-class RemoteAutomationWorkflowProjectFacadeClientIntTest {
+class RemoteAutomationProjectFacadeClientIntTest {
 
     @Autowired
     private AutomationProjectFacade automationProjectFacade;
@@ -46,7 +46,7 @@ class RemoteAutomationWorkflowProjectFacadeClientIntTest {
     @BeforeEach
     void beforeEach() throws IOException {
         embeddedConfigurationGrpcTestServer = EmbeddedConfigurationGrpcTestServer.start(
-            new AutomationWorkflowProjectFacadeRemoteServiceGrpcServer(
+            new AutomationProjectFacadeRemoteServiceGrpcServer(
                 automationProjectFacade, new EmbeddedConfigurationProtoMapper(objectMapper)));
 
         remoteAutomationProjectFacadeClient = new RemoteAutomationProjectFacadeClient(
@@ -81,14 +81,14 @@ class RemoteAutomationWorkflowProjectFacadeClientIntTest {
 
         automationProjectFacade.createProjectWorkflow(draftProjectId, null, null);
 
-        List<AutomationProjectDTO> remoteAutomationWorkflowProjectDTOs =
+        List<AutomationProjectDTO> remoteAutomationProjectDTOs =
             remoteAutomationProjectFacadeClient.getPublishedProjects();
 
-        assertThat(remoteAutomationWorkflowProjectDTOs).usingRecursiveComparison()
+        assertThat(remoteAutomationProjectDTOs).usingRecursiveComparison()
             .isEqualTo(automationProjectFacade.getPublishedProjects());
 
-        AutomationProjectDTO automationProjectDTO = remoteAutomationWorkflowProjectDTOs.stream()
-            .filter(remoteAutomationWorkflowProjectDTO -> remoteAutomationWorkflowProjectDTO.id() == projectId)
+        AutomationProjectDTO automationProjectDTO = remoteAutomationProjectDTOs.stream()
+            .filter(remoteAutomationProjectDTO -> remoteAutomationProjectDTO.id() == projectId)
             .findFirst()
             .orElseThrow();
 

@@ -81,8 +81,8 @@ service ConnectedUserProjectDeploymentResolverRemoteService {
   rpc GetProjectDeploymentIds(IdRequest) returns (IdsResponse);
 }
 
-service AutomationWorkflowProjectFacadeRemoteService {
-  rpc GetPublishedProjects(google.protobuf.Empty) returns (RemoteAutomationWorkflowProjects);
+service AutomationProjectFacadeRemoteService {
+  rpc GetPublishedProjects(google.protobuf.Empty) returns (RemoteAutomationProjects);
 }
 
 service ConnectedUserProjectRemoteService {
@@ -361,7 +361,7 @@ message RemoteAppEvent {
   optional int32 version = 8;
 }
 
-message RemoteAutomationWorkflowProject {
+message RemoteAutomationProject {
   optional bool automation_hub_visible = 1;
   optional int64 category_id = 2;
   optional string description = 3;
@@ -377,8 +377,8 @@ message RemoteAutomationWorkflowProject {
   optional google.protobuf.Timestamp last_published_date = 13;
 }
 
-message RemoteAutomationWorkflowProjects {
-  repeated RemoteAutomationWorkflowProject projects = 1;
+message RemoteAutomationProjects {
+  repeated RemoteAutomationProject projects = 1;
 }
 
 message RemoteWorkflowTemplate {

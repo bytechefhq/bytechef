@@ -42,11 +42,11 @@ public class EmbeddedConfigurationGrpcServerConfiguration {
     }
 
     @Bean
-    AutomationWorkflowProjectFacadeRemoteServiceGrpcServer automationWorkflowProjectFacadeRemoteServiceGrpcServer(
+    AutomationProjectFacadeRemoteServiceGrpcServer automationProjectFacadeRemoteServiceGrpcServer(
         AutomationProjectFacade automationProjectFacade,
         EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper) {
 
-        return new AutomationWorkflowProjectFacadeRemoteServiceGrpcServer(automationProjectFacade,
+        return new AutomationProjectFacadeRemoteServiceGrpcServer(automationProjectFacade,
             embeddedConfigurationProtoMapper);
     }
 

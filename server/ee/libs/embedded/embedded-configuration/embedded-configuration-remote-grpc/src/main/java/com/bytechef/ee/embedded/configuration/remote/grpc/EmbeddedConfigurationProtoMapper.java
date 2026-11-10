@@ -20,8 +20,8 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAppEvent;
-import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAutomationWorkflowProject;
-import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAutomationWorkflowProjects;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAutomationProject;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAutomationProjects;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegration;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstance;
 import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteIntegrationInstanceConfiguration;
@@ -82,13 +82,13 @@ public class EmbeddedConfigurationProtoMapper {
         return protoJsonMapper.toObject(remoteAppEvent, AppEvent.class);
     }
 
-    public List<AutomationProjectDTO> toAutomationWorkflowProjectDTOs(
-        RemoteAutomationWorkflowProjects remoteAutomationWorkflowProjects) {
+    public List<AutomationProjectDTO> toAutomationProjectDTOs(
+        RemoteAutomationProjects remoteAutomationProjects) {
 
-        return remoteAutomationWorkflowProjects.getProjectsList()
+        return remoteAutomationProjects.getProjectsList()
             .stream()
-            .map(remoteAutomationWorkflowProject -> protoJsonMapper.toObject(
-                remoteAutomationWorkflowProject, AutomationProjectDTO.class))
+            .map(remoteAutomationProject -> protoJsonMapper.toObject(
+                remoteAutomationProject, AutomationProjectDTO.class))
             .toList();
     }
 
@@ -287,15 +287,15 @@ public class EmbeddedConfigurationProtoMapper {
         return builder.build();
     }
 
-    public RemoteAutomationWorkflowProjects toRemoteAutomationWorkflowProjects(
+    public RemoteAutomationProjects toRemoteAutomationProjects(
         List<AutomationProjectDTO> automationProjectDTOs) {
 
-        RemoteAutomationWorkflowProjects.Builder builder = RemoteAutomationWorkflowProjects.newBuilder();
+        RemoteAutomationProjects.Builder builder = RemoteAutomationProjects.newBuilder();
 
         for (AutomationProjectDTO automationProjectDTO : automationProjectDTOs) {
             builder.addProjects(
-                protoJsonMapper.<RemoteAutomationWorkflowProject>toProto(
-                    automationProjectDTO, RemoteAutomationWorkflowProject.newBuilder()));
+                protoJsonMapper.<RemoteAutomationProject>toProto(
+                    automationProjectDTO, RemoteAutomationProject.newBuilder()));
         }
 
         return builder.build();

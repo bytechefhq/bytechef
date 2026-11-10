@@ -20,7 +20,7 @@ import com.bytechef.ee.embedded.configuration.remote.client.ConnectedUserProject
 import com.bytechef.ee.embedded.configuration.remote.client.EmbeddedConfigurationGrpcTestServer;
 import com.bytechef.ee.embedded.configuration.remote.grpc.ConnectedUserProjectFacadeRemoteServiceGrpcServer;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
-import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -47,7 +47,7 @@ class RemoteConnectedUserProjectFacadeClientIntTest {
         """;
 
     @Autowired
-    private AutomationWorkflowProjectConfigurationService automationWorkflowProjectConfigurationService;
+    private AutomationProjectConfigurationService automationProjectConfigurationService;
 
     @Autowired
     private AutomationProjectFacade automationProjectFacade;
@@ -143,7 +143,7 @@ class RemoteConnectedUserProjectFacadeClientIntTest {
 
         automationProjectFacade.publishProject(projectId);
 
-        automationWorkflowProjectConfigurationService.create(
+        automationProjectConfigurationService.create(
             projectId, Environment.PRODUCTION.ordinal(), "Default", null, 1, true, true);
 
         return workflowUuid;
