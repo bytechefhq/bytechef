@@ -147,12 +147,6 @@ describe('ProjectWorkflowListItem', () => {
         expect(screen.getByText('Test Workflow')).toBeInTheDocument();
     });
 
-    it('should mark the workflow label with the workflow icon', () => {
-        const {container} = renderProjectWorkflowListItem();
-
-        expect(container.querySelector('svg.lucide-workflow')).toBeInTheDocument();
-    });
-
     it('should render last modified date', () => {
         renderProjectWorkflowListItem();
 

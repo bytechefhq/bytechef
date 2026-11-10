@@ -152,7 +152,6 @@ describe('AutomationWorkflowProjectConfigurationWorkflowListItem', () => {
 
         expect(workflowButton.tagName).toBe('BUTTON');
         expect(workflowButton).toHaveAttribute('type', 'button');
-        expect(workflowButton.querySelector('svg.lucide-workflow')).toBeInTheDocument();
     });
 
     it('opens the executions from the keyboard', async () => {

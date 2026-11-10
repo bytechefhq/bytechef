@@ -111,12 +111,6 @@ describe('IntegrationInstanceConfigurationWorkflowListItem', () => {
         );
     });
 
-    it('marks the workflow label with the workflow icon', () => {
-        const {container} = renderItem();
-
-        expect(container.querySelector('svg.lucide-workflow')).toBeInTheDocument();
-    });
-
     it("opens the workflow's executions sheet when the workflow is clicked", () => {
         renderItem();
 

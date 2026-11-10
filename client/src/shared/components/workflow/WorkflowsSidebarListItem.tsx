@@ -1,5 +1,4 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {WorkflowIcon} from 'lucide-react';
 import {KeyboardEvent, ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -35,8 +34,6 @@ const WorkflowsSidebarListItem = ({active, editedTimeAgo, label, menu, onClick}:
                 role="button"
                 tabIndex={0}
             >
-                <WorkflowIcon aria-hidden="true" className="size-4 shrink-0 text-content-neutral-secondary" />
-
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <div className="flex min-w-0 flex-col gap-1 text-start">

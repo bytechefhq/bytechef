@@ -9,7 +9,7 @@ import {
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
-import {ChevronDownIcon, WorkflowIcon} from 'lucide-react';
+import {ChevronDownIcon} from 'lucide-react';
 
 interface IntegrationItemSelectProps {
     currentIntegrationWorkflowId?: number;
@@ -60,8 +60,6 @@ const IntegrationItemSelect = ({
                                 title={workflow.label!.length > 30 ? workflow.label! : undefined}
                                 value={workflow.integrationWorkflowId!.toString()}
                             >
-                                <WorkflowIcon className="size-4 shrink-0" />
-
                                 <span className="truncate">{workflow.label!}</span>
                             </DropdownMenuRadioItem>
                         ))}
