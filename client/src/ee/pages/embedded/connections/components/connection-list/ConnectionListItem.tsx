@@ -5,6 +5,7 @@ import {Connection, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {useUpdateConnectionTagsMutation} from '@/ee/shared/mutations/embedded/connectionTags.mutations';
 import {
     useDeleteConnectionMutation,
+    useUpdateConnectionCredentialsMutation,
     useUpdateConnectionMutation,
 } from '@/ee/shared/mutations/embedded/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
@@ -129,6 +130,7 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                     onClose={() => setShowEditDialog(false)}
                     showSharedOption
                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                    useUpdateConnectionCredentialsMutation={useUpdateConnectionCredentialsMutation}
                     useUpdateConnectionMutation={useUpdateConnectionMutation}
                 />
             )}
