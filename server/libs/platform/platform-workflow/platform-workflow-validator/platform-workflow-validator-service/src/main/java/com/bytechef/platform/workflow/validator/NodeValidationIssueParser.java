@@ -76,6 +76,8 @@ class NodeValidationIssueParser {
         new MessageTemplate(
             Pattern.compile("^Task '([^']+)' doesn't exist\\.$"), WorkflowIssueKind.BROKEN_REFERENCE),
         new MessageTemplate(
+            Pattern.compile("^Input '([^']+)' is referenced as '[^']+'; use .*$"), WorkflowIssueKind.BROKEN_REFERENCE),
+        new MessageTemplate(
             Pattern.compile("^Input property '([^']+)' is of type .*$"), WorkflowIssueKind.TYPE_MISMATCH),
         new MessageTemplate(
             Pattern.compile("^Property '([^']+)' is in incorrect .*$"), WorkflowIssueKind.TYPE_MISMATCH),

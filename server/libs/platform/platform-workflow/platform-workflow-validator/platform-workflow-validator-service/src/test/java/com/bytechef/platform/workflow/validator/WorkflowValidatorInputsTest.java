@@ -711,6 +711,95 @@ class WorkflowValidatorInputsTest {
         assertDoesNotThrow(() -> inputNamesFacade().validateInputNames(inputNamesWorkflow("my_input")));
     }
 
+    @Test
+    void validateWorkflowInputReferencedWithInputsPrefixReportsError() {
+        String errors = validateDataPillWorkflow("${inputs.anyName}");
+
+        assertEquals("[task_1] Input 'anyName' is referenced as '${inputs.anyName}'; use '${anyName}' instead.",
+            errors);
+    }
+
+    @Test
+    void validateWorkflowInputReferencedWithInputPrefixReportsError() {
+        String errors = validateDataPillWorkflow("${input.anyName}");
+
+        assertEquals("[task_1] Input 'anyName' is referenced as '${input.anyName}'; use '${anyName}' instead.", errors);
+    }
+
+    @Test
+    void validateWorkflowPropertyOfUnknownNodeReportsError() {
+        String errors = validateDataPillWorkflow("${unknownTask.result}");
+
+        assertEquals("[task_1] Task 'unknownTask' doesn't exist.", errors);
+    }
+
+    @Test
+    void validateWorkflowInputsPrefixWithUnknownInputNameReportsUnknownNode() {
+        String errors = validateDataPillWorkflow("${inputs.missing}");
+
+        assertEquals("[task_1] Task 'inputs' doesn't exist.", errors);
+    }
+
+    @Test
+    void validateWorkflowPropertyOfTriggerOutputNoErrors() {
+        String errors = validateDataPillWorkflow("${trigger_1.triggerResult}");
+
+        assertEquals("", errors);
+    }
+
+    private static String validateDataPillWorkflow(String dataPill) {
+        String workflow = """
+            {
+                "label": "Test Workflow",
+                "description": "Test workflow description",
+                "inputs": [
+                    {
+                        "name": "anyName",
+                        "label": "any Label",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "triggers": [
+                    {
+                        "label": "Manual Trigger",
+                        "name": "trigger_1",
+                        "type": "manual/v1/manual",
+                        "parameters": {}
+                    }
+                ],
+                "tasks": [
+                    {
+                        "label": "Test Task",
+                        "name": "task_1",
+                        "type": "component/v1/action1",
+                        "parameters": {
+                            "name": "DATA_PILL"
+                        }
+                    }
+                ]
+            }
+            """.replace("DATA_PILL", dataPill);
+
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
+            "component/v1/action1", List.of(new PropertyInfo("name", "STRING", null, false, true, null, null)),
+            "manual/v1/manual", List.of(new PropertyInfo("name", "STRING", null, false, true, null, null)));
+
+        Map<String, PropertyInfo> taskOutputMap = Map.of(
+            "component/v1/action1", new PropertyInfo("actionResult", "STRING", null, false, false, null, null),
+            "manual/v1/manual", new PropertyInfo("triggerResult", "STRING", null, false, false, null, null));
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        WorkflowValidator.validateWorkflow(
+            workflow, (taskType, kind) -> taskDefinitionMap.get(taskType),
+            (taskType, kind, warningsBuilder) -> taskOutputMap.get(taskType), taskType -> null, new HashMap<>(),
+            new HashMap<>(), new HashMap<>(), errors, warnings);
+
+        return errors.toString();
+    }
+
     private static WorkflowValidatorFacade inputNamesFacade() {
         return new WorkflowValidatorFacade() {
 

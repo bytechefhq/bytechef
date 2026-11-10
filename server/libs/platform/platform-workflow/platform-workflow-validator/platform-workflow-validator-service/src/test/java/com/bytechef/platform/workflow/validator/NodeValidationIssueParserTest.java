@@ -140,6 +140,18 @@ class NodeValidationIssueParserTest {
         assertEquals(0, issues.size());
     }
 
+    @Test
+    void classifiesAnInputReferencedWithAPrefixAsABrokenReference() {
+        List<NodeValidationIssue> issues = NodeValidationIssueParser.parse(
+            List.of(
+                "[task_1] Input 'accountName' is referenced as '${inputs.accountName}'; use '${accountName}' instead."),
+            List.of());
+
+        assertEquals(1, issues.size());
+        assertIssue(issues.getFirst(), "task_1", "accountName", WorkflowIssueKind.BROKEN_REFERENCE,
+            WorkflowIssueSeverity.ERROR);
+    }
+
     private static void assertIssue(
         NodeValidationIssue issue, String nodeName, String propertyPath, WorkflowIssueKind kind,
         WorkflowIssueSeverity severity) {
