@@ -10,7 +10,7 @@ import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/co
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {AutomationProjectsQuery} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon, PencilIcon, Trash2Icon} from 'lucide-react';
-import {useMemo} from 'react';
+import {MouseEvent, useMemo} from 'react';
 
 type AutomationProjectWorkflowTemplateType =
     AutomationProjectsQuery['automationProjects'][number]['workflowTemplates'][number];
@@ -57,11 +57,34 @@ const AutomationProjectWorkflowListItem = ({
         ? new Date(workflow.lastModifiedDate).toLocaleDateString()
         : undefined;
 
+    const handleWorkflowListItemClick = (event: MouseEvent<HTMLLIElement>) => {
+        const target = event.target as HTMLElement;
+
+        // Clicks inside portaled dialogs and menus bubble through React but are not DOM descendants of the row.
+        if (!event.currentTarget.contains(target)) {
+            return;
+        }
+
+        if (target.closest('a, button:not([data-slot="tooltip-trigger"]), [role="menu"], [role="menuitem"]')) {
+            return;
+        }
+
+        onSelectWorkflow(workflow.workflowUuid);
+    };
+
     return (
-        <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+        <li
+            className="flex cursor-pointer items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
+            onClick={handleWorkflowListItemClick}
+            role="presentation"
+        >
             <div
-                className="flex flex-1 cursor-pointer items-center gap-2"
-                onClick={() => onSelectWorkflow(workflow.workflowUuid)}
+                className="flex flex-1 items-center gap-2"
+                onClick={(event) => {
+                    event.stopPropagation();
+
+                    onSelectWorkflow(workflow.workflowUuid);
+                }}
                 onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                         onSelectWorkflow(workflow.workflowUuid);

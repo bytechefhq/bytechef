@@ -65,6 +65,14 @@ describe('AutomationProjectWorkflowListItem', () => {
         expect(handlers.onSelectWorkflow).toHaveBeenCalledWith('wf-1');
     });
 
+    it('opens the workflow editor when the row outside the label is clicked', async () => {
+        renderRow();
+
+        await userEvent.click(screen.getByText(/Modified at/));
+
+        expect(handlers.onSelectWorkflow).toHaveBeenCalledWith('wf-1');
+    });
+
     describe('menu', () => {
         it('should render with the design-system DropdownMenu', async () => {
             await openMenu();
