@@ -102,7 +102,7 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
             return;
         }
 
-        workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => persistJobId(null));
+        void workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => persistJobId(null));
     }, [getPersistedJobId, persistJobId]);
 
     const onPageHide = useCallback(() => {
@@ -146,7 +146,7 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
             const jobId = workflowTestJobIdRef.current ?? getPersistedJobId();
 
             if (jobId) {
-                workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => persistJobId(null));
+                void workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => persistJobId(null));
             }
         };
     }, [onBeforeUnload, onKeyDown, onPageHide, getPersistedJobId, persistJobId]);

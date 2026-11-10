@@ -143,7 +143,7 @@ const WorkflowTestConfigurationDialog = ({
 
     const saveWorkflowTestConfigurationMutation = useSaveWorkflowTestConfigurationMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
+            void queryClient.invalidateQueries({queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations});
 
             onClose();
         },

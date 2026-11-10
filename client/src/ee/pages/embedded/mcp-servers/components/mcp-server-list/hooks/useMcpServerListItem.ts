@@ -23,8 +23,8 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const deleteEmbeddedMcpServerMutation = useDeleteEmbeddedMcpServerMutation();
     const updateEmbeddedMcpServerTagsMutation = useUpdateEmbeddedMcpServerTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
-            queryClient.invalidateQueries({queryKey: ['embeddedMcpServerTags']});
+            void queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
+            void queryClient.invalidateQueries({queryKey: ['embeddedMcpServerTags']});
         },
     });
 
@@ -40,7 +40,7 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
             },
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
+                    void queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
                     setIsEnablePending(false);
                 },
             }
@@ -54,7 +54,7 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
             },
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
+                    void queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
                     setShowDeleteDialog(false);
                 },
             }

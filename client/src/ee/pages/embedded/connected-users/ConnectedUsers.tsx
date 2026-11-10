@@ -210,7 +210,7 @@ const ConnectedUsers = () => {
         createDateRange?: DateRange,
         pageNumber?: number
     ) {
-        navigate(
+        void navigate(
             `/embedded/connected-users?search=${search ? search : ''}&credentialStatus=${credentialStatus ? credentialStatus : ''}&integrationIdId=${integrationIdId ? integrationIdId : ''}&createDateFrom=${createDateRange?.from ? createDateRange.from?.getTime() : ''}&createDateTo=${createDateRange?.to ? createDateRange.to?.getTime() : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
@@ -332,7 +332,7 @@ const ConnectedUsers = () => {
                                             onValueChange={(value) => {
                                                 field.onChange(value);
 
-                                                form.handleSubmit(handleFilterConnectedUsers)();
+                                                void form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
                                             value={field.value}
                                         >
@@ -382,7 +382,7 @@ const ConnectedUsers = () => {
                                             onChange={(item) => {
                                                 field.onChange(item?.value);
 
-                                                form.handleSubmit(handleFilterConnectedUsers)();
+                                                void form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
                                             value={field.value}
                                         />
@@ -405,7 +405,7 @@ const ConnectedUsers = () => {
                                             onSelect={(value) => {
                                                 field.onChange(value);
 
-                                                form.handleSubmit(handleFilterConnectedUsers)();
+                                                void form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
                                             value={field.value}
                                         />

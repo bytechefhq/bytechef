@@ -43,10 +43,10 @@ const IntegrationWorkflowsListItemDropdownMenu = ({
                 });
             }
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
             });
-            queryClient.invalidateQueries({queryKey: IntegrationKeys.integrations});
+            void queryClient.invalidateQueries({queryKey: IntegrationKeys.integrations});
 
             if (workflow.id !== currentWorkflowId) {
                 return;
@@ -57,21 +57,21 @@ const IntegrationWorkflowsListItemDropdownMenu = ({
             );
 
             if (firstRemainingIntegrationWorkflowId) {
-                navigate(
+                void navigate(
                     `/embedded/integrations/${integrationId}/integration-workflows/${firstRemainingIntegrationWorkflowId}?${searchParams}`
                 );
             } else {
-                navigate('/embedded/integrations');
+                void navigate('/embedded/integrations');
             }
         },
     });
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId),
             });
-            queryClient.invalidateQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
+            void queryClient.invalidateQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
 
             setShowEditWorkflowDialog(false);
         },
@@ -85,7 +85,7 @@ const IntegrationWorkflowsListItemDropdownMenu = ({
                         onClose={() => setShowEditWorkflowDialog(false)}
                         onSave={() => {
                             if (workflow.integrationWorkflowId) {
-                                queryClient.invalidateQueries({
+                                void queryClient.invalidateQueries({
                                     queryKey: IntegrationWorkflowKeys.integrationWorkflow(
                                         integrationId,
                                         workflow.integrationWorkflowId

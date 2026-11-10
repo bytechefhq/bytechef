@@ -69,7 +69,7 @@ export default function useAiAgentStreamResponse(): UseAiAgentStreamResponseI {
 
             setRootClusterElementNodeData(updatedRootClusterElementNodeData);
 
-            saveWorkflowDefinition({
+            void saveWorkflowDefinition({
                 nodeData: updatedRootClusterElementNodeData,
                 updateWorkflowMutation,
             });

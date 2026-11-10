@@ -68,8 +68,8 @@ const useMcpComponentDialog = ({
     const queryClient = useQueryClient();
 
     const invalidateMcpQueries = () => {
-        queryClient.invalidateQueries({queryKey: ['embeddedMcpComponentsByServerId']});
-        queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
+        void queryClient.invalidateQueries({queryKey: ['embeddedMcpComponentsByServerId']});
+        void queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
     };
 
     const createEmbeddedMcpComponentMutation = useCreateEmbeddedMcpComponentMutation({

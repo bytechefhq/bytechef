@@ -82,7 +82,7 @@ export default function useWorkflowInputs({
         onSuccess: () => {
             closeEditDialog();
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
             });
         },

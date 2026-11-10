@@ -52,7 +52,7 @@ const IntegrationWorkflowListItem = ({
     const updateIntegrationWorkflowPermissionExpressionMutation =
         useUpdateIntegrationWorkflowPermissionExpressionMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: ['integrationWorkflowsByIntegrationId', integrationWorkflowsQueryVariables],
                 });
             },
@@ -69,7 +69,7 @@ const IntegrationWorkflowListItem = ({
 
     const deleteWorkflowMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: IntegrationKeys.integrations});
+            void queryClient.invalidateQueries({queryKey: IntegrationKeys.integrations});
 
             setShowDeleteDialog(false);
         },
@@ -88,7 +88,7 @@ const IntegrationWorkflowListItem = ({
                 });
             }
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflows(integration.id!),
             });
 
@@ -96,7 +96,7 @@ const IntegrationWorkflowListItem = ({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
             });
 

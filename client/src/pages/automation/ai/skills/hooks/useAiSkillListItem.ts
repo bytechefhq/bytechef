@@ -24,7 +24,7 @@ export default function useAiSkillListItem({deleteSkill, onDownload, onUpdate, s
     const handleClick = useCallback(() => {
         openSkillDetail(skill.id, skill.name);
 
-        navigate(`${getAiSkillsBasePath(location.pathname)}/${skill.id}`);
+        void navigate(`${getAiSkillsBasePath(location.pathname)}/${skill.id}`);
     }, [location.pathname, navigate, openSkillDetail, skill.id, skill.name]);
 
     const handleDeleteClick = useCallback(async () => {

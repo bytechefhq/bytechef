@@ -36,16 +36,16 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
     const deleteProjectMutation = useDeleteProjectMutation({
         onSuccess: (_, projectId) => {
-            navigate('/automation/projects');
+            void navigate('/automation/projects');
 
-            queryClient.cancelQueries({queryKey: ProjectKeys.project(projectId)});
+            void queryClient.cancelQueries({queryKey: ProjectKeys.project(projectId)});
             queryClient.removeQueries({queryKey: ProjectKeys.project(projectId)});
 
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({
                 queryKey: ProjectCategoryKeys.projectCategories(project.workspaceId!),
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectTagKeys.projectTags,
             });
         },
@@ -53,9 +53,9 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            navigate(`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`);
+            void navigate(`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`);
 
             toast('Project duplicated successfully.');
         },
@@ -63,10 +63,10 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
     const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
         onError: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             toast('Workflow duplicated successfully.');
         },
@@ -74,9 +74,9 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
     const pullProjectFromGitMutation = getProjectGitApi().usePullProjectFromGitMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectVersionKeys.projectProjectVersions(project.id!),
             });
 
@@ -136,7 +136,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         if (project.id) {
             deleteProjectMutation.mutate(project.id);
 
-            navigate('/automation/projects');
+            void navigate('/automation/projects');
         }
     };
 
@@ -158,11 +158,11 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
             queryClient.removeQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 exact: true,
                 queryKey: ProjectKeys.project(projectId),
             });
@@ -174,7 +174,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
                 firstRemainingWorkflowUrlSuffix = `/${projectId}/project-workflows/${firstRemainingWorkflowId}?${searchParams}`;
             }
 
-            navigate(baseUrl + firstRemainingWorkflowUrlSuffix);
+            void navigate(baseUrl + firstRemainingWorkflowUrlSuffix);
         },
     });
 

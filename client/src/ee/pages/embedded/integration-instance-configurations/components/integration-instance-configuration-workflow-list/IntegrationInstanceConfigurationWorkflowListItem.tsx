@@ -60,7 +60,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     const enableIntegrationInstanceConfigurationWorkflowMutation =
         useEnableIntegrationInstanceConfigurationWorkflowMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
                 });
             },

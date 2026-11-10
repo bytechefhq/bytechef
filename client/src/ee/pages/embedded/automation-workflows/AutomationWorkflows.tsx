@@ -112,13 +112,13 @@ const AutomationWorkflows = () => {
         useUpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation();
 
     const invalidateProjects = () => {
-        queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectCategories']});
-        queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectTags']});
-        queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectCategories']});
+        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectTags']});
+        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
     };
 
     const openWorkflowEditor = (workflowUuid: string) => {
-        navigate(`/embedded/automation-workflows/${workflowUuid}/editor`);
+        void navigate(`/embedded/automation-workflows/${workflowUuid}/editor`);
     };
 
     const closeProjectDialog = () => {

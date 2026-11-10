@@ -61,7 +61,7 @@ const AccountProfileDetails = () => {
         if (updateSuccess) {
             toast('Account has been updated.');
 
-            getAccount();
+            void getAccount();
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps

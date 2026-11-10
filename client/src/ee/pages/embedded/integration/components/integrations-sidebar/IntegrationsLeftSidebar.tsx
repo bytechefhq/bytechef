@@ -104,7 +104,7 @@ const IntegrationsLeftSidebar = ({
 
     useEffect(() => {
         if (selectedIntegrationId === 0) {
-            refetchIntegrations();
+            void refetchIntegrations();
         }
     }, [selectedIntegrationId, refetchIntegrations]);
 

@@ -50,9 +50,9 @@ const WorkflowsListItemDropdownMenu = ({currentWorkflowId, project, workflow}: W
                 });
             }
 
-            queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-            queryClient.invalidateQueries({exact: true, queryKey: ProjectKeys.project(projectId)});
+            void queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({exact: true, queryKey: ProjectKeys.project(projectId)});
 
             if (workflow.id !== currentWorkflowId) {
                 return;
@@ -63,22 +63,22 @@ const WorkflowsListItemDropdownMenu = ({currentWorkflowId, project, workflow}: W
             );
 
             if (firstRemainingProjectWorkflowId) {
-                navigate(
+                void navigate(
                     `/automation/projects/${projectId}/project-workflows/${firstRemainingProjectWorkflowId}?${searchParams}`
                 );
             } else {
-                navigate('/automation/projects');
+                void navigate('/automation/projects');
             }
         },
     });
 
     const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
         onError: () => {
-            queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
+            void queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             toast('Workflow duplicated successfully.');
         },
@@ -86,12 +86,12 @@ const WorkflowsListItemDropdownMenu = ({currentWorkflowId, project, workflow}: W
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({queryKey: ProjectWorkflowKeys.projectWorkflows(projectId)});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
             });
-            queryClient.invalidateQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
+            void queryClient.invalidateQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
 
             setShowEditWorkflowDialog(false);
         },
@@ -106,7 +106,7 @@ const WorkflowsListItemDropdownMenu = ({currentWorkflowId, project, workflow}: W
                             onClose={() => setShowEditWorkflowDialog(false)}
                             onSave={() => {
                                 if (workflow.projectWorkflowId) {
-                                    queryClient.invalidateQueries({
+                                    void queryClient.invalidateQueries({
                                         queryKey: ProjectWorkflowKeys.projectWorkflow(
                                             projectId,
                                             workflow.projectWorkflowId

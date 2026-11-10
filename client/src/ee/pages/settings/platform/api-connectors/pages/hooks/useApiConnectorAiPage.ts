@@ -62,12 +62,12 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
     }, [reset]);
 
     const onSuccess = () => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ['apiConnectors'],
         });
 
         reset();
-        navigate(API_CONNECTORS_PATH);
+        void navigate(API_CONNECTORS_PATH);
     };
 
     const importOpenApiSpecificationMutation = useImportOpenApiSpecificationMutation({onSuccess});
@@ -363,7 +363,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         }
 
         reset();
-        navigate(API_CONNECTORS_PATH);
+        void navigate(API_CONNECTORS_PATH);
     };
 
     const canProceed = (() => {

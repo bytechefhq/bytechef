@@ -29,14 +29,14 @@ const OAuth2Redirect = () => {
                     if (requiresFullPageLoad(redirect)) {
                         window.location.assign(redirect);
                     } else {
-                        navigate(redirect, {replace: true});
+                        void navigate(redirect, {replace: true});
                     }
                 } else {
-                    navigate('/login?error=oauth2', {replace: true});
+                    void navigate('/login?error=oauth2', {replace: true});
                 }
             })
             .catch(() => {
-                navigate('/login?error=oauth2', {replace: true});
+                void navigate('/login?error=oauth2', {replace: true});
             });
     }, [analytics, getAccount, navigate, redirect]);
 

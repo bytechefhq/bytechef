@@ -55,16 +55,16 @@ const ProjectDeploymentListItem = ({
 
     const deleteProjectDeploymentMutation = useDeleteProjectDeploymentMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
-            queryClient.invalidateQueries({queryKey: ProjectDeploymentTagKeys.projectDeploymentTags});
+            void queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
+            void queryClient.invalidateQueries({queryKey: ProjectDeploymentTagKeys.projectDeploymentTags});
             void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
     });
 
     const updateProjectDeploymentTagsMutation = useUpdateProjectDeploymentTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
-            queryClient.invalidateQueries({queryKey: ProjectDeploymentTagKeys.projectDeploymentTags});
+            void queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
+            void queryClient.invalidateQueries({queryKey: ProjectDeploymentTagKeys.projectDeploymentTags});
         },
     });
 
@@ -74,7 +74,7 @@ const ProjectDeploymentListItem = ({
                 captureProjectDeploymentEnabled();
             }
 
-            queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
+            void queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
         },
     });
 
@@ -127,7 +127,7 @@ const ProjectDeploymentListItem = ({
 
     const handleOpenProjectClick = () => {
         if (projectDeployment.projectId != null) {
-            openProject(projectDeployment.projectId);
+            void openProject(projectDeployment.projectId);
         }
     };
 

@@ -63,7 +63,7 @@ const ApiCollectionEndpointListItem = ({
 
     const deleteApiCollectionEndpoint = useDeleteApiCollectionEndpointMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ApiCollectionKeys.apiCollections,
             });
 
@@ -73,7 +73,7 @@ const ApiCollectionEndpointListItem = ({
 
     const enableProjectDeploymentWorkflowMutation = useEnableProjectDeploymentWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ApiCollectionKeys.apiCollections,
             });
         },

@@ -93,9 +93,11 @@ export function AppSidebarFooter() {
         setCurrentType(selectedType);
 
         if (selectedType === PlatformType.AUTOMATION) {
-            navigate(`/automation${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
+            void navigate(
+                `/automation${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`
+            );
         } else if (selectedType === PlatformType.EMBEDDED) {
-            navigate(
+            void navigate(
                 `/embedded${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`
             );
         }

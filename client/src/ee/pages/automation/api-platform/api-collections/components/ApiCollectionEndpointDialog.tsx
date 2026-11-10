@@ -76,7 +76,7 @@ const ApiCollectionEndpointDialog = ({
     const queryClient = useQueryClient();
 
     const onSuccess = () => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ApiCollectionKeys.apiCollections,
         });
 

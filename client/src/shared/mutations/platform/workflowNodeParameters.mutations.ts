@@ -19,11 +19,11 @@ const clusterElementOptionsQueryKey = ['clusterElementOptions'] as const;
 // parameter write can shift their results. Invalidate here to force a refetch instead of
 // serving cached (possibly empty) responses keyed by a since-stale dependency snapshot.
 function invalidateDependentQueries(queryClient: QueryClient) {
-    queryClient.invalidateQueries({queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties});
-    queryClient.invalidateQueries({queryKey: ClusterElementDynamicPropertyKeys.clusterElementDynamicProperties});
-    queryClient.invalidateQueries({queryKey: WorkflowNodeOptionKeys.workflowNodeOptions});
-    queryClient.invalidateQueries({queryKey: WorkflowNodeOptionKeys.clusterElementNodeOptions});
-    queryClient.invalidateQueries({queryKey: clusterElementOptionsQueryKey});
+    void queryClient.invalidateQueries({queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties});
+    void queryClient.invalidateQueries({queryKey: ClusterElementDynamicPropertyKeys.clusterElementDynamicProperties});
+    void queryClient.invalidateQueries({queryKey: WorkflowNodeOptionKeys.workflowNodeOptions});
+    void queryClient.invalidateQueries({queryKey: WorkflowNodeOptionKeys.clusterElementNodeOptions});
+    void queryClient.invalidateQueries({queryKey: clusterElementOptionsQueryKey});
 }
 
 interface DeleteWorkflowNodeParameterProps {

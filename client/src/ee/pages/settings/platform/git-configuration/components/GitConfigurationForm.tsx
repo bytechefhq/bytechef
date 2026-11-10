@@ -40,7 +40,7 @@ const GitConfigurationForm = ({gitConfiguration}: {gitConfiguration?: GitConfigu
 
     const updateGitConfigurationMutation = useUpdateWorkspaceGitConfigurationMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: GitConfigurationKeys.gitConfiguration,
             });
 

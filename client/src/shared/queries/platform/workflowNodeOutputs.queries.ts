@@ -37,7 +37,7 @@ export const WorkflowNodeOutputKeys = {
 
 /** Drops all cached previous-node-output entries for a workflow (see query key shape). */
 export function invalidatePreviousWorkflowNodeOutputsForWorkflow(queryClient: QueryClient, workflowId: string): void {
-    queryClient.invalidateQueries({
+    void queryClient.invalidateQueries({
         queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflowId, 'previousWorkflowNodeOutputs'],
     });
 }

@@ -27,7 +27,11 @@ const ClusterElementsWorkflowEditorToolbar = ({onResetLayout}: ClusterElementsWo
     const handleZoomOut = useCallback(() => zoomOut({duration: 300}), [zoomOut]);
 
     const handleFitView = useCallback(() => {
-        fitView({duration: 500, minZoom: 0.2, padding: {bottom: '16px', left: '16px', right: '16px', top: '64px'}});
+        void fitView({
+            duration: 500,
+            minZoom: 0.2,
+            padding: {bottom: '16px', left: '16px', right: '16px', top: '64px'},
+        });
     }, [fitView]);
 
     const handleToggleLock = useCallback(() => {

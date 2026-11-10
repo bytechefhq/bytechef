@@ -20,7 +20,7 @@ const VerifyEmail = () => {
                 startCountdown();
             })
             .catch(() => {
-                navigate('/account-error', {state: {fromInternalFlow: true}});
+                void navigate('/account-error', {state: {fromInternalFlow: true}});
             });
     }
 

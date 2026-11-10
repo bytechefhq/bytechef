@@ -61,7 +61,7 @@ export default function useOverlayPanelsViewport({enabled}: UseOverlayPanelsView
         const viewport = {x: targetX, y: currentY, zoom};
 
         if (previousOffset === undefined) {
-            setViewport(viewport);
+            void setViewport(viewport);
 
             return;
         }
@@ -73,7 +73,7 @@ export default function useOverlayPanelsViewport({enabled}: UseOverlayPanelsView
             pendingTargetXRef.current = undefined;
         }, OVERLAY_PAN_DURATION);
 
-        setViewport(viewport, {duration: OVERLAY_PAN_DURATION, ease: easeOutCubic, interpolate: 'linear'});
+        void setViewport(viewport, {duration: OVERLAY_PAN_DURATION, ease: easeOutCubic, interpolate: 'linear'});
     }, [
         agentPlaygroundOpen,
         clusterElementsCanvasOpen,

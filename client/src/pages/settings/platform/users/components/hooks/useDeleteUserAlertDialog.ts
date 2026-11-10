@@ -18,7 +18,7 @@ export default function useDeleteUserAlertDialog(): UseDeleteUserAlertDialogI {
 
     const deleteUserMutation = useDeleteUserMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['users']});
+            void queryClient.invalidateQueries({queryKey: ['users']});
             clearLoginToDelete();
         },
     });

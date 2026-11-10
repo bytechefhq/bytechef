@@ -45,10 +45,10 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
 
     const updateApiCollectionTagsMutation = useUpdateApiCollectionTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ApiCollectionKeys.apiCollections,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ApiCollectionTagKeys.apiCollectionTags,
             });
         },
@@ -56,7 +56,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
 
     const deleteApiCollection = useDeleteApiCollectionMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ApiCollectionKeys.apiCollections,
             });
 
@@ -66,7 +66,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
 
     const enableProjectDeploymentMutation = useEnableProjectDeploymentMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ApiCollectionKeys.apiCollections,
             });
         },
@@ -118,7 +118,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
     );
 
     const handleOnProjectDeploymentDialogClose = () => {
-        queryClient
+        void queryClient
             .invalidateQueries({
                 queryKey: ApiCollectionKeys.apiCollections,
             })

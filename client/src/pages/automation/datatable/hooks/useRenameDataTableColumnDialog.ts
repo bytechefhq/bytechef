@@ -29,8 +29,8 @@ export default function useRenameDataTableColumnDialog(): UseRenameDataTableColu
 
     const renameColumnMutation = useRenameDataTableColumnMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['dataTables']});
-            queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
+            void queryClient.invalidateQueries({queryKey: ['dataTables']});
+            void queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
 
             clearDialog();
         },

@@ -39,7 +39,7 @@ const WorkflowTemplate = ({
         onSuccess: ({importWorkflowTemplate}) => {
             captureProjectWorkflowCreatedFromTemplate();
 
-            navigate(`/automation/projects/${selectedProjectId}/project-workflows/${importWorkflowTemplate}`);
+            void navigate(`/automation/projects/${selectedProjectId}/project-workflows/${importWorkflowTemplate}`);
         },
     });
 

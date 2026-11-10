@@ -183,7 +183,7 @@ export default function useBranchCaseLabel({
                 nodesMap,
             });
 
-            saveWorkflowDefinition({
+            void saveWorkflowDefinition({
                 nodeData: rootNodeData,
                 onSuccess,
                 updateWorkflowMutation: updateWorkflowMutation!,

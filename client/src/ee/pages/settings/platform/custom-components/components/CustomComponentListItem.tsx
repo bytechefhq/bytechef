@@ -49,7 +49,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
 
     const deleteCustomComponentMutation = useDeleteCustomComponentMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['customComponents'],
             });
         },
@@ -57,7 +57,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
 
     const enableCustomComponentMutation = useEnableCustomComponentMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['customComponents'],
             });
         },

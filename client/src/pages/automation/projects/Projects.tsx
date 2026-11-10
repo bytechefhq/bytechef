@@ -65,7 +65,7 @@ const Projects = () => {
         onSuccess: () => {
             captureProjectImported();
 
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             toast('Project is imported.');
         },
@@ -132,7 +132,7 @@ const Projects = () => {
     const isFirstRun = !isFiltered && projects?.length === 0;
 
     useEffect(() => {
-        loadProject();
+        void loadProject();
     }, []);
 
     return (

@@ -92,7 +92,7 @@ const IntegrationListItem = ({
         onSuccess: (integrationWorkflowId) => {
             captureIntegrationWorkflowCreated();
 
-            navigate(
+            void navigate(
                 `/embedded/integrations/${integration.id}/integration-workflows/${integrationWorkflowId}?${searchParams}`
             );
 
@@ -106,13 +106,13 @@ const IntegrationListItem = ({
                 queryKey: IntegrationKeys.integration(integration.id!),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integrations,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationCategoryKeys.integrationCategories,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationTagKeys.integrationTags,
             });
 
@@ -124,7 +124,7 @@ const IntegrationListItem = ({
         onSuccess: () => {
             captureIntegrationWorkflowImported();
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integrations,
             });
 
@@ -142,10 +142,10 @@ const IntegrationListItem = ({
 
     const updateIntegrationTagsMutation = useUpdateIntegrationTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integrations,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationTagKeys.integrationTags,
             });
         },

@@ -210,13 +210,13 @@ const IntegrationInstanceConfigurationDialog = ({
             captureIntegrationInstanceConfigurationCreated();
         }
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
         });
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: IntegrationInstanceConfigurationTagKeys.integrationInstanceConfigurationTags,
         });
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: IntegrationKeys.filteredIntegrations({}),
         });
 

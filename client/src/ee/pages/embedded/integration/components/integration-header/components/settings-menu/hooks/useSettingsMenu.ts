@@ -26,13 +26,13 @@ export const useSettingsMenu = ({integration, workflow}: {integration: Integrati
 
     const deleteIntegrationMutation = useDeleteIntegrationMutation({
         onSuccess: () => {
-            navigate('/embedded/integrations');
+            void navigate('/embedded/integrations');
 
-            queryClient.invalidateQueries({queryKey: IntegrationKeys.integrations});
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({queryKey: IntegrationKeys.integrations});
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationCategoryKeys.integrationCategories,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationTagKeys.integrationTags,
             });
         },
@@ -46,11 +46,11 @@ export const useSettingsMenu = ({integration, workflow}: {integration: Integrati
             );
 
             if (integrationWorkflowIds?.length) {
-                navigate(
+                void navigate(
                     `/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowIds[0]}?${searchParams}`
                 );
             } else {
-                navigate('/embedded/integrations');
+                void navigate('/embedded/integrations');
             }
 
             queryClient.removeQueries({
@@ -61,7 +61,7 @@ export const useSettingsMenu = ({integration, workflow}: {integration: Integrati
             });
             queryClient.removeQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
 
-            queryClient.invalidateQueries({queryKey: IntegrationKeys.integrations});
+            void queryClient.invalidateQueries({queryKey: IntegrationKeys.integrations});
         },
     });
 
@@ -69,8 +69,8 @@ export const useSettingsMenu = ({integration, workflow}: {integration: Integrati
         onSuccess: () => {
             captureIntegrationWorkflowImported();
 
-            queryClient.invalidateQueries({queryKey: IntegrationKeys.integration(integrationId!)});
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({queryKey: IntegrationKeys.integration(integrationId!)});
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflows(integrationId!),
             });
 

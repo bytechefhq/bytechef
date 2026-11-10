@@ -283,18 +283,18 @@ const ProjectDeploymentDialog = ({
             captureProjectDeploymentCreated();
         }
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ProjectDeploymentKeys.projectDeployments,
         });
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ProjectDeploymentTagKeys.projectDeploymentTags,
         });
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ProjectKeys.filteredProjects({id: currentWorkspaceId!}),
         });
 
         if (effectiveProjectDeployment?.projectId) {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: [...ProjectKeys.projects, effectiveProjectDeployment.projectId],
             });
         }
@@ -317,7 +317,7 @@ const ProjectDeploymentDialog = ({
 
             const search = submittedProjectId != null ? `?projectId=${submittedProjectId}` : '';
 
-            navigate(`/automation/deployments${search}`, {
+            void navigate(`/automation/deployments${search}`, {
                 state: {projectDeploymentId: savedDeploymentId},
             });
         }

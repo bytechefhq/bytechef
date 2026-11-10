@@ -62,9 +62,9 @@ export default function useKnowledgeBaseDocumentListItemTagList({
             return {cachedTagsByDocumentData: previousTagsData};
         },
         onSettled: () => {
-            queryClient.invalidateQueries({queryKey: ['knowledgeBaseDocumentTags']});
-            queryClient.invalidateQueries({queryKey: ['knowledgeBaseDocumentTagsByDocument']});
-            queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
+            void queryClient.invalidateQueries({queryKey: ['knowledgeBaseDocumentTags']});
+            void queryClient.invalidateQueries({queryKey: ['knowledgeBaseDocumentTagsByDocument']});
+            void queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
         },
     });
 

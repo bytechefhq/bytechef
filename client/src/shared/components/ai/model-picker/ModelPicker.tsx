@@ -179,7 +179,7 @@ const ModelPicker = ({
     };
 
     const handleConfigureCredentials = () => {
-        navigate(AI_PROVIDERS_SETTINGS_PATH);
+        void navigate(AI_PROVIDERS_SETTINGS_PATH);
         closeMenu();
     };
 

@@ -31,7 +31,7 @@ export default function useKnowledgeBaseListItem({knowledgeBase}: UseKnowledgeBa
     };
 
     const handleKnowledgeBaseClick = () => {
-        navigate(`/automation/knowledge-bases/${knowledgeBase.id}`);
+        void navigate(`/automation/knowledge-bases/${knowledgeBase.id}`);
     };
 
     const handleTagListClick = (event: MouseEvent) => {

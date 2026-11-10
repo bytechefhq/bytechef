@@ -357,7 +357,7 @@ export const WorkflowExecutions = () => {
         workflowId?: string,
         pageNumber?: number
     ) {
-        navigate(
+        void navigate(
             `/embedded/workflow-executions?source=${source}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&integrationId=${integrationId ? integrationId : ''}&integrationInstanceConfigurationId=${integrationInstanceConfigurationId ? integrationInstanceConfigurationId : ''}&connectedUserId=${connectedUserId ? connectedUserId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }

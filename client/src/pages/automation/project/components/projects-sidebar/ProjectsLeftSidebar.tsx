@@ -117,7 +117,7 @@ const ProjectsLeftSidebar = ({
 
     useEffect(() => {
         if (selectedProjectId === 0) {
-            refetchProjects();
+            void refetchProjects();
         }
     }, [selectedProjectId, refetchProjects]);
 

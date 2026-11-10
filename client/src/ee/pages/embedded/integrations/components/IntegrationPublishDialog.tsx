@@ -29,7 +29,7 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
         onSuccess: () => {
             captureIntegrationPublished();
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integrations,
             });
 

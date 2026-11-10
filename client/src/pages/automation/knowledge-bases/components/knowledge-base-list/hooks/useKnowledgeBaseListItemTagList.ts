@@ -70,9 +70,9 @@ export default function useKnowledgeBaseListItemTagList({
             return {previous};
         },
         onSettled: () => {
-            queryClient.invalidateQueries({queryKey: ['knowledgeBaseTags']});
-            queryClient.invalidateQueries({queryKey: ['knowledgeBaseTagsByKnowledgeBase']});
-            queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
+            void queryClient.invalidateQueries({queryKey: ['knowledgeBaseTags']});
+            void queryClient.invalidateQueries({queryKey: ['knowledgeBaseTagsByKnowledgeBase']});
+            void queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
         },
     });
 

@@ -7,9 +7,9 @@ import {type QueryClient} from '@tanstack/react-query';
    creating or deleting a skill can change it. Callers that only ever touch one facet should invalidate
    that facet directly rather than reach for this — a tag edit, for instance, cannot stale a file. */
 export default function invalidateSkillQueries(queryClient: QueryClient) {
-    queryClient.invalidateQueries({queryKey: ['aiSkills']});
-    queryClient.invalidateQueries({queryKey: ['aiSkill']});
-    queryClient.invalidateQueries({queryKey: ['aiSkillTags']});
-    queryClient.invalidateQueries({queryKey: ['aiSkillFilePaths']});
-    queryClient.invalidateQueries({queryKey: ['aiSkillFileContent']});
+    void queryClient.invalidateQueries({queryKey: ['aiSkills']});
+    void queryClient.invalidateQueries({queryKey: ['aiSkill']});
+    void queryClient.invalidateQueries({queryKey: ['aiSkillTags']});
+    void queryClient.invalidateQueries({queryKey: ['aiSkillFilePaths']});
+    void queryClient.invalidateQueries({queryKey: ['aiSkillFileContent']});
 }

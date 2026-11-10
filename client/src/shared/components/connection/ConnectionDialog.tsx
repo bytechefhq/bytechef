@@ -187,15 +187,15 @@ const ConnectionDialog = ({
     const canUpdateCredentials = isEdit && !!useUpdateConnectionCredentialsMutation && !connection?.managed;
 
     const handleConnectionSuccess = (connectionId: number | void) => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ComponentDefinitionKeys.componentDefinitions,
         });
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: connectionsQueryKey,
         });
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: connectionTagsQueryKey,
         });
 

@@ -14,7 +14,7 @@ export default function useApiConnectorCreateMenu(): UseApiConnectorCreateMenuI 
     const handleMenuItemClick = useCallback(
         (path: string) => {
             reset();
-            navigate(path);
+            void navigate(path);
         },
         [navigate, reset]
     );

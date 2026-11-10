@@ -23,7 +23,7 @@ export default function useImportDataTableCsvDialog(): UseImportDataTableCsvDial
 
     const importCsvMutation = useImportDataTableCsvMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
+            void queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
 
             clearDialog();
         },

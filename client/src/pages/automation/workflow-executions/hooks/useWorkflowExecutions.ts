@@ -139,7 +139,7 @@ export const useWorkflowExecutions = () => {
         pageNumber?: number,
         source: GetWorkflowExecutionsPageSourceEnum = filterSource
     ) {
-        navigate(
+        void navigate(
             `/automation/workflow-executions?source=${source}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&projectId=${projectId ? projectId : ''}&projectDeploymentId=${projectDeploymentId ? projectDeploymentId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }

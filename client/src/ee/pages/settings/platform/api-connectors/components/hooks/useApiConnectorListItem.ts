@@ -31,7 +31,7 @@ export default function useApiConnectorListItem({
 
     const deleteApiConnectorMutation = useDeleteApiConnectorMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['apiConnectors'],
             });
         },
@@ -39,7 +39,7 @@ export default function useApiConnectorListItem({
 
     const enableApiConnectorMutation = useEnableApiConnectorMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['apiConnectors'],
             });
         },

@@ -22,7 +22,7 @@ export default function useMcpIntegrationInstanceConfigurationWorkflowProperties
     const updateMcpIntegrationInstanceConfigurationWorkflowMutation =
         useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: ['mcpIntegrationInstanceConfigurationsByServerId'],
                 });
 

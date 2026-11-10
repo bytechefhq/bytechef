@@ -57,7 +57,7 @@ const ApiClientDialog = ({apiClient, onClose, triggerNode}: ApiClientDialogProps
 
     const createApiClientMutation = useCreateApiClientMutation({
         onSuccess: (result: {secretKey?: string}) => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ApiClientKeys.apiClients,
             });
 
@@ -68,7 +68,7 @@ const ApiClientDialog = ({apiClient, onClose, triggerNode}: ApiClientDialogProps
     });
     const updateApiClientMutation = useUpdateApiClientMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ApiClientKeys.apiClients,
             });
 
@@ -141,7 +141,7 @@ const ApiClientDialog = ({apiClient, onClose, triggerNode}: ApiClientDialogProps
 
                                             <Button
                                                 onClick={() => {
-                                                    copyToClipboard(secretApiKey);
+                                                    void copyToClipboard(secretApiKey);
 
                                                     toast('The secret API key is copied.');
                                                 }}

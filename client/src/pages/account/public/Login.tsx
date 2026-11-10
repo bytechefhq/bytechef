@@ -178,7 +178,7 @@ const Login = () => {
 
     useEffect(() => {
         if (searchParams.get('error') === 'oauth2') {
-            navigate('/account-error', {
+            void navigate('/account-error', {
                 state: {
                     error: 'Failed to sign in with social provider. Please try again or use email/password.',
                     fromInternalFlow: true,
@@ -189,7 +189,7 @@ const Login = () => {
 
     useEffect(() => {
         if (loginError && !authenticated) {
-            navigate('/account-error', {
+            void navigate('/account-error', {
                 state: {
                     error: 'Failed to sign in, please check your credentials and try again.',
                     fromInternalFlow: true,
@@ -291,7 +291,7 @@ const Login = () => {
                                                     {...field}
                                                     onBlur={() => {
                                                         field.onBlur();
-                                                        handleEmailBlur();
+                                                        void handleEmailBlur();
                                                     }}
                                                 />
                                             </FormControl>

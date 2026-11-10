@@ -20,7 +20,7 @@ export const ConditionalPostHogProvider = ({children}: ConditionalPostHogProvide
 
     useEffect(() => {
         if (analytics.enabled && analytics.postHog.apiKey && analytics.postHog.host) {
-            import('posthog-js').then((module) => setPosthog(module.default));
+            void import('posthog-js').then((module) => setPosthog(module.default));
         }
     }, [analytics.enabled, analytics.postHog.apiKey, analytics.postHog.host]);
 

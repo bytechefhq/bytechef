@@ -86,7 +86,7 @@ export function useApprovalTaskDetail(): UseApprovalTaskDetailReturnI {
                             storeUpdateApprovalTask(previous);
                         }
 
-                        queryClient.invalidateQueries({queryKey: ['approvalTasks']});
+                        void queryClient.invalidateQueries({queryKey: ['approvalTasks']});
                     },
                     onSuccess: (data) => {
                         storeUpdateApprovalTask({

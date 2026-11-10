@@ -871,7 +871,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         trimmed
                     );
 
-                    saveWorkflowDefinition({
+                    void saveWorkflowDefinition({
                         decorative: true,
                         nodeData: {
                             ...mainClusterRootTask,
@@ -883,7 +883,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         updateWorkflowMutation: updateWorkflowMutation!,
                     });
                 } else {
-                    saveWorkflowDefinition({
+                    void saveWorkflowDefinition({
                         decorative: true,
                         nodeData: {
                             ...data,

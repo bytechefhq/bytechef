@@ -52,7 +52,7 @@ const ProjectWorkflowListItem = ({
 
     const deleteWorkflowMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             setShowDeleteDialog(false);
         },
@@ -60,10 +60,10 @@ const ProjectWorkflowListItem = ({
 
     const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
         onError: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             toast('Workflow duplicated successfully.');
         },
@@ -71,19 +71,19 @@ const ProjectWorkflowListItem = ({
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projects,
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflows(project.id!),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowKeys.workflow(workflow.id!),
             });
 

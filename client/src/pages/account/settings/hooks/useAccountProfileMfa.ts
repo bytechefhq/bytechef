@@ -132,7 +132,7 @@ export function useAccountProfileMfa() {
     };
 
     useEffect(() => {
-        fetchMfaStatus();
+        void fetchMfaStatus();
     }, [fetchMfaStatus]);
 
     return {

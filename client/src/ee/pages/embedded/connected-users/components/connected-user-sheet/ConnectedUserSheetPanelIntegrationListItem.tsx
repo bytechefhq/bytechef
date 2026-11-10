@@ -106,7 +106,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
 
     const deleteIntegrationInstanceMutation = useDeleteIntegrationInstanceMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectedUserKeys.connectedUser(connectedUserId),
             });
 
@@ -116,10 +116,10 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
 
     const enableIntegrationInstanceMutation = useEnableIntegrationInstanceMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectedUserKeys.connectedUser(connectedUserId),
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceKeys.integrationInstance(connectedUserIntegrationInstance.id!),
             });
         },

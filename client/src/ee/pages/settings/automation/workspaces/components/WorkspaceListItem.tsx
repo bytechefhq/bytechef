@@ -34,12 +34,12 @@ const WorkspaceListItem = ({isCurrentWorkspace, onOpen, workspace}: WorkspaceLis
 
     const deleteWorkspaceMutation = useDeleteWorkspaceMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkspaceKeys.workspaces,
             });
 
             if (account) {
-                queryClient.refetchQueries({
+                void queryClient.refetchQueries({
                     queryKey: WorkspaceKeys.userWorkspaces(account.id!),
                 });
             }

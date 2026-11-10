@@ -130,7 +130,7 @@ export const useSSE = <T = unknown>(request: SSERequestType, options: UseSSEOpti
 
         abortControllerRef.current = controller;
 
-        (async () => {
+        void (async () => {
             try {
                 setError(null);
                 setErrorStatus(null);

@@ -206,7 +206,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
     const saveNodeToWorkflow = useCallback(
         (nodeData: NodeDataType, nodeIndex?: number) => {
-            saveWorkflowDefinition({
+            void saveWorkflowDefinition({
                 nodeData,
                 nodeIndex,
                 onError: () => handleComponentAddedError({nodeData}),
@@ -513,7 +513,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                                     return;
                                 }
 
-                                handleOperationClick({
+                                void handleOperationClick({
                                     componentLabel: title,
                                     componentName: name,
                                     icon: icon,

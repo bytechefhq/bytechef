@@ -59,7 +59,7 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
 
     const createSigningKeyMutation = useCreateSigningKeyMutation({
         onSuccess: (result: {privateKey?: string}) => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: SigningKeyKeys.signingKeys,
             });
 
@@ -70,7 +70,7 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
     });
     const updateSigningKeyMutation = useUpdateSigningKeyMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: SigningKeyKeys.signingKeys,
             });
 
@@ -147,7 +147,7 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
                                             <div className="flex justify-end">
                                                 <Button
                                                     onClick={() => {
-                                                        copyToClipboard(privateKey);
+                                                        void copyToClipboard(privateKey);
 
                                                         toast('The Signing Key is copied.');
                                                     }}

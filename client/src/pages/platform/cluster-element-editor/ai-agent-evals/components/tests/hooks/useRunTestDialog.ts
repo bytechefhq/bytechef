@@ -66,7 +66,7 @@ export default function useRunTestDialog({onClose, test, workflowId, workflowNod
             toast.error('Failed to start eval run: ' + error.message);
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({queryKey: ['aiAgentEvalRuns']});
+            void queryClient.invalidateQueries({queryKey: ['aiAgentEvalRuns']});
 
             setSelectedTestId(test.id);
             setEvalsTab('runs');

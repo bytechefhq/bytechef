@@ -506,7 +506,7 @@ const PropertyComboBox = ({
             return;
         }
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: WorkflowNodeOptionKeys.propertyWorkflowNodeOptions(
                 queryOptions.request,
                 queryOptions.loadDependencyValueKey

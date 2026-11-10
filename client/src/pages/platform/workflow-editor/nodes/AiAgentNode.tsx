@@ -273,7 +273,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 return;
             }
 
-            saveWorkflowDefinition({
+            void saveWorkflowDefinition({
                 decorative: true,
                 nodeData: {
                     ...mainClusterRootTask,

@@ -73,7 +73,7 @@ export const useAutomationWorkflowEditorHeader = ({
 
     const publishProjectMutation = usePublishAutomationWorkflowProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+            void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
 
             toast('The project has been published.');
         },
@@ -91,7 +91,7 @@ export const useAutomationWorkflowEditorHeader = ({
     };
 
     const handleWorkflowValueChange = (workflowUuid: string) => {
-        navigate('/embedded/automation-workflows/' + workflowUuid + '/editor');
+        void navigate('/embedded/automation-workflows/' + workflowUuid + '/editor');
     };
 
     const handleProjectValueChange = (selectedProjectId: string) => {
@@ -161,7 +161,7 @@ export const useAutomationWorkflowEditorHeader = ({
         const currentJobId = jobId || getPersistedJobId();
 
         if (currentJobId) {
-            workflowTestApi.stopWorkflowTest({jobId: currentJobId}, {keepalive: true}).finally(() => {
+            void workflowTestApi.stopWorkflowTest({jobId: currentJobId}, {keepalive: true}).finally(() => {
                 persistJobId(null);
                 setJobId(null);
             });

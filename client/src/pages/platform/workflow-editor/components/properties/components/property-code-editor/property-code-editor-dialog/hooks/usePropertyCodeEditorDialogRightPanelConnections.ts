@@ -67,9 +67,9 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
         saveWorkflowDefinitionUpdate({
             onSuccess: () => {
                 if (isClusterElement) {
-                    queryClient.invalidateQueries({queryKey: ['clusterElementComponentConnections']});
+                    void queryClient.invalidateQueries({queryKey: ['clusterElementComponentConnections']});
                 } else {
-                    queryClient.invalidateQueries({queryKey: ['workflowNodeComponentConnections']});
+                    void queryClient.invalidateQueries({queryKey: ['workflowNodeComponentConnections']});
                 }
             },
             updateDefinition,

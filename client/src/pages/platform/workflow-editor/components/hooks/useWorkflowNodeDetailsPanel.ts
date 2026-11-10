@@ -248,7 +248,7 @@ export default function useWorkflowNodeDetailsPanel({
 
     const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflow.id],
             });
         },
@@ -1224,9 +1224,9 @@ export default function useWorkflowNodeDetailsPanel({
         );
 
         if (refetchTarget === 'cluster') {
-            refetchClusterElementMissingRequiredProperties();
+            void refetchClusterElementMissingRequiredProperties();
         } else if (refetchTarget === 'regular') {
-            refetchWorkflowNodeMissingRequiredProperties();
+            void refetchWorkflowNodeMissingRequiredProperties();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
@@ -1374,7 +1374,7 @@ export default function useWorkflowNodeDetailsPanel({
             return;
         }
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: [...WorkflowNodeOptionKeys.clusterElementNodeOptions],
         });
 
@@ -1480,7 +1480,7 @@ export default function useWorkflowNodeDetailsPanel({
 
         if (currentComponentDefinition?.clusterElement && currentNode?.parentClusterRootId) {
             if (matchingOperation) {
-                fetchClusterElementDefinition();
+                void fetchClusterElementDefinition();
             } else {
                 setCurrentActionDefinition(undefined);
             }
@@ -1490,7 +1490,7 @@ export default function useWorkflowNodeDetailsPanel({
             );
 
             if (!!currentComponentDefinition?.actions && !currentNode?.trigger && !!matchingAction) {
-                fetchActionDefinition();
+                void fetchActionDefinition();
             } else {
                 setCurrentActionDefinition(undefined);
             }

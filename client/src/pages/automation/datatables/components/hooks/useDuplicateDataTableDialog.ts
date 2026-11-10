@@ -25,7 +25,7 @@ export default function useDuplicateDataTableDialog(): UseDuplicateDataTableDial
 
     const duplicateMutation = useDuplicateDataTableMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['dataTables']});
+            void queryClient.invalidateQueries({queryKey: ['dataTables']});
             clearTableToDuplicate();
         },
     });

@@ -24,7 +24,7 @@ export default function useDataTableListItem({table}: UseDataTableListItemProps)
     }, []);
 
     const handleRowClick = useCallback(() => {
-        navigate(`/automation/datatables/${table.id}`);
+        void navigate(`/automation/datatables/${table.id}`);
     }, [navigate, table.id]);
 
     return {

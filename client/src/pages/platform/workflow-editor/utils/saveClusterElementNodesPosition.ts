@@ -128,7 +128,7 @@ export default function saveClusterElementNodesPosition({
             });
         }
 
-        saveWorkflowDefinition({
+        void saveWorkflowDefinition({
             nodeData: {
                 ...updatedNodeData,
                 componentName: mainClusterRootComponentName,

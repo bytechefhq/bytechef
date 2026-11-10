@@ -82,7 +82,7 @@ export const useWorkflowBuilder = () => {
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
             if (workflowUuid) {
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
                 });
             }
@@ -96,7 +96,7 @@ export const useWorkflowBuilder = () => {
 
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
         onSuccess: (_result, variables) => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription({
                     environmentId: variables.environmentId,
                     id: variables.id,
@@ -104,7 +104,7 @@ export const useWorkflowBuilder = () => {
                 }),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowNodeParameterKeys.propertyWorkflowNodeParameterDisplayConditions({
                     environmentId: variables.environmentId,
                     id: variables.id,
@@ -112,7 +112,7 @@ export const useWorkflowBuilder = () => {
                 }),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowNodeOutputKeys.workflowNodeOutputs,
             });
         },

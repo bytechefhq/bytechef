@@ -87,7 +87,7 @@ const AutomationWorkflowEditorLeftSidebar = ({currentWorkflowId}: AutomationWork
 
     const handleWorkflowClick = (workflowUuid: string) => {
         if (workflowUuid !== currentWorkflowId) {
-            navigate(`/embedded/automation-workflows/${workflowUuid}/editor`);
+            void navigate(`/embedded/automation-workflows/${workflowUuid}/editor`);
         }
     };
 

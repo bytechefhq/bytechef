@@ -25,7 +25,7 @@ export default function useAiSkillUploadForm({onSuccess}: UseAiSkillUploadFormOp
     const createSkillFromInstructionsMutation = useCreateAiSkillFromInstructionsMutation();
 
     const handleUploadBatchComplete = useCallback(() => {
-        queryClient.invalidateQueries({queryKey: ['aiSkills']});
+        void queryClient.invalidateQueries({queryKey: ['aiSkills']});
 
         const totalCount = totalToUploadRef.current;
         const successCount = successCountRef.current;

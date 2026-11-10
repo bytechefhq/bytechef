@@ -101,8 +101,8 @@ export default function useAiSkillDetail() {
     const {mutateAsync: updateAiSkillContent} = useUpdateAiSkillContentMutation();
     const {mutateAsync: updateAiSkill} = useUpdateAiSkillMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['aiSkill', {id: selectedSkillId}]});
-            queryClient.invalidateQueries({queryKey: ['aiSkills']});
+            void queryClient.invalidateQueries({queryKey: ['aiSkill', {id: selectedSkillId}]});
+            void queryClient.invalidateQueries({queryKey: ['aiSkills']});
         },
     });
     const {mutateAsync: deleteAiSkill} = useDeleteAiSkillMutation({
@@ -221,7 +221,7 @@ export default function useAiSkillDetail() {
         const idToDelete = selectedSkillId;
 
         closeSkillDetail();
-        navigate(getAiSkillsBasePath(location.pathname));
+        void navigate(getAiSkillsBasePath(location.pathname));
 
         try {
             await deleteAiSkill({id: idToDelete});
@@ -307,7 +307,7 @@ export default function useAiSkillDetail() {
                 queryClient.setQueryData(['aiSkillFileContent', {id: selectedSkillId, path: selectedFilePath}], {
                     aiSkillFileContent: content,
                 });
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: ['aiSkillFileContent', {id: selectedSkillId, path: selectedFilePath}],
                 });
 

@@ -114,7 +114,7 @@ const Register = () => {
 
     useEffect(() => {
         if (registerErrorMessage) {
-            navigate('/account-error', {state: {error: registerErrorMessage, fromInternalFlow: true}});
+            void navigate('/account-error', {state: {error: registerErrorMessage, fromInternalFlow: true}});
         }
 
         reset();
@@ -125,11 +125,11 @@ const Register = () => {
             captureUserSignedUp(getValues().email);
 
             if (activationRequired) {
-                navigate('/verify-email', {
+                void navigate('/verify-email', {
                     state: {email: form.getValues().email, fromInternalFlow: true, password: form.getValues().password},
                 });
             } else if (!activationRequired) {
-                navigate('/activate', {state: {fromInternalFlow: true}});
+                void navigate('/activate', {state: {fromInternalFlow: true}});
             }
 
             reset();

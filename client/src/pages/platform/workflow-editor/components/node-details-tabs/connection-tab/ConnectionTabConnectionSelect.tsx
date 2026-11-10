@@ -103,7 +103,7 @@ const ConnectionTabConnectionSelect = ({
 
     const saveWorkflowTestConfigurationConnectionMutation = useSaveWorkflowTestConfigurationConnectionMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
             });
 
@@ -113,7 +113,7 @@ const ConnectionTabConnectionSelect = ({
 
     const deleteWorkflowTestConfigurationConnectionMutation = useDeleteWorkflowTestConfigurationConnectionMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
             });
 
@@ -177,7 +177,7 @@ const ConnectionTabConnectionSelect = ({
                             queryKey: [...WorkflowNodeOptionKeys.clusterElementNodeOptions, workflowId],
                         });
 
-                        queryClient.invalidateQueries({
+                        void queryClient.invalidateQueries({
                             queryKey: ConnectionKeys!.connections,
                         });
                     },
@@ -214,7 +214,7 @@ const ConnectionTabConnectionSelect = ({
                 },
                 {
                     onSuccess: () => {
-                        queryClient.invalidateQueries({
+                        void queryClient.invalidateQueries({
                             queryKey: ConnectionKeys!.connections,
                         });
                     },

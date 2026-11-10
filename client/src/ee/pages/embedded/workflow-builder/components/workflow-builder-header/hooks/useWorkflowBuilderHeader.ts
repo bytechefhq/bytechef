@@ -60,7 +60,7 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
             captureProjectPublished();
 
             if (workflowUuid) {
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: ConnectedUserProjectWorkflowKeys.connectedUserProjectWorkflow(workflowUuid),
                 });
             }
@@ -74,7 +74,7 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
         useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
         setCurrentNode(undefined);
 
-        navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${searchParams}`);
+        void navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${searchParams}`);
     };
 
     const handlePublishProjectSubmit = ({description, onSuccess}: {description?: string; onSuccess: () => void}) => {
@@ -163,7 +163,7 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
         setStreamRequest(null);
 
         if (jobId) {
-            workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => {
+            void workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => {
                 persistJobId(null);
                 setJobId(null);
             });

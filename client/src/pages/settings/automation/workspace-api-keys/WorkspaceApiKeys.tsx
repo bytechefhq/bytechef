@@ -58,7 +58,7 @@ const WorkspaceApiKeys = () => {
                             props?.onError?.(error as unknown as Error);
                         },
                         onSuccess: (data) => {
-                            queryClient.invalidateQueries({queryKey: ['workspaceApiKeys']});
+                            void queryClient.invalidateQueries({queryKey: ['workspaceApiKeys']});
 
                             props?.onSuccess?.(data.createWorkspaceApiKey);
                         },
@@ -81,7 +81,7 @@ const WorkspaceApiKeys = () => {
                             props?.onError?.(error as unknown as Error);
                         },
                         onSuccess: (data) => {
-                            queryClient.invalidateQueries({queryKey: ['workspaceApiKeys']});
+                            void queryClient.invalidateQueries({queryKey: ['workspaceApiKeys']});
 
                             props?.onSuccess?.(data.deleteWorkspaceApiKey);
                         },
@@ -101,7 +101,7 @@ const WorkspaceApiKeys = () => {
                             props?.onError?.(error as unknown as Error);
                         },
                         onSuccess: (data) => {
-                            queryClient.invalidateQueries({queryKey: ['workspaceApiKeys']});
+                            void queryClient.invalidateQueries({queryKey: ['workspaceApiKeys']});
 
                             props?.onSuccess?.(data.updateWorkspaceApiKey);
                         },

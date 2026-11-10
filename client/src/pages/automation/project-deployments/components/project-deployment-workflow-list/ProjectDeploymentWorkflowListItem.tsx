@@ -90,7 +90,7 @@ const ProjectDeploymentWorkflowListItem = ({
 
     const enableProjectDeploymentWorkflowMutation = useEnableProjectDeploymentWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectDeploymentKeys.projectDeployments,
             });
         },
@@ -108,14 +108,14 @@ const ProjectDeploymentWorkflowListItem = ({
 
     const handleOpenInProjectClick = () => {
         if (projectId != null) {
-            openProjectWorkflow(projectId, workflow.workflowUuid);
+            void openProjectWorkflow(projectId, workflow.workflowUuid);
         }
     };
 
     const handleRunWorkflowClick = (event: MouseEvent<HTMLButtonElement>) => {
         event?.stopPropagation();
 
-        projectDeploymentApi
+        void projectDeploymentApi
             .createProjectDeploymentWorkflowJob({
                 id: projectDeploymentId,
                 workflowId: workflow.id!,

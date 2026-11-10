@@ -146,11 +146,11 @@ export const useProject = () => {
 
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.workflows,
             });
 
@@ -169,7 +169,7 @@ export const useProject = () => {
                 workflowId: variables.id,
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription({
                     environmentId: variables.environmentId,
                     id: variables.id,
@@ -177,7 +177,7 @@ export const useProject = () => {
                 }),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowNodeParameterKeys.propertyWorkflowNodeParameterDisplayConditions({
                     environmentId: variables.environmentId,
                     id: variables.id,
@@ -185,7 +185,7 @@ export const useProject = () => {
                 }),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowNodeOutputKeys.workflowNodeOutputs,
             });
         },
@@ -271,7 +271,7 @@ export const useProject = () => {
                     bottomResizablePanelRef.current.resize(0);
                 }
 
-                navigate(
+                void navigate(
                     `/automation/projects/${projectId}/project-workflows/${matchingWorkflow.projectWorkflowId}?${newSearchParams}`
                 );
             }
@@ -298,7 +298,9 @@ export const useProject = () => {
             newSearchParams.delete('parentProjectWorkflowId');
             newSearchParams.delete('restoreExecutionPanel');
 
-            navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`);
+            void navigate(
+                `/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`
+            );
         },
         [navigate, searchParams]
     );

@@ -8,7 +8,7 @@ const ConnectedUserDeleteDialog = ({connectedUserId, onClose}: {connectedUserId:
 
     const deleteConnectedUserMutation = useDeleteConnectedUserMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectedUserKeys.connectedUsers,
             });
 

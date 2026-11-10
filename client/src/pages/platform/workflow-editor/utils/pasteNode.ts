@@ -376,7 +376,7 @@ export default function pasteNode({
         cancelWorkflowQueries();
     }
 
-    saveWorkflowDefinition({
+    void saveWorkflowDefinition({
         nodeData: newNodeData,
         nodeIndex: resolvedNodeIndex,
         taskDispatcherContext,

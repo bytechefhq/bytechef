@@ -21,7 +21,7 @@ export default function useDataStreamTestStep() {
     const rootWorkflowNodeName = rootClusterElementNodeData?.workflowNodeName || '';
 
     const invalidateNodeOutputs = useCallback(() => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflow.id],
         });
     }, [queryClient, workflow.id]);

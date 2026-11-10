@@ -32,7 +32,7 @@ const useChat = () => {
             workflowExecutionId &&
             activeWorkflowExecutionId !== workflowExecutionId
         ) {
-            navigate(`/automation/chat/${activeWorkflowExecutionId}`, {replace: true});
+            void navigate(`/automation/chat/${activeWorkflowExecutionId}`, {replace: true});
         }
     }, [activeWorkflowExecutionId, isRunning, navigate, workflowExecutionId]);
 

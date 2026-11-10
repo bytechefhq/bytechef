@@ -34,7 +34,7 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
 
     const handleCreated = (createdSkillId: string | null) => {
         if (createdSkillId) {
-            navigate(`${getAiSkillsBasePath(location.pathname)}/${createdSkillId}`);
+            void navigate(`${getAiSkillsBasePath(location.pathname)}/${createdSkillId}`);
         }
     };
 

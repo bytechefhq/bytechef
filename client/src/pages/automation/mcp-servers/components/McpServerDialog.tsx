@@ -88,7 +88,7 @@ const McpServerDialog = ({
                 },
                 {
                     onSuccess: () => {
-                        queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+                        void queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
                         setOpen(false);
                     },
                 }
@@ -107,7 +107,7 @@ const McpServerDialog = ({
                 },
                 {
                     onSuccess: () => {
-                        queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+                        void queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
                         setOpen(false);
                     },
                 }

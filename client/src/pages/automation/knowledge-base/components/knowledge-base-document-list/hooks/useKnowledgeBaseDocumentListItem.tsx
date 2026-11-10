@@ -23,7 +23,7 @@ export default function useKnowledgeBaseDocumentListItem({document}: UseKnowledg
     const handleStatusChange = useCallback(
         (status: number) => {
             if (status === STATUS_READY || status === STATUS_ERROR) {
-                queryClient.invalidateQueries({queryKey: ['knowledgeBase']});
+                void queryClient.invalidateQueries({queryKey: ['knowledgeBase']});
             }
         },
         [queryClient]

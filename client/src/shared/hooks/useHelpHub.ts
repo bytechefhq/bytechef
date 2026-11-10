@@ -33,7 +33,7 @@ export const useHelpHub = (): HelpHubI => {
             if (window.CommandBar) {
                 bootRef.current = true;
 
-                window.CommandBar.boot(account.uuid, {
+                void window.CommandBar.boot(account.uuid, {
                     edition: application?.edition,
                     email: account.email,
                     name: `${account.firstName} ${account.lastName}`,

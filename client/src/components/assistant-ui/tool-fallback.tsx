@@ -360,7 +360,7 @@ function ToolFallbackApproval({
       approval.approved === undefined &&
       respondToApproval
     ) {
-      respondToApproval({ approved });
+      void respondToApproval({ approved });
     } else if (interrupt) {
       resume?.({ approved });
     } else {
@@ -371,7 +371,7 @@ function ToolFallbackApproval({
 
   const respondWithOption = (option: ToolApprovalOption) => {
     if (submitted) return;
-    respondToApproval?.({ optionId: option.id });
+    void respondToApproval?.({ optionId: option.id });
     setSubmitted(true);
     setConfirmingId(null);
   };

@@ -91,7 +91,7 @@ export default function handleTaskDispatcherSubtaskOperationClick({
 
     const taskAfterCurrentIndex = workflow.tasks?.length;
 
-    saveWorkflowDefinition({
+    void saveWorkflowDefinition({
         nodeData: {
             ...newWorkflowNodeData,
             parameters: getParametersWithDefaultValues({
