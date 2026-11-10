@@ -23,10 +23,17 @@ public final class SendgridConstants {
 
     public static final String ATTACHMENTS = "attachments";
     public static final String CC = "cc";
+    public static final String CUSTOM_UNSUBSCRIBE_URL = "customUnsubscribeUrl";
     public static final String FROM = "from";
+    public static final String HTML_CONTENT = "htmlContent";
     public static final String ID = "id";
+    public static final String LIST_IDS = "listIds";
     public static final String NAME = "name";
+    public static final String SEND_AT = "sendAt";
+    public static final String SENDER_ID = "senderId";
+    public static final String SINGLE_SEND_ID = "singleSendId";
     public static final String SUBJECT = "subject";
+    public static final String SUPPRESSION_GROUP_ID = "suppressionGroupId";
     public static final String DYNAMIC_TEMPLATE_DATA = "dynamic_template_data";
     public static final String TEMPLATE_ID = "template_id";
     public static final String TEXT = "text";
