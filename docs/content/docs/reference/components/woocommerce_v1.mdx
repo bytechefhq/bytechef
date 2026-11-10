@@ -854,6 +854,449 @@ Type: OBJECT
 
 
 
+### Get Order
+Name: getOrder
+
+`Get an order by its ID.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | Order ID | STRING | ID of the order to get. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Order",
+  "name" : "getOrder",
+  "parameters" : {
+    "id" : ""
+  },
+  "type" : "woocommerce/v1/getOrder"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the resource. |
+| parent_id | STRING | Parent order ID. |
+| number | STRING | Order number. |
+| order_key | STRING | Order key. |
+| created_via | STRING | Shows where the order was created. |
+| version | STRING | Version of WooCommerce which last updated the order. |
+| status | STRING | Order status. |
+| currency | STRING | Currency the order was created with, in ISO format. |
+| date_created | STRING | The date the order was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the order was created, as GMT. |
+| date_modified | STRING | The date the order was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the order was last modified, as GMT. |
+| discount_total | STRING | Total discount amount for the order. |
+| discount_tax | STRING | Total discount tax amount for the order. |
+| shipping_total | STRING | Total shipping amount for the order. |
+| shipping_tax | STRING | Total shipping tax amount for the order. |
+| cart_tax | STRING | Sum of line item taxes only. |
+| total | STRING | Grand total. |
+| total_tax | STRING | Sum of all taxes. |
+| prices_include_tax | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | True the prices included tax during checkout. |
+| customer_id | INTEGER | User ID who owns the order. 0 for guests. Default is 0. |
+| customer_ip_address | STRING | Customer's IP address. |
+| customer_user_agent | STRING | User agent of the customer. |
+| customer_note | STRING | Note left by customer during checkout. |
+| billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | Billing address. |
+| shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country)&#125; </details> | Shipping address. |
+| payment_methods | STRING | Payment method ID. |
+| payment_method_title | STRING | Payment method title. |
+| transaction_id | STRING | Unique transaction ID. |
+| date_paid | STRING | The date the order was paid, in the site's timezone. |
+| date_paid_gmt | STRING | The date the order was paid, as GMT. |
+| date_completed | STRING | The date the order was completed, in the site's timezone. |
+| date_completed_gmt | STRING | The date the order was completed, as GMT. |
+| cart_hash | STRING | Sum of line item taxes only. |
+| meta_data | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(key), STRING\(value)&#125;] </details> | Meta data. |
+| line_items | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), INTEGER\(product_id), INTEGER\(variation_id), INTEGER\(quantity), STRING\(tax_class), STRING\(subtotal), STRING\(subtotal_tax), STRING\(total), STRING\(total_tax), []\(taxes), []\(meta_data), STRING\(sku), STRING\(price)&#125;] </details> | Line items data. |
+| tax_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(rate_code), INTEGER\(rate_id), STRING\(label), BOOLEAN\(compound), STRING\(tax_total), STRING\(shipping_tax_total), []\(mata_data)&#125;] </details> | Tax lines data. |
+| shipping_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(method_title), STRING\(method_id), STRING\(total), STRING\(total_tax), []\(taxes), []\(meta_data)&#125;] </details> | Shipping lines data. |
+| fee_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(tax_class), STRING\(tax_status), STRING\(total), STRING\(total_tax), []\(taxes), []\(mata_data)&#125;] </details> | Fee lines data. |
+| coupon_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(code), STRING\(discount), STRING\(discount_tax), []\(meta_data)&#125;] </details> | Coupons line data. |
+| refunds | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(reason), STRING\(total)&#125;] </details> | List of refunds. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "parent_id" : "",
+  "number" : "",
+  "order_key" : "",
+  "created_via" : "",
+  "version" : "",
+  "status" : "",
+  "currency" : "",
+  "date_created" : "",
+  "date_created_gmt" : "",
+  "date_modified" : "",
+  "date_modified_gmt" : "",
+  "discount_total" : "",
+  "discount_tax" : "",
+  "shipping_total" : "",
+  "shipping_tax" : "",
+  "cart_tax" : "",
+  "total" : "",
+  "total_tax" : "",
+  "prices_include_tax" : false,
+  "customer_id" : 1,
+  "customer_ip_address" : "",
+  "customer_user_agent" : "",
+  "customer_note" : "",
+  "billing" : {
+    "first_name" : "",
+    "last_name" : "",
+    "company" : "",
+    "address_1" : "",
+    "address_2" : "",
+    "city" : "",
+    "state" : "",
+    "postcode" : "",
+    "country" : "",
+    "email" : "",
+    "phone" : ""
+  },
+  "shipping" : {
+    "first_name" : "",
+    "last_name" : "",
+    "company" : "",
+    "address_1" : "",
+    "address_2" : "",
+    "city" : "",
+    "state" : "",
+    "postcode" : "",
+    "country" : ""
+  },
+  "payment_methods" : "",
+  "payment_method_title" : "",
+  "transaction_id" : "",
+  "date_paid" : "",
+  "date_paid_gmt" : "",
+  "date_completed" : "",
+  "date_completed_gmt" : "",
+  "cart_hash" : "",
+  "meta_data" : [ {
+    "id" : 1,
+    "key" : "",
+    "value" : ""
+  } ],
+  "line_items" : [ {
+    "id" : 1,
+    "name" : "",
+    "product_id" : 1,
+    "variation_id" : 1,
+    "quantity" : 1,
+    "tax_class" : "",
+    "subtotal" : "",
+    "subtotal_tax" : "",
+    "total" : "",
+    "total_tax" : "",
+    "taxes" : [ ],
+    "meta_data" : [ ],
+    "sku" : "",
+    "price" : ""
+  } ],
+  "tax_lines" : [ {
+    "id" : 1,
+    "rate_code" : "",
+    "rate_id" : 1,
+    "label" : "",
+    "compound" : false,
+    "tax_total" : "",
+    "shipping_tax_total" : "",
+    "mata_data" : [ ]
+  } ],
+  "shipping_lines" : [ {
+    "id" : 1,
+    "method_title" : "",
+    "method_id" : "",
+    "total" : "",
+    "total_tax" : "",
+    "taxes" : [ ],
+    "meta_data" : [ ]
+  } ],
+  "fee_lines" : [ {
+    "id" : 1,
+    "name" : "",
+    "tax_class" : "",
+    "tax_status" : "",
+    "total" : "",
+    "total_tax" : "",
+    "taxes" : [ ],
+    "mata_data" : [ ]
+  } ],
+  "coupon_lines" : [ {
+    "id" : 1,
+    "code" : "",
+    "discount" : "",
+    "discount_tax" : "",
+    "meta_data" : [ ]
+  } ],
+  "refunds" : [ {
+    "id" : 1,
+    "reason" : "",
+    "total" : ""
+  } ],
+  "_links" : {
+    "self" : [ {
+      "href" : ""
+    } ],
+    "collection" : [ {
+      "href" : ""
+    } ]
+  }
+}
+```
+
+
+
+
+### Search Orders
+Name: searchOrders
+
+`Search orders, most recent first, optionally filtered by status, creation date, customer and a search term.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| status | Status | STRING <details> <summary> Options </summary> <span>pending</span>, <span>processing</span>, <span>on-hold</span>, <span>completed</span>, <span>cancelled</span>, <span>refunded</span>, <span>failed</span>, <span>trash</span> </details> | Only return orders with this status. | false |
+| after | Created After | DATE_TIME | Only return orders created after this date and time, in the site's timezone. | false |
+| before | Created Before | DATE_TIME | Only return orders created before this date and time, in the site's timezone. | false |
+| customer | Customer ID | INTEGER | Only return orders of the customer with this ID. | false |
+| search | Search | STRING | Only return orders matching this term, for example an order number or a customer email. | false |
+| per_page | Limit | INTEGER | Maximum number of orders to return, between 1 and 100. Defaults to 10. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Orders",
+  "name" : "searchOrders",
+  "parameters" : {
+    "status" : "",
+    "after" : "2021-01-01T00:00:00",
+    "before" : "2021-01-01T00:00:00",
+    "customer" : 1,
+    "search" : "",
+    "per_page" : 1
+  },
+  "type" : "woocommerce/v1/searchOrders"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Unique identifier for the resource. |
+| parent_id | STRING | Parent order ID. |
+| number | STRING | Order number. |
+| order_key | STRING | Order key. |
+| created_via | STRING | Shows where the order was created. |
+| version | STRING | Version of WooCommerce which last updated the order. |
+| status | STRING | Order status. |
+| currency | STRING | Currency the order was created with, in ISO format. |
+| date_created | STRING | The date the order was created, in the site's timezone. |
+| date_created_gmt | STRING | The date the order was created, as GMT. |
+| date_modified | STRING | The date the order was last modified, in the site's timezone. |
+| date_modified_gmt | STRING | The date the order was last modified, as GMT. |
+| discount_total | STRING | Total discount amount for the order. |
+| discount_tax | STRING | Total discount tax amount for the order. |
+| shipping_total | STRING | Total shipping amount for the order. |
+| shipping_tax | STRING | Total shipping tax amount for the order. |
+| cart_tax | STRING | Sum of line item taxes only. |
+| total | STRING | Grand total. |
+| total_tax | STRING | Sum of all taxes. |
+| prices_include_tax | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | True the prices included tax during checkout. |
+| customer_id | INTEGER | User ID who owns the order. 0 for guests. Default is 0. |
+| customer_ip_address | STRING | Customer's IP address. |
+| customer_user_agent | STRING | User agent of the customer. |
+| customer_note | STRING | Note left by customer during checkout. |
+| billing | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country), STRING\(email), STRING\(phone)&#125; </details> | Billing address. |
+| shipping | OBJECT <details> <summary> Properties </summary> &#123;STRING\(first_name), STRING\(last_name), STRING\(company), STRING\(address_1), STRING\(address_2), STRING\(city), STRING\(state), STRING\(postcode), STRING\(country)&#125; </details> | Shipping address. |
+| payment_methods | STRING | Payment method ID. |
+| payment_method_title | STRING | Payment method title. |
+| transaction_id | STRING | Unique transaction ID. |
+| date_paid | STRING | The date the order was paid, in the site's timezone. |
+| date_paid_gmt | STRING | The date the order was paid, as GMT. |
+| date_completed | STRING | The date the order was completed, in the site's timezone. |
+| date_completed_gmt | STRING | The date the order was completed, as GMT. |
+| cart_hash | STRING | Sum of line item taxes only. |
+| meta_data | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(key), STRING\(value)&#125;] </details> | Meta data. |
+| line_items | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), INTEGER\(product_id), INTEGER\(variation_id), INTEGER\(quantity), STRING\(tax_class), STRING\(subtotal), STRING\(subtotal_tax), STRING\(total), STRING\(total_tax), []\(taxes), []\(meta_data), STRING\(sku), STRING\(price)&#125;] </details> | Line items data. |
+| tax_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(rate_code), INTEGER\(rate_id), STRING\(label), BOOLEAN\(compound), STRING\(tax_total), STRING\(shipping_tax_total), []\(mata_data)&#125;] </details> | Tax lines data. |
+| shipping_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(method_title), STRING\(method_id), STRING\(total), STRING\(total_tax), []\(taxes), []\(meta_data)&#125;] </details> | Shipping lines data. |
+| fee_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(name), STRING\(tax_class), STRING\(tax_status), STRING\(total), STRING\(total_tax), []\(taxes), []\(mata_data)&#125;] </details> | Fee lines data. |
+| coupon_lines | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(code), STRING\(discount), STRING\(discount_tax), []\(meta_data)&#125;] </details> | Coupons line data. |
+| refunds | ARRAY <details> <summary> Items </summary> [&#123;INTEGER\(id), STRING\(reason), STRING\(total)&#125;] </details> | List of refunds. |
+| _links | OBJECT <details> <summary> Properties </summary> &#123;[&#123;STRING\(href)&#125;]\(self), [&#123;STRING\(href)&#125;]\(collection)&#125; </details> |  |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "id" : 1,
+  "parent_id" : "",
+  "number" : "",
+  "order_key" : "",
+  "created_via" : "",
+  "version" : "",
+  "status" : "",
+  "currency" : "",
+  "date_created" : "",
+  "date_created_gmt" : "",
+  "date_modified" : "",
+  "date_modified_gmt" : "",
+  "discount_total" : "",
+  "discount_tax" : "",
+  "shipping_total" : "",
+  "shipping_tax" : "",
+  "cart_tax" : "",
+  "total" : "",
+  "total_tax" : "",
+  "prices_include_tax" : false,
+  "customer_id" : 1,
+  "customer_ip_address" : "",
+  "customer_user_agent" : "",
+  "customer_note" : "",
+  "billing" : {
+    "first_name" : "",
+    "last_name" : "",
+    "company" : "",
+    "address_1" : "",
+    "address_2" : "",
+    "city" : "",
+    "state" : "",
+    "postcode" : "",
+    "country" : "",
+    "email" : "",
+    "phone" : ""
+  },
+  "shipping" : {
+    "first_name" : "",
+    "last_name" : "",
+    "company" : "",
+    "address_1" : "",
+    "address_2" : "",
+    "city" : "",
+    "state" : "",
+    "postcode" : "",
+    "country" : ""
+  },
+  "payment_methods" : "",
+  "payment_method_title" : "",
+  "transaction_id" : "",
+  "date_paid" : "",
+  "date_paid_gmt" : "",
+  "date_completed" : "",
+  "date_completed_gmt" : "",
+  "cart_hash" : "",
+  "meta_data" : [ {
+    "id" : 1,
+    "key" : "",
+    "value" : ""
+  } ],
+  "line_items" : [ {
+    "id" : 1,
+    "name" : "",
+    "product_id" : 1,
+    "variation_id" : 1,
+    "quantity" : 1,
+    "tax_class" : "",
+    "subtotal" : "",
+    "subtotal_tax" : "",
+    "total" : "",
+    "total_tax" : "",
+    "taxes" : [ ],
+    "meta_data" : [ ],
+    "sku" : "",
+    "price" : ""
+  } ],
+  "tax_lines" : [ {
+    "id" : 1,
+    "rate_code" : "",
+    "rate_id" : 1,
+    "label" : "",
+    "compound" : false,
+    "tax_total" : "",
+    "shipping_tax_total" : "",
+    "mata_data" : [ ]
+  } ],
+  "shipping_lines" : [ {
+    "id" : 1,
+    "method_title" : "",
+    "method_id" : "",
+    "total" : "",
+    "total_tax" : "",
+    "taxes" : [ ],
+    "meta_data" : [ ]
+  } ],
+  "fee_lines" : [ {
+    "id" : 1,
+    "name" : "",
+    "tax_class" : "",
+    "tax_status" : "",
+    "total" : "",
+    "total_tax" : "",
+    "taxes" : [ ],
+    "mata_data" : [ ]
+  } ],
+  "coupon_lines" : [ {
+    "id" : 1,
+    "code" : "",
+    "discount" : "",
+    "discount_tax" : "",
+    "meta_data" : [ ]
+  } ],
+  "refunds" : [ {
+    "id" : 1,
+    "reason" : "",
+    "total" : ""
+  } ],
+  "_links" : {
+    "self" : [ {
+      "href" : ""
+    } ],
+    "collection" : [ {
+      "href" : ""
+    } ]
+  }
+} ]
+```
+
+
+
+
 
 ## Triggers
 
