@@ -33,7 +33,7 @@ export default function useMcpProjectWorkflowBadge(mcpProjectWorkflow: McpProjec
 
     const deleteMcpProjectWorkflowMutation = useDeleteMcpProjectWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['mcpProjectsByServerId'],
             });
 
@@ -52,7 +52,7 @@ export default function useMcpProjectWorkflowBadge(mcpProjectWorkflow: McpProjec
     const handleCloseEditDialog = () => {
         setShowEditWorkflowDialog(false);
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ['mcpProjectsByServerId'],
         });
     };

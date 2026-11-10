@@ -92,7 +92,7 @@ const ClusterElementsCanvasDialog = ({
 
     useEffect(() => {
         return useCopilotPostTurnRegistry.getState().register(Source.CLUSTER_ELEMENT, () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
             });
         });

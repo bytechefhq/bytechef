@@ -68,7 +68,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
 
     const updateProjectDeploymentWorkflowMutation = useUpdateProjectDeploymentWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectDeploymentKeys.projectDeployments,
             });
 

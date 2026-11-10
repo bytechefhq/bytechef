@@ -15,7 +15,7 @@ const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: stri
     const refreshedTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(codeSnippet);
+        void navigator.clipboard.writeText(codeSnippet);
 
         setCopied(true);
 

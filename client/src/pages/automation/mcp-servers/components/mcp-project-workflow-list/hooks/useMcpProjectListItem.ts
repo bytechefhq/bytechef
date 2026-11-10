@@ -35,7 +35,7 @@ const useMcpProjectListItem = (mcpProject: McpProjectItemType) => {
     );
 
     const handleOnProjectDeploymentDialogClose = () => {
-        queryClient
+        void queryClient
             .invalidateQueries({
                 queryKey: ['mcpProjectsByServerId'],
             })

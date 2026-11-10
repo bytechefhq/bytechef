@@ -83,10 +83,10 @@ const IntegrationInstanceConfigurationListItem = ({
 
     const deleteIntegrationInstanceConfigurationMutation = useDeleteIntegrationInstanceConfigurationMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceConfigurationTagKeys.integrationInstanceConfigurationTags,
             });
             void queryClient.invalidateQueries({
@@ -97,10 +97,10 @@ const IntegrationInstanceConfigurationListItem = ({
 
     const updateIntegrationInstanceConfigurationTagsMutation = useUpdateIntegrationInstanceConfigurationTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceConfigurationTagKeys.integrationInstanceConfigurationTags,
             });
         },
@@ -112,7 +112,7 @@ const IntegrationInstanceConfigurationListItem = ({
                 captureIntegrationInstanceConfigurationEnabled();
             }
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
             });
         },

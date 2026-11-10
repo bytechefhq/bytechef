@@ -39,13 +39,13 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
 
     const deleteConnectionMutation = useDeleteConnectionMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ComponentDefinitionKeys.componentDefinitions,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connections,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connectionTags,
             });
         },
@@ -53,10 +53,10 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
 
     const updateConnectionTagsMutation = useUpdateConnectionTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connections,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connectionTags,
             });
         },

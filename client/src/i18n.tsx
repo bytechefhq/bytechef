@@ -16,7 +16,7 @@ function I18n({children}: {children: ReactNode}) {
     const [locale, setLocale] = useState(defaultLocale);
 
     useEffect(() => {
-        loadLocale(locale);
+        void loadLocale(locale);
     }, [locale]);
 
     return <I18nProvider i18n={i18n}>{children}</I18nProvider>;

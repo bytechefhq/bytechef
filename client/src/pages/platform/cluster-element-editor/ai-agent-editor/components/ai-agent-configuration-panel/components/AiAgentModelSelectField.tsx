@@ -57,7 +57,7 @@ export default function AiAgentModelSelectField() {
                                             className="flex-none rounded p-0.5 hover:bg-muted"
                                             onClick={(event) => {
                                                 event.stopPropagation();
-                                                handleConfigureModel(model);
+                                                void handleConfigureModel(model);
                                             }}
                                             role="button"
                                         >

@@ -50,7 +50,7 @@ const AppEventDialog = ({appEvent, onClose, triggerNode}: AppEventDialogProps) =
     const queryClient = useQueryClient();
 
     const onSuccess = () => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: AppEventKeys.appEvents,
         });
 

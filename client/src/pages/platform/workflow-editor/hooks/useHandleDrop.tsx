@@ -177,7 +177,7 @@ async function saveDroppedNode({
 
     const workflowId = useWorkflowDataStore.getState().workflow.id;
 
-    saveWorkflowDefinition({
+    void saveWorkflowDefinition({
         ...options,
         nodeData,
         onSuccess: () => {

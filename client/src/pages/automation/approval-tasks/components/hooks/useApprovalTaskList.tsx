@@ -144,7 +144,7 @@ export function useApprovalTaskList(): UseApprovalTaskListReturnI {
                     onError: () => {
                         updateApprovalTaskInStore(previous);
 
-                        queryClient.invalidateQueries({queryKey: ['approvalTasks']});
+                        void queryClient.invalidateQueries({queryKey: ['approvalTasks']});
                     },
                     onSuccess: (data) => {
                         updateApprovalTaskInStore({

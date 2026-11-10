@@ -41,7 +41,7 @@ const AdminApiKeys = () => {
                 useCreateApiKeyMutation: (props?: CreateApiKeyMutationProps) => {
                     const createApiKeyMutation = useCreateApiKeyMutation({
                         onSuccess: (data: CreateApiKeyMutation) => {
-                            queryClient.invalidateQueries({
+                            void queryClient.invalidateQueries({
                                 queryKey: ['adminApiKeys'],
                             });
 
@@ -62,7 +62,7 @@ const AdminApiKeys = () => {
                 useDeleteApiKeyMutation: (props?: SimpleMutationProps) => {
                     const deleteApiKeyMutation = useDeleteApiKeyMutation({
                         onSuccess: (data) => {
-                            queryClient.invalidateQueries({
+                            void queryClient.invalidateQueries({
                                 queryKey: ['adminApiKeys'],
                             });
 
@@ -81,7 +81,7 @@ const AdminApiKeys = () => {
                 useUpdateApiKeyMutation: (props?: SimpleMutationProps) =>
                     useUpdateApiKeyMutation({
                         onSuccess: (data) => {
-                            queryClient.invalidateQueries({
+                            void queryClient.invalidateQueries({
                                 queryKey: ['adminApiKeys'],
                             });
 

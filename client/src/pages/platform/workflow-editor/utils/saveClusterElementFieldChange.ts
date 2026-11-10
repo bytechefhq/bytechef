@@ -127,7 +127,7 @@ export default function saveClusterElementFieldChange({
         return;
     }
 
-    saveWorkflowDefinition({
+    void saveWorkflowDefinition({
         decorative: true,
         nodeData: updatedMainRootData,
         onError,

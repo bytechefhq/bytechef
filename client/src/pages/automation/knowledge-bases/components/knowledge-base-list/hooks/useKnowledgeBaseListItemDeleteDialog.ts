@@ -15,7 +15,7 @@ export default function useKnowledgeBaseListItemDeleteDialog({
 
     const deleteKnowledgeBaseMutation = useDeleteKnowledgeBaseMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
+            void queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
 
             toast('Knowledge base deleted successfully.');
         },

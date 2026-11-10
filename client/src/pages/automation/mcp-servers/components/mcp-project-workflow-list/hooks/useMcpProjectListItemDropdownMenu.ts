@@ -9,7 +9,7 @@ const useMcpProjectListItemDropdownMenu = (mcpProjectId: string) => {
 
     const deleteMcpProjectMutation = useDeleteMcpProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['mcpProjectsByServerId'],
             });
             setShowDeleteDialog(false);

@@ -9,7 +9,7 @@ const useMcpIntegrationInstanceConfigurationListItemDropdownMenu = (mcpIntegrati
 
     const deleteMcpIntegrationInstanceConfigurationMutation = useDeleteMcpIntegrationInstanceConfigurationMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['mcpIntegrationInstanceConfigurationsByServerId'],
             });
             setShowDeleteDialog(false);

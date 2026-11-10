@@ -28,7 +28,7 @@ const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
 
     const deleteAppEventMutation = useDeleteAppEventMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: AppEventKeys.appEvents,
             });
         },

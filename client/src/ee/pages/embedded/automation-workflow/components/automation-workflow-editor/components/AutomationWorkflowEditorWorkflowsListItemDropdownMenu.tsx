@@ -39,7 +39,7 @@ const AutomationWorkflowEditorWorkflowsListItemDropdownMenu = ({
     const updateWorkflowMutation = useUpdateAutomationWorkflowProjectWorkflowMutation();
 
     const invalidateProjects = () => {
-        queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+        void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
     };
 
     const handleDeleteWorkflowClick = () => {
@@ -58,9 +58,9 @@ const AutomationWorkflowEditorWorkflowsListItemDropdownMenu = ({
                     );
 
                     if (firstRemainingWorkflow) {
-                        navigate(`/embedded/automation-workflows/${firstRemainingWorkflow.workflowUuid}/editor`);
+                        void navigate(`/embedded/automation-workflows/${firstRemainingWorkflow.workflowUuid}/editor`);
                     } else {
-                        navigate('/embedded/automation-workflows');
+                        void navigate('/embedded/automation-workflows');
                     }
                 },
             }

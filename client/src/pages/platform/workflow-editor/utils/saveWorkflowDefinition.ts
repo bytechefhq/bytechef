@@ -54,7 +54,7 @@ export default async function saveWorkflowDefinition(props: SaveWorkflowDefiniti
         }
 
         enqueuePendingSave(workflow.id, () => {
-            saveWorkflowDefinition(props);
+            void saveWorkflowDefinition(props);
         });
 
         return;

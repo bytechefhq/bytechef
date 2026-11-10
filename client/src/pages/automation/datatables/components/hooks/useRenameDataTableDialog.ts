@@ -25,7 +25,7 @@ export default function useRenameDataTableDialog(): UseRenameDataTableDialogI {
 
     const renameMutation = useRenameDataTableMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['dataTables']});
+            void queryClient.invalidateQueries({queryKey: ['dataTables']});
             clearTableToRename();
         },
     });

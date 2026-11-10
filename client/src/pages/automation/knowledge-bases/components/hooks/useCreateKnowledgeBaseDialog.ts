@@ -93,7 +93,7 @@ export default function useCreateKnowledgeBaseDialog({workspaceId}: UseCreateKno
 
         await Promise.all(files.map((selectedFile, index) => uploadFile(knowledgeBaseId, selectedFile.file, index)));
 
-        queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
+        void queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
 
         setTimeout(() => {
             setOpen(false);
@@ -106,9 +106,9 @@ export default function useCreateKnowledgeBaseDialog({workspaceId}: UseCreateKno
             const knowledgeBaseId = data.createKnowledgeBase?.id;
 
             if (selectedFiles.length > 0 && knowledgeBaseId) {
-                uploadFiles(knowledgeBaseId, selectedFiles);
+                void uploadFiles(knowledgeBaseId, selectedFiles);
             } else {
-                queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
+                void queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
                 setOpen(false);
                 resetForm();
             }

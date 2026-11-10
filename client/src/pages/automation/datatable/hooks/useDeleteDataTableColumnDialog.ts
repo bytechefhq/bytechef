@@ -24,7 +24,7 @@ export default function useDeleteDataTableColumnDialog(): UseDeleteDataTableColu
 
     const removeColumnMutation = useRemoveDataTableColumnMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['dataTables']});
+            void queryClient.invalidateQueries({queryKey: ['dataTables']});
             clearDialog();
         },
     });

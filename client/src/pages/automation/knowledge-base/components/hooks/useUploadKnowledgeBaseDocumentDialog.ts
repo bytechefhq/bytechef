@@ -88,7 +88,7 @@ export default function useUploadKnowledgeBaseDocumentDialog({
 
         await Promise.all(uploadPromises);
 
-        queryClient.invalidateQueries({queryKey: ['knowledgeBase', {id: knowledgeBaseId}]});
+        void queryClient.invalidateQueries({queryKey: ['knowledgeBase', {id: knowledgeBaseId}]});
 
         setTimeout(() => {
             setOpen(false);
@@ -115,7 +115,7 @@ export default function useUploadKnowledgeBaseDocumentDialog({
 
     const handleSubmit = () => {
         if (selectedFiles.length > 0) {
-            uploadFiles();
+            void uploadFiles();
         }
     };
 

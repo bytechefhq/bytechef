@@ -105,16 +105,16 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
             captureProjectPublished();
 
             if (project) {
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: ProjectKeys.project(project.id!),
                 });
 
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: ProjectVersionKeys.projectProjectVersions(project.id!),
                 });
             }
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectKeys.filteredProjects({id: currentWorkspaceId!}),
             });
 
@@ -281,7 +281,7 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         const currentJobId = jobId || getPersistedJobId();
 
         if (currentJobId) {
-            workflowTestApi.stopWorkflowTest({jobId: currentJobId}, {keepalive: true}).finally(() => {
+            void workflowTestApi.stopWorkflowTest({jobId: currentJobId}, {keepalive: true}).finally(() => {
                 persistJobId(null);
                 setJobId(null);
             });

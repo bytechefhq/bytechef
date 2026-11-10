@@ -41,7 +41,7 @@ const IntegrationWorkflowList = ({
         onSuccess: (integrationWorkflowId) => {
             captureIntegrationWorkflowCreated();
 
-            navigate(`/embedded/integrations/${integration.id}/integration-workflows/${integrationWorkflowId}`);
+            void navigate(`/embedded/integrations/${integration.id}/integration-workflows/${integrationWorkflowId}`);
         },
     });
 

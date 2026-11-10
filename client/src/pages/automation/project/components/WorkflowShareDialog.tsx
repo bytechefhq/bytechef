@@ -53,7 +53,7 @@ export function WorkflowShareDialog({
                     console.log('error', err);
                 },
                 onSuccess: () => {
-                    refetch();
+                    void refetch();
                     setShareState('exported');
                 },
             }
@@ -69,7 +69,7 @@ export function WorkflowShareDialog({
                 },
                 {
                     onSuccess: () => {
-                        refetch();
+                        void refetch();
                         setShareState('exported');
                     },
                 }

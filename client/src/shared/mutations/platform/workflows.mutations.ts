@@ -36,7 +36,7 @@ const useUpdatePlatformWorkflowMutation = ({
 
     return useUpdateWorkflowMutation({
         onError: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: workflowKeys.workflow(workflowId),
             });
 
@@ -45,7 +45,7 @@ const useUpdatePlatformWorkflowMutation = ({
             }
         },
         onSuccess: (updatedWorkflow) => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflowId),
             });
 

@@ -99,11 +99,11 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
     const queryClient = useQueryClient();
 
     const onSuccess = () => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ApiCollectionKeys.apiCollections,
         });
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ApiCollectionTagKeys.apiCollectionTags,
         });
 

@@ -32,7 +32,7 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
 
     const inviteUserMutation = useInviteUserMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['users']});
+            void queryClient.invalidateQueries({queryKey: ['users']});
             reset();
         },
     });

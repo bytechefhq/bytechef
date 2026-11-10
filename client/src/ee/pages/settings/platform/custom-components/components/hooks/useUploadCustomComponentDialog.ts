@@ -79,7 +79,7 @@ export default function useUploadCustomComponentDialog() {
 
         await Promise.all(uploadPromises);
 
-        queryClient.invalidateQueries({queryKey: ['customComponents']});
+        void queryClient.invalidateQueries({queryKey: ['customComponents']});
 
         setTimeout(() => {
             setOpen(false);
@@ -106,7 +106,7 @@ export default function useUploadCustomComponentDialog() {
 
     const handleSubmit = () => {
         if (selectedFiles.length > 0) {
-            uploadFiles();
+            void uploadFiles();
         }
     };
 

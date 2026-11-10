@@ -40,7 +40,7 @@ export default function useDeleteDataTableAlertDialog(): UseDeleteDataTableAlert
             clearTableToDelete();
 
             if (isOnListPage) {
-                navigate('/automation/datatables');
+                void navigate('/automation/datatables');
             } else {
                 const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
                 const sorted = [...(tablesData?.dataTables ?? [])].sort((sortedTableA, sortedTableB) =>
@@ -50,9 +50,9 @@ export default function useDeleteDataTableAlertDialog(): UseDeleteDataTableAlert
                 const nextTable = currentIndex >= 0 ? sorted[currentIndex + 1] : undefined;
 
                 if (nextTable?.id) {
-                    navigate(`/automation/datatables/${nextTable.id}`);
+                    void navigate(`/automation/datatables/${nextTable.id}`);
                 } else {
-                    navigate('/automation/datatables');
+                    void navigate('/automation/datatables');
                 }
             }
         },

@@ -25,7 +25,7 @@ const MonacoEditorWrapper = (props: MonacoEditorProps) => {
 
     useEffect(() => {
         if (!isReady) {
-            ensureMonacoConfigured().then(() => setIsReady(true));
+            void ensureMonacoConfigured().then(() => setIsReady(true));
         }
     }, [isReady]);
 

@@ -38,11 +38,11 @@ const SubflowBanner = ({className}: {className?: string}) => {
                 newSearchParams.set('restoreExecutionPanel', 'true');
             }
 
-            navigate(
+            void navigate(
                 `/automation/projects/${projectId}/project-workflows/${parentProjectWorkflowIdParam}?${newSearchParams}`
             );
         } else {
-            navigate(-1);
+            void navigate(-1);
         }
     }, [navigate, parentProjectWorkflowIdParam, projectId, searchParams]);
 

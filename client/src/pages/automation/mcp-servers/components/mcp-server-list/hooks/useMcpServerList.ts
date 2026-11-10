@@ -23,7 +23,7 @@ const useMcpServerList = (mcpServers: McpServer[]) => {
                 },
                 {
                     onSuccess: () => {
-                        queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+                        void queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
                     },
                 }
             );

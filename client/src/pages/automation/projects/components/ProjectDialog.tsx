@@ -78,16 +78,16 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
         }
 
         if (projectId) {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectKeys.project(projectId),
             });
         }
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ProjectCategoryKeys.projectCategories(currentWorkspaceId!),
         });
-        queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+        void queryClient.invalidateQueries({
             queryKey: ProjectTagKeys.projectTags,
         });
 

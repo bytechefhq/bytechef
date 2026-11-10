@@ -82,7 +82,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
             return;
         }
 
-        saveWorkflowDefinition({
+        void saveWorkflowDefinition({
             decorative: true,
             nodeData: {
                 ...currentNode,
@@ -141,7 +141,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
             return;
         }
 
-        saveWorkflowDefinition({
+        void saveWorkflowDefinition({
             decorative: true,
             nodeData: {
                 ...currentNode,

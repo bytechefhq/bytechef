@@ -26,11 +26,11 @@ const legacyEmbeddedWorkflowBuilderUrl = getLegacyEmbeddedWorkflowBuilderUrl(win
 if (legacyEmbeddedWorkflowBuilderUrl) {
     window.location.replace(legacyEmbeddedWorkflowBuilderUrl);
 } else if (process.env.NODE_ENV === 'mock') {
-    import('./mocks/server').then(({worker}) => {
-        worker.start().then(() => renderApp());
+    void import('./mocks/server').then(({worker}) => {
+        void worker.start().then(() => renderApp());
     });
 } else {
-    renderApp();
+    void renderApp();
 }
 
 const publicRoutes = [

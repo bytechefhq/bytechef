@@ -18,7 +18,7 @@ export default function useMcpProjectWorkflowPropertiesPopover(
 
     const updateMcpProjectWorkflowMutation = useUpdateMcpProjectWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['mcpProjectsByServerId'],
             });
 

@@ -33,13 +33,13 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
     const deleteConnectionMutation = useDeleteConnectionMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ComponentDefinitionKeys.componentDefinitions,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connections,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connectionTags,
             });
 
@@ -54,13 +54,13 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
             setShowDisconnectDialog(false);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ComponentDefinitionKeys.componentDefinitions,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connections,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connectionTags,
             });
 
@@ -72,10 +72,10 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
     const updateConnectionTagsMutation = useUpdateConnectionTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connections,
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectionKeys.connectionTags,
             });
         },

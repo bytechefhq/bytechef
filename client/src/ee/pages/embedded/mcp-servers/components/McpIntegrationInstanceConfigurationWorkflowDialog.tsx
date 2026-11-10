@@ -121,9 +121,9 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
     const queryClient = useQueryClient();
 
     const invalidateAndClose = () => {
-        queryClient.invalidateQueries({queryKey: ['mcpIntegrationInstanceConfigurationsByServerId']});
-        queryClient.invalidateQueries({queryKey: ['mcpIntegrationInstanceConfigurations']});
-        queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
+        void queryClient.invalidateQueries({queryKey: ['mcpIntegrationInstanceConfigurationsByServerId']});
+        void queryClient.invalidateQueries({queryKey: ['mcpIntegrationInstanceConfigurations']});
+        void queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
 
         closeDialog();
     };

@@ -34,7 +34,7 @@ const ProjectTemplate = ({
 
             projectTemplate?.workflows.forEach(() => captureProjectWorkflowCreatedFromTemplate());
 
-            navigate('/automation/projects');
+            void navigate('/automation/projects');
         },
     });
 

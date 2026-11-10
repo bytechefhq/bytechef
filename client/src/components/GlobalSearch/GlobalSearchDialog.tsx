@@ -63,7 +63,7 @@ const GlobalSearchDialog = ({onOpenChange, open}: GlobalSearchDialogProps) => {
 
     const handleSelect = useCallback(
         (path: string) => {
-            navigate(path);
+            void navigate(path);
             onOpenChange(false);
             setQuery('');
         },

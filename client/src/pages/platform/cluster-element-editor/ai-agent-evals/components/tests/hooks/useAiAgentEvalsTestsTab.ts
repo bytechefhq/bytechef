@@ -20,8 +20,8 @@ export default function useAiAgentEvalsTestsTab(workflowId: string, workflowNode
     const evalTests = useMemo(() => evalTestsData?.aiAgentEvalTests ?? [], [evalTestsData]);
 
     const invalidateTests = useCallback(() => {
-        queryClient.invalidateQueries({queryKey: ['aiAgentEvalTest']});
-        queryClient.invalidateQueries({queryKey: ['aiAgentEvalTests']});
+        void queryClient.invalidateQueries({queryKey: ['aiAgentEvalTest']});
+        void queryClient.invalidateQueries({queryKey: ['aiAgentEvalTests']});
     }, [queryClient]);
 
     const createTestMutation = useCreateAiAgentEvalTestMutation({

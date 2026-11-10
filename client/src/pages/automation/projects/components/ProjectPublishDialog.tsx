@@ -29,7 +29,7 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
         onSuccess: () => {
             captureProjectPublished();
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectKeys.projects,
             });
 

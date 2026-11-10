@@ -73,7 +73,7 @@ const McpServerDialog = ({
                 },
                 {
                     onSuccess: () => {
-                        queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
+                        void queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
                         setOpen(false);
                     },
                 }
@@ -89,7 +89,7 @@ const McpServerDialog = ({
                 },
                 {
                     onSuccess: () => {
-                        queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
+                        void queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
                         setOpen(false);
                     },
                 }

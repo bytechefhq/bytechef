@@ -170,7 +170,7 @@ const WorkflowEditorLayout = ({
 
     useEffect(() => {
         return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR, () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
             });
         });

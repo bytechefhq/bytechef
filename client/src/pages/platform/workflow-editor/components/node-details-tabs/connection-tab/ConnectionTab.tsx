@@ -108,7 +108,7 @@ const ConnectionTab = ({
             return;
         }
 
-        saveWorkflowDefinition({
+        void saveWorkflowDefinition({
             decorative: true,
             nodeData: {
                 ...currentNode,

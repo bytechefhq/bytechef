@@ -349,7 +349,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     });
 
     const invalidateRows = useCallback(() => {
-        queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
+        void queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
     }, [queryClient]);
 
     const insertRowMutation = useInsertDataTableRowMutation();
@@ -364,7 +364,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
             scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 60;
 
         if (isNearBottom && hasNextPageRef.current && !isFetchingNextPageRef.current) {
-            fetchNextPageRef.current();
+            void fetchNextPageRef.current();
         }
     }, []);
 

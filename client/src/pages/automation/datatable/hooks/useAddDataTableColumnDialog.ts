@@ -22,7 +22,7 @@ export default function useAddDataTableColumnDialog(): UseAddDataTableColumnDial
 
     const addColumnMutation = useAddDataTableColumnMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['dataTables']});
+            void queryClient.invalidateQueries({queryKey: ['dataTables']});
             clearDialog();
         },
     });

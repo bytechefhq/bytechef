@@ -45,9 +45,9 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
             setCurrentType(selectedType);
 
             if (selectedType === PlatformType.AUTOMATION) {
-                navigate('/automation');
+                void navigate('/automation');
             } else if (selectedType === PlatformType.EMBEDDED) {
-                navigate('/embedded');
+                void navigate('/embedded');
             }
 
             handleDialogClose();

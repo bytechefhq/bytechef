@@ -85,18 +85,18 @@ const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: Integ
         const id = integrationId || integration?.id;
 
         if (id) {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integration(id),
             });
         }
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: IntegrationCategoryKeys.integrationCategories,
         });
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: IntegrationKeys.integrations,
         });
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: IntegrationTagKeys.integrationTags,
         });
 

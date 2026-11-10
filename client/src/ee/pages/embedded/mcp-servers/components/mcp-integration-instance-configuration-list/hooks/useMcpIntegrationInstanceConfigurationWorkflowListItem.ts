@@ -46,7 +46,7 @@ export default function useMcpIntegrationInstanceConfigurationWorkflowListItem(
     const deleteMcpIntegrationInstanceConfigurationWorkflowMutation =
         useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: ['mcpIntegrationInstanceConfigurationsByServerId'],
                 });
 
@@ -73,7 +73,7 @@ export default function useMcpIntegrationInstanceConfigurationWorkflowListItem(
     const handleCloseEditDialog = () => {
         setShowEditWorkflowDialog(false);
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ['mcpIntegrationInstanceConfigurationsByServerId'],
         });
     };

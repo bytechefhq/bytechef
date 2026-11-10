@@ -144,9 +144,9 @@ const AutomationWorkflowEditorHeader = ({
             {workflowUuid: currentWorkflowId},
             {
                 onSuccess: (data) => {
-                    queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+                    void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
 
-                    navigate(
+                    void navigate(
                         '/embedded/automation-workflows/' + data.duplicateAutomationWorkflowProjectWorkflow + '/editor'
                     );
                 },
@@ -163,9 +163,9 @@ const AutomationWorkflowEditorHeader = ({
             {id: project.id},
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+                    void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
 
-                    navigate('/embedded/automation-workflows');
+                    void navigate('/embedded/automation-workflows');
                 },
             }
         );
@@ -214,13 +214,13 @@ const AutomationWorkflowEditorHeader = ({
             },
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
+                    void queryClient.invalidateQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
 
                     updateWorkflowPermissionExpressionMutation.mutate(
                         {permissionExpression: values.permissionExpression, workflowUuid: currentWorkflowId},
                         {
                             onSuccess: () => {
-                                queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+                                void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
 
                                 setShowWorkflowEditDialog(false);
                             },
@@ -244,9 +244,9 @@ const AutomationWorkflowEditorHeader = ({
             {workflowUuid: currentWorkflowId},
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+                    void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
 
-                    navigate('/embedded/automation-workflows');
+                    void navigate('/embedded/automation-workflows');
                 },
             }
         );
@@ -272,9 +272,9 @@ const AutomationWorkflowEditorHeader = ({
             },
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
-                    queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectCategories']});
-                    queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectTags']});
+                    void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+                    void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectCategories']});
+                    void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectTags']});
 
                     setShowProjectEditDialog(false);
                 },
@@ -299,9 +299,9 @@ const AutomationWorkflowEditorHeader = ({
             {id: project.id},
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+                    void queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
 
-                    navigate('/embedded/automation-workflows');
+                    void navigate('/embedded/automation-workflows');
                 },
             }
         );

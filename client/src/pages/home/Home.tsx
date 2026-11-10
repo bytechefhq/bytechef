@@ -14,9 +14,9 @@ const Home = () => {
     useEffect(() => {
         if (currentType !== undefined) {
             if (currentType === PlatformType.AUTOMATION) {
-                navigate('/automation');
+                void navigate('/automation');
             } else if (currentType === PlatformType.EMBEDDED) {
-                navigate('/embedded');
+                void navigate('/embedded');
             }
         }
 

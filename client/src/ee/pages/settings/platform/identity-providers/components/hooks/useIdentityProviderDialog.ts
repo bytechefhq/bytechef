@@ -79,14 +79,14 @@ export default function useIdentityProviderDialog(): UseIdentityProviderDialogI 
 
     const createMutation = useCreateIdentityProviderMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['identityProviders']});
+            void queryClient.invalidateQueries({queryKey: ['identityProviders']});
             handleClose();
         },
     });
 
     const updateMutation = useUpdateIdentityProviderMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['identityProviders']});
+            void queryClient.invalidateQueries({queryKey: ['identityProviders']});
             handleClose();
         },
     });

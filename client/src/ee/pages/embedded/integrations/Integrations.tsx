@@ -166,7 +166,7 @@ const Integrations = () => {
                         setShowIntegrationDialog(false);
 
                         if (integration) {
-                            navigate(
+                            void navigate(
                                 `/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}`
                             );
                         }

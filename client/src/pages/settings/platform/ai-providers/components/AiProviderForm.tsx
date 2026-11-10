@@ -44,10 +44,10 @@ const AiProviderForm = ({
 
     const updateAiProviderMutation = useUpdateAiProviderMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: AiProviderKeys.aiProviders(environment),
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
             });
 

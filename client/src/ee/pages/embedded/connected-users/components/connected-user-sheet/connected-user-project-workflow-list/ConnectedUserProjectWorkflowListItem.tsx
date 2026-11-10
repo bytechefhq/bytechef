@@ -54,7 +54,7 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     const deleteConnectedUserProjectWorkflowMutation = useDeleteConnectedUserProjectWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['connectedUserProjects']});
+            void queryClient.invalidateQueries({queryKey: ['connectedUserProjects']});
 
             setShowDeleteDialog(false);
         },
@@ -62,7 +62,7 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     const enableConnectedUserProjectWorkflowMutation = useEnableConnectedUserProjectWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['connectedUserProjects']});
+            void queryClient.invalidateQueries({queryKey: ['connectedUserProjects']});
         },
     });
 

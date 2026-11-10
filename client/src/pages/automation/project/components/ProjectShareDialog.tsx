@@ -53,7 +53,7 @@ export function ProjectShareDialog({
                     console.error('error', err);
                 },
                 onSuccess: () => {
-                    refetch();
+                    void refetch();
                     setShareState('exported');
                 },
             }
@@ -69,7 +69,7 @@ export function ProjectShareDialog({
                 },
                 {
                     onSuccess: () => {
-                        refetch();
+                        void refetch();
                         setShareState('exported');
                     },
                 }

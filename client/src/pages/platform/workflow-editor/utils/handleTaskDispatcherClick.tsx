@@ -146,7 +146,7 @@ export default async function handleTaskDispatcherClick({
         nodeIndex = calculateNodeInsertIndex(edge.target);
     }
 
-    saveWorkflowDefinition({
+    void saveWorkflowDefinition({
         nodeData: {
             ...newNodeData,
             parameters: config.getInitialParameters(taskDispatcherDefinition?.properties as Array<PropertyAllType>),

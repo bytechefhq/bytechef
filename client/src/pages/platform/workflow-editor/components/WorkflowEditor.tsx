@@ -138,7 +138,7 @@ const WorkflowEditor = ({
         const triggerNode = nodes[0];
 
         if (layoutDirection === 'TB' && triggerNode) {
-            setViewport(
+            void setViewport(
                 getAxisCenteredViewport({
                     ...FIT_VIEW_OPTIONS,
                     axisX: triggerNode.position.x + TRIGGER_NODE_HALF_WIDTH,
@@ -149,7 +149,7 @@ const WorkflowEditor = ({
                 {duration: 0}
             );
         } else {
-            fitView({...FIT_VIEW_OPTIONS, duration: 0});
+            void fitView({...FIT_VIEW_OPTIONS, duration: 0});
         }
 
         onFitView?.();

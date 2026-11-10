@@ -33,7 +33,7 @@ const AccountProfileLinkedAccounts = () => {
     }, []);
 
     useEffect(() => {
-        fetchLinkedAccounts();
+        void fetchLinkedAccounts();
     }, [fetchLinkedAccounts]);
 
     const handleUnlink = async (provider: string) => {

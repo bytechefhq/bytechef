@@ -115,11 +115,11 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
     const queryClient = useQueryClient();
 
     const invalidateAndClose = () => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ['mcpProjectsByServerId'],
         });
 
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ['mcpProjects'],
         });
 

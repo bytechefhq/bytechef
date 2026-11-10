@@ -397,7 +397,7 @@ export default function useDataStreamMapping() {
                     clusterElements: updatedClusterElements.nestedClusterElements,
                 };
 
-                saveWorkflowDefinition({
+                void saveWorkflowDefinition({
                     nodeData: {
                         ...updatedNodeData,
                         componentName: rootClusterElementNodeData.componentName!,
@@ -435,7 +435,7 @@ export default function useDataStreamMapping() {
             }
         };
 
-        createDefaultProcessor();
+        void createDefaultProcessor();
     }, [
         currentNode,
         hasSourceAndDestination,
@@ -486,7 +486,7 @@ export default function useDataStreamMapping() {
             }
         };
 
-        fetchProperties();
+        void fetchProperties();
         setupNodeDetailsPanelForProcessor(processor);
     }, [processor, queryClient, setupNodeDetailsPanelForProcessor]);
 

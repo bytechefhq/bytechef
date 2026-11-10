@@ -114,7 +114,7 @@ const ApiKeyDialog = ({triggerNode}: ApiKeyDialogProps) => {
                                                 onClick={(event) => {
                                                     event.preventDefault();
 
-                                                    copyToClipboard(secretKey);
+                                                    void copyToClipboard(secretKey);
 
                                                     toast('The secret API key is copied.');
                                                 }}

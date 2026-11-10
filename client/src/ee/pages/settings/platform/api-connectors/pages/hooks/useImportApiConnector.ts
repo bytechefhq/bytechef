@@ -19,12 +19,12 @@ const useImportApiConnector = (): UseImportApiConnectorI => {
     const queryClient = useQueryClient();
 
     const onSuccess = () => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: ['apiConnectors'],
         });
 
         reset();
-        navigate(API_CONNECTORS_PATH);
+        void navigate(API_CONNECTORS_PATH);
     };
 
     const importOpenApiSpecificationMutation = useImportOpenApiSpecificationMutation({onSuccess});
@@ -45,7 +45,7 @@ const useImportApiConnector = (): UseImportApiConnectorI => {
 
     const handleCancel = () => {
         reset();
-        navigate(API_CONNECTORS_PATH);
+        void navigate(API_CONNECTORS_PATH);
     };
 
     return {

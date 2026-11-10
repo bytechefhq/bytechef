@@ -126,7 +126,7 @@ export default function useOutputTab({
     );
 
     const invalidateNodeOutputs = useCallback(() => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflowId],
         });
 
@@ -142,7 +142,7 @@ export default function useOutputTab({
     }, []);
 
     const showTestOutputError = useCallback((title: string, error: unknown, generation: number) => {
-        resolveErrorMessage(error).then((message) => {
+        void resolveErrorMessage(error).then((message) => {
             if (generation === testOutputErrorGenerationRef.current) {
                 setTestOutputError({message, title});
             }
@@ -315,9 +315,9 @@ export default function useOutputTab({
                                 return;
                             }
 
-                            workflowNodeTestOutputExistsRefetch().then((result) => {
+                            void workflowNodeTestOutputExistsRefetch().then((result) => {
                                 if (result.data?._exists) {
-                                    queryClient.invalidateQueries({
+                                    void queryClient.invalidateQueries({
                                         queryKey: [
                                             ...WorkflowNodeOutputKeys.workflowNodeOutput({
                                                 environmentId: currentEnvironmentId,
@@ -329,7 +329,7 @@ export default function useOutputTab({
 
                                     invalidateWorkflowValidation(queryClient);
 
-                                    workflowNodeOutputRefetch().then(() => {
+                                    void workflowNodeOutputRefetch().then(() => {
                                         setStartWebhookTest(false);
                                     });
                                 } else {
@@ -361,12 +361,12 @@ export default function useOutputTab({
     ]);
 
     const handleTestCancelClick = useCallback(() => {
-        workflowNodeOutputRefetch();
+        void workflowNodeOutputRefetch();
 
         setStartWebhookTest(false);
         setWebhookTestCancelEnabled(false);
 
-        webhookTriggerTestApi!.stopWebhookTriggerTest({
+        void webhookTriggerTestApi!.stopWebhookTriggerTest({
             environmentId: currentEnvironmentId,
             triggerName: currentNode.name,
             workflowId,

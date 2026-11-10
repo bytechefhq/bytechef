@@ -91,7 +91,7 @@ export default function clearAllClusterElementPositions({
         clusterElements: clearedClusterElements,
     } as typeof rootClusterElementNodeData);
 
-    saveWorkflowDefinition({
+    void saveWorkflowDefinition({
         nodeData: {
             ...updatedNodeData,
             componentName: rootClusterElementNodeData.componentName,

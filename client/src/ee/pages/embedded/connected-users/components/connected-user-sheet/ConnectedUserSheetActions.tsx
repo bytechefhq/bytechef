@@ -23,7 +23,7 @@ const ConnectedUserSheetActions = ({connectedUser}: {connectedUser: ConnectedUse
 
     const enableConnectedUserMutation = useEnableConnectedUserMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectedUserKeys.connectedUsers,
             });
         },

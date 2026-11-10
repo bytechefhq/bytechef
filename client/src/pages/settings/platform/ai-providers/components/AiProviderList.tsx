@@ -63,10 +63,10 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
 
     const enableAiProviderMutation = useEnableAiProviderMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: AiProviderKeys.aiProviders(environment),
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
             });
         },

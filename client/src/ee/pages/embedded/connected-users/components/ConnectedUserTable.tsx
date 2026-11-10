@@ -235,7 +235,7 @@ const ConnectedUserTable = ({connectedUsers, onSelectionChange, selectedConnecte
 
     const enableConnectedUserMutation = useEnableConnectedUserMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectedUserKeys.connectedUsers,
             });
         },

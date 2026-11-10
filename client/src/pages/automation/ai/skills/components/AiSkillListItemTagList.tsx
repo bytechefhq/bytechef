@@ -26,8 +26,8 @@ const AiSkillListItemTagList = ({skillId, tags}: AiSkillListItemTagListProps) =>
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['aiSkills']});
-            queryClient.invalidateQueries({queryKey: ['aiSkillTags']});
+            void queryClient.invalidateQueries({queryKey: ['aiSkills']});
+            void queryClient.invalidateQueries({queryKey: ['aiSkillTags']});
         },
     });
 

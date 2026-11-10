@@ -23,7 +23,7 @@ const ApiClientDeleteDialog = ({apiClientId, onClose}: {apiClientId: number; onC
 
     const deleteApiClientMutation = useDeleteApiClientMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ApiClientKeys.apiClients,
             });
 

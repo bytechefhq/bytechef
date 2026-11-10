@@ -21,7 +21,7 @@ export default function useAiSkillWriteForm({onSuccess}: UseAiSkillWriteFormOpti
             });
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({queryKey: ['aiSkills']});
+            void queryClient.invalidateQueries({queryKey: ['aiSkills']});
 
             setName('');
             setDescription('');

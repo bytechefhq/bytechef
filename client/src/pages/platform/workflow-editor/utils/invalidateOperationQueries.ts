@@ -6,19 +6,19 @@ import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOpti
 import {QueryClient} from '@tanstack/react-query';
 
 export default function invalidateOperationQueries(queryClient: QueryClient): void {
-    queryClient.invalidateQueries({
+    void queryClient.invalidateQueries({
         queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
     });
 
-    queryClient.invalidateQueries({
+    void queryClient.invalidateQueries({
         queryKey: ClusterElementDynamicPropertyKeys.clusterElementDynamicProperties,
     });
 
-    queryClient.invalidateQueries({
+    void queryClient.invalidateQueries({
         queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
     });
 
-    queryClient.invalidateQueries({
+    void queryClient.invalidateQueries({
         queryKey: WorkflowNodeOptionKeys.clusterElementNodeOptions,
     });
 }

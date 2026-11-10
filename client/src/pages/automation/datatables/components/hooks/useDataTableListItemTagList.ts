@@ -54,9 +54,9 @@ export default function useDataTableListItemTagList({tableId}: UseDataTableListI
             return {previous};
         },
         onSettled: () => {
-            queryClient.invalidateQueries({queryKey: ['dataTableTags']});
-            queryClient.invalidateQueries({queryKey: ['dataTableTagsByTable']});
-            queryClient.invalidateQueries({queryKey: ['dataTables']});
+            void queryClient.invalidateQueries({queryKey: ['dataTableTags']});
+            void queryClient.invalidateQueries({queryKey: ['dataTableTagsByTable']});
+            void queryClient.invalidateQueries({queryKey: ['dataTables']});
         },
     });
 

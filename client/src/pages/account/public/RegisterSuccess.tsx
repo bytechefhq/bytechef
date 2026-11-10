@@ -34,7 +34,7 @@ const RegisterSuccess = () => {
 
     useEffect(() => {
         if (activationFailure) {
-            navigate('/account-error', {state: {fromInternalFlow: true}});
+            void navigate('/account-error', {state: {fromInternalFlow: true}});
         }
     }, [activationFailure, navigate]);
 

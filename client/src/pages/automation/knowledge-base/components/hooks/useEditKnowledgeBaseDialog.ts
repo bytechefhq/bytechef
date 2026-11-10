@@ -25,8 +25,8 @@ export default function useEditKnowledgeBaseDialog({
 
     const updateMutation = useUpdateKnowledgeBaseMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['knowledgeBase', {id: knowledgeBase.id}]});
-            queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
+            void queryClient.invalidateQueries({queryKey: ['knowledgeBase', {id: knowledgeBase.id}]});
+            void queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
 
             toast('Settings saved successfully.');
 

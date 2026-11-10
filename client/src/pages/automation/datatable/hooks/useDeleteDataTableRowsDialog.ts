@@ -57,7 +57,7 @@ export default function useDeleteDataTableRowsDialog(): UseDeleteDataTableRowsDi
 
         setIsPending(false);
 
-        queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
+        void queryClient.invalidateQueries({queryKey: ['dataTableRowsPage']});
 
         const failedRowIds = rowIds.filter((rowId, index) => results[index].status === 'rejected');
 

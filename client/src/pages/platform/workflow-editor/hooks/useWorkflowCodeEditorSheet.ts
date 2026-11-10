@@ -210,7 +210,7 @@ const useWorkflowCodeEditorSheet = ({
         closeWorkflowTestStream();
 
         if (jobId) {
-            workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => {
+            void workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => {
                 persistJobId(null);
                 setJobId(null);
             });
@@ -246,7 +246,7 @@ const useWorkflowCodeEditorSheet = ({
         (newMarkers: editor.IMarkerData[]) => {
             setMarkers(newMarkers);
 
-            refetchValidateWorkflow();
+            void refetchValidateWorkflow();
         },
         [refetchValidateWorkflow]
     );

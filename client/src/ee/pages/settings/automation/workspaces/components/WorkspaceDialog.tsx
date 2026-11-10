@@ -54,12 +54,12 @@ const WorkspaceDialog = ({onClose, triggerNode, workspace}: WorkspaceDialogProps
     const queryClient = useQueryClient();
 
     const onSuccess = () => {
-        queryClient.invalidateQueries({
+        void queryClient.invalidateQueries({
             queryKey: WorkspaceKeys.workspaces,
         });
 
         if (account) {
-            queryClient.refetchQueries({
+            void queryClient.refetchQueries({
                 queryKey: WorkspaceKeys.userWorkspaces(account.id!),
             });
         }

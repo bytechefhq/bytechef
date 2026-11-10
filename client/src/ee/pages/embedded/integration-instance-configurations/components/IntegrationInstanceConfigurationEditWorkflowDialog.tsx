@@ -51,7 +51,7 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
     const updateIntegrationInstanceConfigurationWorkflowMutation =
         useUpdateIntegrationInstanceConfigurationWorkflowMutation({
             onSuccess: () => {
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
                 });
 

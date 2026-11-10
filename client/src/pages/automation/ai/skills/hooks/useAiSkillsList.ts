@@ -29,7 +29,7 @@ export default function useAiSkillsList(skills: AiSkill[]) {
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['aiSkills']});
+            void queryClient.invalidateQueries({queryKey: ['aiSkills']});
         },
     });
 
@@ -40,7 +40,7 @@ export default function useAiSkillsList(skills: AiSkill[]) {
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['aiSkills']});
+            void queryClient.invalidateQueries({queryKey: ['aiSkills']});
         },
     });
 

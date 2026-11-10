@@ -361,7 +361,7 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
 
                 const newProperties = (clusterElementDefinition.properties as PropertyAllType[]) || [];
 
-                saveWorkflowDefinition({
+                void saveWorkflowDefinition({
                     nodeData: {
                         ...updatedNodeData,
                         componentName: rootClusterElementNodeData.componentName,
@@ -460,7 +460,7 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
             }
         };
 
-        fetchProperties();
+        void fetchProperties();
 
         if (elementExistsInDefinition) {
             setupNodeDetailsPanel(elementItem);

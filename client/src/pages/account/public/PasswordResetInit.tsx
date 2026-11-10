@@ -39,9 +39,9 @@ export const PasswordResetInit = () => {
 
     useEffect(() => {
         if (email && resetPasswordSuccess) {
-            navigate('/password-reset/email', {state: {email: email, fromInternalFlow: true}});
+            void navigate('/password-reset/email', {state: {email: email, fromInternalFlow: true}});
         } else if (resetPasswordFailure) {
-            navigate('/account-error', {state: {fromInternalFlow: true}});
+            void navigate('/account-error', {state: {fromInternalFlow: true}});
         }
 
         reset();

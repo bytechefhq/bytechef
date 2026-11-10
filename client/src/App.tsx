@@ -299,7 +299,7 @@ function App() {
 
             resetAuthentication();
 
-            queryClient.resetQueries();
+            void queryClient.resetQueries();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authenticated]);

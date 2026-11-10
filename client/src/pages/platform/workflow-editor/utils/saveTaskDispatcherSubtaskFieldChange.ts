@@ -333,7 +333,7 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
         recursivelyUpdatedTasks = getRecursivelyUpdatedTasks(workflowDefinitionTasks, updatedTaskDispatcherTask);
     }
 
-    saveWorkflowDefinition({
+    void saveWorkflowDefinition({
         onError,
         onSuccess: () => {
             let commonUpdates: NodeDataType = {

@@ -89,7 +89,7 @@ export const useIntegration = () => {
 
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflows(+integrationId!),
             });
 
@@ -102,7 +102,7 @@ export const useIntegration = () => {
 
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
         onSuccess: (_result, variables) => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowNodeDescriptionKeys.workflowNodeDescription({
                     environmentId: variables.environmentId,
                     id: variables.id,
@@ -110,7 +110,7 @@ export const useIntegration = () => {
                 }),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowNodeParameterKeys.propertyWorkflowNodeParameterDisplayConditions({
                     environmentId: variables.environmentId,
                     id: variables.id,
@@ -118,7 +118,7 @@ export const useIntegration = () => {
                 }),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowNodeOutputKeys.workflowNodeOutputs,
             });
         },
@@ -141,7 +141,7 @@ export const useIntegration = () => {
     };
 
     const handleIntegrationClick = (integrationId: number, integrationWorkflowId: number) => {
-        navigate(
+        void navigate(
             `/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowId}?${searchParams}`
         );
     };

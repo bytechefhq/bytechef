@@ -39,7 +39,7 @@ const useMcpIntegrationInstanceConfigurationListItem = (
     );
 
     const handleOnIntegrationInstanceConfigurationDialogClose = () => {
-        queryClient
+        void queryClient
             .invalidateQueries({
                 queryKey: ['mcpIntegrationInstanceConfigurationsByServerId'],
             })

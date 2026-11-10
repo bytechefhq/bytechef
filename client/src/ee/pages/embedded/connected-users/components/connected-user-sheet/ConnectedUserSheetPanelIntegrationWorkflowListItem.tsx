@@ -47,10 +47,10 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
     const enableIntegrationInstanceWorkflowMutation = useEnableIntegrationInstanceWorkflowMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ConnectedUserKeys.connectedUser(integrationInstance.connectedUserId!),
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceKeys.integrationInstance(integrationInstance.id!),
             });
         },

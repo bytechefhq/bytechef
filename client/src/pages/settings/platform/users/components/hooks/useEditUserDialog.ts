@@ -29,7 +29,7 @@ export default function useEditUserDialog(): UseEditUserDialogI {
 
     const updateUserMutation = useUpdateUserMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['users']});
+            void queryClient.invalidateQueries({queryKey: ['users']});
             clearLoginToEdit();
         },
     });

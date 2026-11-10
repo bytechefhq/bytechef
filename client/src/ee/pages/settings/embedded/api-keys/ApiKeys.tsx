@@ -43,7 +43,7 @@ const ApiKeys = () => {
                 useCreateApiKeyMutation: (props?: CreateApiKeyMutationProps) => {
                     const createApiKeyMutation = useCreateApiKeyMutation({
                         onSuccess: (data: CreateApiKeyMutation) => {
-                            queryClient.invalidateQueries({
+                            void queryClient.invalidateQueries({
                                 queryKey: ['apiKeys'],
                             });
 
@@ -65,7 +65,7 @@ const ApiKeys = () => {
                 useDeleteApiKeyMutation: (props?: SimpleMutationProps) => {
                     const deleteApiKeyMutation = useDeleteApiKeyMutation({
                         onSuccess: (data) => {
-                            queryClient.invalidateQueries({
+                            void queryClient.invalidateQueries({
                                 queryKey: ['apiKeys'],
                             });
 
@@ -84,7 +84,7 @@ const ApiKeys = () => {
                 useUpdateApiKeyMutation: <TVariables = unknown,>(props?: SimpleMutationProps) =>
                     useUpdateApiKeyMutation({
                         onSuccess: (data) => {
-                            queryClient.invalidateQueries({
+                            void queryClient.invalidateQueries({
                                 queryKey: ['apiKeys'],
                             });
 

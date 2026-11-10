@@ -17,7 +17,7 @@ export default function useDeleteIdentityProviderAlertDialog(): UseDeleteIdentit
 
     const deleteIdentityProviderMutation = useDeleteIdentityProviderMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['identityProviders']});
+            void queryClient.invalidateQueries({queryKey: ['identityProviders']});
             clearIdToDelete();
         },
     });

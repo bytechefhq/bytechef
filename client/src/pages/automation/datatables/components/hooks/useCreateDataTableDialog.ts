@@ -38,7 +38,7 @@ export default function useCreateDataTableDialog(): UseCreateDataTableDialogI {
 
     const createMutation = useCreateDataTableMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['dataTables']});
+            void queryClient.invalidateQueries({queryKey: ['dataTables']});
 
             handleClose();
         },

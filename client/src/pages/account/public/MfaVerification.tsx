@@ -54,7 +54,7 @@ const MfaVerification = ({onBack, onVerify}: MfaVerificationProps) => {
                             onChange={(event) => setMfaCode(event.target.value)}
                             onKeyDown={(event) => {
                                 if (event.key === 'Enter' && mfaCode.length === 6) {
-                                    handleSubmit();
+                                    void handleSubmit();
                                 }
                             }}
                             pattern="[0-9]*"

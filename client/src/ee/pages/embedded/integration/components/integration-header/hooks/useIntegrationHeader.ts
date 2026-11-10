@@ -79,16 +79,16 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
             captureIntegrationPublished();
 
             if (integration) {
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: IntegrationKeys.integration(integration.id!),
                 });
 
-                queryClient.invalidateQueries({
+                void queryClient.invalidateQueries({
                     queryKey: IntegrationVersionKeys.integrationIntegrationVersions(integration.id!),
                 });
             }
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.filteredIntegrations({}),
             });
 
@@ -97,7 +97,7 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
     });
 
     const handleIntegrationWorkflowValueChange = (integrationWorkflowId: number) => {
-        navigate(
+        void navigate(
             `/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowId}?${searchParams}`
         );
     };
@@ -190,7 +190,7 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
         const currentJobId = jobId || getPersistedJobId();
 
         if (currentJobId) {
-            workflowTestApi.stopWorkflowTest({jobId: currentJobId}, {keepalive: true}).finally(() => {
+            void workflowTestApi.stopWorkflowTest({jobId: currentJobId}, {keepalive: true}).finally(() => {
                 persistJobId(null);
                 setJobId(null);
             });

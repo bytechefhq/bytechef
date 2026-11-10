@@ -146,7 +146,7 @@ export default function useFetchInterceptor() {
                     clearCurrentWorkspaceId();
 
                     if (!response.url.endsWith('/api/account')) {
-                        navigate(buildLoginPath(window.location));
+                        void navigate(buildLoginPath(window.location));
                     }
 
                     return response;
@@ -154,7 +154,7 @@ export default function useFetchInterceptor() {
 
                 if (response.status === 402) {
                     if (!window.location.pathname.startsWith('/automation/settings/billing')) {
-                        navigate('/automation/settings/billing');
+                        void navigate('/automation/settings/billing');
                     }
 
                     return response;
@@ -283,7 +283,7 @@ export default function useFetchInterceptor() {
                 clearCurrentWorkspaceId();
 
                 if (!url.endsWith('/api/account')) {
-                    navigate(buildLoginPath(window.location));
+                    void navigate(buildLoginPath(window.location));
                 }
             }
 

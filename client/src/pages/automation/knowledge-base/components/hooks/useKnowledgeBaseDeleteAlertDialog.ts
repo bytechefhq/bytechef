@@ -17,11 +17,11 @@ export default function useKnowledgeBaseDeleteAlertDialog({
 
     const deleteKnowledgeBaseMutation = useDeleteKnowledgeBaseMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
+            void queryClient.invalidateQueries({queryKey: ['knowledgeBases']});
 
             toast('Knowledge base deleted successfully.');
 
-            navigate('/automation/knowledge-bases');
+            void navigate('/automation/knowledge-bases');
         },
     });
 

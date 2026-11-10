@@ -57,9 +57,9 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
 
     const handleOnSubmit = () => {
         if (curSchema) {
-            fetchGenerateSchema(JSON.stringify(curSchema)).then((response) => {
+            void fetchGenerateSchema(JSON.stringify(curSchema)).then((response) => {
                 if (response.ok) {
-                    response.json().then((data) => {
+                    void response.json().then((data) => {
                         if (onChange) {
                             onChange({...data});
                         }

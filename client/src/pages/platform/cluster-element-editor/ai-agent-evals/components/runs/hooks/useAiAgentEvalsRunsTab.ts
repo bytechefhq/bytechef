@@ -47,7 +47,7 @@ export default function useAiAgentEvalsRunsTab(agentEvalTestId: string | null) {
             toast.error('Failed to start eval run: ' + error.message);
         },
         onSuccess: (data) => {
-            invalidateRuns();
+            void invalidateRuns();
 
             if (data.startAiAgentEvalRun?.id) {
                 setSelectedRunId(data.startAiAgentEvalRun.id);
@@ -60,8 +60,8 @@ export default function useAiAgentEvalsRunsTab(agentEvalTestId: string | null) {
             toast.error('Failed to cancel eval run: ' + error.message);
         },
         onSuccess: () => {
-            invalidateRuns();
-            queryClient.invalidateQueries({queryKey: ['aiAgentEvalRun']});
+            void invalidateRuns();
+            void queryClient.invalidateQueries({queryKey: ['aiAgentEvalRun']});
         },
     });
 
@@ -82,7 +82,7 @@ export default function useAiAgentEvalsRunsTab(agentEvalTestId: string | null) {
     const handleSelectRun = useCallback(
         (id: string | null) => {
             if (id === null) {
-                queryClient.invalidateQueries({queryKey: ['aiAgentEvalRuns']});
+                void queryClient.invalidateQueries({queryKey: ['aiAgentEvalRuns']});
             }
 
             setSelectedRunId(id);

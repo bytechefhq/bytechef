@@ -47,7 +47,7 @@ export default function useApiConnectorEditDialog({
 
     const importOpenApiSpecificationMutation = useImportOpenApiSpecificationMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['apiConnectors'],
             });
 

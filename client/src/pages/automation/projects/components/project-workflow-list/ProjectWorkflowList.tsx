@@ -74,9 +74,9 @@ const ProjectWorkflowList = ({
         onSuccess: (response) => {
             captureProjectWorkflowCreated();
 
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            navigate(`/automation/projects/${project.id}/project-workflows/${response.projectWorkflowId}`);
+            void navigate(`/automation/projects/${project.id}/project-workflows/${response.projectWorkflowId}`);
         },
     });
 
@@ -84,8 +84,8 @@ const ProjectWorkflowList = ({
         onSuccess: () => {
             captureProjectWorkflowImported();
 
-            queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             if (hiddenFileInputRef.current) {
                 hiddenFileInputRef.current.value = '';
@@ -202,7 +202,7 @@ const ProjectWorkflowList = ({
                                                     onClick={(event) => {
                                                         event.stopPropagation();
 
-                                                        navigate(`./${project.id}/templates`);
+                                                        void navigate(`./${project.id}/templates`);
                                                     }}
                                                 />
 

@@ -140,22 +140,22 @@ const ProjectListItem = ({
         onSuccess: (response) => {
             captureProjectWorkflowCreated();
 
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            navigate(`/automation/projects/${project.id}/project-workflows/${response.projectWorkflowId}`);
+            void navigate(`/automation/projects/${project.id}/project-workflows/${response.projectWorkflowId}`);
         },
     });
 
     const deleteProjectMutation = useDeleteProjectMutation({
         onSuccess: (_, projectId) => {
-            queryClient.cancelQueries({queryKey: ProjectKeys.project(projectId)});
+            void queryClient.cancelQueries({queryKey: ProjectKeys.project(projectId)});
             queryClient.removeQueries({queryKey: ProjectKeys.project(projectId)});
 
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({
                 queryKey: ProjectCategoryKeys.projectCategories(currentWorkspaceId!),
             });
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ProjectTagKeys.projectTags,
             });
 
@@ -165,7 +165,7 @@ const ProjectListItem = ({
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             toast('Project duplicated successfully.');
         },
@@ -175,8 +175,8 @@ const ProjectListItem = ({
         onSuccess: () => {
             captureProjectWorkflowImported();
 
-            queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             if (hiddenFileInputRef.current) {
                 hiddenFileInputRef.current.value = '';
@@ -192,7 +192,7 @@ const ProjectListItem = ({
 
     const pullProjectFromGitMutation = getProjectGitApi().usePullProjectFromGitMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
             toast('Project pulled from git repository successfully.');
         },
@@ -202,8 +202,8 @@ const ProjectListItem = ({
 
     const updateProjectTagsMutation = useUpdateProjectTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+            void queryClient.invalidateQueries({
                 queryKey: ProjectTagKeys.projectTags,
             });
         },
@@ -573,7 +573,7 @@ const ProjectListItem = ({
                                             onClick={(event) => {
                                                 event.stopPropagation();
 
-                                                navigate(`./${project.id}/templates`);
+                                                void navigate(`./${project.id}/templates`);
                                             }}
                                         />
 

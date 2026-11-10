@@ -8,7 +8,7 @@ const SigningKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose:
 
     const deleteSigningKeyMutation = useDeleteSigningKeyMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: SigningKeyKeys.signingKeys,
             });
 
