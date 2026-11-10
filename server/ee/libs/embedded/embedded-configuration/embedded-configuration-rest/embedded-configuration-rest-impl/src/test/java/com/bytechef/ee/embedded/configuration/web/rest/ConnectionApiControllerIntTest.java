@@ -329,7 +329,14 @@ class ConnectionApiControllerIntTest {
             .expectStatus()
             .isOk()
             .expectBodyList(ConnectionModel.class)
-            .hasSize(1);
+            .value(connectionModels -> {
+                assertThat(connectionModels).hasSize(1);
+
+                ConnectionModel connectionModel = connectionModels.getFirst();
+
+                assertThat(connectionModel.getAuthorizationParameters()).isNullOrEmpty();
+                assertThat(connectionModel.getParameters()).isNullOrEmpty();
+            });
 
         verify(connectedUserConnectionFacade).getConnectedUserConnectionsForAdmin(eq(5L), any(), anyList());
         verify(connectedUserConnectionFacade, never()).getConnectedUserConnections(anyLong(), any(), anyList());
