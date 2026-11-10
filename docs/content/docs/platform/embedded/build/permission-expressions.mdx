@@ -104,8 +104,8 @@ The same expressions are settable programmatically, scoped to the resource they 
 
 **Automation workflow projects:**
 
-- The project-level expression is folded into `createAutomationWorkflowProject` / `updateAutomationWorkflowProject` as a `permissionExpression` argument, so it is saved with the rest of the project in a single write. A `null` argument leaves any stored expression unchanged; an empty string clears it.
-- A workflow's expression can be passed on `createAutomationWorkflowProjectWorkflow`, and changed later with `updateAutomationWorkflowProjectWorkflowPermissionExpression`.
+- The project-level expression is folded into `createAutomationProject` / `updateAutomationProject` as a `permissionExpression` argument, so it is saved with the rest of the project in a single write. A `null` argument leaves any stored expression unchanged; an empty string clears it.
+- A workflow's expression can be passed on `createAutomationProjectWorkflow`, and changed later with `updateAutomationProjectWorkflowPermissionExpression`.
 
 A workflow-level expression lets you ship an integration or automation workflow project broadly while still gating individual workflows inside it - e.g., the project is visible to everyone, but its "bulk export" workflow only to enterprise accounts. The project-level expression behaves like the integration-level one: when it evaluates `false`, the whole project (and all its workflows) drops out of that connected user's catalog.
 

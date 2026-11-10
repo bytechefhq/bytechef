@@ -74,7 +74,7 @@ const GROUP_META: Record<
     navTitle: 'User Workflows',
     description: "Create, update and manage a connected user's own workflows, including generation from a prompt.",
   },
-  'embedded-configuration-automation-workflow-project': {
+  'embedded-configuration-automation-project': {
     title: 'Embedded Workflow Catalog',
     navTitle: 'Workflow Catalog',
     description: 'List the catalog projects available to connected users.',
@@ -142,7 +142,7 @@ const GROUP_META: Record<
     navTitle: 'User Workflows',
     description: "Create, update and manage the signed-in user's own workflows, including generation from a prompt.",
   },
-  'embedded-configuration-automation-workflow-project-frontend': {
+  'embedded-configuration-automation-project-frontend': {
     title: 'Embedded Workflow Catalog (Frontend)',
     navTitle: 'Workflow Catalog',
     description: "List the catalog projects available to the signed-in connected user.",
