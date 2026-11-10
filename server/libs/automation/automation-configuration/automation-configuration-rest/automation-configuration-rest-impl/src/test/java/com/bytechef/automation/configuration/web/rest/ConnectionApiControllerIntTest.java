@@ -130,7 +130,7 @@ class ConnectionApiControllerIntTest {
 
     @Test
     void testGetConnection() {
-        when(connectionFacade.getConnection(1L)).thenReturn(createConnectionDTO());
+        when(workspaceConnectionFacade.getConnection(1L)).thenReturn(createConnectionDTO());
 
         webTestClient.get()
             .uri("/internal/connections/1")
@@ -174,8 +174,9 @@ class ConnectionApiControllerIntTest {
             .expectStatus()
             .isNoContent();
 
-        verify(connectionFacade).update(1L, "renamed", List.of(), 3);
-        verify(connectionFacade, never()).update(anyLong(), anyString(), anyMap(), anyList(), anyInt());
+        verify(workspaceConnectionFacade).update(1L, "renamed", List.of(), 3);
+        verify(workspaceConnectionFacade, never()).update(anyLong(), anyString(), anyMap(), anyList(), anyInt());
+        verify(connectionFacade, never()).update(anyLong(), anyString(), anyList(), anyInt());
     }
 
     @Test
@@ -191,8 +192,10 @@ class ConnectionApiControllerIntTest {
             .expectStatus()
             .isNoContent();
 
-        verify(connectionFacade).update(1L, "renamed", Map.of("baseUri", "https://new.example.com"), List.of(), 3);
-        verify(connectionFacade, never()).update(anyLong(), anyString(), anyList(), anyInt());
+        verify(workspaceConnectionFacade).update(
+            1L, "renamed", Map.of("baseUri", "https://new.example.com"), List.of(), 3);
+        verify(workspaceConnectionFacade, never()).update(anyLong(), anyString(), anyList(), anyInt());
+        verify(connectionFacade, never()).update(anyLong(), anyString(), anyMap(), anyList(), anyInt());
     }
 
     private static ConnectionDTO createConnectionDTO() {

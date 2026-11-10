@@ -21,21 +21,21 @@ import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
-import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,6 +80,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
     @Override
     public void delete(long connectionId) {
+        requireAutomationConnection(connectionId);
+
         workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 
         connectionFacade.delete(connectionId);
@@ -91,8 +93,18 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     })
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void disconnectConnection(long connectionId) {
+        requireAutomationConnection(connectionId);
+
         projectDeploymentWorkflowService.deleteProjectDeploymentWorkflowConnection(connectionId);
         workflowTestConfigurationService.deleteWorkflowTestConfigurationConnection(connectionId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ConnectionDTO getConnection(long connectionId) {
+        requireAutomationConnection(connectionId);
+
+        return connectionFacade.getConnection(connectionId);
     }
 
     @Override
@@ -111,18 +123,44 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    public void update(long connectionId, String name, List<Tag> tags, int version) {
+        requireAutomationConnection(connectionId);
+
+        connectionFacade.update(connectionId, name, tags, version);
+    }
+
+    @Override
+    public void update(
+        long connectionId, String name, Map<String, ?> connectionParameters, List<Tag> tags, int version) {
+
+        requireAutomationConnection(connectionId);
+
+        connectionFacade.update(connectionId, name, connectionParameters, tags, version);
+    }
+
+    @Override
+    public void updateConnectionTags(long connectionId, List<Tag> tags) {
+        requireAutomationConnection(connectionId);
+
+        connectionFacade.update(connectionId, tags);
+    }
+
+    @Override
     @Audited(event = WorkspaceConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, data = {
         @AuditData(key = "connectionId", value = "#connectionId")
     })
     @PreAuthorize("isTenantAdmin() or isResourceOwner(#connectionId, 'Connection')")
     public void updateConnectionCredentials(long connectionId, Map<String, ?> parameters, int version) {
+        requireAutomationConnection(connectionId);
+
+        connectionFacade.updateCredentials(connectionId, parameters, version);
+    }
+
+    private void requireAutomationConnection(long connectionId) {
         Connection connection = connectionService.getConnection(connectionId);
 
         if (connection.getType() != PlatformType.AUTOMATION) {
-            throw new ConfigurationException(
-                "Credentials can only be replaced on automation connections", ConnectionErrorType.INVALID_CONNECTION);
+            throw new NoSuchElementException("Connection does not exist for id=" + connectionId);
         }
-
-        connectionFacade.updateCredentials(connectionId, parameters, version);
     }
 }

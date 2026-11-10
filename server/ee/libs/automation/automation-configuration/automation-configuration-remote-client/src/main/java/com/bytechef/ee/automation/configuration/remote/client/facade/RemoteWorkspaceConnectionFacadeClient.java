@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.remote.client.facade;
 
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -38,10 +39,32 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
     }
 
     @Override
+    public com.bytechef.platform.connection.dto.ConnectionDTO getConnection(long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<com.bytechef.platform.connection.dto.ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long connectionEnvironment,
         Long tagId) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void update(long connectionId, String name, List<Tag> tags, int version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void update(
+        long connectionId, String name, Map<String, ?> connectionParameters, List<Tag> tags, int version) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateConnectionTags(long connectionId, List<Tag> tags) {
         throw new UnsupportedOperationException();
     }
 

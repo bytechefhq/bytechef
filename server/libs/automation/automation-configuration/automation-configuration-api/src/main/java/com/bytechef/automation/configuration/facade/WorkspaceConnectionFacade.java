@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +32,16 @@ public interface WorkspaceConnectionFacade {
 
     void disconnectConnection(long connectionId);
 
+    ConnectionDTO getConnection(long connectionId);
+
     List<ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long environmentId, Long tagId);
+
+    void update(long connectionId, String name, List<Tag> tags, int version);
+
+    void update(long connectionId, String name, Map<String, ?> connectionParameters, List<Tag> tags, int version);
+
+    void updateConnectionTags(long connectionId, List<Tag> tags);
 
     /**
      * Replaces the authorization parameters of an existing connection wholesale.
