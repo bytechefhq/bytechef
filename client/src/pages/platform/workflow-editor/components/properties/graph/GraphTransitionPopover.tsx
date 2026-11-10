@@ -12,11 +12,14 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {flattenDefinitionTasks} from '@/pages/platform/workflow-editor/utils/flattenDefinitionTasks';
 import {GRAPH_TRANSITION_EDITOR_ATTRIBUTE} from '@/pages/platform/workflow-editor/utils/graph/graphTransitionDeleteKey';
 import {
+    type GraphTransitionFieldType,
     isDynamicTransitionTarget,
     removeTransition,
     updateTransition,
+    updateTransitionField,
 } from '@/pages/platform/workflow-editor/utils/graph/graphTransitionMutations';
 import {saveGraphTransitions} from '@/pages/platform/workflow-editor/utils/graph/saveGraphParameters';
+import {registerPropertySaveOverride} from '@/pages/platform/workflow-editor/utils/propertySaveOverrides';
 import {GRAPH_TRANSITION_EDGE_TYPE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {useGetTaskDispatcherDefinitionQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
@@ -36,6 +39,10 @@ export default function GraphTransitionPopover({graphId, index}: GraphTransition
     const [currentNodeReachedGraph, setCurrentNodeReachedGraph] = useState(false);
 
     const displacedCurrentNodeRef = useRef<{node: NodeDataType | undefined} | undefined>(undefined);
+    const savedFieldValuesRef = useRef<{
+        index: number;
+        values: Record<GraphTransitionFieldType, Array<string | undefined>>;
+    }>({index, values: {condition: [], to: []}});
 
     const setCurrentNode = useWorkflowNodeDetailsPanelStore((state) => state.setCurrentNode);
     const currentNodePointsAtGraph = useWorkflowNodeDetailsPanelStore(
@@ -149,6 +156,53 @@ export default function GraphTransitionPopover({graphId, index}: GraphTransition
     }
 
     const toModeToggle = <PropertyFormulaSwitch formulaMode={expressionMode} handleClick={handleToModeToggleClick} />;
+
+    useEffect(() => {
+        if (!transition || !updateWorkflowMutation) {
+            return;
+        }
+
+        const expectedTransition = transition;
+        const transitionFields: Array<GraphTransitionFieldType> = ['condition', 'to'];
+
+        const unregisterPropertySaveOverrides = transitionFields.map((field) =>
+            registerPropertySaveOverride({
+                path: `transitions[${index}].${field}`,
+                save: (value) => {
+                    if (savedFieldValuesRef.current.index !== index) {
+                        savedFieldValuesRef.current = {index, values: {condition: [], to: []}};
+                    }
+
+                    const savedFieldValues = savedFieldValuesRef.current.values[field];
+                    const knownFieldValues = [...savedFieldValues];
+                    const fieldValue = value === undefined || value === null ? undefined : String(value);
+
+                    savedFieldValues.push(fieldValue);
+
+                    saveGraphTransitions({
+                        graphId,
+                        mutate: (currentTransitions) =>
+                            updateTransitionField({
+                                expectedTransition,
+                                field,
+                                index,
+                                knownFieldValues,
+                                transitions: currentTransitions,
+                                value: fieldValue,
+                            }),
+                        updateWorkflowMutation,
+                    });
+                },
+                workflowNodeName: graphId,
+            })
+        );
+
+        return () => {
+            for (const unregisterPropertySaveOverride of unregisterPropertySaveOverrides) {
+                unregisterPropertySaveOverride();
+            }
+        };
+    }, [graphId, index, transition, updateWorkflowMutation]);
 
     useEffect(() => {
         if (currentNodePointsAtGraph) {

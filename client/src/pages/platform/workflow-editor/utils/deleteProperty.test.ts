@@ -3,6 +3,7 @@ import {beforeEach, describe, expect, test, vi} from 'vitest';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import deleteProperty from './deleteProperty';
+import {registerPropertySaveOverride} from './propertySaveOverrides';
 
 vi.mock('./workflowMutationQueue', () => ({
     enqueueWorkflowMutation: (execute: () => Promise<unknown>) => execute(),
@@ -104,5 +105,27 @@ describe('deleteProperty', () => {
         });
 
         expect(mutateAsync.mock.calls[0][0].workflowNodeName).toBe('aiAgent_1');
+    });
+
+    test('hands a path with a registered save override to it instead of the node parameter mutation', () => {
+        const mutateAsync = vi.fn();
+        const save = vi.fn();
+
+        useWorkflowNodeDetailsPanelStore.setState({
+            currentNode: {componentName: 'graph', workflowNodeName: 'graph_1'} as never,
+        });
+
+        const unregister = registerPropertySaveOverride({
+            path: 'transitions[0].condition',
+            save,
+            workflowNodeName: 'graph_1',
+        });
+
+        deleteProperty('workflow-1', 'transitions[0].condition', createMockMutation(mutateAsync));
+
+        unregister();
+
+        expect(save).toHaveBeenCalledWith(undefined);
+        expect(mutateAsync).not.toHaveBeenCalled();
     });
 });

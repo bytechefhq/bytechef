@@ -12,6 +12,7 @@ import {
     removeTransitionsForNode,
     transitionsFrom,
     updateTransition,
+    updateTransitionField,
 } from './graphTransitionMutations';
 
 describe('graphTransitionMutations', () => {
@@ -187,5 +188,118 @@ describe('graphTransitionMutations', () => {
         expect(moveTransition({direction: 1, expectedTransition: base[0], index: 0, transitions: shifted})).toBe(
             shifted
         );
+    });
+
+    it('updateTransitionField writes the field when the transition at the index is still the edited one', () => {
+        const transitions: GraphTransitionType[] = [
+            {from: 'a', to: 'b'},
+            {condition: '=x', from: 'a', to: 'c'},
+        ];
+
+        expect(
+            updateTransitionField({
+                expectedTransition: transitions[1],
+                field: 'condition',
+                index: 1,
+                knownFieldValues: [],
+                transitions,
+                value: '=y',
+            })
+        ).toEqual([
+            {from: 'a', to: 'b'},
+            {condition: '=y', from: 'a', to: 'c'},
+        ]);
+    });
+
+    it('updateTransitionField leaves the list alone when an earlier delete shifted another transition into the index', () => {
+        const editedTransition: GraphTransitionType = {condition: '=x', from: 'a', to: 'c'};
+        const shiftedTransitions: GraphTransitionType[] = [
+            {from: 'a', to: 'b'},
+            {condition: '=z', from: 'b', to: 'd'},
+        ];
+
+        expect(
+            updateTransitionField({
+                expectedTransition: editedTransition,
+                field: 'condition',
+                index: 1,
+                knownFieldValues: [],
+                transitions: shiftedTransitions,
+                value: '=y',
+            })
+        ).toBe(shiftedTransitions);
+    });
+
+    it('updateTransitionField leaves the list alone when the other fields still match but the field holds a value nobody here wrote', () => {
+        const editedTransition: GraphTransitionType = {condition: '=x', from: 'a', to: 'c'};
+        const transitions: GraphTransitionType[] = [{condition: '=foreign', from: 'a', to: 'c'}];
+
+        expect(
+            updateTransitionField({
+                expectedTransition: editedTransition,
+                field: 'condition',
+                index: 0,
+                knownFieldValues: ['=x1'],
+                transitions,
+                value: '=x12',
+            })
+        ).toBe(transitions);
+    });
+
+    it('updateTransitionField accepts a field value an earlier keystroke of the same editor already saved', () => {
+        const renderedTransition: GraphTransitionType = {condition: '=x', from: 'a', to: 'c'};
+        const transitions: GraphTransitionType[] = [{condition: '=x1', from: 'a', to: 'c'}];
+
+        expect(
+            updateTransitionField({
+                expectedTransition: renderedTransition,
+                field: 'condition',
+                index: 0,
+                knownFieldValues: ['=x1'],
+                transitions,
+                value: '=x12',
+            })
+        ).toEqual([{condition: '=x12', from: 'a', to: 'c'}]);
+    });
+
+    it('updateTransitionField retargets an expression to and clears a condition', () => {
+        const transitions: GraphTransitionType[] = [{condition: '=x', from: 'a', to: 'b'}];
+
+        expect(
+            updateTransitionField({
+                expectedTransition: transitions[0],
+                field: 'to',
+                index: 0,
+                knownFieldValues: [],
+                transitions,
+                value: '=${next}',
+            })
+        ).toEqual([{condition: '=x', from: 'a', to: '=${next}'}]);
+
+        expect(
+            updateTransitionField({
+                expectedTransition: transitions[0],
+                field: 'condition',
+                index: 0,
+                knownFieldValues: [],
+                transitions,
+                value: undefined,
+            })
+        ).toEqual([{condition: undefined, from: 'a', to: 'b'}]);
+    });
+
+    it('updateTransitionField returns the same list when the value is unchanged', () => {
+        const transitions: GraphTransitionType[] = [{condition: '=x', from: 'a', to: 'b'}];
+
+        expect(
+            updateTransitionField({
+                expectedTransition: transitions[0],
+                field: 'condition',
+                index: 0,
+                knownFieldValues: [],
+                transitions,
+                value: '=x',
+            })
+        ).toBe(transitions);
     });
 });

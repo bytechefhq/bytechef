@@ -85,6 +85,51 @@ export function updateTransition({
     );
 }
 
+export type GraphTransitionFieldType = 'condition' | 'to';
+
+interface UpdateTransitionFieldProps {
+    expectedTransition: GraphTransitionType;
+    field: GraphTransitionFieldType;
+    index: number;
+    knownFieldValues: Array<string | undefined>;
+    transitions: GraphTransitionType[];
+    value: string | undefined;
+}
+
+export function updateTransitionField({
+    expectedTransition,
+    field,
+    index,
+    knownFieldValues,
+    transitions,
+    value,
+}: UpdateTransitionFieldProps): GraphTransitionType[] {
+    const currentTransition = transitions[index];
+
+    if (!currentTransition) {
+        return transitions;
+    }
+
+    const otherFieldsMatch = isSameTransition(
+        {...currentTransition, [field]: expectedTransition[field]},
+        expectedTransition
+    );
+
+    const currentFieldValue = currentTransition[field] || '';
+
+    const fieldValueKnown = [expectedTransition[field], ...knownFieldValues].some(
+        (knownFieldValue) => (knownFieldValue || '') === currentFieldValue
+    );
+
+    if (!otherFieldsMatch || !fieldValueKnown || currentFieldValue === (value || '')) {
+        return transitions;
+    }
+
+    return transitions.map((transition, transitionIndex) =>
+        transitionIndex === index ? {...transition, [field]: value} : transition
+    );
+}
+
 interface MoveTransitionProps {
     direction: -1 | 1;
     expectedTransition: GraphTransitionType;

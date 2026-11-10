@@ -10,6 +10,7 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {decodePath} from './encodingUtils';
+import {getPropertySaveOverride} from './propertySaveOverrides';
 import {resolveMainClusterRootName} from './resolveClusterRootId';
 import {enqueueWorkflowMutation} from './workflowMutationQueue';
 
@@ -58,6 +59,20 @@ export default function saveProperty({
     }
 
     const decodedPath = decodePath(path);
+
+    const propertySaveOverride = currentNode.clusterElementType
+        ? undefined
+        : getPropertySaveOverride(currentNode.workflowNodeName, decodedPath);
+
+    if (propertySaveOverride) {
+        propertySaveOverride(value);
+
+        if (successCallback) {
+            successCallback();
+        }
+
+        return;
+    }
 
     function handleSuccess(
         response: DeleteClusterElementParameter200Response & {workflowNodeName?: string},
