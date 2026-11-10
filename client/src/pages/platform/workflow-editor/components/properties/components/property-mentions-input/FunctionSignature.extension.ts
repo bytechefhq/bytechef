@@ -5,6 +5,7 @@ import {ReactRenderer} from '@tiptap/react';
 import tippy, {type Instance as TippyInstance} from 'tippy.js';
 
 import FunctionSignatureTooltip from './FunctionSignatureTooltip';
+import {FunctionSuggestionPluginKey} from './FunctionSuggestion.extension';
 import {findEnclosingFunctionCall, isFormulaModeActive} from './functionSuggestionUtils';
 
 export const FunctionSignaturePluginKey = new PluginKey('functionSignature');
@@ -49,7 +50,12 @@ export const FunctionSignature = Extension.create({
                         const {state} = editor.view;
                         const {selection} = state;
 
-                        if (!editor.isFocused || !selection.empty || !isFormulaModeActive(editor)) {
+                        if (
+                            !editor.isFocused ||
+                            !selection.empty ||
+                            !isFormulaModeActive(editor) ||
+                            FunctionSuggestionPluginKey.getState(state)?.active
+                        ) {
                             hide();
 
                             return;
