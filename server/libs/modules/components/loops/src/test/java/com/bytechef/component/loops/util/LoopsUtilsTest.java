@@ -53,6 +53,32 @@ class LoopsUtilsTest {
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
+    void testGetCampaignOptionsFollowsTheCursor(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
+        ArgumentCaptor<Object[]> queryParametersArgumentCaptor = forClass(Object[].class);
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(queryParametersArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(
+                Map.of("data", List.of(Map.of(NAME, "name1", ID, "id1")), "pagination", Map.of("nextCursor", "next")))
+            .thenReturn(Map.of("data", List.of(Map.of(NAME, "name2", ID, "id2")), "pagination", Map.of()));
+
+        List<Option<String>> result = LoopsUtils.getCampaignOptions(null, null, Map.of(), "", mockedContext);
+
+        assertEquals(List.of(option("name1", "id1"), option("name2", "id2")), result);
+        assertEquals(List.of("/campaigns", "/campaigns"), stringArgumentCaptor.getAllValues());
+
+        List<Object[]> queryParameters = queryParametersArgumentCaptor.getAllValues();
+
+        assertEquals(List.of("perPage", "50"), List.of(queryParameters.get(0)));
+        assertEquals(List.of("perPage", "50", "cursor", "next"), List.of(queryParameters.get(1)));
+    }
+
+    @Test
     void testGetMailingListOptions(
         Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,

@@ -21,7 +21,11 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.loops.action.LoopsCreateCampaignAction;
 import com.bytechef.component.loops.action.LoopsCreateContactAction;
+import com.bytechef.component.loops.action.LoopsGetCampaignAction;
+import com.bytechef.component.loops.action.LoopsGetEmailMessageAction;
+import com.bytechef.component.loops.action.LoopsUpdateEmailMessageAction;
 import com.bytechef.component.loops.connection.LoopsConnection;
 import com.google.auto.service.AutoService;
 
@@ -40,7 +44,12 @@ public class LoopsComponentHandler implements ComponentHandler {
         .icon("path:assets/loops.svg")
         .categories(ComponentCategory.ADVERTISING)
         .connection(LoopsConnection.CONNECTION_DEFINITION)
-        .actions(LoopsCreateContactAction.ACTION_DEFINITION)
+        .actions(
+            LoopsCreateCampaignAction.ACTION_DEFINITION,
+            LoopsCreateContactAction.ACTION_DEFINITION,
+            LoopsGetCampaignAction.ACTION_DEFINITION,
+            LoopsGetEmailMessageAction.ACTION_DEFINITION,
+            LoopsUpdateEmailMessageAction.ACTION_DEFINITION)
         .version(1)
         .customAction(true)
         .customActionHelp("", "https://loops.so/docs/api-reference/intro");

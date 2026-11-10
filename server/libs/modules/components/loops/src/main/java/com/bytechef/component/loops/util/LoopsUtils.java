@@ -34,6 +34,51 @@ import java.util.Map;
  */
 public class LoopsUtils {
 
+    private static final int CAMPAIGNS_PER_PAGE = 50;
+
+    private LoopsUtils() {
+    }
+
+    public static List<Option<String>> getCampaignOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        List<Option<String>> options = new ArrayList<>();
+        String cursor = null;
+
+        do {
+            String currentCursor = cursor;
+
+            Map<String, Object> response = context.http(http -> http.get("/campaigns"))
+                .queryParameters(getCampaignQueryParameters(currentCursor))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (response == null) {
+                break;
+            }
+
+            if (response.get("data") instanceof List<?> campaigns) {
+                for (Object campaign : campaigns) {
+                    if (campaign instanceof Map<?, ?> campaignMap) {
+                        options.add(option((String) campaignMap.get(NAME), (String) campaignMap.get(ID)));
+                    }
+                }
+            }
+
+            cursor = null;
+
+            if (response.get("pagination") instanceof Map<?, ?> pagination &&
+                pagination.get("nextCursor") instanceof String nextCursor && !nextCursor.isBlank()) {
+
+                cursor = nextCursor;
+            }
+        } while (cursor != null);
+
+        return options;
+    }
+
     public static List<Option<String>> getMailingListOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
@@ -50,5 +95,17 @@ public class LoopsUtils {
         }
 
         return options;
+    }
+
+    private static Object[] getCampaignQueryParameters(String cursor) {
+        if (cursor == null) {
+            return new Object[] {
+                "perPage", String.valueOf(CAMPAIGNS_PER_PAGE)
+            };
+        }
+
+        return new Object[] {
+            "perPage", String.valueOf(CAMPAIGNS_PER_PAGE), "cursor", cursor
+        };
     }
 }
