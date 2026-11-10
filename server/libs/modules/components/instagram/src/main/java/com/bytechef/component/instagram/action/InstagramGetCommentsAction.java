@@ -1,0 +1,58 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.component.instagram.action;
+
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.instagram.constant.InstagramConstants.COMMENT_OUTPUT_PROPERTY;
+import static com.bytechef.component.instagram.constant.InstagramConstants.MEDIA_ID;
+
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.instagram.util.InstagramUtils;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author Ivica Cardic
+ */
+public class InstagramGetCommentsAction {
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getComments")
+        .title("Get Comments")
+        .description("Lists the comments on an Instagram media item of the connected account.")
+        .help("", "https://docs.bytechef.io/reference/components/instagram_v1#get-comments")
+        .properties(
+            string(MEDIA_ID)
+                .label("Media ID")
+                .description("ID of the Instagram media item whose comments to list.")
+                .required(true))
+        .output(outputSchema(array().items(COMMENT_OUTPUT_PROPERTY)))
+        .perform(InstagramGetCommentsAction::perform);
+
+    private InstagramGetCommentsAction() {
+    }
+
+    public static List<Map<String, Object>> perform(
+        Parameters inputParameters, Parameters connectionParameters, Context context) {
+
+        return InstagramUtils.getComments(context, inputParameters.getRequiredString(MEDIA_ID));
+    }
+}
