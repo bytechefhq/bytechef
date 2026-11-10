@@ -74,7 +74,7 @@ const WorkflowIssuesNote = ({fallback}: WorkflowIssuesNoteProps) => {
                 <AlertTriangleIcon
                     className={twMerge(
                         'size-4 shrink-0',
-                        hasErrors ? 'text-content-destructive' : 'text-content-onwarning'
+                        hasErrors ? 'text-content-destructive' : 'text-content-warning-primary'
                     )}
                 />
 
