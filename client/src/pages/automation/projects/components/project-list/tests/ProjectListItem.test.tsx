@@ -132,20 +132,10 @@ it('links the title to the project with its first workflow without toggling the 
     expect(onTabChange).not.toHaveBeenCalled();
 });
 
-it('opens the project with its first workflow when the open button is clicked', () => {
-    renderProjectListItem();
-
-    fireEvent.click(screen.getByLabelText('Open project'));
-
-    expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects/7/project-workflows/1?');
-    expect(onTabChange).not.toHaveBeenCalled();
-});
-
-it('shows a plain title without the open button for a project without workflows', () => {
+it('shows a plain title for a project without workflows', () => {
     renderProjectListItem(undefined, {projectWorkflowIds: []});
 
     expect(screen.queryByLabelText('Project title link')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Open project')).not.toBeInTheDocument();
 });
 
 it('offers New Workflow on the workflows tab', () => {

@@ -26,7 +26,6 @@ import ProjectListItemTabs, {
 } from '@/pages/automation/projects/components/project-list/ProjectListItemTabs';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
-import OpenInButton from '@/shared/components/OpenInButton';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import EEVersion from '@/shared/edition/EEVersion';
@@ -46,6 +45,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
+    ArrowRightIcon,
     ChevronDownIcon,
     CopyIcon,
     DownloadIcon,
@@ -287,32 +287,33 @@ const ProjectListItem = ({
                     >
                         <div className="flex items-center gap-2">
                             {hasWorkflows ? (
-                                <>
-                                    <Link
-                                        aria-label="Project title link"
-                                        className="group/title"
-                                        onClick={(event) => event.stopPropagation()}
-                                        to={projectUrl}
-                                    >
-                                        {project.description ? (
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <span className="text-base font-semibold group-hover/title:underline">
-                                                        {project.name}
-                                                    </span>
-                                                </TooltipTrigger>
+                                <Link
+                                    aria-label="Project title link"
+                                    className="group/title flex items-center gap-1"
+                                    onClick={(event) => event.stopPropagation()}
+                                    to={projectUrl}
+                                >
+                                    {project.description ? (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className="text-base font-semibold underline-offset-4 group-hover/title:text-content-brand-primary group-hover/title:underline">
+                                                    {project.name}
+                                                </span>
+                                            </TooltipTrigger>
 
-                                                <TooltipContent>{project.description}</TooltipContent>
-                                            </Tooltip>
-                                        ) : (
-                                            <span className="text-base font-semibold group-hover/title:underline">
-                                                {project.name}
-                                            </span>
-                                        )}
-                                    </Link>
+                                            <TooltipContent>{project.description}</TooltipContent>
+                                        </Tooltip>
+                                    ) : (
+                                        <span className="text-base font-semibold underline-offset-4 group-hover/title:text-content-brand-primary group-hover/title:underline">
+                                            {project.name}
+                                        </span>
+                                    )}
 
-                                    <OpenInButton label="Open project" onClick={() => navigate(projectUrl)} />
-                                </>
+                                    <ArrowRightIcon
+                                        aria-hidden="true"
+                                        className="size-4 shrink-0 -translate-x-1 text-content-brand-primary opacity-0 transition group-hover/title:translate-x-0 group-hover/title:opacity-100"
+                                    />
+                                </Link>
                             ) : project.description ? (
                                 <Tooltip>
                                     <TooltipTrigger>
