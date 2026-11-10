@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectionAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionCredentialsRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionRequestModel;
+import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.tag.domain.Tag;
@@ -64,9 +65,15 @@ public class ConnectionApiController implements ConnectionApi {
 
     @Override
     public ResponseEntity<Long> createConnectedUserConnection(Long connectedUserId, ConnectionModel connectionModel) {
+        ConnectionDTO connectionDTO = conversionService.convert(connectionModel, ConnectionDTO.class);
+
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            return ResponseEntity.ok(
+                connectedUserConnectionFacade.createConnectedUserConnection(connectedUserId, connectionDTO));
+        }
+
         return ResponseEntity.ok(
-            connectedUserConnectionFacade.createConnectedUserConnectionAsAdmin(
-                connectedUserId, conversionService.convert(connectionModel, ConnectionDTO.class)));
+            connectedUserConnectionFacade.createConnectedUserConnectionAsAdmin(connectedUserId, connectionDTO));
     }
 
     @Override

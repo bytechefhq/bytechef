@@ -37,6 +37,8 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionCredentialsRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionRequestModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -45,12 +47,15 @@ import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -119,6 +124,11 @@ class ConnectionApiControllerIntTest {
     private MockMvc mockMvc;
 
     private WebTestClient webTestClient;
+
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
+    }
 
     @BeforeEach
     void beforeEach() {
@@ -273,21 +283,25 @@ class ConnectionApiControllerIntTest {
     void testPostConnectedUserConnectionCreatesTheConnectionAsAdmin() {
         when(connectedUserConnectionFacade.createConnectedUserConnectionAsAdmin(eq(5L), any())).thenReturn(77L);
 
-        this.webTestClient
-            .post()
-            .uri("/internal/connected-users/5/connections")
-            .accept(MediaType.APPLICATION_JSON)
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(new ConnectionModel().componentName("componentName")
-                .name("name"))
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(Long.class)
-            .isEqualTo(77L);
+        postConnectedUserConnection(5L, 77L);
 
         verify(connectedUserConnectionFacade).createConnectedUserConnectionAsAdmin(eq(5L), any());
         verify(connectedUserConnectionFacade, never()).createConnectedUserConnection(anyLong(), any());
+    }
+
+    @Test
+    void testPostConnectedUserConnectionKeepsAConnectedUserCreatingTheirOwnConnection() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new EmbeddedApiKeyAuthenticationToken(
+                    Environment.PRODUCTION.ordinal(), 5L, new User("external-user-5", "", List.of()), false));
+
+        when(connectedUserConnectionFacade.createConnectedUserConnection(eq(5L), any())).thenReturn(78L);
+
+        postConnectedUserConnection(5L, 78L);
+
+        verify(connectedUserConnectionFacade).createConnectedUserConnection(eq(5L), any());
+        verify(connectedUserConnectionFacade, never()).createConnectedUserConnectionAsAdmin(anyLong(), any());
     }
 
     @SuppressWarnings("unchecked")
@@ -354,6 +368,21 @@ class ConnectionApiControllerIntTest {
         assertThat(tagsArgumentCaptor.getValue())
             .singleElement()
             .hasFieldOrPropertyWithValue("name", "tag1");
+    }
+
+    private void postConnectedUserConnection(long connectedUserId, long expectedConnectionId) {
+        this.webTestClient
+            .post()
+            .uri("/internal/connected-users/" + connectedUserId + "/connections")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new ConnectionModel().componentName("componentName")
+                .name("name"))
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(Long.class)
+            .isEqualTo(expectedConnectionId);
     }
 
     private static ConnectionDTO getConnection() {
