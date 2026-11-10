@@ -35,7 +35,6 @@ import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {
-    ArrowRightIcon,
     ChevronDownIcon,
     ComponentIcon,
     EditIcon,
@@ -226,11 +225,6 @@ const IntegrationListItem = ({
                                         <span className="text-base font-semibold text-content-neutral-primary underline-offset-4 group-hover/title:text-content-brand-primary group-hover/title:underline">
                                             {integration?.name}
                                         </span>
-
-                                        <ArrowRightIcon
-                                            aria-hidden="true"
-                                            className="size-4 shrink-0 -translate-x-1 text-content-brand-primary opacity-0 transition group-hover/title:translate-x-0 group-hover/title:opacity-100"
-                                        />
                                     </Link>
                                 ) : (
                                     <div className="flex items-center gap-2">
