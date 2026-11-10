@@ -234,6 +234,46 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
         await waitFor(() => expect(onClose).toHaveBeenCalled());
     });
 
+    it('reloads the connection after a failed save so a retry sends the current version', async () => {
+        const onClose = vi.fn();
+
+        hoisted.updateIntegrationInstanceCredentials
+            .mockRejectedValueOnce(new Error('Connection id=70 was modified by someone else'))
+            .mockResolvedValueOnce(undefined);
+
+        renderDialog(onClose);
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Update credentials'}));
+        await userEvent.type(screen.getByLabelText('apiKey'), 'new-key');
+
+        hoisted.getIntegrationInstanceConnection.mockResolvedValue({
+            authorizationParameters: {apiKey: '••••••••'},
+            authorizationType: 'API_KEY',
+            componentName: 'slack',
+            connectionVersion: 1,
+            id: 70,
+            name: 'Slack',
+            parameters: {},
+            version: 5,
+        });
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(hoisted.getIntegrationInstanceConnection).toHaveBeenCalledTimes(2));
+
+        expect(onClose).not.toHaveBeenCalled();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() =>
+            expect(hoisted.updateIntegrationInstanceCredentials).toHaveBeenLastCalledWith({
+                id: 40,
+                updateConnectionCredentialsRequest: {parameters: {apiKey: 'new-key'}, version: 5},
+            })
+        );
+        await waitFor(() => expect(onClose).toHaveBeenCalled());
+    });
+
     it('is view-only when the integration configuration is no longer provisionable', async () => {
         mockProvisionableConfiguration(undefined);
 

@@ -68,6 +68,11 @@ const ConnectedUserIntegrationCredentialsDialog = ({
     );
 
     const updateIntegrationInstanceCredentialsMutation = useUpdateIntegrationInstanceCredentialsMutation({
+        onError: () => {
+            void queryClient.invalidateQueries({
+                queryKey: IntegrationInstanceKeys.integrationInstanceConnection(integrationInstance.id!),
+            });
+        },
         onSuccess: () => {
             void queryClient.invalidateQueries({queryKey: ConnectedUserKeys.connectedUser(connectedUserId)});
             void queryClient.invalidateQueries({
