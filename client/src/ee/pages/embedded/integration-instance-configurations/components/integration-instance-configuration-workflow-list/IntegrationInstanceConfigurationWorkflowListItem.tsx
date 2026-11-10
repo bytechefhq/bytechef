@@ -12,6 +12,7 @@ import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -101,7 +102,13 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
             )}
             key={workflow.id}
         >
-            <div className="flex flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
+            <div
+                className="flex flex-1 cursor-pointer items-center"
+                onClick={handleWorkflowClick}
+                onKeyDown={handleActivationKeyDown}
+                role="button"
+                tabIndex={0}
+            >
                 <div
                     className={twMerge(
                         'flex w-80 items-center gap-2 text-sm font-semibold',

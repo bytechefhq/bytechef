@@ -3,6 +3,7 @@ import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinition,
 } from '@/shared/middleware/platform/configuration';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {paintMonochromeSvgWithCurrentColor} from '@/shared/util/svg-utils';
 import {ComponentIcon} from 'lucide-react';
 import {HTMLAttributes, MouseEvent, useEffect, useRef, useState} from 'react';
@@ -126,7 +127,9 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
                 event.stopPropagation();
             }}
             onDragStart={(event) => onDragStart(event)}
+            onKeyDown={handleActivationKeyDown}
             ref={ref}
+            tabIndex={0}
         >
             <span className="mr-2 flex-none" ref={iconRef}>
                 {node.icon ? (

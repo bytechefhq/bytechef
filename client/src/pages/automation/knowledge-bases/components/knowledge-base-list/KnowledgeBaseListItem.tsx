@@ -12,6 +12,7 @@ import KnowledgeBaseListItemDeleteDialog from '@/pages/automation/knowledge-base
 import KnowledgeBaseListItemTagList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseListItemTagList';
 import useKnowledgeBaseListItem from '@/pages/automation/knowledge-bases/components/knowledge-base-list/hooks/useKnowledgeBaseListItem';
 import {KnowledgeBase, Tag} from '@/shared/middleware/graphql';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {DatabaseIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 interface KnowledgeBaseListItemProps {
@@ -37,6 +38,9 @@ const KnowledgeBaseListItem = ({knowledgeBase, remainingTags, tags}: KnowledgeBa
             <div
                 className="mb-2 flex w-full cursor-pointer items-center justify-between rounded border border-border/50 px-3 hover:bg-muted/50"
                 onClick={handleKnowledgeBaseClick}
+                onKeyDown={handleActivationKeyDown}
+                role="button"
+                tabIndex={0}
             >
                 <div className="flex flex-1 items-center py-3">
                     <div className="flex-1">
@@ -66,7 +70,7 @@ const KnowledgeBaseListItem = ({knowledgeBase, remainingTags, tags}: KnowledgeBa
                                     )}
                                 </div>
 
-                                <div onClick={handleTagListClick}>
+                                <div onClick={handleTagListClick} role="presentation">
                                     <KnowledgeBaseListItemTagList
                                         knowledgeBaseId={knowledgeBase.id}
                                         remainingTags={remainingTags}

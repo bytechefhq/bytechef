@@ -5,6 +5,7 @@ import {transformPathForObjectAccess} from '@/pages/platform/workflow-editor/uti
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {DataPillDragPayloadType, PropertyAllType} from '@/shared/types';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {DragEvent, MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -166,6 +167,9 @@ const DataPill = ({
                     onClick={() => handleDataPillClick({workflowNodeName})}
                     onDragEnd={handleDragEnd}
                     onDragStart={(event) => handleDragStart(event, {workflowNodeName})}
+                    onKeyDown={handleActivationKeyDown}
+                    role="button"
+                    tabIndex={0}
                 >
                     <span className="pointer-events-none mr-2" title={property?.type}>
                         {TYPE_ICONS[property?.type as keyof typeof TYPE_ICONS]}
@@ -215,6 +219,9 @@ const DataPill = ({
                                 workflowNodeName,
                             })
                         }
+                        onKeyDown={handleActivationKeyDown}
+                        role="button"
+                        tabIndex={0}
                     >
                         {property?.name && (
                             <span className="pointer-events-none mr-2" title={property?.type}>

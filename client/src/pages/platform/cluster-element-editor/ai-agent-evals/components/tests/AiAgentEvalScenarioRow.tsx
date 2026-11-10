@@ -4,6 +4,7 @@ import CreateJudgeDialog from '@/pages/platform/cluster-element-editor/ai-agent-
 import CreateToolSimulationDialog from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/CreateToolSimulationDialog';
 import useAiAgentEvalScenarioRow from '@/pages/platform/cluster-element-editor/ai-agent-evals/components/tests/hooks/useAiAgentEvalScenarioRow';
 import {type AiAgentEvalTestQuery, AiAgentScenarioType} from '@/shared/middleware/graphql';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {ChevronDownIcon, ChevronRightIcon, GavelIcon, PencilIcon, PlusIcon, TrashIcon, WrenchIcon} from 'lucide-react';
 import {useState} from 'react';
 
@@ -38,7 +39,13 @@ const AiAgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AiAgentEvalScenari
     return (
         <div className="py-1">
             <div className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-surface-neutral-primary-hover">
-                <div className="flex flex-1 cursor-pointer items-center gap-3" onClick={() => setExpanded(!expanded)}>
+                <div
+                    className="flex flex-1 cursor-pointer items-center gap-3"
+                    onClick={() => setExpanded(!expanded)}
+                    onKeyDown={handleActivationKeyDown}
+                    role="button"
+                    tabIndex={0}
+                >
                     {expanded ? (
                         <ChevronDownIcon className="size-3.5 text-content-neutral-tertiary" />
                     ) : (

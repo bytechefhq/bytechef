@@ -12,6 +12,7 @@ import {
     useJobFileLogsQuery,
     useTriggerExecutionFileLogsQuery,
 } from '@/shared/middleware/graphql';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {
     AlertCircleIcon,
     AlertTriangleIcon,
@@ -180,6 +181,9 @@ const LogEntryRow = ({collapsed, entry, showComponentName}: LogEntryRowProps) =>
                 hasError && 'cursor-pointer hover:bg-surface-neutral-secondary'
             )}
             onClick={() => hasError && setIsExpanded(!isExpanded)}
+            onKeyDown={handleActivationKeyDown}
+            role="button"
+            tabIndex={0}
         >
             <div className="flex items-start gap-2">
                 <span className="shrink-0 text-xs text-muted-foreground">

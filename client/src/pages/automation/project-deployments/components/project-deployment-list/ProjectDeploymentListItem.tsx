@@ -136,6 +136,7 @@ const ProjectDeploymentListItem = ({
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleProjectDeploymentListItemClick(event)}
+                role="presentation"
             >
                 <ListItemExpandButton label="Toggle deployment" />
 
@@ -170,7 +171,7 @@ const ProjectDeploymentListItem = ({
                                     </span>
                                 </CollapsibleTrigger>
 
-                                <div onClick={(event) => event.stopPropagation()}>
+                                <div onClick={(event) => event.stopPropagation()} role="presentation">
                                     {showTags && projectDeployment.tags && (
                                         <TagList
                                             getRequest={(id, tags) => ({

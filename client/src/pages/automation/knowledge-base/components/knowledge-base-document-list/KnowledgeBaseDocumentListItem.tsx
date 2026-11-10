@@ -64,7 +64,7 @@ const KnowledgeBaseDocumentListItem = ({document, remainingTags, tags}: Knowledg
                             </span>
                         )}
 
-                        <span onClick={handleTagListClick}>
+                        <span onClick={handleTagListClick} role="presentation">
                             <TagList
                                 getRequest={(_id, newTags) => ({
                                     input: {

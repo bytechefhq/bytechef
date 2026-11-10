@@ -41,7 +41,7 @@ const renderListItem = () => {
 };
 
 const openRowMenu = async () => {
-    await userEvent.click(screen.getByRole('button'));
+    await userEvent.click(screen.getByRole('button', {expanded: false}));
 };
 
 describe('AiSkillListItem', () => {

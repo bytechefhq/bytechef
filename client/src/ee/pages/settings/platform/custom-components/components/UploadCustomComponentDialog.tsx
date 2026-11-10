@@ -10,6 +10,7 @@ import {
 } from '@/components/Dialog';
 import {Label} from '@/components/ui/label';
 import useUploadCustomComponentDialog from '@/ee/pages/settings/platform/custom-components/components/hooks/useUploadCustomComponentDialog';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {Loader2Icon, UploadIcon, XIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -60,6 +61,9 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                     onClick={() =>
                                         !uploading && document.getElementById('component-file-upload')?.click()
                                     }
+                                    onKeyDown={handleActivationKeyDown}
+                                    role="button"
+                                    tabIndex={0}
                                 >
                                     <UploadIcon className="mb-2 size-8 text-content-neutral-tertiary" />
 

@@ -191,6 +191,7 @@ const IntegrationListItem = ({
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleIntegrationListItemClick(event)}
+                role="presentation"
             >
                 <ListItemExpandButton label="Toggle integration" />
 
@@ -263,7 +264,7 @@ const IntegrationListItem = ({
                                     </span>
                                 </CollapsibleTrigger>
 
-                                <div onClick={(event) => event.preventDefault()}>
+                                <div onClick={(event) => event.preventDefault()} role="presentation">
                                     {integration.tags && (
                                         <TagList
                                             getRequest={(id, tags) => ({

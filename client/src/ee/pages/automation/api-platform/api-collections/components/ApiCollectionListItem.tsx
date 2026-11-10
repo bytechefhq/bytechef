@@ -130,6 +130,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
             <div
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleApiCollectionListItemClick(event)}
+                role="presentation"
             >
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div className="flex-1">
@@ -164,7 +165,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
-                                <div onClick={(event) => event.preventDefault()}>
+                                <div onClick={(event) => event.preventDefault()} role="presentation">
                                     {apiCollection.tags && (
                                         <TagList
                                             getRequest={(id, tags) => ({

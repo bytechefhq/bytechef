@@ -16,6 +16,7 @@ import {
     AiAgentScenarioType,
     useAiAgentEvalTestQuery,
 } from '@/shared/middleware/graphql';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {
     ChevronDownIcon,
     ChevronRightIcon,
@@ -85,6 +86,9 @@ const AiAgentEvalTestCard = ({
                 <div
                     className="flex cursor-pointer items-center justify-between px-3 py-3 hover:bg-surface-neutral-primary-hover"
                     onClick={() => setExpanded(!expanded)}
+                    onKeyDown={handleActivationKeyDown}
+                    role="button"
+                    tabIndex={0}
                 >
                     <div className="flex flex-1 items-center gap-3">
                         {expanded ? (

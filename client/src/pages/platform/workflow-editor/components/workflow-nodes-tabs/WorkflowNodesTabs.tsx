@@ -4,6 +4,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {getClusterElementsLabel} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {ClickedDefinitionType, UpdateWorkflowMutationType} from '@/shared/types';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {ClipboardPasteIcon, ClipboardXIcon} from 'lucide-react';
 import {MouseEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -418,6 +419,9 @@ const WorkflowNodesTabs = ({
                                 <div
                                     className="group/paste flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-2 px-2 hover:bg-surface-brand-secondary active:bg-surface-brand-secondary"
                                     onClick={handlePasteClick}
+                                    onKeyDown={handleActivationKeyDown}
+                                    role="button"
+                                    tabIndex={0}
                                 >
                                     <ClipboardPasteIcon className="size-4 shrink-0 text-content-neutral-primary group-active/paste:text-content-brand-primary" />
 

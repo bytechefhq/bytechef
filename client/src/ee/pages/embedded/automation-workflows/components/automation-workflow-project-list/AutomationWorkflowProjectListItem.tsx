@@ -89,6 +89,7 @@ const AutomationWorkflowProjectListItem = ({
                 aria-label={`${project.name}_container`}
                 className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleProjectListItemClick(event)}
+                role="presentation"
             >
                 <ListItemExpandButton label="Toggle project" />
 
@@ -157,7 +158,7 @@ const AutomationWorkflowProjectListItem = ({
                                     </span>
                                 </CollapsibleTrigger>
 
-                                <div onClick={(event) => event.stopPropagation()}>
+                                <div onClick={(event) => event.stopPropagation()} role="presentation">
                                     <TagList
                                         getRequest={(_id, updatedTags) => updatedTags.map((tag) => tag.name)}
                                         id={0}

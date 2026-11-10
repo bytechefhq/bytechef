@@ -270,6 +270,7 @@ export default function WorkflowEdge({
                     className="nodrag nopan p-8"
                     id={id}
                     onClick={handleClick}
+                    role="presentation"
                     {...dropzoneHandlers}
                     style={{
                         pointerEvents: 'all',

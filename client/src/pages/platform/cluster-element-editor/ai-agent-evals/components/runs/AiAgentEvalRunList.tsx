@@ -6,6 +6,7 @@ import {
     formatRunDate,
 } from '@/pages/platform/cluster-element-editor/ai-agent-evals/utils/evalRunUtils';
 import {AiAgentEvalRunStatus, type AiAgentEvalRunsQuery} from '@/shared/middleware/graphql';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {HistoryIcon, Loader2Icon, SquareIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
@@ -60,6 +61,9 @@ const AiAgentEvalRunList = ({onCancelRun, onSelectRun, runs}: AiAgentEvalRunList
                         className="cursor-pointer border-b border-border/30 px-3 py-2.5 last:border-b-0 hover:bg-surface-neutral-primary-hover"
                         key={run.id}
                         onClick={() => onSelectRun(run.id)}
+                        onKeyDown={handleActivationKeyDown}
+                        role="button"
+                        tabIndex={0}
                     >
                         <div className="grid grid-cols-[1fr_100px_180px_100px_160px] items-center gap-2">
                             <div className="truncate text-sm font-medium">{run.name}</div>

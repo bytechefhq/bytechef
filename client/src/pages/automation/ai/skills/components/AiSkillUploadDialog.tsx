@@ -9,6 +9,7 @@ import {
     DialogMain,
 } from '@/components/Dialog';
 import useAiSkillUploadForm from '@/pages/automation/ai/skills/hooks/useAiSkillUploadForm';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {FileIcon, UploadIcon, XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
@@ -61,6 +62,9 @@ const AiSkillUploadDialog = ({onCreated, onOpenChange, open}: AiSkillUploadDialo
                                 onDragLeave={handleDragLeave}
                                 onDragOver={handleDragOver}
                                 onDrop={handleDrop}
+                                onKeyDown={handleActivationKeyDown}
+                                role="button"
+                                tabIndex={0}
                             >
                                 <div className="flex flex-col items-center gap-2">
                                     <UploadIcon className="size-10 text-content-neutral-tertiary" />

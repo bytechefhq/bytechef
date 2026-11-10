@@ -8,6 +8,7 @@ import {
     AiAgentJudgeVerdictStatus,
     AiAgentScenarioType,
 } from '@/shared/middleware/graphql';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 import {
     CheckCircle2Icon,
     ChevronDownIcon,
@@ -98,6 +99,9 @@ const ScenarioResultsTable = ({results}: ScenarioResultsTableProps) => {
                             <div
                                 className="grid cursor-pointer grid-cols-[24px_1fr_100px_80px_80px_90px_56px] items-center gap-2 px-3 py-2.5 hover:bg-surface-neutral-primary-hover"
                                 onClick={() => setExpandedResultId(isExpanded ? null : result.id)}
+                                onKeyDown={handleActivationKeyDown}
+                                role="button"
+                                tabIndex={0}
                             >
                                 <div>{STATUS_ICONS[result.status]}</div>
 

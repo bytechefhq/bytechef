@@ -3,6 +3,7 @@ import DataTableListItemTagList from '@/pages/automation/datatables/components/D
 import DataTableListItemTooltip from '@/pages/automation/datatables/components/DataTableListItemTooltip';
 import useDataTableListItem from '@/pages/automation/datatables/components/hooks/useDataTableListItem';
 import {DataTable, Tag} from '@/shared/middleware/graphql';
+import {handleActivationKeyDown} from '@/shared/util/keyboard-utils';
 
 interface DataTableListItemProps {
     table: DataTable;
@@ -17,6 +18,9 @@ const DataTableListItem = ({remainingTags, table, tags}: DataTableListItemProps)
         <div
             className="group mb-2 flex w-full cursor-pointer items-center justify-between rounded border border-border/50 px-3 hover:bg-surface-neutral-primary-hover"
             onClick={handleRowClick}
+            onKeyDown={handleActivationKeyDown}
+            role="button"
+            tabIndex={0}
         >
             <div className="flex flex-1 items-center py-3">
                 <div className="flex-1">
@@ -28,7 +32,7 @@ const DataTableListItem = ({remainingTags, table, tags}: DataTableListItemProps)
                         <div className="flex items-center gap-3">
                             <div className="text-xs font-semibold text-muted-foreground">{columnCountLabel}</div>
 
-                            <div onClick={handleDataTableListItemTagListClick}>
+                            <div onClick={handleDataTableListItemTagListClick} role="presentation">
                                 <DataTableListItemTagList
                                     datatableId={table.id}
                                     remainingTags={remainingTags}
@@ -42,7 +46,7 @@ const DataTableListItem = ({remainingTags, table, tags}: DataTableListItemProps)
                 <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                     <DataTableListItemTooltip lastModifiedDate={table.lastModifiedDate} />
 
-                    <div onClick={handleDataTableListItemTagListClick}>
+                    <div onClick={handleDataTableListItemTagListClick} role="presentation">
                         <DataTableListItemDropdownMenu baseName={table.baseName} dataTableId={table.id} />
                     </div>
                 </div>
