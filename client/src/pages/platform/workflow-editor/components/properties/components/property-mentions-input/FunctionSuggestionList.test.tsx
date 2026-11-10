@@ -46,9 +46,11 @@ describe('FunctionSuggestionList', () => {
         const command = vi.fn();
         const items = [
             definition('contains', {
+                description: 'Checks for a boolean element.',
                 parameters: [{description: '', name: 'element', required: true, type: EvaluatorFunctionType.Boolean}],
             }),
             definition('contains', {
+                description: 'Checks for a map element.',
                 parameters: [{description: '', name: 'element', required: true, type: EvaluatorFunctionType.Map}],
             }),
             definition('concat'),
@@ -62,6 +64,8 @@ describe('FunctionSuggestionList', () => {
         expect(screen.getByText('2 variations')).toBeInTheDocument();
         expect(screen.getByText('(element: Boolean): String')).toBeInTheDocument();
         expect(screen.getByText('(element: Map): String')).toBeInTheDocument();
+        expect(screen.getByText('Checks for a boolean element.')).toBeInTheDocument();
+        expect(screen.getByText('Checks for a map element.')).toBeInTheDocument();
 
         act(() => {
             ref.current!.onKeyDown({event: new KeyboardEvent('keydown', {key: 'ArrowDown'})} as never);
