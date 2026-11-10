@@ -165,7 +165,7 @@ const ClusterFrameShell = ({children, data, nodeId, nodeMenu}: ClusterFrameShell
 
     return (
         <div
-            className="group relative rounded-lg border-2 border-dashed border-stroke-neutral-secondary bg-surface-neutral-secondary/40"
+            className="group relative rounded-lg border-2 border-dashed border-stroke-neutral-secondary bg-background bg-[linear-gradient(hsl(var(--surface-neutral-secondary)/0.4),hsl(var(--surface-neutral-secondary)/0.4))]"
             data-nodetype="clusterFrame"
             data-testid="cluster-frame-shell"
             style={{height: clusterFrame.height, width: clusterFrame.width}}
