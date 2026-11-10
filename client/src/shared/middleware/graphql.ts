@@ -755,6 +755,13 @@ export type UpdateA2aServerTagsMutationVariables = Exact<{
 
 export type UpdateA2aServerTagsMutation = { updateA2aServerTags: Array<{ id: string } | null> | null };
 
+export type UpdateConnectionCredentialsMutationVariables = Exact<{
+  input: Types.UpdateConnectionCredentialsInput;
+}>;
+
+
+export type UpdateConnectionCredentialsMutation = { updateConnectionCredentials: boolean };
+
 export type UpdateMcpProjectMutationVariables = Exact<{
   id: string | number;
   input: Types.UpdateMcpProjectInput;
@@ -5190,6 +5197,25 @@ export const useUpdateA2aServerTagsMutation = <
       {
     mutationKey: ['updateA2aServerTags'],
     mutationFn: (variables?: UpdateA2aServerTagsMutationVariables) => fetcher<UpdateA2aServerTagsMutation, UpdateA2aServerTagsMutationVariables>(UpdateA2aServerTagsDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateConnectionCredentialsDocument = new TypedDocumentString(`
+    mutation UpdateConnectionCredentials($input: UpdateConnectionCredentialsInput!) {
+  updateConnectionCredentials(input: $input)
+}
+    `);
+
+export const useUpdateConnectionCredentialsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateConnectionCredentialsMutation, TError, UpdateConnectionCredentialsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateConnectionCredentialsMutation, TError, UpdateConnectionCredentialsMutationVariables, TContext>(
+      {
+    mutationKey: ['UpdateConnectionCredentials'],
+    mutationFn: (variables?: UpdateConnectionCredentialsMutationVariables) => fetcher<UpdateConnectionCredentialsMutation, UpdateConnectionCredentialsMutationVariables>(UpdateConnectionCredentialsDocument, variables)(),
     ...options
   }
     )};
