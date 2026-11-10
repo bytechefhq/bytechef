@@ -75,7 +75,7 @@ it('should not select the workflow when the actions menu is used', async () => {
     expect(mockOnProjectClick).not.toHaveBeenCalled();
 });
 
-it('should render the trigger apart from the task component icons', () => {
+it('should not render component icons for the workflow trigger and tasks', () => {
     const mockWorkflowWithComponents = {
         ...mockWorkflow,
         workflowTaskComponentNames: ['Task1', 'Task2', 'Task3', 'Task4'],
@@ -98,31 +98,6 @@ it('should render the trigger apart from the task component icons', () => {
         </MemoryRouter>
     );
 
-    expect(screen.getAllByLabelText('Workflow component icon')).toHaveLength(4);
-});
-
-it('should show +X indicator when there are more task components than fit', () => {
-    const mockWorkflowWithComponents = {
-        ...mockWorkflow,
-        workflowTaskComponentNames: ['Task1', 'Task2', 'Task3', 'Task4', 'Task5', 'Task6', 'Task7', 'Task8'],
-        workflowTriggerComponentNames: ['Trigger1'],
-    };
-
-    render(
-        <MemoryRouter>
-            <TooltipProvider>
-                <WorkflowsListItem
-                    calculateTimeDifference={vi.fn().mockReturnValue('1 hour ago')}
-                    currentWorkflowId="1001"
-                    findProjectIdByWorkflow={vi.fn().mockReturnValue(1050)}
-                    onProjectClick={mockOnProjectClick}
-                    project={mockProject}
-                    setSelectedProjectId={vi.fn()}
-                    workflow={mockWorkflowWithComponents}
-                />
-            </TooltipProvider>
-        </MemoryRouter>
-    );
-
-    expect(screen.getByText('+1')).toBeInTheDocument();
+    expect(screen.getByText('Workflow One')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Workflow component icon')).not.toBeInTheDocument();
 });
