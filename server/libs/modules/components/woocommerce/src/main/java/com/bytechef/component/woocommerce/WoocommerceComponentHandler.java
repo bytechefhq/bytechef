@@ -26,6 +26,8 @@ import com.bytechef.component.woocommerce.action.WoocommerceCreateCouponAction;
 import com.bytechef.component.woocommerce.action.WoocommerceCreateCustomerAction;
 import com.bytechef.component.woocommerce.action.WoocommerceCreateOrderAction;
 import com.bytechef.component.woocommerce.action.WoocommerceCreateProductAction;
+import com.bytechef.component.woocommerce.action.WoocommerceGetOrderAction;
+import com.bytechef.component.woocommerce.action.WoocommerceSearchOrdersAction;
 import com.bytechef.component.woocommerce.connection.WoocommerceConnection;
 import com.bytechef.component.woocommerce.trigger.WoocommerceNewCouponTrigger;
 import com.bytechef.component.woocommerce.trigger.WoocommerceNewOrderTrigger;
@@ -50,12 +52,16 @@ public class WoocommerceComponentHandler implements ComponentHandler {
             WoocommerceCreateCouponAction.ACTION_DEFINITION,
             WoocommerceCreateCustomerAction.ACTION_DEFINITION,
             WoocommerceCreateOrderAction.ACTION_DEFINITION,
-            WoocommerceCreateProductAction.ACTION_DEFINITION)
+            WoocommerceCreateProductAction.ACTION_DEFINITION,
+            WoocommerceGetOrderAction.ACTION_DEFINITION,
+            WoocommerceSearchOrdersAction.ACTION_DEFINITION)
         .clusterElements(
             tool(WoocommerceCreateCouponAction.ACTION_DEFINITION),
             tool(WoocommerceCreateCustomerAction.ACTION_DEFINITION),
             tool(WoocommerceCreateOrderAction.ACTION_DEFINITION),
-            tool(WoocommerceCreateProductAction.ACTION_DEFINITION))
+            tool(WoocommerceCreateProductAction.ACTION_DEFINITION),
+            tool(WoocommerceGetOrderAction.ACTION_DEFINITION),
+            tool(WoocommerceSearchOrdersAction.ACTION_DEFINITION))
         .triggers(
             WoocommerceNewOrderTrigger.TRIGGER_DEFINITION,
             WoocommerceNewCouponTrigger.TRIGGER_DEFINITION);
