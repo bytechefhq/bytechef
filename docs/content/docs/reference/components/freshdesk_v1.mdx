@@ -347,6 +347,118 @@ Type: OBJECT
 
 
 
+### List Tickets
+Name: listTickets
+
+`Lists tickets. By default, only tickets created within the past 30 days are returned; use Updated Since to return older tickets.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| filter | Filter | STRING <details> <summary> Options </summary> <span>new_and_my_open</span>, <span>watching</span>, <span>spam</span>, <span>deleted</span> </details> | Predefined filter to apply to the tickets. | false |
+| updated_since | Updated Since | STRING | Only return tickets updated since this date or timestamp, in UTC, for example 2015-01-19T02:00:00Z or 2015-08-17. | false |
+| order_by | Order By | STRING <details> <summary> Options </summary> <span>created_at</span>, <span>due_by</span>, <span>updated_at</span>, <span>status</span> </details> | Ticket field to sort the tickets by. | false |
+| order_type | Order Type | STRING <details> <summary> Options </summary> <span>asc</span>, <span>desc</span> </details> | Sort direction of the tickets. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Tickets",
+  "name" : "listTickets",
+  "parameters" : {
+    "filter" : "",
+    "updated_since" : "",
+    "order_by" : "",
+    "order_type" : ""
+  },
+  "type" : "freshdesk/v1/listTickets"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| cc_emails | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of email addresses added in the cc field of the ticket. |
+| fwd_emails | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of email addresses added while forwarding a ticket. |
+| reply_cc_emails | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of email addresses added while replying to a ticket. |
+| email_config_id | INTEGER | ID of the email config used for the ticket. |
+| group_id | INTEGER | ID of the group the ticket is assigned to. |
+| priority | INTEGER | Priority of the ticket. |
+| requester_id | INTEGER | ID of the requester of the ticket. |
+| responder_id | INTEGER | ID of the agent the ticket is assigned to. |
+| source | INTEGER | Channel through which the ticket was created. |
+| status | INTEGER | Status of the ticket. |
+| subject | STRING | Subject of the ticket. |
+| company_id | INTEGER | ID of the company the ticket belongs to. |
+| id | INTEGER | ID of the ticket. |
+| type | STRING | Type of the ticket. |
+| to_emails | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of email addresses the ticket was sent to. |
+| product_id | INTEGER | ID of the product the ticket belongs to. |
+| fr_escalated | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the ticket has been escalated as the result of first response time being breached. |
+| spam | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the ticket has been marked as spam. |
+| urgent | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the ticket is marked as urgent. |
+| is_escalated | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the ticket has been escalated. |
+| created_at | STRING | Timestamp when the ticket was created. |
+| updated_at | STRING | Timestamp when the ticket was last updated. |
+| due_by | STRING | Timestamp when the ticket is due to be resolved. |
+| fr_due_by | STRING | Timestamp when the first response is due. |
+| description_text | STRING | Plain text version of the ticket description. |
+| description | STRING | HTML content of the ticket description. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | List of tags associated with the ticket. |
+| attachments | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of attachments associated with the ticket. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "cc_emails" : [ "" ],
+  "fwd_emails" : [ "" ],
+  "reply_cc_emails" : [ "" ],
+  "email_config_id" : 1,
+  "group_id" : 1,
+  "priority" : 1,
+  "requester_id" : 1,
+  "responder_id" : 1,
+  "source" : 1,
+  "status" : 1,
+  "subject" : "",
+  "company_id" : 1,
+  "id" : 1,
+  "type" : "",
+  "to_emails" : [ "" ],
+  "product_id" : 1,
+  "fr_escalated" : false,
+  "spam" : false,
+  "urgent" : false,
+  "is_escalated" : false,
+  "created_at" : "",
+  "updated_at" : "",
+  "due_by" : "",
+  "fr_due_by" : "",
+  "description_text" : "",
+  "description" : "",
+  "tags" : [ "" ],
+  "attachments" : [ { } ]
+} ]
+```
+
+
+
+
 ### Update Ticket
 Name: updateTicket
 
@@ -362,6 +474,9 @@ Name: updateTicket
 | description | Description | STRING | HTML content of the ticket. | false |
 | priority | Priority | INTEGER <details> <summary> Options </summary> <span>1</span>, <span>2</span>, <span>3</span>, <span>4</span> </details> | Priority of the ticket. | false |
 | status | Status | INTEGER <details> <summary> Options </summary> <span>2</span>, <span>3</span>, <span>4</span>, <span>5</span> </details> | Status of the ticket. | false |
+| group_id | Group ID | INTEGER | ID of the group to which the ticket will be assigned. | false |
+| responder_id | Responder ID | INTEGER | ID of the agent to whom the ticket will be assigned. | false |
+| tags | Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | Tags to associate with the ticket. The provided tags replace all existing tags of the ticket. | false |
 
 #### Example JSON Structure
 ```json
@@ -374,7 +489,10 @@ Name: updateTicket
     "email" : "",
     "description" : "",
     "priority" : 1,
-    "status" : 1
+    "status" : 1,
+    "group_id" : 1,
+    "responder_id" : 1,
+    "tags" : [ "" ]
   },
   "type" : "freshdesk/v1/updateTicket"
 }
