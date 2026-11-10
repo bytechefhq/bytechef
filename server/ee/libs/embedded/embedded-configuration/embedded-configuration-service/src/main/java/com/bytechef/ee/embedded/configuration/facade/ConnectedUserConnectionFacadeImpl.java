@@ -142,7 +142,9 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     public List<ConnectionDTO> getConnectedUserConnectionsForAdmin(
         long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
-        List<ConnectionDTO> connectionDTOs = getConnections(connectedUserId, componentName, connectionIds);
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        List<ConnectionDTO> connectionDTOs = getConnections(connectedUser, componentName, connectionIds);
 
         Set<Long> listedConnectionIds = connectionDTOs.stream()
             .map(ConnectionDTO::id)
@@ -152,7 +154,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         Set<Long> adminEnteredConnectionIds = new HashSet<>(
             connectedUserConnectionService.getProvisionedConnectionIdsIn(listedConnectionIds));
 
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+        adminEnteredConnectionIds.addAll(connectedUserConnectionService.getSharedConnectionIds());
 
         for (IntegrationInstance integrationInstance : integrationInstanceService
             .getConnectedUserIntegrationInstances(connectedUserId, connectedUser.getEnvironment())) {
@@ -167,6 +169,8 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
                 ? connectionDTO
                 : ConnectionDTO.builder(connectionDTO)
                     .authorizationParameters(null)
+                    .baseUri(null)
+                    .connectionParameters(null)
                     .parameters(null)
                     .build())
             .toList();
@@ -186,7 +190,11 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     public List<ConnectionDTO> getConnections(
         Long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
-        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+        return getConnections(connectedUserService.getConnectedUser(connectedUserId), componentName, connectionIds);
+    }
+
+    private List<ConnectionDTO> getConnections(
+        ConnectedUser connectedUser, @Nullable String componentName, List<Long> connectionIds) {
 
         Set<Long> entitledConnectionIds = connectedUserConnectionMembership.getConnectionIds(
             connectedUser.getId(), connectedUser.getEnvironment());

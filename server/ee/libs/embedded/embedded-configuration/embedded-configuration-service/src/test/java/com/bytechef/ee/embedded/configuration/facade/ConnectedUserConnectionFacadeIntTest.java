@@ -553,7 +553,27 @@ class ConnectedUserConnectionFacadeIntTest {
 
         assertThat(connectionDTO.id()).isEqualTo(84001L);
         assertThat(connectionDTO.authorizationParameters()).isNull();
+        assertThat(connectionDTO.baseUri()).isNull();
+        assertThat(connectionDTO.connectionParameters()).isNull();
         assertThat(connectionDTO.parameters()).isNull();
+    }
+
+    @Test
+    void testGetConnectedUserConnectionsForAdminKeepsSharedConnectionCredentials() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        stubSharedConnection(84031L);
+
+        stubConnectionsWithCredentials();
+
+        List<ConnectionDTO> connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(
+            connectedUserId, null, List.of());
+
+        assertThat(connectionDTOs).hasSize(1);
+
+        ConnectionDTO connectionDTO = connectionDTOs.getFirst();
+
+        assertThat(connectionDTO.authorizationParameters()).isEqualTo(Map.of("secret", "value"));
     }
 
     @Test
@@ -575,6 +595,8 @@ class ConnectedUserConnectionFacadeIntTest {
 
         for (ConnectionDTO connectionDTO : connectionDTOs) {
             assertThat(connectionDTO.authorizationParameters()).isEqualTo(Map.of("secret", "value"));
+            assertThat(connectionDTO.baseUri()).isEqualTo("https://example.com");
+            assertThat(connectionDTO.connectionParameters()).isEqualTo(Map.of("tenant", "acme"));
             assertThat(connectionDTO.parameters()).isEqualTo(Map.of("region", "eu"));
         }
     }
@@ -591,8 +613,10 @@ class ConnectedUserConnectionFacadeIntTest {
             connectedUserId, null, List.of());
 
         assertThat(connectionDTOs).hasSize(1);
-        assertThat(connectionDTOs.getFirst()
-            .authorizationParameters()).isEqualTo(Map.of("secret", "value"));
+
+        ConnectionDTO connectionDTO = connectionDTOs.getFirst();
+
+        assertThat(connectionDTO.authorizationParameters()).isEqualTo(Map.of("secret", "value"));
     }
 
     @Test
@@ -874,6 +898,8 @@ class ConnectedUserConnectionFacadeIntTest {
                 return requestedConnectionIds.stream()
                     .map(requestedConnectionId -> ConnectionDTO.builder()
                         .authorizationParameters(Map.of("secret", "value"))
+                        .baseUri("https://example.com")
+                        .connectionParameters(Map.of("tenant", "acme"))
                         .id(requestedConnectionId)
                         .parameters(Map.of("region", "eu"))
                         .build())
