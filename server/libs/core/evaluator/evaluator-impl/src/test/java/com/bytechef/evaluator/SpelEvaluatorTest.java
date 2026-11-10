@@ -504,6 +504,24 @@ class SpelEvaluatorTest {
     }
 
     @Test
+    void testUnknownFunctionFailsWithItsName() {
+        ExpressionEvaluationException expressionEvaluationException = assertThrowsExactly(
+            ExpressionEvaluationException.class,
+            () -> EVALUATOR.evaluate(
+                Map.of("value", "=intgetOrDefault(${attempt}, 0) + 1"), Map.of("attempt", 1)));
+
+        assertEquals("Method invocation is not allowed: intgetOrDefault", expressionEvaluationException.getMessage());
+    }
+
+    @Test
+    void testUnknownFunctionIsLeftUnevaluatedWhenLenient() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", "=intgetOrDefault(${attempt}, 0) + 1"), Map.of("attempt", 1), true);
+
+        assertEquals("=intgetOrDefault(${attempt}, 0) + 1", MapUtils.get(map, "value"));
+    }
+
+    @Test
     void testConcatJoinsAllStringArguments() {
         Map<String, Object> map = EVALUATOR.evaluate(
             Map.of(

@@ -379,7 +379,9 @@ public class SpelEvaluator implements Evaluator {
             MethodExecutor executor = methodExecutorMap.get(name);
 
             if (executor == null) {
-                throw new UnsupportedOperationException("Method invocation is not allowed: " + name);
+                String message = "Method invocation is not allowed: " + name;
+
+                throw new AccessException(message, new IllegalArgumentException(message));
             }
 
             return (context, target, arguments) -> {
