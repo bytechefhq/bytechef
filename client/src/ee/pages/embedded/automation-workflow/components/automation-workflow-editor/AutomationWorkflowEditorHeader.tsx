@@ -92,12 +92,14 @@ const AutomationWorkflowEditorHeader = ({
     const queryClient = useQueryClient();
 
     const {
+        handleProjectValueChange,
         handlePublishProjectSubmit,
         handleRunClick,
         handleShowOutputClick,
         handleStopClick,
         handleWorkflowValueChange,
         project,
+        projects,
         publishProjectMutationIsPending,
     } = useAutomationWorkflowEditorHeader({
         bottomResizablePanelRef,
@@ -331,7 +333,9 @@ const AutomationWorkflowEditorHeader = ({
                             workflows={project.workflowTemplates}
                         />
                     }
+                    onProjectValueChange={handleProjectValueChange}
                     project={project}
+                    projects={projects}
                 />
             </div>
 

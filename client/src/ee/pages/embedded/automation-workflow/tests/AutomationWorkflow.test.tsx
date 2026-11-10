@@ -3,6 +3,7 @@ import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/work
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {fireEvent, render, screen, userEvent} from '@/shared/util/test-utils';
+import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import AutomationWorkflow from '../AutomationWorkflow';
@@ -48,7 +49,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
                     name: 'My Project',
                     published: true,
                     tagIds: [],
-                    version: 1,
+                    version: 3,
                     workflowTemplates: [
                         {
                             components: [],
@@ -120,6 +121,7 @@ vi.mock('@/shared/components/LoadingIndicator', () => ({
 }));
 
 vi.mock('react-router-dom', () => ({
+    Link: ({children, to}: {children: ReactNode; to: string}) => <a href={to}>{children}</a>,
     useBlocker: () => undefined,
     useNavigate: () => hoisted.navigateMock,
     useParams: () => ({workflowUuid: hoisted.workflowUuid}),
@@ -262,11 +264,11 @@ describe('AutomationWorkflow', () => {
         expect(hoisted.publishMutationMock).toHaveBeenCalledWith({id: 'project-1'}, expect.anything());
     });
 
-    it('shows the published version badge for the project', () => {
+    it('shows the draft version badge for a published project', () => {
         renderAutomationWorkflow();
 
-        expect(screen.getByText('V2')).toBeInTheDocument();
-        expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+        expect(screen.getByText('V3')).toBeInTheDocument();
+        expect(screen.getByText('DRAFT')).toBeInTheDocument();
     });
 
     it('clears the test output and the node states of the previous workflow once another workflow opens', () => {
