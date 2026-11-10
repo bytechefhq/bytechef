@@ -146,7 +146,7 @@ class EmbeddedConfigurationProtoMapperTest {
     }
 
     @Test
-    void testAutomationWorkflowProjectsRoundTrip() {
+    void testAutomationProjectsRoundTrip() {
         List<AutomationProjectDTO> automationProjectDTOs = List.of(
             new AutomationProjectDTO(
                 7L, "Live Project", "Live", 2L, List.of(3L), true, 2, 1,
@@ -161,8 +161,8 @@ class EmbeddedConfigurationProtoMapperTest {
                         "hasAuthority('ADMIN')", "workflow-1")),
                 "hasAuthority('ADMIN')", true, 3, Instant.parse("2026-10-26T10:00:00Z")));
 
-        assertThat(embeddedConfigurationProtoMapper.toAutomationWorkflowProjectDTOs(
-            embeddedConfigurationProtoMapper.toRemoteAutomationWorkflowProjects(automationProjectDTOs)))
+        assertThat(embeddedConfigurationProtoMapper.toAutomationProjectDTOs(
+            embeddedConfigurationProtoMapper.toRemoteAutomationProjects(automationProjectDTOs)))
                 .isEqualTo(automationProjectDTOs);
     }
 

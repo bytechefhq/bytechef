@@ -14,7 +14,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.remote.grpc.EmbeddedConfigurationProtoMapper;
-import com.bytechef.ee.embedded.configuration.remote.grpc.proto.AutomationWorkflowProjectFacadeRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.AutomationProjectFacadeRemoteServiceGrpc;
 import com.bytechef.ee.remote.grpc.GrpcChannels;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -121,11 +121,11 @@ public class RemoteAutomationProjectFacadeClient implements AutomationProjectFac
 
     @Override
     public List<AutomationProjectDTO> getPublishedProjects() {
-        AutomationWorkflowProjectFacadeRemoteServiceGrpc.AutomationWorkflowProjectFacadeRemoteServiceBlockingStub stub =
-            AutomationWorkflowProjectFacadeRemoteServiceGrpc
+        AutomationProjectFacadeRemoteServiceGrpc.AutomationProjectFacadeRemoteServiceBlockingStub stub =
+            AutomationProjectFacadeRemoteServiceGrpc
                 .newBlockingStub(grpcChannels.getChannel(CONFIGURATION_APP));
 
-        return embeddedConfigurationProtoMapper.toAutomationWorkflowProjectDTOs(
+        return embeddedConfigurationProtoMapper.toAutomationProjectDTOs(
             stub.getPublishedProjects(Empty.getDefaultInstance()));
     }
 

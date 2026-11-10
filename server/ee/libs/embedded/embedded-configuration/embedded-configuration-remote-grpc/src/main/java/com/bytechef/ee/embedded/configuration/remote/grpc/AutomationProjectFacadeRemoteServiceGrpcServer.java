@@ -8,8 +8,8 @@
 package com.bytechef.ee.embedded.configuration.remote.grpc;
 
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
-import com.bytechef.ee.embedded.configuration.remote.grpc.proto.AutomationWorkflowProjectFacadeRemoteServiceGrpc;
-import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAutomationWorkflowProjects;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.AutomationProjectFacadeRemoteServiceGrpc;
+import com.bytechef.ee.embedded.configuration.remote.grpc.proto.RemoteAutomationProjects;
 import com.google.protobuf.Empty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.stub.StreamObserver;
@@ -19,14 +19,14 @@ import io.grpc.stub.StreamObserver;
  *
  * @author Ivica Cardic
  */
-public class AutomationWorkflowProjectFacadeRemoteServiceGrpcServer
-    extends AutomationWorkflowProjectFacadeRemoteServiceGrpc.AutomationWorkflowProjectFacadeRemoteServiceImplBase {
+public class AutomationProjectFacadeRemoteServiceGrpcServer
+    extends AutomationProjectFacadeRemoteServiceGrpc.AutomationProjectFacadeRemoteServiceImplBase {
 
     private final EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper;
     private final AutomationProjectFacade automationProjectFacade;
 
     @SuppressFBWarnings("EI")
-    public AutomationWorkflowProjectFacadeRemoteServiceGrpcServer(
+    public AutomationProjectFacadeRemoteServiceGrpcServer(
         AutomationProjectFacade automationProjectFacade,
         EmbeddedConfigurationProtoMapper embeddedConfigurationProtoMapper) {
 
@@ -35,9 +35,9 @@ public class AutomationWorkflowProjectFacadeRemoteServiceGrpcServer
     }
 
     @Override
-    public void getPublishedProjects(Empty request, StreamObserver<RemoteAutomationWorkflowProjects> responseObserver) {
+    public void getPublishedProjects(Empty request, StreamObserver<RemoteAutomationProjects> responseObserver) {
         responseObserver.onNext(
-            embeddedConfigurationProtoMapper.toRemoteAutomationWorkflowProjects(
+            embeddedConfigurationProtoMapper.toRemoteAutomationProjects(
                 automationProjectFacade.getPublishedProjects()));
         responseObserver.onCompleted();
     }
