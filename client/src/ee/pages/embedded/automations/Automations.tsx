@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
+import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
@@ -25,7 +26,6 @@ import {FolderIcon} from 'lucide-react';
 import {ChangeEvent, useRef, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
-import AutomationProjectsFilterTitle from './components/AutomationProjectsFilterTitle';
 import AutomationDialog, {AutomationFormValuesI} from './components/automation-dialog/AutomationDialog';
 import AutomationExecutionsSheet from './components/automation-executions-sheet/AutomationExecutionsSheet';
 import AutomationProjectDialog, {
@@ -309,9 +309,10 @@ const Automations = () => {
                         position="main"
                         right={<Button aria-label="New Project" label="New Project" onClick={handleNewProject} />}
                         title={
-                            <AutomationProjectsFilterTitle
+                            <ProjectsFilterTitle
                                 categories={categories}
-                                filterData={filterData}
+                                filterByTag={filterData.type === AutomationProjectFilterType.Tag}
+                                filterId={filterData.id}
                                 tags={tags}
                             />
                         }

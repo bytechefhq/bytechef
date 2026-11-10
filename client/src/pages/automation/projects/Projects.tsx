@@ -184,7 +184,14 @@ const Projects = () => {
                                     </DropdownMenu>
                                 </ButtonGroup>
                             }
-                            title={<ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
+                            title={
+                                <ProjectsFilterTitle
+                                    categories={categories}
+                                    filterByTag={filterData.type === Type.Tag}
+                                    filterId={filterData.id}
+                                    tags={tags}
+                                />
+                            }
                         />
                     )
                 )
