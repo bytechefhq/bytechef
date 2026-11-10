@@ -15,6 +15,7 @@ package com.bytechef.ee.embedded.configuration.audit;
 public final class ConnectionAuditEvents {
 
     public static final String CONNECTION_CREATED = "CONNECTION_CREATED";
+    public static final String CONNECTION_CREDENTIALS_UPDATED = "CONNECTION_CREDENTIALS_UPDATED";
     public static final String CONNECTION_DELETED = "CONNECTION_DELETED";
     public static final String CONNECTION_REAUTHORIZED = "CONNECTION_REAUTHORIZED";
     public static final String CONNECTION_UPDATED = "CONNECTION_UPDATED";
