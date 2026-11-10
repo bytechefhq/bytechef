@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 ByteChef
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.Property.ValueProperty;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -41,33 +44,7 @@ public class InstagramConstants {
 
     public static final String COMMENT_FIELDS = "id,text,username,timestamp,like_count,replies";
 
-    public static final ModifiableObjectProperty COMMENT_OUTPUT_PROPERTY = object()
-        .properties(
-            string("id")
-                .description("ID of the comment."),
-            string("text")
-                .description("Text of the comment."),
-            string("username")
-                .description("Username of the Instagram user who wrote the comment."),
-            string("timestamp")
-                .description("ISO 8601 date and time when the comment was created."),
-            integer("like_count")
-                .description("Number of likes on the comment."),
-            object("replies")
-                .description("Replies to the comment.")
-                .properties(
-                    array("data")
-                        .items(
-                            object()
-                                .properties(
-                                    string("id")
-                                        .description("ID of the reply."),
-                                    string("text")
-                                        .description("Text of the reply."),
-                                    string("username")
-                                        .description("Username of the Instagram user who wrote the reply."),
-                                    string("timestamp")
-                                        .description("ISO 8601 date and time when the reply was created.")))));
+    public static final ModifiableObjectProperty COMMENT_OUTPUT_PROPERTY = createCommentOutputProperty();
 
     public static final ModifiableObjectProperty MEDIA_OUTPUT_PROPERTY = object()
         .properties(
@@ -75,5 +52,39 @@ public class InstagramConstants {
                 .description("ID of the published Instagram media."));
 
     private InstagramConstants() {
+    }
+
+    public static ModifiableObjectProperty createCommentOutputProperty(ValueProperty<?>... additionalProperties) {
+        List<ValueProperty<?>> properties = new ArrayList<>(List.of(additionalProperties));
+
+        properties.addAll(
+            List.of(
+                string("id")
+                    .description("ID of the comment."),
+                string("text")
+                    .description("Text of the comment."),
+                string("username")
+                    .description("Username of the Instagram user who wrote the comment."),
+                string("timestamp")
+                    .description("ISO 8601 date and time when the comment was created."),
+                integer("like_count")
+                    .description("Number of likes on the comment."),
+                object("replies")
+                    .description("Replies to the comment.")
+                    .properties(
+                        array("data")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("id")
+                                            .description("ID of the reply."),
+                                        string("text")
+                                            .description("Text of the reply."),
+                                        string("username")
+                                            .description("Username of the Instagram user who wrote the reply."),
+                                        string("timestamp")
+                                            .description("ISO 8601 date and time when the reply was created."))))));
+
+        return object().properties(properties);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 ByteChef
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ public class InstagramUtils {
 
     public static Map<String, Object> publishMediaContainer(Context context, String userId, String creationId) {
         Map<String, Object> response = context.http(http -> http.post("/" + userId + "/media_publish"))
-            .body(Body.of("creation_id", creationId))
+            .body(Body.of(Map.of("creation_id", creationId)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
