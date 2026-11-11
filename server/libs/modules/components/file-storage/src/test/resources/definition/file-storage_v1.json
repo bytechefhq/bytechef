@@ -666,6 +666,64 @@
       "regex": null,
       "required": false,
       "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "UTF-8",
+      "description": "Character encoding the content is written in. A character the encoding cannot represent fails the action.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Encoding",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "encoding",
+      "options": [ {
+        "description": null,
+        "label": "UTF-8",
+        "value": "UTF-8"
+      }, {
+        "description": null,
+        "label": "UTF-16",
+        "value": "UTF-16"
+      }, {
+        "description": null,
+        "label": "US-ASCII",
+        "value": "US-ASCII"
+      }, {
+        "description": null,
+        "label": "ISO-8859-1 (Latin-1)",
+        "value": "ISO-8859-1"
+      }, {
+        "description": null,
+        "label": "ISO-8859-2 (Latin-2)",
+        "value": "ISO-8859-2"
+      }, {
+        "description": null,
+        "label": "ISO-8859-15 (Latin-9)",
+        "value": "ISO-8859-15"
+      }, {
+        "description": null,
+        "label": "Windows-1250",
+        "value": "windows-1250"
+      }, {
+        "description": null,
+        "label": "Windows-1251",
+        "value": "windows-1251"
+      }, {
+        "description": null,
+        "label": "Windows-1252",
+        "value": "windows-1252"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
     } ],
     "resumePerform": null,
     "title": "Write to File",
@@ -1598,6 +1656,64 @@
       "minLength": null,
       "name": "filename",
       "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": false,
+      "controlType": "SELECT",
+      "defaultValue": "UTF-8",
+      "description": "Character encoding the content is written in. A character the encoding cannot represent fails the action.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Encoding",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "encoding",
+      "options": [ {
+        "description": null,
+        "label": "UTF-8",
+        "value": "UTF-8"
+      }, {
+        "description": null,
+        "label": "UTF-16",
+        "value": "UTF-16"
+      }, {
+        "description": null,
+        "label": "US-ASCII",
+        "value": "US-ASCII"
+      }, {
+        "description": null,
+        "label": "ISO-8859-1 (Latin-1)",
+        "value": "ISO-8859-1"
+      }, {
+        "description": null,
+        "label": "ISO-8859-2 (Latin-2)",
+        "value": "ISO-8859-2"
+      }, {
+        "description": null,
+        "label": "ISO-8859-15 (Latin-9)",
+        "value": "ISO-8859-15"
+      }, {
+        "description": null,
+        "label": "Windows-1250",
+        "value": "windows-1250"
+      }, {
+        "description": null,
+        "label": "Windows-1251",
+        "value": "windows-1251"
+      }, {
+        "description": null,
+        "label": "Windows-1252",
+        "value": "windows-1252"
+      } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": false,
       "placeholder": null,
