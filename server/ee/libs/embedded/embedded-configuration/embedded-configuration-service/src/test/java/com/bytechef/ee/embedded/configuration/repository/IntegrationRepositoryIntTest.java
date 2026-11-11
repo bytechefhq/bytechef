@@ -22,7 +22,13 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -41,9 +47,13 @@ class IntegrationRepositoryIntTest {
     @Autowired
     private IntegrationRepository integrationRepository;
 
+    @Autowired
+    private TagRepository tagRepository;
+
     @AfterEach
     void afterEach() {
         integrationRepository.deleteAll();
+        tagRepository.deleteAll();
     }
 
     @Test
@@ -70,6 +80,63 @@ class IntegrationRepositoryIntTest {
     }
 
     @Test
+    void testFindAllIntegrations() {
+        Tag firstTag = tagRepository.save(new Tag("first"));
+        Tag secondTag = tagRepository.save(new Tag("second"));
+
+        Integration betaIntegration = integrationRepository.save(
+            getPublishedIntegration("Beta", List.of(firstTag.getId(), secondTag.getId())));
+        Integration alphaIntegration = integrationRepository.save(getIntegration("Alpha"));
+
+        List<Integration> integrations = integrationRepository.findAllIntegrations(null, List.of(), null, null);
+
+        assertThat(integrations)
+            .extracting(Integration::getName)
+            .containsExactly("Alpha", "Beta");
+
+        Integration resultAlphaIntegration = integrations.getFirst();
+
+        assertThat(resultAlphaIntegration.isMultipleInstances()).isFalse();
+        assertThat(resultAlphaIntegration.getCreatedDate()).isNotNull();
+        assertThat(resultAlphaIntegration.getIntegrationVersions())
+            .containsExactlyElementsOf(alphaIntegration.getIntegrationVersions());
+
+        Integration resultBetaIntegration = integrations.getLast();
+
+        assertThat(resultBetaIntegration.isMultipleInstances()).isTrue();
+        assertThat(resultBetaIntegration.getTagIds()).containsExactlyInAnyOrder(firstTag.getId(), secondTag.getId());
+        assertThat(resultBetaIntegration.getIntegrationVersions())
+            .containsExactlyElementsOf(betaIntegration.getIntegrationVersions());
+        assertThat(resultBetaIntegration.getLastModifiedDate()).isNotNull();
+    }
+
+    @Test
+    void testFindAllIntegrationsWithFilters() {
+        Tag firstTag = tagRepository.save(new Tag("first"));
+        Tag unusedTag = tagRepository.save(new Tag("unused"));
+
+        Integration betaIntegration = integrationRepository.save(
+            getPublishedIntegration("Beta", List.of(firstTag.getId())));
+        Integration alphaIntegration = integrationRepository.save(getIntegration("Alpha"));
+
+        assertThat(
+            integrationRepository.findAllIntegrations(null, List.of(), null,
+                IntegrationVersion.Status.PUBLISHED.ordinal()))
+                    .extracting(Integration::getId)
+                    .containsExactly(betaIntegration.getId());
+
+        assertThat(integrationRepository.findAllIntegrations(null, List.of(), firstTag.getId(), null))
+            .extracting(Integration::getId)
+            .containsExactly(betaIntegration.getId());
+
+        assertThat(integrationRepository.findAllIntegrations(null, List.of(alphaIntegration.getId()), null, null))
+            .extracting(Integration::getId)
+            .containsExactly(alphaIntegration.getId());
+
+        assertThat(integrationRepository.findAllIntegrations(null, List.of(), unusedTag.getId(), null)).isEmpty();
+    }
+
+    @Test
     void testFindById() {
         Integration integration = integrationRepository.save(getIntegration());
 
@@ -90,9 +157,31 @@ class IntegrationRepositoryIntTest {
     }
 
     private static Integration getIntegration() {
+        return getIntegration("Name");
+    }
+
+    private static Integration getIntegration(String name) {
         return Integration.builder()
             .componentName("componentName")
-            .name("Name")
+            .name(name)
             .build();
+    }
+
+    private static Integration getPublishedIntegration(String name, List<Long> tagIds) {
+        Integration integration = Integration.builder()
+            .componentName("componentName")
+            .name(name)
+            .tagIds(tagIds)
+            .build();
+
+        integration.setMultipleInstances(true);
+        integration.setIntegrationVersions(
+            List.of(
+                new IntegrationVersion(
+                    1, IntegrationVersion.Status.PUBLISHED.ordinal(), Instant.now()
+                        .truncatedTo(ChronoUnit.MILLIS),
+                    "description")));
+
+        return integration;
     }
 }

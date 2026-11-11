@@ -8,9 +8,14 @@
 package com.bytechef.ee.embedded.configuration.repository;
 
 import com.bytechef.ee.embedded.configuration.domain.Integration;
-import java.time.Instant;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 /**
@@ -20,16 +25,19 @@ import org.springframework.jdbc.core.simple.JdbcClient;
  */
 public class CustomIntegrationRepositoryImpl implements CustomIntegrationRepository {
 
+    private final JdbcAggregateTemplate jdbcAggregateTemplate;
     private final JdbcClient jdbcClient;
 
-    public CustomIntegrationRepositoryImpl(JdbcClient jdbcClient) {
+    @SuppressFBWarnings("EI")
+    public CustomIntegrationRepositoryImpl(JdbcAggregateTemplate jdbcAggregateTemplate, JdbcClient jdbcClient) {
+        this.jdbcAggregateTemplate = jdbcAggregateTemplate;
         this.jdbcClient = jdbcClient;
     }
 
     @Override
     public List<Integration> findAllIntegrations(Long categoryId, List<Long> ids, Long tagId, Integer status) {
         List<Object> arguments = new ArrayList<>();
-        String query = "SELECT DISTINCT integration.* FROM integration ";
+        String query = "SELECT DISTINCT integration.id, integration.name FROM integration ";
 
         if (status != null) {
             query += "JOIN integration_version ON integration.id = integration_version.integration_id ";
@@ -91,38 +99,24 @@ public class CustomIntegrationRepositoryImpl implements CustomIntegrationReposit
 
         query += "ORDER BY integration.name ASC";
 
-        List<Integration> integrations = jdbcClient.sql(query)
+        List<Long> integrationIds = jdbcClient.sql(query)
             .params(arguments)
-            .query(Integration.class)
+            .query((resultSet, rowNumber) -> resultSet.getLong("id"))
             .list();
 
-        for (Integration integration : integrations) {
-            integration.setTagIds(
-                jdbcClient
-                    .sql(
-                        "SELECT integration_tag.tag_id FROM integration_tag WHERE integration_id = ?")
-                    .param(integration.getId())
-                    .query(Long.class)
-                    .list());
-
-            integration.setIntegrationVersions(
-                jdbcClient
-                    .sql(
-                        "SELECT integration_version.version, integration_version.status, integration_version.published_date, integration_version.description FROM integration_version WHERE integration_id = ?")
-                    .param(integration.getId())
-                    .query(IntegrationVersion.class)
-                    .list()
-                    .stream()
-                    .map(integrationVersion -> new com.bytechef.ee.embedded.configuration.domain.IntegrationVersion(
-                        integrationVersion.version, integrationVersion.status, integrationVersion.publishedDate,
-                        integrationVersion.description))
-                    .toList());
+        if (integrationIds.isEmpty()) {
+            return List.of();
         }
 
-        return integrations;
-    }
+        List<Integration> integrations = jdbcAggregateTemplate.findAllById(integrationIds, Integration.class);
 
-    private record IntegrationVersion(int version, int status, Instant publishedDate, String description) {
+        Map<Long, Integration> integrationMap = integrations.stream()
+            .collect(Collectors.toMap(Integration::getId, Function.identity()));
+
+        return integrationIds.stream()
+            .map(integrationMap::get)
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     private record IntegrationWorkflow(String workflow_id, int integration_version) {
