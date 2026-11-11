@@ -1937,6 +1937,11 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ProvisionableIntegrationInstanceConfiguration"
+        mcpWorkflowUuids:
+          description: "The uuids of the integration's workflows that embedded MCP servers expose as tools."
+          type: "array"
+          items:
+            type: "string"
     ProvisionableIntegrationInstanceConfiguration:
       description: "An integration instance configuration the integration can be provisioned onto."
       type: "object"
