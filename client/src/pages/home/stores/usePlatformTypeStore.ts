@@ -15,7 +15,7 @@ export const usePlatformTypeStore = create<PlatformTypeI>()(
     devtools(
         persist(
             (set) => ({
-                currentType: PlatformType.AUTOMATION,
+                currentType: undefined,
                 setCurrentType: (currentType) =>
                     set(() => ({
                         currentType,

@@ -1,14 +1,8 @@
-import './radioCard.css';
-
-import Button from '@/components/Button/Button';
-import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
-import {Label} from '@/components/ui/label';
-import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
-import {BotIcon, CodeIcon} from 'lucide-react';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {Dialog, DialogBody, DialogContent, DialogHeader, DialogMain} from '@/components/Dialog';
+import {PLATFORM_MODES, getPlatformModePath} from '@/pages/home/constants/platformModes';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {ArrowRightIcon, CheckIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
-import {useShallow} from 'zustand/react/shallow';
 
 import {PlatformType, usePlatformTypeStore} from '../stores/usePlatformTypeStore';
 
@@ -18,155 +12,74 @@ interface ModeSelectionDialogProps {
 }
 
 const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDialogProps) => {
-    const [selectedType, setSelectedType] = useState<PlatformType | undefined>(undefined);
-
-    const {currentType, setCurrentType} = usePlatformTypeStore(
-        useShallow((state) => ({
-            currentType: state.currentType,
-            setCurrentType: state.setCurrentType,
-        }))
-    );
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const setCurrentType = usePlatformTypeStore((state) => state.setCurrentType);
 
     const navigate = useNavigate();
 
-    const radioValue = useMemo(() => (selectedType ?? currentType ?? '').toString(), [currentType, selectedType]);
+    const handleModeClick = (type: PlatformType) => {
+        setCurrentType(type);
 
-    const isEmbeddedChecked = useMemo(() => radioValue === PlatformType.EMBEDDED.toString(), [radioValue]);
-    const isAutomationChecked = useMemo(() => radioValue === PlatformType.AUTOMATION.toString(), [radioValue]);
+        handleDialogClose();
 
-    const handleChangePlatformType = useCallback(() => {
-        if (selectedType === currentType) {
-            handleDialogClose();
-
-            return;
-        }
-
-        if (selectedType !== undefined && selectedType !== currentType) {
-            setCurrentType(selectedType);
-
-            if (selectedType === PlatformType.AUTOMATION) {
-                void navigate('/automation');
-            } else if (selectedType === PlatformType.EMBEDDED) {
-                void navigate('/embedded');
-            }
-
-            handleDialogClose();
-        }
-    }, [currentType, handleDialogClose, navigate, selectedType, setCurrentType]);
-
-    useEffect(() => {
-        if (!isDialogOpen && currentType !== undefined) {
-            setSelectedType(undefined);
-        }
-    }, [isDialogOpen, currentType]);
+        void navigate(type === PlatformType.EMBEDDED ? '/embedded' : getPlatformModePath(type, currentEnvironmentId));
+    };
 
     return (
-        <Dialog onOpenChange={handleDialogClose} open={isDialogOpen}>
+        <Dialog open={isDialogOpen}>
             <DialogContent
-                className={twMerge('flex flex-col p-6', currentType === undefined && '[&>button:last-child]:hidden')}
-                onEscapeKeyDown={(event) => currentType === undefined && event.preventDefault()}
-                onInteractOutside={(event) => currentType === undefined && event.preventDefault()}
+                onEscapeKeyDown={(event) => event.preventDefault()}
+                onInteractOutside={(event) => event.preventDefault()}
+                size="lg"
             >
                 <DialogMain>
                     <DialogHeader
-                        description="You can always change this configuration"
-                        title="Select how you will use ByteChef"
+                        description="Pick where you want to start. You can switch anytime from the logo menu at the top of the sidebar."
+                        showCloseButton={false}
+                        title="How will you use ByteChef?"
                     />
 
                     <DialogBody>
-                        <RadioGroup
-                            className="flex flex-col gap-4"
-                            onValueChange={(value) => setSelectedType(Number(value))}
-                            value={radioValue}
-                        >
-                            <Label
-                                className={twMerge('radio-card-label group', isEmbeddedChecked && 'is-checked')}
-                                htmlFor="embedded"
-                            >
-                                <div className="flex items-center gap-4 p-4 pr-2">
-                                    <div>
-                                        <CodeIcon size={48} />
-                                    </div>
-
-                                    <div className="flex grow flex-col gap-1">
-                                        <p className="text-base font-semibold">Embedded</p>
-
-                                        <p className="text-sm font-normal text-content-neutral-secondary">
-                                            Allow your users to integrate your product with applications they use.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div
-                                    className={twMerge(
-                                        'radio-card-indicator-container',
-                                        isEmbeddedChecked ? 'is-checked' : 'is-unchecked'
-                                    )}
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            {PLATFORM_MODES.map((mode) => (
+                                <button
+                                    aria-label={`Start with ${mode.title}`}
+                                    className="group flex flex-col gap-4 rounded-lg border border-stroke-neutral-secondary p-5 text-left transition-colors hover:border-stroke-brand-primary hover:bg-surface-brand-secondary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                    key={mode.type}
+                                    onClick={() => handleModeClick(mode.type)}
+                                    type="button"
                                 >
-                                    <RadioGroupItem
-                                        className={twMerge('radio-card-indicator', isEmbeddedChecked && 'is-checked')}
-                                        data-testid="embedded"
-                                        id="embedded"
-                                        value={PlatformType.EMBEDDED.toString()}
-                                    />
-                                </div>
-                            </Label>
+                                    <span className="flex size-10 items-center justify-center rounded-md bg-surface-neutral-secondary text-content-brand-primary">
+                                        <mode.icon className="size-6" />
+                                    </span>
 
-                            <Label
-                                className={twMerge('radio-card-label group', isAutomationChecked && 'is-checked')}
-                                htmlFor="automation"
-                            >
-                                <div className="flex items-center gap-6 p-4 pr-2">
-                                    <div>
-                                        <BotIcon size={48} />
-                                    </div>
+                                    <span className="flex flex-col gap-1">
+                                        <span className="text-base font-semibold">{mode.title}</span>
 
-                                    <div className="flex grow flex-col gap-1">
-                                        <p className="text-base font-semibold">Automation</p>
+                                        <span className="text-sm text-content-neutral-secondary">
+                                            {mode.description}
+                                        </span>
+                                    </span>
 
-                                        <p className="text-sm font-normal text-content-neutral-secondary">
-                                            Integrate applications and automate processes inside your organization.
-                                        </p>
-                                    </div>
-                                </div>
+                                    <ul className="flex flex-1 flex-col gap-2">
+                                        {mode.highlights.map((highlight) => (
+                                            <li className="flex items-start gap-2 text-sm" key={highlight}>
+                                                <CheckIcon className="mt-0.5 size-4 shrink-0 text-content-brand-primary" />
 
-                                <div
-                                    className={twMerge(
-                                        'radio-card-indicator-container',
-                                        isAutomationChecked ? 'is-checked' : 'is-unchecked'
-                                    )}
-                                >
-                                    <RadioGroupItem
-                                        className={twMerge('radio-card-indicator', isAutomationChecked && 'is-checked')}
-                                        data-testid="automation"
-                                        id="automation"
-                                        value={PlatformType.AUTOMATION.toString()}
-                                    />
-                                </div>
-                            </Label>
-                        </RadioGroup>
+                                                <span>{highlight}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <span className="flex items-center gap-1 text-sm font-medium text-content-brand-primary">
+                                        {`Start with ${mode.title}`}
+
+                                        <ArrowRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" />
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
                     </DialogBody>
-
-                    <DialogFooter>
-                        {currentType !== undefined && (
-                            <Button
-                                aria-label="cancel"
-                                label="Cancel"
-                                onClick={handleDialogClose}
-                                type="button"
-                                variant="outline"
-                            />
-                        )}
-
-                        <Button
-                            aria-label="confirm"
-                            className="bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
-                            disabled={selectedType === undefined}
-                            label="Confirm"
-                            onClick={handleChangePlatformType}
-                            type="button"
-                        />
-                    </DialogFooter>
                 </DialogMain>
             </DialogContent>
         </Dialog>

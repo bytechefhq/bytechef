@@ -1,193 +1,110 @@
 import ModeSelectionDialog from '@/pages/home/components/ModeSelectionDialog';
-import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
-import {mockPlatformTypeStore} from '@/pages/home/tests/mocks/mockPlatformTypeStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {render, resetAll, screen, userEvent} from '@/shared/util/test-utils';
-import {MemoryRouter, Route, Routes} from 'react-router-dom';
+import {MemoryRouter} from 'react-router-dom';
 import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
+
+const hoisted = vi.hoisted(() => ({
+    currentEnvironmentId: 0,
+    navigateMock: vi.fn(),
+    setCurrentTypeMock: vi.fn(),
+}));
 
 vi.mock('@/pages/home/stores/usePlatformTypeStore', async () => {
     const actual = await import('@/pages/home/stores/usePlatformTypeStore');
+
     return {
         ...actual,
         usePlatformTypeStore: vi.fn(),
     };
 });
 
-const {mockedUseNavigate} = vi.hoisted(() => ({mockedUseNavigate: vi.fn()}));
+vi.mock('@/shared/stores/useEnvironmentStore', () => ({
+    useEnvironmentStore: vi.fn((selector: (state: {currentEnvironmentId: number}) => unknown) =>
+        selector({currentEnvironmentId: hoisted.currentEnvironmentId})
+    ),
+}));
 
 vi.mock('react-router-dom', async () => {
-    const mod = await import('react-router-dom');
+    const actual = await import('react-router-dom');
+
     return {
-        ...mod,
-        useNavigate: () => mockedUseNavigate,
+        ...actual,
+        useNavigate: () => hoisted.navigateMock,
     };
 });
 
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: vi.fn(),
-}));
-
-const mockedUseFeatureFlagsStore = useFeatureFlagsStore as Mock;
+const handleDialogCloseMock = vi.fn();
 
 beforeEach(() => {
-    mockPlatformTypeStore();
-    mockedUseFeatureFlagsStore.mockReturnValue(() => true);
+    hoisted.currentEnvironmentId = 0;
+
+    (usePlatformTypeStore as unknown as Mock).mockImplementation(
+        (selector: (state: {currentType: undefined; setCurrentType: Mock}) => unknown) =>
+            selector({currentType: undefined, setCurrentType: hoisted.setCurrentTypeMock})
+    );
 });
 
 afterEach(() => {
     resetAll();
 });
 
-const mockOnClose = vi.fn();
-
-const renderModeSelectionDialog = () => {
+const renderModeSelectionDialog = (isDialogOpen = true) =>
     render(
         <MemoryRouter>
-            <Routes>
-                <Route element={<ModeSelectionDialog handleDialogClose={mockOnClose} isDialogOpen={true} />} path="/" />
-            </Routes>
-        </MemoryRouter>
-    );
-};
-
-it('should show dialog when isDialogOpen is true', () => {
-    renderModeSelectionDialog();
-
-    expect(screen.getByText('Select how you will use ByteChef')).toBeInTheDocument();
-});
-
-it('should not show dialog when isDialogOpen is false', () => {
-    render(
-        <MemoryRouter>
-            <Routes>
-                <Route
-                    element={<ModeSelectionDialog handleDialogClose={mockOnClose} isDialogOpen={false} />}
-                    path="/"
-                />
-            </Routes>
+            <ModeSelectionDialog handleDialogClose={handleDialogCloseMock} isDialogOpen={isDialogOpen} />
         </MemoryRouter>
     );
 
-    expect(screen.queryByText('Select how you will use ByteChef')).not.toBeInTheDocument();
-});
-
-it('should show current type as checked on dialog open', () => {
-    mockPlatformTypeStore({
-        currentType: PlatformType.EMBEDDED,
-    });
-
+it('shows an overview of both modes when open', () => {
     renderModeSelectionDialog();
 
-    expect(screen.getByTestId('embedded')).toBeChecked();
+    expect(screen.getByText('How will you use ByteChef?')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Start with Automation'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Start with Embedded'})).toBeInTheDocument();
+    expect(screen.getByText('Embed a white-labeled integration marketplace')).toBeInTheDocument();
 });
 
-it('should not show any type as checked if the current type is undefined', () => {
-    mockPlatformTypeStore({
-        currentType: undefined,
-    });
+it('renders nothing when closed', () => {
+    renderModeSelectionDialog(false);
 
-    renderModeSelectionDialog();
-
-    expect(screen.queryByTestId('embedded')).not.toBeChecked();
-    expect(screen.queryByTestId('automation')).not.toBeChecked();
+    expect(screen.queryByText('How will you use ByteChef?')).not.toBeInTheDocument();
 });
 
-it('should disable "Confirm" button as default and enable it once the type is selected', async () => {
-    renderModeSelectionDialog();
-
-    expect(screen.getByText('Confirm')).toBeDisabled();
-
-    await userEvent.click(screen.getByTestId('embedded'));
-
-    expect(screen.getByText('Confirm')).toBeEnabled();
-});
-
-it('should show the cancel button and x icon', () => {
-    renderModeSelectionDialog();
-
-    expect(screen.getByLabelText('cancel')).toBeInTheDocument();
-
-    expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument();
-});
-
-it('should not show the cancel button when currentType is undefined', () => {
-    mockPlatformTypeStore({
-        currentType: undefined,
-    });
-
-    renderModeSelectionDialog();
-
-    expect(screen.queryByLabelText('cancel')).not.toBeInTheDocument();
-});
-
-it('should call the onDialogClose function on click of the "Cancel" button or x icon', async () => {
-    renderModeSelectionDialog();
-
-    await userEvent.click(screen.getByLabelText('cancel'));
-
-    expect(mockOnClose).toHaveBeenCalledOnce();
-});
-
-it('should call the onDialogClose function on click of the "Confirm" button if it is enabled', async () => {
-    renderModeSelectionDialog();
-
-    await userEvent.click(screen.getByTestId('embedded'));
-
-    await userEvent.click(screen.getByText('Confirm'));
-
-    expect(mockOnClose).toHaveBeenCalledOnce();
-});
-
-it('should not call the onDialogClose function on click of escape key if the currentType is undefined', async () => {
-    mockPlatformTypeStore({
-        currentType: undefined,
-    });
-
+it('cannot be dismissed without choosing a mode', async () => {
     renderModeSelectionDialog();
 
     await userEvent.keyboard('[Escape]');
 
-    expect(mockOnClose).not.toHaveBeenCalled();
+    expect(handleDialogCloseMock).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', {name: 'Close'})).not.toBeInTheDocument();
 });
 
-it('should call setCurrentType with appropriate value when a currentType is changed', async () => {
-    const mockSetCurrentType = vi.fn();
+it('selects Embedded and lets the embedded index route decide where to land', async () => {
+    renderModeSelectionDialog();
 
-    mockPlatformTypeStore({
-        currentType: PlatformType.EMBEDDED,
-        setCurrentType: mockSetCurrentType,
-    });
+    await userEvent.click(screen.getByRole('button', {name: 'Start with Embedded'}));
+
+    expect(hoisted.setCurrentTypeMock).toHaveBeenCalledWith(PlatformType.EMBEDDED);
+    expect(handleDialogCloseMock).toHaveBeenCalledOnce();
+    expect(hoisted.navigateMock).toHaveBeenCalledWith('/embedded');
+});
+
+it('selects Automation and redirects to its projects page', async () => {
+    renderModeSelectionDialog();
+
+    await userEvent.click(screen.getByRole('button', {name: 'Start with Automation'}));
+
+    expect(hoisted.setCurrentTypeMock).toHaveBeenCalledWith(PlatformType.AUTOMATION);
+    expect(hoisted.navigateMock).toHaveBeenCalledWith('/automation/projects');
+});
+
+it('redirects to the deployed view outside the development environment', async () => {
+    hoisted.currentEnvironmentId = 2;
 
     renderModeSelectionDialog();
 
-    await userEvent.click(screen.getByTestId('automation'));
+    await userEvent.click(screen.getByRole('button', {name: 'Start with Automation'}));
 
-    await userEvent.click(screen.getByText('Confirm'));
-
-    expect(mockSetCurrentType).toHaveBeenCalledWith(PlatformType.AUTOMATION);
-});
-
-it('should navigate to embedded page when currentType is changed to embedded', async () => {
-    renderModeSelectionDialog();
-
-    await userEvent.click(screen.getByTestId('embedded'));
-
-    await userEvent.click(screen.getByText('Confirm'));
-
-    expect(mockedUseNavigate).toHaveBeenCalledWith('/embedded');
-});
-
-it('should navigate to automation page when currentType is changed to automation', async () => {
-    mockPlatformTypeStore({
-        currentType: PlatformType.EMBEDDED,
-    });
-
-    renderModeSelectionDialog();
-
-    await userEvent.click(screen.getByTestId('automation'));
-
-    await userEvent.click(screen.getByText('Confirm'));
-
-    expect(mockedUseNavigate).toHaveBeenCalledWith('/automation');
+    expect(hoisted.navigateMock).toHaveBeenCalledWith('/automation/deployments');
 });
