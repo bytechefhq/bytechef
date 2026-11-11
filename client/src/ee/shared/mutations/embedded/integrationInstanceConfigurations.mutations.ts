@@ -7,6 +7,7 @@ import {
     IntegrationInstanceConfigurationTagApi,
     IntegrationInstanceConfigurationWorkflow,
     MoveIntegrationInstanceConfigurationConnectedUsersRequest,
+    UpdateIntegrationInstanceConfigurationCredentialsRequest,
     UpdateIntegrationInstanceConfigurationTagsRequest,
     UpdateIntegrationTagsRequest,
     UpgradeIntegrationInstanceConfigurationConnectedUsersRequest,
@@ -95,6 +96,22 @@ export const useUpdateIntegrationInstanceConfigurationMutation = (
                 id: integrationInstanceConfiguration.id!,
                 integrationInstanceConfiguration,
             });
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface UpdateIntegrationInstanceConfigurationCredentialsMutationProps {
+    onSuccess?: (result: void, variables: UpdateIntegrationInstanceConfigurationCredentialsRequest) => void;
+    onError?: (error: Error, variables: UpdateIntegrationInstanceConfigurationCredentialsRequest) => void;
+}
+
+export const useUpdateIntegrationInstanceConfigurationCredentialsMutation = (
+    mutationProps?: UpdateIntegrationInstanceConfigurationCredentialsMutationProps
+) =>
+    useMutation<void, Error, UpdateIntegrationInstanceConfigurationCredentialsRequest>({
+        mutationFn: (request: UpdateIntegrationInstanceConfigurationCredentialsRequest) => {
+            return new IntegrationInstanceConfigurationApi().updateIntegrationInstanceConfigurationCredentials(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
