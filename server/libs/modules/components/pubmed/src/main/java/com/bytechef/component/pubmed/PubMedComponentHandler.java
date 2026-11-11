@@ -17,6 +17,7 @@
 package com.bytechef.component.pubmed;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -43,6 +44,9 @@ public class PubMedComponentHandler implements ComponentHandler {
         .actions(
             PubMedGetArticleAbstractAction.ACTION_DEFINITION,
             PubMedSearchArticlesAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(PubMedGetArticleAbstractAction.ACTION_DEFINITION),
+            tool(PubMedSearchArticlesAction.ACTION_DEFINITION))
         .version(1)
         .customAction(true)
         .customActionHelp("", "https://www.ncbi.nlm.nih.gov/books/NBK25501/");
