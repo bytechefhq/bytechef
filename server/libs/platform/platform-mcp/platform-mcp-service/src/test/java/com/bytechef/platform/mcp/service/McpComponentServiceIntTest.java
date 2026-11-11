@@ -109,6 +109,46 @@ class McpComponentServiceIntTest {
     }
 
     @Test
+    void testCreateRejectsAComponentVersionAlreadyOnTheServer() {
+        mcpComponentService.create(getMcpComponent());
+
+        String expectedMessage =
+            "Component test-component version 1 is already added to this MCP server. Edit its tools instead.";
+
+        assertThatThrownBy(() -> mcpComponentService.create(getMcpComponent()))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage(expectedMessage);
+        assertThatThrownBy(() -> mcpComponentService.create(getMcpComponent(), List.of()))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage(expectedMessage);
+
+        assertThat(mcpComponentRepository.findAllByMcpServerId(mcpServer.getId())).hasSize(1);
+    }
+
+    @Test
+    void testCreateAllowsAnotherVersionOfAComponentOnTheServer() {
+        mcpComponentService.create(getMcpComponent());
+
+        McpComponent mcpComponent = mcpComponentService.create(
+            new McpComponent("test-component", 2, mcpServer.getId(), null), List.of());
+
+        assertThat(mcpComponent.getId()).isNotNull();
+    }
+
+    @Test
+    void testCreateAllowsTheSameComponentVersionOnAnotherServer() {
+        mcpComponentService.create(getMcpComponent());
+
+        McpServer anotherServer = mcpServerRepository.save(
+            new McpServer("another-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
+
+        McpComponent mcpComponent = mcpComponentService.create(
+            new McpComponent("test-component", 1, anotherServer.getId(), null), List.of());
+
+        assertThat(mcpComponent.getMcpServerId()).isEqualTo(anotherServer.getId());
+    }
+
+    @Test
     void testUpdate() {
         McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
 

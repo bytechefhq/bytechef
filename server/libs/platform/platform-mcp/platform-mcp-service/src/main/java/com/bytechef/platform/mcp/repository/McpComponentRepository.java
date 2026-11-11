@@ -29,6 +29,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface McpComponentRepository extends ListCrudRepository<McpComponent, Long> {
 
+    boolean existsByComponentNameAndComponentVersionAndMcpServerId(
+        String componentName, int componentVersion, long mcpServerId);
+
     /**
      * Find all components associated with a specific MCP server.
      *

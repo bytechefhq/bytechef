@@ -34,6 +34,7 @@ public interface McpComponentService {
      *
      * @param mcpComponent the MCP component to create
      * @return the created MCP component
+     * @throws IllegalArgumentException if the server already has this component version
      */
     McpComponent create(McpComponent mcpComponent);
 
