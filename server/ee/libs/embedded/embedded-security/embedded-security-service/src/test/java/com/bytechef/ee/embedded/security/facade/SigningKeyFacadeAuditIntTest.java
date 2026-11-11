@@ -20,6 +20,7 @@ import com.bytechef.ee.embedded.security.audit.SigningKeyAuditEvents;
 import com.bytechef.ee.embedded.security.config.EmbeddedSecurityIntTestConfiguration;
 import com.bytechef.ee.embedded.security.domain.SigningKey;
 import com.bytechef.ee.embedded.security.repository.SigningKeyRepository;
+import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -218,7 +219,8 @@ class SigningKeyFacadeAuditIntTest {
 
     @Configuration
     @Import({
-        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class
+        AuditAspect.class, AuditFailureCounter.class, AuditCaptureAspect.class, AuditEventService.class,
+        AuditMapperResolver.class
     })
     static class AuditConfiguration {
 

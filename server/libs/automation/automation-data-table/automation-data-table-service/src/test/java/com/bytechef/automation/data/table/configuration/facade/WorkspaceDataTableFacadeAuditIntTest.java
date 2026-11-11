@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.data.table.config.AutomationDataTableIntTestConfiguration;
+import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -210,7 +211,8 @@ class WorkspaceDataTableFacadeAuditIntTest {
 
     @Configuration
     @Import({
-        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class,
+        AuditAspect.class, AuditFailureCounter.class, AuditCaptureAspect.class, AuditEventService.class,
+        AuditMapperResolver.class,
         DataTableAuditMapper.class
     })
     static class AuditConfiguration {

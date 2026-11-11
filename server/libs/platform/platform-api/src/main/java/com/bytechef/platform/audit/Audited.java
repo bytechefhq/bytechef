@@ -38,4 +38,6 @@ public @interface Audited {
     Class<? extends AuditMapper> mapper() default AuditMapper.None.class;
 
     PlatformType[] platform() default {};
+
+    boolean strict() default true;
 }

@@ -29,6 +29,8 @@ import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.security.Principal;
@@ -51,6 +53,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.OrderUtils;
 import org.springframework.data.domain.Page;
@@ -115,6 +118,9 @@ class AuditAspectIntTest {
 
     @Autowired
     private OuterGuardedService outerGuardedService;
+
+    @Autowired
+    private MeterRegistry meterRegistry;
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
@@ -591,6 +597,71 @@ class AuditAspectIntTest {
     }
 
     @Test
+    void testStrictAuditedWriteCommitsTheChangeAndItsAuditEventOnce() {
+        assertThat(auditedBusinessService.writeBusinessRow()).isEqualTo("written");
+
+        assertThat(findAll())
+            .extracting(PersistentAuditEvent::getEventType)
+            .containsExactlyInAnyOrder("BUSINESS_WRITE", "STRICT_BUSINESS_TEST");
+    }
+
+    @Test
+    void testStrictAuditedWriteIsRolledBackWhenItsAuditEventCannotBeSaved() {
+        doThrow(new IllegalStateException("audit backend down"))
+            .when(auditEventService)
+            .saveAll(any());
+
+        double failedBefore = countFailedAuditEvents("STRICT_BUSINESS_TEST");
+
+        assertThatThrownBy(() -> auditedBusinessService.writeBusinessRow())
+            .isInstanceOf(AuditPersistenceException.class)
+            .hasMessageContaining("STRICT_BUSINESS_TEST");
+
+        assertThat(findAll()).isEmpty();
+        assertThat(countFailedAuditEvents("STRICT_BUSINESS_TEST")).isGreaterThan(failedBefore);
+    }
+
+    @Test
+    void testBestEffortAuditedWriteKeepsTheChangeWhenItsAuditEventCannotBeSaved() {
+        doThrow(new IllegalStateException("audit backend down"))
+            .when(auditEventService)
+            .saveAll(any());
+
+        assertThat(auditedBusinessService.writeBusinessRowBestEffort()).isEqualTo("written");
+
+        assertThat(findAll())
+            .extracting(PersistentAuditEvent::getEventType)
+            .containsExactly("BUSINESS_WRITE");
+    }
+
+    @Test
+    void testStrictAuditedCallInsideACallerTransactionCommitsItsAuditEventOnce() {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        String result = transactionTemplate.execute(status -> auditedBusinessService.writeBusinessRow());
+
+        assertThat(result).isEqualTo("written");
+
+        assertThat(findAll())
+            .extracting(PersistentAuditEvent::getEventType)
+            .containsExactlyInAnyOrder("BUSINESS_WRITE", "STRICT_BUSINESS_TEST");
+    }
+
+    @Test
+    void testStrictAuditedCallInsideACallerTransactionFailsTheCallerWhenItsAuditEventCannotBeSaved() {
+        doThrow(new IllegalStateException("audit backend down"))
+            .when(auditEventService)
+            .saveAll(any());
+
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        assertThatThrownBy(() -> transactionTemplate.execute(status -> auditedBusinessService.writeBusinessRow()))
+            .isInstanceOf(AuditPersistenceException.class);
+
+        assertThat(findAll()).isEmpty();
+    }
+
+    @Test
     void testStackOverflowWhileWritingDoesNotReplaceTheBusinessException() {
         doThrow(new StackOverflowError())
             .when(auditEventService)
@@ -805,6 +876,11 @@ class AuditAspectIntTest {
             .collect(Collectors.toMap(data -> data.get("method"), data -> data.get("result")));
     }
 
+    private double countFailedAuditEvents(String eventType) {
+        return meterRegistry.counter("bytechef.audit.failed", "event", eventType)
+            .count();
+    }
+
     private PersistentAuditEvent findSingle() {
         List<PersistentAuditEvent> persistentAuditEvents = findAll();
 
@@ -895,6 +971,12 @@ class AuditAspectIntTest {
         @Bean
         LinkageErrorAuditMapper linkageErrorAuditMapper() {
             return new LinkageErrorAuditMapper();
+        }
+
+        @Bean
+        @Primary
+        MeterRegistry meterRegistry() {
+            return new SimpleMeterRegistry();
         }
 
         @Bean
@@ -1072,7 +1154,7 @@ class AuditAspectIntTest {
             return "inner";
         }
 
-        @Audited(event = "REJECTED_BY_THE_DATABASE", mapper = CountingAuditMapper.class)
+        @Audited(event = "REJECTED_BY_THE_DATABASE", mapper = CountingAuditMapper.class, strict = false)
         @PreAuthorize("hasRole('ADMIN')")
         @Transactional
         public String rejectedAuditAdminOnly() {
@@ -1219,10 +1301,32 @@ class AuditAspectIntTest {
             return "written";
         }
 
+        @Audited(event = "STRICT_BUSINESS_TEST")
+        @Transactional
+        public String writeBusinessRow() {
+            saveBusinessRow();
+
+            return "written";
+        }
+
+        @Audited(event = "BEST_EFFORT_BUSINESS_TEST", strict = false)
+        @Transactional
+        public String writeBusinessRowBestEffort() {
+            saveBusinessRow();
+
+            return "written";
+        }
+
         @Audited(event = "BUSINESS_TEST", mapper = CountingAuditMapper.class)
         @PreAuthorize("hasRole('ADMIN')")
         @Transactional
         public String writeThenFail() {
+            saveBusinessRow();
+
+            throw new IllegalStateException("business failed");
+        }
+
+        private void saveBusinessRow() {
             PersistentAuditEvent persistentAuditEvent = new PersistentAuditEvent();
 
             persistentAuditEvent.setEventDate(LocalDateTime.now());
@@ -1230,8 +1334,6 @@ class AuditAspectIntTest {
             persistentAuditEvent.setPrincipal("alice");
 
             persistenceAuditEventRepository.save(persistentAuditEvent);
-
-            throw new IllegalStateException("business failed");
         }
     }
 
