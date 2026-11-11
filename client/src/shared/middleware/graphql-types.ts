@@ -1089,6 +1089,7 @@ export type CreateMcpIntegrationInstanceConfigurationInput = {
   integrationInstanceConfigurationId: Scalars['ID']['input'];
   mcpServerId: Scalars['ID']['input'];
   selectedWorkflowIds: Array<Scalars['String']['input']>;
+  toolParameters?: InputMaybe<Array<WorkflowToolParametersInput>>;
 };
 
 export type CreateMcpProjectInput = {
@@ -1096,6 +1097,7 @@ export type CreateMcpProjectInput = {
   projectId: Scalars['ID']['input'];
   projectVersion: Scalars['Int']['input'];
   selectedWorkflowIds: Array<Scalars['String']['input']>;
+  toolParameters?: InputMaybe<Array<WorkflowToolParametersInput>>;
   workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
 };
 
@@ -3737,9 +3739,11 @@ export type Query = {
   taskDispatcherDefinitionVersions: Array<TaskDispatcherDefinition>;
   taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
   taskExecutionFileLogs: Array<LogEntry>;
+  toolEligibleIntegrationInstanceConfigurationWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
   toolEligibleIntegrationInstanceConfigurationWorkflows: Array<IntegrationWorkflow>;
   toolEligibleIntegrationVersionWorkflows: Array<IntegrationWorkflow>;
   toolEligibleProjectVersionWorkflows: Array<ProjectWorkflow>;
+  toolEligibleWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
   triggerDefinition: TriggerDefinition;
   triggerDefinitions: Array<TriggerDefinition>;
   triggerExecutionFileLogs: LogPage;
@@ -4580,6 +4584,12 @@ export type QueryTaskExecutionFileLogsArgs = {
 };
 
 
+export type QueryToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesArgs = {
+  integrationInstanceConfigurationId: Scalars['ID']['input'];
+  workflowId: Scalars['String']['input'];
+};
+
+
 export type QueryToolEligibleIntegrationInstanceConfigurationWorkflowsArgs = {
   integrationInstanceConfigurationId: Scalars['ID']['input'];
 };
@@ -4594,6 +4604,12 @@ export type QueryToolEligibleIntegrationVersionWorkflowsArgs = {
 export type QueryToolEligibleProjectVersionWorkflowsArgs = {
   projectId: Scalars['ID']['input'];
   projectVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryToolEligibleWorkflowPropertiesArgs = {
+  projectId: Scalars['ID']['input'];
+  workflowId: Scalars['String']['input'];
 };
 
 
@@ -5004,10 +5020,12 @@ export type UpdateMcpAutomationProjectConfigurationInput = {
 
 export type UpdateMcpIntegrationInstanceConfigurationInput = {
   selectedWorkflowIds: Array<Scalars['String']['input']>;
+  toolParameters?: InputMaybe<Array<WorkflowToolParametersInput>>;
 };
 
 export type UpdateMcpProjectInput = {
   selectedWorkflowIds: Array<Scalars['String']['input']>;
+  toolParameters?: InputMaybe<Array<WorkflowToolParametersInput>>;
   workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
 };
 
@@ -5181,6 +5199,11 @@ export type WorkflowTemplate = {
   projectVersion?: Maybe<Scalars['Int']['output']>;
   publicUrl?: Maybe<Scalars['String']['output']>;
   workflow: Workflow;
+};
+
+export type WorkflowToolParametersInput = {
+  parameters?: InputMaybe<Scalars['Map']['input']>;
+  workflowId: Scalars['String']['input'];
 };
 
 export type WorkflowTrigger = {
