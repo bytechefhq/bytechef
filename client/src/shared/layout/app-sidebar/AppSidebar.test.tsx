@@ -143,6 +143,12 @@ describe('AppSidebar', () => {
             expect(screen.getByTestId('environment-select')).toHaveTextContent('icon');
         });
 
+        it('hides the selector on the home route while no mode is chosen yet', () => {
+            renderSidebar(false, '/');
+
+            expect(screen.queryByTestId('environment-select')).not.toBeInTheDocument();
+        });
+
         it('falls back to the icon-only selector on the collapsed rail', () => {
             renderSidebar(false);
 
