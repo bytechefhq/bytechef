@@ -28,6 +28,10 @@ import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
 import com.bytechef.ee.ai.hub.exception.ForbiddenException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubClusterElementToolCallbacks;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
+import com.bytechef.ee.ai.hub.toolsearch.ClusterElementToolCallback;
+import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.User;
@@ -83,6 +87,8 @@ class AiHubToolApprovalFacadeTest {
     private ToolCallback gatedDelegate;
     private AiHubChat chat;
     private AiHubToolApprovalFacadeImpl facade;
+    private List<AiHubGlobalToolCatalog> globalToolCatalogs;
+    private AiHubClusterElementToolCallbacks clusterElementToolCallbacks;
 
     @BeforeEach
     void setUp() {
@@ -93,6 +99,7 @@ class AiHubToolApprovalFacadeTest {
         continuationStarter = mock(AiHubContinuationStarter.class);
 
         gatedDelegate = callback(TOOL_NAME);
+        globalToolCatalogs = new ArrayList<>();
 
         when(pinnedToolCallbacks.pinnedToolCallbacks(Mode.BUILD)).thenReturn(List.of(gatedDelegate));
         when(pinnedToolCallbacks.pinnedToolCallbacks(Mode.ASK)).thenReturn(List.of());
@@ -373,6 +380,76 @@ class AiHubToolApprovalFacadeTest {
     }
 
     @Test
+    void testApproveFindsACatalogToolOfTheApprovalsMode() {
+        ToolCallback catalogTool = callback("listComponents");
+
+        when(catalogTool.call(anyString(), any())).thenReturn("[]");
+
+        globalToolCatalogs.add(
+            new AiHubGlobalToolCatalog(ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID, List.of(catalogTool)));
+
+        pendingApproval("listComponents", "BUILD");
+
+        AiHubToolApprovalFacade.Resolution resolution = facade.resolve(WORKSPACE_ID, 99L, true, null);
+
+        assertThat(resolution.approval()
+            .getStatus()).isEqualTo(AiHubToolApproval.Status.APPROVED);
+
+        verify(catalogTool).call(anyString(), any());
+    }
+
+    @Test
+    void testApproveIgnoresTheCatalogOfTheOtherMode() {
+        ToolCallback catalogTool = callback("listComponents");
+
+        globalToolCatalogs.add(
+            new AiHubGlobalToolCatalog(ToolSearchCatalogFeeder.GLOBAL_ASK_SESSION_ID, List.of(catalogTool)));
+
+        pendingApproval("listComponents", "BUILD");
+
+        AiHubToolApprovalFacade.Resolution resolution = facade.resolve(WORKSPACE_ID, 99L, true, null);
+
+        assertThat(resolution.approval()
+            .getStatus()).isEqualTo(AiHubToolApproval.Status.FAILED);
+
+        verify(catalogTool, never()).call(anyString(), any());
+    }
+
+    @Test
+    void testApproveFindsAClusterElementToolThatWritesInBuildMode() {
+        ClusterElementToolCallback clusterElementTool = clusterElementToolCallback("slack", "sendMessage");
+
+        when(clusterElementTool.call(anyString(), any())).thenReturn("{\"ok\":true}");
+
+        facade = newFacade(pinnedToolCallbacks, continuationStarter, clusterElementTool);
+
+        pendingApproval("slack_sendMessage", "BUILD");
+
+        AiHubToolApprovalFacade.Resolution resolution = facade.resolve(WORKSPACE_ID, 99L, true, null);
+
+        assertThat(resolution.approval()
+            .getStatus()).isEqualTo(AiHubToolApproval.Status.APPROVED);
+
+        verify(clusterElementTool).call(anyString(), any());
+    }
+
+    @Test
+    void testApproveInAskModeNeverRunsAClusterElementToolThatWrites() {
+        ClusterElementToolCallback clusterElementTool = clusterElementToolCallback("slack", "sendMessage");
+
+        facade = newFacade(pinnedToolCallbacks, continuationStarter, clusterElementTool);
+
+        pendingApproval("slack_sendMessage", "ASK");
+
+        AiHubToolApprovalFacade.Resolution resolution = facade.resolve(WORKSPACE_ID, 99L, true, null);
+
+        assertThat(resolution.approval()
+            .getStatus()).isEqualTo(AiHubToolApproval.Status.FAILED);
+
+        verify(clusterElementTool, never()).call(anyString(), any());
+    }
+
+    @Test
     void testApproveWithoutAnyPinnedToolSourceMarksFailed() {
         pendingApproval(TOOL_NAME, "BUILD");
 
@@ -471,8 +548,36 @@ class AiHubToolApprovalFacadeTest {
         AiHubPinnedToolCallbacks pinnedToolCallbacksSource, AiHubContinuationStarter continuationStarterSource) {
 
         return new AiHubToolApprovalFacadeImpl(
-            approvalService, chatService, userService, provider(pinnedToolCallbacksSource),
-            provider(continuationStarterSource), securityContextRehydrator, transactionManager, clock);
+            approvalService, chatService, userService, provider(pinnedToolCallbacksSource), globalToolCatalogProvider(),
+            provider(clusterElementToolCallbacks), provider(continuationStarterSource), securityContextRehydrator,
+            transactionManager, clock);
+    }
+
+    private AiHubToolApprovalFacadeImpl newFacade(
+        AiHubPinnedToolCallbacks pinnedToolCallbacksSource, AiHubContinuationStarter continuationStarterSource,
+        ClusterElementToolCallback clusterElementToolCallback) {
+
+        clusterElementToolCallbacks = new AiHubClusterElementToolCallbacks(
+            () -> Map.of(clusterElementToolCallback.getToolName(), clusterElementToolCallback));
+
+        return newFacade(pinnedToolCallbacksSource, continuationStarterSource);
+    }
+
+    private static ClusterElementToolCallback clusterElementToolCallback(
+        String componentName, String clusterElementName) {
+
+        ClusterElementToolCallback clusterElementToolCallback = mock(ClusterElementToolCallback.class);
+
+        when(clusterElementToolCallback.getToolName()).thenReturn(componentName + "_" + clusterElementName);
+        when(clusterElementToolCallback.getClusterElementName()).thenReturn(clusterElementName);
+        when(clusterElementToolCallback.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name(componentName + "_" + clusterElementName)
+                .description(clusterElementName)
+                .inputSchema("{}")
+                .build());
+
+        return clusterElementToolCallback;
     }
 
     private AiHubToolApproval pendingApproval(String toolName, String mode) {
@@ -524,6 +629,15 @@ class AiHubToolApprovalFacadeTest {
         when(user.getAuthorityIds()).thenReturn(List.of());
 
         return user;
+    }
+
+    @SuppressWarnings("unchecked")
+    private ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider() {
+        ObjectProvider<AiHubGlobalToolCatalog> objectProvider = mock(ObjectProvider.class);
+
+        when(objectProvider.orderedStream()).thenAnswer(invocation -> globalToolCatalogs.stream());
+
+        return objectProvider;
     }
 
     @SuppressWarnings("unchecked")

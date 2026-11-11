@@ -13,9 +13,11 @@ import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOpe
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.listener.ProjectContentContributor;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.automation.configuration.domain.ProjectGitConfiguration;
@@ -26,7 +28,9 @@ import com.bytechef.ee.platform.configuration.dto.GitConfigurationDTO;
 import com.bytechef.ee.platform.configuration.facade.GitConfigurationFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProjectGitFacadeImpl implements ProjectGitFacade {
 
     private final GitConfigurationFacade gitConfigurationFacade;
+    private final List<ProjectContentContributor> projectContentContributors;
     private final ProjectFacade projectFacade;
     private final ProjectGitConfigurationService projectGitConfigurationService;
     private final ProjectGitService projectGitService;
@@ -57,9 +62,10 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
         ProjectGitConfigurationService projectGitConfigurationService, ProjectGitService projectGitService,
         ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService,
-        WorkspaceService workspaceService) {
+        WorkspaceService workspaceService, List<ProjectContentContributor> projectContentContributors) {
 
         this.gitConfigurationFacade = gitConfigurationFacade;
+        this.projectContentContributors = projectContentContributors;
         this.projectFacade = projectFacade;
         this.projectGitConfigurationService = projectGitConfigurationService;
         this.projectGitService = projectGitService;
@@ -81,12 +87,11 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
 
         GitWorkflows gitWorkflows = projectGitService.getWorkflows(
             gitConfiguration.url(), projectGitConfiguration.getBranch(), gitConfiguration.username(),
-            gitConfiguration.password());
+            gitConfiguration.password(), getContentDirectories());
 
         Project project = projectService.getProject(projectId);
 
-        List<Workflow> oldWorkflows = projectWorkflowService
-            .getProjectWorkflows(projectId, project.getLastProjectVersion())
+        List<Workflow> oldWorkflows = getOrdinaryProjectWorkflows(projectId, project.getLastProjectVersion())
             .stream()
             .map(projectWorkflow -> workflowService.getWorkflow(projectWorkflow.getWorkflowId()))
             .toList();
@@ -105,24 +110,46 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
                 projectWorkflowFacade.updateWorkflow(
                     Objects.requireNonNull(oldWorkflow.getId()), workflow.getDefinition(), oldWorkflow.getVersion());
             }
-
-            GitInfo gitInfo = gitWorkflows.gitInfo();
-            GitConfigurationDTO gitConfigurationDTO = gitConfigurationFacade.getGitConfiguration(workspace.getId());
-
-            projectFacade.publishProject(
-                projectId,
-                """
-                    %s
-
-                    Project pulled from git repository:
-                    Repository: %s
-                    Branch: %s
-                    Commit hash: %s
-                    """.formatted(
-                    gitInfo.message(), gitConfigurationDTO.url(), projectGitConfiguration.getBranch(),
-                    gitInfo.commitHash()),
-                false);
         }
+
+        Map<String, byte[]> contentFiles = gitWorkflows.contentFiles();
+
+        for (ProjectContentContributor projectContentContributor : projectContentContributors) {
+            Map<String, byte[]> contributorContentFiles = getContentFiles(
+                contentFiles, projectContentContributor.getContentDirectory());
+
+            if (!contributorContentFiles.isEmpty()) {
+                projectContentContributor.pullProjectContent(projectId, contributorContentFiles);
+            }
+        }
+
+        if (gitWorkflows.workflows()
+            .isEmpty() && contentFiles.isEmpty()) {
+
+            return;
+        }
+
+        for (ProjectContentContributor projectContentContributor : projectContentContributors) {
+            if (!projectContentContributor.isProjectContentPublishable(projectId)) {
+                return;
+            }
+        }
+
+        GitInfo gitInfo = gitWorkflows.gitInfo();
+
+        projectFacade.publishProject(
+            projectId,
+            """
+                %s
+
+                Project pulled from git repository:
+                Repository: %s
+                Branch: %s
+                Commit hash: %s
+                """.formatted(
+                gitInfo.message(), gitConfiguration.url(), projectGitConfiguration.getBranch(),
+                gitInfo.commitHash()),
+            false);
     }
 
     @Override
@@ -139,7 +166,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     public String pushProjectToGit(long projectId, String commitMessage) {
         Project project = projectService.getProject(projectId);
 
-        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
+        List<ProjectWorkflow> projectWorkflows = getOrdinaryProjectWorkflows(
             projectId, project.getLastProjectVersion());
 
         Workspace workspace = workspaceService.getProjectWorkspace(projectId);
@@ -148,11 +175,45 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
         ProjectGitConfiguration projectGitConfiguration = projectGitConfigurationService.getProjectGitConfiguration(
             projectId);
 
+        Map<String, byte[]> contentFiles = new LinkedHashMap<>();
+
+        for (ProjectContentContributor projectContentContributor : projectContentContributors) {
+            contentFiles.putAll(
+                projectContentContributor.exportProjectContent(projectId, project.getLastProjectVersion()));
+        }
+
         return projectGitService.save(
             projectWorkflows.stream()
                 .map(projectWorkflow -> workflowService.getWorkflow(projectWorkflow.getWorkflowId()))
                 .toList(),
-            commitMessage, gitConfigurationDTO.url(), projectGitConfiguration.getBranch(),
-            gitConfigurationDTO.username(), gitConfigurationDTO.password());
+            contentFiles, getContentDirectories(), commitMessage, gitConfigurationDTO.url(),
+            projectGitConfiguration.getBranch(), gitConfigurationDTO.username(), gitConfigurationDTO.password());
+    }
+
+    private List<String> getContentDirectories() {
+        return projectContentContributors.stream()
+            .map(ProjectContentContributor::getContentDirectory)
+            .toList();
+    }
+
+    private static Map<String, byte[]> getContentFiles(Map<String, byte[]> contentFiles, String contentDirectory) {
+        Map<String, byte[]> directoryContentFiles = new LinkedHashMap<>();
+
+        for (Map.Entry<String, byte[]> entry : contentFiles.entrySet()) {
+            if (entry.getKey()
+                .startsWith(contentDirectory)) {
+
+                directoryContentFiles.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return directoryContentFiles;
+    }
+
+    private List<ProjectWorkflow> getOrdinaryProjectWorkflows(long projectId, int projectVersion) {
+        return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
+            .stream()
+            .filter(projectWorkflow -> projectWorkflow.getType() == ProjectWorkflowType.WORKFLOW)
+            .toList();
     }
 }

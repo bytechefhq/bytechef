@@ -3311,6 +3311,13 @@
     "title": "Send Media",
     "workflowNodeDescription": null
   }, {
+    "agentReplyDefinition": {
+      "attachmentsProperty": null,
+      "channelParameters": { },
+      "conversationIdProperty": "chat_id",
+      "fixedParameters": { },
+      "messageProperty": "text"
+    },
     "batch": false,
     "beforeResume": null,
     "beforeSuspend": null,
@@ -6297,6 +6304,15 @@
     "resumePerform": null,
     "title": "Send Message",
     "workflowNodeDescription": null
+  } ],
+  "agentChannels": [ {
+    "approvalChannelName": "telegram",
+    "description": null,
+    "name": "telegram",
+    "replyActionName": "sendMessage",
+    "title": "Telegram",
+    "triggerName": "newMessage",
+    "triggerParameters": { }
   } ],
   "clusterElements": [ {
     "name": "telegram",
@@ -12726,6 +12742,11 @@
   "tags": [ ],
   "title": "Telegram",
   "triggers": [ {
+    "agentRequestDefinition": {
+      "attachmentsPath": null,
+      "conversationIdPath": "message.chat.id",
+      "messagePath": "message.text"
+    },
     "batch": false,
     "deduplicate": null,
     "deprecated": false,

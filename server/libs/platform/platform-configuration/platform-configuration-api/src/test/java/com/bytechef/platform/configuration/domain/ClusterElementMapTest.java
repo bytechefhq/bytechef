@@ -59,6 +59,38 @@ class ClusterElementMapTest {
     }
 
     @Test
+    void testGetClusterElementsReadsAMultipleTypeStoredAsALoneObject() {
+        Map<String, Object> extensions = Map.of(
+            WorkflowExtConstants.CLUSTER_ELEMENTS,
+            Map.of("tools", Map.of(
+                WorkflowConstants.NAME, "hubspot_1",
+                WorkflowConstants.TYPE, "hubspot/v1/createContact",
+                WorkflowConstants.PARAMETERS, Map.of())));
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        assertThat(clusterElementMap.getClusterElements(TOOLS))
+            .extracting(ClusterElement::getWorkflowNodeName)
+            .containsExactly("hubspot_1");
+    }
+
+    @Test
+    void testGetClusterElementResolvesAMultipleTypeStoredAsALoneObject() {
+        Map<String, Object> extensions = Map.of(
+            WorkflowExtConstants.CLUSTER_ELEMENTS,
+            Map.of("tools", Map.of(
+                WorkflowConstants.NAME, "hubspot_1",
+                WorkflowConstants.TYPE, "hubspot/v1/createContact",
+                WorkflowConstants.PARAMETERS, Map.of())));
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        ClusterElement clusterElement = clusterElementMap.getClusterElement(TOOLS, "hubspot_1");
+
+        assertThat(clusterElement.getComponentName()).isEqualTo("hubspot");
+    }
+
+    @Test
     void testGetClusterElementResolvesNestedChild() {
         Map<String, Object> hubspotTool = Map.of(
             WorkflowConstants.NAME, "hubspot_1",

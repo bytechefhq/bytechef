@@ -1,0 +1,3 @@
+mutation updateAiAgentElement($input: UpdateAiAgentElementInput!) {
+    updateAiAgentElement(input: $input)
+}

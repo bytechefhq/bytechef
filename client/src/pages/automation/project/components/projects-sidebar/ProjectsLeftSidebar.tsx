@@ -4,6 +4,7 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ProjectAgentsList from '@/pages/automation/project/components/projects-sidebar/components/ProjectAgentsList';
 import ProjectSelect from '@/pages/automation/project/components/projects-sidebar/components/ProjectSelect';
 import ProjectWorkflowsList from '@/pages/automation/project/components/projects-sidebar/components/ProjectWorkflowsList';
 import WorkflowsListItem from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListItem';
@@ -30,6 +31,7 @@ import {toast} from 'sonner';
 
 interface ProjectsLeftSidebarProps {
     bottomResizablePanelRef?: RefObject<PanelImperativeHandle | null>;
+    currentAgentId?: string;
     onProjectClick: (projectId: number, projectWorkflowId: number) => void;
     projectId: number;
     currentWorkflowId: string;
@@ -37,6 +39,7 @@ interface ProjectsLeftSidebarProps {
 
 const ProjectsLeftSidebar = ({
     bottomResizablePanelRef,
+    currentAgentId,
     currentWorkflowId,
     onProjectClick,
     projectId,
@@ -314,6 +317,21 @@ const ProjectsLeftSidebar = ({
                             <span className="w-full py-2 text-sm text-muted-foreground">No workflows found</span>
                         )}
                     </ul>
+                )}
+
+                {!isLoading && (
+                    <div className="mt-4 flex flex-col gap-2">
+                        <h3 className="text-xs font-semibold text-muted-foreground uppercase">Agents</h3>
+
+                        <ul className="flex flex-col gap-4">
+                            <ProjectAgentsList
+                                calculateTimeDifference={calculateTimeDifference}
+                                currentAgentId={currentAgentId}
+                                emptyMessage="No agents yet."
+                                projectId={selectedProjectId}
+                            />
+                        </ul>
+                    </div>
                 )}
             </ScrollArea>
 

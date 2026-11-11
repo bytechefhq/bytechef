@@ -1,4 +1,5 @@
 import Badge from '@/components/Badge/Badge';
+import {AgentsFilterType} from '@/pages/automation/agents/components/AgentsFilterLeftSidebarNav';
 import {ReactNode} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -8,13 +9,14 @@ interface ProjectsFilterTitleItemI {
 }
 
 interface ProjectsFilterTitleProps {
+    agentsFilter?: AgentsFilterType;
     categories: ProjectsFilterTitleItemI[] | undefined;
     filterByTag: boolean;
     filterId?: number | string;
     tags: ProjectsFilterTitleItemI[] | undefined;
 }
 
-const ProjectsFilterTitle = ({categories, filterByTag, filterId, tags}: ProjectsFilterTitleProps) => {
+const ProjectsFilterTitle = ({agentsFilter, categories, filterByTag, filterId, tags}: ProjectsFilterTitleProps) => {
     const [searchParams] = useSearchParams();
 
     let pageTitle: string | ReactNode | undefined;
@@ -35,6 +37,14 @@ const ProjectsFilterTitle = ({categories, filterByTag, filterId, tags}: Projects
                 styleType="primary-outline"
                 weight="semibold"
             />
+
+            {agentsFilter && (
+                <Badge
+                    label={`Agents: ${agentsFilter === 'scheduled' ? 'Scheduled' : 'All Agents'}`}
+                    styleType="primary-outline"
+                    weight="semibold"
+                />
+            )}
         </div>
     );
 };

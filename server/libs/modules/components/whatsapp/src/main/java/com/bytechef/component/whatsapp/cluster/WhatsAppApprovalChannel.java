@@ -32,6 +32,7 @@ import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECEIVE
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECIPIENT_TYPE;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TEXT;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TYPE;
+import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.WHATS_APP;
 
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -50,7 +51,7 @@ import java.util.Map;
 public class WhatsAppApprovalChannel {
 
     public static final ClusterElementDefinition<ApprovalChannelFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ApprovalChannelFunction>clusterElement("whatsApp")
+        ComponentDsl.<ApprovalChannelFunction>clusterElement(WHATS_APP)
             .title("WhatsApp")
             .description("Sends an approval request message via WhatsApp.")
             .type(APPROVAL_CHANNELS)

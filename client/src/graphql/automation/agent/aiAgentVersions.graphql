@@ -1,0 +1,8 @@
+query aiAgentVersions($id: ID!) {
+    aiAgentVersions(id: $id) {
+        description
+        publishedDate
+        status
+        version
+    }
+}

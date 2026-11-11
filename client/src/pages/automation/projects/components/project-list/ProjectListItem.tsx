@@ -69,6 +69,10 @@ import ProjectDialog from '../ProjectDialog';
 
 interface ProjectItemProps {
     activeTab?: ProjectListItemTabType;
+    agentCount: number;
+    agentsActions?: ReactNode;
+    agentsContent: ReactNode;
+    defaultTab?: ProjectListItemTabType;
     deploymentsContent: ReactNode;
     onTabChange: (tab?: ProjectListItemTabType, expandedProjectDeploymentId?: number) => void;
     project: Project;
@@ -83,6 +87,10 @@ const ProjectGitConfigurationDialog = lazy(
 
 const ProjectListItem = ({
     activeTab,
+    agentCount,
+    agentsActions,
+    agentsContent,
+    defaultTab = 'workflows',
     deploymentsContent,
     onTabChange,
     project,
@@ -263,9 +271,9 @@ const ProjectListItem = ({
                 return;
             }
 
-            onTabChange(activeTab ? undefined : 'workflows');
+            onTabChange(activeTab ? undefined : defaultTab);
         },
-        [activeTab, onTabChange, showProjectDeploymentDialog]
+        [activeTab, defaultTab, onTabChange, showProjectDeploymentDialog]
     );
 
     return (
@@ -641,11 +649,16 @@ const ProjectListItem = ({
                                     </Button>
                                 }
                             />
+                        ) : activeTab === 'agents' ? (
+                            <div onClick={(event) => event.stopPropagation()}>{agentsActions}</div>
                         ) : undefined
                     }
-                    activeTab={activeTab ?? 'workflows'}
+                    activeTab={activeTab ?? defaultTab}
+                    agentCount={agentCount}
+                    agentsContent={agentsContent}
                     deploymentsContent={deploymentsContent}
                     onTabChange={(tab) => onTabChange(tab)}
+                    workflowCount={workflowCount}
                     workflowsContent={workflowsContent}
                 />
             </CollapsibleContent>

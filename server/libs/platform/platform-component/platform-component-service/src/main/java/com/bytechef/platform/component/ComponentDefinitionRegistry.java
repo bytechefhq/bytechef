@@ -18,6 +18,7 @@ package com.bytechef.platform.component;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.definition.approval.ApprovalChannelFunction.APPROVAL_CHANNELS;
 import static com.bytechef.platform.component.util.ClusterElementTypeUtils.isSameClusterElementType;
 
 import com.bytechef.commons.util.CollectionUtils;
@@ -25,6 +26,7 @@ import com.bytechef.commons.util.MemoizationUtils;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.AgentChannelDefinition;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ClusterElementContext;
@@ -65,6 +67,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +108,7 @@ public class ComponentDefinitionRegistry {
         new DefaultComponentHandlerLoader(), new JdbcComponentHandlerLoader(), new OpenApiComponentHandlerLoader());
 
     private final ApplicationProperties applicationProperties;
+    private final Supplier<List<com.bytechef.platform.component.domain.AgentChannelDefinition>> agentChannelDefinitionsSupplier;
     private final Supplier<List<ComponentDefinition>> allComponentDefinitionsSupplier;
     private final Supplier<Map<String, Map<Integer, ComponentDefinition>>> componentDefinitionsMapSupplier;
     private final List<ComponentHandler> componentHandlers;
@@ -131,6 +135,7 @@ public class ComponentDefinitionRegistry {
         Supplier<Optional<ComponentIndex>> componentIndexSupplier) {
 
         this.applicationProperties = applicationProperties;
+        this.agentChannelDefinitionsSupplier = MemoizationUtils.memoize(this::loadAgentChannelDefinitions);
         this.componentHandlers = componentHandlers;
         this.allComponentDefinitionsSupplier = MemoizationUtils.memoize(this::loadAllComponentDefinitions);
         this.componentDefinitionsMapSupplier = MemoizationUtils.memoize(
@@ -472,6 +477,88 @@ public class ComponentDefinitionRegistry {
                     .map(ComponentHandler::getDefinition)
                     .toList()),
             this::compare);
+    }
+
+    public List<com.bytechef.platform.component.domain.AgentChannelDefinition> getAgentChannelDefinitions() {
+        return agentChannelDefinitionsSupplier.get();
+    }
+
+    public Optional<com.bytechef.platform.component.domain.AgentChannelDefinition> fetchAgentChannelDefinition(
+        String name) {
+
+        return getAgentChannelDefinitions()
+            .stream()
+            .filter(agentChannelDefinition -> Objects.equals(agentChannelDefinition.getName(), name))
+            .findFirst();
+    }
+
+    private List<com.bytechef.platform.component.domain.AgentChannelDefinition> loadAgentChannelDefinitions() {
+        Map<String, com.bytechef.platform.component.domain.AgentChannelDefinition> definitionsByName =
+            new LinkedHashMap<>();
+
+        for (ComponentDefinition componentDefinition : getComponentDefinitions()) {
+            for (AgentChannelDefinition agentChannelDefinition : componentDefinition.getAgentChannels()) {
+                validateAgentChannel(componentDefinition, agentChannelDefinition);
+
+                com.bytechef.platform.component.domain.AgentChannelDefinition previous = definitionsByName.putIfAbsent(
+                    agentChannelDefinition.getName(),
+                    new com.bytechef.platform.component.domain.AgentChannelDefinition(
+                        agentChannelDefinition, componentDefinition.getName(), componentDefinition.getVersion()));
+
+                if (previous != null) {
+                    throw new IllegalStateException(
+                        "Agent channel name '%s' is declared by both component '%s' and component '%s'".formatted(
+                            agentChannelDefinition.getName(), previous.getComponentName(),
+                            componentDefinition.getName()));
+                }
+            }
+        }
+
+        return List.copyOf(definitionsByName.values());
+    }
+
+    private static void validateAgentChannel(
+        ComponentDefinition componentDefinition, AgentChannelDefinition agentChannelDefinition) {
+
+        String componentName = componentDefinition.getName();
+        String triggerName = agentChannelDefinition.getTrigger()
+            .getName();
+
+        if (componentDefinition.getTriggers()
+            .stream()
+            .noneMatch(triggerDefinition -> Objects.equals(triggerDefinition.getName(), triggerName))) {
+
+            throw new IllegalStateException(
+                "Agent channel '%s' references trigger '%s' which component '%s' does not register".formatted(
+                    agentChannelDefinition.getName(), triggerName, componentName));
+        }
+
+        agentChannelDefinition.getReplyAction()
+            .ifPresent(replyAction -> {
+                if (componentDefinition.getActions()
+                    .stream()
+                    .noneMatch(actionDefinition -> Objects.equals(actionDefinition.getName(), replyAction.getName()))) {
+
+                    throw new IllegalStateException(
+                        "Agent channel '%s' references action '%s' which component '%s' does not register".formatted(
+                            agentChannelDefinition.getName(), replyAction.getName(), componentName));
+                }
+            });
+
+        agentChannelDefinition.getApprovalChannelName()
+            .ifPresent(approvalChannelName -> {
+                if (componentDefinition.getClusterElements()
+                    .stream()
+                    .noneMatch(
+                        clusterElementDefinition -> Objects.equals(clusterElementDefinition.getName(),
+                            approvalChannelName)
+                            && Objects.equals(clusterElementDefinition.getType(), APPROVAL_CHANNELS))) {
+
+                    throw new IllegalStateException(
+                        "Agent channel '%s' references approval channel '%s' which component '%s' does not declare"
+                            .formatted(agentChannelDefinition.getName(), approvalChannelName, componentName));
+                }
+            });
     }
 
     public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {

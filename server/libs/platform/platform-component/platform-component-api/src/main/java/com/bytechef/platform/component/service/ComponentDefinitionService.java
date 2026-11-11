@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.service;
 
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.domain.AgentChannelDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.constant.PlatformType;
@@ -30,12 +31,16 @@ import org.jspecify.annotations.Nullable;
  */
 public interface ComponentDefinitionService {
 
+    Optional<AgentChannelDefinition> fetchAgentChannelDefinition(String name);
+
     Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version);
 
     List<Option> executeWorkflowInputOptions(
         String componentName, int componentVersion, String groupName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         @Nullable ComponentConnection componentConnection);
+
+    List<AgentChannelDefinition> getAgentChannelDefinitions();
 
     ComponentDefinition getComponentDefinition(String name, @Nullable Integer version);
 
