@@ -4,6 +4,7 @@ extend type Query {
     mcpIntegrationInstanceConfigurationWorkflowsByMcpIntegrationInstanceConfigurationId(mcpIntegrationInstanceConfigurationId: ID): [McpIntegrationInstanceConfigurationWorkflow]
     toolEligibleIntegrationVersionWorkflows(integrationId: ID!, integrationVersion: Int!): [IntegrationWorkflow!]!
     toolEligibleIntegrationInstanceConfigurationWorkflows(integrationInstanceConfigurationId: ID!): [IntegrationWorkflow!]!
+    toolEligibleIntegrationInstanceConfigurationWorkflowProperties(integrationInstanceConfigurationId: ID!, workflowId: String!): [Property]
     mcpIntegrationInstanceConfigurationWorkflowProperties(mcpIntegrationInstanceConfigurationWorkflowId: ID!): [Property]
 }
 

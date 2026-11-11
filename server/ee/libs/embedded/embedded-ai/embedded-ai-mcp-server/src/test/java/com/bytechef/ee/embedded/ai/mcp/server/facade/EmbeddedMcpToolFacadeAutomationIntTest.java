@@ -35,6 +35,7 @@ import com.bytechef.ee.embedded.configuration.dto.CallableAutomationDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserMcpAutomationResolver;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -545,6 +546,45 @@ class EmbeddedMcpToolFacadeAutomationIntTest {
             .containsExactly("workingTool");
     }
 
+    @Test
+    void testAutomationToolFillsTriggerInputDefaultsTheModelLeftOut() {
+        String workflowId = insertWorkflow(
+            WORKFLOW_LABEL, WORKFLOW_DESCRIPTION, TRIGGER_NAME, WORKFLOW_CALL_TRIGGER_TYPE,
+            Map.of(
+                WorkflowConstants.INPUT_SCHEMA,
+                """
+                    {"type":"object","properties":{"currency":{"type":"string","default":"EUR"},\
+                    "text":{"type":"string"}}}
+                    """));
+
+        addAutomationTool(Map.of(), workflowId, true, null);
+
+        mockCompletedJob();
+
+        getSingleAutomationToolCallback().call("{\"text\": \"hi\"}");
+
+        assertThat(captureJobParameters().getInputs())
+            .containsEntry(TRIGGER_NAME, Map.of("currency", "EUR", "text", "hi"));
+    }
+
+    @Test
+    void testAutomationToolLetsTheModelArgumentWinOverATriggerInputDefault() {
+        String workflowId = insertWorkflow(
+            WORKFLOW_LABEL, WORKFLOW_DESCRIPTION, TRIGGER_NAME, WORKFLOW_CALL_TRIGGER_TYPE,
+            Map.of(
+                WorkflowConstants.INPUT_SCHEMA,
+                "{\"type\":\"object\",\"properties\":{\"currency\":{\"type\":\"string\",\"default\":\"EUR\"}}}"));
+
+        addAutomationTool(Map.of(), workflowId, true, null);
+
+        mockCompletedJob();
+
+        getSingleAutomationToolCallback().call("{\"currency\": \"USD\"}");
+
+        assertThat(captureJobParameters().getInputs())
+            .containsEntry(TRIGGER_NAME, Map.of("currency", "USD"));
+    }
+
     private AutomationTool addAutomationTool(
         Map<String, Object> parameters, String workflowId, boolean rowEnabled,
         @Nullable String missingConnectionComponentName) {
@@ -675,12 +715,20 @@ class EmbeddedMcpToolFacadeAutomationIntTest {
     }
 
     private String insertWorkflow(String label, String description, String triggerName, String triggerType) {
+        return insertWorkflow(label, description, triggerName, triggerType, Map.of());
+    }
+
+    private String insertWorkflow(
+        String label, String description, String triggerName, String triggerType,
+        Map<String, Object> triggerParameters) {
+
         String workflowId = String.valueOf(UUID.randomUUID());
 
         Map<String, Object> workflowDefinition = Map.of(
             "label", label,
             "description", description,
-            "triggers", List.of(Map.of("name", triggerName, "type", triggerType, "parameters", Map.of())),
+            "triggers", List.of(
+                Map.of("name", triggerName, "type", triggerType, "parameters", triggerParameters)),
             "tasks", List.of());
 
         jdbcTemplate.update(

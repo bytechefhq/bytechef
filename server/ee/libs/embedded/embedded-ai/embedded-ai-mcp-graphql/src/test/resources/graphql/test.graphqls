@@ -104,3 +104,7 @@ input McpToolInput {
     version: Int
 }
 
+input WorkflowToolParametersInput {
+    workflowId: String!
+    parameters: Map
+}

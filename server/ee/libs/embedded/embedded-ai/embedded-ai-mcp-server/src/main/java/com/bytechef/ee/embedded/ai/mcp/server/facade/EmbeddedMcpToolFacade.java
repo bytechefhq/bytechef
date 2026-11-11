@@ -53,6 +53,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.ai.tool.FromAiResult;
 import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
+import com.bytechef.platform.ai.tool.util.ToolParameterDefaultsUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
@@ -226,8 +227,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 getClusterElementToolCallbackFunction(
                     toolName, externalUserId, clusterElementDefinition.getComponentName(),
                     clusterElementDefinition.getComponentVersion(),
-                    clusterElementDefinition.getName(), mcpTool.getParameters(), integrationId,
-                    mcpComponent.getMcpServerId(), environment, tenantId))
+                    clusterElementDefinition.getName(), mcpTool.getParameters(),
+                    ToolParameterDefaultsUtils.collectPropertyDefaults(clusterElementDefinition.getProperties()),
+                    integrationId, mcpComponent.getMcpServerId(), environment, tenantId))
             .inputType(Map.class)
             .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
@@ -305,6 +307,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 toolName -> getWorkflowToolCallbackFunction(
                     toolName, externalUserId, integration.getComponentName(), integration.getId(),
                     integrationInstanceConfigurationWorkflow, trigger.getName(), workflowParameters,
+                    ToolParameterDefaultsUtils.collectTriggerInputDefaults(trigger.getParameters()),
                     mcpIntegrationInstanceConfiguration.getMcpServerId(), environment, tenantId));
 
             toolCallbacks.add(EmbeddedMcpToolCallback.ofIntegration(toolCallback, integration.getId()));
@@ -390,17 +393,19 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         Workflow workflow = workflowService.getWorkflow(callableAutomation.workflowId());
 
         Map<String, ?> workflowParameters = mcpAutomationProjectConfigurationWorkflow.getParameters();
+        Map<String, Object> triggerInputDefaults = getTriggerInputDefaults(workflow, triggerName);
 
         return createWorkflowToolCallback(
             workflow, workflowParameters,
             toolName -> getAutomationToolCallbackFunction(
                 toolName, externalUserId, connectedUserId, callableAutomation, triggerName, workflowParameters,
-                mcpAutomationProjectConfiguration.getMcpServerId(), environment));
+                triggerInputDefaults, mcpAutomationProjectConfiguration.getMcpServerId(), environment));
     }
 
     private Function<Map<String, Object>, Object> getAutomationToolCallbackFunction(
         String toolName, String externalUserId, long connectedUserId, CallableAutomationDTO callableAutomation,
-        String triggerName, Map<String, ?> workflowParameters, long mcpServerId, Environment environment) {
+        String triggerName, Map<String, ?> workflowParameters, Map<String, Object> triggerInputDefaults,
+        long mcpServerId, Environment environment) {
 
         return inputParameters -> {
             checkMcpServerEnabled(mcpServerId);
@@ -425,7 +430,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             JobParametersDTO jobParametersDTO = new JobParametersDTO(
                 callableAutomation.workflowId(),
-                getWorkflowJobInputs(callableAutomation.inputs(), triggerName, workflowParameters, inputParameters));
+                getWorkflowJobInputs(
+                    callableAutomation.inputs(), triggerName, workflowParameters, triggerInputDefaults,
+                    inputParameters));
 
             return runWorkflowJob(
                 eventBuilder,
@@ -545,8 +552,8 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     private Function<Map<String, Object>, Object> getClusterElementToolCallbackFunction(
         String toolName, @Nullable String externalUserId, String componentName, int componentVersion,
-        String clusterElementName, Map<String, ?> parameters, @Nullable Long integrationId, long mcpServerId,
-        Environment environment, String tenantId) {
+        String clusterElementName, Map<String, ?> parameters, Map<String, Object> propertyDefaults,
+        @Nullable Long integrationId, long mcpServerId, Environment environment, String tenantId) {
 
         return request -> {
             checkMcpServerEnabled(mcpServerId);
@@ -591,7 +598,10 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             }
 
             Map<String, Object> mergedParameters = EmbeddedToolConstants.withConnectedUserContext(
-                MapUtils.concat(request, resolvedParameters), externalUserId, environment);
+                ToolParameterDefaultsUtils.mergeParameters(
+                    ToolParameterDefaultsUtils.removeClearedDefaults(propertyDefaults, parameters),
+                    MapUtils.concat(request, resolvedParameters)),
+                externalUserId, environment);
 
             return externalInvocationRecorder.record(
                 eventBuilder,
@@ -622,7 +632,8 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private Function<Map<String, Object>, Object> getWorkflowToolCallbackFunction(
         String toolName, @Nullable String externalUserId, String componentName, long integrationId,
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow, String triggerName,
-        Map<String, ?> workflowParameters, long mcpServerId, Environment environment, String tenantId) {
+        Map<String, ?> workflowParameters, Map<String, Object> triggerInputDefaults, long mcpServerId,
+        Environment environment, String tenantId) {
 
         return inputParameters -> {
             checkMcpServerEnabled(mcpServerId);
@@ -655,7 +666,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 integrationInstanceConfigurationWorkflow.getWorkflowId(),
                 getWorkflowJobInputs(
                     integrationInstanceConfigurationWorkflow.getInputs(), triggerName, workflowParameters,
-                    inputParameters));
+                    triggerInputDefaults, inputParameters));
 
             return runWorkflowJob(
                 eventBuilder,
@@ -665,7 +676,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     private Map<String, Object> getWorkflowJobInputs(
         Map<String, ?> workflowInputs, String triggerName, Map<String, ?> workflowParameters,
-        Map<String, Object> inputParameters) {
+        Map<String, Object> triggerInputDefaults, Map<String, Object> inputParameters) {
 
         Map<String, Object> inputs = new HashMap<>(workflowInputs);
 
@@ -676,6 +687,12 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         }
 
         triggerInputs.putAll(inputParameters);
+
+        if (!triggerInputDefaults.isEmpty()) {
+            triggerInputs = ToolParameterDefaultsUtils.mergeParameters(
+                ToolParameterDefaultsUtils.removeClearedDefaults(triggerInputDefaults, workflowParameters),
+                triggerInputs);
+        }
 
         inputs.put(triggerName, triggerInputs);
         inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, triggerName);
@@ -907,6 +924,16 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         } catch (Throwable throwable) {
             throw new IllegalStateException(throwable);
         }
+    }
+
+    private static Map<String, Object> getTriggerInputDefaults(Workflow workflow, String triggerName) {
+        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
+            if (Objects.equals(workflowTrigger.getName(), triggerName)) {
+                return ToolParameterDefaultsUtils.collectTriggerInputDefaults(workflowTrigger.getParameters());
+            }
+        }
+
+        return Map.of();
     }
 
     private static @Nullable WorkflowTrigger getMcpToolCallableTrigger(Workflow workflow) {
