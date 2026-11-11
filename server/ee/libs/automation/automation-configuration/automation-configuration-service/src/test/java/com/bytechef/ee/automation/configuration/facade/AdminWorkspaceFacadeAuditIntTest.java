@@ -16,7 +16,6 @@ import com.bytechef.ee.automation.configuration.audit.WorkspaceAuditEvents;
 import com.bytechef.ee.automation.configuration.config.WorkspacePermissionIntTestConfiguration;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.ee.automation.configuration.service.WorkspaceServiceImpl;
-import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -207,8 +206,7 @@ class AdminWorkspaceFacadeAuditIntTest {
 
     @Configuration
     @Import({
-        AdminWorkspaceFacadeImpl.class, AuditAspect.class, AuditFailureCounter.class, AuditCaptureAspect.class,
-        AuditEventService.class,
+        AdminWorkspaceFacadeImpl.class, AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class,
         AuditMapperResolver.class, WorkspaceServiceImpl.class
     })
     static class AuditConfiguration {

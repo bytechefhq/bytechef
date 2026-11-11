@@ -17,7 +17,6 @@ import com.bytechef.ee.automation.apiplatform.configuration.config.ApiCollection
 import com.bytechef.ee.automation.apiplatform.configuration.config.ApiCollectionIntTestConfigurationSharedMocks;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiCollectionRepository;
-import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -164,8 +163,7 @@ class ApiCollectionFacadeAuditIntTest {
 
     @Configuration
     @Import({
-        AuditAspect.class, AuditFailureCounter.class, AuditCaptureAspect.class, AuditEventService.class,
-        AuditMapperResolver.class
+        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class
     })
     static class AuditConfiguration {
     }

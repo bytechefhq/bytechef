@@ -14,7 +14,6 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.repository.CustomAuditEventRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
@@ -25,7 +24,6 @@ import com.bytechef.platform.security.web.authentication.TenantPrincipal;
 import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -36,7 +34,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.boot.actuate.audit.InMemoryAuditEventRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -366,9 +363,7 @@ class CredentialUsageAuditListenerTest {
         audit.setCredentialUsageInterval(credentialUsageInterval);
 
         return new CredentialUsageAuditListener(
-            applicationProperties, inMemoryAuditEventRepository,
-            new AuditFailureCounter(new DefaultListableBeanFactory().getBeanProvider(MeterRegistry.class)),
-            mutableClock,
+            applicationProperties, inMemoryAuditEventRepository, mutableClock,
             CredentialUsageAuditListener.MAX_TRACKED_CREDENTIALS);
     }
 

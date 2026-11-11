@@ -29,8 +29,6 @@ import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.security.Principal;
@@ -53,7 +51,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.OrderUtils;
 import org.springframework.data.domain.Page;
@@ -99,6 +96,9 @@ class AuditAspectIntTest {
     private AuditEventService auditEventService;
 
     @Autowired
+    private AuditedBusinessCaller auditedBusinessCaller;
+
+    @Autowired
     private AuditedBusinessService auditedBusinessService;
 
     @Autowired
@@ -120,10 +120,10 @@ class AuditAspectIntTest {
     private OuterGuardedService outerGuardedService;
 
     @Autowired
-    private MeterRegistry meterRegistry;
+    private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     @Autowired
-    private PersistenceAuditEventRepository persistenceAuditEventRepository;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private PlatformTransactionManager platformTransactionManager;
@@ -611,14 +611,11 @@ class AuditAspectIntTest {
             .when(auditEventService)
             .saveAll(any());
 
-        double failedBefore = countFailedAuditEvents("STRICT_BUSINESS_TEST");
-
         assertThatThrownBy(() -> auditedBusinessService.writeBusinessRow())
             .isInstanceOf(AuditPersistenceException.class)
             .hasMessageContaining("STRICT_BUSINESS_TEST");
 
         assertThat(findAll()).isEmpty();
-        assertThat(countFailedAuditEvents("STRICT_BUSINESS_TEST")).isGreaterThan(failedBefore);
     }
 
     @Test
@@ -639,6 +636,29 @@ class AuditAspectIntTest {
         TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
 
         String result = transactionTemplate.execute(status -> auditedBusinessService.writeBusinessRow());
+
+        assertThat(result).isEqualTo("written");
+
+        assertThat(findAll())
+            .extracting(PersistentAuditEvent::getEventType)
+            .containsExactlyInAnyOrder("BUSINESS_WRITE", "STRICT_BUSINESS_TEST");
+    }
+
+    @Test
+    void testStrictAuditEventIsSavedAgainWhenTheBatchItWasSavedInIsRolledBack() {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(platformTransactionManager);
+
+        String result = transactionTemplate.execute(status -> {
+            jdbcTemplate.execute(
+                "ALTER TABLE persistent_audit_event ADD CONSTRAINT reject_audit_event "
+                    + "CHECK (event_type <> 'REJECTED_BY_THE_DATABASE')");
+
+            String written = auditedBusinessCaller.callStrictWriteInARejectedBatch();
+
+            jdbcTemplate.execute("ALTER TABLE persistent_audit_event DROP CONSTRAINT reject_audit_event");
+
+            return written;
+        });
 
         assertThat(result).isEqualTo("written");
 
@@ -876,11 +896,6 @@ class AuditAspectIntTest {
             .collect(Collectors.toMap(data -> data.get("method"), data -> data.get("result")));
     }
 
-    private double countFailedAuditEvents(String eventType) {
-        return meterRegistry.counter("bytechef.audit.failed", "event", eventType)
-            .count();
-    }
-
     private PersistentAuditEvent findSingle() {
         List<PersistentAuditEvent> persistentAuditEvents = findAll();
 
@@ -915,6 +930,11 @@ class AuditAspectIntTest {
     @Configuration
     @EnableMethodSecurity
     static class GuardedServiceConfiguration {
+
+        @Bean
+        AuditedBusinessCaller auditedBusinessCaller(AuditedBusinessService auditedBusinessService) {
+            return new AuditedBusinessCaller(auditedBusinessService);
+        }
 
         @Bean
         AuditedBusinessService auditedBusinessService(
@@ -971,12 +991,6 @@ class AuditAspectIntTest {
         @Bean
         LinkageErrorAuditMapper linkageErrorAuditMapper() {
             return new LinkageErrorAuditMapper();
-        }
-
-        @Bean
-        @Primary
-        MeterRegistry meterRegistry() {
-            return new SimpleMeterRegistry();
         }
 
         @Bean
@@ -1284,6 +1298,20 @@ class AuditAspectIntTest {
             innerGuardedService.auditedAdminOnly();
 
             throw new IllegalStateException("caller failed");
+        }
+    }
+
+    static class AuditedBusinessCaller {
+
+        private final AuditedBusinessService auditedBusinessService;
+
+        AuditedBusinessCaller(AuditedBusinessService auditedBusinessService) {
+            this.auditedBusinessService = auditedBusinessService;
+        }
+
+        @Audited(event = "REJECTED_BY_THE_DATABASE", strict = false)
+        public String callStrictWriteInARejectedBatch() {
+            return auditedBusinessService.writeBusinessRow();
         }
     }
 

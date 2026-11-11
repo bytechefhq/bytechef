@@ -25,7 +25,6 @@ import com.bytechef.ee.automation.configuration.repository.WorkspaceUserReposito
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.ee.automation.configuration.service.WorkspaceUserServiceImpl;
-import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -220,7 +219,7 @@ class WorkspaceUserAuditIntTest {
     @EnableMethodSecurity
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     @Import({
-        AuditAspect.class, AuditFailureCounter.class, AuditCaptureAspect.class, AuditMapperResolver.class,
+        AuditAspect.class, AuditCaptureAspect.class, AuditMapperResolver.class,
         WorkspaceUserAuditMapper.class, WorkspaceUserServiceImpl.class
     })
     static class Config {

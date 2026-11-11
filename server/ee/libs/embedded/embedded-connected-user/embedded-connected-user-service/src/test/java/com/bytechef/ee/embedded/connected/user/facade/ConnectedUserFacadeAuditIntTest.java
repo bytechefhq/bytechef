@@ -28,7 +28,6 @@ import com.bytechef.ee.embedded.connected.user.dto.ConnectedUserDTO;
 import com.bytechef.ee.embedded.connected.user.dto.ConnectedUserImportResultDTO;
 import com.bytechef.ee.embedded.connected.user.repository.ConnectedUserRepository;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -286,8 +285,7 @@ class ConnectedUserFacadeAuditIntTest {
     @EnableMethodSecurity
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     @Import({
-        AuditAspect.class, AuditFailureCounter.class, AuditCaptureAspect.class, AuditEventService.class,
-        AuditMapperResolver.class
+        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class
     })
     static class AuditConfiguration {
 
