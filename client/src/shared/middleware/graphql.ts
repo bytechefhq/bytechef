@@ -609,7 +609,20 @@ export type McpProjectWorkflowPropertiesQueryVariables = Exact<{
 
 
 export type McpProjectWorkflowPropertiesQuery = { mcpProjectWorkflowProperties: Array<
-    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null, items: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
     | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
@@ -618,7 +631,20 @@ export type McpProjectWorkflowPropertiesQuery = { mcpProjectWorkflowProperties: 
     | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
     | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
-    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any, properties: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
     | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, maxLength: number | null, minLength: number | null, placeholder: string | null, regex: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
    | null> | null };
@@ -714,6 +740,53 @@ export type ToolEligibleProjectVersionWorkflowsQueryVariables = Exact<{
 
 
 export type ToolEligibleProjectVersionWorkflowsQuery = { toolEligibleProjectVersionWorkflows: Array<{ id: string, workflow: { id: string, label: string } }> };
+
+export type ToolEligibleWorkflowPropertiesQueryVariables = Exact<{
+  projectId: string | number;
+  workflowId: string;
+}>;
+
+
+export type ToolEligibleWorkflowPropertiesQuery = { toolEligibleWorkflowProperties: Array<
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null, items: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any, properties: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
+    | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, maxLength: number | null, minLength: number | null, placeholder: string | null, regex: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+   | null> | null };
 
 export type UpdateA2aProjectMutationVariables = Exact<{
   id: string | number;
@@ -1587,7 +1660,20 @@ export type McpIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables 
 
 
 export type McpIntegrationInstanceConfigurationWorkflowPropertiesQuery = { mcpIntegrationInstanceConfigurationWorkflowProperties: Array<
-    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null, items: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
     | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
@@ -1596,7 +1682,20 @@ export type McpIntegrationInstanceConfigurationWorkflowPropertiesQuery = { mcpIn
     | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
     | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
-    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any, properties: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
     | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, maxLength: number | null, minLength: number | null, placeholder: string | null, regex: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
    | null> | null };
@@ -1660,6 +1759,53 @@ export type RestoreAutomationProjectVersionMutationVariables = Exact<{
 
 
 export type RestoreAutomationProjectVersionMutation = { restoreAutomationProjectVersion: boolean };
+
+export type ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables = Exact<{
+  integrationInstanceConfigurationId: string | number;
+  workflowId: string;
+}>;
+
+
+export type ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery = { toolEligibleIntegrationInstanceConfigurationWorkflowProperties: Array<
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null, items: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any, properties: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+        | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      > | null }
+    | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, maxLength: number | null, minLength: number | null, placeholder: string | null, regex: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+   | null> | null };
 
 export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables = Exact<{
   integrationInstanceConfigurationId: string | number;
@@ -4654,6 +4800,52 @@ export const McpProjectWorkflowPropertiesDocument = new TypedDocumentString(`
     ... on ArrayProperty {
       arrayDefaultValue: defaultValue
       controlType
+      items {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
       label
       placeholder
     }
@@ -4662,6 +4854,52 @@ export const McpProjectWorkflowPropertiesDocument = new TypedDocumentString(`
       label
       objectDefaultValue: defaultValue
       placeholder
+      properties {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
     }
   }
 }
@@ -5131,6 +5369,168 @@ export const useToolEligibleProjectVersionWorkflowsQuery = <
       {
     queryKey: ['toolEligibleProjectVersionWorkflows', variables],
     queryFn: fetcher<ToolEligibleProjectVersionWorkflowsQuery, ToolEligibleProjectVersionWorkflowsQueryVariables>(ToolEligibleProjectVersionWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const ToolEligibleWorkflowPropertiesDocument = new TypedDocumentString(`
+    query toolEligibleWorkflowProperties($projectId: ID!, $workflowId: String!) {
+  toolEligibleWorkflowProperties(projectId: $projectId, workflowId: $workflowId) {
+    advancedOption
+    description
+    displayCondition
+    expressionEnabled
+    hidden
+    name
+    required
+    type
+    ... on StringProperty {
+      controlType
+      defaultValue
+      label
+      maxLength
+      minLength
+      placeholder
+      regex
+    }
+    ... on IntegerProperty {
+      controlType
+      integerDefaultValue: defaultValue
+      label
+      placeholder
+    }
+    ... on NumberProperty {
+      controlType
+      label
+      numberDefaultValue: defaultValue
+      placeholder
+    }
+    ... on BooleanProperty {
+      booleanDefaultValue: defaultValue
+      controlType
+      label
+      placeholder
+    }
+    ... on ArrayProperty {
+      arrayDefaultValue: defaultValue
+      controlType
+      items {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
+      label
+      placeholder
+    }
+    ... on ObjectProperty {
+      controlType
+      label
+      objectDefaultValue: defaultValue
+      placeholder
+      properties {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
+    }
+  }
+}
+    `);
+
+export const useToolEligibleWorkflowPropertiesQuery = <
+      TData = ToolEligibleWorkflowPropertiesQuery,
+      TError = unknown
+    >(
+      variables: ToolEligibleWorkflowPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<ToolEligibleWorkflowPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolEligibleWorkflowPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ToolEligibleWorkflowPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['toolEligibleWorkflowProperties', variables],
+    queryFn: fetcher<ToolEligibleWorkflowPropertiesQuery, ToolEligibleWorkflowPropertiesQueryVariables>(ToolEligibleWorkflowPropertiesDocument, variables),
     ...options
   }
     )};
@@ -8282,6 +8682,52 @@ export const McpIntegrationInstanceConfigurationWorkflowPropertiesDocument = new
     ... on ArrayProperty {
       arrayDefaultValue: defaultValue
       controlType
+      items {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
       label
       placeholder
     }
@@ -8290,6 +8736,52 @@ export const McpIntegrationInstanceConfigurationWorkflowPropertiesDocument = new
       label
       objectDefaultValue: defaultValue
       placeholder
+      properties {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
     }
   }
 }
@@ -8585,6 +9077,171 @@ export const useRestoreAutomationProjectVersionMutation = <
       {
     mutationKey: ['restoreAutomationProjectVersion'],
     mutationFn: (variables?: RestoreAutomationProjectVersionMutationVariables) => fetcher<RestoreAutomationProjectVersionMutation, RestoreAutomationProjectVersionMutationVariables>(RestoreAutomationProjectVersionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesDocument = new TypedDocumentString(`
+    query toolEligibleIntegrationInstanceConfigurationWorkflowProperties($integrationInstanceConfigurationId: ID!, $workflowId: String!) {
+  toolEligibleIntegrationInstanceConfigurationWorkflowProperties(
+    integrationInstanceConfigurationId: $integrationInstanceConfigurationId
+    workflowId: $workflowId
+  ) {
+    advancedOption
+    description
+    displayCondition
+    expressionEnabled
+    hidden
+    name
+    required
+    type
+    ... on StringProperty {
+      controlType
+      defaultValue
+      label
+      maxLength
+      minLength
+      placeholder
+      regex
+    }
+    ... on IntegerProperty {
+      controlType
+      integerDefaultValue: defaultValue
+      label
+      placeholder
+    }
+    ... on NumberProperty {
+      controlType
+      label
+      numberDefaultValue: defaultValue
+      placeholder
+    }
+    ... on BooleanProperty {
+      booleanDefaultValue: defaultValue
+      controlType
+      label
+      placeholder
+    }
+    ... on ArrayProperty {
+      arrayDefaultValue: defaultValue
+      controlType
+      items {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
+      label
+      placeholder
+    }
+    ... on ObjectProperty {
+      controlType
+      label
+      objectDefaultValue: defaultValue
+      placeholder
+      properties {
+        advancedOption
+        description
+        displayCondition
+        expressionEnabled
+        hidden
+        name
+        required
+        type
+        ... on StringProperty {
+          controlType
+          defaultValue
+          label
+          placeholder
+        }
+        ... on IntegerProperty {
+          controlType
+          integerDefaultValue: defaultValue
+          label
+          placeholder
+        }
+        ... on NumberProperty {
+          controlType
+          label
+          numberDefaultValue: defaultValue
+          placeholder
+        }
+        ... on BooleanProperty {
+          booleanDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ArrayProperty {
+          arrayDefaultValue: defaultValue
+          controlType
+          label
+          placeholder
+        }
+        ... on ObjectProperty {
+          controlType
+          label
+          objectDefaultValue: defaultValue
+          placeholder
+        }
+      }
+    }
+  }
+}
+    `);
+
+export const useToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery = <
+      TData = ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery,
+      TError = unknown
+    >(
+      variables: ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['toolEligibleIntegrationInstanceConfigurationWorkflowProperties', variables],
+    queryFn: fetcher<ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery, ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables>(ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesDocument, variables),
     ...options
   }
     )};
