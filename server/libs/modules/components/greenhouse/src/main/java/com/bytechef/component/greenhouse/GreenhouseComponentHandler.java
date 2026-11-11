@@ -17,6 +17,7 @@
 package com.bytechef.component.greenhouse;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -47,6 +48,11 @@ public class GreenhouseComponentHandler implements ComponentHandler {
             GreenhouseGetCandidateAction.ACTION_DEFINITION,
             GreenhouseGetJobAction.ACTION_DEFINITION,
             GreenhouseListApplicationScorecardsAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(GreenhouseGetApplicationAction.ACTION_DEFINITION),
+            tool(GreenhouseGetCandidateAction.ACTION_DEFINITION),
+            tool(GreenhouseGetJobAction.ACTION_DEFINITION),
+            tool(GreenhouseListApplicationScorecardsAction.ACTION_DEFINITION))
         .version(1)
         .customAction(true)
         .customActionHelp("", "https://harvestdocs.greenhouse.io/");
