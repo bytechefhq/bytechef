@@ -73,13 +73,19 @@ const configuration = {
     workflows: [],
 };
 
-const renderList = (onEdit = vi.fn(), projectOverrides: Partial<typeof project> = {}, onCreate = vi.fn()) =>
+const renderList = (
+    onEdit = vi.fn(),
+    projectOverrides: Partial<typeof project> = {},
+    onCreate = vi.fn(),
+    onPublishProject?: (projectId: string) => void
+) =>
     render(
         <TooltipProvider>
             <AutomationProjectConfigurationList
                 environmentId={2}
                 onCreate={onCreate}
                 onEdit={onEdit}
+                onPublishProject={onPublishProject}
                 onUpdateVersion={vi.fn()}
                 project={{...project, ...projectOverrides}}
             />
@@ -130,6 +136,33 @@ describe('AutomationProjectConfigurationList', () => {
 
         expect(screen.getByText('Publish the project to configure it')).toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
+    });
+
+    it('publishes the project from the empty state while it is unpublished', async () => {
+        const onPublishProject = vi.fn();
+
+        renderList(
+            vi.fn(),
+            {published: false, workflowTemplates: [{workflowUuid: 'workflow-1'}] as typeof project.workflowTemplates},
+            vi.fn(),
+            onPublishProject
+        );
+
+        await userEvent.setup().click(screen.getByRole('button', {name: 'Publish'}));
+
+        expect(onPublishProject).toHaveBeenCalledWith('project-1');
+    });
+
+    it('disables publishing from the empty state of a project without workflows', () => {
+        renderList(vi.fn(), {published: false, workflowTemplates: []}, vi.fn(), vi.fn());
+
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
+    });
+
+    it('offers no publish button when publishing is not available', () => {
+        renderList(vi.fn(), {published: false});
+
+        expect(screen.queryByRole('button', {name: 'Publish'})).not.toBeInTheDocument();
     });
 
     it('shows one skeleton card with a row per workflow while loading instead of the empty state', () => {

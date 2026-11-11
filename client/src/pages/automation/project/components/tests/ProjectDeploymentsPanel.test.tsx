@@ -117,6 +117,10 @@ vi.mock('@/pages/automation/project-deployments/components/project-deployment-di
     ),
 }));
 
+vi.mock('@/pages/automation/projects/components/ProjectPublishDialog', () => ({
+    default: ({project}: {project: Project}) => <div>{`Publish dialog for project ${project.id}`}</div>,
+}));
+
 const onProjectDeploymentSaved = vi.fn();
 
 const project = {id: 7, lastProjectVersion: 3, lastPublishedDate: new Date(), name: 'Orders'} as Project;
@@ -293,5 +297,33 @@ describe('ProjectDeploymentsPanel', () => {
         );
 
         expect(screen.getByText('Publish the project to deploy it')).toBeInTheDocument();
+    });
+
+    it('opens the publish dialog from the empty state of an unpublished project', () => {
+        hoisted.projectDeployments = [];
+
+        renderProjectDeploymentsPanel(undefined, {
+            ...project,
+            lastPublishedDate: undefined,
+            projectWorkflowIds: [11],
+        } as Project);
+
+        expect(screen.queryByText('Publish dialog for project 7')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Publish'}));
+
+        expect(screen.getByText('Publish dialog for project 7')).toBeInTheDocument();
+    });
+
+    it('disables publishing from the empty state of a project without workflows', () => {
+        hoisted.projectDeployments = [];
+
+        renderProjectDeploymentsPanel(undefined, {
+            ...project,
+            lastPublishedDate: undefined,
+            projectWorkflowIds: [],
+        } as Project);
+
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
     });
 });

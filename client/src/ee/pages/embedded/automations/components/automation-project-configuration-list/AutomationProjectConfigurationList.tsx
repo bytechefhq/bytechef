@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import LoadingIcon from '@/components/LoadingIcon';
+import PublishButton from '@/shared/components/PublishButton';
 import WorkflowGroupCardSkeleton from '@/shared/components/WorkflowGroupCardSkeleton';
 import {
     AutomationProjectConfigurationsQuery,
@@ -21,6 +22,7 @@ interface AutomationProjectConfigurationListProps {
     environmentId: number;
     onCreate: () => void;
     onEdit: (configuration: AutomationProjectConfigurationType) => void;
+    onPublishProject?: (projectId: string) => void;
     onUpdateVersion: (configuration: AutomationProjectConfigurationType) => void;
     project: AutomationProjectType;
     showOpenInProject?: boolean;
@@ -31,6 +33,7 @@ const AutomationProjectConfigurationList = ({
     environmentId,
     onCreate,
     onEdit,
+    onPublishProject,
     onUpdateVersion,
     project,
     showOpenInProject = false,
@@ -73,7 +76,22 @@ const AutomationProjectConfigurationList = ({
         return (
             <div className="flex justify-center py-8">
                 <EmptyList
-                    button={project.published && <Button label="Create Configuration" onClick={onCreate} />}
+                    button={
+                        project.published ? (
+                            <Button label="Create Configuration" onClick={onCreate} />
+                        ) : (
+                            onPublishProject && (
+                                <PublishButton
+                                    disabledReason={
+                                        project.workflowTemplates?.length
+                                            ? undefined
+                                            : 'Add a workflow before publishing the project.'
+                                    }
+                                    onClick={() => onPublishProject(project.id)}
+                                />
+                            )
+                        )
+                    }
                     icon={<SlidersHorizontalIcon className="size-24 text-stroke-neutral-tertiary" />}
                     message={
                         project.published

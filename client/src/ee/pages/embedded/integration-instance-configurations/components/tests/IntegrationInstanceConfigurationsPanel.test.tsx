@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationsPanel from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationsPanel';
 import {Integration, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {fireEvent, render, screen, within} from '@/shared/util/test-utils';
@@ -74,6 +75,12 @@ vi.mock(
     })
 );
 
+vi.mock('@/ee/pages/embedded/integrations/components/IntegrationPublishDialog', () => ({
+    default: ({integration}: {integration: Integration}) => (
+        <div>{`Publish dialog for integration ${integration.id}`}</div>
+    ),
+}));
+
 const integration = {
     componentName: 'asana',
     id: 7,
@@ -84,7 +91,11 @@ const integration = {
 } as Integration;
 
 const renderPanel = (integrationOverrides: Partial<Integration> = {}) =>
-    render(<IntegrationInstanceConfigurationsPanel enabled integration={{...integration, ...integrationOverrides}} />);
+    render(
+        <TooltipProvider>
+            <IntegrationInstanceConfigurationsPanel enabled integration={{...integration, ...integrationOverrides}} />
+        </TooltipProvider>
+    );
 
 describe('IntegrationInstanceConfigurationsPanel', () => {
     beforeEach(() => {
@@ -127,6 +138,22 @@ describe('IntegrationInstanceConfigurationsPanel', () => {
 
         expect(screen.getByText('Publish the integration to configure it')).toBeInTheDocument();
         expect(screen.queryByText(/Configuration dialog/)).not.toBeInTheDocument();
+    });
+
+    it('opens the publish dialog from the empty state of an unpublished integration', () => {
+        renderPanel({integrationWorkflowIds: [3], lastPublishedDate: undefined});
+
+        expect(screen.queryByText('Publish dialog for integration 7')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Publish'}));
+
+        expect(screen.getByText('Publish dialog for integration 7')).toBeInTheDocument();
+    });
+
+    it('disables publishing from the empty state of an integration without workflows', () => {
+        renderPanel({integrationWorkflowIds: [], lastPublishedDate: undefined});
+
+        expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
     });
 
     it('shows one skeleton card with a row per integration workflow while loading', () => {

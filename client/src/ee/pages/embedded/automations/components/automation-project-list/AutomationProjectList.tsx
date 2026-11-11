@@ -181,6 +181,7 @@ const AutomationProjectList = ({
                                     environmentId={DEVELOPMENT_ENVIRONMENT}
                                     onCreate={() => setConfigurationDialog({project})}
                                     onEdit={(configuration) => setConfigurationDialog({configuration, project})}
+                                    onPublishProject={onPublishProject}
                                     onUpdateVersion={(configuration) =>
                                         setConfigurationDialog({configuration, project, updateProjectVersion: true})
                                     }

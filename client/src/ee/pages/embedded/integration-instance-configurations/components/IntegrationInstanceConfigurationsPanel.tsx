@@ -3,16 +3,18 @@ import EmptyState from '@/components/EmptyState/EmptyState';
 import LoadingIcon from '@/components/LoadingIcon';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
+import IntegrationPublishDialog from '@/ee/pages/embedded/integrations/components/IntegrationPublishDialog';
 import {Integration, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import PublishButton from '@/shared/components/PublishButton';
 import WorkflowGroupCardSkeleton from '@/shared/components/WorkflowGroupCardSkeleton';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {AlertTriangleIcon, SendIcon, Settings2Icon} from 'lucide-react';
-import {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 
 interface IntegrationInstanceConfigurationsPanelProps {
     enabled: boolean;
@@ -23,6 +25,8 @@ const IntegrationInstanceConfigurationsPanel = ({
     enabled,
     integration,
 }: IntegrationInstanceConfigurationsPanelProps) => {
+    const [showPublishIntegrationDialog, setShowPublishIntegrationDialog] = useState(false);
+
     const {
         data: integrationInstanceConfigurations,
         error: integrationInstanceConfigurationsError,
@@ -118,6 +122,16 @@ const IntegrationInstanceConfigurationsPanel = ({
                     />
                 ) : (
                     <EmptyState
+                        actions={
+                            <PublishButton
+                                disabledReason={
+                                    integration.integrationWorkflowIds?.length
+                                        ? undefined
+                                        : 'Add a workflow before publishing the integration.'
+                                }
+                                onClick={() => setShowPublishIntegrationDialog(true)}
+                            />
+                        }
                         description="Instance configurations run a published version of an integration. Publish this integration to create its first version."
                         icon={<SendIcon />}
                         title="Publish the integration to configure it"
@@ -141,6 +155,13 @@ const IntegrationInstanceConfigurationsPanel = ({
                         taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
                 </WorkflowReadOnlyProvider>
+            )}
+
+            {showPublishIntegrationDialog && !!integration.id && (
+                <IntegrationPublishDialog
+                    integration={integration}
+                    onClose={() => setShowPublishIntegrationDialog(false)}
+                />
             )}
         </>
     );

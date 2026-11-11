@@ -5,8 +5,10 @@ import ProjectDeploymentDialog from '@/pages/automation/project-deployments/comp
 import ProjectDeploymentList from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentList';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
 import useOpenSavedProjectDeployment from '@/pages/automation/project-deployments/hooks/useOpenSavedProjectDeployment';
+import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import PublishButton from '@/shared/components/PublishButton';
 import WorkflowGroupCardSkeleton from '@/shared/components/WorkflowGroupCardSkeleton';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
@@ -17,7 +19,7 @@ import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automatio
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {AlertTriangleIcon, Layers3Icon, RocketIcon, SendIcon} from 'lucide-react';
-import {useMemo} from 'react';
+import {useMemo, useState} from 'react';
 
 interface ProjectDeploymentsPanelProps {
     enabled: boolean;
@@ -36,6 +38,8 @@ const ProjectDeploymentsPanel = ({
     onProjectDeploymentSaved,
     project,
 }: ProjectDeploymentsPanelProps) => {
+    const [showPublishProjectDialog, setShowPublishProjectDialog] = useState(false);
+
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -136,6 +140,16 @@ const ProjectDeploymentsPanel = ({
                     />
                 ) : (
                     <EmptyState
+                        actions={
+                            <PublishButton
+                                disabledReason={
+                                    project.projectWorkflowIds?.length
+                                        ? undefined
+                                        : 'Add a workflow before publishing the project.'
+                                }
+                                onClick={() => setShowPublishProjectDialog(true)}
+                            />
+                        }
                         description="Deployments run a published, read-only version of a project. Publish this project to create its first version."
                         icon={<SendIcon />}
                         title="Publish the project to deploy it"
@@ -163,6 +177,10 @@ const ProjectDeploymentsPanel = ({
 
                     <ProjectDeploymentWorkflowExecutionsSheet />
                 </WorkflowReadOnlyProvider>
+            )}
+
+            {showPublishProjectDialog && !!project.id && (
+                <ProjectPublishDialog onClose={() => setShowPublishProjectDialog(false)} project={project} />
             )}
         </>
     );
