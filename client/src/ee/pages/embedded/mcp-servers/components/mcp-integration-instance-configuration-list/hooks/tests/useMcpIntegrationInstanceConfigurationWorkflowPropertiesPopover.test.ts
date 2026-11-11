@@ -122,42 +122,61 @@ describe('useMcpIntegrationInstanceConfigurationWorkflowPropertiesPopover', () =
         expect(result.current.form.getValues()).toEqual(expect.objectContaining({channel: 'general', limit: 3}));
     });
 
-    it('submits the values with blank strings in nested objects converted to null', () => {
-        const {result} = renderPopover(createWorkflow(), vi.fn());
+    it('saves only the fields the user changed on top of the saved parameters', () => {
+        const {result} = renderPopover(createWorkflow({extra: 1}), vi.fn());
 
-        act(() =>
-            result.current.handleFormSubmit({
-                channel: '',
-                dryRun: false,
-                limit: 0,
-                nested: {deeper: {value: ''}},
-                unset: null,
-            })
-        );
+        act(() => result.current.form.setValue('channel', '', {shouldDirty: true}));
+        act(() => result.current.form.setValue('nested', {deeper: {value: ''}}, {shouldDirty: true}));
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
 
         expect(hoisted.updateMutate).toHaveBeenCalledWith({
             id: 'mcp-workflow-1',
-            input: {
-                parameters: {
-                    channel: null,
-                    dryRun: false,
-                    limit: 0,
-                    nested: {deeper: {value: null}},
-                    unset: null,
-                },
-            },
+            input: {parameters: {channel: null, extra: 1, nested: {deeper: {value: null}}}},
         });
     });
 
-    it('converts blank strings inside array values to null like the project workflow popover', () => {
+    it('shows a saved null as an empty string and does not report it as changed', () => {
+        const {result} = renderPopover(createWorkflow({channel: null, extra: 1}), vi.fn());
+
+        expect(result.current.form.getValues('channel')).toBe('');
+
+        act(() => result.current.form.setValue('channel', '', {shouldDirty: true}));
+
+        expect(result.current.form.getFieldState('channel').isDirty).toBe(false);
+
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
+
+        expect(hoisted.updateMutate).toHaveBeenCalledWith(
+            expect.objectContaining({input: {parameters: {channel: null, extra: 1}}})
+        );
+    });
+
+    it('does not save untouched built-in defaults', () => {
         const {result} = renderPopover(createWorkflow(), vi.fn());
 
-        act(() =>
-            result.current.handleFormSubmit({
-                items: [{name: ''}, '', 'kept', ['']],
-                nested: {list: ['', 1]},
-            })
-        );
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
+
+        expect(hoisted.updateMutate).toHaveBeenCalledWith({id: 'mcp-workflow-1', input: {parameters: {}}});
+    });
+
+    it('saves the ai filled values', () => {
+        const {result} = renderPopover(createWorkflow(), vi.fn());
+
+        act(() => result.current.form.setValue('channel', '=fromAi(channel, "", "STRING")', {shouldDirty: true}));
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
+
+        expect(hoisted.updateMutate).toHaveBeenCalledWith({
+            id: 'mcp-workflow-1',
+            input: {parameters: {channel: '=fromAi(channel, "", "STRING")'}},
+        });
+    });
+
+    it('converts blank strings inside dirty array values to null', () => {
+        const {result} = renderPopover(createWorkflow(), vi.fn());
+
+        act(() => result.current.form.setValue('items', [{name: ''}, '', 'kept', ['']], {shouldDirty: true}));
+        act(() => result.current.form.setValue('nested', {list: ['', 1]}, {shouldDirty: true}));
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
 
         expect(hoisted.updateMutate).toHaveBeenCalledWith({
             id: 'mcp-workflow-1',

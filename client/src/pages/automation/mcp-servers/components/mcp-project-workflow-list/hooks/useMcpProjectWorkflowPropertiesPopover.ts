@@ -1,3 +1,7 @@
+import buildToolParametersPayload, {deepMerge} from '@/pages/platform/mcp-servers/utils/buildToolParametersPayload';
+import {collectPropertyDefaults} from '@/pages/platform/mcp-servers/utils/mcpToolAiFill';
+import pickChangedValues from '@/pages/platform/mcp-servers/utils/pickChangedValues';
+import {toFormParameters, toStoredWorkflowParameters} from '@/pages/platform/mcp-servers/utils/toolParameterConversion';
 import {useMcpProjectWorkflowPropertiesQuery, useUpdateMcpProjectWorkflowMutation} from '@/shared/middleware/graphql';
 import {PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
@@ -35,23 +39,7 @@ export default function useMcpProjectWorkflowPropertiesPopover(
     }, [propertiesData]);
 
     const defaultValues = useMemo(() => {
-        const propertyDefaults: Record<string, unknown> = {};
-
-        for (const property of properties) {
-            const propertyRecord = property as unknown as Record<string, unknown>;
-
-            const resolvedDefault =
-                propertyRecord.defaultValue ??
-                propertyRecord.integerDefaultValue ??
-                propertyRecord.numberDefaultValue ??
-                propertyRecord.booleanDefaultValue ??
-                propertyRecord.arrayDefaultValue ??
-                propertyRecord.objectDefaultValue;
-
-            if (property.name && resolvedDefault !== undefined && resolvedDefault !== null) {
-                propertyDefaults[property.name] = resolvedDefault;
-            }
-        }
+        const propertyDefaults = collectPropertyDefaults(properties);
 
         const rawParameters = mcpProjectWorkflow.parameters;
         const savedParameters =
@@ -59,10 +47,10 @@ export default function useMcpProjectWorkflowPropertiesPopover(
                 ? (rawParameters as Record<string, unknown>)
                 : {};
 
-        return {...propertyDefaults, ...savedParameters};
+        return deepMerge(propertyDefaults, toFormParameters(savedParameters));
     }, [mcpProjectWorkflow.parameters, properties]);
 
-    const form = useForm({
+    const form = useForm<Record<string, unknown>>({
         defaultValues,
     });
 
@@ -70,45 +58,29 @@ export default function useMcpProjectWorkflowPropertiesPopover(
         form.reset(defaultValues);
     }, [defaultValues, form]);
 
-    const {control, formState, handleSubmit} = form;
+    const {handleSubmit} = form;
 
     const handleFormSubmit = (values: Record<string, unknown>) => {
-        function sanitizeValue(value: unknown): unknown {
-            if (value === '') {
-                return null;
-            }
-
-            if (Array.isArray(value)) {
-                return value.map((item) => sanitizeValue(item));
-            }
-
-            if (value && typeof value === 'object') {
-                return sanitize(value as Record<string, unknown>);
-            }
-
-            return value;
-        }
-
-        function sanitize(record: Record<string, unknown>): Record<string, unknown> {
-            return Object.fromEntries(
-                Object.entries(record).map(([key, value]) => {
-                    return [key, sanitizeValue(value)];
-                })
-            );
-        }
-
         updateMcpProjectWorkflowMutation.mutate({
             id: mcpProjectWorkflow.id,
             input: {
-                parameters: sanitize(values),
+                parameters: toStoredWorkflowParameters(
+                    buildToolParametersPayload({
+                        aiValues: {},
+                        dirtyValues: pickChangedValues(
+                            values,
+                            defaultValues,
+                            (path) => form.getFieldState(path).isDirty
+                        ),
+                        savedParameters: mcpProjectWorkflow.parameters as Record<string, unknown> | null | undefined,
+                    })
+                ),
             },
         });
     };
 
     return {
-        control,
         form,
-        formState,
         handleFormSubmit,
         handleSubmit,
         isLoading,

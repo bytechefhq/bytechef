@@ -144,6 +144,17 @@ describe('McpComponentDialogShell', () => {
             expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
         });
 
+        it('should disable the save action and show a spinner while the save is pending', () => {
+            render(
+                <McpComponentDialogShell {...defaultProps} currentStep="tools" isSavePending selectedToolCount={1} />
+            );
+
+            const saveButton = screen.getByRole('button', {name: 'Save'});
+
+            expect(saveButton).toBeDisabled();
+            expect(saveButton.querySelector('.animate-spin')).not.toBeNull();
+        });
+
         it('should label the action Update when editing', () => {
             render(<McpComponentDialogShell {...defaultProps} currentStep="tools" editing selectedToolCount={1} />);
 

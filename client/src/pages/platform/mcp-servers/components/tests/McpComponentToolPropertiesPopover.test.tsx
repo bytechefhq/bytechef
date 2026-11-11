@@ -46,9 +46,7 @@ vi.mock('@/pages/platform/mcp-servers/hooks/useMcpComponentToolPropertiesPopover
         const form = useForm({defaultValues: {toolName: ''}});
 
         return {
-            control: form.control,
             form,
-            formState: form.formState,
             handleFormSubmit: vi.fn(),
             handleSubmit: form.handleSubmit,
             isLoading: hoisted.isLoading,
@@ -59,7 +57,11 @@ vi.mock('@/pages/platform/mcp-servers/hooks/useMcpComponentToolPropertiesPopover
     return {default: useMcpComponentToolPropertiesPopover};
 });
 
-vi.mock('@/pages/platform/mcp-servers/hooks/useMcpToolFormDisplayConditions', () => ({
+vi.mock('@/pages/platform/mcp-servers/hooks/useMcpToolOptionsLoader', () => ({
+    default: () => async () => null,
+}));
+
+vi.mock('@/shared/queries/platform/useFormDisplayConditions', () => ({
     default: () => ({displayConditions: hoisted.displayConditions, isEvaluating: hoisted.isEvaluating}),
 }));
 
@@ -94,7 +96,7 @@ describe('McpComponentToolPropertiesPopover', () => {
 
         renderPopover(true);
 
-        expect(screen.getByTestId('properties')).toHaveAttribute('data-connection-required', 'true');
+        expect(screen.getAllByTestId('properties')[0]).toHaveAttribute('data-connection-required', 'true');
     });
 
     it('picks up connectionRequired when it arrives after the first render', () => {
@@ -102,7 +104,7 @@ describe('McpComponentToolPropertiesPopover', () => {
 
         const {rerender} = renderPopover(undefined);
 
-        expect(screen.getByTestId('properties')).toHaveAttribute('data-connection-required', 'undefined');
+        expect(screen.getAllByTestId('properties')[0]).toHaveAttribute('data-connection-required', 'undefined');
 
         rerender(
             <McpComponentToolPropertiesPopover
@@ -114,7 +116,7 @@ describe('McpComponentToolPropertiesPopover', () => {
             />
         );
 
-        expect(screen.getByTestId('properties')).toHaveAttribute('data-connection-required', 'true');
+        expect(screen.getAllByTestId('properties')[0]).toHaveAttribute('data-connection-required', 'true');
     });
 
     it('opts the form out of native validation so react-hook-form can report required fields', () => {
@@ -134,7 +136,7 @@ describe('McpComponentToolPropertiesPopover', () => {
         renderPopover();
 
         expect(screen.getByText('Loading properties...')).toBeInTheDocument();
-        expect(screen.queryByTestId('properties')).not.toBeInTheDocument();
+        expect(screen.queryAllByTestId('properties')).toHaveLength(0);
     });
 
     it('renders the properties once the display conditions have been evaluated', () => {
@@ -142,7 +144,7 @@ describe('McpComponentToolPropertiesPopover', () => {
 
         renderPopover();
 
-        expect(screen.getByTestId('properties')).toBeInTheDocument();
+        expect(screen.getAllByTestId('properties')[0]).toBeInTheDocument();
         expect(screen.queryByText('Loading properties...')).not.toBeInTheDocument();
     });
 

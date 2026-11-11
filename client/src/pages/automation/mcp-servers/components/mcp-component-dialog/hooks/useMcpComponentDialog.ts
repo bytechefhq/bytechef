@@ -1,3 +1,4 @@
+import useMcpComponentToolForms from '@/pages/platform/mcp-servers/hooks/useMcpComponentToolForms';
 import useCeEdition from '@/shared/edition/useCeEdition';
 import {Connection} from '@/shared/middleware/automation/configuration';
 import {
@@ -8,6 +9,7 @@ import {
     useUpdateMcpComponentWithToolsMutation,
 } from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {getRoleLabel} from '@/shared/util/role-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo, useState} from 'react';
@@ -52,6 +54,24 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
     );
 
     const queryClient = useQueryClient();
+
+    const {data: componentDefinition} = useGetComponentDefinitionQuery(
+        {
+            componentName: selectedComponent?.name || '',
+            componentVersion: selectedComponent?.version || 1,
+        },
+        !!selectedComponent
+    );
+
+    const {aiValuesByTool, buildToolsPayload, isAwaitingSeeding, registerToolForm, savedParametersByToolName} =
+        useMcpComponentToolForms({
+            componentName: selectedComponent?.name || '',
+            componentVersion: selectedComponent?.version ?? 1,
+            connectionId: selectedConnection?.id?.toString(),
+            connectionRequired: componentDefinition?.connectionRequired ?? true,
+            existingTools: existingTools?.mcpToolsByComponentId,
+            selectedTools,
+        });
 
     const invalidateMcpQueries = () => {
         void queryClient.invalidateQueries({queryKey: ['mcpComponentsByServerId']});
@@ -104,10 +124,12 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!selectedComponent) {
             return;
         }
+
+        const tools = await buildToolsPayload(selectedTools);
 
         const onMutationSuccess = () => {
             if (onOpenChange) {
@@ -135,10 +157,7 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
                         connectionId: selectedConnection?.id?.toString() || undefined,
                         mcpServerId,
                         requiredAuthorities,
-                        tools: selectedTools.map((tool) => ({
-                            name: tool.name,
-                            parameters: {},
-                        })),
+                        tools,
                         version: mcpComponent.version,
                     },
                 },
@@ -153,10 +172,7 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
                         connectionId: selectedConnection?.id?.toString() || undefined,
                         mcpServerId,
                         requiredAuthorities,
-                        tools: selectedTools.map((tool) => ({
-                            name: tool.name,
-                            parameters: {},
-                        })),
+                        tools,
                     },
                 },
                 {onSuccess: onMutationSuccess}
@@ -205,7 +221,13 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
         }
     };
 
+    const isSavePending =
+        isAwaitingSeeding ||
+        createMcpComponentWithToolsMutation.isPending ||
+        updateMcpComponentWithToolsMutation.isPending;
+
     return {
+        aiValuesByTool,
         authoritiesLoading,
         authorityOptions,
         currentStep,
@@ -215,7 +237,10 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
         handleComponentSelect,
         handleOpenChange,
         handleSave,
+        isSavePending,
+        registerToolForm,
         requiredAuthorities,
+        savedParametersByToolName,
         selectedComponent,
         selectedConnection,
         selectedTools,

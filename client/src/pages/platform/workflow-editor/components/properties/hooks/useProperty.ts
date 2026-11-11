@@ -71,6 +71,7 @@ import sanitizeHtml from 'sanitize-html';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {getTask} from '../../../utils/getTask';
+import buildFromAiExpression from '../utils/buildFromAiExpression';
 import {computeFromAiToggle} from './fromAiToggle';
 
 const getStringValueValidation = (
@@ -131,7 +132,8 @@ type UsePropertyReturnType = {
     handleFromAiClick: ((fromAi: boolean) => void) | undefined;
     handleFormulaSwitch: () => void;
     handleFromAiToggle: (fromAi: boolean, fieldOnChange: (value: string) => void) => void;
-    handleControlledNativeFromAiClick: (fieldOnChange: (value: string) => void) => void;
+    handleControlledNativeFromAiClick: (fieldOnChange: (value: string) => void, previousValue?: unknown) => void;
+    handleControlledSelectFromAiOff: (fieldOnChange: (value: string) => void) => void;
     handleInputChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
     handleInputClear: () => void;
     handleJsonSchemaBuilderChange: (value?: SchemaRecordType) => void;
@@ -255,6 +257,7 @@ export const useProperty = ({
 
     const controlledExpressionExitRef = useRef(false);
     const controlledFormulaOnChangeRef = useRef<((value: string) => void) | null>(null);
+    const controlledSelectValueBeforeFromAiRef = useRef<string | undefined>(undefined);
     const editorPendingSaveCancelRef = useRef<(() => void) | null>(null);
     const editorRef = useRef<Editor>(null!);
 
@@ -404,43 +407,19 @@ export const useProperty = ({
         return formattedOptions?.map((option) => String(option.value));
     }, [controlType, formattedOptions, optionsDataSource, optionsLoadedDynamically]);
 
-    const fromAiExpression = useMemo(() => {
-        const mapEntries: string[] = [];
-
-        if (description) {
-            const escapedDescription = description.replace(/'/g, "''");
-
-            mapEntries.push(`'description': '${escapedDescription}'`);
-        }
-
-        if (defaultValue !== '' && defaultValue !== null && defaultValue !== undefined) {
-            const defaultValueString = String(defaultValue);
-
-            // Skip expression-shaped defaults (including prior fromAi output) so repeat
-            // clicks don't keep nesting the previous expression as an escaped default.
-            if (!defaultValueString.startsWith('=')) {
-                const escapedDefault = defaultValueString.replace(/'/g, "''");
-
-                mapEntries.push(`'defaultValue': '${escapedDefault}'`);
-            }
-        }
-
-        if (formattedOptions != null && formattedOptions.length > 0) {
-            const optionValues = formattedOptions
-                .map((option) => `'${String(option?.value ?? '').replace(/'/g, "''")}'`)
-                .join(', ');
-
-            mapEntries.push(`'options': {${optionValues}}`);
-        }
-
-        mapEntries.push(`'required': ${required}`);
-
-        // Array items have `name` equal to the index (e.g. "0"). Qualifying it with
-        // the parent array's name gives the model a meaningful identifier.
-        const qualifiedName = arrayName ? `${arrayName}_${name}` : name;
-
-        return `=fromAi('${qualifiedName}', '${type}', {${mapEntries.join(', ')}})`;
-    }, [arrayName, defaultValue, description, formattedOptions, name, required, type]);
+    const fromAiExpression = useMemo(
+        () =>
+            buildFromAiExpression({
+                arrayName,
+                defaultValue,
+                description,
+                name: String(name),
+                options: formattedOptions,
+                required,
+                type,
+            }),
+        [arrayName, defaultValue, description, formattedOptions, name, required, type]
+    );
 
     const isValidControlType = useMemo(
         () => controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType),
@@ -862,12 +841,30 @@ export const useProperty = ({
     );
 
     const handleControlledNativeFromAiClick = useCallback(
-        (fieldOnChange: (value: string) => void) => {
+        (fieldOnChange: (value: string) => void, previousValue?: unknown) => {
+            controlledSelectValueBeforeFromAiRef.current =
+                typeof previousValue === 'string' && previousValue !== '' ? previousValue : undefined;
+
             setIsFormulaMode(true);
 
             handleFromAiToggle(true, fieldOnChange);
         },
         [handleFromAiToggle, setIsFormulaMode]
+    );
+
+    const handleControlledSelectFromAiOff = useCallback(
+        (fieldOnChange: (value: string) => void) => {
+            const restoredValue = controlledSelectValueBeforeFromAiRef.current || String(property.defaultValue ?? '');
+
+            controlledSelectValueBeforeFromAiRef.current = undefined;
+
+            setControlledFromAi(false);
+            setFormulaModeState(false);
+            setSelectValue(restoredValue);
+
+            fieldOnChange(restoredValue);
+        },
+        [property.defaultValue, setSelectValue]
     );
 
     const handleJsonSchemaBuilderChange = useDebouncedCallback((value?: SchemaRecordType) => {
@@ -2122,6 +2119,7 @@ export const useProperty = ({
         handleControlledFormulaSwitch,
         handleControlledNativeFromAiClick,
         handleControlledNativeKeyDown,
+        handleControlledSelectFromAiOff,
         handleDeleteCustomPropertyClick,
         handleDynamicSwitch,
         handleFormulaSwitch,

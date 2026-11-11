@@ -115,6 +115,7 @@ const useMcpComponentDialogToolSelectionStep = ({
 
     return {
         allToolsSelected,
+        componentDefinition,
         handleSelectAllTools,
         handleToolToggle,
         isLoadingComponentDefinition,

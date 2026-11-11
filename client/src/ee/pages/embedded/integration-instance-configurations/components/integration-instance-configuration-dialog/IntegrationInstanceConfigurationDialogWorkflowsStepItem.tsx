@@ -4,7 +4,7 @@ import {ComponentConnection, IntegrationInstanceConfiguration} from '@/ee/shared
 import InputConfigurationList from '@/shared/components/InputConfigurationList';
 import WorkflowConfigurationCard from '@/shared/components/workflow-configuration/WorkflowConfigurationCard';
 import {Workflow} from '@/shared/middleware/automation/configuration';
-import {useEffect} from 'react';
+import {ReactNode, useEffect} from 'react';
 import {Control, FieldValues, FormState, UseFormSetValue, useWatch} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -17,6 +17,7 @@ export interface IntegrationInstanceConfigurationDialogWorkflowListItemProps {
     onEnabledChange?: (enabled: boolean) => void;
     setValue: UseFormSetValue<IntegrationInstanceConfiguration>;
     showWorkflowToggle?: boolean;
+    toolContent?: ReactNode;
     workflow: Workflow;
     workflowIndex: number;
 }
@@ -30,6 +31,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
     onEnabledChange,
     setValue,
     showWorkflowToggle = false,
+    toolContent,
     workflow,
     workflowIndex,
 }: IntegrationInstanceConfigurationDialogWorkflowListItemProps) => {
@@ -102,6 +104,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
             onEnabledChange={handleEnabledChange}
             showWorkflowToggle={showWorkflowToggle}
             switchId={`integrationInstanceConfigurationWorkflows.${workflowIndex}`}
+            toolContent={toolContent}
         />
     );
 };

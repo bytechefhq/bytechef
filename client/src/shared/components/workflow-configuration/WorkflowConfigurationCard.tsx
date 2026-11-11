@@ -1,7 +1,7 @@
 import Switch from '@/components/Switch/Switch';
 import {Label} from '@/components/ui/label';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {FileInputIcon, Link2Icon, WorkflowIcon} from 'lucide-react';
+import {FileInputIcon, Link2Icon, WorkflowIcon, WrenchIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -15,6 +15,7 @@ interface WorkflowConfigurationCardProps {
     onEnabledChange: (enabled: boolean) => void;
     showWorkflowToggle: boolean;
     switchId: string;
+    toolContent?: ReactNode;
 }
 
 const WorkflowConfigurationCard = ({
@@ -27,6 +28,7 @@ const WorkflowConfigurationCard = ({
     onEnabledChange,
     showWorkflowToggle,
     switchId,
+    toolContent,
 }: WorkflowConfigurationCardProps) => (
     <div
         className={twMerge(
@@ -82,6 +84,14 @@ const WorkflowConfigurationCard = ({
 
                         <span className="ml-1">({inputCount})</span>
                     </TabsTrigger>
+
+                    {toolContent && (
+                        <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="tool">
+                            <WrenchIcon className="mr-2 size-4" />
+
+                            <span>Tool</span>
+                        </TabsTrigger>
+                    )}
                 </TabsList>
 
                 <TabsContent className="mt-0 space-y-4" tabIndex={-1} value="connections">
@@ -91,6 +101,12 @@ const WorkflowConfigurationCard = ({
                 <TabsContent className="mt-0" tabIndex={-1} value="inputs">
                     {inputsContent}
                 </TabsContent>
+
+                {toolContent && (
+                    <TabsContent className="mt-0" tabIndex={-1} value="tool">
+                        {toolContent}
+                    </TabsContent>
+                )}
             </Tabs>
         )}
     </div>
