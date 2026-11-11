@@ -434,8 +434,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             };
             case BASIC_AUTH, DIGEST_AUTH -> (Parameters connectionParameters, Context context) -> {
                 String valueToEncode =
-                    MapUtils.getString(connectionParameters, Authorization.USERNAME) +
-                        ":" + MapUtils.getString(connectionParameters, Authorization.PASSWORD);
+                    MapUtils.getString(connectionParameters, Authorization.USERNAME, "") +
+                        ":" + MapUtils.getString(connectionParameters, Authorization.PASSWORD, "");
 
                 return ApplyResponse.ofHeaders(
                     Map.of(

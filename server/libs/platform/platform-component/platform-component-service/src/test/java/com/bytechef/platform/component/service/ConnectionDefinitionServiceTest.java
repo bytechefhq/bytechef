@@ -21,19 +21,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Context;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.aspect.TokenRefreshHandler;
 import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 public class ConnectionDefinitionServiceTest {
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry = mock(ComponentDefinitionRegistry.class);
@@ -80,10 +89,30 @@ public class ConnectionDefinitionServiceTest {
 // TODO
     }
 
-    @Disabled
     @Test
-    public void testPerformAuthorizationApply() {
-// TODO
+    public void testExecuteAuthorizationApplySendsEmptyPasswordForUsernameOnlyBasicAuth() {
+        when(componentDefinitionRegistry.getAuthorization("bamboohr", 1, AuthorizationType.BASIC_AUTH))
+            .thenReturn(ComponentDsl.authorization(AuthorizationType.BASIC_AUTH));
+
+        ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
+            "bamboohr", 1, AuthorizationType.BASIC_AUTH, Map.of(Authorization.USERNAME, "apiKey"),
+            mock(Context.class));
+
+        assertThat(applyResponse.getHeaders())
+            .containsEntry("Authorization", List.of("Basic " + encode("apiKey:")));
+    }
+
+    @Test
+    public void testExecuteAuthorizationApplySendsUsernameAndPasswordForBasicAuth() {
+        when(componentDefinitionRegistry.getAuthorization("http", 1, AuthorizationType.BASIC_AUTH))
+            .thenReturn(ComponentDsl.authorization(AuthorizationType.BASIC_AUTH));
+
+        ApplyResponse applyResponse = connectionDefinitionService.executeAuthorizationApply(
+            "http", 1, AuthorizationType.BASIC_AUTH,
+            Map.of(Authorization.USERNAME, "user", Authorization.PASSWORD, "secret"), mock(Context.class));
+
+        assertThat(applyResponse.getHeaders())
+            .containsEntry("Authorization", List.of("Basic " + encode("user:secret")));
     }
 
     @Disabled
@@ -120,5 +149,11 @@ public class ConnectionDefinitionServiceTest {
     @Test
     public void testGetOAuth2Parameters() {
         // TODO
+    }
+
+    private static String encode(String value) {
+        Base64.Encoder encoder = Base64.getEncoder();
+
+        return encoder.encodeToString(value.getBytes(StandardCharsets.UTF_8));
     }
 }
