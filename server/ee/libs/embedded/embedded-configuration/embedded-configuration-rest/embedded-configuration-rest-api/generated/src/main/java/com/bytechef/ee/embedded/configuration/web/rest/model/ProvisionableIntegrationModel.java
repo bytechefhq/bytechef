@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProvisionableIntegration", description = "An integration that can be provisioned to a connected user.")
 @JsonTypeName("ProvisionableIntegration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T02:20:55.684519+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-11T12:16:15.177229+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ProvisionableIntegrationModel {
 
   private @Nullable IntegrationBasicModel integration;
@@ -35,6 +35,8 @@ public class ProvisionableIntegrationModel {
   private @Nullable Integer componentVersion;
 
   private List<@Valid ProvisionableIntegrationInstanceConfigurationModel> integrationInstanceConfigurations = new ArrayList<>();
+
+  private List<String> mcpWorkflowUuids = new ArrayList<>();
 
   public ProvisionableIntegrationModel integration(@Nullable IntegrationBasicModel integration) {
     this.integration = integration;
@@ -107,6 +109,35 @@ public class ProvisionableIntegrationModel {
     this.integrationInstanceConfigurations = integrationInstanceConfigurations;
   }
 
+  public ProvisionableIntegrationModel mcpWorkflowUuids(List<String> mcpWorkflowUuids) {
+    this.mcpWorkflowUuids = mcpWorkflowUuids;
+    return this;
+  }
+
+  public ProvisionableIntegrationModel addMcpWorkflowUuidsItem(String mcpWorkflowUuidsItem) {
+    if (this.mcpWorkflowUuids == null) {
+      this.mcpWorkflowUuids = new ArrayList<>();
+    }
+    this.mcpWorkflowUuids.add(mcpWorkflowUuidsItem);
+    return this;
+  }
+
+  /**
+   * The uuids of the integration's workflows that embedded MCP servers expose as tools.
+   * @return mcpWorkflowUuids
+   */
+  
+  @Schema(name = "mcpWorkflowUuids", description = "The uuids of the integration's workflows that embedded MCP servers expose as tools.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("mcpWorkflowUuids")
+  public List<String> getMcpWorkflowUuids() {
+    return mcpWorkflowUuids;
+  }
+
+  @JsonProperty("mcpWorkflowUuids")
+  public void setMcpWorkflowUuids(List<String> mcpWorkflowUuids) {
+    this.mcpWorkflowUuids = mcpWorkflowUuids;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -118,12 +149,13 @@ public class ProvisionableIntegrationModel {
     ProvisionableIntegrationModel provisionableIntegration = (ProvisionableIntegrationModel) o;
     return Objects.equals(this.integration, provisionableIntegration.integration) &&
         Objects.equals(this.componentVersion, provisionableIntegration.componentVersion) &&
-        Objects.equals(this.integrationInstanceConfigurations, provisionableIntegration.integrationInstanceConfigurations);
+        Objects.equals(this.integrationInstanceConfigurations, provisionableIntegration.integrationInstanceConfigurations) &&
+        Objects.equals(this.mcpWorkflowUuids, provisionableIntegration.mcpWorkflowUuids);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(integration, componentVersion, integrationInstanceConfigurations);
+    return Objects.hash(integration, componentVersion, integrationInstanceConfigurations, mcpWorkflowUuids);
   }
 
   @Override
@@ -133,6 +165,7 @@ public class ProvisionableIntegrationModel {
     sb.append("    integration: ").append(toIndentedString(integration)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    integrationInstanceConfigurations: ").append(toIndentedString(integrationInstanceConfigurations)).append("\n");
+    sb.append("    mcpWorkflowUuids: ").append(toIndentedString(mcpWorkflowUuids)).append("\n");
     sb.append("}");
     return sb.toString();
   }

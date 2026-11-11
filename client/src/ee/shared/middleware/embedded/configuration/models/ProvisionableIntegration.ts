@@ -46,6 +46,10 @@ export interface ProvisionableIntegration {
      * 
      */
     integrationInstanceConfigurations?: Array<ProvisionableIntegrationInstanceConfiguration>;
+    /**
+     * The uuids of the integration's workflows that embedded MCP servers expose as tools.
+     */
+    mcpWorkflowUuids?: Array<string>;
 }
 
 /**
@@ -68,6 +72,7 @@ export function ProvisionableIntegrationFromJSONTyped(json: any, ignoreDiscrimin
         'integration': json['integration'] == null ? undefined : IntegrationBasicFromJSON(json['integration']),
         'componentVersion': json['componentVersion'] == null ? undefined : json['componentVersion'],
         'integrationInstanceConfigurations': json['integrationInstanceConfigurations'] == null ? undefined : ((json['integrationInstanceConfigurations'] as Array<any>).map(ProvisionableIntegrationInstanceConfigurationFromJSON)),
+        'mcpWorkflowUuids': json['mcpWorkflowUuids'] == null ? undefined : json['mcpWorkflowUuids'],
     };
 }
 
@@ -85,6 +90,7 @@ export function ProvisionableIntegrationToJSONTyped(value?: ProvisionableIntegra
         'integration': IntegrationBasicToJSON(value['integration']),
         'componentVersion': value['componentVersion'],
         'integrationInstanceConfigurations': value['integrationInstanceConfigurations'] == null ? undefined : ((value['integrationInstanceConfigurations'] as Array<any>).map(ProvisionableIntegrationInstanceConfigurationToJSON)),
+        'mcpWorkflowUuids': value['mcpWorkflowUuids'],
     };
 }
 

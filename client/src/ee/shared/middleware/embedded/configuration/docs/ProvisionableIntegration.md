@@ -10,6 +10,7 @@ Name | Type
 `integration` | [IntegrationBasic](IntegrationBasic.md)
 `componentVersion` | number
 `integrationInstanceConfigurations` | [Array&lt;ProvisionableIntegrationInstanceConfiguration&gt;](ProvisionableIntegrationInstanceConfiguration.md)
+`mcpWorkflowUuids` | Array&lt;string&gt;
 
 ## Example
 
@@ -21,6 +22,7 @@ const example = {
   "integration": null,
   "componentVersion": null,
   "integrationInstanceConfigurations": null,
+  "mcpWorkflowUuids": null,
 } satisfies ProvisionableIntegration
 
 console.log(example)
