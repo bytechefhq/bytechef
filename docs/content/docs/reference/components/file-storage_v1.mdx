@@ -126,6 +126,7 @@ Name: write
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | content | Content | STRING | String to write to the file. | true |
 | filename | Filename | STRING | Filename to set for data. By default, "file.txt" will be used. | false |
+| encoding | Encoding | STRING <details> <summary> Options </summary> <span>UTF-8</span>, <span>UTF-16</span>, <span>US-ASCII</span>, <span>ISO-8859-1</span>, <span>ISO-8859-2</span>, <span>ISO-8859-15</span>, <span>windows-1250</span>, <span>windows-1251</span>, <span>windows-1252</span> </details> | Character encoding the content is written in. A character the encoding cannot represent fails the action. | false |
 
 #### Example JSON Structure
 ```json
@@ -134,7 +135,8 @@ Name: write
   "name" : "write",
   "parameters" : {
     "content" : "",
-    "filename" : ""
+    "filename" : "",
+    "encoding" : ""
   },
   "type" : "fileStorage/v1/write"
 }
