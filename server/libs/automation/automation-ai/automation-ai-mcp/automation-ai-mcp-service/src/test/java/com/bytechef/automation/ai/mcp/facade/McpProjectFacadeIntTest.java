@@ -65,6 +65,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConne
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO.WorkflowConnectionDTO;
+import com.bytechef.platform.configuration.dto.WorkflowToolParametersDTO;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
@@ -76,6 +77,7 @@ import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -465,6 +467,80 @@ class McpProjectFacadeIntTest {
             mcpProjectWorkflowRepository.findAllByMcpProjectId(mcpProject.getId());
 
         assertThat(mcpProjectWorkflowsAfter).hasSize(2);
+    }
+
+    @Test
+    void testCreateMcpProjectStoresToolParameters() {
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId1, workflowId2), List.of(),
+            List.of(new WorkflowToolParametersDTO(workflowId1, Map.of("toolName", "first_tool"))));
+
+        Map<String, McpProjectWorkflow> mcpProjectWorkflowMap = getMcpProjectWorkflowsByWorkflowId(mcpProject);
+
+        assertThat(mcpProjectWorkflowMap.get(workflowId1)
+            .getParameters()).isEqualTo(Map.of("toolName", "first_tool"));
+        assertThat(mcpProjectWorkflowMap.get(workflowId2)
+            .getParameters()).isNullOrEmpty();
+    }
+
+    @Test
+    void testUpdateMcpProjectStoresToolParametersForNewAndExistingWorkflows() {
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId1));
+
+        mcpProjectFacade.updateMcpProject(
+            mcpProject.getId(), List.of(workflowId1, workflowId2), List.of(),
+            List.of(
+                new WorkflowToolParametersDTO(workflowId1, Map.of("toolName", "kept_tool")),
+                new WorkflowToolParametersDTO(workflowId2, Map.of("toolName", "added_tool"))));
+
+        Map<String, McpProjectWorkflow> mcpProjectWorkflowMap = getMcpProjectWorkflowsByWorkflowId(mcpProject);
+
+        assertThat(mcpProjectWorkflowMap.get(workflowId1)
+            .getParameters()).isEqualTo(Map.of("toolName", "kept_tool"));
+        assertThat(mcpProjectWorkflowMap.get(workflowId2)
+            .getParameters()).isEqualTo(Map.of("toolName", "added_tool"));
+    }
+
+    @Test
+    void testUpdateMcpProjectLeavesParametersOfWorkflowsWithoutToolParameters() {
+        McpProject mcpProject = mcpProjectFacade.createMcpProject(
+            mcpServer.getId(), project.getId(), 1, List.of(workflowId1, workflowId2), List.of(),
+            List.of(
+                new WorkflowToolParametersDTO(workflowId1, Map.of("toolName", "first_tool")),
+                new WorkflowToolParametersDTO(workflowId2, Map.of("toolName", "second_tool"))));
+
+        mcpProjectFacade.updateMcpProject(
+            mcpProject.getId(), List.of(workflowId1, workflowId2), List.of(),
+            List.of(new WorkflowToolParametersDTO(workflowId2, Map.of("toolName", "renamed_tool"))));
+
+        Map<String, McpProjectWorkflow> mcpProjectWorkflowMap = getMcpProjectWorkflowsByWorkflowId(mcpProject);
+
+        assertThat(mcpProjectWorkflowMap.get(workflowId1)
+            .getParameters()).isEqualTo(Map.of("toolName", "first_tool"));
+        assertThat(mcpProjectWorkflowMap.get(workflowId2)
+            .getParameters()).isEqualTo(Map.of("toolName", "renamed_tool"));
+    }
+
+    private Map<String, McpProjectWorkflow> getMcpProjectWorkflowsByWorkflowId(McpProject mcpProject) {
+        Map<Long, String> workflowIdMap = new HashMap<>();
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflowRepository
+            .findAllByProjectDeploymentId(mcpProject.getProjectDeploymentId())) {
+
+            workflowIdMap.put(projectDeploymentWorkflow.getId(), projectDeploymentWorkflow.getWorkflowId());
+        }
+
+        Map<String, McpProjectWorkflow> mcpProjectWorkflowMap = new HashMap<>();
+
+        for (McpProjectWorkflow mcpProjectWorkflow : mcpProjectWorkflowRepository
+            .findAllByMcpProjectId(mcpProject.getId())) {
+
+            mcpProjectWorkflowMap.put(
+                workflowIdMap.get(mcpProjectWorkflow.getProjectDeploymentWorkflowId()), mcpProjectWorkflow);
+        }
+
+        return mcpProjectWorkflowMap;
     }
 
     @Nested
@@ -1218,6 +1294,14 @@ class McpProjectFacadeIntTest {
         }
 
         @Test
+        void testCreateWithToolParametersRequiresServerEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectFacade.createMcpProject(3L, 4L, 1, List.of(), List.of(), List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
         void testDeleteRequiresProjectEditor() {
             when(permissionEvaluator.hasPermission(any(), eq(5L), eq("McpProject"), eq("MCP_EDIT"))).thenReturn(false);
 
@@ -1230,6 +1314,14 @@ class McpProjectFacadeIntTest {
             when(permissionEvaluator.hasPermission(any(), eq(5L), eq("McpProject"), eq("MCP_EDIT"))).thenReturn(false);
 
             assertThatThrownBy(() -> mcpProjectFacade.updateMcpProject(5L, List.of()))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testUpdateWithToolParametersRequiresProjectEditor() {
+            when(permissionEvaluator.hasPermission(any(), eq(5L), eq("McpProject"), eq("MCP_EDIT"))).thenReturn(false);
+
+            assertThatThrownBy(() -> mcpProjectFacade.updateMcpProject(5L, List.of(), List.of(), List.of()))
                 .isInstanceOf(AccessDeniedException.class);
         }
 

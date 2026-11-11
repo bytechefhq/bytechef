@@ -32,6 +32,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO.WorkflowConnectionDTO;
+import com.bytechef.platform.configuration.dto.WorkflowToolParametersDTO;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -192,7 +193,8 @@ class McpProjectGraphQlControllerIntTest {
         // Given
         McpProject mockProject = createMockMcpProject(1L, 123L, 1L);
 
-        when(mcpProjectFacade.createMcpProject(anyLong(), anyLong(), anyInt(), any(), any())).thenReturn(mockProject);
+        when(mcpProjectFacade.createMcpProject(anyLong(), anyLong(), anyInt(), any(), any(), any()))
+            .thenReturn(mockProject);
 
         // When & Then
         this.graphQlTester
@@ -218,14 +220,15 @@ class McpProjectGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("1");
 
-        verify(mcpProjectFacade).createMcpProject(1L, 123L, 1, List.of("workflow1", "workflow2"), List.of());
+        verify(mcpProjectFacade).createMcpProject(1L, 123L, 1, List.of("workflow1", "workflow2"), List.of(), List.of());
     }
 
     @Test
     void testCreateMcpProjectWithWorkflowConfigurations() {
         McpProject mockProject = createMockMcpProject(1L, 123L, 1L);
 
-        when(mcpProjectFacade.createMcpProject(anyLong(), anyLong(), anyInt(), any(), any())).thenReturn(mockProject);
+        when(mcpProjectFacade.createMcpProject(anyLong(), anyLong(), anyInt(), any(), any(), any()))
+            .thenReturn(mockProject);
 
         this.graphQlTester
             .document("""
@@ -259,7 +262,72 @@ class McpProjectGraphQlControllerIntTest {
             List.of(
                 new WorkflowConfigurationDTO(
                     "workflow1", List.of(new WorkflowConnectionDTO(7L, "slack", "slack_1")),
-                    Map.of("channel", "general"))));
+                    Map.of("channel", "general"))),
+            List.of());
+    }
+
+    @Test
+    void testCreateMcpProjectWithToolParameters() {
+        McpProject mockProject = createMockMcpProject(1L, 123L, 1L);
+
+        when(mcpProjectFacade.createMcpProject(anyLong(), anyLong(), anyInt(), any(), any(), any()))
+            .thenReturn(mockProject);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    createMcpProject(input: {
+                        mcpServerId: "1",
+                        projectId: "123",
+                        projectVersion: 1,
+                        selectedWorkflowIds: ["workflow1"],
+                        toolParameters: [{
+                            workflowId: "workflow1",
+                            parameters: {toolName: "my_tool"}
+                        }]
+                    }) {
+                        id
+                    }
+                }
+                """)
+            .execute()
+            .path("createMcpProject.id")
+            .entity(String.class)
+            .isEqualTo("1");
+
+        verify(mcpProjectFacade).createMcpProject(
+            1L, 123L, 1, List.of("workflow1"), List.of(),
+            List.of(new WorkflowToolParametersDTO("workflow1", Map.of("toolName", "my_tool"))));
+    }
+
+    @Test
+    void testUpdateMcpProjectWithToolParameters() {
+        McpProject mockProject = createMockMcpProject(1L, 123L, 1L);
+
+        when(mcpProjectFacade.updateMcpProject(anyLong(), any(), any(), any())).thenReturn(mockProject);
+
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpProject(id: "1", input: {
+                        selectedWorkflowIds: ["workflow1"],
+                        toolParameters: [{
+                            workflowId: "workflow1",
+                            parameters: {toolName: "my_tool"}
+                        }]
+                    }) {
+                        id
+                    }
+                }
+                """)
+            .execute()
+            .path("updateMcpProject.id")
+            .entity(String.class)
+            .isEqualTo("1");
+
+        verify(mcpProjectFacade).updateMcpProject(
+            1L, List.of("workflow1"), List.of(),
+            List.of(new WorkflowToolParametersDTO("workflow1", Map.of("toolName", "my_tool"))));
     }
 
     @Test
@@ -287,7 +355,7 @@ class McpProjectGraphQlControllerIntTest {
         // Given
         McpProject mockProject = createMockMcpProject(1L, 123L, 1L);
 
-        when(mcpProjectFacade.updateMcpProject(anyLong(), any(), any())).thenReturn(mockProject);
+        when(mcpProjectFacade.updateMcpProject(anyLong(), any(), any(), any())).thenReturn(mockProject);
 
         // When & Then
         this.graphQlTester
@@ -313,7 +381,7 @@ class McpProjectGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("1");
 
-        verify(mcpProjectFacade).updateMcpProject(1L, List.of("workflow1", "workflow3"), List.of());
+        verify(mcpProjectFacade).updateMcpProject(1L, List.of("workflow1", "workflow3"), List.of(), List.of());
     }
 
     @Test

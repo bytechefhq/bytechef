@@ -29,6 +29,7 @@ import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,6 +105,22 @@ public class McpProjectWorkflowFacadeImpl implements McpProjectWorkflowFacade {
                 return McpWorkflowUtils.getCallableTrigger(workflow) != null;
             })
             .toList();
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
+    @Transactional(readOnly = true)
+    public Workflow getToolEligibleWorkflow(long projectId, String workflowId) {
+        boolean belongsToProject = projectWorkflowService.getProjectWorkflows(projectId)
+            .stream()
+            .anyMatch(projectWorkflow -> Objects.equals(projectWorkflow.getWorkflowId(), workflowId));
+
+        if (!belongsToProject) {
+            throw new IllegalArgumentException(
+                "Workflow " + workflowId + " does not belong to project " + projectId);
+        }
+
+        return workflowService.getWorkflow(workflowId);
     }
 
     @Override
