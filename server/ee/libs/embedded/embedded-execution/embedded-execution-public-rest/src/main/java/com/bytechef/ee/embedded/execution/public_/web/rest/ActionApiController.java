@@ -20,6 +20,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -96,12 +97,10 @@ public class ActionApiController implements ActionApi {
             }
         }
 
-        return ResponseEntity.ok(
-            Map.of(
-                "result",
-                actionFacade.executeAction(
-                    externalUserId, componentName, componentVersion, actionName, inputParameters, xInstanceId,
-                    environment)));
+        Object result = actionFacade.executeAction(
+            externalUserId, componentName, componentVersion, actionName, inputParameters, xInstanceId, environment);
+
+        return ResponseEntity.ok(Collections.singletonMap("result", result));
     }
 
     @InitBinder

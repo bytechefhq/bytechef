@@ -51,6 +51,8 @@ public interface ConnectedUserService {
 
     List<ConnectedUser> getConnectedUsers(List<Long> ids);
 
+    Optional<ConnectedUser> fetchLastEnabledConnectedUser(Environment environment);
+
     void updateConnectedUser(String externalUserId, Environment environment, Map<String, Object> metadata);
 
     ConnectedUser updateConnectedUser(

@@ -417,6 +417,9 @@ class IntegrationFacadesAuditIntTest {
         void testCreateForAnUnpublishedIntegrationRecordsAFailure() {
             Integration integration = createIntegration();
 
+            integrationWorkflowService.addWorkflow(
+                integration.getId(), integration.getLastIntegrationVersion(), String.valueOf(UUID.randomUUID()));
+
             String name = "instance-configuration-" + UUID.randomUUID();
 
             assertThatThrownBy(

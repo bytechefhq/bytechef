@@ -160,6 +160,12 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<ConnectedUser> fetchLastEnabledConnectedUser(Environment environment) {
+        return connectedUserRepository.findFirstByEnvironmentAndEnabledOrderByIdDesc(environment.ordinal(), true);
+    }
+
+    @Override
     public void updateConnectedUser(String externalUserId, Environment environment, Map<String, Object> metadata) {
         ConnectedUser connectedUser = getConnectedUser(externalUserId, environment);
 

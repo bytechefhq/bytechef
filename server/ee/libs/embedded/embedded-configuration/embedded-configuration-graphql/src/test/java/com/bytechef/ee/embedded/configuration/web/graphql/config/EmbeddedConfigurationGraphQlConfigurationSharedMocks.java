@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.web.graphql.config;
 
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.EmbeddedGettingStartedFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import java.lang.annotation.ElementType;
@@ -24,7 +25,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    AutomationProjectFacade.class, IntegrationWorkflowFacade.class, IntegrationWorkflowService.class
+    AutomationProjectFacade.class, EmbeddedGettingStartedFacade.class, IntegrationWorkflowFacade.class,
+    IntegrationWorkflowService.class
 })
 public @interface EmbeddedConfigurationGraphQlConfigurationSharedMocks {
 }

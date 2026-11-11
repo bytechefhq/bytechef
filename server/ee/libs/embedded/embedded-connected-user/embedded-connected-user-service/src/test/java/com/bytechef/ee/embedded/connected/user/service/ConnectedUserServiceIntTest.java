@@ -103,6 +103,34 @@ class ConnectedUserServiceIntTest {
     }
 
     @Test
+    void testFetchLastEnabledConnectedUserIsEmptyWithoutConnectedUsers() {
+        assertThat(connectedUserService.fetchLastEnabledConnectedUser(Environment.DEVELOPMENT)).isEmpty();
+    }
+
+    @Test
+    void testFetchLastEnabledConnectedUserReturnsTheNewestEnabledUserOfTheEnvironment() {
+        ConnectedUser olderConnectedUser = connectedUserService.createConnectedUser(
+            "customer-older", Environment.PRODUCTION);
+        ConnectedUser newerConnectedUser = connectedUserService.createConnectedUser(
+            "customer-newer", Environment.PRODUCTION);
+
+        assertThat(connectedUserService.fetchLastEnabledConnectedUser(Environment.PRODUCTION))
+            .map(ConnectedUser::getId)
+            .contains(newerConnectedUser.getId());
+        assertThat(connectedUserService.fetchLastEnabledConnectedUser(Environment.DEVELOPMENT)).isEmpty();
+
+        connectedUserService.enableConnectedUser(newerConnectedUser.getId(), false);
+
+        assertThat(connectedUserService.fetchLastEnabledConnectedUser(Environment.PRODUCTION))
+            .map(ConnectedUser::getId)
+            .contains(olderConnectedUser.getId());
+
+        connectedUserService.enableConnectedUser(olderConnectedUser.getId(), false);
+
+        assertThat(connectedUserService.fetchLastEnabledConnectedUser(Environment.PRODUCTION)).isEmpty();
+    }
+
+    @Test
     void testCreatePersistsNameEmailAndMetadata() {
         ConnectedUser connectedUser = connectedUserService.createConnectedUser(
             "customer-a", Environment.PRODUCTION, "Acme", "ops@acme.io", Map.of("a", "1", "b", "2"));

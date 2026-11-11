@@ -33,6 +33,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -48,6 +49,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @ContextConfiguration(classes = EmbeddedExecutionPublicRestTestConfiguration.class)
 @TestPropertySource(properties = "bytechef.edition=ee")
+@Import(ExternalInvocationApiController.class)
 @WebMvcTest(ExternalInvocationApiController.class)
 @WithMockUser(username = ExternalInvocationApiControllerIntTest.EXTERNAL_USER_ID)
 class ExternalInvocationApiControllerIntTest {

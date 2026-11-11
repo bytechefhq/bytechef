@@ -95,6 +95,11 @@ public class RemoteConnectedUserServiceClient implements ConnectedUserService {
     }
 
     @Override
+    public Optional<ConnectedUser> fetchLastEnabledConnectedUser(Environment environment) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void updateConnectedUser(String externalUserId, Environment environment, Map<String, Object> metadata) {
         throw new UnsupportedOperationException();
     }

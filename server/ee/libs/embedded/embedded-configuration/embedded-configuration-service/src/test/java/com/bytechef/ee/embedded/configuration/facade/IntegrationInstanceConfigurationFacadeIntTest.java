@@ -46,6 +46,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveImpactDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationConnectedUserDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.exception.IntegrationInstanceConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceRepository;
@@ -389,6 +390,82 @@ class IntegrationInstanceConfigurationFacadeIntTest {
                     .isInstanceOf(AccessDeniedException.class);
 
         verify(connectionService, never()).updateConnectionParameters(anyLong(), any());
+    }
+
+    @Test
+    void testCreateIntegrationInstanceConfigurationPublishesAnIntegrationWithoutWorkflows() {
+        authenticate(admin());
+
+        Integration integration = createIntegration();
+
+        long integrationInstanceConfigurationId =
+            integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                newIntegrationInstanceConfigurationDTO(integration.getId(), 1));
+
+        Integration publishedIntegration = integrationService.getIntegration(integration.getId());
+
+        assertThat(publishedIntegration.isPublished()).isTrue();
+        assertThat(publishedIntegration.getLastIntegrationVersion()).isEqualTo(2);
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId)
+                .getIntegrationVersion())
+                    .isEqualTo(1);
+    }
+
+    @Test
+    void testCreateIntegrationInstanceConfigurationEnablesAConfigurationWithoutWorkflows() {
+        authenticate(admin());
+
+        Integration integration = createIntegration();
+
+        long integrationInstanceConfigurationId =
+            integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                newIntegrationInstanceConfigurationDTO(integration.getId(), 1));
+
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId)
+                .isEnabled())
+                    .isTrue();
+    }
+
+    @Test
+    void testCreateIntegrationInstanceConfigurationLeavesAConfigurationWithWorkflowsDisabled() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        addCronWorkflow(integration.getId(), 1, UUID.randomUUID());
+
+        long integrationInstanceConfigurationId =
+            integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                newIntegrationInstanceConfigurationDTO(integration.getId(), 1));
+
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId)
+                .isEnabled())
+                    .isFalse();
+    }
+
+    @Test
+    void testCreateIntegrationInstanceConfigurationRefusesAnUnpublishedIntegrationWithWorkflows() {
+        authenticate(admin());
+
+        Integration integration = createIntegration();
+
+        addCronWorkflow(integration.getId(), 1, UUID.randomUUID());
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                newIntegrationInstanceConfigurationDTO(integration.getId(), 1)))
+                    .isInstanceOf(ConfigurationException.class)
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(IntegrationInstanceConfigurationErrorType.INTEGRATION_NOT_PUBLISHED.getErrorKey()));
+
+        assertThat(integrationService.getIntegration(integration.getId())
+            .isPublished()).isFalse();
     }
 
     @Test
@@ -1563,13 +1640,17 @@ class IntegrationInstanceConfigurationFacadeIntTest {
         return integrationInstanceConfigurationId;
     }
 
-    private Integration createPublishedIntegration() {
+    private Integration createIntegration() {
         Integration integration = new Integration();
 
         integration.setComponentName("componentName");
         integration.setName("integration-" + UUID.randomUUID());
 
-        integration = integrationService.create(integration);
+        return integrationService.create(integration);
+    }
+
+    private Integration createPublishedIntegration() {
+        Integration integration = createIntegration();
 
         integrationService.publishIntegration(integration.getId(), null);
 

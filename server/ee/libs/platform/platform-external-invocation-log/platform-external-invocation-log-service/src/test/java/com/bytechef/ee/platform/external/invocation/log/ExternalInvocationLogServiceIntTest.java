@@ -198,6 +198,59 @@ class ExternalInvocationLogServiceIntTest {
         assertThat(externalInvocationLogRepository.count()).isEqualTo(1);
     }
 
+    @Test
+    void testHasExternalInvocationLogMatchesTypeEnvironmentAndOutcome() {
+        createWithEnvironment(PlatformType.EMBEDDED, 0, ExternalInvocationOutcome.ERROR, Instant.now());
+        createWithEnvironment(PlatformType.AUTOMATION, 0, ExternalInvocationOutcome.SUCCESS, Instant.now());
+        createWithEnvironment(PlatformType.EMBEDDED, 2, ExternalInvocationOutcome.SUCCESS, Instant.now());
+
+        assertThat(
+            externalInvocationLogService.hasExternalInvocationLog(
+                PlatformType.EMBEDDED, 0, ExternalInvocationOutcome.SUCCESS)).isFalse();
+        assertThat(
+            externalInvocationLogService.hasExternalInvocationLog(
+                PlatformType.EMBEDDED, 2, ExternalInvocationOutcome.SUCCESS)).isTrue();
+    }
+
+    @Test
+    void testFetchLastFailedExternalInvocationLogReturnsLatestFailureInEnvironment() {
+        Instant now = Instant.now();
+
+        createWithEnvironment(
+            PlatformType.EMBEDDED, 0, ExternalInvocationOutcome.ERROR, now.minus(2, ChronoUnit.MINUTES));
+        createWithEnvironment(
+            PlatformType.EMBEDDED, 0, ExternalInvocationOutcome.CONNECTION_REQUIRED, now.minus(1, ChronoUnit.MINUTES));
+        createWithEnvironment(PlatformType.EMBEDDED, 0, ExternalInvocationOutcome.SUCCESS, now);
+        createWithEnvironment(PlatformType.EMBEDDED, 0, ExternalInvocationOutcome.APPROVAL_REQUIRED, now);
+        createWithEnvironment(PlatformType.EMBEDDED, 0, ExternalInvocationOutcome.SUSPENDED, now);
+        createWithEnvironment(PlatformType.AUTOMATION, 0, ExternalInvocationOutcome.TIMEOUT, now);
+        createWithEnvironment(PlatformType.EMBEDDED, 2, ExternalInvocationOutcome.ERROR, now);
+
+        assertThat(externalInvocationLogService.fetchLastFailedExternalInvocationLog(PlatformType.EMBEDDED, 0))
+            .get()
+            .extracting(ExternalInvocationLog::getOutcome)
+            .isEqualTo(ExternalInvocationOutcome.CONNECTION_REQUIRED);
+        assertThat(externalInvocationLogService.fetchLastFailedExternalInvocationLog(PlatformType.EMBEDDED, 1))
+            .isEmpty();
+    }
+
+    private void createWithEnvironment(
+        PlatformType type, int environment, ExternalInvocationOutcome outcome, Instant createdDate) {
+
+        ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
+
+        externalInvocationLog.setType(type);
+        externalInvocationLog.setSource(ExternalInvocationSource.MCP_SERVER);
+        externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
+        externalInvocationLog.setToolName("slack_sendMessage");
+        externalInvocationLog.setEnvironment(environment);
+        externalInvocationLog.setOutcome(outcome);
+        externalInvocationLog.setDurationMs(5);
+        externalInvocationLog.setCreatedDate(createdDate);
+
+        externalInvocationLogService.create(externalInvocationLog);
+    }
+
     private void createInEnvironment(ExternalInvocationSource source, int environment) {
         ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
 

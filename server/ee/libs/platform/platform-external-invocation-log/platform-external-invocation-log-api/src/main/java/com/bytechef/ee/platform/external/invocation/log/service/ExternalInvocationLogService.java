@@ -12,6 +12,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import java.time.Instant;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 
@@ -25,6 +26,10 @@ public interface ExternalInvocationLogService {
     ExternalInvocationLog create(ExternalInvocationLog externalInvocationLog);
 
     int deleteExternalInvocationLogsCreatedBefore(Instant instant);
+
+    Optional<ExternalInvocationLog> fetchLastFailedExternalInvocationLog(PlatformType type, int environment);
+
+    boolean hasExternalInvocationLog(PlatformType type, int environment, ExternalInvocationOutcome outcome);
 
     Page<ExternalInvocationLog> getExternalInvocationLogs(
         PlatformType type, @Nullable Integer environment, @Nullable ExternalInvocationSource source,
