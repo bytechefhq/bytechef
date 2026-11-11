@@ -205,21 +205,39 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             )}
 
                             <div className="flex min-w-52 flex-col items-end gap-y-2">
-                                <div className="relative flex min-h-8 items-center">
-                                    {enableIntegrationInstanceMutation.isPending && (
-                                        <LoadingIcon className="absolute top-[3px] left-[-15px]" />
+                                <div className="flex min-h-8 items-center gap-x-4">
+                                    {connectedUserIntegrationInstance.provisioned && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    aria-label="Credentials"
+                                                    icon={<KeyRoundIcon />}
+                                                    onClick={() => setShowCredentialsDialog(true)}
+                                                    size="icon"
+                                                    variant="ghost"
+                                                />
+                                            </TooltipTrigger>
+
+                                            <TooltipContent>Credentials</TooltipContent>
+                                        </Tooltip>
                                     )}
 
-                                    <Switch
-                                        checked={connectedUserIntegrationInstance.enabled}
-                                        disabled={!integrationInstance?.integrationInstanceConfiguration?.enabled}
-                                        onCheckedChange={(value) => {
-                                            enableIntegrationInstanceMutation.mutate({
-                                                enable: value,
-                                                id: connectedUserIntegrationInstance.id!,
-                                            });
-                                        }}
-                                    />
+                                    <div className="relative flex items-center">
+                                        {enableIntegrationInstanceMutation.isPending && (
+                                            <LoadingIcon className="absolute top-[3px] left-[-15px]" />
+                                        )}
+
+                                        <Switch
+                                            checked={connectedUserIntegrationInstance.enabled}
+                                            disabled={!integrationInstance?.integrationInstanceConfiguration?.enabled}
+                                            onCheckedChange={(value) => {
+                                                enableIntegrationInstanceMutation.mutate({
+                                                    enable: value,
+                                                    id: connectedUserIntegrationInstance.id!,
+                                                });
+                                            }}
+                                        />
+                                    </div>
                                 </div>
 
                                 <Tooltip>
@@ -237,22 +255,6 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 </Tooltip>
                             </div>
                         </div>
-
-                        {connectedUserIntegrationInstance.provisioned && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        aria-label="Credentials"
-                                        icon={<KeyRoundIcon />}
-                                        onClick={() => setShowCredentialsDialog(true)}
-                                        size="icon"
-                                        variant="ghost"
-                                    />
-                                </TooltipTrigger>
-
-                                <TooltipContent>Credentials</TooltipContent>
-                            </Tooltip>
-                        )}
 
                         <ConnectedUserSheetDeleteDropdownMenu
                             changeConfigurationDisabled={!integrationConfigurations}

@@ -108,8 +108,17 @@ vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () 
 });
 
 vi.mock('@/shared/components/connection/OAuth2Button', () => ({
-    default: ({onCodeSuccess}: {onCodeSuccess: (payload: {code: string; code_verifier?: string}) => void}) => (
-        <button onClick={() => onCodeSuccess({code: 'auth-code', code_verifier: 'verifier'})} type="button">
+    default: ({
+        onClick,
+        onCodeSuccess,
+    }: {
+        onClick: (getAuth: () => void) => void;
+        onCodeSuccess: (payload: {code: string; code_verifier?: string}) => void;
+    }) => (
+        <button
+            onClick={() => onClick(() => onCodeSuccess({code: 'auth-code', code_verifier: 'verifier'}))}
+            type="button"
+        >
             Authorize
         </button>
     ),
@@ -317,15 +326,10 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
         );
         expect(screen.queryByLabelText('clientSecret')).not.toBeInTheDocument();
 
-        const saveButton = screen.getByRole('button', {name: 'Save'});
-
-        expect(saveButton).toBeDisabled();
+        expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
+        expect(screen.getAllByRole('button', {name: 'Authorize'})).toHaveLength(1);
 
         await userEvent.click(screen.getByRole('button', {name: 'Authorize'}));
-
-        await waitFor(() => expect(saveButton).toBeEnabled());
-
-        await userEvent.click(saveButton);
 
         await waitFor(() =>
             expect(hoisted.updateIntegrationInstanceCredentials).toHaveBeenCalledWith({
@@ -336,5 +340,49 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
                 },
             })
         );
+    });
+
+    it('offers Save to retry an OAuth2 authorization whose save failed', async () => {
+        const oAuth2Configuration = buildConfiguration(2, 'OAUTH2_AUTHORIZATION_CODE');
+
+        mockProvisionableConfiguration(oAuth2Configuration);
+
+        hoisted.updateIntegrationInstanceCredentials
+            .mockRejectedValueOnce(new Error('Connection id=70 was modified by someone else'))
+            .mockResolvedValueOnce(undefined);
+
+        hoisted.getIntegrationInstanceConnection.mockResolvedValue({
+            authorizationParameters: {clientId: 'cid', clientSecret: '••••••••'},
+            authorizationType: 'OAUTH2_AUTHORIZATION_CODE',
+            componentName: 'slack',
+            connectionVersion: 1,
+            id: 70,
+            name: 'Slack',
+            parameters: {},
+            version: 6,
+        });
+
+        renderDialog();
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Update credentials'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Authorize'}));
+
+        const saveButton = await screen.findByRole('button', {name: 'Save'});
+
+        expect(screen.queryByRole('button', {name: 'Authorize'})).not.toBeInTheDocument();
+
+        await waitFor(() => expect(saveButton).toBeEnabled());
+
+        await userEvent.click(saveButton);
+
+        await waitFor(() => expect(hoisted.updateIntegrationInstanceCredentials).toHaveBeenCalledTimes(2));
+
+        expect(hoisted.updateIntegrationInstanceCredentials).toHaveBeenLastCalledWith({
+            id: 40,
+            updateConnectionCredentialsRequest: {
+                parameters: {code: 'auth-code', code_verifier: 'verifier'},
+                version: 6,
+            },
+        });
     });
 });

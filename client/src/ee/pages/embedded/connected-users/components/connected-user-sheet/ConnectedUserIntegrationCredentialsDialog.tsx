@@ -21,6 +21,7 @@ import {
 } from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {useGetProvisionableIntegrationsQuery} from '@/ee/shared/queries/embedded/provisionableIntegrations.queries';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
+import OAuth2Button from '@/shared/components/connection/OAuth2Button';
 import {CodePayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {useGetConnectionComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
@@ -116,11 +117,20 @@ const ConnectedUserIntegrationCredentialsDialog = ({
         (!codeRequired || !!code) &&
         !updateIntegrationInstanceCredentialsMutation.isPending;
 
+    const oAuth2AuthorizationParameters = provisionableConfiguration?.oAuth2AuthorizationParameters;
+
+    const showOAuth2Button =
+        updating && codeRequired && !code && !updateIntegrationInstanceCredentialsMutation.isPending;
+
     const handleCodeSuccess = ({code, code_verifier: codeVerifier}: CodePayloadI) => {
         setValue('connectionParameters.code', code);
 
         if (codeVerifier) {
             setValue('connectionParameters.code_verifier', codeVerifier);
+        }
+
+        if (!updateIntegrationInstanceCredentialsMutation.isPending) {
+            void handleSubmit(handleSave)();
         }
     };
 
@@ -170,6 +180,7 @@ const ConnectedUserIntegrationCredentialsDialog = ({
                             control={control as unknown as Control<FieldValues>}
                             formState={formState as unknown as FormState<FieldValues>}
                             onCodeSuccess={handleCodeSuccess}
+                            showOAuth2Button={false}
                         />
                     )}
                 </div>
@@ -177,11 +188,30 @@ const ConnectedUserIntegrationCredentialsDialog = ({
                 <DialogFooter>
                     <Button label={updating ? 'Cancel' : 'Close'} onClick={onClose} variant="outline" />
 
-                    {updating ? (
+                    {showOAuth2Button &&
+                        provisionableIntegration &&
+                        connection?.version != null &&
+                        oAuth2AuthorizationParameters?.authorizationUrl &&
+                        oAuth2AuthorizationParameters.clientId && (
+                            <OAuth2Button
+                                authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
+                                clientId={oAuth2AuthorizationParameters.clientId}
+                                componentName={provisionableIntegration.integration!.componentName}
+                                extraQueryParameters={oAuth2AuthorizationParameters.extraQueryParameters}
+                                onClick={(getAuth: () => void) => getAuth()}
+                                onCodeSuccess={handleCodeSuccess}
+                                redirectUri={provisionableConfiguration?.redirectUri || ''}
+                                responseType="code"
+                                scopes={oAuth2AuthorizationParameters.scopes}
+                            />
+                        )}
+
+                    {updating && !showOAuth2Button && (
                         <Button disabled={!canSave} label="Save" onClick={handleSubmit(handleSave)} />
-                    ) : (
-                        provisionableConfiguration &&
-                        connection && <Button label="Update credentials" onClick={() => setUpdating(true)} />
+                    )}
+
+                    {!updating && provisionableConfiguration && connection && (
+                        <Button label="Update credentials" onClick={() => setUpdating(true)} />
                     )}
                 </DialogFooter>
             </DialogContent>
