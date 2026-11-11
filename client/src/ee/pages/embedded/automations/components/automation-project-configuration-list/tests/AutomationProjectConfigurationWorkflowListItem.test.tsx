@@ -167,7 +167,7 @@ describe('AutomationProjectConfigurationWorkflowListItem', () => {
         expect(state.workflow).toEqual({label: 'Mailer', workflowId: 'pinned-wf-1', workflowUuid: 'wf-1'});
     });
 
-    it('opens the executions from the actions menu', async () => {
+    it('does not offer the executions in the actions menu', async () => {
         const user = userEvent.setup();
 
         renderItem();
@@ -175,12 +175,9 @@ describe('AutomationProjectConfigurationWorkflowListItem', () => {
         screen.getByRole('button', {name: 'Workflow Actions'}).focus();
 
         await user.keyboard('{ArrowDown}');
-        await user.click(await screen.findByRole('menuitem', {name: 'View Executions'}));
 
-        const state = useAutomationExecutionsSheetStore.getState();
-
-        expect(state.automationExecutionsSheetOpen).toBe(true);
-        expect(state.projectName).toBe('Mail Project');
+        expect(await screen.findByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'View Executions'})).not.toBeInTheDocument();
     });
 
     it('opens and closes the provided values dialog from the actions menu', async () => {
