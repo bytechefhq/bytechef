@@ -1,25 +1,29 @@
 import McpComponentSelectionGrid from '@/pages/platform/mcp-servers/components/McpComponentSelectionGrid';
+import {McpComponent} from '@/shared/middleware/graphql';
 
 import {McpIntegrationComponentOptionI} from './hooks/useMcpComponentDialog';
 import useMcpComponentDialogComponentSelectionStep from './hooks/useMcpComponentDialogComponentSelectionStep';
 
 interface ComponentSelectionStepProps {
-    componentName?: string;
+    mcpComponent?: McpComponent;
+    mcpServerId: string;
     open: boolean;
     onComponentSelect: (component: McpIntegrationComponentOptionI) => void;
 }
 
 const McpComponentDialogComponentSelectionStep = ({
-    componentName,
+    mcpComponent,
+    mcpServerId,
     onComponentSelect,
     open,
 }: ComponentSelectionStepProps) => {
-    const {filteredComponents, isLoadingComponents, searchTerm, setSearchTerm} =
-        useMcpComponentDialogComponentSelectionStep(open, componentName);
+    const {filteredComponents, isComponentAdded, isLoadingComponents, searchTerm, setSearchTerm} =
+        useMcpComponentDialogComponentSelectionStep(open, mcpServerId, mcpComponent);
 
     return (
         <McpComponentSelectionGrid
             components={filteredComponents}
+            isComponentAdded={isComponentAdded}
             isLoading={isLoadingComponents}
             onComponentSelect={onComponentSelect}
             onSearchTermChange={setSearchTerm}
