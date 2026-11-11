@@ -14,6 +14,7 @@ import com.bytechef.ee.ai.hub.approval.repository.AiHubToolApprovalRuleRepositor
 import com.bytechef.ee.ai.hub.audit.AiHubAuditEvents;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.config.AiHubAuditIntTestConfiguration;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
@@ -23,6 +24,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -154,10 +156,12 @@ public class AiHubToolApprovalRuleFacadeIntTest {
 
         @Bean
         AiHubToolApprovalRuleFacade aiHubToolApprovalRuleFacade(
-            AiHubPinnedToolCallbacks pinnedToolCallbacks, AiHubToolApprovalRuleService ruleService,
+            AiHubPinnedToolCallbacks pinnedToolCallbacks,
+            ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider, AiHubToolApprovalRuleService ruleService,
             PermissionService permissionService) {
 
-            return new AiHubToolApprovalRuleFacadeImpl(pinnedToolCallbacks, ruleService, permissionService);
+            return new AiHubToolApprovalRuleFacadeImpl(
+                pinnedToolCallbacks, globalToolCatalogProvider, ruleService, permissionService);
         }
     }
 }

@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -162,11 +163,12 @@ public class AiHubChatServiceIntTest {
             AiHubChatRepository chatRepository, AiHubToolApprovalService approvalService,
             ObjectProvider<AiHubSessionMemory> aiHubSessionMemoryProvider,
             InFlightAiHubRunRegistry inFlightRunRegistry, PlatformTransactionManager transactionManager,
-            ObjectProvider<WebhookResumeRegistry> webhookResumeRegistryProvider) {
+            ObjectProvider<WebhookResumeRegistry> webhookResumeRegistryProvider,
+            ApplicationEventPublisher eventPublisher) {
 
             return new AiHubChatServiceImpl(
                 chatRepository, new AiHubChatAccessPolicyImpl(), approvalService, aiHubSessionMemoryProvider,
-                inFlightRunRegistry, transactionManager, webhookResumeRegistryProvider);
+                inFlightRunRegistry, transactionManager, webhookResumeRegistryProvider, eventPublisher);
         }
     }
 }
