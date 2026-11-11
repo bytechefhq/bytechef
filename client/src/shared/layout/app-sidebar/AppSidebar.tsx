@@ -143,7 +143,7 @@ export function AppSidebar({navigation}: AppSidebarProps) {
                 <div className="flex items-center justify-between gap-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-3">
                     <AppSidebarWorkspaceSelect />
 
-                    <EnvironmentSelect onChange={handleEnvironmentChange} variant="icon" />
+                    {pathname !== '/' && <EnvironmentSelect onChange={handleEnvironmentChange} variant="icon" />}
 
                     {!collapsed && (
                         <Tooltip>
