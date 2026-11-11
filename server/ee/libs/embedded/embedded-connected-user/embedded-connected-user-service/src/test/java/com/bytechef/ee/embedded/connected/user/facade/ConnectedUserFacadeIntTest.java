@@ -13,6 +13,9 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.domain.Integration;
@@ -47,6 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -319,6 +323,33 @@ class ConnectedUserFacadeIntTest {
         assertThat(ungatedMethodNames)
             .as("ConnectedUserFacadeImpl methods without @PreAuthorize(\"isTenantAdmin()\")")
             .isEmpty();
+    }
+
+    @Test
+    void testDeleteConnectedUserLeavesTheInstanceConnectionToTheInstanceDelete() {
+        ConnectedUser connectedUser =
+            connectedUserService.createConnectedUser("deleted-user", Environment.PRODUCTION);
+
+        IntegrationInstance integrationInstance = createIntegrationInstance(7L, connectedUser.getId(), null);
+
+        when(integrationInstanceService.getConnectedUserIntegrationInstances(connectedUser.getId()))
+            .thenReturn(List.of(integrationInstance));
+        when(connectedUserConnectionService.getConnectionIds(connectedUser.getId())).thenReturn(List.of(8L));
+
+        connectedUserFacade.deleteConnectedUser(connectedUser.getId());
+
+        InOrder deleteOrder = inOrder(integrationInstanceFacade, connectedUserConnectionService, connectionFacade);
+
+        deleteOrder.verify(integrationInstanceFacade)
+            .deleteIntegrationInstance(7L);
+        deleteOrder.verify(connectedUserConnectionService)
+            .getConnectionIds(connectedUser.getId());
+        deleteOrder.verify(connectionFacade)
+            .delete(8L);
+
+        verify(connectionFacade, never()).delete(7L);
+
+        assertThat(connectedUserRepository.findById(connectedUser.getId())).isEmpty();
     }
 
     @Test

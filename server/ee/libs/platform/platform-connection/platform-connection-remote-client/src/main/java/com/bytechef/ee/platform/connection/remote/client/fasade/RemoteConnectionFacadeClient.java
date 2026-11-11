@@ -35,6 +35,11 @@ public class RemoteConnectionFacadeClient implements ConnectionFacade {
     }
 
     @Override
+    public boolean isConnectionUsed(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Integer executeConnectionRefresh(Long connectionId) {
         throw new UnsupportedOperationException();
     }

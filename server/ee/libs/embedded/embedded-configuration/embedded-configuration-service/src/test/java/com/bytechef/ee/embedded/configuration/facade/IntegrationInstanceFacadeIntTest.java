@@ -40,6 +40,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -168,7 +169,16 @@ class IntegrationInstanceFacadeIntTest {
         """;
 
     @Autowired
+    private ConnectedUserConnectionService connectedUserConnectionService;
+
+    @Autowired
     private ConnectedUserService connectedUserService;
+
+    @Autowired
+    private ConnectionFacade connectionFacade;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @Autowired
     private IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -205,6 +215,7 @@ class IntegrationInstanceFacadeIntTest {
 
     private ConnectedUser connectedUserA;
     private ConnectedUser developmentConnectedUserA;
+    private long connectionAId;
     private String externalUserAId;
     private long integrationId;
     private long integrationInstanceAId;
@@ -215,6 +226,9 @@ class IntegrationInstanceFacadeIntTest {
     @BeforeEach
     void beforeEach() {
         recordingDataStorage.reset();
+
+        connectionAId = UUID.randomUUID()
+            .getMostSignificantBits() & Long.MAX_VALUE;
 
         externalUserAId = "external-user-a-" + UUID.randomUUID();
 
@@ -266,7 +280,7 @@ class IntegrationInstanceFacadeIntTest {
         integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
 
         IntegrationInstance integrationInstanceA = integrationInstanceService.create(
-            connectedUserA.getId(), 41L, integrationInstanceConfiguration.getId());
+            connectedUserA.getId(), connectionAId, integrationInstanceConfiguration.getId());
 
         integrationInstanceAId = integrationInstanceA.getId();
 
@@ -279,6 +293,8 @@ class IntegrationInstanceFacadeIntTest {
     @AfterEach
     void afterEach() {
         SecurityContextHolder.clearContext();
+
+        connectedUserConnectionService.deleteByConnectionId(connectionAId);
     }
 
     @Test
@@ -495,6 +511,44 @@ class IntegrationInstanceFacadeIntTest {
             new ScopeData(
                 DataStorageScope.WORKFLOW, String.valueOf(integrationInstanceWorkflow.getId()),
                 PlatformType.EMBEDDED));
+    }
+
+    @Test
+    void testDeleteIntegrationInstanceDeletesItsUnusedConnection() {
+        authenticate(createTenantAdminAuthentication());
+
+        integrationInstanceFacade.deleteIntegrationInstance(integrationInstanceAId);
+
+        verify(connectionService).delete(connectionAId);
+
+        assertThat(connectedUserConnectionService.getConnectionIds(connectedUserA.getId())).isEmpty();
+    }
+
+    @Test
+    void testDeleteIntegrationInstanceHandsItsConnectionInUseToTheConnectedUser() {
+        authenticate(createTenantAdminAuthentication());
+
+        when(connectionFacade.isConnectionUsed(connectionAId)).thenReturn(true);
+
+        integrationInstanceFacade.deleteIntegrationInstance(integrationInstanceAId);
+
+        verify(connectionService, never()).delete(anyLong());
+
+        assertThat(connectedUserConnectionService.getConnectionIds(connectedUserA.getId()))
+            .containsExactly(connectionAId);
+    }
+
+    @Test
+    void testDeleteIntegrationInstanceKeepsTheConnectionAnotherInstanceUses() {
+        authenticate(createTenantAdminAuthentication());
+
+        integrationInstanceService.create(connectedUserA.getId(), connectionAId, integrationInstanceConfigurationId);
+
+        integrationInstanceFacade.deleteIntegrationInstance(integrationInstanceAId);
+
+        verify(connectionService, never()).delete(anyLong());
+
+        assertThat(connectedUserConnectionService.getConnectionIds(connectedUserA.getId())).isEmpty();
     }
 
     @Test

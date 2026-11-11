@@ -62,6 +62,7 @@ import com.bytechef.ee.embedded.configuration.dto.ProvisionableIntegrationDTO.Pr
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
 import com.bytechef.ee.embedded.configuration.exception.IntegrationInstanceConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -193,10 +194,19 @@ class ConnectedUserIntegrationFacadeIntTest {
         "tasks":[]}""";
 
     @Autowired
+    private ConnectedUserConnectionService connectedUserConnectionService;
+
+    @Autowired
     private ConnectedUserIntegrationFacade connectedUserIntegrationFacade;
 
     @Autowired
     private ConnectedUserService connectedUserService;
+
+    @Autowired
+    private ConnectionFacade connectionFacade;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @Autowired
     private IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -238,19 +248,26 @@ class ConnectedUserIntegrationFacadeIntTest {
     private String enabledWorkflowId;
     private String enabledWorkflowUuid;
     private long integrationId;
+    private long instanceConnectionId;
     private long integrationInstanceId;
     private String otherExternalUserId;
+    private long ownerConnectedUserId;
     private String ownerExternalUserId;
 
     @BeforeEach
     void beforeEach() {
         recordingDataStorage.reset();
 
+        instanceConnectionId = UUID.randomUUID()
+            .getMostSignificantBits() & Long.MAX_VALUE;
+
         ownerExternalUserId = "owner-" + UUID.randomUUID();
         otherExternalUserId = "other-" + UUID.randomUUID();
 
         ConnectedUser ownerConnectedUser = connectedUserService.createConnectedUser(
             ownerExternalUserId, Environment.PRODUCTION);
+
+        ownerConnectedUserId = ownerConnectedUser.getId();
 
         connectedUserService.createConnectedUser(otherExternalUserId, Environment.PRODUCTION);
 
@@ -277,7 +294,7 @@ class ConnectedUserIntegrationFacadeIntTest {
         integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfiguration.getId(), true);
 
         IntegrationInstance integrationInstance = integrationInstanceService.create(
-            ownerConnectedUser.getId(), CONNECTION_ID, integrationInstanceConfiguration.getId());
+            ownerConnectedUser.getId(), instanceConnectionId, integrationInstanceConfiguration.getId());
 
         integrationInstanceId = integrationInstance.getId();
 
@@ -305,6 +322,36 @@ class ConnectedUserIntegrationFacadeIntTest {
         assertThat(integrationInstanceService.getIntegrationInstances(List.of(integrationInstanceId))).isEmpty();
     }
 
+    @AfterEach
+    void afterEach() {
+        connectedUserConnectionService.deleteByConnectionId(instanceConnectionId);
+    }
+
+    @Test
+    void testDeleteAlsoDeletesTheUnusedConnectionOfTheInstance() {
+        integrationInstanceService.updateEnabled(integrationInstanceId, false);
+
+        connectedUserIntegrationFacade.deleteIntegrationInstance(ownerExternalUserId, integrationInstanceId);
+
+        verify(connectionService).delete(instanceConnectionId);
+
+        assertThat(connectedUserConnectionService.getConnectionIds(ownerConnectedUserId)).isEmpty();
+    }
+
+    @Test
+    void testDeleteHandsTheConnectionInUseToTheConnectedUser() {
+        integrationInstanceService.updateEnabled(integrationInstanceId, false);
+
+        when(connectionFacade.isConnectionUsed(instanceConnectionId)).thenReturn(true);
+
+        connectedUserIntegrationFacade.deleteIntegrationInstance(ownerExternalUserId, integrationInstanceId);
+
+        verify(connectionService, never()).delete(anyLong());
+
+        assertThat(connectedUserConnectionService.getConnectionIds(ownerConnectedUserId))
+            .containsExactly(instanceConnectionId);
+    }
+
     @Test
     void testDeleteDisablesTheEnabledWorkflowsOfAnEnabledInstanceBeforeDeletingThem() {
         List<Integer> integrationInstanceWorkflowCountsAtTriggerDisable = new ArrayList<>();
@@ -324,7 +371,7 @@ class ConnectedUserIntegrationFacadeIntTest {
             ArgumentCaptor.forClass(WorkflowExecutionId.class);
 
         verify(triggerLifecycleFacade).executeTriggerDisable(
-            eq(enabledWorkflowId), workflowExecutionIdArgumentCaptor.capture(), any(), any(), eq(CONNECTION_ID));
+            eq(enabledWorkflowId), workflowExecutionIdArgumentCaptor.capture(), any(), any(), eq(instanceConnectionId));
         verifyNoMoreInteractions(triggerLifecycleFacade);
 
         WorkflowExecutionId workflowExecutionId = workflowExecutionIdArgumentCaptor.getValue();
