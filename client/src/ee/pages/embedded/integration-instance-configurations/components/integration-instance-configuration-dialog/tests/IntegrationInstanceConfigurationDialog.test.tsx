@@ -87,6 +87,10 @@ vi.mock('../IntegrationInstanceConfigurationDialogBasicStep', () => ({
                 Use API Key
             </button>
 
+            <button onClick={() => setValue('authorizationType', 'OAUTH2_AUTHORIZATION_CODE')} type="button">
+                Use OAuth2
+            </button>
+
             <button
                 onClick={() => {
                     setCurIntegrationId(2);
@@ -241,12 +245,23 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             );
         });
 
-        it('should default to the OAuth2 authorization and offer the OAuth2 step', async () => {
+        it('should leave the authorization unselected when the connection offers several', async () => {
             const user = userEvent.setup();
 
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
 
-            expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
+            await user.click(screen.getByRole('button', {name: 'Pick Integration'}));
+
+            expect(screen.getByRole('navigation', {name: 'Steps'})).toHaveTextContent(/^Basic$/);
+            expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+        });
+
+        it('should offer the OAuth2 step once the OAuth2 authorization is selected', async () => {
+            const user = userEvent.setup();
+
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            await user.click(screen.getByRole('button', {name: 'Use OAuth2'}));
 
             expect(screen.getByRole('navigation', {name: 'Steps'})).toHaveTextContent('BasicOAuth2 Connection');
 
@@ -256,17 +271,14 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
         });
 
-        it('should fall back to the first authorization when the connection has no OAuth2 authorization', async () => {
+        it('should select the authorization when the connection offers only one', async () => {
             const user = userEvent.setup();
 
-            hoisted.connectionDefinition = {
-                authorizations: [
-                    {title: 'Basic Auth', type: 'BASIC_AUTH'},
-                    {title: 'API Key', type: 'API_KEY'},
-                ],
-            };
+            hoisted.connectionDefinition = {authorizations: [{title: 'Basic Auth', type: 'BASIC_AUTH'}]};
 
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            await user.click(screen.getByRole('button', {name: 'Pick Integration'}));
 
             await user.click(await screen.findByRole('button', {name: 'Save'}));
 
@@ -277,14 +289,15 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             );
         });
 
-        it('should re-apply the default authorization when the integration changes', async () => {
+        it('should clear the selected authorization when the integration changes', async () => {
             const user = userEvent.setup();
 
             const {rerender} = render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
 
+            await user.click(screen.getByRole('button', {name: 'Pick Integration'}));
             await user.click(screen.getByRole('button', {name: 'Use API Key'}));
 
-            expect(await screen.findByRole('button', {name: 'Save'})).toBeInTheDocument();
+            await waitFor(() => expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled());
 
             hoisted.connectionDefinition = {
                 authorizations: [
@@ -296,9 +309,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
 
             rerender(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
 
-            await waitFor(() => expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument());
-
-            expect(screen.getByRole('button', {name: 'Next'})).toBeInTheDocument();
+            await waitFor(() => expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled());
         });
 
         it('should keep Next disabled until the connection authorizations are loaded', async () => {

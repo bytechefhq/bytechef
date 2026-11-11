@@ -57,10 +57,8 @@ const OAUTH2_AUTHORIZATION_TYPES = new Set<string>([
 ]);
 
 const getDefaultAuthorizationType = (authorizations?: Authorization[]) =>
-    (
-        authorizations?.find((authorization) => OAUTH2_AUTHORIZATION_TYPES.has(authorization.type!)) ??
-        authorizations?.[0]
-    )?.type as IntegrationInstanceConfiguration['authorizationType'];
+    (authorizations?.length === 1 ? authorizations[0].type : undefined) as
+        IntegrationInstanceConfiguration['authorizationType'] | undefined;
 
 interface IntegrationInstanceConfigurationDialogStepContentProps {
     basicStepContent: ReactNode;
@@ -426,7 +424,8 @@ const IntegrationInstanceConfigurationDialog = ({
 
         if (
             defaultedAuthorizationsRef.current !== authorizations ||
-            !authorizations.some((authorization) => authorization.type === selectedAuthorizationType)
+            (!!selectedAuthorizationType &&
+                !authorizations.some((authorization) => authorization.type === selectedAuthorizationType))
         ) {
             defaultedAuthorizationsRef.current = authorizations;
 
