@@ -78,7 +78,7 @@ const ConnectedUserEditDialog = ({connectedUser, onClose}: {connectedUser: Conne
 
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-lg" showCloseButton>
                 <DialogHeader>
                     <DialogTitle>Edit connected user</DialogTitle>
                 </DialogHeader>
