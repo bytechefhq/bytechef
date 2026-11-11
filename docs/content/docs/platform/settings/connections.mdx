@@ -141,10 +141,8 @@ Grants are deleted with the connection.
 | `CONNECTION_ACCESS_REVOKED` | A user's grant was removed. |
 | `CONNECTION_REASSIGNED` | A connection's owner changed. |
 
-Every one of these except `CONNECTION_CREATED` and `CONNECTION_ACCESS_GRANTED` is **strict-audit**: if the entry cannot be written, the operation fails rather than proceeding unrecorded. Those are exactly the events that can remove someone's access. See [Audit Events](/platform/settings/audit-events).
+See [Audit Events](/platform/settings/audit-events).
 
 ## Metrics
 
 `bytechef_connection_create` (counter) increments on every connection created through the workspace facade, tagged `visibility=PRIVATE|WORKSPACE`, so you can watch how much credential sharing actually happens against how much stays private. The tag reads the *persisted* visibility rather than the request body, so it reflects the CE and embedded overrides. Organization connections are created through their own facade and are not counted here.
-
-Failed audit writes on non-strict events are counted on `bytechef_connection_audit_failed`.
