@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.embedded.execution.public_.web.rest.config;
 
-import com.bytechef.ee.embedded.execution.public_.web.rest.ExternalInvocationApiController;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -18,8 +17,6 @@ import org.springframework.context.annotation.Import;
  * @author Ivica Cardic
  */
 @Configuration
-@Import({
-    JacksonConfiguration.class, ExternalInvocationApiController.class
-})
+@Import(JacksonConfiguration.class)
 public class EmbeddedExecutionPublicRestTestConfiguration {
 }

@@ -89,6 +89,11 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
+    public Optional<IntegrationInstance> fetchFirstRunnableIntegrationInstance(Environment environment) {
+        return integrationInstanceRepository.findFirstRunnableIntegrationInstance(environment.ordinal());
+    }
+
+    @Override
     public Optional<IntegrationInstance> fetchIntegrationInstanceByIntegrationId(
         long connectedUserId, long integrationId, Environment environment) {
 

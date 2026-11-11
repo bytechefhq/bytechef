@@ -15,6 +15,7 @@ import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,6 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogService {
 
     private static final int DEFAULT_PAGE_SIZE = 50;
+
+    private static final List<Integer> NON_FAILED_OUTCOMES = List.of(
+        ExternalInvocationOutcome.SUCCESS.ordinal(), ExternalInvocationOutcome.APPROVAL_REQUIRED.ordinal(),
+        ExternalInvocationOutcome.SUSPENDED.ordinal());
 
     private final ExternalInvocationLogRepository externalInvocationLogRepository;
 
@@ -49,6 +54,19 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
     @Transactional
     public int deleteExternalInvocationLogsCreatedBefore(Instant instant) {
         return externalInvocationLogRepository.deleteByCreatedDateBefore(instant);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ExternalInvocationLog> fetchLastFailedExternalInvocationLog(PlatformType type, int environment) {
+        return externalInvocationLogRepository.findLastFailed(type.ordinal(), environment, NON_FAILED_OUTCOMES);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasExternalInvocationLog(PlatformType type, int environment, ExternalInvocationOutcome outcome) {
+        return externalInvocationLogRepository.existsByTypeAndEnvironmentAndOutcome(
+            type.ordinal(), environment, outcome.ordinal());
     }
 
     @Override

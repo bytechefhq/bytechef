@@ -23,6 +23,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
+    implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
@@ -34,6 +35,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api"))
+    implementation(project(":server:ee:libs:platform:platform-external-invocation-log:platform-external-invocation-log-api"))
 
     testImplementation(rootProject.libs.org.graalvm.polyglot.polyglot)
     testImplementation("org.liquibase:liquibase-core")

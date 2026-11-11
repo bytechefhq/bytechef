@@ -24,6 +24,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @version ee
@@ -40,7 +42,7 @@ import org.springframework.context.annotation.Import;
 @SpringBootTest(
     classes = IntegrationIntTestConfiguration.class,
     properties = {
-        "bytechef.edition=EE", "spring.liquibase.contexts=configuration"
+        "bytechef.edition=EE", "spring.liquibase.contexts=configuration,user"
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @IntegrationIntTestConfigurationSharedMocks
@@ -49,6 +51,9 @@ class IntegrationInstanceServiceIntTest {
     private static final long CONNECTION_ID = 42L;
     private static final long USER_A_ID = 1001L;
     private static final long USER_B_ID = 1002L;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private IntegrationInstanceConfigurationRepository integrationInstanceConfigurationRepository;
@@ -76,10 +81,68 @@ class IntegrationInstanceServiceIntTest {
 
     @AfterEach
     void afterEach() {
+        jdbcTemplate.update("DELETE FROM connected_user");
+
         integrationInstanceRepository.deleteAll();
         integrationInstanceConfigurationRepository.deleteAll();
         integrationWorkflowRepository.deleteAll();
         integrationRepository.deleteAll();
+    }
+
+    @Test
+    void testFetchFirstRunnableIntegrationInstance() {
+        long publishedIntegrationId = createIntegration();
+
+        integrationService.publishIntegration(publishedIntegrationId, null);
+
+        long unpublishedIntegrationId = createIntegration();
+
+        long enabledConfigurationId = createConfiguration(publishedIntegrationId, 1, Environment.DEVELOPMENT, true);
+        long disabledConfigurationId = createConfiguration(publishedIntegrationId, 1, Environment.DEVELOPMENT, false);
+        long unpublishedConfigurationId = createConfiguration(
+            unpublishedIntegrationId, 1, Environment.DEVELOPMENT, true);
+        long stagingConfigurationId = createConfiguration(publishedIntegrationId, 1, Environment.STAGING, true);
+
+        long disabledUserId = insertConnectedUser("disabled-user", Environment.DEVELOPMENT, false);
+        long disabledInstanceUserId = insertConnectedUser("disabled-instance-user", Environment.DEVELOPMENT);
+        long disabledConfigurationUserId = insertConnectedUser("disabled-configuration-user", Environment.DEVELOPMENT);
+        long unpublishedUserId = insertConnectedUser("unpublished-user", Environment.DEVELOPMENT);
+        long stagingUserId = insertConnectedUser("staging-user", Environment.STAGING);
+        long mismatchedEnvironmentUserId = insertConnectedUser("mismatched-environment-user", Environment.STAGING);
+
+        long runnableUserId = insertConnectedUser("runnable-user", Environment.DEVELOPMENT);
+
+        long newerRunnableUserId = insertConnectedUser("newer-runnable-user", Environment.DEVELOPMENT);
+
+        long disabledInstanceId = integrationInstanceService
+            .create(disabledInstanceUserId, CONNECTION_ID, enabledConfigurationId)
+            .getId();
+
+        integrationInstanceService.updateEnabled(disabledInstanceId, false);
+
+        integrationInstanceService.create(disabledUserId, CONNECTION_ID, enabledConfigurationId);
+        integrationInstanceService.create(disabledConfigurationUserId, CONNECTION_ID, disabledConfigurationId);
+        integrationInstanceService.create(unpublishedUserId, CONNECTION_ID, unpublishedConfigurationId);
+        integrationInstanceService.create(stagingUserId, CONNECTION_ID, stagingConfigurationId);
+        integrationInstanceService.create(mismatchedEnvironmentUserId, CONNECTION_ID, enabledConfigurationId);
+
+        assertThat(integrationInstanceService.fetchFirstRunnableIntegrationInstance(Environment.DEVELOPMENT))
+            .isEmpty();
+
+        integrationInstanceService.create(newerRunnableUserId, CONNECTION_ID, enabledConfigurationId);
+        integrationInstanceService.create(runnableUserId, CONNECTION_ID, enabledConfigurationId);
+
+        assertThat(integrationInstanceService.fetchFirstRunnableIntegrationInstance(Environment.DEVELOPMENT))
+            .hasValueSatisfying(integrationInstance -> {
+                assertThat(integrationInstance.getConnectedUserId()).isEqualTo(runnableUserId);
+                assertThat(integrationInstance.getIntegrationInstanceConfigurationId())
+                    .isEqualTo(enabledConfigurationId);
+            });
+        assertThat(integrationInstanceService.fetchFirstRunnableIntegrationInstance(Environment.STAGING))
+            .hasValueSatisfying(
+                integrationInstance -> assertThat(integrationInstance.getConnectedUserId()).isEqualTo(stagingUserId));
+        assertThat(integrationInstanceService.fetchFirstRunnableIntegrationInstance(Environment.PRODUCTION))
+            .isEmpty();
     }
 
     @Test
@@ -284,16 +347,41 @@ class IntegrationInstanceServiceIntTest {
     }
 
     private long createConfiguration(long integrationId, int integrationVersion) {
+        return createConfiguration(integrationId, integrationVersion, Environment.PRODUCTION, false);
+    }
+
+    private long insertConnectedUser(String externalId, Environment environment) {
+        return insertConnectedUser(externalId, environment, true);
+    }
+
+    private long insertConnectedUser(String externalId, Environment environment, boolean enabled) {
+        return Objects.requireNonNull(
+            jdbcTemplate.queryForObject(
+                """
+                    INSERT INTO connected_user
+                        (external_id, enabled, environment, created_date, created_by, last_modified_date,
+                         last_modified_by, version)
+                    VALUES (?, ?, ?, NOW(), 'test', NOW(), 'test', 0)
+                    RETURNING id
+                    """,
+                Long.class, externalId, enabled, environment.ordinal()));
+    }
+
+    private long createConfiguration(
+        long integrationId, int integrationVersion, Environment environment, boolean enabled) {
+
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
         integrationInstanceConfiguration.setConnectionParameters(Map.of());
-        integrationInstanceConfiguration.setEnvironment(Environment.PRODUCTION);
+        integrationInstanceConfiguration.setEnvironment(environment);
         integrationInstanceConfiguration.setIntegrationId(integrationId);
         integrationInstanceConfiguration.setIntegrationVersion(integrationVersion);
         integrationInstanceConfiguration.setName("instance-configuration-" + UUID.randomUUID());
 
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
             integrationInstanceConfiguration);
+
+        integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfiguration.getId(), enabled);
 
         return integrationInstanceConfiguration.getId();
     }

@@ -153,4 +153,25 @@ public interface IntegrationInstanceRepository
         WHERE connection_id IN (:connectionIds)
         """)
     List<Long> findConnectionIdsIn(@Param("connectionIds") Collection<Long> connectionIds);
+
+    @Query("""
+        SELECT integration_instance.*
+        FROM integration_instance
+        JOIN connected_user ON integration_instance.connected_user_id = connected_user.id
+        JOIN integration_instance_configuration
+            ON integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
+        WHERE integration_instance.enabled = TRUE
+        AND connected_user.enabled = TRUE
+        AND connected_user.environment = :environment
+        AND integration_instance_configuration.enabled = TRUE
+        AND integration_instance_configuration.environment = :environment
+        AND EXISTS (
+            SELECT 1 FROM integration_version
+            WHERE integration_version.integration_id = integration_instance_configuration.integration_id
+            AND integration_version.status = 1
+        )
+        ORDER BY connected_user.id, integration_instance_configuration.id DESC
+        LIMIT 1
+        """)
+    Optional<IntegrationInstance> findFirstRunnableIntegrationInstance(@Param("environment") int environment);
 }

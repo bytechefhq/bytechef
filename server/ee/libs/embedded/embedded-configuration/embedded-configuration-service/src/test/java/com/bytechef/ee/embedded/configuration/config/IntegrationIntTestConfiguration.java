@@ -30,12 +30,17 @@ import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserSecurity;
+import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.configuration.repository.PropertyRepository;
+import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.configuration.service.PropertyServiceImpl;
+import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.WorkflowValidationResult;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -83,6 +88,24 @@ public class IntegrationIntTestConfiguration {
     @Bean
     Evaluator evaluator() {
         return SpelEvaluator.create();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ApiKeyService apiKeyService() {
+        return mock(ApiKeyService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    ExternalInvocationLogService externalInvocationLogService() {
+        return mock(ExternalInvocationLogService.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    PropertyService propertyService(PropertyRepository propertyRepository) {
+        return new PropertyServiceImpl(propertyRepository);
     }
 
     @Bean

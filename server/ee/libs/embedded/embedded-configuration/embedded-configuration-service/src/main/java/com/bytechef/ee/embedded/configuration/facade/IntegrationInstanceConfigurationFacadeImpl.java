@@ -101,6 +101,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     private static final Logger log = LoggerFactory.getLogger(IntegrationInstanceConfigurationFacadeImpl.class);
 
+    private static final String INITIAL_VERSION_DESCRIPTION = "Initial version";
+
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
@@ -190,9 +192,22 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         Integration integration = integrationService.getIntegration(integrationId);
 
         if (!integration.isPublished()) {
-            throw new ConfigurationException(
-                "Integration id=%s is not published".formatted(integrationId),
-                IntegrationInstanceConfigurationErrorType.INTEGRATION_NOT_PUBLISHED);
+            int draftIntegrationVersion = integration.getLastIntegrationVersion();
+
+            List<Long> draftIntegrationWorkflowIds = integrationWorkflowService.getIntegrationWorkflowIds(
+                integrationId, draftIntegrationVersion);
+
+            if (!draftIntegrationWorkflowIds.isEmpty()) {
+                throw new ConfigurationException(
+                    "Integration id=%s is not published".formatted(integrationId),
+                    IntegrationInstanceConfigurationErrorType.INTEGRATION_NOT_PUBLISHED);
+            }
+
+            integrationService.publishIntegration(integrationId, INITIAL_VERSION_DESCRIPTION);
+
+            integrationInstanceConfiguration.setIntegrationVersion(draftIntegrationVersion);
+
+            integration = integrationService.getIntegration(integrationId);
         }
 
         if (integration.getLastIntegrationVersion() == integrationInstanceConfiguration.getIntegrationVersion()) {
@@ -239,6 +254,13 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows(),
                 IntegrationInstanceConfigurationWorkflowDTO::toIntegrationInstanceConfigurationWorkflow),
             List.of());
+
+        List<Long> integrationWorkflowIds = integrationWorkflowService.getIntegrationWorkflowIds(
+            integrationId, integrationVersion);
+
+        if (integrationWorkflowIds.isEmpty()) {
+            integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfiguration.getId(), true);
+        }
 
         return integrationInstanceConfiguration.getId();
     }

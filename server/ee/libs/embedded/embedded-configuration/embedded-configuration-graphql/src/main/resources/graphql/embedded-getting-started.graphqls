@@ -1,0 +1,36 @@
+extend type Query {
+    embeddedGettingStarted: EmbeddedGettingStarted!
+    embeddedGettingStartedCompleted: Boolean!
+}
+
+extend type Mutation {
+    dismissEmbeddedGettingStarted: Boolean
+}
+
+type EmbeddedGettingStarted {
+    apiBaseUrl: String
+    apiKeyCreated: Boolean!
+    completed: Boolean!
+    completionType: String
+    componentName: String
+    componentVersion: Int
+    firstCallMade: Boolean!
+    integrationConfigurationCreated: Boolean!
+    integrationConfigurationEnabled: Boolean!
+    integrationCreated: Boolean!
+    integrationHasWorkflows: Boolean!
+    integrationId: Long
+    integrationInstanceConfigurationId: Long
+    integrationPublished: Boolean!
+    lastFailedCall: EmbeddedGettingStartedFailedCall
+    testUserAdded: Boolean!
+    testUserConnected: Boolean!
+    testUserExternalId: String
+    testUserId: Long
+}
+
+type EmbeddedGettingStartedFailedCall {
+    createdDate: Long!
+    errorMessage: String
+    outcome: String!
+}

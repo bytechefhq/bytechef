@@ -9,7 +9,9 @@ package com.bytechef.ee.platform.external.invocation.log.repository;
 
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -71,6 +73,25 @@ public interface ExternalInvocationLogRepository extends ListCrudRepository<Exte
         @Param("connectedUserId") @Nullable Long connectedUserId,
         @Param("integrationInstanceId") @Nullable Long integrationInstanceId,
         @Param("startDate") @Nullable Instant startDate, @Param("endDate") @Nullable Instant endDate);
+
+    @Query("""
+        SELECT EXISTS (
+            SELECT 1 FROM external_invocation_log
+            WHERE type = :type AND environment = :environment AND outcome = :outcome
+        )
+        """)
+    boolean existsByTypeAndEnvironmentAndOutcome(
+        @Param("type") int type, @Param("environment") int environment, @Param("outcome") int outcome);
+
+    @Query("""
+        SELECT * FROM external_invocation_log
+        WHERE type = :type AND environment = :environment AND outcome NOT IN (:nonFailedOutcomes)
+        ORDER BY created_date DESC
+        LIMIT 1
+        """)
+    Optional<ExternalInvocationLog> findLastFailed(
+        @Param("type") int type, @Param("environment") int environment,
+        @Param("nonFailedOutcomes") Collection<Integer> nonFailedOutcomes);
 
     @Modifying
     @Query("DELETE FROM external_invocation_log WHERE created_date < :instant")
