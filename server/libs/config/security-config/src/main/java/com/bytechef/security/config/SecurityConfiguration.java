@@ -67,6 +67,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -238,7 +239,7 @@ public class SecurityConfiguration {
             });
 
         http.addFilterAfter(new SpaWebFilter(spaWebFilterContributors), BasicAuthenticationFilter.class)
-            .addFilterAfter(new CookieCsrfFilter(), BasicAuthenticationFilter.class);
+            .addFilterAfter(new CookieCsrfFilter(), RememberMeAuthenticationFilter.class);
 
         TwoFactorVerificationFilter twoFactorVerificationFilter =
             twoFactorVerificationFilterProvider.getIfAvailable();
