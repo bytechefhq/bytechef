@@ -70,7 +70,7 @@ const ConnectedUserCreateDialog = ({onClose}: {onClose: () => void}) => {
 
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-lg" showCloseButton>
                 <DialogHeader>
                     <DialogTitle>New connected user</DialogTitle>
 
