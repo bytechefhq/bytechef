@@ -171,12 +171,13 @@ public class SendEmailAction {
         multipart.addBodyPart(mimeBodyPart);
 
         if (inputParameters.containsKey(ATTACHMENTS)) {
-            MimeBodyPart attachmentBodyPart = new MimeBodyPart();
-
             for (FileEntry fileEntry : inputParameters.getFileEntries(ATTACHMENTS, List.of())) {
+                MimeBodyPart attachmentBodyPart = new MimeBodyPart();
+
                 attachmentBodyPart.setDataHandler(
                     new DataHandler(new ByteArrayDataSource(
                         (InputStream) context.file(file -> file.getInputStream(fileEntry)), fileEntry.getMimeType())));
+                attachmentBodyPart.setFileName(fileEntry.getName());
 
                 multipart.addBodyPart(attachmentBodyPart);
             }
