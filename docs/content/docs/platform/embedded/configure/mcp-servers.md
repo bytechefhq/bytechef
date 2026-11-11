@@ -47,6 +47,8 @@ Expand the server row. It has **Component Tools**, **Workflow Tools** and **Conn
 
 For each exposed action, you choose which parameters you fix yourself and which the connected agent fills at call time with the `fromAi(...)` expression, the same mechanism used to attach tools to an AI Agent. See [Supplying tool parameters with fromAi](/platform/automation/build/workflows/ai/agent#supplying-tool-parameters-with-fromai) for the syntax.
 
+The tool forms offer **Let AI fill all**, new tools start with their empty fields set to `fromAi(...)`, and when a component tool runs, a field without a value gets its built-in default. A value you saved wins over the agent's, and a field you cleared stays empty. Workflow tools don't apply defaults yet. See [Let AI fill all](/platform/automation/deploy/mcp-servers#let-ai-fill-all) and [Defaults at call time](/platform/automation/deploy/mcp-servers#defaults-at-call-time).
+
 <!-- TODO screenshot: Add Component dialog on the Select Tools step, showing the list of the component's actions with per-tool selection and the tool properties popover -->
 
 ### Workflow tools
@@ -57,6 +59,8 @@ For each exposed action, you choose which parameters you fix yourself and which 
 4. Save the dialog.
 
 Only workflows with a **New Workflow Call** trigger are eligible. A configuration without one shows "No tool-eligible workflows found". A workflow that is off in the configuration is listed as **Turned off in the configuration** and cannot be added. Adding a workflow does not turn it on and does not change the configuration. Its inputs and connections are set in the instance configuration, not on the MCP server.
+
+Each switched-on workflow shows its tool settings under its row: **Tool Name**, **Tool Description** and the fields of its **New Workflow Call** trigger, the same mapping that **Configure** opens later. Tool settings are stored per workflow.
 
 The **Workflow Tools** tab groups workflows by instance configuration. Each configuration row has a ⋮ menu with **Edit Workflows**, **Change Integration Version** and **Delete**. Each workflow has a **Configure** button (the tool's property values), a switch, and a ⋮ menu with **Edit** (its connections and inputs in the instance configuration) and **Delete**.
 
