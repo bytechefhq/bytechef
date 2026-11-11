@@ -19,20 +19,27 @@ package com.bytechef.automation.ai.mcp.web.graphql;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.web.graphql.config.AutomationMcpGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.ai.mcp.web.graphql.config.AutomationMcpGraphQlTestConfiguration;
+import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import graphql.ErrorType;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.graphql.ResponseError;
@@ -44,6 +51,7 @@ import org.springframework.test.context.ContextConfiguration;
  *
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 @ContextConfiguration(classes = {
     AutomationMcpGraphQlTestConfiguration.class,
     McpProjectWorkflowGraphQlController.class
@@ -56,6 +64,9 @@ import org.springframework.test.context.ContextConfiguration;
     })
 @AutomationMcpGraphQlConfigurationSharedMocks
 class McpProjectWorkflowGraphQlControllerIntTest {
+
+    private static final String INPUT_SCHEMA =
+        "{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"}}}";
 
     @Autowired
     private GraphQlTester graphQlTester;
@@ -306,6 +317,37 @@ class McpProjectWorkflowGraphQlControllerIntTest {
             .isEqualTo(true);
 
         verify(mcpProjectWorkflowFacade, never()).updateMcpProjectWorkflowEnabled(anyLong(), anyBoolean());
+    }
+
+    @Test
+    void testToolEligibleWorkflowProperties() {
+        // Given
+        WorkflowTrigger workflowTrigger = new WorkflowTrigger(
+            Map.of(
+                "name", "newWorkflowCall_1", "type", "workflow/v1/newWorkflowCall",
+                "parameters", Map.of("inputSchema", INPUT_SCHEMA)));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getExtensions(WorkflowExtConstants.TRIGGERS, WorkflowTrigger.class, List.of()))
+            .thenReturn(List.of(workflowTrigger));
+        when(mcpProjectWorkflowFacade.getToolEligibleWorkflow(5L, "workflow1")).thenReturn(workflow);
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                query {
+                    toolEligibleWorkflowProperties(projectId: "5", workflowId: "workflow1") {
+                        name
+                    }
+                }
+                """)
+            .execute()
+            .path("toolEligibleWorkflowProperties[*].name")
+            .entityList(String.class)
+            .containsExactly("toolName", "toolDescription", "message");
+
+        verify(mcpProjectWorkflowFacade).getToolEligibleWorkflow(5L, "workflow1");
     }
 
     @Test

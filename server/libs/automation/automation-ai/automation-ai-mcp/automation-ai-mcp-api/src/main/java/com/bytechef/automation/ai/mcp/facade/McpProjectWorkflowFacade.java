@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import java.util.List;
@@ -37,6 +38,14 @@ public interface McpProjectWorkflowFacade {
     void deleteMcpProjectWorkflow(long mcpProjectWorkflowId);
 
     List<McpProjectWorkflow> getMcpProjectMcpProjectWorkflows(long mcpProjectId);
+
+    /**
+     * Returns the workflow of the given project, in any of the project versions, so its tool properties can be built
+     * before it is added as an MCP tool.
+     *
+     * @throws IllegalArgumentException if the workflow does not belong to the project
+     */
+    Workflow getToolEligibleWorkflow(long projectId, String workflowId);
 
     List<ProjectWorkflow> getToolEligibleProjectVersionWorkflows(long projectId, int projectVersion);
 

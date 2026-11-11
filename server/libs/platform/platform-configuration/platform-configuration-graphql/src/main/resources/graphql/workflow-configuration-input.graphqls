@@ -9,3 +9,8 @@ input WorkflowConnectionInput {
     workflowConnectionKey: String!
     workflowNodeName: String!
 }
+
+input WorkflowToolParametersInput {
+    workflowId: String!
+    parameters: Map
+}

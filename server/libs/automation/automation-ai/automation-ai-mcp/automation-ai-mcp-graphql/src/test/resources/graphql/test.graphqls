@@ -200,6 +200,11 @@ input WorkflowConfigurationInput {
     inputs: Map
 }
 
+input WorkflowToolParametersInput {
+    workflowId: String!
+    parameters: Map
+}
+
 input WorkflowConnectionInput {
     connectionId: ID!
     workflowConnectionKey: String!
