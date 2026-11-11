@@ -2,6 +2,7 @@ extend type Query {
     mcpProjectWorkflow(id: ID): McpProjectWorkflow
     mcpProjectWorkflowsByMcpProjectId(mcpProjectId: ID): [McpProjectWorkflow]
     toolEligibleProjectVersionWorkflows(projectId: ID!, projectVersion: Int!): [ProjectWorkflow!]!
+    toolEligibleWorkflowProperties(projectId: ID!, workflowId: String!): [Property]
     mcpProjectWorkflowProperties(mcpProjectWorkflowId: ID!): [Property]
 }
 

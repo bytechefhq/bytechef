@@ -89,7 +89,11 @@ public class McpProjectWorkflowGraphQlController {
         return mcpProjectWorkflowFacade.getToolEligibleProjectVersionWorkflows(projectId, projectVersion);
     }
 
-    @SuppressFBWarnings("BC_VACUOUS_INSTANCEOF")
+    @QueryMapping
+    List<Property> toolEligibleWorkflowProperties(@Argument long projectId, @Argument String workflowId) {
+        return getWorkflowToolProperties(mcpProjectWorkflowFacade.getToolEligibleWorkflow(projectId, workflowId));
+    }
+
     @QueryMapping
     List<Property> mcpProjectWorkflowProperties(@Argument long mcpProjectWorkflowId) {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService.fetchMcpProjectWorkflow(mcpProjectWorkflowId)
@@ -105,6 +109,11 @@ public class McpProjectWorkflowGraphQlController {
 
         Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
+        return getWorkflowToolProperties(workflow);
+    }
+
+    @SuppressFBWarnings("BC_VACUOUS_INSTANCEOF")
+    private List<Property> getWorkflowToolProperties(Workflow workflow) {
         WorkflowTrigger trigger = McpWorkflowUtils.getCallableTrigger(workflow);
 
         if (trigger == null) {

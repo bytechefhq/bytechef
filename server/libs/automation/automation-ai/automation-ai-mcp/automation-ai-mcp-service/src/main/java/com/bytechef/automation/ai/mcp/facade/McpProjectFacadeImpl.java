@@ -47,6 +47,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConne
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO.WorkflowConnectionDTO;
+import com.bytechef.platform.configuration.dto.WorkflowToolParametersDTO;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
@@ -63,6 +64,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,6 +134,18 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds,
         List<WorkflowConfigurationDTO> workflowConfigurations) {
 
+        return createMcpProject(
+            mcpServerId, projectId, projectVersion, selectedWorkflowIds, workflowConfigurations, List.of());
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT') and " +
+        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
+    @Audited(event = McpProjectAuditEvents.MCP_PROJECT_CREATED, mapper = McpProjectAuditMapper.class)
+    public McpProject createMcpProject(
+        long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds,
+        List<WorkflowConfigurationDTO> workflowConfigurations, List<WorkflowToolParametersDTO> toolParameters) {
+
         Project project = projectService.getProject(projectId);
 
         validateSameWorkspace(project, mcpServerId);
@@ -162,11 +176,16 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
         mcpProject = mcpProjectService.create(mcpProject);
 
+        Map<String, Map<String, ?>> toolParametersMap = toToolParametersMap(toolParameters);
+
         for (Map.Entry<String, WorkflowDeploymentSettings> entry : workflowDeploymentSettingsMap.entrySet()) {
             ProjectDeploymentWorkflow projectDeploymentWorkflow = createProjectDeploymentWorkflow(
                 projectDeployment.getId(), entry.getKey(), entry.getValue());
 
-            mcpProjectWorkflowService.create(mcpProject.getId(), projectDeploymentWorkflow.getId());
+            McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService.create(
+                mcpProject.getId(), projectDeploymentWorkflow.getId());
+
+            storeToolParameters(mcpProjectWorkflow, toolParametersMap.get(entry.getKey()));
         }
 
         return mcpProject;
@@ -203,6 +222,20 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     public McpProject updateMcpProject(
         long mcpProjectId, List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations) {
 
+        return updateMcpProject(mcpProjectId, selectedWorkflowIds, workflowConfigurations, List.of());
+    }
+
+    @Override
+    @Audited(event = McpProjectAuditEvents.MCP_PROJECT_UPDATED, data = {
+        @AuditData(key = "mcpProjectId", value = "#mcpProjectId"),
+        @AuditData(key = "mcpServerId", value = "#result?.mcpServerId"),
+        @AuditData(key = "workflowIds", value = "#selectedWorkflowIds")
+    })
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')")
+    public McpProject updateMcpProject(
+        long mcpProjectId, List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations,
+        List<WorkflowToolParametersDTO> toolParameters) {
+
         McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
             .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
 
@@ -234,6 +267,8 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
             .toList();
 
         Map<String, WorkflowDeploymentSettings> addedWorkflowDeploymentSettingsMap = Map.of();
+
+        Map<String, Map<String, ?>> toolParametersMap = toToolParametersMap(toolParameters);
 
         Set<String> selectedWorkflowIdSet = new HashSet<>(selectedWorkflowIds);
 
@@ -277,7 +312,16 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
             ProjectDeploymentWorkflow projectDeploymentWorkflow = createProjectDeploymentWorkflow(
                 mcpProject.getProjectDeploymentId(), entry.getKey(), entry.getValue());
 
-            mcpProjectWorkflowService.create(mcpProjectId, projectDeploymentWorkflow.getId());
+            McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService.create(
+                mcpProjectId, projectDeploymentWorkflow.getId());
+
+            storeToolParameters(mcpProjectWorkflow, toolParametersMap.get(entry.getKey()));
+        }
+
+        for (Map.Entry<String, McpProjectWorkflow> entry : existingWorkflowIdMap.entrySet()) {
+            if (selectedWorkflowIdSet.contains(entry.getKey())) {
+                storeToolParameters(entry.getValue(), toolParametersMap.get(entry.getKey()));
+            }
         }
 
         for (Map.Entry<String, McpProjectWorkflow> entry : existingWorkflowIdMap.entrySet()) {
@@ -348,6 +392,23 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         return createMcpProject(
             targetMcpServerId, sourceDeployment.getProjectId(), sourceDeployment.getProjectVersion(),
             selectedWorkflowIds);
+    }
+
+    private void storeToolParameters(McpProjectWorkflow mcpProjectWorkflow, @Nullable Map<String, ?> parameters) {
+        if (parameters != null) {
+            mcpProjectWorkflowService.updateParameters(
+                Objects.requireNonNull(mcpProjectWorkflow.getId()), parameters);
+        }
+    }
+
+    private static Map<String, Map<String, ?>> toToolParametersMap(List<WorkflowToolParametersDTO> toolParameters) {
+        Map<String, Map<String, ?>> toolParametersMap = new HashMap<>();
+
+        for (WorkflowToolParametersDTO workflowToolParameters : toolParameters) {
+            toolParametersMap.put(workflowToolParameters.workflowId(), workflowToolParameters.parameters());
+        }
+
+        return toolParametersMap;
     }
 
     private ProjectDeploymentWorkflow createProjectDeploymentWorkflow(
