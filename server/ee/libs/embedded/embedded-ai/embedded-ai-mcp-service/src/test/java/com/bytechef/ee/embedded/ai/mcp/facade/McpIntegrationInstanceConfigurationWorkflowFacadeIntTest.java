@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -277,6 +278,40 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
                 .extracting(IntegrationWorkflowDTO::getId)
                 .containsExactlyInAnyOrder(
                     "5eed0000-0000-0000-0000-0000000000a1", "5eed0000-0000-0000-0000-0000000000a4");
+        }
+
+        @Test
+        void testGetToolEligibleIntegrationInstanceConfigurationWorkflowReturnsAnEligibleWorkflow() {
+            Workflow workflow = mcpIntegrationInstanceConfigurationWorkflowFacade
+                .getToolEligibleIntegrationInstanceConfigurationWorkflow(
+                    integrationInstanceConfigurationId, "5eed0000-0000-0000-0000-0000000000a1");
+
+            assertThat(workflow.getId()).isEqualTo("5eed0000-0000-0000-0000-0000000000a1");
+        }
+
+        @Test
+        void testGetToolEligibleIntegrationInstanceConfigurationWorkflowRejectsAWorkflowWithoutAWorkflowCallTrigger() {
+            assertThatThrownBy(
+                () -> mcpIntegrationInstanceConfigurationWorkflowFacade
+                    .getToolEligibleIntegrationInstanceConfigurationWorkflow(
+                        integrationInstanceConfigurationId, "5eed0000-0000-0000-0000-0000000000a2"))
+                            .isInstanceOf(IllegalArgumentException.class)
+                            .hasMessageContaining("5eed0000-0000-0000-0000-0000000000a2");
+        }
+
+        @Test
+        void testGetToolEligibleIntegrationInstanceConfigurationWorkflowRejectsAWorkflowOfAnotherIntegrationVersion() {
+            insertIntegrationWorkflow(
+                INTEGRATION_VERSION + 1, "5eed0000-0000-0000-0000-0000000000a5",
+                """
+                    {"triggers":[{"name":"trigger_1","type":"workflow/v1/newWorkflowCall"}],"tasks":[]}""");
+
+            assertThatThrownBy(
+                () -> mcpIntegrationInstanceConfigurationWorkflowFacade
+                    .getToolEligibleIntegrationInstanceConfigurationWorkflow(
+                        integrationInstanceConfigurationId, "5eed0000-0000-0000-0000-0000000000a5"))
+                            .isInstanceOf(IllegalArgumentException.class)
+                            .hasMessageContaining("5eed0000-0000-0000-0000-0000000000a5");
         }
 
         private long insert(String sql, Object... arguments) {

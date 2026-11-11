@@ -225,6 +225,25 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
             .toList();
     }
 
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    @Transactional(readOnly = true)
+    public Workflow getToolEligibleIntegrationInstanceConfigurationWorkflow(
+        long integrationInstanceConfigurationId, String workflowId) {
+
+        for (IntegrationWorkflowDTO integrationWorkflowDTO : getToolEligibleIntegrationInstanceConfigurationWorkflows(
+            integrationInstanceConfigurationId)) {
+
+            if (Objects.equals(integrationWorkflowDTO.getId(), workflowId)) {
+                return integrationWorkflowDTO.getWorkflow();
+            }
+        }
+
+        throw new IllegalArgumentException(
+            "Workflow " + workflowId + " is not tool-eligible for integration instance configuration " +
+                integrationInstanceConfigurationId);
+    }
+
     private void addMissingRowsForConnectedUsers(long mcpIntegrationInstanceConfigurationId) {
         McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
             mcpIntegrationInstanceConfigurationService
@@ -247,7 +266,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
                         + mcpIntegrationInstanceConfigurationWorkflowId));
     }
 
-    private static @Nullable WorkflowTrigger getToolCallableTrigger(Workflow workflow) {
+    static @Nullable WorkflowTrigger getToolCallableTrigger(Workflow workflow) {
         for (WorkflowTrigger workflowTrigger : WorkflowTrigger.ofEnabled(workflow)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 

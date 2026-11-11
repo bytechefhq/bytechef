@@ -7,6 +7,9 @@
 
 package com.bytechef.ee.embedded.ai.mcp.server.facade;
 
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,6 +18,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -50,6 +54,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -73,6 +78,7 @@ import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -118,6 +124,10 @@ class EmbeddedMcpToolFacadeIntTest {
     private static final String CLUSTER_ELEMENT_DESCRIPTION =
         "The POST method submits an entity to the specified resource.";
     private static final String CONNECTED_EXTERNAL_USER_ID = "external-user";
+    private static final List<? extends Property> DEFAULTED_PROPERTIES = List.of(
+        Property.toProperty(integer("length").defaultValue(8)),
+        Property.toProperty(string("text").defaultValue("default")),
+        Property.toProperty(object("body").properties(string("content"), string("format").defaultValue("text"))));
     private static final String NEW_WORKFLOW_CALL_TRIGGER_NAME = "newWorkflowCall_1";
     private static final String UNCONNECTED_EXTERNAL_USER_ID = "external-user-1";
     private static final String WORKFLOW_DESCRIPTION = "Sends an email to a customer";
@@ -321,6 +331,63 @@ class EmbeddedMcpToolFacadeIntTest {
         functionToolCallback.call("{}");
 
         verify(clusterElementDefinitionFacade).executeTool(eq("httpClient"), eq(1), eq("post"), any(), isNull());
+    }
+
+    @Test
+    void testClusterElementToolCallFillsMissingDefaultedParameter() {
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+            Map.of(), null, DEFAULTED_PROPERTIES);
+
+        when(componentDefinitionService.getComponentDefinition("httpClient", 1))
+            .thenReturn(mock(ComponentDefinition.class));
+
+        functionToolCallback.call("{}");
+
+        assertThat(captureExecutedToolParameters())
+            .containsEntry("length", 8L)
+            .containsEntry("text", "default")
+            .containsEntry("body", Map.of("format", "text"));
+    }
+
+    @Test
+    void testClusterElementToolCallLetsSavedValuesAndModelArgumentsWinOverDefaults() {
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+            Map.of("text", "saved", "body", Map.of("content", "x")), null, DEFAULTED_PROPERTIES);
+
+        when(componentDefinitionService.getComponentDefinition("httpClient", 1))
+            .thenReturn(mock(ComponentDefinition.class));
+
+        functionToolCallback.call("{\"length\": 12}");
+
+        assertThat(captureExecutedToolParameters())
+            .containsEntry("length", 12)
+            .containsEntry("text", "saved")
+            .containsEntry("body", Map.of("content", "x", "format", "text"));
+    }
+
+    @Test
+    void testClusterElementToolCallKeepsExplicitlyClearedSavedValuesOverDefaults() {
+        Map<String, Object> savedBody = new HashMap<>();
+
+        savedBody.put("format", null);
+
+        Map<String, Object> savedParameters = new HashMap<>();
+
+        savedParameters.put("text", null);
+        savedParameters.put("body", savedBody);
+
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getClusterElementToolCallback(
+            savedParameters, null, DEFAULTED_PROPERTIES);
+
+        when(componentDefinitionService.getComponentDefinition("httpClient", 1))
+            .thenReturn(mock(ComponentDefinition.class));
+
+        functionToolCallback.call("{}");
+
+        assertThat(captureExecutedToolParameters())
+            .containsEntry("length", 8L)
+            .doesNotContainKey("text")
+            .containsEntry("body", savedBody);
     }
 
     @Test
@@ -949,8 +1016,24 @@ class EmbeddedMcpToolFacadeIntTest {
         return functionToolCallback.getToolDefinition();
     }
 
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> captureExecutedToolParameters() {
+        ArgumentCaptor<Map<String, Object>> parametersArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(clusterElementDefinitionFacade).executeTool(
+            eq("httpClient"), eq(1), eq("post"), parametersArgumentCaptor.capture(), isNull());
+
+        return parametersArgumentCaptor.getValue();
+    }
+
     private FunctionToolCallback<Map<String, Object>, Object> getClusterElementToolCallback(
         Map<String, Object> parameters, @Nullable String externalUserId) {
+
+        return getClusterElementToolCallback(parameters, externalUserId, List.of());
+    }
+
+    private FunctionToolCallback<Map<String, Object>, Object> getClusterElementToolCallback(
+        Map<String, Object> parameters, @Nullable String externalUserId, List<? extends Property> properties) {
 
         McpTool mcpTool = saveMcpTool("post", parameters, true);
 
@@ -960,6 +1043,8 @@ class EmbeddedMcpToolFacadeIntTest {
         when(clusterElementDefinition.getComponentVersion()).thenReturn(1);
         when(clusterElementDefinition.getName()).thenReturn("post");
         when(clusterElementDefinition.getDescription()).thenReturn(CLUSTER_ELEMENT_DESCRIPTION);
+        doReturn(properties).when(clusterElementDefinition)
+            .getProperties();
         when(clusterElementDefinitionService.getClusterElementDefinition("httpClient", 1, "post"))
             .thenReturn(clusterElementDefinition);
 

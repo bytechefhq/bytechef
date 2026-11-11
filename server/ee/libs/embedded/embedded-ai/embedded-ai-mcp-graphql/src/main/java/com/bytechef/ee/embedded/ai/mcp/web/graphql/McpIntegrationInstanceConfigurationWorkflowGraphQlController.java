@@ -97,7 +97,15 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
             .getToolEligibleIntegrationInstanceConfigurationWorkflows(integrationInstanceConfigurationId);
     }
 
-    @SuppressFBWarnings("BC_VACUOUS_INSTANCEOF")
+    @QueryMapping
+    List<Property> toolEligibleIntegrationInstanceConfigurationWorkflowProperties(
+        @Argument long integrationInstanceConfigurationId, @Argument String workflowId) {
+
+        return getWorkflowToolProperties(
+            mcpIntegrationInstanceConfigurationWorkflowFacade.getToolEligibleIntegrationInstanceConfigurationWorkflow(
+                integrationInstanceConfigurationId, workflowId));
+    }
+
     @QueryMapping
     List<Property> mcpIntegrationInstanceConfigurationWorkflowProperties(
         @Argument long mcpIntegrationInstanceConfigurationWorkflowId) {
@@ -116,6 +124,11 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
 
         Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
 
+        return getWorkflowToolProperties(workflow);
+    }
+
+    @SuppressFBWarnings("BC_VACUOUS_INSTANCEOF")
+    private static List<Property> getWorkflowToolProperties(Workflow workflow) {
         WorkflowTrigger trigger = getToolCallableTrigger(workflow);
 
         if (trigger == null) {
