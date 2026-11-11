@@ -1,4 +1,5 @@
 import {Form} from '@/components/ui/form';
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {Authorization, AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {mockScrollIntoView, render, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
@@ -66,24 +67,26 @@ const BasicStepHarness = ({
     const authorizationType = useWatch({control: form.control, name: 'authorizationType'});
 
     return (
-        <Form {...form}>
-            <IntegrationInstanceConfigurationDialogBasicStep
-                authorizations={authorizations}
-                control={form.control}
-                curIntegrationId={curIntegrationId}
-                getValues={form.getValues}
-                integrationInstanceConfiguration={integrationInstanceConfiguration}
-                setCurIntegrationId={vi.fn()}
-                setCurIntegrationVersion={vi.fn()}
-                setValue={form.setValue}
-            />
+        <TooltipProvider>
+            <Form {...form}>
+                <IntegrationInstanceConfigurationDialogBasicStep
+                    authorizations={authorizations}
+                    control={form.control}
+                    curIntegrationId={curIntegrationId}
+                    getValues={form.getValues}
+                    integrationInstanceConfiguration={integrationInstanceConfiguration}
+                    setCurIntegrationId={vi.fn()}
+                    setCurIntegrationVersion={vi.fn()}
+                    setValue={form.setValue}
+                />
 
-            <span data-testid="selected-authorization-type">{authorizationType}</span>
+                <span data-testid="selected-authorization-type">{authorizationType}</span>
 
-            <button onClick={() => onSubmit?.(form.getValues())} type="button">
-                Submit
-            </button>
-        </Form>
+                <button onClick={() => onSubmit?.(form.getValues())} type="button">
+                    Submit
+                </button>
+            </Form>
+        </TooltipProvider>
     );
 };
 
@@ -122,10 +125,14 @@ describe('IntegrationInstanceConfigurationDialogBasicStep', () => {
         render(<BasicStepHarness onSubmit={onSubmit} />);
 
         expect(screen.getByText('Assignment rule', {selector: 'label'})).toBeInTheDocument();
+        expect(screen.queryByText(/^Which connected users self-serve places/)).not.toBeInTheDocument();
+
+        await user.hover(screen.getByLabelText('About Assignment rule'));
+
         expect(
-            screen.getByText(
-                /^Which connected users self-serve places on this configuration\. Checked once, when their instance is created\./
-            )
+            await screen.findByRole('tooltip', {
+                name: /^Which connected users self-serve places on this configuration\. Checked once, when their instance is created\./,
+            })
         ).toBeInTheDocument();
 
         await user.click(screen.getByRole('textbox', {name: 'Assignment rule'}));
