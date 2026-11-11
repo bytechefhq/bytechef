@@ -8,10 +8,12 @@ import {
 const ConnectedUserSheetPanelIntegrationWorkflowList = ({
     integrationInstance,
     integrationInstanceConfiguration,
+    mcpWorkflowUuids,
     workflows,
 }: {
     integrationInstance: IntegrationInstance;
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
+    mcpWorkflowUuids?: string[];
     workflows: Workflow[];
 }) => {
     return (
@@ -40,6 +42,9 @@ const ConnectedUserSheetPanelIntegrationWorkflowList = ({
                                     integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
                                     integrationInstanceWorkflow={integrationInstanceWorkflow}
                                     key={workflow.id}
+                                    mcpTool={
+                                        !!workflow.workflowUuid && !!mcpWorkflowUuids?.includes(workflow.workflowUuid)
+                                    }
                                     workflow={workflow}
                                 />
                             )

@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -25,12 +26,14 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     integrationInstanceConfiguration,
     integrationInstanceConfigurationWorkflow,
     integrationInstanceWorkflow,
+    mcpTool = false,
     workflow,
 }: {
     integrationInstance: IntegrationInstance;
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
     integrationInstanceWorkflow?: IntegrationInstanceWorkflow;
+    mcpTool?: boolean;
     workflow: Workflow;
 }) => {
     const {workflowComponentDefinitions, workflowTaskDispatcherDefinitions} = useWorkflowComponentDefinitions(
@@ -82,6 +85,8 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
                     >
                         {workflow.label}
                     </button>
+
+                    {mcpTool && <Badge label="MCP tool" styleType="secondary-filled" />}
                 </div>
 
                 <WorkflowTriggerAndComponentsRow

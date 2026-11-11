@@ -29,6 +29,7 @@ import {
     useGetIntegrationInstanceQuery,
 } from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {useGetProvisionableIntegrationsQuery} from '@/ee/shared/queries/embedded/provisionableIntegrations.queries';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, KeyRoundIcon} from 'lucide-react';
@@ -57,6 +58,8 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
     );
 
     const {data: integrationInstance} = useGetIntegrationInstanceQuery(connectedUserIntegrationInstance.id!);
+
+    const {data: provisionableIntegrations} = useGetProvisionableIntegrationsQuery(connectedUserId);
 
     const [showChangeConfigurationDialog, setShowChangeConfigurationDialog] = useState(false);
     const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
@@ -106,6 +109,15 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
     );
 
     const initialSelectedConnectedUserIds = useMemo(() => [connectedUserId], [connectedUserId]);
+
+    const mcpWorkflowUuids = useMemo(
+        () =>
+            provisionableIntegrations?.find(
+                (provisionableIntegration) =>
+                    provisionableIntegration.integration?.id === connectedUserIntegrationInstance.integrationId
+            )?.mcpWorkflowUuids,
+        [connectedUserIntegrationInstance.integrationId, provisionableIntegrations]
+    );
 
     const deleteIntegrationInstanceMutation = useDeleteIntegrationInstanceMutation({
         onSuccess: () => {
@@ -271,6 +283,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                     <ConnectedUserSheetPanelIntegrationWorkflowList
                         integrationInstance={integrationInstance}
                         integrationInstanceConfiguration={integrationInstanceConfiguration}
+                        mcpWorkflowUuids={mcpWorkflowUuids}
                         workflows={workflows}
                     />
                 )}

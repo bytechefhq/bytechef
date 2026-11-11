@@ -41,6 +41,10 @@ vi.mock('@/ee/shared/queries/embedded/integrationInstances.queries', () => ({
     useGetIntegrationInstanceQuery: () => ({data: undefined}),
 }));
 
+vi.mock('@/ee/shared/queries/embedded/provisionableIntegrations.queries', () => ({
+    useGetProvisionableIntegrationsQuery: () => ({data: undefined}),
+}));
+
 vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
     useGetIntegrationVersionWorkflowsQuery: () => ({data: []}),
 }));
