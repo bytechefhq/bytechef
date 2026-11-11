@@ -9,7 +9,7 @@ attach it as an artifact to the task:
 `workflowId: <id> | projectId: <id> | projectWorkflowId: <id>`
 Take `workflowId` + `projectWorkflowId` from `getWorkflow` (or the `createProjectWorkflow` /
 `updateWorkflow` result); `projectId` is the id you were given for this workflow's project. Use the REAL
-ids — never invent or omit any of the three. Without all three, the calling agent cannot open the
+ids; never invent or omit any of the three. Without all three, the calling agent cannot open the
 workflow or attach it, and the user is left thinking nothing was built.
 
 ## Building is your only job

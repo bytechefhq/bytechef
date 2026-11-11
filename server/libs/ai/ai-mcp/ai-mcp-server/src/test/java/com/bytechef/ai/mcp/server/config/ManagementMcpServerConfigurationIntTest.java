@@ -21,23 +21,32 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
+import com.bytechef.automation.ai.tool.EnvironmentScopedToolCallback;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowLifecycleTools;
 import com.bytechef.automation.ai.tool.WorkspaceTools;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.jackson.config.JacksonConfiguration;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class ManagementMcpServerConfigurationIntTest {
 
     private static final List<String> WORKSPACE_SCOPED_TOOL_NAMES = List.of(
@@ -47,7 +56,11 @@ class ManagementMcpServerConfigurationIntTest {
         .withBean(ProjectTools.class, () -> mock(ProjectTools.class))
         .withBean(ProjectWorkflowLifecycleTools.class, () -> mock(ProjectWorkflowLifecycleTools.class))
         .withBean(WorkspaceTools.class, () -> mock(WorkspaceTools.class))
-        .withUserConfiguration(ManagementMcpServerConfiguration.class);
+        .withUserConfiguration(ManagementMcpServerConfiguration.class, JacksonConfiguration.class)
+        .withBean(ObjectMapper.class, () -> JsonMapper.builder()
+            .build())
+        .withBean(XmlMapper.class, () -> XmlMapper.builder()
+            .build());
 
     @Test
     void testToolCallbackProviderIsNotRegisteredAsBean() {
@@ -103,14 +116,14 @@ class ManagementMcpServerConfigurationIntTest {
     }
 
     @Test
-    void testToolCallbackProviderExposesLifecycleToolsWithoutUpdateWorkflow() {
+    void testToolCallbackProviderExposesTheValidatingUpdateWorkflowButNoPartialWrites() {
         applicationContextRunner.run(context -> {
             assertThat(context).hasNotFailed();
 
             assertThat(getToolNames(context.getBean(ManagementMcpServerConfiguration.class)))
-                .contains("deleteWorkflow", "saveWorkflowTestConnection")
+                .contains("deleteWorkflow", "saveWorkflowTestConnection", "updateWorkflow", "createProjectWorkflow")
                 .doesNotContain(
-                    "updateWorkflow", "getActionDefinition", "listComponents", "getTaskProperties",
+                    "getActionDefinition", "listComponents", "getTaskProperties",
                     "listTaskDispatchers", "updateScriptComponentCode", "updateClusterElementTask",
                     "updateWorkflowRootProperties");
         });
@@ -125,8 +138,7 @@ class ManagementMcpServerConfigurationIntTest {
                 .containsExactlyInAnyOrder(
                     "listWorkspaces", "listProjects", "getProject", "createProject", "updateProject",
                     "deleteProject", "publishProject", "getWorkflow", "listWorkflows", "searchWorkflows",
-                    "deleteWorkflow",
-                    "saveWorkflowTestConnection");
+                    "deleteWorkflow", "saveWorkflowTestConnection", "updateWorkflow", "createProjectWorkflow");
         });
     }
 
@@ -136,8 +148,49 @@ class ManagementMcpServerConfigurationIntTest {
             assertThat(context).hasNotFailed();
 
             assertThat(getToolNames(context.getBean(ManagementMcpServerConfiguration.class)))
-                .doesNotContain("createProjectWorkflow", "searchProjects", "getProjectStatus");
+                .doesNotContain("searchProjects", "getProjectStatus");
         });
+    }
+
+    @Test
+    void testWorkflowScopedWritesAcceptAnEnvironment() {
+        applicationContextRunner.run(context -> {
+            assertThat(context).hasNotFailed();
+
+            ManagementMcpServerConfiguration configuration = context.getBean(ManagementMcpServerConfiguration.class);
+
+            assertThat(Arrays.stream(configuration.toolCallbackProvider()
+                .getToolCallbacks())
+                .map(ToolCallback::getToolDefinition)
+                .filter(definition -> List.of("updateWorkflow", "saveWorkflowTestConnection")
+                    .contains(definition.name())))
+                        .hasSize(2)
+                        .allSatisfy(definition -> assertThat(definition.inputSchema()).contains("\"environment\""));
+        });
+    }
+
+    @Test
+    void testServesTheAuthoringLoopOnceTheBuildInstructionsAreContributed() {
+        ToolCallback contributedToolCallback = mock(ToolCallback.class);
+
+        when(contributedToolCallback.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name("getWorkflowBuildInstructions")
+                .description("d")
+                .inputSchema("{\"type\":\"object\"}")
+                .build());
+
+        McpServerToolCallbackContributor contributor = () -> List.of(contributedToolCallback);
+
+        applicationContextRunner
+            .withBean(McpServerToolCallbackContributor.class, () -> contributor)
+            .run(context -> {
+                assertThat(context).hasNotFailed();
+
+                List<String> toolNames = getToolNames(context.getBean(ManagementMcpServerConfiguration.class));
+
+                assertThat(ManagementMcpInstructions.build(toolNames)).contains("To author a workflow yourself");
+            });
     }
 
     @Test
@@ -158,13 +211,35 @@ class ManagementMcpServerConfigurationIntTest {
     }
 
     @Test
-    void testInstructionsDescribeImportWorkflowWithAProjectIdOrAWorkflowId() {
-        assertThat(ManagementMcpServerConfiguration.INSTRUCTIONS)
-            .contains("createProject (if needed) → importWorkflow with the source")
-            .contains("the projectId for a new workflow or the workflowId for an existing one")
-            .doesNotContain(
-                "createProjectWorkflow", "searchProjects", "getProjectStatus", "cloneMcpProject",
-                "listMcpProjectWorkflows", "—");
+    void testBuildsTheContributedCallbacksOnlyAfterJsonUtilsIsInitialized() {
+        ToolCallback probeToolCallback = mock(ToolCallback.class);
+
+        when(probeToolCallback.getToolDefinition()).thenReturn(
+            ToolDefinition.builder()
+                .name("probe")
+                .description("d")
+                .inputSchema("{\"type\":\"object\",\"properties\":{}}")
+                .build());
+
+        McpServerToolCallbackContributor contributor = () -> List.of(
+            new EnvironmentScopedToolCallback(probeToolCallback));
+
+        JsonUtils.setObjectMapper(null);
+
+        try {
+            applicationContextRunner
+                .withBean(McpServerToolCallbackContributor.class, () -> contributor)
+                .run(context -> {
+                    assertThat(context).hasNotFailed();
+
+                    assertThat(getToolNames(context.getBean(ManagementMcpServerConfiguration.class)))
+                        .contains("probe");
+                });
+        } finally {
+            JsonUtils.setObjectMapper(
+                JsonMapper.builder()
+                    .build());
+        }
     }
 
     @Test

@@ -36,6 +36,10 @@ vi.mock('@/pages/automation/project/components/project-header/hooks/useProjectHe
     }),
 }));
 
+vi.mock('@/pages/automation/project/components/project-header/components/LeftSidebarButton', () => ({
+    default: () => <button>See projects</button>,
+}));
+
 vi.mock('@/pages/automation/project/components/project-header/components/ProjectBreadcrumb', () => ({
     default: ({itemSelect}: {itemSelect: React.ReactNode}) => <nav>{itemSelect}</nav>,
 }));
@@ -96,7 +100,14 @@ vi.mock('@/shared/components/copilot/hooks/useCopilotLayoutShifted', () => ({
     default: () => false,
 }));
 
-const renderProjectHeader = () =>
+const renderProjectHeader = (
+    embeddedProps: Partial<
+        Pick<
+            React.ComponentProps<typeof ProjectHeader>,
+            'embedded' | 'onWorkflowChange' | 'showPublishDeploy' | 'showWorkflowSelect'
+        >
+    > = {}
+) =>
     render(
         <TooltipProvider>
             <ProjectHeader
@@ -105,6 +116,7 @@ const renderProjectHeader = () =>
                 projectWorkflowId={11}
                 runDisabled={false}
                 updateWorkflowMutation={{} as UpdateWorkflowMutationType}
+                {...embeddedProps}
             />
         </TooltipProvider>
     );
@@ -205,4 +217,49 @@ it('opens the deployments page in production after deploying to production', () 
         state: {projectDeploymentId: 43},
     });
     expect(screen.queryByText(/Deployments sheet/)).not.toBeInTheDocument();
+});
+
+it('shows the sidebar toggle, breadcrumb, Publish, Deploy and Settings on the project page', () => {
+    renderProjectHeader();
+
+    expect(screen.getByRole('button', {name: 'See projects'})).toBeInTheDocument();
+    expect(screen.getByRole('navigation')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Publish'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Deploy'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Settings'})).toBeInTheDocument();
+});
+
+it('hides the sidebar toggle, breadcrumb, Publish, Deploy and Settings when embedded', () => {
+    renderProjectHeader({embedded: true});
+
+    expect(screen.queryByRole('button', {name: 'See projects'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Publish'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Deploy'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Settings'})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Test'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Output'})).toBeInTheDocument();
+});
+
+it('shows Publish and Deploy when embedded with showPublishDeploy', () => {
+    renderProjectHeader({embedded: true, showPublishDeploy: true});
+
+    expect(screen.getByRole('button', {name: 'Publish'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Deploy'})).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Settings'})).not.toBeInTheDocument();
+});
+
+it('shows the workflow select without the breadcrumb when embedded with showWorkflowSelect', () => {
+    useWorkflowDataStore.setState({workflow: {...useWorkflowDataStore.getState().workflow, label: 'Workflow 1'}});
+
+    renderProjectHeader({embedded: true, onWorkflowChange: vi.fn(), showWorkflowSelect: true});
+
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Project item select')).toHaveTextContent('Workflow 1');
+});
+
+it('hides the workflow select when embedded without showWorkflowSelect', () => {
+    renderProjectHeader({embedded: true});
+
+    expect(screen.queryByLabelText('Project item select')).not.toBeInTheDocument();
 });

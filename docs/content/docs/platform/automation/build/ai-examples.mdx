@@ -1,0 +1,219 @@
+---
+title: AI Building Examples
+description: Prompts you can give the AI Copilot, the AI Hub and the management MCP server, and what each one builds
+ee: true
+comingSoon: true
+---
+
+These are the prompts ByteChef's own end-to-end tests send to the [AI Copilot](/platform/automation/build/ai-copilot),
+the [AI Hub](/platform/automation/build/hub) and the management MCP server, run against a real model. Each one shows
+something the assistants can do today. Copy a prompt, adapt the names and channels to your workspace, and compare the
+result with what the example says it builds.
+
+## The same instruction, three ways in
+
+Every building example works on all three surfaces. Only the opening sentence changes:
+
+| Where you type it | How to phrase it |
+| --- | --- |
+| **AI Copilot**, Build mode, in an empty workflow | `Build this workflow. <instruction>` |
+| **AI Copilot**, Build mode, in an existing workflow | `<instruction>` - the open workflow is the one it changes |
+| **AI Hub**, Build mode, new workflow | `Create a new project "Invoices" with this workflow. <instruction>` |
+| **AI Hub**, Build mode, existing workflow | `In the project "Invoices", update the existing workflow "Invoice Search". <instruction>` |
+| **Management MCP**, `buildWorkflow` tool | `Create a new workflow in project <projectId>. <instruction>` or `Update the existing workflow with workflowId <workflowId>. <instruction>` |
+
+When the assistant needs a decision - which channel, which connection, which data table - it asks with a card in the
+Copilot and the AI Hub. Over MCP, `buildWorkflow` returns a numbered question; call it again with the original request
+plus your answer, for example `... Answer to "Which channel?": #signups.`
+
+Every save is validated: the assistant never stores a workflow with errors. A connection you still have to bind, or a
+knowledge base or data table you still have to create, does not stop the save - the assistant tells you what to set up.
+
+## Building workflows from scratch
+
+### Gmail invoices to Google Drive and a data table
+
+```text
+A workflow that checks Gmail every morning for invoices, saves PDF attachments to Google Drive, and adds a row to a
+Data Table. Ask me before publishing the workflow.
+```
+
+Builds a schedule trigger, a Gmail email search, a Google Drive upload and a data table record. Only PDF attachments
+are kept, and the assistant asks before it publishes.
+
+### Customer support agent with tools and a PII guardrail
+
+```text
+A customer support chat agent. Users chat with it; it uses an Anthropic Claude model, remembers the conversation, can
+tell the current date and do arithmetic, and must block messages that contain personal data (PII) before they reach
+the model.
+```
+
+Builds a chat trigger and an AI Agent with an Anthropic model, chat memory, a current-date tool, a math tool whose
+inputs the agent fills at run time, and a PII check guardrail.
+
+### Data stream: CSV in, JSON out
+
+```text
+A workflow that uses a Data Stream: read contacts from a CSV file, map the columns first_name and last_name into a
+single full_name field and keep email, then write the result as a JSON file.
+```
+
+Builds a Data Stream with a CSV reader, a processor that maps the fields and a JSON writer.
+
+### Agent whose Slack posts need approval
+
+```text
+An AI agent on chat, using an Anthropic Claude model, that can post messages to the #ops Slack channel. Every Slack
+post must be approved by a human first; send the approval request in the chat.
+```
+
+Builds an AI Agent whose Slack tool sits behind an approval gate that asks for approval in the chat.
+
+### Agent that answers from your knowledge base (RAG)
+
+```text
+A chat agent using an OpenAI model that answers employee questions using retrieval (RAG) over our company knowledge
+base.
+```
+
+Builds an AI Agent with an OpenAI model and a RAG element over ByteChef's built-in knowledge base. If no knowledge base
+exists yet, the workflow is still saved and the assistant tells you to create one.
+
+### Agent that delegates research to a subagent
+
+```text
+A chat agent using an Anthropic Claude model that delegates web research to a research subagent with its own model and
+returns a short summary to the user.
+```
+
+Builds an AI Agent with a research subagent that has its own model.
+
+### Load uploaded PDFs into the knowledge base
+
+```text
+When I upload a PDF through a webhook, split it into chunks and load them into our built-in knowledge base.
+```
+
+Builds a webhook trigger and a knowledge base load with a document splitter.
+
+### Manager approval for large expenses
+
+```text
+A webhook receives an expense request (employee email, amount, description). If the amount is over 500, pause the
+workflow and ask a manager to approve it through Slack and email, with the request expiring after 2 days. If approved,
+add a row to an "expenses" data table; if rejected, email the employee with the manager comment. Expenses of 500 or
+less are added to the table directly.
+```
+
+Builds a webhook trigger, a condition on the amount, an approval request delivered through Slack and email that
+expires after 2 days, and branches on the decision that add a data table row or email the employee.
+
+### A daily Slack message
+
+```text
+Build a workflow that posts "Hello from ByteChef" to the #general Slack channel every morning at 9:00 UTC. Let me pick
+the Slack connection.
+```
+
+Builds a daily schedule and a Slack message, then shows a card listing your Slack connections to pick from.
+
+### A webhook-to-Slack integration workflow (embedded)
+
+In the embedded integration workflow editor:
+
+```text
+Build this workflow: when a webhook receives a new signup (name, email), post a message about it to the #signups Slack
+channel.
+```
+
+Builds a webhook trigger and a Slack message in the integration's existing workflow.
+
+## Editing existing workflows
+
+Open the workflow in the editor (Copilot), name it (AI Hub), or pass its `workflowId` (MCP). The assistant changes that
+workflow; it never adds a second one.
+
+| Workflow before | Prompt | What changes |
+| --- | --- | --- |
+| Webhook → HTTP POST | `Update this workflow so failed orders are sent to Slack, then retry the API request after 10 minutes.` | Adds a Slack notification and a 10-minute wait before the retry; keeps the webhook and the request |
+| Chat trigger → AI Agent (Claude, chat memory) | `Give the agent a tool that tells the current date, and let it post messages to the #ops Slack channel, but only after a human approves each post in the chat.` | Adds a current-date tool and a Slack tool behind an approval gate |
+| Schedule at 8:00 → Gmail search | `Change the schedule to run at 7:30 instead of 8:00, and only find emails that have a PDF attachment.` | Moves the schedule and narrows the search; adds nothing else |
+| Webhook → logger → Slack | `Remove the logging step; keep posting the signup to Slack.` | Removes the logger; keeps the rest |
+| Data Stream: CSV reader → JSON writer | `Add a processor to the data stream that converts every contact name to upper case.` | Adds a processor between the reader and the writer |
+
+## Questions, pickers and connections
+
+The assistant asks instead of guessing, with a card you answer in the chat.
+
+- **A question:** `Build a workflow: when a webhook receives a new signup (name, email, plan), post a message about it
+  to Slack. I have not decided which Slack channel yet, so ask me which channel to use.`
+- **Pick from your real data:** `Build a workflow: a manual trigger, then add a record with a "note" field set to
+  "hello" to one of my existing data tables. Do not create a table; let me pick which existing data table to use.`
+- **Pick a knowledge base:** `... a chat agent using an OpenAI model that answers questions with retrieval (RAG) over
+  one of our knowledge bases. Let me pick which knowledge base.`
+- **Pick a trigger's table:** `... when a record is added to one of my existing data tables, log the record. Do not
+  create a table; let me pick which existing data table triggers it.`
+- **Pick a connection inside an agent:** `... a chat agent that answers questions with an Anthropic Claude model
+  (claude-sonnet-4-5). Let me pick which Anthropic connection the model uses.`
+- **Create a connection:** `Build a chat agent workflow that answers questions with a Mistral model
+  (mistral-large-latest). Then help me connect Mistral.` Click **Connect Mistral** on the card, create the connection,
+  then tell the assistant `I created the <name> connection. Bind it to the workflow.`
+
+## Debugging a failed run
+
+With a workflow whose last run failed:
+
+```text
+Debug the latest failed execution of this workflow. Explain what failed, then suggest a fix before changing anything.
+```
+
+In the AI Hub, name the workflow and project instead: `Debug the latest failed execution of the "Sync orders"
+workflow in the Orders project. ...`. The assistant reads the execution, explains which step failed and why, and
+proposes a fix without changing anything. Reply `Yes, apply the fix.` to have it applied.
+
+## Projects and deployments from the AI Hub
+
+In the AI Hub, Build mode:
+
+- `Create a project called Orders. Do not add any workflows.`
+- `Rename the project Orders to Order Sync.`
+- `Publish the project Order Sync.`
+- `Create a deployment of project <projectId> with project version 1 in the DEVELOPMENT environment.`
+- `Enable that deployment.` / `Now disable that deployment.`
+- `Update that deployment to project version 2.` / `Roll that deployment back to project version 1.`
+- `Promote project <projectId> version 2 to the STAGING environment.`
+
+In Ask mode, questions such as `Which of my projects have a name containing "Order"?` are answered without changing
+anything. Ask mode never runs a tool that changes your workspace, even when asked to.
+
+## Tool approvals
+
+Some AI Hub tools, such as deleting a project, wait for your approval:
+
+```text
+Delete the project Order Sync (id <projectId>). Do not ask questions.
+```
+
+A **Tool approval required** card appears and nothing runs until you choose **Approve** or **Reject**. Sending another
+message instead, for example `Never mind, do not delete anything.`, withdraws the pending approval. Workspace rules can
+exempt a tool from approval or require approval for one that runs freely by default.
+
+## Talking to a deployed chat workflow
+
+Pick a deployed chat workflow from the AI Hub composer's model picker (**Workflows**) and chat with it. A workflow
+with chat memory remembers across turns (`My name is Mira.` then `What is my name?`), and one with the Ask User
+Question tool asks you with a card mid-conversation (`Plan my trip.`).
+
+## Importing an n8n workflow
+
+Through the management MCP server's `importWorkflow` tool, with a `projectId` for a new workflow or a `workflowId` to
+convert into an existing one:
+
+```text
+Import this n8n workflow:
+<n8n workflow JSON>
+```
+
+Each n8n node is mapped to the closest ByteChef component. A node with no valid counterpart becomes an HTTP Client or
+Script step, and the workflow description says what is left to finish.
