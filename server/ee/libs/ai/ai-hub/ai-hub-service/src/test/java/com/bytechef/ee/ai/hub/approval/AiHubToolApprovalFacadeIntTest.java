@@ -19,6 +19,8 @@ import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.config.AiHubAuditIntTestConfiguration;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubClusterElementToolCallbacks;
+import com.bytechef.ee.ai.hub.toolsearch.AiHubGlobalToolCatalog;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
@@ -221,12 +223,15 @@ public class AiHubToolApprovalFacadeIntTest {
         AiHubToolApprovalFacade aiHubToolApprovalFacade(
             AiHubToolApprovalService approvalService, AiHubChatService chatService, UserService userService,
             ObjectProvider<AiHubPinnedToolCallbacks> pinnedToolCallbacksProvider,
+            ObjectProvider<AiHubGlobalToolCatalog> globalToolCatalogProvider,
+            ObjectProvider<AiHubClusterElementToolCallbacks> clusterElementToolCallbacksProvider,
             ObjectProvider<AiHubContinuationStarter> continuationStarterProvider,
             ObjectProvider<SecurityContextRehydrator> securityContextRehydratorProvider,
             PlatformTransactionManager transactionManager) {
 
             return new AiHubToolApprovalFacadeImpl(
-                approvalService, chatService, userService, pinnedToolCallbacksProvider, continuationStarterProvider,
+                approvalService, chatService, userService, pinnedToolCallbacksProvider, globalToolCatalogProvider,
+                clusterElementToolCallbacksProvider, continuationStarterProvider,
                 securityContextRehydratorProvider.getIfAvailable(), transactionManager);
         }
     }
