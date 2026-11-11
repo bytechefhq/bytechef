@@ -8,8 +8,12 @@
 package com.bytechef.ee.ai.hub.approval;
 
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.ai.hub.audit.AiHubAuditEvents;
+import com.bytechef.ee.ai.hub.audit.AiHubAuditMapper;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.ee.ai.hub.util.Mode;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -69,6 +73,13 @@ public class AiHubToolApprovalRuleFacadeImpl implements AiHubToolApprovalRuleFac
     }
 
     @Override
+    @Audited(event = AiHubAuditEvents.AI_HUB_TOOL_APPROVAL_RULE_CHANGED, data = {
+        @AuditData(key = "action", value = "'created'"),
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "ruleId", value = "#result?.id"),
+        @AuditData(key = "toolName", value = "#result?.toolName"),
+        @AuditData(key = "mode", value = "#mode")
+    })
     public AiHubToolApprovalRule createRule(
         long workspaceId, AiHubToolApproval.ToolKind toolKind, String toolName, AiHubToolApprovalRule.Mode mode) {
 
@@ -93,6 +104,11 @@ public class AiHubToolApprovalRuleFacadeImpl implements AiHubToolApprovalRuleFac
     }
 
     @Override
+    @Audited(event = AiHubAuditEvents.AI_HUB_TOOL_APPROVAL_RULE_CHANGED, mapper = AiHubAuditMapper.class, data = {
+        @AuditData(key = "action", value = "'deleted'"),
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "ruleId", value = "#ruleId")
+    })
     public void deleteRule(long workspaceId, long ruleId) {
         checkAdmin();
 
