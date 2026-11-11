@@ -52,6 +52,31 @@ describe('McpComponentSelectionGrid', () => {
         expect(onComponentSelect).toHaveBeenCalledWith(codeComponent);
     });
 
+    it('should show an added component as disabled and ignore clicks on it', async () => {
+        const onComponentSelect = vi.fn();
+        const gmail = {name: 'googleMail', title: 'Gmail', version: 1};
+        const slack = {name: 'slack', title: 'Slack', version: 1};
+
+        render(
+            <McpComponentSelectionGrid
+                {...defaultProps}
+                components={[gmail, slack]}
+                isComponentAdded={(component) => component.name === 'googleMail'}
+                onComponentSelect={onComponentSelect}
+            />
+        );
+
+        expect(screen.getByText('Already added')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByText('Gmail'));
+
+        expect(onComponentSelect).not.toHaveBeenCalled();
+
+        await userEvent.click(screen.getByText('Slack'));
+
+        expect(onComponentSelect).toHaveBeenCalledWith(slack);
+    });
+
     it('should name the search term when it matches no component', () => {
         render(<McpComponentSelectionGrid {...defaultProps} searchTerm="eeee" />);
 
