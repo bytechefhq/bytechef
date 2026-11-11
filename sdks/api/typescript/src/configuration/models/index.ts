@@ -2,10 +2,10 @@
 /* eslint-disable */
 export * from './AuthorizationType.js';
 export * from './AutomationComponentInputOptionsRequest.js';
+export * from './AutomationProject.js';
 export * from './AutomationProjectCodeWorkflow.js';
 export * from './AutomationProjectCodeWorkflowDeployResult.js';
 export * from './AutomationProjectCodeWorkflowTemplate.js';
-export * from './AutomationProject.js';
 export * from './AutomationProjectComponent.js';
 export * from './AutomationProjectWorkflowInput.js';
 export * from './AutomationProjectWorkflowTemplate.js';

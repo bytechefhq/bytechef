@@ -1,4 +1,5 @@
 apis/ActionApi.ts
+apis/ExternalInvocationApi.ts
 apis/ToolApi.ts
 apis/index.ts
 docs/ActionApi.md
@@ -8,6 +9,12 @@ docs/ErrorsInnerMeta.md
 docs/ExecuteAction400Response.md
 docs/ExecuteActionRequest.md
 docs/ExecuteToolRequest.md
+docs/ExternalInvocation.md
+docs/ExternalInvocationApi.md
+docs/ExternalInvocationKind.md
+docs/ExternalInvocationOutcome.md
+docs/ExternalInvocationPage.md
+docs/ExternalInvocationSource.md
 docs/Function.md
 docs/Tool.md
 docs/ToolApi.md
@@ -18,6 +25,11 @@ models/ErrorsInnerMeta.ts
 models/ExecuteAction400Response.ts
 models/ExecuteActionRequest.ts
 models/ExecuteToolRequest.ts
+models/ExternalInvocation.ts
+models/ExternalInvocationKind.ts
+models/ExternalInvocationOutcome.ts
+models/ExternalInvocationPage.ts
+models/ExternalInvocationSource.ts
 models/Function.ts
 models/Tool.ts
 models/index.ts

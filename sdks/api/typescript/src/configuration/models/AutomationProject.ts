@@ -50,18 +50,18 @@ export interface AutomationProject {
     /**
      * Whether copying this project's templates creates a per-user copy or a shared reference.
      */
-    kind?: AutomationWorkflowProjectKindEnum;
+    kind?: AutomationProjectKindEnum;
 }
 
 
 /**
  * @export
  */
-export const AutomationWorkflowProjectKindEnum = {
+export const AutomationProjectKindEnum = {
     Copy: 'COPY',
     Reference: 'REFERENCE',
 } as const;
-export type AutomationWorkflowProjectKindEnum = typeof AutomationWorkflowProjectKindEnum[keyof typeof AutomationWorkflowProjectKindEnum];
+export type AutomationProjectKindEnum = typeof AutomationProjectKindEnum[keyof typeof AutomationProjectKindEnum];
 
 
 /**

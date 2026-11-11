@@ -1,8 +1,8 @@
 README.md
 pom.xml
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/ApiUtil.java
-src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/AutomationProjectCodeWorkflowApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/AutomationProjectApi.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/AutomationProjectCodeWorkflowApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/ConnectedUserApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/ConnectedUserProjectWorkflowApi.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/ConnectionApi.java

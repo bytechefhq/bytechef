@@ -13,13 +13,6 @@
  */
 
 import { mapValues } from '../runtime.js';
-import type { AutomationProjectWorkflowInput } from './AutomationProjectWorkflowInput.js';
-import {
-    AutomationProjectWorkflowInputFromJSON,
-    AutomationProjectWorkflowInputFromJSONTyped,
-    AutomationProjectWorkflowInputToJSON,
-    AutomationProjectWorkflowInputToJSONTyped,
-} from './AutomationProjectWorkflowInput.js';
 import type { AutomationProjectComponent } from './AutomationProjectComponent.js';
 import {
     AutomationProjectComponentFromJSON,
@@ -27,6 +20,13 @@ import {
     AutomationProjectComponentToJSON,
     AutomationProjectComponentToJSONTyped,
 } from './AutomationProjectComponent.js';
+import type { AutomationProjectWorkflowInput } from './AutomationProjectWorkflowInput.js';
+import {
+    AutomationProjectWorkflowInputFromJSON,
+    AutomationProjectWorkflowInputFromJSONTyped,
+    AutomationProjectWorkflowInputToJSON,
+    AutomationProjectWorkflowInputToJSONTyped,
+} from './AutomationProjectWorkflowInput.js';
 
 /**
  * An automation workflow template within an automation project.

@@ -13,13 +13,6 @@
  */
 
 import { mapValues, parseDate, parseDateTime, serializeDate, serializeDateTime } from '../runtime.js';
-import type { AutomationProjectWorkflowInput } from './AutomationProjectWorkflowInput.js';
-import {
-    AutomationProjectWorkflowInputFromJSON,
-    AutomationProjectWorkflowInputFromJSONTyped,
-    AutomationProjectWorkflowInputToJSON,
-    AutomationProjectWorkflowInputToJSONTyped,
-} from './AutomationProjectWorkflowInput.js';
 import type { AutomationProjectComponent } from './AutomationProjectComponent.js';
 import {
     AutomationProjectComponentFromJSON,
@@ -27,6 +20,13 @@ import {
     AutomationProjectComponentToJSON,
     AutomationProjectComponentToJSONTyped,
 } from './AutomationProjectComponent.js';
+import type { AutomationProjectWorkflowInput } from './AutomationProjectWorkflowInput.js';
+import {
+    AutomationProjectWorkflowInputFromJSON,
+    AutomationProjectWorkflowInputFromJSONTyped,
+    AutomationProjectWorkflowInputToJSON,
+    AutomationProjectWorkflowInputToJSONTyped,
+} from './AutomationProjectWorkflowInput.js';
 
 /**
  * A group of tasks that make one logical workflow.
