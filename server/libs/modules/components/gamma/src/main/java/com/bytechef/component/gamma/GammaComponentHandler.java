@@ -17,6 +17,7 @@
 package com.bytechef.component.gamma;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -43,6 +44,9 @@ public class GammaComponentHandler implements ComponentHandler {
         .actions(
             GammaGeneratePresentationAction.ACTION_DEFINITION,
             GammaGetGenerationAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(GammaGeneratePresentationAction.ACTION_DEFINITION),
+            tool(GammaGetGenerationAction.ACTION_DEFINITION))
         .version(1)
         .customAction(true)
         .customActionHelp("", "https://developers.gamma.app");
