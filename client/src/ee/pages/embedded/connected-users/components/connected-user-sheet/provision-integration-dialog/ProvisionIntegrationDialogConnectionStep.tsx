@@ -15,6 +15,7 @@ interface ProvisionIntegrationDialogConnectionStepProps {
     control: Control<FieldValues>;
     formState: FormState<FieldValues>;
     onCodeSuccess: (payload: CodePayloadI) => void;
+    showOAuth2Button?: boolean;
 }
 
 export const isOAuth2CodeAuthorizationType = (authorizationType?: string): boolean =>
@@ -32,6 +33,7 @@ const ProvisionIntegrationDialogConnectionStep = ({
     control,
     formState,
     onCodeSuccess,
+    showOAuth2Button = true,
 }: ProvisionIntegrationDialogConnectionStepProps) => {
     const {data: connectionDefinition} = useGetConnectionDefinitionQuery({componentName, componentVersion});
 
@@ -79,7 +81,8 @@ const ProvisionIntegrationDialogConnectionStep = ({
                 </p>
             )}
 
-            {isOAuth2CodeAuthorizationType(authorizationType) &&
+            {showOAuth2Button &&
+                isOAuth2CodeAuthorizationType(authorizationType) &&
                 oAuth2AuthorizationParameters?.authorizationUrl &&
                 oAuth2AuthorizationParameters.clientId && (
                     <OAuth2Button
