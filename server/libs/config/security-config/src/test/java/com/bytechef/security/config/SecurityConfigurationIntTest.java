@@ -44,6 +44,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.junit.jupiter.api.Nested;
@@ -59,6 +60,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
@@ -77,6 +79,7 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.test.context.NestedTestConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -392,6 +395,53 @@ class SecurityConfigurationIntTest {
                 .isInstanceOfSatisfying(
                     TenantWebAuthenticationDetails.class,
                     details -> assertThat(details.getTenantId()).isEqualTo(COOKIE_TENANT_ID));
+        }
+
+        @Test
+        void testRememberMeAutoLoginReissuesTheCsrfCookie() throws Exception {
+            User user = new User();
+
+            user.setId(1L);
+            user.setLogin("jane");
+
+            PersistentToken persistentToken = new PersistentToken();
+
+            persistentToken.setSeries(SERIES);
+            persistentToken.setTokenDate(LocalDate.now());
+            persistentToken.setTokenValue(TOKEN_VALUE);
+            persistentToken.setUser(user);
+
+            when(tenantService.isMultiTenantEnabled()).thenReturn(false);
+            when(persistentTokenService.fetchPersistentToken(SERIES)).thenReturn(Optional.of(persistentToken));
+            when(userService.getUser(1L)).thenReturn(user);
+            when(userDetailsService.loadUserByUsername("jane"))
+                .thenReturn(
+                    new org.springframework.security.core.userdetails.User(
+                        "jane", "", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+            MvcResult mvcResult = mockMvc.perform(
+                get("/api/remember-me-probe")
+                    .cookie(
+                        new Cookie("remember-me", encodeCookie(SERIES, TOKEN_VALUE, "")),
+                        new Cookie("XSRF-TOKEN", "previous-token"))
+                    .header("User-Agent", "Test agent"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+            MockHttpServletResponse response = mvcResult.getResponse();
+
+            List<Cookie> csrfCookies = Arrays.stream(response.getCookies())
+                .filter(cookie -> Objects.equals(cookie.getName(), "XSRF-TOKEN"))
+                .toList();
+
+            assertThat(csrfCookies).isNotEmpty();
+
+            Cookie lastCsrfCookie = csrfCookies.getLast();
+
+            assertThat(lastCsrfCookie.getValue())
+                .isNotBlank()
+                .isNotEqualTo("previous-token");
+            assertThat(lastCsrfCookie.getMaxAge()).isNotZero();
         }
 
         private static String encodeCookie(String... cookieTokens) {
