@@ -520,18 +520,12 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .map(IntegrationInstanceConfigurationWorkflow::getWorkflowId)
             .collect(Collectors.toSet());
 
-        Set<String> mcpWorkflowUuids = getMcpWorkflows(integration.getId(), connectedUser)
-            .stream()
-            .map(ConnectedUserIntegrationDTO.McpWorkflowInfo::workflowUuid)
-            .collect(Collectors.toSet());
-
         Map<String, Map<String, Object>> inputsByWorkflowId = new LinkedHashMap<>();
 
         for (ProvisionIntegrationInstanceWorkflowDTO workflow : workflows) {
             IntegrationWorkflow integrationWorkflow = integrationWorkflows.stream()
                 .filter(curIntegrationWorkflow -> Objects.equals(
                     curIntegrationWorkflow.getUuidAsString(), workflow.workflowUuid()))
-                .filter(curIntegrationWorkflow -> !mcpWorkflowUuids.contains(curIntegrationWorkflow.getUuidAsString()))
                 .filter(curIntegrationWorkflow -> enabledConfigurationWorkflowIds.contains(
                     curIntegrationWorkflow.getWorkflowId()))
                 .findFirst()
@@ -631,7 +625,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                 integrationInstanceConfigurationDTO = filterWorkflows(
                     integrationInstanceConfigurationDTOAssembler.toConnectedUserIntegrationInstanceConfigurationDTO(
                         integrationInstanceConfiguration.getId()),
-                    connectedUser, mcpWorkflows);
+                    connectedUser, List.of());
 
                 oAuth2 = connectionDefinition == null
                     ? null
@@ -670,9 +664,15 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             return Optional.empty();
         }
 
+        List<String> mcpWorkflowUuids = mcpWorkflows.stream()
+            .map(ConnectedUserIntegrationDTO.McpWorkflowInfo::workflowUuid)
+            .distinct()
+            .sorted()
+            .toList();
+
         return Optional.of(
             new ProvisionableIntegrationDTO(
-                integrationDTO, integration.getComponentVersion(), provisionableConfigurations));
+                integrationDTO, integration.getComponentVersion(), provisionableConfigurations, mcpWorkflowUuids));
     }
 
     private String getConnectionName(
