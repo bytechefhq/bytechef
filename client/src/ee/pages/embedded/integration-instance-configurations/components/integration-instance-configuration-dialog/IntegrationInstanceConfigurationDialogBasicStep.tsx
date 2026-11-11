@@ -7,6 +7,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect';
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox';
 import IntegrationInstanceConfigurationDialogBasicStepTagsSelect from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepTagsSelect';
+import {NO_AUTHORIZATION_TYPE} from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/noAuthorizationType';
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -19,6 +20,7 @@ import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 interface IntegrationInstanceConfigurationDialogBasicStepProps {
+    authorizationRequired?: boolean;
     authorizations?: Authorization[];
     control: Control<IntegrationInstanceConfiguration>;
     curIntegrationId?: number;
@@ -32,6 +34,7 @@ interface IntegrationInstanceConfigurationDialogBasicStepProps {
 }
 
 const IntegrationInstanceConfigurationDialogBasicStep = ({
+    authorizationRequired = true,
     authorizations,
     control,
     curIntegrationId,
@@ -141,7 +144,7 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                 />
             )}
 
-            {curIntegrationId && authorizations && authorizations.length > 1 && (
+            {curIntegrationId && authorizations && authorizations.length + (authorizationRequired ? 0 : 1) > 1 && (
                 <FormField
                     control={control}
                     name="authorizationType"
@@ -155,7 +158,12 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                             <Select
                                 disabled={!!integrationInstanceConfiguration?.id}
                                 onValueChange={field.onChange}
-                                value={field.value}
+                                value={
+                                    field.value ||
+                                    (integrationInstanceConfiguration?.id && !authorizationRequired
+                                        ? NO_AUTHORIZATION_TYPE
+                                        : undefined)
+                                }
                             >
                                 <FormControl>
                                     <SelectTrigger className="w-full">
@@ -164,6 +172,10 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                                 </FormControl>
 
                                 <SelectContent>
+                                    {!authorizationRequired && (
+                                        <SelectItem value={NO_AUTHORIZATION_TYPE}>None</SelectItem>
+                                    )}
+
                                     {authorizations.map((authorization) => (
                                         <SelectItem key={authorization.type} value={authorization.type!}>
                                             {authorization.title || authorization.type}

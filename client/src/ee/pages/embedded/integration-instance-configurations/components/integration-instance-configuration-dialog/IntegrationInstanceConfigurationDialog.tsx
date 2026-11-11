@@ -49,6 +49,7 @@ import {useShallow} from 'zustand/react/shallow';
 import IntegrationInstanceConfigurationDialogBasicStep from './IntegrationInstanceConfigurationDialogBasicStep';
 import IntegrationInstanceConfigurationDialogCredentials from './IntegrationInstanceConfigurationDialogCredentials';
 import IntegrationInstanceConfigurationDialogWorkflowsStep from './IntegrationInstanceConfigurationDialogWorkflowsStep';
+import {NO_AUTHORIZATION_TYPE} from './noAuthorizationType';
 
 const OAUTH2_AUTHORIZATION_TYPES = new Set<string>([
     AuthorizationType.Oauth2AuthorizationCode,
@@ -56,9 +57,17 @@ const OAUTH2_AUTHORIZATION_TYPES = new Set<string>([
     AuthorizationType.Oauth2ImplicitCode,
 ]);
 
-const getDefaultAuthorizationType = (authorizations?: Authorization[]) =>
-    (authorizations?.length === 1 ? authorizations[0].type : undefined) as
+const getDefaultAuthorizationType = (authorizations: Authorization[] | undefined, authorizationRequired: boolean) => {
+    if (!authorizationRequired) {
+        return authorizations?.length ? undefined : NO_AUTHORIZATION_TYPE;
+    }
+
+    return (authorizations?.length === 1 ? authorizations[0].type : undefined) as
         IntegrationInstanceConfiguration['authorizationType'] | undefined;
+};
+
+const toSavedAuthorizationType = (authorizationType: IntegrationInstanceConfiguration['authorizationType']) =>
+    authorizationType === NO_AUTHORIZATION_TYPE ? undefined : authorizationType;
 
 interface IntegrationInstanceConfigurationDialogStepContentProps {
     basicStepContent: ReactNode;
@@ -197,6 +206,7 @@ const IntegrationInstanceConfigurationDialog = ({
     });
 
     const authorizations = connectionDefinition?.authorizations;
+    const authorizationRequired = connectionDefinition?.authorizationRequired !== false;
 
     const selectedAuthorizationType = useWatch({control, name: 'authorizationType'});
 
@@ -269,6 +279,7 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const basicStepContent = (
         <IntegrationInstanceConfigurationDialogBasicStep
+            authorizationRequired={authorizationRequired}
             authorizations={authorizations}
             control={control}
             curIntegrationId={curIntegrationId}
@@ -371,7 +382,9 @@ const IntegrationInstanceConfigurationDialog = ({
         } else {
             createIntegrationInstanceConfigurationMutation.mutate({
                 ...formData,
-                authorizationType: formData.authorizationType || getDefaultAuthorizationType(authorizations),
+                authorizationType: toSavedAuthorizationType(
+                    formData.authorizationType || getDefaultAuthorizationType(authorizations, authorizationRequired)
+                ),
                 environmentId: currentEnvironmentId,
                 integrationInstanceConfigurationWorkflows: formData.integrationInstanceConfigurationWorkflows?.map(
                     (integrationInstanceConfigurationWorkflow) => {
@@ -418,20 +431,30 @@ const IntegrationInstanceConfigurationDialog = ({
     const handleCompleteClick = () => handleSubmit(handleSaveClick)();
 
     useEffect(() => {
-        if (integrationInstanceConfiguration?.id || !authorizations?.length) {
+        if (integrationInstanceConfiguration?.id || (authorizationRequired && !authorizations?.length)) {
             return;
         }
 
+        const selectedAuthorizationTypeOffered =
+            selectedAuthorizationType === NO_AUTHORIZATION_TYPE
+                ? !authorizationRequired
+                : !!authorizations?.some((authorization) => authorization.type === selectedAuthorizationType);
+
         if (
             defaultedAuthorizationsRef.current !== authorizations ||
-            (!!selectedAuthorizationType &&
-                !authorizations.some((authorization) => authorization.type === selectedAuthorizationType))
+            (!!selectedAuthorizationType && !selectedAuthorizationTypeOffered)
         ) {
             defaultedAuthorizationsRef.current = authorizations;
 
-            setValue('authorizationType', getDefaultAuthorizationType(authorizations));
+            setValue('authorizationType', getDefaultAuthorizationType(authorizations, authorizationRequired));
         }
-    }, [authorizations, integrationInstanceConfiguration?.id, selectedAuthorizationType, setValue]);
+    }, [
+        authorizationRequired,
+        authorizations,
+        integrationInstanceConfiguration?.id,
+        selectedAuthorizationType,
+        setValue,
+    ]);
 
     useEffect(() => {
         if (!workflows?.length) {
