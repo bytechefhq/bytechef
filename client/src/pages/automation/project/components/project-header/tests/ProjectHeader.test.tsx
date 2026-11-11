@@ -1,5 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ProjectHeader from '@/pages/automation/project/components/project-header/ProjectHeader';
+import useProjectHeaderDialogsStore from '@/pages/automation/project/stores/useProjectHeaderDialogsStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
@@ -96,13 +97,13 @@ vi.mock('@/shared/components/copilot/hooks/useCopilotLayoutShifted', () => ({
     default: () => false,
 }));
 
-const renderProjectHeader = () =>
+const renderProjectHeader = (projectId = 5, projectWorkflowId = 11) =>
     render(
         <TooltipProvider>
             <ProjectHeader
                 bottomResizablePanelRef={{current: null}}
-                projectId={5}
-                projectWorkflowId={11}
+                projectId={projectId}
+                projectWorkflowId={projectWorkflowId}
                 runDisabled={false}
                 updateWorkflowMutation={{} as UpdateWorkflowMutationType}
             />
@@ -205,4 +206,36 @@ it('opens the deployments page in production after deploying to production', () 
         state: {projectDeploymentId: 43},
     });
     expect(screen.queryByText(/Deployments sheet/)).not.toBeInTheDocument();
+});
+
+it('clears the publish and deploy open flags when the header unmounts', () => {
+    useProjectHeaderDialogsStore.setState({deployDialogOpen: true, publishPopoverOpen: true});
+
+    const {unmount} = renderProjectHeader();
+
+    unmount();
+
+    expect(useProjectHeaderDialogsStore.getState().deployDialogOpen).toBe(false);
+    expect(useProjectHeaderDialogsStore.getState().publishPopoverOpen).toBe(false);
+});
+
+it('clears the publish and deploy open flags when the workflow changes', () => {
+    const {rerender} = renderProjectHeader();
+
+    useProjectHeaderDialogsStore.setState({deployDialogOpen: true, publishPopoverOpen: true});
+
+    rerender(
+        <TooltipProvider>
+            <ProjectHeader
+                bottomResizablePanelRef={{current: null}}
+                projectId={5}
+                projectWorkflowId={12}
+                runDisabled={false}
+                updateWorkflowMutation={{} as UpdateWorkflowMutationType}
+            />
+        </TooltipProvider>
+    );
+
+    expect(useProjectHeaderDialogsStore.getState().deployDialogOpen).toBe(false);
+    expect(useProjectHeaderDialogsStore.getState().publishPopoverOpen).toBe(false);
 });

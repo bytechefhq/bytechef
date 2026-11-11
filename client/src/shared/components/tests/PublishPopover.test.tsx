@@ -1,5 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {describe, expect, it, vi} from 'vitest';
 
@@ -82,5 +82,36 @@ describe('PublishPopover', () => {
         await userEvent.click(triggerButton);
 
         expect(screen.getByRole('button', {name: 'Publish button'})).toHaveClass('submit-override');
+    });
+
+    it('shows the popover content without a click when open is true', () => {
+        renderPublishPopover({open: true});
+
+        expect(screen.getByText('Publish Project')).toBeInTheDocument();
+        expect(screen.getByLabelText('Description')).toBeInTheDocument();
+    });
+
+    it('calls onOpenChange with false when the controlled popover is dismissed with Escape', () => {
+        const onOpenChangeMock = vi.fn();
+
+        renderPublishPopover({onOpenChange: onOpenChangeMock, open: true});
+
+        fireEvent.keyDown(screen.getByLabelText('Description'), {code: 'Escape', key: 'Escape'});
+
+        expect(onOpenChangeMock).toHaveBeenCalledWith(false);
+    });
+
+    it('does not render the popover content when disabled even if open is true', () => {
+        renderPublishPopover({disabled: true, open: true});
+
+        expect(screen.queryByText('Publish Project')).not.toBeInTheDocument();
+    });
+
+    it('clears the open flag through onOpenChange when disabled while open', () => {
+        const onOpenChangeMock = vi.fn();
+
+        renderPublishPopover({disabled: true, onOpenChange: onOpenChangeMock, open: true});
+
+        expect(onOpenChangeMock).toHaveBeenCalledWith(false);
     });
 });

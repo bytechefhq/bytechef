@@ -10,7 +10,7 @@ const toTitleCase = (name: string) => name.charAt(0).toUpperCase() + name.slice(
  * environments the way EnvironmentSelect does, but returns undefined unless there is another one to switch to
  * (outside EE, or with a single environment).
  */
-export const useEnvironmentScopeNote = (entityTitle: string): string | undefined => {
+export const useEnvironmentScopeNote = (entityTitle: string, suffix?: string): string | undefined => {
     const application = useApplicationInfoStore((state) => state.application);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -27,5 +27,7 @@ export const useEnvironmentScopeNote = (entityTitle: string): string | undefined
         return undefined;
     }
 
-    return `${entityTitle} are separate for each environment. You're viewing ${toTitleCase(currentEnvironmentConfig.label)}.`;
+    const note = `${entityTitle} are separate for each environment. You're viewing ${toTitleCase(currentEnvironmentConfig.label)}.`;
+
+    return suffix ? `${note} ${suffix}` : note;
 };

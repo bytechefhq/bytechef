@@ -3,18 +3,25 @@ import {Toaster} from '@/components/ui/sonner';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import shouldShowEmbeddedGettingStarted from '@/ee/pages/embedded/getting-started/shouldShowEmbeddedGettingStarted';
 import {useUserGuiding} from '@/hooks/useUserGuiding';
+import shouldShowAutomationGettingStarted from '@/pages/automation/getting-started/shouldShowAutomationGettingStarted';
 import {useCloseProjectsLeftSidebarOnLeave} from '@/pages/automation/project/hooks/useCloseProjectsLeftSidebarOnLeave';
-import {EMBEDDED_GETTING_STARTED_PATH} from '@/pages/home/constants/platformModes';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {AUTOMATION_GETTING_STARTED_PATH, EMBEDDED_GETTING_STARTED_PATH} from '@/pages/home/constants/platformModes';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
+import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
-import {useEmbeddedGettingStartedCompletedQuery} from '@/shared/middleware/graphql';
+import {
+    useAutomationGettingStartedCompletedQuery,
+    useEmbeddedGettingStartedCompletedQuery,
+} from '@/shared/middleware/graphql';
 import {isStandaloneRoute} from '@/shared/navigation/standaloneRoutes';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -69,6 +76,11 @@ const executionsNavigationGroup: NavigationGroupType = {icon: ActivityIcon, name
 const serversNavigationGroup: NavigationGroupType = {icon: RadioTowerIcon, name: 'Servers'};
 
 const automationNavigation: NavigationType[] = [
+    {
+        href: AUTOMATION_GETTING_STARTED_PATH,
+        icon: RocketIcon,
+        name: 'Getting Started',
+    },
     {
         href: '/automation/projects',
         icon: FolderIcon,
@@ -197,6 +209,7 @@ function App() {
     );
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const {currentType, setCurrentType} = usePlatformTypeStore(
         useShallow((state) => ({
             currentType: state.currentType,
@@ -211,16 +224,37 @@ function App() {
     const userGuiding = useUserGuiding();
 
     useFetchInterceptor();
+    useLoadWorkspaceScopes(location.pathname.includes('/automation/') ? currentWorkspaceId : undefined);
+
+    const canEditWorkspace = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
 
     const isAdmin = !!account?.authorities?.includes(AUTHORITIES.ADMIN);
+    const isAutomationPath = location.pathname.includes('/automation/');
     const isEmbeddedPath = location.pathname.startsWith('/embedded/');
 
     const {data: embeddedGettingStartedCompletedData} = useEmbeddedGettingStartedCompletedQuery(undefined, {
         enabled:
             currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && isEmbeddedPath && isAdmin && edition === EditionType.EE,
+    });
+
+    const {data: automationGettingStartedCompletedData} = useAutomationGettingStartedCompletedQuery(
+        {workspaceId: currentWorkspaceId},
+        {
+            enabled:
+                isAutomationPath &&
+                canEditWorkspace &&
+                currentEnvironmentId === DEVELOPMENT_ENVIRONMENT &&
+                currentWorkspaceId !== undefined,
+        }
+    );
+
+    const showAutomationGettingStarted = shouldShowAutomationGettingStarted({
+        canEdit: canEditWorkspace,
+        completed: automationGettingStartedCompletedData?.automationGettingStartedCompleted,
+        development: currentEnvironmentId === DEVELOPMENT_ENVIRONMENT,
     });
 
     const showEmbeddedGettingStarted = shouldShowEmbeddedGettingStarted({
@@ -231,6 +265,10 @@ function App() {
     });
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
+        if (navItem.href === AUTOMATION_GETTING_STARTED_PATH) {
+            return showAutomationGettingStarted;
+        }
+
         if (
             currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT &&
             edition === EditionType.EE &&

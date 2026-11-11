@@ -13,9 +13,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import shouldShowEmbeddedGettingStartedHelpLink from '@/ee/pages/embedded/getting-started/shouldShowEmbeddedGettingStartedHelpLink';
 import {useUserGuidingLauncher} from '@/hooks/useUserGuiding';
-import {EMBEDDED_GETTING_STARTED_PATH} from '@/pages/home/constants/platformModes';
+import shouldShowAutomationGettingStartedHelpLink from '@/pages/automation/getting-started/shouldShowAutomationGettingStartedHelpLink';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {AUTOMATION_GETTING_STARTED_PATH, EMBEDDED_GETTING_STARTED_PATH} from '@/pages/home/constants/platformModes';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
-import {AUTHORITIES} from '@/shared/constants';
+import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -62,6 +65,9 @@ export function AppSidebarFooter() {
             setCurrentEnvironmentId: state.setCurrentEnvironmentId,
         }))
     );
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canCreateProject = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
 
     const userGuidingLauncher = useUserGuidingLauncher();
 
@@ -77,6 +83,18 @@ export function AppSidebarFooter() {
         isAdmin: !!account?.authorities?.includes(AUTHORITIES.ADMIN),
         pathname,
     });
+
+    const showAutomationGettingStartedHelpLink = shouldShowAutomationGettingStartedHelpLink({
+        canCreateProject,
+        development: currentEnvironmentId === DEVELOPMENT_ENVIRONMENT,
+        pathname,
+    });
+
+    const gettingStartedHelpPath = showEmbeddedGettingStartedHelpLink
+        ? EMBEDDED_GETTING_STARTED_PATH
+        : showAutomationGettingStartedHelpLink
+          ? AUTOMATION_GETTING_STARTED_PATH
+          : undefined;
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: environmentsQuery} = useEnvironmentsQuery();
@@ -201,10 +219,10 @@ export function AppSidebarFooter() {
 
                         <DropdownMenuPortal>
                             <DropdownMenuSubContent className="w-56">
-                                {showEmbeddedGettingStartedHelpLink && (
+                                {gettingStartedHelpPath && (
                                     <DropdownMenuItem
                                         className="cursor-pointer"
-                                        onClick={() => navigate(EMBEDDED_GETTING_STARTED_PATH)}
+                                        onClick={() => navigate(gettingStartedHelpPath)}
                                     >
                                         <RocketIcon className="size-4" />
 

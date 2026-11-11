@@ -5,14 +5,18 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {RocketIcon} from 'lucide-react';
-import {MouseEvent} from 'react';
+import {MouseEvent, useEffect, useState} from 'react';
 
 interface DeployButtonProps {
     onDeploymentSaved?: (projectDeploymentId: number, environmentId?: number) => void;
+    onOpenChange?: (open: boolean) => void;
+    open?: boolean;
     project: Project;
 }
 
-const DeployButton = ({onDeploymentSaved, project}: DeployButtonProps) => {
+const DeployButton = ({onDeploymentSaved, onOpenChange, open, project}: DeployButtonProps) => {
+    const [openRefetchSettled, setOpenRefetchSettled] = useState(false);
+
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const projectDeploymentsQuery = useGetWorkspaceProjectDeploymentsQuery(
@@ -34,6 +38,38 @@ const DeployButton = ({onDeploymentSaved, project}: DeployButtonProps) => {
 
         await projectDeploymentsQuery.refetch();
     };
+
+    const refetchProjectDeployments = projectDeploymentsQuery.refetch;
+
+    useEffect(() => {
+        if (!open) {
+            setOpenRefetchSettled(false);
+
+            return;
+        }
+
+        if (!isDeployable) {
+            onOpenChange?.(false);
+
+            return;
+        }
+
+        if (!currentWorkspaceId || !project.id) {
+            return;
+        }
+
+        let cancelled = false;
+
+        void refetchProjectDeployments().finally(() => {
+            if (!cancelled) {
+                setOpenRefetchSettled(true);
+            }
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [currentWorkspaceId, isDeployable, onOpenChange, open, project.id, refetchProjectDeployments]);
 
     if (!isDeployable) {
         return (
@@ -75,6 +111,21 @@ const DeployButton = ({onDeploymentSaved, project}: DeployButtonProps) => {
             />
 
             <TooltipContent>Deploy the published project version</TooltipContent>
+
+            {open && openRefetchSettled && (
+                <ProjectDeploymentDialog
+                    onClose={() => onOpenChange?.(false)}
+                    onSuccess={onDeploymentSaved}
+                    projectDeployment={{
+                        name: project.name,
+                        projectId: project.id,
+                    }}
+                    projectDeployments={projectDeploymentsQuery.data}
+                    projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
+                    redirectOnSubmit={false}
+                    showTabs
+                />
+            )}
         </Tooltip>
     );
 };

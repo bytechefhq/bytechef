@@ -6,7 +6,7 @@ import {usePermissionStore} from '@/shared/stores/usePermissionStore';
 import {useEffect} from 'react';
 import {toast} from 'sonner';
 
-const ENVIRONMENT_ENUMS: Record<number, EnvironmentEnum> = {
+export const ENVIRONMENT_ENUMS: Record<number, EnvironmentEnum> = {
     [DEVELOPMENT_ENVIRONMENT]: EnvironmentEnum.Development,
     [PRODUCTION_ENVIRONMENT]: EnvironmentEnum.Production,
     [STAGING_ENVIRONMENT]: EnvironmentEnum.Staging,

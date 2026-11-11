@@ -83,4 +83,15 @@ describe('useAutomationJourney', () => {
 
         expect(result.current.journey).toBeUndefined();
     });
+
+    it('exposes a query error', () => {
+        const failure = new Error('failed');
+
+        hoisted.projectsResult = {data: undefined, error: failure, isLoading: false};
+
+        const {result} = renderHook(() => useAutomationJourney());
+
+        expect(result.current.error).toBe(failure);
+        expect(result.current.journey).toBeUndefined();
+    });
 });

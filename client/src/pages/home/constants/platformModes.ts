@@ -35,6 +35,8 @@ export const PLATFORM_MODES: PlatformModeI[] = [
     },
 ];
 
+export const AUTOMATION_GETTING_STARTED_PATH = '/automation/getting-started';
+
 export const EMBEDDED_GETTING_STARTED_PATH = '/embedded/getting-started';
 
 export const getPlatformModePath = (type: PlatformType, environmentId: number | undefined) => {
@@ -44,5 +46,5 @@ export const getPlatformModePath = (type: PlatformType, environmentId: number | 
         return `/embedded${development ? '/integrations' : '/configurations'}`;
     }
 
-    return `/automation${development ? '/projects' : '/deployments'}`;
+    return development ? '/automation' : '/automation/deployments';
 };

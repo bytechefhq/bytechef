@@ -14,6 +14,7 @@ import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/share
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
+import {WorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon, FormIcon, MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
@@ -121,7 +122,12 @@ const ProjectDeploymentWorkflowListItem = ({
                 id: projectDeploymentId,
                 workflowId: workflow.id!,
             })
-            .then(() => toast('Workflow request sent.'));
+            .then(() => {
+                toast('Workflow request sent.');
+
+                void queryClient.invalidateQueries({queryKey: ProjectDeploymentKeys.projectDeployments});
+                void queryClient.invalidateQueries({queryKey: WorkflowExecutionKeys.workflowExecutions});
+            });
     };
 
     interface HandleEnableProjectDeploymentWorkflowProps {

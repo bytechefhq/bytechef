@@ -22,7 +22,7 @@ interface WorkflowExecutionsEmptyStateProps {
 }
 
 const CURRENT_STEP_DESCRIPTIONS: Partial<Record<AutomationJourneyStageType, string>> = {
-    buildWorkflow: 'Add a workflow to a project and test it in the editor.',
+    buildWorkflow: 'Add a workflow to a project, give it a Schedule trigger, and test it in the editor.',
     createProject: 'Projects group related workflows.',
     deploy: 'Pick a published version and enable its workflows.',
     publish: 'Publishing creates a read-only version you can deploy.',

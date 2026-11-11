@@ -7,7 +7,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {PUBLISH_DESCRIPTION_PLACEHOLDER} from '@/shared/constants';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {SendIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 import * as z from 'zod';
@@ -19,7 +19,9 @@ const formSchema = z.object({
 interface PublishPopoverProps {
     disabled?: boolean;
     isPending: boolean;
+    onOpenChange?: (open: boolean) => void;
     onPublishSubmit: ({description, onSuccess}: {description?: string; onSuccess: () => void}) => void;
+    open?: boolean;
     submitButtonClassName?: string;
     title: string;
     tooltip: string;
@@ -29,13 +31,23 @@ interface PublishPopoverProps {
 const PublishPopover = ({
     disabled,
     isPending,
+    onOpenChange,
     onPublishSubmit,
+    open: controlledOpen,
     submitButtonClassName,
     title,
     tooltip,
     triggerButtonClassName,
 }: PublishPopoverProps) => {
-    const [open, setOpen] = useState(false);
+    const [internalOpen, setInternalOpen] = useState(false);
+
+    const open = controlledOpen ?? internalOpen;
+
+    const setOpen = (nextOpen: boolean) => {
+        setInternalOpen(nextOpen);
+
+        onOpenChange?.(nextOpen);
+    };
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -52,6 +64,12 @@ const PublishPopover = ({
             },
         });
     };
+
+    useEffect(() => {
+        if (disabled && controlledOpen) {
+            onOpenChange?.(false);
+        }
+    }, [controlledOpen, disabled, onOpenChange]);
 
     if (disabled) {
         return (

@@ -206,7 +206,7 @@ const ConnectionConfigurationListFormField = ({
                         </SelectContent>
                     </Select>
 
-                    {connectionList.length === 0 && (
+                    {componentConnection.required && connectionList.length === 0 && (
                         <div className="flex items-center gap-1">
                             <InfoIcon className="size-4 text-content-destructive-primary" />
 

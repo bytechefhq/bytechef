@@ -4,9 +4,18 @@ import {AUTOMATION_JOURNEY_STEP_IDS, type AutomationJourneyStepIdType} from './g
 
 export const A2A_SERVERS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/automation/deploy/a2a-servers';
 
+export const BUILD_FIRST_AGENT_DOCUMENTATION_URL =
+    'https://docs.bytechef.io/platform/automation/get-started/quick-start/build-first-agent';
+
+export const BUILD_FIRST_WORKFLOW_DOCUMENTATION_URL =
+    'https://docs.bytechef.io/platform/automation/get-started/quick-start/build-first-workflow';
+
 export const CHATS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/automation/deploy/chats';
 
 export const CONNECTIONS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/automation/build/connections';
+
+export const CONFIGURE_WORKFLOW_TRIGGER_DOCUMENTATION_URL =
+    'https://docs.bytechef.io/platform/automation/get-started/quick-start/configure-workflow-trigger';
 
 export const DATA_TABLES_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/automation/data/data-tables';
 
@@ -20,6 +29,9 @@ export const PROJECTS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/aut
 
 export const EXTERNAL_INVOCATIONS_DOCUMENTATION_URL =
     'https://docs.bytechef.io/platform/automation/monitor/external-invocations';
+
+export const STAR_REPOSITORY_ON_GITHUB_DOCUMENTATION_URL =
+    'https://docs.bytechef.io/platform/automation/get-started/quick-start/star-repository-on-github';
 
 export const WORKFLOW_EXECUTIONS_DOCUMENTATION_URL =
     'https://docs.bytechef.io/platform/automation/monitor/workflow-executions';
