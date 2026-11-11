@@ -81,6 +81,7 @@ class AuditDataContractTest {
         "count", "exists", "fetch", "find", "get", "has", "is", "list", "load", "read", "search");
     private static final String DEFINITION_EDIT = "workflow definition edit";
     private static final String DELEGATES = "delegates to an audited method";
+    private static final String GETTING_STARTED_DISMISSAL = "onboarding page dismissal";
     private static final String TAGS = "tag assignment";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
@@ -92,13 +93,14 @@ class AuditDataContractTest {
     private static final Map<String, String> UNAUDITED_GUARDED_METHODS = Map.ofEntries(
         Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
+        Map.entry("AutomationGettingStartedFacadeImpl.dismissAutomationGettingStarted", GETTING_STARTED_DISMISSAL),
         Map.entry("AutomationProjectFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
         Map.entry("AutomationProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
         Map.entry("ConnectedUserConnectionFacadeImpl.updateConnectedUserConnectionTags", TAGS),
         Map.entry("ConnectedUserConnectionFacadeImpl.updateIntegrationInstanceConnectionCredentials",
             RECORDED_BY_CALLER),
         Map.entry("ConnectionAdminFacadeImpl.updateConnectionTags", TAGS),
-        Map.entry("EmbeddedGettingStartedFacadeImpl.dismissEmbeddedGettingStarted", "onboarding page dismissal"),
+        Map.entry("EmbeddedGettingStartedFacadeImpl.dismissEmbeddedGettingStarted", GETTING_STARTED_DISMISSAL),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpServer", DELEGATES),
         Map.entry("EmbeddedMcpServerFacadeImpl.deleteEmbeddedMcpComponent", DELEGATES),

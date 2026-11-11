@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
 
+    testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
