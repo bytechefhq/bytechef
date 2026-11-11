@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -236,8 +235,7 @@ class IdentityProviderFacadeAuditIntTest {
     @EnableAutoConfiguration
     @EnableMethodSecurity
     @Import({
-        AuditAspect.class, AuditFailureCounter.class, AuditCaptureAspect.class, AuditEventService.class,
-        AuditMapperResolver.class,
+        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class,
         AuditJdbcConfiguration.class, EncryptionImpl.class, IdentityProviderFacadeImpl.class,
         IdentityProviderServiceImpl.class
     })

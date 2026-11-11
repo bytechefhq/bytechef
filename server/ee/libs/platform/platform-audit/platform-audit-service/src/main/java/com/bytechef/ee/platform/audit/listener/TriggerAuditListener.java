@@ -7,7 +7,6 @@
 
 package com.bytechef.ee.platform.audit.listener;
 
-import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.error.ExecutionError;
@@ -55,18 +54,15 @@ public class TriggerAuditListener implements ApplicationEventListener, ErrorEven
     private static final Logger log = LoggerFactory.getLogger(TriggerAuditListener.class);
 
     private final AuditEventService auditEventService;
-    private final AuditFailureCounter auditFailureCounter;
     private final ObjectProvider<TriggerExecutionService> triggerExecutionServiceProvider;
 
     @SuppressFBWarnings({
         "CT_CONSTRUCTOR_THROW", "EI"
     })
     public TriggerAuditListener(
-        AuditEventService auditEventService, AuditFailureCounter auditFailureCounter,
-        ObjectProvider<TriggerExecutionService> triggerExecutionServiceProvider) {
+        AuditEventService auditEventService, ObjectProvider<TriggerExecutionService> triggerExecutionServiceProvider) {
 
         this.auditEventService = auditEventService;
-        this.auditFailureCounter = auditFailureCounter;
         this.triggerExecutionServiceProvider = triggerExecutionServiceProvider;
     }
 
@@ -160,8 +156,6 @@ public class TriggerAuditListener implements ApplicationEventListener, ErrorEven
         try {
             auditEventService.saveAll(List.of(persistentAuditEvent));
         } catch (Exception exception) {
-            auditFailureCounter.increment(eventType);
-
             log.error(
                 "AUDIT PERSISTENCE FAILURE: the trigger event was not recorded — audit trail is incomplete: {}",
                 persistentAuditEvent, exception);

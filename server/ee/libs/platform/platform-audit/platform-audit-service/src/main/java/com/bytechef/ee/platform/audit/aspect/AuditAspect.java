@@ -8,7 +8,6 @@
 package com.bytechef.ee.platform.audit.aspect;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.ee.platform.audit.util.AuditPlatformUtils;
@@ -94,7 +93,6 @@ public class AuditAspect {
     private static final Logger log = LoggerFactory.getLogger(AuditAspect.class);
 
     private final AuditEventService auditEventService;
-    private final AuditFailureCounter auditFailureCounter;
     private final AuditMapperResolver auditMapperResolver;
     private final boolean recordAllowedPermissionChecks;
     private final TransactionAttributeSource transactionAttributeSource = new AnnotationTransactionAttributeSource();
@@ -105,13 +103,12 @@ public class AuditAspect {
     })
     public AuditAspect(
         ApplicationProperties applicationProperties, AuditEventService auditEventService,
-        AuditFailureCounter auditFailureCounter, AuditMapperResolver auditMapperResolver,
+        AuditMapperResolver auditMapperResolver,
         ObjectProvider<PlatformTransactionManager> transactionManagerProvider) {
 
         ApplicationProperties.Audit audit = applicationProperties.getAudit();
 
         this.auditEventService = auditEventService;
-        this.auditFailureCounter = auditFailureCounter;
         this.auditMapperResolver = auditMapperResolver;
         this.recordAllowedPermissionChecks = audit.isRecordAllowedPermissionChecks();
         this.transactionManager = transactionManagerProvider.getIfAvailable();
@@ -412,6 +409,10 @@ public class AuditAspect {
 
             return true;
         } catch (Exception exception) {
+            for (PersistentAuditEvent persistentAuditEvent : auditEvents) {
+                persistentAuditEvent.setId(null);
+            }
+
             reportLostAuditEvents(auditEvents, "persisting them failed", exception);
 
             return false;
@@ -425,10 +426,6 @@ public class AuditAspect {
             "AUDIT PERSISTENCE FAILURE: {} audit event(s) were not recorded because {} \u2014 audit trail is "
                 + "incomplete: {}",
             auditEvents.size(), cause, auditEvents, exception);
-
-        for (PersistentAuditEvent persistentAuditEvent : auditEvents) {
-            auditFailureCounter.increment(persistentAuditEvent.getEventType());
-        }
     }
 
     private @Nullable PersistentAuditEvent createAuditEvent(

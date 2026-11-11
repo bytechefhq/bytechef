@@ -22,7 +22,6 @@ import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.listener.SharedApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
@@ -60,9 +59,6 @@ class JobStatusAuditListenerIntTest {
 
     @MockitoSpyBean
     private AuditEventService auditEventService;
-
-    @Autowired
-    private AuditFailureCounter auditFailureCounter;
 
     @Autowired
     private JobStatusAuditListener jobStatusAuditListener;
@@ -161,8 +157,7 @@ class JobStatusAuditListenerIntTest {
         @SuppressWarnings("unchecked")
         ObjectProvider<PrincipalJobService> principalJobServiceProvider = mock(ObjectProvider.class);
 
-        JobStatusAuditListener listener = new JobStatusAuditListener(
-            auditEventService, auditFailureCounter, principalJobServiceProvider);
+        JobStatusAuditListener listener = new JobStatusAuditListener(auditEventService, principalJobServiceProvider);
 
         listener.onApplicationEvent(new JobStatusApplicationEvent(42L, Job.Status.FAILED));
 

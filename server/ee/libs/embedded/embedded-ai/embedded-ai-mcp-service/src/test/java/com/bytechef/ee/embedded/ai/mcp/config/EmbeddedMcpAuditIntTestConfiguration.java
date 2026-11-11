@@ -10,7 +10,6 @@ package com.bytechef.ee.embedded.ai.mcp.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -35,8 +34,7 @@ import org.springframework.data.domain.PageRequest;
 @Configuration
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import({
-    AuditAspect.class, AuditFailureCounter.class, AuditCaptureAspect.class, AuditEventService.class,
-    AuditMapperResolver.class
+    AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class
 })
 public class EmbeddedMcpAuditIntTestConfiguration {
 
