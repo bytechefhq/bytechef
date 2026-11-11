@@ -10,6 +10,7 @@ import useMcpComponentDialog from './hooks/useMcpComponentDialog';
 
 const McpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open, triggerNode}: McpComponentDialogProps) => {
     const {
+        aiValuesByTool,
         authoritiesLoading,
         authorityOptions,
         currentStep,
@@ -18,7 +19,10 @@ const McpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open, trig
         handleComponentSelect,
         handleOpenChange,
         handleSave,
+        isSavePending,
+        registerToolForm,
         requiredAuthorities,
+        savedParametersByToolName,
         selectedComponent,
         selectedConnection,
         selectedTools,
@@ -33,6 +37,7 @@ const McpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open, trig
         <McpComponentDialogShell
             currentStep={currentStep}
             editing={!!mcpComponent}
+            isSavePending={isSavePending}
             onBack={handleBack}
             onOpenChange={handleOpenChange}
             onSave={handleSave}
@@ -52,11 +57,14 @@ const McpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open, trig
             {currentStep === 'tools' && (
                 <>
                     <McpComponentDialogToolSelectionStep
+                        aiValuesByTool={aiValuesByTool}
                         existingTools={existingTools}
                         mcpComponent={mcpComponent}
                         onConnectionChange={setSelectedConnection}
+                        onToolFormChange={registerToolForm}
                         onToolsChange={setSelectedTools}
                         open={open ?? true}
+                        savedParametersByToolName={savedParametersByToolName}
                         selectedComponent={selectedComponent}
                         selectedConnection={selectedConnection}
                         selectedTools={selectedTools}

@@ -1,5 +1,5 @@
 import {PropertyAllType} from '@/shared/types';
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import Properties from '../Properties';
@@ -51,6 +51,19 @@ describe('Properties advanced section', () => {
 
         render(<Properties properties={properties} />);
 
+        expect(screen.getByText('Top K')).toBeInTheDocument();
+    });
+
+    it('reports when the advanced properties are expanded', () => {
+        const handleAdvancedPropertiesOpenChange = vi.fn();
+
+        render(
+            <Properties onAdvancedPropertiesOpenChange={handleAdvancedPropertiesOpenChange} properties={properties} />
+        );
+
+        fireEvent.click(screen.getByRole('button', {name: 'Show Advanced Properties'}));
+
+        expect(handleAdvancedPropertiesOpenChange).toHaveBeenCalledWith(true);
         expect(screen.getByText('Top K')).toBeInTheDocument();
     });
 });

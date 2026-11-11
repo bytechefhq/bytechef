@@ -10,6 +10,7 @@ const hoisted = vi.hoisted(() => ({
     handleSave: vi.fn(),
     state: {
         currentStep: 'components' as 'components' | 'tools',
+        isSavePending: false,
         selectedTools: [] as unknown[],
     },
 }));
@@ -29,6 +30,7 @@ vi.mock('../hooks/useMcpComponentDialog', () => ({
         handleComponentSelect: vi.fn(),
         handleOpenChange: hoisted.handleOpenChange,
         handleSave: hoisted.handleSave,
+        isSavePending: hoisted.state.isSavePending,
         requiredAuthorities: [],
         selectedComponent: undefined,
         selectedConnection: undefined,
@@ -50,6 +52,7 @@ vi.mock('../McpComponentDialogToolSelectionStep', () => ({
 beforeEach(() => {
     windowResizeObserver();
     hoisted.state.currentStep = 'components';
+    hoisted.state.isSavePending = false;
     hoisted.state.selectedTools = [];
     hoisted.enabledFeatureFlags = ['ff-6383'];
 });
@@ -136,6 +139,15 @@ describe('McpComponentDialog', () => {
             render(<McpComponentDialog mcpServerId="1" open />);
 
             expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled();
+        });
+
+        it('should show the save action as pending while the save is pending', () => {
+            hoisted.state.isSavePending = true;
+            hoisted.state.selectedTools = [{name: 'tool'}];
+
+            render(<McpComponentDialog mcpServerId="1" open />);
+
+            expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
         });
 
         it('should label the action Update when editing', () => {

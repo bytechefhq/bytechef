@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Form} from '@/components/ui/form';
 import {PopoverContent} from '@/components/ui/popover';
-import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import McpWorkflowToolForm from '@/pages/platform/mcp-servers/components/McpWorkflowToolForm';
 import {XIcon} from 'lucide-react';
 
 import {McpProjectWorkflowItemType} from './hooks/useMcpProjectList';
@@ -16,8 +16,10 @@ const McpProjectWorkflowPropertiesPopover = ({
     mcpProjectWorkflow,
     onClose,
 }: McpProjectWorkflowPropertiesPopoverProps) => {
-    const {control, form, formState, handleFormSubmit, handleSubmit, isLoading, properties} =
-        useMcpProjectWorkflowPropertiesPopover(mcpProjectWorkflow, onClose);
+    const {form, handleFormSubmit, handleSubmit, isLoading, properties} = useMcpProjectWorkflowPropertiesPopover(
+        mcpProjectWorkflow,
+        onClose
+    );
 
     return (
         <PopoverContent
@@ -49,15 +51,7 @@ const McpProjectWorkflowPropertiesPopover = ({
                         {isLoading ? (
                             <p className="text-sm text-muted-foreground">Loading properties...</p>
                         ) : properties.length > 0 ? (
-                            <fieldset className="space-y-4 border-0 p-0">
-                                <Properties
-                                    control={control}
-                                    controlPath=""
-                                    formState={formState}
-                                    properties={properties}
-                                    toolsMode
-                                />
-                            </fieldset>
+                            <McpWorkflowToolForm form={form} properties={properties} />
                         ) : (
                             <p className="text-sm text-muted-foreground">
                                 No configurable properties for this workflow tool.

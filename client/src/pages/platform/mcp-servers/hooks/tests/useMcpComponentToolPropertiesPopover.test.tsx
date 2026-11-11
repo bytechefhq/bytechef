@@ -86,7 +86,8 @@ describe('useMcpComponentToolPropertiesPopover', () => {
 
         await waitFor(() => expect(result.current.properties).toHaveLength(3));
 
-        act(() => result.current.handleFormSubmit({toolDescription: '', uri: 'https://example.com'}));
+        act(() => result.current.form.setValue('toolDescription', '', {shouldDirty: true}));
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
 
         expect(hoisted.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -102,7 +103,10 @@ describe('useMcpComponentToolPropertiesPopover', () => {
 
         await waitFor(() => expect(result.current.properties).toHaveLength(3));
 
-        act(() => result.current.handleFormSubmit({body: {bodyContent: '', bodyContentType: 'JSON'}}));
+        act(() =>
+            result.current.form.setValue('body', {bodyContent: '', bodyContentType: 'JSON'}, {shouldDirty: true})
+        );
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
 
         expect(hoisted.mutate).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -118,7 +122,8 @@ describe('useMcpComponentToolPropertiesPopover', () => {
 
         await waitFor(() => expect(result.current.properties).toHaveLength(3));
 
-        act(() => result.current.handleFormSubmit({uri: 'https://example.org'}));
+        act(() => result.current.form.setValue('uri', 'https://example.org', {shouldDirty: true}));
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
 
         expect(hoisted.embeddedMutate).toHaveBeenCalledWith({
             id: '1',
@@ -127,12 +132,44 @@ describe('useMcpComponentToolPropertiesPopover', () => {
         expect(hoisted.mutate).not.toHaveBeenCalled();
     });
 
+    it('does not save untouched built-in defaults', async () => {
+        hoisted.properties = [{controlType: 'TEXT', defaultValue: 'GET', name: 'method', type: 'STRING'}];
+
+        const {result} = renderPopoverHook({uri: 'https://example.com'});
+
+        await waitFor(() => expect(result.current.properties).toHaveLength(1));
+
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
+
+        expect(hoisted.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+                input: expect.objectContaining({parameters: {uri: 'https://example.com'}}),
+            })
+        );
+    });
+
+    it('saves the ai filled values', async () => {
+        const {result} = renderPopoverHook({});
+
+        await waitFor(() => expect(result.current.properties).toHaveLength(3));
+
+        act(() => result.current.form.setValue('uri', '=fromAi(uri, "", "STRING")', {shouldDirty: true}));
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
+
+        expect(hoisted.mutate).toHaveBeenCalledWith(
+            expect.objectContaining({
+                input: expect.objectContaining({parameters: {uri: '=fromAi(uri, "", "STRING")'}}),
+            })
+        );
+    });
+
     it('round-trips a cleared field back to an empty string', async () => {
         const {result} = renderPopoverHook({});
 
         await waitFor(() => expect(result.current.properties).toHaveLength(3));
 
-        act(() => result.current.handleFormSubmit({toolDescription: ''}));
+        act(() => result.current.form.setValue('toolDescription', '', {shouldDirty: true}));
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
 
         const stored = (hoisted.mutate as unknown as Mock).mock.calls[0][0].input.parameters;
 
