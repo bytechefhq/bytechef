@@ -73,23 +73,54 @@ const getStage = (projects: Project[], projectDeployments: ProjectDeployment[]):
     return 'createProject';
 };
 
-export const getAutomationJourney = (
-    projects: Project[],
-    projectDeployments: ProjectDeployment[]
-): AutomationJourneyI => {
-    const stage = getStage(projects, projectDeployments);
+export interface AutomationJourneyStageSignalsI {
+    deployed: boolean;
+    live: boolean;
+    projectCreated: boolean;
+    published: boolean;
+    workflowCreated: boolean;
+}
 
+const getStageFromSignals = (signals: AutomationJourneyStageSignalsI): AutomationJourneyStageType => {
+    if (signals.live) {
+        return 'live';
+    }
+
+    if (signals.deployed) {
+        return 'enable';
+    }
+
+    if (signals.published) {
+        return 'deploy';
+    }
+
+    if (signals.workflowCreated) {
+        return 'publish';
+    }
+
+    return signals.projectCreated ? 'buildWorkflow' : 'createProject';
+};
+
+const toJourney = (stage: AutomationJourneyStageType, nextProject?: Project): AutomationJourneyI => {
     const currentStepIndex = getCurrentStepIndex(stage);
 
     const stepStatuses = Object.fromEntries(
         AUTOMATION_JOURNEY_STEP_IDS.map((stepId, index) => [stepId, getStepStatus(index, currentStepIndex)])
     ) as Record<AutomationJourneyStepIdType, JourneyStepStatusType>;
 
+    return {nextProject, stage, stepStatuses};
+};
+
+export const getAutomationJourney = (
+    projects: Project[],
+    projectDeployments: ProjectDeployment[]
+): AutomationJourneyI => {
+    const stage = getStage(projects, projectDeployments);
+
     const publishableProjects = stage === 'publish' ? projects.filter(hasWorkflows) : [];
 
-    return {
-        nextProject: publishableProjects.length === 1 ? publishableProjects[0] : undefined,
-        stage,
-        stepStatuses,
-    };
+    return toJourney(stage, publishableProjects.length === 1 ? publishableProjects[0] : undefined);
 };
+
+export const getAutomationJourneyFromSignals = (signals: AutomationJourneyStageSignalsI): AutomationJourneyI =>
+    toJourney(getStageFromSignals(signals));

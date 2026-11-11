@@ -1,4 +1,5 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
+import EditorGettingStartedOverlay from '@/pages/automation/project/components/editor-getting-started/EditorGettingStartedOverlay';
 import ProjectHeader from '@/pages/automation/project/components/project-header/ProjectHeader';
 import ProjectsLeftSidebar from '@/pages/automation/project/components/projects-sidebar/ProjectsLeftSidebar';
 import {useProject} from '@/pages/automation/project/hooks/useProject';
@@ -122,6 +123,14 @@ const Project = () => {
                                     />
                                 )}
                             </WorkflowEditorProvider>
+
+                            {!!projectId && !!projectWorkflowId && (
+                                <EditorGettingStartedOverlay
+                                    key={projectWorkflowId}
+                                    projectId={+projectId}
+                                    projectWorkflowId={+projectWorkflowId}
+                                />
+                            )}
                         </ResizablePanel>
 
                         <ResizableHandle className="bg-transparent aria-[orientation=horizontal]:-top-1.5 aria-[orientation=horizontal]:h-0" />

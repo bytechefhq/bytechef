@@ -1,11 +1,11 @@
 import ModeSelectionDialog from '@/pages/home/components/ModeSelectionDialog';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render, resetAll, screen, userEvent} from '@/shared/util/test-utils';
 import {MemoryRouter} from 'react-router-dom';
 import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
-    currentEnvironmentId: 0,
     navigateMock: vi.fn(),
     setCurrentTypeMock: vi.fn(),
 }));
@@ -19,12 +19,6 @@ vi.mock('@/pages/home/stores/usePlatformTypeStore', async () => {
     };
 });
 
-vi.mock('@/shared/stores/useEnvironmentStore', () => ({
-    useEnvironmentStore: vi.fn((selector: (state: {currentEnvironmentId: number}) => unknown) =>
-        selector({currentEnvironmentId: hoisted.currentEnvironmentId})
-    ),
-}));
-
 vi.mock('react-router-dom', async () => {
     const actual = await import('react-router-dom');
 
@@ -37,8 +31,6 @@ vi.mock('react-router-dom', async () => {
 const handleDialogCloseMock = vi.fn();
 
 beforeEach(() => {
-    hoisted.currentEnvironmentId = 0;
-
     (usePlatformTypeStore as unknown as Mock).mockImplementation(
         (selector: (state: {currentType: undefined; setCurrentType: Mock}) => unknown) =>
             selector({currentType: undefined, setCurrentType: hoisted.setCurrentTypeMock})
@@ -47,6 +39,7 @@ beforeEach(() => {
 
 afterEach(() => {
     resetAll();
+    environmentStore.setState({currentEnvironmentId: 0});
 });
 
 const renderModeSelectionDialog = (isDialogOpen = true) =>
@@ -90,17 +83,17 @@ it('selects Embedded and lets the embedded index route decide where to land', as
     expect(hoisted.navigateMock).toHaveBeenCalledWith('/embedded');
 });
 
-it('selects Automation and redirects to its projects page', async () => {
+it('selects Automation and lets the automation index route decide where to land', async () => {
     renderModeSelectionDialog();
 
     await userEvent.click(screen.getByRole('button', {name: 'Start with Automation'}));
 
     expect(hoisted.setCurrentTypeMock).toHaveBeenCalledWith(PlatformType.AUTOMATION);
-    expect(hoisted.navigateMock).toHaveBeenCalledWith('/automation/projects');
+    expect(hoisted.navigateMock).toHaveBeenCalledWith('/automation');
 });
 
-it('redirects to the deployed view outside the development environment', async () => {
-    hoisted.currentEnvironmentId = 2;
+it('selects Automation outside Development and lands on Deployments', async () => {
+    environmentStore.setState({currentEnvironmentId: 2});
 
     renderModeSelectionDialog();
 

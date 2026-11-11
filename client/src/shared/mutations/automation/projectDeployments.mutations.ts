@@ -1,4 +1,6 @@
 import {
+    CreateProjectDeploymentWorkflowJob200Response,
+    CreateProjectDeploymentWorkflowJobRequest,
     EnableProjectDeploymentRequest,
     ProjectDeployment,
     ProjectDeploymentApi,
@@ -16,6 +18,25 @@ export const useCreateProjectDeploymentMutation = (mutationProps?: CreateProject
             return new ProjectDeploymentApi().createProjectDeployment({
                 projectDeployment,
             });
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface CreateProjectDeploymentWorkflowJobMutationProps {
+    onSuccess?: (
+        result: CreateProjectDeploymentWorkflowJob200Response,
+        variables: CreateProjectDeploymentWorkflowJobRequest
+    ) => void;
+    onError?: (error: Error, variables: CreateProjectDeploymentWorkflowJobRequest) => void;
+}
+
+export const useCreateProjectDeploymentWorkflowJobMutation = (
+    mutationProps?: CreateProjectDeploymentWorkflowJobMutationProps
+) =>
+    useMutation({
+        mutationFn: (request: CreateProjectDeploymentWorkflowJobRequest) => {
+            return new ProjectDeploymentApi().createProjectDeploymentWorkflowJob(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

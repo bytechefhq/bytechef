@@ -15,6 +15,7 @@ const DOCS = {
 
 const hoisted = vi.hoisted(() => ({
     authorities: [] as string[],
+    canCreateProject: false,
     currentType: 0,
     docs: {} as Record<string, string | undefined>,
     edition: 'CE',
@@ -24,6 +25,10 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useEnvironmentsQuery: () => ({data: {environments: []}}),
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoisted.canCreateProject,
 }));
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
@@ -86,6 +91,7 @@ describe('AppSidebarFooter', () => {
         vi.clearAllMocks();
 
         hoisted.authorities = [];
+        hoisted.canCreateProject = false;
         hoisted.currentType = 0;
         hoisted.docs = {...DOCS};
         hoisted.edition = 'CE';
@@ -235,6 +241,29 @@ describe('AppSidebarFooter', () => {
         fireEvent.click(await screen.findByText('Getting started'));
 
         expect(await screen.findByText('Getting started page')).toBeInTheDocument();
+    });
+
+    it('shows the Getting started help item on automation pages for users who can create projects', async () => {
+        hoisted.canCreateProject = true;
+
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter initialEntries={['/automation/projects']}>
+                <Routes>
+                    <Route element={<AppSidebarFooter />} path="/automation/projects" />
+
+                    <Route element={<div>Automation getting started page</div>} path="/automation/getting-started" />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+        await user.click(screen.getByText('Help & Feedback'));
+
+        fireEvent.click(await screen.findByText('Getting started'));
+
+        expect(await screen.findByText('Automation getting started page')).toBeInTheDocument();
     });
 
     it('hides the Getting started help item for non-admins and outside embedded pages', async () => {
