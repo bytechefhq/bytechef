@@ -1,9 +1,11 @@
+import Badge from '@/components/Badge/Badge';
 import {Input} from '@/components/Input/Input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Skeleton} from '@/components/ui/skeleton';
 import {PackageIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
+import {twMerge} from 'tailwind-merge';
 
 /**
  * The fields a component card renders. Kept structural rather than tied to one definition type: the automation
@@ -21,6 +23,7 @@ export interface McpSelectableComponentI {
 
 interface McpComponentSelectionGridProps<T extends McpSelectableComponentI> {
     components: T[];
+    isComponentAdded?: (component: T) => boolean;
     isLoading: boolean;
     onComponentSelect: (component: T) => void;
     onSearchTermChange: (searchTerm: string) => void;
@@ -29,6 +32,7 @@ interface McpComponentSelectionGridProps<T extends McpSelectableComponentI> {
 
 const McpComponentSelectionGrid = <T extends McpSelectableComponentI>({
     components,
+    isComponentAdded,
     isLoading,
     onComponentSelect,
     onSearchTermChange,
@@ -82,37 +86,54 @@ const McpComponentSelectionGrid = <T extends McpSelectableComponentI>({
                         </p>
                     </div>
                 ) : (
-                    components.map((component) => (
-                        <Card
-                            className="cursor-pointer transition-shadow hover:shadow-md"
-                            key={component.id ?? `${component.name}-${component.version}`}
-                            onClick={() => onComponentSelect(component)}
-                        >
-                            <CardHeader className="pb-2 text-center">
-                                <div className="mx-auto mb-2">
-                                    {component.icon ? (
-                                        <InlineSVG className="size-12" src={component.icon} />
-                                    ) : (
-                                        <PackageIcon className="size-12 text-content-neutral-tertiary" />
-                                    )}
-                                </div>
+                    components.map((component) => {
+                        const added = isComponentAdded?.(component) ?? false;
 
-                                <CardTitle className="text-sm">{component.title || component.name}</CardTitle>
-                            </CardHeader>
+                        return (
+                            <Card
+                                aria-disabled={added || undefined}
+                                className={twMerge(
+                                    'transition-shadow',
+                                    added ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:shadow-md'
+                                )}
+                                key={component.id ?? `${component.name}-${component.version}`}
+                                onClick={added ? undefined : () => onComponentSelect(component)}
+                                title={
+                                    added
+                                        ? 'Already added to this server. Edit its tools from the component menu.'
+                                        : undefined
+                                }
+                            >
+                                <CardHeader className="pb-2 text-center">
+                                    <div className="mx-auto mb-2">
+                                        {component.icon ? (
+                                            <InlineSVG className="size-12" src={component.icon} />
+                                        ) : (
+                                            <PackageIcon className="size-12 text-content-neutral-tertiary" />
+                                        )}
+                                    </div>
 
-                            <CardContent className="pt-0">
-                                <CardDescription className="line-clamp-3 text-center text-xs">
-                                    {component.description || 'No description available'}
-                                </CardDescription>
+                                    <CardTitle className="text-sm">{component.title || component.name}</CardTitle>
+                                </CardHeader>
 
-                                <div className="mt-2 text-center text-xs text-muted-foreground">
-                                    {component.clusterElementsCount?.TOOLS && (
-                                        <span>{component.clusterElementsCount.TOOLS} tools</span>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))
+                                <CardContent className="pt-0">
+                                    <CardDescription className="line-clamp-3 text-center text-xs">
+                                        {component.description || 'No description available'}
+                                    </CardDescription>
+
+                                    <div className="mt-2 text-center text-xs text-muted-foreground">
+                                        {added ? (
+                                            <Badge label="Already added" styleType="secondary-filled" />
+                                        ) : (
+                                            component.clusterElementsCount?.TOOLS && (
+                                                <span>{component.clusterElementsCount.TOOLS} tools</span>
+                                            )
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        );
+                    })
                 )}
             </div>
         </ScrollArea>

@@ -4,17 +4,23 @@ import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configurati
 import useMcpComponentDialogComponentSelectionStep from './hooks/useMcpComponentDialogComponentSelectionStep';
 
 interface ComponentSelectionStepProps {
+    mcpServerId: string;
     open: boolean;
     onComponentSelect: (component: ComponentDefinitionBasic) => void;
 }
 
-const McpComponentDialogComponentSelectionStep = ({onComponentSelect, open}: ComponentSelectionStepProps) => {
-    const {filteredComponents, isLoadingComponents, searchTerm, setSearchTerm} =
-        useMcpComponentDialogComponentSelectionStep(open);
+const McpComponentDialogComponentSelectionStep = ({
+    mcpServerId,
+    onComponentSelect,
+    open,
+}: ComponentSelectionStepProps) => {
+    const {filteredComponents, isComponentAdded, isLoadingComponents, searchTerm, setSearchTerm} =
+        useMcpComponentDialogComponentSelectionStep(open, mcpServerId);
 
     return (
         <McpComponentSelectionGrid
             components={filteredComponents}
+            isComponentAdded={isComponentAdded}
             isLoading={isLoadingComponents}
             onComponentSelect={onComponentSelect}
             onSearchTermChange={setSearchTerm}

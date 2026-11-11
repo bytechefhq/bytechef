@@ -1,7 +1,11 @@
+import {ComponentDefinitionBasic} from '@/shared/middleware/automation/configuration';
+import {useMcpComponentsByServerIdQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
-import {useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
-const useMcpComponentDialogComponentSelectionStep = (open: boolean) => {
+const getComponentKey = (name: string, version: number | null | undefined) => `${name}/${version}`;
+
+const useMcpComponentDialogComponentSelectionStep = (open: boolean, mcpServerId: string) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const {data: components = [], isLoading: isLoadingComponents} = useGetComponentDefinitionsQuery(
@@ -9,6 +13,27 @@ const useMcpComponentDialogComponentSelectionStep = (open: boolean) => {
             actionDefinitions: true,
         },
         open
+    );
+
+    const {data: mcpComponentsData, isLoading: isLoadingMcpComponents} = useMcpComponentsByServerIdQuery(
+        {mcpServerId},
+        {enabled: open && !!mcpServerId}
+    );
+
+    const addedComponentKeys = useMemo(
+        () =>
+            new Set(
+                (mcpComponentsData?.mcpComponentsByServerId ?? [])
+                    .filter((mcpComponent) => mcpComponent != null)
+                    .map((mcpComponent) => getComponentKey(mcpComponent!.componentName, mcpComponent!.componentVersion))
+            ),
+        [mcpComponentsData]
+    );
+
+    const isComponentAdded = useCallback(
+        (component: ComponentDefinitionBasic) =>
+            addedComponentKeys.has(getComponentKey(component.name, component.version)),
+        [addedComponentKeys]
     );
 
     const filteredComponents = components.filter((component) => {
@@ -32,7 +57,8 @@ const useMcpComponentDialogComponentSelectionStep = (open: boolean) => {
 
     return {
         filteredComponents,
-        isLoadingComponents,
+        isComponentAdded,
+        isLoadingComponents: isLoadingComponents || isLoadingMcpComponents,
         searchTerm,
         setSearchTerm,
     };
