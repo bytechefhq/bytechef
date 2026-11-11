@@ -1,3 +1,4 @@
+import GettingStartedStatusBox from '@/components/GettingStarted/GettingStartedStatusBox';
 import WorkflowExecutionContentClipboardButton from '@/shared/components/workflow-executions/WorkflowExecutionContentClipboardButton';
 import {EmbeddedGettingStartedQuery} from '@/shared/middleware/graphql';
 import {Link} from 'react-router-dom';
@@ -34,16 +35,7 @@ const FirstCallStepContent = ({callReceived, curl, lastFailedCall, listening, mu
         </div>
 
         {callReceived && (
-            <div
-                className="space-y-1 rounded-md border border-stroke-neutral-secondary p-3 text-sm"
-                data-testid="call-received"
-            >
-                <div className="flex items-center gap-2 font-medium text-content-neutral-primary">
-                    <span aria-hidden="true" className="size-2 rounded-full bg-surface-success-primary" />
-
-                    <span>Call received</span>
-                </div>
-
+            <GettingStartedStatusBox data-testid="call-received" title="Call received" tone="success">
                 <p className="text-xs text-content-neutral-secondary">
                     Your first call succeeded in Development. Setup is complete.
                 </p>
@@ -54,24 +46,15 @@ const FirstCallStepContent = ({callReceived, curl, lastFailedCall, listening, mu
                 >
                     View external invocations
                 </Link>
-            </div>
+            </GettingStartedStatusBox>
         )}
 
         {listening && (
-            <div className="space-y-1 rounded-md border border-stroke-neutral-secondary p-3 text-sm">
-                <div className="flex items-center gap-2 font-medium text-content-neutral-primary">
-                    <span
-                        aria-hidden="true"
-                        className={twMerge(
-                            'size-2 rounded-full',
-                            muted ? 'bg-content-neutral-tertiary' : 'animate-pulse bg-surface-success-primary'
-                        )}
-                        data-testid="listening-indicator"
-                    />
-
-                    <span>Listening for the call</span>
-                </div>
-
+            <GettingStartedStatusBox
+                indicatorTestId="listening-indicator"
+                title="Listening for the call"
+                tone={muted ? 'idle' : 'waiting'}
+            >
                 <p className="text-xs text-content-neutral-secondary">
                     A call to Development finishes setup. You can leave this page; we&apos;ll remember.
                 </p>
@@ -90,7 +73,7 @@ const FirstCallStepContent = ({callReceived, curl, lastFailedCall, listening, mu
                         </Link>
                     </div>
                 )}
-            </div>
+            </GettingStartedStatusBox>
         )}
     </div>
 );
