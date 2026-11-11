@@ -93,6 +93,14 @@ API keys, embedded connected-user tokens, MCP tokens and the system user's HTTP 
 
 A guarded call that is denied or fails is recorded with `DENIED` or `ERROR` as its result: under its own event type when it has one, for example `PROJECT_DELETED`, and as `PERMISSION_CHECK` otherwise. Passed checks are not recorded as `PERMISSION_CHECK`: an operation with its own event type above is recorded with the result `SUCCESS`, carrying the affected resource, unless the call changed nothing, such as a SCIM request that matched no user or the deletion of a workspace API key that did not exist. A successful audited operation called from inside another audited operation is recorded with the result `ROLLED_BACK` when the transaction it ran in does not commit while the outer operation's entries are still saved, for example when it ran in a transaction of its own. Entries are saved inside the caller's transaction when there is one, so if that transaction rolls back, its entries roll back with it, whatever their result; the server logs an `AUDIT PERSISTENCE FAILURE` line instead. Set `bytechef.audit.record-allowed-permission-checks` to `true` to record passed checks on calls that change something as well; passed checks recorded this way have the result `ALLOWED`. Passed checks on reads are never recorded: calls whose method name starts with `count`, `exists`, `fetch`, `find`, `get`, `has`, `is`, `list`, `load`, `read` or `search` followed by an uppercase letter, or is exactly one of those words.
 
+### When an entry cannot be saved
+
+A successful operation with its own event type, such as `CONNECTION_CREATED` or `USER_DELETED`, is not allowed to change anything without its entry. When it runs in a read-write transaction and its entry cannot be saved, for example because the database rejects the insert, the transaction is rolled back and the call fails with an error saying the audit event could not be recorded. When the operation runs inside a caller's transaction, the caller's transaction is rolled back as well.
+
+The other entries are saved on a best-effort basis: if one cannot be saved, the operation still goes ahead and the server logs an `AUDIT PERSISTENCE FAILURE` line. This covers denied and failed attempts, `PERMISSION_CHECK`, operations that do not run in a read-write transaction, job and trigger events, sign-ins and `CREDENTIAL_USED`.
+
+Each entry from an operation, a job, a trigger or a credential use that could not be saved increments the `bytechef.audit.failed` counter, tagged with the event type under `event`. It is exported with the rest of the server's metrics (as `bytechef_audit_failed_total` in Prometheus), so you can alert on gaps in the trail.
+
 ## What is not logged
 
 - **Secret values.** The log records that a credential was created or deleted, by whom, and when - never the secret material.
