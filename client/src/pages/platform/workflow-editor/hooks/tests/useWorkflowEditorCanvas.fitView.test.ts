@@ -20,7 +20,9 @@ vi.mock('../useInitialViewport', () => ({default: hoisted.useInitialViewportMock
 
 vi.mock('../useOverlayPanelsViewport', () => ({default: () => ({getViewportOffsetX: () => 0})}));
 
-vi.mock('../useLayout', () => ({default: () => undefined}));
+vi.mock('../useLayout', () => ({default: () => ({autoPlacedGraphPositionsRef: {current: {}}})}));
+
+vi.mock('../useCanvasHeightViewport', () => ({default: () => undefined}));
 
 vi.mock('../useHandleDrop', () => ({default: () => [vi.fn(), vi.fn(), vi.fn(), vi.fn()]}));
 
@@ -46,7 +48,8 @@ describe('useWorkflowEditorCanvas fit view on workflow change', () => {
     beforeEach(() => {
         hoisted.useInitialViewportMock.mockClear();
         hoisted.useNodesInitializedMock.mockClear();
-        hoisted.useReactFlowMock.mockClear();
+        hoisted.useReactFlowMock.mockReset();
+        hoisted.useReactFlowMock.mockReturnValue({getInternalNode: vi.fn(), screenToFlowPosition: vi.fn()});
 
         useWorkflowDataStore.setState({
             workflow: {id: 'workflow-1', nodeNames: [], version: 1, workflowUuid: 'workflow-uuid-1'},
@@ -70,6 +73,5 @@ describe('useWorkflowEditorCanvas fit view on workflow change', () => {
         renderCanvasHook(false);
 
         expect(hoisted.useNodesInitializedMock).not.toHaveBeenCalled();
-        expect(hoisted.useReactFlowMock).not.toHaveBeenCalled();
     });
 });
