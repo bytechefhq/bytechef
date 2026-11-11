@@ -2,13 +2,29 @@ import Button from '@/components/Button/Button';
 import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import {Label} from '@/components/ui/label';
+import {Skeleton} from '@/components/ui/skeleton';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {EDITOR_PLACEHOLDER, SPACE} from '@/shared/constants';
 import {Suspense, lazy, useEffect, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
+
+const SKELETON_LINE_WIDTHS = ['w-4', 'w-2/5', 'w-1/3', 'w-2/5', 'w-1/4', 'w-4'];
+
+const SampleDataEditorSkeleton = () => (
+    <div
+        aria-busy="true"
+        className="absolute inset-0 flex flex-col gap-2 py-1 pl-[70px]"
+        data-testid="sample-data-editor-skeleton"
+    >
+        {SKELETON_LINE_WIDTHS.map((width, index) => (
+            <Skeleton className={twMerge('h-4', width)} key={index} />
+        ))}
+    </div>
+);
 
 interface OutputTabSampleDataDialogProps {
     fileUploadEnabled?: boolean;
@@ -30,14 +46,9 @@ const OutputTabSampleDataDialog = ({
     const [rawValue, setRawValue] = useState<string>('');
     const [parsedValue, setParsedValue] = useState<object | undefined>();
     const [sampleFile, setSampleFile] = useState<File | null>(null);
+    const [isEditorMounted, setIsEditorMounted] = useState(false);
 
     const handleEditorOnChange = (editorValue: string | undefined) => {
-        const placeholderElement = document.querySelector('#monaco-placeholder') as HTMLElement | null;
-
-        if (placeholderElement) {
-            placeholderElement.style.display = editorValue ? 'none' : 'block';
-        }
-
         setRawValue(editorValue ?? '');
 
         if (editorValue) {
@@ -52,11 +63,7 @@ const OutputTabSampleDataDialog = ({
     };
 
     const handleEditorOnMount = (editor: StandaloneCodeEditorType) => {
-        const placeholderElement = document.querySelector('#monaco-placeholder') as HTMLElement | null;
-
-        if (placeholderElement) {
-            placeholderElement.style.display = rawValue ? 'none' : 'block';
-        }
+        setIsEditorMounted(true);
 
         editor.focus();
     };
@@ -68,6 +75,7 @@ const OutputTabSampleDataDialog = ({
             setRawValue(hasPlaceholder ? JSON.stringify(placeholder, null, SPACE) : '');
             setParsedValue(hasPlaceholder ? placeholder : undefined);
             setSampleFile(null);
+            setIsEditorMounted(false);
             onClose();
         }
     };
@@ -83,6 +91,8 @@ const OutputTabSampleDataDialog = ({
     };
 
     const uploadDisabled = fileUploadEnabled ? !sampleFile : !parsedValue;
+
+    const showEditorSkeleton = !isEditorMounted && !!rawValue;
 
     useEffect(() => {
         if (placeholder !== undefined && Object.keys(placeholder).length) {
@@ -123,7 +133,9 @@ const OutputTabSampleDataDialog = ({
                             </fieldset>
                         ) : (
                             <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">
-                                <div className="absolute inset-0">
+                                {showEditorSkeleton && <SampleDataEditorSkeleton />}
+
+                                <div className={twMerge('absolute inset-0', showEditorSkeleton && 'invisible')}>
                                     <Suspense fallback={<MonacoEditorLoader />}>
                                         <MonacoEditor
                                             className="bg-transparent"
@@ -134,12 +146,14 @@ const OutputTabSampleDataDialog = ({
                                         />
                                     </Suspense>
 
-                                    <div
-                                        className="pointer-events-none absolute top-[-2px] left-[70px] h-full text-sm text-muted-foreground"
-                                        id="monaco-placeholder"
-                                    >
-                                        {EDITOR_PLACEHOLDER}
-                                    </div>
+                                    {isEditorMounted && !rawValue && (
+                                        <div
+                                            className="pointer-events-none absolute top-[-2px] left-[70px] h-full text-sm text-muted-foreground"
+                                            id="monaco-placeholder"
+                                        >
+                                            {EDITOR_PLACEHOLDER}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}

@@ -1,4 +1,4 @@
-import {fireEvent, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {fireEvent, render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
@@ -145,6 +145,40 @@ describe('OutputTabSampleDataDialog', () => {
             const editor = (await screen.findByTestId('mock-monaco-editor')) as HTMLTextAreaElement;
 
             expect(editor.value).toBe('');
+        });
+    });
+
+    describe('loading state', () => {
+        it('should show a skeleton until the editor mounts when a value is defined', async () => {
+            renderDialog({placeholder: {key: 'value'}});
+
+            expect(screen.getByTestId('sample-data-editor-skeleton')).toBeInTheDocument();
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('sample-data-editor-skeleton')).not.toBeInTheDocument();
+            });
+        });
+
+        it('should not show a skeleton when no value is defined', async () => {
+            renderDialog();
+
+            expect(screen.queryByTestId('sample-data-editor-skeleton')).not.toBeInTheDocument();
+
+            await waitFor(() => {
+                expect(document.querySelector('#monaco-placeholder')).toBeInTheDocument();
+            });
+        });
+
+        it('should never show the editor placeholder when a value is defined', async () => {
+            renderDialog({placeholder: {key: 'value'}});
+
+            expect(document.querySelector('#monaco-placeholder')).not.toBeInTheDocument();
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('sample-data-editor-skeleton')).not.toBeInTheDocument();
+            });
+
+            expect(document.querySelector('#monaco-placeholder')).not.toBeInTheDocument();
         });
     });
 
