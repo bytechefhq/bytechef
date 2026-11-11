@@ -15,10 +15,12 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationPublishDialog from '@/ee/pages/embedded/integrations/components/IntegrationPublishDialog';
+import IntegrationComponentElementList from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationComponentElementList';
 import IntegrationListItemPublishMenuItem from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItemPublishMenuItem';
 import IntegrationListItemTabs, {
     IntegrationListItemTabType,
 } from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItemTabs';
+import useIntegrationComponentElements from '@/ee/pages/embedded/integrations/components/integration-list/useIntegrationComponentElements';
 import {isIntegrationConfigurable} from '@/ee/pages/embedded/shared/integrationPublication';
 import {Integration, IntegrationInstanceConfiguration, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {
@@ -46,6 +48,8 @@ import {
     Trash2Icon,
     UploadIcon,
     WorkflowIcon,
+    WrenchIcon,
+    ZapIcon,
 } from 'lucide-react';
 import {ChangeEvent, ReactNode, useCallback, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -54,6 +58,7 @@ import {toast} from 'sonner';
 
 interface IntegrationItemProps {
     activeTab?: IntegrationListItemTabType;
+    componentVersion?: number;
     configurationsContent: ReactNode;
     integration: Integration;
     onTabChange: (tab?: IntegrationListItemTabType) => void;
@@ -63,6 +68,7 @@ interface IntegrationItemProps {
 
 const IntegrationListItem = ({
     activeTab,
+    componentVersion,
     configurationsContent,
     integration,
     onTabChange,
@@ -78,6 +84,14 @@ const IntegrationListItem = ({
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
     const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowImported} = useAnalytics();
+
+    const {
+        actions: componentActions,
+        isError: isComponentElementsError,
+        isLoading: isComponentElementsLoading,
+        refetch: refetchComponentElements,
+        tools: componentTools,
+    } = useIntegrationComponentElements(integration.componentName, componentVersion, !!activeTab);
 
     const navigate = useNavigate();
 
@@ -419,6 +433,7 @@ const IntegrationListItem = ({
 
             <CollapsibleContent className="mt-1 mr-3 mb-3 ml-11">
                 <IntegrationListItemTabs
+                    actionCount={componentActions?.length}
                     actions={
                         activeTab === 'workflows' && workflowCount > 0 ? (
                             <ButtonGroup aria-label="Workflow Creation Actions">
@@ -481,9 +496,32 @@ const IntegrationListItem = ({
                             />
                         ) : undefined
                     }
+                    actionsContent={
+                        <IntegrationComponentElementList
+                            elements={componentActions || []}
+                            emptyIcon={<ZapIcon />}
+                            idLabel="Action ID"
+                            isError={isComponentElementsError}
+                            isLoading={isComponentElementsLoading}
+                            noun="actions"
+                            onRetry={() => void refetchComponentElements()}
+                        />
+                    }
                     activeTab={activeTab ?? 'workflows'}
                     configurationsContent={configurationsContent}
                     onTabChange={(tab) => onTabChange(tab)}
+                    toolCount={componentTools?.length}
+                    toolsContent={
+                        <IntegrationComponentElementList
+                            elements={componentTools || []}
+                            emptyIcon={<WrenchIcon />}
+                            idLabel="Tool ID"
+                            isError={isComponentElementsError}
+                            isLoading={isComponentElementsLoading}
+                            noun="tools"
+                            onRetry={() => void refetchComponentElements()}
+                        />
+                    }
                     workflowsContent={workflowsContent}
                 />
             </CollapsibleContent>

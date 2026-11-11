@@ -102,6 +102,11 @@ const IntegrationList = ({
         <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
             {integrations.map((integration) => {
                 const activeTab = openIntegrations.get(integration.id!);
+                const componentVersion = componentDefinitions
+                    ? (componentDefinitions.find(
+                          (componentDefinition) => componentDefinition.name === integration.componentName
+                      )?.version ?? 1)
+                    : undefined;
                 const integrationTagIds = integration.tags?.map((tag) => tag.id);
 
                 return (
@@ -114,6 +119,7 @@ const IntegrationList = ({
                     >
                         <IntegrationListItem
                             activeTab={activeTab}
+                            componentVersion={componentVersion}
                             configurationsContent={
                                 <IntegrationInstanceConfigurationsPanel enabled integration={integration} />
                             }
