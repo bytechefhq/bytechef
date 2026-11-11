@@ -99,8 +99,6 @@ A successful operation with its own event type, such as `CONNECTION_CREATED` or 
 
 The other entries are saved on a best-effort basis: if one cannot be saved, the operation still goes ahead and the server logs an `AUDIT PERSISTENCE FAILURE` line. This covers denied and failed attempts, `PERMISSION_CHECK`, operations that do not run in a read-write transaction, job and trigger events, sign-ins and `CREDENTIAL_USED`.
 
-Each entry from an operation, a job, a trigger or a credential use that could not be saved increments the `bytechef.audit.failed` counter, tagged with the event type under `event`. It is exported with the rest of the server's metrics (as `bytechef_audit_failed_total` in Prometheus), so you can alert on gaps in the trail.
-
 ## What is not logged
 
 - **Secret values.** The log records that a credential was created or deleted, by whom, and when - never the secret material.
