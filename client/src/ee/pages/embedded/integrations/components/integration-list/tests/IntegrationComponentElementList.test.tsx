@@ -54,6 +54,13 @@ describe('IntegrationComponentElementList', () => {
         expect(screen.getByText('No tools')).toBeInTheDocument();
     });
 
+    it('shows a loading indicator while the elements load', () => {
+        renderList({isLoading: true});
+
+        expect(screen.getByText('Loading tools...')).toBeInTheDocument();
+        expect(screen.queryByRole('textbox', {name: 'Search tools'})).not.toBeInTheDocument();
+    });
+
     it('offers a retry when loading failed', async () => {
         const onRetry = vi.fn();
 
