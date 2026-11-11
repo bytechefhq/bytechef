@@ -907,8 +907,8 @@ export type AutomationProjectCategory = {
   name: Scalars['String']['output'];
 };
 
-export type AutomationWorkflowProjectCodeWorkflowSource = {
-  __typename?: 'AutomationWorkflowProjectCodeWorkflowSource';
+export type AutomationProjectCodeWorkflowSource = {
+  __typename?: 'AutomationProjectCodeWorkflowSource';
   content: Scalars['String']['output'];
   language: CodeWorkflowLanguage;
 };
@@ -2368,7 +2368,7 @@ export type Mutation = {
   createApiKey: Scalars['String']['output'];
   createApprovalTask?: Maybe<ApprovalTask>;
   createAutomationProject: Scalars['ID']['output'];
-  createAutomationWorkflowProjectCodeWorkflow: Scalars['ID']['output'];
+  createAutomationProjectCodeWorkflow: Scalars['ID']['output'];
   createAutomationProjectConfiguration: Scalars['ID']['output'];
   createAutomationProjectWorkflow: Scalars['ID']['output'];
   createCodeWorkflow: Scalars['ID']['output'];
@@ -2576,7 +2576,7 @@ export type Mutation = {
   updateAssetFileTags: AssetFile;
   updateAssetFileTextContent: AssetFile;
   updateAutomationProject: Scalars['Boolean']['output'];
-  updateAutomationWorkflowProjectCodeWorkflowSource: Scalars['Boolean']['output'];
+  updateAutomationProjectCodeWorkflowSource: Scalars['Boolean']['output'];
   updateAutomationProjectConfiguration: Scalars['Boolean']['output'];
   updateAutomationProjectConfigurationWorkflow: Scalars['Boolean']['output'];
   updateAutomationProjectWorkflow: Scalars['Boolean']['output'];
@@ -2587,6 +2587,11 @@ export type Mutation = {
    * every rule and enforces none. Admin-only.
    */
   updateComponentRuleSettings: ComponentRuleSettings;
+  /**
+   * Replace an existing connection's authorization parameters. A parameter that is not submitted is cleared.
+   * Succeeding means the values were stored, not that they work.
+   */
+  updateConnectionCredentials: Scalars['Boolean']['output'];
   updateCustomComponentSource: CustomComponent;
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
@@ -2795,7 +2800,7 @@ export type MutationCreateAutomationProjectArgs = {
 };
 
 
-export type MutationCreateAutomationWorkflowProjectCodeWorkflowArgs = {
+export type MutationCreateAutomationProjectCodeWorkflowArgs = {
   category?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   language: CodeWorkflowLanguage;
@@ -3700,7 +3705,7 @@ export type MutationUpdateAutomationProjectArgs = {
 };
 
 
-export type MutationUpdateAutomationWorkflowProjectCodeWorkflowSourceArgs = {
+export type MutationUpdateAutomationProjectCodeWorkflowSourceArgs = {
   automationProjectId: Scalars['ID']['input'];
   content: Scalars['String']['input'];
 };
@@ -3747,6 +3752,11 @@ export type MutationUpdateComponentRuleSettingsArgs = {
   approvalExpiresInHours: Scalars['Int']['input'];
   observeMode: Scalars['Boolean']['input'];
   workspaceId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type MutationUpdateConnectionCredentialsArgs = {
+  input: UpdateConnectionCredentialsInput;
 };
 
 
@@ -4341,7 +4351,7 @@ export type Query = {
   auditEvents: AuditEventPageType;
   authorities: Array<Scalars['String']['output']>;
   automationProjectCategories: Array<AutomationProjectCategory>;
-  automationWorkflowProjectCodeWorkflowSource: AutomationWorkflowProjectCodeWorkflowSource;
+  automationProjectCodeWorkflowSource: AutomationProjectCodeWorkflowSource;
   automationProjectConfigurationConnectedUsers: Array<AutomationProjectConfigurationConnectedUser>;
   automationProjectConfigurationDeleteImpact: AutomationProjectConfigurationDeleteImpact;
   automationProjectConfigurationMoveImpact: AutomationProjectConfigurationMoveImpact;
@@ -4764,13 +4774,7 @@ export type QueryAuditEventsArgs = {
 };
 
 
-export type QueryAutomationSearchArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  query: Scalars['String']['input'];
-};
-
-
-export type QueryAutomationWorkflowProjectCodeWorkflowSourceArgs = {
+export type QueryAutomationProjectCodeWorkflowSourceArgs = {
   automationProjectId: Scalars['ID']['input'];
 };
 
