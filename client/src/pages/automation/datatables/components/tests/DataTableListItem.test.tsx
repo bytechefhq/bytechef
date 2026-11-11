@@ -65,6 +65,12 @@ describe('DataTableListItem', () => {
         expect(screen.getByText('orders')).toBeInTheDocument();
     });
 
+    it('should underline the base name when the row is hovered', () => {
+        render(<DataTableListItem remainingTags={mockRemainingTags} table={mockTable} tags={mockTags} />);
+
+        expect(screen.getByText('orders')).toHaveClass('group-hover/row:underline');
+    });
+
     it('should render column count for multiple columns', () => {
         render(<DataTableListItem remainingTags={mockRemainingTags} table={mockTable} tags={mockTags} />);
 

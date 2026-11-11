@@ -23,8 +23,11 @@ vi.mock('@tanstack/react-query', async () => {
     };
 });
 
+const mockNavigate = vi.hoisted(() => vi.fn());
+
 vi.mock('react-router-dom', () => ({
     Link: ({children, to}: {children: React.ReactNode; to: string}) => <a href={to}>{children}</a>,
+    useNavigate: () => mockNavigate,
     useSearchParams: () => [new URLSearchParams(''), vi.fn()],
 }));
 
@@ -151,6 +154,32 @@ describe('IntegrationWorkflowListItem', () => {
         vi.clearAllMocks();
 
         hoisted.integrationWorkflowsQueryResult = {data: null, isFetching: false};
+    });
+
+    describe('row', () => {
+        it('should underline the label when the row is hovered', () => {
+            renderItem({id: '5'});
+
+            expect(screen.getByText('My Workflow')).toHaveClass('group-hover/row:underline');
+        });
+
+        it('should open the workflow when the row outside the link is clicked', async () => {
+            renderItem({id: '5', lastModifiedDate: new Date('2024-01-15T10:00:00')});
+
+            await userEvent.click(screen.getByText(/Modified at/));
+
+            expect(mockNavigate).toHaveBeenCalledWith(
+                `/embedded/integrations/${integration.id}/integration-workflows/10?`
+            );
+        });
+
+        it('should not open the workflow when the row menu is clicked', async () => {
+            renderItem({id: '5'});
+
+            await openMenu();
+
+            expect(mockNavigate).not.toHaveBeenCalled();
+        });
     });
 
     describe('menu', () => {

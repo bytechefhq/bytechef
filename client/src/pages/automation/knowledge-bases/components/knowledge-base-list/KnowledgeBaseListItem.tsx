@@ -36,7 +36,7 @@ const KnowledgeBaseListItem = ({knowledgeBase, remainingTags, tags}: KnowledgeBa
     return (
         <>
             <div
-                className="mb-2 flex w-full cursor-pointer items-center justify-between rounded border border-border/50 px-3 hover:bg-muted/50"
+                className="group/row mb-2 flex w-full cursor-pointer items-center justify-between rounded border border-border/50 px-3 hover:bg-muted/50"
                 onClick={handleKnowledgeBaseClick}
                 onKeyDown={handleActivationKeyDown}
                 role="button"
@@ -50,13 +50,17 @@ const KnowledgeBaseListItem = ({knowledgeBase, remainingTags, tags}: KnowledgeBa
                             {knowledgeBase.description ? (
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <span className="text-base font-semibold">{knowledgeBase.name}</span>
+                                        <span className="text-base font-semibold underline-offset-4 group-hover/row:text-content-brand-primary group-hover/row:underline">
+                                            {knowledgeBase.name}
+                                        </span>
                                     </TooltipTrigger>
 
                                     <TooltipContent>{knowledgeBase.description}</TooltipContent>
                                 </Tooltip>
                             ) : (
-                                <span className="text-base font-semibold">{knowledgeBase.name}</span>
+                                <span className="text-base font-semibold underline-offset-4 group-hover/row:text-content-brand-primary group-hover/row:underline">
+                                    {knowledgeBase.name}
+                                </span>
                             )}
                         </div>
 

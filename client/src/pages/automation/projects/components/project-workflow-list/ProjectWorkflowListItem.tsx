@@ -112,7 +112,7 @@ const ProjectWorkflowListItem = ({
 
     return (
         <li
-            className="flex cursor-pointer items-center justify-between rounded-md py-1 pl-3 hover:bg-surface-neutral-primary-hover"
+            className="group/row flex cursor-pointer items-center justify-between rounded-md py-1 pl-3 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
             onClick={handleWorkflowListItemClick}
             role="presentation"
@@ -126,7 +126,7 @@ const ProjectWorkflowListItem = ({
                 <div className="flex w-80 min-w-0 shrink-0 flex-col gap-1 pr-1 text-sm font-semibold">
                     <div className="flex min-w-0 items-center gap-2">
                         <Tooltip>
-                            <TooltipTrigger className="line-clamp-1 min-w-0 truncate text-start">
+                            <TooltipTrigger className="line-clamp-1 min-w-0 truncate text-start underline-offset-4 group-hover/row:text-content-brand-primary group-hover/row:underline">
                                 {workflow.label}
                             </TooltipTrigger>
 

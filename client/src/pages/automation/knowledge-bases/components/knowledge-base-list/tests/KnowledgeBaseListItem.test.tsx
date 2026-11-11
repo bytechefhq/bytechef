@@ -144,6 +144,18 @@ describe('KnowledgeBaseListItem', () => {
         expect(screen.getByText('Test KB')).toBeInTheDocument();
     });
 
+    it('underlines the name when the row is hovered to signal it opens the details page', () => {
+        render(
+            <KnowledgeBaseListItem
+                knowledgeBase={mockKnowledgeBase}
+                remainingTags={mockRemainingTags}
+                tags={mockTags}
+            />
+        );
+
+        expect(screen.getByText('Test KB')).toHaveClass('group-hover/row:underline');
+    });
+
     it('renders max chunk size', () => {
         render(
             <KnowledgeBaseListItem
