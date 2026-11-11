@@ -32,7 +32,7 @@ afterEach(() => {
 });
 
 describe('ConnectedUserCreateDialog', () => {
-    it('submits the entered values, drops blank metadata rows and opens the new user sheet', async () => {
+    it('submits the entered values, drops blank metadata rows and closes without opening the new user sheet', async () => {
         const onClose = vi.fn();
 
         render(<ConnectedUserCreateDialog onClose={onClose} />);
@@ -63,8 +63,8 @@ describe('ConnectedUserCreateDialog', () => {
 
         await waitFor(() => expect(onClose).toHaveBeenCalled());
 
-        expect(useConnectedUserSheetStore.getState().connectedUserId).toBe(77);
-        expect(useConnectedUserSheetStore.getState().connectedUserSheetOpen).toBe(true);
+        expect(useConnectedUserSheetStore.getState().connectedUserId).toBe(0);
+        expect(useConnectedUserSheetStore.getState().connectedUserSheetOpen).toBe(false);
     });
 
     it('blocks submit when a metadata row has a value but no key', async () => {

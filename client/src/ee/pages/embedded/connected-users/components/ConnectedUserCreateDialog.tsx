@@ -13,7 +13,6 @@ import ConnectedUserMetadataFields, {
     type MetadataRowI,
     metadataRowsToRecord,
 } from '@/ee/pages/embedded/connected-users/components/ConnectedUserMetadataFields';
-import useConnectedUserSheetStore from '@/ee/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
 import {useCreateConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -29,8 +28,6 @@ interface ConnectedUserCreateFormI {
 
 const ConnectedUserCreateDialog = ({onClose}: {onClose: () => void}) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const setConnectedUserId = useConnectedUserSheetStore((state) => state.setConnectedUserId);
-    const setConnectedUserSheetOpen = useConnectedUserSheetStore((state) => state.setConnectedUserSheetOpen);
 
     const queryClient = useQueryClient();
 
@@ -44,15 +41,10 @@ const ConnectedUserCreateDialog = ({onClose}: {onClose: () => void}) => {
     });
 
     const createConnectedUserMutation = useCreateConnectedUserMutation({
-        onSuccess: (connectedUser) => {
+        onSuccess: () => {
             void queryClient.invalidateQueries({queryKey: ConnectedUserKeys.connectedUsers});
 
             onClose();
-
-            if (connectedUser.id != null) {
-                setConnectedUserId(connectedUser.id);
-                setConnectedUserSheetOpen(true);
-            }
         },
     });
 
