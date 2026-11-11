@@ -1,20 +1,27 @@
+import {McpComponent} from '@/shared/middleware/graphql';
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useMcpComponentDialogComponentSelectionStep from '../useMcpComponentDialogComponentSelectionStep';
 
 const hoisted = vi.hoisted(() => ({
+    useEmbeddedMcpComponentsByServerIdQuery: vi.fn(),
     useMcpComponentDefinitionsQuery: vi.fn(),
     useMcpComponentIntegrationsQuery: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useEmbeddedMcpComponentsByServerIdQuery: hoisted.useEmbeddedMcpComponentsByServerIdQuery,
     useMcpComponentDefinitionsQuery: hoisted.useMcpComponentDefinitionsQuery,
     useMcpComponentIntegrationsQuery: hoisted.useMcpComponentIntegrationsQuery,
 }));
 
 describe('useMcpComponentDialogComponentSelectionStep', () => {
     beforeEach(() => {
+        hoisted.useEmbeddedMcpComponentsByServerIdQuery.mockReturnValue({
+            data: {embeddedMcpComponentsByServerId: []},
+            isLoading: false,
+        });
         hoisted.useMcpComponentDefinitionsQuery.mockReturnValue({
             data: {
                 mcpComponentDefinitions: [
@@ -38,7 +45,7 @@ describe('useMcpComponentDialogComponentSelectionStep', () => {
     });
 
     it('offers one option per integration with its component definition', () => {
-        const {result} = renderHook(() => useMcpComponentDialogComponentSelectionStep(true));
+        const {result} = renderHook(() => useMcpComponentDialogComponentSelectionStep(true, '1'));
 
         expect(result.current.filteredComponents).toEqual([
             {
@@ -72,13 +79,19 @@ describe('useMcpComponentDialogComponentSelectionStep', () => {
     });
 
     it('offers only the integrations of the given component', () => {
-        const {result} = renderHook(() => useMcpComponentDialogComponentSelectionStep(true, 'googleMail'));
+        const {result} = renderHook(() =>
+            useMcpComponentDialogComponentSelectionStep(true, '1', {
+                componentName: 'googleMail',
+                componentVersion: 1,
+                id: '9',
+            } as McpComponent)
+        );
 
         expect(result.current.filteredComponents.map((option) => option.integrationId)).toEqual(['5', '6']);
     });
 
     it('filters the options by integration name', () => {
-        const {result} = renderHook(() => useMcpComponentDialogComponentSelectionStep(true));
+        const {result} = renderHook(() => useMcpComponentDialogComponentSelectionStep(true, '1'));
 
         act(() => result.current.setSearchTerm('code'));
 
@@ -86,9 +99,75 @@ describe('useMcpComponentDialogComponentSelectionStep', () => {
     });
 
     it('loads the options only while the dialog is open', () => {
-        renderHook(() => useMcpComponentDialogComponentSelectionStep(false));
+        renderHook(() => useMcpComponentDialogComponentSelectionStep(false, '1'));
 
         expect(hoisted.useMcpComponentDefinitionsQuery).toHaveBeenLastCalledWith({}, {enabled: false});
         expect(hoisted.useMcpComponentIntegrationsQuery).toHaveBeenLastCalledWith({}, {enabled: false});
+        expect(hoisted.useEmbeddedMcpComponentsByServerIdQuery).toHaveBeenLastCalledWith(
+            {mcpServerId: '1'},
+            {enabled: false}
+        );
+    });
+
+    it('marks every integration of a component version that is already on the server as added', () => {
+        hoisted.useEmbeddedMcpComponentsByServerIdQuery.mockReturnValue({
+            data: {embeddedMcpComponentsByServerId: [{componentName: 'googleMail', componentVersion: 1, id: '9'}]},
+            isLoading: false,
+        });
+
+        const {result} = renderHook(() => useMcpComponentDialogComponentSelectionStep(true, '1'));
+
+        expect(
+            result.current.filteredComponents
+                .filter((option) => result.current.isComponentAdded(option))
+                .map((option) => option.integrationId)
+        ).toEqual(['5', '6']);
+    });
+
+    it('matches a component definition without a version against version 1 on the server', () => {
+        hoisted.useMcpComponentDefinitionsQuery.mockReturnValue({
+            data: {mcpComponentDefinitions: [{name: 'slack', title: 'Slack', version: null}]},
+            isLoading: false,
+        });
+        hoisted.useEmbeddedMcpComponentsByServerIdQuery.mockReturnValue({
+            data: {embeddedMcpComponentsByServerId: [{componentName: 'slack', componentVersion: 1, id: '9'}]},
+            isLoading: false,
+        });
+
+        const {result} = renderHook(() => useMcpComponentDialogComponentSelectionStep(true, '1'));
+
+        expect(result.current.filteredComponents.map((option) => result.current.isComponentAdded(option))).toEqual([
+            true,
+        ]);
+    });
+
+    it('does not load the server components without a server id', () => {
+        renderHook(() => useMcpComponentDialogComponentSelectionStep(true, ''));
+
+        expect(hoisted.useEmbeddedMcpComponentsByServerIdQuery).toHaveBeenLastCalledWith(
+            {mcpServerId: ''},
+            {enabled: false}
+        );
+    });
+
+    it('stays loading until the server components are loaded', () => {
+        hoisted.useEmbeddedMcpComponentsByServerIdQuery.mockReturnValue({data: undefined, isLoading: true});
+
+        const {result} = renderHook(() => useMcpComponentDialogComponentSelectionStep(true, '1'));
+
+        expect(result.current.isLoadingComponents).toBe(true);
+    });
+
+    it('does not mark the component being edited as added', () => {
+        const mcpComponent = {componentName: 'googleMail', componentVersion: 1, id: '9'} as McpComponent;
+
+        hoisted.useEmbeddedMcpComponentsByServerIdQuery.mockReturnValue({
+            data: {embeddedMcpComponentsByServerId: [mcpComponent]},
+            isLoading: false,
+        });
+
+        const {result} = renderHook(() => useMcpComponentDialogComponentSelectionStep(true, '1', mcpComponent));
+
+        expect(result.current.filteredComponents.some((option) => result.current.isComponentAdded(option))).toBe(false);
     });
 });

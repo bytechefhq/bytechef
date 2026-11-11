@@ -1,10 +1,23 @@
-import {useMcpComponentDefinitionsQuery, useMcpComponentIntegrationsQuery} from '@/shared/middleware/graphql';
-import {useMemo, useState} from 'react';
+import {
+    McpComponent,
+    useEmbeddedMcpComponentsByServerIdQuery,
+    useMcpComponentDefinitionsQuery,
+    useMcpComponentIntegrationsQuery,
+} from '@/shared/middleware/graphql';
+import {useCallback, useMemo, useState} from 'react';
 
 import {McpIntegrationComponentOptionI} from './useMcpComponentDialog';
 
-const useMcpComponentDialogComponentSelectionStep = (open: boolean, componentName?: string) => {
+const getComponentKey = (name: string, version: number | null | undefined) => `${name}/${version ?? 1}`;
+
+const useMcpComponentDialogComponentSelectionStep = (
+    open: boolean,
+    mcpServerId: string,
+    mcpComponent?: McpComponent
+) => {
     const [searchTerm, setSearchTerm] = useState('');
+
+    const componentName = mcpComponent?.componentName;
 
     const {data: componentDefinitionsData, isLoading: isLoadingComponentDefinitions} = useMcpComponentDefinitionsQuery(
         {},
@@ -14,6 +27,33 @@ const useMcpComponentDialogComponentSelectionStep = (open: boolean, componentNam
     const {data: integrationsData, isLoading: isLoadingIntegrations} = useMcpComponentIntegrationsQuery(
         {},
         {enabled: open}
+    );
+
+    const {data: mcpComponentsData, isLoading: isLoadingMcpComponents} = useEmbeddedMcpComponentsByServerIdQuery(
+        {mcpServerId},
+        {enabled: open && !!mcpServerId}
+    );
+
+    const addedComponentKeys = useMemo(
+        () =>
+            new Set(
+                (mcpComponentsData?.embeddedMcpComponentsByServerId ?? [])
+                    .filter(
+                        (serverMcpComponent) => serverMcpComponent != null && serverMcpComponent.id !== mcpComponent?.id
+                    )
+                    .map((serverMcpComponent) =>
+                        getComponentKey(serverMcpComponent!.componentName, serverMcpComponent!.componentVersion)
+                    )
+            ),
+        [mcpComponent?.id, mcpComponentsData]
+    );
+
+    const isComponentAdded = useCallback(
+        (integrationComponentOption: McpIntegrationComponentOptionI) =>
+            addedComponentKeys.has(
+                getComponentKey(integrationComponentOption.name, integrationComponentOption.version)
+            ),
+        [addedComponentKeys]
     );
 
     const integrationComponentOptions = useMemo(() => {
@@ -52,7 +92,8 @@ const useMcpComponentDialogComponentSelectionStep = (open: boolean, componentNam
 
     return {
         filteredComponents,
-        isLoadingComponents: isLoadingComponentDefinitions || isLoadingIntegrations,
+        isComponentAdded,
+        isLoadingComponents: isLoadingComponentDefinitions || isLoadingIntegrations || isLoadingMcpComponents,
         searchTerm,
         setSearchTerm,
     };
