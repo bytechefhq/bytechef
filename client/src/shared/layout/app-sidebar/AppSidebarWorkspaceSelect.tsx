@@ -1,4 +1,3 @@
-import reactLogo from '@/assets/logo.svg';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -21,11 +20,7 @@ import {useEffect} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
-const Logo = () => (
-    <span className="flex size-10 shrink-0 items-center justify-center">
-        <img alt="ByteChef" className="size-8 max-w-none shrink-0" src={reactLogo} />
-    </span>
-);
+import {AppSidebarLogo, AppSidebarModeSelect} from './AppSidebarModeSelect';
 
 export function AppSidebarWorkspaceSelect() {
     const account = useAuthenticationStore((state) => state.account);
@@ -70,21 +65,41 @@ export function AppSidebarWorkspaceSelect() {
         }
     }, [currentWorkspaceId, workspaces, setCurrentWorkspaceId]);
 
-    if (!pathname.startsWith('/automation') || application?.edition !== 'EE' || !workspaces?.length) {
+    const ee = application?.edition === 'EE';
+
+    let currentMode = currentType ?? PlatformType.AUTOMATION;
+
+    if (pathname.startsWith('/automation')) {
+        currentMode = PlatformType.AUTOMATION;
+    } else if (pathname.startsWith('/embedded')) {
+        currentMode = PlatformType.EMBEDDED;
+    }
+
+    if (!ee) {
         return (
             <Link className="flex min-w-0 flex-1 items-center gap-1 group-data-[collapsible=icon]:flex-none" to="/">
-                <Logo />
+                <AppSidebarLogo />
 
                 <span className="px-2 text-base font-medium group-data-[collapsible=icon]:hidden">ByteChef</span>
             </Link>
         );
     }
 
+    if (currentMode === PlatformType.EMBEDDED || !workspaces?.length) {
+        return (
+            <div className="flex min-w-0 flex-1 items-center gap-1 group-data-[collapsible=icon]:flex-none">
+                <AppSidebarModeSelect currentMode={currentMode} />
+
+                <span className="truncate px-2 text-base font-medium group-data-[collapsible=icon]:hidden">
+                    {currentMode === PlatformType.EMBEDDED ? 'Embedded' : 'Automation'}
+                </span>
+            </div>
+        );
+    }
+
     return (
         <div className="flex min-w-0 flex-1 items-center gap-1 group-data-[collapsible=icon]:flex-none">
-            <Link className="shrink-0" to="/">
-                <Logo />
-            </Link>
+            <AppSidebarModeSelect currentMode={currentMode} />
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>

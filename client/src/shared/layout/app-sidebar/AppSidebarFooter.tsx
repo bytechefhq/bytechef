@@ -5,8 +5,6 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuPortal,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
     DropdownMenuSeparator,
     DropdownMenuSub,
     DropdownMenuSubContent,
@@ -15,14 +13,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {useUserGuidingLauncher} from '@/hooks/useUserGuiding';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
-import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
-    BlendIcon,
     BookOpenIcon,
     BugIcon,
     ChevronsUpDownIcon,
@@ -43,24 +39,14 @@ import {useShallow} from 'zustand/react/shallow';
 const openExternalLink = (url: string) => window.open(url, '_blank', 'noopener,noreferrer');
 
 export function AppSidebarFooter() {
-    const {application, docs} = useApplicationInfoStore(
-        useShallow((state) => ({
-            application: state.application,
-            docs: state.docs,
-        }))
-    );
+    const docs = useApplicationInfoStore((state) => state.docs);
     const {account, logout} = useAuthenticationStore(
         useShallow((state) => ({
             account: state.account,
             logout: state.logout,
         }))
     );
-    const {currentType, setCurrentType} = usePlatformTypeStore(
-        useShallow((state) => ({
-            currentType: state.currentType,
-            setCurrentType: state.setCurrentType,
-        }))
-    );
+    const currentType = usePlatformTypeStore((state) => state.currentType);
     const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore(
         useShallow((state) => ({
             currentEnvironmentId: state.currentEnvironmentId,
@@ -85,22 +71,6 @@ export function AppSidebarFooter() {
         await logout();
 
         queryClient.clear();
-    };
-
-    const handlePlatformTypeChange = (value: string) => {
-        const selectedType = +value;
-
-        setCurrentType(selectedType);
-
-        if (selectedType === PlatformType.AUTOMATION) {
-            void navigate(
-                `/automation${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`
-            );
-        } else if (selectedType === PlatformType.EMBEDDED) {
-            void navigate(
-                `/embedded${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`
-            );
-        }
     };
 
     useEffect(() => {
@@ -161,33 +131,6 @@ export function AppSidebarFooter() {
                 </div>
 
                 <DropdownMenuSeparator />
-
-                {application?.edition === 'EE' && (
-                    <>
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
-                                <BlendIcon className="size-5" />
-
-                                <span>{`Mode: ${currentType === PlatformType.AUTOMATION ? 'Automation' : 'Embedded'}`}</span>
-                            </DropdownMenuSubTrigger>
-
-                            <DropdownMenuPortal>
-                                <DropdownMenuSubContent>
-                                    <DropdownMenuRadioGroup
-                                        onValueChange={handlePlatformTypeChange}
-                                        value={currentType?.toString()}
-                                    >
-                                        <DropdownMenuRadioItem value="0">Automation</DropdownMenuRadioItem>
-
-                                        <DropdownMenuRadioItem value="1">Embedded</DropdownMenuRadioItem>
-                                    </DropdownMenuRadioGroup>
-                                </DropdownMenuSubContent>
-                            </DropdownMenuPortal>
-                        </DropdownMenuSub>
-
-                        <DropdownMenuSeparator />
-                    </>
-                )}
 
                 <div className="space-y-1">
                     {currentType === PlatformType.AUTOMATION && (

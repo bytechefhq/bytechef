@@ -7,6 +7,7 @@ import {AppSidebarWorkspaceSelect} from './AppSidebarWorkspaceSelect';
 const hoisted = vi.hoisted(() => ({
     currentWorkspaceId: 1 as number | undefined,
     edition: 'EE',
+    setCurrentTypeMock: vi.fn(),
     setCurrentWorkspaceIdMock: vi.fn(),
     workspaces: [] as {id: number; name: string}[],
 }));
@@ -39,7 +40,9 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 
 vi.mock('@/pages/home/stores/usePlatformTypeStore', () => ({
     PlatformType: {AUTOMATION: 0, EMBEDDED: 1},
-    usePlatformTypeStore: vi.fn((selector: (state: {currentType: number}) => unknown) => selector({currentType: 0})),
+    usePlatformTypeStore: vi.fn((selector: (state: {currentType: number; setCurrentType: () => void}) => unknown) =>
+        selector({currentType: 0, setCurrentType: hoisted.setCurrentTypeMock})
+    ),
 }));
 
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
@@ -55,6 +58,8 @@ const renderWorkspaceSelect = (pathname = '/automation/projects') =>
                 <Route element={<AppSidebarWorkspaceSelect />} path={pathname} />
 
                 <Route element={<div>Workspaces settings page</div>} path="/automation/settings/workspaces" />
+
+                <Route element={<div>Embedded integrations page</div>} path="/embedded/integrations" />
             </Routes>
         </MemoryRouter>
     );
@@ -87,10 +92,51 @@ describe('AppSidebarWorkspaceSelect', () => {
         expect(screen.queryByRole('button', {name: 'Workspace menu'})).not.toBeInTheDocument();
     });
 
-    it('falls back to the wordmark outside automation', () => {
+    it('shows the Embedded title in embedded mode', () => {
         renderWorkspaceSelect('/embedded/integrations');
 
-        expect(screen.getByText('ByteChef')).toBeInTheDocument();
+        expect(screen.getByText('Embedded')).toBeInTheDocument();
+        expect(screen.queryByText('ByteChef')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Workspace menu'})).not.toBeInTheDocument();
+    });
+
+    it('shows the Automation title when there are no workspaces', () => {
+        hoisted.workspaces = [];
+
+        renderWorkspaceSelect();
+
+        expect(screen.getByText('Automation')).toBeInTheDocument();
+    });
+
+    it('does not offer the mode switcher in the community edition', () => {
+        hoisted.edition = 'CE';
+
+        renderWorkspaceSelect();
+
+        expect(screen.queryByRole('button', {name: 'Switch mode'})).not.toBeInTheDocument();
+    });
+
+    it('switches to embedded mode from the logo menu', async () => {
+        const user = userEvent.setup();
+
+        renderWorkspaceSelect();
+
+        await user.click(screen.getByRole('button', {name: 'Switch mode'}));
+        await user.click(await screen.findByRole('menuitem', {name: /Embedded/}));
+
+        expect(hoisted.setCurrentTypeMock).toHaveBeenCalledWith(1);
+        expect(await screen.findByText('Embedded integrations page')).toBeInTheDocument();
+    });
+
+    it('stays put when the current mode is selected again', async () => {
+        const user = userEvent.setup();
+
+        renderWorkspaceSelect();
+
+        await user.click(screen.getByRole('button', {name: 'Switch mode'}));
+        await user.click(await screen.findByRole('menuitem', {name: /Automation/}));
+
+        expect(hoisted.setCurrentTypeMock).not.toHaveBeenCalled();
     });
 
     it('switches the current workspace', async () => {
