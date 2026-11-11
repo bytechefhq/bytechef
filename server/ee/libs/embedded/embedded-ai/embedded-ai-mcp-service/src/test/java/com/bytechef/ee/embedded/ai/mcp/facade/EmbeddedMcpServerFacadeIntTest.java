@@ -245,6 +245,22 @@ class EmbeddedMcpServerFacadeIntTest {
         }
 
         @Test
+        void testCreateEmbeddedMcpComponentDoesNotBindAComponentTheServerRejects() {
+            McpComponent mcpComponent = createMcpComponent(null, EMBEDDED_MCP_SERVER_ID);
+            List<McpTool> mcpTools = List.of(new McpTool("tool", Map.of()));
+
+            when(mcpComponentService.create(mcpComponent, mcpTools))
+                .thenThrow(new IllegalArgumentException("already added"));
+
+            assertThatThrownBy(
+                () -> embeddedMcpServerFacade.createEmbeddedMcpComponent(mcpComponent, INTEGRATION_ID, mcpTools))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("already added");
+
+            verify(mcpIntegrationComponentService, never()).create(anyLong(), anyLong());
+        }
+
+        @Test
         void testCreateEmbeddedMcpComponentRejectsAnIntegrationOnAnotherComponent() {
             McpComponent mcpComponent = createMcpComponent(null, EMBEDDED_MCP_SERVER_ID);
 

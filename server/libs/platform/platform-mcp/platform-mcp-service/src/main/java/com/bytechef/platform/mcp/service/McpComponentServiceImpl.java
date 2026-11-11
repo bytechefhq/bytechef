@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +63,9 @@ public class McpComponentServiceImpl implements McpComponentService {
     })
     @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent create(McpComponent mcpComponent) {
-        return mcpComponentRepository.save(mcpComponent);
+        validateNotOnServer(mcpComponent);
+
+        return saveNew(mcpComponent);
     }
 
     @Override
@@ -74,7 +77,9 @@ public class McpComponentServiceImpl implements McpComponentService {
     })
     @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent create(McpComponent mcpComponent, List<McpTool> mcpTools) {
-        McpComponent savedMcpComponent = mcpComponentRepository.save(mcpComponent);
+        validateNotOnServer(mcpComponent);
+
+        McpComponent savedMcpComponent = saveNew(mcpComponent);
 
         for (McpTool mcpTool : mcpTools) {
             mcpToolRepository.save(new McpTool(mcpTool.getName(), mcpTool.getParameters(), savedMcpComponent.getId()));
@@ -156,5 +161,26 @@ public class McpComponentServiceImpl implements McpComponentService {
     @Override
     public List<McpComponent> getMcpServerMcpComponents(long mcpServerId) {
         return mcpComponentRepository.findAllByMcpServerId(mcpServerId);
+    }
+
+    private static String getAlreadyOnServerMessage(McpComponent mcpComponent) {
+        return "Component %s version %d is already added to this MCP server. Edit its tools instead.".formatted(
+            mcpComponent.getComponentName(), mcpComponent.getComponentVersion());
+    }
+
+    private McpComponent saveNew(McpComponent mcpComponent) {
+        try {
+            return mcpComponentRepository.save(mcpComponent);
+        } catch (DuplicateKeyException duplicateKeyException) {
+            throw new IllegalArgumentException(getAlreadyOnServerMessage(mcpComponent), duplicateKeyException);
+        }
+    }
+
+    private void validateNotOnServer(McpComponent mcpComponent) {
+        if (mcpComponentRepository.existsByComponentNameAndComponentVersionAndMcpServerId(
+            mcpComponent.getComponentName(), mcpComponent.getComponentVersion(), mcpComponent.getMcpServerId())) {
+
+            throw new IllegalArgumentException(getAlreadyOnServerMessage(mcpComponent));
+        }
     }
 }
