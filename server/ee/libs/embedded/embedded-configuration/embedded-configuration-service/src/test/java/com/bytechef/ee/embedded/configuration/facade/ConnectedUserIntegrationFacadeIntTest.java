@@ -1537,23 +1537,61 @@ class ConnectedUserIntegrationFacadeIntTest {
         }
 
         @Test
-        void testProvisioningRefusesAnMcpWorkflow() {
+        void testProvisioningEnablesAWorkflowThatAnMcpServerExposes() {
             IntegrationWorkflow mcpIntegrationWorkflow = addConfigurationWorkflow(
                 provisioningIntegrationId, version1ConfigurationId, 1, "mcp", null);
 
             exposeAsMcpWorkflow(provisioningIntegrationId, version1ConfigurationId, mcpIntegrationWorkflow);
 
-            assertThatThrownBy(() -> connectedUserIntegrationFacade.provisionIntegrationInstance(
+            long instanceId = connectedUserIntegrationFacade.provisionIntegrationInstance(
                 connectedUserId, version1ConfigurationId, Map.of(),
                 List.of(
                     new ProvisionIntegrationInstanceWorkflowDTO(mcpIntegrationWorkflow.getUuidAsString(), Map.of())),
-                "admin"))
-                    .isInstanceOf(ConfigurationException.class)
-                    .extracting(thrown -> ((ConfigurationException) thrown).getErrorKey())
-                    .isEqualTo(
-                        IntegrationInstanceConfigurationErrorType.WORKFLOW_NOT_IN_CONFIGURATION.getErrorKey());
+                "admin");
 
-            verifyNoInteractions(connectionFacade);
+            assertThat(
+                integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(
+                    instanceId, mcpIntegrationWorkflow.getWorkflowId()))
+                        .hasValueSatisfying(
+                            integrationInstanceWorkflow -> assertThat(integrationInstanceWorkflow.isEnabled())
+                                .isTrue());
+        }
+
+        @Test
+        void testProvisionableIntegrationsListAndMarkTheWorkflowsAnMcpServerExposes() {
+            IntegrationWorkflow mcpIntegrationWorkflow = addConfigurationWorkflow(
+                provisioningIntegrationId, version1ConfigurationId, 1, "mcp", null);
+
+            exposeAsMcpWorkflow(provisioningIntegrationId, version1ConfigurationId, mcpIntegrationWorkflow);
+
+            ProvisionableIntegrationDTO provisionableIntegration = connectedUserIntegrationFacade
+                .getProvisionableIntegrations(connectedUserId)
+                .stream()
+                .filter(integration -> Objects.equals(
+                    integration.integration()
+                        .id(),
+                    provisioningIntegrationId))
+                .findFirst()
+                .orElseThrow();
+
+            assertThat(provisionableIntegration.mcpWorkflowUuids())
+                .containsExactly(mcpIntegrationWorkflow.getUuidAsString());
+
+            ProvisionableIntegrationInstanceConfiguration version1Configuration =
+                provisionableIntegration.integrationInstanceConfigurations()
+                    .stream()
+                    .filter(configuration -> Objects.equals(
+                        configuration.integrationInstanceConfiguration()
+                            .id(),
+                        version1ConfigurationId))
+                    .findFirst()
+                    .orElseThrow();
+
+            assertThat(
+                version1Configuration.integrationInstanceConfiguration()
+                    .integrationInstanceConfigurationWorkflows())
+                        .extracting(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
+                        .contains(mcpIntegrationWorkflow.getUuidAsString(), workflowUuidA, workflowUuidB);
         }
 
         @Test
