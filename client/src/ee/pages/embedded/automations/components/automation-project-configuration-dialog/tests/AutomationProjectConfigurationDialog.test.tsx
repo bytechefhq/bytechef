@@ -361,7 +361,9 @@ describe('AutomationProjectConfigurationDialog', () => {
             });
         });
 
-        it('shows the assignment rule placeholder and help text', () => {
+        it('shows the assignment rule placeholder and help text in a tooltip', async () => {
+            const user = userEvent.setup();
+
             render(
                 <TooltipProvider>
                     <AutomationProjectConfigurationDialog onClose={vi.fn()} project={project} />
@@ -369,10 +371,14 @@ describe('AutomationProjectConfigurationDialog', () => {
             );
 
             expect(screen.getByPlaceholderText("e.g. metadata['beta'] == 'true'")).toBeInTheDocument();
+            expect(screen.queryByText(/^Which new users self-serve places/)).not.toBeInTheDocument();
+
+            await user.hover(screen.getByLabelText('About Assignment rule'));
+
             expect(
-                screen.getByText(
-                    /^Which new users self-serve places on this configuration\. Checked once, when a user is first assigned\./
-                )
+                await screen.findByRole('tooltip', {
+                    name: /^Which new users self-serve places on this configuration\. Checked once, when a user is first assigned\./,
+                })
             ).toBeInTheDocument();
         });
 

@@ -1,8 +1,9 @@
 import {Input} from '@/components/Input/Input';
 import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
-import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect';
 import IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox';
 import IntegrationInstanceConfigurationDialogBasicStepTagsSelect from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogBasicStepTagsSelect';
@@ -12,6 +13,7 @@ import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {Authorization} from '@/shared/middleware/platform/configuration';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {InfoIcon} from 'lucide-react';
 import {Dispatch, SetStateAction} from 'react';
 import {Control, UseFormGetValues, UseFormSetValue} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
@@ -221,7 +223,24 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                     name="permissionExpression"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Assignment rule</FormLabel>
+                            <div className="flex items-center gap-1.5">
+                                <FormLabel>Assignment rule</FormLabel>
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <InfoIcon
+                                            aria-label="About Assignment rule"
+                                            className="size-4 text-content-neutral-secondary"
+                                        />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent className="max-w-80">
+                                        Which connected users self-serve places on this configuration. Checked once,
+                                        when their instance is created. Users already on it stay until you move them.
+                                        Empty means everyone.
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
 
                             <FormControl>
                                 <Input
@@ -230,11 +249,6 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                                     value={field.value ?? ''}
                                 />
                             </FormControl>
-
-                            <FormDescription>
-                                Which connected users self-serve places on this configuration. Checked once, when their
-                                instance is created. Users already on it stay until you move them. Empty means everyone.
-                            </FormDescription>
 
                             <FormMessage />
                         </FormItem>

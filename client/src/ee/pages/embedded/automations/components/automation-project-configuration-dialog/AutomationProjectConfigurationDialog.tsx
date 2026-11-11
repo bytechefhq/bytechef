@@ -442,7 +442,23 @@ const AutomationProjectConfigurationDialog = ({
 
     const permissionExpressionFieldset = (
         <fieldset className="flex flex-col gap-2 border-0 p-0">
-            <Label htmlFor="configurationPermissionExpression">Assignment rule</Label>
+            <div className="flex items-center gap-1.5">
+                <Label htmlFor="configurationPermissionExpression">Assignment rule</Label>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <InfoIcon
+                            aria-label="About Assignment rule"
+                            className="size-4 text-content-neutral-secondary"
+                        />
+                    </TooltipTrigger>
+
+                    <TooltipContent className="max-w-80">
+                        Which new users self-serve places on this configuration. Checked once, when a user is first
+                        assigned. Users already on it stay until you move them. Empty means everyone.
+                    </TooltipContent>
+                </Tooltip>
+            </div>
 
             <Textarea
                 disabled={basicFieldsLocked}
@@ -452,11 +468,6 @@ const AutomationProjectConfigurationDialog = ({
                 rows={3}
                 value={permissionExpression}
             />
-
-            <p className="text-sm text-content-neutral-secondary">
-                Which new users self-serve places on this configuration. Checked once, when a user is first assigned.
-                Users already on it stay until you move them. Empty means everyone.
-            </p>
         </fieldset>
     );
 
