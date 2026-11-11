@@ -8,8 +8,11 @@
 package com.bytechef.ee.ai.hub.approval;
 
 import com.bytechef.ee.ai.hub.approval.repository.AiHubToolApprovalRepository;
+import com.bytechef.ee.ai.hub.audit.AiHubAuditEvents;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Clock;
 import java.time.Duration;
@@ -52,6 +55,13 @@ public class AiHubToolApprovalServiceImpl implements AiHubToolApprovalService {
     }
 
     @Override
+    @Audited(event = AiHubAuditEvents.AI_HUB_TOOL_APPROVAL_REQUESTED, data = {
+        @AuditData(key = "approvalId", value = "#result?.id"),
+        @AuditData(key = "chatId", value = "#approval.chatId"),
+        @AuditData(key = "toolName", value = "#approval.toolName"),
+        @AuditData(key = "componentName", value = "#approval.componentName"),
+        @AuditData(key = "requestedByUserId", value = "#approval.requestedByUserId")
+    })
     public AiHubToolApproval createPending(AiHubToolApproval approval) {
         approval.setStatus(AiHubToolApproval.Status.PENDING);
 

@@ -11,6 +11,8 @@ import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
 import com.bytechef.ee.ai.hub.agent.AiHubToolCallbackWrappers;
+import com.bytechef.ee.ai.hub.audit.AiHubAuditEvents;
+import com.bytechef.ee.ai.hub.audit.AiHubAuditMapper;
 import com.bytechef.ee.ai.hub.chat.AiHubChat;
 import com.bytechef.ee.ai.hub.chat.AiHubChatService;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
@@ -19,6 +21,8 @@ import com.bytechef.ee.ai.hub.exception.ForbiddenException;
 import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
@@ -106,6 +110,11 @@ public class AiHubToolApprovalFacadeImpl implements AiHubToolApprovalFacade {
     }
 
     @Override
+    @Audited(event = AiHubAuditEvents.AI_HUB_TOOL_APPROVAL_DECIDED, mapper = AiHubAuditMapper.class, data = {
+        @AuditData(key = "approvalId", value = "#approvalId"),
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "decision", value = "#approved ? 'APPROVED' : 'REJECTED'")
+    })
     public Resolution resolve(long workspaceId, long approvalId, boolean approved, @Nullable String comment) {
         long currentUserId = currentUserId();
 
