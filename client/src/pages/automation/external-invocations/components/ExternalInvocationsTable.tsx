@@ -1,7 +1,6 @@
-import Badge, {type BadgeStyleType} from '@/components/Badge/Badge';
+import Badge from '@/components/Badge/Badge';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {formatDateTime} from '@/pages/automation/workflow-executions/utils/workflowExecutionsTable';
 import {
     EXECUTIONS_TABLE_CELL_CLASS_NAME,
     EXECUTIONS_TABLE_HEADER_CLASS_NAME,
@@ -12,17 +11,23 @@ import {
     PINNED_HEAD_CLASS_NAME,
     PINNED_STRIPED_CELL_CLASS_NAME,
 } from '@/shared/components/workflow-executions/workflowExecutionsTableClassNames';
-import {ExternalInvocationLogsQuery} from '@/shared/middleware/graphql';
 import {type LucideIcon, PuzzleIcon, SparklesIcon, WorkflowIcon, ZapIcon} from 'lucide-react';
+import {KeyboardEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import {
+    type ExternalInvocationLogItemType,
+    SOURCE_LABELS,
+    STATUS_STYLE_TYPES,
+    formatCreatedDate,
+    targetLabel,
+} from '../utils/externalInvocationLabels';
 import ExternalInvocationsDropdownMenu from './ExternalInvocationsDropdownMenu';
-
-type ExternalInvocationLogItemType = ExternalInvocationLogsQuery['externalInvocationLogs']['content'][number];
 
 interface ExternalInvocationsTableProps {
     a2aServerNames?: Record<string, string>;
     mcpServerNames?: Record<string, string>;
+    onSelect?: (externalInvocationLog: ExternalInvocationLogItemType) => void;
     onViewJob?: (jobId: number) => void;
     showConnectedUser?: boolean;
     showSource?: boolean;
@@ -31,13 +36,6 @@ interface ExternalInvocationsTableProps {
 
 const PINNED_IDLE_CELL_CLASS_NAME =
     'sticky right-0 z-10 bg-surface-neutral-primary [tr:nth-child(even)>&]:bg-surface-neutral-secondary';
-
-const SOURCE_LABELS: Record<string, string> = {
-    A2A_SERVER: 'A2A',
-    API_ACTION: 'API (Action)',
-    API_TOOL: 'API (Tool)',
-    MCP_SERVER: 'MCP',
-};
 
 interface InvocationTypeI {
     icon: LucideIcon;
@@ -52,14 +50,6 @@ const KIND_TYPES: Record<string, InvocationTypeI> = {
 const SOURCE_TYPES: Record<string, InvocationTypeI> = {
     A2A_SERVER: {icon: SparklesIcon, label: 'Skill'},
     API_ACTION: {icon: ZapIcon, label: 'Action'},
-};
-
-const OUTCOME_STYLE_TYPES: Record<string, BadgeStyleType> = {
-    APPROVAL_DENIED: 'warning-outline',
-    ERROR: 'destructive-outline',
-    RULE_BLOCKED: 'warning-outline',
-    SUCCESS: 'success-outline',
-    TIMEOUT: 'destructive-outline',
 };
 
 const serverLabel = (
@@ -78,16 +68,14 @@ const serverLabel = (
     return '—';
 };
 
-const targetLabel = (externalInvocationLog: ExternalInvocationLogItemType): string => {
-    if (externalInvocationLog.kind === 'WORKFLOW') {
-        return externalInvocationLog.workflowName || externalInvocationLog.componentName || 'Workflow';
+const handleRowKeyDown = (event: KeyboardEvent<HTMLTableRowElement>, openRow: () => void) => {
+    if (event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) {
+        return;
     }
 
-    const componentName = externalInvocationLog.componentName || '—';
+    event.preventDefault();
 
-    return externalInvocationLog.operationName
-        ? `${componentName} / ${externalInvocationLog.operationName}`
-        : componentName;
+    openRow();
 };
 
 const InvocationTypeCell = ({externalInvocationLog}: {externalInvocationLog: ExternalInvocationLogItemType}) => {
@@ -112,18 +100,11 @@ const InvocationTypeCell = ({externalInvocationLog}: {externalInvocationLog: Ext
     );
 };
 
-const formatCreatedDate = (createdDate: unknown): string => {
-    if (createdDate == null) {
-        return '';
-    }
-
-    return formatDateTime(new Date(Number(createdDate)));
-};
-
 const ExternalInvocationsTable = ({
     a2aServerNames,
     externalInvocationLogs,
     mcpServerNames,
+    onSelect,
     onViewJob,
     showConnectedUser = false,
     showSource = true,
@@ -164,20 +145,28 @@ const ExternalInvocationsTable = ({
                 const jobId = externalInvocationLog.jobId;
                 const viewable = onViewJob != null && jobId != null;
 
+                const openRow = onSelect
+                    ? () => onSelect(externalInvocationLog)
+                    : viewable
+                      ? () => onViewJob(Number(jobId))
+                      : undefined;
+
                 return (
                     <TableRow
                         className={twMerge(
-                            viewable ? EXECUTIONS_TABLE_ROW_CLASS_NAME : 'border-0',
+                            openRow ? EXECUTIONS_TABLE_ROW_CLASS_NAME : 'border-0',
                             EXECUTIONS_TABLE_STRIPED_ROW_CLASS_NAME
                         )}
                         key={externalInvocationLog.id}
-                        onClick={viewable ? () => onViewJob(Number(jobId)) : undefined}
+                        onClick={openRow}
+                        onKeyDown={openRow && ((event) => handleRowKeyDown(event, openRow))}
+                        tabIndex={openRow ? 0 : undefined}
                     >
                         <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
                             <Badge
                                 className="border-transparent uppercase"
-                                label={externalInvocationLog.outcome}
-                                styleType={OUTCOME_STYLE_TYPES[externalInvocationLog.outcome] || 'secondary-filled'}
+                                label={externalInvocationLog.status}
+                                styleType={STATUS_STYLE_TYPES[externalInvocationLog.status] || 'secondary-filled'}
                                 weight="semibold"
                             />
                         </TableCell>
@@ -235,7 +224,7 @@ const ExternalInvocationsTable = ({
                                     <ExternalInvocationsDropdownMenu
                                         jobId={jobId}
                                         onViewJob={onViewJob}
-                                        outcome={externalInvocationLog.outcome}
+                                        status={externalInvocationLog.status}
                                     />
                                 )}
                             </TableCell>

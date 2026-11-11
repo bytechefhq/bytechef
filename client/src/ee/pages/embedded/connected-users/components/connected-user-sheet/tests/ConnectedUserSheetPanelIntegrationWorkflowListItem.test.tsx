@@ -85,6 +85,28 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
         expect(state.workflow).toBe(workflow);
     });
 
+    it("should open the workflow's executions when the row is clicked outside the workflow name", async () => {
+        render(
+            <TooltipProvider>
+                <ul>
+                    <ConnectedUserSheetPanelIntegrationWorkflowListItem
+                        integrationInstance={integrationInstance}
+                        integrationInstanceConfiguration={integrationInstanceConfiguration}
+                        integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                        workflow={workflow}
+                    />
+                </ul>
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('listitem'));
+
+        expect(
+            useIntegrationInstanceConfigurationWorkflowSheetStore.getState()
+                .integrationInstanceConfigurationWorkflowSheetOpen
+        ).toBe(true);
+    });
+
     it('shows when the workflow last ran for this integration instance', () => {
         const lastExecutionDate = new Date('2026-10-28T12:00:00Z');
 

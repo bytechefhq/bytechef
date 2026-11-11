@@ -29,8 +29,8 @@ const externalInvocationLog = {
     kind: 'COMPONENT',
     mcpServerId: 11,
     operationName: 'sendMessage',
-    outcome: 'SUCCESS',
     source: 'MCP_SERVER',
+    status: 'SUCCESS',
     toolName: 'SLACK_SEND_MESSAGE',
 };
 
@@ -75,9 +75,34 @@ describe('ConnectedUserSheetPanelExternalInvocationList', () => {
         expect(screen.getByText('SLACK_SEND_MESSAGE')).toBeInTheDocument();
         expect(screen.getByText('MCP')).toBeInTheDocument();
         expect(screen.getByText('slack / sendMessage')).toBeInTheDocument();
-        expect(
-            screen.queryByText('No external invocations have been recorded for this user yet.')
-        ).not.toBeInTheDocument();
+        expect(screen.queryByRole('heading', {name: 'No external invocations yet'})).not.toBeInTheDocument();
+    });
+
+    it('opens the details of a call when its row is clicked', () => {
+        hoisted.externalInvocationLogsQuery.mockReturnValue({
+            data: {
+                externalInvocationLogs: {
+                    content: [externalInvocationLog],
+                    number: 0,
+                    size: 50,
+                    totalElements: 1,
+                    totalPages: 1,
+                },
+            },
+            isLoading: false,
+        });
+
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetPanelExternalInvocationList connectedUserId={7} />
+            </TooltipProvider>
+        );
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('SLACK_SEND_MESSAGE'));
+
+        expect(screen.getByRole('dialog', {name: 'SLACK_SEND_MESSAGE'})).toBeInTheDocument();
     });
 
     it('shows an error with a retry instead of the empty message when the invocations cannot be loaded', () => {
@@ -97,9 +122,7 @@ describe('ConnectedUserSheetPanelExternalInvocationList', () => {
         );
 
         expect(screen.getByText('External invocations could not be loaded.')).toBeInTheDocument();
-        expect(
-            screen.queryByText('No external invocations have been recorded for this user yet.')
-        ).not.toBeInTheDocument();
+        expect(screen.queryByRole('heading', {name: 'No external invocations yet'})).not.toBeInTheDocument();
 
         fireEvent.click(screen.getByRole('button', {name: 'Retry'}));
 
@@ -118,7 +141,11 @@ describe('ConnectedUserSheetPanelExternalInvocationList', () => {
             </TooltipProvider>
         );
 
-        expect(screen.getByText('No external invocations have been recorded for this user yet.')).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'No external invocations yet'})).toBeInTheDocument();
+        expect(screen.getByRole('link', {name: /How external invocations work/})).toHaveAttribute(
+            'href',
+            'https://docs.bytechef.io/platform/embedded/monitor/external-invocations'
+        );
         expect(screen.queryByRole('table')).not.toBeInTheDocument();
     });
 });

@@ -306,16 +306,30 @@ describe('ConnectedUserMcpServerListItem', () => {
         expect(hoisted.enableWorkflowMutate).toHaveBeenCalledWith({enable: true, id: 10, workflowId: 'workflow-2'});
     });
 
-    it('offers Delete only for servers without workflow tools', async () => {
+    it('disables Delete and explains why for servers with workflow tools', async () => {
         const {unmount} = renderListItem(mixedMcpServer);
 
-        expect(screen.queryByRole('button', {name: 'More actions'})).not.toBeInTheDocument();
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+
+        const deleteMenuItem = await screen.findByRole('menuitem', {name: 'Delete'});
+
+        expect(deleteMenuItem).toHaveAttribute('aria-disabled', 'true');
+
+        await userEvent.hover(deleteMenuItem.parentElement!);
+
+        expect(
+            await screen.findByRole('tooltip', {
+                name: "Workflow tools come with this user's integrations, so this server can't be deleted. Switch it off instead.",
+            })
+        ).toBeInTheDocument();
 
         unmount();
 
         renderListItem(toolsOnlyMcpServer);
 
-        expect(screen.getByRole('button', {name: 'More actions'})).toBeInTheDocument();
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+
+        expect(await screen.findByRole('menuitem', {name: 'Delete'})).not.toHaveAttribute('aria-disabled');
     });
 
     it('toggles the whole server and refreshes the Integrations tab data', async () => {
@@ -338,7 +352,7 @@ describe('ConnectedUserMcpServerListItem', () => {
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ConnectedUserKeys.connectedUser(5)});
     });
 
-    it('deletes the server for the user after confirmation and refreshes the list', async () => {
+    it('deletes the server for the user after confirmation and refreshes the list and what can be provisioned again', async () => {
         const queryClient = new QueryClient();
         const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
@@ -352,7 +366,9 @@ describe('ConnectedUserMcpServerListItem', () => {
 
         hoisted.deleteServerOptions.onSuccess?.();
 
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['provisionableConnectedUserMcpServers']});
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['connectedUserMcpServers']});
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['provisionableConnectedUserMcpServers']});
     });
 
     it('refreshes the MCP servers and Integrations data after a tool or workflow toggle', async () => {

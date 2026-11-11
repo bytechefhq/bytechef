@@ -1,4 +1,3 @@
-import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {
     Dialog,
@@ -71,11 +70,8 @@ const ProvisionMcpServerDialog = ({connectedUserId, onClose}: ProvisionMcpServer
 
     const provisionableMcpServers = data?.provisionableConnectedUserMcpServers;
 
-    const orderedMcpServers = useMemo(
-        () => [
-            ...(provisionableMcpServers ?? []).filter((mcpServer) => !mcpServer.provisioned),
-            ...(provisionableMcpServers ?? []).filter((mcpServer) => mcpServer.provisioned),
-        ],
+    const unprovisionedMcpServers = useMemo(
+        () => (provisionableMcpServers ?? []).filter((mcpServer) => !mcpServer.provisioned),
         [provisionableMcpServers]
     );
 
@@ -92,7 +88,7 @@ const ProvisionMcpServerDialog = ({connectedUserId, onClose}: ProvisionMcpServer
 
     const getComponentTitle = (componentName: string) => componentTitles.get(componentName) || componentName;
 
-    const selectedMcpServer = orderedMcpServers.find((mcpServer) => mcpServer.id === mcpServerId);
+    const selectedMcpServer = unprovisionedMcpServers.find((mcpServer) => mcpServer.id === mcpServerId);
 
     const canSave = !!selectedMcpServer && selectedMcpServer.coveredComponentNames.length > 0;
 
@@ -115,12 +111,16 @@ const ProvisionMcpServerDialog = ({connectedUserId, onClose}: ProvisionMcpServer
                 </DialogHeader>
 
                 <div className="flex flex-col gap-4">
-                    {provisionableMcpServers?.length === 0 ? (
-                        <p className="text-sm text-content-neutral-secondary">No MCP servers are defined.</p>
+                    {provisionableMcpServers && unprovisionedMcpServers.length === 0 ? (
+                        <p className="text-sm text-content-neutral-secondary">
+                            {provisionableMcpServers.length === 0
+                                ? 'No MCP servers are defined.'
+                                : 'Every MCP server is already provisioned for this user.'}
+                        </p>
                     ) : (
                         <fieldset className="border-0 p-0">
                             <RadioGroup name="mcpServerId" onValueChange={setMcpServerId} value={mcpServerId}>
-                                {orderedMcpServers.map((mcpServer) => (
+                                {unprovisionedMcpServers.map((mcpServer) => (
                                     <div
                                         className="flex items-start gap-3 rounded border border-border/50 px-3 py-2"
                                         key={mcpServer.id}
@@ -136,13 +136,7 @@ const ProvisionMcpServerDialog = ({connectedUserId, onClose}: ProvisionMcpServer
                                             className="flex flex-1 flex-col items-start gap-1"
                                             htmlFor={`provision-mcp-server-${mcpServer.id}`}
                                         >
-                                            <span className="flex items-center gap-2 text-sm font-medium">
-                                                {mcpServer.name}
-
-                                                {mcpServer.provisioned && (
-                                                    <Badge label="Provisioned" styleType="success-filled" />
-                                                )}
-                                            </span>
+                                            <span className="text-sm font-medium">{mcpServer.name}</span>
 
                                             <span className="text-sm font-normal text-content-neutral-secondary">
                                                 {describeMcpServer(mcpServer, getComponentTitle)}

@@ -130,18 +130,22 @@ describe('ProvisionMcpServerDialog', () => {
         ).toBeInTheDocument();
     });
 
-    it('lists provisioned servers last with a badge and keeps them selectable', () => {
+    it('leaves out the servers already provisioned for the user', () => {
         renderDialog();
 
-        expect(screen.getByText('Provisioned')).toBeInTheDocument();
-        expect(screen.getByRole('radio', {name: /Existing server/})).toBeEnabled();
-        expect(screen.getAllByRole('radio').map((radio) => radio.getAttribute('value'))).toEqual([
-            '3',
-            '4',
-            '5',
-            '8',
-            '6',
-        ]);
+        expect(screen.queryByText('Existing server')).not.toBeInTheDocument();
+        expect(screen.getAllByRole('radio').map((radio) => radio.getAttribute('value'))).toEqual(['3', '4', '5', '8']);
+    });
+
+    it('says so when every server is already provisioned for the user', () => {
+        hoisted.provisionableQuery.mockReturnValue({
+            data: {provisionableConnectedUserMcpServers: MCP_SERVERS.filter((mcpServer) => mcpServer.provisioned)},
+        });
+
+        renderDialog();
+
+        expect(screen.getByText('Every MCP server is already provisioned for this user.')).toBeInTheDocument();
+        expect(screen.queryByRole('radio')).not.toBeInTheDocument();
     });
 
     it('keeps Save disabled until a selectable server is chosen', async () => {

@@ -68,10 +68,10 @@ const integrationRow = {
     workflow: {label: 'Notify Slack on New Email'},
 } as unknown as AnyWorkflowExecutionRowI;
 
-const renderTable = (data: AnyWorkflowExecutionRowI[]) =>
+const renderTable = (data: AnyWorkflowExecutionRowI[], showConnectedUser?: boolean) =>
     render(
         <TooltipProvider>
-            <AnyWorkflowExecutionsTable data={data} />
+            <AnyWorkflowExecutionsTable data={data} showConnectedUser={showConnectedUser} />
         </TooltipProvider>
     );
 
@@ -97,6 +97,14 @@ describe('AnyWorkflowExecutionsTable', () => {
         expect(screen.getByText('Gmail')).toBeInTheDocument();
         expect(screen.getByText('external-9')).toBeInTheDocument();
         expect(screen.getByText('V5')).toBeInTheDocument();
+    });
+
+    it('leaves out the connected user column when the table is already scoped to one user', () => {
+        renderTable([automationJobRow, integrationRow], false);
+
+        expect(screen.queryByRole('columnheader', {name: 'Connected user'})).not.toBeInTheDocument();
+        expect(screen.queryByText('external-5')).not.toBeInTheDocument();
+        expect(screen.getByRole('columnheader', {name: 'Version'})).toBeInTheDocument();
     });
 
     it('shows the source of each run after the workflow as an icon followed by the project or integration name', () => {

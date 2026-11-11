@@ -27,7 +27,7 @@ interface ExternalInvocationsFiltersI {
     a2aServerId: string | undefined;
     endDate: Date | undefined;
     mcpServerId: string | undefined;
-    outcome: string | undefined;
+    status: string | undefined;
     pageNumber: number;
     startDate: Date | undefined;
     source: string | undefined;
@@ -37,14 +37,14 @@ interface UseExternalInvocationsI {
     filterA2aServerId: string | undefined;
     filterEndDate: Date | undefined;
     filterMcpServerId: string | undefined;
-    filterOutcome: string | undefined;
+    filterStatus: string | undefined;
     filterPageNumber: number;
     filterSource: string | undefined;
     filterStartDate: Date | undefined;
     handleA2aServerChange: (item?: ComboBoxItemType) => void;
     handleEndDateChange: (date: Date | undefined) => void;
     handleMcpServerChange: (item?: ComboBoxItemType) => void;
-    handleOutcomeChange: (item?: ComboBoxItemType) => void;
+    handleStatusChange: (item?: ComboBoxItemType) => void;
     handlePaginationClick: (pageNumber: number) => void;
     handleSourceChange: (item?: ComboBoxItemType) => void;
     handleStartDateChange: (date: Date | undefined) => void;
@@ -65,9 +65,9 @@ const toFilterVariables = (
     environmentId: environmentId != null ? String(environmentId) : undefined,
     fromDate: filters.startDate ? filters.startDate.getTime() : undefined,
     mcpServerId: filters.mcpServerId ? Number(filters.mcpServerId) : undefined,
-    outcome: filters.outcome || undefined,
     page: filters.pageNumber,
     source: filters.source || undefined,
+    status: filters.status || undefined,
     toDate: filters.endDate ? endOfDay(filters.endDate).getTime() : undefined,
     type,
 });
@@ -80,7 +80,7 @@ export const useExternalInvocations = ({
     const [filterA2aServerId, setFilterA2aServerId] = useState<string | undefined>(undefined);
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(undefined);
     const [filterMcpServerId, setFilterMcpServerId] = useState<string | undefined>(undefined);
-    const [filterOutcome, setFilterOutcome] = useState<string | undefined>(undefined);
+    const [filterStatus, setFilterStatus] = useState<string | undefined>(undefined);
     const [filterPageNumber, setFilterPageNumber] = useState<number>(0);
     const [filterStartDate, setFilterStartDate] = useState<Date | undefined>(undefined);
     const [filterSource, setFilterSource] = useState<string | undefined>(undefined);
@@ -90,10 +90,10 @@ export const useExternalInvocations = ({
             a2aServerId: filterA2aServerId,
             endDate: filterEndDate,
             mcpServerId: filterMcpServerId,
-            outcome: filterOutcome,
             pageNumber: filterPageNumber,
             source: filterSource,
             startDate: filterStartDate,
+            status: filterStatus,
         },
         type,
         environmentId
@@ -131,8 +131,8 @@ export const useExternalInvocations = ({
         setFilterPageNumber(0);
     };
 
-    const handleOutcomeChange = (item?: ComboBoxItemType) => {
-        setFilterOutcome(item?.value ? String(item.value) : undefined);
+    const handleStatusChange = (item?: ComboBoxItemType) => {
+        setFilterStatus(item?.value ? String(item.value) : undefined);
         setFilterPageNumber(0);
     };
 
@@ -168,17 +168,17 @@ export const useExternalInvocations = ({
         filterA2aServerId,
         filterEndDate,
         filterMcpServerId,
-        filterOutcome,
         filterPageNumber,
         filterSource,
         filterStartDate,
+        filterStatus,
         handleA2aServerChange,
         handleEndDateChange,
         handleMcpServerChange,
-        handleOutcomeChange,
         handlePaginationClick,
         handleSourceChange,
         handleStartDateChange,
+        handleStatusChange,
         refetchExternalInvocations: activeQuery.refetch,
     };
 };
