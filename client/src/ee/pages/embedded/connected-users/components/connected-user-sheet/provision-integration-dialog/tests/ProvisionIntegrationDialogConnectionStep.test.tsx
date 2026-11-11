@@ -50,7 +50,6 @@ const ConnectionStepHarness = ({
             }}
             control={control}
             formState={formState}
-            onCodeSuccess={vi.fn()}
         />
     );
 };

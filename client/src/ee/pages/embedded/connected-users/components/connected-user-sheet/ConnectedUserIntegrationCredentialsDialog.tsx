@@ -179,8 +179,6 @@ const ConnectedUserIntegrationCredentialsDialog = ({
                             configuration={provisionableConfiguration}
                             control={control as unknown as Control<FieldValues>}
                             formState={formState as unknown as FormState<FieldValues>}
-                            onCodeSuccess={handleCodeSuccess}
-                            showOAuth2Button={false}
                         />
                     )}
                 </div>
