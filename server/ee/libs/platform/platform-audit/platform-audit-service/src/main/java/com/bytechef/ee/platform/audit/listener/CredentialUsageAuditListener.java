@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.audit.listener;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.repository.CustomAuditEventRepository;
 import com.bytechef.ee.platform.audit.util.AuditPlatformUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -64,6 +65,7 @@ public class CredentialUsageAuditListener implements ApplicationListener<Credent
     private static final Logger log = LoggerFactory.getLogger(CredentialUsageAuditListener.class);
 
     private final AuditEventRepository auditEventRepository;
+    private final AuditFailureCounter auditFailureCounter;
     private final Clock clock;
     private final FailureLogRateLimiter failureLogRateLimiter;
     private final @Nullable ConcurrentMap<CredentialKey, Long> recordedCredentials;
@@ -71,21 +73,25 @@ public class CredentialUsageAuditListener implements ApplicationListener<Credent
     @Autowired
     @SuppressFBWarnings("EI")
     public CredentialUsageAuditListener(
-        ApplicationProperties applicationProperties, AuditEventRepository auditEventRepository) {
+        ApplicationProperties applicationProperties, AuditEventRepository auditEventRepository,
+        AuditFailureCounter auditFailureCounter) {
 
-        this(applicationProperties, auditEventRepository, Clock.systemUTC(), MAX_TRACKED_CREDENTIALS);
+        this(
+            applicationProperties, auditEventRepository, auditFailureCounter, Clock.systemUTC(),
+            MAX_TRACKED_CREDENTIALS);
     }
 
     @SuppressFBWarnings("EI")
     CredentialUsageAuditListener(
-        ApplicationProperties applicationProperties, AuditEventRepository auditEventRepository, Clock clock,
-        long maxTrackedCredentials) {
+        ApplicationProperties applicationProperties, AuditEventRepository auditEventRepository,
+        AuditFailureCounter auditFailureCounter, Clock clock, long maxTrackedCredentials) {
 
         ApplicationProperties.Audit audit = applicationProperties.getAudit();
 
         Duration credentialUsageInterval = audit.getCredentialUsageInterval();
 
         this.auditEventRepository = auditEventRepository;
+        this.auditFailureCounter = auditFailureCounter;
         this.clock = clock;
         this.failureLogRateLimiter = new FailureLogRateLimiter(clock, FAILURE_LOG_INTERVAL);
         this.recordedCredentials = createRecordedCredentials(credentialUsageInterval, clock, maxTrackedCredentials);
@@ -152,6 +158,8 @@ public class CredentialUsageAuditListener implements ApplicationListener<Credent
         try {
             auditEventRepository.add(new AuditEvent(clock.instant(), principal, CREDENTIAL_USED, data));
         } catch (RuntimeException exception) {
+            auditFailureCounter.increment(CREDENTIAL_USED);
+
             if (recordedCredentials != null) {
                 recordedCredentials.remove(credentialKey, nowMillis);
             }

@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.audit.aspect;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.ee.platform.audit.util.AuditPlatformUtils;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -35,6 +37,8 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -43,8 +47,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
+import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.StringUtils;
 
 /**
  * @version ee
@@ -83,21 +94,27 @@ public class AuditAspect {
     private static final Logger log = LoggerFactory.getLogger(AuditAspect.class);
 
     private final AuditEventService auditEventService;
+    private final AuditFailureCounter auditFailureCounter;
     private final AuditMapperResolver auditMapperResolver;
     private final boolean recordAllowedPermissionChecks;
+    private final TransactionAttributeSource transactionAttributeSource = new AnnotationTransactionAttributeSource();
+    private final @Nullable PlatformTransactionManager transactionManager;
 
     @SuppressFBWarnings({
         "CT_CONSTRUCTOR_THROW", "EI"
     })
     public AuditAspect(
         ApplicationProperties applicationProperties, AuditEventService auditEventService,
-        AuditMapperResolver auditMapperResolver) {
+        AuditFailureCounter auditFailureCounter, AuditMapperResolver auditMapperResolver,
+        ObjectProvider<PlatformTransactionManager> transactionManagerProvider) {
 
         ApplicationProperties.Audit audit = applicationProperties.getAudit();
 
         this.auditEventService = auditEventService;
+        this.auditFailureCounter = auditFailureCounter;
         this.auditMapperResolver = auditMapperResolver;
         this.recordAllowedPermissionChecks = audit.isRecordAllowedPermissionChecks();
+        this.transactionManager = transactionManagerProvider.getIfAvailable();
     }
 
     @Around("com.bytechef.ee.platform.audit.aspect.AuditPointcuts.preAuthorizedMethod()"
@@ -120,9 +137,20 @@ public class AuditAspect {
         AuditOutcome auditOutcome = AuditOutcome.SUCCESS;
         Class<? extends Throwable> errorClass = null;
         Object result = null;
+        boolean recordedInStrictTransaction = false;
 
         try {
-            result = proceedingJoinPoint.proceed();
+            TransactionAttribute strictTransactionAttribute = findStrictTransactionAttribute(
+                proceedingJoinPoint, audited);
+
+            if (strictTransactionAttribute == null) {
+                result = proceedingJoinPoint.proceed();
+            } else {
+                result = proceedInStrictTransaction(
+                    proceedingJoinPoint, strictTransactionAttribute, principal, audited, auditFrame);
+
+                recordedInStrictTransaction = true;
+            }
 
             return result;
         } catch (AccessDeniedException accessDeniedException) {
@@ -136,19 +164,27 @@ public class AuditAspect {
             throw throwable;
         } finally {
             try {
-                try {
-                    PersistentAuditEvent persistentAuditEvent = createAuditEvent(
-                        proceedingJoinPoint, principal, audited, auditFrame, result, auditOutcome, errorClass);
+                if (!recordedInStrictTransaction) {
+                    try {
+                        PersistentAuditEvent persistentAuditEvent = createAuditEvent(
+                            proceedingJoinPoint, principal, audited, auditFrame, result, auditOutcome, errorClass);
 
-                    if (persistentAuditEvent != null) {
-                        pendingAuditEvents.add(persistentAuditEvent);
+                        if (persistentAuditEvent != null) {
+                            pendingAuditEvents.add(persistentAuditEvent);
 
-                        if (!outermost && auditOutcome == AuditOutcome.SUCCESS) {
-                            markRolledBackWhenTheTransactionRollsBack(persistentAuditEvent);
+                            if (auditOutcome == AuditOutcome.SUCCESS) {
+                                if (!outermost) {
+                                    markRolledBackWhenTheTransactionRollsBack(persistentAuditEvent);
+                                }
+
+                                if (isStrict(audited)) {
+                                    saveBeforeTheTransactionCommits(persistentAuditEvent);
+                                }
+                            }
                         }
+                    } catch (RuntimeException | LinkageError | StackOverflowError throwable) {
+                        reportAuditEventFailure(proceedingJoinPoint, "build", throwable);
                     }
-                } catch (RuntimeException | LinkageError | StackOverflowError throwable) {
-                    reportAuditEventFailure(proceedingJoinPoint, "build", throwable);
                 }
 
                 try {
@@ -166,6 +202,123 @@ public class AuditAspect {
         }
     }
 
+    private @Nullable TransactionAttribute findStrictTransactionAttribute(
+        ProceedingJoinPoint proceedingJoinPoint, @Nullable Audited audited) {
+
+        if (!isStrict(audited) || transactionManager == null ||
+            TransactionSynchronizationManager.isActualTransactionActive()) {
+
+            return null;
+        }
+
+        MethodSignature methodSignature = (MethodSignature) proceedingJoinPoint.getSignature();
+        Object target = proceedingJoinPoint.getTarget();
+
+        Class<?> targetClass = target == null ? methodSignature.getDeclaringType() : AopUtils.getTargetClass(target);
+
+        TransactionAttribute transactionAttribute = transactionAttributeSource.getTransactionAttribute(
+            methodSignature.getMethod(), targetClass);
+
+        if (transactionAttribute == null || transactionAttribute.isReadOnly() ||
+            transactionAttribute.getPropagationBehavior() != TransactionDefinition.PROPAGATION_REQUIRED ||
+            StringUtils.hasText(transactionAttribute.getQualifier())) {
+
+            return null;
+        }
+
+        return transactionAttribute;
+    }
+
+    private Object proceedInStrictTransaction(
+        ProceedingJoinPoint proceedingJoinPoint, TransactionAttribute transactionAttribute, String principal,
+        Audited audited, AuditFrame auditFrame) throws Throwable {
+
+        PlatformTransactionManager strictTransactionManager = Objects.requireNonNull(transactionManager);
+
+        TransactionStatus transactionStatus = strictTransactionManager.getTransaction(transactionAttribute);
+
+        Object result;
+
+        try {
+            result = proceedingJoinPoint.proceed();
+        } catch (Throwable throwable) {
+            if (transactionAttribute.rollbackOn(throwable)) {
+                strictTransactionManager.rollback(transactionStatus);
+            } else {
+                strictTransactionManager.commit(transactionStatus);
+            }
+
+            throw throwable;
+        }
+
+        PersistentAuditEvent persistentAuditEvent = null;
+
+        try {
+            persistentAuditEvent = createAuditEvent(
+                proceedingJoinPoint, principal, audited, auditFrame, result, AuditOutcome.SUCCESS, null);
+        } catch (RuntimeException | LinkageError | StackOverflowError throwable) {
+            reportAuditEventFailure(proceedingJoinPoint, "build", throwable);
+        }
+
+        if (persistentAuditEvent != null) {
+            try {
+                auditEventService.saveAll(List.of(persistentAuditEvent));
+            } catch (RuntimeException exception) {
+                strictTransactionManager.rollback(transactionStatus);
+
+                reportLostAuditEvents(
+                    List.of(persistentAuditEvent), "the strict audit write failed and the operation was rolled back",
+                    exception);
+
+                throw new AuditPersistenceException(audited.event(), exception);
+            }
+        }
+
+        strictTransactionManager.commit(transactionStatus);
+
+        return result;
+    }
+
+    private void saveBeforeTheTransactionCommits(PersistentAuditEvent persistentAuditEvent) {
+        if (!TransactionSynchronizationManager.isActualTransactionActive() ||
+            !TransactionSynchronizationManager.isSynchronizationActive() ||
+            TransactionSynchronizationManager.isCurrentTransactionReadOnly()) {
+
+            return;
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void beforeCommit(boolean readOnly) {
+                if (persistentAuditEvent.getId() != null) {
+                    return;
+                }
+
+                try {
+                    auditEventService.saveAll(List.of(persistentAuditEvent));
+                } catch (RuntimeException exception) {
+                    reportLostAuditEvents(
+                        List.of(persistentAuditEvent),
+                        "the strict audit write failed and the transaction was rolled back", exception);
+
+                    throw new AuditPersistenceException(persistentAuditEvent.getEventType(), exception);
+                }
+            }
+
+            @Override
+            public void afterCompletion(int status) {
+                if (status != STATUS_COMMITTED) {
+                    persistentAuditEvent.setId(null);
+                }
+            }
+        });
+    }
+
+    private static boolean isStrict(@Nullable Audited audited) {
+        return audited != null && audited.strict();
+    }
+
     private void reportAuditEventFailure(
         ProceedingJoinPoint proceedingJoinPoint, String stage, Throwable throwable) {
 
@@ -179,9 +332,7 @@ public class AuditAspect {
 
     private void writePendingAuditEvents(List<PersistentAuditEvent> pendingAuditEvents, boolean outermost) {
         if (!TransactionSynchronizationManager.isActualTransactionActive()) {
-            List<PersistentAuditEvent> auditEvents = List.copyOf(pendingAuditEvents);
-
-            pendingAuditEvents.clear();
+            List<PersistentAuditEvent> auditEvents = takeUnsavedAuditEvents(pendingAuditEvents);
 
             if (auditEvents.isEmpty()) {
                 return;
@@ -196,9 +347,7 @@ public class AuditAspect {
             return;
         }
 
-        List<PersistentAuditEvent> auditEvents = List.copyOf(pendingAuditEvents);
-
-        pendingAuditEvents.clear();
+        List<PersistentAuditEvent> auditEvents = takeUnsavedAuditEvents(pendingAuditEvents);
 
         if (auditEvents.isEmpty()) {
             return;
@@ -221,6 +370,16 @@ public class AuditAspect {
                 }
             });
         }
+    }
+
+    private static List<PersistentAuditEvent> takeUnsavedAuditEvents(List<PersistentAuditEvent> pendingAuditEvents) {
+        List<PersistentAuditEvent> auditEvents = pendingAuditEvents.stream()
+            .filter(persistentAuditEvent -> persistentAuditEvent.getId() == null)
+            .toList();
+
+        pendingAuditEvents.clear();
+
+        return auditEvents;
     }
 
     private static void markRolledBackWhenTheTransactionRollsBack(PersistentAuditEvent persistentAuditEvent) {
@@ -266,6 +425,10 @@ public class AuditAspect {
             "AUDIT PERSISTENCE FAILURE: {} audit event(s) were not recorded because {} \u2014 audit trail is "
                 + "incomplete: {}",
             auditEvents.size(), cause, auditEvents, exception);
+
+        for (PersistentAuditEvent persistentAuditEvent : auditEvents) {
+            auditFailureCounter.increment(persistentAuditEvent.getEventType());
+        }
     }
 
     private @Nullable PersistentAuditEvent createAuditEvent(

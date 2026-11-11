@@ -30,6 +30,7 @@ import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigura
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -524,7 +525,8 @@ class ConnectionAdminFacadeIntTest {
     @Configuration
     @EnableMethodSecurity
     @Import({
-        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class
+        AuditAspect.class, AuditFailureCounter.class, AuditCaptureAspect.class, AuditEventService.class,
+        AuditMapperResolver.class
     })
     static class MethodSecurityConfiguration {
 

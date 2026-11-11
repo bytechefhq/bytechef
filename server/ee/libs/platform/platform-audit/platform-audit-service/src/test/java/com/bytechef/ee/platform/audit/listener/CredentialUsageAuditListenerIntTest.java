@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.audit.listener;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
@@ -54,6 +55,9 @@ class CredentialUsageAuditListenerIntTest {
     private AuditEventRepository auditEventRepository;
 
     @Autowired
+    private AuditFailureCounter auditFailureCounter;
+
+    @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     private final Clock fixedClock = Clock.fixed(Instant.parse("2026-11-01T10:00:00Z"), ZoneOffset.UTC);
@@ -66,7 +70,7 @@ class CredentialUsageAuditListenerIntTest {
     @Test
     void testFirstUseRecordsTheCredentialWithItsContext() {
         CredentialUsageAuditListener credentialUsageAuditListener = new CredentialUsageAuditListener(
-            new ApplicationProperties(), auditEventRepository, fixedClock,
+            new ApplicationProperties(), auditEventRepository, auditFailureCounter, fixedClock,
             CredentialUsageAuditListener.MAX_TRACKED_CREDENTIALS);
 
         credentialUsageAuditListener.onApplicationEvent(createEvent(LOGIN));

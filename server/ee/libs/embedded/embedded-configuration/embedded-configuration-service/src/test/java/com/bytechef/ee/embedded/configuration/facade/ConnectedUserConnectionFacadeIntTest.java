@@ -50,6 +50,7 @@ import com.bytechef.ee.embedded.connected.user.constant.ConnectedUserConstants;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
+import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -1081,7 +1082,8 @@ class ConnectedUserConnectionFacadeIntTest {
     @Configuration
     @ComponentScan("com.bytechef.ee.embedded.connected.user.service")
     @Import({
-        AuditAspect.class, AuditCaptureAspect.class, AuditEventService.class, AuditMapperResolver.class
+        AuditAspect.class, AuditFailureCounter.class, AuditCaptureAspect.class, AuditEventService.class,
+        AuditMapperResolver.class
     })
     static class ConnectedUserServiceConfiguration {
     }

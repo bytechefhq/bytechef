@@ -39,6 +39,7 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
@@ -49,6 +50,7 @@ import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -406,9 +408,13 @@ class A2aAuditIntTest {
         @Bean
         AuditAspect auditAspect(
             ApplicationProperties applicationProperties, AuditEventService auditEventService,
-            AuditMapperResolver auditMapperResolver) {
+            AuditMapperResolver auditMapperResolver, ObjectProvider<MeterRegistry> meterRegistryProvider,
+            ObjectProvider<PlatformTransactionManager> transactionManagerProvider) {
 
-            return new AuditAspect(applicationProperties, auditEventService, auditMapperResolver);
+            return new AuditAspect(
+                applicationProperties, auditEventService, new AuditFailureCounter(meterRegistryProvider),
+                auditMapperResolver,
+                transactionManagerProvider);
         }
 
         @Bean

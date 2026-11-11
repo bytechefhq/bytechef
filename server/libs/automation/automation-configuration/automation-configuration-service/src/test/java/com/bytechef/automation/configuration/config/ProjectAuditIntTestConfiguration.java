@@ -17,11 +17,13 @@
 package com.bytechef.automation.configuration.config;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.aspect.AuditAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -37,9 +39,13 @@ public class ProjectAuditIntTestConfiguration {
     @Bean
     AuditAspect auditAspect(
         ApplicationProperties applicationProperties, AuditEventService auditEventService,
-        AuditMapperResolver auditMapperResolver) {
+        AuditMapperResolver auditMapperResolver, ObjectProvider<MeterRegistry> meterRegistryProvider,
+        ObjectProvider<PlatformTransactionManager> transactionManagerProvider) {
 
-        return new AuditAspect(applicationProperties, auditEventService, auditMapperResolver);
+        return new AuditAspect(
+            applicationProperties, auditEventService, new AuditFailureCounter(meterRegistryProvider),
+            auditMapperResolver,
+            transactionManagerProvider);
     }
 
     @Bean

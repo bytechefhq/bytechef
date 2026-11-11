@@ -11,6 +11,7 @@ import com.bytechef.atlas.coordinator.event.ApplicationEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
 import com.bytechef.atlas.coordinator.event.listener.SharedApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.ee.platform.audit.AuditFailureCounter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -49,15 +50,18 @@ public class JobStatusAuditListener implements SharedApplicationEventListener {
     private static final Logger log = LoggerFactory.getLogger(JobStatusAuditListener.class);
 
     private final AuditEventService auditEventService;
+    private final AuditFailureCounter auditFailureCounter;
     private final ObjectProvider<PrincipalJobService> principalJobServiceProvider;
 
     @SuppressFBWarnings({
         "CT_CONSTRUCTOR_THROW", "EI"
     })
     public JobStatusAuditListener(
-        AuditEventService auditEventService, ObjectProvider<PrincipalJobService> principalJobServiceProvider) {
+        AuditEventService auditEventService, AuditFailureCounter auditFailureCounter,
+        ObjectProvider<PrincipalJobService> principalJobServiceProvider) {
 
         this.auditEventService = auditEventService;
+        this.auditFailureCounter = auditFailureCounter;
         this.principalJobServiceProvider = principalJobServiceProvider;
     }
 
@@ -89,6 +93,8 @@ public class JobStatusAuditListener implements SharedApplicationEventListener {
         try {
             auditEventService.saveAll(List.of(persistentAuditEvent));
         } catch (Exception exception) {
+            auditFailureCounter.increment(persistentAuditEvent.getEventType());
+
             log.error(
                 "AUDIT PERSISTENCE FAILURE: the job status event was not recorded \u2014 audit trail is incomplete: {}",
                 persistentAuditEvent, exception);
