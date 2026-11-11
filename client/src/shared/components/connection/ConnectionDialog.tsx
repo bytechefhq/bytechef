@@ -54,7 +54,7 @@ import OAuth2Button from './OAuth2Button';
 import Scopes from './Scopes';
 
 export interface ConnectionDialogFormProps {
-    authorizationType: string;
+    authorizationType?: string;
     componentName: string;
     environmentId: number;
     id?: number;
@@ -64,6 +64,8 @@ export interface ConnectionDialogFormProps {
     shared: boolean;
     tags: Array<Tag | {label: string; value: string}>;
 }
+
+const NO_AUTHORIZATION_OPTION_VALUE = 'NONE';
 
 interface ConnectionDialogProps {
     componentDefinition?: ComponentDefinition;
@@ -716,11 +718,22 @@ const ConnectionDialog = ({
 
                                                     <Select
                                                         onValueChange={(value) => {
-                                                            setAuthorizationType(value);
+                                                            const selectedAuthorizationType =
+                                                                value === NO_AUTHORIZATION_OPTION_VALUE
+                                                                    ? undefined
+                                                                    : value;
+
+                                                            setAuthorizationType(selectedAuthorizationType);
                                                             setUsePredefinedOAuthApp(false);
-                                                            setValue('authorizationType', value);
+                                                            setValue('authorizationType', selectedAuthorizationType);
                                                         }}
                                                         {...field}
+                                                        value={
+                                                            field.value ||
+                                                            (connectionDefinition?.authorizationRequired === false
+                                                                ? NO_AUTHORIZATION_OPTION_VALUE
+                                                                : undefined)
+                                                        }
                                                     >
                                                         <SelectTrigger className="mt-1">
                                                             <FormControl>
@@ -731,8 +744,14 @@ const ConnectionDialog = ({
                                                         <SelectContent>
                                                             {authorizationOptions.map((authorizationOption) => (
                                                                 <SelectItem
-                                                                    key={authorizationOption.value!}
-                                                                    value={authorizationOption.value!}
+                                                                    key={
+                                                                        authorizationOption.value ||
+                                                                        NO_AUTHORIZATION_OPTION_VALUE
+                                                                    }
+                                                                    value={
+                                                                        authorizationOption.value ||
+                                                                        NO_AUTHORIZATION_OPTION_VALUE
+                                                                    }
                                                                 >
                                                                     {authorizationOption.label!}
                                                                 </SelectItem>

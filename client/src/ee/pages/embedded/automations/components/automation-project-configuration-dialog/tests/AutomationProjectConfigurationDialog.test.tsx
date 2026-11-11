@@ -244,7 +244,7 @@ describe('AutomationProjectConfigurationDialog', () => {
             expect(screen.getByRole('combobox', {name: 'Project'})).toHaveTextContent('My Project');
         });
 
-        it('prefills the name with the project name and saves from the basic step with defaults', async () => {
+        it('prefills the name and the latest published version and saves from the basic step with defaults', async () => {
             const user = userEvent.setup();
 
             const onClose = vi.fn();
@@ -258,7 +258,7 @@ describe('AutomationProjectConfigurationDialog', () => {
             expect(screen.getByText('Staging')).toBeInTheDocument();
             expect(screen.queryByRole('combobox', {name: 'Environment'})).not.toBeInTheDocument();
             expect(screen.getByLabelText(/^Name/)).toHaveValue('My Project');
-            expect(screen.getByRole('combobox', {name: 'Version'})).toHaveTextContent('Latest published version (V3)');
+            expect(screen.getByRole('combobox', {name: 'Version'})).toHaveTextContent(/^V3$/);
 
             await user.click(screen.getByRole('button', {name: 'Save'}));
 

@@ -1,4 +1,5 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {WORKSPACE_API_KEYS_DOCUMENTATION_URL} from '@/pages/settings/settingsDocumentationUrls';
 import ApiKeysContent from '@/shared/components/api-keys/ApiKeysContent';
 import {
     ApiKeysProvider,
@@ -120,6 +121,8 @@ const WorkspaceApiKeys = () => {
         >
             <ApiKeysContent
                 description="Do not share your API key with others or expose it in the browser or other client-side code."
+                docsLink={{href: WORKSPACE_API_KEYS_DOCUMENTATION_URL, label: 'How API keys work'}}
+                emptyDescription="An API key lets your scripts and services call this workspace's workflows and the ByteChef API."
                 title="API Keys"
             />
         </ApiKeysProvider>

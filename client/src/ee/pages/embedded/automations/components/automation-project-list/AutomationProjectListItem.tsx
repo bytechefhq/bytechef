@@ -14,7 +14,16 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
 import {AutomationProjectTagsQuery, AutomationProjectsQuery} from '@/shared/middleware/graphql';
-import {DownloadIcon, EditIcon, EllipsisVerticalIcon, PlusIcon, SendIcon, Trash2Icon, UploadIcon} from 'lucide-react';
+import {
+    DownloadIcon,
+    EditIcon,
+    EllipsisVerticalIcon,
+    PlusIcon,
+    SendIcon,
+    SettingsIcon,
+    Trash2Icon,
+    UploadIcon,
+} from 'lucide-react';
 import {MouseEvent, useCallback, useMemo, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -22,6 +31,7 @@ type AutomationProjectType = AutomationProjectsQuery['automationProjects'][numbe
 type EmbeddedTagType = AutomationProjectTagsQuery['automationProjectTags'][number];
 
 interface AutomationProjectListItemProps {
+    onCreateConfiguration: (project: AutomationProjectType) => void;
     onCreateWorkflow: (projectId: string) => void;
     onDeleteProject: (projectId: string) => void;
     onEditProject: (project: AutomationProjectType) => void;
@@ -34,6 +44,7 @@ interface AutomationProjectListItemProps {
 }
 
 const AutomationProjectListItem = ({
+    onCreateConfiguration,
     onCreateWorkflow,
     onDeleteProject,
     onEditProject,
@@ -265,6 +276,28 @@ const AutomationProjectListItem = ({
                                         label="Import Workflow"
                                         onClick={() => onImportWorkflow(project.id)}
                                     />
+                                </DropdownMenuGroup>
+
+                                <DropdownMenuSeparator />
+
+                                <DropdownMenuGroup aria-label="Configuration Actions">
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <span className="block">
+                                                <DropdownMenuItem
+                                                    aria-label="New Configuration"
+                                                    disabled={!project.published}
+                                                    icon={<SettingsIcon />}
+                                                    label="New Configuration"
+                                                    onClick={() => onCreateConfiguration(project)}
+                                                />
+                                            </span>
+                                        </TooltipTrigger>
+
+                                        {!project.published && (
+                                            <TooltipContent>Publish the project before configuring it.</TooltipContent>
+                                        )}
+                                    </Tooltip>
                                 </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />

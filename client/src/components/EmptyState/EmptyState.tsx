@@ -1,3 +1,4 @@
+import {Alert, AlertDescription} from '@/components/ui/alert';
 import {
     Empty as ShadcnEmpty,
     EmptyContent as ShadcnEmptyContent,
@@ -6,7 +7,7 @@ import {
     EmptyMedia as ShadcnEmptyMedia,
     EmptyTitle as ShadcnEmptyTitle,
 } from '@/components/ui/empty';
-import {BookOpenIcon} from 'lucide-react';
+import {BookOpenIcon, InfoIcon} from 'lucide-react';
 import {ComponentPropsWithRef, ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -41,7 +42,7 @@ const EmptyState = ({
 
     return (
         <ShadcnEmpty className={twMerge(basicStyles, className)} {...props}>
-            <ShadcnEmptyHeader className="max-w-md">
+            <ShadcnEmptyHeader className="max-w-xl">
                 <ShadcnEmptyMedia
                     className="size-12 rounded-xl bg-surface-brand-secondary text-content-brand-primary"
                     variant="icon"
@@ -58,7 +59,7 @@ const EmptyState = ({
                 </ShadcnEmptyTitle>
 
                 {description && (
-                    <ShadcnEmptyDescription className="text-content-neutral-secondary">
+                    <ShadcnEmptyDescription className="text-pretty text-content-neutral-secondary">
                         {description}
                     </ShadcnEmptyDescription>
                 )}
@@ -70,7 +71,13 @@ const EmptyState = ({
 
                     {children}
 
-                    {note && <p className="text-xs text-content-neutral-secondary">{note}</p>}
+                    {note && (
+                        <Alert className="w-full max-w-xl text-left text-wrap" role="note">
+                            <InfoIcon />
+
+                            <AlertDescription className="text-xs">{note}</AlertDescription>
+                        </Alert>
+                    )}
 
                     {docsLink && (
                         <a

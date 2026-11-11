@@ -64,6 +64,7 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
 
                             <FormControl>
                                 <IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox
+                                    disabled={!!integrationInstanceConfiguration?.integrationId}
                                     onBlur={field.onBlur}
                                     onChange={(item) => {
                                         if (item) {
@@ -126,6 +127,11 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
 
                             <FormControl>
                                 <IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect
+                                    excludedIntegrationVersion={
+                                        updateIntegrationVersion
+                                            ? integrationInstanceConfiguration?.integrationVersion
+                                            : undefined
+                                    }
                                     integrationId={curIntegrationId}
                                     integrationVersion={curIntegrationVersion}
                                     onChange={(value) => {
@@ -152,7 +158,7 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                         <FormItem>
                             <FormLabel className="gap-0">
                                 Authorization
-                                <RequiredMark />
+                                {authorizationRequired && <RequiredMark />}
                             </FormLabel>
 
                             <Select
@@ -187,7 +193,7 @@ const IntegrationInstanceConfigurationDialogBasicStep = ({
                             <FormMessage />
                         </FormItem>
                     )}
-                    rules={{required: true}}
+                    rules={{required: authorizationRequired}}
                     shouldUnregister={false}
                 />
             )}

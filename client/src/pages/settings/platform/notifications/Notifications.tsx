@@ -1,10 +1,11 @@
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import NotificationDialog from '@/pages/settings/platform/notifications/components/NotificationDialog';
 import NotificationsTable from '@/pages/settings/platform/notifications/components/NotificationsTable';
 import SigningSecretDialog from '@/pages/settings/platform/notifications/components/SigningSecretDialog';
+import {NOTIFICATIONS_DOCUMENTATION_URL} from '@/pages/settings/settingsDocumentationUrls';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -59,10 +60,11 @@ const Notifications = () => {
                 {hasNotifications ? (
                     <NotificationsTable columns={columns} notifications={notificationsData!} />
                 ) : (
-                    <EmptyList
-                        button={<Button label="New Notification" onClick={() => openEditDialog()} />}
-                        icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
-                        message="You do not have any Notifications created yet."
+                    <EmptyState
+                        actions={<Button label="New Notification" onClick={() => openEditDialog()} />}
+                        description="Get an email, Slack message or webhook call when a workflow run starts, completes or fails."
+                        docsLink={{href: NOTIFICATIONS_DOCUMENTATION_URL, label: 'How notifications work'}}
+                        icon={<Link2Icon />}
                         title="No Notifications"
                     />
                 )}

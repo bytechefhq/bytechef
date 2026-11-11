@@ -1,6 +1,8 @@
 import Button from '@/components/Button/Button';
 import {render, screen, within} from '@/shared/util/test-utils';
-import {describe, expect, it} from 'vitest';
+import userEvent from '@testing-library/user-event';
+import {createPortal} from 'react-dom';
+import {describe, expect, it, vi} from 'vitest';
 
 import JourneySteps, {type JourneyStepI} from './JourneySteps';
 
@@ -67,6 +69,47 @@ it('should render a step description and action when given', () => {
     expect(within(currentItem).getByRole('button', {name: 'Create project'})).toBeInTheDocument();
 });
 
+it('should render step content below the description in vertical orientation', () => {
+    render(
+        <JourneySteps
+            orientation="vertical"
+            steps={[
+                {
+                    content: <div data-testid="step-content">Listening for events</div>,
+                    description: 'Projects group related workflows.',
+                    id: 'createProject',
+                    label: 'Create a project',
+                    status: 'current',
+                },
+            ]}
+        />
+    );
+
+    const content = screen.getByTestId('step-content');
+    const description = screen.getByText('Projects group related workflows.');
+
+    expect(screen.getByRole('listitem')).toContainElement(content);
+    expect(description.compareDocumentPosition(content) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(content.parentElement).toHaveClass('col-span-2', 'col-start-2');
+});
+
+it('should ignore step content in horizontal orientation', () => {
+    render(
+        <JourneySteps
+            steps={[
+                {
+                    content: <div data-testid="step-content">Listening for events</div>,
+                    id: 'createProject',
+                    label: 'Create a project',
+                    status: 'current',
+                },
+            ]}
+        />
+    );
+
+    expect(screen.queryByTestId('step-content')).not.toBeInTheDocument();
+});
+
 describe('JourneySteps status tokens', () => {
     it('should use success tokens for a complete step marker', () => {
         render(<JourneySteps steps={steps} />);
@@ -95,6 +138,74 @@ describe('TypeScript tests', () => {
     it('should not allow an unknown step status', () => {
         // @ts-expect-error - status must be complete, current or upcoming
         render(<JourneySteps steps={[{id: 'publish', label: 'Publish a version', status: 'done'}]} />);
+    });
+
+    it('should toggle a step when its row is clicked, but not when its content is clicked', async () => {
+        const onToggle = vi.fn();
+
+        render(
+            <JourneySteps
+                orientation="vertical"
+                steps={[
+                    {
+                        content: <span>step details</span>,
+                        expanded: true,
+                        id: 'done',
+                        label: 'Done step',
+                        onToggle,
+                        status: 'complete',
+                    },
+                ]}
+            />
+        );
+
+        const toggle = screen.getByRole('button', {name: /Done step/});
+
+        expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+        await userEvent.click(screen.getByText('step details'));
+
+        expect(onToggle).not.toHaveBeenCalled();
+
+        await userEvent.click(toggle);
+
+        expect(onToggle).toHaveBeenCalledTimes(1);
+
+        toggle.focus();
+
+        await userEvent.keyboard('{Enter}');
+
+        expect(onToggle).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not toggle a step when a portal rendered from it is clicked', async () => {
+        const onToggle = vi.fn();
+
+        render(
+            <JourneySteps
+                orientation="vertical"
+                steps={[
+                    {
+                        content: createPortal(<button type="button">inside dialog</button>, document.body),
+                        expanded: true,
+                        id: 'withDialog',
+                        label: 'Step with dialog',
+                        onToggle,
+                        status: 'current',
+                    },
+                ]}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'inside dialog'}));
+
+        expect(onToggle).not.toHaveBeenCalled();
+    });
+
+    it('should not make a step without a toggle interactive', () => {
+        render(<JourneySteps orientation="vertical" steps={steps} />);
+
+        expect(screen.queryByRole('button', {name: /Create a project/})).not.toBeInTheDocument();
     });
 
     it('should not allow an unknown orientation', () => {

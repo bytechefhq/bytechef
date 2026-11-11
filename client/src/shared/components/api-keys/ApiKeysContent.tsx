@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import ApiKeyDeleteDialog from '@/shared/components/api-keys/components/ApiKeyDeleteDialog';
 import ApiKeyDialog from '@/shared/components/api-keys/components/ApiKeyDialog';
@@ -12,7 +13,24 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {KeyIcon} from 'lucide-react';
 import {useShallow} from 'zustand/react/shallow';
 
-const ApiKeysContent = ({description, title}: {description: string; title: string}) => {
+interface ApiKeysContentDocsLinkI {
+    href: string;
+    label: string;
+}
+
+interface ApiKeysContentProps {
+    description: string;
+    docsLink?: ApiKeysContentDocsLinkI;
+    emptyDescription?: string;
+    title: string;
+}
+
+const ApiKeysContent = ({
+    description,
+    docsLink,
+    emptyDescription = 'Get started by creating a new API key.',
+    title,
+}: ApiKeysContentProps) => {
     const {setShowEditDialog, showDeleteDialog, showEditDialog} = useApiKeysStore(
         useShallow((state) => ({
             setShowEditDialog: state.setShowEditDialog,
@@ -56,12 +74,13 @@ const ApiKeysContent = ({description, title}: {description: string; title: strin
                 ) : apiKeys && apiKeys.length > 0 ? (
                     <ApiKeyTable apiKeys={apiKeys} canManage={canManage} />
                 ) : (
-                    <EmptyList
-                        button={
+                    <EmptyState
+                        actions={
                             canCreate ? <Button onClick={() => setShowEditDialog(true)}>New API Key</Button> : undefined
                         }
-                        icon={<KeyIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message={canCreate ? 'Get started by creating a new API key.' : undefined}
+                        description={canCreate ? emptyDescription : undefined}
+                        docsLink={docsLink}
+                        icon={<KeyIcon />}
                         title="No API Keys"
                     />
                 )}

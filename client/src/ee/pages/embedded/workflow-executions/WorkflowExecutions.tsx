@@ -2,6 +2,8 @@ import Button from '@/components/Button/Button';
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
+import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import TablePagination from '@/components/TablePagination';
@@ -65,6 +67,12 @@ import EmbeddedWorkflowExecutionsTable from './components/EmbeddedWorkflowExecut
 import EmbeddedWorkflowExecutionSheet from './components/workflow-execution-sheet/WorkflowExecutionSheet';
 
 const ANY_FILTER_OPTION = {label: 'Any', value: ''};
+
+const WORKFLOW_EXECUTION_STEPS = [
+    {id: 'publishIntegration', label: 'Publish an integration', status: 'current' as const},
+    {id: 'enableWorkflow', label: 'Enable a workflow for a connected user', status: 'upcoming' as const},
+    {id: 'runWorkflow', label: 'Run it', status: 'upcoming' as const},
+];
 
 const jobStatusOptions = [
     ANY_FILTER_OPTION,
@@ -282,17 +290,16 @@ export const WorkflowExecutions = () => {
         return [selectedConnectedUser, ...(connectedUsersPageContent ?? [])];
     }, [connectedUsersPage, selectedConnectedUser]);
 
-    const emptyListMessage =
-        !filterStatus &&
-        !filterConnectedUserId &&
-        !filterIntegrationId &&
-        !filterWorkflowId &&
-        !filterStartDate &&
-        !filterEndDate &&
-        !filterIntegrationInstanceConfigurationId &&
-        !filterPageNumber
-            ? "You don't have any executed workflows yet."
-            : 'There is no executed workflows for the current criteria.';
+    const hasActiveFilter =
+        !!filterStatus ||
+        !!filterConnectedUserId ||
+        !!filterIntegrationId ||
+        !!filterWorkflowId ||
+        !!filterStartDate ||
+        !!filterEndDate ||
+        !!filterIntegrationInstanceConfigurationId ||
+        !!filterPageNumber ||
+        filterSource !== WorkflowExecutionsSource.Any;
 
     const workflowExecutions = workflowExecutionPage?.content?.map((workflowExecution: object) => {
         if (filterSource === WorkflowExecutionsSource.Any) {
@@ -303,6 +310,26 @@ export const WorkflowExecutions = () => {
             ? AutomationExecutionFromJSON(workflowExecution)
             : EmbeddedWorkflowExecutionFromJSON(workflowExecution);
     });
+
+    const isFirstRun =
+        !workflowExecutionsIsLoading && !workflowExecutionsError && !hasActiveFilter && !workflowExecutions?.length;
+
+    const refreshButton = (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Button
+                    aria-label="Refresh workflow executions"
+                    disabled={workflowExecutionsIsFetching}
+                    icon={<RefreshCwIcon className={twMerge(workflowExecutionsIsFetching && 'animate-spin')} />}
+                    onClick={() => refetchWorkflowExecutions()}
+                    size="icon"
+                    variant="ghost"
+                />
+            </TooltipTrigger>
+
+            <TooltipContent>Refresh</TooltipContent>
+        </Tooltip>
+    );
 
     const activeFilters = useMemo(
         () =>
@@ -627,37 +654,22 @@ export const WorkflowExecutions = () => {
                 )
             }
             header={
-                <Header
-                    className="3xl:w-full"
-                    position="main"
-                    right={
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    aria-label="Refresh workflow executions"
-                                    disabled={workflowExecutionsIsFetching}
-                                    icon={
-                                        <RefreshCwIcon
-                                            className={twMerge(workflowExecutionsIsFetching && 'animate-spin')}
-                                        />
-                                    }
-                                    onClick={() => refetchWorkflowExecutions()}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-                            </TooltipTrigger>
-
-                            <TooltipContent>Refresh</TooltipContent>
-                        </Tooltip>
-                    }
-                    title={
-                        workflowExecutions && workflowExecutions.length > 0 ? (
-                            <FilterTitle filters={activeFilters} />
-                        ) : (
-                            ''
-                        )
-                    }
-                />
+                isFirstRun ? (
+                    <Header centerTitle={true} position="main" right={refreshButton} title="Workflow Executions" />
+                ) : (
+                    <Header
+                        className="3xl:w-full"
+                        position="main"
+                        right={refreshButton}
+                        title={
+                            workflowExecutions && workflowExecutions.length > 0 ? (
+                                <FilterTitle filters={activeFilters} />
+                            ) : (
+                                ''
+                            )
+                        }
+                    />
+                )
             }
             leftSidebarBody={
                 <div className="space-y-4 px-2">
@@ -832,7 +844,7 @@ export const WorkflowExecutions = () => {
                 </div>
             }
             leftSidebarHeader={<Header position="sidebar" title="Workflow Executions" />}
-            leftSidebarHidden={!initialLoadComplete}
+            leftSidebarHidden={!initialLoadComplete || isFirstRun}
             leftSidebarWidth="64"
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
@@ -847,12 +859,20 @@ export const WorkflowExecutions = () => {
                             showConnectedUser
                         />
                     )
-                ) : (
+                ) : hasActiveFilter ? (
                     <EmptyList
                         icon={<ActivityIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message={emptyListMessage}
-                        title="No Executed Workflows"
+                        message="There are no executed workflows for the current criteria."
+                        title="No Matching Executions"
                     />
+                ) : (
+                    <EmptyState
+                        description="Each time an integration or automation workflow runs for a connected user, the run is recorded here with its status, timing and the output of each step."
+                        icon={<ActivityIcon />}
+                        title="No workflow executions yet"
+                    >
+                        <JourneySteps aria-label="Getting started" steps={WORKFLOW_EXECUTION_STEPS} />
+                    </EmptyState>
                 )}
             </PageLoader>
 

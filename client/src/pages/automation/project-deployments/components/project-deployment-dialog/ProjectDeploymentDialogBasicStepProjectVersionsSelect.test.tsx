@@ -41,6 +41,45 @@ describe('ProjectDeploymentDialogBasicStepProjectVersionsSelect', () => {
         expect(screen.queryByText(noPublishedVersionMessage)).not.toBeInTheDocument();
     });
 
+    it('should select the latest published version when none is selected', () => {
+        (useGetProjectVersionsQuery as Mock).mockReturnValue({
+            data: [
+                {status: ProjectStatus.Published, version: 1},
+                {status: ProjectStatus.Published, version: 3},
+                {status: ProjectStatus.Draft, version: 4},
+            ],
+            isPending: false,
+        });
+
+        const onChange = vi.fn();
+
+        render(<ProjectDeploymentDialogBasicStepProjectVersionsSelect onChange={onChange} projectId={1} />);
+
+        expect(onChange).toHaveBeenCalledWith(3);
+    });
+
+    it('should keep a version that is already selected', () => {
+        (useGetProjectVersionsQuery as Mock).mockReturnValue({
+            data: [
+                {status: ProjectStatus.Published, version: 1},
+                {status: ProjectStatus.Published, version: 3},
+            ],
+            isPending: false,
+        });
+
+        const onChange = vi.fn();
+
+        render(
+            <ProjectDeploymentDialogBasicStepProjectVersionsSelect
+                onChange={onChange}
+                projectId={1}
+                projectVersion={1}
+            />
+        );
+
+        expect(onChange).not.toHaveBeenCalled();
+    });
+
     it('should not ask to publish the project when loading the versions fails', () => {
         (useGetProjectVersionsQuery as Mock).mockReturnValue({
             data: undefined,

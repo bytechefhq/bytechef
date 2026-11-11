@@ -1,9 +1,10 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {OAUTH2_CLIENTS_DOCUMENTATION_URL} from '@/pages/settings/settingsDocumentationUrls';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
@@ -213,9 +214,10 @@ const RegisteredClients = () => {
                         </Table>
                     </div>
                 ) : (
-                    <EmptyList
-                        icon={<KeyIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Clients registered through Dynamic Client Registration will appear here."
+                    <EmptyState
+                        description="AI assistants such as Claude or Cursor register here on their own when a user connects them to an MCP server. You can see who has access and revoke it."
+                        docsLink={{href: OAUTH2_CLIENTS_DOCUMENTATION_URL, label: 'How OAuth2 clients work'}}
+                        icon={<KeyIcon />}
                         title="No OAuth2 Clients"
                     />
                 )}

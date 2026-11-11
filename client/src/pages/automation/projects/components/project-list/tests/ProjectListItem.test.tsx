@@ -22,14 +22,18 @@ vi.mock('@/pages/automation/project-deployments/components/project-deployment-di
     default: ({
         onSuccess,
         redirectOnSubmit,
+        showTabs,
         triggerNode,
     }: {
         onSuccess: (deploymentId: number, environmentId?: number) => void;
         redirectOnSubmit?: boolean;
+        showTabs?: boolean;
         triggerNode: React.ReactNode;
     }) => (
         <>
             {triggerNode}
+
+            {showTabs && <span>New or Change Version tabs</span>}
 
             <button onClick={() => onSuccess(42, 0)}>{`Save deployment ${redirectOnSubmit}`}</button>
 
@@ -218,6 +222,15 @@ it('opens the file picker from the Import Workflow menu item', async () => {
     await userEvent.click(screen.getByRole('menuitem', {name: 'Import Workflow'}));
 
     expect(clickSpy).toHaveBeenCalled();
+});
+
+it('opens New Deployment from the menu without offering to change the version of an existing deployment', async () => {
+    renderProjectListItem();
+
+    await openNewDeploymentFromMenu();
+
+    expect(screen.getByText('Save deployment false')).toBeInTheDocument();
+    expect(screen.queryByText('New or Change Version tabs')).not.toBeInTheDocument();
 });
 
 it('opens the deployments tab on a saved development deployment', async () => {

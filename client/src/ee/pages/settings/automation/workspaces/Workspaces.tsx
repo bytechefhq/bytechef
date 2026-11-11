@@ -1,9 +1,10 @@
 import Button from '@/components/Button/Button';
-import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import WorkspaceDialog from '@/ee/pages/settings/automation/workspaces/components/WorkspaceDialog';
 import WorkspaceList from '@/ee/pages/settings/automation/workspaces/components/WorkspaceList';
 import {useGetWorkspacesQuery} from '@/ee/shared/queries/automation/workspaces.queries';
+import {WORKSPACES_DOCUMENTATION_URL} from '@/pages/settings/settingsDocumentationUrls';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {ZapIcon} from 'lucide-react';
@@ -30,10 +31,11 @@ const Workspaces = () => {
                 {workspaces && workspaces.length > 0 ? (
                     <WorkspaceList workspaces={workspaces} />
                 ) : (
-                    <EmptyList
-                        button={<WorkspaceDialog triggerNode={<Button>New Workspace</Button>} />}
-                        icon={<ZapIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a workspace."
+                    <EmptyState
+                        actions={<WorkspaceDialog triggerNode={<Button>New Workspace</Button>} />}
+                        description="A workspace groups projects, connections, data tables and knowledge bases, and controls who can see them."
+                        docsLink={{href: WORKSPACES_DOCUMENTATION_URL, label: 'How workspaces work'}}
+                        icon={<ZapIcon />}
                         title="No Workspaces"
                     />
                 )}

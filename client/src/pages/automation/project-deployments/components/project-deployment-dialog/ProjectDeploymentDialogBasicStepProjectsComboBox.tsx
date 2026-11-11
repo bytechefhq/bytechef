@@ -14,6 +14,7 @@ const ProjectLabel = ({project}: {project: Project}) => (
 );
 
 interface ProjectDeploymentDialogBasicStepProjectsComboBoxProps {
+    disabled?: boolean;
     onBlur: FocusEventHandler;
     onChange: (item?: ComboBoxItemType) => void;
     projects?: Project[];
@@ -21,6 +22,7 @@ interface ProjectDeploymentDialogBasicStepProjectsComboBoxProps {
 }
 
 const ProjectDeploymentDialogBasicStepProjectsComboBox = ({
+    disabled,
     onBlur,
     onChange,
     projects,
@@ -28,6 +30,7 @@ const ProjectDeploymentDialogBasicStepProjectsComboBox = ({
 }: ProjectDeploymentDialogBasicStepProjectsComboBoxProps) =>
     projects ? (
         <ComboBox
+            disabled={disabled}
             emptyMessage="No projects with workflows yet. Add a workflow to a project and publish it."
             items={projects.map(
                 (project) =>

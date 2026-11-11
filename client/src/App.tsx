@@ -1,17 +1,20 @@
 import {SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
 import {Toaster} from '@/components/ui/sonner';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
+import shouldShowEmbeddedGettingStarted from '@/ee/pages/embedded/getting-started/shouldShowEmbeddedGettingStarted';
 import {useUserGuiding} from '@/hooks/useUserGuiding';
 import {useCloseProjectsLeftSidebarOnLeave} from '@/pages/automation/project/hooks/useCloseProjectsLeftSidebarOnLeave';
+import {EMBEDDED_GETTING_STARTED_PATH} from '@/pages/home/constants/platformModes';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
 import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
+import {useEmbeddedGettingStartedCompletedQuery} from '@/shared/middleware/graphql';
 import {isStandaloneRoute} from '@/shared/navigation/standaloneRoutes';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -30,6 +33,7 @@ import {
     MessagesSquareIcon,
     NetworkIcon,
     RadioTowerIcon,
+    RocketIcon,
     ServerIcon,
     Settings2Icon,
     SlidersHorizontalIcon,
@@ -119,6 +123,7 @@ const automationNavigation: NavigationType[] = [
 ];
 
 const embeddedNavigation: NavigationType[] = [
+    {href: EMBEDDED_GETTING_STARTED_PATH, icon: RocketIcon, name: 'Getting Started'},
     {
         href: '/embedded/integrations',
         icon: SquareIcon,
@@ -210,6 +215,21 @@ function App() {
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
 
+    const isAdmin = !!account?.authorities?.includes(AUTHORITIES.ADMIN);
+    const isEmbeddedPath = location.pathname.startsWith('/embedded/');
+
+    const {data: embeddedGettingStartedCompletedData} = useEmbeddedGettingStartedCompletedQuery(undefined, {
+        enabled:
+            currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && isEmbeddedPath && isAdmin && edition === EditionType.EE,
+    });
+
+    const showEmbeddedGettingStarted = shouldShowEmbeddedGettingStarted({
+        completed: embeddedGettingStartedCompletedData?.embeddedGettingStartedCompleted,
+        edition,
+        environmentId: currentEnvironmentId,
+        isAdmin,
+    });
+
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
         if (
             currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT &&
@@ -239,6 +259,10 @@ function App() {
     });
 
     const filteredEmbeddedNavigation = embeddedNavigation.filter((navItem) => {
+        if (navItem.href === EMBEDDED_GETTING_STARTED_PATH) {
+            return showEmbeddedGettingStarted;
+        }
+
         if (currentEnvironmentId !== 0 && navItem.href === '/embedded/integrations') {
             return false;
         }
@@ -265,7 +289,7 @@ function App() {
 
     if (location.pathname.includes('/automation/')) {
         navigation = filteredAutomationNavigation;
-    } else if (location.pathname.includes('/embedded/')) {
+    } else if (isEmbeddedPath) {
         navigation = filteredEmbeddedNavigation;
     }
 

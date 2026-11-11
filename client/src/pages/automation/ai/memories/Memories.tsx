@@ -8,9 +8,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import {Input} from '@/components/ui/input';
-import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {DEFAULT_WORKSPACE_ID, useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {MEMORIES_DOCUMENTATION_URL} from '@/pages/settings/settingsDocumentationUrls';
 import FilterBadges from '@/shared/components/filters/FilterBadges';
 import FilterMenu, {type FilterGroupI, hasActiveFilters} from '@/shared/components/filters/FilterMenu';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
@@ -20,6 +22,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {formatDistanceToNow} from 'date-fns';
 import {BrainIcon, EllipsisVerticalIcon, PencilIcon, SearchIcon, Trash2Icon, TriangleAlertIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
+import {useLocation} from 'react-router-dom';
 
 import MemoryDeleteDialog from './dialogs/MemoryDeleteDialog';
 import MemoryDetailDialog from './dialogs/MemoryDetailDialog';
@@ -146,10 +149,10 @@ const MemoriesTableRow = ({memory, mutable, onDelete, onEdit, onView}: MemoriesT
 };
 
 const MemoriesEmptyState = () => (
-    <EmptyList
-        className="mx-auto max-w-2xl px-6"
-        icon={<BrainIcon className="size-24 text-stroke-neutral-tertiary" />}
-        message="AI Agents that use the Auto Memory tool write memories here when their workflows run - user preferences, project decisions, corrections, and external reference pointers. Once an agent stores something worth keeping, it shows up on this page and you can inspect, edit, or delete it."
+    <EmptyState
+        description="AI agents that use the Auto Memory tool store what is worth keeping here, such as user preferences and project decisions. You can inspect, edit or delete each memory."
+        docsLink={{href: MEMORIES_DOCUMENTATION_URL, label: 'How memories work'}}
+        icon={<BrainIcon />}
         title="No memories yet"
     />
 );
@@ -182,11 +185,15 @@ const Memories = () => {
 
     const isAdmin = useIsTenantAdmin();
 
+    const {pathname} = useLocation();
+
+    const memoriesWorkspaceId = pathname.startsWith('/embedded/') ? DEFAULT_WORKSPACE_ID : currentWorkspaceId;
+
     const {
         data: principals,
         isError: isPrincipalsError,
         refetch: refetchPrincipals,
-    } = useAiAutoMemoryPrincipalsQuery(currentWorkspaceId, currentEnvironmentId);
+    } = useAiAutoMemoryPrincipalsQuery(memoriesWorkspaceId, currentEnvironmentId);
 
     const memoryType = activeFilter === 'ALL' ? undefined : activeFilter;
 
@@ -199,7 +206,7 @@ const Memories = () => {
         isLoading,
         refetch: refetchMemories,
     } = useAiAutoMemoriesQuery(
-        currentWorkspaceId,
+        memoriesWorkspaceId,
         currentEnvironmentId,
         memoryType,
         selectedPrincipal?.principalType,
@@ -396,7 +403,7 @@ const Memories = () => {
                 memory={viewTarget}
                 onClose={() => setViewTargetId(null)}
                 open={viewTarget !== null}
-                workspaceId={currentWorkspaceId}
+                workspaceId={memoriesWorkspaceId}
             />
 
             <MemoryEditDialog
@@ -404,7 +411,7 @@ const Memories = () => {
                 memory={editTarget}
                 onClose={() => setEditTargetId(null)}
                 open={editTargetId !== null}
-                workspaceId={currentWorkspaceId}
+                workspaceId={memoriesWorkspaceId}
             />
 
             <MemoryDeleteDialog
@@ -412,7 +419,7 @@ const Memories = () => {
                 memory={deleteTarget}
                 onClose={() => setDeleteTargetId(null)}
                 open={deleteTarget !== null}
-                workspaceId={currentWorkspaceId}
+                workspaceId={memoriesWorkspaceId}
             />
         </LayoutContainer>
     );

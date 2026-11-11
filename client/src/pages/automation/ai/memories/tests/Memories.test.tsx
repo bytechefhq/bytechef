@@ -19,6 +19,7 @@ vi.mock('@/pages/automation/ai/memories/hooks/useAiAutoMemories', async (importO
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
+    DEFAULT_WORKSPACE_ID: 1049,
     useWorkspaceStore: vi.fn((selector: (state: {currentWorkspaceId: number}) => unknown) =>
         selector({currentWorkspaceId: 7})
     ),
@@ -126,6 +127,17 @@ const withProviders = (ui: ReactNode) => (
 
 const wrap = (ui: ReactNode) => render(withProviders(ui));
 
+const renderAt = (pathname: string) =>
+    render(
+        <MemoryRouter initialEntries={[pathname]}>
+            <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
+                <TooltipProvider>
+                    <Memories />
+                </TooltipProvider>
+            </QueryClientProvider>
+        </MemoryRouter>
+    );
+
 beforeEach(() => {
     mockUseMemoriesQuery.mockReturnValue(makeQueryResult({data: []}));
     mockUseMemoryDetailQuery.mockImplementation(((memory: AiAutoMemoryDetailI | null) =>
@@ -151,7 +163,7 @@ describe('Memories page', () => {
 
         expect(screen.getByRole('heading', {name: /no memories yet/i})).toBeInTheDocument();
         expect(
-            screen.getByText(/AI Agents that use the Auto Memory tool write memories here when their workflows run/i)
+            screen.getByText(/AI agents that use the Auto Memory tool store what is worth keeping here/i)
         ).toBeInTheDocument();
     });
 
@@ -658,5 +670,19 @@ describe('Memories page', () => {
 
         expect(lastCall?.[3]).toBeUndefined();
         expect(lastCall?.[4]).toBeUndefined();
+    });
+
+    it('lists the memories of the selected workspace under Automation', () => {
+        renderAt('/automation/settings/ai/memories');
+
+        expect(mockUsePrincipalsQuery).toHaveBeenLastCalledWith(7, 0);
+        expect(mockUseMemoriesQuery.mock.calls.at(-1)?.[0]).toBe(7);
+    });
+
+    it('lists the default workspace memories, where embedded agents store them, under Embedded', () => {
+        renderAt('/embedded/settings/ai/memories');
+
+        expect(mockUsePrincipalsQuery).toHaveBeenLastCalledWith(1049, 0);
+        expect(mockUseMemoriesQuery.mock.calls.at(-1)?.[0]).toBe(1049);
     });
 });

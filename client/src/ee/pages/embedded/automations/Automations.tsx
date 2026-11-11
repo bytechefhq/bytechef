@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
+import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
@@ -37,6 +38,12 @@ import AutomationProjectsFilterSidebar, {
 } from './components/automation-projects-filter-sidebar/AutomationProjectsFilterSidebar';
 
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
+
+const AUTOMATION_STEPS = [
+    {id: 'createProject', label: 'Create a project', status: 'current' as const},
+    {id: 'addWorkflowTemplates', label: 'Add workflow templates', status: 'upcoming' as const},
+    {id: 'releaseConfiguration', label: 'Release a configuration', status: 'upcoming' as const},
+];
 
 const Automations = () => {
     const [editProject, setEditProject] = useState<AutomationProjectType | undefined>();
@@ -362,7 +369,9 @@ const Automations = () => {
                         description="A project groups the workflow templates that ship with your product. Your connected users start from these templates and adjust their own copies in the embedded workflow builder."
                         icon={<FolderIcon />}
                         title="Create your first project"
-                    />
+                    >
+                        <JourneySteps aria-label="Getting started" steps={AUTOMATION_STEPS} />
+                    </EmptyState>
                 )}
             </PageLoader>
 

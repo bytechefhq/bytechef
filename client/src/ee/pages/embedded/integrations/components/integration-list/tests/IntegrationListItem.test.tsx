@@ -249,6 +249,33 @@ describe('IntegrationListItem', () => {
             );
         });
 
+        it('should offer configuring instead of publishing an unpublished integration without workflows', async () => {
+            renderItem({integrationWorkflowIds: [], lastPublishedDate: undefined});
+
+            const menuTrigger = screen
+                .getAllByRole('button')
+                .filter((button) => button.getAttribute('aria-haspopup') === 'menu')
+                .pop();
+
+            await userEvent.click(menuTrigger!);
+
+            expect(screen.queryByRole('menuitem', {name: 'Publish'})).not.toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'New Configuration'})).not.toHaveAttribute('data-disabled');
+        });
+
+        it('should keep Publish for a published integration whose draft has no workflows', async () => {
+            renderItem({integrationWorkflowIds: []});
+
+            const menuTrigger = screen
+                .getAllByRole('button')
+                .filter((button) => button.getAttribute('aria-haspopup') === 'menu')
+                .pop();
+
+            await userEvent.click(menuTrigger!);
+
+            expect(screen.getByRole('menuitem', {name: 'Publish'})).toBeInTheDocument();
+        });
+
         it('should ask for confirmation when Delete is clicked', async () => {
             await openMenu();
 

@@ -2,6 +2,8 @@ import useCopilotStateContributorRegistry from '@/shared/components/copilot/stor
 import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 
+export const DEFAULT_WORKSPACE_ID = 1049;
+
 interface WorkspaceStateI {
     clearCurrentWorkspaceId: () => void;
 
@@ -19,7 +21,7 @@ export const useWorkspaceStore = create<WorkspaceStateI>()(
                     }));
                 },
 
-                currentWorkspaceId: 1049, // Default workspace id,
+                currentWorkspaceId: DEFAULT_WORKSPACE_ID,
                 setCurrentWorkspaceId: (currentWorkspaceId: number) =>
                     set(() => ({
                         currentWorkspaceId,

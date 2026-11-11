@@ -1,5 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {createTestQueryClientWrapper, screen, userEvent} from '@/shared/util/test-utils';
+import {createTestQueryClientWrapper, screen, userEvent, within} from '@/shared/util/test-utils';
 import {render} from '@testing-library/react';
 import {ReactElement, ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -182,6 +182,18 @@ describe('Automations', () => {
 
         expect(screen.getByText('Create your first project')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: /create project/i})).toBeInTheDocument();
+
+        const steps = screen.getByRole('list', {name: 'Getting started'});
+
+        expect(
+            within(steps)
+                .getAllByRole('listitem')
+                .map((step) => step.textContent)
+        ).toEqual([
+            expect.stringContaining('Create a project'),
+            expect.stringContaining('Add workflow templates'),
+            expect.stringContaining('Release a configuration'),
+        ]);
     });
 
     it('renders the project list from the query', () => {

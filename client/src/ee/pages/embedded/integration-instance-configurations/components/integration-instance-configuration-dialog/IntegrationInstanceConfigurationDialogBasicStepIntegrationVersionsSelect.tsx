@@ -3,21 +3,52 @@ import {IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
 import {CheckIcon} from 'lucide-react';
 import {Select as SelectPrimitive} from 'radix-ui';
+import {useEffect, useMemo} from 'react';
 
 const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect = ({
+    excludedIntegrationVersion,
     integrationId,
     integrationVersion,
     onChange,
 }: {
+    excludedIntegrationVersion?: number;
     integrationId: number;
     integrationVersion?: number;
     onChange: (value: number) => void;
 }) => {
     const {data: integrationVersions} = useGetIntegrationVersionsQuery(integrationId);
 
-    const filteredIntegrationVersions = integrationVersions?.filter(
-        (integrationVersion) => integrationVersion.status === IntegrationStatus.Published
+    const filteredIntegrationVersions = useMemo(() => {
+        const selectableIntegrationVersions = integrationVersions?.filter(
+            (integrationVersion) => integrationVersion.version !== excludedIntegrationVersion
+        );
+
+        const publishedIntegrationVersions = selectableIntegrationVersions?.filter(
+            (integrationVersion) => integrationVersion.status === IntegrationStatus.Published
+        );
+
+        if (!selectableIntegrationVersions || publishedIntegrationVersions?.length) {
+            return publishedIntegrationVersions;
+        }
+
+        return selectableIntegrationVersions.filter(
+            (integrationVersion) => integrationVersion.status === IntegrationStatus.Draft
+        );
+    }, [excludedIntegrationVersion, integrationVersions]);
+
+    const latestSelectableVersion = filteredIntegrationVersions?.reduce<number | undefined>(
+        (latestVersion, selectableIntegrationVersion) =>
+            latestVersion === undefined || selectableIntegrationVersion.version! > latestVersion
+                ? selectableIntegrationVersion.version
+                : latestVersion,
+        undefined
     );
+
+    useEffect(() => {
+        if (integrationVersion === undefined && latestSelectableVersion !== undefined) {
+            onChange(latestSelectableVersion);
+        }
+    }, [integrationVersion, latestSelectableVersion, onChange]);
 
     return (
         <Select

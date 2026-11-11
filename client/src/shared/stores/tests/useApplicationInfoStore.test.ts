@@ -55,6 +55,31 @@ describe('applicationInfoStore', () => {
             });
         });
 
+        it('shares the in-flight request between concurrent callers', async () => {
+            const fetchSpy = mockActuatorInfo({...ACTUATOR_INFO, application: {edition: 'EE'}});
+
+            const firstRequest = applicationInfoStore.getState().getApplicationInfo();
+            const secondRequest = applicationInfoStore.getState().getApplicationInfo();
+
+            expect(secondRequest).toBe(firstRequest);
+
+            await Promise.all([firstRequest, secondRequest]);
+
+            expect(fetchSpy).toHaveBeenCalledTimes(1);
+            expect(applicationInfoStore.getState().application).toEqual({edition: 'EE'});
+        });
+
+        it('starts a new request once the previous one has settled', async () => {
+            const fetchSpy = vi
+                .spyOn(globalThis, 'fetch')
+                .mockImplementation(() => Promise.resolve(new Response(JSON.stringify(ACTUATOR_INFO), {status: 200})));
+
+            await applicationInfoStore.getState().getApplicationInfo();
+            await applicationInfoStore.getState().getApplicationInfo();
+
+            expect(fetchSpy).toHaveBeenCalledTimes(2);
+        });
+
         it('parses authorizationServer enabled from actuator info', async () => {
             mockActuatorInfo({...ACTUATOR_INFO, oauth2: {authorizationServer: {enabled: 'true'}}});
 

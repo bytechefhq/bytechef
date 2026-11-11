@@ -74,7 +74,12 @@ const AutomationConfigurationsEmptyState = ({
             note={environmentScopeNote}
             title="Create your first configuration"
         >
-            <JourneySteps aria-label="Getting started" className="max-w-md" orientation="vertical" steps={steps} />
+            <JourneySteps
+                aria-label="Getting started"
+                className="w-full max-w-xl"
+                orientation="vertical"
+                steps={steps}
+            />
         </EmptyState>
     );
 };

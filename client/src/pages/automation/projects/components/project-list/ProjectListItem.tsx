@@ -676,7 +676,6 @@ const ProjectListItem = ({
                     projectDeployments={projectDeploymentsQuery.data}
                     projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
                     redirectOnSubmit={false}
-                    showTabs
                 />
             )}
 

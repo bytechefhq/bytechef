@@ -1,5 +1,7 @@
 import ImportApp from '@/ImportApp';
 import DevelopmentAutomationConfigurationsRedirect from '@/ee/pages/embedded/automation-configurations/DevelopmentAutomationConfigurationsRedirect';
+import loadEmbeddedIndexRedirect from '@/ee/pages/embedded/getting-started/loadEmbeddedIndexRedirect';
+import {EMBEDDED_GETTING_STARTED_ROUTE_PATH} from '@/ee/pages/embedded/getting-started/resolveEmbeddedIndexRedirect';
 import DevelopmentIntegrationInstanceConfigurationsRedirect from '@/ee/pages/embedded/integration-instance-configurations/DevelopmentIntegrationInstanceConfigurationsRedirect';
 import AcceptInvitation from '@/pages/account/public/AcceptInvitation';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
@@ -87,6 +89,7 @@ const ApiConnectorImportPage = lazy(
 const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorAiPage'));
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
+const EmbeddedGettingStarted = lazy(() => import('@/ee/pages/embedded/getting-started/EmbeddedGettingStarted'));
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
 const AuditEvents = lazy(() => import('@/ee/pages/settings/platform/audit-events/AuditEvents'));
 const Billing = lazy(() => import('@/ee/pages/settings/platform/billing/Billing'));
@@ -964,11 +967,21 @@ export const getRouter = (queryClient: QueryClient) =>
                             children: [
                                 {
                                     index: true,
-                                    loader: async () => {
-                                        return redirect('integrations');
-                                    },
+                                    loader: async () => redirect(await loadEmbeddedIndexRedirect(queryClient)),
                                 },
                                 getAccountRoutes('/embedded'),
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <EmbeddedGettingStarted />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: EMBEDDED_GETTING_STARTED_ROUTE_PATH,
+                                },
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
