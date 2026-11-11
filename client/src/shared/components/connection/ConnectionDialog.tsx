@@ -144,7 +144,7 @@ const ConnectionDialog = ({
         mode: 'onTouched',
     });
 
-    const {control, formState, getValues, handleSubmit, reset: formReset, setValue, watch} = form;
+    const {control, formState, getValues, handleSubmit, reset: formReset, setValue, unregister, watch} = form;
 
     const {
         data: connectionDefinition,
@@ -319,6 +319,18 @@ const ConnectionDialog = ({
         if (payload.code) {
             await saveConnection(payload);
         }
+    }
+
+    function handleUsePredefinedOAuthAppToggle() {
+        if (!usePredefinedOAuthApp) {
+            authorizations?.[0]?.properties?.forEach((property) => {
+                if (property.name) {
+                    unregister(`parameters.${property.name}`);
+                }
+            });
+        }
+
+        setUsePredefinedOAuthApp(!usePredefinedOAuthApp);
     }
 
     async function handleTokenSuccess(payload: TokenPayloadI) {
@@ -761,7 +773,7 @@ const ConnectionDialog = ({
                                             <a
                                                 className="text-sm text-content-brand-primary"
                                                 href="#"
-                                                onClick={() => setUsePredefinedOAuthApp(!usePredefinedOAuthApp)}
+                                                onClick={handleUsePredefinedOAuthAppToggle}
                                             >
                                                 <span>
                                                     I want to use {usePredefinedOAuthApp ? 'my own' : 'predefined'} app

@@ -9,6 +9,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ComponentProps, ReactNode} from 'react';
+import {Control, Controller} from 'react-hook-form';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -23,7 +24,21 @@ vi.mock('@/shared/queries/platform/oauth2.queries', () => ({
 }));
 
 vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () => ({
-    default: () => <div data-testid="connection-properties" />,
+    default: ({control, properties}: {control: Control; properties?: Array<{name: string; required?: boolean}>}) => (
+        <div data-testid="connection-properties">
+            {properties
+                ?.filter((property) => property.required)
+                .map((property) => (
+                    <Controller
+                        control={control}
+                        key={property.name}
+                        name={`parameters.${property.name}`}
+                        render={() => <></>}
+                        rules={{required: true}}
+                    />
+                ))}
+        </div>
+    ),
 }));
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
@@ -352,6 +367,51 @@ describe('ConnectionDialog', () => {
 
             expect(screen.getByText('Redirect URI')).toBeInTheDocument();
             expect(screen.getByText('I want to use predefined app credentials')).toBeInTheDocument();
+        });
+
+        it('enables Next after switching back to the predefined app credentials', async () => {
+            vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+                data: {
+                    authorizations: [
+                        {
+                            name: 'oauth2',
+                            properties: [{name: 'clientId', required: true}],
+                            type: 'OAUTH2_AUTHORIZATION_CODE',
+                        },
+                    ],
+                },
+                error: null,
+                isLoading: false,
+            } as never);
+            vi.mocked(useGetOAuth2PropertiesQuery).mockReturnValue({
+                data: {predefinedApps: ['slack'], redirectUri: 'http://localhost:5173/callback'},
+                error: null,
+                isLoading: false,
+            } as never);
+
+            renderDialog({
+                connection: oAuth2Connection as never,
+                startInCredentialsMode: true,
+                useCreateConnectionMutation: undefined,
+                useUpdateConnectionCredentialsMutation: (() => ({
+                    isPending: false,
+                    mutateAsync: vi.fn(),
+                    reset: vi.fn(),
+                })) as never,
+                useUpdateConnectionMutation: (() => ({isPending: false, mutate: vi.fn(), reset: vi.fn()})) as never,
+            });
+
+            await userEvent.click(await screen.findByText('I want to use my own app credentials'));
+
+            await waitFor(() => {
+                expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
+            });
+
+            await userEvent.click(screen.getByText('I want to use predefined app credentials'));
+
+            await waitFor(() => {
+                expect(screen.getByRole('button', {name: 'Next'})).toBeEnabled();
+            });
         });
 
         it('shows why a credentials update was rejected', () => {
