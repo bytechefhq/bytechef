@@ -238,6 +238,11 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
                                         control={control as unknown as Control<FieldValues>}
                                         formState={formState as unknown as FormState<FieldValues>}
                                         key={configurationWorkflow.workflowUuid}
+                                        mcpTool={
+                                            !!provisionableIntegration?.mcpWorkflowUuids?.includes(
+                                                configurationWorkflow.workflowUuid!
+                                            )
+                                        }
                                         onEnabledChange={(enabled) =>
                                             setValue(`workflows.${workflowIndex}.enabled`, enabled)
                                         }

@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import Switch from '@/components/Switch/Switch';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -8,6 +9,7 @@ import {Control, FieldValues, FormState, useWatch} from 'react-hook-form';
 interface ProvisionIntegrationDialogWorkflowItemProps {
     control: Control<FieldValues>;
     formState: FormState<FieldValues>;
+    mcpTool?: boolean;
     onEnabledChange: (enabled: boolean) => void;
     workflow: Workflow;
     workflowIndex: number;
@@ -16,6 +18,7 @@ interface ProvisionIntegrationDialogWorkflowItemProps {
 const ProvisionIntegrationDialogWorkflowItem = ({
     control,
     formState,
+    mcpTool = false,
     onEnabledChange,
     workflow,
     workflowIndex,
@@ -29,7 +32,11 @@ const ProvisionIntegrationDialogWorkflowItem = ({
     return (
         <div className="space-y-3 rounded border border-border/50 px-3 py-2">
             <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">{label}</span>
+                <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">{label}</span>
+
+                    {mcpTool && <Badge label="MCP tool" styleType="secondary-filled" />}
+                </div>
 
                 <Switch aria-label={label} checked={!!enabled} onCheckedChange={onEnabledChange} />
             </div>

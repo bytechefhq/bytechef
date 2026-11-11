@@ -109,6 +109,24 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
         ).toBeInTheDocument();
     });
 
+    it('marks a workflow that an MCP server exposes as a tool', () => {
+        render(
+            <TooltipProvider>
+                <ul>
+                    <ConnectedUserSheetPanelIntegrationWorkflowListItem
+                        integrationInstance={integrationInstance}
+                        integrationInstanceConfiguration={integrationInstanceConfiguration}
+                        integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                        mcpTool
+                        workflow={workflow}
+                    />
+                </ul>
+            </TooltipProvider>
+        );
+
+        expect(screen.getByText('MCP tool')).toBeInTheDocument();
+    });
+
     it('shows no executions for a workflow that never ran for this integration instance', () => {
         render(
             <TooltipProvider>
