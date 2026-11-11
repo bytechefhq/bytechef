@@ -744,6 +744,30 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ConfigurationConnectedUser"
+  /integration-instance-configurations/{id}/credentials:
+    put:
+      description: "Replaces the shared credentials of an integration instance configuration and of the connections of its integration instances."
+      summary: "Replaces the shared credentials of an integration instance configuration"
+      tags:
+        - "integration-instance-configuration"
+      operationId: "updateIntegrationInstanceConfigurationCredentials"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance configuration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateConnectionCredentialsRequest"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /integration-instance-configurations/{id}/move-impact:
     post:
       description: "Preview what moving connected users from an integration instance configuration to another one would change."
