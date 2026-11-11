@@ -22,6 +22,7 @@ package com.bytechef.component.file.storage.constant;
 public class FileStorageConstants {
 
     public static final String CONTENT = "content";
+    public static final String ENCODING = "encoding";
     public static final String FILE_ENTRY = "fileEntry";
     public static final String FILENAME = "filename";
     public static final String URL = "url";
