@@ -79,6 +79,15 @@ Click a configuration workflow to open a side panel with two tabs:
 - **Executions** - the workflow's executions in this configuration, a page at a time, with a **Connected user** column that names whose instance ran. Click an execution to see its step-by-step results; the refresh button reloads the list.
 - **Workflow** - a read-only view of the workflow.
 
+### Rotating Shared Credentials
+
+The **Authorization Parameters** of a configuration, such as the OAuth2 app's client id and client secret, are shared by every connected user on it. To rotate them, choose **Edit** on the configuration and click **Update credentials** in the **Edit Instance Configuration** dialog. Enter the new values and click **Save**. Fields you leave empty keep their current value.
+
+- The new values replace the configuration's shared parameters and are written to the connection of every connected user's instance on this configuration in the same step, so nobody has to reconnect. Each user's own tokens are kept.
+- Only parameters the configuration already shares can be replaced, and a parameter cannot be set to an empty value.
+- If someone else changed the configuration in the meantime, the save is refused and you reload before trying again.
+- Each replacement is recorded as an `INTEGRATION_INSTANCE_CONFIGURATION_CREDENTIALS_UPDATED` audit event that holds the configuration id only, never the credential values.
+
 ### Several Configurations of One Integration
 
 An environment can have more than one enabled configuration of the same integration, for example one on version 3 and one on version 4 while you move customers across.
