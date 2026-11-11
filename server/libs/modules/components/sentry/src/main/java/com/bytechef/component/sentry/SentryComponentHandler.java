@@ -17,6 +17,7 @@
 package com.bytechef.component.sentry;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -47,6 +48,11 @@ public class SentryComponentHandler implements ComponentHandler {
             SentryGetLatestEventForIssueAction.ACTION_DEFINITION,
             SentryListProjectIssuesAction.ACTION_DEFINITION,
             SentryUpdateIssueAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(SentryGetIssueAction.ACTION_DEFINITION),
+            tool(SentryGetLatestEventForIssueAction.ACTION_DEFINITION),
+            tool(SentryListProjectIssuesAction.ACTION_DEFINITION),
+            tool(SentryUpdateIssueAction.ACTION_DEFINITION))
         .version(1)
         .customAction(true)
         .customActionHelp("", "https://docs.sentry.io/api/");
