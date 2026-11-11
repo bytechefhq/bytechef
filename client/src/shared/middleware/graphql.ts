@@ -469,6 +469,20 @@ export type A2aServersQueryVariables = Exact<{
 
 export type A2aServersQuery = { a2aServers: Array<{ authenticationRequired: boolean, description: string | null, enabled: boolean, environmentId: string, id: string, lastModifiedDate: any, name: string, secretKey: string | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
+export type AutomationGettingStartedQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AutomationGettingStartedQuery = { automationGettingStarted: { completed: boolean, deployed: boolean, httpClientAdded: boolean, live: boolean, loggerAdded: boolean, projectCreated: boolean, published: boolean, workflowCreated: boolean, firstRun: { date: string, errorMessage: string | null, jobId: string, projectDeploymentEnabled: boolean | null, projectDeploymentId: string, status: string } | null, lastFailedRun: { date: string, errorMessage: string | null, jobId: string, projectDeploymentEnabled: boolean | null, projectDeploymentId: string, status: string } | null } };
+
+export type AutomationGettingStartedCompletedQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type AutomationGettingStartedCompletedQuery = { automationGettingStartedCompleted: boolean };
+
 export type CreateA2aProjectMutationVariables = Exact<{
   input: Types.CreateA2aProjectInput;
 }>;
@@ -568,6 +582,13 @@ export type DisconnectConnectionMutationVariables = Exact<{
 
 
 export type DisconnectConnectionMutation = { disconnectConnection: boolean };
+
+export type DismissAutomationGettingStartedMutationVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type DismissAutomationGettingStartedMutation = { dismissAutomationGettingStarted: boolean | null };
 
 export type ExportSharedProjectMutationVariables = Exact<{
   id: string | number;
@@ -4244,6 +4265,75 @@ export const useA2aServersQuery = <
   }
     )};
 
+export const AutomationGettingStartedDocument = new TypedDocumentString(`
+    query automationGettingStarted($workspaceId: ID!) {
+  automationGettingStarted(workspaceId: $workspaceId) {
+    completed
+    deployed
+    firstRun {
+      date
+      errorMessage
+      jobId
+      projectDeploymentEnabled
+      projectDeploymentId
+      status
+    }
+    httpClientAdded
+    lastFailedRun {
+      date
+      errorMessage
+      jobId
+      projectDeploymentEnabled
+      projectDeploymentId
+      status
+    }
+    live
+    loggerAdded
+    projectCreated
+    published
+    workflowCreated
+  }
+}
+    `);
+
+export const useAutomationGettingStartedQuery = <
+      TData = AutomationGettingStartedQuery,
+      TError = unknown
+    >(
+      variables: AutomationGettingStartedQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationGettingStartedQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationGettingStartedQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationGettingStartedQuery, TError, TData>(
+      {
+    queryKey: ['automationGettingStarted', variables],
+    queryFn: fetcher<AutomationGettingStartedQuery, AutomationGettingStartedQueryVariables>(AutomationGettingStartedDocument, variables),
+    ...options
+  }
+    )};
+
+export const AutomationGettingStartedCompletedDocument = new TypedDocumentString(`
+    query automationGettingStartedCompleted($workspaceId: ID!) {
+  automationGettingStartedCompleted(workspaceId: $workspaceId)
+}
+    `);
+
+export const useAutomationGettingStartedCompletedQuery = <
+      TData = AutomationGettingStartedCompletedQuery,
+      TError = unknown
+    >(
+      variables: AutomationGettingStartedCompletedQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationGettingStartedCompletedQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationGettingStartedCompletedQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationGettingStartedCompletedQuery, TError, TData>(
+      {
+    queryKey: ['automationGettingStartedCompleted', variables],
+    queryFn: fetcher<AutomationGettingStartedCompletedQuery, AutomationGettingStartedCompletedQueryVariables>(AutomationGettingStartedCompletedDocument, variables),
+    ...options
+  }
+    )};
+
 export const CreateA2aProjectDocument = new TypedDocumentString(`
     mutation createA2aProject($input: CreateA2aProjectInput!) {
   createA2aProject(input: $input) {
@@ -4525,6 +4615,25 @@ export const useDisconnectConnectionMutation = <
       {
     mutationKey: ['DisconnectConnection'],
     mutationFn: (variables?: DisconnectConnectionMutationVariables) => fetcher<DisconnectConnectionMutation, DisconnectConnectionMutationVariables>(DisconnectConnectionDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DismissAutomationGettingStartedDocument = new TypedDocumentString(`
+    mutation dismissAutomationGettingStarted($workspaceId: ID!) {
+  dismissAutomationGettingStarted(workspaceId: $workspaceId)
+}
+    `);
+
+export const useDismissAutomationGettingStartedMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DismissAutomationGettingStartedMutation, TError, DismissAutomationGettingStartedMutationVariables, TContext>) => {
+    
+    return useMutation<DismissAutomationGettingStartedMutation, TError, DismissAutomationGettingStartedMutationVariables, TContext>(
+      {
+    mutationKey: ['dismissAutomationGettingStarted'],
+    mutationFn: (variables?: DismissAutomationGettingStartedMutationVariables) => fetcher<DismissAutomationGettingStartedMutation, DismissAutomationGettingStartedMutationVariables>(DismissAutomationGettingStartedDocument, variables)(),
     ...options
   }
     )};
