@@ -948,6 +948,13 @@ class WebhookDeliveryServiceIntTest {
             2, 10, meterRegistryProvider(null));
 
         try {
+            blockOncePaths.add("/context");
+
+            CompletableFuture<WebhookDeliveryOutcome> blockingFuture = contextFailingWebhookDeliveryService.submit(
+                delivery("/context", "blocking"));
+
+            assertThat(arrivals.tryAcquire(10, TimeUnit.SECONDS)).isTrue();
+
             contextThreadLocal.set("unrestorable");
 
             CompletableFuture<WebhookDeliveryOutcome> unrestorableFuture = contextFailingWebhookDeliveryService.submit(
@@ -955,11 +962,13 @@ class WebhookDeliveryServiceIntTest {
 
             contextThreadLocal.remove();
 
-            assertThat(statuses(await(unrestorableFuture))).containsExactly(Status.SKIPPED);
-
             CompletableFuture<WebhookDeliveryOutcome> laterFuture = contextFailingWebhookDeliveryService.submit(
                 delivery("/context", "later"));
 
+            releaseLatch.countDown();
+
+            assertThat(statuses(await(blockingFuture))).containsExactly(Status.SENT);
+            assertThat(statuses(await(unrestorableFuture))).containsExactly(Status.SKIPPED);
             assertThat(statuses(await(laterFuture))).containsExactly(Status.SENT);
         } finally {
             contextThreadLocal.remove();

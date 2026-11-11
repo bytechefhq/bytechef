@@ -236,6 +236,17 @@ public class WebhookDeliveryService {
 
                             deliver(endpointKey, delivery, outcomeFuture);
                         });
+                } catch (RuntimeException runtimeException) {
+                    if (deliveryStarted.get()) {
+                        throw runtimeException;
+                    }
+
+                    DeliveryProgress unrestoredDeliveryProgress = new DeliveryProgress();
+
+                    unrestoredDeliveryProgress.skipReason =
+                        "its context could not be restored (" + describe(runtimeException) + ")";
+
+                    complete(endpointKey, delivery, unrestoredDeliveryProgress, outcomeFuture, true);
                 }
 
                 runningDelivery = endpointState.takeNext(endpointKey);
