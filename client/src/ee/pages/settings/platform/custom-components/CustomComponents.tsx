@@ -1,7 +1,8 @@
-import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import CustomComponentList from '@/ee/pages/settings/platform/custom-components/components/CustomComponentList';
 import UploadCustomComponentDialog from '@/ee/pages/settings/platform/custom-components/components/UploadCustomComponentDialog';
+import {CUSTOM_COMPONENTS_DOCUMENTATION_URL} from '@/pages/settings/settingsDocumentationUrls';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useCustomComponentsQuery} from '@/shared/middleware/graphql';
@@ -19,15 +20,13 @@ const CustomComponents = () => {
     return (
         <LayoutContainer
             header={
-                customComponents &&
-                customComponents.length > 0 && (
-                    <Header
-                        centerTitle={true}
-                        position="main"
-                        right={<UploadCustomComponentDialog />}
-                        title="Custom Components"
-                    />
-                )
+                <Header
+                    centerTitle={true}
+                    description="Extend the component catalog with your own components."
+                    position="main"
+                    right={customComponents && customComponents.length > 0 && <UploadCustomComponentDialog />}
+                    title="Custom Components"
+                />
             }
             leftSidebarOpen={false}
         >
@@ -35,10 +34,11 @@ const CustomComponents = () => {
                 {customComponents && customComponents?.length > 0 ? (
                     <CustomComponentList customComponents={customComponents} />
                 ) : (
-                    <EmptyList
-                        button={<UploadCustomComponentDialog />}
-                        icon={<Link2Icon className="size-12 text-content-neutral-tertiary" />}
-                        message="You do not have any Custom Components created yet."
+                    <EmptyState
+                        actions={<UploadCustomComponentDialog />}
+                        description="Upload a JavaScript, Python or Ruby file, or a Java jar, to add your own component to the catalog."
+                        docsLink={{href: CUSTOM_COMPONENTS_DOCUMENTATION_URL, label: 'How custom components work'}}
+                        icon={<Link2Icon />}
                         title="No Custom Components"
                     />
                 )}

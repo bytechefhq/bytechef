@@ -47,7 +47,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {KeyRoundIcon, Settings2Icon} from 'lucide-react';
 import {ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Control, FieldValues, FormState, useForm, useWatch} from 'react-hook-form';
+import {Control, DefaultValues, FieldValues, FormState, useForm, useWatch} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 import IntegrationInstanceConfigurationDialogBasicStep from './IntegrationInstanceConfigurationDialogBasicStep';
@@ -132,7 +132,7 @@ const IntegrationInstanceConfigurationDialog = ({
 }: IntegrationInstanceConfigurationDialogProps) => {
     const [curIntegrationId, setCurIntegrationId] = useState(integrationInstanceConfiguration?.integrationId);
     const [curIntegrationVersion, setCurIntegrationVersion] = useState<number | undefined>(
-        integrationInstanceConfiguration?.integrationVersion
+        updateIntegrationVersion ? undefined : integrationInstanceConfiguration?.integrationVersion
     );
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [isUpdatingCredentials, setIsUpdatingCredentials] = useState(false);
@@ -149,23 +149,25 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const {captureIntegrationInstanceConfigurationCreated} = useAnalytics();
 
-    const form = useForm<IntegrationInstanceConfiguration>({
-        defaultValues: {
-            authorizationType: integrationInstanceConfiguration?.authorizationType,
-            description: integrationInstanceConfiguration?.description || undefined,
-            enabled: integrationInstanceConfiguration?.enabled || false,
-            integrationId: integrationInstanceConfiguration?.integrationId || undefined,
-            integrationInstanceConfigurationWorkflows: [],
-            integrationVersion: integrationInstanceConfiguration?.integrationVersion || undefined,
-            name: integrationInstanceConfiguration?.name || undefined,
-            permissionExpression: integrationInstanceConfiguration?.permissionExpression || undefined,
-            tags:
-                integrationInstanceConfiguration?.tags?.map((tag) => ({
-                    ...tag,
-                    label: tag.name,
-                })) || [],
-        },
-    });
+    const defaultValues: DefaultValues<IntegrationInstanceConfiguration> = {
+        authorizationType: integrationInstanceConfiguration?.authorizationType,
+        description: integrationInstanceConfiguration?.description || undefined,
+        enabled: integrationInstanceConfiguration?.enabled || false,
+        integrationId: integrationInstanceConfiguration?.integrationId || undefined,
+        integrationInstanceConfigurationWorkflows: [],
+        integrationVersion: updateIntegrationVersion
+            ? undefined
+            : integrationInstanceConfiguration?.integrationVersion || undefined,
+        name: integrationInstanceConfiguration?.name || undefined,
+        permissionExpression: integrationInstanceConfiguration?.permissionExpression || undefined,
+        tags:
+            integrationInstanceConfiguration?.tags?.map((tag) => ({
+                ...tag,
+                label: tag.name,
+            })) || [],
+    };
+
+    const form = useForm<IntegrationInstanceConfiguration>({defaultValues});
 
     const {control, formState, getValues, handleSubmit, reset, setValue} = form;
 
@@ -332,7 +334,7 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const hasOauth2Step = !!oAuth2Authorization && !!integration && !updateIntegrationVersion;
 
-    const hasWorkflowsStep = updateIntegrationVersion || workflows === undefined || workflows.length > 0;
+    const hasWorkflowsStep = workflows === undefined || workflows.length > 0;
 
     const basicStepCanProceed =
         !authorizationTypePending && (hasOauth2Step || hasWorkflowsStep || !!connectionDefinition);
@@ -356,9 +358,7 @@ const IntegrationInstanceConfigurationDialog = ({
         setUsePredefinedOAuthApp(true);
 
         setTimeout(() => {
-            reset({
-                integrationInstanceConfigurationWorkflows: [],
-            });
+            reset(defaultValues);
 
             credentialsForm.reset({parameters: {}});
 
@@ -436,7 +436,7 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const isWizard = !integrationInstanceConfiguration?.id || updateIntegrationVersion;
 
-    const wizardTitle = updateIntegrationVersion ? 'Upgrade Integration Version' : 'New Instance Configuration';
+    const wizardTitle = updateIntegrationVersion ? 'Upgrade Version' : 'New Configuration';
 
     const wizardDescription = updateIntegrationVersion
         ? 'Move this configuration to another integration version.'
@@ -445,6 +445,14 @@ const IntegrationInstanceConfigurationDialog = ({
     const validateStep = useCallback(() => form.trigger(undefined, {shouldFocus: true}), [form]);
 
     const handleCompleteClick = () => handleSubmit(handleSaveClick)();
+
+    useEffect(() => {
+        if (!isOpen || integrationInstanceConfiguration?.id || !integration?.name || getValues('name')) {
+            return;
+        }
+
+        setValue('name', integration.name);
+    }, [getValues, integration?.name, integrationInstanceConfiguration?.id, isOpen, setValue]);
 
     useEffect(() => {
         if (integrationInstanceConfiguration?.id || (authorizationRequired && !authorizations?.length)) {

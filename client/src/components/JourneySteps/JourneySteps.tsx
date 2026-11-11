@@ -1,5 +1,5 @@
 import {CheckIcon} from 'lucide-react';
-import {ComponentPropsWithRef, ReactNode} from 'react';
+import {ComponentPropsWithRef, KeyboardEvent, ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 type JourneyStepStatusType = 'complete' | 'current' | 'upcoming';
@@ -8,9 +8,12 @@ type OrientationType = 'horizontal' | 'vertical';
 
 interface JourneyStepI {
     action?: ReactNode;
+    content?: ReactNode;
     description?: string;
+    expanded?: boolean;
     id: string;
     label: string;
+    onToggle?: () => void;
     status: JourneyStepStatusType;
 }
 
@@ -54,6 +57,16 @@ const JourneyStepMarker = ({position, status}: {position: number; status: Journe
     </span>
 );
 
+const handleStepKeyDown = (event: KeyboardEvent<HTMLSpanElement>, onToggle?: () => void) => {
+    if (!onToggle || (event.key !== 'Enter' && event.key !== ' ')) {
+        return;
+    }
+
+    event.preventDefault();
+
+    onToggle();
+};
+
 const JourneySteps = ({className, orientation = 'horizontal', steps, ...props}: JourneyStepsProps) => (
     <ol className={twMerge(listStyles[orientation], className)} {...props}>
         {steps.map((step, index) => (
@@ -68,7 +81,14 @@ const JourneySteps = ({className, orientation = 'horizontal', steps, ...props}: 
 
                 <JourneyStepMarker position={index + 1} status={step.status} />
 
-                <span className="flex min-w-0 flex-col">
+                <span
+                    aria-expanded={step.onToggle ? !!step.expanded : undefined}
+                    className={twMerge('flex min-w-0 flex-col', step.onToggle && 'cursor-pointer')}
+                    onClick={step.onToggle}
+                    onKeyDown={(event) => handleStepKeyDown(event, step.onToggle)}
+                    role={step.onToggle ? 'button' : undefined}
+                    tabIndex={step.onToggle ? 0 : undefined}
+                >
                     <span className={labelStyles[step.status]}>
                         {step.status === 'complete' && <span className="sr-only">Completed:</span>}
 
@@ -81,6 +101,12 @@ const JourneySteps = ({className, orientation = 'horizontal', steps, ...props}: 
                 </span>
 
                 {step.action}
+
+                {orientation === 'vertical' && step.content && (
+                    <div className="col-span-2 col-start-2 min-w-0" data-slot="journey-step-content">
+                        {step.content}
+                    </div>
+                )}
             </li>
         ))}
     </ol>

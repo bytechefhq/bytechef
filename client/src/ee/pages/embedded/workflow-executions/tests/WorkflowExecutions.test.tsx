@@ -247,6 +247,20 @@ describe('WorkflowExecutions', () => {
     });
 
     it('lists the executions of every source by default', () => {
+        useWorkflowExecutionsMock.mockReturnValue({
+            connectedUserProjects: [],
+            refetchWorkflowExecutions: vi.fn(),
+            workflowExecutionPage: {
+                content: [{integrationWorkflowExecution: {id: 1}, source: 'INTEGRATION'}],
+                size: 20,
+                totalElements: 1,
+                totalPages: 1,
+            },
+            workflowExecutionsError: null,
+            workflowExecutionsIsFetching: false,
+            workflowExecutionsIsLoading: false,
+        });
+
         renderWorkflowExecutions('');
 
         expect(useWorkflowExecutionsMock).toHaveBeenLastCalledWith('ANY', expect.anything());
@@ -255,6 +269,22 @@ describe('WorkflowExecutions', () => {
         expect(screen.queryByText('Integration', {selector: 'label'})).not.toBeInTheDocument();
         expect(screen.queryByText('Instance Configuration', {selector: 'label'})).not.toBeInTheDocument();
         expect(screen.queryByText('Workflow', {selector: 'label'})).not.toBeInTheDocument();
+    });
+
+    it('hides the filter sidebar and guides the first run while nothing has been executed', () => {
+        renderWorkflowExecutions('');
+
+        expect(screen.getByRole('heading', {name: 'No workflow executions yet'})).toBeInTheDocument();
+        expect(screen.getByRole('list', {name: 'Getting started'})).toBeInTheDocument();
+        expect(screen.queryByText('Source', {selector: 'label'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Refresh workflow executions'})).toBeInTheDocument();
+    });
+
+    it('keeps the filter sidebar when a filter matches no executions', () => {
+        renderWorkflowExecutions('status=FAILED');
+
+        expect(screen.getByText('No Matching Executions')).toBeInTheDocument();
+        expect(screen.getByText('Source', {selector: 'label'})).toBeInTheDocument();
     });
 
     it.each([

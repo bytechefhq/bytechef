@@ -1,3 +1,4 @@
+import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {Control, FieldValues, useController} from 'react-hook-form';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -9,7 +10,9 @@ const hoisted = vi.hoisted(() => ({
         {authorizationRequired?: boolean; authorizations: {title: string; type: string}[]} | undefined,
     createMutate: vi.fn(),
     findTestConnectionId: vi.fn(),
-    integration: undefined as {componentName: string} | undefined,
+    integration: undefined as {componentName: string; name?: string} | undefined,
+    readIntegrationId: undefined as unknown,
+    readName: undefined as unknown,
     updateCredentialsMutate: vi.fn(),
     updateMutate: vi.fn(),
     workflows: [] as {id: string; tasks?: unknown[]; triggers?: unknown[]; workflowUuid: string}[],
@@ -90,6 +93,14 @@ vi.mock('../IntegrationInstanceConfigurationDialogBasicStep', () => ({
                 {String(getValues('permissionExpression') ?? '')}
             </span>
 
+            <button onClick={() => (hoisted.readName = getValues('name'))} type="button">
+                Read Name
+            </button>
+
+            <button onClick={() => (hoisted.readIntegrationId = getValues('integrationId'))} type="button">
+                Read Integration
+            </button>
+
             <button onClick={() => setValue('authorizationType', 'API_KEY')} type="button">
                 Use API Key
             </button>
@@ -157,16 +168,75 @@ afterEach(() => {
 
     hoisted.connectionDefinition = undefined;
     hoisted.integration = undefined;
+    hoisted.readName = undefined;
+    hoisted.readIntegrationId = undefined;
     hoisted.workflows = [];
 });
 
 describe('IntegrationInstanceConfigurationDialog', () => {
     describe('create mode', () => {
+        it('should keep the preselected integration when the dialog is opened again after closing', async () => {
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2} as IntegrationInstanceConfiguration}
+                    onClose={onClose}
+                    triggerNode={<button type="button">Open Dialog</button>}
+                />
+            );
+
+            await userEvent.click(screen.getByRole('button', {name: 'Open Dialog'}));
+            await userEvent.click(screen.getByRole('button', {name: 'Close'}));
+
+            await waitFor(() => expect(onClose).toHaveBeenCalled(), {interval: 5, timeout: 5000});
+
+            await userEvent.click(screen.getByRole('button', {name: 'Open Dialog'}));
+            await userEvent.click(screen.getByRole('button', {name: 'Read Integration'}));
+
+            expect(hoisted.readIntegrationId).toBe(2);
+        });
+
         it('should title the dialog for a new configuration and name the current step', () => {
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
 
-            expect(screen.getByRole('dialog', {name: 'New Instance Configuration - Basic'})).toBeInTheDocument();
-            expect(screen.getByRole('heading', {name: 'New Instance Configuration - Basic'})).toBeInTheDocument();
+            expect(screen.getByRole('dialog', {name: 'New Configuration - Basic'})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'New Configuration - Basic'})).toBeInTheDocument();
+        });
+
+        it('should name a new configuration after its preselected integration', async () => {
+            hoisted.integration = {componentName: 'httpClient', name: 'HTTP Client'};
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2} as IntegrationInstanceConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            await userEvent.click(screen.getByRole('button', {name: 'Read Name'}));
+
+            expect(hoisted.readName).toBe('HTTP Client');
+        });
+
+        it('should name a new configuration after its integration again when the dialog is reopened', async () => {
+            hoisted.integration = {componentName: 'httpClient', name: 'HTTP Client'};
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2} as IntegrationInstanceConfiguration}
+                    onClose={onClose}
+                    triggerNode={<button type="button">Open Dialog</button>}
+                />
+            );
+
+            await userEvent.click(screen.getByRole('button', {name: 'Open Dialog'}));
+            await userEvent.click(screen.getByRole('button', {name: 'Close'}));
+
+            await waitFor(() => expect(onClose).toHaveBeenCalled(), {interval: 5, timeout: 5000});
+
+            await userEvent.click(screen.getByRole('button', {name: 'Open Dialog'}));
+            await userEvent.click(screen.getByRole('button', {name: 'Read Name'}));
+
+            expect(hoisted.readName).toBe('HTTP Client');
         });
 
         it('should show the wizard header with the subtitle, the steps and the step progress', () => {
@@ -174,7 +244,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
 
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
 
-            expect(screen.getByText('New Instance Configuration')).toBeInTheDocument();
+            expect(screen.getByText('New Configuration')).toBeInTheDocument();
             expect(screen.getAllByText('Run an integration version for connected users.').length).toBeGreaterThan(0);
             expect(screen.getByRole('navigation', {name: 'Steps'})).toHaveTextContent('BasicWorkflows');
             expect(screen.getByRole('progressbar', {name: 'Step 1 of 2'})).toBeInTheDocument();
@@ -213,7 +283,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
 
             expect(await screen.findByTestId('workflows-step')).toBeInTheDocument();
             expect(screen.getByRole('progressbar', {name: 'Step 2 of 2'})).toBeInTheDocument();
-            expect(screen.getByRole('heading', {name: 'New Instance Configuration - Workflows'})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'New Configuration - Workflows'})).toBeInTheDocument();
 
             await user.click(screen.getByRole('button', {name: 'Previous'}));
 
@@ -409,6 +479,27 @@ describe('IntegrationInstanceConfigurationDialog', () => {
     });
 
     describe('edit mode', () => {
+        it('should keep the name of an existing configuration', async () => {
+            hoisted.integration = {componentName: 'httpClient', name: 'HTTP Client'};
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{
+                        id: 1,
+                        integrationId: 2,
+                        integrationVersion: 1,
+                        name: 'Existing',
+                    }}
+                    onClose={onClose}
+                    updateIntegrationVersion
+                />
+            );
+
+            await userEvent.click(screen.getByRole('button', {name: 'Read Name'}));
+
+            expect(hoisted.readName).toBe('Existing');
+        });
+
         it('should title the dialog for an existing configuration', () => {
             render(
                 <IntegrationInstanceConfigurationDialog
@@ -518,7 +609,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
         it('should title the dialog for a version upgrade', () => {
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} updateIntegrationVersion />);
 
-            expect(screen.getByRole('heading', {name: 'Upgrade Integration Version - Basic'})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'Upgrade Version - Basic'})).toBeInTheDocument();
             expect(
                 screen.getAllByText('Move this configuration to another integration version.').length
             ).toBeGreaterThan(0);
@@ -534,6 +625,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
                 ],
             };
             hoisted.integration = {componentName: 'httpClient'};
+            hoisted.workflows = [{id: 'workflow-1', workflowUuid: 'workflow-uuid-1'}];
 
             render(
                 <IntegrationInstanceConfigurationDialog
@@ -565,6 +657,28 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             );
 
             expect(hoisted.createMutate).not.toHaveBeenCalled();
+        });
+
+        it('should skip the workflows step when the chosen version has no workflows', () => {
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+            hoisted.integration = {componentName: 'httpClient'};
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{
+                        authorizationType: 'API_KEY',
+                        id: 1,
+                        integrationId: 2,
+                        integrationVersion: 1,
+                        name: 'Existing',
+                    }}
+                    onClose={onClose}
+                    updateIntegrationVersion
+                />
+            );
+
+            expect(screen.getByRole('navigation', {name: 'Steps'})).toHaveTextContent(/^Basic$/);
+            expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
         });
     });
 

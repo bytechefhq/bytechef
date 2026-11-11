@@ -133,8 +133,8 @@ describe('IntegrationInstanceConfigurationsPanel', () => {
         expect(screen.getByText('Configuration dialog for integration 7 in environment 0')).toBeInTheDocument();
     });
 
-    it('asks to publish the integration first when it has no published version', () => {
-        renderPanel({lastPublishedDate: undefined});
+    it('asks to publish the integration first when it has workflows but no published version', () => {
+        renderPanel({integrationWorkflowIds: [1], lastPublishedDate: undefined});
 
         expect(screen.getByText('Publish the integration to configure it')).toBeInTheDocument();
         expect(screen.queryByText(/Configuration dialog/)).not.toBeInTheDocument();
@@ -150,10 +150,11 @@ describe('IntegrationInstanceConfigurationsPanel', () => {
         expect(screen.getByText('Publish dialog for integration 7')).toBeInTheDocument();
     });
 
-    it('disables publishing from the empty state of an integration without workflows', () => {
+    it('offers creating a configuration of an unpublished integration without workflows', () => {
         renderPanel({integrationWorkflowIds: [], lastPublishedDate: undefined});
 
-        expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
+        expect(screen.getByText('Configuration dialog for integration 7 in environment 0')).toBeInTheDocument();
+        expect(screen.queryByText('Publish the integration to configure it')).not.toBeInTheDocument();
     });
 
     it('shows one skeleton card with a row per integration workflow while loading', () => {

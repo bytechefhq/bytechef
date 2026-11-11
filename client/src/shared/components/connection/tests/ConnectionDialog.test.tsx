@@ -190,6 +190,26 @@ describe('ConnectionDialog', () => {
         expect(screen.getByTestId('connection-properties')).toBeInTheDocument();
     });
 
+    it('should show None as the authorization when the connection does not require one', () => {
+        vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
+            data: {
+                authorizationRequired: false,
+                authorizations: [
+                    {name: 'api_key', title: 'API Key', type: 'API_KEY'},
+                    {name: 'bearer_token', title: 'Bearer Token', type: 'BEARER_TOKEN'},
+                ],
+            },
+            error: null,
+            isLoading: false,
+        } as never);
+
+        renderDialog();
+
+        expect(screen.getByText('Authorization', {selector: 'label'}).parentElement).toHaveTextContent(
+            /^AuthorizationNone$/
+        );
+    });
+
     it('should explain the shared connection switch in a tooltip instead of inline text', async () => {
         vi.mocked(useGetConnectionDefinitionQuery).mockReturnValue({
             data: {properties: []},

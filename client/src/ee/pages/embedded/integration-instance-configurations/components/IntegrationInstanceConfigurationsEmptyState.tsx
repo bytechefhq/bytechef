@@ -3,6 +3,7 @@ import EmptyState from '@/components/EmptyState/EmptyState';
 import JourneySteps, {type JourneyStepI, type JourneyStepStatusType} from '@/components/JourneySteps/JourneySteps';
 import {EMBEDDED_INSTANCE_CONFIGURATIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
+import {isIntegrationConfigurable, isIntegrationPublished} from '@/ee/pages/embedded/shared/integrationPublication';
 import {IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
@@ -16,7 +17,8 @@ const getStepStatus = (complete: boolean, current: boolean): JourneyStepStatusTy
 
 /*
  * An instance configuration deploys a published integration version to this environment, so a new user first needs an
- * integration with a published version. The steps read both from the integration list, which is not environment scoped.
+ * integration with a published version. An integration without workflows needs no publishing: creating its configuration
+ * publishes it. The steps read both from the integration list, which is not environment scoped.
  */
 const IntegrationInstanceConfigurationsEmptyState = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -25,10 +27,12 @@ const IntegrationInstanceConfigurationsEmptyState = () => {
 
     const environmentScopeNote = useEnvironmentScopeNote('Instance configurations');
 
-    const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false});
+    const {data: integrations} = useGetIntegrationsQuery({includeAllFields: true});
 
     const hasIntegration = !!integrations && integrations.length > 0;
-    const hasPublishedIntegration = !!integrations?.some((integration) => !!integration.lastPublishedDate);
+    const hasPublishedIntegration = !!integrations?.some(isIntegrationPublished);
+    const hasConfigurableIntegration = !!integrations?.some(isIntegrationConfigurable);
+    const needsPublishedVersion = hasPublishedIntegration || !hasConfigurableIntegration;
 
     const steps: JourneyStepI[] = useMemo(() => {
         const goToIntegrationsButton = (
@@ -37,7 +41,7 @@ const IntegrationInstanceConfigurationsEmptyState = () => {
 
         const createIntegrationStatus = getStepStatus(hasIntegration, true);
         const publishVersionStatus = getStepStatus(hasPublishedIntegration, hasIntegration);
-        const createConfigurationStatus = getStepStatus(false, hasPublishedIntegration);
+        const createConfigurationStatus = getStepStatus(false, hasConfigurableIntegration);
 
         return [
             {
@@ -49,15 +53,19 @@ const IntegrationInstanceConfigurationsEmptyState = () => {
                 label: 'Create an integration',
                 status: createIntegrationStatus,
             },
-            {
-                ...(publishVersionStatus === 'current' && {
-                    action: goToIntegrationsButton,
-                    description: 'Publishing creates a read-only version you can configure.',
-                }),
-                id: 'publishVersion',
-                label: 'Publish a version',
-                status: publishVersionStatus,
-            },
+            ...(needsPublishedVersion
+                ? [
+                      {
+                          ...(publishVersionStatus === 'current' && {
+                              action: goToIntegrationsButton,
+                              description: 'Publishing creates a read-only version you can configure.',
+                          }),
+                          id: 'publishVersion',
+                          label: 'Publish a version',
+                          status: publishVersionStatus,
+                      },
+                  ]
+                : []),
             {
                 ...(createConfigurationStatus === 'current' && {
                     action: (
@@ -77,11 +85,18 @@ const IntegrationInstanceConfigurationsEmptyState = () => {
                 status: createConfigurationStatus,
             },
         ];
-    }, [currentEnvironmentId, hasIntegration, hasPublishedIntegration, navigate]);
+    }, [
+        currentEnvironmentId,
+        hasConfigurableIntegration,
+        hasIntegration,
+        hasPublishedIntegration,
+        needsPublishedVersion,
+        navigate,
+    ]);
 
     return (
         <EmptyState
-            description="An instance configuration makes a published integration version available to your users in this environment, with its settings and connection. Three steps to get there:"
+            description={`An instance configuration makes a published integration version available to your users in this environment, with its settings and connection. ${steps.length === 3 ? 'Three' : 'Two'} steps to get there:`}
             docsLink={{
                 href: EMBEDDED_INSTANCE_CONFIGURATIONS_DOCUMENTATION_URL,
                 label: 'How instance configurations work',
@@ -91,7 +106,12 @@ const IntegrationInstanceConfigurationsEmptyState = () => {
             title="Create your first instance configuration"
         >
             {integrations && (
-                <JourneySteps aria-label="Getting started" className="max-w-md" orientation="vertical" steps={steps} />
+                <JourneySteps
+                    aria-label="Getting started"
+                    className="w-full max-w-xl"
+                    orientation="vertical"
+                    steps={steps}
+                />
             )}
         </EmptyState>
     );

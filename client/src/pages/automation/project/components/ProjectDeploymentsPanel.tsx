@@ -130,7 +130,6 @@ const ProjectDeploymentsPanel = ({
                                 }}
                                 projectDeployments={projectDeployments}
                                 redirectOnSubmit={false}
-                                showTabs
                                 triggerNode={<Button icon={<RocketIcon />} label="Deploy" />}
                             />
                         }

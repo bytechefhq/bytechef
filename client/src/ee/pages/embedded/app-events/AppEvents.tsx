@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import EmptyState from '@/components/EmptyState/EmptyState';
+import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
 import AppEventDialog from '@/ee/pages/embedded/app-events/components/AppEventDialog';
 import AppEventList from '@/ee/pages/embedded/app-events/components/AppEventList';
@@ -12,6 +13,12 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ZapIcon} from 'lucide-react';
+
+const APP_EVENT_STEPS = [
+    {id: 'createAppEvent', label: 'Create an app event', status: 'current' as const},
+    {id: 'startWorkflow', label: 'Start a workflow on it', status: 'upcoming' as const},
+    {id: 'fireFromProduct', label: 'Fire it from your product', status: 'upcoming' as const},
+];
 
 const AppEvents = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -78,7 +85,9 @@ const AppEvents = () => {
                         docsLink={{href: EMBEDDED_APP_EVENTS_DOCUMENTATION_URL, label: 'How app events work'}}
                         icon={<ZapIcon />}
                         title="Create your first app event"
-                    />
+                    >
+                        <JourneySteps aria-label="Getting started" steps={APP_EVENT_STEPS} />
+                    </EmptyState>
                 )}
             </LayoutContainer>
         </PageLoader>

@@ -1,7 +1,7 @@
 import {useUserGuidingStore} from '@/shared/stores/useUserGuidingStore';
 import {fireEvent, render, screen, userEvent} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {MemoryRouter} from 'react-router-dom';
+import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AppSidebarFooter} from './AppSidebarFooter';
@@ -14,6 +14,7 @@ const DOCS = {
 };
 
 const hoisted = vi.hoisted(() => ({
+    authorities: [] as string[],
     currentType: 0,
     docs: {} as Record<string, string | undefined>,
     edition: 'CE',
@@ -30,6 +31,7 @@ vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
 }));
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    EditionType: {CE: 'CE', EE: 'EE'},
     useApplicationInfoStore: vi.fn(
         (
             selector: (state: {
@@ -48,8 +50,16 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
 
 vi.mock('@/shared/stores/useAuthenticationStore', () => ({
     useAuthenticationStore: vi.fn(
-        (selector: (state: {account: {email: string; id: number} | undefined; logout: () => void}) => unknown) =>
-            selector({account: {email: 'user@localhost.com', id: 1}, logout: hoisted.logoutMock})
+        (
+            selector: (state: {
+                account: {authorities: string[]; email: string; id: number} | undefined;
+                logout: () => void;
+            }) => unknown
+        ) =>
+            selector({
+                account: {authorities: hoisted.authorities, email: 'user@localhost.com', id: 1},
+                logout: hoisted.logoutMock,
+            })
     ),
 }));
 
@@ -67,7 +77,7 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
                 currentEnvironmentId: number | undefined;
                 setCurrentEnvironmentId: () => void;
             }) => unknown
-        ) => selector({currentEnvironmentId: undefined, setCurrentEnvironmentId: vi.fn()})
+        ) => selector({currentEnvironmentId: 0, setCurrentEnvironmentId: vi.fn()})
     ),
 }));
 
@@ -75,6 +85,7 @@ describe('AppSidebarFooter', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        hoisted.authorities = [];
         hoisted.currentType = 0;
         hoisted.docs = {...DOCS};
         hoisted.edition = 'CE';
@@ -200,6 +211,64 @@ describe('AppSidebarFooter', () => {
         expect(screen.queryByText('Need Help?')).not.toBeInTheDocument();
         expect(screen.queryByText('Community Support')).not.toBeInTheDocument();
         expect(screen.queryByText('Report a Bug')).not.toBeInTheDocument();
+    });
+
+    it('shows the Getting started help item for EE admins on embedded pages', async () => {
+        hoisted.authorities = ['ROLE_ADMIN'];
+        hoisted.edition = 'EE';
+
+        const user = userEvent.setup();
+
+        render(
+            <MemoryRouter initialEntries={['/embedded/integrations']}>
+                <Routes>
+                    <Route element={<AppSidebarFooter />} path="/embedded/integrations" />
+
+                    <Route element={<div>Getting started page</div>} path="/embedded/getting-started" />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+        await user.click(screen.getByText('Help & Feedback'));
+
+        fireEvent.click(await screen.findByText('Getting started'));
+
+        expect(await screen.findByText('Getting started page')).toBeInTheDocument();
+    });
+
+    it('hides the Getting started help item for non-admins and outside embedded pages', async () => {
+        hoisted.edition = 'EE';
+
+        const user = userEvent.setup();
+
+        const {unmount} = render(
+            <MemoryRouter initialEntries={['/embedded/integrations']}>
+                <AppSidebarFooter />
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+        await user.click(screen.getByText('Help & Feedback'));
+
+        expect(await screen.findByText('Report a Bug')).toBeInTheDocument();
+        expect(screen.queryByText('Getting started')).not.toBeInTheDocument();
+
+        unmount();
+
+        hoisted.authorities = ['ROLE_ADMIN'];
+
+        render(
+            <MemoryRouter initialEntries={['/automation/projects']}>
+                <AppSidebarFooter />
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+        await user.click(screen.getByText('Help & Feedback'));
+
+        expect(await screen.findByText('Report a Bug')).toBeInTheDocument();
+        expect(screen.queryByText('Getting started')).not.toBeInTheDocument();
     });
 
     it('does not offer the guide toggle when UserGuiding is disabled', async () => {

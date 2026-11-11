@@ -35,6 +35,7 @@ interface ProjectDialogBasicStepProps {
     projectDeployment: ProjectDeployment | undefined;
     projectDeployments?: ProjectDeployment[];
     projectDeploymentsLoading?: boolean;
+    projectLocked?: boolean;
     setValue: UseFormSetValue<ProjectDeployment>;
     showTabs?: boolean;
 }
@@ -49,6 +50,7 @@ const ProjectDeploymentDialogBasicStep = ({
     projectDeployment,
     projectDeployments,
     projectDeploymentsLoading,
+    projectLocked = false,
     setValue,
     showTabs,
 }: ProjectDialogBasicStepProps) => {
@@ -146,6 +148,7 @@ const ProjectDeploymentDialogBasicStep = ({
 
                             <FormControl>
                                 <ProjectDeploymentDialogBasicStepProjectsComboBox
+                                    disabled={projectLocked}
                                     onBlur={field.onBlur}
                                     onChange={handleProjectSelectionChange}
                                     projects={projects}

@@ -3,6 +3,7 @@ import ComboBox from '@/components/ComboBox/ComboBox';
 import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import {Input} from '@/components/Input/Input';
+import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import TablePagination from '@/components/TablePagination';
@@ -119,6 +120,12 @@ const IntegrationLabel = ({
         </span>
     </div>
 );
+
+const CONNECTED_USER_STEPS = [
+    {id: 'addConnectedUser', label: 'Add a connected user', status: 'current' as const},
+    {id: 'provisionIntegration', label: 'Provision an integration', status: 'upcoming' as const},
+    {id: 'connectAccount', label: 'Connect their account', status: 'upcoming' as const},
+];
 
 const ConnectedUsers = () => {
     const [searchParams] = useSearchParams();
@@ -463,7 +470,9 @@ const ConnectedUsers = () => {
                         icon={<UsersIcon />}
                         note={environmentScopeNote}
                         title="No connected users yet"
-                    />
+                    >
+                        <JourneySteps aria-label="Getting started" steps={CONNECTED_USER_STEPS} />
+                    </EmptyState>
                 )}
             </PageLoader>
 

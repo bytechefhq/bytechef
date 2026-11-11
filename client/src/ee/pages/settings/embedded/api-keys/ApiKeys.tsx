@@ -1,100 +1,17 @@
+import {EMBEDDED_API_KEYS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
+import useEmbeddedApiKeysProviderValue from '@/ee/pages/settings/embedded/api-keys/hooks/useEmbeddedApiKeysProviderValue';
 import ApiKeysContent from '@/shared/components/api-keys/ApiKeysContent';
-import {
-    ApiKeysProvider,
-    CreateApiKeyMutationProps,
-    SimpleMutationProps,
-} from '@/shared/components/api-keys/providers/apiKeysProvider';
-import {
-    ApiKey,
-    CreateApiKeyMutation,
-    PlatformType,
-    useApiKeysQuery,
-    useCreateApiKeyMutation,
-    useDeleteApiKeyMutation,
-    useUpdateApiKeyMutation,
-} from '@/shared/middleware/graphql';
-import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
+import {ApiKeysProvider} from '@/shared/components/api-keys/providers/apiKeysProvider';
 
 const ApiKeys = () => {
-    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-
-    const queryClient = useQueryClient();
+    const apiKeysProviderValue = useEmbeddedApiKeysProviderValue();
 
     return (
-        <ApiKeysProvider
-            value={{
-                useApiKeysQuery: () => {
-                    const {
-                        data: {apiKeys} = {},
-                        error,
-                        isLoading,
-                    } = useApiKeysQuery({
-                        environmentId: `${environmentId}`,
-                        type: PlatformType.Embedded,
-                    });
-
-                    return {
-                        data: apiKeys,
-                        error,
-                        isLoading,
-                    } as UseQueryResult<ApiKey[], Error>;
-                },
-                useCreateApiKeyMutation: (props?: CreateApiKeyMutationProps) => {
-                    const createApiKeyMutation = useCreateApiKeyMutation({
-                        onSuccess: (data: CreateApiKeyMutation) => {
-                            void queryClient.invalidateQueries({
-                                queryKey: ['apiKeys'],
-                            });
-
-                            props?.onSuccess?.(data.createApiKey);
-                        },
-                    }) as UseMutationResult<unknown, Error>;
-
-                    return {
-                        mutate: (apiKey: ApiKey) => {
-                            createApiKeyMutation.mutate({
-                                ...apiKey,
-                                environmentId: environmentId,
-                                type: PlatformType.Embedded,
-                            });
-                        },
-                    } as UseMutationResult<unknown, Error>;
-                },
-
-                useDeleteApiKeyMutation: (props?: SimpleMutationProps) => {
-                    const deleteApiKeyMutation = useDeleteApiKeyMutation({
-                        onSuccess: (data) => {
-                            void queryClient.invalidateQueries({
-                                queryKey: ['apiKeys'],
-                            });
-
-                            props?.onSuccess?.(data.deleteApiKey);
-                        },
-                    });
-
-                    return {
-                        isPending: deleteApiKeyMutation.isPending,
-                        mutate: ({apiKeyId}: {apiKeyId: string}) => {
-                            deleteApiKeyMutation.mutate({id: apiKeyId});
-                        },
-                    } as UseMutationResult<unknown, Error>;
-                },
-
-                useUpdateApiKeyMutation: <TVariables = unknown,>(props?: SimpleMutationProps) =>
-                    useUpdateApiKeyMutation({
-                        onSuccess: (data) => {
-                            void queryClient.invalidateQueries({
-                                queryKey: ['apiKeys'],
-                            });
-
-                            props?.onSuccess?.(data.updateApiKey);
-                        },
-                    }) as unknown as UseMutationResult<unknown, Error, TVariables>,
-            }}
-        >
+        <ApiKeysProvider value={apiKeysProviderValue}>
             <ApiKeysContent
                 description="Do not share your API key with others or expose it in the browser or other client-side code."
+                docsLink={{href: EMBEDDED_API_KEYS_DOCUMENTATION_URL, label: 'How API keys work'}}
+                emptyDescription="Your backend sends an API key with every call to the Embedded API, such as listing a user's integrations or running an action."
                 title="API Keys"
             />
         </ApiKeysProvider>

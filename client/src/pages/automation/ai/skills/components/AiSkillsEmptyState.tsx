@@ -1,5 +1,5 @@
-import Button from '@/components/Button/Button';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
+import {SKILLS_DOCUMENTATION_URL} from '@/pages/settings/settingsDocumentationUrls';
 import {BookOpenIcon, BrainCircuitIcon, RepeatIcon, ZapIcon} from 'lucide-react';
 
 const AiSkillsEmptyState = () => (
@@ -49,11 +49,17 @@ const AiSkillsEmptyState = () => (
             </div>
         </div>
 
-        <div className="flex items-center gap-3">
-            <Button variant="outline">Read more</Button>
+        <AiSkillsCreateDropdown />
 
-            <AiSkillsCreateDropdown />
-        </div>
+        <a
+            className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-content-brand-primary hover:underline"
+            href={SKILLS_DOCUMENTATION_URL}
+            rel="noopener noreferrer"
+            target="_blank"
+        >
+            <BookOpenIcon aria-hidden="true" className="size-4" />
+            How skills work
+        </a>
     </div>
 );
 

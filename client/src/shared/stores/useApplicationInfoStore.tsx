@@ -84,9 +84,80 @@ const fetchGetActuatorInfo = async (): Promise<Response> => {
     }).then((response) => response);
 };
 
+let applicationInfoRequest: Promise<void> | undefined;
+
 export const applicationInfoStore = createStore<ApplicationInfoI>()(
     devtools(
-        (set, get) => {
+        (set) => {
+            const loadApplicationInfo = async () => {
+                set((state) => ({
+                    ...state,
+                    loading: true,
+                }));
+
+                const response = await fetchGetActuatorInfo();
+
+                if (response.status === 200) {
+                    const json = await response.json();
+
+                    set((state) => ({
+                        ...state,
+                        ai: {
+                            copilot: {
+                                enabled: json.ai.copilot.enabled === 'true',
+                            },
+                            knowledgeBase: {
+                                enabled: json.ai.knowledgeBase?.enabled === 'true',
+                            },
+                        },
+                        analytics: {
+                            enabled: json.analytics.enabled === 'true',
+                            postHog: json.analytics.postHog,
+                        },
+                        application: json.application,
+                        audit: {
+                            enabled: json.audit?.enabled === 'true',
+                        },
+                        billing: {
+                            customerPortalUrl: json.billing?.customerPortalUrl || undefined,
+                            enabled: json.billing?.enabled === 'true',
+                        },
+                        docs: {
+                            changelogUrl: json.docs?.changelogUrl || undefined,
+                            communitySupportUrl: json.docs?.communitySupportUrl || undefined,
+                            documentationUrl: json.docs?.documentationUrl || undefined,
+                            reportBugUrl: json.docs?.reportBugUrl || undefined,
+                        },
+                        embedded: {
+                            allowedParentOrigins: toAllowedParentOrigins(json.embedded?.allowedParentOrigins),
+                        },
+                        featureFlags: json.featureFlags,
+                        helpHub: {
+                            commandBar: json.helpHub.commandBar,
+                            enabled: json.helpHub.enabled === 'true',
+                        },
+                        loading: false,
+                        oauth2: {
+                            authorizationServer: {
+                                enabled: json.oauth2?.authorizationServer?.enabled === 'true',
+                            },
+                        },
+                        signUp: {
+                            activationRequired: json.signUp?.activationRequired === 'true',
+                            enabled: json.signUp?.enabled === 'true',
+                        },
+                        socialLogin: {
+                            enabled: json.socialLogin?.enabled === 'true',
+                        },
+                        templatesSubmissionForm: json.templatesSubmissionForm,
+                        userGuiding: {
+                            containerId: json.userGuiding?.containerId,
+                            enabled: json.userGuiding?.enabled === 'true',
+                        },
+                    }));
+                }
+            };
+
             return {
                 ai: {
                     copilot: {
@@ -120,77 +191,20 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                 embedded: null,
                 featureFlags: {},
 
-                getApplicationInfo: async () => {
-                    if (get().loading) {
-                        return;
+                getApplicationInfo: () => {
+                    if (applicationInfoRequest) {
+                        return applicationInfoRequest;
                     }
 
-                    set((state) => ({
-                        ...state,
-                        loading: true,
-                    }));
+                    const request = loadApplicationInfo().finally(() => {
+                        if (applicationInfoRequest === request) {
+                            applicationInfoRequest = undefined;
+                        }
+                    });
 
-                    const response = await fetchGetActuatorInfo();
+                    applicationInfoRequest = request;
 
-                    if (response.status === 200) {
-                        const json = await response.json();
-
-                        set((state) => ({
-                            ...state,
-                            ai: {
-                                copilot: {
-                                    enabled: json.ai.copilot.enabled === 'true',
-                                },
-                                knowledgeBase: {
-                                    enabled: json.ai.knowledgeBase?.enabled === 'true',
-                                },
-                            },
-                            analytics: {
-                                enabled: json.analytics.enabled === 'true',
-                                postHog: json.analytics.postHog,
-                            },
-                            application: json.application,
-                            audit: {
-                                enabled: json.audit?.enabled === 'true',
-                            },
-                            billing: {
-                                customerPortalUrl: json.billing?.customerPortalUrl || undefined,
-                                enabled: json.billing?.enabled === 'true',
-                            },
-                            docs: {
-                                changelogUrl: json.docs?.changelogUrl || undefined,
-                                communitySupportUrl: json.docs?.communitySupportUrl || undefined,
-                                documentationUrl: json.docs?.documentationUrl || undefined,
-                                reportBugUrl: json.docs?.reportBugUrl || undefined,
-                            },
-                            embedded: {
-                                allowedParentOrigins: toAllowedParentOrigins(json.embedded?.allowedParentOrigins),
-                            },
-                            featureFlags: json.featureFlags,
-                            helpHub: {
-                                commandBar: json.helpHub.commandBar,
-                                enabled: json.helpHub.enabled === 'true',
-                            },
-                            loading: false,
-                            oauth2: {
-                                authorizationServer: {
-                                    enabled: json.oauth2?.authorizationServer?.enabled === 'true',
-                                },
-                            },
-                            signUp: {
-                                activationRequired: json.signUp?.activationRequired === 'true',
-                                enabled: json.signUp?.enabled === 'true',
-                            },
-                            socialLogin: {
-                                enabled: json.socialLogin?.enabled === 'true',
-                            },
-                            templatesSubmissionForm: json.templatesSubmissionForm,
-                            userGuiding: {
-                                containerId: json.userGuiding?.containerId,
-                                enabled: json.userGuiding?.enabled === 'true',
-                            },
-                        }));
-                    }
+                    return request;
                 },
                 helpHub: {
                     commandBar: {

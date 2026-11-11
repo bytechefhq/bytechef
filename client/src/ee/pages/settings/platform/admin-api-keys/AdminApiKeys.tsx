@@ -1,19 +1,10 @@
+import {ADMIN_API_KEYS_DOCUMENTATION_URL} from '@/pages/settings/settingsDocumentationUrls';
 import ApiKeysContent from '@/shared/components/api-keys/ApiKeysContent';
-import {
-    ApiKeysProvider,
-    CreateApiKeyMutationProps,
-    SimpleMutationProps,
-} from '@/shared/components/api-keys/providers/apiKeysProvider';
-import {
-    ApiKey,
-    CreateApiKeyMutation,
-    useAdminApiKeysQuery,
-    useCreateApiKeyMutation,
-    useDeleteApiKeyMutation,
-    useUpdateApiKeyMutation,
-} from '@/shared/middleware/graphql';
+import {ApiKeysProvider} from '@/shared/components/api-keys/providers/apiKeysProvider';
+import {getApiKeyMutationHooks} from '@/shared/components/api-keys/utils/getApiKeyMutationHooks';
+import {ApiKey, useAdminApiKeysQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
+import {UseQueryResult, useQueryClient} from '@tanstack/react-query';
 
 const AdminApiKeys = () => {
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -23,6 +14,7 @@ const AdminApiKeys = () => {
     return (
         <ApiKeysProvider
             value={{
+                ...getApiKeyMutationHooks({environmentId, queryClient, queryKey: ['adminApiKeys']}),
                 useApiKeysQuery: () => {
                     const {
                         data: {adminApiKeys} = {},
@@ -38,60 +30,12 @@ const AdminApiKeys = () => {
                         isLoading,
                     } as UseQueryResult<ApiKey[], Error>;
                 },
-                useCreateApiKeyMutation: (props?: CreateApiKeyMutationProps) => {
-                    const createApiKeyMutation = useCreateApiKeyMutation({
-                        onSuccess: (data: CreateApiKeyMutation) => {
-                            void queryClient.invalidateQueries({
-                                queryKey: ['adminApiKeys'],
-                            });
-
-                            props?.onSuccess?.(data.createApiKey);
-                        },
-                    }) as UseMutationResult<unknown, Error>;
-
-                    return {
-                        mutate: (apiKey: ApiKey) => {
-                            createApiKeyMutation.mutate({
-                                ...apiKey,
-                                environmentId: environmentId,
-                            });
-                        },
-                    } as UseMutationResult<unknown, Error>;
-                },
-
-                useDeleteApiKeyMutation: (props?: SimpleMutationProps) => {
-                    const deleteApiKeyMutation = useDeleteApiKeyMutation({
-                        onSuccess: (data) => {
-                            void queryClient.invalidateQueries({
-                                queryKey: ['adminApiKeys'],
-                            });
-
-                            props?.onSuccess?.(data.deleteApiKey);
-                        },
-                    });
-
-                    return {
-                        isPending: deleteApiKeyMutation.isPending,
-                        mutate: ({apiKeyId}: {apiKeyId: string}) => {
-                            deleteApiKeyMutation.mutate({id: apiKeyId});
-                        },
-                    } as UseMutationResult<unknown, Error>;
-                },
-
-                useUpdateApiKeyMutation: (props?: SimpleMutationProps) =>
-                    useUpdateApiKeyMutation({
-                        onSuccess: (data) => {
-                            void queryClient.invalidateQueries({
-                                queryKey: ['adminApiKeys'],
-                            });
-
-                            props?.onSuccess?.(data.updateApiKey);
-                        },
-                    }) as unknown as UseMutationResult<unknown, Error>,
             }}
         >
             <ApiKeysContent
                 description="Use Admin keys for programmatic administration of your account. Do not share your API key with others or expose it."
+                docsLink={{href: ADMIN_API_KEYS_DOCUMENTATION_URL, label: 'How admin API keys work'}}
+                emptyDescription="Scripts, CI pipelines and the management MCP server use an admin API key to administer this account without signing in."
                 title="Admin API Keys"
             />
         </ApiKeysProvider>

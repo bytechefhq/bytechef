@@ -112,6 +112,7 @@ const AutomationProjectList = ({
                     open={openProjectIds.has(project.id)}
                 >
                     <AutomationProjectListItem
+                        onCreateConfiguration={(selectedProject) => setConfigurationDialog({project: selectedProject})}
                         onCreateWorkflow={onCreateWorkflow}
                         onDeleteProject={onDeleteProject}
                         onEditProject={onEditProject}

@@ -115,7 +115,7 @@ const WorkflowExecutionsEmptyState = ({onRefresh}: WorkflowExecutionsEmptyStateP
             {journey && (
                 <JourneySteps
                     aria-label="Getting started"
-                    className="max-w-md"
+                    className="w-full max-w-xl"
                     orientation="vertical"
                     steps={getAutomationJourneySteps(journey.stepStatuses, {
                         action: (

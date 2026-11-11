@@ -59,7 +59,12 @@ const KnowledgeBasesEmptyState = ({embeddingActive, workspaceId}: KnowledgeBases
             icon={<BookOpenTextIcon />}
             title="Create your first knowledge base"
         >
-            <JourneySteps aria-label="Getting started" className="max-w-md" orientation="vertical" steps={steps} />
+            <JourneySteps
+                aria-label="Getting started"
+                className="w-full max-w-xl"
+                orientation="vertical"
+                steps={steps}
+            />
         </EmptyState>
     );
 };

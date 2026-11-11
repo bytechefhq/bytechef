@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
-import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
+import {EMBEDDED_SIGNING_KEYS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import SigningKeyDialog from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyDialog';
 import SigningKeyTable from '@/ee/pages/settings/embedded/signing-keys/components/SigningKeyTable';
 import {useGeSigningKeysQuery} from '@/ee/shared/queries/embedded/signingKeys.queries';
@@ -20,6 +21,7 @@ const SigningKeys = () => {
                 header={
                     <Header
                         centerTitle
+                        description="Sign the user tokens your backend hands to the frontend SDK, so ByteChef knows which connected user is calling."
                         position="main"
                         right={
                             signingKeys &&
@@ -34,10 +36,11 @@ const SigningKeys = () => {
                 {signingKeys && signingKeys.length > 0 ? (
                     <SigningKeyTable signingKeys={signingKeys} />
                 ) : (
-                    <EmptyList
-                        button={<Button onClick={() => setShowEditDialog(true)}>New Signing Key</Button>}
-                        icon={<ClipboardSignatureIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="Get started by creating a new Signing key."
+                    <EmptyState
+                        actions={<Button onClick={() => setShowEditDialog(true)}>New Signing Key</Button>}
+                        description="Your backend signs a short-lived token for each user with a signing key, and the frontend SDK passes it to ByteChef to open the Connect popup."
+                        docsLink={{href: EMBEDDED_SIGNING_KEYS_DOCUMENTATION_URL, label: 'How signing keys work'}}
+                        icon={<ClipboardSignatureIcon />}
                         title="No Signing Keys"
                     />
                 )}

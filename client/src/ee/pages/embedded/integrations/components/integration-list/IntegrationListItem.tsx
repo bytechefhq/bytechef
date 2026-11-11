@@ -18,6 +18,7 @@ import IntegrationPublishDialog from '@/ee/pages/embedded/integrations/component
 import IntegrationListItemTabs, {
     IntegrationListItemTabType,
 } from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItemTabs';
+import {isIntegrationConfigurable, isIntegrationPublished} from '@/ee/pages/embedded/shared/integrationPublication';
 import {Integration, IntegrationInstanceConfiguration, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {
     useDeleteIntegrationMutation,
@@ -87,7 +88,8 @@ const IntegrationListItem = ({
     const configurationCount = integration.developmentConfigurationCount;
     const workflowCount = integration.integrationWorkflowIds?.length ?? 0;
     const hasWorkflows = workflowCount > 0;
-    const isPublished = !!(integration.lastPublishedDate && integration.lastIntegrationVersion);
+    const isPublished = isIntegrationPublished(integration);
+    const isConfigurable = isIntegrationConfigurable(integration);
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
         onSuccess: (integrationWorkflowId) => {
@@ -345,11 +347,13 @@ const IntegrationListItem = ({
                                         onClick={() => setShowEditDialog(true)}
                                     />
 
-                                    <DropdownMenuItem
-                                        icon={<SendIcon />}
-                                        label="Publish"
-                                        onClick={() => setShowPublishIntegrationDialog(true)}
-                                    />
+                                    {(isPublished || hasWorkflows) && (
+                                        <DropdownMenuItem
+                                            icon={<SendIcon />}
+                                            label="Publish"
+                                            onClick={() => setShowPublishIntegrationDialog(true)}
+                                        />
+                                    )}
                                 </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
@@ -387,7 +391,7 @@ const IntegrationListItem = ({
                                         <TooltipTrigger asChild>
                                             <span className="block">
                                                 <DropdownMenuItem
-                                                    disabled={!isPublished}
+                                                    disabled={!isConfigurable}
                                                     icon={<SettingsIcon />}
                                                     label="New Configuration"
                                                     onSelect={() => setShowIntegrationInstanceConfigurationDialog(true)}
@@ -395,7 +399,7 @@ const IntegrationListItem = ({
                                             </span>
                                         </TooltipTrigger>
 
-                                        {!isPublished && (
+                                        {!isConfigurable && (
                                             <TooltipContent>
                                                 Publish the integration before configuring it.
                                             </TooltipContent>
@@ -464,7 +468,7 @@ const IntegrationListItem = ({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </ButtonGroup>
-                        ) : activeTab === 'configurations' && isPublished && configurationCount !== 0 ? (
+                        ) : activeTab === 'configurations' && isConfigurable && configurationCount !== 0 ? (
                             <IntegrationInstanceConfigurationDialog
                                 integrationInstanceConfiguration={
                                     {

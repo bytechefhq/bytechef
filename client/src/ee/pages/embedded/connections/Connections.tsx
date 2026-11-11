@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyState from '@/components/EmptyState/EmptyState';
+import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
 import ConnectionsFilterTitle from '@/ee/pages/embedded/connections/components/ConnectionsFilterTitle';
 import {EMBEDDED_CONNECTIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
@@ -28,6 +29,12 @@ export enum Type {
     Component,
     Tag,
 }
+
+const CONNECTION_STEPS = [
+    {id: 'createConnection', label: 'Create a connection', status: 'current' as const},
+    {id: 'shareConnection', label: 'Share it with connected users', status: 'upcoming' as const},
+    {id: 'useInWorkflow', label: 'Use it in a workflow', status: 'upcoming' as const},
+];
 
 export const Connections = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -173,7 +180,9 @@ export const Connections = () => {
                         icon={<Link2Icon />}
                         note={environmentScopeNote}
                         title="Create your first connection"
-                    />
+                    >
+                        <JourneySteps aria-label="Getting started" steps={CONNECTION_STEPS} />
+                    </EmptyState>
                 )}
             </PageLoader>
         </LayoutContainer>

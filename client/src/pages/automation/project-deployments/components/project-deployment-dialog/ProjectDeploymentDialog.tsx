@@ -412,6 +412,7 @@ const ProjectDeploymentDialog = ({
                 projectDeployment={effectiveProjectDeployment}
                 projectDeployments={environmentProjectDeployments}
                 projectDeploymentsLoading={projectDeploymentsLoading}
+                projectLocked={!!projectDeployment?.projectId}
                 setValue={setValue}
                 showTabs={showTabs}
             />

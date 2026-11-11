@@ -1,0 +1,3 @@
+mutation dismissEmbeddedGettingStarted {
+    dismissEmbeddedGettingStarted
+}

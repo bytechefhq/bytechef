@@ -87,7 +87,7 @@ const ApiKeyDialog = ({triggerNode}: ApiKeyDialogProps) => {
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent aria-describedby={undefined} size="md">
+            <DialogContent aria-describedby={undefined}>
                 <DialogMain>
                     <DialogHeader
                         title={`${secretKey ? 'Save your' : currentApiKey?.id ? 'Edit' : 'Create'} API Key`}

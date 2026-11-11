@@ -8,6 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
 
 const handlers = {
+    onCreateConfiguration: vi.fn(),
     onCreateWorkflow: vi.fn(),
     onDeleteProject: vi.fn(),
     onEditProject: vi.fn(),
@@ -64,8 +65,8 @@ const renderItem = (overrides: Partial<AutomationProjectType> = {}) =>
 
 // A pointer click on a menu trigger bubbles to the row in jsdom, because jsdom has no hit testing and ignores the
 // pointer-events lock Radix puts on the body while a menu is open. The keyboard opens the menu without that click.
-const openMenu = async (triggerName = 'More Project Actions') => {
-    renderItem();
+const openMenu = async (triggerName = 'More Project Actions', overrides: Partial<AutomationProjectType> = {}) => {
+    renderItem(overrides);
 
     screen.getByRole('button', {name: triggerName}).focus();
 
@@ -149,6 +150,20 @@ describe('AutomationProjectListItem', () => {
             await userEvent.click(screen.getByRole('menuitem', {name: 'New Workflow'}));
 
             expect(handlers.onCreateWorkflow).toHaveBeenCalledWith('project-1');
+        });
+
+        it('should create a configuration when New Configuration is clicked on a published project', async () => {
+            await openMenu('More Project Actions', {published: true});
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'New Configuration'}));
+
+            expect(handlers.onCreateConfiguration).toHaveBeenCalledWith(expect.objectContaining({id: 'project-1'}));
+        });
+
+        it('should disable New Configuration until the project is published', async () => {
+            await openMenu();
+
+            expect(screen.getByRole('menuitem', {name: 'New Configuration'})).toHaveAttribute('data-disabled');
         });
 
         it('should import a workflow when Import Workflow is clicked', async () => {

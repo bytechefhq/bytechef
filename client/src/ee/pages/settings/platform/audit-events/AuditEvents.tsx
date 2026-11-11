@@ -14,6 +14,8 @@ import AuditEventsTable from './components/AuditEventsTable';
 import {useAuditEventFilters} from './hooks/useAuditEventFilters';
 import {AuditEventItemType} from './types';
 
+const AUDIT_EVENTS_DESCRIPTION = 'A record of who did what in this account, and when.';
+
 const PAGE_SIZE = 25;
 
 const AuditEvents = () => {
@@ -65,7 +67,9 @@ const AuditEvents = () => {
     if (auditDisabled) {
         return (
             <LayoutContainer
-                header={<Header centerTitle position="main" title="Audit Events" />}
+                header={
+                    <Header centerTitle description={AUDIT_EVENTS_DESCRIPTION} position="main" title="Audit Events" />
+                }
                 leftSidebarOpen={false}
             >
                 <AuditEventsDisabled />
@@ -78,6 +82,7 @@ const AuditEvents = () => {
             header={
                 <Header
                     centerTitle
+                    description={AUDIT_EVENTS_DESCRIPTION}
                     position="main"
                     right={
                         <div className="flex items-center gap-2">

@@ -73,3 +73,32 @@ export const Vertical: Story = {
         />
     ),
 };
+
+export const VerticalWithContent: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'Vertical checklist where the current step carries rich content below its description, spanning the label and action columns.',
+            },
+        },
+    },
+    render: () => (
+        <JourneySteps
+            className="w-96"
+            orientation="vertical"
+            steps={steps.map((step) =>
+                step.status === 'current'
+                    ? {
+                          ...step,
+                          content: (
+                              <div className="rounded-md border border-stroke-neutral-secondary p-2 text-xs">
+                                  Listening for the first event...
+                              </div>
+                          ),
+                          description: 'Publishing creates a read-only version you can deploy.',
+                      }
+                    : step
+            )}
+        />
+    ),
+};

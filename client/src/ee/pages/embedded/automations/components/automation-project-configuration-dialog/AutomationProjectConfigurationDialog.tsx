@@ -482,7 +482,7 @@ const AutomationProjectConfigurationDialog = ({
             <Select
                 disabled={!project || basicFieldsLocked}
                 onValueChange={handleSelectProjectVersion}
-                value={chosenProjectVersion}
+                value={projectVersion}
             >
                 <SelectTrigger aria-label="Version">
                     <SelectValue placeholder={project ? latestPublishedVersionPlaceholder : 'Select a project first'} />

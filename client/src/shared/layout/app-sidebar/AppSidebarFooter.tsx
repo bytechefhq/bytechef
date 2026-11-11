@@ -11,8 +11,11 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import shouldShowEmbeddedGettingStartedHelpLink from '@/ee/pages/embedded/getting-started/shouldShowEmbeddedGettingStartedHelpLink';
 import {useUserGuidingLauncher} from '@/hooks/useUserGuiding';
+import {EMBEDDED_GETTING_STARTED_PATH} from '@/pages/home/constants/platformModes';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
+import {AUTHORITIES} from '@/shared/constants';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -28,6 +31,7 @@ import {
     HelpCircleIcon,
     HistoryIcon,
     MessagesSquareIcon,
+    RocketIcon,
     SettingsIcon,
     User2Icon,
     UserRoundCogIcon,
@@ -39,7 +43,12 @@ import {useShallow} from 'zustand/react/shallow';
 const openExternalLink = (url: string) => window.open(url, '_blank', 'noopener,noreferrer');
 
 export function AppSidebarFooter() {
-    const docs = useApplicationInfoStore((state) => state.docs);
+    const {docs, edition} = useApplicationInfoStore(
+        useShallow((state) => ({
+            docs: state.docs,
+            edition: state.application?.edition,
+        }))
+    );
     const {account, logout} = useAuthenticationStore(
         useShallow((state) => ({
             account: state.account,
@@ -61,6 +70,13 @@ export function AppSidebarFooter() {
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();
+
+    const showEmbeddedGettingStartedHelpLink = shouldShowEmbeddedGettingStartedHelpLink({
+        edition,
+        environmentId: currentEnvironmentId,
+        isAdmin: !!account?.authorities?.includes(AUTHORITIES.ADMIN),
+        pathname,
+    });
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: environmentsQuery} = useEnvironmentsQuery();
@@ -185,6 +201,17 @@ export function AppSidebarFooter() {
 
                         <DropdownMenuPortal>
                             <DropdownMenuSubContent className="w-56">
+                                {showEmbeddedGettingStartedHelpLink && (
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => navigate(EMBEDDED_GETTING_STARTED_PATH)}
+                                    >
+                                        <RocketIcon className="size-4" />
+
+                                        <span>Getting started</span>
+                                    </DropdownMenuItem>
+                                )}
+
                                 {docs.documentationUrl && (
                                     <DropdownMenuItem
                                         className="cursor-pointer"

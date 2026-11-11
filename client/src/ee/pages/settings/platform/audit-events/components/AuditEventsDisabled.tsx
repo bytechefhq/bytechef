@@ -1,4 +1,5 @@
 import EmptyState from '@/components/EmptyState/EmptyState';
+import {AUDIT_EVENTS_DOCUMENTATION_URL} from '@/pages/settings/settingsDocumentationUrls';
 import {ScrollTextIcon} from 'lucide-react';
 
 const AuditEventsDisabled = () => (
@@ -13,6 +14,7 @@ const AuditEventsDisabled = () => (
                 and restart the server.
             </>
         }
+        docsLink={{href: AUDIT_EVENTS_DOCUMENTATION_URL, label: 'How audit events work'}}
         icon={<ScrollTextIcon />}
         title="Audit events are disabled"
     />
