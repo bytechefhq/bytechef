@@ -203,12 +203,12 @@ class ScopedProjectGuardTest {
     }
 
     @Test
-    void testCheckWorkflowRejectsAnUnconfinedRunOnAWorkflowOfAnEmbeddedAutomationWorkflowProject() {
+    void testCheckWorkflowRejectsAnUnconfinedRunOnAWorkflowOfAnEmbeddedAutomationProject() {
         when(permissionService.hasWorkflowScope("wf-1", ScopedProjectGuard.WORKFLOW_EDIT)).thenReturn(true);
         when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1"))
             .thenReturn(new ProjectWorkflow(OWN_PROJECT_ID, 1, "wf-1"));
 
-        givenOwnedProject(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+        givenOwnedProject(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
 
         ScopedProjectGuard scopedProjectGuard = newGuard();
 
@@ -221,17 +221,17 @@ class ScopedProjectGuardTest {
     }
 
     @Test
-    void testCheckWorkflowAllowsAWorkflowOfAnEmbeddedAutomationWorkflowProjectWhenTheRunDeclaresItsOwner() {
+    void testCheckWorkflowAllowsAWorkflowOfAnEmbeddedAutomationProjectWhenTheRunDeclaresItsOwner() {
         when(permissionService.hasWorkflowScope("wf-1", ScopedProjectGuard.WORKFLOW_EDIT)).thenReturn(true);
         when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1"))
             .thenReturn(new ProjectWorkflow(OWN_PROJECT_ID, 1, "wf-1"));
 
-        givenOwnedProject(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+        givenOwnedProject(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
 
         assertThatCode(
             () -> newGuard().checkWorkflow(
                 "wf-1", ScopedProjectGuard.WORKFLOW_EDIT,
-                declaredOwnerToolContext(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT.name()),
+                declaredOwnerToolContext(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT.name()),
                 ProjectWorkflowErrorType.UPDATE_WORKFLOW))
                     .doesNotThrowAnyException();
     }
@@ -251,8 +251,8 @@ class ScopedProjectGuardTest {
     }
 
     @Test
-    void testCheckProjectNotHiddenRejectsAnEmbeddedAutomationWorkflowProjectWhenTheDeclaredOwnerIsUnknown() {
-        givenOwnedProject(ProjectOwner.EMBEDDED_AUTOMATION_WORKFLOW_PROJECT);
+    void testCheckProjectNotHiddenRejectsAnEmbeddedAutomationProjectWhenTheDeclaredOwnerIsUnknown() {
+        givenOwnedProject(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT);
 
         ScopedProjectGuard scopedProjectGuard = newGuard();
         ToolContext toolContext = declaredOwnerToolContext("UNKNOWN_OWNER");

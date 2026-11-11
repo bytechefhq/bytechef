@@ -10,6 +10,9 @@ package com.bytechef.ee.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
@@ -28,8 +31,13 @@ import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.user.service.UserService;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -428,8 +436,17 @@ class PermissionServiceIntTest {
             new WorkspaceConnection(91002L, foreignWorkspace.getId()));
 
         try {
+            Connection connection = mock(Connection.class);
+
+            when(connection.getType()).thenReturn(PlatformType.AUTOMATION);
+
+            ConnectionService connectionService = mock(ConnectionService.class);
+
+            when(connectionService.fetchConnection(anyLong())).thenReturn(Optional.of(connection));
+
             PermissionService resourcePermissionService = createPermissionService(
-                new ConnectionOwnershipResolver(workspaceConnectionRepository));
+                new ConnectionOwnershipResolver(
+                    connectionService, mock(UserService.class), workspaceConnectionRepository));
 
             assertThat(resourcePermissionService.hasResourceScope(91001L, "Connection", "WORKFLOW_VIEW")).isTrue();
             assertThat(resourcePermissionService.hasResourceScope(91002L, "Connection", "WORKFLOW_VIEW")).isFalse();
