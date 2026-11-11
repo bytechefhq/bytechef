@@ -3,11 +3,13 @@ import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/usePr
 import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {fireEvent, render, screen} from '@testing-library/react';
 import {ReactNode} from 'react';
+import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectAgent from './ProjectAgent';
 
-vi.mock('react-router-dom', () => ({
+vi.mock('react-router-dom', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('react-router-dom')>()),
     useNavigate: () => vi.fn(),
     useParams: () => ({agentId: '22', projectId: '7'}),
 }));
@@ -82,7 +84,13 @@ vi.mock('@/shared/middleware/graphql', () => ({
     }),
 }));
 
-const renderProjectAgent = () => render(<ProjectAgent />, {wrapper: TooltipProvider});
+const Wrapper = ({children}: {children: ReactNode}) => (
+    <MemoryRouter>
+        <TooltipProvider>{children}</TooltipProvider>
+    </MemoryRouter>
+);
+
+const renderProjectAgent = () => render(<ProjectAgent />, {wrapper: Wrapper});
 
 describe('ProjectAgent', () => {
     it('renders the agent inside the project layout', () => {
