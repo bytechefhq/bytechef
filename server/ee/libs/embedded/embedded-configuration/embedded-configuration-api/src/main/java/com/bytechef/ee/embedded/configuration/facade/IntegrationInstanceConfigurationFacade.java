@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -60,6 +61,8 @@ public interface IntegrationInstanceConfigurationFacade {
 
     void updateIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO);
+
+    void updateIntegrationInstanceConfigurationCredentials(long id, Map<String, ?> parameters, int version);
 
     void updateIntegrationInstanceConfigurationTags(long id, List<Tag> tags);
 

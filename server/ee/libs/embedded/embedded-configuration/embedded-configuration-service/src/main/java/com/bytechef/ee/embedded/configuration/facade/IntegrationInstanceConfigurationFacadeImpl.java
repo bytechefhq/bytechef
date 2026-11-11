@@ -675,6 +675,47 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_INSTANCE_CONFIGURATION_CREDENTIALS_UPDATED, data = {
+        @AuditData(key = "integrationInstanceConfigurationId", value = "#id")
+    })
+    @PreAuthorize("isTenantAdmin()")
+    public void updateIntegrationInstanceConfigurationCredentials(long id, Map<String, ?> parameters, int version) {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(id);
+
+        Set<String> sharedConnectionParameterNames = integrationInstanceConfiguration.getConnectionParameters()
+            .keySet();
+
+        for (Map.Entry<String, ?> parameterEntry : parameters.entrySet()) {
+            String parameterName = parameterEntry.getKey();
+
+            if (!sharedConnectionParameterNames.contains(parameterName)) {
+                throw new ConfigurationException(
+                    "Integration instance configuration id=%s has no connection parameter %s".formatted(
+                        id, parameterName),
+                    IntegrationInstanceConfigurationErrorType.UNKNOWN_CONNECTION_PARAMETER);
+            }
+
+            Object parameterValue = parameterEntry.getValue();
+
+            if (parameterValue == null ||
+                (parameterValue instanceof String stringValue && StringUtils.isBlank(stringValue))) {
+
+                throw new ConfigurationException(
+                    "Connection parameter %s of integration instance configuration id=%s must not be blank"
+                        .formatted(parameterName, id),
+                    IntegrationInstanceConfigurationErrorType.BLANK_CONNECTION_PARAMETER);
+            }
+        }
+
+        integrationInstanceConfigurationService.updateConnectionParameters(id, parameters, version);
+
+        for (IntegrationInstance integrationInstance : integrationInstanceService.getIntegrationInstances(id)) {
+            connectionService.updateConnectionParameters(integrationInstance.getConnectionId(), parameters);
+        }
+    }
+
+    @Override
     @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationInstanceConfigurationTags(long id, List<Tag> tags) {
         integrationInstanceConfigurationService.update(id, CollectionUtils.map(checkTags(tags), Tag::getId));

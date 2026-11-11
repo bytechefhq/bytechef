@@ -261,6 +261,137 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
+    void testUpdateCredentialsReplacesTheSharedParametersOfTheConfigurationAndOfItsConnections() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integration.getId());
+        long otherIntegrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integration.getId());
+
+        integrationInstanceService.create(CONNECTED_USER_ID, 41L, integrationInstanceConfigurationId);
+        integrationInstanceService.create(CONNECTED_USER_ID, 42L, integrationInstanceConfigurationId);
+        integrationInstanceService.create(CONNECTED_USER_ID, 43L, otherIntegrationInstanceConfigurationId);
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationCredentials(
+            integrationInstanceConfigurationId, Map.of("key", "rotated-value"),
+            getLockVersion(integrationInstanceConfigurationId));
+
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId)
+                .getConnectionParameters())
+                    .isEqualTo(Map.of("key", "rotated-value"));
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                otherIntegrationInstanceConfigurationId)
+                .getConnectionParameters())
+                    .isEqualTo(Map.of("key", "admin-value"));
+
+        verify(connectionService).updateConnectionParameters(41L, Map.of("key", "rotated-value"));
+        verify(connectionService).updateConnectionParameters(42L, Map.of("key", "rotated-value"));
+        verify(connectionService, never()).updateConnectionParameters(eq(43L), any());
+    }
+
+    @Test
+    void testUpdateCredentialsRejectsAStaleVersion() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integration.getId());
+
+        integrationInstanceService.create(CONNECTED_USER_ID, 41L, integrationInstanceConfigurationId);
+
+        int staleVersion = getLockVersion(integrationInstanceConfigurationId) - 1;
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationCredentials(
+                integrationInstanceConfigurationId, Map.of("key", "rotated-value"), staleVersion))
+                    .isInstanceOf(ConfigurationException.class)
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(108));
+
+        verify(connectionService, never()).updateConnectionParameters(anyLong(), any());
+    }
+
+    @Test
+    void testUpdateCredentialsRejectsAParameterTheConfigurationDoesNotShare() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integration.getId());
+
+        integrationInstanceService.create(CONNECTED_USER_ID, 41L, integrationInstanceConfigurationId);
+
+        int lockVersion = getLockVersion(integrationInstanceConfigurationId);
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationCredentials(
+                integrationInstanceConfigurationId, Map.of("access_token", "injected"), lockVersion))
+                    .isInstanceOf(ConfigurationException.class)
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(109));
+
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId)
+                .getConnectionParameters())
+                    .isEqualTo(Map.of("key", "admin-value"));
+
+        verify(connectionService, never()).updateConnectionParameters(anyLong(), any());
+    }
+
+    @Test
+    void testUpdateCredentialsRejectsABlankValue() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integration.getId());
+
+        integrationInstanceService.create(CONNECTED_USER_ID, 41L, integrationInstanceConfigurationId);
+
+        int lockVersion = getLockVersion(integrationInstanceConfigurationId);
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationCredentials(
+                integrationInstanceConfigurationId, Map.of("key", " "), lockVersion))
+                    .isInstanceOf(ConfigurationException.class)
+                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
+                        .isEqualTo(110));
+
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId)
+                .getConnectionParameters())
+                    .isEqualTo(Map.of("key", "admin-value"));
+
+        verify(connectionService, never()).updateConnectionParameters(anyLong(), any());
+    }
+
+    @Test
+    void testUpdateCredentialsIsDeniedToAConnectedUser() {
+        authenticate(admin());
+
+        Integration integration = createPublishedIntegration();
+
+        long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integration.getId());
+
+        int lockVersion = getLockVersion(integrationInstanceConfigurationId);
+
+        authenticate(connectedUser());
+
+        assertThatThrownBy(
+            () -> integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationCredentials(
+                integrationInstanceConfigurationId, Map.of("key", "rotated-value"), lockVersion))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionService, never()).updateConnectionParameters(anyLong(), any());
+    }
+
+    @Test
     void testCreateIntegrationInstanceConfigurationAllowsAnotherVersionWhateverTheExistingLockVersion() {
         authenticate(admin());
 
@@ -1163,6 +1294,13 @@ class IntegrationInstanceConfigurationFacadeIntTest {
 
     private static void authenticate(Authentication authentication) {
         SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
+    }
+
+    private int getLockVersion(long integrationInstanceConfigurationId) {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstanceConfigurationId);
+
+        return integrationInstanceConfiguration.getVersion();
     }
 
     private int bumpLockVersionPast(long integrationInstanceConfigurationId, int integrationVersion) {

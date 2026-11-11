@@ -14,6 +14,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -107,6 +108,13 @@ public class RemoteIntegrationInstanceConfigurationServiceClient implements Inte
 
     @Override
     public IntegrationInstanceConfiguration update(IntegrationInstanceConfiguration integrationInstanceConfiguration) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public IntegrationInstanceConfiguration updateConnectionParameters(
+        long id, Map<String, ?> connectionParameters, int version) {
+
         throw new UnsupportedOperationException();
     }
 

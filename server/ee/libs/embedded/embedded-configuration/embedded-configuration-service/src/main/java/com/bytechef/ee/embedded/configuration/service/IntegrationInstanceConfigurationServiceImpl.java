@@ -9,11 +9,15 @@ package com.bytechef.ee.embedded.configuration.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.exception.IntegrationInstanceConfigurationErrorType;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationInstanceConfigurationRepository;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -153,6 +157,29 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
         curIntegrationInstanceConfiguration.setVersion(integrationInstanceConfiguration.getVersion());
 
         return integrationInstanceConfigurationRepository.save(curIntegrationInstanceConfiguration);
+    }
+
+    @Override
+    public IntegrationInstanceConfiguration updateConnectionParameters(
+        long id, Map<String, ?> connectionParameters, int version) {
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = getIntegrationInstanceConfiguration(id);
+
+        if (integrationInstanceConfiguration.getVersion() != version) {
+            throw new ConfigurationException(
+                "Integration instance configuration id=%s was modified by someone else; reload and try again"
+                    .formatted(id),
+                IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_MODIFIED);
+        }
+
+        Map<String, Object> mergedConnectionParameters = new HashMap<>(
+            integrationInstanceConfiguration.getConnectionParameters());
+
+        mergedConnectionParameters.putAll(connectionParameters);
+
+        integrationInstanceConfiguration.setConnectionParameters(mergedConnectionParameters);
+
+        return integrationInstanceConfigurationRepository.save(integrationInstanceConfiguration);
     }
 
     @Override
