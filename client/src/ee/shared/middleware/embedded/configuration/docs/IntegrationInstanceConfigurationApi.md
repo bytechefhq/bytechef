@@ -16,6 +16,7 @@ All URIs are relative to */api/embedded/internal*
 | [**getIntegrationInstanceConfigurations**](IntegrationInstanceConfigurationApi.md#getintegrationinstanceconfigurations) | **GET** /integration-instance-configurations | Get integration instance configurations |
 | [**moveIntegrationInstanceConfigurationConnectedUsers**](IntegrationInstanceConfigurationApi.md#moveintegrationinstanceconfigurationconnectedusers) | **POST** /integration-instance-configurations/{id}/move | Move connected users to another integration instance configuration |
 | [**updateIntegrationInstanceConfiguration**](IntegrationInstanceConfigurationApi.md#updateintegrationinstanceconfiguration) | **PUT** /integration-instance-configurations/{id} | Update an existing integration instance configuration |
+| [**updateIntegrationInstanceConfigurationCredentials**](IntegrationInstanceConfigurationApi.md#updateintegrationinstanceconfigurationcredentials) | **PUT** /integration-instance-configurations/{id}/credentials | Replaces the shared credentials of an integration instance configuration |
 | [**updateIntegrationInstanceConfigurationWorkflow**](IntegrationInstanceConfigurationApi.md#updateintegrationinstanceconfigurationworkflow) | **PUT** /integration-instance-configurations/{id}/workflows/{workflowId} | Update an existing integration instance configuration workflow |
 | [**upgradeIntegrationInstanceConfigurationConnectedUsers**](IntegrationInstanceConfigurationApi.md#upgradeintegrationinstanceconfigurationconnectedusers) | **POST** /integration-instance-configurations/{id}/upgrade | Upgrade connected users to an integration instance configuration |
 
@@ -835,6 +836,76 @@ example().catch(console.error);
 |------------- | ------------- | ------------- | -------------|
 | **id** | `number` | The id of an integration instance configuration. | [Defaults to `undefined`] |
 | **integrationInstanceConfiguration** | [IntegrationInstanceConfiguration](IntegrationInstanceConfiguration.md) |  | |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Successful operation. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## updateIntegrationInstanceConfigurationCredentials
+
+> updateIntegrationInstanceConfigurationCredentials(id, updateConnectionCredentialsRequest)
+
+Replaces the shared credentials of an integration instance configuration
+
+Replaces the shared credentials of an integration instance configuration and of the connections of its integration instances.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IntegrationInstanceConfigurationApi,
+} from '';
+import type { UpdateIntegrationInstanceConfigurationCredentialsRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IntegrationInstanceConfigurationApi();
+
+  const body = {
+    // number | The id of an integration instance configuration.
+    id: 789,
+    // UpdateConnectionCredentialsRequest
+    updateConnectionCredentialsRequest: ...,
+  } satisfies UpdateIntegrationInstanceConfigurationCredentialsRequest;
+
+  try {
+    const data = await api.updateIntegrationInstanceConfigurationCredentials(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of an integration instance configuration. | [Defaults to `undefined`] |
+| **updateConnectionCredentialsRequest** | [UpdateConnectionCredentialsRequest](UpdateConnectionCredentialsRequest.md) |  | |
 
 ### Return type
 
