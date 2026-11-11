@@ -33,6 +33,12 @@ public class IntegrationInstanceConfigurationErrorType extends AbstractErrorType
         new IntegrationInstanceConfigurationErrorType(106);
     public static final IntegrationInstanceConfigurationErrorType INSTANCE_CONFIGURATION_MISMATCH =
         new IntegrationInstanceConfigurationErrorType(107);
+    public static final IntegrationInstanceConfigurationErrorType INSTANCE_CONFIGURATION_MODIFIED =
+        new IntegrationInstanceConfigurationErrorType(108);
+    public static final IntegrationInstanceConfigurationErrorType UNKNOWN_CONNECTION_PARAMETER =
+        new IntegrationInstanceConfigurationErrorType(109);
+    public static final IntegrationInstanceConfigurationErrorType BLANK_CONNECTION_PARAMETER =
+        new IntegrationInstanceConfigurationErrorType(110);
 
     private IntegrationInstanceConfigurationErrorType(int errorKey) {
         super(IntegrationInstanceConfiguration.class, errorKey);

@@ -23,9 +23,11 @@ import com.bytechef.ee.embedded.configuration.web.rest.model.ConfigurationUpgrad
 import com.bytechef.ee.embedded.configuration.web.rest.model.CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
+import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateConnectionCredentialsRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -188,6 +190,18 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
             Validate.notNull(
                 conversionService.convert(configurationMoveResultDTO, ConfigurationMoveResultModel.class),
                 "configurationMoveResultModel"));
+    }
+
+    @Override
+    public ResponseEntity<Void> updateIntegrationInstanceConfigurationCredentials(
+        Long id, UpdateConnectionCredentialsRequestModel updateConnectionCredentialsRequestModel) {
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationCredentials(
+            id, updateConnectionCredentialsRequestModel.getParameters(),
+            Objects.requireNonNull(updateConnectionCredentialsRequestModel.getVersion()));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override

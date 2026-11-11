@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.service;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @version ee
@@ -46,6 +47,9 @@ public interface IntegrationInstanceConfigurationService {
     IntegrationInstanceConfiguration update(long id, List<Long> tagIds);
 
     IntegrationInstanceConfiguration update(IntegrationInstanceConfiguration integrationInstanceConfiguration);
+
+    IntegrationInstanceConfiguration updateConnectionParameters(
+        long id, Map<String, ?> connectionParameters, int version);
 
     void updateEnabled(long id, boolean enabled);
 
