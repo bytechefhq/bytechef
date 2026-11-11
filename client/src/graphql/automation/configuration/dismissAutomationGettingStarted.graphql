@@ -1,0 +1,3 @@
+mutation dismissAutomationGettingStarted($workspaceId: ID!) {
+    dismissAutomationGettingStarted(workspaceId: $workspaceId)
+}

@@ -1,0 +1,3 @@
+query automationGettingStartedCompleted($workspaceId: ID!) {
+    automationGettingStartedCompleted(workspaceId: $workspaceId)
+}

@@ -1,0 +1,28 @@
+query automationGettingStarted($workspaceId: ID!) {
+    automationGettingStarted(workspaceId: $workspaceId) {
+        completed
+        deployed
+        firstRun {
+            date
+            errorMessage
+            jobId
+            projectDeploymentEnabled
+            projectDeploymentId
+            status
+        }
+        httpClientAdded
+        lastFailedRun {
+            date
+            errorMessage
+            jobId
+            projectDeploymentEnabled
+            projectDeploymentId
+            status
+        }
+        live
+        loggerAdded
+        projectCreated
+        published
+        workflowCreated
+    }
+}
