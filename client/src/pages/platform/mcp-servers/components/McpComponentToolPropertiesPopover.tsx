@@ -1,13 +1,10 @@
 import Button from '@/components/Button/Button';
 import {Form} from '@/components/ui/form';
 import {PopoverContent} from '@/components/ui/popover';
+import McpComponentToolForm from '@/pages/platform/mcp-servers/components/McpComponentToolForm';
 import useMcpComponentToolPropertiesPopover from '@/pages/platform/mcp-servers/hooks/useMcpComponentToolPropertiesPopover';
-import useMcpToolFormDisplayConditions from '@/pages/platform/mcp-servers/hooks/useMcpToolFormDisplayConditions';
-import {ClusterElementProvider} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
-import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {McpTool} from '@/shared/middleware/graphql';
 import {XIcon} from 'lucide-react';
-import {useMemo} from 'react';
 
 interface McpComponentToolPropertiesPopoverProps {
     componentName: string;
@@ -28,64 +25,33 @@ const McpComponentToolPropertiesPopover = ({
     mcpTool,
     onClose,
 }: McpComponentToolPropertiesPopoverProps) => {
-    const {control, form, formState, handleFormSubmit, handleSubmit, isLoading, properties} =
-        useMcpComponentToolPropertiesPopover(componentName, componentVersion, mcpTool, onClose, embedded);
-
-    const formValues = form.watch();
-
-    const {displayConditions, isEvaluating} = useMcpToolFormDisplayConditions(
+    const {form, handleFormSubmit, handleSubmit, isLoading, properties} = useMcpComponentToolPropertiesPopover(
         componentName,
         componentVersion,
         mcpTool,
-        formValues
+        onClose,
+        embedded
     );
 
-    const propertiesContent = useMemo(() => {
-        if (isLoading || isEvaluating) {
-            return <p className="text-sm text-muted-foreground">Loading properties...</p>;
-        }
+    let propertiesContent;
 
-        if (properties.length === 0) {
-            return <p className="text-sm text-muted-foreground">No configurable properties for this tool.</p>;
-        }
-
-        return (
-            <fieldset className="space-y-4 border-0 p-0">
-                <ClusterElementProvider
-                    value={{
-                        clusterElementName: mcpTool.name,
-                        componentName,
-                        componentVersion,
-                        connectionId: connectionId ? Number(connectionId) : undefined,
-                        connectionRequired,
-                        inputParameters: formValues,
-                    }}
-                >
-                    <Properties
-                        control={control}
-                        controlPath=""
-                        formDisplayConditions={displayConditions}
-                        formState={formState}
-                        properties={properties}
-                        toolsMode
-                    />
-                </ClusterElementProvider>
-            </fieldset>
+    if (isLoading) {
+        propertiesContent = <p className="text-sm text-muted-foreground">Loading properties...</p>;
+    } else if (properties.length === 0) {
+        propertiesContent = <p className="text-sm text-muted-foreground">No configurable properties for this tool.</p>;
+    } else {
+        propertiesContent = (
+            <McpComponentToolForm
+                componentName={componentName}
+                componentVersion={componentVersion}
+                connectionId={connectionId}
+                connectionRequired={connectionRequired}
+                form={form}
+                properties={properties}
+                toolName={mcpTool.name}
+            />
         );
-    }, [
-        componentName,
-        componentVersion,
-        connectionId,
-        connectionRequired,
-        control,
-        displayConditions,
-        formState,
-        formValues,
-        isEvaluating,
-        isLoading,
-        mcpTool.name,
-        properties,
-    ]);
+    }
 
     return (
         <PopoverContent

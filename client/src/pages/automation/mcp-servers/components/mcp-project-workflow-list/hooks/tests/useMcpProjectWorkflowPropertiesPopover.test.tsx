@@ -1,5 +1,8 @@
-import {act, renderHook} from '@testing-library/react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {TooltipProvider} from '@/components/ui/tooltip';
+import McpWorkflowToolForm from '@/pages/platform/mcp-servers/components/McpWorkflowToolForm';
+import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {act, render, renderHook, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {McpProjectWorkflowItemType} from '../useMcpProjectList';
 import useMcpProjectWorkflowPropertiesPopover from '../useMcpProjectWorkflowPropertiesPopover';
@@ -58,6 +61,10 @@ describe('useMcpProjectWorkflowPropertiesPopover', () => {
         };
         hoisted.updateMutate.mockReset();
         hoisted.useMcpProjectWorkflowPropertiesQuery.mockReset();
+    });
+
+    afterEach(() => {
+        resetAll();
     });
 
     it('queries the properties of the MCP project workflow', () => {
@@ -135,33 +142,122 @@ describe('useMcpProjectWorkflowPropertiesPopover', () => {
         expect(result.current.form.getValues()).toEqual(expect.objectContaining({channel: 'general', limit: 3}));
     });
 
-    it('submits the values with blank strings converted to null at every depth', () => {
+    it('saves only the fields the user changed on top of the saved parameters', () => {
+        const {result} = renderPopover(createWorkflow({extra: 1}), vi.fn());
+
+        act(() => result.current.form.setValue('channel', '', {shouldDirty: true}));
+        act(() => result.current.form.setValue('nested', {deeper: {value: ''}}, {shouldDirty: true}));
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
+
+        expect(hoisted.updateMutate).toHaveBeenCalledWith({
+            id: 'mcp-workflow-1',
+            input: {parameters: {channel: null, extra: 1, nested: {deeper: {value: null}}}},
+        });
+    });
+
+    it('shows a saved null as an empty string and does not report it as changed', () => {
+        const {result} = renderPopover(createWorkflow({channel: null, extra: 1}), vi.fn());
+
+        expect(result.current.form.getValues('channel')).toBe('');
+
+        act(() => result.current.form.setValue('channel', '', {shouldDirty: true}));
+
+        expect(result.current.form.getFieldState('channel').isDirty).toBe(false);
+
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
+
+        expect(hoisted.updateMutate).toHaveBeenCalledWith(
+            expect.objectContaining({input: {parameters: {channel: null, extra: 1}}})
+        );
+    });
+
+    it('does not save untouched built-in defaults', () => {
         const {result} = renderPopover(createWorkflow(), vi.fn());
 
-        act(() =>
-            result.current.handleFormSubmit({
-                channel: '',
-                dryRun: false,
-                items: [{name: ''}, '', 'kept'],
-                limit: 0,
-                nested: {deeper: {value: ''}, list: ['']},
-                unset: null,
-            })
-        );
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
+
+        expect(hoisted.updateMutate).toHaveBeenCalledWith({id: 'mcp-workflow-1', input: {parameters: {}}});
+    });
+
+    it('saves the ai filled values', () => {
+        const {result} = renderPopover(createWorkflow(), vi.fn());
+
+        act(() => result.current.form.setValue('channel', '=fromAi(channel, "", "STRING")', {shouldDirty: true}));
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
+
+        expect(hoisted.updateMutate).toHaveBeenCalledWith({
+            id: 'mcp-workflow-1',
+            input: {parameters: {channel: '=fromAi(channel, "", "STRING")'}},
+        });
+    });
+
+    it('converts blank strings inside dirty array values to null', () => {
+        const {result} = renderPopover(createWorkflow(), vi.fn());
+
+        act(() => result.current.form.setValue('items', [{name: ''}, '', 'kept', ['']], {shouldDirty: true}));
+        act(() => result.current.form.setValue('nested', {list: ['', 1]}, {shouldDirty: true}));
+        act(() => result.current.handleFormSubmit(result.current.form.getValues()));
 
         expect(hoisted.updateMutate).toHaveBeenCalledWith({
             id: 'mcp-workflow-1',
             input: {
                 parameters: {
-                    channel: null,
-                    dryRun: false,
-                    items: [{name: null}, null, 'kept'],
-                    limit: 0,
-                    nested: {deeper: {value: null}, list: [null]},
-                    unset: null,
+                    items: [{name: null}, null, 'kept', [null]],
+                    nested: {list: [null, 1]},
                 },
             },
         });
+    });
+
+    it('does not save a nested built-in default that a field wrote while registering', async () => {
+        windowResizeObserver();
+
+        hoisted.propertiesQueryResult = {
+            data: {
+                mcpProjectWorkflowProperties: [
+                    {
+                        controlType: 'OBJECT_BUILDER',
+                        name: 'body',
+                        properties: [
+                            {controlType: 'TEXT', defaultValue: 'JSON', name: 'format', type: 'STRING'},
+                            {controlType: 'TEXT', name: 'content', type: 'STRING'},
+                        ],
+                        type: 'OBJECT',
+                    },
+                ],
+            },
+            isLoading: false,
+        };
+
+        let popoverResult: ReturnType<typeof useMcpProjectWorkflowPropertiesPopover> | undefined;
+
+        const workflow = createWorkflow(null);
+
+        const Harness = () => {
+            const popover = useMcpProjectWorkflowPropertiesPopover(workflow, vi.fn());
+
+            popoverResult = popover;
+
+            return <McpWorkflowToolForm form={popover.form} properties={popover.properties} />;
+        };
+
+        render(
+            <TooltipProvider>
+                <WorkflowReadOnlyProvider value={{useGetComponentDefinitionsQuery: () => ({data: []})} as never}>
+                    <Harness />
+                </WorkflowReadOnlyProvider>
+            </TooltipProvider>
+        );
+
+        expect(await screen.findByDisplayValue('JSON')).toBeInTheDocument();
+
+        act(() => {
+            popoverResult?.form.setValue('body.format', 'JSON' as never);
+        });
+
+        act(() => popoverResult?.handleFormSubmit(popoverResult.form.getValues()));
+
+        expect(hoisted.updateMutate).toHaveBeenCalledWith({id: 'mcp-workflow-1', input: {parameters: {}}});
     });
 
     it('refreshes the MCP project list and closes after saving', () => {

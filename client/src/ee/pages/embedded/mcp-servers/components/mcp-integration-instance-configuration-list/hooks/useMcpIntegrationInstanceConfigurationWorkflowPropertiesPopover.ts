@@ -1,3 +1,7 @@
+import buildToolParametersPayload, {deepMerge} from '@/pages/platform/mcp-servers/utils/buildToolParametersPayload';
+import {collectPropertyDefaults} from '@/pages/platform/mcp-servers/utils/mcpToolAiFill';
+import pickChangedValues from '@/pages/platform/mcp-servers/utils/pickChangedValues';
+import {toFormParameters, toStoredWorkflowParameters} from '@/pages/platform/mcp-servers/utils/toolParameterConversion';
 import {
     useMcpIntegrationInstanceConfigurationWorkflowPropertiesQuery,
     useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation,
@@ -7,7 +11,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo} from 'react';
 import {useForm} from 'react-hook-form';
 
-import {getMcpToolPropertyFormDefaults, sanitizeMcpToolParameters} from '../../hooks/mcpToolPropertyForm';
 import {McpIntegrationInstanceConfigurationWorkflowItemType} from './useMcpIntegrationInstanceConfigurationList';
 
 export default function useMcpIntegrationInstanceConfigurationWorkflowPropertiesPopover(
@@ -41,16 +44,16 @@ export default function useMcpIntegrationInstanceConfigurationWorkflowProperties
         ) as unknown as PropertyAllType[];
     }, [propertiesData]);
 
-    const defaultValues = useMemo(
-        () =>
-            getMcpToolPropertyFormDefaults(
-                properties,
-                mcpIntegrationInstanceConfigurationWorkflow.parameters as Record<string, unknown> | null
-            ),
-        [mcpIntegrationInstanceConfigurationWorkflow.parameters, properties]
-    );
+    const defaultValues = useMemo(() => {
+        const propertyDefaults = collectPropertyDefaults(properties);
 
-    const form = useForm({
+        const savedParameters =
+            (mcpIntegrationInstanceConfigurationWorkflow.parameters as Record<string, unknown>) ?? {};
+
+        return deepMerge(propertyDefaults, toFormParameters(savedParameters));
+    }, [mcpIntegrationInstanceConfigurationWorkflow.parameters, properties]);
+
+    const form = useForm<Record<string, unknown>>({
         defaultValues,
     });
 
@@ -58,21 +61,30 @@ export default function useMcpIntegrationInstanceConfigurationWorkflowProperties
         form.reset(defaultValues);
     }, [defaultValues, form]);
 
-    const {control, formState, handleSubmit} = form;
+    const {handleSubmit} = form;
 
     const handleFormSubmit = (values: Record<string, unknown>) => {
         updateMcpIntegrationInstanceConfigurationWorkflowMutation.mutate({
             id: mcpIntegrationInstanceConfigurationWorkflow.id,
             input: {
-                parameters: sanitizeMcpToolParameters(values),
+                parameters: toStoredWorkflowParameters(
+                    buildToolParametersPayload({
+                        aiValues: {},
+                        dirtyValues: pickChangedValues(
+                            values,
+                            defaultValues,
+                            (path) => form.getFieldState(path).isDirty
+                        ),
+                        savedParameters: mcpIntegrationInstanceConfigurationWorkflow.parameters as
+                            Record<string, unknown> | null | undefined,
+                    })
+                ),
             },
         });
     };
 
     return {
-        control,
         form,
-        formState,
         handleFormSubmit,
         handleSubmit,
         isLoading,
