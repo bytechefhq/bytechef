@@ -8,15 +8,15 @@ extend type Mutation {
 }
 
 extend type Query {
-    automationWorkflowProjectCodeWorkflowSource(automationProjectId: ID!): AutomationWorkflowProjectCodeWorkflowSource!
+    automationProjectCodeWorkflowSource(automationProjectId: ID!): AutomationProjectCodeWorkflowSource!
 }
 
 extend type Mutation {
-    createAutomationWorkflowProjectCodeWorkflow(name: String!, language: CodeWorkflowLanguage!, description: String, category: String, tags: [String!], permissionExpression: String): ID!
-    updateAutomationWorkflowProjectCodeWorkflowSource(automationProjectId: ID!, content: String!): Boolean!
+    createAutomationProjectCodeWorkflow(name: String!, language: CodeWorkflowLanguage!, description: String, category: String, tags: [String!], permissionExpression: String): ID!
+    updateAutomationProjectCodeWorkflowSource(automationProjectId: ID!, content: String!): Boolean!
 }
 
-type AutomationWorkflowProjectCodeWorkflowSource {
+type AutomationProjectCodeWorkflowSource {
     content: String!
     language: CodeWorkflowLanguage!
 }

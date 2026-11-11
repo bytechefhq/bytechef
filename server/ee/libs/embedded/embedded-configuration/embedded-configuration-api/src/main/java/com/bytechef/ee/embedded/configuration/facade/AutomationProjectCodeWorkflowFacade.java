@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCodeWorkflowSourceDTO;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCodeWorkflowStateDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowSourceDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowStateDTO;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
@@ -20,15 +20,15 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Ivica Cardic
  */
-public interface AutomationWorkflowProjectCodeWorkflowFacade {
+public interface AutomationProjectCodeWorkflowFacade {
 
     long createEmptyCodeWorkflow(
         String name, Language language, @Nullable String description, @Nullable String category,
         @Nullable List<String> tags, @Nullable String permissionExpression);
 
-    AutomationWorkflowProjectCodeWorkflowSourceDTO getCodeWorkflowSource(long automationProjectId);
+    AutomationProjectCodeWorkflowSourceDTO getCodeWorkflowSource(long automationProjectId);
 
-    Optional<AutomationWorkflowProjectCodeWorkflowStateDTO> getCodeWorkflowState(long automationProjectId);
+    Optional<AutomationProjectCodeWorkflowStateDTO> getCodeWorkflowState(long automationProjectId);
 
     List<String> save(byte[] bytes, Language language, Environment environment, boolean release);
 

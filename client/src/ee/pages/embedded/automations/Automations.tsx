@@ -4,8 +4,8 @@ import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import ImportCodeWorkflowDialog from '@/pages/platform/code-workflow/components/ImportCodeWorkflowDialog';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
+import ImportCodeWorkflowDialog from '@/pages/platform/code-workflow/components/ImportCodeWorkflowDialog';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
@@ -16,7 +16,7 @@ import {
     useAutomationProjectCategoriesQuery,
     useAutomationProjectTagsQuery,
     useAutomationProjectsQuery,
-    useCreateAutomationWorkflowProjectCodeWorkflowMutation,
+    useCreateAutomationProjectCodeWorkflowMutation,
     useCreateAutomationProjectMutation,
     useCreateAutomationProjectWorkflowMutation,
     useDeleteAutomationProjectMutation,
@@ -105,7 +105,7 @@ const Automations = () => {
 
     const isFirstRun = !projectsIsLoading && !hasActiveFilter && !hasProjects;
 
-    const createCodeWorkflowMutation = useCreateAutomationWorkflowProjectCodeWorkflowMutation();
+    const createCodeWorkflowMutation = useCreateAutomationProjectCodeWorkflowMutation();
     const createProjectMutation = useCreateAutomationProjectMutation();
     const createWorkflowMutation = useCreateAutomationProjectWorkflowMutation();
     const deleteProjectMutation = useDeleteAutomationProjectMutation();
@@ -482,7 +482,7 @@ const Automations = () => {
                                     setShowCodeProjectDialog(false);
 
                                     navigate(
-                                        `/embedded/automations/projects/${data.createAutomationWorkflowProjectCodeWorkflow}/code`
+                                        `/embedded/automations/projects/${data.createAutomationProjectCodeWorkflow}/code`
                                     );
                                 },
                             }

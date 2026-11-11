@@ -8,8 +8,8 @@
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCodeWorkflowSourceDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowSourceDTO;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectCodeWorkflowFacade;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -27,39 +27,39 @@ import org.springframework.stereotype.Controller;
 @Controller
 @ConditionalOnCoordinator
 @ConditionalOnEEVersion
-public class AutomationWorkflowProjectCodeWorkflowGraphQlController {
+public class AutomationProjectCodeWorkflowGraphQlController {
 
-    private final AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+    private final AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade;
 
     @SuppressFBWarnings("EI")
-    public AutomationWorkflowProjectCodeWorkflowGraphQlController(
-        AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade) {
+    public AutomationProjectCodeWorkflowGraphQlController(
+        AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade) {
 
-        this.automationWorkflowProjectCodeWorkflowFacade = automationWorkflowProjectCodeWorkflowFacade;
+        this.automationProjectCodeWorkflowFacade = automationProjectCodeWorkflowFacade;
     }
 
     @QueryMapping
-    public AutomationWorkflowProjectCodeWorkflowSourceDTO automationWorkflowProjectCodeWorkflowSource(
+    public AutomationProjectCodeWorkflowSourceDTO automationProjectCodeWorkflowSource(
         @Argument long automationProjectId) {
 
-        return automationWorkflowProjectCodeWorkflowFacade.getCodeWorkflowSource(automationProjectId);
+        return automationProjectCodeWorkflowFacade.getCodeWorkflowSource(automationProjectId);
     }
 
     @MutationMapping
-    public String createAutomationWorkflowProjectCodeWorkflow(
+    public String createAutomationProjectCodeWorkflow(
         @Argument String name, @Argument Language language, @Argument String description, @Argument String category,
         @Argument List<String> tags, @Argument String permissionExpression) {
 
         return String.valueOf(
-            automationWorkflowProjectCodeWorkflowFacade.createEmptyCodeWorkflow(
+            automationProjectCodeWorkflowFacade.createEmptyCodeWorkflow(
                 name, language, description, category, tags, permissionExpression));
     }
 
     @MutationMapping
-    public boolean updateAutomationWorkflowProjectCodeWorkflowSource(
+    public boolean updateAutomationProjectCodeWorkflowSource(
         @Argument long automationProjectId, @Argument String content) {
 
-        automationWorkflowProjectCodeWorkflowFacade.updateCodeWorkflowSource(automationProjectId, content);
+        automationProjectCodeWorkflowFacade.updateCodeWorkflowSource(automationProjectId, content);
 
         return true;
     }

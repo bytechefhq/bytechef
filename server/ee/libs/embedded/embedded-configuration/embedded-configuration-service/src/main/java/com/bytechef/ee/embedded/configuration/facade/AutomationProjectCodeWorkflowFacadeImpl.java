@@ -16,8 +16,8 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftService;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCodeWorkflowSourceDTO;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCodeWorkflowStateDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowSourceDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowStateDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.exception.CodeWorkflowErrorType;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
@@ -61,9 +61,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements AutomationWorkflowProjectCodeWorkflowFacade {
+public class AutomationProjectCodeWorkflowFacadeImpl implements AutomationProjectCodeWorkflowFacade {
 
-    private static final Logger log = LoggerFactory.getLogger(AutomationWorkflowProjectCodeWorkflowFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(AutomationProjectCodeWorkflowFacadeImpl.class);
 
     private final AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade;
     private final AutomationProjectFacade automationProjectFacade;
@@ -76,7 +76,7 @@ public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements Automati
     private final ProjectService projectService;
 
     @SuppressFBWarnings("EI")
-    public AutomationWorkflowProjectCodeWorkflowFacadeImpl(
+    public AutomationProjectCodeWorkflowFacadeImpl(
         ApplicationProperties applicationProperties,
         AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade,
         AutomationProjectFacade automationProjectFacade, CacheManager cacheManager,
@@ -177,10 +177,10 @@ public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements Automati
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public AutomationWorkflowProjectCodeWorkflowSourceDTO getCodeWorkflowSource(long automationProjectId) {
+    public AutomationProjectCodeWorkflowSourceDTO getCodeWorkflowSource(long automationProjectId) {
         CodeWorkflowContainer codeWorkflowContainer = getEditableCodeWorkflowContainer(automationProjectId);
 
-        return new AutomationWorkflowProjectCodeWorkflowSourceDTO(
+        return new AutomationProjectCodeWorkflowSourceDTO(
             codeWorkflowFileStorage.readCodeWorkflowFileContent(codeWorkflowContainer.getWorkflows()),
             codeWorkflowContainer.getLanguage());
     }
@@ -188,7 +188,7 @@ public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements Automati
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public Optional<AutomationWorkflowProjectCodeWorkflowStateDTO> getCodeWorkflowState(
+    public Optional<AutomationProjectCodeWorkflowStateDTO> getCodeWorkflowState(
         long automationProjectId) {
 
         Project project = projectService.getProject(automationProjectId);
@@ -198,7 +198,7 @@ public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements Automati
                 CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(
                     projectCodeWorkflow.getCodeWorkflowContainerId());
 
-                return new AutomationWorkflowProjectCodeWorkflowStateDTO(
+                return new AutomationProjectCodeWorkflowStateDTO(
                     codeWorkflowContainer.getLanguage(),
                     projectCodeWorkflow.getProjectVersion() == project.getLastProjectVersion());
             });
@@ -302,9 +302,9 @@ public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements Automati
     }
 
     private static String readTemplate(Language language) {
-        String resource = "automation-workflow-project-code-workflow-templates/starter." + language.getExtension();
+        String resource = "automation-project-code-workflow-templates/starter." + language.getExtension();
 
-        try (InputStream inputStream = AutomationWorkflowProjectCodeWorkflowFacadeImpl.class.getClassLoader()
+        try (InputStream inputStream = AutomationProjectCodeWorkflowFacadeImpl.class.getClassLoader()
             .getResourceAsStream(resource)) {
 
             if (inputStream == null) {
@@ -324,7 +324,7 @@ public class AutomationWorkflowProjectCodeWorkflowFacadeImpl implements Automati
             .orElseGet(List::of);
 
         boolean startable = triggerDefinitions.stream()
-            .anyMatch(AutomationWorkflowProjectCodeWorkflowFacadeImpl::isStartableTrigger);
+            .anyMatch(AutomationProjectCodeWorkflowFacadeImpl::isStartableTrigger);
 
         if (!startable) {
             String warning = ("Workflow '%s' in deployed automation code workflow project '%s' has no trigger that "

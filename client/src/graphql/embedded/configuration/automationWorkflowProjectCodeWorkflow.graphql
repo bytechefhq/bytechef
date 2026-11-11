@@ -1,11 +1,11 @@
-query automationWorkflowProjectCodeWorkflowSource($automationProjectId: ID!) {
-    automationWorkflowProjectCodeWorkflowSource(automationProjectId: $automationProjectId) {
+query automationProjectCodeWorkflowSource($automationProjectId: ID!) {
+    automationProjectCodeWorkflowSource(automationProjectId: $automationProjectId) {
         content
         language
     }
 }
 
-mutation createAutomationWorkflowProjectCodeWorkflow(
+mutation createAutomationProjectCodeWorkflow(
     $name: String!
     $language: CodeWorkflowLanguage!
     $description: String
@@ -13,7 +13,7 @@ mutation createAutomationWorkflowProjectCodeWorkflow(
     $tags: [String!]
     $permissionExpression: String
 ) {
-    createAutomationWorkflowProjectCodeWorkflow(
+    createAutomationProjectCodeWorkflow(
         name: $name
         language: $language
         description: $description
@@ -23,8 +23,8 @@ mutation createAutomationWorkflowProjectCodeWorkflow(
     )
 }
 
-mutation updateAutomationWorkflowProjectCodeWorkflowSource($automationProjectId: ID!, $content: String!) {
-    updateAutomationWorkflowProjectCodeWorkflowSource(
+mutation updateAutomationProjectCodeWorkflowSource($automationProjectId: ID!, $content: String!) {
+    updateAutomationProjectCodeWorkflowSource(
         automationProjectId: $automationProjectId
         content: $content
     )

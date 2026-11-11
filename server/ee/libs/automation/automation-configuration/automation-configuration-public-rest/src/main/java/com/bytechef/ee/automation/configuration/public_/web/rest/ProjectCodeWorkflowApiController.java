@@ -49,7 +49,7 @@ public class ProjectCodeWorkflowApiController implements ProjectCodeWorkflowApi 
 
     @Override
     public ResponseEntity<Void> deployProject(
-        Long workspaceId, EnvironmentModel xEnvironment, Boolean enable, MultipartFile projectFile) {
+        Long workspaceId, MultipartFile projectFile, EnvironmentModel xEnvironment, Boolean enable) {
 
         try {
             projectCodeWorkflowFacade.save(

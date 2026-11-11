@@ -29,8 +29,8 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowDraftService;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCodeWorkflowSourceDTO;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCodeWorkflowStateDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowSourceDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowStateDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.exception.CodeWorkflowErrorType;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
@@ -63,7 +63,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
  * @author Ivica Cardic
  */
 @ExtendWith(MockitoExtension.class)
-class AutomationWorkflowProjectCodeWorkflowFacadeTest {
+class AutomationProjectCodeWorkflowFacadeTest {
 
     @Mock
     private AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade;
@@ -250,7 +250,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
         when(codeWorkflowFileStorage.readCodeWorkflowFileContent(any())).thenReturn("source");
 
         assertThat(facade().getCodeWorkflowSource(7L))
-            .isEqualTo(new AutomationWorkflowProjectCodeWorkflowSourceDTO("source", Language.PYTHON));
+            .isEqualTo(new AutomationProjectCodeWorkflowSourceDTO("source", Language.PYTHON));
     }
 
     @Test
@@ -258,7 +258,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
         stubCatalogCodeProject(7L, "orders", Language.PYTHON, 3, 3);
 
         assertThat(facade().getCodeWorkflowState(7L))
-            .contains(new AutomationWorkflowProjectCodeWorkflowStateDTO(Language.PYTHON, true));
+            .contains(new AutomationProjectCodeWorkflowStateDTO(Language.PYTHON, true));
     }
 
     @Test
@@ -266,7 +266,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
         stubCatalogCodeProject(7L, "orders", Language.JAVASCRIPT, 2, 3);
 
         assertThat(facade().getCodeWorkflowState(7L))
-            .contains(new AutomationWorkflowProjectCodeWorkflowStateDTO(Language.JAVASCRIPT, false));
+            .contains(new AutomationProjectCodeWorkflowStateDTO(Language.JAVASCRIPT, false));
     }
 
     @Test
@@ -288,7 +288,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
         "save"
     })
     void testCodeWorkflowMethodsAreAdminOnly(String methodName) {
-        Method method = Arrays.stream(AutomationWorkflowProjectCodeWorkflowFacadeImpl.class.getDeclaredMethods())
+        Method method = Arrays.stream(AutomationProjectCodeWorkflowFacadeImpl.class.getDeclaredMethods())
             .filter(declaredMethod -> declaredMethod.getName()
                 .equals(methodName))
             .findFirst()
@@ -348,8 +348,8 @@ class AutomationWorkflowProjectCodeWorkflowFacadeTest {
             + "perform: function() { return \"hello\"; }}]}]})";
     }
 
-    private AutomationWorkflowProjectCodeWorkflowFacadeImpl facade() {
-        return new AutomationWorkflowProjectCodeWorkflowFacadeImpl(
+    private AutomationProjectCodeWorkflowFacadeImpl facade() {
+        return new AutomationProjectCodeWorkflowFacadeImpl(
             new ApplicationProperties(), automationProjectConfigurationAdminFacade,
             automationProjectFacade, mock(CacheManager.class),
             codeWorkflowContainerService, codeWorkflowFileStorage, projectCodeWorkflowDraftService,

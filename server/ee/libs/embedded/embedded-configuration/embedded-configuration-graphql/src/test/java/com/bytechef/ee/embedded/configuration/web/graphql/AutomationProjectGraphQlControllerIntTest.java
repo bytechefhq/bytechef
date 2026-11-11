@@ -14,12 +14,12 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCategoryDTO;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCodeWorkflowStateDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowStateDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
@@ -102,7 +102,7 @@ class AutomationProjectGraphQlControllerIntTest {
     private AutomationProjectFacade automationProjectFacade;
 
     @MockitoBean
-    private AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+    private AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade;
 
     @Autowired
     private GraphQlTester graphQlTester;
@@ -259,8 +259,8 @@ class AutomationProjectGraphQlControllerIntTest {
             3L, "Code Project", null, null, List.of(), true, 2, 1, List.of(), null, true, true, 0, null);
 
         when(automationProjectFacade.getProjects()).thenReturn(List.of(codeProject));
-        when(automationWorkflowProjectCodeWorkflowFacade.getCodeWorkflowState(3L))
-            .thenReturn(Optional.of(new AutomationWorkflowProjectCodeWorkflowStateDTO(Language.JAVA, false)));
+        when(automationProjectCodeWorkflowFacade.getCodeWorkflowState(3L))
+            .thenReturn(Optional.of(new AutomationProjectCodeWorkflowStateDTO(Language.JAVA, false)));
 
         this.graphQlTester
             .document("query { automationProjects { id codeWorkflowLanguage codeWorkflowDraftPublishable } }")
@@ -288,7 +288,7 @@ class AutomationProjectGraphQlControllerIntTest {
             .path("automationProjects[0].codeWorkflowDraftPublishable")
             .valueIsNull();
 
-        verifyNoInteractions(automationWorkflowProjectCodeWorkflowFacade);
+        verifyNoInteractions(automationProjectCodeWorkflowFacade);
     }
 
     @Test

@@ -12,8 +12,8 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCodeWorkflowSourceDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowSourceDTO;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
@@ -32,66 +32,66 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ContextConfiguration(classes = {
     EmbeddedConfigurationGraphQlTestConfiguration.class,
-    AutomationWorkflowProjectCodeWorkflowGraphQlController.class
+    AutomationProjectCodeWorkflowGraphQlController.class
 })
 @GraphQlTest(
-    controllers = AutomationWorkflowProjectCodeWorkflowGraphQlController.class,
+    controllers = AutomationProjectCodeWorkflowGraphQlController.class,
     properties = {
         "bytechef.coordinator.enabled=true",
         "bytechef.edition=ee",
         "spring.graphql.schema.locations=classpath*:/graphql/"
     })
 @EmbeddedConfigurationGraphQlConfigurationSharedMocks
-class AutomationWorkflowProjectCodeWorkflowGraphQlControllerIntTest {
+class AutomationProjectCodeWorkflowGraphQlControllerIntTest {
 
     @Autowired
     private GraphQlTester graphQlTester;
 
     @MockitoBean
-    private AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+    private AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade;
 
     @Test
-    void testAutomationWorkflowProjectCodeWorkflowSource() {
-        when(automationWorkflowProjectCodeWorkflowFacade.getCodeWorkflowSource(7L))
-            .thenReturn(new AutomationWorkflowProjectCodeWorkflowSourceDTO("print('hi')", Language.PYTHON));
+    void testAutomationProjectCodeWorkflowSource() {
+        when(automationProjectCodeWorkflowFacade.getCodeWorkflowSource(7L))
+            .thenReturn(new AutomationProjectCodeWorkflowSourceDTO("print('hi')", Language.PYTHON));
 
         graphQlTester
-            .document("query { automationWorkflowProjectCodeWorkflowSource(automationProjectId: 7) " +
+            .document("query { automationProjectCodeWorkflowSource(automationProjectId: 7) " +
                 "{ content language } }")
             .execute()
-            .path("automationWorkflowProjectCodeWorkflowSource.content")
+            .path("automationProjectCodeWorkflowSource.content")
             .entity(String.class)
             .isEqualTo("print('hi')")
-            .path("automationWorkflowProjectCodeWorkflowSource.language")
+            .path("automationProjectCodeWorkflowSource.language")
             .entity(String.class)
             .isEqualTo("PYTHON");
     }
 
     @Test
-    void testUpdateAutomationWorkflowProjectCodeWorkflowSource() {
+    void testUpdateAutomationProjectCodeWorkflowSource() {
         graphQlTester
-            .document("mutation { updateAutomationWorkflowProjectCodeWorkflowSource(automationProjectId: 7, " +
+            .document("mutation { updateAutomationProjectCodeWorkflowSource(automationProjectId: 7, " +
                 "content: \"x\") }")
             .execute()
-            .path("updateAutomationWorkflowProjectCodeWorkflowSource")
+            .path("updateAutomationProjectCodeWorkflowSource")
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(automationWorkflowProjectCodeWorkflowFacade).updateCodeWorkflowSource(7L, "x");
+        verify(automationProjectCodeWorkflowFacade).updateCodeWorkflowSource(7L, "x");
     }
 
     @Test
-    void testCreateAutomationWorkflowProjectCodeWorkflow() {
-        when(automationWorkflowProjectCodeWorkflowFacade.createEmptyCodeWorkflow(
+    void testCreateAutomationProjectCodeWorkflow() {
+        when(automationProjectCodeWorkflowFacade.createEmptyCodeWorkflow(
             eq("orders"), eq(Language.JAVASCRIPT), isNull(), eq("Sales"), eq(List.of("crm")), isNull()))
                 .thenReturn(7L);
 
         graphQlTester
             .document(
-                "mutation { createAutomationWorkflowProjectCodeWorkflow(name: \"orders\", language: JAVASCRIPT, " +
+                "mutation { createAutomationProjectCodeWorkflow(name: \"orders\", language: JAVASCRIPT, " +
                     "category: \"Sales\", tags: [\"crm\"]) }")
             .execute()
-            .path("createAutomationWorkflowProjectCodeWorkflow")
+            .path("createAutomationProjectCodeWorkflow")
             .entity(String.class)
             .isEqualTo("7");
     }

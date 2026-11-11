@@ -1495,7 +1495,7 @@ class AutomationProjectFacadeIntTest {
     class CodeProjectLifecycle {
 
         @Autowired
-        private AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+        private AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade;
 
         @Autowired
         private AutomationProjectFacade automationProjectFacade;
@@ -1532,10 +1532,10 @@ class AutomationProjectFacadeIntTest {
         void testEveryWorkflowKeepsItsUuidAcrossCreateEditAndTwoPublishes() {
             String projectName = "uuid-continuity-create-edit";
 
-            long projectId = automationWorkflowProjectCodeWorkflowFacade.createEmptyCodeWorkflow(
+            long projectId = automationProjectCodeWorkflowFacade.createEmptyCodeWorkflow(
                 projectName, Language.JAVASCRIPT, null, null, null, null);
 
-            automationWorkflowProjectCodeWorkflowFacade.updateCodeWorkflowSource(
+            automationProjectCodeWorkflowFacade.updateCodeWorkflowSource(
                 projectId, jsSource(projectName, "first", "alpha", "beta"));
 
             Map<String, UUID> draftUuids = getLatestWorkflowUuidsByName(projectId);
@@ -1548,7 +1548,7 @@ class AutomationProjectFacadeIntTest {
 
             assertThat(firstPublishedUuids).isEqualTo(draftUuids);
 
-            automationWorkflowProjectCodeWorkflowFacade.updateCodeWorkflowSource(
+            automationProjectCodeWorkflowFacade.updateCodeWorkflowSource(
                 projectId, jsSource(projectName, "second", "alpha", "beta"));
 
             assertThat(getLatestWorkflowUuidsByName(projectId)).isEqualTo(firstPublishedUuids);
@@ -1571,7 +1571,7 @@ class AutomationProjectFacadeIntTest {
         void testUploadMatchingAPublishedProjectWithAnUnpublishedEditPublishesAndKeepsUuids() {
             String projectName = "uuid-continuity-upload-over-edit";
 
-            automationWorkflowProjectCodeWorkflowFacade.save(
+            automationProjectCodeWorkflowFacade.save(
                 jsSource(projectName, "uploaded", "alpha", "beta")
                     .getBytes(StandardCharsets.UTF_8),
                 Language.JAVASCRIPT, Environment.PRODUCTION, false);
@@ -1583,12 +1583,12 @@ class AutomationProjectFacadeIntTest {
 
             assertThat(publishedUuids).containsOnlyKeys("alpha", "beta");
 
-            automationWorkflowProjectCodeWorkflowFacade.updateCodeWorkflowSource(
+            automationProjectCodeWorkflowFacade.updateCodeWorkflowSource(
                 projectId, jsSource(projectName, "unpublished edit", "alpha", "beta"));
 
             String upload = jsSource(projectName, "second upload", "alpha", "beta");
 
-            automationWorkflowProjectCodeWorkflowFacade.save(
+            automationProjectCodeWorkflowFacade.save(
                 upload.getBytes(StandardCharsets.UTF_8), Language.JAVASCRIPT, Environment.PRODUCTION, false);
 
             assertThat(getLatestWorkflowUuidsByName(projectId)).isEqualTo(publishedUuids);
@@ -1604,7 +1604,7 @@ class AutomationProjectFacadeIntTest {
         void testFirstEditOfAProjectUploadedBeforeDraftSupportRestoresUuidsByName() {
             String projectName = "uuid-continuity-upload-then-edit";
 
-            automationWorkflowProjectCodeWorkflowFacade.save(
+            automationProjectCodeWorkflowFacade.save(
                 jsSource(projectName, "uploaded", "alpha", "beta")
                     .getBytes(StandardCharsets.UTF_8),
                 Language.JAVASCRIPT, Environment.PRODUCTION, false);
@@ -1630,7 +1630,7 @@ class AutomationProjectFacadeIntTest {
                 projectCodeWorkflowService.getProjectCodeWorkflow(projectId)
                     .getProjectVersion()).isLessThan(draftVersion);
 
-            automationWorkflowProjectCodeWorkflowFacade.updateCodeWorkflowSource(
+            automationProjectCodeWorkflowFacade.updateCodeWorkflowSource(
                 projectId, jsSource(projectName, "first edit", "alpha", "beta"));
 
             assertThat(getLatestWorkflowUuidsByName(projectId)).isEqualTo(uploadedUuids);
@@ -1644,10 +1644,10 @@ class AutomationProjectFacadeIntTest {
         void testAddingAndRemovingAWorkflowKeepsTheOthersAndRestoresTheRemovedOne() {
             String projectName = "uuid-continuity-add-remove";
 
-            long projectId = automationWorkflowProjectCodeWorkflowFacade.createEmptyCodeWorkflow(
+            long projectId = automationProjectCodeWorkflowFacade.createEmptyCodeWorkflow(
                 projectName, Language.JAVASCRIPT, null, null, null, null);
 
-            automationWorkflowProjectCodeWorkflowFacade.updateCodeWorkflowSource(
+            automationProjectCodeWorkflowFacade.updateCodeWorkflowSource(
                 projectId, jsSource(projectName, "v1", "alpha"));
 
             automationProjectFacade.publishProject(projectId);
@@ -1656,9 +1656,9 @@ class AutomationProjectFacadeIntTest {
 
             assertThat(alphaUuid).isNotNull();
 
-            automationWorkflowProjectCodeWorkflowFacade.updateCodeWorkflowSource(
+            automationProjectCodeWorkflowFacade.updateCodeWorkflowSource(
                 projectId, jsSource(projectName, "v2", "alpha", "beta"));
-            automationWorkflowProjectCodeWorkflowFacade.updateCodeWorkflowSource(
+            automationProjectCodeWorkflowFacade.updateCodeWorkflowSource(
                 projectId, jsSource(projectName, "v3", "alpha"));
 
             automationProjectFacade.publishProject(projectId);
@@ -1666,7 +1666,7 @@ class AutomationProjectFacadeIntTest {
             assertThat(getLatestWorkflowUuidsByName(projectId)).containsOnlyKeys("alpha")
                 .containsEntry("alpha", alphaUuid);
 
-            automationWorkflowProjectCodeWorkflowFacade.updateCodeWorkflowSource(
+            automationProjectCodeWorkflowFacade.updateCodeWorkflowSource(
                 projectId, jsSource(projectName, "v4", "alpha", "beta"));
 
             automationProjectFacade.publishProject(projectId);
@@ -1678,9 +1678,9 @@ class AutomationProjectFacadeIntTest {
 
             UUID betaUuid = bothPublishedUuids.get("beta");
 
-            automationWorkflowProjectCodeWorkflowFacade.updateCodeWorkflowSource(
+            automationProjectCodeWorkflowFacade.updateCodeWorkflowSource(
                 projectId, jsSource(projectName, "v5", "alpha"));
-            automationWorkflowProjectCodeWorkflowFacade.updateCodeWorkflowSource(
+            automationProjectCodeWorkflowFacade.updateCodeWorkflowSource(
                 projectId, jsSource(projectName, "v6", "alpha", "beta"));
 
             assertThat(getLatestWorkflowUuidsByName(projectId)).containsEntry("alpha", alphaUuid)
@@ -1696,7 +1696,7 @@ class AutomationProjectFacadeIntTest {
         void testPublishingWithoutAnEditSinceTheLastPublishIsRefused() {
             String projectName = "uuid-continuity-empty-draft";
 
-            long projectId = automationWorkflowProjectCodeWorkflowFacade.createEmptyCodeWorkflow(
+            long projectId = automationProjectCodeWorkflowFacade.createEmptyCodeWorkflow(
                 projectName, Language.JAVASCRIPT, null, null, null, null);
 
             automationProjectFacade.publishProject(projectId);

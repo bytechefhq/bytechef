@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.AutomationProjectCodeWorkflowDeployResultModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
@@ -26,9 +26,9 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * Deploying through this internal endpoint (as opposed to the plain automation deploy endpoint) is what creates the
  * embedded relation: the resulting catalog {@code Project} is resolved/created through
- * {@code AutomationProjectFacade}'s marker convention so it stays hidden behind the embedded
- * automation-project entity. Never expose {@code Project} ids on this surface -- only embedded-entity
- * identifiers are meant to reach embedded callers.
+ * {@code AutomationProjectFacade}'s marker convention so it stays hidden behind the embedded automation-project entity.
+ * Never expose {@code Project} ids on this surface -- only embedded-entity identifiers are meant to reach embedded
+ * callers.
  *
  * @version ee
  *
@@ -40,23 +40,23 @@ import org.springframework.web.multipart.MultipartFile;
 @ConditionalOnEEVersion
 public class AutomationProjectCodeWorkflowApiController implements AutomationProjectCodeWorkflowApi {
 
-    private final AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+    private final AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade;
     private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public AutomationProjectCodeWorkflowApiController(
-        AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade,
+        AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade,
         EnvironmentService environmentService) {
 
-        this.automationWorkflowProjectCodeWorkflowFacade = automationWorkflowProjectCodeWorkflowFacade;
+        this.automationProjectCodeWorkflowFacade = automationProjectCodeWorkflowFacade;
         this.environmentService = environmentService;
     }
 
     /**
-     * Authorization note: the {@code ROLE_ADMIN} guard lives on
-     * {@code AutomationWorkflowProjectCodeWorkflowFacadeImpl#save}, exactly mirroring
-     * {@code IntegrationCodeWorkflowApiController}, so a connected-user bearer token (which carries no authorities, see
-     * {@code EmbeddedApiKeyAuthenticationProvider}) is denied at the facade regardless of what reaches this controller.
+     * Authorization note: the {@code ROLE_ADMIN} guard lives on {@code AutomationProjectCodeWorkflowFacadeImpl#save},
+     * exactly mirroring {@code IntegrationCodeWorkflowApiController}, so a connected-user bearer token (which carries
+     * no authorities, see {@code EmbeddedApiKeyAuthenticationProvider}) is denied at the facade regardless of what
+     * reaches this controller.
      */
     @Override
     public ResponseEntity<AutomationProjectCodeWorkflowDeployResultModel> deployAutomationProjectCodeWorkflow(
@@ -65,7 +65,7 @@ public class AutomationProjectCodeWorkflowApiController implements AutomationPro
         List<String> warnings;
 
         try {
-            warnings = automationWorkflowProjectCodeWorkflowFacade.save(
+            warnings = automationProjectCodeWorkflowFacade.save(
                 projectFile.getBytes(),
                 Language.of(Objects.requireNonNull(projectFile.getOriginalFilename())),
                 environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name()),

@@ -16,12 +16,10 @@ import TagList from '@/shared/components/TagList';
 import {AutomationProjectTagsQuery, AutomationProjectsQuery} from '@/shared/middleware/graphql';
 import getCodeWorkflowLanguageLabel from '@/shared/util/codeWorkflowLanguage-utils';
 import {
-    ChevronDownIcon,
     CodeIcon,
     DownloadIcon,
     EditIcon,
     EllipsisVerticalIcon,
-    FolderIcon,
     PlusIcon,
     SendIcon,
     Trash2Icon,
@@ -32,7 +30,7 @@ import {MouseEvent, useCallback, useMemo, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import isEditableCodeLanguage from '../../utils/isEditableCodeLanguage';
-import AutomationWorkflowProjectUsageSheet from '../AutomationWorkflowProjectUsageSheet';
+import AutomationProjectUsageSheet from '../AutomationProjectUsageSheet';
 
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
 type EmbeddedTagType = AutomationProjectTagsQuery['automationProjectTags'][number];
@@ -347,7 +345,7 @@ const AutomationProjectListItem = ({
             />
 
             {showUsageSheet && (
-                <AutomationWorkflowProjectUsageSheet
+                <AutomationProjectUsageSheet
                     codeWorkflowProject={project.codeWorkflowProject}
                     onClose={() => setShowUsageSheet(false)}
                     projectName={project.name}

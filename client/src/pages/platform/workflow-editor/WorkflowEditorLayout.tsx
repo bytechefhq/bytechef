@@ -51,8 +51,8 @@ const AiAgentTestingPanel = lazy(
     () =>
         import('@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel')
 );
-const AutomationWorkflowProjectCodeWorkflowDetail = lazy(
-    () => import('@/pages/platform/code-workflow/AutomationWorkflowProjectCodeWorkflowDetail')
+const AutomationProjectCodeWorkflowDetail = lazy(
+    () => import('@/pages/platform/code-workflow/AutomationProjectCodeWorkflowDetail')
 );
 const IntegrationCodeWorkflowDetail = lazy(
     () => import('@/pages/platform/code-workflow/IntegrationCodeWorkflowDetail')
@@ -157,13 +157,8 @@ const WorkflowEditorLayout = ({
 
     const issues = useWorkflowIssues();
 
-    const {
-        automationProjectId,
-        codeWorkflow,
-        codeWorkflowLanguage,
-        invalidateWorkflowQueries,
-        updateWorkflowMutation,
-    } = useWorkflowEditor();
+    const {automationProjectId, codeWorkflow, codeWorkflowLanguage, invalidateWorkflowQueries, updateWorkflowMutation} =
+        useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     const queryClient = useQueryClient();
@@ -287,7 +282,7 @@ const WorkflowEditorLayout = ({
                     </div>
                 ) : isCodeWorkflow && codeWorkflowLanguage && automationProjectId ? (
                     <Suspense>
-                        <AutomationWorkflowProjectCodeWorkflowDetail
+                        <AutomationProjectCodeWorkflowDetail
                             automationProjectId={automationProjectId}
                             headerless
                             invalidateWorkflowQueries={invalidateWorkflowQueries}

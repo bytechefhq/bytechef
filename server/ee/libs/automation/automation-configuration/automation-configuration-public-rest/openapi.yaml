@@ -39,8 +39,6 @@ paths:
           multipart/form-data:
             schema:
               type: "object"
-              required:
-                - "workspaceId"
               properties:
                 workspaceId:
                   description: "The id of a workspace this project will belong."

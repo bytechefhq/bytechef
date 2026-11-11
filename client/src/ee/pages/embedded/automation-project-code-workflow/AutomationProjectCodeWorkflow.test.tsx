@@ -4,7 +4,7 @@ import {ReactNode} from 'react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import AutomationWorkflowProjectCodeWorkflow from './AutomationWorkflowProjectCodeWorkflow';
+import AutomationProjectCodeWorkflow from './AutomationProjectCodeWorkflow';
 
 const hoisted = vi.hoisted(() => ({
     projects: [] as Array<Record<string, unknown>>,
@@ -39,7 +39,7 @@ const renderPage = (projectId = '7') => {
         <MemoryRouter initialEntries={[`/embedded/automations/projects/${projectId}/code`]}>
             <Routes>
                 <Route
-                    element={<AutomationWorkflowProjectCodeWorkflow />}
+                    element={<AutomationProjectCodeWorkflow />}
                     path="/embedded/automations/projects/:automationProjectId/code"
                 />
 
@@ -48,17 +48,14 @@ const renderPage = (projectId = '7') => {
                     path="/embedded/automations/:workflowUuid/editor"
                 />
 
-                <Route
-                    element={<div data-testid="automation-workflows-page" />}
-                    path="/embedded/automations"
-                />
+                <Route element={<div data-testid="automation-workflows-page" />} path="/embedded/automations" />
             </Routes>
         </MemoryRouter>,
         {wrapper}
     );
 };
 
-describe('AutomationWorkflowProjectCodeWorkflow', () => {
+describe('AutomationProjectCodeWorkflow', () => {
     beforeEach(() => {
         hoisted.projects = [buildProject()];
     });

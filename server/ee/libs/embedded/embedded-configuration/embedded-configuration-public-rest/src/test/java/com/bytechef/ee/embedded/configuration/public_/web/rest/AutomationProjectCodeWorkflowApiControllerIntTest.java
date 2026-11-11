@@ -22,7 +22,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
@@ -80,7 +80,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
     private static final byte[] PROJECT_BYTES = "({name: 'p', workflows: []})".getBytes(StandardCharsets.UTF_8);
 
     @MockitoBean
-    private AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+    private AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade;
 
     @MockitoBean
     private AutomationProjectFacade automationProjectFacade;
@@ -103,7 +103,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
     @Test
     @WithMockUser(authorities = "ROLE_ADMIN")
     void testDeployReturnsWarnings() {
-        when(automationWorkflowProjectCodeWorkflowFacade.save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
+        when(automationProjectCodeWorkflowFacade.save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
             anyBoolean()))
                 .thenReturn(List.of("Workflow 'internal-only' will not be invocable"));
 
@@ -114,14 +114,14 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .jsonPath("$.warnings[0]")
             .isEqualTo("Workflow 'internal-only' will not be invocable");
 
-        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
+        verify(automationProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
             anyBoolean());
     }
 
     @Test
     @WithMockUser(authorities = "ROLE_ADMIN")
     void testDeployAcceptsTheEnvironmentHeaderCaseInsensitively() {
-        when(automationWorkflowProjectCodeWorkflowFacade.save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
+        when(automationProjectCodeWorkflowFacade.save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
             anyBoolean()))
                 .thenReturn(List.of());
 
@@ -129,7 +129,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .expectStatus()
             .isOk();
 
-        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
+        verify(automationProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
             anyBoolean());
     }
 
@@ -137,14 +137,14 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
     @WithMockUser(authorities = "ROLE_ADMIN")
     void testDeployPassesTheReleaseFlagAndTheRequestEnvironmentToTheFacade() {
         when(environmentService.getEnvironment("STAGING")).thenReturn(Environment.STAGING);
-        when(automationWorkflowProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
+        when(automationProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
             .thenReturn(List.of());
 
         deploy(webTestClient, "/v1/automation-project-code-workflows/deploy", null, "staging", "true")
             .expectStatus()
             .isOk();
 
-        verify(automationWorkflowProjectCodeWorkflowFacade)
+        verify(automationProjectCodeWorkflowFacade)
             .save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), eq(Environment.STAGING), eq(true));
     }
 
@@ -152,14 +152,14 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
     @WithMockUser(authorities = "ROLE_ADMIN")
     void testDeployWithoutTheReleaseFieldPassesFalseToTheFacade() {
         when(environmentService.getEnvironment("STAGING")).thenReturn(Environment.STAGING);
-        when(automationWorkflowProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
+        when(automationProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
             .thenReturn(List.of());
 
         deploy(webTestClient, "/v1/automation-project-code-workflows/deploy", null, "staging")
             .expectStatus()
             .isOk();
 
-        verify(automationWorkflowProjectCodeWorkflowFacade)
+        verify(automationProjectCodeWorkflowFacade)
             .save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), eq(Environment.STAGING), eq(false));
     }
 
@@ -170,7 +170,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .expectStatus()
             .isBadRequest();
 
-        verify(automationWorkflowProjectCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
+        verify(automationProjectCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
     }
 
     @Test
@@ -319,14 +319,14 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
         void testTypedApiKeyReachesTheFacade() {
             stubApiKey(PlatformType.EMBEDDED);
 
-            when(automationWorkflowProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
+            when(automationProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
                 .thenReturn(List.of());
 
             deploy(webTestClient, DEPLOY_PATH, SECRET_KEY)
                 .expectStatus()
                 .isOk();
 
-            verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
+            verify(automationProjectCodeWorkflowFacade).save(eq(PROJECT_BYTES), eq(Language.JAVASCRIPT), any(),
                 anyBoolean());
         }
 
@@ -338,7 +338,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
                 .expectStatus()
                 .isUnauthorized();
 
-            verify(automationWorkflowProjectCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
+            verify(automationProjectCodeWorkflowFacade, never()).save(any(), any(), any(), anyBoolean());
         }
 
         private void stubApiKey(PlatformType type) {

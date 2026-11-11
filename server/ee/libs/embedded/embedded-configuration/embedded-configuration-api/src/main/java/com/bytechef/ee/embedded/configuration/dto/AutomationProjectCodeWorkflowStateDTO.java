@@ -14,5 +14,5 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
  *
  * @author Ivica Cardic
  */
-public record AutomationWorkflowProjectCodeWorkflowStateDTO(Language language, boolean draftPublishable) {
+public record AutomationProjectCodeWorkflowStateDTO(Language language, boolean draftPublishable) {
 }

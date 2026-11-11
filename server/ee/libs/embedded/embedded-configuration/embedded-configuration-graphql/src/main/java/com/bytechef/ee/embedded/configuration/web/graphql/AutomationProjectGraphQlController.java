@@ -9,11 +9,11 @@ package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCategoryDTO;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCodeWorkflowStateDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCodeWorkflowStateDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -40,28 +40,28 @@ import org.springframework.stereotype.Controller;
 public class AutomationProjectGraphQlController {
 
     private final AutomationProjectFacade automationProjectFacade;
-    private final AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+    private final AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade;
 
     @SuppressFBWarnings("EI")
     public AutomationProjectGraphQlController(
         AutomationProjectFacade automationProjectFacade,
-        AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade) {
+        AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade) {
 
         this.automationProjectFacade = automationProjectFacade;
-        this.automationWorkflowProjectCodeWorkflowFacade = automationWorkflowProjectCodeWorkflowFacade;
+        this.automationProjectCodeWorkflowFacade = automationProjectCodeWorkflowFacade;
     }
 
     @SchemaMapping(typeName = "AutomationProject")
     public Boolean codeWorkflowDraftPublishable(AutomationProjectDTO automationProjectDTO) {
         return fetchCodeWorkflowState(automationProjectDTO)
-            .map(AutomationWorkflowProjectCodeWorkflowStateDTO::draftPublishable)
+            .map(AutomationProjectCodeWorkflowStateDTO::draftPublishable)
             .orElse(null);
     }
 
     @SchemaMapping(typeName = "AutomationProject")
     public Language codeWorkflowLanguage(AutomationProjectDTO automationProjectDTO) {
         return fetchCodeWorkflowState(automationProjectDTO)
-            .map(AutomationWorkflowProjectCodeWorkflowStateDTO::language)
+            .map(AutomationProjectCodeWorkflowStateDTO::language)
             .orElse(null);
     }
 
@@ -182,13 +182,13 @@ public class AutomationProjectGraphQlController {
         return String.valueOf(automationProjectFacade.duplicateProject(Long.parseLong(id)));
     }
 
-    private Optional<AutomationWorkflowProjectCodeWorkflowStateDTO> fetchCodeWorkflowState(
+    private Optional<AutomationProjectCodeWorkflowStateDTO> fetchCodeWorkflowState(
         AutomationProjectDTO automationProjectDTO) {
 
         if (!automationProjectDTO.codeWorkflowProject()) {
             return Optional.empty();
         }
 
-        return automationWorkflowProjectCodeWorkflowFacade.getCodeWorkflowState(automationProjectDTO.id());
+        return automationProjectCodeWorkflowFacade.getCodeWorkflowState(automationProjectDTO.id());
     }
 }

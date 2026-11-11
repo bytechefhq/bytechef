@@ -105,8 +105,8 @@ const AutomationConfigurations = lazy(
     () => import('@/ee/pages/embedded/automation-configurations/AutomationConfigurations')
 );
 const Automations = lazy(() => import('@/ee/pages/embedded/automations/Automations'));
-const AutomationWorkflowProjectCodeWorkflow = lazy(
-    () => import('@/ee/pages/embedded/automation-workflow-project-code-workflow/AutomationWorkflowProjectCodeWorkflow')
+const AutomationProjectCodeWorkflow = lazy(
+    () => import('@/ee/pages/embedded/automation-project-code-workflow/AutomationProjectCodeWorkflow')
 );
 const Automation = lazy(() => import('@/ee/pages/embedded/automation/Automation'));
 const ComponentRules = lazy(() => import('@/ee/pages/settings/automation/ai/rules/ComponentRules'));
@@ -1234,7 +1234,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
-                                                    <AutomationWorkflowProjectCodeWorkflow />
+                                                    <AutomationProjectCodeWorkflow />
                                                 </LazyLoadWrapper>
                                             </EEVersion>
                                         </PrivateRoute>

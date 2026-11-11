@@ -16,7 +16,7 @@
 
 package com.bytechef.ee.embedded.configuration.web.rest.config;
 
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectionAdminFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationCategoryFacade;
@@ -38,7 +38,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    AutomationWorkflowProjectCodeWorkflowFacade.class, ComponentDefinitionService.class, ConnectionAdminFacade.class,
+    AutomationProjectCodeWorkflowFacade.class, ComponentDefinitionService.class, ConnectionAdminFacade.class,
     ConnectionFacade.class, ConnectedUserConnectionFacade.class, IntegrationCategoryFacade.class,
     IntegrationCodeWorkflowFacade.class,
     IntegrationInstanceAdminFacade.class, IntegrationTagFacade.class, WebhookTriggerTestAdminFacade.class

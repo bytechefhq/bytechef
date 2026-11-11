@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
@@ -100,7 +100,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
     private WorkflowService workflowService;
 
     @Autowired
-    private AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+    private AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade;
 
     @Autowired
     private MockMvc mockMvc;
@@ -118,7 +118,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
     void testDeployAutomationProjectCodeWorkflowReturnsTheWarnings() {
         byte[] bytes = "export function handler() {}".getBytes(StandardCharsets.UTF_8);
 
-        when(automationWorkflowProjectCodeWorkflowFacade.save(eq(bytes), eq(Language.JAVASCRIPT), any(), anyBoolean()))
+        when(automationProjectCodeWorkflowFacade.save(eq(bytes), eq(Language.JAVASCRIPT), any(), anyBoolean()))
             .thenReturn(List.of("Workflow 'charge' has no trigger that can start it"));
 
         webTestClient
@@ -133,7 +133,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .jsonPath("$.warnings[0]")
             .isEqualTo("Workflow 'charge' has no trigger that can start it");
 
-        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(bytes), eq(Language.JAVASCRIPT), any(),
+        verify(automationProjectCodeWorkflowFacade).save(eq(bytes), eq(Language.JAVASCRIPT), any(),
             anyBoolean());
     }
 
@@ -143,7 +143,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             0x50, 0x4b, 0x03, 0x04
         };
 
-        when(automationWorkflowProjectCodeWorkflowFacade.save(eq(bytes), eq(Language.JAVA), any(), anyBoolean()))
+        when(automationProjectCodeWorkflowFacade.save(eq(bytes), eq(Language.JAVA), any(), anyBoolean()))
             .thenReturn(List.of());
 
         webTestClient
@@ -158,7 +158,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .jsonPath("$.warnings")
             .isEmpty();
 
-        verify(automationWorkflowProjectCodeWorkflowFacade).save(eq(bytes), eq(Language.JAVA), any(), anyBoolean());
+        verify(automationProjectCodeWorkflowFacade).save(eq(bytes), eq(Language.JAVA), any(), anyBoolean());
     }
 
     @Test
@@ -166,7 +166,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
         byte[] bytes = "export function handler() {}".getBytes(StandardCharsets.UTF_8);
 
         when(environmentService.getEnvironment("STAGING")).thenReturn(Environment.STAGING);
-        when(automationWorkflowProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
+        when(automationProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
             .thenReturn(List.of());
 
         MultipartBodyBuilder multipartBodyBuilder = multipartBody("projectFile", "project.js", bytes);
@@ -183,7 +183,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .expectStatus()
             .isOk();
 
-        verify(automationWorkflowProjectCodeWorkflowFacade)
+        verify(automationProjectCodeWorkflowFacade)
             .save(eq(bytes), eq(Language.JAVASCRIPT), eq(Environment.STAGING), eq(true));
     }
 
@@ -192,7 +192,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
         byte[] bytes = "export function handler() {}".getBytes(StandardCharsets.UTF_8);
 
         when(environmentService.getEnvironment("STAGING")).thenReturn(Environment.STAGING);
-        when(automationWorkflowProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
+        when(automationProjectCodeWorkflowFacade.save(any(), any(), any(), anyBoolean()))
             .thenReturn(List.of());
 
         webTestClient
@@ -205,7 +205,7 @@ class AutomationProjectCodeWorkflowApiControllerIntTest {
             .expectStatus()
             .isOk();
 
-        verify(automationWorkflowProjectCodeWorkflowFacade)
+        verify(automationProjectCodeWorkflowFacade)
             .save(eq(bytes), eq(Language.JAVASCRIPT), eq(Environment.STAGING), eq(false));
     }
 

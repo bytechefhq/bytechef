@@ -9,7 +9,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectCodeWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectCodeWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationProjectCodeWorkflowDeployResultModel;
@@ -46,16 +46,16 @@ import org.springframework.web.multipart.MultipartFile;
 @ConditionalOnEEVersion
 public class AutomationProjectCodeWorkflowApiController implements AutomationProjectCodeWorkflowApi {
 
-    private final AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+    private final AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade;
     private final AutomationProjectFacade automationProjectFacade;
     private final EnvironmentService environmentService;
 
     @SuppressFBWarnings("EI")
     public AutomationProjectCodeWorkflowApiController(
-        AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade,
+        AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade,
         AutomationProjectFacade automationProjectFacade, EnvironmentService environmentService) {
 
-        this.automationWorkflowProjectCodeWorkflowFacade = automationWorkflowProjectCodeWorkflowFacade;
+        this.automationProjectCodeWorkflowFacade = automationProjectCodeWorkflowFacade;
         this.automationProjectFacade = automationProjectFacade;
         this.environmentService = environmentService;
     }
@@ -67,7 +67,7 @@ public class AutomationProjectCodeWorkflowApiController implements AutomationPro
         List<String> warnings;
 
         try {
-            warnings = automationWorkflowProjectCodeWorkflowFacade.save(
+            warnings = automationProjectCodeWorkflowFacade.save(
                 projectFile.getBytes(),
                 Language.of(Objects.requireNonNull(projectFile.getOriginalFilename())),
                 environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name()),

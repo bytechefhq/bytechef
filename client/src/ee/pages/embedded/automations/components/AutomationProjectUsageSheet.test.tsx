@@ -1,7 +1,7 @@
 import {render, resetAll, screen, userEvent} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import AutomationWorkflowProjectUsageSheet from './AutomationWorkflowProjectUsageSheet';
+import AutomationProjectUsageSheet from './AutomationProjectUsageSheet';
 
 const hoisted = vi.hoisted(() => ({
     mockOnClose: vi.fn(),
@@ -29,7 +29,7 @@ const workflowTemplates = [{label: 'My Workflow', workflowUuid: 'uuid-1'}];
 
 const renderSheet = (codeWorkflowProject = false) =>
     render(
-        <AutomationWorkflowProjectUsageSheet
+        <AutomationProjectUsageSheet
             codeWorkflowProject={codeWorkflowProject}
             onClose={hoisted.mockOnClose}
             projectName="My Project"
@@ -49,7 +49,7 @@ afterEach(() => {
     resetAll();
 });
 
-describe('AutomationWorkflowProjectUsageSheet', () => {
+describe('AutomationProjectUsageSheet', () => {
     it('titles the sheet with the usage of the project', () => {
         hoisted.mockUseConnectedUserCodeWorkflowReferencesQuery.mockReturnValue({
             data: {connectedUserCodeWorkflowReferences: []},

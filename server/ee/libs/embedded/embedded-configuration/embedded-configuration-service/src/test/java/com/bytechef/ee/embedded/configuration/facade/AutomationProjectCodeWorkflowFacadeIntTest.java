@@ -109,10 +109,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     WorkflowTestConfigurationFacade.class, WorkflowTestConfigurationService.class,
     WorkspaceConnectionFacade.class, WorkspaceFacade.class
 })
-class AutomationWorkflowProjectCodeWorkflowFacadeIntTest {
+class AutomationProjectCodeWorkflowFacadeIntTest {
 
     @Autowired
-    private AutomationWorkflowProjectCodeWorkflowFacade automationWorkflowProjectCodeWorkflowFacade;
+    private AutomationProjectCodeWorkflowFacade automationProjectCodeWorkflowFacade;
 
     @Autowired
     private AutomationProjectConfigurationAdminFacade automationProjectConfigurationAdminFacade;
@@ -128,7 +128,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeIntTest {
         String name = "Release Create " + UUID.randomUUID();
         long projectId = createDeployedProject(name);
 
-        automationWorkflowProjectCodeWorkflowFacade.save(
+        automationProjectCodeWorkflowFacade.save(
             codeProject(name), Language.JAVASCRIPT, Environment.PRODUCTION, true);
 
         AutomationProjectConfigurationDTO configuration = getConfiguration(projectId);
@@ -152,7 +152,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeIntTest {
             projectId, Environment.PRODUCTION.ordinal(), Environment.PRODUCTION.name(), null, firstVersion,
             false, false);
 
-        automationWorkflowProjectCodeWorkflowFacade.save(
+        automationProjectCodeWorkflowFacade.save(
             codeProject(name), Language.JAVASCRIPT, Environment.PRODUCTION, true);
 
         int newVersion = getLastPublishedVersion(projectId);
@@ -182,7 +182,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeIntTest {
         long developmentConfigurationId = automationProjectConfigurationAdminFacade.createConfiguration(
             projectId, Environment.DEVELOPMENT.ordinal(), "Development", null, firstVersion, true, true);
 
-        automationWorkflowProjectCodeWorkflowFacade.save(
+        automationProjectCodeWorkflowFacade.save(
             codeProject(name), Language.JAVASCRIPT, Environment.PRODUCTION, true);
 
         int newVersion = getLastPublishedVersion(projectId);
@@ -218,7 +218,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeIntTest {
             projectId, Environment.PRODUCTION.ordinal(), Environment.PRODUCTION.name(), null, firstVersion,
             true, true);
 
-        automationWorkflowProjectCodeWorkflowFacade.save(
+        automationProjectCodeWorkflowFacade.save(
             codeProject(name), Language.JAVASCRIPT, Environment.PRODUCTION, false);
 
         assertThat(getLastPublishedVersion(projectId)).isGreaterThan(firstVersion);
@@ -230,7 +230,7 @@ class AutomationWorkflowProjectCodeWorkflowFacadeIntTest {
         String name = "Release None " + UUID.randomUUID();
         long projectId = createDeployedProject(name);
 
-        automationWorkflowProjectCodeWorkflowFacade.save(
+        automationProjectCodeWorkflowFacade.save(
             codeProject(name), Language.JAVASCRIPT, Environment.PRODUCTION, false);
 
         assertThat(automationProjectConfigurationAdminFacade.getConfigurations(projectId)).isEmpty();

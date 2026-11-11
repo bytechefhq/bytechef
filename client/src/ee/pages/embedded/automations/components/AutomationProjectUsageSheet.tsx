@@ -11,7 +11,7 @@ import {
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo} from 'react';
 
-interface AutomationWorkflowProjectUsageSheetProps {
+interface AutomationProjectUsageSheetProps {
     codeWorkflowProject: boolean;
     onClose: () => void;
     projectName: string;
@@ -37,12 +37,12 @@ const EnabledBadge = ({enabled}: {enabled: boolean}) => (
     <Badge label={enabled ? 'Enabled' : 'Disabled'} styleType={enabled ? 'success-outline' : 'secondary-outline'} />
 );
 
-const AutomationWorkflowProjectUsageSheet = ({
+const AutomationProjectUsageSheet = ({
     codeWorkflowProject,
     onClose,
     projectName,
     workflowTemplates,
-}: AutomationWorkflowProjectUsageSheetProps) => {
+}: AutomationProjectUsageSheetProps) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const automationUuids = workflowTemplates.map((workflowTemplate) => workflowTemplate.workflowUuid);
@@ -129,9 +129,7 @@ const AutomationWorkflowProjectUsageSheet = ({
 
                                     <TableBody>
                                         {references.map((reference) => (
-                                            <TableRow
-                                                key={`${reference.automationUuid}-${reference.externalUserId}`}
-                                            >
+                                            <TableRow key={`${reference.automationUuid}-${reference.externalUserId}`}>
                                                 <TableCell>
                                                     {workflowLabelsByUuid.get(reference.automationUuid) ||
                                                         reference.automationUuid}
@@ -234,4 +232,4 @@ const AutomationWorkflowProjectUsageSheet = ({
     );
 };
 
-export default AutomationWorkflowProjectUsageSheet;
+export default AutomationProjectUsageSheet;

@@ -2,11 +2,11 @@ import {CodeWorkflowLanguage} from '@/shared/middleware/graphql';
 import {fireEvent, render, resetAll, screen} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-import AutomationWorkflowProjectCodeWorkflowDetail from './AutomationWorkflowProjectCodeWorkflowDetail';
+import AutomationProjectCodeWorkflowDetail from './AutomationProjectCodeWorkflowDetail';
 
 const hoisted = vi.hoisted(() => ({
-    mockUseAutomationWorkflowProjectCodeWorkflowSourceQuery: vi.fn(),
-    mockUseUpdateAutomationWorkflowProjectCodeWorkflowSourceMutation: vi.fn(),
+    mockUseAutomationProjectCodeWorkflowSourceQuery: vi.fn(),
+    mockUseUpdateAutomationProjectCodeWorkflowSourceMutation: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', async () => {
@@ -14,10 +14,9 @@ vi.mock('@/shared/middleware/graphql', async () => {
 
     return {
         ...actual,
-        useAutomationWorkflowProjectCodeWorkflowSourceQuery:
-            hoisted.mockUseAutomationWorkflowProjectCodeWorkflowSourceQuery,
-        useUpdateAutomationWorkflowProjectCodeWorkflowSourceMutation:
-            hoisted.mockUseUpdateAutomationWorkflowProjectCodeWorkflowSourceMutation,
+        useAutomationProjectCodeWorkflowSourceQuery: hoisted.mockUseAutomationProjectCodeWorkflowSourceQuery,
+        useUpdateAutomationProjectCodeWorkflowSourceMutation:
+            hoisted.mockUseUpdateAutomationProjectCodeWorkflowSourceMutation,
     };
 });
 
@@ -41,9 +40,9 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
 }));
 
 beforeEach(() => {
-    hoisted.mockUseAutomationWorkflowProjectCodeWorkflowSourceQuery.mockReturnValue({
+    hoisted.mockUseAutomationProjectCodeWorkflowSourceQuery.mockReturnValue({
         data: {
-            automationWorkflowProjectCodeWorkflowSource: {
+            automationProjectCodeWorkflowSource: {
                 content: 'console.log("hi");',
                 language: CodeWorkflowLanguage.Javascript,
             },
@@ -51,7 +50,7 @@ beforeEach(() => {
         error: null,
         isLoading: false,
     });
-    hoisted.mockUseUpdateAutomationWorkflowProjectCodeWorkflowSourceMutation.mockReturnValue({
+    hoisted.mockUseUpdateAutomationProjectCodeWorkflowSourceMutation.mockReturnValue({
         isPending: false,
         mutateAsync: vi.fn().mockResolvedValue(undefined),
     });
@@ -62,20 +61,17 @@ afterEach(() => {
     vi.clearAllMocks();
 });
 
-describe('AutomationWorkflowProjectCodeWorkflowDetail', () => {
+describe('AutomationProjectCodeWorkflowDetail', () => {
     it('fetches the source for the given project and renders it in the editor', async () => {
         render(
-            <AutomationWorkflowProjectCodeWorkflowDetail
-                automationProjectId="7"
-                language={CodeWorkflowLanguage.Javascript}
-            />
+            <AutomationProjectCodeWorkflowDetail automationProjectId="7" language={CodeWorkflowLanguage.Javascript} />
         );
 
         const editor = await screen.findByTestId('monaco-editor-mock');
 
         expect(editor).toHaveAttribute('data-language', 'javascript');
         expect(editor).toHaveValue('console.log("hi");');
-        expect(hoisted.mockUseAutomationWorkflowProjectCodeWorkflowSourceQuery).toHaveBeenCalledWith(
+        expect(hoisted.mockUseAutomationProjectCodeWorkflowSourceQuery).toHaveBeenCalledWith(
             {automationProjectId: '7'},
             {enabled: true}
         );
@@ -84,16 +80,13 @@ describe('AutomationWorkflowProjectCodeWorkflowDetail', () => {
     it('calls the update mutation with the project id and edited content on Save', async () => {
         const mutateAsyncMock = vi.fn().mockResolvedValue(undefined);
 
-        hoisted.mockUseUpdateAutomationWorkflowProjectCodeWorkflowSourceMutation.mockReturnValue({
+        hoisted.mockUseUpdateAutomationProjectCodeWorkflowSourceMutation.mockReturnValue({
             isPending: false,
             mutateAsync: mutateAsyncMock,
         });
 
         render(
-            <AutomationWorkflowProjectCodeWorkflowDetail
-                automationProjectId="7"
-                language={CodeWorkflowLanguage.Javascript}
-            />
+            <AutomationProjectCodeWorkflowDetail automationProjectId="7" language={CodeWorkflowLanguage.Javascript} />
         );
 
         fireEvent.change(await screen.findByTestId('monaco-editor-mock'), {

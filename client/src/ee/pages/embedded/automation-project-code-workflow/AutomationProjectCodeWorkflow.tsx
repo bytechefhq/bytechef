@@ -2,7 +2,7 @@ import isEditableCodeLanguage from '@/ee/pages/embedded/automations/utils/isEdit
 import {useAutomationProjectsQuery} from '@/shared/middleware/graphql';
 import {Navigate, useParams} from 'react-router-dom';
 
-const AutomationWorkflowProjectCodeWorkflow = () => {
+const AutomationProjectCodeWorkflow = () => {
     const {automationProjectId} = useParams();
 
     const {data: projectsData} = useAutomationProjectsQuery();
@@ -24,4 +24,4 @@ const AutomationWorkflowProjectCodeWorkflow = () => {
     return <Navigate replace to={`/embedded/automations/${firstWorkflowUuid}/editor`} />;
 };
 
-export default AutomationWorkflowProjectCodeWorkflow;
+export default AutomationProjectCodeWorkflow;
