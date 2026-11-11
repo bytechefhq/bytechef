@@ -5,7 +5,8 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import IntegrationInstanceConfigurationDialog from '../IntegrationInstanceConfigurationDialog';
 
 const hoisted = vi.hoisted(() => ({
-    connectionDefinition: undefined as {authorizations: {title: string; type: string}[]} | undefined,
+    connectionDefinition: undefined as
+        {authorizationRequired?: boolean; authorizations: {title: string; type: string}[]} | undefined,
     createMutate: vi.fn(),
     integration: undefined as {componentName: string} | undefined,
     updateCredentialsMutate: vi.fn(),
@@ -89,6 +90,10 @@ vi.mock('../IntegrationInstanceConfigurationDialogBasicStep', () => ({
 
             <button onClick={() => setValue('authorizationType', 'OAUTH2_AUTHORIZATION_CODE')} type="button">
                 Use OAuth2
+            </button>
+
+            <button onClick={() => setValue('authorizationType', 'NONE')} type="button">
+                Use None
             </button>
 
             <button
@@ -287,6 +292,55 @@ describe('IntegrationInstanceConfigurationDialog', () => {
                     expect.objectContaining({authorizationType: 'BASIC_AUTH'})
                 )
             );
+        });
+
+        it('should leave the authorization unselected when the connection offers one optional authorization', async () => {
+            const user = userEvent.setup();
+
+            hoisted.connectionDefinition = {
+                authorizationRequired: false,
+                authorizations: [{title: 'API Key', type: 'API_KEY'}],
+            };
+
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            await user.click(screen.getByRole('button', {name: 'Pick Integration'}));
+
+            expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+        });
+
+        it('should save no authorization when None is selected', async () => {
+            const user = userEvent.setup();
+
+            hoisted.connectionDefinition = {
+                authorizationRequired: false,
+                authorizations: [{title: 'API Key', type: 'API_KEY'}],
+            };
+
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            await user.click(screen.getByRole('button', {name: 'Pick Integration'}));
+            await user.click(screen.getByRole('button', {name: 'Use None'}));
+            await user.click(await screen.findByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(hoisted.createMutate).toHaveBeenCalled());
+
+            expect(hoisted.createMutate.mock.calls[0][0].authorizationType).toBeUndefined();
+        });
+
+        it('should select None when the connection has no authorizations and does not require one', async () => {
+            const user = userEvent.setup();
+
+            hoisted.connectionDefinition = {authorizationRequired: false, authorizations: []};
+
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} />);
+
+            await user.click(screen.getByRole('button', {name: 'Pick Integration'}));
+            await user.click(await screen.findByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(hoisted.createMutate).toHaveBeenCalled());
+
+            expect(hoisted.createMutate.mock.calls[0][0].authorizationType).toBeUndefined();
         });
 
         it('should clear the selected authorization when the integration changes', async () => {

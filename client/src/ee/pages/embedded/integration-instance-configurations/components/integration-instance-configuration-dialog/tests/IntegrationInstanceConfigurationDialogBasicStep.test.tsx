@@ -7,6 +7,7 @@ import {useForm, useWatch} from 'react-hook-form';
 import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import IntegrationInstanceConfigurationDialogBasicStep from '../IntegrationInstanceConfigurationDialogBasicStep';
+import {NO_AUTHORIZATION_TYPE} from '../noAuthorizationType';
 
 const environmentState = vi.hoisted(() => ({currentEnvironmentId: 1}));
 
@@ -45,6 +46,7 @@ const authorizations: Authorization[] = [
 ];
 
 interface BasicStepHarnessPropsI {
+    authorizationRequired?: boolean;
     authorizations?: Authorization[];
     curIntegrationId?: number;
     integrationInstanceConfiguration?: IntegrationInstanceConfiguration;
@@ -52,6 +54,7 @@ interface BasicStepHarnessPropsI {
 }
 
 const BasicStepHarness = ({
+    authorizationRequired,
     authorizations,
     curIntegrationId,
     integrationInstanceConfiguration,
@@ -70,6 +73,7 @@ const BasicStepHarness = ({
         <TooltipProvider>
             <Form {...form}>
                 <IntegrationInstanceConfigurationDialogBasicStep
+                    authorizationRequired={authorizationRequired}
                     authorizations={authorizations}
                     control={form.control}
                     curIntegrationId={curIntegrationId}
@@ -179,6 +183,49 @@ describe('IntegrationInstanceConfigurationDialogBasicStep', () => {
             await userEvent.click(screen.getByRole('option', {name: AuthorizationType.BearerToken}));
 
             expect(screen.getByTestId('selected-authorization-type')).toHaveTextContent(AuthorizationType.BearerToken);
+        });
+
+        it('should offer None first when the connection does not require authorization', async () => {
+            render(
+                <BasicStepHarness authorizationRequired={false} authorizations={authorizations} curIntegrationId={2} />
+            );
+
+            await userEvent.click(screen.getByRole('combobox', {name: 'Authorization'}));
+
+            expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+                'None',
+                'API Key',
+                AuthorizationType.BearerToken,
+            ]);
+
+            await userEvent.click(screen.getByRole('option', {name: 'None'}));
+
+            expect(screen.getByTestId('selected-authorization-type')).toHaveTextContent(NO_AUTHORIZATION_TYPE);
+        });
+
+        it('should offer None next to a single authorization the connection does not require', () => {
+            render(
+                <BasicStepHarness
+                    authorizationRequired={false}
+                    authorizations={[authorizations[0]]}
+                    curIntegrationId={2}
+                />
+            );
+
+            expect(screen.getByRole('combobox', {name: 'Authorization'})).toBeInTheDocument();
+        });
+
+        it('should show None for an existing configuration saved without authorization', () => {
+            render(
+                <BasicStepHarness
+                    authorizationRequired={false}
+                    authorizations={authorizations}
+                    curIntegrationId={2}
+                    integrationInstanceConfiguration={{id: 1} as IntegrationInstanceConfiguration}
+                />
+            );
+
+            expect(screen.getByRole('combobox', {name: 'Authorization'})).toHaveTextContent('None');
         });
 
         it('should hide the select when the connection has a single authorization', () => {
