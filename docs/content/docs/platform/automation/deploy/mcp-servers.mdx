@@ -38,7 +38,7 @@ A server exposes nothing until you add components or workflows to it.
 
 1. Expand the server's row, open its **Component Tools** tab and click **Add Component**.
 2. **Select a component** from the available components.
-3. **Select the actions** (tools) from that component you want to expose. Only the actions you pick become callable; everything else stays hidden.
+3. **Select the actions** (tools) from that component you want to expose. Only the actions you pick become callable; everything else stays hidden. Ticking an action opens its settings form under its row: **Tool Name**, **Tool Description**, **Let AI fill all** and the action's own parameters. Filling it in is optional, and saving never waits on it.
 4. If the actions need authentication, attach one of your **connections** to the component. The assistant then runs those actions using that connection's credentials.
 5. Optionally pick the component's **Required Authorities** - the roles a caller must hold, one of them at least, to see this component's tools when the server has [Enforce tool authorization](#enforce-tool-authorization) on. The list of authorities is available on the Enterprise Edition, and the picker is shown only when the `ff-6383` feature flag is on.
 
@@ -52,6 +52,27 @@ The same properties control also offers a **Tool Name** and a **Tool Description
 
 Rename an action when its generated name would not tell the model what it does in your context, or when two servers should surface the same action differently. The override is stored on the server's attachment to the tool, not on the component, so it does not follow the action anywhere else.
 
+### Let AI fill all
+
+**Let AI fill all** sits below **Tool Description** in the inline forms, in a workflow's **Tool** tab and in the **Configure** panels. It sets every empty, visible field to a `fromAi(...)` expression, so the assistant supplies those values at call time:
+
+- Fields you filled in are left alone, and so is a field still holding its built-in default.
+- Fields hidden by a display condition are skipped, and so are advanced fields unless **Show Advanced Properties** is expanded.
+- A select field gets its list of options in the expression. If the options can't be loaded, the field stays empty.
+- A nested field gets an argument named after its full path, so `shipping.city` and `billing.city` become `shipping_city` and `billing_city`.
+
+New tools start this way: when you add an action or a workflow, its empty fields are filled with `fromAi(...)` even if you never open its form. Tools you already exposed are never filled again, and **Edit** keeps their saved settings.
+
+### Defaults at call time
+
+When a component tool runs, a field without a value gets its built-in default. Workflow tools don't apply defaults yet. Values are applied in this order, each overriding the one before:
+
+1. the field's built-in default
+2. the value the assistant sends
+3. the value you saved
+
+A value you fixed therefore always wins over the assistant. A field you cleared stays empty; its default does not come back.
+
 ---
 
 ## Expose workflows
@@ -61,8 +82,8 @@ Rename an action when its generated name would not tell the model what it does i
 1. Expand the server's row, open its **Workflow Tools** tab and click **Add Workflows**.
 2. On the **Basic** step, **select a project** and a **published version**, then click **Next**.
 3. On the **Workflows** step, switch on the workflows from that version you want to expose. Only workflows that start with the **Workflow → New Workflow Call** trigger are listed; a version without any says so.
-4. For each switched-on workflow, pick its **Connections** and fill in its **Inputs**, then click **Add**. Every required connection must be set; a connection must belong to the server's environment.
-5. Complete each workflow's **tool mapping**: click **Configure** on its row in the expanded server. The mapping offers a **Tool Name** and a **Tool Description** - both what the model sees - plus one field per input declared on the workflow's trigger schema. A tool name is limited to 64 characters made up of letters, digits, `_`, `-`, `.` and `/`; anything else, a space included, is rejected as you type.
+4. For each switched-on workflow, pick its **Connections**, fill in its **Inputs** and set up its **Tool** tab, then click **Add**. Every required connection must be set; a connection must belong to the server's environment.
+5. The **Tool** tab holds the workflow's **tool mapping**: a **Tool Name** and a **Tool Description** - both what the model sees - plus one field per input declared on the workflow's **New Workflow Call** trigger, including the child fields of object and array inputs. A tool name is limited to 64 characters made up of letters, digits, `_`, `-`, `.` and `/`; anything else, a space included, is rejected as you type. The **Inputs** tab is the workflow's own configuration and can't be filled by AI. To change the mapping later, click **Configure** on the workflow's row in the expanded server.
 
 Adding a project version does not touch your own deployments. The server deploys the selected workflows itself, in a deployment of its own in the server's environment that does not appear in the Deployments list. The attachment stays pinned to that version: to expose another version, choose **Change Project Version** from the project's menu.
 

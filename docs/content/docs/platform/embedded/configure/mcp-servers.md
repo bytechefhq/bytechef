@@ -47,12 +47,16 @@ A new server requires authentication (see [Authentication](#authentication)); th
 
 Expand the server row. It has **Component Tools**, **Workflow Tools** and **Connect** tabs:
 
-- **Add Component** (on the **Component Tools** tab) -- opens a two-step dialog: **Select Component** (pick the third-party component) then **Select Tools from &lt;component&gt;** (choose which of its actions are exposed as tools, and configure each tool's parameters).
+- **Add Component** (on the **Component Tools** tab) -- opens a two-step dialog: **Select Component** (pick the third-party component) then **Select Tools from &lt;component&gt;** (choose which of its actions are exposed as tools; ticking an action opens its settings form under its row).
 - **Add Workflows** (on the **Workflow Tools** tab) -- opens a two-step dialog: **Basic** (pick an integration instance configuration) then **Workflows** (switch on the workflows within it to expose, and set each one's **Inputs** and the **Connections** of components other than the integration's own, which each connected user supplies). Only workflows carrying a **New Workflow Call** trigger are eligible; a configuration with none shows "No tool-eligible workflows found". The inputs and connections are saved on the integration instance configuration's workflows. A workflow you add is also added to the integration instance configuration and enabled there, and every connected user who already has the server gets it as a tool.
 
 Each exposed workflow has a **Configure** button (its tool mapping) and an ellipsis (⋮) menu with **Edit** (its connections and inputs in the integration instance configuration) and **Delete**. **Delete** removes the workflow from this server only; it stays in the integration instance configuration, enabled, with its other triggers. Deleting the whole server works the same way: the integration instance configurations it used, and their workflows, are kept.
 
 For each exposed component action, you choose which parameters you fix yourself and which the connected agent fills at call time, using the `fromAi(...)` expression - the same mechanism as attaching tools to an AI Agent. See [Supplying tool parameters with fromAi](/platform/automation/build/workflows/ai/agent#supplying-tool-parameters-with-fromai) for the syntax.
+
+The **Add Workflows** dialog has a **Tool** tab next to **Connections** and **Inputs**. It holds the workflow's **Tool Name**, **Tool Description** and the fields of its **New Workflow Call** trigger, the same mapping that **Configure** opens later. Tool settings are stored per workflow and kept when you change the instance configuration's integration version. Fields the new version no longer has are dropped, nested fields included.
+
+The tool forms offer **Let AI fill all**, new tools start with their empty fields set to `fromAi(...)`, and when a component tool runs, a field without a value gets its built-in default. A value you saved wins over the agent's, and a field you cleared stays empty. Workflow tools don't apply defaults yet. See [Let AI fill all](/platform/automation/deploy/mcp-servers#let-ai-fill-all) and [Defaults at call time](/platform/automation/deploy/mcp-servers#defaults-at-call-time).
 
 <!-- TODO screenshot: Add Component dialog on the Select Tools step, showing the list of the component's actions with per-tool selection and the tool properties popover -->
 
