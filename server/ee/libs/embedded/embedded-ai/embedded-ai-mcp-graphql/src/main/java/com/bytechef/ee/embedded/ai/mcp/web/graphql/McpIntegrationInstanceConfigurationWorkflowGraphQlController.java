@@ -18,7 +18,6 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -87,7 +86,15 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
             .getToolEligibleIntegrationInstanceConfigurationWorkflows(integrationInstanceConfigurationId);
     }
 
-    @SuppressFBWarnings("BC_VACUOUS_INSTANCEOF")
+    @QueryMapping
+    List<Property> toolEligibleIntegrationInstanceConfigurationWorkflowProperties(
+        @Argument long integrationInstanceConfigurationId, @Argument String workflowId) {
+
+        return McpToolWorkflowProperties.getToolProperties(
+            mcpIntegrationInstanceConfigurationWorkflowFacade.getToolEligibleIntegrationInstanceConfigurationWorkflow(
+                integrationInstanceConfigurationId, workflowId));
+    }
+
     @QueryMapping
     List<Property> mcpIntegrationInstanceConfigurationWorkflowProperties(
         @Argument long mcpIntegrationInstanceConfigurationWorkflowId) {

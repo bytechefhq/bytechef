@@ -9,12 +9,16 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceConfigurationAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
@@ -44,6 +48,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.dto.WorkflowToolParametersDTO;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.connection.service.ConnectionServiceImpl;
@@ -51,22 +56,34 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.service.McpComponentServiceImpl;
+import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -291,12 +308,14 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
     @Test
     void testFacadeAcceptsNoWorkflowConfigurations() {
         for (Method method : McpIntegrationInstanceConfigurationFacade.class.getMethods()) {
-            if (method.getName()
-                .equals("createMcpIntegrationInstanceConfiguration")) {
-                assertThat(method.getParameterTypes()).containsExactly(long.class, long.class, List.class);
-            } else if (method.getName()
-                .equals("updateMcpIntegrationInstanceConfiguration")) {
-                assertThat(method.getParameterTypes()).containsExactly(long.class, List.class);
+            String methodName = method.getName();
+
+            if (methodName.equals("createMcpIntegrationInstanceConfiguration") ||
+                methodName.equals("updateMcpIntegrationInstanceConfiguration")) {
+
+                assertThat(method.getGenericParameterTypes())
+                    .extracting(Type::getTypeName)
+                    .noneMatch(typeName -> typeName.contains("WorkflowConfigurationDTO"));
             }
         }
     }
@@ -486,6 +505,71 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
                 .isEmpty();
     }
 
+    @Test
+    void testCreateStoresToolParameters() {
+        createConfigurationWorkflow(SECOND_WORKFLOW_ID, true);
+
+        McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
+            mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID, SECOND_WORKFLOW_ID),
+                List.of(new WorkflowToolParametersDTO(WORKFLOW_ID, Map.of("toolName", "first_tool"))));
+
+        Map<String, McpIntegrationInstanceConfigurationWorkflow> mcpWorkflowMap =
+            getMcpWorkflowsByWorkflowId(mcpIntegrationInstanceConfiguration.getId());
+
+        assertThat(mcpWorkflowMap.get(WORKFLOW_ID)
+            .getParameters()).isEqualTo(Map.of("toolName", "first_tool"));
+        assertThat(mcpWorkflowMap.get(SECOND_WORKFLOW_ID)
+            .getParameters()).isNullOrEmpty();
+    }
+
+    @Test
+    void testUpdateStoresToolParametersForNewAndKeptWorkflows() {
+        createConfigurationWorkflow(SECOND_WORKFLOW_ID, true);
+
+        McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
+            mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID));
+
+        mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfiguration(
+            mcpIntegrationInstanceConfiguration.getId(), List.of(WORKFLOW_ID, SECOND_WORKFLOW_ID),
+            List.of(
+                new WorkflowToolParametersDTO(WORKFLOW_ID, Map.of("toolName", "kept_tool")),
+                new WorkflowToolParametersDTO(SECOND_WORKFLOW_ID, Map.of("toolName", "added_tool"))));
+
+        Map<String, McpIntegrationInstanceConfigurationWorkflow> mcpWorkflowMap =
+            getMcpWorkflowsByWorkflowId(mcpIntegrationInstanceConfiguration.getId());
+
+        assertThat(mcpWorkflowMap.get(WORKFLOW_ID)
+            .getParameters()).isEqualTo(Map.of("toolName", "kept_tool"));
+        assertThat(mcpWorkflowMap.get(SECOND_WORKFLOW_ID)
+            .getParameters()).isEqualTo(Map.of("toolName", "added_tool"));
+    }
+
+    @Test
+    void testUpdateLeavesParametersOfWorkflowsWithoutToolParameters() {
+        createConfigurationWorkflow(SECOND_WORKFLOW_ID, true);
+
+        McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
+            mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID, SECOND_WORKFLOW_ID),
+                List.of(
+                    new WorkflowToolParametersDTO(WORKFLOW_ID, Map.of("toolName", "first_tool")),
+                    new WorkflowToolParametersDTO(SECOND_WORKFLOW_ID, Map.of("toolName", "second_tool"))));
+
+        mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfiguration(
+            mcpIntegrationInstanceConfiguration.getId(), List.of(WORKFLOW_ID, SECOND_WORKFLOW_ID),
+            List.of(new WorkflowToolParametersDTO(SECOND_WORKFLOW_ID, Map.of("toolName", "renamed_tool"))));
+
+        Map<String, McpIntegrationInstanceConfigurationWorkflow> mcpWorkflowMap =
+            getMcpWorkflowsByWorkflowId(mcpIntegrationInstanceConfiguration.getId());
+
+        assertThat(mcpWorkflowMap.get(WORKFLOW_ID)
+            .getParameters()).isEqualTo(Map.of("toolName", "first_tool"));
+        assertThat(mcpWorkflowMap.get(SECOND_WORKFLOW_ID)
+            .getParameters()).isEqualTo(Map.of("toolName", "renamed_tool"));
+    }
+
     private void createConfigurationWorkflow(String workflowId, boolean enabled) {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             new IntegrationInstanceConfigurationWorkflow();
@@ -538,12 +622,141 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
         return integrationInstanceConfigurationWorkflows.getFirst();
     }
 
+    private Map<String, McpIntegrationInstanceConfigurationWorkflow> getMcpWorkflowsByWorkflowId(
+        long mcpIntegrationInstanceConfigurationId) {
+
+        Map<Long, String> workflowIdMap = new HashMap<>();
+
+        for (IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow : integrationInstanceConfigurationWorkflowService
+            .getIntegrationInstanceConfigurationWorkflows(integrationInstanceConfigurationId)) {
+
+            workflowIdMap.put(
+                integrationInstanceConfigurationWorkflow.getId(),
+                integrationInstanceConfigurationWorkflow.getWorkflowId());
+        }
+
+        Map<String, McpIntegrationInstanceConfigurationWorkflow> mcpWorkflowMap = new HashMap<>();
+
+        for (McpIntegrationInstanceConfigurationWorkflow mcpWorkflow : getMcpIntegrationInstanceConfigurationWorkflows(
+            mcpIntegrationInstanceConfigurationId)) {
+
+            mcpWorkflowMap.put(
+                workflowIdMap.get(mcpWorkflow.getIntegrationInstanceConfigurationWorkflowId()), mcpWorkflow);
+        }
+
+        return mcpWorkflowMap;
+    }
+
     private List<McpIntegrationInstanceConfigurationWorkflow> getMcpIntegrationInstanceConfigurationWorkflows(
         long mcpIntegrationInstanceConfigurationId) {
 
         return mcpIntegrationInstanceConfigurationWorkflowService
             .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
                 mcpIntegrationInstanceConfigurationId);
+    }
+
+    @Nested
+    class MethodSecurityIntTest {
+
+        private AnnotationConfigApplicationContext methodSecurityApplicationContext;
+        private McpIntegrationInstanceConfigurationFacade securedMcpIntegrationInstanceConfigurationFacade;
+        private PermissionService securedPermissionService;
+
+        @BeforeEach
+        void beforeEach() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "user", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+            methodSecurityApplicationContext = new AnnotationConfigApplicationContext(
+                MethodSecurityConfiguration.class);
+
+            securedMcpIntegrationInstanceConfigurationFacade = methodSecurityApplicationContext.getBean(
+                McpIntegrationInstanceConfigurationFacade.class);
+            securedPermissionService = methodSecurityApplicationContext.getBean(PermissionService.class);
+        }
+
+        @AfterEach
+        void afterEach() {
+            methodSecurityApplicationContext.close();
+        }
+
+        @Test
+        void testNonAdminDenied() {
+            List<Method> methods = Arrays.stream(McpIntegrationInstanceConfigurationFacade.class.getDeclaredMethods())
+                .filter(method -> !method.isSynthetic())
+                .filter(method -> !method.isDefault())
+                .toList();
+
+            assertThat(methods).isNotEmpty();
+
+            for (Method method : methods) {
+                assertThatThrownBy(() -> invoke(method))
+                    .as("%s.%s", McpIntegrationInstanceConfigurationFacade.class.getSimpleName(), method.getName())
+                    .isInstanceOf(AccessDeniedException.class);
+            }
+
+            verify(securedPermissionService, times(methods.size())).isTenantAdmin();
+        }
+
+        private void invoke(Method method) throws Throwable {
+            Object[] arguments = Arrays.stream(method.getParameterTypes())
+                .map(MethodSecurityIntTest::defaultValue)
+                .toArray();
+
+            try {
+                method.invoke(securedMcpIntegrationInstanceConfigurationFacade, arguments);
+            } catch (InvocationTargetException invocationTargetException) {
+                throw invocationTargetException.getCause();
+            }
+        }
+
+        private static Object defaultValue(Class<?> type) {
+            if (type == boolean.class) {
+                return false;
+            }
+
+            if (type == int.class) {
+                return 0;
+            }
+
+            if (type == long.class) {
+                return 0L;
+            }
+
+            return null;
+        }
+
+        @EnableMethodSecurity
+        static class MethodSecurityConfiguration {
+
+            @Bean
+            static PermissionService permissionService() {
+                return mock(PermissionService.class);
+            }
+
+            @Bean
+            static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+                PermissionService permissionService,
+                ObjectProvider<MethodSecurityExpressionContributor> methodSecurityExpressionContributorProvider) {
+                return new AutomationMethodSecurityExpressionHandler(
+                    permissionService, methodSecurityExpressionContributorProvider);
+            }
+
+            @Bean
+            McpIntegrationInstanceConfigurationFacade mcpIntegrationInstanceConfigurationFacade()
+                throws ReflectiveOperationException {
+                Constructor<?> constructor =
+                    McpIntegrationInstanceConfigurationFacadeImpl.class.getDeclaredConstructors()[0];
+
+                Object[] arguments = Arrays.stream(constructor.getParameterTypes())
+                    .map(parameterType -> (Object) mock(parameterType))
+                    .toArray();
+
+                return (McpIntegrationInstanceConfigurationFacade) constructor.newInstance(arguments);
+            }
+        }
     }
 
     @Configuration
