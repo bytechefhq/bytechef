@@ -53,6 +53,11 @@ import {
     IntegrationInstanceConfigurationWorkflowFromJSON,
     IntegrationInstanceConfigurationWorkflowToJSON,
 } from '../models/IntegrationInstanceConfigurationWorkflow';
+import {
+    type UpdateConnectionCredentialsRequest,
+    UpdateConnectionCredentialsRequestFromJSON,
+    UpdateConnectionCredentialsRequestToJSON,
+} from '../models/UpdateConnectionCredentialsRequest';
 
 export interface CreateIntegrationInstanceConfigurationRequest {
     /**
@@ -180,6 +185,17 @@ export interface UpdateIntegrationInstanceConfigurationRequest {
      * 
      */
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
+}
+
+export interface UpdateIntegrationInstanceConfigurationCredentialsRequest {
+    /**
+     * The id of an integration instance configuration.
+     */
+    id: number;
+    /**
+     * 
+     */
+    updateConnectionCredentialsRequest: UpdateConnectionCredentialsRequest;
 }
 
 export interface UpdateIntegrationInstanceConfigurationWorkflowRequest {
@@ -857,6 +873,62 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
      */
     async updateIntegrationInstanceConfiguration(requestParameters: UpdateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.updateIntegrationInstanceConfigurationRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for updateIntegrationInstanceConfigurationCredentials without sending the request
+     */
+    async updateIntegrationInstanceConfigurationCredentialsRequestOpts(requestParameters: UpdateIntegrationInstanceConfigurationCredentialsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateIntegrationInstanceConfigurationCredentials().'
+            );
+        }
+
+        if (requestParameters['updateConnectionCredentialsRequest'] == null) {
+            throw new runtime.RequiredError(
+                'updateConnectionCredentialsRequest',
+                'Required parameter "updateConnectionCredentialsRequest" was null or undefined when calling updateIntegrationInstanceConfigurationCredentials().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/integration-instance-configurations/{id}/credentials`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateConnectionCredentialsRequestToJSON(requestParameters['updateConnectionCredentialsRequest']),
+        };
+    }
+
+    /**
+     * Replaces the shared credentials of an integration instance configuration and of the connections of its integration instances.
+     * Replaces the shared credentials of an integration instance configuration
+     */
+    async updateIntegrationInstanceConfigurationCredentialsRaw(requestParameters: UpdateIntegrationInstanceConfigurationCredentialsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateIntegrationInstanceConfigurationCredentialsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Replaces the shared credentials of an integration instance configuration and of the connections of its integration instances.
+     * Replaces the shared credentials of an integration instance configuration
+     */
+    async updateIntegrationInstanceConfigurationCredentials(requestParameters: UpdateIntegrationInstanceConfigurationCredentialsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateIntegrationInstanceConfigurationCredentialsRaw(requestParameters, initOverrides);
     }
 
     /**
