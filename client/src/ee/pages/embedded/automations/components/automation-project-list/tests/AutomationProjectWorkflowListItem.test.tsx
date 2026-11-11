@@ -57,6 +57,12 @@ describe('AutomationProjectWorkflowListItem', () => {
         expect(screen.getByText(/Modified at/)).toBeInTheDocument();
     });
 
+    it('underlines the label when the row is hovered', () => {
+        renderRow();
+
+        expect(screen.getByText('Mailer')).toHaveClass('group-hover/row:underline');
+    });
+
     it('opens the workflow editor when the row is clicked', async () => {
         renderRow();
 

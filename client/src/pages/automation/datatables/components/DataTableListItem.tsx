@@ -16,7 +16,7 @@ const DataTableListItem = ({remainingTags, table, tags}: DataTableListItemProps)
 
     return (
         <div
-            className="group mb-2 flex w-full cursor-pointer items-center justify-between rounded border border-border/50 px-3 hover:bg-surface-neutral-primary-hover"
+            className="group group/row mb-2 flex w-full cursor-pointer items-center justify-between rounded border border-border/50 px-3 hover:bg-surface-neutral-primary-hover"
             onClick={handleRowClick}
             onKeyDown={handleActivationKeyDown}
             role="button"
@@ -25,7 +25,9 @@ const DataTableListItem = ({remainingTags, table, tags}: DataTableListItemProps)
             <div className="flex flex-1 items-center py-3">
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
-                        <span className="text-base font-semibold">{table.baseName}</span>
+                        <span className="text-base font-semibold underline-offset-4 group-hover/row:text-content-brand-primary group-hover/row:underline">
+                            {table.baseName}
+                        </span>
                     </div>
 
                     <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">

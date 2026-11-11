@@ -30,7 +30,7 @@ const KnowledgeBase = () => {
                     <KnowledgeBaseEmbeddingInactiveEmptyState />
                 ) : (
                     knowledgeBase && (
-                        <div className="mx-auto flex h-full w-full max-w-(--breakpoint-lg) flex-col p-4 pt-0">
+                        <div className="flex h-full w-full flex-col self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                             <KnowledgeBaseInfoCard knowledgeBase={knowledgeBase} />
 
                             <KnowledgeBaseTabs documents={documents} knowledgeBaseId={knowledgeBaseId} />

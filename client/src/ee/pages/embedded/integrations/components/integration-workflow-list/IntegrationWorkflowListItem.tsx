@@ -16,8 +16,8 @@ import {
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {useEffect, useRef, useState} from 'react';
-import {Link, useSearchParams} from 'react-router-dom';
+import {MouseEvent, useEffect, useRef, useState} from 'react';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 
 const IntegrationWorkflowListItem = ({
     filteredComponentNames,
@@ -44,6 +44,8 @@ const IntegrationWorkflowListItem = ({
     const pendingPermissionExpressionRef = useRef<string | null | undefined>(undefined);
 
     const [searchParams] = useSearchParams();
+
+    const navigate = useNavigate();
 
     const queryClient = useQueryClient();
 
@@ -124,16 +126,36 @@ const IntegrationWorkflowListItem = ({
         showEditDialog,
     ]);
 
+    const workflowUrl = `/embedded/integrations/${integration.id}/integration-workflows/${workflow.integrationWorkflowId}?${searchParams}`;
+
+    const handleWorkflowListItemClick = (event: MouseEvent<HTMLLIElement>) => {
+        const target = event.target as HTMLElement;
+
+        // Clicks inside portaled dialogs and menus bubble through React but are not DOM descendants of the row.
+        if (!event.currentTarget.contains(target)) {
+            return;
+        }
+
+        if (target.closest('a, button:not([data-slot="tooltip-trigger"]), [role="menu"], [role="menuitem"]')) {
+            return;
+        }
+
+        void navigate(workflowUrl);
+    };
+
     return (
         <li
-            className="flex items-center justify-between rounded-md py-1 pl-3 hover:bg-surface-neutral-primary-hover"
+            className="group/row flex cursor-pointer items-center justify-between rounded-md py-1 pl-3 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
+            onClick={handleWorkflowListItemClick}
+            role="presentation"
         >
-            <Link
-                className="flex flex-1 items-center"
-                to={`/embedded/integrations/${integration.id}/integration-workflows/${workflow.integrationWorkflowId}?${searchParams}`}
-            >
-                <div className="flex w-80 items-center gap-2 text-sm font-semibold">{workflow.label}</div>
+            <Link className="flex flex-1 items-center" to={workflowUrl}>
+                <div className="flex w-80 items-center gap-2 text-sm font-semibold">
+                    <span className="underline-offset-4 group-hover/row:text-content-brand-primary group-hover/row:underline">
+                        {workflow.label}
+                    </span>
+                </div>
 
                 <WorkflowTriggerAndComponentsRow
                     className="hidden sm:flex"

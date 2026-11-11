@@ -150,6 +150,12 @@ describe('ProjectWorkflowListItem', () => {
         expect(screen.getByText('Test Workflow')).toBeInTheDocument();
     });
 
+    it('should underline the label when the row is hovered', () => {
+        renderProjectWorkflowListItem();
+
+        expect(screen.getByText('Test Workflow')).toHaveClass('group-hover/row:underline');
+    });
+
     it('should render last modified date', () => {
         renderProjectWorkflowListItem();
 
