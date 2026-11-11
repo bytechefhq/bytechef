@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.tool.aiagent;
 
 import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.automation.ai.agent.facade.AiAgentFacade;
+import com.bytechef.exception.ConfigurationException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -36,16 +37,16 @@ public class UpdateAiAgentSettingsToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION =
         """
-            Replace an AI Agent's settings. Top level: streamResponse (default ON) — ON runs the agent's
+            Replace an AI Agent's settings. Top level: streamResponse (default ON), where ON runs the agent's
             aiAgent/v1/streamChat action, sending the reply back token by token; OFF runs aiAgent/v1/chat,
             sending it once complete. Beside it, builtInTools, a set of on/off switches for the platform's
             built-in agent tools: askUserQuestion (default ON), autoMemory (default ON),
-            skills (default ON — gates the SKILL elements aggregate), skillManagement (default ON — the
+            skills (default ON, gates the SKILL elements aggregate), skillManagement (default ON, the
             five create/update/delete/append/removeFile skill-authoring tools), webSearch (default OFF).
-            Web search picks its source with webSearchProvider: BRAVE (the default), FIRECRAWL — both of
-            which need webSearchConnectionId set to publish — or NATIVE, the model provider's own search,
+            Web search picks its source with webSearchProvider: BRAVE (the default), FIRECRAWL (both of
+            which need webSearchConnectionId set to publish), or NATIVE, the model provider's own search,
             which takes no connection and only works on a model provider that supports it (anthropic).
-            This REPLACES the entire settings object, not a per-key merge — always include every key you
+            This REPLACES the entire settings object, not a per-key merge, so always include every key you
             want to keep, not just the ones you're changing. Example: {"streamResponse": false,
             "builtInTools": {"webSearch": true, "webSearchProvider": "FIRECRAWL",
             "webSearchConnectionId": 42}}. Any key you omit resets to its documented default.""";
@@ -104,7 +105,7 @@ public class UpdateAiAgentSettingsToolCallback implements ToolCallback {
             return writeResult(Map.of("updated", true, "id", input.id()));
         } catch (JacksonException exception) {
             return ToolErrors.invalidInput(exception);
-        } catch (IllegalArgumentException exception) {
+        } catch (ConfigurationException | IllegalArgumentException exception) {
             return toolError(exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(

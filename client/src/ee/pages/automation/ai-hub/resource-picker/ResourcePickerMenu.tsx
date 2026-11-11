@@ -2,9 +2,10 @@ import {Command, CommandGroup, CommandInput, CommandItem, CommandList} from '@/c
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {isWorkspaceIdKnown} from '@/ee/pages/automation/ai-hub/chats/isWorkspaceIdKnown';
 import {ReferencedResourceKindType} from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
+import {useAiAgentsQuery} from '@/shared/middleware/graphql';
 import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
-import {ChevronLeftIcon, ChevronRightIcon, WorkflowIcon} from 'lucide-react';
+import {BotIcon, ChevronLeftIcon, ChevronRightIcon, WorkflowIcon} from 'lucide-react';
 import {ReactNode, useMemo, useState} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -35,7 +36,7 @@ interface WorkflowItemI {
 const SECTION_INITIAL_CAP = 20;
 const SECTION_EXPAND_INCREMENT = 50;
 
-type MenuPathType = [] | ['workflows'] | ['workflows', string];
+type MenuPathType = [] | ['aiAgents'] | ['workflows'] | ['workflows', string];
 
 const EmptyMessage = ({children}: {children: ReactNode}) => (
     <div className="py-6 text-center text-sm text-muted-foreground">{children}</div>
@@ -52,6 +53,7 @@ const ResourcePickerMenu = ({
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [menuPath, setMenuPath] = useState<MenuPathType>([]);
+    const [aiAgentsShowCount, setAiAgentsShowCount] = useState(SECTION_INITIAL_CAP);
     const [workflowsShowCount, setWorkflowsShowCount] = useState(SECTION_INITIAL_CAP);
 
     const open = controlledOpen ?? uncontrolledOpen;
@@ -60,6 +62,11 @@ const ResourcePickerMenu = ({
     const {data: projects, isLoading: projectsLoading} = useGetWorkspaceProjectsQuery(
         {id: workspaceId},
         open && isWorkspaceIdKnown(workspaceId)
+    );
+
+    const {data: aiAgentsData, isLoading: aiAgentsLoading} = useAiAgentsQuery(
+        {workspaceId: String(workspaceId)},
+        {enabled: open && isWorkspaceIdKnown(workspaceId)}
     );
 
     const {data: projectWorkflows, isLoading: projectWorkflowsLoading} = useGetProjectWorkflowsQuery(
@@ -82,6 +89,14 @@ const ResourcePickerMenu = ({
                     project.name.toLowerCase().includes(lowerSearch)
             ),
         [projects, lowerSearch]
+    );
+
+    const filteredAiAgents = useMemo(
+        () =>
+            (aiAgentsData?.aiAgents ?? []).filter(
+                (aiAgent) => aiAgent != null && aiAgent.title.toLowerCase().includes(lowerSearch)
+            ),
+        [aiAgentsData, lowerSearch]
     );
 
     const selectedWorkflowProject = useMemo(() => {
@@ -108,11 +123,17 @@ const ResourcePickerMenu = ({
             }));
     }, [lowerSearch, projectWorkflows, selectedProjectId, selectedWorkflowProject]);
 
-    const showsWorkflowProjects = menuPath.length === 1 || (menuPath.length === 0 && debouncedSearch !== '');
+    const showsWorkflowProjects =
+        (menuPath.length === 1 && menuPath[0] === 'workflows') || (menuPath.length === 0 && debouncedSearch !== '');
+
+    const showsAiAgents = menuPath[0] === 'aiAgents' || (menuPath.length === 0 && debouncedSearch !== '');
+
+    const isRootMenu = menuPath.length === 0 && debouncedSearch === '';
 
     const resetSearch = () => {
         setSearch('');
         setDebouncedSearch('');
+        setAiAgentsShowCount(SECTION_INITIAL_CAP);
         setWorkflowsShowCount(SECTION_INITIAL_CAP);
     };
 
@@ -132,6 +153,12 @@ const ResourcePickerMenu = ({
         }
 
         onOpenChange?.(nextOpen);
+    };
+
+    const handleSelectAiAgent = (aiAgentId: string, title: string) => {
+        onSelect({id: aiAgentId, kind: 'aiAgent', name: title});
+
+        handleOpenChange(false);
     };
 
     const handleSelectWorkflow = (workflow: WorkflowItemI) => {
@@ -165,12 +192,20 @@ const ResourcePickerMenu = ({
                     </div>
 
                     <CommandList>
-                        {menuPath.length === 0 && !showsWorkflowProjects ? (
+                        {isRootMenu ? (
                             <CommandGroup>
                                 <CommandItem onSelect={() => navigateTo(['workflows'])} value="root-workflows">
                                     <WorkflowIcon className="mr-2 size-3.5" />
 
                                     <span className="flex-1">Workflows</span>
+
+                                    <ChevronRightIcon className="size-3.5 text-muted-foreground" />
+                                </CommandItem>
+
+                                <CommandItem onSelect={() => navigateTo(['aiAgents'])} value="root-ai-agents">
+                                    <BotIcon className="mr-2 size-3.5" />
+
+                                    <span className="flex-1">AI Agents</span>
 
                                     <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                                 </CommandItem>
@@ -187,6 +222,42 @@ const ResourcePickerMenu = ({
 
                                             <span className="flex-1 text-muted-foreground">Back</span>
                                         </CommandItem>
+                                    </CommandGroup>
+                                )}
+
+                                {showsAiAgents && (
+                                    <CommandGroup heading="AI Agents">
+                                        {filteredAiAgents.length === 0 && (
+                                            <EmptyMessage>
+                                                {aiAgentsLoading ? 'Loading…' : 'No AI Agents.'}
+                                            </EmptyMessage>
+                                        )}
+
+                                        {filteredAiAgents.slice(0, aiAgentsShowCount).map((aiAgent) => (
+                                            <CommandItem
+                                                key={`ai-agent-${aiAgent.id}`}
+                                                onSelect={() => handleSelectAiAgent(aiAgent.id, aiAgent.title)}
+                                                value={`ai-agent-${aiAgent.id}-${aiAgent.title}`}
+                                            >
+                                                <BotIcon className="mr-2 size-3.5" />
+
+                                                {aiAgent.title}
+                                            </CommandItem>
+                                        ))}
+
+                                        {filteredAiAgents.length > aiAgentsShowCount && (
+                                            <CommandItem
+                                                key="ai-agents-show-more"
+                                                onSelect={() =>
+                                                    setAiAgentsShowCount((count) => count + SECTION_EXPAND_INCREMENT)
+                                                }
+                                                value="ai-agents-show-more"
+                                            >
+                                                <span className="text-xs text-muted-foreground">
+                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredAiAgents.length - aiAgentsShowCount)} more…`}
+                                                </span>
+                                            </CommandItem>
+                                        )}
                                     </CommandGroup>
                                 )}
 
