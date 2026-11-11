@@ -40,7 +40,7 @@ vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
         onViewJob: (jobId: number) => void;
         workflowExecutionSheet: ReactNode;
     } & Parameters<typeof useExternalInvocations>[0]) => {
-        const {filterOutcome, filterPageNumber, handleOutcomeChange, handlePaginationClick} = useExternalInvocations({
+        const {filterPageNumber, filterStatus, handlePaginationClick, handleStatusChange} = useExternalInvocations({
             environmentId,
             type,
             workspaceScope,
@@ -48,11 +48,11 @@ vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
 
         return (
             <div>
-                <span data-testid="filters">{`outcome=${filterOutcome ?? ''};page=${filterPageNumber}`}</span>
+                <span data-testid="filters">{`status=${filterStatus ?? ''};page=${filterPageNumber}`}</span>
 
                 <span data-testid="workspace-scope">{workspaceScope === undefined ? 'none' : 'scoped'}</span>
 
-                <button onClick={() => handleOutcomeChange({label: 'Error', value: 'ERROR'})}>pick outcome</button>
+                <button onClick={() => handleStatusChange({label: 'Error', value: 'ERROR'})}>pick status</button>
 
                 <button onClick={() => handlePaginationClick(3)}>next pages</button>
 
@@ -106,12 +106,12 @@ describe('EmbeddedExternalInvocations', () => {
     it('resets the filters and the page and queries the new environment when the environment changes', async () => {
         renderPage();
 
-        await userEvent.click(screen.getByRole('button', {name: 'pick outcome'}));
+        await userEvent.click(screen.getByRole('button', {name: 'pick status'}));
         await userEvent.click(screen.getByRole('button', {name: 'next pages'}));
 
-        expect(screen.getByTestId('filters')).toHaveTextContent('outcome=ERROR;page=3');
+        expect(screen.getByTestId('filters')).toHaveTextContent('status=ERROR;page=3');
         expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
-            expect.objectContaining({environmentId: '2', outcome: 'ERROR', page: 3, type: 'EMBEDDED'}),
+            expect.objectContaining({environmentId: '2', page: 3, status: 'ERROR', type: 'EMBEDDED'}),
             {enabled: true}
         );
 
@@ -119,9 +119,9 @@ describe('EmbeddedExternalInvocations', () => {
             environmentStore.setState({currentEnvironmentId: 1});
         });
 
-        expect(screen.getByTestId('filters')).toHaveTextContent('outcome=;page=0');
+        expect(screen.getByTestId('filters')).toHaveTextContent('status=;page=0');
         expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
-            expect.objectContaining({environmentId: '1', outcome: undefined, page: 0, type: 'EMBEDDED'}),
+            expect.objectContaining({environmentId: '1', page: 0, status: undefined, type: 'EMBEDDED'}),
             {enabled: true}
         );
     });

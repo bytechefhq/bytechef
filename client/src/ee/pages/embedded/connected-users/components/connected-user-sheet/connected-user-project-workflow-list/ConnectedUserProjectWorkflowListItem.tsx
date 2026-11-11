@@ -7,6 +7,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
+import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {
     AutomationProjectsQuery,
@@ -28,6 +29,7 @@ export type ConnectedUserWorkflowTemplateType =
     AutomationProjectsQuery['automationProjects'][number]['workflowTemplates'][number];
 
 export interface ConnectedUserWorkflowTemplateSourceI {
+    projectId: string;
     projectName: string;
     workflowTemplate: ConnectedUserWorkflowTemplateType;
 }
@@ -132,7 +134,14 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     return (
         <>
-            <li className="flex min-h-12 items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+            <li
+                className="flex min-h-12 cursor-pointer items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
+                onClick={(event) => {
+                    if (isCollapsibleRowClick(event)) {
+                        handleWorkflowClick();
+                    }
+                }}
+            >
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                     <div className="flex w-80 min-w-0 shrink-0 flex-col gap-y-1 pr-1">
                         <div className="flex min-w-0 items-center gap-2">
@@ -184,17 +193,21 @@ const ConnectedUserProjectWorkflowListItem = ({
 
                 <div className="flex items-center gap-x-2">
                     <div className="flex items-center gap-x-4">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Badge
-                                    label={isDraft ? 'V1 DRAFT' : `V${connectedUserProjectWorkflow.workflowVersion}`}
-                                    styleType="secondary-filled"
-                                    weight="semibold"
-                                />
-                            </TooltipTrigger>
+                        <div className="flex w-20 justify-start">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge
+                                        label={
+                                            isDraft ? 'V1 DRAFT' : `V${connectedUserProjectWorkflow.workflowVersion}`
+                                        }
+                                        styleType="secondary-filled"
+                                        weight="semibold"
+                                    />
+                                </TooltipTrigger>
 
-                            <TooltipContent>The workflow version</TooltipContent>
-                        </Tooltip>
+                                <TooltipContent>The workflow version</TooltipContent>
+                            </Tooltip>
+                        </div>
 
                         <div className="flex min-w-52 items-center justify-end gap-x-4">
                             <Tooltip>

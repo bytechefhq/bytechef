@@ -6,11 +6,13 @@ import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ExternalInvocationDetailsDialog from '@/pages/automation/external-invocations/components/ExternalInvocationDetailsDialog';
 import ExternalInvocationsTable from '@/pages/automation/external-invocations/components/ExternalInvocationsTable';
 import {
     ExternalInvocationsWorkspaceScopeI,
     useExternalInvocations,
 } from '@/pages/automation/external-invocations/hooks/useExternalInvocations';
+import {type ExternalInvocationLogItemType} from '@/pages/automation/external-invocations/utils/externalInvocationLabels';
 import {sourceHasA2aServer, sourceHasMcpServer} from '@/pages/automation/external-invocations/utils/sourceServers';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Footer from '@/shared/layout/Footer';
@@ -18,12 +20,12 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {PlatformType} from '@/shared/middleware/graphql';
 import {HammerIcon, RefreshCwIcon} from 'lucide-react';
-import {ReactNode, useMemo} from 'react';
+import {ReactNode, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ANY_FILTER_OPTION = {label: 'Any', value: ''};
 
-const outcomeOptions = [
+const statusOptions = [
     ANY_FILTER_OPTION,
     {label: 'Success', value: 'SUCCESS'},
     {label: 'Error', value: 'ERROR'},
@@ -68,6 +70,10 @@ export const ExternalInvocations = ({
     workflowExecutionSheet,
     workspaceScope,
 }: ExternalInvocationsProps) => {
+    const [selectedExternalInvocationLog, setSelectedExternalInvocationLog] = useState<
+        ExternalInvocationLogItemType | undefined
+    >();
+
     const {
         externalInvocationLogPage,
         externalInvocationLogs,
@@ -77,17 +83,17 @@ export const ExternalInvocations = ({
         filterA2aServerId,
         filterEndDate,
         filterMcpServerId,
-        filterOutcome,
         filterPageNumber,
         filterSource,
         filterStartDate,
+        filterStatus,
         handleA2aServerChange,
         handleEndDateChange,
         handleMcpServerChange,
-        handleOutcomeChange,
         handlePaginationClick,
         handleSourceChange,
         handleStartDateChange,
+        handleStatusChange,
         refetchExternalInvocations,
     } = useExternalInvocations({environmentId, type, workspaceScope});
 
@@ -113,7 +119,7 @@ export const ExternalInvocations = ({
         !!filterA2aServerId ||
         !!filterEndDate ||
         !!filterMcpServerId ||
-        !!filterOutcome ||
+        !!filterStatus ||
         !!filterStartDate ||
         !!filterSource;
 
@@ -182,7 +188,7 @@ export const ExternalInvocations = ({
                     <div className="flex flex-col space-y-2">
                         <Label>Status</Label>
 
-                        <ComboBox items={outcomeOptions} onChange={handleOutcomeChange} value={filterOutcome} />
+                        <ComboBox items={statusOptions} onChange={handleStatusChange} value={filterStatus} />
                     </div>
 
                     {sourceHasMcpServer(filterSource) && mcpServerOptions && mcpServerOptions.length > 0 && (
@@ -235,6 +241,7 @@ export const ExternalInvocations = ({
                             a2aServerNames={a2aServerNames}
                             externalInvocationLogs={externalInvocationLogs}
                             mcpServerNames={mcpServerNames}
+                            onSelect={setSelectedExternalInvocationLog}
                             onViewJob={onViewJob}
                             showConnectedUser={type === PlatformType.Embedded}
                             showSource={showSource}
@@ -250,6 +257,13 @@ export const ExternalInvocations = ({
                     />
                 )}
             </PageLoader>
+
+            {selectedExternalInvocationLog && (
+                <ExternalInvocationDetailsDialog
+                    externalInvocationLog={selectedExternalInvocationLog}
+                    onClose={() => setSelectedExternalInvocationLog(undefined)}
+                />
+            )}
 
             {workflowExecutionSheet}
         </LayoutContainer>

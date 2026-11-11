@@ -30,10 +30,12 @@ import {
 } from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetProvisionableIntegrationsQuery} from '@/ee/shared/queries/embedded/provisionableIntegrations.queries';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
+import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, KeyRoundIcon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {type MouseEvent, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
@@ -64,6 +66,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
     const [showChangeConfigurationDialog, setShowChangeConfigurationDialog] = useState(false);
     const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const queryClient = useQueryClient();
 
@@ -140,13 +143,32 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
         },
     });
 
+    const workflowCount = workflows?.length ?? 0;
+
+    const handleRowClick = (event: MouseEvent<HTMLDivElement>) => {
+        if (workflowCount > 0 && isCollapsibleRowClick(event)) {
+            setOpen((previousOpen) => !previousOpen);
+        }
+    };
+
     return (
-        <Collapsible className="mb-2 rounded border border-border/50" key={connectedUserIntegrationInstance.id}>
+        <Collapsible
+            className="mb-2 rounded border border-border/50"
+            key={connectedUserIntegrationInstance.id}
+            onOpenChange={setOpen}
+            open={open}
+        >
             {componentDefinition && (
-                <div className="flex items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover">
-                    <CollapsibleTrigger className="flex-1 py-3">
+                <div
+                    className="flex cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
+                    onClick={handleRowClick}
+                    role="presentation"
+                >
+                    <ListItemExpandButton disabled={workflowCount === 0} label="Toggle integration" />
+
+                    <CollapsibleTrigger className="flex-1 py-3" disabled={workflowCount === 0}>
                         <div className="flex flex-col items-start justify-center gap-y-2">
-                            <div className="flex min-h-8 flex-1 items-center gap-2">
+                            <div className="flex min-h-6 flex-1 items-center gap-2">
                                 {componentDefinition.icon ? (
                                     <InlineSVG
                                         aria-hidden="true"
@@ -177,7 +199,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 </div>
                             </div>
 
-                            <div className="flex min-h-7 items-center text-xs font-semibold text-muted-foreground">
+                            <div className="flex min-h-6 items-center text-xs font-semibold text-muted-foreground">
                                 <ConnectedUserCredentialStatus
                                     componentTitle={componentDefinition.title!}
                                     credentialStatus={connectedUserIntegrationInstance.credentialStatus}
@@ -217,12 +239,13 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             )}
 
                             <div className="flex min-w-52 flex-col items-end gap-y-2">
-                                <div className="flex min-h-8 items-center gap-x-4">
+                                <div className="flex min-h-6 items-center gap-x-4">
                                     {connectedUserIntegrationInstance.provisioned && (
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <Button
                                                     aria-label="Credentials"
+                                                    className="-my-1.5"
                                                     icon={<KeyRoundIcon />}
                                                     onClick={() => setShowCredentialsDialog(true)}
                                                     size="icon"
@@ -253,7 +276,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 </div>
 
                                 <Tooltip>
-                                    <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
+                                    <TooltipTrigger className="flex min-h-6 items-center text-sm text-content-neutral-secondary">
                                         {integrationInstance?.lastExecutionDate ? (
                                             <span className="text-xs">
                                                 {`Executed at ${integrationInstance.lastExecutionDate?.toLocaleDateString()} ${integrationInstance.lastExecutionDate?.toLocaleTimeString()}`}
@@ -278,7 +301,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                 </div>
             )}
 
-            <CollapsibleContent>
+            <CollapsibleContent className="ml-8">
                 {workflows && integrationInstance && integrationInstanceConfiguration && (
                     <ConnectedUserSheetPanelIntegrationWorkflowList
                         integrationInstance={integrationInstance}

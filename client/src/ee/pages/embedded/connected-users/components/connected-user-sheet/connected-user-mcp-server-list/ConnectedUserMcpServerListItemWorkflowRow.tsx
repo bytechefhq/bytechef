@@ -10,6 +10,7 @@ import {
     useGetIntegrationInstanceQuery,
 } from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
+import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
@@ -17,6 +18,7 @@ import useWorkflowComponentDefinitions, {
 import {ConnectedUserMcpServerWorkflow} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 const ConnectedUserMcpServerListItemWorkflowRow = ({
     connectedUserId,
@@ -70,7 +72,17 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
     };
 
     return (
-        <li className="-mx-3 flex min-h-12 items-center gap-2 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+        <li
+            className={twMerge(
+                '-mx-3 flex min-h-12 items-center gap-2 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover',
+                canOpenExecutions && 'cursor-pointer'
+            )}
+            onClick={(event) => {
+                if (isCollapsibleRowClick(event)) {
+                    handleWorkflowClick();
+                }
+            }}
+        >
             <div className="flex min-w-0 flex-1 items-center">
                 <div className="flex w-full max-w-80 min-w-0 shrink items-center gap-2 sm:w-80 sm:shrink-0">
                     <Tooltip>

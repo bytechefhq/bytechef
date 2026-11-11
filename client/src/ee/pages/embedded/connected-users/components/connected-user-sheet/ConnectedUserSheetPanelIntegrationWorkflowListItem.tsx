@@ -14,6 +14,7 @@ import {useEnableIntegrationInstanceWorkflowMutation} from '@/ee/shared/mutation
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {IntegrationInstanceKeys} from '@/ee/shared/queries/embedded/integrationInstances.queries';
+import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
@@ -73,8 +74,13 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
     return (
         <li
-            className="flex min-h-12 items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
+            className="flex min-h-12 cursor-pointer items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
+            onClick={(event) => {
+                if (isCollapsibleRowClick(event)) {
+                    handleWorkflowClick();
+                }
+            }}
         >
             <div className="flex min-w-0 flex-1 items-center gap-2">
                 <div className="flex w-80 shrink-0 items-center gap-2 pr-1">

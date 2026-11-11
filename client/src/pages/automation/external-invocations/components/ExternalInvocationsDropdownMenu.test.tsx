@@ -38,7 +38,7 @@ describe('ExternalInvocationsDropdownMenu', () => {
     it('opens the workflow run of the call when View is chosen', async () => {
         const onViewJob = vi.fn();
 
-        render(<ExternalInvocationsDropdownMenu jobId="7" onViewJob={onViewJob} outcome="SUCCESS" />);
+        render(<ExternalInvocationsDropdownMenu jobId="7" onViewJob={onViewJob} status="SUCCESS" />);
 
         await openMenu();
         await userEvent.click(menuItem('View'));
@@ -47,7 +47,7 @@ describe('ExternalInvocationsDropdownMenu', () => {
     });
 
     it('disables View and Stop for a call that started no workflow run', async () => {
-        render(<ExternalInvocationsDropdownMenu jobId={null} onViewJob={vi.fn()} outcome="SUSPENDED" />);
+        render(<ExternalInvocationsDropdownMenu jobId={null} onViewJob={vi.fn()} status="SUSPENDED" />);
 
         await openMenu();
 
@@ -57,8 +57,8 @@ describe('ExternalInvocationsDropdownMenu', () => {
 
     it.each(['APPROVAL_REQUIRED', 'SUSPENDED', 'TIMEOUT'])(
         'stops the workflow run of a call that ended with %s',
-        async (outcome) => {
-            render(<ExternalInvocationsDropdownMenu jobId="7" onViewJob={vi.fn()} outcome={outcome} />);
+        async (status) => {
+            render(<ExternalInvocationsDropdownMenu jobId="7" onViewJob={vi.fn()} status={status} />);
 
             await openMenu();
             await userEvent.click(menuItem('Stop'));
@@ -69,8 +69,8 @@ describe('ExternalInvocationsDropdownMenu', () => {
 
     it.each(['SUCCESS', 'ERROR', 'APPROVAL_DENIED'])(
         'disables Stop for a call whose workflow run ended with %s',
-        async (outcome) => {
-            render(<ExternalInvocationsDropdownMenu jobId="7" onViewJob={vi.fn()} outcome={outcome} />);
+        async (status) => {
+            render(<ExternalInvocationsDropdownMenu jobId="7" onViewJob={vi.fn()} status={status} />);
 
             await openMenu();
 
@@ -79,7 +79,7 @@ describe('ExternalInvocationsDropdownMenu', () => {
     );
 
     it('announces the stop once the workflow run is stopped', () => {
-        render(<ExternalInvocationsDropdownMenu jobId="7" onViewJob={vi.fn()} outcome="SUSPENDED" />);
+        render(<ExternalInvocationsDropdownMenu jobId="7" onViewJob={vi.fn()} status="SUSPENDED" />);
 
         hoisted.stopJobMutationOptions.onSuccess?.();
 

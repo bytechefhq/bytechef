@@ -17,7 +17,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowList = ({
     workflows: Workflow[];
 }) => {
     return (
-        <div className="flex w-full flex-col gap-y-1 pt-3">
+        <div className="flex w-full flex-col gap-y-1 pt-1">
             <h3 className="flex justify-start px-3 text-sm font-semibold text-muted-foreground uppercase">Workflows</h3>
 
             {workflows.length > 0 ? (

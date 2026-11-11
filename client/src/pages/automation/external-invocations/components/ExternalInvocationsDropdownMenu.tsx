@@ -9,15 +9,15 @@ import {useStopJobMutation} from '@/shared/mutations/platform/jobs.mutations';
 import {CircleStopIcon, EllipsisVerticalIcon, ViewIcon} from 'lucide-react';
 import {toast} from 'sonner';
 
-const RUNNING_OUTCOMES = new Set<string>(['APPROVAL_REQUIRED', 'SUSPENDED', 'TIMEOUT']);
+const RUNNING_STATUSES = new Set<string>(['APPROVAL_REQUIRED', 'SUSPENDED', 'TIMEOUT']);
 
 interface ExternalInvocationsDropdownMenuProps {
     jobId?: number | string | null;
     onViewJob: (jobId: number) => void;
-    outcome: string;
+    status: string;
 }
 
-const ExternalInvocationsDropdownMenu = ({jobId, onViewJob, outcome}: ExternalInvocationsDropdownMenuProps) => {
+const ExternalInvocationsDropdownMenu = ({jobId, onViewJob, status}: ExternalInvocationsDropdownMenuProps) => {
     const stopJobMutation = useStopJobMutation({
         onSuccess: () => toast('Stopping Workflow Execution'),
     });
@@ -51,7 +51,7 @@ const ExternalInvocationsDropdownMenu = ({jobId, onViewJob, outcome}: ExternalIn
                 <DropdownMenuItem disabled={!hasJob} icon={<ViewIcon />} label="View" onClick={handleViewClick} />
 
                 <DropdownMenuItem
-                    disabled={!hasJob || !RUNNING_OUTCOMES.has(outcome)}
+                    disabled={!hasJob || !RUNNING_STATUSES.has(status)}
                     icon={<CircleStopIcon />}
                     label="Stop"
                     onClick={handleStopClick}

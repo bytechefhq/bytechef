@@ -215,7 +215,7 @@ describe('useExternalInvocations', () => {
         expect(result.current.externalInvocationLogPage).toBeUndefined();
     });
 
-    it('passes the source, outcome and date filters as query variables and clears them again', () => {
+    it('passes the source, status and date filters as query variables and clears them again', () => {
         const startDate = new Date(Date.UTC(2026, 9, 1));
         const endDate = new Date(2026, 9, 31);
 
@@ -227,13 +227,13 @@ describe('useExternalInvocations', () => {
 
         act(() => {
             result.current.handleSourceChange({label: 'MCP Servers', value: 'MCP_SERVER'});
-            result.current.handleOutcomeChange({label: 'Error', value: 'ERROR'});
+            result.current.handleStatusChange({label: 'Error', value: 'ERROR'});
             result.current.handleStartDateChange(startDate);
             result.current.handleEndDateChange(endDate);
         });
 
         expect(result.current.filterSource).toBe('MCP_SERVER');
-        expect(result.current.filterOutcome).toBe('ERROR');
+        expect(result.current.filterStatus).toBe('ERROR');
         expect(result.current.filterStartDate).toBe(startDate);
         expect(result.current.filterEndDate).toBe(endDate);
         expect(result.current.filterPageNumber).toBe(0);
@@ -243,9 +243,9 @@ describe('useExternalInvocations', () => {
                 environmentId: undefined,
                 fromDate: startDate.getTime(),
                 mcpServerId: undefined,
-                outcome: 'ERROR',
                 page: 0,
                 source: 'MCP_SERVER',
+                status: 'ERROR',
                 toDate: new Date(2026, 9, 31, 23, 59, 59, 999).getTime(),
                 type: 'AUTOMATION',
             },
@@ -254,7 +254,7 @@ describe('useExternalInvocations', () => {
 
         act(() => {
             result.current.handleSourceChange(undefined);
-            result.current.handleOutcomeChange(undefined);
+            result.current.handleStatusChange(undefined);
             result.current.handleMcpServerChange(undefined);
             result.current.handleStartDateChange(undefined);
             result.current.handleEndDateChange(undefined);
@@ -266,9 +266,9 @@ describe('useExternalInvocations', () => {
                 environmentId: undefined,
                 fromDate: undefined,
                 mcpServerId: undefined,
-                outcome: undefined,
                 page: 0,
                 source: undefined,
+                status: undefined,
                 toDate: undefined,
                 type: 'AUTOMATION',
             },

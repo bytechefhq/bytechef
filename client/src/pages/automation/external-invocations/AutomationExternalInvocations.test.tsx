@@ -58,25 +58,25 @@ vi.mock('@/pages/automation/external-invocations/ExternalInvocations', () => ({
         const {
             filterA2aServerId,
             filterMcpServerId,
-            filterOutcome,
             filterPageNumber,
+            filterStatus,
             handleA2aServerChange,
             handleMcpServerChange,
-            handleOutcomeChange,
             handlePaginationClick,
+            handleStatusChange,
         } = useExternalInvocations({type, workspaceScope});
 
         return (
             <div>
                 <span data-testid="filters">
-                    {`a2a=${filterA2aServerId ?? ''};mcp=${filterMcpServerId ?? ''};outcome=${filterOutcome ?? ''};page=${filterPageNumber}`}
+                    {`a2a=${filterA2aServerId ?? ''};mcp=${filterMcpServerId ?? ''};status=${filterStatus ?? ''};page=${filterPageNumber}`}
                 </span>
 
                 <button onClick={() => handleA2aServerChange({label: 'Agent', value: '4'})}>pick a2a server</button>
 
                 <button onClick={() => handleMcpServerChange({label: 'Server', value: '9'})}>pick server</button>
 
-                <button onClick={() => handleOutcomeChange({label: 'Error', value: 'ERROR'})}>pick outcome</button>
+                <button onClick={() => handleStatusChange({label: 'Error', value: 'ERROR'})}>pick status</button>
 
                 <button onClick={() => handlePaginationClick(3)}>next pages</button>
 
@@ -146,16 +146,16 @@ describe('AutomationExternalInvocations', () => {
             renderPage();
 
             await userEvent.click(screen.getByRole('button', {name: 'pick server'}));
-            await userEvent.click(screen.getByRole('button', {name: 'pick outcome'}));
+            await userEvent.click(screen.getByRole('button', {name: 'pick status'}));
             await userEvent.click(screen.getByRole('button', {name: 'next pages'}));
 
-            expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;mcp=9;outcome=ERROR;page=3');
+            expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;mcp=9;status=ERROR;page=3');
             expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
                 expect.objectContaining({
                     environmentId: '2',
                     mcpServerId: 9,
-                    outcome: 'ERROR',
                     page: 3,
+                    status: 'ERROR',
                     type: 'AUTOMATION',
                     workspaceId: '7',
                 }),
@@ -166,13 +166,13 @@ describe('AutomationExternalInvocations', () => {
                 switchScope();
             });
 
-            expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;mcp=;outcome=;page=0');
+            expect(screen.getByTestId('filters')).toHaveTextContent('a2a=;mcp=;status=;page=0');
             expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
                 expect.objectContaining({
                     environmentId,
                     mcpServerId: undefined,
-                    outcome: undefined,
                     page: 0,
+                    status: undefined,
                     type: 'AUTOMATION',
                     workspaceId,
                 }),
@@ -229,7 +229,7 @@ describe('AutomationExternalInvocations', () => {
 
         await userEvent.click(screen.getByRole('button', {name: 'pick a2a server'}));
 
-        expect(screen.getByTestId('filters')).toHaveTextContent('a2a=4;mcp=;outcome=;page=0');
+        expect(screen.getByTestId('filters')).toHaveTextContent('a2a=4;mcp=;status=;page=0');
         expect(hoisted.useWorkspaceExternalInvocationLogsQueryMock).toHaveBeenLastCalledWith(
             expect.objectContaining({a2aServerId: 4, mcpServerId: undefined, type: 'AUTOMATION'}),
             {enabled: true}

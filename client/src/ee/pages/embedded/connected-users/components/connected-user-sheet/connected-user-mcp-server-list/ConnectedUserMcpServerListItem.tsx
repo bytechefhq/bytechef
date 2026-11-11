@@ -9,13 +9,15 @@ import ConnectedUserMcpServerListItemToolRow from '@/ee/pages/embedded/connected
 import ConnectedUserMcpServerListItemWorkflowRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemWorkflowRow';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
+import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import {
     ConnectedUserMcpServer,
     useDeleteConnectedUserMcpServerMutation,
     useEnableConnectedUserMcpServerMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useMemo, useState} from 'react';
+import {type MouseEvent, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ConnectedUserMcpServerListItem = ({
@@ -28,12 +30,14 @@ const ConnectedUserMcpServerListItem = ({
     mcpServer: ConnectedUserMcpServer;
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const queryClient = useQueryClient();
 
     const deleteConnectedUserMcpServerMutation = useDeleteConnectedUserMcpServerMutation({
         onSuccess: () => {
             void queryClient.invalidateQueries({queryKey: ['connectedUserMcpServers']});
+            void queryClient.invalidateQueries({queryKey: ['provisionableConnectedUserMcpServers']});
 
             setShowDeleteDialog(false);
         },
@@ -48,6 +52,7 @@ const ConnectedUserMcpServerListItem = ({
 
     const toolCount = mcpServer.tools.length;
     const workflowCount = mcpServer.workflows.length;
+    const hasItems = toolCount > 0 || workflowCount > 0;
 
     const toolsByComponentName = useMemo(
         () => groupByComponent(mcpServer.tools, (tool) => tool.componentVersion),
@@ -66,22 +71,39 @@ const ConnectedUserMcpServerListItem = ({
 
     const lastExecutionDate = useMemo(() => getLastExecutionDate(mcpServer.workflows), [mcpServer.workflows]);
 
+    const handleRowClick = (event: MouseEvent<HTMLDivElement>) => {
+        if (hasItems && isCollapsibleRowClick(event)) {
+            setOpen((previousOpen) => !previousOpen);
+        }
+    };
+
     return (
         <>
-            <Collapsible className="mb-2 rounded border border-border/50" key={mcpServer.id}>
-                <div className="flex items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover">
-                    <CollapsibleTrigger className="flex-1 py-3">
+            <Collapsible
+                className="mb-2 rounded border border-border/50"
+                key={mcpServer.id}
+                onOpenChange={setOpen}
+                open={open}
+            >
+                <div
+                    className="flex cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
+                    onClick={handleRowClick}
+                    role="presentation"
+                >
+                    <ListItemExpandButton disabled={!hasItems} label="Toggle MCP server" />
+
+                    <CollapsibleTrigger className="flex-1 py-3" disabled={!hasItems}>
                         <div className="flex flex-col items-start justify-center gap-y-2">
                             <div
                                 className={twMerge(
-                                    'flex min-h-8 items-center text-base font-semibold',
+                                    'flex min-h-6 items-center text-base font-semibold',
                                     !mcpServer.enabled && 'text-muted-foreground'
                                 )}
                             >
                                 {mcpServer.name}
                             </div>
 
-                            <div className="flex min-h-7 items-center text-xs font-semibold text-muted-foreground">
+                            <div className="flex min-h-6 items-center text-xs font-semibold text-muted-foreground">
                                 {toolCount > 0 && (
                                     <span>{toolCount === 1 ? '1 component tool' : `${toolCount} component tools`}</span>
                                 )}
@@ -103,7 +125,7 @@ const ConnectedUserMcpServerListItem = ({
 
                     <div className="flex items-center gap-x-2">
                         <div className="flex min-w-52 flex-col items-end gap-y-2">
-                            <div className="relative flex min-h-8 items-center">
+                            <div className="relative flex min-h-6 items-center">
                                 {enableConnectedUserMcpServerMutation.isPending && (
                                     <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                                 )}
@@ -121,7 +143,7 @@ const ConnectedUserMcpServerListItem = ({
                             </div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex min-h-7 items-center text-xs text-content-neutral-secondary">
+                                <TooltipTrigger className="flex min-h-6 items-center text-xs text-content-neutral-secondary">
                                     {lastExecutionDate
                                         ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
                                         : 'No executions'}
@@ -131,17 +153,20 @@ const ConnectedUserMcpServerListItem = ({
                             </Tooltip>
                         </div>
 
-                        {workflowCount > 0 ? (
-                            <div aria-hidden="true" className="size-9 shrink-0" />
-                        ) : (
-                            <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
-                        )}
+                        <ConnectedUserSheetDeleteDropdownMenu
+                            deleteDisabledReason={
+                                workflowCount > 0
+                                    ? "Workflow tools come with this user's integrations, so this server can't be deleted. Switch it off instead."
+                                    : undefined
+                            }
+                            onDeleteClick={() => setShowDeleteDialog(true)}
+                        />
                     </div>
                 </div>
 
-                <CollapsibleContent>
+                <CollapsibleContent className="ml-8">
                     {toolCount > 0 && (
-                        <div className="flex w-full flex-col gap-y-2 py-3">
+                        <div className="flex w-full flex-col gap-y-2 py-3 first:pt-1">
                             <h3 className="flex justify-start px-3 text-sm font-semibold text-muted-foreground uppercase">
                                 Component Tools
                             </h3>
@@ -165,7 +190,7 @@ const ConnectedUserMcpServerListItem = ({
                     )}
 
                     {workflowCount > 0 && (
-                        <div className="flex w-full flex-col gap-y-2 py-3">
+                        <div className="flex w-full flex-col gap-y-2 py-3 first:pt-1">
                             <h3 className="flex justify-start px-3 text-sm font-semibold text-muted-foreground uppercase">
                                 Workflow Tools
                             </h3>

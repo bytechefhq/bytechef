@@ -3,7 +3,7 @@ query WorkspaceExternalInvocationLogs(
     $workspaceId: ID!
     $environmentId: ID!
     $source: String
-    $outcome: String
+    $status: String
     $mcpServerId: Long
     $a2aServerId: Long
     $connectedUserId: Long
@@ -17,7 +17,7 @@ query WorkspaceExternalInvocationLogs(
         workspaceId: $workspaceId
         environmentId: $environmentId
         source: $source
-        outcome: $outcome
+        status: $status
         mcpServerId: $mcpServerId
         a2aServerId: $a2aServerId
         connectedUserId: $connectedUserId
@@ -43,7 +43,7 @@ query WorkspaceExternalInvocationLogs(
             a2aServerId
             jobId
             workflowName
-            outcome
+            status
             errorType
             errorMessage
             durationMs

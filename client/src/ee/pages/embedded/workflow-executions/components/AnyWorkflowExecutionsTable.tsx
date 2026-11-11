@@ -63,7 +63,12 @@ const getVersion = (row: AnyWorkflowExecutionRowI) => {
     return integrationVersion != null ? `V${integrationVersion}` : '';
 };
 
-const AnyWorkflowExecutionsTable = ({data}: {data: AnyWorkflowExecutionRowI[]}) => {
+interface AnyWorkflowExecutionsTablePropsI {
+    data: AnyWorkflowExecutionRowI[];
+    showConnectedUser?: boolean;
+}
+
+const AnyWorkflowExecutionsTable = ({data, showConnectedUser = true}: AnyWorkflowExecutionsTablePropsI) => {
     const setAutomationExecutionId = useAutomationExecutionSheetStore((state) => state.setWorkflowExecutionId);
     const setAutomationExecutionSheetOpen = useAutomationExecutionSheetStore(
         (state) => state.setWorkflowExecutionSheetOpen
@@ -96,19 +101,24 @@ const AnyWorkflowExecutionsTable = ({data}: {data: AnyWorkflowExecutionRowI[]}) 
                 header: 'Source',
                 id: 'source',
             }),
-            columnHelper.display({
-                cell: ({row}) => (
-                    <EmbeddedWorkflowExecutionConnectedUser
-                        connectedUserId={
-                            row.original.automationExecution
-                                ? row.original.automationExecution.connectedUserId
-                                : row.original.integrationWorkflowExecution?.integrationInstance?.connectedUserId
-                        }
-                    />
-                ),
-                header: 'Connected user',
-                id: 'connectedUser',
-            }),
+            ...(showConnectedUser
+                ? [
+                      columnHelper.display({
+                          cell: ({row}) => (
+                              <EmbeddedWorkflowExecutionConnectedUser
+                                  connectedUserId={
+                                      row.original.automationExecution
+                                          ? row.original.automationExecution.connectedUserId
+                                          : row.original.integrationWorkflowExecution?.integrationInstance
+                                                ?.connectedUserId
+                                  }
+                              />
+                          ),
+                          header: 'Connected user',
+                          id: 'connectedUser',
+                      }),
+                  ]
+                : []),
             columnHelper.display({
                 cell: ({row}) => getVersion(row.original),
                 header: 'Version',

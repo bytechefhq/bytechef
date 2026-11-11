@@ -32,3 +32,8 @@ export const EMBEDDED_MCP_SERVERS_DOCUMENTATION_URL =
 
 export const EMBEDDED_AUTOMATION_HUB_DOCUMENTATION_URL =
     'https://docs.bytechef.io/platform/embedded/build/automation-hub';
+
+export const EMBEDDED_API_KEYS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/embedded/administration/api-keys';
+
+export const EMBEDDED_WORKFLOW_EXECUTIONS_DOCUMENTATION_URL =
+    'https://docs.bytechef.io/platform/embedded/monitor/workflow-executions';

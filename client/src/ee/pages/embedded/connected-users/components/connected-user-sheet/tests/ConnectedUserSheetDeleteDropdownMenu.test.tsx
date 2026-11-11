@@ -19,13 +19,21 @@ afterEach(() => {
 
 describe('ConnectedUserSheetDeleteDropdownMenu', () => {
     it('should render the menu trigger button', () => {
-        render(<ConnectedUserSheetDeleteDropdownMenu onDeleteClick={hoisted.onDeleteClick} />);
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={hoisted.onDeleteClick} />
+            </TooltipProvider>
+        );
 
         expect(screen.getByRole('button', {name: 'More actions'})).toBeInTheDocument();
     });
 
     it('should render with the design-system DropdownMenu', async () => {
-        render(<ConnectedUserSheetDeleteDropdownMenu onDeleteClick={hoisted.onDeleteClick} />);
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={hoisted.onDeleteClick} />
+            </TooltipProvider>
+        );
 
         await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
 
@@ -34,7 +42,11 @@ describe('ConnectedUserSheetDeleteDropdownMenu', () => {
     });
 
     it('should call onDeleteClick when clicking Delete', async () => {
-        render(<ConnectedUserSheetDeleteDropdownMenu onDeleteClick={hoisted.onDeleteClick} />);
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={hoisted.onDeleteClick} />
+            </TooltipProvider>
+        );
 
         await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
 
@@ -44,7 +56,11 @@ describe('ConnectedUserSheetDeleteDropdownMenu', () => {
     });
 
     it('should not offer Change configuration unless the handler is given', async () => {
-        render(<ConnectedUserSheetDeleteDropdownMenu onDeleteClick={hoisted.onDeleteClick} />);
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={hoisted.onDeleteClick} />
+            </TooltipProvider>
+        );
 
         await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
 

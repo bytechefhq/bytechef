@@ -110,6 +110,14 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
         });
     });
 
+    it("opens the workflow's executions when the row is clicked outside the workflow name", async () => {
+        renderListItem(createConnectedUserProjectWorkflow(null), 'Automation Playground');
+
+        await userEvent.click(screen.getByRole('listitem'));
+
+        expect(useAutomationExecutionsSheetStore.getState().automationExecutionsSheetOpen).toBe(true);
+    });
+
     it('shows the static webhook url and copies it', async () => {
         renderListItem(createConnectedUserProjectWorkflow(STATIC_WEBHOOK_URL));
 

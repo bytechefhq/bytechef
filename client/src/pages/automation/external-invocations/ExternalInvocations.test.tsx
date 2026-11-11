@@ -36,10 +36,10 @@ const externalInvocationsState = () => ({
     filterPageNumber: 0,
     handleEndDateChange: vi.fn(),
     handleMcpServerChange: vi.fn(),
-    handleOutcomeChange: vi.fn(),
     handlePaginationClick: vi.fn(),
     handleSourceChange: vi.fn(),
     handleStartDateChange: vi.fn(),
+    handleStatusChange: vi.fn(),
     refetchExternalInvocations: vi.fn(),
 });
 
@@ -74,8 +74,8 @@ const externalInvocationLog = {
     kind: 'COMPONENT',
     mcpServerId: 11,
     operationName: 'sendMessage',
-    outcome: 'SUCCESS',
     source: 'MCP_SERVER',
+    status: 'SUCCESS',
     toolName: 'slack_sendMessage',
     workflowName: null,
 };
@@ -155,7 +155,7 @@ describe('ExternalInvocations', () => {
         expect(renderedItemLabels()).toContain('MCP_SERVER=MCP Servers');
     });
 
-    it('offers a paused run as an outcome filter', () => {
+    it('offers a paused run as an status filter', () => {
         hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
 
         renderExternalInvocations();
@@ -183,7 +183,7 @@ describe('ExternalInvocations', () => {
     });
 
     it('keeps the filters and shows a no-match state when a filter hides every record', () => {
-        hoisted.useExternalInvocationsMock.mockReturnValue({...externalInvocationsState(), filterOutcome: 'ERROR'});
+        hoisted.useExternalInvocationsMock.mockReturnValue({...externalInvocationsState(), filterStatus: 'ERROR'});
 
         renderExternalInvocations();
 
@@ -216,6 +216,18 @@ describe('ExternalInvocations', () => {
         await userEvent.click(screen.getByText('2'));
 
         expect(pagedExternalInvocationsState.handlePaginationClick).toHaveBeenCalledWith(1);
+    });
+
+    it('opens the details of an invocation when its row is clicked', async () => {
+        hoisted.useExternalInvocationsMock.mockReturnValue(recordedExternalInvocationsState());
+
+        renderExternalInvocations({workspaceScope: {environmentId: 2, workspaceId: 7}});
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByText('slack_sendMessage'));
+
+        expect(screen.getByRole('dialog', {name: 'slack_sendMessage'})).toHaveTextContent('slack / sendMessage');
     });
 
     it('refreshes the invocations from the header button', async () => {

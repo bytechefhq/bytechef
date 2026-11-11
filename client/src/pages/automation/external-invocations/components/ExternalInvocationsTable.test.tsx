@@ -30,15 +30,15 @@ const baseLog = {
     kind: 'COMPONENT',
     mcpServerId: null,
     operationName: 'sendMessage',
-    outcome: 'SUCCESS',
     source: 'MCP_SERVER',
+    status: 'SUCCESS',
     toolName: 'slack_sendMessage',
     workflowName: null,
     workspaceId: null,
 };
 
 describe('ExternalInvocationsTable', () => {
-    it('renders a row with the tool name, mapped source label and outcome', () => {
+    it('renders a row with the tool name, mapped source label and status', () => {
         render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} />);
 
         expect(screen.getByText('slack_sendMessage')).toBeInTheDocument();
@@ -106,11 +106,11 @@ describe('ExternalInvocationsTable', () => {
         ['CONNECTION_REQUIRED', 'bg-surface-neutral-secondary'],
         ['APPROVAL_REQUIRED', 'bg-surface-neutral-secondary'],
         ['SUSPENDED', 'bg-surface-neutral-secondary'],
-    ])('colours the %s outcome with %s', (outcome, className) => {
-        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, outcome}]} />);
+    ])('colours the %s status with %s', (status, className) => {
+        render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, status}]} />);
 
-        expect(screen.getByText(outcome)).toHaveClass(className);
-        expect(screen.getByText(outcome)).toHaveClass('border-transparent');
+        expect(screen.getByText(status)).toHaveClass(className);
+        expect(screen.getByText(status)).toHaveClass('border-transparent');
     });
 
     it('shows only the component name when the call has no operation', () => {
@@ -191,6 +191,38 @@ describe('ExternalInvocationsTable', () => {
 
         expect(screen.getByText('Research agent')).toBeInTheDocument();
         expect(screen.queryByText('Sales MCP')).not.toBeInTheDocument();
+    });
+
+    it('hands every clicked row to onSelect, including rows without a job', () => {
+        const onSelect = vi.fn();
+
+        render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} onSelect={onSelect} />);
+
+        fireEvent.click(screen.getByText('slack_sendMessage'));
+
+        expect(onSelect).toHaveBeenCalledWith(baseLog);
+    });
+
+    it('opens a focused row with the Enter and Space keys', () => {
+        const onSelect = vi.fn();
+
+        render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} onSelect={onSelect} />);
+
+        const row = screen.getByText('slack_sendMessage').closest('tr')!;
+
+        expect(row).toHaveAttribute('tabindex', '0');
+
+        fireEvent.keyDown(row, {key: 'Enter'});
+        fireEvent.keyDown(row, {key: ' '});
+        fireEvent.keyDown(row, {key: 'a'});
+
+        expect(onSelect).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not make a row without an action focusable', () => {
+        render(<ExternalInvocationsTable externalInvocationLogs={[baseLog]} />);
+
+        expect(screen.getByText('slack_sendMessage').closest('tr')).not.toHaveAttribute('tabindex');
     });
 
     it('hides the source column when showSource is false', () => {
