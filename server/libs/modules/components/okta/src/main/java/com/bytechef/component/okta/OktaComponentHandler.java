@@ -17,6 +17,7 @@
 package com.bytechef.component.okta;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -54,6 +55,14 @@ public class OktaComponentHandler implements ComponentHandler {
             OktaListGroupMembersAction.ACTION_DEFINITION,
             OktaListGroupAppsAction.ACTION_DEFINITION,
             OktaListApplicationUsersAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(OktaGetUserAction.ACTION_DEFINITION),
+            tool(OktaListUsersAction.ACTION_DEFINITION),
+            tool(OktaListUserGroupsAction.ACTION_DEFINITION),
+            tool(OktaListUserAppLinksAction.ACTION_DEFINITION),
+            tool(OktaListGroupMembersAction.ACTION_DEFINITION),
+            tool(OktaListGroupAppsAction.ACTION_DEFINITION),
+            tool(OktaListApplicationUsersAction.ACTION_DEFINITION))
         .version(1)
         .customAction(true)
         .customActionHelp("", "https://developer.okta.com/docs/api/");
