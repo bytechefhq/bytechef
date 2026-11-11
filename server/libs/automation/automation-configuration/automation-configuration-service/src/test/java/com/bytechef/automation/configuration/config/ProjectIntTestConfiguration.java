@@ -24,11 +24,15 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.encryption.Encryption;
+import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.domain.FileEntry;
@@ -63,7 +67,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 @ComponentScan(
     basePackages = {
-        "com.bytechef.commons.util", "com.bytechef.jackson.config",
+        "com.bytechef.commons.util", "com.bytechef.encryption", "com.bytechef.jackson.config",
         "com.bytechef.platform.category", "com.bytechef.automation.configuration", "com.bytechef.platform.connection",
         "com.bytechef.platform.tag", "com.bytechef.platform.configuration.service",
         "com.bytechef.platform.configuration.workflow.diff"
@@ -80,6 +84,11 @@ public class ProjectIntTestConfiguration {
 
     @Autowired
     private ComponentDefinitionService componentDefinitionService;
+
+    @Bean
+    EncryptionKey encryptionKey() {
+        return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
 
     @Bean
     Evaluator evaluator() {
@@ -132,16 +141,20 @@ public class ProjectIntTestConfiguration {
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class ProjectIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
+        private final Encryption encryption;
         private final ObjectMapper objectMapper;
 
         @SuppressFBWarnings("EI2")
-        public ProjectIntTestJdbcConfiguration(ObjectMapper objectMapper) {
+        public ProjectIntTestJdbcConfiguration(Encryption encryption, ObjectMapper objectMapper) {
+            this.encryption = encryption;
             this.objectMapper = objectMapper;
         }
 
         @Override
         protected List<?> userConverters() {
             return Arrays.asList(
+                new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
+                new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
                 new FileEntryToStringConverter(objectMapper),
                 new MapWrapperToStringConverter(objectMapper),
                 new StringToFileEntryConverter(objectMapper),
