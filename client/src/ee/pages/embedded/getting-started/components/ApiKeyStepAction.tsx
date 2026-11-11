@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import StepDoneText from '@/ee/pages/embedded/getting-started/components/StepDoneText';
+import StepDoneText from '@/components/GettingStarted/StepDoneText';
 import useEmbeddedApiKeysProviderValue from '@/ee/pages/settings/embedded/api-keys/hooks/useEmbeddedApiKeysProviderValue';
 import ApiKeyDialog from '@/shared/components/api-keys/components/ApiKeyDialog';
 import {ApiKeysProvider, CreateApiKeyMutationProps} from '@/shared/components/api-keys/providers/apiKeysProvider';
