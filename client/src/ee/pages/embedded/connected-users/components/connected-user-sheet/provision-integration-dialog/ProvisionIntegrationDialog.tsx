@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {
     Dialog,
@@ -18,6 +19,7 @@ import {useProvisionIntegrationInstanceMutation} from '@/ee/shared/mutations/emb
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetProvisionableIntegrationsQuery} from '@/ee/shared/queries/embedded/provisionableIntegrations.queries';
+import OAuth2Button from '@/shared/components/connection/OAuth2Button';
 import {CodePayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
@@ -84,6 +86,37 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
         !!configuration && !isOAuth2AppMisconfigured(provisionableConfiguration) && (!codeRequired || !!code);
 
     const noProvisionableIntegrations = provisionableIntegrations?.length === 0;
+
+    const oAuth2AuthorizationParameters = provisionableConfiguration?.oAuth2AuthorizationParameters;
+
+    const renderConnectAction = () => {
+        if (!codeRequired || !provisionableIntegration || !provisionableConfiguration) {
+            return undefined;
+        }
+
+        if (code) {
+            return <Badge label="Connected" styleType="success-outline" />;
+        }
+
+        if (!oAuth2AuthorizationParameters?.authorizationUrl || !oAuth2AuthorizationParameters.clientId) {
+            return undefined;
+        }
+
+        return (
+            <OAuth2Button
+                authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
+                clientId={oAuth2AuthorizationParameters.clientId}
+                componentName={provisionableIntegration.integration!.componentName}
+                extraQueryParameters={oAuth2AuthorizationParameters.extraQueryParameters}
+                key={provisionableConfiguration.integrationInstanceConfiguration?.id}
+                onClick={(getAuth: () => void) => getAuth()}
+                onCodeSuccess={handleCodeSuccess}
+                redirectUri={provisionableConfiguration.redirectUri || ''}
+                responseType="code"
+                scopes={oAuth2AuthorizationParameters.scopes}
+            />
+        );
+    };
 
     const handleIntegrationChange = (value: string) => {
         setValue('integrationId', value ? Number(value) : undefined);
@@ -169,6 +202,7 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
                         <ProvisionIntegrationDialogConfigurationSelect
                             configurations={provisionableIntegration.integrationInstanceConfigurations ?? []}
                             onChange={handleConfigurationChange}
+                            selectedConfigurationAction={renderConnectAction()}
                             value={integrationInstanceConfigurationId}
                         />
                     )}
@@ -181,7 +215,6 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
                             control={control as unknown as Control<FieldValues>}
                             formState={formState as unknown as FormState<FieldValues>}
                             key={integrationInstanceConfigurationId}
-                            onCodeSuccess={handleCodeSuccess}
                         />
                     )}
 

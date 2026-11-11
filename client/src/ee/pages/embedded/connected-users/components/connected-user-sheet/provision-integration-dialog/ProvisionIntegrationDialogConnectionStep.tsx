@@ -2,8 +2,6 @@ import {Label} from '@/components/ui/label';
 import {ProvisionableIntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import OAuth2Button from '@/shared/components/connection/OAuth2Button';
-import {CodePayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {PropertyAllType} from '@/shared/types';
 import {Control, FieldValues, FormState} from 'react-hook-form';
@@ -14,8 +12,6 @@ interface ProvisionIntegrationDialogConnectionStepProps {
     configuration: ProvisionableIntegrationInstanceConfiguration;
     control: Control<FieldValues>;
     formState: FormState<FieldValues>;
-    onCodeSuccess: (payload: CodePayloadI) => void;
-    showOAuth2Button?: boolean;
 }
 
 export const isOAuth2CodeAuthorizationType = (authorizationType?: string): boolean =>
@@ -32,8 +28,6 @@ const ProvisionIntegrationDialogConnectionStep = ({
     configuration,
     control,
     formState,
-    onCodeSuccess,
-    showOAuth2Button = true,
 }: ProvisionIntegrationDialogConnectionStepProps) => {
     const {data: connectionDefinition} = useGetConnectionDefinitionQuery({componentName, componentVersion});
 
@@ -55,8 +49,6 @@ const ProvisionIntegrationDialogConnectionStep = ({
     const properties = [...connectionProperties, ...authorizationProperties].filter(
         (property) => !sharedConnectionParameterNames.includes(property.name!)
     ) as PropertyAllType[];
-
-    const oAuth2AuthorizationParameters = configuration.oAuth2AuthorizationParameters;
 
     return (
         <div className="space-y-4">
@@ -80,23 +72,6 @@ const ProvisionIntegrationDialogConnectionStep = ({
                     This configuration&apos;s OAuth2 app is missing its authorization URL or client ID.
                 </p>
             )}
-
-            {showOAuth2Button &&
-                isOAuth2CodeAuthorizationType(authorizationType) &&
-                oAuth2AuthorizationParameters?.authorizationUrl &&
-                oAuth2AuthorizationParameters.clientId && (
-                    <OAuth2Button
-                        authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
-                        clientId={oAuth2AuthorizationParameters.clientId}
-                        componentName={componentName}
-                        extraQueryParameters={oAuth2AuthorizationParameters.extraQueryParameters}
-                        onClick={(getAuth: () => void) => getAuth()}
-                        onCodeSuccess={onCodeSuccess}
-                        redirectUri={configuration.redirectUri ?? ''}
-                        responseType="code"
-                        scopes={oAuth2AuthorizationParameters.scopes}
-                    />
-                )}
         </div>
     );
 };
