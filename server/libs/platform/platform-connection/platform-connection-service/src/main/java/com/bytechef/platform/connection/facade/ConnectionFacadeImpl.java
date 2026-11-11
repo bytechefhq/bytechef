@@ -279,6 +279,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
+    public boolean isConnectionUsed(long id) {
+        Connection connection = connectionService.getConnection(id);
+
+        return isConnectionUsed(id, connection.getType());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ConnectionDTO> getConnections(List<Long> connectionIds, PlatformType type) {
         return connectionService.getConnections(connectionIds)
             .stream()

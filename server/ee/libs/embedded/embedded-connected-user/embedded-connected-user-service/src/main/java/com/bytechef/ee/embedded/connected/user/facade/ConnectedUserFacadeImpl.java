@@ -40,7 +40,6 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -200,19 +199,15 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     })
     @PreAuthorize("isTenantAdmin()")
     public void deleteConnectedUser(long id) {
-        Set<Long> connectionIds = new LinkedHashSet<>(connectedUserConnectionService.getConnectionIds(id));
-
         for (IntegrationInstance integrationInstance : integrationInstanceService.getConnectedUserIntegrationInstances(
             id)) {
-
-            connectionIds.add(integrationInstance.getConnectionId());
 
             integrationInstanceFacade.deleteIntegrationInstance(integrationInstance.getId());
         }
 
         connectedUserProjectFacade.deleteConnectedUserProjects(id);
 
-        for (long connectionId : connectionIds) {
+        for (long connectionId : connectedUserConnectionService.getConnectionIds(id)) {
             connectedUserConnectionService.deleteByConnectionId(connectionId);
 
             connectionFacade.delete(connectionId);

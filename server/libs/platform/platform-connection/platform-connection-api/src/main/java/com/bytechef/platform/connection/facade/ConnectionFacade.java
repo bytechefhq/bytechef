@@ -35,6 +35,8 @@ public interface ConnectionFacade {
 
     ConnectionDTO getConnection(Long id);
 
+    boolean isConnectionUsed(long id);
+
     List<ConnectionDTO> getConnections(List<Long> connectionIds, PlatformType type);
 
     List<ConnectionDTO> getConnections(
