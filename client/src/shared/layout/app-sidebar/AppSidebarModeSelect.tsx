@@ -57,11 +57,11 @@ export function AppSidebarModeSelect({currentMode}: AppSidebarModeSelectProps) {
 
                 {PLATFORM_MODES.map((mode) => (
                     <DropdownMenuItem
-                        className="cursor-pointer items-start gap-3 py-2"
+                        className="cursor-pointer items-center gap-3 py-2"
                         key={mode.type}
                         onClick={() => handleModeSelect(mode.type)}
                     >
-                        <mode.icon className="mt-0.5 size-5 shrink-0" />
+                        <mode.icon className="size-5 shrink-0" />
 
                         <div className="flex min-w-0 flex-1 flex-col">
                             <span className="font-medium">{mode.title}</span>
@@ -70,7 +70,7 @@ export function AppSidebarModeSelect({currentMode}: AppSidebarModeSelectProps) {
                         </div>
 
                         {mode.type === currentMode && (
-                            <CheckIcon aria-label="Current mode" className="mt-0.5 size-4 shrink-0" />
+                            <CheckIcon aria-label="Current mode" className="size-4 shrink-0" />
                         )}
                     </DropdownMenuItem>
                 ))}
