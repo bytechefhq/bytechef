@@ -1,4 +1,5 @@
 import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {Control, FieldValues, useController} from 'react-hook-form';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import IntegrationInstanceConfigurationDialog from '../IntegrationInstanceConfigurationDialog';
@@ -7,12 +8,17 @@ const hoisted = vi.hoisted(() => ({
     connectionDefinition: undefined as {authorizations: {title: string; type: string}[]} | undefined,
     createMutate: vi.fn(),
     integration: undefined as {componentName: string} | undefined,
+    updateCredentialsMutate: vi.fn(),
     updateMutate: vi.fn(),
     workflows: [] as {id: string; workflowUuid: string}[],
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
     useCreateIntegrationInstanceConfigurationMutation: () => ({mutate: hoisted.createMutate, reset: vi.fn()}),
+    useUpdateIntegrationInstanceConfigurationCredentialsMutation: () => ({
+        isPending: false,
+        mutate: hoisted.updateCredentialsMutate,
+    }),
     useUpdateIntegrationInstanceConfigurationMutation: () => ({mutate: hoisted.updateMutate, reset: vi.fn()}),
 }));
 
@@ -101,6 +107,24 @@ vi.mock('../IntegrationInstanceConfigurationDialogOauth2Step', () => ({
 vi.mock('../IntegrationInstanceConfigurationDialogWorkflowsStep', () => ({
     default: () => <div data-testid="workflows-step" />,
 }));
+
+vi.mock('../IntegrationInstanceConfigurationDialogCredentials', () => {
+    const ParameterInput = ({control, name}: {control: Control<FieldValues>; name: string}) => {
+        const {field} = useController({control, name: `parameters.${name}`});
+
+        return <input aria-label={name} onChange={field.onChange} value={(field.value as string) ?? ''} />;
+    };
+
+    return {
+        default: ({control, sharedParameterNames}: {control: Control<FieldValues>; sharedParameterNames: string[]}) => (
+            <div data-testid="credentials-form">
+                {sharedParameterNames.map((sharedParameterName) => (
+                    <ParameterInput control={control} key={sharedParameterName} name={sharedParameterName} />
+                ))}
+            </div>
+        ),
+    };
+});
 
 vi.mock('@/shared/components/connection/ConnectionParameters', () => ({
     default: () => <div data-testid="connection-parameters" />,
@@ -507,6 +531,118 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             await user.click(screen.getByRole('button', {name: 'Close'}));
 
             await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+        });
+    });
+
+    describe('credentials', () => {
+        const sharedConfiguration = {
+            authorizationType: 'OAUTH2_AUTHORIZATION_CODE',
+            connectionAuthorizationParameters: {clientId: 'client-id', clientSecret: '••••••••'},
+            id: 1,
+            integrationId: 2,
+            integrationVersion: 1,
+            name: 'Existing',
+            version: 3,
+        } as const;
+
+        beforeEach(() => {
+            hoisted.connectionDefinition = {
+                authorizations: [{title: 'OAuth2', type: 'OAUTH2_AUTHORIZATION_CODE'}],
+            };
+        });
+
+        it('should replace the shared credentials without saving the rest of the configuration', async () => {
+            const user = userEvent.setup();
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={sharedConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Update credentials'}));
+
+            expect(screen.queryByTestId('basic-step')).not.toBeInTheDocument();
+            expect(screen.getByTestId('credentials-form')).toBeInTheDocument();
+
+            await user.type(screen.getByLabelText('clientSecret'), 'rotated-secret');
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(hoisted.updateCredentialsMutate).toHaveBeenCalledWith({
+                    id: 1,
+                    updateConnectionCredentialsRequest: {parameters: {clientSecret: 'rotated-secret'}, version: 3},
+                })
+            );
+            expect(hoisted.updateMutate).not.toHaveBeenCalled();
+        });
+
+        it('should keep the current value of a cleared field and need one entered value to save', async () => {
+            const user = userEvent.setup();
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={sharedConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Update credentials'}));
+
+            expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+
+            await user.type(screen.getByLabelText('clientId'), 'typo');
+            await user.clear(screen.getByLabelText('clientId'));
+
+            expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+
+            await user.type(screen.getByLabelText('clientSecret'), 'rotated-secret');
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(hoisted.updateCredentialsMutate).toHaveBeenCalledWith({
+                    id: 1,
+                    updateConnectionCredentialsRequest: {parameters: {clientSecret: 'rotated-secret'}, version: 3},
+                })
+            );
+        });
+
+        it('should return to the configuration form with Back', async () => {
+            const user = userEvent.setup();
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={sharedConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Update credentials'}));
+            await user.click(screen.getByRole('button', {name: 'Back'}));
+
+            expect(screen.getByTestId('basic-step')).toBeInTheDocument();
+            expect(screen.queryByTestId('credentials-form')).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
+        });
+
+        it('should not offer to update credentials when the configuration shares none', () => {
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{
+                        id: 1,
+                        integrationId: 2,
+                        integrationVersion: 1,
+                        name: 'Existing',
+                        version: 3,
+                    }}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
         });
     });
 });

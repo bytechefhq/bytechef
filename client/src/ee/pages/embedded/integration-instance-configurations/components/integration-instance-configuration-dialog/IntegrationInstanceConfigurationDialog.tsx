@@ -27,6 +27,7 @@ import {
 } from '@/ee/shared/middleware/embedded/configuration';
 import {
     useCreateIntegrationInstanceConfigurationMutation,
+    useUpdateIntegrationInstanceConfigurationCredentialsMutation,
     useUpdateIntegrationInstanceConfigurationMutation,
 } from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
@@ -40,12 +41,13 @@ import {Authorization, AuthorizationType} from '@/shared/middleware/platform/con
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {Settings2Icon} from 'lucide-react';
+import {KeyRoundIcon, Settings2Icon} from 'lucide-react';
 import {ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {useForm, useWatch} from 'react-hook-form';
+import {Control, FieldValues, FormState, useForm, useWatch} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 import IntegrationInstanceConfigurationDialogBasicStep from './IntegrationInstanceConfigurationDialogBasicStep';
+import IntegrationInstanceConfigurationDialogCredentials from './IntegrationInstanceConfigurationDialogCredentials';
 import IntegrationInstanceConfigurationDialogWorkflowsStep from './IntegrationInstanceConfigurationDialogWorkflowsStep';
 
 const OAUTH2_AUTHORIZATION_TYPES = new Set<string>([
@@ -96,6 +98,10 @@ const IntegrationInstanceConfigurationDialogStepContent = ({
 
 IntegrationInstanceConfigurationDialogStepContent.displayName = 'IntegrationInstanceConfigurationDialogStepContent';
 
+interface CredentialsFormI {
+    parameters: Record<string, unknown>;
+}
+
 interface IntegrationInstanceConfigurationDialogProps {
     excludeWorkflowIds?: Set<string>;
     filterWorkflowUuids?: string[];
@@ -118,6 +124,7 @@ const IntegrationInstanceConfigurationDialog = ({
         integrationInstanceConfiguration?.integrationVersion
     );
     const [isOpen, setIsOpen] = useState(!triggerNode);
+    const [isUpdatingCredentials, setIsUpdatingCredentials] = useState(false);
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
     const defaultedAuthorizationsRef = useRef<Authorization[]>(undefined);
@@ -149,6 +156,10 @@ const IntegrationInstanceConfigurationDialog = ({
     });
 
     const {control, formState, getValues, handleSubmit, reset, setValue} = form;
+
+    const credentialsForm = useForm<CredentialsFormI>({defaultValues: {parameters: {}}});
+
+    const credentialsParameters = useWatch({control: credentialsForm.control, name: 'parameters'});
 
     const {data: allWorkflows, isPending: isWorkflowsPending} = useGetIntegrationVersionWorkflowsQuery(
         curIntegrationId!,
@@ -231,6 +242,33 @@ const IntegrationInstanceConfigurationDialog = ({
         onSuccess,
     });
 
+    const updateIntegrationInstanceConfigurationCredentialsMutation =
+        useUpdateIntegrationInstanceConfigurationCredentialsMutation({onSuccess});
+
+    const sharedParameterNames = useMemo(
+        () => [
+            ...Object.keys(integrationInstanceConfiguration?.connectionAuthorizationParameters ?? {}),
+            ...Object.keys(integrationInstanceConfiguration?.connectionConnectionParameters ?? {}),
+        ],
+        [integrationInstanceConfiguration]
+    );
+
+    const enteredCredentialsParameters = useMemo(
+        () =>
+            Object.fromEntries(
+                Object.entries(credentialsParameters ?? {}).filter(
+                    ([, parameterValue]) =>
+                        parameterValue != null && !(typeof parameterValue === 'string' && parameterValue.trim() === '')
+                )
+            ),
+        [credentialsParameters]
+    );
+
+    const canUpdateCredentials =
+        !!integrationInstanceConfiguration?.id &&
+        integrationInstanceConfiguration.version != null &&
+        sharedParameterNames.length > 0;
+
     const basicStepContent = (
         <IntegrationInstanceConfigurationDialogBasicStep
             authorizations={authorizations}
@@ -297,6 +335,10 @@ const IntegrationInstanceConfigurationDialog = ({
                 integrationInstanceConfigurationWorkflows: [],
             });
 
+            credentialsForm.reset({parameters: {}});
+
+            setIsUpdatingCredentials(false);
+
             if (onClose) {
                 onClose();
             }
@@ -350,9 +392,20 @@ const IntegrationInstanceConfigurationDialog = ({
         }
     };
 
+    const handleSaveCredentialsClick = () => {
+        updateIntegrationInstanceConfigurationCredentialsMutation.mutate({
+            id: integrationInstanceConfiguration!.id!,
+            updateConnectionCredentialsRequest: {
+                parameters: enteredCredentialsParameters,
+                version: integrationInstanceConfiguration!.version!,
+            },
+        });
+    };
+
     const isSaving =
         !!createIntegrationInstanceConfigurationMutation.isPending ||
-        !!updateIntegrationInstanceConfigurationMutation.isPending;
+        !!updateIntegrationInstanceConfigurationMutation.isPending ||
+        !!updateIntegrationInstanceConfigurationCredentialsMutation.isPending;
 
     const isWizard = !integrationInstanceConfiguration?.id || updateIntegrationVersion;
 
@@ -492,7 +545,9 @@ const IntegrationInstanceConfigurationDialog = ({
                             <DialogHeader title="Edit Instance Configuration" />
 
                             <DialogBody>
-                                <WorkflowMockProvider>{basicStepContent}</WorkflowMockProvider>
+                                {!isUpdatingCredentials && (
+                                    <WorkflowMockProvider>{basicStepContent}</WorkflowMockProvider>
+                                )}
 
                                 {connectionDefinition && (
                                     <div className="py-4">
@@ -508,16 +563,54 @@ const IntegrationInstanceConfigurationDialog = ({
                                         />
                                     </div>
                                 )}
+
+                                {isUpdatingCredentials && connectionDefinition && (
+                                    <IntegrationInstanceConfigurationDialogCredentials
+                                        authorization={selectedAuthorization}
+                                        connectionDefinition={connectionDefinition}
+                                        control={credentialsForm.control as unknown as Control<FieldValues>}
+                                        formState={credentialsForm.formState as unknown as FormState<FieldValues>}
+                                        sharedParameterNames={sharedParameterNames}
+                                    />
+                                )}
                             </DialogBody>
 
                             <DialogFooter>
                                 <DialogCancelButton />
 
+                                {canUpdateCredentials && !isUpdatingCredentials && (
+                                    <Button
+                                        onClick={() => setIsUpdatingCredentials(true)}
+                                        type="button"
+                                        variant="outline"
+                                    >
+                                        <KeyRoundIcon /> Update credentials
+                                    </Button>
+                                )}
+
+                                {isUpdatingCredentials && (
+                                    <Button
+                                        label="Back"
+                                        onClick={() => setIsUpdatingCredentials(false)}
+                                        type="button"
+                                        variant="outline"
+                                    />
+                                )}
+
                                 <Button
-                                    disabled={isSaving || authorizationTypePending}
+                                    disabled={
+                                        isSaving ||
+                                        authorizationTypePending ||
+                                        (isUpdatingCredentials &&
+                                            Object.keys(enteredCredentialsParameters).length === 0)
+                                    }
                                     icon={isSaving ? <LoadingIcon /> : undefined}
                                     label="Save"
-                                    onClick={handleSubmit(handleSaveClick)}
+                                    onClick={
+                                        isUpdatingCredentials
+                                            ? credentialsForm.handleSubmit(handleSaveCredentialsClick)
+                                            : handleSubmit(handleSaveClick)
+                                    }
                                 />
                             </DialogFooter>
                         </Form>
