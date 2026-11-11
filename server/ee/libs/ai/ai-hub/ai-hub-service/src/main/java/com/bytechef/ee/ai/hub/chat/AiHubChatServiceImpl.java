@@ -12,6 +12,8 @@ import com.bytechef.ee.ai.hub.agent.InFlightAiHubRunRegistry;
 import com.bytechef.ee.ai.hub.agent.WebhookResumeRegistry;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApproval;
 import com.bytechef.ee.ai.hub.approval.AiHubToolApprovalService;
+import com.bytechef.ee.ai.hub.audit.AiHubAuditEvents;
+import com.bytechef.ee.ai.hub.audit.AiHubAuditMapper;
 import com.bytechef.ee.ai.hub.chat.repository.AiHubChatRepository;
 import com.bytechef.ee.ai.hub.config.ConditionalOnAiHub;
 import com.bytechef.ee.ai.hub.exception.ConflictException;
@@ -19,6 +21,8 @@ import com.bytechef.ee.ai.hub.exception.NotFoundException;
 import com.bytechef.ee.ai.hub.memory.AiHubSessionMemory;
 import com.bytechef.ee.ai.hub.memory.AiHubTurnEndingToolResultAdvisor;
 import com.bytechef.ee.ai.hub.util.EnumOrdinals;
+import com.bytechef.platform.audit.AuditData;
+import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Clock;
@@ -122,6 +126,13 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     }
 
     @Override
+    @Audited(event = AiHubAuditEvents.AI_HUB_CHAT_CREATED, mapper = AiHubAuditMapper.class, data = {
+        @AuditData(key = "chatId", value = "#result?.id"),
+        @AuditData(key = "threadId", value = "#threadId"),
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "kind", value = "#result?.kind"),
+        @AuditData(key = "environment", value = "#result?.environment")
+    })
     public AiHubChat create(long workspaceId, long userId, int environment, String threadId) {
         Optional<AiHubChat> existing = chatRepository.findByThreadId(threadId);
 
@@ -155,6 +166,13 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     }
 
     @Override
+    @Audited(event = AiHubAuditEvents.AI_HUB_CHAT_CREATED, data = {
+        @AuditData(key = "chatId", value = "#result?.id"),
+        @AuditData(key = "threadId", value = "#result?.threadId"),
+        @AuditData(key = "workspaceId", value = "#workspaceId"),
+        @AuditData(key = "kind", value = "#result?.kind"),
+        @AuditData(key = "environment", value = "#result?.environment")
+    })
     public AiHubChat createWorkflowChat(
         long workspaceId, long userId, int environment, String workflowExecutionId, long projectDeploymentId,
         @Nullable String title) {
@@ -646,6 +664,10 @@ public class AiHubChatServiceImpl implements AiHubChatService {
     }
 
     @Override
+    @Audited(event = AiHubAuditEvents.AI_HUB_CHAT_DELETED, mapper = AiHubAuditMapper.class, data = {
+        @AuditData(key = "chatId", value = "#chatId"),
+        @AuditData(key = "workspaceId", value = "#requesterWorkspaceId")
+    })
     public void delete(long chatId, long requesterWorkspaceId, long requesterUserId) {
         AiHubChat chat = load(chatId, requesterWorkspaceId, requesterUserId, accessPolicy::canManage, true);
 
