@@ -418,14 +418,22 @@ public class GoogleSheetsUtils {
                     String sheetName = inputParameters.getRequiredString(SHEET_NAME);
 
                     List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(sheets, spreadSheetId, sheetName, 1);
-                    List<Object> rowToUpdate = GoogleSheetsRowUtils.getRowValues(
-                        sheets, spreadSheetId, sheetName, inputParameters.getRequiredInteger(ROW_NUMBER));
+                    List<Object> rowToUpdate = new ArrayList<>(
+                        GoogleSheetsRowUtils.getRowValues(
+                            sheets, spreadSheetId, sheetName, inputParameters.getRequiredInteger(ROW_NUMBER)));
 
-                    for (Object o : list) {
-                        if (o instanceof Map<?, ?> map) {
-                            int indexOfColumnToUpdate = firstRow.indexOf(map.get(COLUMN));
+                    for (Object item : list) {
+                        if (item instanceof Map<?, ?> map) {
+                            Object column = map.get(COLUMN);
 
-                            rowToUpdate.set(indexOfColumnToUpdate, map.get(VALUE));
+                            int indexOfColumnToUpdate = firstRow.indexOf(column);
+
+                            if (indexOfColumnToUpdate < 0) {
+                                throw new IllegalArgumentException(
+                                    "Column '%s' is not in the header row of sheet '%s'".formatted(column, sheetName));
+                            }
+
+                            setCellValue(rowToUpdate, indexOfColumnToUpdate, map.get(VALUE));
                         }
                     }
 
@@ -437,24 +445,19 @@ public class GoogleSheetsUtils {
                             .toList();
 
                     } else {
-                        List<Object> rowToUpdate = GoogleSheetsRowUtils.getRowValues(
-                            GoogleServices.getSheets(connectionParameters),
-                            inputParameters.getRequiredString(SPREADSHEET_ID),
-                            inputParameters.getRequiredString(SHEET_NAME),
-                            inputParameters.getRequiredInteger(ROW_NUMBER));
+                        List<Object> rowToUpdate = new ArrayList<>(
+                            GoogleSheetsRowUtils.getRowValues(
+                                GoogleServices.getSheets(connectionParameters),
+                                inputParameters.getRequiredString(SPREADSHEET_ID),
+                                inputParameters.getRequiredString(SHEET_NAME),
+                                inputParameters.getRequiredInteger(ROW_NUMBER)));
 
-                        for (Object o : list) {
-                            if (o instanceof Map<?, ?> map) {
+                        for (Object item : list) {
+                            if (item instanceof Map<?, ?> map) {
                                 int indexOfColumnToUpdate =
                                     GoogleSheetsColumnConverterUtils.labelToColumn((String) map.get(COLUMN)) - 1;
 
-                                if (indexOfColumnToUpdate >= rowToUpdate.size()) {
-                                    for (int i = rowToUpdate.size(); i <= indexOfColumnToUpdate; i++) {
-                                        rowToUpdate.add("");
-                                    }
-                                }
-
-                                rowToUpdate.set(indexOfColumnToUpdate, map.get(VALUE));
+                                setCellValue(rowToUpdate, indexOfColumnToUpdate, map.get(VALUE));
                             }
                         }
 
@@ -465,6 +468,14 @@ public class GoogleSheetsUtils {
         }
 
         return row;
+    }
+
+    private static void setCellValue(List<Object> rowToUpdate, int columnIndex, Object value) {
+        while (rowToUpdate.size() <= columnIndex) {
+            rowToUpdate.add("");
+        }
+
+        rowToUpdate.set(columnIndex, value);
     }
 
     private static List<Option<String>> getColumnOptions(Parameters inputParameters, Parameters connectionParameters) {

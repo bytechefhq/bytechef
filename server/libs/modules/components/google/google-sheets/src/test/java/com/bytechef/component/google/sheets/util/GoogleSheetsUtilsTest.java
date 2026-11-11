@@ -33,8 +33,10 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -706,6 +708,80 @@ class GoogleSheetsUtilsTest {
                 List.of("spreadsheetId", "sheetName", "spreadsheetId", "sheetName"),
                 stringArgumentCaptor.getAllValues());
             assertEquals(List.of(1, 5), integerArgumentCaptor.getAllValues());
+        }
+    }
+
+    @Test
+    void testGetUpdatedRowValuesWhenFirstRowIsHeaderAndColumnIsPastLastFilledCell() {
+        mockedParameters = MockParametersFactory.create(Map.of(
+            SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "sheetName", ROW_NUMBER, 5,
+            IS_THE_FIRST_ROW_HEADER, true,
+            ROW, Map.of(VALUES, List.of(Map.of(COLUMN, "Status", VALUE, "Sent")))));
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleSheetsRowUtils> googleSheetsRowUtilsMockedStatic =
+                mockStatic(GoogleSheetsRowUtils.class)) {
+
+            googleServicesMockedStatic.when(() -> GoogleServices.getSheets(any()))
+                .thenReturn(mockedSheets);
+
+            googleSheetsRowUtilsMockedStatic.when(() -> GoogleSheetsRowUtils.getRowValues(
+                any(), anyString(), anyString(), anyInt()))
+                .thenReturn(List.of("Name", "Email", "Notes", "Status"), new ArrayList<>(List.of("Ana", "ana@x.io")));
+
+            List<Object> result = GoogleSheetsUtils.getUpdatedRowValues(mockedParameters, mockedParameters);
+
+            assertEquals(List.of("Ana", "ana@x.io", "", "Sent"), result);
+        }
+    }
+
+    @Test
+    void testGetUpdatedRowValuesWhenFirstRowIsHeaderAndRowIsEmpty() {
+        mockedParameters = MockParametersFactory.create(Map.of(
+            SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "sheetName", ROW_NUMBER, 5,
+            IS_THE_FIRST_ROW_HEADER, true,
+            ROW, Map.of(VALUES, List.of(Map.of(COLUMN, "Email", VALUE, "ana@x.io")))));
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleSheetsRowUtils> googleSheetsRowUtilsMockedStatic =
+                mockStatic(GoogleSheetsRowUtils.class)) {
+
+            googleServicesMockedStatic.when(() -> GoogleServices.getSheets(any()))
+                .thenReturn(mockedSheets);
+
+            googleSheetsRowUtilsMockedStatic.when(() -> GoogleSheetsRowUtils.getRowValues(
+                any(), anyString(), anyString(), anyInt()))
+                .thenReturn(List.of("Name", "Email", "Notes"), List.of());
+
+            List<Object> result = GoogleSheetsUtils.getUpdatedRowValues(mockedParameters, mockedParameters);
+
+            assertEquals(List.of("", "ana@x.io"), result);
+        }
+    }
+
+    @Test
+    void testGetUpdatedRowValuesWhenFirstRowIsHeaderAndColumnIsNotInHeader() {
+        mockedParameters = MockParametersFactory.create(Map.of(
+            SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "sheetName", ROW_NUMBER, 5,
+            IS_THE_FIRST_ROW_HEADER, true,
+            ROW, Map.of(VALUES, List.of(Map.of(COLUMN, "Stauts", VALUE, "Sent")))));
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleSheetsRowUtils> googleSheetsRowUtilsMockedStatic =
+                mockStatic(GoogleSheetsRowUtils.class)) {
+
+            googleServicesMockedStatic.when(() -> GoogleServices.getSheets(any()))
+                .thenReturn(mockedSheets);
+
+            googleSheetsRowUtilsMockedStatic.when(() -> GoogleSheetsRowUtils.getRowValues(
+                any(), anyString(), anyString(), anyInt()))
+                .thenReturn(List.of("Name", "Status"), new ArrayList<>(List.of("Ana")));
+
+            IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> GoogleSheetsUtils.getUpdatedRowValues(mockedParameters, mockedParameters));
+
+            assertEquals("Column 'Stauts' is not in the header row of sheet 'sheetName'", exception.getMessage());
         }
     }
 
