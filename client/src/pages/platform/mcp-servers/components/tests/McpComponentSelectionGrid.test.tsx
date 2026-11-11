@@ -1,5 +1,5 @@
-import {render, resetAll, screen, userEvent} from '@/shared/util/test-utils';
-import {afterEach, describe, expect, it, vi} from 'vitest';
+import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import McpComponentSelectionGrid from '../McpComponentSelectionGrid';
 
@@ -10,6 +10,10 @@ const defaultProps = {
     onSearchTermChange: vi.fn(),
     searchTerm: '',
 };
+
+beforeEach(() => {
+    windowResizeObserver();
+});
 
 afterEach(() => {
     resetAll();

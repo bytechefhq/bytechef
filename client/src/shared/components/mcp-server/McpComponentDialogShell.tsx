@@ -12,7 +12,6 @@ import {
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {McpComponent} from '@/shared/middleware/graphql';
 import {ReactNode, useMemo} from 'react';
-import {twMerge} from 'tailwind-merge';
 
 export interface McpComponentDialogProps {
     mcpComponent?: McpComponent;
@@ -79,9 +78,11 @@ const McpComponentDialogShell = ({
                     <DialogHeader description={description} title={title} />
 
                     <DialogBody>
-                        <ScrollArea className={twMerge('max-h-[60vh]', currentStep === 'components' && 'h-[60vh]')}>
-                            {children}
-                        </ScrollArea>
+                        {currentStep === 'components' ? (
+                            children
+                        ) : (
+                            <ScrollArea className="max-h-[60vh]">{children}</ScrollArea>
+                        )}
                     </DialogBody>
 
                     <DialogFooter
