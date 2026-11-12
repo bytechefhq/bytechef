@@ -170,12 +170,9 @@ describe('AutomationConfigurationsSheet', () => {
         expect(hoisted.navigate).not.toHaveBeenCalled();
     });
 
-    it('opens the configurations page filtered to the project', async () => {
+    it('offers only Close in the footer, without a link to the configurations page', () => {
         renderAutomationConfigurationsSheet();
 
-        await userEvent.click(screen.getByRole('button', {name: 'Open in Configurations'}));
-
-        expect(onSheetOpenChange).toHaveBeenCalledWith(false);
-        expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/automation-configurations?projectId=project-1');
+        expect(screen.queryByRole('button', {name: 'Open in Configurations'})).not.toBeInTheDocument();
     });
 });

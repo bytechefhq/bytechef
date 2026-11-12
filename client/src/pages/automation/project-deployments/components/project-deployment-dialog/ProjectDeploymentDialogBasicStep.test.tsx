@@ -258,6 +258,20 @@ describe('ProjectDeploymentDialogBasicStep', () => {
         expect(screen.getByRole('button', {name: 'Choose AI Agent'})).toBeEnabled();
     });
 
+    it('should name the deployment after a preset project when no name is given', () => {
+        render(<BasicStepHarness defaultValues={{projectId: 2}} projectLocked />);
+
+        expect(screen.getByPlaceholderText('My CRM Project')).toHaveValue('AI Agent');
+    });
+
+    it('should keep the name empty once the user clears it', async () => {
+        render(<BasicStepHarness defaultValues={{projectId: 2}} projectLocked />);
+
+        await userEvent.clear(screen.getByPlaceholderText('My CRM Project'));
+
+        expect(screen.getByPlaceholderText('My CRM Project')).toHaveValue('');
+    });
+
     it('should replace an automatically filled name when another project is selected', async () => {
         render(<BasicStepHarness />);
 

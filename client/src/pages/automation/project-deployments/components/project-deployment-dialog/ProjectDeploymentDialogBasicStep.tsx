@@ -298,6 +298,22 @@ const ProjectDeploymentDialogBasicStep = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [basicStepTab, projectDeployments, projectDeploymentsLoading, selectedDeploymentId, showTabs]);
 
+    useEffect(() => {
+        if (
+            changeProjectVersion ||
+            projectDeployment?.id ||
+            basicStepTab === 'change-version' ||
+            !currentProjectName ||
+            getValues('name')
+        ) {
+            return;
+        }
+
+        setValue('name', currentProjectName);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [basicStepTab, changeProjectVersion, currentProjectName, projectDeployment?.id]);
+
     if (!showTabs) {
         return <div className="flex flex-col gap-4">{newDeploymentForm}</div>;
     }

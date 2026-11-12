@@ -7,8 +7,7 @@ import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ExternalLinkIcon, RefreshCwIcon, Settings2Icon} from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import {RefreshCwIcon, Settings2Icon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 interface IntegrationConfigurationsSheetProps {
@@ -24,8 +23,6 @@ const IntegrationConfigurationsSheet = ({
 }: IntegrationConfigurationsSheetProps) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const navigate = useNavigate();
-
     const {isFetching: configurationsIsFetching, refetch: refetchConfigurations} =
         useGetIntegrationInstanceConfigurationsQuery(
             {
@@ -34,12 +31,6 @@ const IntegrationConfigurationsSheet = ({
             },
             sheetOpen && !!integration.id
         );
-
-    const handleOpenInConfigurationsClick = () => {
-        onSheetOpenChange(false);
-
-        void navigate(`/embedded/configurations?integrationId=${integration.id}`);
-    };
 
     return (
         <Sheet onOpenChange={onSheetOpenChange} open={sheetOpen}>
@@ -88,12 +79,6 @@ const IntegrationConfigurationsSheet = ({
 
                 <footer className="flex shrink-0 justify-end gap-x-2 rounded-b-md border-t border-t-border/50 bg-surface-neutral-primary p-3">
                     <Button label="Close" onClick={() => onSheetOpenChange(false)} variant="outline" />
-
-                    <Button
-                        icon={<ExternalLinkIcon />}
-                        label="Open in Configurations"
-                        onClick={handleOpenInConfigurationsClick}
-                    />
                 </footer>
             </SheetContent>
         </Sheet>

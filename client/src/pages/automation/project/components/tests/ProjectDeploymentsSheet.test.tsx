@@ -158,14 +158,10 @@ describe('ProjectDeploymentsSheet', () => {
         expect(screen.getByText('Orders Dev expanded')).toBeInTheDocument();
     });
 
-    it('opens the project deployments tab without changing the current environment', () => {
+    it('offers no link to the projects page in the footer', () => {
         renderProjectDeploymentsSheet();
 
-        fireEvent.click(screen.getByRole('button', {name: 'Open in Projects'}));
-
-        expect(environmentStore.getState().currentEnvironmentId).toBe(0);
-        expect(onSheetOpenChange).toHaveBeenCalledWith(false);
-        expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects?projectId=7&tab=deployments');
+        expect(screen.queryByRole('button', {name: 'Open in Projects'})).not.toBeInTheDocument();
     });
 
     it('offers to deploy into the current environment when it has no deployments', () => {
