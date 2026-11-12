@@ -44,10 +44,11 @@ class EmbeddedOwnerContributorConfigurationTest {
             .values())
                 .extracting(ProjectOwnerContributor::getProjectOwner)
                 .containsExactlyInAnyOrder(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
-                    ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
+                    ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT, ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION);
         assertThat(context.getBeansOfType(ProjectDeploymentOwnerContributor.class)
             .values())
                 .extracting(ProjectDeploymentOwnerContributor::getProjectDeploymentOwner)
-                .containsExactly(ProjectDeploymentOwner.EMBEDDED, ProjectDeploymentOwner.EMBEDDED);
+                .containsExactly(ProjectDeploymentOwner.EMBEDDED, ProjectDeploymentOwner.EMBEDDED,
+                    ProjectDeploymentOwner.EMBEDDED);
     }
 }

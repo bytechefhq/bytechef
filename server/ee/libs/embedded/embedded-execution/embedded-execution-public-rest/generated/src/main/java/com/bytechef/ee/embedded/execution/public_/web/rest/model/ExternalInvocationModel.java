@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ExternalInvocation", description = "A record of a single external invocation.")
 @JsonTypeName("ExternalInvocation")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T15:10:56.439359+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-12T00:36:32.396363+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ExternalInvocationModel {
 
   private @Nullable String componentName;

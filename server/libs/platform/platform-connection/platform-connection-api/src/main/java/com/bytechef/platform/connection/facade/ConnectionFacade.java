@@ -27,6 +27,13 @@ import java.util.Map;
  * @author Ivica Cardic
  */
 public interface ConnectionFacade {
+
+    /**
+     * Throws the exception {@link #delete(Long)} would throw when the connection cannot be deleted, without deleting
+     * it.
+     */
+    void checkDeletable(Long id);
+
     long create(ConnectionDTO connectionDTO, PlatformType type);
 
     void delete(Long id);

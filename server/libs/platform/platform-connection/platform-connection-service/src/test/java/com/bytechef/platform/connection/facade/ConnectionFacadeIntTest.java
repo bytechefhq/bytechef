@@ -32,11 +32,13 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -98,6 +100,9 @@ class ConnectionFacadeIntTest {
     @Autowired
     private TagRepository tagRepository;
 
+    @Autowired
+    private WorkflowTestConfigurationService workflowTestConfigurationService;
+
     @AfterEach
     void afterEach() {
         connectionRepository.deleteAll();
@@ -127,6 +132,32 @@ class ConnectionFacadeIntTest {
         Assertions.assertThat(connectionRepository.findById(connectionId))
             .hasValueSatisfying(connection -> Assertions.assertThat(connection.getName())
                 .isEqualTo("name1"));
+    }
+
+    @Test
+    void testCheckDeletableRejectsAUsedConnectionWithoutDeletingIt() {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .authorizationType(AuthorizationType.BASIC_AUTH)
+            .componentName("componentName")
+            .connectionVersion(1)
+            .environmentId(Environment.STAGING.ordinal())
+            .name("name1")
+            .build();
+
+        long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
+
+        connectionFacade.checkDeletable(connectionId);
+
+        when(workflowTestConfigurationService.isConnectionUsed(connectionId)).thenReturn(true);
+
+        Assertions.assertThatThrownBy(() -> connectionFacade.checkDeletable(connectionId))
+            .isInstanceOfSatisfying(
+                ConfigurationException.class,
+                exception -> Assertions.assertThat(exception.getErrorKey())
+                    .isEqualTo(ConnectionErrorType.CONNECTION_IS_USED.getErrorKey()));
+
+        Assertions.assertThat(connectionRepository.findById(connectionId))
+            .isPresent();
     }
 
     @Test

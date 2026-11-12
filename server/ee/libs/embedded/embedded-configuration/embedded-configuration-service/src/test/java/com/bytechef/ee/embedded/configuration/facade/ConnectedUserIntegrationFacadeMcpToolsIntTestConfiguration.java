@@ -102,7 +102,7 @@ public class ConnectedUserIntegrationFacadeMcpToolsIntTestConfiguration {
             clusterElementDefinitionService, null, null, null, null, null, null, null, null, null, null, null, null,
             null, null, mcpComponentService, mcpIntegrationComponentService, null, null,
             mcpIntegrationInstanceToolService,
-            mcpServerService, mcpToolService, null, null, null, null, null);
+            mcpServerService, mcpToolService, null, null, null, null, null, null);
     }
 
     @Bean

@@ -15,8 +15,10 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,7 +41,12 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscription;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscriptionDisableReason;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscriptionStatus;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
+import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
+import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
@@ -47,6 +54,8 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.TriggerSubscriptionService;
+import com.bytechef.ee.embedded.configuration.trigger.subscription.TriggerSubscriptionEventSender;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
@@ -103,6 +112,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -209,6 +219,9 @@ class IntegrationInstanceFacadeIntTest {
 
     @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
+
+    @MockitoBean
+    private TriggerSubscriptionManager triggerSubscriptionManager;
 
     @Autowired
     private WorkflowService workflowService;
@@ -563,6 +576,37 @@ class IntegrationInstanceFacadeIntTest {
         assertThat(integrationInstanceService.getIntegrationInstances(List.of(integrationInstanceAId))).isEmpty();
     }
 
+    @Test
+    void testDisableIntegrationInstanceDisablesItsTriggerSubscriptions() {
+        authenticate(createTenantAdminAuthentication());
+
+        integrationInstanceFacade.enableIntegrationInstance(integrationInstanceAId, false);
+
+        verify(triggerSubscriptionManager).disableByIntegrationInstanceId(
+            integrationInstanceAId, TriggerSubscriptionDisableReason.INTEGRATION_INSTANCE_DISABLED);
+        verify(triggerSubscriptionManager, never()).disableByIntegrationInstanceId(
+            eq(integrationInstanceBId), any());
+    }
+
+    @Test
+    void testEnableIntegrationInstanceLeavesTriggerSubscriptionsAlone() {
+        authenticate(createTenantAdminAuthentication());
+
+        integrationInstanceFacade.enableIntegrationInstance(integrationInstanceAId, true);
+
+        verify(triggerSubscriptionManager, never()).disableByIntegrationInstanceId(anyLong(), any());
+    }
+
+    @Test
+    void testDeleteIntegrationInstanceDisablesItsTriggerSubscriptions() {
+        authenticate(createTenantAdminAuthentication());
+
+        integrationInstanceFacade.deleteIntegrationInstance(integrationInstanceAId);
+
+        verify(triggerSubscriptionManager).disableByIntegrationInstanceId(
+            integrationInstanceAId, TriggerSubscriptionDisableReason.INTEGRATION_INSTANCE_DELETED);
+    }
+
     private static void authenticate(Authentication authentication) {
         SecurityContextHolder.getContext()
             .setAuthentication(authentication);
@@ -611,6 +655,171 @@ class IntegrationInstanceFacadeIntTest {
 
             return new AutomationMethodSecurityExpressionHandler(
                 permissionService, methodSecurityExpressionContributorProvider);
+        }
+    }
+
+    /**
+     * Runs the integration instance hooks against the real trigger subscription manager.
+     */
+    @TriggerSubscriptionLifecycleIntTest
+    static class TriggerSubscriptions {
+
+        @Autowired
+        private IntegrationInstanceFacade integrationInstanceFacade;
+
+        @Autowired
+        private ConnectedUserConnectionService connectedUserConnectionService;
+
+        @Autowired
+        private ConnectedUserService connectedUserService;
+
+        @Autowired
+        private ConnectionDefinitionService connectionDefinitionService;
+
+        @Autowired
+        private ConnectionService connectionService;
+
+        @Autowired
+        private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
+
+        @Autowired
+        private EnvironmentService environmentService;
+
+        @Autowired
+        private IntegrationInstanceService integrationInstanceService;
+
+        @Autowired
+        private IntegrationRepository integrationRepository;
+
+        @Autowired
+        private JdbcClient jdbcClient;
+
+        @Autowired
+        private OAuth2Service oAuth2Service;
+
+        @Autowired
+        private PrincipalJobService principalJobService;
+
+        @Autowired
+        private TriggerDefinitionService triggerDefinitionService;
+
+        @Autowired
+        private TriggerLifecycleFacade triggerLifecycleFacade;
+
+        @Autowired
+        private TriggerSubscriptionEventSender triggerSubscriptionEventSender;
+
+        @Autowired
+        private TriggerSubscriptionManager triggerSubscriptionManager;
+
+        @Autowired
+        private TriggerSubscriptionService triggerSubscriptionService;
+
+        private ConnectedUser connectedUser;
+        private long connectionId;
+
+        @BeforeEach
+        void beforeEach() {
+            TriggerSubscriptionLifecycleTestSupport.addConnectionForeignKey(jdbcClient);
+            TriggerSubscriptionLifecycleTestSupport.stubCollaborators(
+                connectionDefinitionService, embeddedPermissionEvaluator, environmentService, oAuth2Service,
+                principalJobService, triggerDefinitionService);
+            TriggerSubscriptionLifecycleTestSupport.authenticateAdmin();
+
+            connectedUser = connectedUserService.createConnectedUser(
+                "trigger-subscription-hook-user-" + UUID.randomUUID(), Environment.PRODUCTION);
+            connectionId = TriggerSubscriptionLifecycleTestSupport.createConnection(connectionService);
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+
+            TriggerSubscriptionLifecycleTestSupport.dropConnectionForeignKey(jdbcClient);
+        }
+
+        @Test
+        void testDisableIntegrationInstanceDisablesItsTriggerSubscriptions() {
+            long integrationInstanceId = createIntegrationInstance();
+
+            TriggerSubscription instanceTriggerSubscription = createSubscription(integrationInstanceId);
+            TriggerSubscription otherTriggerSubscription = createSubscription(null);
+
+            clearInvocations(triggerLifecycleFacade, triggerSubscriptionEventSender);
+
+            integrationInstanceFacade.enableIntegrationInstance(integrationInstanceId, false);
+
+            assertThat(integrationInstanceService.getIntegrationInstance(integrationInstanceId)
+                .isEnabled()).isFalse();
+            assertThat(getStatus(instanceTriggerSubscription)).isEqualTo(TriggerSubscriptionStatus.DISABLED);
+            assertThat(getStatus(otherTriggerSubscription)).isEqualTo(TriggerSubscriptionStatus.ENABLED);
+
+            verify(triggerLifecycleFacade, times(1)).executeTriggerDisable(anyString(), any(), any(), anyMap(), any());
+
+            verifyOneLifecycleEvent(
+                instanceTriggerSubscription, "subscription.disabled",
+                TriggerSubscriptionDisableReason.INTEGRATION_INSTANCE_DISABLED);
+        }
+
+        @Test
+        void testDeleteIntegrationInstanceDisablesItsTriggerSubscriptions() {
+            long integrationInstanceId = createIntegrationInstance();
+
+            TriggerSubscription triggerSubscription = createSubscription(integrationInstanceId);
+
+            clearInvocations(triggerLifecycleFacade, triggerSubscriptionEventSender);
+
+            integrationInstanceFacade.deleteIntegrationInstance(integrationInstanceId);
+
+            assertThat(integrationInstanceService.fetchIntegrationInstance(integrationInstanceId)).isEmpty();
+            assertThat(getStatus(triggerSubscription)).isEqualTo(TriggerSubscriptionStatus.DISABLED);
+
+            verify(triggerLifecycleFacade, times(1)).executeTriggerDisable(anyString(), any(), any(), anyMap(), any());
+
+            verifyOneLifecycleEvent(
+                triggerSubscription, "subscription.disabled",
+                TriggerSubscriptionDisableReason.INTEGRATION_INSTANCE_DELETED);
+        }
+
+        @Test
+        void testDeleteIntegrationInstanceKeepsTheConnectionOfItsTriggerSubscriptionsForTheConnectedUser() {
+            long integrationInstanceId = createIntegrationInstance();
+
+            createSubscription(integrationInstanceId);
+
+            integrationInstanceFacade.deleteIntegrationInstance(integrationInstanceId);
+
+            assertThat(connectionService.fetchConnection(connectionId)).isPresent();
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUser.getId())).contains(connectionId);
+        }
+
+        private long createIntegrationInstance() {
+            return TriggerSubscriptionLifecycleTestSupport.createIntegrationInstance(
+                integrationInstanceService, integrationRepository, jdbcClient, connectedUser.getId(), connectionId);
+        }
+
+        private TriggerSubscription createSubscription(Long integrationInstanceId) {
+            return triggerSubscriptionManager.create(
+                connectedUser, integrationInstanceId, connectionId,
+                TriggerSubscriptionLifecycleTestSupport.WEBHOOK_COMPONENT_NAME, 1,
+                TriggerSubscriptionLifecycleTestSupport.WEBHOOK_TRIGGER_NAME, Map.of(), null, null, null, 0);
+        }
+
+        private TriggerSubscriptionStatus getStatus(TriggerSubscription triggerSubscription) {
+            TriggerSubscription currentTriggerSubscription = triggerSubscriptionService.getTriggerSubscription(
+                triggerSubscription.getId());
+
+            return currentTriggerSubscription.getStatus();
+        }
+
+        private void verifyOneLifecycleEvent(
+            TriggerSubscription triggerSubscription, String type, TriggerSubscriptionDisableReason reason) {
+
+            verify(triggerSubscriptionEventSender, times(1)).sendLifecycleEvent(
+                argThat(curTriggerSubscription -> triggerSubscription.getId()
+                    .equals(curTriggerSubscription.getId())),
+                eq(type), eq(reason));
+            verify(triggerSubscriptionEventSender, times(1)).sendLifecycleEvent(any(), any(), any());
         }
     }
 }

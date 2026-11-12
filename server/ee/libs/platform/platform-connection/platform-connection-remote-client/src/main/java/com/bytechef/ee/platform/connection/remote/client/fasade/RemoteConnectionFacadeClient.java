@@ -25,6 +25,11 @@ import org.springframework.stereotype.Component;
 public class RemoteConnectionFacadeClient implements ConnectionFacade {
 
     @Override
+    public void checkDeletable(Long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public long create(ConnectionDTO connectionDTO, PlatformType type) {
         throw new UnsupportedOperationException();
     }

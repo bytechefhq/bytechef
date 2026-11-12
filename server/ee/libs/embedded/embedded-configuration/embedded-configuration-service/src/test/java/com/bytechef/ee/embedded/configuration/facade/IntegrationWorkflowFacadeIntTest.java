@@ -63,6 +63,7 @@ import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -127,7 +128,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
     ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class, ProjectFacade.class, ProjectService.class,
-    ProjectWorkflowFacade.class, ProjectWorkflowService.class, TaskDispatcherDefinitionService.class,
+    ProjectWorkflowFacade.class, ProjectWorkflowService.class, PropertyService.class,
+    TaskDispatcherDefinitionService.class,
     TriggerDefinitionFacade.class, TriggerDefinitionService.class, TriggerExecutionService.class,
     TriggerLifecycleFacade.class, WebhookTriggerTestFacade.class, WorkflowCacheManager.class,
     WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationFacade.class,

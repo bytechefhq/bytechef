@@ -49,7 +49,8 @@ public class ProjectOwnershipServiceImpl implements ProjectOwnershipService, Sma
     private static final String MATCH_EVERYTHING = "1 = 1";
     private static final String MATCH_NOTHING = "1 = 0";
     private static final Set<ProjectOwner> EMBEDDED_PROJECT_OWNERS = EnumSet.of(
-        ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
+        ProjectOwner.EMBEDDED_AUTOMATION_PROJECT, ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT,
+        ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION);
     private static final Set<ProjectDeploymentOwner> EMBEDDED_PROJECT_DEPLOYMENT_OWNERS = EnumSet.of(
         ProjectDeploymentOwner.EMBEDDED);
     private static final List<String> PROJECT_DEPLOYMENT_ID_COLUMNS = List.of("project_deployment.id");

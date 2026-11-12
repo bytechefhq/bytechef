@@ -1,0 +1,3 @@
+mutation deleteTriggerSubscription($id: ID!) {
+    deleteTriggerSubscription(id: $id)
+}

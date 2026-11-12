@@ -9,13 +9,19 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,6 +35,8 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
@@ -39,6 +47,9 @@ import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserConnection;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscription;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscriptionDisableReason;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscriptionStatus;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserSharedConnectionRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
@@ -46,6 +57,8 @@ import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionSer
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.service.TriggerSubscriptionService;
+import com.bytechef.ee.embedded.configuration.trigger.subscription.TriggerSubscriptionEventSender;
 import com.bytechef.ee.embedded.connected.user.constant.ConnectedUserConstants;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -57,6 +70,7 @@ import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -75,6 +89,7 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -97,6 +112,7 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -105,12 +121,14 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
+import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -121,6 +139,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -205,6 +224,9 @@ class ConnectedUserConnectionFacadeIntTest {
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
+
+    @MockitoBean
+    private TriggerSubscriptionManager triggerSubscriptionManager;
 
     private final Map<Long, Connection> connections = new HashMap<>();
 
@@ -638,6 +660,26 @@ class ConnectedUserConnectionFacadeIntTest {
         assertThat(connectedUserConnectionService.getConnectionIds(connectedUserId)).containsExactly(83101L);
 
         verify(connectionFacade, never()).delete(any());
+        verify(triggerSubscriptionManager, never()).deleteByConnectionId(anyLong());
+    }
+
+    @Test
+    void testDeleteConnectedUserConnectionChecksTheConnectionThenDeletesTriggerSubscriptionsThenTheConnection() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createOwnership(connectedUserId, List.of(83301L), List.of());
+        stubOwnedConnectionDTOs(List.of(83301L));
+
+        connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUserId, 83301L);
+
+        InOrder inOrder = inOrder(triggerSubscriptionManager, connectionFacade);
+
+        inOrder.verify(connectionFacade)
+            .checkDeletable(83301L);
+        inOrder.verify(triggerSubscriptionManager)
+            .deleteByConnectionId(83301L);
+        inOrder.verify(connectionFacade)
+            .delete(83301L);
     }
 
     @Test
@@ -1684,6 +1726,199 @@ class ConnectedUserConnectionFacadeIntTest {
                 return new AutomationMethodSecurityExpressionHandler(
                     permissionService, methodSecurityExpressionContributorProvider);
             }
+        }
+    }
+
+    @TriggerSubscriptionLifecycleIntTest
+    static class TriggerSubscriptions {
+
+        private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
+        @Autowired
+        private ConnectedUserConnectionFacade connectedUserConnectionFacade;
+
+        @Autowired
+        private ConnectedUserConnectionService connectedUserConnectionService;
+
+        @Autowired
+        private ConnectionDefinitionService connectionDefinitionService;
+
+        @Autowired
+        private ConnectionService connectionService;
+
+        @Autowired
+        private ConnectedUserService connectedUserService;
+
+        @Autowired
+        private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
+
+        @Autowired
+        private EnvironmentService environmentService;
+
+        @Autowired
+        private JdbcClient jdbcClient;
+
+        @Autowired
+        private OAuth2Service oAuth2Service;
+
+        @Autowired
+        private PrincipalJobService principalJobService;
+
+        @Autowired
+        private ProjectDeploymentService projectDeploymentService;
+
+        @Autowired
+        private ProjectService projectService;
+
+        @Autowired
+        private TriggerDefinitionService triggerDefinitionService;
+
+        @Autowired
+        private TriggerLifecycleFacade triggerLifecycleFacade;
+
+        @Autowired
+        private TriggerSubscriptionEventSender triggerSubscriptionEventSender;
+
+        @Autowired
+        private TriggerSubscriptionManager triggerSubscriptionManager;
+
+        @Autowired
+        private TriggerSubscriptionService triggerSubscriptionService;
+
+        @Autowired
+        private WorkflowTestConfigurationService workflowTestConfigurationService;
+
+        private ConnectedUser connectedUser;
+
+        @BeforeEach
+        void beforeEach() {
+            TriggerSubscriptionLifecycleTestSupport.addConnectionForeignKey(jdbcClient);
+            TriggerSubscriptionLifecycleTestSupport.stubCollaborators(
+                connectionDefinitionService, embeddedPermissionEvaluator, environmentService, oAuth2Service,
+                principalJobService, triggerDefinitionService);
+            TriggerSubscriptionLifecycleTestSupport.authenticateAdmin();
+
+            connectedUser = connectedUserService.createConnectedUser(
+                "trigger-subscription-connection-user-" + UUID.randomUUID(), Environment.PRODUCTION);
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+
+            TriggerSubscriptionLifecycleTestSupport.dropConnectionForeignKey(jdbcClient);
+        }
+
+        @Test
+        void testDeleteConnectedUserConnectionDeletesTriggerSubscriptionsOfADeletedIntegrationInstance() {
+            long connectionId = TriggerSubscriptionLifecycleTestSupport.createConnection(connectionService);
+
+            connectedUserConnectionService.create(connectedUser.getId(), connectionId);
+
+            long integrationInstanceId = SECURE_RANDOM.nextLong(1_000_000L, Long.MAX_VALUE);
+
+            TriggerSubscription triggerSubscription = createSubscription(integrationInstanceId, connectionId);
+
+            triggerSubscriptionManager.disableByIntegrationInstanceId(
+                integrationInstanceId, TriggerSubscriptionDisableReason.INTEGRATION_INSTANCE_DELETED);
+
+            TriggerSubscription disabledTriggerSubscription = triggerSubscriptionService.getTriggerSubscription(
+                triggerSubscription.getId());
+
+            assertThat(disabledTriggerSubscription.getStatus()).isEqualTo(TriggerSubscriptionStatus.DISABLED);
+
+            clearInvocations(triggerLifecycleFacade, triggerSubscriptionEventSender);
+
+            connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUser.getId(), connectionId);
+
+            assertDeleted(connectionId, triggerSubscription);
+
+            verify(triggerLifecycleFacade, never()).executeTriggerDisable(anyString(), any(), any(), anyMap(), any());
+        }
+
+        @Test
+        void testDeleteConnectedUserConnectionDeletesEnabledTriggerSubscriptions() {
+            long connectionId = TriggerSubscriptionLifecycleTestSupport.createConnection(connectionService);
+
+            connectedUserConnectionService.create(connectedUser.getId(), connectionId);
+
+            TriggerSubscription triggerSubscription = createSubscription(null, connectionId);
+
+            clearInvocations(triggerLifecycleFacade, triggerSubscriptionEventSender);
+
+            connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUser.getId(), connectionId);
+
+            assertDeleted(connectionId, triggerSubscription);
+
+            verify(triggerLifecycleFacade, times(1)).executeTriggerDisable(anyString(), any(), any(), anyMap(), any());
+        }
+
+        @Test
+        void testDeleteConnectedUserConnectionRefusedAsUsedLeavesTriggerSubscriptionsEnabled() {
+            long connectionId = TriggerSubscriptionLifecycleTestSupport.createConnection(connectionService);
+
+            connectedUserConnectionService.create(connectedUser.getId(), connectionId);
+
+            TriggerSubscription triggerSubscription = createSubscription(null, connectionId);
+
+            clearInvocations(triggerLifecycleFacade, triggerSubscriptionEventSender);
+
+            when(workflowTestConfigurationService.isConnectionUsed(connectionId)).thenReturn(true);
+
+            assertConnectionIsUsed(
+                catchThrowable(
+                    () -> connectedUserConnectionFacade.deleteConnectedUserConnection(
+                        connectedUser.getId(), connectionId)));
+
+            assertUntouched(connectionId, triggerSubscription);
+        }
+
+        private void assertDeleted(long connectionId, TriggerSubscription... triggerSubscriptions) {
+            assertThat(connectionService.fetchConnection(connectionId)).isEmpty();
+            assertThat(triggerSubscriptionService.getConnectionTriggerSubscriptions(connectionId)).isEmpty();
+
+            for (TriggerSubscription triggerSubscription : triggerSubscriptions) {
+                assertThat(triggerSubscriptionService.fetchTriggerSubscription(triggerSubscription.getId())).isEmpty();
+                assertThat(projectService.fetchProject(triggerSubscription.getProjectId())).isEmpty();
+                assertThat(
+                    projectDeploymentService.fetchProjectDeployment(
+                        Validate.notNull(triggerSubscription.getProjectDeploymentId(), "projectDeploymentId")))
+                            .isEmpty();
+
+                verify(triggerSubscriptionEventSender, times(1)).sendLifecycleEvent(
+                    argThat(curTriggerSubscription -> triggerSubscription.getId()
+                        .equals(curTriggerSubscription.getId())),
+                    eq("subscription.deleted"), eq(TriggerSubscriptionDisableReason.CONNECTION_DELETED));
+            }
+
+            verify(triggerSubscriptionEventSender, times(triggerSubscriptions.length)).sendLifecycleEvent(
+                any(), any(), any());
+        }
+
+        private void assertUntouched(long connectionId, TriggerSubscription triggerSubscription) {
+            assertThat(connectionService.fetchConnection(connectionId)).isPresent();
+
+            TriggerSubscription currentTriggerSubscription = triggerSubscriptionService.getTriggerSubscription(
+                triggerSubscription.getId());
+
+            assertThat(currentTriggerSubscription.getStatus()).isEqualTo(TriggerSubscriptionStatus.ENABLED);
+
+            verify(triggerLifecycleFacade, never()).executeTriggerDisable(anyString(), any(), any(), anyMap(), any());
+            verify(triggerSubscriptionEventSender, never()).sendLifecycleEvent(any(), any(), any());
+        }
+
+        private static void assertConnectionIsUsed(Throwable throwable) {
+            assertThat(throwable).isInstanceOfSatisfying(
+                ConfigurationException.class,
+                exception -> assertThat(exception.getErrorKey())
+                    .isEqualTo(ConnectionErrorType.CONNECTION_IS_USED.getErrorKey()));
+        }
+
+        private TriggerSubscription createSubscription(Long integrationInstanceId, long connectionId) {
+            return triggerSubscriptionManager.create(
+                connectedUser, integrationInstanceId, connectionId,
+                TriggerSubscriptionLifecycleTestSupport.WEBHOOK_COMPONENT_NAME, 1,
+                TriggerSubscriptionLifecycleTestSupport.WEBHOOK_TRIGGER_NAME, Map.of(), null, null, null, 0);
         }
     }
 }

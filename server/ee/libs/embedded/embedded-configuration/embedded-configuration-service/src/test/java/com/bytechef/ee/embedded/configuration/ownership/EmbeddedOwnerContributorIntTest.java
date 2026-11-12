@@ -422,6 +422,23 @@ class EmbeddedOwnerContributorIntTest {
 
         connectedUserProjectFacade.publishProjectWorkflow(externalUserId, copyWorkflowUuid, "published", null);
 
+        long connectedUserId = jdbcClient
+            .sql("SELECT id FROM connected_user WHERE external_id = :externalId")
+            .param("externalId", externalUserId)
+            .query(Long.class)
+            .single();
+
+        jdbcClient
+            .sql(
+                """
+                    INSERT INTO connected_user_trigger_subscription
+                        (connected_user_id, environment, component_name, component_version, trigger_name, status)
+                    VALUES (:connectedUserId, :environment, 'slack', 1, 'newMessage', 0)
+                    """)
+            .param("connectedUserId", connectedUserId)
+            .param("environment", Environment.PRODUCTION.ordinal())
+            .update();
+
         ProjectOwnershipServiceImpl projectOwnershipService = new ProjectOwnershipServiceImpl(
             jdbcClient, List.of(), List.of());
 
@@ -429,7 +446,7 @@ class EmbeddedOwnerContributorIntTest {
             .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
                 assertThat(exception.getProjectOwners())
                     .containsExactly(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
-                        ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
+                        ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT, ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION);
                 assertThat(exception.getProjectDeploymentOwners()).contains(ProjectDeploymentOwner.EMBEDDED);
             });
         assertThat(ProjectDeploymentOwner.EMBEDDED.getOwnerTables())

@@ -23,6 +23,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscriptionDisableReason;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -82,6 +83,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     private final IntegrationWorkflowService integrationWorkflowService;
     private final JobService jobService;
     private final TriggerLifecycleFacade triggerLifecycleFacade;
+    private final TriggerSubscriptionManager triggerSubscriptionManager;
     private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
     private final String webhookUrl;
@@ -99,7 +101,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
         IntegrationWorkflowService integrationWorkflowService, JobService jobService,
         PrincipalJobService principalJobService, TriggerLifecycleFacade triggerLifecycleFacade,
-        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
+        TriggerSubscriptionManager triggerSubscriptionManager, ComponentConnectionFacade componentConnectionFacade,
+        WorkflowService workflowService) {
 
         this.componentConnectionFacade = componentConnectionFacade;
         this.connectedUserIntegrationInstanceFacadeProvider = connectedUserIntegrationInstanceFacadeProvider;
@@ -116,6 +119,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         this.jobService = jobService;
         this.principalJobService = principalJobService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
+        this.triggerSubscriptionManager = triggerSubscriptionManager;
         this.webhookUrl = applicationProperties.getWebhookUrl();
         this.workflowService = workflowService;
     }
@@ -128,6 +132,9 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     public void deleteIntegrationInstance(long integrationInstanceId) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
+
+        triggerSubscriptionManager.disableByIntegrationInstanceId(
+            integrationInstanceId, TriggerSubscriptionDisableReason.INTEGRATION_INSTANCE_DELETED);
 
         if (integrationInstance.isEnabled()) {
             enableIntegrationInstanceWorkflowTriggers(integrationInstanceId, false);
@@ -155,6 +162,11 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(
             integrationInstance.getConnectedUserId());
+
+        if (!enable) {
+            triggerSubscriptionManager.disableByIntegrationInstanceId(
+                integrationInstanceId, TriggerSubscriptionDisableReason.INTEGRATION_INSTANCE_DISABLED);
+        }
 
         if (connectedUser.isEnabled()) {
             enableIntegrationInstanceWorkflowTriggers(integrationInstanceId, enable);

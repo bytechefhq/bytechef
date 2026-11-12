@@ -1,0 +1,56 @@
+---
+title: "Tools"
+description: List a connected user's tool catalogue and run the tool a language model chose.
+---
+
+A **tool** is an action projected for a language model: a flat name, a description and a JSON Schema. Use tools when a model chooses what to run; when your code has already decided, call the [action](/platform/embedded/build/component-kit/actions) instead. See the [Component Kit overview](/platform/embedded/build/component-kit) for how the two compare.
+
+## Listing a user's tools
+
+`GET /tools` returns the tools grouped by the component they belong to, each already in function-calling shape:
+
+```json
+{
+  "slack": [
+    {
+      "type": "function",
+      "function": {
+        "name": "SLACK_SEND_CHANNEL_MESSAGE",
+        "description": "Sends a message to a public channel.",
+        "parameters": "{\"type\":\"object\",\"properties\":{ ... }}"
+      }
+    }
+  ]
+}
+```
+
+Two things about that shape are worth knowing before you wire it up:
+
+- **`parameters` is a JSON Schema carried as a string**, not a nested object. Parse it before handing it to your model client.
+- **A tool name is an address, not a label.** It is the component name uppercased, then the action name in `SCREAMING_SNAKE_CASE` - `sendChannelMessage` on `slack` becomes `SLACK_SEND_CHANNEL_MESSAGE`. Executing a tool splits that name back apart to find the component and the action, which is why the call carries no component field and no version.
+
+Narrow the catalogue with the `categories`, `components`, and `tools` query parameters. Useful when a user has connected far more than a given conversation should be allowed to reach.
+
+### What ends up in the catalogue
+
+- **Only actions published as tools.** A component opts its actions in one at a time; an action it does not opt in never appears in `GET /tools`, though your own code can still call it as an action.
+- **Only integrations that user has connected.** The catalogue is derived from that user's own integration instances, so it differs per user and grows the moment they connect something new - with no redeploy on your side.
+- **Actions, not workflows.** To let an agent run a whole workflow, expose it through an [MCP server](/platform/embedded/configure/mcp-servers) or trigger it with an [App Event](/platform/embedded/build/app-events).
+
+## Running a tool
+
+```http
+POST /api/embedded/v1/{externalUserId}/tools
+Authorization: Bearer <api-key>
+X-Environment: PRODUCTION
+Content-Type: application/json
+
+{
+  "name": "SLACK_SEND_CHANNEL_MESSAGE",
+  "parameters": { "channel": "#general", "text": "Deploy finished." }
+}
+```
+
+The response is the provider's own response, returned as-is.
+
+Every tool call is recorded as an [external invocation](/platform/embedded/monitor/external-invocations) on the **API (Tool)** source, whether it succeeds or fails.

@@ -52,6 +52,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscriptionDisableReason;
 import com.bytechef.ee.embedded.configuration.dto.ConfigurationMoveResultDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
@@ -241,6 +242,9 @@ class ConnectedUserIntegrationFacadeIntTest {
     @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
 
+    @MockitoBean
+    private TriggerSubscriptionManager triggerSubscriptionManager;
+
     @Autowired
     private WorkflowService workflowService;
 
@@ -353,6 +357,14 @@ class ConnectedUserIntegrationFacadeIntTest {
     }
 
     @Test
+    void testDeleteDisablesTheTriggerSubscriptionsOfTheInstance() {
+        connectedUserIntegrationFacade.deleteIntegrationInstance(ownerExternalUserId, integrationInstanceId);
+
+        verify(triggerSubscriptionManager).disableByIntegrationInstanceId(
+            integrationInstanceId, TriggerSubscriptionDisableReason.INTEGRATION_INSTANCE_DELETED);
+    }
+
+    @Test
     void testDeleteDisablesTheEnabledWorkflowsOfAnEnabledInstanceBeforeDeletingThem() {
         List<Integer> integrationInstanceWorkflowCountsAtTriggerDisable = new ArrayList<>();
 
@@ -431,7 +443,7 @@ class ConnectedUserIntegrationFacadeIntTest {
             () -> connectedUserIntegrationFacade.deleteIntegrationInstance(otherExternalUserId, integrationInstanceId))
                 .isInstanceOf(AccessDeniedException.class);
 
-        verifyNoInteractions(triggerLifecycleFacade);
+        verifyNoInteractions(triggerLifecycleFacade, triggerSubscriptionManager);
 
         assertThat(integrationInstanceWorkflowService.getIntegrationInstanceWorkflows(integrationInstanceId))
             .extracting(IntegrationInstanceWorkflow::isEnabled)

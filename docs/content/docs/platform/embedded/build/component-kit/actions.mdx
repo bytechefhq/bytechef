@@ -1,0 +1,25 @@
+---
+title: "Actions"
+description: Call an action on a connected user's integration when your code has already chosen what to run.
+---
+
+An **action** is the unit ByteChef executes: one operation on one component, addressed by component, version and action name. Use actions when your code has already decided what to run; when a model chooses, use [tools](/platform/embedded/build/component-kit/tools). See the [Component Kit overview](/platform/embedded/build/component-kit) for how the two compare.
+
+## Calling an action
+
+When your code has already decided what to run, address the action directly. The input goes under `input`, and the result comes back wrapped in `result`:
+
+```http
+POST /api/embedded/v1/{externalUserId}/components/slack/versions/1/actions/sendChannelMessage
+Authorization: Bearer <api-key>
+X-Environment: PRODUCTION
+Content-Type: application/json
+
+{
+  "input": { "channel": "#general", "text": "Deploy finished." }
+}
+```
+
+This is also the surface to use when an operation takes a **file**: set `bodyContentType` to `BINARY` or `FORM_DATA` in the input and the endpoint resolves the referenced content into a file entry before the action runs. The tools endpoint has no equivalent, so file-bearing operations stay in your code rather than in the model's hands.
+
+Every action call is recorded as an [external invocation](/platform/embedded/monitor/external-invocations) on the **API (Action)** source. Your backend reads a user's tool and action calls with `GET /api/embedded/v1/{externalUserId}/external-invocations`; see the [API reference](/openapi/backend/embedded-external-invocation).

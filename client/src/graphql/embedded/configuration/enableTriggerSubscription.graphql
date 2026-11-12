@@ -1,0 +1,3 @@
+mutation enableTriggerSubscription($id: ID!, $enable: Boolean!) {
+    enableTriggerSubscription(id: $id, enable: $enable)
+}

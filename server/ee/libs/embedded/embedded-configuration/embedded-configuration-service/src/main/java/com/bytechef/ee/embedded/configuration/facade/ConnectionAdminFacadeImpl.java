@@ -47,18 +47,21 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
     private final ConnectionFacade connectionFacade;
     private final ConnectionService connectionService;
     private final TagService tagService;
+    private final TriggerSubscriptionManager triggerSubscriptionManager;
 
     @SuppressFBWarnings("EI")
     public ConnectionAdminFacadeImpl(
         ConnectedUserConnectionMembership connectedUserConnectionMembership,
         ConnectedUserConnectionService connectedUserConnectionService, ConnectionFacade connectionFacade,
-        ConnectionService connectionService, TagService tagService) {
+        ConnectionService connectionService, TagService tagService,
+        TriggerSubscriptionManager triggerSubscriptionManager) {
 
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectionFacade = connectionFacade;
         this.connectionService = connectionService;
         this.tagService = tagService;
+        this.triggerSubscriptionManager = triggerSubscriptionManager;
     }
 
     @Override
@@ -86,6 +89,10 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
     })
     public void deleteConnection(long id) {
         requireAdminConnection(id);
+
+        connectionFacade.checkDeletable(id);
+
+        triggerSubscriptionManager.deleteByConnectionId(id);
 
         connectedUserConnectionService.deleteByConnectionId(id);
 

@@ -8,6 +8,8 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentMode
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationKindModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationOutcomeModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationSourceModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.TriggerSubscriptionErrorCodeModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.TriggerSubscriptionStatusModel;
 
 import jakarta.annotation.Generated;
 
@@ -22,7 +24,7 @@ import org.springframework.core.convert.converter.Converter;
  * correct conversion if the OpenAPI specification is using an `enumPropertyNaming` other than
  * `original` or the specification has an integer enum.
  */
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T15:10:56.439359+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-12T00:36:32.396363+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 @Configuration(value = "org.openapitools.configuration.enumConverterConfiguration")
 public class EnumConverterConfiguration {
 
@@ -59,6 +61,24 @@ public class EnumConverterConfiguration {
             @Override
             public ExternalInvocationSourceModel convert(String source) {
                 return ExternalInvocationSourceModel.fromValue(source);
+            }
+        };
+    }
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.triggerSubscriptionErrorCodeConverter")
+    Converter<String, TriggerSubscriptionErrorCodeModel> triggerSubscriptionErrorCodeConverter() {
+        return new Converter<String, TriggerSubscriptionErrorCodeModel>() {
+            @Override
+            public TriggerSubscriptionErrorCodeModel convert(String source) {
+                return TriggerSubscriptionErrorCodeModel.fromValue(source);
+            }
+        };
+    }
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.triggerSubscriptionStatusConverter")
+    Converter<String, TriggerSubscriptionStatusModel> triggerSubscriptionStatusConverter() {
+        return new Converter<String, TriggerSubscriptionStatusModel>() {
+            @Override
+            public TriggerSubscriptionStatusModel convert(String source) {
+                return TriggerSubscriptionStatusModel.fromValue(source);
             }
         };
     }

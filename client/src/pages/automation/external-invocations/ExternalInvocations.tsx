@@ -43,6 +43,7 @@ const sourceOptionsByType: Record<PlatformType, Array<ComboBoxItemType>> = {
         {label: 'MCP Servers', value: 'MCP_SERVER'},
         {label: 'API (Action)', value: 'API_ACTION'},
         {label: 'API (Tool)', value: 'API_TOOL'},
+        {label: 'API (Trigger)', value: 'API_TRIGGER'},
     ],
 };
 
