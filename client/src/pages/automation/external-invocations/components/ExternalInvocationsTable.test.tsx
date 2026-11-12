@@ -61,6 +61,7 @@ describe('ExternalInvocationsTable', () => {
         ['API_TOOL', 'COMPONENT', 'Component tool'],
         ['API_ACTION', 'COMPONENT', 'Action'],
         ['A2A_SERVER', 'WORKFLOW', 'Skill'],
+        ['API_TRIGGER', 'COMPONENT', 'Trigger'],
         ['MCP_SERVER', 'UNKNOWN_KIND', 'UNKNOWN_KIND'],
     ])('renders a %s %s call as %s in the Type column', (source, kind, expectedLabel) => {
         render(<ExternalInvocationsTable externalInvocationLogs={[{...baseLog, kind, source}]} />);
@@ -89,6 +90,7 @@ describe('ExternalInvocationsTable', () => {
         ['A2A_SERVER', 'A2A'],
         ['API_ACTION', 'API (Action)'],
         ['API_TOOL', 'API (Tool)'],
+        ['API_TRIGGER', 'API (Trigger)'],
         ['MCP_SERVER', 'MCP'],
         ['FUTURE_SOURCE', 'FUTURE_SOURCE'],
     ])('labels the %s source as %s', (source, label) => {
@@ -316,6 +318,22 @@ describe('ExternalInvocationsTable', () => {
         expect(onViewJob).not.toHaveBeenCalled();
         expect(screen.getAllByRole('row')[1]).not.toHaveClass('cursor-pointer');
         expect(screen.queryByRole('button', {name: 'Send Message'})).not.toBeInTheDocument();
+    });
+
+    it('does not offer the workflow run of a trigger delivery', () => {
+        const onViewJob = vi.fn();
+
+        renderWithProviders(
+            <ExternalInvocationsTable
+                externalInvocationLogs={[{...baseLog, jobId: '7', source: 'API_TRIGGER', toolName: 'new_contact'}]}
+                onViewJob={onViewJob}
+            />
+        );
+
+        fireEvent.click(screen.getByText('new_contact'));
+
+        expect(screen.queryByRole('button', {name: 'External invocation actions'})).not.toBeInTheDocument();
+        expect(onViewJob).not.toHaveBeenCalled();
     });
 
     it('does not open the workflow run when the actions menu is clicked', () => {

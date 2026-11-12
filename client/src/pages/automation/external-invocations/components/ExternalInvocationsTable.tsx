@@ -13,7 +13,7 @@ import {
     PINNED_STRIPED_CELL_CLASS_NAME,
 } from '@/shared/components/workflow-executions/workflowExecutionsTableClassNames';
 import {ExternalInvocationLogsQuery} from '@/shared/middleware/graphql';
-import {type LucideIcon, PuzzleIcon, SparklesIcon, WorkflowIcon, ZapIcon} from 'lucide-react';
+import {type LucideIcon, PuzzleIcon, RadioTowerIcon, SparklesIcon, WorkflowIcon, ZapIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 import ExternalInvocationsDropdownMenu from './ExternalInvocationsDropdownMenu';
@@ -36,6 +36,7 @@ const SOURCE_LABELS: Record<string, string> = {
     A2A_SERVER: 'A2A',
     API_ACTION: 'API (Action)',
     API_TOOL: 'API (Tool)',
+    API_TRIGGER: 'API (Trigger)',
     MCP_SERVER: 'MCP',
 };
 
@@ -52,7 +53,10 @@ const KIND_TYPES: Record<string, InvocationTypeI> = {
 const SOURCE_TYPES: Record<string, InvocationTypeI> = {
     A2A_SERVER: {icon: SparklesIcon, label: 'Skill'},
     API_ACTION: {icon: ZapIcon, label: 'Action'},
+    API_TRIGGER: {icon: RadioTowerIcon, label: 'Trigger'},
 };
+
+const SOURCES_WITHOUT_JOB_VIEW = ['API_TRIGGER'];
 
 const OUTCOME_STYLE_TYPES: Record<string, BadgeStyleType> = {
     APPROVAL_DENIED: 'warning-outline',
@@ -162,7 +166,10 @@ const ExternalInvocationsTable = ({
         <TableBody>
             {externalInvocationLogs.map((externalInvocationLog) => {
                 const jobId = externalInvocationLog.jobId;
-                const viewable = onViewJob != null && jobId != null;
+                const viewable =
+                    onViewJob != null &&
+                    jobId != null &&
+                    !SOURCES_WITHOUT_JOB_VIEW.includes(externalInvocationLog.source);
 
                 return (
                     <TableRow

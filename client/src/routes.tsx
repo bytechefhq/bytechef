@@ -122,6 +122,7 @@ const IntegrationInstanceConfigurations = lazy(
 const Integration = lazy(() => import('@/ee/pages/embedded/integration/Integration'));
 const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integrations'));
 const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
+const TriggerEvents = lazy(() => import('@/ee/pages/settings/embedded/trigger-events/TriggerEvents'));
 const WorkspaceApiKeys = lazy(() => import('@/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 const UsersPage = lazy(() => import('@/pages/settings/platform/users/UsersPage'));
@@ -1177,6 +1178,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                             ),
                                             path: 'api-keys',
                                         },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                    <EEVersion>
+                                                        <LazyLoadWrapper>
+                                                            <TriggerEvents />
+                                                        </LazyLoadWrapper>
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'trigger-events',
+                                        },
                                         ...platformSettingsRoutes.children,
                                     ],
                                     element: (
@@ -1189,6 +1202,10 @@ export const getRouter = (queryClient: QueryClient) =>
                                                 {
                                                     href: '/embedded/settings/api-keys',
                                                     title: 'API Keys',
+                                                },
+                                                {
+                                                    href: '/embedded/settings/trigger-events',
+                                                    title: 'Trigger Events',
                                                 },
                                                 organizationSettingsNavItem,
                                                 ...platformSettingsRoutes.navItems,
