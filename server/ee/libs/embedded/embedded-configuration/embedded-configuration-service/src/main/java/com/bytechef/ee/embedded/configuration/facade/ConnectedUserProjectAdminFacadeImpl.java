@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.audit.AutomationProjectAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
@@ -186,8 +187,8 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
 
             try {
                 connectedUserWorkflowReferenceFacade.getOrCreateReference(
-                    connectedUser.getExternalId(), workflow.workflowUuid(), connectedUser.getEnvironment(), Map.of(),
-                    inputs == null || inputs.isEmpty() ? null : inputs);
+                    connectedUser.getExternalId(), workflow.workflowUuid(), connectedUser.getEnvironment(),
+                    workflow.connections(), inputs == null || inputs.isEmpty() ? null : inputs);
             } catch (MissingConnectionException missingConnectionException) {
                 if (log.isDebugEnabled()) {
                     log.debug(
@@ -333,8 +334,29 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     private static ProvisionableAutomationProjectDTO.Workflow toProvisionableWorkflow(
         ConnectedUserWorkflowTemplateDTO template, @Nullable ConnectedUserProjectWorkflow reference) {
 
+        List<ConnectedUserWorkflowTemplateDTO.Input> inputs = template.inputs()
+            .stream()
+            .filter(input -> !input.provided())
+            .toList();
+
         return new ProvisionableAutomationProjectDTO.Workflow(
-            template.workflowUuid(), template.label(), template.inputs(), reference != null,
-            reference != null && reference.isDangling());
+            template.workflowUuid(), template.label(), inputs, reference != null,
+            reference != null && reference.isDangling(), getConnectionComponents(template));
+    }
+
+    private static List<ConnectedUserWorkflowTemplateDTO.Component> getConnectionComponents(
+        ConnectedUserWorkflowTemplateDTO template) {
+
+        Map<String, ConnectedUserWorkflowTemplateDTO.Component> componentsByName = new LinkedHashMap<>();
+
+        for (ConnectedUserWorkflowTemplateDTO.Component component : CollectionUtils.concat(
+            template.triggers(), template.components())) {
+
+            if (component.connectionRequired() && !component.provided()) {
+                componentsByName.putIfAbsent(component.name(), component);
+            }
+        }
+
+        return List.copyOf(componentsByName.values());
     }
 }

@@ -7,6 +7,9 @@
 
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +33,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.graphql.execution.ErrorType;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -41,7 +47,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @ContextConfiguration(classes = {
     EmbeddedConfigurationGraphQlTestConfiguration.class,
-    ConnectedUserProjectGraphQlController.class
+    ConnectedUserProjectGraphQlController.class,
+    ConnectedUserProjectGraphQlControllerIntTest.GraphQlErrorConfiguration.class
 })
 @GraphQlTest(
     controllers = ConnectedUserProjectGraphQlController.class,
@@ -146,7 +153,8 @@ class ConnectedUserProjectGraphQlControllerIntTest {
         List<ProvisionableAutomationProjectDTO.Workflow> alphaWorkflows = List.of(
             new ProvisionableAutomationProjectDTO.Workflow(
                 "uuid-1", "Label", List.of(new ConnectedUserWorkflowTemplateDTO.Input("name", "Name", "STRING", true)),
-                true, false));
+                true, false,
+                List.of(new ConnectedUserWorkflowTemplateDTO.Component("slack", "Slack", "<svg/>", true, null))));
 
         when(connectedUserProjectAdminFacade.getProvisionableProjects(7L))
             .thenReturn(List.of(
@@ -158,7 +166,7 @@ class ConnectedUserProjectGraphQlControllerIntTest {
                         new ProvisionableAutomationProjectDTO.Configuration(
                             12L, "Beta", 3, false,
                             List.of(new ProvisionableAutomationProjectDTO.Workflow(
-                                "uuid-2", "Other", List.of(), false, false)))),
+                                "uuid-2", "Other", List.of(), false, false, List.of())))),
                     11L)));
 
         this.graphQlTester
@@ -178,6 +186,11 @@ class ConnectedUserProjectGraphQlControllerIntTest {
                                 label
                                 type
                                 required
+                            }
+                            components {
+                                name
+                                title
+                                icon
                             }
                         }
                         configurations {
@@ -218,6 +231,15 @@ class ConnectedUserProjectGraphQlControllerIntTest {
             .path("provisionableConnectedUserProjects[0].workflows[0].inputs[0].required")
             .entity(Boolean.class)
             .isEqualTo(true)
+            .path("provisionableConnectedUserProjects[0].workflows[0].components[0].name")
+            .entity(String.class)
+            .isEqualTo("slack")
+            .path("provisionableConnectedUserProjects[0].workflows[0].components[0].title")
+            .entity(String.class)
+            .isEqualTo("Slack")
+            .path("provisionableConnectedUserProjects[0].workflows[0].components[0].icon")
+            .entity(String.class)
+            .isEqualTo("<svg/>")
             .path("provisionableConnectedUserProjects[0].assignedConfigurationId")
             .entity(String.class)
             .isEqualTo("11")
@@ -266,7 +288,10 @@ class ConnectedUserProjectGraphQlControllerIntTest {
                         connectedUserId: "7",
                         configurationId: "11",
                         workflows: [
-                            {workflowUuid: "uuid-1", inputs: {name: "x"}},
+                            {
+                                workflowUuid: "uuid-1", inputs: {name: "x"},
+                                connections: [{componentName: "slack", connectionId: "41"}]
+                            },
                             {workflowUuid: "uuid-2"}
                         ])
                 }
@@ -279,8 +304,38 @@ class ConnectedUserProjectGraphQlControllerIntTest {
         verify(connectedUserProjectAdminFacade).provisionProjectWorkflows(
             7L, 11L,
             List.of(
-                new ProvisionConnectedUserProjectWorkflowDTO("uuid-1", Map.of("name", "x")),
+                new ProvisionConnectedUserProjectWorkflowDTO("uuid-1", Map.of("name", "x"), Map.of("slack", 41L)),
                 new ProvisionConnectedUserProjectWorkflowDTO("uuid-2", null)));
+    }
+
+    @Test
+    void testProvisionConnectedUserProjectWorkflowsRejectsTwoConnectionsForOneComponent() {
+        this.graphQlTester
+            .document("""
+                mutation {
+                    provisionConnectedUserProjectWorkflows(
+                        connectedUserId: "7",
+                        configurationId: "11",
+                        workflows: [
+                            {
+                                workflowUuid: "uuid-1",
+                                connections: [
+                                    {componentName: "slack", connectionId: "41"},
+                                    {componentName: "slack", connectionId: "42"}
+                                ]
+                            }
+                        ])
+                }
+                """)
+            .execute()
+            .errors()
+            .expect(error -> {
+                String message = error.getMessage();
+
+                return error.getErrorType() == ErrorType.BAD_REQUEST && message != null && message.contains("slack");
+            });
+
+        verify(connectedUserProjectAdminFacade, never()).provisionProjectWorkflows(anyLong(), anyLong(), anyList());
     }
 
     private static ConnectedUserProjectDTO createConnectedUserProjectDTO(@Nullable ConnectedUser connectedUser) {
@@ -296,5 +351,10 @@ class ConnectedUserProjectGraphQlControllerIntTest {
             3L, connectedUser, List.of(referenceWorkflow, copyWorkflow), Environment.DEVELOPMENT, 0L, null, 3L, null,
             null,
             null, null, null, 0);
+    }
+
+    @Configuration
+    @ComponentScan("com.bytechef.graphql.error")
+    static class GraphQlErrorConfiguration {
     }
 }

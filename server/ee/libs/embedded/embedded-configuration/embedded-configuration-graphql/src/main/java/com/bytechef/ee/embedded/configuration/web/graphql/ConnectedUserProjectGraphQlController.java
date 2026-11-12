@@ -17,9 +17,11 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -95,13 +97,37 @@ public class ConnectedUserProjectGraphQlController {
             connectedUserId, configurationId,
             workflows.stream()
                 .map(workflow -> new ProvisionConnectedUserProjectWorkflowDTO(
-                    workflow.workflowUuid(), workflow.inputs()))
+                    workflow.workflowUuid(), workflow.inputs(), getConnectionIds(workflow.connections())))
                 .toList());
 
         return true;
     }
 
+    private static Map<String, Long> getConnectionIds(
+        @Nullable List<ProvisionConnectedUserProjectWorkflowConnectionInput> connections) {
+
+        if (connections == null) {
+            return Map.of();
+        }
+
+        Map<String, Long> connectionIds = new LinkedHashMap<>();
+
+        for (ProvisionConnectedUserProjectWorkflowConnectionInput connection : connections) {
+            if (connectionIds.putIfAbsent(connection.componentName(), connection.connectionId()) != null) {
+                throw new IllegalArgumentException(
+                    "Component %s has more than one connection".formatted(connection.componentName()));
+            }
+        }
+
+        return connectionIds;
+    }
+
     @SuppressFBWarnings("EI")
-    public record ProvisionConnectedUserProjectWorkflowInput(String workflowUuid, Map<String, Object> inputs) {
+    public record ProvisionConnectedUserProjectWorkflowInput(
+        String workflowUuid, Map<String, Object> inputs,
+        @Nullable List<ProvisionConnectedUserProjectWorkflowConnectionInput> connections) {
+    }
+
+    public record ProvisionConnectedUserProjectWorkflowConnectionInput(String componentName, long connectionId) {
     }
 }

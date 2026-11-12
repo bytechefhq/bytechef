@@ -17,5 +17,10 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ProvisionConnectedUserProjectWorkflowDTO(String workflowUuid, @Nullable Map<String, ?> inputs) {
+public record ProvisionConnectedUserProjectWorkflowDTO(
+    String workflowUuid, @Nullable Map<String, ?> inputs, Map<String, Long> connections) {
+
+    public ProvisionConnectedUserProjectWorkflowDTO(String workflowUuid, @Nullable Map<String, ?> inputs) {
+        this(workflowUuid, inputs, Map.of());
+    }
 }
