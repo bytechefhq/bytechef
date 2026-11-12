@@ -48,7 +48,7 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                 onOpenChange={setExpanded}
                 open={expanded}
             >
-                <div className="relative flex items-center gap-2.5 rounded-md px-3 py-2.5 hover:bg-surface-neutral-primary-hover">
+                <div className="relative flex items-center gap-2.5 rounded-md py-2.5 pl-3 hover:bg-surface-neutral-primary-hover">
                     <ListItemExpandButton
                         className="mr-0 after:absolute after:inset-0"
                         label={expanded ? 'Collapse project' : 'Expand project'}

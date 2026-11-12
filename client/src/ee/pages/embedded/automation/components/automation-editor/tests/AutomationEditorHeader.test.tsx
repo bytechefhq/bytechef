@@ -180,12 +180,18 @@ it('hides the save indicator while nothing is being saved and the app is online'
     expect(screen.queryByLabelText('Loading indicator')).not.toBeInTheDocument();
 });
 
-it('shows the save indicator while a mutation is saving', () => {
+it('shows the labelled save indicator after the workflow select while a mutation is saving', () => {
     hoisted.isMutating.mockReturnValue(1);
 
     renderAutomationEditorHeader();
 
-    expect(screen.getByLabelText('Loading indicator')).toBeInTheDocument();
+    const loadingIndicator = screen.getByLabelText('Loading indicator');
+
+    expect(loadingIndicator).toHaveTextContent('Saving…');
+    expect(
+        loadingIndicator.compareDocumentPosition(screen.getByRole('button', {name: 'Settings'})) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
 });
 
 it('shows the save indicator as soon as the app goes offline', () => {

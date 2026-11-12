@@ -190,7 +190,7 @@ const AutomationProjectListItem = ({
 
                     <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                         <div className="flex min-w-52 flex-col items-end gap-y-2">
-                            <div className="flex min-h-8 items-center space-x-2">
+                            <div className="flex min-h-6 items-center space-x-2">
                                 {project.published ? (
                                     <Badge
                                         className="flex space-x-1 border-transparent"
@@ -209,7 +209,7 @@ const AutomationProjectListItem = ({
                             </div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
+                                <TooltipTrigger className="flex min-h-6 items-center text-sm text-content-neutral-secondary">
                                     {lastPublishedDate ? (
                                         <span className="text-xs">
                                             {`Published at ${lastPublishedDate.toLocaleDateString()} ${lastPublishedDate.toLocaleTimeString()}`}
