@@ -42,6 +42,7 @@ public final class IntegrationAuditEvents {
         "INTEGRATION_INSTANCE_WORKFLOW_ENABLED_UPDATED";
     public static final String INTEGRATION_PUBLISHED = "INTEGRATION_PUBLISHED";
     public static final String INTEGRATION_UPDATED = "INTEGRATION_UPDATED";
+    public static final String INTEGRATION_VERSION_RESTORED = "INTEGRATION_VERSION_RESTORED";
 
     private IntegrationAuditEvents() {
     }

@@ -16,6 +16,7 @@
 
 package com.bytechef.ee.embedded.configuration.web.rest;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -215,7 +216,7 @@ class IntegrationApiControllerIntTest {
 
         when(integrationFacade.createIntegration(any())).thenReturn(integrationDTO.id());
 
-        assert integrationDTO.id() != null;
+        assertThat(integrationDTO.id()).isNotNull();
 
         this.webTestClient
             .post()
@@ -236,6 +237,18 @@ class IntegrationApiControllerIntTest {
         IntegrationDTO capturedIntegrationDTO = integrationDTOArgumentCaptor.getValue();
 
         Assertions.assertEquals("componentName", capturedIntegrationDTO.componentName());
+    }
+
+    @Test
+    void testRestoreIntegrationVersion() {
+        this.webTestClient
+            .post()
+            .uri("/internal/integrations/1/versions/2/restore")
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(integrationFacade).restoreIntegrationVersion(1L, 2);
     }
 
     @Test

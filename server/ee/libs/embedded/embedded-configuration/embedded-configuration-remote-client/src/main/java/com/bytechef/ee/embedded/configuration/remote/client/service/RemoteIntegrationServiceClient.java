@@ -93,6 +93,11 @@ public class RemoteIntegrationServiceClient implements IntegrationService {
     }
 
     @Override
+    public IntegrationVersion getPublishedIntegrationVersion(long id, int integrationVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Integration> getIntegrations(Long categoryId, List<Long> ids, Long tagId, Status status) {
         throw new UnsupportedOperationException();
     }

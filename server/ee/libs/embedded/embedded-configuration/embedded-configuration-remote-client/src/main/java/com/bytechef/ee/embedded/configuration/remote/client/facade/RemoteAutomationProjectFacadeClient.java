@@ -145,6 +145,11 @@ public class RemoteAutomationProjectFacadeClient implements AutomationProjectFac
     }
 
     @Override
+    public void restoreProjectVersion(long projectId, int projectVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
         String permissionExpression) {

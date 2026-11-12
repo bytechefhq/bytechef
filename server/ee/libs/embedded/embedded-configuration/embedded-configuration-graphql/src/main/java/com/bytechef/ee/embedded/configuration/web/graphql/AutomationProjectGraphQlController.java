@@ -98,6 +98,13 @@ public class AutomationProjectGraphQlController {
     }
 
     @MutationMapping
+    public boolean restoreAutomationProjectVersion(@Argument String id, @Argument int projectVersion) {
+        automationProjectFacade.restoreProjectVersion(Long.parseLong(id), projectVersion);
+
+        return true;
+    }
+
+    @MutationMapping
     public String createAutomationProjectWorkflow(
         @Argument String projectId, @Argument String definition, @Argument String permissionExpression) {
 

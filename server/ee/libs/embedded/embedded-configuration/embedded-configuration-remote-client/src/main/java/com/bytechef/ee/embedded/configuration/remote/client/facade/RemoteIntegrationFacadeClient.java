@@ -58,6 +58,11 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     }
 
     @Override
+    public void restoreIntegrationVersion(long id, int integrationVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void updateIntegration(IntegrationDTO integration) {
         throw new UnsupportedOperationException();
     }

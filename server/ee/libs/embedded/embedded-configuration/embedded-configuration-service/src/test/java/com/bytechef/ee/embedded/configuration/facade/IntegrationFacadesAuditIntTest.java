@@ -366,6 +366,32 @@ class IntegrationFacadesAuditIntTest {
         }
 
         @Test
+        void testRestoreIntegrationVersionRecordsTheIntegrationIdAndTheRestoredVersion() {
+            Integration integration = createPublishedIntegration();
+
+            integrationFacade.restoreIntegrationVersion(integration.getId(), 1);
+
+            assertThat(findSingleEvent(IntegrationAuditEvents.INTEGRATION_VERSION_RESTORED).getData())
+                .containsEntry("result", "SUCCESS")
+                .containsEntry("integrationId", String.valueOf(integration.getId()))
+                .containsEntry("integrationVersion", "1");
+        }
+
+        @Test
+        void testRestoreOfADraftIntegrationVersionRecordsAFailure() {
+            Integration integration = createIntegration();
+
+            assertThatThrownBy(() -> integrationFacade.restoreIntegrationVersion(integration.getId(), 1))
+                .isInstanceOf(ConfigurationException.class);
+
+            assertThat(findSingleEvent(IntegrationAuditEvents.INTEGRATION_VERSION_RESTORED).getData())
+                .containsEntry("result", "ERROR")
+                .containsEntry("errorClass", ConfigurationException.class.getName())
+                .containsEntry("integrationId", String.valueOf(integration.getId()))
+                .containsEntry("integrationVersion", "1");
+        }
+
+        @Test
         void testDeleteIntegrationRecordsTheIntegrationId() {
             Integration integration = createIntegration();
 

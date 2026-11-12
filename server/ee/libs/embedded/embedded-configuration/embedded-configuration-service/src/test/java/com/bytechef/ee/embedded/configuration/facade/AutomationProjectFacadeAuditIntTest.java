@@ -288,6 +288,14 @@ class AutomationProjectFacadeAuditIntTest {
                 .containsEntry("projectId", String.valueOf(projectId))
                 .containsEntry("projectVersion", String.valueOf(projectVersion));
 
+        automationProjectFacade.restoreProjectVersion(projectId, 1);
+
+        assertThat(
+            findSingleEvent(AutomationProjectAuditEvents.AUTOMATION_PROJECT_VERSION_RESTORED).getData())
+                .containsEntry("result", "SUCCESS")
+                .containsEntry("projectId", String.valueOf(projectId))
+                .containsEntry("projectVersion", "1");
+
         long duplicatedProjectId = automationProjectFacade.duplicateProject(projectId);
 
         assertThat(
