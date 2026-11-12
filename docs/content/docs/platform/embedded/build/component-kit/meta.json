@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../../../../.source/json-schema/docs.meta.json",
+  "title": "Component Kit",
+  "description": "Execute actions and tools, and subscribe to triggers, for a connected user",
+  "pages": [
+    "tools",
+    "actions",
+    "trigger-subscriptions"
+  ]
+}

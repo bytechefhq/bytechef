@@ -1,0 +1,583 @@
+---
+title: "Triggers"
+description: "Subscribe a connected user to a component trigger over the API and receive the trigger's events at your own webhook endpoint, signed with a secret only you and ByteChef know."
+---
+
+A **trigger subscription** connects one [connected user](/platform/embedded/monitor/connected-users) to one trigger of a
+component, such as a new row in the user's spreadsheet or a new message in the user's Slack channel. When the app fires
+the trigger, ByteChef posts the event to a webhook endpoint you control. Your backend creates and manages subscriptions
+with the Embedded API; no workflow has to be designed in the editor.
+
+The Trigger API is available on Enterprise Edition only.
+
+<Callout type="info">
+    Every request authenticates the same way as the other Embedded API calls: an embedded
+    [API key](/platform/embedded/administration/api-keys) in `Authorization: Bearer`, or the connected user's JWT.
+    The `X-Environment` header selects `DEVELOPMENT`, `STAGING` or `PRODUCTION`.
+</Callout>
+
+---
+
+## How it works
+
+1. You set a **webhook URL** for the environment in **Settings > Trigger Events**. ByteChef generates a signing secret
+   for it.
+2. Your backend lists the triggers of a component and subscribes a connected user to one of them.
+3. ByteChef registers the trigger with the app under the user's own connection.
+4. Each time the trigger fires, ByteChef sends a signed `trigger.event` to your webhook URL.
+5. When ByteChef disables or deletes a subscription on its own, it sends a `subscription.disabled` or
+   `subscription.deleted` event, so your side does not keep waiting for events.
+
+---
+
+## Set up Trigger Events
+
+Open **Settings > Trigger Events** for the current environment. Each environment has its own URL and its own secret.
+
+| Control | What it does |
+|---|---|
+| **Webhook URL** | Where the events of the environment are delivered. Saving the URL for the first time generates the signing secret. Clear the field and save to remove the URL. The signing secret is kept and still signs the events of subscriptions with their own `webhookUrl`, but the page shows it only while a URL is set. |
+| **Signing secret** | The secret behind the `X-ByteChef-Signature` header. **Reveal** shows it, **Copy** copies it, **Rotate** replaces it. New events are signed with the new secret right away. Events already waiting for delivery or being retried are still signed with the old secret, so they fail verification once your endpoint has switched to the new one. |
+| **Send test event** | Sends a synthetic `trigger.event` to the URL and shows `Delivered (HTTP <status>)` or the error. |
+
+The secret starts with `whsec_`. The test event carries `"subscriptionId": "test"`, `"componentName": "test"`,
+`"triggerName": "test"`, `"jobId": null` and `"data": {"test": true}`, and is signed like a real event.
+
+A subscription can override the environment URL with its own `webhookUrl`. Events always use the environment's signing
+secret, and only saving an environment URL generates it. Save an environment URL at least once, even if every
+subscription overrides it; otherwise there is no secret and no event is sent.
+
+<Callout type="warn" title="No secret, no event">
+    ByteChef never sends an unsigned event. When the environment has no webhook URL and the subscription has none, or the
+    environment has no signing secret, nothing is sent and the missed event is recorded in
+    [External Invocations](/platform/embedded/monitor/external-invocations).
+</Callout>
+
+### Webhook URL rules
+
+- The URL must use `http` or `https` and have a host.
+- A host that does not resolve, or that resolves to a private, loopback, link-local, CGNAT, IPv6 unique-local or
+  multicast address, is rejected, unless the host is listed in `bytechef.webhook-delivery.allowed-hosts`
+  (comma-separated, matched exactly and ignoring case).
+- The rules apply when you save the environment URL, when you create or update a subscription, and again at delivery
+  time.
+
+---
+
+## List the triggers of a component
+
+```http
+GET /api/embedded/v1/{externalUserId}/components/{componentName}/versions/{componentVersion}/triggers HTTP/1.1
+Host: your-bytechef-host.example.com
+Authorization: Bearer <API Key>
+X-Environment: PRODUCTION
+```
+
+The response is an array of triggers:
+
+```json
+[
+  {
+    "name": "newMessage",
+    "title": "New Message",
+    "description": "Triggers when a new message is posted.",
+    "type": "DYNAMIC_WEBHOOK",
+    "hasDynamicOutput": false,
+    "inputSchema": "{\"type\":\"object\",\"properties\":{ ... }}",
+    "outputSchema": "{\"type\":\"object\",\"properties\":{ ... }}"
+  }
+]
+```
+
+`type` is one of `STATIC_WEBHOOK`, `DYNAMIC_WEBHOOK`, `POLLING`, `HYBRID`, `LISTENER` or `CALLABLE`. `inputSchema` and
+`outputSchema` are JSON Schemas carried as strings, so parse them before use. `outputSchema` is `null` unless the
+output structure is static and an object. Use `name` as `triggerName` when you subscribe.
+
+Like every call under `/{externalUserId}`, the call is made for the connected user in the path. A connected user's JWT
+for another user answers `403`.
+
+---
+
+## Subscribe a connected user
+
+```bash
+curl -X POST \
+  "https://your-bytechef-host.example.com/api/embedded/v1/user-123/components/slack/versions/1/triggers/newMessage/subscriptions" \
+  -H "Authorization: Bearer $BYTECHEF_API_KEY" \
+  -H "X-Environment: PRODUCTION" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Support channel messages",
+    "externalId": "sub-42",
+    "webhookUrl": "https://example.com/hooks/support",
+    "input": {"channel": "C0123456789"}
+  }'
+```
+
+| Field | Required | Meaning |
+|---|---|---|
+| `input` | Yes | The trigger's input parameters, as literals. |
+| `name` | No | A label for the subscription. |
+| `externalId` | No | Your own id for the subscription. It is echoed in every event. |
+| `webhookUrl` | No | Delivers this subscription's events here instead of at the environment URL. Only a call authenticated with an API key may set it; a call with a connected user's JWT that sets it answers `400` (`USER_INPUT_ERROR`). |
+
+`X-Instance-Id` is optional. When the connected user has more than one instance of the integration, it picks the one
+to use. Without it, ByteChef uses the first instance of the integration it finds. An instance that belongs to another
+connected user answers `403`. The instance must also belong to an integration of the requested `componentName` and to
+the environment of the call; otherwise the call answers `400` (`USER_INPUT_ERROR`) and creates nothing. The connected
+user must exist, and when the component needs a connection, the user must
+have connected it; otherwise the call answers `400` (`USER_INPUT_ERROR`). An unknown component, version or trigger
+answers `400` (`NO_TRIGGER`) before the connection is checked.
+
+A connected user can have at most `bytechef.embedded.trigger-subscription.max-per-connected-user` subscriptions in an
+environment (`100` by default, `0` for no limit). Beyond it, the call answers `400` (`USER_INPUT_ERROR`). Concurrent
+subscribe calls of one connected user are counted one after the other, so together they cannot exceed the limit.
+
+ByteChef saves the subscription before it registers the trigger. While the call runs, the list and get calls show the
+new subscription as `FAILED` with no `error`. If the server stops in that window, the subscription stays that way;
+delete it, or enable it again once its registration lease has expired, as described next.
+
+Only one call at a time registers the trigger of a subscription. The call that registers it holds the subscription's
+registration lease, and an enable call made meanwhile answers `204` without registering the trigger again. When the
+server stops while it registers a trigger, the lease expires after
+`bytechef.embedded.trigger-subscription.registration-lease` (`5m` by default), and only then does an enable call
+register the trigger. An update of an `ENABLED` subscription made while another call registers its trigger saves the
+new input, and the trigger is registered again with the new input when that registration ends.
+
+The response is the subscription:
+
+```json
+{
+  "id": 17,
+  "componentName": "slack",
+  "componentVersion": 1,
+  "triggerName": "newMessage",
+  "name": "Support channel messages",
+  "externalId": "sub-42",
+  "webhookUrl": "https://example.com/hooks/support",
+  "input": {"channel": "C0123456789"},
+  "status": "ENABLED",
+  "error": null,
+  "lastEventDate": null,
+  "lastDeliveryStatus": null,
+  "lastDeliveryError": null,
+  "staticWebhookUrl": null,
+  "createdDate": "2026-11-11T09:30:00Z",
+  "lastModifiedDate": "2026-11-11T09:30:00Z"
+}
+```
+
+Optional fields are returned as `null` when they have no value: `error` (`code` and `message`, set when the status is
+`FAILED`), `lastEventDate`, `lastDeliveryStatus`, `lastDeliveryError` and `staticWebhookUrl`.
+
+### Static webhook triggers
+
+For a `STATIC_WEBHOOK` trigger, the app has to be told where to send its events. The response carries that address in
+`staticWebhookUrl`. Register it in the app, for example in the app's webhook settings page. The app calls ByteChef,
+and ByteChef forwards the event to your endpoint as a `trigger.event`. The field is `null` for the other trigger types.
+
+### Input rules
+
+Input values are literals. A string whose first non-blank character is `=` (a lone `=` is allowed), or that contains
+`${`, is rejected with `400` (`USER_INPUT_ERROR`), at any depth of the input.
+
+A subscription cannot be created, enabled or updated while its integration instance is disabled, and cannot be enabled
+or updated once its integration instance was deleted. A subscription of a disabled connected user cannot be enabled.
+The call fails with `400` (`USER_INPUT_ERROR`).
+
+---
+
+## Manage subscriptions
+
+All paths are under `/api/embedded/v1/{externalUserId}` and take the `X-Environment` header.
+
+| Operation | Request | Response |
+|---|---|---|
+| List the user's subscriptions | `GET /trigger-subscriptions` | `200`, array of subscriptions |
+| Get one | `GET /trigger-subscriptions/{id}` | `200`, subscription |
+| Update | `PUT /trigger-subscriptions/{id}` | `200`, subscription |
+| Disable | `POST /trigger-subscriptions/{id}/disable` | `204` |
+| Enable | `POST /trigger-subscriptions/{id}/enable` | `204` |
+| Delete | `DELETE /trigger-subscriptions/{id}` | `204` |
+
+`PUT` takes the same body as the create call and replaces `input`, `name`, `externalId` and `webhookUrl`, so a
+`webhookUrl` left out of the body is cleared. A call with a connected user's JWT that changes `webhookUrl` answers `400`
+(`USER_INPUT_ERROR`). When the subscription is `ENABLED`, the trigger is unregistered and registered again with the new
+input. In any other status the subscription keeps its status, and you call enable to register it. Disabling and
+deleting a subscription unregister the trigger from the app. A subscription you disable yourself ends up `DISABLED` and
+no event is sent for it.
+
+Disabling, updating or deleting an `ENABLED` subscription stops the executions of the subscription that are still running. An
+event that the trigger had already captured but that was not yet handed to delivery is lost, and no External
+Invocations row is written for it.
+
+Each event runs as an internal workflow execution of the subscription. These executions are kept until the
+subscription is deleted, and deleting the subscription removes them, so deleting a subscription that received many
+events, or a connection or connected user with such subscriptions, takes longer.
+
+A call can only reach subscriptions of the connected user named in the path, in the environment named in the header.
+Anything else answers `404`.
+
+### Statuses
+
+| Status | Meaning |
+|---|---|
+| `ENABLED` | The trigger is registered and events are delivered. |
+| `DISABLED` | Disabled by you, or automatically for a reason such as a disabled integration instance or connected user. |
+| `CONNECTION_ERROR` | Disabled automatically because the connection's credentials became invalid. |
+| `FAILED` | The trigger could not be registered, ByteChef could not disable it, or a delete was rolled back after the trigger was unregistered. The `error` field says why. A subscription that is still being created also reads `FAILED`, with no `error`. |
+
+---
+
+## Errors
+
+Error responses carry an `errors` array. Each entry has an `id` (give it to support), `code`, `detail`, `title`,
+`status` and `meta.origin`, which is `remote-provider` when the app failed and `bytechef` otherwise:
+
+```json
+{
+  "errors": [
+    {
+      "id": "9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5",
+      "code": "API_ERROR",
+      "detail": "The app rejected the request.",
+      "title": "The app rejected the request.",
+      "status": "499",
+      "problem_type": "API_ERROR",
+      "meta": {"origin": "remote-provider"}
+    }
+  ],
+  "triggerSubscriptionId": 17
+}
+```
+
+| Status | `errors[].code` | When |
+|---|---|---|
+| `400` | `USER_INPUT_ERROR` | An expression in the input, a webhook URL that is not allowed, a `webhookUrl` set or changed by a call with a connected user's JWT, an unknown connected user, a missing connection, a disabled or deleted integration instance, an `X-Instance-Id` of another component or environment, a disabled connected user on enable, or the subscription limit of the connected user. Origin `bytechef`. |
+| `400` | `NO_TRIGGER` | On create, the component, its version or the trigger does not exist. |
+| `403` | | A connected user's JWT of another user, or an `X-Instance-Id` that names an integration instance of another connected user. |
+| `404` | `NOT_FOUND` | The subscription does not exist, or does not belong to this user and environment. |
+| `499` | `API_ERROR`, `TIMEOUT_ERROR` or `OAUTH_REFRESH` | The app failed while ByteChef registered the trigger. Origin `remote-provider`. `OAUTH_REFRESH` means the user's credentials could not be refreshed. |
+| `500` | `INTERNAL_ERROR` | ByteChef failed locally. Origin `bytechef`. The message is `Internal error while enabling the trigger subscription` when registering the trigger or saving an update failed, and `Internal error while processing the trigger subscription` for any other local failure; the cause is in the server log. |
+
+A required connection that is not set also fails the enable call with `400` (`USER_INPUT_ERROR`), and the message is
+`Not all required connections are set for the trigger subscription`.
+
+Only an error raised while ByteChef registers, unregisters or redeploys the trigger of an existing subscription (`499`,
+`500` with the `enabling` message, or `400` with the missing-connection message) can include `triggerSubscriptionId`,
+as described below. Validation errors (`400` for the input, the webhook
+URL, the integration instance, the connected user or the limit), `NO_TRIGGER` and `404` carry no id and change nothing.
+
+- **Enable.** A failed enable leaves the subscription `FAILED` with the same code in its `error` field. Fix the cause
+  and call enable again.
+- **Update of an `ENABLED` subscription.** When the new configuration cannot be saved, ByteChef registers the previous
+  trigger again: the subscription stays `ENABLED` with its previous configuration, and the response still carries the
+  error and the id. The subscription is left `FAILED` when the old trigger cannot be unregistered, when the previous
+  trigger cannot be registered again, or when the new trigger cannot be registered.
+- **Update in any other status.** A failure changes nothing and has no `triggerSubscriptionId`.
+- **Create.** An error has no `triggerSubscriptionId`: ByteChef removes the failed subscription, so you can retry it as
+  is. If that removal fails too, the response carries the id of the subscription that was kept `FAILED`.
+
+The `error` message of a subscription and its `lastDeliveryError` are cut to 1024 characters.
+
+---
+
+## The events
+
+Every delivery is an HTTP `POST` with a JSON body and these headers:
+
+| Header | Value |
+|---|---|
+| `X-ByteChef-Event` | The event type: `trigger.event`, `subscription.disabled` or `subscription.deleted`. |
+| `X-ByteChef-Delivery` | The delivery id, equal to `id` in the body. |
+| `X-ByteChef-Timestamp` | The time of this delivery attempt in milliseconds since the epoch. It is new on every retry. |
+| `X-ByteChef-Signature` | `t=<timestamp>,v1=<signature>`, where `t` equals `X-ByteChef-Timestamp`. See [Verify the signature](#verify-the-signature). |
+
+The envelope fields shared by all three events:
+
+| Field | Meaning |
+|---|---|
+| `type` | `trigger.event`, `subscription.disabled` or `subscription.deleted`. |
+| `id` | A unique id of the delivery. |
+| `subscriptionId` | The subscription id. |
+| `externalId` | Your `externalId` for the subscription, or `null`. |
+| `externalUserId` | The connected user's external id. |
+| `environment` | `DEVELOPMENT`, `STAGING` or `PRODUCTION`. |
+| `componentName`, `componentVersion`, `triggerName` | The trigger the subscription is for. |
+| `timestamp` | When the event was created, as an ISO-8601 instant. It stays the same on every retry, so do not use it for the replay window. |
+
+### trigger.event
+
+Adds `jobId`, the id of the workflow execution that handled the event, and `data`, the trigger's output.
+
+```json
+{
+  "type": "trigger.event",
+  "id": "6f1d2c1e-0f4b-4d6c-9b5a-2c1e8a7d3f90",
+  "subscriptionId": 17,
+  "externalId": "sub-42",
+  "externalUserId": "user-123",
+  "environment": "PRODUCTION",
+  "componentName": "slack",
+  "componentVersion": 1,
+  "triggerName": "newMessage",
+  "timestamp": "2026-11-11T09:41:07.512Z",
+  "jobId": 8841,
+  "data": {"text": "Hello", "user": "U0123"}
+}
+```
+
+### subscription.disabled
+
+Sent when ByteChef disables an enabled subscription on its own. It adds `reason`.
+
+```json
+{
+  "type": "subscription.disabled",
+  "id": "0c7e9b2a-6a41-4c2f-8d33-5a1f0b9e7c11",
+  "subscriptionId": 17,
+  "externalId": "sub-42",
+  "externalUserId": "user-123",
+  "environment": "PRODUCTION",
+  "componentName": "slack",
+  "componentVersion": 1,
+  "triggerName": "newMessage",
+  "timestamp": "2026-11-11T10:02:44.130Z",
+  "reason": "CONNECTION_INVALID"
+}
+```
+
+| `reason` | Why the subscription was disabled | Resulting status |
+|---|---|---|
+| `CONNECTION_INVALID` | The connection's credentials became invalid. | `CONNECTION_ERROR` |
+| `INTEGRATION_INSTANCE_DISABLED` | Its integration instance was disabled. | `DISABLED` |
+| `INTEGRATION_INSTANCE_DELETED` | Its integration instance was deleted. | `DISABLED` |
+| `CONNECTED_USER_DISABLED` | The connected user was disabled. | `DISABLED` |
+
+Only subscriptions that were `ENABLED` are affected and announced. Enabling a subscription again is up to you, with the
+enable call. A subscription disabled with `INTEGRATION_INSTANCE_DELETED` cannot be enabled again: enable answers `400`
+(`USER_INPUT_ERROR`). Delete it and subscribe again.
+
+ByteChef disables the subscriptions of an integration instance, a connected user or a connection after the change that
+caused it has committed, each subscription in its own transaction, so a rolled-back change disables nothing. When
+disabling one subscription fails, that subscription becomes `FAILED` with the error in its `error` field and no
+`subscription.disabled` event is sent for it. Its trigger may still be registered with the app, but its events are no
+longer delivered. The others are still disabled.
+
+Such a change can also land while a subscription is being created, enabled or updated. Once the
+subscription is saved as `ENABLED`, ByteChef checks its connected user, its integration instance and its connection
+again. If one of them is no longer usable, ByteChef disables the subscription with the matching `reason` and sends the
+`subscription.disabled` event. The create or update call then returns the subscription with its resulting status
+(`DISABLED` or `CONNECTION_ERROR`) instead of `ENABLED`.
+
+### subscription.deleted
+
+Sent for each subscription that ByteChef deletes on its own. It adds `reason`. Deleting a subscription yourself, with the
+API or from the connected user's sheet, sends no event.
+
+| `reason` | Why the subscription was deleted |
+|---|---|
+| `CONNECTION_DELETED` | The connection it uses was deleted. |
+| `CONNECTED_USER_DELETED` | The connected user was deleted. |
+
+Deleting a connection deletes every subscription that uses it, whatever its status: a subscription cannot run without
+its connection. ByteChef first checks that the connection can be deleted, and a refused delete (the connection is in
+use) touches no subscription and makes no call to the app. It then unregisters the trigger of each `ENABLED` subscription
+before it deletes it. When a trigger cannot be unregistered, ByteChef logs it and deletes the subscription
+anyway, so a webhook can remain registered at the app. If a subscription cannot be deleted, the connection is not
+deleted either and nothing is announced. Subscriptions whose trigger was already unregistered are then kept as
+`FAILED` with `INTERNAL_ERROR` and the message `Trigger unregistered; delete was rolled back`; enable them again or
+retry the delete. The same applies to deleting a connected user, which checks all the user's connections first.
+
+```json
+{
+  "type": "subscription.deleted",
+  "id": "b2d1f0aa-3c55-48e8-a4f1-77c9d8e0a512",
+  "subscriptionId": 17,
+  "externalId": "sub-42",
+  "externalUserId": "user-123",
+  "environment": "PRODUCTION",
+  "componentName": "slack",
+  "componentVersion": 1,
+  "triggerName": "newMessage",
+  "timestamp": "2026-11-11T10:15:31.870Z",
+  "reason": "CONNECTED_USER_DELETED"
+}
+```
+
+A `subscription.disabled` or `subscription.deleted` event is sent after the change that caused it has been committed,
+so a rolled-back change never announces anything. If the server stops between that commit and the disabling, the
+subscriptions stay `ENABLED` until you disable them. ByteChef does not retry the disabling later: subscriptions of a
+disabled integration instance or connected user keep delivering events, and those of an invalid connection keep their
+status even though the app no longer accepts the credentials.
+
+---
+
+## Verify the signature
+
+Every event is signed with the environment's signing secret. The signature is the lowercase hex of an HMAC-SHA256,
+computed with the secret as UTF-8 key over the string `<t>.<raw request body>`, where `t` is the value after `t=` in
+the header. The key is the whole secret string, including the `whsec_` prefix. Verify it against the **raw** body,
+before parsing the JSON, using a constant-time comparison. Also reject a timestamp that is too old, to stop replays.
+
+Check `t` from the signature header, or `X-ByteChef-Timestamp`, which has the same value. It is the time of the
+delivery attempt, so a retried event passes the check. Never check the `timestamp` field of the body: it is the time
+the event was created, and an event that waited in the delivery queue or was retried is older than any sensible
+tolerance.
+
+```js
+import crypto from 'node:crypto';
+
+const TOLERANCE_MILLIS = 5 * 60 * 1000;
+
+export function verifySignature(rawBody, signatureHeader, secret) {
+  const parts = Object.fromEntries(
+    signatureHeader.split(',').map((part) => part.split('=', 2))
+  );
+
+  const timestamp = parts.t;
+  const signature = parts.v1;
+
+  if (!timestamp || !signature) {
+    return false;
+  }
+
+  if (Math.abs(Date.now() - Number(timestamp)) > TOLERANCE_MILLIS) {
+    return false;
+  }
+
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(`${timestamp}.${rawBody}`, 'utf8')
+    .digest('hex');
+
+  const expectedBuffer = Buffer.from(expected, 'utf8');
+  const signatureBuffer = Buffer.from(signature, 'utf8');
+
+  return (
+    expectedBuffer.length === signatureBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, signatureBuffer)
+  );
+}
+```
+
+With Express, keep the raw body: `app.post('/hooks', express.raw({type: 'application/json'}), ...)` and pass
+`req.body.toString('utf8')` as `rawBody`.
+
+```java
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.HexFormat;
+
+public final class ByteChefSignature {
+
+    private static final long TOLERANCE_MILLIS = 5 * 60 * 1000L;
+
+    public static boolean verify(String rawBody, String signatureHeader, String secret) throws Exception {
+        String timestamp = null;
+        String signature = null;
+
+        for (String part : signatureHeader.split(",")) {
+            if (part.startsWith("t=")) {
+                timestamp = part.substring(2);
+            } else if (part.startsWith("v1=")) {
+                signature = part.substring(3);
+            }
+        }
+
+        if (timestamp == null || signature == null) {
+            return false;
+        }
+
+        if (Math.abs(System.currentTimeMillis() - Long.parseLong(timestamp)) > TOLERANCE_MILLIS) {
+            return false;
+        }
+
+        Mac mac = Mac.getInstance("HmacSHA256");
+
+        mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+
+        String expected = HexFormat.of()
+            .formatHex(mac.doFinal((timestamp + "." + rawBody).getBytes(StandardCharsets.UTF_8)));
+
+        return MessageDigest.isEqual(
+            expected.getBytes(StandardCharsets.UTF_8), signature.getBytes(StandardCharsets.UTF_8));
+    }
+}
+```
+
+Respond with any `2xx` status once the event is stored. Anything else counts as a failed delivery.
+
+---
+
+## Delivery semantics
+
+- **One delivery at a time per endpoint.** ByteChef posts to one URL sequentially, so a slow endpoint cannot be flooded.
+  Events for the same URL can therefore arrive late, and you should not rely on arrival order.
+- **Retries.** A delivery that fails with a network error, an HTTP `5xx` or `429` is retried, and each attempt is
+  signed again with its own timestamp. Other `4xx` answers are not retried. The defaults are three retries after the
+  first attempt, starting at one second and doubling each time (1s, 2s, 4s). Operators set them with
+  `bytechef.embedded.trigger-subscription.delivery.retry.max-retries`, `initial-interval` and `multiplier`. `0`
+  retries means a single attempt. The server refuses to start when `max-retries` is negative, or when retries are
+  enabled and `initial-interval` is not positive or `multiplier` is below `1`.
+- **A struggling endpoint is paused.** After 10 failed deliveries in a row, or an answer that shows the URL is unusable
+  (a redirect, `404`, `405`, `410` or `415`), ByteChef stops posting to that URL for five minutes. A `400`, `409` or
+  `422` answer does not count and resets the count, and failures older than an hour are forgotten. Events that arrive
+  meanwhile are not sent.
+- **Not durable.** Deliveries are held in memory. An event that exhausts its retries, arrives during a pause, or is
+  waiting when the server restarts is lost. There is no replay.
+- **At least once.** A retry can deliver an event your endpoint already handled. Use `id` to deduplicate.
+- **Never a job failure.** A failed delivery never fails the workflow execution behind it. It shows up on the
+  subscription as `lastDeliveryStatus` (`SENT`, `FAILED` or `DROPPED`) and `lastDeliveryError`, and as a row in
+  External Invocations. `lastEventDate`, `lastDeliveryStatus` and `lastDeliveryError` describe the most recent event:
+  when deliveries finish out of order, the outcome of an older event never replaces that of a newer one. Every
+  delivery still has its own row in External Invocations.
+- **Events can wait.** An event waits behind earlier events for the same URL, and a retry waits for its back-off, so the
+  body `timestamp` can be older than the delivery attempt that carries it. Use `id` to deduplicate.
+- **Events captured while a subscription is being enabled wait for it.** A trigger can fire as soon as it is
+  registered, before the subscription reads `ENABLED`, for example on the first poll of a polling trigger. Such an
+  event is delivered once enabling completes. If the enable fails, or the subscription is disabled before it
+  completes, the event is dropped: it gets no External Invocations row and does not change `lastDeliveryStatus`. An
+  event waits about as long as the registration lease (`5m` by default) at most; one still waiting after that is lost,
+  and its internal workflow execution ends failed.
+- **Lifecycle events are best effort.** A `subscription.disabled` or `subscription.deleted` event that cannot be sent
+  because there is no URL or no secret is only logged; it does not appear in External Invocations.
+
+### External Invocations
+
+Each `trigger.event` produces one row on the **API (Trigger)** source, with the trigger name as the tool and **Trigger**
+as the type. The row carries the id of the internal workflow execution in `jobId`, but it has no **View** or **Stop**
+action, and that execution is not listed in Workflow Executions. See
+[External Invocations](/platform/embedded/monitor/external-invocations).
+
+| Outcome | Error type | Meaning |
+|---|---|---|
+| `SUCCESS` | | Your endpoint accepted the event. |
+| `ERROR` | `DELIVERY_FAILED` | Every attempt failed, or the endpoint was paused. |
+| `ERROR` | `DELIVERY_DROPPED` | The event was dropped before it was sent, for example because the URL is no longer allowed or too many deliveries were waiting for the endpoint. |
+| `ERROR` | `NO_DESTINATION` | No webhook URL on the subscription or the environment. |
+| `ERROR` | `NO_SIGNING_SECRET` | The environment has no signing secret. |
+| `ERROR` | `DELIVERY_ERROR` | ByteChef could not build or submit the delivery. |
+
+---
+
+## Watch subscriptions in the UI
+
+Open a user in [Connected Users](/platform/embedded/monitor/connected-users) and select the **Triggers** tab of the
+user's sheet. It lists the user's subscriptions with the component, the trigger, the status, the last event, the last
+delivery status and the last delivery error. The status badge of a failed subscription shows the error message on
+hover. Use the row menu to disable, enable or delete a subscription. Subscriptions are created with the API only.
+
+Disabling or deleting a subscription from the sheet sends no `subscription.disabled` or `subscription.deleted` event,
+so your backend's copy of the subscription goes out of date. Read the subscriptions again with the API when you need
+their current status.
+
+---
+
+## See also
+
+- [Component Kit](/platform/embedded/build/component-kit) - execute actions and tools for a connected user.
+- [External Invocations](/platform/embedded/monitor/external-invocations) - the log of every trigger event delivery.
+- [API Keys](/platform/embedded/administration/api-keys) - the credential for the calls above.
