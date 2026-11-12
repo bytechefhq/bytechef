@@ -4117,12 +4117,119 @@ public class ApplicationProperties {
 
         private List<String> allowedParentOrigins = List.of();
 
+        /**
+         * Delivery of connected user trigger subscription events to the developer's webhook endpoint
+         */
+        private TriggerSubscription triggerSubscription = new TriggerSubscription();
+
         public List<String> getAllowedParentOrigins() {
             return allowedParentOrigins;
         }
 
+        public TriggerSubscription getTriggerSubscription() {
+            return triggerSubscription;
+        }
+
         public void setAllowedParentOrigins(List<String> allowedParentOrigins) {
             this.allowedParentOrigins = allowedParentOrigins;
+        }
+
+        public void setTriggerSubscription(TriggerSubscription triggerSubscription) {
+            this.triggerSubscription = triggerSubscription;
+        }
+
+        public static class TriggerSubscription {
+
+            private Delivery delivery = new Delivery();
+
+            /**
+             * Trigger subscriptions a connected user may have, 0 for no limit
+             */
+            private int maxPerConnectedUser;
+
+            /**
+             * How long a request that registers the trigger of a subscription holds its registration lease
+             */
+            private Duration registrationLease;
+
+            public Delivery getDelivery() {
+                return delivery;
+            }
+
+            public int getMaxPerConnectedUser() {
+                return maxPerConnectedUser;
+            }
+
+            public Duration getRegistrationLease() {
+                return registrationLease;
+            }
+
+            public void setDelivery(Delivery delivery) {
+                this.delivery = delivery;
+            }
+
+            public void setMaxPerConnectedUser(int maxPerConnectedUser) {
+                this.maxPerConnectedUser = maxPerConnectedUser;
+            }
+
+            public void setRegistrationLease(Duration registrationLease) {
+                this.registrationLease = registrationLease;
+            }
+
+            public static class Delivery {
+
+                private Retry retry = new Retry();
+
+                public Retry getRetry() {
+                    return retry;
+                }
+
+                public void setRetry(Retry retry) {
+                    this.retry = retry;
+                }
+
+                public static class Retry {
+
+                    /**
+                     * Delay before the first retry of a failed event delivery
+                     */
+                    private Duration initialInterval;
+
+                    /**
+                     * Retries of a failed event delivery after the first attempt
+                     */
+                    private int maxRetries;
+
+                    /**
+                     * Factor the delay grows by after each retry
+                     */
+                    private double multiplier;
+
+                    public Duration getInitialInterval() {
+                        return initialInterval;
+                    }
+
+                    public int getMaxRetries() {
+                        return maxRetries;
+                    }
+
+                    public double getMultiplier() {
+                        return multiplier;
+                    }
+
+                    public void setInitialInterval(Duration initialInterval) {
+                        this.initialInterval = initialInterval;
+                    }
+
+                    public void setMaxRetries(int maxRetries) {
+                        this.maxRetries = maxRetries;
+                    }
+
+                    public void setMultiplier(double multiplier) {
+                        this.multiplier = multiplier;
+                    }
+                }
+            }
         }
     }
 
@@ -5547,8 +5654,8 @@ public class ApplicationProperties {
     public static class WebhookDelivery {
 
         /**
-         * Hosts that notification webhook and Slack URLs may use even when they resolve to a private or loopback
-         * address, matched exactly and ignoring case
+         * Hosts that notification webhook, Slack and trigger subscription URLs may use even when they resolve to a
+         * private or loopback address, matched exactly and ignoring case
          */
         private List<String> allowedHosts = List.of();
 

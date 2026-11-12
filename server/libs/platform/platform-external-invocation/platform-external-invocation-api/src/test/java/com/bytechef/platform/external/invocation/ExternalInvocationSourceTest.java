@@ -32,6 +32,6 @@ class ExternalInvocationSourceTest {
             .map(Enum::name)
             .toList())
                 .containsExactly(
-                    "MCP_SERVER", "API_ACTION", "API_TOOL", "A2A_SERVER");
+                    "MCP_SERVER", "API_ACTION", "API_TOOL", "A2A_SERVER", "API_TRIGGER");
     }
 }

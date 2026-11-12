@@ -25,7 +25,8 @@ public enum ProjectDeploymentOwner {
 
     API_COLLECTION("api_collection"),
     A2A_SERVER("a2a_project"),
-    EMBEDDED("connected_user_project", "connected_user_reference_deployment"),
+    EMBEDDED("connected_user_project", "connected_user_reference_deployment",
+        "connected_user_trigger_subscription"),
     MCP_SERVER("mcp_project");
 
     private final List<String> ownerTables;

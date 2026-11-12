@@ -34,6 +34,7 @@ public class TestOwnerContributors {
 
     private final Set<Long> automationProjectIds = ConcurrentHashMap.newKeySet();
     private final Set<Long> connectedUserIds = ConcurrentHashMap.newKeySet();
+    private final Set<Long> triggerSubscriptionProjectIds = ConcurrentHashMap.newKeySet();
     private final Set<Long> apiCollectionIds = ConcurrentHashMap.newKeySet();
     private final Set<Long> a2aServerIds = ConcurrentHashMap.newKeySet();
     private final Set<Long> embeddedIds = ConcurrentHashMap.newKeySet();
@@ -58,9 +59,14 @@ public class TestOwnerContributors {
         projectDeploymentIds.add(projectDeploymentId);
     }
 
+    public void addTriggerSubscriptionProjectId(long projectId) {
+        triggerSubscriptionProjectIds.add(projectId);
+    }
+
     public void clear() {
         automationProjectIds.clear();
         connectedUserIds.clear();
+        triggerSubscriptionProjectIds.clear();
         apiCollectionIds.clear();
         a2aServerIds.clear();
         embeddedIds.clear();
@@ -75,6 +81,11 @@ public class TestOwnerContributors {
     @Bean
     ProjectOwnerContributor connectedUserProjectOwnerContributor() {
         return projectContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT, connectedUserIds);
+    }
+
+    @Bean
+    ProjectOwnerContributor triggerSubscriptionProjectOwnerContributor() {
+        return projectContributor(ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION, triggerSubscriptionProjectIds);
     }
 
     @Bean
