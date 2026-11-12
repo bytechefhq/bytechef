@@ -12,9 +12,8 @@ import {
     useAutomationProjectConfigurationsQuery,
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {ExternalLinkIcon, RefreshCwIcon, Settings2Icon} from 'lucide-react';
+import {RefreshCwIcon, Settings2Icon} from 'lucide-react';
 import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
@@ -38,19 +37,11 @@ const AutomationConfigurationsSheet = ({onSheetOpenChange, project, sheetOpen}: 
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const navigate = useNavigate();
-
     const {isFetching: configurationsIsFetching, refetch: refetchConfigurations} =
         useAutomationProjectConfigurationsQuery(
             {environmentId: String(DEVELOPMENT_ENVIRONMENT), projectId: project.id},
             {enabled: sheetOpen}
         );
-
-    const handleOpenInConfigurationsClick = () => {
-        onSheetOpenChange(false);
-
-        void navigate(`/embedded/automation-configurations?projectId=${project.id}`);
-    };
 
     return (
         <Sheet onOpenChange={onSheetOpenChange} open={sheetOpen}>
@@ -108,12 +99,6 @@ const AutomationConfigurationsSheet = ({onSheetOpenChange, project, sheetOpen}: 
 
                 <footer className="flex shrink-0 justify-end gap-x-2 rounded-b-md border-t border-t-border/50 bg-surface-neutral-primary p-3">
                     <Button label="Close" onClick={() => onSheetOpenChange(false)} variant="outline" />
-
-                    <Button
-                        icon={<ExternalLinkIcon />}
-                        label="Open in Configurations"
-                        onClick={handleOpenInConfigurationsClick}
-                    />
                 </footer>
 
                 {configurationDialog && (
