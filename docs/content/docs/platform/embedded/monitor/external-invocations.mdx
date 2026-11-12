@@ -21,21 +21,23 @@ The page is available on Enterprise Edition only.
 
 ## What is recorded
 
-A record is written for every call made on behalf of a connected user through one of three sources:
+A record is written for every call made on behalf of a connected user through one of four sources:
 
 | Source | Calls recorded |
 |---|---|
 | **MCP** | Component tools and workflow tools an AI agent calls through an embedded MCP server. |
 | **API (Action)** | Actions executed with `POST /{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}`. |
 | **API (Tool)** | Tools executed with `POST /{externalUserId}/tools`. |
+| **API (Trigger)** | Trigger events delivered to your webhook endpoint for a [trigger subscription](/platform/embedded/build/component-kit/trigger-subscriptions). One row per event, `SUCCESS` when your endpoint accepted it and `ERROR` when it did not or when nothing could be sent. |
 
 The call is recorded whether it succeeds or fails, including when the connected user has not
 connected the integration the tool needs. A call that is rejected before it runs, such as a call to a
 server that is turned off or a call without a connected user, is not recorded.
 
-For a workflow tool, the record also carries the id of the workflow execution the call started. The
-API returns it as `jobId`, so you can find the run in
-[Workflow Executions](/platform/embedded/monitor/workflow-executions).
+For a workflow tool, the record also carries the id of the workflow execution the call started. The API
+returns it as `jobId`, so you can find the run in [Workflow Executions](/platform/embedded/monitor/workflow-executions).
+An API (Trigger) record also carries a `jobId`: the id of the internal execution that produced the event.
+That run is not listed in Workflow Executions.
 
 The page lists embedded calls only. Calls made through an automation MCP server or an A2A server are
 recorded separately and appear on the automation [External Invocations](/platform/automation/monitor/external-invocations)
@@ -50,14 +52,14 @@ Each call is one row, newest first:
 | Column | What it shows |
 |---|---|
 | **Status** | How the call ended, for example `SUCCESS`, `ERROR`, `CONNECTION_REQUIRED` or `TIMEOUT`. |
-| **Tool** | The tool name the AI agent called, or the action name your code executed. |
-| **Type** | What was called: a **Component tool** or a **Workflow tool** through embedded MCP or `POST /{externalUserId}/tools`, or an **Action** through the Embedded API action endpoint. |
-| **Source** | Where the call came in: **MCP**, **API (Action)** or **API (Tool)**. |
+| **Tool** | The tool name the AI agent called, the action name your code executed, or the trigger name of a trigger subscription. |
+| **Type** | What was called: a **Component tool** or a **Workflow tool** through embedded MCP or `POST /{externalUserId}/tools`, an **Action** through the Embedded API action endpoint, or a **Trigger** for a trigger subscription event. |
+| **Source** | Where the call came in: **MCP**, **API (Action)**, **API (Tool)** or **API (Trigger)**. |
 | **Server** | The embedded MCP server the call came through. Embedded API calls show a dash. |
 | **Target** | What ran: the component and operation, such as `slack / sendMessage`, or the name of the workflow a workflow tool ran. |
-| **Duration** | How long the call took, in milliseconds. |
+| **Duration** | How long the call took, in milliseconds. For an API (Trigger) row, the time from handing the event to the delivery queue until the delivery ended, including waiting and retries; `0` when no delivery was attempted (no URL, no signing secret or a submit error). |
 | **Date** | When the call was made. |
-| **Actions** | **View** opens the workflow run a workflow tool started, with the input and output of each step. **Stop** stops that run while it is still going: the call ended with `TIMEOUT`, `APPROVAL_REQUIRED` or `SUSPENDED`. Both are unavailable for component tool and action calls, which start no workflow run. |
+| **Actions** | **View** opens the workflow run a workflow tool started, with the input and output of each step. **Stop** stops that run while it is still going: the call ended with `TIMEOUT`, `APPROVAL_REQUIRED` or `SUSPENDED`. Both are unavailable for component tool and action calls, which start no workflow run, and for API (Trigger) rows. |
 
 The list shows 50 rows per page. Use the **Refresh** button in the page header to load the latest
 calls.
@@ -81,7 +83,7 @@ the call returned:
 
 | Filter | Narrows the list to |
 |---|---|
-| **Source** | Calls that came in through one source: **MCP Servers**, **API (Action)** or **API (Tool)**. |
+| **Source** | Calls that came in through one source: **MCP Servers**, **API (Action)**, **API (Tool)** or **API (Trigger)**. |
 | **Status** | Calls that ended one way. |
 | **MCP Server** | Calls made through one embedded MCP server. The filter appears when there is at least one embedded MCP server. |
 | **Start date** / **End date** | Calls made within a date range. |

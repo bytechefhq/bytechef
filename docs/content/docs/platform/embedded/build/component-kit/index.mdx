@@ -1,0 +1,51 @@
+---
+title: "Component Kit"
+description: One API that exposes a connected user's integrations as actions your code calls, tools a language model calls, and triggers that send events to your backend.
+---
+
+**AI ComponentKit** is one API for AI-native products: it exposes what a [connected user](/platform/embedded/monitor/connected-users) has connected as operations you can execute under that user's own credentials. One API covers every integration, so your product acts through the user's ByteChef connections without you writing per-integration glue.
+
+It exposes them three ways: **actions** your code calls, **tools** a model calls, and **triggers** that push the user's events to your backend. The difference between actions and tools is worth getting straight before you pick an endpoint.
+
+## Actions, tools and triggers
+
+An **action** is the unit ByteChef executes: one operation on one component, such as Slack's `sendChannelMessage`. Your code names it, supplies its input, and gets the result.
+
+A **tool** is an action projected for a language model. A component publishes selected actions as tools; the platform gives each one a flat name, a description, and a JSON Schema, hands that catalogue to your model, and the model chooses.
+
+The execution underneath is the same, and so is the connection. The caller is not, so the two surfaces differ in more than their URL:
+
+|  | Action | Tool |
+|---|---|---|
+| **Who chooses it** | Your code, before the call | The model, at inference time |
+| **Endpoint** | `POST /{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}` | `POST /{externalUserId}/tools` |
+| **Address** | Component, version, and action name, in the path | One flat name in the body - `SLACK_SEND_CHANNEL_MESSAGE` |
+| **Coverage** | Every action the component defines | Only the actions the component publishes as tools |
+| **Versioning** | Pinned in the path | Resolved server-side, always the component's current version |
+| **Discovery** | None - your code already knows what it is calling | `GET /{externalUserId}/tools`, scoped to that user |
+| **Request body** | `{ "input": { ... } }` | `{ "name": ..., "parameters": { ... } }` |
+| **Response** | `{ "result": ... }` | The result, unwrapped |
+| **File input** | Binary and form-data uploads supported | Not supported |
+
+The rule of thumb: **if a model is choosing, use tools; if your code has already decided, call the action.**
+
+Both live under `/api/embedded/v1`, authenticate with an embedded **[API key](/platform/embedded/administration/api-keys)** (`Authorization: Bearer`), and take an `X-Environment` header selecting `DEVELOPMENT`, `STAGING`, or `PRODUCTION`. Neither ever sees the user's credential: it is resolved server-side from the connected user, and if that user has more than one instance of the same integration, the optional `X-Instance-Id` header picks which.
+
+The same tool catalogue is also reachable over **MCP**: an [MCP Server](/platform/embedded/configure/mcp-servers) wraps the same actions - and, unlike ComponentKit, whole workflows - for agents that speak that protocol. ComponentKit is the plain-HTTP path, MCP is the protocol path; pick whichever your agent already talks.
+
+**Triggers** go the other way. Instead of your code calling the user's integrations, you subscribe a connected user to a component trigger, such as a new message in the user's Slack channel. The trigger runs under the user's own connection, and ByteChef posts each event to your webhook endpoint, signed with a secret only you and ByteChef know.
+
+## In this section
+
+- [Tools](/platform/embedded/build/component-kit/tools) - list a connected user's tool catalogue and run a tool a model chose.
+- [Actions](/platform/embedded/build/component-kit/actions) - call an action your code has already chosen, including file input.
+- [Triggers](/platform/embedded/build/component-kit/trigger-subscriptions) - subscribe a connected user to a component trigger and receive its events at your webhook endpoint.
+
+<Callout title="ComponentKit in the Sample App">
+    The [Sample App](/platform/embedded/get-started/quick-start/sample-app) includes a "ComponentKit Playground" that calls a single action directly, and a tool-based AI chat page that runs the full catalogue-and-choose flow.
+</Callout>
+
+## Sample projects
+
+- [ComponentKit + Vercel AI SDK (TypeScript)](https://github.com/bytechefhq/bytechef-embedded-ai-componentkit-vercel-ai-sdk) - the `/tools` endpoints consumed from a TypeScript app through the Vercel AI SDK.
+- [ComponentKit + Spring AI (Java)](https://github.com/bytechefhq/bytechef-embedded-ai-componentkit-spring-ai) - the same tools bound into a Spring AI `ChatClient`.
