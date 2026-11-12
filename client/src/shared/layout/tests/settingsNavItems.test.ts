@@ -46,9 +46,10 @@ describe('getSettingsNavItems', () => {
     it('lists the Embedded section pages first', () => {
         const hrefs = flattenHrefs(getSettingsNavItems(PlatformType.EMBEDDED));
 
-        expect(hrefs.slice(0, 3)).toEqual([
+        expect(hrefs.slice(0, 4)).toEqual([
             '/embedded/settings/signing-keys',
             '/embedded/settings/api-keys',
+            '/embedded/settings/trigger-events',
             '/embedded/settings/ai/memories',
         ]);
     });

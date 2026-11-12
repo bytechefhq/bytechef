@@ -48,6 +48,10 @@ const embeddedSectionNavItems: SettingsNavItemI[] = [
         title: 'API Keys',
     },
     {
+        href: `${EMBEDDED_SETTINGS_PATH}/trigger-events`,
+        title: 'Trigger Events',
+    },
+    {
         items: [
             {
                 href: EMBEDDED_MEMORIES_SETTINGS_PATH,
