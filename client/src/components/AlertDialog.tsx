@@ -1,13 +1,14 @@
 import Button from '@/components/Button/Button';
 import {Dialog, DialogCancelButton, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
 import LoadingIcon from '@/components/LoadingIcon';
-import {ReactElement, ReactNode} from 'react';
+import {ReactElement, ReactNode, useRef} from 'react';
 
 type ConfirmVariantType = 'default' | 'destructive' | 'destructiveGhost';
 
 interface AlertDialogProps {
     open: boolean;
     ariaLabel?: string;
+    autoFocusConfirm?: boolean;
     cancelLabel?: string;
     confirmButtonVariant?: ConfirmVariantType;
     confirmClassName?: string;
@@ -23,6 +24,7 @@ interface AlertDialogProps {
 
 const AlertDialog = ({
     ariaLabel,
+    autoFocusConfirm = false,
     cancelLabel = 'Cancel',
     confirmButtonVariant = 'destructive',
     confirmClassName,
@@ -35,36 +37,51 @@ const AlertDialog = ({
     onConfirm,
     open,
     title = 'Are you absolutely sure?',
-}: AlertDialogProps) => (
-    <Dialog
-        onOpenChange={(isOpen) => {
-            if (!isOpen && !isPending) {
-                onCancel();
-            }
-        }}
-        open={open}
-    >
-        <DialogContent onInteractOutside={(event) => event.preventDefault()} role="alertdialog">
-            <DialogMain>
-                <DialogHeader description={description} showCloseButton={!isPending} title={title} />
+}: AlertDialogProps) => {
+    const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
-                <DialogFooter>
-                    <DialogCancelButton disabled={isPending} label={cancelLabel} />
+    return (
+        <Dialog
+            onOpenChange={(isOpen) => {
+                if (!isOpen && !isPending) {
+                    onCancel();
+                }
+            }}
+            open={open}
+        >
+            <DialogContent
+                onInteractOutside={(event) => event.preventDefault()}
+                onOpenAutoFocus={(event) => {
+                    if (autoFocusConfirm && confirmButtonRef.current) {
+                        event.preventDefault();
 
-                    <Button
-                        aria-label={ariaLabel}
-                        className={confirmClassName}
-                        disabled={isPending || confirmDisabled}
-                        icon={isPending ? <LoadingIcon /> : confirmIcon}
-                        label={confirmLabel}
-                        onClick={onConfirm}
-                        variant={confirmButtonVariant}
-                    />
-                </DialogFooter>
-            </DialogMain>
-        </DialogContent>
-    </Dialog>
-);
+                        confirmButtonRef.current.focus();
+                    }
+                }}
+                role="alertdialog"
+            >
+                <DialogMain>
+                    <DialogHeader description={description} showCloseButton={!isPending} title={title} />
+
+                    <DialogFooter>
+                        <DialogCancelButton disabled={isPending} label={cancelLabel} />
+
+                        <Button
+                            aria-label={ariaLabel}
+                            className={confirmClassName}
+                            disabled={isPending || confirmDisabled}
+                            icon={isPending ? <LoadingIcon /> : confirmIcon}
+                            label={confirmLabel}
+                            onClick={onConfirm}
+                            ref={confirmButtonRef}
+                            variant={confirmButtonVariant}
+                        />
+                    </DialogFooter>
+                </DialogMain>
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 export default AlertDialog;
 export type {AlertDialogProps, ConfirmVariantType};

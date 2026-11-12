@@ -1,4 +1,4 @@
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowNodeDeleteAlertDialog from '../WorkflowNodeDeleteAlertDialog';
@@ -23,6 +23,17 @@ afterEach(() => {
 });
 
 describe('WorkflowNodeDeleteAlertDialog', () => {
+    it('should confirm the deletion when Enter is pressed right after opening', async () => {
+        render(<WorkflowNodeDeleteAlertDialog {...defaultProps} />);
+
+        await waitFor(() => expect(screen.getByRole('button', {name: 'Delete node'})).toHaveFocus());
+
+        await userEvent.keyboard('{Enter}');
+
+        expect(onConfirm).toHaveBeenCalledTimes(1);
+        expect(onCancel).not.toHaveBeenCalled();
+    });
+
     it('should name the node in the title', () => {
         render(<WorkflowNodeDeleteAlertDialog {...defaultProps} />);
 

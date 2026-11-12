@@ -120,6 +120,12 @@ describe('AlertDialog alert semantics', () => {
         await waitFor(() => expect(screen.getByRole('button', {name: 'Close'})).toHaveFocus());
     });
 
+    it('should focus the confirming action on open when autoFocusConfirm is set', async () => {
+        render(<AlertDialog {...defaultProps} autoFocusConfirm />);
+
+        await waitFor(() => expect(screen.getByRole('button', {name: 'Delete'})).toHaveFocus());
+    });
+
     // There is deliberately no outside-click test here. Radix's outside dismissal never fires under jsdom — with
     // the onInteractOutside guard removed, pointerdown on the body, on the overlay and on the document all leave the
     // dialog open — so any such test would pass whether or not the guard exists. The guard is verified in a browser.
