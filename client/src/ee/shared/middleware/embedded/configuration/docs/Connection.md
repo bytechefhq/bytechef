@@ -24,6 +24,7 @@ Name | Type
 `parameters` | { [key: string]: any; }
 `tags` | [Array&lt;Tag&gt;](Tag.md)
 `version` | number
+`origin` | string
 `shared` | boolean
 `status` | string
 
@@ -52,6 +53,7 @@ const example = {
   "parameters": null,
   "tags": null,
   "version": null,
+  "origin": null,
   "shared": null,
   "status": null,
 } satisfies Connection

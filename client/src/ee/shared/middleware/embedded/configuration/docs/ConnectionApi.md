@@ -7,6 +7,7 @@ All URIs are relative to */api/embedded/internal*
 | [**createConnectedUserConnection**](ConnectionApi.md#createconnecteduserconnection) | **POST** /connected-users/{connectedUserId}/connections | Create a new connection for the connected user |
 | [**createConnection**](ConnectionApi.md#createconnection) | **POST** /connections | Create a new connection |
 | [**deleteConnection**](ConnectionApi.md#deleteconnection) | **DELETE** /connections/{id} | Delete a connection |
+| [**getAllConnectedUserConnections**](ConnectionApi.md#getallconnecteduserconnections) | **GET** /connected-users/{connectedUserId}/connections | Get all connections a connected user can use |
 | [**getConnectedUserConnections**](ConnectionApi.md#getconnecteduserconnections) | **GET** /connected-users/{connectedUserId}/components/{componentName}/connections | Get all connected user\&#39;s connections |
 | [**getConnection**](ConnectionApi.md#getconnection) | **GET** /connections/{id} | Get a connection by id |
 | [**getConnections**](ConnectionApi.md#getconnections) | **GET** /connections | Get all connections |
@@ -215,6 +216,73 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **204** | Successful operation. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getAllConnectedUserConnections
+
+> Array&lt;Connection&gt; getAllConnectedUserConnections(connectedUserId)
+
+Get all connections a connected user can use
+
+Get all connections a connected user can use, across every component.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ConnectionApi,
+} from '';
+import type { GetAllConnectedUserConnectionsRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ConnectionApi();
+
+  const body = {
+    // number | The id of a connected user.
+    connectedUserId: 789,
+  } satisfies GetAllConnectedUserConnectionsRequest;
+
+  try {
+    const data = await api.getAllConnectedUserConnections(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **connectedUserId** | `number` | The id of a connected user. | [Defaults to `undefined`] |
+
+### Return type
+
+[**Array&lt;Connection&gt;**](Connection.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The list of connections. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

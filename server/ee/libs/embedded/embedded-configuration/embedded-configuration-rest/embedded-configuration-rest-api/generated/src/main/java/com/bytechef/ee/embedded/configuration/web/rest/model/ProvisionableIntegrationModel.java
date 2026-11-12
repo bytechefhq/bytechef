@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProvisionableIntegration", description = "An integration that can be provisioned to a connected user.")
 @JsonTypeName("ProvisionableIntegration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-11T12:16:15.177229+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T10:21:19.930018+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ProvisionableIntegrationModel {
 
   private @Nullable IntegrationBasicModel integration;
@@ -37,6 +37,8 @@ public class ProvisionableIntegrationModel {
   private List<@Valid ProvisionableIntegrationInstanceConfigurationModel> integrationInstanceConfigurations = new ArrayList<>();
 
   private List<String> mcpWorkflowUuids = new ArrayList<>();
+
+  private List<String> toolOnlyMcpWorkflowUuids = new ArrayList<>();
 
   public ProvisionableIntegrationModel integration(@Nullable IntegrationBasicModel integration) {
     this.integration = integration;
@@ -123,11 +125,11 @@ public class ProvisionableIntegrationModel {
   }
 
   /**
-   * The uuids of the integration's workflows that embedded MCP servers expose as tools.
+   * The uuids of the integration's workflows that embedded MCP servers expose as tools and that also have another trigger.
    * @return mcpWorkflowUuids
    */
   
-  @Schema(name = "mcpWorkflowUuids", description = "The uuids of the integration's workflows that embedded MCP servers expose as tools.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "mcpWorkflowUuids", description = "The uuids of the integration's workflows that embedded MCP servers expose as tools and that also have another trigger.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("mcpWorkflowUuids")
   public List<String> getMcpWorkflowUuids() {
     return mcpWorkflowUuids;
@@ -136,6 +138,35 @@ public class ProvisionableIntegrationModel {
   @JsonProperty("mcpWorkflowUuids")
   public void setMcpWorkflowUuids(List<String> mcpWorkflowUuids) {
     this.mcpWorkflowUuids = mcpWorkflowUuids;
+  }
+
+  public ProvisionableIntegrationModel toolOnlyMcpWorkflowUuids(List<String> toolOnlyMcpWorkflowUuids) {
+    this.toolOnlyMcpWorkflowUuids = toolOnlyMcpWorkflowUuids;
+    return this;
+  }
+
+  public ProvisionableIntegrationModel addToolOnlyMcpWorkflowUuidsItem(String toolOnlyMcpWorkflowUuidsItem) {
+    if (this.toolOnlyMcpWorkflowUuids == null) {
+      this.toolOnlyMcpWorkflowUuids = new ArrayList<>();
+    }
+    this.toolOnlyMcpWorkflowUuids.add(toolOnlyMcpWorkflowUuidsItem);
+    return this;
+  }
+
+  /**
+   * The uuids of the integration's workflows that embedded MCP servers expose as tools and that have no other trigger.
+   * @return toolOnlyMcpWorkflowUuids
+   */
+  
+  @Schema(name = "toolOnlyMcpWorkflowUuids", description = "The uuids of the integration's workflows that embedded MCP servers expose as tools and that have no other trigger.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("toolOnlyMcpWorkflowUuids")
+  public List<String> getToolOnlyMcpWorkflowUuids() {
+    return toolOnlyMcpWorkflowUuids;
+  }
+
+  @JsonProperty("toolOnlyMcpWorkflowUuids")
+  public void setToolOnlyMcpWorkflowUuids(List<String> toolOnlyMcpWorkflowUuids) {
+    this.toolOnlyMcpWorkflowUuids = toolOnlyMcpWorkflowUuids;
   }
 
   @Override
@@ -150,12 +181,13 @@ public class ProvisionableIntegrationModel {
     return Objects.equals(this.integration, provisionableIntegration.integration) &&
         Objects.equals(this.componentVersion, provisionableIntegration.componentVersion) &&
         Objects.equals(this.integrationInstanceConfigurations, provisionableIntegration.integrationInstanceConfigurations) &&
-        Objects.equals(this.mcpWorkflowUuids, provisionableIntegration.mcpWorkflowUuids);
+        Objects.equals(this.mcpWorkflowUuids, provisionableIntegration.mcpWorkflowUuids) &&
+        Objects.equals(this.toolOnlyMcpWorkflowUuids, provisionableIntegration.toolOnlyMcpWorkflowUuids);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(integration, componentVersion, integrationInstanceConfigurations, mcpWorkflowUuids);
+    return Objects.hash(integration, componentVersion, integrationInstanceConfigurations, mcpWorkflowUuids, toolOnlyMcpWorkflowUuids);
   }
 
   @Override
@@ -166,6 +198,7 @@ public class ProvisionableIntegrationModel {
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    integrationInstanceConfigurations: ").append(toIndentedString(integrationInstanceConfigurations)).append("\n");
     sb.append("    mcpWorkflowUuids: ").append(toIndentedString(mcpWorkflowUuids)).append("\n");
+    sb.append("    toolOnlyMcpWorkflowUuids: ").append(toIndentedString(toolOnlyMcpWorkflowUuids)).append("\n");
     sb.append("}");
     return sb.toString();
   }

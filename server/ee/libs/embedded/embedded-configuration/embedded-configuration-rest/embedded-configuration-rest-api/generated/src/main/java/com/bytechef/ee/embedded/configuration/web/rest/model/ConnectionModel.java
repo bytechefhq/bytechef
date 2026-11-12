@@ -73,6 +73,45 @@ public class ConnectionModel {
 
   private @Nullable Integer version;
 
+  /**
+   * How a connected user came to have the connection. INTERNAL is an admin connection shared with connected users, SELF_SERVE one the connected user created, PROVISIONED one an admin created for the connected user. Only set when listing a connected user's connections.
+   */
+  public enum OriginEnum {
+    INTERNAL("INTERNAL"),
+    
+    PROVISIONED("PROVISIONED"),
+    
+    SELF_SERVE("SELF_SERVE");
+
+    private final String value;
+
+    OriginEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static OriginEnum fromValue(String value) {
+      for (OriginEnum b : OriginEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  private @Nullable OriginEnum origin;
+
   private Boolean shared = false;
 
   /**
@@ -538,6 +577,27 @@ public class ConnectionModel {
     this.version = version;
   }
 
+  public ConnectionModel origin(@Nullable OriginEnum origin) {
+    this.origin = origin;
+    return this;
+  }
+
+  /**
+   * How a connected user came to have the connection. INTERNAL is an admin connection shared with connected users, SELF_SERVE one the connected user created, PROVISIONED one an admin created for the connected user. Only set when listing a connected user's connections.
+   * @return origin
+   */
+  
+  @Schema(name = "origin", accessMode = Schema.AccessMode.READ_ONLY, description = "How a connected user came to have the connection. INTERNAL is an admin connection shared with connected users, SELF_SERVE one the connected user created, PROVISIONED one an admin created for the connected user. Only set when listing a connected user's connections.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("origin")
+  public @Nullable OriginEnum getOrigin() {
+    return origin;
+  }
+
+  @JsonProperty("origin")
+  public void setOrigin(@Nullable OriginEnum origin) {
+    this.origin = origin;
+  }
+
   public ConnectionModel shared(Boolean shared) {
     this.shared = shared;
     return this;
@@ -607,13 +667,14 @@ public class ConnectionModel {
         Objects.equals(this.parameters, connection.parameters) &&
         Objects.equals(this.tags, connection.tags) &&
         Objects.equals(this.version, connection.version) &&
+        Objects.equals(this.origin, connection.origin) &&
         Objects.equals(this.shared, connection.shared) &&
         Objects.equals(this.status, connection.status);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version, shared, status);
+    return Objects.hash(active, authorizationType, authorizationParameters, baseUri, componentName, connectionParameters, connectionVersion, createdBy, createdDate, credentialStatus, environmentId, id, lastModifiedBy, lastModifiedDate, name, parameters, tags, version, origin, shared, status);
   }
 
   @Override
@@ -638,6 +699,7 @@ public class ConnectionModel {
     sb.append("    parameters: ").append(toIndentedString(parameters)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
+    sb.append("    origin: ").append(toIndentedString(origin)).append("\n");
     sb.append("    shared: ").append(toIndentedString(shared)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("}");

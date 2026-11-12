@@ -11,6 +11,7 @@ All URIs are relative to */api/embedded/internal*
 | [**getIntegrationVersions**](IntegrationApi.md#getintegrationversions) | **GET** /integrations/{id}/versions | Get a integration versions. |
 | [**getIntegrations**](IntegrationApi.md#getintegrations) | **GET** /integrations | Get integrations |
 | [**publishIntegration**](IntegrationApi.md#publishintegrationoperation) | **POST** /integrations/{id}/publish | Publishes existing integration. |
+| [**restoreIntegrationVersion**](IntegrationApi.md#restoreintegrationversion) | **POST** /integrations/{id}/versions/{integrationVersion}/restore | Restores a published integration version into the draft. |
 | [**updateIntegration**](IntegrationApi.md#updateintegration) | **PUT** /integrations/{id} | Update an existing integration |
 
 
@@ -491,6 +492,76 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: `application/json`
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Successful operation. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## restoreIntegrationVersion
+
+> restoreIntegrationVersion(id, integrationVersion)
+
+Restores a published integration version into the draft.
+
+Replaces the draft workflows of an integration with the workflows of a published integration version.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  IntegrationApi,
+} from '';
+import type { RestoreIntegrationVersionRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new IntegrationApi();
+
+  const body = {
+    // number | The id of an integration.
+    id: 789,
+    // number | The version of an integration.
+    integrationVersion: 56,
+  } satisfies RestoreIntegrationVersionRequest;
+
+  try {
+    const data = await api.restoreIntegrationVersion(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of an integration. | [Defaults to `undefined`] |
+| **integrationVersion** | `number` | The version of an integration. | [Defaults to `undefined`] |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: Not defined
 
 
