@@ -51,7 +51,7 @@ Enter a project name, for example `Getting started`. Optionally add a descriptio
 <Steps>
 <Step>
 
-On your new project's row, click **+ Workflow**.
+Your new project's row opens with an empty **Workflows** tab. Click **Create Workflow**. Once a project has workflows, the same button reads **New Workflow**.
 
 </Step>
 <Step>
@@ -96,6 +96,11 @@ Leave **Response Format** on **JSON** and everything else at its default. There 
 Optionally rename the step on the **Description** tab, for example to `Get a random quote`. The step's **name**, `httpClient_1`, is what other steps use to reference its output; it does not change when you edit the title.
 
 </Step>
+<Step>
+
+Open the **Output** tab and click **Test Action**. ByteChef calls the API once and records the fields it returned (`id`, `quote`, `author`). Later steps need these to offer the fields as data pills, and the editor warns about a reference it cannot find in them.
+
+</Step>
 </Steps>
 
 ## 4. Log the quote
@@ -103,7 +108,7 @@ Optionally rename the step on the **Description** tab, for example to `Get a ran
 <Steps>
 <Step>
 
-Click the **+** button below the HTTP Client step, search for **Logger**, and select it. Choose the **Info** action.
+Click the **+** button below the HTTP Client step, search for **Logger**, open the **Helpers** tab, and select it. Choose the **Info** action.
 
 </Step>
 <Step>
