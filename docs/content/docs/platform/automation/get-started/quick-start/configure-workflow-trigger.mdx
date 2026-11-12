@@ -14,7 +14,7 @@ component, publish the project, create a deployment, and monitor the workflow ex
 <Steps>
 <Step>
 
-Click **+ Workflow** on the row of the project you want to add a workflow to.
+Expand the project you want to add a workflow to and, on its **Workflows** tab, click **Create Workflow**. Once a project has workflows, the same button reads **New Workflow**.
 
 </Step>
 <Step>
@@ -38,7 +38,7 @@ Click **Save**.
 <Steps>
 <Step>
 
-Hover the trigger node, open its **⋮ Node actions** menu, and choose **Replace**.
+Right-click the trigger node, or hover it and open its **⋮ Node actions** menu, and choose **Replace**.
 
 </Step>
 <Step>
@@ -53,7 +53,7 @@ Select **New or Updated Event** trigger.
 </Step>
 <Step>
 
-Go to the **Connection** tab.
+The trigger's panel opens on the **Connection** tab.
 
 </Step>
 <Step>
@@ -160,12 +160,12 @@ Go to the **Properties** tab.
 </Step>
 <Step>
 
-For **Model**, choose the desired model (e.g., `gpt-4`).
+For **Model**, choose the desired model (e.g., `gpt-5-mini`).
 
 </Step>
 <Step>
 
-For **Prompt**, enter the prompt text, such as `Describe this event:`.
+For **Prompt**, enter the prompt text, such as `Summarise this calendar event in one sentence:`.
 
 </Step>
 </Steps>
@@ -178,12 +178,12 @@ For **Prompt**, enter the prompt text, such as `Describe this event:`.
 <Steps>
 <Step>
 
-After clicking on the content field, the Data Pill Panel will open on the left. Use the data pill to insert output from a previous component.
+After clicking on the **Prompt** field, the Data Pill Panel will open on the left. Use the data pill to insert output from a previous component.
 
 </Step>
 <Step>
 
-Click on **Google Calendar** component in Data Pill Panel.
+Click the **Google Calendar** row in the Data Pill Panel to expand it.
 
 </Step>
 <Step>
@@ -193,7 +193,7 @@ Click on **trigger_1**, which is the output of the trigger for the Google Calend
 </Step>
 <Step>
 
-Output of Google Calendar trigger is now inserted into the content field.
+Output of Google Calendar trigger is now inserted into the **Prompt** field.
 
 </Step>
 </Steps>
@@ -221,7 +221,7 @@ Navigate to **Projects**, expand your project and select its **Deployments** tab
 </Step>
 <Step>
 
-Click **New Deployment**. The project is already selected.
+Click **Deploy** (once the project has deployments, the button reads **New Deployment**). The **New Deployment** dialog opens with the project already selected.
 
 </Step>
 <Step>
@@ -264,7 +264,7 @@ Enable the deployment. Your workflow will now run whenever a new or updated even
 <Steps>
 <Step>
 
-Navigate to the **Workflow Execution History** view. Here you can see the status of your workflow executions.
+In the left sidebar, open **Executions** and choose **Workflow Executions**. Here you can see the status of your workflow executions.
 
 </Step>
 <Step>
@@ -279,7 +279,7 @@ Review the input and output of the Google Calendar trigger. Click on the **OpenA
 </Step>
 <Step>
 
-Click on the icon to view the entire output.
+Click the panel icon in the top-right corner of the details to show the workflow graph beside them.
 
 </Step>
 </Steps>
