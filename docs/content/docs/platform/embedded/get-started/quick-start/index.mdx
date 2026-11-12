@@ -96,6 +96,14 @@ const token = jwt.sign(
 
 Keep the TTL short (10 minutes is a good default) and mint a fresh token per session.
 
+The token can also carry these optional claims:
+
+| Claim | Default | Purpose |
+|---|---|---|
+| `connectionDialogAllowed` | `true` | Whether the user may create new connections from the [embedded workflow builder](/platform/embedded/build/automations/automation-workflows) and the [Automation Hub](/platform/embedded/build/automation-hub). The server enforces it: with `false`, creating a connection in the builder, or through the embedded connections API, is rejected with `403`, and the builder offers only existing connections. In the Automation Hub the activation dialog also hides its **Connect** button, but only in the UI. The claim does not affect the standalone Connect dialog (`useConnectDialog`), the integration instance connections it creates, or reauthorizing an existing connection. A claim that is not a boolean makes the token invalid. |
+
+ByteChef cannot tell which component a request comes from, so to give the Automation Hub and the workflow builder different values, mint a separate token for each component.
+
 <Callout title="Connected Users are created automatically">
     There is no "create connected user" endpoint. The first request authenticated with a user's JWT (or with an API Key against that user's `/{externalUserId}/…` routes) automatically creates the **Connected User** record for that external id. If a user was disabled by an admin, later requests are rejected until they are re-enabled under **Embedded → Connected Users**. See [Syncing Connected Users](/platform/embedded/get-started/initial-setup/syncing-connected-users-programmatically) for the identity contract and for attaching your own data to the record.
 </Callout>
@@ -186,7 +194,6 @@ export function WorkflowEditor({jwtToken, workflowUuid}: {jwtToken: string; work
         <div style={{height: '100vh', position: 'relative', width: '100%'}}>
             <EmbeddedWorkflowBuilder
                 baseUrl="https://your-bytechef-host.example.com"
-                connectionDialogAllowed
                 environment="DEVELOPMENT"
                 jwtToken={jwtToken}
                 workflowUuid={workflowUuid}
@@ -196,7 +203,7 @@ export function WorkflowEditor({jwtToken, workflowUuid}: {jwtToken: string; work
 }
 ```
 
-Pass `includeComponents={['slack', 'gmail', ...]}` to restrict the component palette to a specific set (omit it to allow all). The parent container must be positioned (`position: relative`) with a defined height because the builder fills it.
+Pass `includeComponents={['slack', 'gmail', ...]}` to restrict the component palette to a specific set (omit it to allow all). Users can create new connections in the builder unless their token sets the `connectionDialogAllowed` claim to `false` (see [step 5](#5-generate-a-jwt-for-an-end-user)). The parent container must be positioned (`position: relative`) with a defined height because the builder fills it.
 
 Set `BYTECHEF_EMBEDDED_ALLOWED_PARENT_ORIGINS` on your ByteChef server to your app's origin (for example `https://app.example.com`; separate several with commas). The builder then only renders inside, and only accepts its session token from, those origins - see [the embed handshake](/platform/embedded/build/automations/automation-workflows#the-embed-handshake).
 

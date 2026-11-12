@@ -50,7 +50,7 @@ The component renders `automation-hub.html` from your ByteChef host, waits for t
 | `environment` | `'DEVELOPMENT' \| 'STAGING' \| 'PRODUCTION'` | `'PRODUCTION'` | The environment whose catalog and connections the hub shows. |
 | `className` | `string` | - | Class for the wrapping element. Give it a height; the iframe fills it. |
 | `tabs` | `{automations?, connections?, newWorkflow?}` | all `true` | Which parts of the hub are shown. See [Tabs](#tabs). |
-| `connectionDialogAllowed` | `boolean` | `true` | Whether users can create a new connection from the activation dialog and the builder. When `false`, they can only pick existing connections. |
+| `connectionDialogAllowed` | `boolean` | - | **Deprecated.** Set the `connectionDialogAllowed` claim in the user's JWT instead (see [Connection creation](#connection-creation)). While the prop is still accepted, `false` turns connection creation off, but `true` cannot turn on what the token turns off. Passing it logs a deprecation warning. |
 | `editWorkflowAllowed` | `boolean` | `true` | Whether users can open copies of your templates in the builder: **Edit workflow** in the activation dialog, and **Customize** on a card. **Edit workflow** is never offered for templates from code-workflow projects. Blank automations stay editable while `tabs.newWorkflow` is on. |
 | `includeComponents` | `string[]` | - | Restricts the components offered in the builder to these names. |
 | `defaultLayout` | `'grid' \| 'list'` | `'grid'` | The initial catalog layout. |
@@ -58,6 +58,15 @@ The component renders `automation-hub.html` from your ByteChef host, waits for t
 | `theme` | `AutomationHubTheme` | - | Colors, font, and radius. See [Theming](#theming). |
 
 The component has no callbacks; everything the user does is saved through the embedded API.
+
+### Connection creation
+
+Whether users can create new connections in the hub is set by the `connectionDialogAllowed` claim of the JWT you pass as `jwtToken` (see [Generate a JWT](/platform/embedded/get-started/quick-start#5-generate-a-jwt-for-an-end-user)). A token without the claim allows it. With `false`:
+
+- the builder the hub opens offers only existing connections, and the server rejects creating a connection with `403`;
+- the activation dialog's **Connect** step hides the **Connect** button, so users can only pick an existing connection. This is enforced only in the UI, because those are integration instance connections.
+
+The hub and the builder it opens use the same token. To give the hub and a separately embedded `EmbeddedWorkflowBuilder` different values, mint a separate token for each.
 
 ### Tabs
 
@@ -87,7 +96,7 @@ A template the user has not activated shows **Use**, which opens the activation 
 
 The activation dialog has up to three steps. It is the same dialog you can open from your own page - see [Activate templates from your app](/platform/embedded/build/activation-dialog).
 
-1. **Connect** - one row per component that needs a connection. **Connect** reuses the user's existing connection for that integration without showing a form when its credentials are valid; otherwise it opens the Connect dialog for the integration behind that component (an existing connection with invalid credentials is reconnected in the form), unless `connectionDialogAllowed` is `false`. The new connection is an integration instance connection that the user's integrations share. If the component's integration has no enabled configuration in the environment, the row shows `<App> isn't set up yet — ask your administrator` and activation cannot continue. Skipped when the template needs no connections.
+1. **Connect** - one row per component that needs a connection. **Connect** reuses the user's existing connection for that integration without showing a form when its credentials are valid; otherwise it opens the Connect dialog for the integration behind that component (an existing connection with invalid credentials is reconnected in the form). When [connection creation](#connection-creation) is turned off, **Connect** is hidden and the user picks an existing connection. The new connection is an integration instance connection that the user's integrations share. If the component's integration has no enabled configuration in the environment, the row shows `<App> isn't set up yet — ask your administrator` and activation cannot continue. Skipped when the template needs no connections.
 2. **Configure** - one field per workflow input. Required inputs must be filled. Skipped when the template has no inputs.
 3. **Activate** - the hub gives the user a reference to the template with the chosen connections and inputs, and turns it on. If this fails, the reference is removed so the user can try again.
 
@@ -95,7 +104,7 @@ When it finishes the user sees "Your automation is running". With `editWorkflowA
 
 ### The builder
 
-**Customize**, **Edit workflow**, and **New Automation** open the embedded [workflow builder](/platform/embedded/build/automations/automation-workflows) inside the hub, with a back arrow to the catalog. The builder honors the hub's `connectionDialogAllowed` and `includeComponents`. Users publish from the builder header before they can enable the automation.
+**Customize**, **Edit workflow**, and **New Automation** open the embedded [workflow builder](/platform/embedded/build/automations/automation-workflows) inside the hub, with a back arrow to the catalog. The builder honors the hub's [connection creation](#connection-creation) setting and `includeComponents`. Users publish from the builder header before they can enable the automation.
 
 The builder opens only what a user may edit: a copy of a template needs `editWorkflowAllowed`, a blank automation needs `editWorkflowAllowed` or `tabs.newWorkflow`, and a reference never opens. Otherwise the hub returns to the catalog.
 
