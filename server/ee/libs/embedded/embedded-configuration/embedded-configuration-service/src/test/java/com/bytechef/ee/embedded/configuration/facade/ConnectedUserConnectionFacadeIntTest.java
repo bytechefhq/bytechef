@@ -1248,6 +1248,20 @@ class ConnectedUserConnectionFacadeIntTest {
         }
 
         @Test
+        void testCreateConnectedUserConnectionDeniesConnectedUserWithoutConnectionDialog() {
+            authenticate(createConnectedUserAuthenticationWithoutConnectionDialog());
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.createConnectedUserConnection(connectedUserAId, connectionDTO()))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(connectionFacade, never()).create(any(), any());
+
+            assertThat(connectedUserConnectionService.getConnectionIds(connectedUserAId))
+                .containsExactly(CONNECTED_USER_A_CONNECTION_ID);
+        }
+
+        @Test
         void testCreateConnectedUserConnectionAllowsTenantAdminOnAnyConnectedUser() {
             authenticate(createTenantAdminAuthentication());
 
@@ -1493,6 +1507,18 @@ class ConnectedUserConnectionFacadeIntTest {
         }
 
         @Test
+        void testReauthorizeConnectedUserConnectionAllowsConnectedUserWithoutConnectionDialog() {
+            authenticate(createConnectedUserAuthenticationWithoutConnectionDialog());
+
+            Map<String, Object> parameters = Map.of("apiKey", "new");
+
+            connectedUserConnectionFacade.reauthorizeConnectedUserConnection(
+                connectedUserAId, CONNECTED_USER_A_CONNECTION_ID, parameters);
+
+            verify(connectionFacade).replaceAuthorizationParameters(CONNECTED_USER_A_CONNECTION_ID, parameters);
+        }
+
+        @Test
         void testReauthorizeConnectedUserConnectionAllowsTenantAdminOnAnyConnectedUser() {
             authenticate(createTenantAdminAuthentication());
 
@@ -1652,6 +1678,12 @@ class ConnectedUserConnectionFacadeIntTest {
 
             return new EmbeddedApiKeyAuthenticationToken(
                 environment.ordinal(), connectedUserId, new User(externalUserAId, "", List.of()), false);
+        }
+
+        private EmbeddedApiKeyAuthenticationToken createConnectedUserAuthenticationWithoutConnectionDialog() {
+            return new EmbeddedApiKeyAuthenticationToken(
+                Environment.PRODUCTION.ordinal(), connectedUserAId, new User(externalUserAId, "", List.of()), false,
+                null, false);
         }
 
         private long createConnectedUser(String externalUserId, Environment environment) {

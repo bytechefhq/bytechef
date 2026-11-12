@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -78,6 +80,26 @@ class EmbeddedApiKeyAuthenticationProviderTest {
         assertThat(authenticationToken.environmentId()).isEqualTo(ENVIRONMENT_ID);
         assertThat(authenticationToken.getApiKeyId()).isEqualTo(API_KEY_ID);
         assertThat(authenticationToken.getConnectedUserId()).isEqualTo(42L);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {
+        false, true
+    })
+    void testAuthenticationCarriesConnectionDialogAllowedOverToTheAuthenticatedToken(
+        boolean connectionDialogAllowed) {
+
+        when(connectedUserService.fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(connectedUser(42L)));
+
+        Authentication authentication = provider.authenticate(
+            new EmbeddedApiKeyAuthenticationToken(
+                ENVIRONMENT_ID, EXTERNAL_USER_ID, null, "tenant", connectionDialogAllowed));
+
+        EmbeddedApiKeyAuthenticationToken authenticationToken = (EmbeddedApiKeyAuthenticationToken) authentication;
+
+        assertThat(authenticationToken.isAuthenticated()).isTrue();
+        assertThat(authenticationToken.connectionDialogAllowed()).isEqualTo(connectionDialogAllowed);
     }
 
     @Test

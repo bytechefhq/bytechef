@@ -99,7 +99,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         @AuditData(key = "name", value = "#connectionDTO.name"),
         @AuditData(key = "componentName", value = "#connectionDTO.componentName")
     })
-    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
+    @PreAuthorize("isTenantAdmin() or (isCurrentConnectedUser(#connectedUserId) and isConnectionDialogAllowed())")
     public long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 

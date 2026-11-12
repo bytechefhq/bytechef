@@ -137,4 +137,25 @@ class ConnectedUserAuthenticationsTest {
 
         assertThat(ConnectedUserAuthentications.isCurrentConnectedUser(5L)).isFalse();
     }
+
+    @Test
+    void testIsConnectionDialogAllowedFollowsTheConnectedUserToken() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestConnectedUserAuthentication.of("external-user"));
+
+        assertThat(ConnectedUserAuthentications.isConnectionDialogAllowed()).isTrue();
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestConnectedUserAuthentication.withoutConnectionDialog("external-user"));
+
+        assertThat(ConnectedUserAuthentications.isConnectionDialogAllowed()).isFalse();
+    }
+
+    @Test
+    void testIsConnectionDialogAllowedIsTrueForAPlatformUser() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of()));
+
+        assertThat(ConnectedUserAuthentications.isConnectionDialogAllowed()).isTrue();
+    }
 }

@@ -22,6 +22,8 @@ import org.jspecify.annotations.Nullable;
  */
 public interface JwtTokenService {
 
+    String CONNECTION_DIALOG_ALLOWED_CLAIM = "connectionDialogAllowed";
+
     String ENVIRONMENT_ID_CLAIM = "environmentId";
 
     String generateJwtToken(String externalUserId, long integrationId, int environmentId, String tenantId);

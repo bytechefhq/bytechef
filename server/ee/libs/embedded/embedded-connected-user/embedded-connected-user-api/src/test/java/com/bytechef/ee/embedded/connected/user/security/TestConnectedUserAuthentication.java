@@ -19,6 +19,7 @@ public final class TestConnectedUserAuthentication extends AbstractAuthenticatio
     implements ConnectedUserAuthentication {
 
     private final boolean apiKeyAuthenticated;
+    private final boolean connectionDialogAllowed;
     private final long connectedUserId;
     private final long environmentId;
     private final String externalUserId;
@@ -26,16 +27,17 @@ public final class TestConnectedUserAuthentication extends AbstractAuthenticatio
     public TestConnectedUserAuthentication(
         String externalUserId, long connectedUserId, long environmentId, boolean authenticated) {
 
-        this(externalUserId, connectedUserId, environmentId, authenticated, false);
+        this(externalUserId, connectedUserId, environmentId, authenticated, false, true);
     }
 
     private TestConnectedUserAuthentication(
         String externalUserId, long connectedUserId, long environmentId, boolean authenticated,
-        boolean apiKeyAuthenticated) {
+        boolean apiKeyAuthenticated, boolean connectionDialogAllowed) {
 
         super(List.of());
 
         this.apiKeyAuthenticated = apiKeyAuthenticated;
+        this.connectionDialogAllowed = connectionDialogAllowed;
         this.connectedUserId = connectedUserId;
         this.environmentId = environmentId;
         this.externalUserId = externalUserId;
@@ -44,7 +46,11 @@ public final class TestConnectedUserAuthentication extends AbstractAuthenticatio
     }
 
     public static TestConnectedUserAuthentication apiKey(String externalUserId) {
-        return new TestConnectedUserAuthentication(externalUserId, 1L, 2L, true, true);
+        return new TestConnectedUserAuthentication(externalUserId, 1L, 2L, true, true, true);
+    }
+
+    public static TestConnectedUserAuthentication withoutConnectionDialog(String externalUserId) {
+        return new TestConnectedUserAuthentication(externalUserId, 1L, 2L, true, false, false);
     }
 
     public static TestConnectedUserAuthentication of(String externalUserId) {
@@ -54,6 +60,11 @@ public final class TestConnectedUserAuthentication extends AbstractAuthenticatio
     @Override
     public boolean apiKeyAuthenticated() {
         return apiKeyAuthenticated;
+    }
+
+    @Override
+    public boolean connectionDialogAllowed() {
+        return connectionDialogAllowed;
     }
 
     @Override

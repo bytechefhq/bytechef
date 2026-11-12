@@ -92,7 +92,8 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
             TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
             return new EmbeddedApiKeyAuthenticationToken(
-                environment.ordinal(), externalUserId, null, tenantKey.getTenantId());
+                environment.ordinal(), externalUserId, null, tenantKey.getTenantId(),
+                getConnectionDialogAllowedClaim(payload));
         } else {
             String externalUserId;
             Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());
@@ -142,6 +143,20 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
         }
 
         return pathExternalUserId;
+    }
+
+    private static boolean getConnectionDialogAllowedClaim(Claims payload) {
+        if (!payload.containsKey(JwtTokenService.CONNECTION_DIALOG_ALLOWED_CLAIM)) {
+            return true;
+        }
+
+        Object connectionDialogAllowedClaim = payload.get(JwtTokenService.CONNECTION_DIALOG_ALLOWED_CLAIM);
+
+        if (!(connectionDialogAllowedClaim instanceof Boolean connectionDialogAllowed)) {
+            throw new BadCredentialsException("Token connectionDialogAllowed claim must be a boolean");
+        }
+
+        return connectionDialogAllowed;
     }
 
     private static void verifyEnvironmentClaim(Claims payload, Environment environment) {

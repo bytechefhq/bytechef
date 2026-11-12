@@ -22,6 +22,10 @@ public class ConnectedUserSecurity implements MethodSecurityExpressionContributo
         return ConnectedUserAuthentications.isConnectedUser();
     }
 
+    public boolean isConnectionDialogAllowed() {
+        return ConnectedUserAuthentications.isConnectionDialogAllowed();
+    }
+
     public boolean isCurrentConnectedUser(long connectedUserId) {
         return ConnectedUserAuthentications.isCurrentConnectedUser(connectedUserId);
     }
