@@ -25,7 +25,7 @@ import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCop
 import {ISSUES_SIDEBAR_EXIT_DURATION} from '@/shared/constants';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {Suspense, lazy, useCallback, useEffect, useState} from 'react';
+import {Suspense, lazy, useCallback, useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
@@ -38,6 +38,11 @@ import {
     WorkflowRightSidebarSkeleton,
 } from './components/WorkflowEditorSkeletons';
 import WorkflowOutputsSheet from './components/WorkflowOutputsSheet';
+import WorkflowConnectionsSheet from './components/workflow-connections/WorkflowConnectionsSheet';
+import {
+    buildWorkflowConnectionGroups,
+    getWorkflowConnectionsSummary,
+} from './components/workflow-connections/utils/workflowConnectionGroups';
 import WorkflowInputsSheet from './components/workflow-inputs/WorkflowInputsSheet';
 import useDataPillPanelStore from './stores/useDataPillPanelStore';
 import useWorkflowDataStore from './stores/useWorkflowDataStore';
@@ -90,18 +95,22 @@ const WorkflowEditorLayout = ({
     const {
         clusterElementsCanvasOpen,
         setShowWorkflowCodeEditorSheet,
+        setShowWorkflowConnectionsSheet,
         setShowWorkflowInputsSheet,
         setShowWorkflowOutputsSheet,
         showWorkflowCodeEditorSheet,
+        showWorkflowConnectionsSheet,
         showWorkflowInputsSheet,
         showWorkflowOutputsSheet,
     } = useWorkflowEditorStore(
         useShallow((state) => ({
             clusterElementsCanvasOpen: state.clusterElementsCanvasOpen,
             setShowWorkflowCodeEditorSheet: state.setShowWorkflowCodeEditorSheet,
+            setShowWorkflowConnectionsSheet: state.setShowWorkflowConnectionsSheet,
             setShowWorkflowInputsSheet: state.setShowWorkflowInputsSheet,
             setShowWorkflowOutputsSheet: state.setShowWorkflowOutputsSheet,
             showWorkflowCodeEditorSheet: state.showWorkflowCodeEditorSheet,
+            showWorkflowConnectionsSheet: state.showWorkflowConnectionsSheet,
             showWorkflowInputsSheet: state.showWorkflowInputsSheet,
             showWorkflowOutputsSheet: state.showWorkflowOutputsSheet,
         }))
@@ -120,6 +129,7 @@ const WorkflowEditorLayout = ({
         handleComponentsAndFlowControlsClick,
         handleCopilotClick,
         handleWorkflowCodeEditorClick,
+        handleWorkflowConnectionsClick,
         handleWorkflowInputsClick,
         handleWorkflowIssuesClick,
         handleWorkflowOutputsClick,
@@ -128,6 +138,7 @@ const WorkflowEditorLayout = ({
         taskDispatcherDefinitions,
         testConfigurationDisabled,
         workflowTestConfiguration,
+        workflowTestConfigurationLoading,
     } = useWorkflowLayout(includeComponents);
 
     useWorkflowIssuesSweep();
@@ -149,6 +160,16 @@ const WorkflowEditorLayout = ({
     const {mounted: issuesSidebarMounted, visible: issuesSidebarVisible} = useDelayedUnmount(
         issuesSidebarOpen,
         workflowNodeDetailsPanelOpen ? 0 : ISSUES_SIDEBAR_EXIT_DURATION
+    );
+
+    const missingConnectionCount = useMemo(
+        () =>
+            workflowTestConfigurationLoading
+                ? 0
+                : getWorkflowConnectionsSummary(
+                      buildWorkflowConnectionGroups(workflow, workflowTestConfiguration?.connections)
+                  ).missingCount,
+        [workflow, workflowTestConfiguration?.connections, workflowTestConfigurationLoading]
     );
 
     useEffect(() => {
@@ -245,7 +266,7 @@ const WorkflowEditorLayout = ({
                 {componentDefinitions && taskDispatcherDefinitions && (
                     <Suspense
                         fallback={
-                            <WorkflowRightSidebarSkeleton itemCount={!showCopilot && !showWorkflowInputs ? 3 : 5} />
+                            <WorkflowRightSidebarSkeleton itemCount={!showCopilot && !showWorkflowInputs ? 4 : 6} />
                         }
                     >
                         <WorkflowRightSidebar
@@ -253,9 +274,11 @@ const WorkflowEditorLayout = ({
                             issueCount={issues.length}
                             issueSeverity={issues[0]?.severity}
                             issuesSidebarOpen={issuesSidebarOpen}
+                            missingConnectionCount={missingConnectionCount}
                             onComponentsAndFlowControlsClick={handleComponentsAndFlowControlsClick}
                             onCopilotClick={handleCopilotClick}
                             onWorkflowCodeEditorClick={handleWorkflowCodeEditorClick}
+                            onWorkflowConnectionsClick={handleWorkflowConnectionsClick}
                             onWorkflowInputsClick={handleWorkflowInputsClick}
                             onWorkflowIssuesClick={handleWorkflowIssuesClick}
                             onWorkflowOutputsClick={handleWorkflowOutputsClick}
@@ -313,6 +336,16 @@ const WorkflowEditorLayout = ({
                         workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                     />
                 </Suspense>
+            )}
+
+            {showWorkflowConnectionsSheet && (
+                <WorkflowConnectionsSheet
+                    onSheetOpenChange={setShowWorkflowConnectionsSheet}
+                    sheetOpen={showWorkflowConnectionsSheet}
+                    workflow={workflow}
+                    workflowTestConfiguration={workflowTestConfiguration}
+                    workflowTestConfigurationLoading={workflowTestConfigurationLoading}
+                />
             )}
 
             {showWorkflowInputsSheet && (
