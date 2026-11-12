@@ -37,7 +37,9 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurati
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserConnection;
+import com.bytechef.ee.embedded.configuration.domain.ConnectionOrigin;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserSharedConnectionRepository;
@@ -509,6 +511,40 @@ class ConnectedUserConnectionFacadeIntTest {
     }
 
     @Test
+    void testGetConnectionsOrdersOwnConnectionsBeforeDisabledIntegrationAndSharedOnes() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        stubSharedConnections(Environment.PRODUCTION, 84001L);
+
+        long disabledIntegrationInstanceId = createIntegrationInstance(
+            connectedUserId, 84002L, Environment.PRODUCTION, Map.of(), null);
+
+        integrationInstanceService.updateEnabled(disabledIntegrationInstanceId, false);
+
+        createConnectedUserConnection(connectedUserId, 84003L, Environment.PRODUCTION);
+        createConnectedUserConnection(connectedUserId, 84004L, Environment.PRODUCTION);
+        createIntegrationInstance(connectedUserId, 84005L, Environment.PRODUCTION);
+        createIntegrationInstance(connectedUserId, 84006L, Environment.PRODUCTION);
+
+        when(connectionFacade.getConnections(any(), eq(PlatformType.EMBEDDED)))
+            .thenAnswer(invocation -> {
+                List<Long> requestedConnectionIds = invocation.getArgument(0);
+
+                return requestedConnectionIds.stream()
+                    .sorted()
+                    .map(requestedConnectionId -> ConnectionDTO.builder()
+                        .componentName("slack")
+                        .id(requestedConnectionId)
+                        .build())
+                    .toList();
+            });
+
+        assertThat(connectedUserConnectionFacade.getConnections(connectedUserId, "slack", List.of()))
+            .extracting(ConnectionDTO::id)
+            .containsExactly(84006L, 84005L, 84004L, 84003L, 84002L, 84001L);
+    }
+
+    @Test
     void testGetConnectionsWithNullComponentNameReturnsAllOwnedConnections() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
 
@@ -622,6 +658,54 @@ class ConnectedUserConnectionFacadeIntTest {
         ConnectionDTO connectionDTO = connectionDTOs.getFirst();
 
         assertThat(connectionDTO.authorizationParameters()).isEqualTo(Map.of("secret", "value"));
+    }
+
+    @Test
+    void testGetConnectionOriginsMarksConnectionsTheConnectedUserCreatedAsSelfServe() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createConnectedUserConnection(connectedUserId, 85001L, Environment.PRODUCTION);
+        createIntegrationInstance(connectedUserId, 85002L, Environment.PRODUCTION);
+
+        assertThat(connectedUserConnectionFacade.getConnectionOrigins(connectedUserId, List.of(85001L, 85002L)))
+            .containsExactlyInAnyOrderEntriesOf(
+                Map.of(85001L, ConnectionOrigin.SELF_SERVE, 85002L, ConnectionOrigin.SELF_SERVE));
+    }
+
+    @Test
+    void testGetConnectionOriginsMarksConnectionsAnAdminCreatedForTheConnectedUserAsProvisioned() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        registerConnection(85011L, Environment.PRODUCTION, PlatformType.EMBEDDED);
+
+        connectedUserConnectionService.create(connectedUserId, 85011L, "admin@localhost.com");
+
+        createProvisionedIntegrationInstance(connectedUserId, 85012L, Environment.PRODUCTION);
+
+        assertThat(connectedUserConnectionFacade.getConnectionOrigins(connectedUserId, List.of(85011L, 85012L)))
+            .containsExactlyInAnyOrderEntriesOf(
+                Map.of(85011L, ConnectionOrigin.PROVISIONED, 85012L, ConnectionOrigin.PROVISIONED));
+    }
+
+    @Test
+    void testGetConnectionOriginsMarksSharedAdminConnectionsAsInternal() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        stubSharedConnections(Environment.PRODUCTION, 85021L);
+
+        assertThat(connectedUserConnectionFacade.getConnectionOrigins(connectedUserId, List.of(85021L)))
+            .containsExactlyEntriesOf(Map.of(85021L, ConnectionOrigin.INTERNAL));
+    }
+
+    @Test
+    void testGetConnectionOriginsLeavesOutConnectionsTheConnectedUserCannotUse() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+        long otherConnectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createConnectedUserConnection(otherConnectedUserId, 85031L, Environment.PRODUCTION);
+
+        assertThat(connectedUserConnectionFacade.getConnectionOrigins(connectedUserId, List.of(85031L, 85032L)))
+            .isEmpty();
     }
 
     @Test
@@ -954,7 +1038,7 @@ class ConnectedUserConnectionFacadeIntTest {
         createIntegrationInstance(connectedUserId, connectionId, environment, connectionParameters, null);
     }
 
-    private void createIntegrationInstance(
+    private long createIntegrationInstance(
         long connectedUserId, long connectionId, Environment environment, Map<String, ?> connectionParameters,
         @Nullable String provisionedBy) {
 
@@ -980,8 +1064,10 @@ class ConnectedUserConnectionFacadeIntTest {
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
             integrationInstanceConfiguration);
 
-        integrationInstanceService.create(
+        IntegrationInstance integrationInstance = integrationInstanceService.create(
             connectedUserId, connectionId, integrationInstanceConfiguration.getId(), provisionedBy);
+
+        return Objects.requireNonNull(integrationInstance.getId());
     }
 
     private void createProvisionedIntegrationInstance(
@@ -1206,6 +1292,26 @@ class ConnectedUserConnectionFacadeIntTest {
                     .isInstanceOf(AccessDeniedException.class);
 
             verify(connectionFacade, never()).getConnections(anyList(), any());
+        }
+
+        @Test
+        void testGetConnectionOriginsDeniesConnectedUserOnAnotherConnectedUser() {
+            authenticate(createConnectedUserAuthentication(Environment.PRODUCTION));
+
+            assertThatThrownBy(
+                () -> connectedUserConnectionFacade.getConnectionOrigins(
+                    connectedUserBId, List.of(CONNECTED_USER_B_CONNECTION_ID)))
+                        .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testGetConnectionOriginsAllowsTenantAdminOnAnyConnectedUser() {
+            authenticate(createTenantAdminAuthentication());
+
+            assertThat(
+                connectedUserConnectionFacade.getConnectionOrigins(
+                    connectedUserBId, List.of(CONNECTED_USER_B_CONNECTION_ID)))
+                        .containsExactlyEntriesOf(Map.of(CONNECTED_USER_B_CONNECTION_ID, ConnectionOrigin.SELF_SERVE));
         }
 
         @Test

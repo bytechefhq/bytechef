@@ -7,11 +7,13 @@
 
 package com.bytechef.ee.embedded.configuration.remote.client.facade;
 
+import com.bytechef.ee.embedded.configuration.domain.ConnectionOrigin;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.tag.domain.Tag;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,6 +74,11 @@ public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserC
     public List<ConnectionDTO> getConnections(
         Long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Map<Long, ConnectionOrigin> getConnectionOrigins(long connectedUserId, Collection<Long> connectionIds) {
         throw new UnsupportedOperationException();
     }
 

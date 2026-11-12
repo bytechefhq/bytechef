@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.ee.embedded.configuration.domain.ConnectionOrigin;
 import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
@@ -284,7 +286,8 @@ class ConnectionApiControllerIntTest {
 
         when(connectionAdminFacade.createConnection(any(), anyBoolean())).thenReturn(getConnection().id());
 
-        assert connectionDTO.id() != null;
+        assertThat(connectionDTO.id()).isNotNull();
+
         this.webTestClient
             .post()
             .uri("/internal/connections")
@@ -366,6 +369,87 @@ class ConnectionApiControllerIntTest {
 
         verify(connectedUserConnectionFacade).getConnectedUserConnectionsForAdmin(eq(5L), any(), anyList());
         verify(connectedUserConnectionFacade, never()).getConnectedUserConnections(anyLong(), any(), anyList());
+    }
+
+    @Test
+    void testGetAllConnectedUserConnectionsTellsEachConnectionsOriginToAdmin() {
+        List<ConnectionDTO> connectionDTOs = List.of(
+            connectedUserConnection(11L, "self-serve"), connectedUserConnection(12L, "provisioned"),
+            connectedUserConnection(13L, "internal"));
+
+        when(connectedUserConnectionFacade.getSharedConnectionIds()).thenReturn(Set.of(13L));
+        when(connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(5L, null, List.of()))
+            .thenReturn(connectionDTOs);
+        when(connectedUserConnectionFacade.getConnectionOrigins(5L, List.of(11L, 12L, 13L)))
+            .thenReturn(
+                Map.of(
+                    11L, ConnectionOrigin.SELF_SERVE, 12L, ConnectionOrigin.PROVISIONED, 13L,
+                    ConnectionOrigin.INTERNAL));
+
+        this.webTestClient
+            .get()
+            .uri("/internal/connected-users/5/connections")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(ConnectionModel.class)
+            .value(connectionModels -> {
+                assertThat(connectionModels)
+                    .extracting(ConnectionModel::getId, ConnectionModel::getOrigin, ConnectionModel::getShared)
+                    .containsExactly(
+                        tuple(11L, ConnectionModel.OriginEnum.SELF_SERVE, false),
+                        tuple(12L, ConnectionModel.OriginEnum.PROVISIONED, false),
+                        tuple(13L, ConnectionModel.OriginEnum.INTERNAL, true));
+
+                assertThat(connectionModels)
+                    .allSatisfy(connectionModel -> assertThat(connectionModel.getParameters()).isNullOrEmpty());
+            });
+
+        verify(connectedUserConnectionFacade, never()).getConnectedUserConnections(anyLong(), any(), anyList());
+    }
+
+    @Test
+    void testGetAllConnectedUserConnectionsLeavesOriginEmptyWhenUnknown() {
+        when(connectedUserConnectionFacade.getSharedConnectionIds()).thenReturn(Set.of());
+        when(connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(5L, null, List.of()))
+            .thenReturn(List.of(connectedUserConnection(14L, "unknown")));
+        when(connectedUserConnectionFacade.getConnectionOrigins(5L, List.of(14L))).thenReturn(Map.of());
+
+        this.webTestClient
+            .get()
+            .uri("/internal/connected-users/5/connections")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(ConnectionModel.class)
+            .value(connectionModels -> assertThat(connectionModels)
+                .singleElement()
+                .extracting(ConnectionModel::getOrigin)
+                .isNull());
+    }
+
+    @Test
+    void testGetConnectedUserConnectionsTellsEachConnectionsOrigin() {
+        when(connectedUserConnectionFacade.getSharedConnectionIds()).thenReturn(Set.of());
+        when(connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(5L, "componentName", List.of()))
+            .thenReturn(List.of(connectedUserConnection(15L, "provisioned")));
+        when(connectedUserConnectionFacade.getConnectionOrigins(5L, List.of(15L)))
+            .thenReturn(Map.of(15L, ConnectionOrigin.PROVISIONED));
+
+        this.webTestClient
+            .get()
+            .uri("/internal/connected-users/5/components/componentName/connections")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBodyList(ConnectionModel.class)
+            .value(connectionModels -> assertThat(connectionModels)
+                .singleElement()
+                .extracting(ConnectionModel::getOrigin)
+                .isEqualTo(ConnectionModel.OriginEnum.PROVISIONED));
     }
 
     @Test
@@ -508,6 +592,16 @@ class ConnectionApiControllerIntTest {
             .isOk()
             .expectBody(Long.class)
             .isEqualTo(expectedConnectionId);
+    }
+
+    private static ConnectionDTO connectedUserConnection(long id, String name) {
+        return ConnectionDTO.builder()
+            .componentName("componentName")
+            .id(id)
+            .name(name)
+            .parameters(Map.of("key1", "value1"))
+            .version(1)
+            .build();
     }
 
     private static ConnectionDTO getConnection() {

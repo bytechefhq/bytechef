@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.audit.ConnectionAuditEvents;
+import com.bytechef.ee.embedded.configuration.domain.ConnectionOrigin;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
@@ -34,6 +35,8 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -186,21 +189,10 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
             .filter(Objects::nonNull)
             .collect(Collectors.toSet());
 
-        Set<Long> adminEnteredConnectionIds = new HashSet<>(
-            connectedUserConnectionService.getProvisionedConnectionIdsIn(listedConnectionIds));
-
-        adminEnteredConnectionIds.addAll(connectedUserConnectionService.getSharedConnectionIds());
-
-        for (IntegrationInstance integrationInstance : integrationInstanceService
-            .getConnectedUserIntegrationInstances(connectedUserId, connectedUser.getEnvironment())) {
-
-            if (integrationInstance.getProvisionedBy() != null) {
-                adminEnteredConnectionIds.add(integrationInstance.getConnectionId());
-            }
-        }
+        Map<Long, ConnectionOrigin> connectionOrigins = getConnectionOrigins(connectedUser, listedConnectionIds);
 
         return connectionDTOs.stream()
-            .map(connectionDTO -> adminEnteredConnectionIds.contains(connectionDTO.id())
+            .map(connectionDTO -> isAdminEntered(connectionOrigins.get(connectionDTO.id()))
                 ? connectionDTO
                 : ConnectionDTO.builder(connectionDTO)
                     .authorizationParameters(null)
@@ -241,7 +233,14 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         return connectionFacade.getConnections(new ArrayList<>(allowedConnectionIds), PlatformType.EMBEDDED)
             .stream()
             .filter(connectionDTO -> componentName == null || componentName.equals(connectionDTO.componentName()))
+            .sorted(Comparator.comparingInt(connectionDTO -> allowedConnectionIds.indexOf(connectionDTO.id())))
             .toList();
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
+    public Map<Long, ConnectionOrigin> getConnectionOrigins(long connectedUserId, Collection<Long> connectionIds) {
+        return getConnectionOrigins(connectedUserService.getConnectedUser(connectedUserId), connectionIds);
     }
 
     @Override
@@ -297,6 +296,50 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     @Override
     public Set<Long> getSharedConnectionIds() {
         return connectedUserConnectionService.getSharedConnectionIds();
+    }
+
+    private Map<Long, ConnectionOrigin> getConnectionOrigins(
+        ConnectedUser connectedUser, Collection<Long> connectionIds) {
+
+        Map<Long, ConnectionOrigin> connectionOrigins = new HashMap<>();
+
+        if (connectionIds.isEmpty()) {
+            return connectionOrigins;
+        }
+
+        Set<Long> ownedConnectionIds = new HashSet<>(
+            connectedUserConnectionService.getConnectionIds(connectedUser.getId()));
+        Set<Long> provisionedConnectionIds = new HashSet<>(
+            connectedUserConnectionService.getProvisionedConnectionIdsIn(new HashSet<>(connectionIds)));
+
+        for (IntegrationInstance integrationInstance : integrationInstanceService
+            .getConnectedUserIntegrationInstances(connectedUser.getId(), connectedUser.getEnvironment())) {
+
+            ownedConnectionIds.add(integrationInstance.getConnectionId());
+
+            if (integrationInstance.getProvisionedBy() != null) {
+                provisionedConnectionIds.add(integrationInstance.getConnectionId());
+            }
+        }
+
+        Set<Long> sharedConnectionIds = connectedUserConnectionService.getSharedConnectionIds();
+
+        for (Long connectionId : connectionIds) {
+            if (ownedConnectionIds.contains(connectionId)) {
+                connectionOrigins.put(
+                    connectionId,
+                    provisionedConnectionIds.contains(connectionId)
+                        ? ConnectionOrigin.PROVISIONED : ConnectionOrigin.SELF_SERVE);
+            } else if (sharedConnectionIds.contains(connectionId)) {
+                connectionOrigins.put(connectionId, ConnectionOrigin.INTERNAL);
+            }
+        }
+
+        return connectionOrigins;
+    }
+
+    private static boolean isAdminEntered(@Nullable ConnectionOrigin connectionOrigin) {
+        return connectionOrigin == ConnectionOrigin.INTERNAL || connectionOrigin == ConnectionOrigin.PROVISIONED;
     }
 
     private void requireProvisionedIntegrationInstanceConnection(long connectedUserId, long connectionId) {
