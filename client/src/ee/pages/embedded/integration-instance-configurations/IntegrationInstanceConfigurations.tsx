@@ -135,7 +135,7 @@ const IntegrationInstanceConfigurations = () => {
                                         environmentId: currentEnvironmentId,
                                     } as IntegrationInstanceConfiguration
                                 }
-                                triggerNode={<Button label="New Instance Configuration" />}
+                                triggerNode={<Button label="New Configuration" />}
                             />
                         )
                     }

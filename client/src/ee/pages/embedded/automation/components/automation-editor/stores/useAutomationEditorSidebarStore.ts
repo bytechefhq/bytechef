@@ -10,7 +10,7 @@ export const useAutomationEditorSidebarStore = create<AutomationEditorSidebarSta
     devtools(
         persist(
             (set) => ({
-                leftSidebarOpen: true,
+                leftSidebarOpen: false,
                 setLeftSidebarOpen: (leftSidebarOpen) => set(() => ({leftSidebarOpen})),
             }),
             {name: 'bytechef.automation-editor-sidebar'}

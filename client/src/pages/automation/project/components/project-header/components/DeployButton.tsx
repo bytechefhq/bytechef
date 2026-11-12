@@ -50,7 +50,7 @@ const DeployButton = ({onDeploymentSaved, project}: DeployButtonProps) => {
                     </span>
                 </TooltipTrigger>
 
-                <TooltipContent>Publish the project to enable deployment</TooltipContent>
+                <TooltipContent>Publish the project before deploying it.</TooltipContent>
             </Tooltip>
         );
     }

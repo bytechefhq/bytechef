@@ -49,6 +49,6 @@ describe('DeployButton', () => {
 
         await userEvent.hover(deployButton.parentElement!);
 
-        expect(await screen.findByRole('tooltip')).toHaveTextContent('Publish the project to enable deployment');
+        expect(await screen.findByRole('tooltip')).toHaveTextContent('Publish the project before deploying it.');
     });
 });

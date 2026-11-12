@@ -10,6 +10,12 @@ const hoisted = vi.hoisted(() => ({
     captureProjectDeploymentEnabledMock: vi.fn(),
     deleteProjectDeploymentMock: vi.fn(),
     openProjectMock: vi.fn(),
+    projectVersionsQueryMock: vi.fn(),
+}));
+
+vi.mock('@/shared/queries/automation/projectVersions.queries', () => ({
+    useGetProjectVersionsQuery: (projectId: number, enabled: boolean) =>
+        hoisted.projectVersionsQueryMock(projectId, enabled),
 }));
 
 vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
@@ -96,6 +102,36 @@ describe('ProjectDeploymentListItem', () => {
         hoisted.captureProjectDeploymentEnabledMock.mockReset();
         hoisted.deleteProjectDeploymentMock.mockReset();
         hoisted.openProjectMock.mockReset();
+        hoisted.projectVersionsQueryMock.mockReset();
+        hoisted.projectVersionsQueryMock.mockReturnValue({data: undefined});
+    });
+
+    it('shows that a newer version is available when the project has published a later version', () => {
+        hoisted.projectVersionsQueryMock.mockReturnValue({
+            data: [
+                {status: 'PUBLISHED', version: 1},
+                {status: 'PUBLISHED', version: 2},
+                {status: 'DRAFT', version: 3},
+            ],
+        });
+
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        expect(screen.getByText('Newer version available')).toBeInTheDocument();
+        expect(hoisted.projectVersionsQueryMock).toHaveBeenCalledWith(7, true);
+    });
+
+    it('does not show that a newer version is available when the deployment uses the last published version', () => {
+        hoisted.projectVersionsQueryMock.mockReturnValue({
+            data: [
+                {status: 'PUBLISHED', version: 1},
+                {status: 'DRAFT', version: 2},
+            ],
+        });
+
+        render(<ProjectDeploymentListItem projectDeployment={projectDeployment} />);
+
+        expect(screen.queryByText('Newer version available')).not.toBeInTheDocument();
     });
 
     it('closes the delete dialog without deleting when cancelled', async () => {

@@ -173,6 +173,7 @@ const ProjectWorkflowListItem = ({
                     exportUrl={`/api/automation/internal/workflows/${workflow.id}/export`}
                     onDeleteClick={() => setShowDeleteDialog(true)}
                     onEditClick={() => setShowEditDialog(true)}
+                    workflowLabel={workflow.label}
                 >
                     {project && workflow && (
                         <DropdownMenuItem

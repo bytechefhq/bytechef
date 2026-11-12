@@ -1,11 +1,16 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import AutomationEditorLeftSidebar from '@/ee/pages/embedded/automation/components/automation-editor/AutomationEditorLeftSidebar';
-import {fireEvent, render, screen, userEvent} from '@/shared/util/test-utils';
+import {useAutomationEditorSidebarStore} from '@/ee/pages/embedded/automation/components/automation-editor/stores/useAutomationEditorSidebarStore';
+import {fireEvent, render, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {beforeEach, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
+    createProjectMutate: vi.fn(),
+    createWorkflow: vi.fn(),
     navigate: vi.fn(),
     projectsQuery: vi.fn(),
+    useCreateAutomationProjectWorkflow: vi.fn(),
+    workflowFileInputClick: vi.fn(),
 }));
 
 vi.mock('react-router-dom', () => ({
@@ -43,7 +48,68 @@ vi.mock(
 );
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useAutomationProjectCategoriesQuery: () => ({data: {automationProjectCategories: []}}),
+    useAutomationProjectTagsQuery: () => ({data: {automationProjectTags: []}}),
     useAutomationProjectsQuery: () => hoisted.projectsQuery(),
+    useCreateAutomationProjectMutation: () => ({
+        mutate: (variables: unknown, options?: {onSuccess?: (data: {createAutomationProject: string}) => void}) => {
+            hoisted.createProjectMutate(variables);
+
+            options?.onSuccess?.({createAutomationProject: 'project-2'});
+        },
+    }),
+}));
+
+vi.mock('@/ee/pages/embedded/automation/hooks/useCreateAutomationProjectWorkflow', () => ({
+    useCreateAutomationProjectWorkflow: (props: unknown) => {
+        hoisted.useCreateAutomationProjectWorkflow(props);
+
+        return {
+            createWorkflow: hoisted.createWorkflow,
+            handleWorkflowFileChange: vi.fn(),
+            workflowFileInputRef: {
+                get current() {
+                    return {click: hoisted.workflowFileInputClick};
+                },
+                set current(_value) {},
+            },
+        };
+    },
+}));
+
+vi.mock('@/ee/pages/embedded/automations/components/automation-dialog/AutomationDialog', () => ({
+    default: ({onSubmit}: {onSubmit: (values: {description: string; label: string}) => void}) => (
+        <div>
+            <span>Workflow dialog</span>
+
+            <button onClick={() => onSubmit({description: '', label: 'New workflow'})} type="button">
+                Submit workflow
+            </button>
+        </div>
+    ),
+}));
+
+vi.mock('@/ee/pages/embedded/automations/components/automation-project-dialog/AutomationProjectDialog', () => ({
+    default: ({onSubmit}: {onSubmit: (values: Record<string, unknown>) => void}) => (
+        <div>
+            <span>Project dialog</span>
+
+            <button
+                onClick={() =>
+                    onSubmit({
+                        category: '',
+                        description: '',
+                        name: 'New project',
+                        permissionExpression: '',
+                        tags: [],
+                    })
+                }
+                type="button"
+            >
+                Submit project
+            </button>
+        </div>
+    ),
 }));
 
 const createWorkflowTemplate = (workflowUuid: string, label: string, lastModifiedDate: string) => ({
@@ -102,6 +168,10 @@ const getWorkflowLabels = () =>
 beforeEach(() => {
     vi.clearAllMocks();
 
+    windowResizeObserver();
+
+    useAutomationEditorSidebarStore.setState({leftSidebarOpen: false});
+
     hoisted.projectsQuery.mockReturnValue({
         data: {automationProjects: mockProjects},
         isLoading: false,
@@ -114,6 +184,35 @@ it('selects the project of the current workflow', () => {
     expect(screen.getByText('Selected:project-1')).toBeInTheDocument();
 });
 
+it('selects the new current project when the current workflow moves to another project', () => {
+    const {rerender} = renderLeftSidebar();
+
+    expect(screen.getByText('Selected:project-1')).toBeInTheDocument();
+
+    rerender(
+        <TooltipProvider>
+            <AutomationEditorLeftSidebar currentWorkflowId="workflow-3" />
+        </TooltipProvider>
+    );
+
+    expect(screen.getByText('Selected:project-2')).toBeInTheDocument();
+    expect(getWorkflowLabels()).toEqual(['Reporter']);
+});
+
+it('keeps the selected project when switching to another workflow of the same project', async () => {
+    const {rerender} = renderLeftSidebar();
+
+    await userEvent.click(screen.getByRole('button', {name: 'All projects'}));
+
+    rerender(
+        <TooltipProvider>
+            <AutomationEditorLeftSidebar currentWorkflowId="workflow-2" />
+        </TooltipProvider>
+    );
+
+    expect(screen.getByText('Selected:0')).toBeInTheDocument();
+});
+
 it("lists the current project's workflows, last edited first", () => {
     renderLeftSidebar();
 
@@ -121,11 +220,100 @@ it("lists the current project's workflows, last edited first", () => {
     expect(screen.queryByText('Reporter')).not.toBeInTheDocument();
 });
 
-it('no longer offers project or workflow creation in the sidebar', () => {
+it('creates a project from the New Project button and selects it', async () => {
     renderLeftSidebar();
 
-    expect(screen.queryByRole('button', {name: /new project/i})).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', {name: /new workflow/i})).not.toBeInTheDocument();
+    await userEvent.hover(screen.getByRole('button', {name: 'New Project'}));
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('New Project');
+
+    await userEvent.click(screen.getByRole('button', {name: 'New Project'}));
+    await userEvent.click(screen.getByRole('button', {name: 'Submit project'}));
+
+    expect(hoisted.createProjectMutate).toHaveBeenCalledWith(
+        expect.objectContaining({name: 'New project', permissionExpression: ''})
+    );
+    expect(screen.queryByText('Project dialog')).not.toBeInTheDocument();
+    expect(screen.getByText('Selected:project-2')).toBeInTheDocument();
+});
+
+it('creates a workflow in the current project from the New Workflow button', async () => {
+    renderLeftSidebar();
+
+    expect(hoisted.useCreateAutomationProjectWorkflow).toHaveBeenLastCalledWith(
+        expect.objectContaining({projectId: 'project-1'})
+    );
+
+    await userEvent.click(screen.getByRole('button', {name: 'New Workflow'}));
+    await userEvent.click(screen.getByRole('button', {name: 'Submit workflow'}));
+
+    expect(hoisted.createWorkflow).toHaveBeenCalledWith({description: '', label: 'New workflow'});
+    expect(screen.queryByText('Workflow dialog')).not.toBeInTheDocument();
+});
+
+it('creates workflows in the selected project', async () => {
+    renderLeftSidebar();
+
+    await userEvent.click(screen.getByRole('button', {name: 'Reporting project'}));
+
+    expect(hoisted.useCreateAutomationProjectWorkflow).toHaveBeenLastCalledWith(
+        expect.objectContaining({projectId: 'project-2'})
+    );
+});
+
+it('creates workflows in the current project when all projects are selected', async () => {
+    renderLeftSidebar();
+
+    await userEvent.click(screen.getByRole('button', {name: 'All projects'}));
+
+    expect(hoisted.useCreateAutomationProjectWorkflow).toHaveBeenLastCalledWith(
+        expect.objectContaining({projectId: 'project-1'})
+    );
+});
+
+it('imports a workflow from the workflow options menu', async () => {
+    renderLeftSidebar();
+
+    await userEvent.click(screen.getByRole('button', {name: 'More workflow options'}));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Import Workflow'}));
+
+    expect(hoisted.workflowFileInputClick).toHaveBeenCalledTimes(1);
+});
+
+it('focuses the search input once the open sidebar has loaded', async () => {
+    useAutomationEditorSidebarStore.setState({leftSidebarOpen: true});
+
+    renderLeftSidebar();
+
+    await waitFor(
+        () => {
+            expect(screen.getByRole('textbox')).toHaveFocus();
+        },
+        {interval: 5, timeout: 5000}
+    );
+});
+
+it('shows the version and status of each project when all projects are selected', async () => {
+    hoisted.projectsQuery.mockReturnValue({
+        data: {
+            automationProjects: [
+                {...mockProjects[0], lastPublishedVersion: 2, version: 2},
+                {...mockProjects[1], lastPublishedVersion: 1, version: 2},
+            ],
+        },
+        isLoading: false,
+    });
+
+    renderLeftSidebar();
+
+    await userEvent.click(screen.getByRole('button', {name: 'All projects'}));
+
+    const [mailingHeader, reportingHeader] = screen
+        .getAllByRole('heading')
+        .map((heading) => heading.parentElement!.textContent);
+
+    expect(mailingHeader).toBe('MailingV2PUBLISHED');
+    expect(reportingHeader).toBe('ReportingV2DRAFT');
 });
 
 it('lists the workflows of another selected project', async () => {
@@ -199,4 +387,5 @@ it('shows skeletons instead of the project select while the projects load', () =
 
     expect(screen.queryByTestId('project-select')).not.toBeInTheDocument();
     expect(screen.queryByText('No workflows found')).not.toBeInTheDocument();
+    expect(document.querySelectorAll('.rounded-full')).toHaveLength(4);
 });

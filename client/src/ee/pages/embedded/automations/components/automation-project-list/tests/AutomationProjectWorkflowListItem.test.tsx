@@ -2,8 +2,31 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import AutomationProjectWorkflowListItem from '@/ee/pages/embedded/automations/components/automation-project-list/AutomationProjectWorkflowListItem';
 import {resetAll, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen} from '@testing-library/react';
+import {act, render, screen} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+const mocks = vi.hoisted(() => ({
+    duplicateMutate: vi.fn(),
+    duplicateMutationOptions: undefined as {onSuccess?: () => void} | undefined,
+    invalidateQueries: vi.fn(),
+    toast: vi.fn(),
+}));
+
+vi.mock('sonner', () => ({toast: mocks.toast}));
+
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
+    useDuplicateAutomationProjectWorkflowMutation: (options?: {onSuccess?: () => void}) => {
+        mocks.duplicateMutationOptions = options;
+
+        return {isPending: false, mutate: mocks.duplicateMutate};
+    },
+}));
+
+vi.mock('@tanstack/react-query', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@tanstack/react-query')>()),
+    useQueryClient: () => ({invalidateQueries: mocks.invalidateQueries}),
+}));
 
 const handlers = {
     onDeleteWorkflow: vi.fn(),
@@ -36,7 +59,7 @@ const renderRow = () =>
 const openMenu = async () => {
     renderRow();
 
-    await userEvent.click(screen.getByRole('button', {name: 'Workflow Actions'}));
+    await userEvent.click(screen.getByRole('button', {name: 'Workflow actions for Mailer'}));
 };
 
 describe('AutomationProjectWorkflowListItem', () => {
@@ -80,22 +103,57 @@ describe('AutomationProjectWorkflowListItem', () => {
     });
 
     describe('menu', () => {
-        it('should render with the design-system DropdownMenu', async () => {
+        it('should render the shared workflow row menu with Edit, Duplicate, Export and Delete', async () => {
             await openMenu();
 
             expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
-            expect(screen.getByRole('menuitem', {name: 'Edit Workflow'})).toBeInTheDocument();
-            expect(screen.getByRole('menuitem', {name: 'Delete Workflow'})).toHaveClass(
-                'text-content-destructive-primary'
-            );
+            expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual([
+                'Edit',
+                'Duplicate',
+                'Export',
+                'Delete',
+            ]);
+            expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
         });
 
         it('should edit the workflow when Edit is clicked', async () => {
             await openMenu();
 
-            await userEvent.click(screen.getByRole('menuitem', {name: 'Edit Workflow'}));
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
 
             expect(handlers.onEditWorkflow).toHaveBeenCalledWith(workflow);
+            expect(handlers.onSelectWorkflow).not.toHaveBeenCalled();
+        });
+
+        it('should duplicate the workflow, refresh the projects and confirm it when Duplicate is clicked', async () => {
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Duplicate'}));
+
+            expect(mocks.duplicateMutate).toHaveBeenCalledWith({workflowUuid: 'wf-1'});
+
+            act(() => {
+                mocks.duplicateMutationOptions?.onSuccess?.();
+            });
+
+            expect(mocks.invalidateQueries).toHaveBeenCalledWith({queryKey: ['automationProjects']});
+            expect(mocks.toast).toHaveBeenCalledWith('Workflow duplicated successfully.');
+        });
+
+        it('should download the workflow when Export is clicked', async () => {
+            const originalLocation = window.location;
+
+            Object.defineProperty(window, 'location', {configurable: true, value: {href: ''}});
+
+            try {
+                await openMenu();
+
+                await userEvent.click(screen.getByRole('menuitem', {name: 'Export'}));
+
+                expect(window.location.href).toBe('/api/automation/internal/workflows/draft-wf-1/export');
+            } finally {
+                Object.defineProperty(window, 'location', {configurable: true, value: originalLocation});
+            }
         });
 
         it('does not offer an Executions action', async () => {
@@ -107,7 +165,7 @@ describe('AutomationProjectWorkflowListItem', () => {
         it('should delete the workflow when Delete is clicked', async () => {
             await openMenu();
 
-            await userEvent.click(screen.getByRole('menuitem', {name: 'Delete Workflow'}));
+            await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
 
             expect(handlers.onDeleteWorkflow).toHaveBeenCalledWith('wf-1');
         });

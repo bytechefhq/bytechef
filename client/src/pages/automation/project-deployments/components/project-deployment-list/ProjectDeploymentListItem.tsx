@@ -9,7 +9,7 @@ import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOp
 import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-deployments/stores/useProjectDeploymentsEnabledStore';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
-import {ProjectDeployment, Tag} from '@/shared/middleware/automation/configuration';
+import {ProjectDeployment, ProjectStatus, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentTagsMutation} from '@/shared/mutations/automation/projectDeploymentTags.mutations';
 import {
     useDeleteProjectDeploymentMutation,
@@ -17,6 +17,7 @@ import {
 } from '@/shared/mutations/automation/projectDeployments.mutations';
 import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
+import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useRef, useState} from 'react';
@@ -50,6 +51,11 @@ const ProjectDeploymentListItem = ({
     const {captureProjectDeploymentEnabled} = useAnalytics();
 
     const {openProject} = useOpenInProject();
+
+    const {data: projectVersions} = useGetProjectVersionsQuery(
+        projectDeployment.projectId!,
+        projectDeployment.projectId != null
+    );
 
     const queryClient = useQueryClient();
 
@@ -123,6 +129,13 @@ const ProjectDeploymentListItem = ({
     const isDeploymentSwitchDisabled =
         enableProjectDeploymentMutation.isPending || (enabledWorkflowCount < 1 && !projectDeployment.enabled);
 
+    const lastPublishedProjectVersion = (projectVersions ?? [])
+        .filter((projectVersion) => projectVersion.status === ProjectStatus.Published)
+        .reduce((lastVersion, projectVersion) => Math.max(lastVersion, projectVersion.version ?? 0), 0);
+
+    const newerVersionAvailable =
+        projectDeployment.projectVersion != null && lastPublishedProjectVersion > projectDeployment.projectVersion;
+
     const showOpenProject = !hideOpenInProject && projectDeployment.projectId != null;
 
     const handleOpenProjectClick = () => {
@@ -190,6 +203,8 @@ const ProjectDeploymentListItem = ({
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
+                        {newerVersionAvailable && <Badge label="Newer version available" styleType="warning-outline" />}
+
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Badge

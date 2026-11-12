@@ -132,6 +132,25 @@ const IntegrationInstanceConfigurationListItem = ({
         [integrationConfigurations, integrationInstanceConfiguration.id]
     );
 
+    const lastExecutionDate = useMemo(
+        () =>
+            (integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows ?? []).reduce<Date | undefined>(
+                (latestExecutionDate, integrationInstanceConfigurationWorkflow) => {
+                    const workflowLastExecutionDate = integrationInstanceConfigurationWorkflow.lastExecutionDate;
+
+                    if (!workflowLastExecutionDate) {
+                        return latestExecutionDate;
+                    }
+
+                    return !latestExecutionDate || workflowLastExecutionDate > latestExecutionDate
+                        ? workflowLastExecutionDate
+                        : latestExecutionDate;
+                },
+                undefined
+            ),
+        [integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows]
+    );
+
     const moveUsersDisabledReason = useMemo(() => {
         if (integrationConfigurationsError) {
             return CONFIGURATIONS_LOAD_FAILED_REASON;
@@ -280,9 +299,9 @@ const IntegrationInstanceConfigurationListItem = ({
 
                             <Tooltip>
                                 <TooltipTrigger className="flex min-h-6 items-center text-sm text-content-neutral-secondary">
-                                    {integrationInstanceConfiguration.lastModifiedDate ? (
+                                    {lastExecutionDate ? (
                                         <span className="text-xs">
-                                            {`Modified at ${integrationInstanceConfiguration.lastModifiedDate?.toLocaleDateString()} ${integrationInstanceConfiguration.lastModifiedDate?.toLocaleTimeString()}`}
+                                            {`Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`}
                                         </span>
                                     ) : (
                                         <span className="text-xs">No executions</span>

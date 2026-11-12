@@ -5,7 +5,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
@@ -31,7 +30,7 @@ import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automa
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChevronDownIcon, FolderIcon, LayoutTemplateIcon, UploadIcon} from 'lucide-react';
+import {ChevronDownIcon, FilterXIcon, FolderIcon, LayoutTemplateIcon, UploadIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -142,7 +141,7 @@ const Projects = () => {
                     <Header centerTitle position="main" title="Projects" />
                 ) : (
                     projects &&
-                    projects.length > 0 && (
+                    (projects.length > 0 || isFiltered) && (
                         <Header
                             centerTitle={true}
                             position="main"
@@ -227,7 +226,11 @@ const Projects = () => {
                         taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
                 ) : isFiltered ? (
-                    <EmptyFilterResult entityName="projects" entityTitle="Projects" />
+                    <EmptyState
+                        description="Try a different filter."
+                        icon={<FilterXIcon />}
+                        title="No matching projects"
+                    />
                 ) : (
                     <EmptyState
                         actions={

@@ -1,3 +1,4 @@
+import {DropdownMenu, DropdownMenuContent} from '@/components/DropdownMenu/DropdownMenu';
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ProjectTabButtons from '@/pages/automation/project/components/project-header/components/settings-menu/components/ProjectTabButtons/ProjectTabButtons';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
@@ -26,7 +27,6 @@ afterEach(() => {
 
 const mockProps = {
     importN8nWorkflowDisabled: false,
-    onCloseDropdownMenuClick: vi.fn(),
     onDeleteProjectClick: vi.fn(),
     onDuplicateProjectClick: vi.fn(),
     onImportN8nWorkflowClick: vi.fn(),
@@ -47,7 +47,11 @@ const renderProjectTabButtons = (props = mockProps) => {
         <MemoryRouter>
             <QueryClientProvider client={queryClient}>
                 <TooltipProvider>
-                    <ProjectTabButtons {...props} />
+                    <DropdownMenu open>
+                        <DropdownMenuContent>
+                            <ProjectTabButtons {...props} />
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </TooltipProvider>
             </QueryClientProvider>
         </MemoryRouter>
@@ -71,14 +75,14 @@ describe('ProjectTabButtons Export Functionality', () => {
     it('should render export button', () => {
         renderProjectTabButtons();
 
-        const exportButton = screen.getByText('Export');
+        const exportButton = screen.getByRole('menuitem', {name: 'Export'});
         expect(exportButton).toBeInTheDocument();
     });
 
     it('should have correct export URL when export button is clicked', async () => {
         renderProjectTabButtons();
 
-        const exportButton = screen.getByText('Export');
+        const exportButton = screen.getByRole('menuitem', {name: 'Export'});
         expect(exportButton).toBeInTheDocument();
 
         // Click the export button
@@ -96,72 +100,62 @@ describe('ProjectTabButtons Export Functionality', () => {
 
         renderProjectTabButtons(customProps);
 
-        const exportButton = screen.getByText('Export');
+        const exportButton = screen.getByRole('menuitem', {name: 'Export'});
         await userEvent.click(exportButton);
 
         expect(window.location.href).toBe('/api/automation/internal/projects/456/export');
     });
 
-    it('should call onCloseDropdownMenuClick when export button is clicked', async () => {
-        renderProjectTabButtons();
-
-        const exportButton = screen.getByText('Export');
-        await userEvent.click(exportButton);
-
-        // The handleButtonClick function should trigger onCloseDropdownMenuClick
-        expect(mockProps.onCloseDropdownMenuClick).toHaveBeenCalled();
-    });
-
     it('should render other action buttons correctly', () => {
         renderProjectTabButtons();
 
-        expect(screen.getByText('Edit')).toBeInTheDocument();
-        expect(screen.getByText('Duplicate')).toBeInTheDocument();
-        expect(screen.getByText('Export')).toBeInTheDocument();
-        expect(screen.getByText('Project History')).toBeInTheDocument();
-        expect(screen.getByText('Delete')).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Duplicate'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Export'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Project History'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
     });
 
     it('should call appropriate handlers when buttons are clicked', async () => {
         renderProjectTabButtons();
 
         // Test Edit button
-        await userEvent.click(screen.getByText('Edit'));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
         expect(mockProps.onShowEditProjectDialogClick).toHaveBeenCalled();
 
         // Test Duplicate button
-        await userEvent.click(screen.getByText('Duplicate'));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Duplicate'}));
         expect(mockProps.onDuplicateProjectClick).toHaveBeenCalled();
 
         // Test Project History button
-        await userEvent.click(screen.getByText('Project History'));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Project History'}));
         expect(mockProps.onShowProjectVersionHistorySheet).toHaveBeenCalled();
 
         // Test Delete button
-        await userEvent.click(screen.getByText('Delete'));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
         expect(mockProps.onDeleteProjectClick).toHaveBeenCalled();
     });
 
     it('should call the workflow creation handlers when their buttons are clicked', async () => {
         renderProjectTabButtons();
 
-        await userEvent.click(screen.getByText('New Workflow'));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'New Workflow'}));
         expect(mockProps.onNewWorkflowClick).toHaveBeenCalled();
 
-        await userEvent.click(screen.getByText('Workflow from Template'));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Workflow from Template'}));
         expect(mockProps.onNewWorkflowFromTemplateClick).toHaveBeenCalled();
 
-        await userEvent.click(screen.getByText('Import Workflow'));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Import Workflow'}));
         expect(mockProps.onImportWorkflowClick).toHaveBeenCalled();
 
-        await userEvent.click(screen.getByText('Import n8n Workflow'));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Import n8n Workflow'}));
         expect(mockProps.onImportN8nWorkflowClick).toHaveBeenCalled();
     });
 
     it('should disable Import n8n Workflow when no AI provider is enabled', () => {
         renderProjectTabButtons({...mockProps, importN8nWorkflowDisabled: true});
 
-        expect(screen.getByLabelText('Import n8n Workflow')).toBeDisabled();
+        expect(screen.getByRole('menuitem', {name: 'Import n8n Workflow'})).toHaveAttribute('aria-disabled', 'true');
     });
 
     it('should not show Git-related buttons when feature flag is disabled', () => {

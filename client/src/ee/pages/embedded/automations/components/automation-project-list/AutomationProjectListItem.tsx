@@ -11,20 +11,29 @@ import {
 } from '@/components/DropdownMenu/DropdownMenu';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ProjectListItemPublishMenuItem from '@/pages/automation/projects/components/project-list/ProjectListItemPublishMenuItem';
 import ListItemExpandButton from '@/shared/components/ListItemExpandButton';
 import TagList from '@/shared/components/TagList';
-import {AutomationProjectTagsQuery, AutomationProjectsQuery} from '@/shared/middleware/graphql';
 import {
+    AutomationProjectTagsQuery,
+    AutomationProjectsQuery,
+    useDeleteAutomationProjectMutation,
+    useDuplicateAutomationProjectMutation,
+} from '@/shared/middleware/graphql';
+import {useQueryClient} from '@tanstack/react-query';
+import {
+    CopyIcon,
     DownloadIcon,
     EditIcon,
     EllipsisVerticalIcon,
     PlusIcon,
-    SendIcon,
-    SettingsIcon,
+    Settings2Icon,
     Trash2Icon,
     UploadIcon,
+    WorkflowIcon,
 } from 'lucide-react';
 import {MouseEvent, useCallback, useMemo, useRef, useState} from 'react';
+import {toast} from 'sonner';
 import {twMerge} from 'tailwind-merge';
 
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
@@ -33,7 +42,6 @@ type EmbeddedTagType = AutomationProjectTagsQuery['automationProjectTags'][numbe
 interface AutomationProjectListItemProps {
     onCreateConfiguration: (project: AutomationProjectType) => void;
     onCreateWorkflow: (projectId: string) => void;
-    onDeleteProject: (projectId: string) => void;
     onEditProject: (project: AutomationProjectType) => void;
     onImportWorkflow: (projectId: string) => void;
     onPublishProject: (projectId: string) => void;
@@ -46,7 +54,6 @@ interface AutomationProjectListItemProps {
 const AutomationProjectListItem = ({
     onCreateConfiguration,
     onCreateWorkflow,
-    onDeleteProject,
     onEditProject,
     onImportWorkflow,
     onPublishProject,
@@ -58,6 +65,26 @@ const AutomationProjectListItem = ({
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
+
+    const queryClient = useQueryClient();
+
+    const deleteProjectMutation = useDeleteAutomationProjectMutation({
+        onSuccess: () => {
+            void queryClient.invalidateQueries({queryKey: ['automationProjectCategories']});
+            void queryClient.invalidateQueries({queryKey: ['automationProjectTags']});
+            void queryClient.invalidateQueries({queryKey: ['automationProjects']});
+
+            setShowDeleteDialog(false);
+        },
+    });
+
+    const duplicateProjectMutation = useDuplicateAutomationProjectMutation({
+        onSuccess: () => {
+            void queryClient.invalidateQueries({queryKey: ['automationProjects']});
+
+            toast('Project duplicated successfully.');
+        },
+    });
 
     const titleClassName = twMerge(
         'text-base font-semibold',
@@ -203,6 +230,8 @@ const AutomationProjectListItem = ({
                                     </Badge>
                                 ) : (
                                     <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
+                                        <span>V{project.version}</span>
+
                                         <span>DRAFT</span>
                                     </Badge>
                                 )}
@@ -243,11 +272,16 @@ const AutomationProjectListItem = ({
                                         onClick={() => onEditProject(project)}
                                     />
 
-                                    <DropdownMenuItem
-                                        aria-label="Publish Project"
-                                        icon={<SendIcon />}
-                                        label="Publish"
+                                    <ProjectListItemPublishMenuItem
+                                        hasWorkflows={project.workflowTemplates.length > 0}
                                         onClick={() => onPublishProject(project.id)}
+                                    />
+
+                                    <DropdownMenuItem
+                                        aria-label="Duplicate Project"
+                                        icon={<CopyIcon />}
+                                        label="Duplicate"
+                                        onClick={() => duplicateProjectMutation.mutate({id: project.id})}
                                     />
 
                                     <DropdownMenuItem
@@ -276,6 +310,15 @@ const AutomationProjectListItem = ({
                                         label="Import Workflow"
                                         onClick={() => onImportWorkflow(project.id)}
                                     />
+
+                                    {project.workflowTemplates.length > 0 && (
+                                        <DropdownMenuItem
+                                            aria-label="View Workflows"
+                                            icon={<WorkflowIcon />}
+                                            label="View Workflows"
+                                            onClick={() => onSelectWorkflow(project.workflowTemplates[0].workflowUuid)}
+                                        />
+                                    )}
                                 </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
@@ -287,7 +330,7 @@ const AutomationProjectListItem = ({
                                                 <DropdownMenuItem
                                                     aria-label="New Configuration"
                                                     disabled={!project.published}
-                                                    icon={<SettingsIcon />}
+                                                    icon={<Settings2Icon />}
                                                     label="New Configuration"
                                                     onClick={() => onCreateConfiguration(project)}
                                                 />
@@ -320,12 +363,11 @@ const AutomationProjectListItem = ({
             </div>
 
             <AlertDialog
+                ariaLabel="Confirm Project Deletion"
+                description="This action cannot be undone. This will permanently delete the project and the workflow templates it contains."
+                isPending={deleteProjectMutation.isPending}
                 onCancel={() => setShowDeleteDialog(false)}
-                onConfirm={() => {
-                    onDeleteProject(project.id);
-
-                    setShowDeleteDialog(false);
-                }}
+                onConfirm={() => deleteProjectMutation.mutate({id: project.id})}
                 open={showDeleteDialog}
             />
         </>

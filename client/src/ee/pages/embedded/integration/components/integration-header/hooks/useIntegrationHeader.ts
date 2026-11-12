@@ -1,7 +1,10 @@
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/ee/shared/mutations/embedded/integrations.mutations';
 import {IntegrationVersionKeys} from '@/ee/shared/queries/embedded/integrationVersions.queries';
-import {useGetIntegrationWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {
+    useGetIntegrationVersionWorkflowsQuery,
+    useGetIntegrationWorkflowsQuery,
+} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {
     IntegrationKeys,
     useGetIntegrationQuery,
@@ -9,13 +12,14 @@ import {
 } from '@/ee/shared/queries/embedded/integrations.queries';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {useQueryClient} from '@tanstack/react-query';
-import {RefObject, useCallback, useEffect, useState} from 'react';
+import {RefObject, useCallback, useEffect, useMemo, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -42,6 +46,7 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
                 showBottomPanel: state.showBottomPanel,
             }))
         );
+    const setCurrentNode = useWorkflowNodeDetailsPanelStore((state) => state.setCurrentNode);
 
     const {captureIntegrationPublished, captureIntegrationWorkflowTested} = useAnalytics();
     const navigate = useNavigate();
@@ -52,6 +57,15 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
     const {data: integrationWorkflows} = useGetIntegrationWorkflowsQuery(integrationId, !!integrationId);
 
     const {data: integrations} = useGetIntegrationsQuery();
+
+    const lastPublishedIntegrationVersion = (integration?.lastIntegrationVersion ?? 0) - 1;
+
+    const {data: lastPublishedIntegrationWorkflows} = useGetIntegrationVersionWorkflowsQuery(
+        integrationId,
+        lastPublishedIntegrationVersion,
+        false,
+        !!integrationId && !!integration?.lastPublishedDate && lastPublishedIntegrationVersion > 0
+    );
 
     const queryClient = useQueryClient();
 
@@ -96,28 +110,96 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
         },
     });
 
-    const handleIntegrationWorkflowValueChange = (integrationWorkflowId: number) => {
-        void navigate(
-            `/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowId}?${searchParams}`
-        );
-    };
-
-    const handleIntegrationValueChange = (selectedIntegrationId: number) => {
-        if (selectedIntegrationId === integrationId) {
-            return;
+    const hasUnpublishedChanges = useMemo(() => {
+        if (!integration?.lastPublishedDate) {
+            return true;
         }
 
-        const selectedIntegration = integrations?.find((integration) => integration.id === selectedIntegrationId);
-        const firstIntegrationWorkflowId = selectedIntegration?.integrationWorkflowIds?.[0];
-
-        if (firstIntegrationWorkflowId === undefined) {
-            return;
+        if ((integrationWorkflows ?? []).some((integrationWorkflow) => (integrationWorkflow.version ?? 1) > 1)) {
+            return true;
         }
 
-        void navigate(
-            `/embedded/integrations/${selectedIntegrationId}/integration-workflows/${firstIntegrationWorkflowId}?${searchParams}`
+        if (!integrationWorkflows || !lastPublishedIntegrationWorkflows) {
+            return false;
+        }
+
+        const publishedWorkflowUuids = new Set(
+            lastPublishedIntegrationWorkflows.map((publishedWorkflow) => publishedWorkflow.workflowUuid)
         );
-    };
+
+        return (
+            integrationWorkflows.length !== publishedWorkflowUuids.size ||
+            integrationWorkflows.some(
+                (integrationWorkflow) => !publishedWorkflowUuids.has(integrationWorkflow.workflowUuid)
+            )
+        );
+    }, [integration?.lastPublishedDate, integrationWorkflows, lastPublishedIntegrationWorkflows]);
+
+    const navigateToIntegrationWorkflow = useCallback(
+        (targetIntegrationId: number, integrationWorkflowId: number) => {
+            const newSearchParams = new URLSearchParams(searchParams.toString());
+
+            newSearchParams.delete('fromSubflow');
+            newSearchParams.delete('parentChain');
+            newSearchParams.delete('parentProjectWorkflowId');
+            newSearchParams.delete('restoreExecutionPanel');
+
+            if (useWorkflowEditorStore.getState().workflowIsRunning) {
+                void navigate(
+                    `/embedded/integrations/${targetIntegrationId}/integration-workflows/${integrationWorkflowId}?${newSearchParams}`
+                );
+
+                return;
+            }
+
+            setWorkflowTestExecution(undefined);
+            useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
+            setCurrentNode(undefined);
+
+            void navigate(
+                `/embedded/integrations/${targetIntegrationId}/integration-workflows/${integrationWorkflowId}?${newSearchParams}`
+            );
+
+            setShowBottomPanelOpen(false);
+
+            if (bottomResizablePanelRef.current) {
+                bottomResizablePanelRef.current.resize(0);
+            }
+        },
+        [
+            bottomResizablePanelRef,
+            navigate,
+            searchParams,
+            setCurrentNode,
+            setShowBottomPanelOpen,
+            setWorkflowTestExecution,
+        ]
+    );
+
+    const handleIntegrationWorkflowValueChange = useCallback(
+        (integrationWorkflowId: number) => navigateToIntegrationWorkflow(integrationId, integrationWorkflowId),
+        [integrationId, navigateToIntegrationWorkflow]
+    );
+
+    const handleIntegrationValueChange = useCallback(
+        (selectedIntegrationId: number) => {
+            if (selectedIntegrationId === integrationId) {
+                return;
+            }
+
+            const selectedIntegration = integrations?.find(
+                (workspaceIntegration) => workspaceIntegration.id === selectedIntegrationId
+            );
+            const firstIntegrationWorkflowId = selectedIntegration?.integrationWorkflowIds?.[0];
+
+            if (firstIntegrationWorkflowId === undefined) {
+                return;
+            }
+
+            navigateToIntegrationWorkflow(selectedIntegrationId, firstIntegrationWorkflowId);
+        },
+        [integrationId, integrations, navigateToIntegrationWorkflow]
+    );
 
     const handlePublishIntegrationSubmit = ({
         description,
@@ -248,6 +330,7 @@ export const useIntegrationHeader = ({bottomResizablePanelRef, integrationId}: U
         handleRunClick,
         handleShowOutputClick,
         handleStopClick,
+        hasUnpublishedChanges,
         integration,
         integrationWorkflows,
         integrations,

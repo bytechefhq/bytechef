@@ -1,8 +1,7 @@
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/components/DropdownMenu/DropdownMenu';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import LoadWorkflowVersionDialog from '@/pages/automation/project/components/LoadWorkflowVersionDialog';
 import {ProjectShareDialog} from '@/pages/automation/project/components/ProjectShareDialog';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
@@ -50,7 +49,6 @@ const SettingsMenu = ({
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
-    const [showLoadWorkflowVersionDialog, setShowLoadWorkflowVersionDialog] = useState(false);
     const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
     const [showProjectShareDialog, setShowProjectShareDialog] = useState(false);
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
@@ -119,7 +117,7 @@ const SettingsMenu = ({
                     <TooltipContent>Project and workflow settings</TooltipContent>
                 </Tooltip>
 
-                <DropdownMenuContent align="end" className="p-0">
+                <DropdownMenuContent align="end">
                     <Tabs aria-label="Settings menu" defaultValue="workflow">
                         <TabsList className="rounded-none">
                             <TabsTrigger
@@ -141,12 +139,10 @@ const SettingsMenu = ({
 
                         <TabsContent className="mt-0" value="workflow">
                             <WorkflowTabButtons
-                                onCloseDropdownMenu={() => setOpenDropdownMenu(false)}
                                 onDuplicateWorkflow={handleDuplicateWorkflowClick}
                                 onShareWorkflow={() => setShowWorkflowShareDialog(true)}
                                 onShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
                                 onShowEditWorkflowDialog={() => setShowEditWorkflowDialog(true)}
-                                onShowLoadWorkflowVersionDialog={() => setShowLoadWorkflowVersionDialog(true)}
                                 workflowId={workflow.id!}
                             />
                         </TabsContent>
@@ -154,7 +150,6 @@ const SettingsMenu = ({
                         <TabsContent className="mt-0" value="project">
                             <ProjectTabButtons
                                 importN8nWorkflowDisabled={importN8nWorkflowDisabled}
-                                onCloseDropdownMenuClick={() => setOpenDropdownMenu(false)}
                                 onDeleteProjectClick={() => setShowDeleteProjectAlertDialog(true)}
                                 onDuplicateProjectClick={handleDuplicateProjectClick}
                                 onImportN8nWorkflowClick={() => n8nWorkflowFileInputRef.current?.click()}
@@ -234,14 +229,6 @@ const SettingsMenu = ({
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}
-                />
-            )}
-
-            {showLoadWorkflowVersionDialog && workflow.workflowUuid && (
-                <LoadWorkflowVersionDialog
-                    onClose={() => setShowLoadWorkflowVersionDialog(false)}
-                    projectId={project.id!}
-                    workflowUuid={workflow.workflowUuid}
                 />
             )}
 

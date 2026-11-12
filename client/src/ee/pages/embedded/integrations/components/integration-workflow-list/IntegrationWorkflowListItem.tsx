@@ -184,6 +184,7 @@ const IntegrationWorkflowListItem = ({
                         setIsPermissionExpressionSeeded(false);
                         setShowEditDialog(true);
                     }}
+                    workflowLabel={workflow.label}
                 />
             </div>
 

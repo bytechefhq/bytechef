@@ -6,8 +6,6 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {afterEach, expect, it, vi} from 'vitest';
 
-screen.debug();
-
 const mockProject = {
     id: 1,
     name: 'Test Project',
@@ -76,12 +74,48 @@ it('should open the settings dropdown menu on click of a settings button', async
     await userEvent.click(screen.getByLabelText('Settings'));
 
     await waitFor(() => {
-        expect(screen.getByText('Edit')).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
 
         expect(screen.getByLabelText('Workflow tab')).toBeInTheDocument();
 
         expect(screen.getByLabelText('Project tab')).toBeInTheDocument();
     });
+});
+
+it('should move focus through the Workflow tab menu items with the arrow keys', async () => {
+    renderSettingsMenu();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+
+    await userEvent.keyboard('{ArrowDown}');
+
+    expect(screen.getByRole('menuitem', {name: 'Edit'})).toHaveFocus();
+
+    await userEvent.keyboard('{ArrowDown}');
+
+    expect(screen.getByRole('menuitem', {name: 'Duplicate'})).toHaveFocus();
+});
+
+it('should list the Project tab menu items in order with Delete styled as destructive', async () => {
+    renderSettingsMenu();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+
+    await userEvent.click(screen.getByLabelText('Project tab'));
+
+    expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual([
+        'Edit',
+        'Duplicate',
+        'Share',
+        'Export',
+        'New Workflow',
+        'Workflow from Template',
+        'Import Workflow',
+        'Import n8n Workflow',
+        'Project History',
+        'Delete',
+    ]);
+    expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
 });
 
 it('should open project tab on click', async () => {
@@ -91,12 +125,12 @@ it('should open project tab on click', async () => {
 
     await userEvent.click(screen.getByLabelText('Settings'));
 
-    expect(screen.queryByText('Project History')).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', {name: 'Project History'})).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByLabelText('Project tab'));
 
     await waitFor(() => {
-        expect(screen.getByText('Project History')).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Project History'})).toBeInTheDocument();
     });
 });
 
@@ -109,7 +143,7 @@ it('should close the dropdown on click of a button inside the Workflow tab', asy
 
     expect(screen.getByLabelText('Workflow tab')).toBeInTheDocument();
 
-    await userEvent.click(screen.getByText('Export'));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Export'}));
 
     await waitFor(() => {
         expect(screen.queryByLabelText('Workflow tab')).not.toBeInTheDocument();
@@ -127,7 +161,7 @@ it('should close the dropdown on click of a button inside the Project tab', asyn
 
     await userEvent.click(screen.getByLabelText('Project tab'));
 
-    await userEvent.click(screen.getByText('Project History'));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Project History'}));
 
     await waitFor(() => {
         expect(screen.queryByLabelText('Project tab')).not.toBeInTheDocument();
@@ -139,7 +173,7 @@ it('should close the delete workflow dialog without deleting when cancelled', as
 
     await userEvent.click(screen.getByLabelText('Settings'));
 
-    await userEvent.click(screen.getByRole('button', {name: 'Delete'}));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
 
     expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(
         'This action cannot be undone. This will permanently delete the workflow.'
@@ -159,7 +193,7 @@ it('should close the delete project dialog without deleting when cancelled', asy
 
     await userEvent.click(screen.getByLabelText('Project tab'));
 
-    await userEvent.click(screen.getByRole('button', {name: 'Delete Project'}));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
 
     expect(screen.getByRole('button', {name: 'Confirm Project Deletion'})).toBeInTheDocument();
 
@@ -177,7 +211,7 @@ it('should open the create workflow dialog from the Project tab', async () => {
 
     await userEvent.click(screen.getByLabelText('Project tab'));
 
-    await userEvent.click(screen.getByRole('button', {name: 'New Workflow'}));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'New Workflow'}));
 
     expect(await screen.findByRole('dialog', {name: 'Create Workflow'})).toBeInTheDocument();
 });
@@ -189,7 +223,7 @@ it('should open the project templates page from the Project tab', async () => {
 
     await userEvent.click(screen.getByLabelText('Project tab'));
 
-    await userEvent.click(screen.getByRole('button', {name: 'New Workflow from Template'}));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Workflow from Template'}));
 
     expect(await screen.findByText('Project templates')).toBeInTheDocument();
 });
@@ -203,7 +237,7 @@ it('should open the workflow file picker from the Project tab', async () => {
 
     await userEvent.click(screen.getByLabelText('Project tab'));
 
-    await userEvent.click(screen.getByRole('button', {name: 'Import Workflow'}));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Import Workflow'}));
 
     expect(inputClickSpy).toHaveBeenCalledTimes(1);
     expect((inputClickSpy.mock.contexts[0] as HTMLInputElement).accept).toBe('.json,.yaml,.yml');

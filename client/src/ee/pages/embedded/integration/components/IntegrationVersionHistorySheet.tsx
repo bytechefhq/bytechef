@@ -1,102 +1,108 @@
-import Badge from '@/components/Badge/Badge';
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
+import AlertDialog from '@/components/AlertDialog';
+import Button from '@/components/Button/Button';
+import LoadingIcon from '@/components/LoadingIcon';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
-import {IntegrationStatus, IntegrationVersion} from '@/ee/shared/middleware/embedded/configuration';
+import {IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
-import {VisuallyHidden} from 'radix-ui';
+import VersionHistoryTimeline from '@/shared/components/version-history/VersionHistoryTimeline';
+import {CheckIcon, HistoryIcon} from 'lucide-react';
 import {useState} from 'react';
 
 import IntegrationVersionWorkflowChanges from './IntegrationVersionWorkflowChanges';
 
 interface IntegrationVersionHistorySheetProps {
+    integrationId: number;
     onClose: () => void;
-    integrationId: number;
+    onRestoreIntegrationVersion: (integrationVersion: number, onSuccess: () => void) => void;
+    restoreIntegrationVersionPending?: boolean;
 }
 
-interface IntegrationVersionAccordionProps {
-    integrationId: number;
-    integrationVersions: IntegrationVersion[];
-}
+const IntegrationVersionHistorySheet = ({
+    integrationId,
+    onClose,
+    onRestoreIntegrationVersion,
+    restoreIntegrationVersionPending,
+}: IntegrationVersionHistorySheetProps) => {
+    const [restoreConfirmationOpen, setRestoreConfirmationOpen] = useState(false);
+    const [selectedVersion, setSelectedVersion] = useState<number | undefined>();
 
-const IntegrationVersionAccordion = ({integrationId, integrationVersions}: IntegrationVersionAccordionProps) => {
-    const [openValues, setOpenValues] = useState<string[]>(
-        integrationVersions.length > 1 ? [integrationVersions[1]!.version!.toString()] : []
-    );
-
-    return (
-        <Accordion onValueChange={setOpenValues} type="multiple" value={openValues}>
-            {integrationVersions.map((integrationVersion) => (
-                <AccordionItem key={integrationVersion.version} value={integrationVersion.version?.toString() || ''}>
-                    <AccordionTrigger>
-                        <div className="flex w-full items-center justify-between pr-2">
-                            <span className="text-sm font-semibold">{`V${integrationVersion.version}`}</span>
-
-                            <div className="flex items-center space-x-4">
-                                {integrationVersion.publishedDate && (
-                                    <span className="text-sm">
-                                        {`${integrationVersion.publishedDate?.toLocaleDateString()} ${integrationVersion.publishedDate?.toLocaleTimeString()}`}
-                                    </span>
-                                )}
-
-                                <Badge
-                                    className="border-transparent"
-                                    label={integrationVersion.status ?? ''}
-                                    styleType={
-                                        integrationVersion.status === IntegrationStatus.Published
-                                            ? 'success-outline'
-                                            : 'secondary-filled'
-                                    }
-                                    weight="semibold"
-                                />
-                            </div>
-                        </div>
-                    </AccordionTrigger>
-
-                    <AccordionContent className="text-muted-foreground">
-                        <p>{integrationVersion.description ? integrationVersion.description : 'No description.'}</p>
-
-                        <IntegrationVersionWorkflowChanges
-                            draft={integrationVersion.status === IntegrationStatus.Draft}
-                            expanded={openValues.includes(integrationVersion.version?.toString() || '')}
-                            integrationId={integrationId}
-                            integrationVersion={integrationVersion.version!}
-                        />
-                    </AccordionContent>
-                </AccordionItem>
-            ))}
-        </Accordion>
-    );
-};
-
-const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVersionHistorySheetProps) => {
     const {data: integrationVersions} = useGetIntegrationVersionsQuery(integrationId);
+
+    const handleRestoreConfirm = () => {
+        if (selectedVersion === undefined) {
+            return;
+        }
+
+        onRestoreIntegrationVersion(selectedVersion, () => {
+            setRestoreConfirmationOpen(false);
+
+            onClose();
+        });
+    };
 
     return (
         <Sheet onOpenChange={() => onClose()} open>
-            <VisuallyHidden.Root>
-                <SheetTitle>Integration Version History</SheetTitle>
-            </VisuallyHidden.Root>
-
             <SheetContent
                 className="top-3 right-4 bottom-4 flex h-auto flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-workflow-sidebar-project-version-history-sheet-width"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
                 <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
-                    <span className="text-lg font-semibold">Integration Version History</span>
+                    <div className="flex items-center gap-x-2">
+                        <HistoryIcon className="size-5" />
+
+                        <SheetTitle className="text-lg font-semibold">Integration Version History</SheetTitle>
+                    </div>
 
                     <SheetCloseButton />
                 </header>
 
-                <div className="m-3 flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg bg-surface-neutral-primary p-3">
-                    {integrationVersions && (
-                        <IntegrationVersionAccordion
-                            integrationId={integrationId}
-                            integrationVersions={integrationVersions}
-                        />
-                    )}
-                </div>
+                {integrationVersions && (
+                    <VersionHistoryTimeline
+                        ariaLabel="Integration versions"
+                        items={integrationVersions.map((integrationVersion) => ({
+                            description: integrationVersion.description,
+                            published: integrationVersion.status === IntegrationStatus.Published,
+                            publishedDate: integrationVersion.publishedDate,
+                            version: integrationVersion.version!,
+                        }))}
+                        onSelectVersion={setSelectedVersion}
+                        renderChanges={({published, version}) => (
+                            <IntegrationVersionWorkflowChanges
+                                draft={!published}
+                                expanded
+                                integrationId={integrationId}
+                                integrationVersion={version}
+                            />
+                        )}
+                        selectedVersion={selectedVersion}
+                    />
+                )}
+
+                <footer className="mt-auto flex shrink-0 justify-end gap-x-2 rounded-b-md border-t border-t-border/50 bg-surface-neutral-primary p-3">
+                    <Button label="Cancel" onClick={() => onClose()} variant="outline" />
+
+                    <Button
+                        disabled={selectedVersion === undefined || restoreIntegrationVersionPending}
+                        icon={restoreIntegrationVersionPending ? <LoadingIcon /> : <CheckIcon />}
+                        label="Apply selected version"
+                        onClick={() => setRestoreConfirmationOpen(true)}
+                    />
+                </footer>
             </SheetContent>
+
+            {restoreConfirmationOpen && selectedVersion !== undefined && (
+                <AlertDialog
+                    confirmButtonVariant="default"
+                    confirmLabel="Apply"
+                    description={`The current draft will be replaced by the workflows of version V${selectedVersion}. Unpublished changes in the draft will be lost.`}
+                    isPending={restoreIntegrationVersionPending}
+                    onCancel={() => setRestoreConfirmationOpen(false)}
+                    onConfirm={handleRestoreConfirm}
+                    open
+                    title={`Apply version V${selectedVersion}?`}
+                />
+            )}
         </Sheet>
     );
 };

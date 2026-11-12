@@ -17,7 +17,7 @@ import {
     useEnableAutomationProjectConfigurationWorkflowMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon, PencilIcon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -178,7 +178,7 @@ const AutomationProjectConfigurationWorkflowListItem = ({
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem
                             aria-label="Edit"
-                            icon={<PencilIcon />}
+                            icon={<EditIcon />}
                             label="Edit"
                             onClick={() => setShowProvidedValuesDialog(true)}
                         />

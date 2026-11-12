@@ -224,7 +224,7 @@ describe('AutomationProjectConfigurationDialog', () => {
                 </TooltipProvider>
             );
 
-            expect(screen.getByText('New Project Configuration')).toBeInTheDocument();
+            expect(screen.getByText('New Configuration')).toBeInTheDocument();
             expect(screen.getAllByText('Run a published project version for connected users.').length).toBeGreaterThan(
                 0
             );
@@ -268,6 +268,46 @@ describe('AutomationProjectConfigurationDialog', () => {
             expect(mocks.createMutateAsync).toHaveBeenCalledWith(expectedCreateVariables);
             expect(mocks.enableWorkflowMutateAsync).not.toHaveBeenCalled();
             expect(mocks.updateWorkflowMutateAsync).not.toHaveBeenCalled();
+        });
+
+        it('reports the created configuration once it is saved', async () => {
+            const user = userEvent.setup();
+
+            const onSuccess = vi.fn();
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog onClose={vi.fn()} onSuccess={onSuccess} project={project} />
+                </TooltipProvider>
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(onSuccess).toHaveBeenCalledWith('configuration-9'));
+
+            expect(onSuccess).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not report a configuration whose workflow settings failed to save', async () => {
+            const user = userEvent.setup();
+
+            const onSuccess = vi.fn();
+
+            mocks.enableWorkflowMutateAsync.mockRejectedValueOnce(new Error('failed'));
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog onClose={vi.fn()} onSuccess={onSuccess} project={project} />
+                </TooltipProvider>
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+            await user.click(await screen.findByRole('switch', {name: 'Send Digest'}));
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            expect(await screen.findByRole('alert')).toBeInTheDocument();
+            expect(onSuccess).not.toHaveBeenCalled();
         });
 
         it('creates a configuration with the chosen version', async () => {
@@ -573,7 +613,7 @@ describe('AutomationProjectConfigurationDialog', () => {
                 </TooltipProvider>
             );
 
-            expect(screen.getByText('Edit Project Configuration')).toBeInTheDocument();
+            expect(screen.getByText('Edit Configuration')).toBeInTheDocument();
             expect(screen.getByText('Staging')).toBeInTheDocument();
             expect(screen.getByLabelText(/^Name/)).toHaveValue('PRODUCTION');
             expect(screen.getByRole('combobox', {name: 'Project'})).toBeDisabled();
@@ -673,7 +713,7 @@ describe('AutomationProjectConfigurationDialog', () => {
                 </TooltipProvider>
             );
 
-            expect(screen.getByText('Upgrade Project Version')).toBeInTheDocument();
+            expect(screen.getByText('Change Project Version')).toBeInTheDocument();
             expect(screen.getByText('Staging')).toBeInTheDocument();
             expect(screen.getByRole('combobox', {name: 'Version'})).toHaveTextContent('V3');
             expect(screen.queryByRole('switch', {name: 'Show in Automation Hub'})).not.toBeInTheDocument();
@@ -826,6 +866,131 @@ describe('AutomationProjectConfigurationDialog', () => {
                 {id: 'configuration-1', projectVersion: 1},
                 {enabled: true}
             );
+        });
+    });
+    describe('tabs', () => {
+        const otherConfiguration = {
+            ...existingConfiguration,
+            automationHubVisible: false,
+            id: 'configuration-2',
+            name: 'BETA',
+            permissionExpression: 'plan == beta',
+            projectVersion: 1,
+        };
+
+        it('shows no tabs without showTabs', () => {
+            mocks.configurations.current = [existingConfiguration];
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog onClose={vi.fn()} project={project} />
+                </TooltipProvider>
+            );
+
+            expect(screen.queryByRole('tab', {name: 'Change Version'})).not.toBeInTheDocument();
+        });
+
+        it('opens on the New tab when the project has no configurations in the environment', () => {
+            mocks.configurations.current = [{...existingConfiguration, environmentId: '1'}];
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog onClose={vi.fn()} project={project} showTabs />
+                </TooltipProvider>
+            );
+
+            expect(screen.getByRole('tab', {name: 'New', selected: true})).toBeInTheDocument();
+            expect(screen.getAllByText('New Configuration').length).toBeGreaterThan(0);
+            expect(screen.getByRole('combobox', {name: 'Project'})).toBeDisabled();
+            expect(screen.getByRole('combobox', {name: 'Version'})).toHaveTextContent(/^V3$/);
+        });
+
+        it('opens on Change Version and blocks saving until a configuration is picked', () => {
+            mocks.configurations.current = [existingConfiguration, otherConfiguration];
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog onClose={vi.fn()} project={project} showTabs />
+                </TooltipProvider>
+            );
+
+            expect(screen.getByRole('tab', {name: 'Change Version', selected: true})).toBeInTheDocument();
+            expect(screen.getAllByText('Change Project Version').length).toBeGreaterThan(0);
+            expect(screen.queryByRole('combobox', {name: 'Version'})).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+        });
+
+        it('shows a message instead of a configuration select when Change Version has nothing to change', async () => {
+            const user = userEvent.setup();
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog onClose={vi.fn()} project={project} showTabs />
+                </TooltipProvider>
+            );
+
+            await user.click(screen.getByRole('tab', {name: 'Change Version'}));
+
+            expect(screen.getByText('No configurations for this project yet')).toBeInTheDocument();
+            expect(screen.queryByRole('combobox', {name: 'Configuration'})).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+        });
+
+        it('updates the version of the picked configuration, keeping its other settings', async () => {
+            const user = userEvent.setup();
+
+            const onClose = vi.fn();
+
+            mocks.configurations.current = [existingConfiguration, otherConfiguration];
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog onClose={onClose} project={project} showTabs />
+                </TooltipProvider>
+            );
+
+            await user.click(screen.getByRole('combobox', {name: 'Configuration'}));
+            await user.click(await screen.findByRole('option', {name: 'BETA - V1'}));
+
+            expect(screen.getByRole('combobox', {name: 'Version'})).toHaveTextContent(/^V3$/);
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+
+            expect(mocks.updateMutateAsync).toHaveBeenCalledWith({
+                automationHubVisible: false,
+                enabled: true,
+                id: 'configuration-2',
+                name: 'BETA',
+                permissionExpression: 'plan == beta',
+                projectVersion: 3,
+            });
+            expect(mocks.createMutateAsync).not.toHaveBeenCalled();
+        });
+
+        it('picks the only configuration and creates a new one again from the New tab', async () => {
+            const user = userEvent.setup();
+
+            mocks.configurations.current = [existingConfiguration];
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog onClose={vi.fn()} project={project} showTabs />
+                </TooltipProvider>
+            );
+
+            expect(screen.getByRole('combobox', {name: 'Configuration'})).toHaveTextContent('PRODUCTION - V3');
+
+            await user.click(screen.getByRole('tab', {name: 'New'}));
+
+            expect(screen.getAllByText('New Configuration').length).toBeGreaterThan(0);
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(mocks.createMutateAsync).toHaveBeenCalledTimes(1));
+
+            expect(mocks.updateMutateAsync).not.toHaveBeenCalled();
         });
     });
 });

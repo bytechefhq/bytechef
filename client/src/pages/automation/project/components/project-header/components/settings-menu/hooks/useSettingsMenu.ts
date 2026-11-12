@@ -52,10 +52,16 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
     });
 
     const duplicateProjectMutation = useDuplicateProjectMutation({
-        onSuccess: () => {
+        onSuccess: (duplicatedProject) => {
             void queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
 
-            void navigate(`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`);
+            const duplicatedProjectFirstWorkflowId = duplicatedProject.projectWorkflowIds?.[0];
+
+            void navigate(
+                duplicatedProjectFirstWorkflowId
+                    ? `/automation/projects/${duplicatedProject.id}/project-workflows/${duplicatedProjectFirstWorkflowId}?${searchParams}`
+                    : '/automation/projects'
+            );
 
             toast('Project duplicated successfully.');
         },
@@ -117,6 +123,10 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
                 );
 
                 queryClient.removeQueries({
+                    queryKey: ProjectWorkflowKeys.projectWorkflow(id, currentProjectWorkflowId),
+                });
+            } else if (currentProjectWorkflowId) {
+                void queryClient.invalidateQueries({
                     queryKey: ProjectWorkflowKeys.projectWorkflow(id, currentProjectWorkflowId),
                 });
             }

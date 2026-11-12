@@ -1,9 +1,10 @@
 import Button from '@/components/Button/Button';
-import EmptyList from '@/components/EmptyList';
+import EmptyState from '@/components/EmptyState/EmptyState';
 import PageLoader from '@/components/PageLoader';
 import AutomationExecutionsSheet from '@/ee/pages/embedded/automations/components/automation-executions-sheet/AutomationExecutionsSheet';
 import AutomationProjectConfigurationDialog from '@/ee/pages/embedded/automations/components/automation-project-configuration-dialog/AutomationProjectConfigurationDialog';
 import AutomationProjectConfigurationList from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/AutomationProjectConfigurationList';
+import {getEnvironmentName} from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/automationProjectConfigurationList-utils';
 import useOpenInEmbeddedEditor from '@/ee/pages/embedded/shared/useOpenInEmbeddedEditor';
 import ListGroupHeader from '@/shared/components/ListGroupHeader';
 import OpenInButton from '@/shared/components/OpenInButton';
@@ -18,7 +19,7 @@ import {
     useAutomationProjectsQuery,
 } from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {FolderIcon, SlidersHorizontalIcon} from 'lucide-react';
+import {FolderIcon, SendIcon, Settings2Icon} from 'lucide-react';
 import {useCallback, useMemo, useState} from 'react';
 import {flushSync} from 'react-dom';
 import {useNavigate, useSearchParams} from 'react-router-dom';
@@ -76,7 +77,7 @@ const AutomationConfigurations = () => {
     const isFirstRun = !projectsIsLoading && !projectId && configuredProjects.length === 0;
 
     const newConfigurationButton = (
-        <Button label="New Project Configuration" onClick={() => setConfigurationDialog({project: selectedProject})} />
+        <Button label="New Configuration" onClick={() => setConfigurationDialog({project: selectedProject})} />
     );
 
     const handleCreateConfiguration = useCallback(() => setConfigurationDialog({}), []);
@@ -154,16 +155,16 @@ const AutomationConfigurations = () => {
                         ))}
                     </div>
                 ) : selectedProject ? (
-                    <EmptyList
-                        button={newConfigurationButton}
-                        icon={<SlidersHorizontalIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message={`${selectedProject.name} has no configurations in this environment.`}
-                        title="No Matching Configurations"
+                    <EmptyState
+                        actions={newConfigurationButton}
+                        description={`${selectedProject.name} has no configurations in this environment.`}
+                        icon={<Settings2Icon />}
+                        title={`No configurations in ${getEnvironmentName(currentEnvironmentId)}`}
                     />
                 ) : projectId ? (
-                    <EmptyList
-                        icon={<SlidersHorizontalIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="The selected project is not published."
+                    <EmptyState
+                        description="The selected project is not published."
+                        icon={<SendIcon />}
                         title="No Matching Project"
                     />
                 ) : (

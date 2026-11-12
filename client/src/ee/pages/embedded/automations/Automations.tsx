@@ -1,5 +1,4 @@
 import Button from '@/components/Button/Button';
-import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
@@ -15,15 +14,13 @@ import {
     useAutomationProjectsQuery,
     useCreateAutomationProjectMutation,
     useCreateAutomationProjectWorkflowMutation,
-    useDeleteAutomationProjectMutation,
     useDeleteAutomationProjectWorkflowMutation,
-    usePublishAutomationProjectMutation,
     useUpdateAutomationProjectMutation,
     useUpdateAutomationProjectWorkflowMutation,
     useUpdateAutomationProjectWorkflowPermissionExpressionMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {FolderIcon} from 'lucide-react';
+import {FilterXIcon, FolderIcon} from 'lucide-react';
 import {ChangeEvent, useRef, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
@@ -106,9 +103,7 @@ const Automations = () => {
 
     const createProjectMutation = useCreateAutomationProjectMutation();
     const createWorkflowMutation = useCreateAutomationProjectWorkflowMutation();
-    const deleteProjectMutation = useDeleteAutomationProjectMutation();
     const deleteWorkflowMutation = useDeleteAutomationProjectWorkflowMutation();
-    const publishProjectMutation = usePublishAutomationProjectMutation();
     const updateProjectMutation = useUpdateAutomationProjectMutation();
     const updateWorkflowMutation = useUpdateAutomationProjectWorkflowMutation();
     const updateWorkflowPermissionExpressionMutation = useUpdateAutomationProjectWorkflowPermissionExpressionMutation();
@@ -270,16 +265,8 @@ const Automations = () => {
         );
     };
 
-    const handleDeleteProject = (projectId: string) => {
-        deleteProjectMutation.mutate({id: projectId}, {onSuccess: invalidateProjects});
-    };
-
     const handleDeleteWorkflow = (workflowUuid: string) => {
         deleteWorkflowMutation.mutate({workflowUuid}, {onSuccess: invalidateProjects});
-    };
-
-    const handlePublishProject = (projectId: string) => {
-        publishProjectMutation.mutate({id: projectId}, {onSuccess: invalidateProjects});
     };
 
     const handleEditProject = (project: AutomationProjectType) => {
@@ -346,22 +333,20 @@ const Automations = () => {
                     <AutomationProjectList
                         newlyCreatedProjectId={newlyCreatedProjectId}
                         onCreateWorkflow={handleCreateWorkflow}
-                        onDeleteProject={handleDeleteProject}
                         onDeleteWorkflow={handleDeleteWorkflow}
                         onEditProject={handleEditProject}
                         onEditWorkflow={handleEditWorkflow}
                         onImportWorkflow={handleImportWorkflow}
-                        onPublishProject={handlePublishProject}
                         onSelectWorkflow={openWorkflowEditor}
                         onUpdateTags={handleUpdateTags}
                         projects={filteredProjects}
                         tags={tags || []}
                     />
                 ) : hasActiveFilter ? (
-                    <EmptyList
-                        icon={<FolderIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="No projects match the selected filter."
-                        title="No Matching Projects"
+                    <EmptyState
+                        description="Try a different filter."
+                        icon={<FilterXIcon />}
+                        title="No matching projects"
                     />
                 ) : (
                     <EmptyState

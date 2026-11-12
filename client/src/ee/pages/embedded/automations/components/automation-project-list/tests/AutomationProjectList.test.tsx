@@ -46,12 +46,10 @@ const renderList = (projectOverrides: Partial<AutomationProjectType> = {}) =>
                 <AutomationProjectList
                     newlyCreatedProjectId="project-1"
                     onCreateWorkflow={vi.fn()}
-                    onDeleteProject={vi.fn()}
                     onDeleteWorkflow={vi.fn()}
                     onEditProject={vi.fn()}
                     onEditWorkflow={vi.fn()}
                     onImportWorkflow={vi.fn()}
-                    onPublishProject={vi.fn()}
                     onSelectWorkflow={vi.fn()}
                     onUpdateTags={vi.fn()}
                     projects={[{...project, ...projectOverrides}]}
@@ -82,13 +80,13 @@ describe('AutomationProjectList', () => {
 
         expect(await screen.findByText('No Workflows')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Create Workflow'})).toHaveTextContent('Create Workflow');
-        expect(screen.queryByRole('button', {name: 'More Workflow Creation Actions'})).not.toBeInTheDocument();
+        expect(screen.getAllByRole('group', {name: 'Workflow Creation Actions'})).toHaveLength(1);
 
         await user.click(screen.getByRole('tab', {name: 'Configurations'}));
 
-        expect(await screen.findByText('No Configurations')).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Create Configuration'})).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
+        expect(await screen.findByRole('heading', {name: 'No configurations in Development'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Configure'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
     });
 
     it('shows the tab actions once the project has workflows and configurations', async () => {
@@ -114,7 +112,9 @@ describe('AutomationProjectList', () => {
 
         await user.click(screen.getByRole('tab', {name: 'Configurations'}));
 
-        expect(await screen.findByRole('button', {name: 'New Configuration'})).toBeInTheDocument();
+        expect(await screen.findByRole('button', {name: 'Create Configuration'})).toHaveTextContent(
+            'New Configuration'
+        );
     });
 
     it('hides configuration creation until the project is published', async () => {
@@ -125,8 +125,8 @@ describe('AutomationProjectList', () => {
         await user.click(await screen.findByRole('tab', {name: 'Configurations'}));
 
         expect(await screen.findByText('Publish the project to configure it')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Configure'})).not.toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
     });
 
     it('opens the configuration dialog from the empty state and closes it on cancel', async () => {
@@ -135,7 +135,7 @@ describe('AutomationProjectList', () => {
         renderList();
 
         await user.click(await screen.findByRole('tab', {name: 'Configurations'}));
-        await user.click(await screen.findByRole('button', {name: 'Create Configuration'}));
+        await user.click(await screen.findByRole('button', {name: 'Configure'}));
 
         expect(await screen.findByRole('dialog')).toBeInTheDocument();
 

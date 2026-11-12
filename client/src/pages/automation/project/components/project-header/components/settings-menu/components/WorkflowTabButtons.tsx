@@ -1,97 +1,53 @@
-import '@/shared/styles/dropdownMenu.css';
-import Button from '@/components/Button/Button';
-import {Separator} from '@/components/ui/separator';
+import {DropdownMenuItem, DropdownMenuSeparator} from '@/components/DropdownMenu/DropdownMenu';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {CopyIcon, DownloadIcon, EditIcon, HistoryIcon, Share2Icon, Trash2Icon} from 'lucide-react';
-import {MouseEvent} from 'react';
+import {CopyIcon, DownloadIcon, EditIcon, Share2Icon, Trash2Icon} from 'lucide-react';
 
 const WorkflowTabButtons = ({
-    onCloseDropdownMenu,
     onDuplicateWorkflow,
     onShareWorkflow,
     onShowDeleteWorkflowAlertDialog,
     onShowEditWorkflowDialog,
-    onShowLoadWorkflowVersionDialog,
     workflowId,
 }: {
-    onCloseDropdownMenu: () => void;
     onDuplicateWorkflow: () => void;
     onShareWorkflow: () => void;
     onShowEditWorkflowDialog: () => void;
     onShowDeleteWorkflowAlertDialog: () => void;
-    onShowLoadWorkflowVersionDialog: () => void;
     workflowId: string;
 }) => {
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.workflows);
 
-    const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
-        if ((event.target as HTMLElement).tagName === 'BUTTON') {
-            onCloseDropdownMenu();
-        }
-    };
-
     return (
-        <div className="flex flex-col" onClick={handleButtonClick} role="presentation">
-            <Button
-                className="dropdown-menu-item"
-                icon={<EditIcon />}
-                label="Edit"
-                onClick={onShowEditWorkflowDialog}
-                variant="ghost"
-            />
+        <>
+            <DropdownMenuItem icon={<EditIcon />} label="Edit" onSelect={onShowEditWorkflowDialog} />
 
-            <Button
-                className="dropdown-menu-item"
-                icon={<CopyIcon />}
-                label="Duplicate"
-                onClick={onDuplicateWorkflow}
-                variant="ghost"
-            />
+            <DropdownMenuItem icon={<CopyIcon />} label="Duplicate" onSelect={onDuplicateWorkflow} />
 
-            <Button
-                className="dropdown-menu-item"
-                icon={<HistoryIcon />}
-                label="Load Previous Version"
-                onClick={onShowLoadWorkflowVersionDialog}
-                variant="ghost"
-            />
-
-            <Button
-                className="dropdown-menu-item"
-                icon={<Share2Icon />}
-                label="Share"
-                onClick={onShareWorkflow}
-                variant="ghost"
-            />
+            <DropdownMenuItem icon={<Share2Icon />} label="Share" onSelect={onShareWorkflow} />
 
             {templatesSubmissionForm && (
-                <Button
-                    className="dropdown-menu-item"
+                <DropdownMenuItem
                     icon={<Share2Icon />}
                     label="Share with Community"
-                    onClick={() => window.open(templatesSubmissionForm, '_blank')}
-                    variant="ghost"
+                    onSelect={() => window.open(templatesSubmissionForm, '_blank')}
                 />
             )}
 
-            <Button
-                className="dropdown-menu-item"
+            <DropdownMenuItem
                 icon={<DownloadIcon />}
                 label="Export"
-                onClick={() => (window.location.href = `/api/automation/internal/workflows/${workflowId}/export`)}
-                variant="ghost"
+                onSelect={() => (window.location.href = `/api/automation/internal/workflows/${workflowId}/export`)}
             />
 
-            <Separator />
+            <DropdownMenuSeparator />
 
-            <Button
-                className="dropdown-menu-item-destructive"
+            <DropdownMenuItem
                 icon={<Trash2Icon />}
                 label="Delete"
-                onClick={() => onShowDeleteWorkflowAlertDialog()}
-                variant="ghost"
+                onSelect={onShowDeleteWorkflowAlertDialog}
+                variant="destructive"
             />
-        </div>
+        </>
     );
 };
 

@@ -19,6 +19,7 @@ import {useSearchParams} from 'react-router-dom';
 
 import AutomationProjectConfigurationDialog from '../automation-project-configuration-dialog/AutomationProjectConfigurationDialog';
 import AutomationProjectConfigurationList from '../automation-project-configuration-list/AutomationProjectConfigurationList';
+import AutomationProjectPublishDialog from '../automation-project-publish-dialog/AutomationProjectPublishDialog';
 import AutomationProjectListItem from './AutomationProjectListItem';
 import AutomationProjectListItemTabs, {AutomationProjectListItemTabType} from './AutomationProjectListItemTabs';
 import AutomationProjectWorkflowList from './AutomationProjectWorkflowList';
@@ -31,12 +32,10 @@ type EmbeddedTagType = AutomationProjectTagsQuery['automationProjectTags'][numbe
 interface AutomationProjectListProps {
     newlyCreatedProjectId?: string;
     onCreateWorkflow: (projectId: string) => void;
-    onDeleteProject: (projectId: string) => void;
     onDeleteWorkflow: (workflowUuid: string) => void;
     onEditProject: (project: AutomationProjectType) => void;
     onEditWorkflow: (workflow: AutomationProjectType['workflowTemplates'][number]) => void;
     onImportWorkflow: (projectId: string) => void;
-    onPublishProject: (projectId: string) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
     onUpdateTags: (project: AutomationProjectType, tagNames: string[]) => void;
     projects: Array<AutomationProjectType>;
@@ -46,12 +45,10 @@ interface AutomationProjectListProps {
 const AutomationProjectList = ({
     newlyCreatedProjectId,
     onCreateWorkflow,
-    onDeleteProject,
     onDeleteWorkflow,
     onEditProject,
     onEditWorkflow,
     onImportWorkflow,
-    onPublishProject,
     onSelectWorkflow,
     onUpdateTags,
     projects,
@@ -72,11 +69,18 @@ const AutomationProjectList = ({
           }
         | undefined
     >();
+    const [publishDialogProject, setPublishDialogProject] = useState<AutomationProjectType | undefined>();
     const [openProjectIds, setOpenProjectIds] = useState<Set<string>>(() => {
         const projectId = searchParams.get('projectId');
 
         return new Set(projectId ? [projectId] : []);
     });
+
+    const handleConfigurationSaved = (projectId: string) => {
+        setActiveTabs((previousActiveTabs) => ({...previousActiveTabs, [projectId]: 'configurations'}));
+
+        setOpenProjectIds((previousOpenProjectIds) => new Set(previousOpenProjectIds).add(projectId));
+    };
 
     useEffect(() => {
         if (newlyCreatedProjectId) {
@@ -114,10 +118,9 @@ const AutomationProjectList = ({
                     <AutomationProjectListItem
                         onCreateConfiguration={(selectedProject) => setConfigurationDialog({project: selectedProject})}
                         onCreateWorkflow={onCreateWorkflow}
-                        onDeleteProject={onDeleteProject}
                         onEditProject={onEditProject}
                         onImportWorkflow={onImportWorkflow}
-                        onPublishProject={onPublishProject}
+                        onPublishProject={() => setPublishDialogProject(project)}
                         onSelectWorkflow={onSelectWorkflow}
                         onUpdateTags={onUpdateTags}
                         project={project}
@@ -166,7 +169,7 @@ const AutomationProjectList = ({
                                     : project.published &&
                                       project.configurationCount > 0 && (
                                           <Button
-                                              aria-label="New Configuration"
+                                              aria-label="Create Configuration"
                                               onClick={() => setConfigurationDialog({project})}
                                               size="sm"
                                               variant="secondary"
@@ -182,7 +185,7 @@ const AutomationProjectList = ({
                                     environmentId={DEVELOPMENT_ENVIRONMENT}
                                     onCreate={() => setConfigurationDialog({project})}
                                     onEdit={(configuration) => setConfigurationDialog({configuration, project})}
-                                    onPublishProject={onPublishProject}
+                                    onPublishProject={() => setPublishDialogProject(project)}
                                     onUpdateVersion={(configuration) =>
                                         setConfigurationDialog({configuration, project, updateProjectVersion: true})
                                     }
@@ -197,6 +200,7 @@ const AutomationProjectList = ({
                                     onCreateWorkflow={onCreateWorkflow}
                                     onDeleteWorkflow={onDeleteWorkflow}
                                     onEditWorkflow={onEditWorkflow}
+                                    onImportWorkflow={onImportWorkflow}
                                     onSelectWorkflow={onSelectWorkflow}
                                     project={project}
                                 />
@@ -210,8 +214,16 @@ const AutomationProjectList = ({
                 <AutomationProjectConfigurationDialog
                     configuration={configurationDialog.configuration}
                     onClose={() => setConfigurationDialog(undefined)}
+                    onSuccess={() => handleConfigurationSaved(configurationDialog.project.id)}
                     project={configurationDialog.project}
                     updateProjectVersion={configurationDialog.updateProjectVersion}
+                />
+            )}
+
+            {publishDialogProject && (
+                <AutomationProjectPublishDialog
+                    onClose={() => setPublishDialogProject(undefined)}
+                    project={publishDialogProject}
                 />
             )}
         </div>

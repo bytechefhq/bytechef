@@ -13,6 +13,8 @@ const hoisted = vi.hoisted(() => ({
     deleteProjectVersionMutate: vi.fn(),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     deleteProjectVersionOptions: undefined as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    duplicateProjectOptions: undefined as any,
     navigate: vi.fn(),
     noopMutation: () => ({isPending: false, mutate: vi.fn()}),
     restoreProjectVersionMutate: vi.fn(),
@@ -33,7 +35,12 @@ vi.mock('@/shared/mutations/automation/projects.mutations', () => ({
 
         return {isPending: false, mutate: hoisted.deleteProjectVersionMutate};
     },
-    useDuplicateProjectMutation: hoisted.noopMutation,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    useDuplicateProjectMutation: (options: any) => {
+        hoisted.duplicateProjectOptions = options;
+
+        return {isPending: false, mutate: vi.fn()};
+    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useRestoreProjectVersionMutation: (options: any) => {
         hoisted.restoreProjectVersionOptions = options;
@@ -104,7 +111,7 @@ describe('useSettingsMenu', () => {
         expect(hoisted.toast).toHaveBeenCalledWith('Version V2 deleted.');
     });
 
-    it('stays on the current workflow when the restored version still contains it', async () => {
+    it('stays on the current workflow and refreshes it when the restored version still contains it', async () => {
         vi.spyOn(queryClient, 'query').mockResolvedValue({...project, projectWorkflowIds: [11, 13]});
 
         const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
@@ -117,6 +124,7 @@ describe('useSettingsMenu', () => {
 
         expect(hoisted.navigate).not.toHaveBeenCalled();
         expect(hoisted.clearWorkflowHistory).toHaveBeenCalled();
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['projects', 7, 'projectWorkflows', 11]});
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['projectVersions', 'projects', 7]});
         expect(hoisted.toast).toHaveBeenCalledWith('Version V1 applied to the draft.');
     });
@@ -162,6 +170,23 @@ describe('useSettingsMenu', () => {
         await act(async () => {
             await hoisted.restoreProjectVersionOptions.onSuccess(undefined, {id: 7, projectVersion: 1});
         });
+
+        expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects');
+    });
+
+    it('opens the first workflow of the duplicated project after duplicating', () => {
+        renderSettingsMenu();
+
+        hoisted.duplicateProjectOptions.onSuccess({...project, id: 21, projectWorkflowIds: [31, 32]}, 7);
+
+        expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects/21/project-workflows/31?environmentId=1');
+        expect(hoisted.toast).toHaveBeenCalledWith('Project duplicated successfully.');
+    });
+
+    it('returns to the project list when the duplicated project has no workflows', () => {
+        renderSettingsMenu();
+
+        hoisted.duplicateProjectOptions.onSuccess({...project, id: 21, projectWorkflowIds: []}, 7);
 
         expect(hoisted.navigate).toHaveBeenCalledWith('/automation/projects');
     });

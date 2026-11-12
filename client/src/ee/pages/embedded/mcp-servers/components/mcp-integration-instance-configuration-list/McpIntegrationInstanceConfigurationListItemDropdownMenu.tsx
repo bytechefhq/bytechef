@@ -38,7 +38,7 @@ const McpIntegrationInstanceConfigurationListItemDropdownMenu = ({
 
                     <DropdownMenuItem
                         icon={<RefreshCwIcon />}
-                        label="Update Integration Version"
+                        label="Change Integration Version"
                         onClick={onUpdateIntegrationVersionClick}
                     />
 

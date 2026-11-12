@@ -28,6 +28,7 @@ it('shows the project title with its draft version and status', () => {
     expect(screen.getByRole('heading', {name: 'Mailing'})).toBeInTheDocument();
     expect(screen.getByText('V3')).toBeInTheDocument();
     expect(screen.getByText('DRAFT')).toBeInTheDocument();
+    expect(screen.getByText('DRAFT').parentElement).not.toHaveClass('text-content-success-primary');
 });
 
 it('shows the draft being edited, not the last published version, of a published project', () => {
@@ -44,6 +45,23 @@ it('shows the draft being edited, not the last published version, of a published
     expect(screen.getByText('V3')).toBeInTheDocument();
     expect(screen.getByText('DRAFT')).toBeInTheDocument();
     expect(screen.queryByText('PUBLISHED')).not.toBeInTheDocument();
+});
+
+it('shows the published status of a project whose latest version is published', () => {
+    render(
+        <MemoryRouter>
+            <TooltipProvider>
+                <AutomationEditorBreadcrumb
+                    project={{...draftProject, lastPublishedVersion: 3, published: true} as never as ProjectPropType}
+                />
+            </TooltipProvider>
+        </MemoryRouter>
+    );
+
+    expect(screen.getByText('V3')).toBeInTheDocument();
+    expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+    expect(screen.queryByText('DRAFT')).not.toBeInTheDocument();
+    expect(screen.getByText('PUBLISHED').parentElement).toHaveClass('text-content-success-primary');
 });
 
 it('shows the item switcher after a separator when one is given', () => {

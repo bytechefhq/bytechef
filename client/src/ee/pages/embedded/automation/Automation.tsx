@@ -170,7 +170,10 @@ const Automation = () => {
                         leftSidebarOpen ? 'ml-0 opacity-100' : 'ml-[-355px] opacity-0'
                     )}
                 >
-                    <AutomationEditorLeftSidebar currentWorkflowId={workflowUuid!} />
+                    <AutomationEditorLeftSidebar
+                        bottomResizablePanelRef={bottomResizablePanelRef}
+                        currentWorkflowId={workflowUuid!}
+                    />
                 </div>
             </div>
 

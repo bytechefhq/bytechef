@@ -10,7 +10,7 @@ interface ProjectListItemNewDeploymentMenuItemProps {
 
 const getDisabledReason = (hasWorkflows: boolean, isPublished: boolean) => {
     if (!hasWorkflows) {
-        return 'Add a workflow before deploying the project.';
+        return 'Add a workflow before publishing the project.';
     }
 
     if (!isPublished) {

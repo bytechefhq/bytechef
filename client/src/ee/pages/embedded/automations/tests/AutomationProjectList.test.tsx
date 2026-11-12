@@ -19,6 +19,21 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     }),
 }));
 
+vi.mock('../components/automation-project-configuration-dialog/AutomationProjectConfigurationDialog', () => ({
+    default: ({onClose, onSuccess}: {onClose: () => void; onSuccess?: (configurationId: string) => void}) => (
+        <button
+            onClick={() => {
+                onSuccess?.('configuration-9');
+
+                onClose();
+            }}
+            type="button"
+        >
+            Save Configuration
+        </button>
+    ),
+}));
+
 const renderWithProviders = (ui: ReactElement, initialEntries = ['/embedded/automations']) => {
     const QueryClientWrapper = createTestQueryClientWrapper();
 
@@ -54,12 +69,10 @@ const makeProject = (
 
 describe('AutomationProjectList', () => {
     const onCreateWorkflow = vi.fn();
-    const onDeleteProject = vi.fn();
     const onDeleteWorkflow = vi.fn();
     const onEditProject = vi.fn();
     const onEditWorkflow = vi.fn();
     const onImportWorkflow = vi.fn();
-    const onPublishProject = vi.fn();
     const onSelectWorkflow = vi.fn();
     const onUpdateTags = vi.fn();
 
@@ -67,12 +80,10 @@ describe('AutomationProjectList', () => {
 
     const defaultProps = {
         onCreateWorkflow,
-        onDeleteProject,
         onDeleteWorkflow,
         onEditProject,
         onEditWorkflow,
         onImportWorkflow,
-        onPublishProject,
         onSelectWorkflow,
         onUpdateTags,
         tags,
@@ -80,12 +91,10 @@ describe('AutomationProjectList', () => {
 
     beforeEach(() => {
         onCreateWorkflow.mockReset();
-        onDeleteProject.mockReset();
         onDeleteWorkflow.mockReset();
         onEditProject.mockReset();
         onEditWorkflow.mockReset();
         onImportWorkflow.mockReset();
-        onPublishProject.mockReset();
         onSelectWorkflow.mockReset();
         onUpdateTags.mockReset();
     });
@@ -163,10 +172,27 @@ describe('AutomationProjectList', () => {
         expect(onUpdateTags.mock.calls[0][1]).toContain('sales');
     });
 
-    it('calls onPublishProject when Publish is selected', async () => {
+    it('opens the publish dialog when Publish is selected', async () => {
         const user = userEvent.setup();
 
-        const projects = [makeProject({id: 'project-7', name: 'My Project'})];
+        const projects = [
+            makeProject({
+                id: 'project-7',
+                name: 'My Project',
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: null,
+                        label: 'Sync',
+                        lastModifiedDate: null,
+                        permissionExpression: null,
+                        triggers: [],
+                        workflowId: 'draft-wf-7',
+                        workflowUuid: 'wf-uuid-7',
+                    },
+                ],
+            }),
+        ];
 
         renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
 
@@ -174,7 +200,8 @@ describe('AutomationProjectList', () => {
 
         await user.click(await screen.findByRole('menuitem', {name: /publish/i}));
 
-        expect(onPublishProject).toHaveBeenCalledWith('project-7');
+        expect(await screen.findByRole('dialog', {name: 'Publish Project My Project'})).toBeInTheDocument();
+        expect(screen.getByLabelText('Description')).toBeInTheDocument();
     });
 
     it('calls onCreateWorkflow from the New Workflow button next to the Workflows heading', async () => {
@@ -241,6 +268,24 @@ describe('AutomationProjectList', () => {
         expect(onImportWorkflow).toHaveBeenCalledWith('project-4');
     });
 
+    it('imports a workflow from the empty Workflows tab of a project', async () => {
+        const user = userEvent.setup();
+
+        const projects = [makeProject({id: 'project-8', name: 'Empty Project'})];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
+
+        await user.click(screen.getByText('0 workflows'));
+
+        expect(await screen.findByText('No Workflows')).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', {name: 'More Workflow Creation Actions'}));
+
+        await user.click(await screen.findByRole('menuitem', {name: 'Import Workflow'}));
+
+        expect(onImportWorkflow).toHaveBeenCalledWith('project-8');
+    });
+
     it('offers configuration creation only once the project is published and has configurations', async () => {
         const user = userEvent.setup();
 
@@ -263,7 +308,7 @@ describe('AutomationProjectList', () => {
         await user.click(screen.getByRole('tab', {name: 'Configurations'}));
 
         expect(await screen.findByText('Publish the project to configure it')).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
 
         await user.click(liveTrigger);
 
@@ -271,7 +316,38 @@ describe('AutomationProjectList', () => {
 
         await user.click(liveTabs[liveTabs.length - 1]);
 
-        expect(await screen.findByRole('button', {name: 'New Configuration'})).toBeEnabled();
+        expect(await screen.findByRole('button', {name: 'Create Configuration'})).toBeEnabled();
+    });
+
+    it('opens the publish dialog from Publish on the Configurations tab of a draft project', async () => {
+        const user = userEvent.setup();
+
+        const projects = [
+            makeProject({
+                id: 'draft',
+                name: 'Draft Project',
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: null,
+                        label: 'Sync',
+                        lastModifiedDate: null,
+                        permissionExpression: null,
+                        triggers: [],
+                        workflowId: 'draft-wf-1',
+                        workflowUuid: 'wf-uuid-1',
+                    },
+                ],
+            }),
+        ];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />, [
+            '/embedded/automations?projectId=draft&tab=configurations',
+        ]);
+
+        await user.click(await screen.findByRole('button', {name: 'Publish'}));
+
+        expect(await screen.findByRole('dialog', {name: 'Publish Project Draft Project'})).toBeInTheDocument();
     });
 
     it('opens the project on its Configurations tab from the projectId and tab parameters', () => {
@@ -294,7 +370,7 @@ describe('AutomationProjectList', () => {
 
         expect(configurationsTabs).toHaveLength(1);
         expect(configurationsTabs[0]).toHaveAttribute('aria-selected', 'true');
-        expect(screen.getByRole('button', {name: 'New Configuration'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Create Configuration'})).toHaveTextContent('New Configuration');
     });
 
     it('expands a project to show its workflows and navigates on click', async () => {
@@ -328,5 +404,32 @@ describe('AutomationProjectList', () => {
         await user.click(workflowItem);
 
         expect(onSelectWorkflow).toHaveBeenCalledWith('wf-uuid-5');
+    });
+
+    it('opens the project on its Configurations tab after a configuration is created from the project menu', async () => {
+        const user = userEvent.setup();
+
+        const projects = [
+            makeProject({
+                configurationCount: 0,
+                id: 'live',
+                lastPublishedVersion: 1,
+                name: 'Live Project',
+                published: true,
+            }),
+        ];
+
+        renderWithProviders(<AutomationProjectList {...defaultProps} projects={projects} />);
+
+        expect(screen.queryByRole('tab', {name: 'Configurations'})).not.toBeInTheDocument();
+
+        await user.click(screen.getByTestId('live-moreProjectActionsButton'));
+
+        await user.click(await screen.findByRole('menuitem', {name: 'New Configuration'}));
+
+        await user.click(await screen.findByRole('button', {name: 'Save Configuration'}));
+
+        expect(await screen.findByRole('tab', {name: 'Configurations'})).toHaveAttribute('aria-selected', 'true');
+        expect(screen.queryByRole('button', {name: 'Save Configuration'})).not.toBeInTheDocument();
     });
 });

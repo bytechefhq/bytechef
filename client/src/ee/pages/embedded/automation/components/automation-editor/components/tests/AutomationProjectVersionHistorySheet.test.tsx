@@ -1,5 +1,5 @@
 import AutomationProjectVersionHistorySheet from '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationProjectVersionHistorySheet';
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
+import {act, fireEvent, render, screen, within} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const {
@@ -39,6 +39,25 @@ const versionsResult = {
         ],
     },
 };
+
+const renderSheet = ({
+    onClose = vi.fn(),
+    onRestoreProjectVersion = vi.fn(),
+    restoreProjectVersionPending = false,
+}: {
+    onClose?: () => void;
+    onRestoreProjectVersion?: (projectVersion: number, onSuccess: () => void) => void;
+    restoreProjectVersionPending?: boolean;
+} = {}) =>
+    render(
+        <AutomationProjectVersionHistorySheet
+            onClose={onClose}
+            onRestoreProjectVersion={onRestoreProjectVersion}
+            open
+            projectId="project-1"
+            restoreProjectVersionPending={restoreProjectVersionPending}
+        />
+    );
 
 describe('AutomationProjectVersionHistorySheet', () => {
     beforeEach(() => {
@@ -84,28 +103,116 @@ describe('AutomationProjectVersionHistorySheet', () => {
         }));
     });
 
-    it('lists the versions in the order the server returns them and expands the latest published one', () => {
-        render(<AutomationProjectVersionHistorySheet onClose={vi.fn()} open projectId="project-1" />);
+    it('lists the versions in the order the server returns them, collapsed', () => {
+        renderSheet();
 
+        expect(screen.getByRole('heading', {name: /Version History$/})).toBeInTheDocument();
         expect(screen.getAllByText(/^V\d+$/).map((element) => element.textContent)).toEqual(['V3', 'V2', 'V1']);
-        expect(screen.getByText('Adds greeting')).toBeInTheDocument();
-        expect(screen.getByText('Fixes typo')).toBeInTheDocument();
+        expect(screen.getByText('Draft')).toBeInTheDocument();
+        expect(screen.getAllByText('Published')).toHaveLength(2);
+        expect(screen.getByText('Current working version.')).toBeInTheDocument();
+        expect(screen.getByText(/^Adds greeting\s+Fixes typo$/)).toBeInTheDocument();
+        expect(screen.getByText('No description.')).toBeInTheDocument();
+        expect(screen.queryByText('Sync orders')).not.toBeInTheDocument();
+    });
+
+    it('offers only the published versions for selection and applies nothing until one is selected', () => {
+        renderSheet();
+
+        expect(screen.getByRole('listbox', {name: 'Project versions'})).toBeInTheDocument();
+        expect(screen.getByRole('option', {name: 'Version 3'})).toHaveAttribute('aria-disabled', 'true');
+        expect(screen.getByRole('option', {name: 'Version 2'})).toHaveAttribute('aria-disabled', 'false');
+        expect(screen.getByRole('button', {name: 'Apply selected version'})).toBeDisabled();
+
+        fireEvent.click(screen.getByRole('option', {name: 'Version 3'}));
+
+        expect(screen.getByRole('option', {name: 'Version 3'})).toHaveAttribute('aria-selected', 'false');
+        expect(screen.getByRole('button', {name: 'Apply selected version'})).toBeDisabled();
+    });
+
+    it('restores the selected published version after confirmation and closes once it is applied', () => {
+        const onClose = vi.fn();
+        const onRestoreProjectVersion = vi.fn();
+
+        renderSheet({onClose, onRestoreProjectVersion});
+
+        fireEvent.click(screen.getByRole('option', {name: 'Version 2'}));
+
+        expect(screen.getByRole('option', {name: 'Version 2'})).toHaveAttribute('aria-selected', 'true');
+
+        fireEvent.click(screen.getByRole('button', {name: 'Apply selected version'}));
+
+        const confirmationDialog = screen.getByRole('alertdialog');
+
+        expect(within(confirmationDialog).getByText('Apply version V2?')).toBeInTheDocument();
+        expect(onRestoreProjectVersion).not.toHaveBeenCalled();
+
+        fireEvent.click(within(confirmationDialog).getByRole('button', {name: 'Apply'}));
+
+        expect(onRestoreProjectVersion).toHaveBeenCalledWith(2, expect.any(Function));
+        expect(onClose).not.toHaveBeenCalled();
+
+        const [, onSuccess] = onRestoreProjectVersion.mock.calls[0];
+
+        act(() => {
+            onSuccess();
+        });
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+        expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
+
+    it('keeps the draft when the confirmation is cancelled', () => {
+        const onRestoreProjectVersion = vi.fn();
+
+        renderSheet({onRestoreProjectVersion});
+
+        fireEvent.click(screen.getByRole('option', {name: 'Version 1'}));
+        fireEvent.click(screen.getByRole('button', {name: 'Apply selected version'}));
+        fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', {name: 'Cancel'}));
+
+        expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+        expect(onRestoreProjectVersion).not.toHaveBeenCalled();
+    });
+
+    it('disables applying while a restore is pending', () => {
+        renderSheet({restoreProjectVersionPending: true});
+
+        fireEvent.click(screen.getByRole('option', {name: 'Version 2'}));
+
+        expect(screen.getByRole('button', {name: 'Apply selected version'})).toBeDisabled();
+    });
+
+    it('closes from the Cancel button', () => {
+        const onClose = vi.fn();
+
+        renderSheet({onClose});
+
+        fireEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+        expect(onClose).toHaveBeenCalledTimes(1);
     });
 
     it('expands the draft version and loads its changed workflows', () => {
-        render(<AutomationProjectVersionHistorySheet onClose={vi.fn()} open projectId="project-1" />);
+        renderSheet();
 
-        fireEvent.click(screen.getByText('V3'));
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle changes of version 3'}));
 
+        expect(screen.getByRole('button', {name: 'Toggle changes of version 3'})).toHaveAttribute(
+            'aria-expanded',
+            'true'
+        );
         expect(useAutomationProjectVersionWorkflowChangesQuery).toHaveBeenCalledWith(
             {id: 'project-1', projectVersion: 3},
             expect.objectContaining({enabled: true})
         );
-        expect(screen.getAllByText('Sync orders')).toHaveLength(2);
+        expect(screen.getByText('Sync orders')).toBeInTheDocument();
     });
 
-    it('loads changed workflows when a published version is expanded', () => {
-        render(<AutomationProjectVersionHistorySheet onClose={vi.fn()} open projectId="project-1" />);
+    it('loads changed workflows only for the expanded published version', () => {
+        renderSheet();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle changes of version 2'}));
 
         expect(useAutomationProjectVersionWorkflowChangesQuery).toHaveBeenCalledWith(
             {id: 'project-1', projectVersion: 2},
@@ -117,34 +224,26 @@ describe('AutomationProjectVersionHistorySheet', () => {
         );
     });
 
-    it('opens the changes dialog with the version range for the clicked workflow', () => {
-        render(<AutomationProjectVersionHistorySheet onClose={vi.fn()} open projectId="project-1" />);
+    it('collapses an expanded version again', () => {
+        renderSheet();
 
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle changes of version 2'}));
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle changes of version 2'}));
+
+        expect(screen.queryByText('Sync orders')).not.toBeInTheDocument();
+    });
+
+    it('opens the changes dialog with the version range for the clicked workflow', () => {
+        renderSheet();
+
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle changes of version 2'}));
         fireEvent.click(screen.getByText('Sync orders'));
 
         expect(screen.getByTestId('mock-changes-dialog')).toHaveTextContent('V1|V2');
 
-        fireEvent.click(screen.getByText('V3'));
+        fireEvent.click(screen.getByRole('button', {name: 'Toggle changes of version 3'}));
         fireEvent.click(screen.getAllByText('Sync orders')[0]!);
 
         expect(screen.getAllByTestId('mock-changes-dialog')[0]).toHaveTextContent('V2|Draft');
-    });
-
-    it('expands the latest published version once the version data loads', () => {
-        useAutomationProjectVersionsQuery.mockReturnValue({data: undefined});
-
-        const {rerender} = render(
-            <AutomationProjectVersionHistorySheet onClose={vi.fn()} open projectId="project-1" />
-        );
-
-        useAutomationProjectVersionsQuery.mockReturnValue(versionsResult);
-
-        rerender(<AutomationProjectVersionHistorySheet onClose={vi.fn()} open projectId="project-1" />);
-
-        expect(useAutomationProjectVersionWorkflowChangesQuery).toHaveBeenCalledWith(
-            {id: 'project-1', projectVersion: 2},
-            expect.objectContaining({enabled: true})
-        );
-        expect(screen.getByText('Fixes typo')).toBeInTheDocument();
     });
 });
