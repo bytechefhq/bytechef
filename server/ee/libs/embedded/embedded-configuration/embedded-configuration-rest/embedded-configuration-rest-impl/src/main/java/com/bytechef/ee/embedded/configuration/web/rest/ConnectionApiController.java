@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.domain.ConnectionOrigin;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectionAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
@@ -19,9 +20,11 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,28 +85,17 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
+    public ResponseEntity<List<ConnectionModel>> getAllConnectedUserConnections(Long connectedUserId) {
+        return ResponseEntity.ok(getConnectedUserConnectionModels(connectedUserId, null, List.of()));
+    }
+
+    @Override
     public ResponseEntity<List<ConnectionModel>> getConnectedUserConnections(
         Long connectedUserId, String componentName, List<Long> connectionIds) {
 
-        Set<Long> sharedConnectionIds = connectedUserConnectionFacade.getSharedConnectionIds();
-
-        List<Long> requestedConnectionIds = connectionIds == null ? List.of() : connectionIds;
-
-        List<ConnectionDTO> connectionDTOs;
-
-        if (ConnectedUserAuthentications.isConnectedUser()) {
-            connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnections(
-                connectedUserId, componentName, requestedConnectionIds);
-        } else {
-            connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(
-                connectedUserId, componentName, requestedConnectionIds);
-        }
-
         return ResponseEntity.ok(
-            connectionDTOs
-                .stream()
-                .map(connectionDTO -> toConnectionModel(connectionDTO, sharedConnectionIds))
-                .toList());
+            getConnectedUserConnectionModels(
+                connectedUserId, componentName, connectionIds == null ? List.of() : connectionIds));
     }
 
     @Override
@@ -152,6 +144,41 @@ public class ConnectionApiController implements ConnectionApi {
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    private List<ConnectionModel> getConnectedUserConnectionModels(
+        long connectedUserId, @Nullable String componentName, List<Long> connectionIds) {
+
+        Set<Long> sharedConnectionIds = connectedUserConnectionFacade.getSharedConnectionIds();
+
+        List<ConnectionDTO> connectionDTOs;
+
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnections(
+                connectedUserId, componentName, connectionIds);
+        } else {
+            connectionDTOs = connectedUserConnectionFacade.getConnectedUserConnectionsForAdmin(
+                connectedUserId, componentName, connectionIds);
+        }
+
+        Map<Long, ConnectionOrigin> connectionOrigins = connectedUserConnectionFacade.getConnectionOrigins(
+            connectedUserId, connectionDTOs.stream()
+                .map(ConnectionDTO::id)
+                .filter(Objects::nonNull)
+                .toList());
+
+        return connectionDTOs.stream()
+            .map(connectionDTO -> toConnectionModel(connectionDTO, sharedConnectionIds)
+                .origin(toOriginEnum(connectionOrigins.get(connectionDTO.id()))))
+            .toList();
+    }
+
+    private static ConnectionModel.@Nullable OriginEnum toOriginEnum(@Nullable ConnectionOrigin connectionOrigin) {
+        if (connectionOrigin == null) {
+            return null;
+        }
+
+        return ConnectionModel.OriginEnum.valueOf(connectionOrigin.name());
     }
 
     private ConnectionModel toConnectionModel(ConnectionDTO connection, Set<Long> sharedConnectionIds) {

@@ -17,8 +17,10 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +52,11 @@ public class ConnectedUserConnectionMembership {
     public Set<Long> getConnectionIds(long connectedUserId, Environment environment) {
         Set<Long> connectionIds = getUnfilteredOwnedConnectionIds(connectedUserId, environment);
 
-        connectionIds.addAll(connectedUserConnectionService.getSharedConnectionIds());
+        connectionIds.addAll(
+            connectedUserConnectionService.getSharedConnectionIds()
+                .stream()
+                .sorted(Comparator.reverseOrder())
+                .toList());
 
         return filterByEnvironment(connectionIds, environment);
     }
@@ -102,15 +108,31 @@ public class ConnectedUserConnectionMembership {
     }
 
     private Set<Long> getUnfilteredOwnedConnectionIds(long connectedUserId, Environment environment) {
+        List<IntegrationInstance> integrationInstances = integrationInstanceService
+            .getConnectedUserIntegrationInstances(connectedUserId, environment)
+            .stream()
+            .sorted(Comparator.comparing(IntegrationInstance::getId, Comparator.reverseOrder()))
+            .toList();
+
         Set<Long> connectionIds = new LinkedHashSet<>();
 
-        for (IntegrationInstance integrationInstance : integrationInstanceService.getConnectedUserIntegrationInstances(
-            connectedUserId, environment)) {
-
-            connectionIds.add(integrationInstance.getConnectionId());
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            if (integrationInstance.isEnabled()) {
+                connectionIds.add(integrationInstance.getConnectionId());
+            }
         }
 
-        connectionIds.addAll(connectedUserConnectionService.getConnectionIds(connectedUserId));
+        connectionIds.addAll(
+            connectedUserConnectionService.getConnectionIds(connectedUserId)
+                .stream()
+                .sorted(Comparator.reverseOrder())
+                .toList());
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            if (!integrationInstance.isEnabled()) {
+                connectionIds.add(integrationInstance.getConnectionId());
+            }
+        }
 
         return connectionIds;
     }
