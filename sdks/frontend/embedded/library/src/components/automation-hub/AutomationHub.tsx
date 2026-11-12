@@ -2,6 +2,7 @@
 
 import {useRef} from 'react';
 
+import useConnectionDialogAllowedDeprecation from '../../shared/useConnectionDialogAllowedDeprecation';
 import useEmbedInit from '../../shared/useEmbedInit';
 
 export interface AutomationHubTabsConfig {
@@ -47,6 +48,11 @@ interface AutomationHubProps {
 
     editWorkflowAllowed?: boolean;
 
+    /**
+     * @deprecated Set the `connectionDialogAllowed` claim in the embed JWT instead; the server enforces the claim.
+     * Until the prop is removed, `false` still hides the connection dialog, but `true` cannot grant what the token
+     * denies.
+     */
     connectionDialogAllowed?: boolean;
 
     environment?: 'DEVELOPMENT' | 'STAGING' | 'PRODUCTION';
@@ -65,7 +71,7 @@ interface AutomationHubProps {
 const AutomationHub = ({
     baseUrl = 'https://app.bytechef.io',
     className,
-    connectionDialogAllowed = true,
+    connectionDialogAllowed,
     defaultLayout = 'grid',
     editWorkflowAllowed = true,
     environment = 'PRODUCTION',
@@ -76,6 +82,8 @@ const AutomationHub = ({
     theme,
 }: AutomationHubProps) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
+
+    useConnectionDialogAllowedDeprecation('AutomationHub', connectionDialogAllowed);
 
     useEmbedInit({
         baseUrl,
