@@ -53,9 +53,8 @@ abstract class AbstractDataTableTriggerTest {
 
         when(inputParameters.getRequiredString(TABLE)).thenReturn("conversations");
         when(((TriggerContextAware) triggerContext).getEnvironmentId()).thenReturn(1L);
-        when(dataTableWebhookService.addWebhook(
-            "conversations", WORKFLOW_EXECUTION_ID, WEBHOOK_URL, dataTableWebhookType, 1L))
-                .thenReturn(42L);
+        when(dataTableWebhookService.addWebhook("conversations", WORKFLOW_EXECUTION_ID, dataTableWebhookType, 1L))
+            .thenReturn(42L);
 
         WebhookEnableFunction webhookEnableFunction = triggerDefinition.getWebhookEnable()
             .orElseThrow();
