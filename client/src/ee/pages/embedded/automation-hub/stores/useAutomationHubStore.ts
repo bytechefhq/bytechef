@@ -1,3 +1,4 @@
+import {resolveConnectionDialogAllowed} from '@/ee/pages/embedded/shared/connectionDialogAllowed';
 import {EmbedInitParamsI} from '@/ee/pages/embedded/shared/useEmbedHandshake';
 import {create} from 'zustand';
 
@@ -49,7 +50,7 @@ export const useAutomationHubStore = create<AutomationHubStateI>()((set) => ({
     includeComponents: undefined,
     initialize: (params) =>
         set({
-            connectionDialogAllowed: params.connectionDialogAllowed ?? true,
+            connectionDialogAllowed: resolveConnectionDialogAllowed(params),
             defaultLayout: params.defaultLayout ?? 'grid',
             editWorkflowAllowed: params.editWorkflowAllowed ?? true,
             includeComponents: params.includeComponents,

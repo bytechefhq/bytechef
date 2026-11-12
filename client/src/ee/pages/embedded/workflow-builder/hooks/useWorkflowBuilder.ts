@@ -1,4 +1,5 @@
 import {HubBuilderContext} from '@/ee/pages/embedded/automation-hub/hubBuilderContext';
+import {resolveConnectionDialogAllowed} from '@/ee/pages/embedded/shared/connectionDialogAllowed';
 import {useEmbedHandshake} from '@/ee/pages/embedded/shared/useEmbedHandshake';
 import {
     ConnectedUserProjectWorkflowKeys,
@@ -129,7 +130,7 @@ export const useWorkflowBuilder = () => {
     };
 
     useEmbedHandshake((params) => {
-        setConnectionDialogAllowed(params.connectionDialogAllowed ?? false);
+        setConnectionDialogAllowed(resolveConnectionDialogAllowed(params));
         setIncludeComponents(params.includeComponents);
         setInitialized(true);
     }, !hubContext);
