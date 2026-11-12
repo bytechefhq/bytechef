@@ -25,8 +25,6 @@ public class IntegrationInstanceConfigurationErrorType extends AbstractErrorType
         new IntegrationInstanceConfigurationErrorType(102);
     public static final IntegrationInstanceConfigurationErrorType INVALID_INTEGRATION_VERSION =
         new IntegrationInstanceConfigurationErrorType(103);
-    public static final IntegrationInstanceConfigurationErrorType INSTANCE_CONFIGURATION_EXISTS =
-        new IntegrationInstanceConfigurationErrorType(104);
     public static final IntegrationInstanceConfigurationErrorType INSTANCE_CONFIGURATION_DISABLED =
         new IntegrationInstanceConfigurationErrorType(105);
     public static final IntegrationInstanceConfigurationErrorType WORKFLOW_NOT_IN_CONFIGURATION =

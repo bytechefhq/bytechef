@@ -217,22 +217,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 IntegrationInstanceConfigurationErrorType.INVALID_INTEGRATION_VERSION);
         }
 
-        int integrationVersion = integrationInstanceConfiguration.getIntegrationVersion();
-
-        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
-            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
-                integrationInstanceConfiguration.getEnvironment(), integrationId, null);
-
-        if (integrationInstanceConfigurations.stream()
-            .anyMatch(curIntegrationInstanceConfiguration -> Objects.equals(
-                curIntegrationInstanceConfiguration.getIntegrationVersion(), integrationVersion))) {
-
-            throw new ConfigurationException(
-                "Instance Configuration already exists for environment=%s and integrationVersion=%s".formatted(
-                    integrationInstanceConfiguration.getEnvironment(), integrationVersion),
-                IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_EXISTS);
-        }
-
         List<Tag> tags = checkTags(integrationInstanceConfigurationDTO.tags());
 
         if (!tags.isEmpty()) {
@@ -256,7 +240,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             List.of());
 
         List<Long> integrationWorkflowIds = integrationWorkflowService.getIntegrationWorkflowIds(
-            integrationId, integrationVersion);
+            integrationId, integrationInstanceConfiguration.getIntegrationVersion());
 
         if (integrationWorkflowIds.isEmpty()) {
             integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfiguration.getId(), true);
