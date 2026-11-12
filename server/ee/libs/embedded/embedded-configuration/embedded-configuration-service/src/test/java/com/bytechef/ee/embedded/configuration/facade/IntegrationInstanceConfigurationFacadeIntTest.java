@@ -244,21 +244,23 @@ class IntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
-    void testCreateIntegrationInstanceConfigurationRefusesASecondConfigurationOfTheSameVersion() {
+    void testCreateIntegrationInstanceConfigurationAllowsASecondConfigurationOfTheSameVersion() {
         authenticate(admin());
 
         Integration integration = createPublishedIntegration();
 
         long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integration.getId());
 
-        bumpLockVersionPast(integrationInstanceConfigurationId, 1);
+        long secondIntegrationInstanceConfigurationId =
+            integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                newIntegrationInstanceConfigurationDTO(integration.getId(), 1));
 
-        assertThatThrownBy(
-            () -> integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
-                newIntegrationInstanceConfigurationDTO(integration.getId(), 1)))
-                    .isInstanceOf(ConfigurationException.class)
-                    .satisfies(throwable -> assertThat(((ConfigurationException) throwable).getErrorKey())
-                        .isEqualTo(104));
+        assertThat(secondIntegrationInstanceConfigurationId).isNotEqualTo(integrationInstanceConfigurationId);
+        assertThat(
+            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                secondIntegrationInstanceConfigurationId)
+                .getIntegrationVersion())
+                    .isEqualTo(1);
     }
 
     @Test
