@@ -130,14 +130,8 @@ describe('ConnectedUserSheetPanelIntegrationListItem', () => {
         expect(container.querySelector('svg.lucide-component')).not.toBeInTheDocument();
     });
 
-    it('shows the Credentials action only for provisioned integrations', () => {
-        const {unmount} = renderItem({...connectedUserIntegrationInstance, provisioned: true});
-
-        expect(screen.getByRole('button', {name: 'Credentials'})).toBeInTheDocument();
-
-        unmount();
-
-        renderItem({...connectedUserIntegrationInstance, provisioned: false});
+    it('leaves the Credentials action to the Connections tab even for provisioned integrations', () => {
+        renderItem({...connectedUserIntegrationInstance, provisioned: true});
 
         expect(screen.queryByRole('button', {name: 'Credentials'})).not.toBeInTheDocument();
     });

@@ -57,6 +57,8 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
 
     const integrationInstanceConfigurationId = integrationInstance?.integrationInstanceConfigurationId;
 
+    const workflowLabel = integrationWorkflow?.label || workflow.name;
+
     const canOpenExecutions = integrationWorkflow != null && integrationInstanceConfigurationId != null;
 
     const handleWorkflowClick = () => {
@@ -72,75 +74,78 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
     };
 
     return (
-        <li
-            className={twMerge(
-                '-mx-3 flex min-h-12 items-center gap-2 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover',
-                canOpenExecutions && 'cursor-pointer'
-            )}
-            onClick={(event) => {
-                if (isCollapsibleRowClick(event)) {
-                    handleWorkflowClick();
-                }
-            }}
-        >
-            <div className="flex min-w-0 flex-1 items-center">
-                <div className="flex w-full max-w-80 min-w-0 shrink items-center gap-2 sm:w-80 sm:shrink-0">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <button
-                                className="max-w-full truncate text-left text-sm font-medium disabled:cursor-default"
-                                disabled={!canOpenExecutions}
-                                onClick={handleWorkflowClick}
-                                type="button"
-                            >
-                                {workflow.name}
-                            </button>
-                        </TooltipTrigger>
+        <li>
+            <div
+                className={twMerge(
+                    '-mx-3 flex min-h-12 items-center gap-2 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover',
+                    canOpenExecutions && 'cursor-pointer'
+                )}
+                onClick={(event) => {
+                    if (isCollapsibleRowClick(event)) {
+                        handleWorkflowClick();
+                    }
+                }}
+                role="presentation"
+            >
+                <div className="flex min-w-0 flex-1 items-center">
+                    <div className="flex w-full max-w-80 min-w-0 shrink items-center gap-2 sm:w-80 sm:shrink-0">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    className="max-w-full truncate text-left text-sm font-medium disabled:cursor-default"
+                                    disabled={!canOpenExecutions}
+                                    onClick={handleWorkflowClick}
+                                    type="button"
+                                >
+                                    {workflowLabel}
+                                </button>
+                            </TooltipTrigger>
 
-                        <TooltipContent align="start">
-                            {canOpenExecutions ? 'Show executions' : workflow.name}
-                        </TooltipContent>
-                    </Tooltip>
+                            <TooltipContent align="start">
+                                {canOpenExecutions ? 'Show executions' : workflowLabel}
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+
+                    {integrationWorkflow && (
+                        <div className="ml-6 flex min-w-0 items-center gap-1 overflow-hidden">
+                            <WorkflowTriggerAndComponentsRow
+                                className="hidden sm:flex"
+                                filteredComponentNames={filteredComponentNames}
+                                workflow={integrationWorkflow}
+                                workflowComponentDefinitions={workflowComponentDefinitions}
+                                workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                            />
+                        </div>
+                    )}
                 </div>
 
-                {integrationWorkflow && (
-                    <div className="ml-6 flex min-w-0 items-center gap-1 overflow-hidden">
-                        <WorkflowTriggerAndComponentsRow
-                            className="hidden sm:flex"
-                            filteredComponentNames={filteredComponentNames}
-                            workflow={integrationWorkflow}
-                            workflowComponentDefinitions={workflowComponentDefinitions}
-                            workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                        />
-                    </div>
-                )}
-            </div>
+                <Tooltip>
+                    <TooltipTrigger className="shrink-0 text-xs text-content-neutral-secondary">
+                        {lastExecutionDate
+                            ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
+                            : 'No executions'}
+                    </TooltipTrigger>
 
-            <Tooltip>
-                <TooltipTrigger className="shrink-0 text-xs text-content-neutral-secondary">
-                    {lastExecutionDate
-                        ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
-                        : 'No executions'}
-                </TooltipTrigger>
+                    <TooltipContent side="left">Last Execution Date</TooltipContent>
+                </Tooltip>
 
-                <TooltipContent side="left">Last Execution Date</TooltipContent>
-            </Tooltip>
+                <div className="relative mr-11 flex shrink-0 items-center">
+                    {enableIntegrationInstanceWorkflowMutation.isPending && (
+                        <LoadingIcon className="absolute top-[3px] left-[-15px]" />
+                    )}
 
-            <div className="relative mr-11 flex shrink-0 items-center">
-                {enableIntegrationInstanceWorkflowMutation.isPending && (
-                    <LoadingIcon className="absolute top-[3px] left-[-15px]" />
-                )}
-
-                <Switch
-                    checked={workflow.enabled}
-                    onCheckedChange={(value) => {
-                        enableIntegrationInstanceWorkflowMutation.mutate({
-                            enable: value,
-                            id: Number(workflow.integrationInstanceId),
-                            workflowId: workflow.workflowId,
-                        });
-                    }}
-                />
+                    <Switch
+                        checked={workflow.enabled}
+                        onCheckedChange={(value) => {
+                            enableIntegrationInstanceWorkflowMutation.mutate({
+                                enable: value,
+                                id: Number(workflow.integrationInstanceId),
+                                workflowId: workflow.workflowId,
+                            });
+                        }}
+                    />
+                </div>
             </div>
         </li>
     );

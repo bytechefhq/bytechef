@@ -32,6 +32,11 @@ query provisionableConnectedUserProjects($connectedUserId: ID!) {
                 }
                 provisioned
                 dangling
+                components {
+                    name
+                    title
+                    icon
+                }
             }
         }
     }

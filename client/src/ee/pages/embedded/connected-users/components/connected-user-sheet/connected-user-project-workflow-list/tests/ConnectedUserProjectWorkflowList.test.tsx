@@ -11,15 +11,21 @@ import {
 
 vi.mock('../ConnectedUserProjectWorkflowListItem', () => ({
     default: ({
+        configurationProjectVersion,
         connectedUserProjectWorkflow,
         projectName,
         workflowTemplate,
     }: {
+        configurationProjectVersion?: number;
         connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType;
         projectName?: string;
         workflowTemplate?: ConnectedUserWorkflowTemplateType;
     }) => (
-        <li data-project-name={projectName ?? ''} data-template-uuid={workflowTemplate?.workflowUuid ?? ''}>
+        <li
+            data-configuration-project-version={configurationProjectVersion ?? ''}
+            data-project-name={projectName ?? ''}
+            data-template-uuid={workflowTemplate?.workflowUuid ?? ''}
+        >
             {connectedUserProjectWorkflow.workflow.label}
         </li>
     ),
@@ -260,6 +266,41 @@ describe('ConnectedUserProjectWorkflowList', () => {
         expect(
             within(playgroundGroup).getByRole('button', {name: 'Change configuration Default 10'})
         ).toBeInTheDocument();
+    });
+
+    it('passes the project version of its configuration to a provisioned workflow', async () => {
+        render(
+            <ConnectedUserProjectWorkflowList
+                configurations={[
+                    {
+                        configurationId: '51',
+                        configurationName: 'Default',
+                        configurationProjectVersion: 3,
+                        projectId: '10',
+                    },
+                ]}
+                connectedUser={{connectedUserId: '1050', externalId: 'ext-1050'}}
+                connectedUserProjectWorkflows={[
+                    {
+                        ...createConnectedUserProjectWorkflow('1', 'Greet on Request', {
+                            automationUuid: 'template-greeting',
+                        }),
+                        projectId: '10',
+                        workflowVersion: null,
+                    },
+                ]}
+                workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
+            />
+        );
+
+        const playgroundGroup = screen.getByRole('region', {name: 'Automation Playground'});
+
+        await userEvent.click(within(playgroundGroup).getByRole('button', {name: 'Toggle configuration'}));
+
+        expect(within(playgroundGroup).getByText('Greet on Request')).toHaveAttribute(
+            'data-configuration-project-version',
+            '3'
+        );
     });
 
     it('toggles a configured project card when its row is clicked outside the controls', async () => {

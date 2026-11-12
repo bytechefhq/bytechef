@@ -65,13 +65,15 @@ const createConnectedUserProjectWorkflow = (
 const renderListItem = (
     connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType,
     projectName?: string,
-    workflowTemplate?: ConnectedUserWorkflowTemplateType
+    workflowTemplate?: ConnectedUserWorkflowTemplateType,
+    configurationProjectVersion?: number
 ) =>
     render(
         <QueryClientProvider client={new QueryClient()}>
             <TooltipProvider>
                 <ul>
                     <ConnectedUserProjectWorkflowListItem
+                        configurationProjectVersion={configurationProjectVersion}
                         connectedUserProjectWorkflow={connectedUserProjectWorkflow}
                         projectName={projectName}
                         workflowTemplate={workflowTemplate}
@@ -113,7 +115,7 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
     it("opens the workflow's executions when the row is clicked outside the workflow name", async () => {
         renderListItem(createConnectedUserProjectWorkflow(null), 'Automation Playground');
 
-        await userEvent.click(screen.getByRole('listitem'));
+        await userEvent.click(screen.getByRole('listitem').firstElementChild as HTMLElement);
 
         expect(useAutomationExecutionsSheetStore.getState().automationExecutionsSheetOpen).toBe(true);
     });
@@ -145,6 +147,36 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
     it('lets a running workflow that is flagged as a draft be disabled', () => {
         renderListItem(createConnectedUserProjectWorkflow(null, {enabled: true, workflowVersion: null}));
 
+        expect(screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'})).toBeEnabled();
+    });
+
+    it('shows a provisioned workflow at the project version of its configuration and lets it be enabled', () => {
+        renderListItem(
+            createConnectedUserProjectWorkflow(null, {
+                automationUuid: '3f6d2a40-0d6b-4f0e-9a51-6c1a7f1b2c3d',
+                enabled: false,
+                workflowVersion: null,
+            }),
+            undefined,
+            undefined,
+            3
+        );
+
+        expect(screen.queryByText('V1 DRAFT')).not.toBeInTheDocument();
+        expect(screen.getByText('V3')).toBeInTheDocument();
+        expect(screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'})).toBeEnabled();
+    });
+
+    it('shows no version for a provisioned workflow whose configuration is unknown', () => {
+        renderListItem(
+            createConnectedUserProjectWorkflow(null, {
+                automationUuid: '3f6d2a40-0d6b-4f0e-9a51-6c1a7f1b2c3d',
+                enabled: false,
+                workflowVersion: null,
+            })
+        );
+
+        expect(screen.queryByText('V1 DRAFT')).not.toBeInTheDocument();
         expect(screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'})).toBeEnabled();
     });
 

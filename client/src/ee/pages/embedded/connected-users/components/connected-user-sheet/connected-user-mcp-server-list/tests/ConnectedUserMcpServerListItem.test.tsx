@@ -142,7 +142,7 @@ const mixedMcpServer = {
             integrationInstanceId: '10',
             integrationVersion: 6,
             lastExecutionDate: '2026-10-05T10:00:00Z',
-            name: 'Send Email',
+            name: 'send_email',
             workflowId: 'workflow-1',
         },
         {
@@ -223,8 +223,8 @@ describe('ConnectedUserMcpServerListItem', () => {
 
         await expandCard();
 
-        const workflowGroup = screen.getByText('v6').closest('[data-slot="collapsible"]')!;
-        const componentGroup = screen.getByText('v1').closest('[data-slot="collapsible"]')!;
+        const workflowGroup = screen.getByText('V6').closest('[data-slot="collapsible"]')!;
+        const componentGroup = screen.getByText('V1').closest('[data-slot="collapsible"]')!;
 
         expect(within(workflowGroup as HTMLElement).getByText(/^Executed at /)).toBeInTheDocument();
         expect(
@@ -239,10 +239,20 @@ describe('ConnectedUserMcpServerListItem', () => {
 
         expect(screen.getByText('Component Tools')).toBeInTheDocument();
         expect(screen.getByText('Workflow Tools')).toBeInTheDocument();
-        expect(screen.getByText('v1')).toBeInTheDocument();
-        expect(screen.getByText('v6')).toBeInTheDocument();
+        expect(screen.getByText('V1')).toBeInTheDocument();
+        expect(screen.getByText('V6')).toBeInTheDocument();
         expect(screen.getAllByText('Account Connected')).toHaveLength(2);
         expect(screen.queryByText('Search Email')).not.toBeInTheDocument();
+    });
+
+    it('names a workflow tool after its workflow, as the MCP server page does', async () => {
+        renderListItem(mixedMcpServer);
+
+        await expandCard();
+        await expandGroups();
+
+        expect(screen.getByRole('button', {name: 'Send Email'})).toBeInTheDocument();
+        expect(screen.queryByText('send_email')).not.toBeInTheDocument();
     });
 
     it("opens a workflow's executions for the connected user when the workflow is clicked", async () => {

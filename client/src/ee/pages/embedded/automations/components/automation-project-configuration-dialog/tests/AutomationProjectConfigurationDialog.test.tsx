@@ -329,8 +329,11 @@ describe('AutomationProjectConfigurationDialog', () => {
             expect(mocks.createMutateAsync).toHaveBeenCalledWith({...expectedCreateVariables, projectVersion: 1});
         });
 
-        it('leaves the name empty when the project name is already taken in the environment', () => {
-            mocks.configurations.current = [{...existingConfiguration, name: 'my project'}];
+        it('numbers the prefilled name when the project name is already taken in the environment', () => {
+            mocks.configurations.current = [
+                {...existingConfiguration, name: 'my project'},
+                {...existingConfiguration, id: 'configuration-2', name: 'My Project 2'},
+            ];
 
             render(
                 <TooltipProvider>
@@ -338,9 +341,9 @@ describe('AutomationProjectConfigurationDialog', () => {
                 </TooltipProvider>
             );
 
-            expect(screen.getByLabelText(/^Name/)).toHaveValue('');
-            expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
-            expect(screen.getByRole('button', {name: 'Next'})).toBeDisabled();
+            expect(screen.getByLabelText(/^Name/)).toHaveValue(`${project.name} 3`);
+            expect(screen.queryByText(/already exists/)).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled();
         });
 
         it('updates the prefilled name when the project changes until the user types a name', async () => {

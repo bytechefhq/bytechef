@@ -1,4 +1,5 @@
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import ConnectedUserSheetPanelConnectionList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelConnectionList';
 import ConnectedUserSheetPanelExternalInvocationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelExternalInvocationList';
 import ConnectedUserSheetPanelIntegrationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationList';
 import ConnectedUserSheetPanelMcpServerList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelMcpServerList';
@@ -37,6 +38,10 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                         Automations
                     </TabsTrigger>
 
+                    <TabsTrigger className={tabsTriggerClassName} value="connections">
+                        Connections
+                    </TabsTrigger>
+
                     <TabsTrigger className={tabsTriggerClassName} value="workflow-executions">
                         Workflow Executions
                     </TabsTrigger>
@@ -71,6 +76,15 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                             connectedUserEmail={connectedUser.email}
                             connectedUserId={connectedUser.id}
                             connectedUserName={connectedUser.name}
+                        />
+                    )}
+                </TabsContent>
+
+                <TabsContent value="connections">
+                    {connectedUser.id != null && (
+                        <ConnectedUserSheetPanelConnectionList
+                            connectedUserId={connectedUser.id}
+                            connectedUserIntegrationInstances={connectedUser.integrationInstances ?? []}
                         />
                     )}
                 </TabsContent>
