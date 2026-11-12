@@ -3,6 +3,9 @@ import {beforeEach, describe, expect, it} from 'vitest';
 
 const DEFAULT_TABS = {automations: true, connections: true, newWorkflow: true};
 
+const createJwt = (payload: object) =>
+    `header.${btoa(JSON.stringify(payload)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}.signature`;
+
 describe('useAutomationHubStore', () => {
     beforeEach(() => {
         useAutomationHubStore.setState({
@@ -33,5 +36,25 @@ describe('useAutomationHubStore', () => {
         expect(state.initialized).toBe(true);
         expect(state.tabs).toEqual(DEFAULT_TABS);
         expect(state.theme).toEqual({});
+    });
+
+    it('takes connectionDialogAllowed from the token claim', () => {
+        useAutomationHubStore.getState().initialize({jwtToken: createJwt({connectionDialogAllowed: false})});
+
+        expect(useAutomationHubStore.getState().connectionDialogAllowed).toBe(false);
+    });
+
+    it('lets the deprecated connectionDialogAllowed param only remove the permission', () => {
+        useAutomationHubStore
+            .getState()
+            .initialize({connectionDialogAllowed: true, jwtToken: createJwt({connectionDialogAllowed: false})});
+
+        expect(useAutomationHubStore.getState().connectionDialogAllowed).toBe(false);
+
+        useAutomationHubStore
+            .getState()
+            .initialize({connectionDialogAllowed: false, jwtToken: createJwt({connectionDialogAllowed: true})});
+
+        expect(useAutomationHubStore.getState().connectionDialogAllowed).toBe(false);
     });
 });

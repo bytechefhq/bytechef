@@ -1,3 +1,4 @@
+import {EmbedInitParamsI} from '@/ee/pages/embedded/shared/useEmbedHandshake';
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
@@ -11,6 +12,16 @@ import {ReactNode, createElement} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
 import {useWorkflowBuilder} from '../useWorkflowBuilder';
+
+const hoisted = vi.hoisted(() => ({
+    embedInit: undefined as ((params: EmbedInitParamsI) => void) | undefined,
+}));
+
+vi.mock('@/ee/pages/embedded/shared/useEmbedHandshake', () => ({
+    useEmbedHandshake: (onInit: (params: EmbedInitParamsI) => void) => {
+        hoisted.embedInit = onInit;
+    },
+}));
 
 vi.mock('react-router-dom', async (importOriginal) => ({
     ...(await importOriginal<typeof import('react-router-dom')>()),
@@ -93,5 +104,29 @@ describe('useWorkflowBuilder', () => {
         });
 
         expect(counter.renders).toBeGreaterThan(rendersBeforeWrite);
+    });
+
+    it.each([
+        ['allows the connection dialog when nothing restricts it', {}, true],
+        [
+            'takes the connection dialog permission from the token claim',
+            {jwtToken: `header.${btoa(JSON.stringify({connectionDialogAllowed: false}))}.signature`},
+            false,
+        ],
+        ['lets the deprecated param remove the permission', {connectionDialogAllowed: false}, false],
+    ])('%s', (_description, params: EmbedInitParamsI, expectedConnectionDialogAllowed) => {
+        useWorkflowNodeDetailsPanelStore.setState({connectionDialogAllowed: !expectedConnectionDialogAllowed});
+
+        renderCountedHook();
+
+        expect(hoisted.embedInit).toBeDefined();
+
+        act(() => {
+            hoisted.embedInit!(params);
+        });
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().connectionDialogAllowed).toBe(
+            expectedConnectionDialogAllowed
+        );
     });
 });
