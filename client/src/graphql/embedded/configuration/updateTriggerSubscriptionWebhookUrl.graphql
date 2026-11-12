@@ -1,0 +1,6 @@
+mutation updateTriggerSubscriptionWebhookUrl($environmentId: ID!, $webhookUrl: String!) {
+    updateTriggerSubscriptionWebhookUrl(environmentId: $environmentId, webhookUrl: $webhookUrl) {
+        signingSecret
+        webhookUrl
+    }
+}

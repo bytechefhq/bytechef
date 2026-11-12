@@ -1,0 +1,6 @@
+query triggerSubscriptionWebhookSettings($environmentId: ID!) {
+    triggerSubscriptionWebhookSettings(environmentId: $environmentId) {
+        signingSecret
+        webhookUrl
+    }
+}

@@ -1,0 +1,19 @@
+query connectedUserTriggerSubscriptions($connectedUserId: ID!) {
+    connectedUserTriggerSubscriptions(connectedUserId: $connectedUserId) {
+        componentName
+        componentVersion
+        createdDate
+        errorCode
+        errorMessage
+        externalId
+        id
+        lastDeliveryError
+        lastDeliveryStatus
+        lastEventDate
+        name
+        staticWebhookUrl
+        status
+        triggerName
+        webhookUrl
+    }
+}
