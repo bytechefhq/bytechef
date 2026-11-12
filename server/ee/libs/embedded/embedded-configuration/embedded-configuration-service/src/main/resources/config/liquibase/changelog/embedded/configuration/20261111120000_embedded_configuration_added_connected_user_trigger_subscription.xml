@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261111120000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="connected_user_trigger_subscription"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="connected_user_trigger_subscription">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="connected_user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_name" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_version" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_name" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(256)"/>
+            <column name="external_id" type="varchar(256)"/>
+            <column name="parameters" type="text"/>
+            <column name="webhook_url" type="varchar(2048)"/>
+            <column name="status" type="integer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error_code" type="varchar(64)"/>
+            <column name="error_message" type="varchar(1024)"/>
+            <column name="integration_instance_id" type="bigint"/>
+            <column name="connection_id" type="bigint"/>
+            <column name="project_id" type="bigint">
+                <constraints unique="true" uniqueConstraintName="uk_connected_user_trigger_subscription_project_id"/>
+            </column>
+            <column name="project_deployment_id" type="bigint">
+                <constraints unique="true"
+                             uniqueConstraintName="uk_connected_user_trigger_subscription_project_deployment_id"/>
+            </column>
+            <column name="workflow_uuid" type="varchar(36)"/>
+            <column name="last_event_date" type="timestamp"/>
+            <column name="last_delivery_status" type="varchar(16)"/>
+            <column name="last_delivery_error" type="varchar(1024)"/>
+            <column name="registration_lease_until" type="timestamp"/>
+            <column name="created_by" type="varchar(50)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+            <column name="version" type="integer" defaultValueNumeric="0"/>
+        </createTable>
+
+        <createIndex tableName="connected_user_trigger_subscription"
+                     indexName="idx_connected_user_trigger_subscription_connected_user_id_environment">
+            <column name="connected_user_id"/>
+            <column name="environment"/>
+        </createIndex>
+
+        <createIndex tableName="connected_user_trigger_subscription"
+                     indexName="idx_connected_user_trigger_subscription_connection_id">
+            <column name="connection_id"/>
+        </createIndex>
+
+        <createIndex tableName="connected_user_trigger_subscription"
+                     indexName="idx_connected_user_trigger_subscription_integration_instance_id">
+            <column name="integration_instance_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint baseTableName="connected_user_trigger_subscription" baseColumnNames="project_id"
+                                 constraintName="fk_connected_user_trigger_subscription_project"
+                                 referencedTableName="project" referencedColumnNames="id" onDelete="CASCADE"/>
+
+        <rollback>
+            <dropTable tableName="connected_user_trigger_subscription"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20261111120000-2" author="Ivica Cardic" contextFilter="mono">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyTableName="connected_user_trigger_subscription"
+                                            foreignKeyName="fk_connected_user_trigger_subscription_connected_user"/>
+            </not>
+        </preConditions>
+
+        <addForeignKeyConstraint baseTableName="connected_user_trigger_subscription"
+                                 baseColumnNames="connected_user_id"
+                                 constraintName="fk_connected_user_trigger_subscription_connected_user"
+                                 referencedTableName="connected_user" referencedColumnNames="id" onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>
