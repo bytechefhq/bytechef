@@ -50,6 +50,7 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -82,7 +83,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectionDefinitionService.class, TriggerDefinitionFacade.class, ConnectionFacade.class, ConnectionService.class,
     ConnectedUserService.class, EmbeddedPermissionEvaluator.class, EnvironmentService.class,
     PrincipalJobFacade.class,
-    PrincipalJobService.class, JobFacade.class, JobService.class, McpComponentService.class,
+    PrincipalJobService.class, PropertyService.class, JobFacade.class, JobService.class, McpComponentService.class,
     McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceConfigurationWorkflowService.class,
     McpIntegrationInstanceToolService.class,
