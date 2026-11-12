@@ -10,8 +10,8 @@ package com.bytechef.ee.platform.external.invocation.log.service;
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.ee.platform.external.invocation.log.repository.ExternalInvocationLogRepository;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -33,9 +33,9 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
 
     private static final int DEFAULT_PAGE_SIZE = 50;
 
-    private static final List<Integer> NON_FAILED_OUTCOMES = List.of(
-        ExternalInvocationOutcome.SUCCESS.ordinal(), ExternalInvocationOutcome.APPROVAL_REQUIRED.ordinal(),
-        ExternalInvocationOutcome.SUSPENDED.ordinal());
+    private static final List<Integer> NON_FAILED_STATUSES = List.of(
+        ExternalInvocationStatus.SUCCESS.ordinal(), ExternalInvocationStatus.APPROVAL_REQUIRED.ordinal(),
+        ExternalInvocationStatus.SUSPENDED.ordinal());
 
     private final ExternalInvocationLogRepository externalInvocationLogRepository;
 
@@ -59,27 +59,27 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
     @Override
     @Transactional(readOnly = true)
     public Optional<ExternalInvocationLog> fetchLastFailedExternalInvocationLog(PlatformType type, int environment) {
-        return externalInvocationLogRepository.findLastFailed(type.ordinal(), environment, NON_FAILED_OUTCOMES);
+        return externalInvocationLogRepository.findLastFailed(type.ordinal(), environment, NON_FAILED_STATUSES);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public boolean hasExternalInvocationLog(PlatformType type, int environment, ExternalInvocationOutcome outcome) {
-        return externalInvocationLogRepository.existsByTypeAndEnvironmentAndOutcome(
-            type.ordinal(), environment, outcome.ordinal());
+    public boolean hasExternalInvocationLog(PlatformType type, int environment, ExternalInvocationStatus status) {
+        return externalInvocationLogRepository.existsByTypeAndEnvironmentAndStatus(
+            type.ordinal(), environment, status.ordinal());
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<ExternalInvocationLog> getExternalInvocationLogs(
         PlatformType type, @Nullable Integer environment, @Nullable ExternalInvocationSource source,
-        @Nullable ExternalInvocationOutcome outcome,
+        @Nullable ExternalInvocationStatus status,
         @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId,
         @Nullable Instant startDate, @Nullable Instant endDate, int pageNumber) {
 
         return findPage(
-            type, null, environment, source, outcome, mcpServerId, a2aServerId, connectedUserId, integrationInstanceId,
+            type, null, environment, source, status, mcpServerId, a2aServerId, connectedUserId, integrationInstanceId,
             startDate,
             endDate, pageNumber);
     }
@@ -88,13 +88,13 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
     @Transactional(readOnly = true)
     public Page<ExternalInvocationLog> getWorkspaceExternalInvocationLogs(
         PlatformType type, long workspaceId, int environment, @Nullable ExternalInvocationSource source,
-        @Nullable ExternalInvocationOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
+        @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
 
         return findPage(
-            type, workspaceId, environment, source, outcome, mcpServerId, a2aServerId, connectedUserId,
+            type, workspaceId, environment, source, status, mcpServerId, a2aServerId, connectedUserId,
             integrationInstanceId,
             startDate, endDate, pageNumber);
     }
@@ -102,23 +102,23 @@ public class ExternalInvocationLogServiceImpl implements ExternalInvocationLogSe
     private Page<ExternalInvocationLog> findPage(
         PlatformType type, @Nullable Long workspaceId, @Nullable Integer environment,
         @Nullable ExternalInvocationSource source,
-        @Nullable ExternalInvocationOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
+        @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId,
         @Nullable Long integrationInstanceId, @Nullable Instant startDate, @Nullable Instant endDate,
         int pageNumber) {
 
         Integer sourceOrdinal = source == null ? null : source.ordinal();
-        Integer outcomeOrdinal = outcome == null ? null : outcome.ordinal();
+        Integer statusOrdinal = status == null ? null : status.ordinal();
 
         PageRequest pageRequest = PageRequest.of(pageNumber, DEFAULT_PAGE_SIZE);
 
         List<ExternalInvocationLog> content = externalInvocationLogRepository.findFiltered(
-            type.ordinal(), workspaceId, environment, sourceOrdinal, outcomeOrdinal, mcpServerId, a2aServerId,
+            type.ordinal(), workspaceId, environment, sourceOrdinal, statusOrdinal, mcpServerId, a2aServerId,
             connectedUserId,
             integrationInstanceId, startDate, endDate, pageRequest.getPageSize(), pageRequest.getOffset());
 
         long total = externalInvocationLogRepository.countFiltered(
-            type.ordinal(), workspaceId, environment, sourceOrdinal, outcomeOrdinal, mcpServerId, a2aServerId,
+            type.ordinal(), workspaceId, environment, sourceOrdinal, statusOrdinal, mcpServerId, a2aServerId,
             connectedUserId,
             integrationInstanceId, startDate, endDate);
 

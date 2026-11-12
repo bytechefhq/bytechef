@@ -27,7 +27,7 @@ public record ExternalInvocationEvent(
     @Nullable String componentName, @Nullable Integer componentVersion, @Nullable String operationName,
     @Nullable Long connectionId, @Nullable Integer environment, @Nullable Long workspaceId,
     @Nullable String externalUserId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
-    @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long jobId, ExternalInvocationOutcome outcome,
+    @Nullable Long mcpServerId, @Nullable Long a2aServerId, @Nullable Long jobId, ExternalInvocationStatus status,
     @Nullable String errorType, @Nullable String errorMessage, long durationMs) {
 
     public static final int ERROR_MESSAGE_MAX_LENGTH = 512;
@@ -57,7 +57,7 @@ public record ExternalInvocationEvent(
         private @Nullable Long mcpServerId;
         private @Nullable Long a2aServerId;
         private @Nullable Long jobId;
-        private ExternalInvocationOutcome outcome = ExternalInvocationOutcome.SUCCESS;
+        private ExternalInvocationStatus status = ExternalInvocationStatus.SUCCESS;
         private @Nullable String errorType;
         private @Nullable String errorMessage;
         private long durationMs;
@@ -142,8 +142,8 @@ public record ExternalInvocationEvent(
             return this;
         }
 
-        public Builder outcome(ExternalInvocationOutcome outcome) {
-            this.outcome = outcome;
+        public Builder status(ExternalInvocationStatus status) {
+            this.status = status;
 
             return this;
         }
@@ -174,7 +174,7 @@ public record ExternalInvocationEvent(
             return new ExternalInvocationEvent(
                 type, source, kind, toolName, componentName, componentVersion, operationName, connectionId,
                 environment, workspaceId, externalUserId, connectedUserId, integrationInstanceId, mcpServerId,
-                a2aServerId, jobId, outcome, errorType, errorMessage, durationMs);
+                a2aServerId, jobId, status, errorType, errorMessage, durationMs);
         }
     }
 }

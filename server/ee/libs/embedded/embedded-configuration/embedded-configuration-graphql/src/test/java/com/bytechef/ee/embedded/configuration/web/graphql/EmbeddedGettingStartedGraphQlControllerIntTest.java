@@ -92,7 +92,7 @@ class EmbeddedGettingStartedGraphQlControllerIntTest {
                         lastFailedCall {
                             createdDate
                             errorMessage
-                            outcome
+                            status
                         }
                         testUserAdded
                         testUserConnected
@@ -147,7 +147,7 @@ class EmbeddedGettingStartedGraphQlControllerIntTest {
             .path("embeddedGettingStarted.lastFailedCall.errorMessage")
             .entity(String.class)
             .isEqualTo("boom")
-            .path("embeddedGettingStarted.lastFailedCall.outcome")
+            .path("embeddedGettingStarted.lastFailedCall.status")
             .entity(String.class)
             .isEqualTo("FAILED")
             .path("embeddedGettingStarted.testUserAdded")
@@ -179,7 +179,7 @@ class EmbeddedGettingStartedGraphQlControllerIntTest {
                 query {
                     embeddedGettingStarted {
                         lastFailedCall {
-                            outcome
+                            status
                         }
                         testUserExternalId
                     }

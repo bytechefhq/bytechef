@@ -52,9 +52,9 @@ import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -202,7 +202,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
                 new JobParametersDTO(projectDeploymentWorkflow.getWorkflowId(), inputs, metadata),
                 projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION);
         } catch (RuntimeException runtimeException) {
-            recordSkillCall(eventBuilder, startNanos, ExternalInvocationOutcome.ERROR, runtimeException);
+            recordSkillCall(eventBuilder, startNanos, ExternalInvocationStatus.ERROR, runtimeException);
 
             throw runtimeException;
         }
@@ -220,7 +220,7 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
         } catch (RuntimeException runtimeException) {
             log.error("Failed to await A2A workflow run {}", jobId, runtimeException);
 
-            recordSkillCall(eventBuilder, startNanos, ExternalInvocationOutcome.ERROR, runtimeException);
+            recordSkillCall(eventBuilder, startNanos, ExternalInvocationStatus.ERROR, runtimeException);
 
             return A2AAgentRun.started(
                 taskReference, CompletableFuture.completedFuture(inProgressResult(taskReference)));
@@ -277,13 +277,13 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
             try {
                 A2AAgentResult agentResult = toAgentResult(job, taskReference, eventBuilder);
 
-                recordSkillCall(eventBuilder, startNanos, getOutcome(agentResult), null);
+                recordSkillCall(eventBuilder, startNanos, getExternalInvocationStatus(agentResult), null);
 
                 return agentResult;
             } catch (RuntimeException runtimeException) {
                 log.error("Failed to read the result of A2A workflow run {}", jobId, runtimeException);
 
-                recordSkillCall(eventBuilder, startNanos, ExternalInvocationOutcome.ERROR, runtimeException);
+                recordSkillCall(eventBuilder, startNanos, ExternalInvocationStatus.ERROR, runtimeException);
 
                 return inProgressResult(taskReference);
             }
@@ -293,18 +293,18 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
             completionException.getCause() != null ? completionException.getCause() : throwable;
 
         if (cause instanceof TimeoutException) {
-            recordSkillCall(eventBuilder, startNanos, ExternalInvocationOutcome.TIMEOUT, cause);
+            recordSkillCall(eventBuilder, startNanos, ExternalInvocationStatus.TIMEOUT, cause);
         } else {
             log.error("Failed to await A2A workflow run {}", jobId, cause);
 
-            recordSkillCall(eventBuilder, startNanos, ExternalInvocationOutcome.ERROR, cause);
+            recordSkillCall(eventBuilder, startNanos, ExternalInvocationStatus.ERROR, cause);
         }
 
         return inProgressResult(taskReference);
     }
 
     private void recordSkillCall(
-        ExternalInvocationEvent.Builder eventBuilder, long startNanos, ExternalInvocationOutcome outcome,
+        ExternalInvocationEvent.Builder eventBuilder, long startNanos, ExternalInvocationStatus status,
         @Nullable Throwable throwable) {
 
         if (throwable != null) {
@@ -314,18 +314,18 @@ public class A2AAgentExecutorImpl implements A2AAgentExecutor {
             eventBuilder.errorMessage(throwable.getMessage());
         }
 
-        eventBuilder.outcome(outcome);
+        eventBuilder.status(status);
         eventBuilder.durationMs(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos));
 
         externalInvocationRecorder.record(eventBuilder.build());
     }
 
-    private static ExternalInvocationOutcome getOutcome(A2AAgentResult agentResult) {
+    private static ExternalInvocationStatus getExternalInvocationStatus(A2AAgentResult agentResult) {
         return switch (agentResult) {
-            case A2AAgentResult.Completed _ -> ExternalInvocationOutcome.SUCCESS;
-            case A2AAgentResult.Failed _ -> ExternalInvocationOutcome.ERROR;
-            case A2AAgentResult.InputRequired _ -> ExternalInvocationOutcome.APPROVAL_REQUIRED;
-            case A2AAgentResult.Working _ -> ExternalInvocationOutcome.SUSPENDED;
+            case A2AAgentResult.Completed _ -> ExternalInvocationStatus.SUCCESS;
+            case A2AAgentResult.Failed _ -> ExternalInvocationStatus.ERROR;
+            case A2AAgentResult.InputRequired _ -> ExternalInvocationStatus.APPROVAL_REQUIRED;
+            case A2AAgentResult.Working _ -> ExternalInvocationStatus.SUSPENDED;
         };
     }
 

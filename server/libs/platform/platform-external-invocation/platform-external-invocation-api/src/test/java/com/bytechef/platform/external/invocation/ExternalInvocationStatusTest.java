@@ -16,17 +16,23 @@
 
 package com.bytechef.platform.external.invocation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Arrays;
+import org.junit.jupiter.api.Test;
+
 /**
  * @author Ivica Cardic
  */
-public enum ExternalInvocationOutcome {
+class ExternalInvocationStatusTest {
 
-    SUCCESS,
-    ERROR,
-    CONNECTION_REQUIRED,
-    TIMEOUT,
-    APPROVAL_REQUIRED,
-    APPROVAL_DENIED,
-    RULE_BLOCKED,
-    SUSPENDED
+    @Test
+    void testStatusOrdinals() {
+        assertThat(Arrays.stream(ExternalInvocationStatus.values())
+            .map(Enum::name)
+            .toList())
+                .containsExactly(
+                    "SUCCESS", "ERROR", "CONNECTION_REQUIRED", "TIMEOUT", "APPROVAL_REQUIRED", "APPROVAL_DENIED",
+                    "RULE_BLOCKED", "SUSPENDED");
+    }
 }

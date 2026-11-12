@@ -31,7 +31,7 @@ class WorkflowToolRunResultTest {
         WorkflowToolRunResult workflowToolRunResult = WorkflowToolRunResult.completed(
             Map.of("status", "approval_required"));
 
-        assertThat(workflowToolRunResult.getOutcome()).isEqualTo(ExternalInvocationOutcome.SUCCESS);
+        assertThat(workflowToolRunResult.getExternalInvocationStatus()).isEqualTo(ExternalInvocationStatus.SUCCESS);
         assertThat(workflowToolRunResult.result()).isEqualTo(Map.of("status", "approval_required"));
     }
 
@@ -40,7 +40,8 @@ class WorkflowToolRunResultTest {
         WorkflowToolRunResult workflowToolRunResult = new WorkflowToolRunResult(
             WorkflowToolRunResult.Status.APPROVAL_REQUIRED, Map.of());
 
-        assertThat(workflowToolRunResult.getOutcome()).isEqualTo(ExternalInvocationOutcome.APPROVAL_REQUIRED);
+        assertThat(workflowToolRunResult.getExternalInvocationStatus())
+            .isEqualTo(ExternalInvocationStatus.APPROVAL_REQUIRED);
     }
 
     @Test
@@ -48,7 +49,7 @@ class WorkflowToolRunResultTest {
         WorkflowToolRunResult workflowToolRunResult = new WorkflowToolRunResult(
             WorkflowToolRunResult.Status.PAUSED, Map.of());
 
-        assertThat(workflowToolRunResult.getOutcome()).isEqualTo(ExternalInvocationOutcome.SUSPENDED);
+        assertThat(workflowToolRunResult.getExternalInvocationStatus()).isEqualTo(ExternalInvocationStatus.SUSPENDED);
     }
 
     @Test
@@ -56,6 +57,6 @@ class WorkflowToolRunResultTest {
         WorkflowToolRunResult workflowToolRunResult = new WorkflowToolRunResult(
             WorkflowToolRunResult.Status.STOPPED, Map.of());
 
-        assertThat(workflowToolRunResult.getOutcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(workflowToolRunResult.getExternalInvocationStatus()).isEqualTo(ExternalInvocationStatus.ERROR);
     }
 }

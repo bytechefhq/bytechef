@@ -11,8 +11,8 @@ import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocatio
 import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import java.time.Instant;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -44,14 +44,14 @@ public class RemoteExternalInvocationLogServiceClient implements ExternalInvocat
     }
 
     @Override
-    public boolean hasExternalInvocationLog(PlatformType type, int environment, ExternalInvocationOutcome outcome) {
+    public boolean hasExternalInvocationLog(PlatformType type, int environment, ExternalInvocationStatus status) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Page<ExternalInvocationLog> getExternalInvocationLogs(
         PlatformType type, @Nullable Integer environment, @Nullable ExternalInvocationSource source,
-        @Nullable ExternalInvocationOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
+        @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Instant startDate,
         @Nullable Instant endDate, int pageNumber) {
 
@@ -61,7 +61,7 @@ public class RemoteExternalInvocationLogServiceClient implements ExternalInvocat
     @Override
     public Page<ExternalInvocationLog> getWorkspaceExternalInvocationLogs(
         PlatformType type, long workspaceId, int environment, @Nullable ExternalInvocationSource source,
-        @Nullable ExternalInvocationOutcome outcome, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
+        @Nullable ExternalInvocationStatus status, @Nullable Long mcpServerId, @Nullable Long a2aServerId,
         @Nullable Long connectedUserId, @Nullable Long integrationInstanceId, @Nullable Instant startDate,
         @Nullable Instant endDate, int pageNumber) {
 

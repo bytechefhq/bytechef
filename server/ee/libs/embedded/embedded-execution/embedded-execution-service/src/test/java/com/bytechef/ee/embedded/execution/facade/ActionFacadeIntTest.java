@@ -29,8 +29,8 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -105,7 +105,7 @@ class ActionFacadeIntTest {
                 assertThat(externalInvocationLog.getExternalUserId()).isEqualTo("user-1");
                 assertThat(externalInvocationLog.getConnectedUserId()).isEqualTo(connectedUserId);
                 assertThat(externalInvocationLog.getIntegrationInstanceId()).isEqualTo(integrationInstance.getId());
-                assertThat(externalInvocationLog.getOutcome()).isEqualTo(ExternalInvocationOutcome.SUCCESS);
+                assertThat(externalInvocationLog.getStatus()).isEqualTo(ExternalInvocationStatus.SUCCESS);
             });
     }
 
@@ -128,7 +128,7 @@ class ActionFacadeIntTest {
 
         assertThat(getExternalInvocationLogs(connectedUserId)).singleElement()
             .satisfies(externalInvocationLog -> {
-                assertThat(externalInvocationLog.getOutcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+                assertThat(externalInvocationLog.getStatus()).isEqualTo(ExternalInvocationStatus.ERROR);
                 assertThat(externalInvocationLog.getErrorType()).isEqualTo("IllegalStateException");
                 assertThat(externalInvocationLog.getErrorMessage()).isEqualTo("Channel not found");
                 assertThat(externalInvocationLog.getConnectedUserId()).isEqualTo(connectedUserId);
@@ -156,7 +156,7 @@ class ActionFacadeIntTest {
 
         assertThat(getExternalInvocationLogs(connectedUserId)).singleElement()
             .satisfies(externalInvocationLog -> {
-                assertThat(externalInvocationLog.getOutcome()).isEqualTo(ExternalInvocationOutcome.CONNECTION_REQUIRED);
+                assertThat(externalInvocationLog.getStatus()).isEqualTo(ExternalInvocationStatus.CONNECTION_REQUIRED);
                 assertThat(externalInvocationLog.getSource()).isEqualTo(ExternalInvocationSource.API_ACTION);
                 assertThat(externalInvocationLog.getConnectedUserId()).isEqualTo(connectedUserId);
                 assertThat(externalInvocationLog.getConnectionId()).isNull();
@@ -181,8 +181,8 @@ class ActionFacadeIntTest {
 
         assertThat(result).isEqualTo("ok");
         assertThat(getExternalInvocationLogs(connectedUserId)).singleElement()
-            .satisfies(externalInvocationLog -> assertThat(externalInvocationLog.getOutcome())
-                .isEqualTo(ExternalInvocationOutcome.SUCCESS));
+            .satisfies(externalInvocationLog -> assertThat(externalInvocationLog.getStatus())
+                .isEqualTo(ExternalInvocationStatus.SUCCESS));
     }
 
     @Test
@@ -202,8 +202,8 @@ class ActionFacadeIntTest {
 
         assertThat(result).isEqualTo("ok");
         assertThat(getExternalInvocationLogs(connectedUserId)).singleElement()
-            .satisfies(externalInvocationLog -> assertThat(externalInvocationLog.getOutcome())
-                .isEqualTo(ExternalInvocationOutcome.SUCCESS));
+            .satisfies(externalInvocationLog -> assertThat(externalInvocationLog.getStatus())
+                .isEqualTo(ExternalInvocationStatus.SUCCESS));
     }
 
     private List<ExternalInvocationLog> getExternalInvocationLogs(long connectedUserId) {

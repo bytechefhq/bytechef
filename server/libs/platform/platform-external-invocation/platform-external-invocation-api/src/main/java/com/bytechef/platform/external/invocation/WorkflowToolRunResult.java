@@ -27,12 +27,12 @@ public record WorkflowToolRunResult(Status status, @Nullable Object result) {
         return new WorkflowToolRunResult(Status.COMPLETED, result);
     }
 
-    public ExternalInvocationOutcome getOutcome() {
+    public ExternalInvocationStatus getExternalInvocationStatus() {
         return switch (status) {
-            case APPROVAL_REQUIRED -> ExternalInvocationOutcome.APPROVAL_REQUIRED;
-            case COMPLETED -> ExternalInvocationOutcome.SUCCESS;
-            case PAUSED -> ExternalInvocationOutcome.SUSPENDED;
-            case STOPPED -> ExternalInvocationOutcome.ERROR;
+            case APPROVAL_REQUIRED -> ExternalInvocationStatus.APPROVAL_REQUIRED;
+            case COMPLETED -> ExternalInvocationStatus.SUCCESS;
+            case PAUSED -> ExternalInvocationStatus.SUSPENDED;
+            case STOPPED -> ExternalInvocationStatus.ERROR;
         };
     }
 

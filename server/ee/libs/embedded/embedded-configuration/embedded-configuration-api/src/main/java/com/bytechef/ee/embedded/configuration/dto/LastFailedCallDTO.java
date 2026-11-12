@@ -15,5 +15,5 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Ivica Cardic
  */
-public record LastFailedCallDTO(String outcome, @Nullable String errorMessage, Instant createdDate) {
+public record LastFailedCallDTO(String status, @Nullable String errorMessage, Instant createdDate) {
 }

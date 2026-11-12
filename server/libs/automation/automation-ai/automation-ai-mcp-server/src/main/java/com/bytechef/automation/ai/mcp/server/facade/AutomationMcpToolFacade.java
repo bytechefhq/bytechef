@@ -355,7 +355,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                         jobCompletionAwaiter.await(jobId, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT)
                             .join());
                 },
-                WorkflowToolRunResult::getOutcome);
+                WorkflowToolRunResult::getExternalInvocationStatus);
 
             return workflowToolRunResult.result();
         };
@@ -561,12 +561,12 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
     }
 
     public @Nullable Object resolveApprovalAndAwait(String resumeToken, Map<String, Object> data, long jobId) {
-        JobResumeFacade.JobResumeOutcome outcome = jobResumeFacade.resumeJob(resumeToken, data);
+        JobResumeFacade.JobResumeOutcome status = jobResumeFacade.resumeJob(resumeToken, data);
 
-        if (outcome != JobResumeFacade.JobResumeOutcome.OK) {
+        if (status != JobResumeFacade.JobResumeOutcome.OK) {
             return Map.of(
                 "status", "approval_unavailable",
-                "message", "The approval could no longer be resolved (" + outcome + ").");
+                "message", "The approval could no longer be resolved (" + status + ").");
         }
 
         return awaitApprovedWorkflowRun(jobId);

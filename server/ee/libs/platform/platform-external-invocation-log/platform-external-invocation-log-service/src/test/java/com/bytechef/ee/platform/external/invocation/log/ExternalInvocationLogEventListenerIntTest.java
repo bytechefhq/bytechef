@@ -16,8 +16,8 @@ import com.bytechef.ee.platform.external.invocation.log.repository.ExternalInvoc
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -85,7 +85,7 @@ class ExternalInvocationLogEventListenerIntTest {
             .mcpServerId(3L)
             .a2aServerId(4L)
             .jobId(11L)
-            .outcome(ExternalInvocationOutcome.ERROR)
+            .status(ExternalInvocationStatus.ERROR)
             .errorType("IllegalStateException")
             .errorMessage("failed")
             .durationMs(42)
@@ -116,7 +116,7 @@ class ExternalInvocationLogEventListenerIntTest {
         assertThat(externalInvocationLog.getMcpServerId()).isEqualTo(3L);
         assertThat(externalInvocationLog.getA2aServerId()).isEqualTo(4L);
         assertThat(externalInvocationLog.getJobId()).isEqualTo(11L);
-        assertThat(externalInvocationLog.getOutcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(externalInvocationLog.getStatus()).isEqualTo(ExternalInvocationStatus.ERROR);
         assertThat(externalInvocationLog.getErrorType()).isEqualTo("IllegalStateException");
         assertThat(externalInvocationLog.getErrorMessage()).isEqualTo("failed");
         assertThat(externalInvocationLog.getDurationMs()).isEqualTo(42);
@@ -133,7 +133,7 @@ class ExternalInvocationLogEventListenerIntTest {
                 "s".repeat(300))
             .componentName("c".repeat(300))
             .operationName("o".repeat(300))
-            .outcome(ExternalInvocationOutcome.ERROR)
+            .status(ExternalInvocationStatus.ERROR)
             .errorType("t".repeat(300))
             .errorMessage("m".repeat(600))
             .build();
@@ -160,7 +160,7 @@ class ExternalInvocationLogEventListenerIntTest {
                 PlatformType.EMBEDDED, ExternalInvocationSource.API_ACTION, ExternalInvocationKind.COMPONENT,
                 "slack_sendMessage")
             .externalUserId("x".repeat(300))
-            .outcome(ExternalInvocationOutcome.SUCCESS)
+            .status(ExternalInvocationStatus.SUCCESS)
             .build();
 
         applicationEventPublisher.publishEvent(externalInvocationEvent);

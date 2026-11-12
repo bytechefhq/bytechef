@@ -17,8 +17,8 @@ import com.bytechef.ee.platform.external.invocation.log.repository.ExternalInvoc
 import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocationLogService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
 import com.bytechef.tenant.sql.BaseDataSource;
@@ -162,7 +162,7 @@ class ExternalInvocationLogRetentionJobIntTest {
         externalInvocationLog.setSource(ExternalInvocationSource.MCP_SERVER);
         externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
         externalInvocationLog.setToolName(toolName);
-        externalInvocationLog.setOutcome(ExternalInvocationOutcome.SUCCESS);
+        externalInvocationLog.setStatus(ExternalInvocationStatus.SUCCESS);
         externalInvocationLog.setDurationMs(5);
         externalInvocationLog.setCreatedDate(createdDate);
 
@@ -186,9 +186,9 @@ class ExternalInvocationLogRetentionJobIntTest {
     private void insert(String schema, String toolName, Instant createdDate) {
         jdbcTemplate.update(
             "INSERT INTO " + schema + ".external_invocation_log " +
-                "(type, source, kind, tool_name, outcome, duration_ms, created_date) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "(type, source, kind, tool_name, status, duration_ms, created_date) VALUES (?, ?, ?, ?, ?, ?, ?)",
             PlatformType.AUTOMATION.ordinal(), ExternalInvocationSource.MCP_SERVER.ordinal(),
-            ExternalInvocationKind.COMPONENT.ordinal(), toolName, ExternalInvocationOutcome.SUCCESS.ordinal(), 5,
+            ExternalInvocationKind.COMPONENT.ordinal(), toolName, ExternalInvocationStatus.SUCCESS.ordinal(), 5,
             Timestamp.from(createdDate));
     }
 
