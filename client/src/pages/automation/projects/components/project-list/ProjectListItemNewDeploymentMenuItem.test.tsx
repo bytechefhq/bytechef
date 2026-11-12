@@ -35,7 +35,7 @@ describe('ProjectListItemNewDeploymentMenuItem', () => {
 
         await userEvent.hover(newDeploymentMenuItem.parentElement!);
 
-        expect(await screen.findByRole('tooltip')).toHaveTextContent('Add a workflow before deploying the project.');
+        expect(await screen.findByRole('tooltip')).toHaveTextContent('Add a workflow before publishing the project.');
 
         await userEvent.click(newDeploymentMenuItem, {pointerEventsCheck: 0});
 

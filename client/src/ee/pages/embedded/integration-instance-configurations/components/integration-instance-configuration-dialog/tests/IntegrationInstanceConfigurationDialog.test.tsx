@@ -6,9 +6,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import IntegrationInstanceConfigurationDialog from '../IntegrationInstanceConfigurationDialog';
 
 const hoisted = vi.hoisted(() => ({
+    configurations: undefined as IntegrationInstanceConfiguration[] | undefined,
+    configurationsQuery: vi.fn(),
     connectionDefinition: undefined as
         {authorizationRequired?: boolean; authorizations: {title: string; type: string}[]} | undefined,
     createMutate: vi.fn(),
+    createMutationOnSuccess: {current: undefined as ((createdId: number) => void) | undefined},
     findTestConnectionId: vi.fn(),
     integration: undefined as {componentName: string; name?: string} | undefined,
     readIntegrationId: undefined as unknown,
@@ -19,7 +22,11 @@ const hoisted = vi.hoisted(() => ({
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
-    useCreateIntegrationInstanceConfigurationMutation: () => ({mutate: hoisted.createMutate, reset: vi.fn()}),
+    useCreateIntegrationInstanceConfigurationMutation: (mutationProps?: {onSuccess?: (createdId: number) => void}) => {
+        hoisted.createMutationOnSuccess.current = mutationProps?.onSuccess;
+
+        return {mutate: hoisted.createMutate, reset: vi.fn()};
+    },
     useUpdateIntegrationInstanceConfigurationCredentialsMutation: () => ({
         isPending: false,
         mutate: hoisted.updateCredentialsMutate,
@@ -29,6 +36,11 @@ vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutati
 
 vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries', () => ({
     IntegrationInstanceConfigurationKeys: {integrationInstanceConfigurations: ['integrationInstanceConfigurations']},
+    useGetIntegrationInstanceConfigurationsQuery: (filters: unknown, enabled: boolean) => {
+        hoisted.configurationsQuery(filters, enabled);
+
+        return {data: enabled ? hoisted.configurations : undefined, isFetching: false};
+    },
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries', () => ({
@@ -45,7 +57,7 @@ vi.mock('@/shared/hooks/useWorkflowTestConfigurationConnections', () => ({
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrations.queries', () => ({
-    IntegrationKeys: {integrations: ['integrations']},
+    IntegrationKeys: {filteredIntegrations: () => ['integrations', 'filtered'], integrations: ['integrations']},
     useGetIntegrationQuery: () => ({data: hoisted.integration}),
 }));
 
@@ -74,17 +86,25 @@ vi.mock('../IntegrationInstanceConfigurationDialogBasicStep', () => ({
     default: ({
         authorizations,
         getValues,
+        integrationInstanceConfiguration,
         setCurIntegrationId,
         setCurIntegrationVersion,
         setValue,
+        updateIntegrationVersion,
     }: {
         authorizations?: {type: string}[];
         getValues: (name: string) => unknown;
+        integrationInstanceConfiguration?: {name?: string};
         setCurIntegrationId: (integrationId: number) => void;
         setCurIntegrationVersion: (integrationVersion: number) => void;
         setValue: (name: string, value: unknown) => void;
+        updateIntegrationVersion?: boolean;
     }) => (
         <div data-testid="basic-step">
+            <span data-testid="basic-step-mode">
+                {`${updateIntegrationVersion ? 'update' : 'create'}:${integrationInstanceConfiguration?.name ?? ''}`}
+            </span>
+
             <span data-testid="basic-step-authorizations">
                 {authorizations?.map((authorization) => authorization.type).join(',')}
             </span>
@@ -166,6 +186,7 @@ afterEach(() => {
     resetAll();
     vi.clearAllMocks();
 
+    hoisted.configurations = undefined;
     hoisted.connectionDefinition = undefined;
     hoisted.integration = undefined;
     hoisted.readName = undefined;
@@ -370,6 +391,44 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             );
         });
 
+        it('should report the id of the created configuration', async () => {
+            const onSuccess = vi.fn();
+            const user = userEvent.setup();
+
+            hoisted.connectionDefinition = {authorizations: [{title: 'Basic Auth', type: 'BASIC_AUTH'}]};
+            hoisted.createMutate.mockImplementation(() => hoisted.createMutationOnSuccess.current?.(42));
+
+            render(<IntegrationInstanceConfigurationDialog onClose={onClose} onSuccess={onSuccess} />);
+
+            await user.click(screen.getByRole('button', {name: 'Pick Integration'}));
+
+            await user.click(await screen.findByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(onSuccess).toHaveBeenCalledWith(42), {interval: 5, timeout: 5000});
+
+            await waitFor(() => expect(onClose).toHaveBeenCalled(), {interval: 5, timeout: 5000});
+        });
+
+        it('should create the configuration in the environment it was opened for', async () => {
+            const user = userEvent.setup();
+
+            hoisted.connectionDefinition = {authorizations: [{title: 'Basic Auth', type: 'BASIC_AUTH'}]};
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{environmentId: 0} as IntegrationInstanceConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Pick Integration'}));
+            await user.click(await screen.findByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(hoisted.createMutate).toHaveBeenCalledWith(expect.objectContaining({environmentId: 0}))
+            );
+        });
+
         it('should leave the authorization unselected when the connection offers one optional authorization', async () => {
             const user = userEvent.setup();
 
@@ -513,7 +572,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
                 />
             );
 
-            expect(screen.getByRole('heading', {name: 'Edit Instance Configuration'})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'Edit Configuration'})).toBeInTheDocument();
             expect(screen.queryByRole('navigation', {name: 'Steps'})).not.toBeInTheDocument();
             expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
             expect(screen.queryByRole('button', {name: 'Next'})).not.toBeInTheDocument();
@@ -609,7 +668,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
         it('should title the dialog for a version upgrade', () => {
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} updateIntegrationVersion />);
 
-            expect(screen.getByRole('heading', {name: 'Upgrade Version - Basic'})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'Change Integration Version - Basic'})).toBeInTheDocument();
             expect(
                 screen.getAllByText('Move this configuration to another integration version.').length
             ).toBeGreaterThan(0);
@@ -919,6 +978,131 @@ describe('IntegrationInstanceConfigurationDialog', () => {
                     connections: [expect.objectContaining({connectionId: 7, workflowNodeName: 'googleMail_1'})],
                 }),
             ]);
+        });
+    });
+
+    describe('tabs', () => {
+        const developmentConfigurations = [
+            {
+                authorizationType: 'API_KEY',
+                id: 7,
+                integrationId: 2,
+                integrationVersion: 1,
+                name: 'Beta Users',
+            },
+            {
+                authorizationType: 'API_KEY',
+                id: 8,
+                integrationId: 2,
+                integrationVersion: 2,
+                name: 'Everyone',
+            },
+        ] as IntegrationInstanceConfiguration[];
+
+        it('should not show the tabs or load configurations without showTabs', () => {
+            hoisted.configurations = developmentConfigurations;
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2} as IntegrationInstanceConfiguration}
+                    onClose={onClose}
+                />
+            );
+
+            expect(screen.queryByRole('tab', {name: 'Change Version'})).not.toBeInTheDocument();
+            expect(hoisted.configurationsQuery).toHaveBeenCalledWith({environmentId: 0, integrationId: 2}, false);
+        });
+
+        it('should open on the New tab when the integration has no configurations', async () => {
+            hoisted.configurations = [];
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2} as IntegrationInstanceConfiguration}
+                    onClose={onClose}
+                    showTabs
+                />
+            );
+
+            expect(await screen.findByRole('tab', {name: 'New', selected: true})).toBeInTheDocument();
+            expect(screen.getByTestId('basic-step-mode')).toHaveTextContent('create:');
+            expect(screen.getByRole('heading', {name: 'New Configuration - Basic'})).toBeInTheDocument();
+            expect(hoisted.configurationsQuery).toHaveBeenCalledWith({environmentId: 0, integrationId: 2}, true);
+        });
+
+        it('should open on Change Version and block the basic step when no configuration is picked', async () => {
+            hoisted.configurations = developmentConfigurations;
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2} as IntegrationInstanceConfiguration}
+                    onClose={onClose}
+                    showTabs
+                />
+            );
+
+            expect(await screen.findByRole('tab', {name: 'Change Version', selected: true})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'Change Integration Version - Basic'})).toBeInTheDocument();
+            expect(screen.queryByTestId('basic-step')).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+        });
+
+        it('should switch to the version update of the configuration picked on Change Version', async () => {
+            const user = userEvent.setup();
+
+            Element.prototype.hasPointerCapture = vi.fn();
+            Element.prototype.scrollIntoView = vi.fn();
+
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+            hoisted.configurations = developmentConfigurations;
+            hoisted.integration = {componentName: 'httpClient'};
+            hoisted.workflows = [{id: 'workflow-1', workflowUuid: 'workflow-uuid-1'}];
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2} as IntegrationInstanceConfiguration}
+                    onClose={onClose}
+                    showTabs
+                />
+            );
+
+            await user.click(await screen.findByRole('combobox', {name: 'Configuration'}));
+            await user.click(await screen.findByRole('option', {name: 'Everyone - V2'}));
+
+            expect(screen.getByTestId('basic-step-mode')).toHaveTextContent('update:Everyone');
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+
+            expect(await screen.findByTestId('workflows-step')).toBeInTheDocument();
+
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() =>
+                expect(hoisted.updateMutate).toHaveBeenCalledWith(expect.objectContaining({id: 8, name: 'Everyone'}))
+            );
+
+            expect(hoisted.createMutate).not.toHaveBeenCalled();
+        });
+
+        it('should pick the only configuration and return to a new configuration on the New tab', async () => {
+            const user = userEvent.setup();
+
+            hoisted.configurations = [developmentConfigurations[0]];
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{integrationId: 2} as IntegrationInstanceConfiguration}
+                    onClose={onClose}
+                    showTabs
+                />
+            );
+
+            await waitFor(() => expect(screen.getByTestId('basic-step-mode')).toHaveTextContent('update:Beta Users'));
+
+            await user.click(screen.getByRole('tab', {name: 'New'}));
+
+            expect(screen.getByTestId('basic-step-mode')).toHaveTextContent('create:');
+            expect(screen.getByRole('heading', {name: 'New Configuration - Basic'})).toBeInTheDocument();
         });
     });
 });

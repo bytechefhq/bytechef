@@ -31,6 +31,8 @@ const AutomationEditorBreadcrumb = ({
         [projects]
     );
 
+    const projectPublished = project.lastPublishedVersion === project.version;
+
     return (
         <Breadcrumb className="min-w-0">
             <BreadcrumbList className="flex-nowrap">
@@ -42,12 +44,12 @@ const AutomationEditorBreadcrumb = ({
                         badge={
                             <Badge
                                 className="flex shrink-0 space-x-1 border-transparent"
-                                styleType="secondary-filled"
+                                styleType={projectPublished ? 'success-outline' : 'secondary-filled'}
                                 weight="semibold"
                             >
                                 <span>V{project.version}</span>
 
-                                <span>DRAFT</span>
+                                <span>{projectPublished ? 'PUBLISHED' : 'DRAFT'}</span>
                             </Badge>
                         }
                         currentId={project.id}

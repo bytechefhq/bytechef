@@ -1,6 +1,4 @@
-import '@/shared/styles/dropdownMenu.css';
-import Button from '@/components/Button/Button';
-import {Separator} from '@/components/ui/separator';
+import {DropdownMenuItem, DropdownMenuSeparator} from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import EEVersion from '@/shared/edition/EEVersion';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -18,11 +16,9 @@ import {
     Trash2Icon,
     UploadIcon,
 } from 'lucide-react';
-import {MouseEvent} from 'react';
 
 const ProjectTabButtons = ({
     importN8nWorkflowDisabled,
-    onCloseDropdownMenuClick,
     onDeleteProjectClick,
     onDuplicateProjectClick,
     onImportN8nWorkflowClick,
@@ -38,7 +34,6 @@ const ProjectTabButtons = ({
     projectId,
 }: {
     importN8nWorkflowDisabled: boolean;
-    onCloseDropdownMenuClick: () => void;
     onDeleteProjectClick: () => void;
     onDuplicateProjectClick: () => void;
     onImportN8nWorkflowClick: () => void;
@@ -57,101 +52,48 @@ const ProjectTabButtons = ({
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
 
-    const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
-        if ((event.target as HTMLElement).tagName === 'BUTTON') {
-            onCloseDropdownMenuClick();
-        }
-    };
-
     return (
-        <div className="flex flex-col" onClick={handleButtonClick} role="presentation">
-            <Button
-                aria-label="Edit Project Button"
-                className="dropdown-menu-item"
-                icon={<EditIcon />}
-                label="Edit"
-                onClick={() => onShowEditProjectDialogClick()}
-                variant="ghost"
-            />
+        <>
+            <DropdownMenuItem icon={<EditIcon />} label="Edit" onSelect={onShowEditProjectDialogClick} />
 
-            <Button
-                aria-label="Duplicate Project Button"
-                className="dropdown-menu-item"
-                icon={<CopyIcon />}
-                label="Duplicate"
-                onClick={onDuplicateProjectClick}
-                variant="ghost"
-            />
+            <DropdownMenuItem icon={<CopyIcon />} label="Duplicate" onSelect={onDuplicateProjectClick} />
 
-            <Button
-                aria-label="Share ProjectButton"
-                className="dropdown-menu-item"
-                icon={<Share2Icon />}
-                label="Share"
-                onClick={onShareProject}
-                variant="ghost"
-            />
+            <DropdownMenuItem icon={<Share2Icon />} label="Share" onSelect={onShareProject} />
 
             {templatesSubmissionForm && (
-                <Button
-                    aria-label="Share Project with Community Button"
-                    className="dropdown-menu-item"
+                <DropdownMenuItem
                     icon={<Share2Icon />}
                     label="Share with Community"
-                    onClick={() => window.open(templatesSubmissionForm, '_blank')}
-                    variant="ghost"
+                    onSelect={() => window.open(templatesSubmissionForm, '_blank')}
                 />
             )}
 
-            <Button
-                aria-label="Export Project"
-                className="dropdown-menu-item"
+            <DropdownMenuItem
                 icon={<DownloadIcon />}
                 label="Export"
-                onClick={() => (window.location.href = `/api/automation/internal/projects/${projectId}/export`)}
-                variant="ghost"
+                onSelect={() => (window.location.href = `/api/automation/internal/projects/${projectId}/export`)}
             />
 
-            <Separator />
+            <DropdownMenuSeparator />
 
-            <Button
-                aria-label="New Workflow"
-                className="dropdown-menu-item"
-                icon={<PlusIcon />}
-                label="New Workflow"
-                onClick={onNewWorkflowClick}
-                variant="ghost"
-            />
+            <DropdownMenuItem icon={<PlusIcon />} label="New Workflow" onSelect={onNewWorkflowClick} />
 
-            <Button
-                aria-label="New Workflow from Template"
-                className="dropdown-menu-item"
+            <DropdownMenuItem
                 icon={<LayoutTemplateIcon />}
                 label="Workflow from Template"
-                onClick={onNewWorkflowFromTemplateClick}
-                variant="ghost"
+                onSelect={onNewWorkflowFromTemplateClick}
             />
 
-            <Button
-                aria-label="Import Workflow"
-                className="dropdown-menu-item"
-                icon={<UploadIcon />}
-                label="Import Workflow"
-                onClick={onImportWorkflowClick}
-                variant="ghost"
-            />
+            <DropdownMenuItem icon={<UploadIcon />} label="Import Workflow" onSelect={onImportWorkflowClick} />
 
             <Tooltip>
                 <TooltipTrigger asChild>
                     <span className="block">
-                        <Button
-                            aria-label="Import n8n Workflow"
-                            className="dropdown-menu-item w-full"
+                        <DropdownMenuItem
                             disabled={importN8nWorkflowDisabled}
                             icon={<UploadIcon />}
                             label="Import n8n Workflow"
-                            onClick={onImportN8nWorkflowClick}
-                            variant="ghost"
+                            onSelect={onImportN8nWorkflowClick}
                         />
                     </span>
                 </TooltipTrigger>
@@ -161,53 +103,42 @@ const ProjectTabButtons = ({
                 )}
             </Tooltip>
 
-            <Separator />
+            <DropdownMenuSeparator />
 
             {ff_1039 && (
                 <EEVersion hidden={true}>
-                    <Button
-                        aria-label="Pull Project from Git"
-                        className="dropdown-menu-item"
+                    <DropdownMenuItem
                         disabled={!projectGitConfigurationEnabled}
                         icon={<GitPullRequestArrowIcon />}
                         label="Pull Project from Git"
-                        onClick={onPullProjectFromGitClick}
-                        variant="ghost"
+                        onSelect={onPullProjectFromGitClick}
                     />
 
-                    <Button
-                        aria-label="Git Configuration"
-                        className="dropdown-menu-item"
+                    <DropdownMenuItem
                         icon={<GitBranchIcon />}
                         label="Git Configuration"
-                        onClick={onShowProjectGitConfigurationDialog}
-                        variant="ghost"
+                        onSelect={onShowProjectGitConfigurationDialog}
                     />
 
-                    <Separator />
+                    <DropdownMenuSeparator />
                 </EEVersion>
             )}
 
-            <Button
-                aria-label="Project History"
-                className="dropdown-menu-item"
+            <DropdownMenuItem
                 icon={<HistoryIcon />}
                 label="Project History"
-                onClick={onShowProjectVersionHistorySheet}
-                variant="ghost"
+                onSelect={onShowProjectVersionHistorySheet}
             />
 
-            <Separator />
+            <DropdownMenuSeparator />
 
-            <Button
-                aria-label="Delete Project"
-                className="dropdown-menu-item-destructive"
+            <DropdownMenuItem
                 icon={<Trash2Icon />}
                 label="Delete"
-                onClick={onDeleteProjectClick}
-                variant="ghost"
+                onSelect={onDeleteProjectClick}
+                variant="destructive"
             />
-        </div>
+        </>
     );
 };
 

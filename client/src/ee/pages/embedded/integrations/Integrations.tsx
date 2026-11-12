@@ -1,5 +1,4 @@
 import Button from '@/components/Button/Button';
-import EmptyList from '@/components/EmptyList';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import JourneySteps from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
@@ -18,7 +17,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {SquareIcon} from 'lucide-react';
+import {FilterXIcon, SquareIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
@@ -87,7 +86,7 @@ const Integrations = () => {
                     position="main"
                     right={
                         integrations &&
-                        integrations.length > 0 && (
+                        (integrations.length > 0 || hasActiveFilter) && (
                             <Button
                                 aria-label="Create Integration"
                                 label="New Integration"
@@ -135,10 +134,10 @@ const Integrations = () => {
                         taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
                 ) : hasActiveFilter ? (
-                    <EmptyList
-                        icon={<SquareIcon className="size-24 text-stroke-neutral-tertiary" />}
-                        message="No integrations match the selected filter."
-                        title="No Matching Integrations"
+                    <EmptyState
+                        description="Try a different filter."
+                        icon={<FilterXIcon />}
+                        title="No matching integrations"
                     />
                 ) : (
                     <EmptyState

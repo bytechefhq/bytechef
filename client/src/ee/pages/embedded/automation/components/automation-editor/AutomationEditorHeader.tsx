@@ -1,3 +1,5 @@
+import {ButtonGroup} from '@/components/ui/button-group';
+import AutomationConfigurationsSheet from '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationConfigurationsSheet';
 import AutomationEditorBreadcrumb from '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorBreadcrumb';
 import AutomationEditorSettingsMenu from '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorSettingsMenu';
 import AutomationEditorWorkflowSelect from '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorWorkflowSelect';
@@ -5,14 +7,19 @@ import AutomationProjectVersionHistorySheet from '@/ee/pages/embedded/automation
 import OutputButton from '@/ee/pages/embedded/automation/components/automation-editor/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/automation/components/automation-editor/components/PublishPopover';
 import {useAutomationEditorHeader} from '@/ee/pages/embedded/automation/components/automation-editor/hooks/useAutomationEditorHeader';
+import {useRestoreAutomationProjectVersion} from '@/ee/pages/embedded/automation/components/automation-editor/hooks/useRestoreAutomationProjectVersion';
 import {useAutomationEditorSidebarStore} from '@/ee/pages/embedded/automation/components/automation-editor/stores/useAutomationEditorSidebarStore';
+import {getPathAfterWorkflowDelete} from '@/ee/pages/embedded/automation/components/automation-editor/utils/getPathAfterWorkflowDelete';
 import {useCreateAutomationProjectWorkflow} from '@/ee/pages/embedded/automation/hooks/useCreateAutomationProjectWorkflow';
 import AutomationDialog, {
     AutomationFormValuesI,
 } from '@/ee/pages/embedded/automations/components/automation-dialog/AutomationDialog';
+import AutomationProjectConfigurationDialog from '@/ee/pages/embedded/automations/components/automation-project-configuration-dialog/AutomationProjectConfigurationDialog';
 import AutomationProjectDialog, {
     AutomationProjectFormValuesI,
 } from '@/ee/pages/embedded/automations/components/automation-project-dialog/AutomationProjectDialog';
+import ConfigurationsListButton from '@/ee/pages/embedded/shared/ConfigurationsListButton';
+import ConfigureButton from '@/ee/pages/embedded/shared/ConfigureButton';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
 import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/WorkflowActionsButton';
@@ -63,6 +70,8 @@ const AutomationEditorHeader = ({
     runDisabled,
     updateWorkflowMutation,
 }: AutomationEditorHeaderProps) => {
+    const [showConfigurationDialog, setShowConfigurationDialog] = useState(false);
+    const [showConfigurationsSheet, setShowConfigurationsSheet] = useState(false);
     const [showCreateWorkflowDialog, setShowCreateWorkflowDialog] = useState(false);
     const [showProjectDeleteAlert, setShowProjectDeleteAlert] = useState(false);
     const [showProjectEditDialog, setShowProjectEditDialog] = useState(false);
@@ -98,6 +107,7 @@ const AutomationEditorHeader = ({
         handleShowOutputClick,
         handleStopClick,
         handleWorkflowValueChange,
+        hasUnpublishedChanges,
         project,
         projects,
         publishProjectMutationIsPending,
@@ -108,6 +118,11 @@ const AutomationEditorHeader = ({
 
     const {createWorkflow, handleWorkflowFileChange, workflowFileInputRef} = useCreateAutomationProjectWorkflow({
         bottomResizablePanelRef,
+        projectId: project?.id,
+    });
+
+    const {handleRestoreProjectVersion, restoreProjectVersionPending} = useRestoreAutomationProjectVersion({
+        currentWorkflowUuid: currentWorkflowId,
         projectId: project?.id,
     });
 
@@ -237,7 +252,7 @@ const AutomationEditorHeader = ({
                 onSuccess: () => {
                     void queryClient.invalidateQueries({queryKey: ['automationProjects']});
 
-                    void navigate('/embedded/automations');
+                    void navigate(getPathAfterWorkflowDelete(project?.workflowTemplates ?? [], currentWorkflowId));
                 },
             }
         );
@@ -289,6 +304,9 @@ const AutomationEditorHeader = ({
         deleteProjectMutation.mutate(
             {id: project.id},
             {
+                onSettled: () => {
+                    setShowProjectDeleteAlert(false);
+                },
                 onSuccess: () => {
                     void queryClient.invalidateQueries({queryKey: ['automationProjects']});
 
@@ -313,7 +331,7 @@ const AutomationEditorHeader = ({
             <div className="flex min-w-0 items-center gap-2">
                 <LeftSidebarButton
                     onLeftSidebarOpenClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
-                    tooltip="See workflows"
+                    tooltip="See projects"
                 />
 
                 <AutomationEditorBreadcrumb
@@ -341,10 +359,23 @@ const AutomationEditorHeader = ({
                     workflowIsRunning={workflowIsRunning}
                 />
 
-                <PublishPopover
-                    isPending={publishProjectMutationIsPending}
-                    onPublishProjectSubmit={handlePublishProjectSubmit}
-                />
+                <ButtonGroup>
+                    <PublishPopover
+                        disabled={!hasUnpublishedChanges}
+                        isPending={publishProjectMutationIsPending}
+                        onPublishProjectSubmit={handlePublishProjectSubmit}
+                    />
+
+                    <ConfigureButton
+                        disabledReason={project.published ? undefined : 'Publish the project before configuring it.'}
+                        onClick={() => setShowConfigurationDialog(true)}
+                    />
+
+                    <ConfigurationsListButton
+                        label="Automation Configurations"
+                        onClick={() => setShowConfigurationsSheet(true)}
+                    />
+                </ButtonGroup>
 
                 <OutputButton onShowOutputClick={handleShowOutputClick} />
 
@@ -371,6 +402,23 @@ const AutomationEditorHeader = ({
                 ref={workflowFileInputRef}
                 type="file"
             />
+
+            {showConfigurationDialog && (
+                <AutomationProjectConfigurationDialog
+                    onClose={() => setShowConfigurationDialog(false)}
+                    onSuccess={() => setShowConfigurationsSheet(true)}
+                    project={project}
+                    showTabs
+                />
+            )}
+
+            {showConfigurationsSheet && (
+                <AutomationConfigurationsSheet
+                    onSheetOpenChange={(open) => !open && setShowConfigurationsSheet(false)}
+                    project={project}
+                    sheetOpen
+                />
+            )}
 
             {showCreateWorkflowDialog && (
                 <AutomationDialog
@@ -414,20 +462,19 @@ const AutomationEditorHeader = ({
 
             {showProjectDeleteAlert && (
                 <DeleteProjectAlertDialog
+                    isPending={deleteProjectMutation.isPending}
                     onClose={() => setShowProjectDeleteAlert(false)}
-                    onDelete={() => {
-                        handleConfirmDeleteProject();
-
-                        setShowProjectDeleteAlert(false);
-                    }}
+                    onDelete={handleConfirmDeleteProject}
                 />
             )}
 
             {project && (
                 <AutomationProjectVersionHistorySheet
                     onClose={() => setShowProjectVersionHistorySheet(false)}
+                    onRestoreProjectVersion={handleRestoreProjectVersion}
                     open={showProjectVersionHistorySheet}
                     projectId={project.id}
+                    restoreProjectVersionPending={restoreProjectVersionPending}
                 />
             )}
         </header>

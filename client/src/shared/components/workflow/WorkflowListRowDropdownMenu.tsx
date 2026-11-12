@@ -14,6 +14,7 @@ interface WorkflowListRowDropdownMenuProps {
     exportUrl: string;
     onDeleteClick: () => void;
     onEditClick: () => void;
+    workflowLabel?: string;
 }
 
 const WorkflowListRowDropdownMenu = ({
@@ -21,10 +22,16 @@ const WorkflowListRowDropdownMenu = ({
     exportUrl,
     onDeleteClick,
     onEditClick,
+    workflowLabel,
 }: WorkflowListRowDropdownMenuProps) => (
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
-            <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
+            <Button
+                aria-label={workflowLabel ? `Workflow actions for ${workflowLabel}` : 'Workflow actions'}
+                icon={<EllipsisVerticalIcon />}
+                size="icon"
+                variant="ghost"
+            />
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">

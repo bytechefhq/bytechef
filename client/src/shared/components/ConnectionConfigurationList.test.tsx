@@ -63,6 +63,13 @@ const ConnectionConfigurationListHarness = ({
 };
 
 describe('ConnectionConfigurationList', () => {
+    it('should label the connection with its workflow step name only', () => {
+        render(<ConnectionConfigurationListHarness connections={[connection]} handleConnectionIdChange={vi.fn()} />);
+
+        expect(screen.getByText('(httpClient_1)')).toBeInTheDocument();
+        expect(screen.queryByText('(httpClient - httpClient_1)')).not.toBeInTheDocument();
+    });
+
     it('should report a cleared connection as undefined rather than NaN', () => {
         const handleConnectionIdChange = vi.fn();
 

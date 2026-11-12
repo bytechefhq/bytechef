@@ -20,10 +20,11 @@ import {
     AutomationProjectConfigurationsQuery,
     AutomationProjectsQuery,
     useAutomationProjectConfigurationDeleteImpactQuery,
+    useDeleteAutomationProjectConfigurationMutation,
     useEnableAutomationProjectConfigurationMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon, FolderIcon, PencilIcon, RefreshCcwIcon, Trash2Icon, UsersIcon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, FolderIcon, RefreshCcwIcon, Trash2Icon, UsersIcon} from 'lucide-react';
 import {MouseEvent, useCallback, useRef, useState} from 'react';
 
 import AutomationProjectConfigurationMoveUsersDialog from './AutomationProjectConfigurationMoveUsersDialog';
@@ -36,7 +37,6 @@ type AutomationProjectType = AutomationProjectsQuery['automationProjects'][numbe
 interface AutomationProjectConfigurationListItemProps {
     configuration: AutomationProjectConfigurationType;
     configurations?: AutomationProjectConfigurationType[];
-    onDelete: (configuration: AutomationProjectConfigurationType) => void;
     onEdit: (configuration: AutomationProjectConfigurationType) => void;
     onUpdateVersion: (configuration: AutomationProjectConfigurationType) => void;
     project: AutomationProjectType;
@@ -49,7 +49,6 @@ const formatCount = (count: number, noun: string): string => `${count} ${count =
 const AutomationProjectConfigurationListItem = ({
     configuration,
     configurations = [],
-    onDelete,
     onEdit,
     onUpdateVersion,
     project,
@@ -62,6 +61,15 @@ const AutomationProjectConfigurationListItem = ({
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const queryClient = useQueryClient();
+
+    const deleteConfigurationMutation = useDeleteAutomationProjectConfigurationMutation({
+        onSuccess: () => {
+            void queryClient.invalidateQueries({queryKey: ['automationProjectConfigurations']});
+            void queryClient.invalidateQueries({queryKey: ['automationProjects']});
+
+            setShowDeleteDialog(false);
+        },
+    });
 
     const enableConfigurationMutation = useEnableAutomationProjectConfigurationMutation();
 
@@ -229,15 +237,15 @@ const AutomationProjectConfigurationListItem = ({
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem
                                     aria-label="Edit Configuration"
-                                    icon={<PencilIcon />}
+                                    icon={<EditIcon />}
                                     label="Edit"
                                     onClick={() => onEdit(configuration)}
                                 />
 
                                 <DropdownMenuItem
-                                    aria-label="Update Project Version"
+                                    aria-label="Change Project Version"
                                     icon={<RefreshCcwIcon />}
-                                    label="Update Project Version"
+                                    label="Change Project Version"
                                     onClick={() => onUpdateVersion(configuration)}
                                 />
 
@@ -285,12 +293,9 @@ const AutomationProjectConfigurationListItem = ({
             <AlertDialog
                 confirmDisabled={!deleteImpact}
                 description={deleteDescription}
+                isPending={deleteConfigurationMutation.isPending}
                 onCancel={() => setShowDeleteDialog(false)}
-                onConfirm={() => {
-                    onDelete(configuration);
-
-                    setShowDeleteDialog(false);
-                }}
+                onConfirm={() => deleteConfigurationMutation.mutate({id: configuration.id})}
                 open={showDeleteDialog}
             />
 

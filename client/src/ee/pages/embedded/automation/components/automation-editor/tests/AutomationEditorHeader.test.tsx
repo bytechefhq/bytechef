@@ -9,21 +9,35 @@ import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
+    configurationDialogProps: vi.fn(),
+    configurationsSheetProps: vi.fn(),
     createWorkflow: vi.fn(),
+    deleteProjectMutation: {isPending: false, mutate: vi.fn()},
+    deleteWorkflowMutate: vi.fn(),
     handleWorkflowValueChange: vi.fn(),
+    hasUnpublishedChanges: {current: true},
     isMutating: vi.fn(() => 0),
+    navigate: vi.fn(),
     project: {
         current: undefined as Record<string, unknown> | undefined,
     },
+    restoreProjectVersion: vi.fn(),
     updatePermissionExpressionMutate: vi.fn(),
     updateProjectMutate: vi.fn(),
     useCreateAutomationProjectWorkflow: vi.fn(),
+    useRestoreAutomationProjectVersion: vi.fn(),
+    versionHistorySheetProps: vi.fn(),
     workflowFileInputClick: vi.fn(),
 }));
 
 vi.mock('@tanstack/react-query', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@tanstack/react-query')>()),
     useIsMutating: () => hoisted.isMutating(),
+}));
+
+vi.mock('react-router-dom', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('react-router-dom')>()),
+    useNavigate: () => hoisted.navigate,
 }));
 
 vi.mock('@/ee/pages/embedded/automation/components/automation-editor/hooks/useAutomationEditorHeader', () => ({
@@ -33,9 +47,18 @@ vi.mock('@/ee/pages/embedded/automation/components/automation-editor/hooks/useAu
         handleShowOutputClick: vi.fn(),
         handleStopClick: vi.fn(),
         handleWorkflowValueChange: hoisted.handleWorkflowValueChange,
+        hasUnpublishedChanges: hoisted.hasUnpublishedChanges.current,
         project: hoisted.project.current,
         publishProjectMutationIsPending: false,
     }),
+}));
+
+vi.mock('@/ee/pages/embedded/automation/components/automation-editor/hooks/useRestoreAutomationProjectVersion', () => ({
+    useRestoreAutomationProjectVersion: (props: unknown) => {
+        hoisted.useRestoreAutomationProjectVersion(props);
+
+        return {handleRestoreProjectVersion: hoisted.restoreProjectVersion, restoreProjectVersionPending: true};
+    },
 }));
 
 vi.mock('@/ee/pages/embedded/automation/hooks/useCreateAutomationProjectWorkflow', () => ({
@@ -59,8 +82,8 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useAutomationProjectCategoriesQuery: () => ({data: {automationProjectCategories: []}}),
     useAutomationProjectTagsQuery: () => ({data: {automationProjectTags: []}}),
     useAutomationProjectsQuery: () => ({data: undefined}),
-    useDeleteAutomationProjectMutation: () => ({mutate: vi.fn()}),
-    useDeleteAutomationProjectWorkflowMutation: () => ({mutate: vi.fn()}),
+    useDeleteAutomationProjectMutation: () => hoisted.deleteProjectMutation,
+    useDeleteAutomationProjectWorkflowMutation: () => ({mutate: hoisted.deleteWorkflowMutate}),
     useDuplicateAutomationProjectMutation: () => ({mutate: vi.fn()}),
     useDuplicateAutomationProjectWorkflowMutation: () => ({mutate: vi.fn()}),
     useUpdateAutomationProjectMutation: () => ({mutate: hoisted.updateProjectMutate}),
@@ -72,16 +95,46 @@ vi.mock('@/shared/middleware/graphql', () => ({
 vi.mock(
     '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationProjectVersionHistorySheet',
     () => ({
-        default: () => null,
+        default: (props: Record<string, unknown>) => {
+            hoisted.versionHistorySheetProps(props);
+
+            return null;
+        },
     })
 );
+
+vi.mock(
+    '@/ee/pages/embedded/automations/components/automation-project-configuration-dialog/AutomationProjectConfigurationDialog',
+    () => ({
+        default: (props: Record<string, unknown>) => {
+            hoisted.configurationDialogProps(props);
+
+            return (
+                <div role="dialog">
+                    Configuration Dialog
+                    <button onClick={() => (props.onSuccess as ((id: string) => void) | undefined)?.('7')}>
+                        Save Configuration
+                    </button>
+                </div>
+            );
+        },
+    })
+);
+
+vi.mock('@/ee/pages/embedded/automation/components/automation-editor/components/AutomationConfigurationsSheet', () => ({
+    default: (props: Record<string, unknown>) => {
+        hoisted.configurationsSheetProps(props);
+
+        return <div role="complementary">Configurations Sheet</div>;
+    },
+}));
 
 vi.mock('@/pages/platform/workflow-editor/components/WorkflowActionsButton', () => ({
     default: () => <button>Test</button>,
 }));
 
 vi.mock('@/ee/pages/embedded/automation/components/automation-editor/components/PublishPopover', () => ({
-    default: () => <button>Publish</button>,
+    default: ({disabled}: {disabled?: boolean}) => <button disabled={disabled}>Publish</button>,
 }));
 
 vi.mock('@/ee/pages/embedded/automation/components/automation-editor/components/OutputButton', () => ({
@@ -125,6 +178,8 @@ const renderAutomationEditorHeader = () =>
 beforeEach(() => {
     vi.clearAllMocks();
 
+    hoisted.deleteProjectMutation = {isPending: false, mutate: vi.fn()};
+    hoisted.hasUnpublishedChanges.current = true;
     hoisted.project.current = mockProject;
     hoisted.isMutating.mockReturnValue(0);
 
@@ -147,15 +202,92 @@ afterEach(() => {
     onlineManager.setOnline(true);
 });
 
-it('orders the header actions Test, Publish, Output, Settings', () => {
+it('orders the header actions Test, Publish, Configure, Automation Configurations, Output, Settings', () => {
     renderAutomationEditorHeader();
 
     const actionNames = screen
         .getAllByRole('button')
         .map((button) => button.getAttribute('aria-label') || button.textContent)
-        .filter((name) => ['Output', 'Publish', 'Settings', 'Test'].includes(name ?? ''));
+        .filter((name) =>
+            ['Automation Configurations', 'Configure', 'Output', 'Publish', 'Settings', 'Test'].includes(name ?? '')
+        );
 
-    expect(actionNames).toEqual(['Test', 'Publish', 'Output', 'Settings']);
+    expect(actionNames).toEqual(['Test', 'Publish', 'Configure', 'Automation Configurations', 'Output', 'Settings']);
+});
+
+it('groups Publish, Configure and the configurations list', () => {
+    renderAutomationEditorHeader();
+
+    const buttonGroup = screen.getByRole('group');
+
+    expect(within(buttonGroup).getByRole('button', {name: 'Publish'})).toBeInTheDocument();
+    expect(within(buttonGroup).getByRole('button', {name: 'Configure'})).toBeInTheDocument();
+    expect(within(buttonGroup).getByRole('button', {name: 'Automation Configurations'})).toBeInTheDocument();
+});
+
+it('enables Publish while the project has unpublished changes', () => {
+    renderAutomationEditorHeader();
+
+    expect(screen.getByRole('button', {name: 'Publish'})).toBeEnabled();
+});
+
+it('disables Publish when the project has no unpublished changes', () => {
+    hoisted.hasUnpublishedChanges.current = false;
+
+    renderAutomationEditorHeader();
+
+    expect(screen.getByRole('button', {name: 'Publish'})).toBeDisabled();
+});
+
+it('disables Configure and explains why while the project is unpublished', async () => {
+    renderAutomationEditorHeader();
+
+    const configureButton = screen.getByRole('button', {name: 'Configure'});
+
+    expect(configureButton).toBeDisabled();
+
+    await userEvent.hover(configureButton.parentElement!);
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Publish the project before configuring it.');
+});
+
+it('opens the configuration dialog with tabs for this project from Configure', async () => {
+    hoisted.project.current = {...mockProject, lastPublishedVersion: 1, published: true};
+
+    renderAutomationEditorHeader();
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', {name: 'Configure'}));
+
+    expect(screen.getByRole('dialog')).toHaveTextContent('Configuration Dialog');
+    expect(hoisted.configurationDialogProps).toHaveBeenCalledWith(
+        expect.objectContaining({project: hoisted.project.current, showTabs: true})
+    );
+});
+
+it('opens the automation configurations sheet once Configure creates a configuration', async () => {
+    hoisted.project.current = {...mockProject, lastPublishedVersion: 1, published: true};
+
+    renderAutomationEditorHeader();
+
+    await userEvent.click(screen.getByRole('button', {name: 'Configure'}));
+    await userEvent.click(screen.getByRole('button', {name: 'Save Configuration'}));
+
+    expect(screen.getByRole('complementary')).toHaveTextContent('Configurations Sheet');
+});
+
+it('opens the automation configurations sheet from the list button', async () => {
+    renderAutomationEditorHeader();
+
+    expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', {name: 'Automation Configurations'}));
+
+    expect(screen.getByRole('complementary')).toHaveTextContent('Configurations Sheet');
+    expect(hoisted.configurationsSheetProps).toHaveBeenCalledWith(
+        expect.objectContaining({project: mockProject, sheetOpen: true})
+    );
 });
 
 it('shows the current workflow in the breadcrumb switcher', () => {
@@ -220,14 +352,14 @@ it('shows a skeleton until the project loads', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
 });
 
-it('toggles the workflows sidebar from the sidebar button', async () => {
+it('toggles the projects sidebar from the See projects button', async () => {
     renderAutomationEditorHeader();
 
-    await userEvent.click(screen.getAllByRole('button')[0]);
+    await userEvent.click(screen.getByRole('button', {name: 'See projects'}));
 
     expect(useAutomationEditorSidebarStore.getState().leftSidebarOpen).toBe(true);
 
-    await userEvent.click(screen.getAllByRole('button')[0]);
+    await userEvent.click(screen.getByRole('button', {name: 'See projects'}));
 
     expect(useAutomationEditorSidebarStore.getState().leftSidebarOpen).toBe(false);
 });
@@ -327,4 +459,99 @@ it("prefills and saves the current workflow's permission expression from the Edi
         expect.objectContaining({id: 'draft-1', workflow: expect.objectContaining({version: 1})}),
         expect.anything()
     );
+});
+
+it('opens the next remaining workflow of the project after deleting the current workflow', async () => {
+    hoisted.deleteWorkflowMutate.mockImplementation((_variables, options) => options.onSuccess());
+
+    renderAutomationEditorHeader();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
+    await userEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', {name: 'Delete'}));
+
+    expect(hoisted.deleteWorkflowMutate).toHaveBeenCalledWith({workflowUuid: 'workflow-1'}, expect.anything());
+    expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/automations/workflow-2/editor');
+});
+
+it('returns to the automations list after deleting the last workflow of the project', async () => {
+    hoisted.deleteWorkflowMutate.mockImplementation((_variables, options) => options.onSuccess());
+    hoisted.project.current = {...mockProject, workflowTemplates: mockProject.workflowTemplates.slice(0, 1)};
+
+    renderAutomationEditorHeader();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
+    await userEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', {name: 'Delete'}));
+
+    expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/automations');
+});
+
+it('keeps the delete project dialog open with a pending state until the deletion settles', async () => {
+    renderAutomationEditorHeader();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+    await userEvent.click(screen.getByLabelText('Project tab'));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
+    await userEvent.click(await screen.findByRole('button', {name: 'Confirm Project Deletion'}));
+
+    expect(hoisted.deleteProjectMutation.mutate).toHaveBeenCalledWith({id: 'project-1'}, expect.anything());
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+});
+
+it('disables the delete project confirmation while the deletion is pending', async () => {
+    hoisted.deleteProjectMutation = {isPending: true, mutate: vi.fn()};
+
+    renderAutomationEditorHeader();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+    await userEvent.click(screen.getByLabelText('Project tab'));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
+
+    expect(await screen.findByRole('button', {name: 'Confirm Project Deletion'})).toBeDisabled();
+});
+
+it('closes the delete project dialog once the deletion settles', async () => {
+    renderAutomationEditorHeader();
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+    await userEvent.click(screen.getByLabelText('Project tab'));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
+    await userEvent.click(await screen.findByRole('button', {name: 'Confirm Project Deletion'}));
+
+    const [, mutationOptions] = hoisted.deleteProjectMutation.mutate.mock.calls[0];
+
+    act(() => {
+        mutationOptions.onSettled();
+        mutationOptions.onSuccess();
+    });
+
+    await waitFor(() => {
+        expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
+
+    expect(hoisted.navigate).toHaveBeenCalledWith('/embedded/automations');
+});
+
+it('opens the project version history sheet with the restore handler for the current workflow', async () => {
+    renderAutomationEditorHeader();
+
+    expect(hoisted.useRestoreAutomationProjectVersion).toHaveBeenCalledWith({
+        currentWorkflowUuid: 'workflow-1',
+        projectId: 'project-1',
+    });
+    expect(hoisted.versionHistorySheetProps).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+            onRestoreProjectVersion: hoisted.restoreProjectVersion,
+            open: false,
+            projectId: 'project-1',
+            restoreProjectVersionPending: true,
+        })
+    );
+
+    await userEvent.click(screen.getByLabelText('Settings'));
+    await userEvent.click(screen.getByLabelText('Project tab'));
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Project History'}));
+
+    expect(hoisted.versionHistorySheetProps).toHaveBeenLastCalledWith(expect.objectContaining({open: true}));
 });

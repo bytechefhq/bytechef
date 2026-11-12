@@ -1,0 +1,3 @@
+mutation restoreAutomationProjectVersion($id: ID!, $projectVersion: Int!) {
+    restoreAutomationProjectVersion(id: $id, projectVersion: $projectVersion)
+}

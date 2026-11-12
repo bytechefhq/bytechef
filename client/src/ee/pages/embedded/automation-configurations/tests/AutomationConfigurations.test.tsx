@@ -171,11 +171,11 @@ describe('AutomationConfigurations', () => {
             within(screen.getByText('PRODUCTION').closest('[data-state]') as HTMLElement).queryByText('Live Project')
         ).not.toBeInTheDocument();
         expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'New Project Configuration'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'New Configuration'})).toBeInTheDocument();
         expect(mocks.configurationsVariables).toContainEqual({environmentId: '2', projectId: 'live'});
     });
 
-    it('opens one dialog that offers every published project from New Project Configuration', async () => {
+    it('opens one dialog that offers every published project from New Configuration', async () => {
         mocks.projects = [
             makeProject('live', 'Live Project', true, 1),
             makeProject('other', 'Other Project', true),
@@ -184,7 +184,7 @@ describe('AutomationConfigurations', () => {
 
         renderPage();
 
-        await userEvent.click(screen.getByRole('button', {name: 'New Project Configuration'}));
+        await userEvent.click(screen.getByRole('button', {name: 'New Configuration'}));
 
         expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
 
@@ -213,7 +213,7 @@ describe('AutomationConfigurations', () => {
         expect(screen.getByText('Create your first configuration')).toBeInTheDocument();
         expect(screen.getByRole('link', {name: /How configurations work/})).toBeInTheDocument();
         expect(listedProjectIds()).toEqual([]);
-        expect(screen.queryByRole('button', {name: 'New Project Configuration'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'New Configuration'})).not.toBeInTheDocument();
 
         await userEvent.click(screen.getByRole('button', {name: 'Create Configuration'}));
 
@@ -226,11 +226,11 @@ describe('AutomationConfigurations', () => {
         renderPage('/embedded/automation-configurations?projectId=other');
 
         expect(screen.getByText('Projects: Other Project')).toBeInTheDocument();
-        expect(screen.getByText('No Matching Configurations')).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'No configurations in Production'})).toBeInTheDocument();
         expect(screen.getByText('Other Project has no configurations in this environment.')).toBeInTheDocument();
         expect(listedProjectIds()).toEqual([]);
         expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'New Project Configuration'})).not.toHaveAttribute('aria-haspopup');
+        expect(screen.getByRole('button', {name: 'New Configuration'})).not.toHaveAttribute('aria-haspopup');
     });
 
     it('shows the configurations of the project chosen in the sidebar', () => {

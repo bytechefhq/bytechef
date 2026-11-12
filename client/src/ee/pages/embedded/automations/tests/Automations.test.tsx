@@ -1,5 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {createTestQueryClientWrapper, screen, userEvent, within} from '@/shared/util/test-utils';
+import {act, createTestQueryClientWrapper, screen, userEvent, waitFor, within} from '@/shared/util/test-utils';
 import {render} from '@testing-library/react';
 import {ReactElement, ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -46,10 +46,19 @@ const hoisted = vi.hoisted(() => {
             name: string;
             published: boolean;
             tagIds: Array<string>;
-            workflowTemplates: Array<{description: string | null; label: string | null; workflowUuid: string}>;
+            workflowTemplates: Array<{
+                components?: Array<unknown>;
+                description: string | null;
+                label: string | null;
+                triggers?: Array<unknown>;
+                workflowUuid: string;
+            }>;
         }>,
         publishProjectMutate: vi.fn(),
+        publishProjectMutationOptions: undefined as {onSuccess?: () => void} | undefined,
+        searchParams: new URLSearchParams(),
         tags: [] as Array<{id: string; name: string}>,
+        toast: vi.fn(),
         updateProjectMutate: vi.fn(),
         updateWorkflowMutate: vi.fn(),
         updateWorkflowPermissionExpressionMutate: vi.fn(),
@@ -97,12 +106,15 @@ vi.mock('@/shared/middleware/graphql', () => ({
         isPending: false,
         mutate: hoisted.deleteWorkflowMutate,
     }),
+    useDuplicateAutomationProjectMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useDuplicateAutomationProjectWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
     useEnableAutomationProjectConfigurationMutation: () => ({isPending: false, mutate: vi.fn()}),
     useEnableAutomationProjectConfigurationWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
-    usePublishAutomationProjectMutation: () => ({
-        isPending: false,
-        mutate: hoisted.publishProjectMutate,
-    }),
+    usePublishAutomationProjectMutation: (options?: {onSuccess?: () => void}) => {
+        hoisted.publishProjectMutationOptions = options;
+
+        return {isPending: false, mutate: hoisted.publishProjectMutate};
+    },
     useUpdateAutomationProjectMutation: () => ({
         isPending: false,
         mutate: hoisted.updateProjectMutate,
@@ -135,10 +147,12 @@ vi.mock(
     }
 );
 
+vi.mock('sonner', () => ({toast: hoisted.toast}));
+
 vi.mock('react-router-dom', () => ({
     Link: ({children}: {children: React.ReactNode}) => <a>{children}</a>,
     useNavigate: () => hoisted.navigateMock,
-    useSearchParams: () => [new URLSearchParams(), vi.fn()],
+    useSearchParams: () => [hoisted.searchParams, vi.fn()],
 }));
 
 vi.mock(import('@tanstack/react-query'), async (importOriginal) => {
@@ -161,7 +175,10 @@ beforeEach(() => {
     hoisted.navigateMock.mockReset();
     hoisted.projects = [];
     hoisted.publishProjectMutate.mockReset();
+    hoisted.publishProjectMutationOptions = undefined;
+    hoisted.searchParams = new URLSearchParams();
     hoisted.tags = [];
+    hoisted.toast.mockReset();
     hoisted.updateProjectMutate.mockReset();
     hoisted.updateWorkflowMutate.mockReset();
     hoisted.updateWorkflowPermissionExpressionMutate.mockReset();
@@ -214,6 +231,29 @@ describe('Automations', () => {
 
         expect(screen.getByText('CRM Project')).toBeInTheDocument();
         expect(screen.getByText('DRAFT')).toBeInTheDocument();
+    });
+
+    it('keeps the header and reports no match when a filter excludes every project', () => {
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: null,
+                id: 'project-1',
+                lastPublishedVersion: null,
+                name: 'CRM Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [],
+            },
+        ];
+        hoisted.searchParams = new URLSearchParams('tagId=2');
+
+        renderWithProviders(<Automations />);
+
+        expect(screen.getByRole('heading', {name: 'No matching projects'})).toBeInTheDocument();
+        expect(screen.getByText('Try a different filter.')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'New Project'})).toBeInTheDocument();
+        expect(screen.queryByText('CRM Project')).not.toBeInTheDocument();
     });
 
     it('renders the Categories and Tags filter sidebar sections', () => {
@@ -355,7 +395,7 @@ describe('Automations', () => {
         });
     });
 
-    it('calls the publish mutation when Publish is selected from the project menu', async () => {
+    it('publishes with a description from the dialog opened by Publish in the project menu', async () => {
         const user = userEvent.setup();
 
         hoisted.projects = [
@@ -367,7 +407,9 @@ describe('Automations', () => {
                 name: 'Publishable Project',
                 published: false,
                 tagIds: [],
-                workflowTemplates: [],
+                workflowTemplates: [
+                    {components: [], description: null, label: 'Sync Contacts', triggers: [], workflowUuid: 'wf-9'},
+                ],
             },
         ];
 
@@ -377,8 +419,25 @@ describe('Automations', () => {
 
         await user.click(await screen.findByRole('menuitem', {name: /publish/i}));
 
-        expect(hoisted.publishProjectMutate).toHaveBeenCalledTimes(1);
-        expect(hoisted.publishProjectMutate.mock.calls[0][0]).toMatchObject({id: 'project-9'});
+        expect(hoisted.publishProjectMutate).not.toHaveBeenCalled();
+
+        const publishDialog = await screen.findByRole('dialog', {name: 'Publish Project Publishable Project'});
+
+        await user.type(within(publishDialog).getByLabelText('Description'), 'First release');
+
+        await user.click(within(publishDialog).getByRole('button', {name: 'Publish'}));
+
+        expect(hoisted.publishProjectMutate).toHaveBeenCalledWith({description: 'First release', id: 'project-9'});
+
+        act(() => {
+            hoisted.publishProjectMutationOptions?.onSuccess?.();
+        });
+
+        await waitFor(() =>
+            expect(screen.queryByRole('dialog', {name: 'Publish Project Publishable Project'})).not.toBeInTheDocument()
+        );
+
+        expect(hoisted.toast).toHaveBeenCalledWith('The project has been published.');
     });
 
     it('opens the Create Workflow dialog when New Workflow is picked from the project menu', async () => {
@@ -531,8 +590,13 @@ describe('Automations', () => {
         renderWithProviders(<Automations />);
 
         await user.click(screen.getByText('1 workflow'));
-        await user.click(await screen.findByRole('button', {name: 'Workflow Actions'}));
-        await user.click(await screen.findByRole('menuitem', {name: 'Edit Workflow'}));
+
+        const workflowRowButtons = within((await screen.findByText('Sync Contacts')).closest('li')!).getAllByRole(
+            'button'
+        );
+
+        await user.click(workflowRowButtons[workflowRowButtons.length - 1]);
+        await user.click(await screen.findByRole('menuitem', {name: 'Edit'}));
 
         const labelInput = await screen.findByRole('textbox', {name: /label/i});
 

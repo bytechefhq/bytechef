@@ -8,8 +8,10 @@ const mocks = vi.hoisted(() => ({
     configurations: [] as unknown[],
     configurationsVariables: undefined as unknown,
     deleteMutate: vi.fn(),
+    error: null as Error | null,
     invalidateQueries: vi.fn(),
     isLoading: false,
+    refetch: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -22,8 +24,10 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
         mocks.configurationsVariables = variables;
 
         return {
-            data: mocks.isLoading ? undefined : {automationProjectConfigurations: mocks.configurations},
+            data: mocks.isLoading || mocks.error ? undefined : {automationProjectConfigurations: mocks.configurations},
+            error: mocks.error,
             isLoading: mocks.isLoading,
+            refetch: mocks.refetch,
         };
     },
     useDeleteAutomationProjectConfigurationMutation: (options?: {onSuccess?: () => void}) => ({
@@ -98,6 +102,7 @@ describe('AutomationProjectConfigurationList', () => {
 
         mocks.configurations = [];
         mocks.configurationsVariables = undefined;
+        mocks.error = null;
         mocks.isLoading = false;
     });
 
@@ -112,13 +117,40 @@ describe('AutomationProjectConfigurationList', () => {
         vi.clearAllMocks();
     });
 
-    it('shows the empty state when the project has no configurations', () => {
+    it('shows the empty state of the listed environment when the project has no configurations', () => {
         renderList();
 
-        expect(screen.getByText('No Configurations')).toBeInTheDocument();
-        expect(
-            screen.getByText('Create a configuration to run a published version of this project in an environment.')
-        ).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'No configurations in Production'})).toBeInTheDocument();
+        expect(screen.getByText('Configure this project to run its workflows here.')).toBeInTheDocument();
+    });
+
+    it('names the Development environment in the empty state of development configurations', () => {
+        render(
+            <TooltipProvider>
+                <AutomationProjectConfigurationList
+                    environmentId={0}
+                    onCreate={vi.fn()}
+                    onEdit={vi.fn()}
+                    onUpdateVersion={vi.fn()}
+                    project={project}
+                />
+            </TooltipProvider>
+        );
+
+        expect(screen.getByRole('heading', {name: 'No configurations in Development'})).toBeInTheDocument();
+    });
+
+    it('shows a load error with a retry instead of the empty state when the configurations fail to load', async () => {
+        mocks.error = new Error('failed');
+
+        renderList();
+
+        expect(screen.getByRole('heading', {name: 'Failed to load configurations'})).toBeInTheDocument();
+        expect(screen.queryByRole('heading', {name: /No configurations/})).not.toBeInTheDocument();
+
+        await userEvent.setup().click(screen.getByRole('button', {name: 'Retry'}));
+
+        expect(mocks.refetch).toHaveBeenCalledOnce();
     });
 
     it('creates a configuration from the empty state', async () => {
@@ -126,7 +158,7 @@ describe('AutomationProjectConfigurationList', () => {
 
         renderList(vi.fn(), {}, onCreate);
 
-        await userEvent.setup().click(screen.getByRole('button', {name: 'Create Configuration'}));
+        await userEvent.setup().click(screen.getByRole('button', {name: 'Configure'}));
 
         expect(onCreate).toHaveBeenCalledOnce();
     });
@@ -134,8 +166,8 @@ describe('AutomationProjectConfigurationList', () => {
     it('asks to publish the project instead of offering creation while it is unpublished', () => {
         renderList(vi.fn(), {published: false});
 
-        expect(screen.getByText('Publish the project to configure it')).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'Publish the project to configure it'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Configure'})).not.toBeInTheDocument();
     });
 
     it('publishes the project from the empty state while it is unpublished', async () => {
@@ -175,7 +207,7 @@ describe('AutomationProjectConfigurationList', () => {
 
         expect(screen.getAllByRole('status', {name: 'Loading Mail Project configurations'})).toHaveLength(1);
         expect(within(screen.getByRole('list', {name: 'Loading workflows'})).getAllByRole('listitem')).toHaveLength(2);
-        expect(screen.queryByText('No Configurations')).not.toBeInTheDocument();
+        expect(screen.queryByText(/No configurations/)).not.toBeInTheDocument();
     });
 
     it('shows a single skeleton card however many configurations the project has', () => {
@@ -192,8 +224,8 @@ describe('AutomationProjectConfigurationList', () => {
         renderList();
 
         expect(screen.queryByRole('status', {name: 'Loading Mail Project configurations'})).not.toBeInTheDocument();
-        expect(screen.queryByText('No Configurations')).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'Create Configuration'})).not.toBeInTheDocument();
+        expect(screen.queryByText(/No configurations/)).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Configure'})).not.toBeInTheDocument();
     });
 
     it('lists the configurations by name instead of the empty state', () => {
@@ -202,7 +234,7 @@ describe('AutomationProjectConfigurationList', () => {
         renderList();
 
         expect(screen.getByText(configuration.name)).toBeInTheDocument();
-        expect(screen.queryByText('No Configurations')).not.toBeInTheDocument();
+        expect(screen.queryByText(/No configurations/)).not.toBeInTheDocument();
     });
 
     it('deletes the confirmed configuration by id', async () => {

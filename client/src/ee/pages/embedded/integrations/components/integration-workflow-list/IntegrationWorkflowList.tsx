@@ -1,16 +1,28 @@
 import Button from '@/components/Button/Button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/DropdownMenu/DropdownMenu';
 import EmptyList from '@/components/EmptyList';
+import {ButtonGroup} from '@/components/ui/button-group';
 import {Skeleton} from '@/components/ui/skeleton';
 import IntegrationWorkflowListItem from '@/ee/pages/embedded/integrations/components/integration-workflow-list/IntegrationWorkflowListItem';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateIntegrationWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
 import {useGetIntegrationWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
-import {WorkflowIcon} from 'lucide-react';
+import {useQueryClient} from '@tanstack/react-query';
+import {ChevronDownIcon, UploadIcon, WorkflowIcon} from 'lucide-react';
+import {ChangeEvent, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {toast} from 'sonner';
 
 const IntegrationWorkflowList = ({
     componentDefinitions,
@@ -21,9 +33,16 @@ const IntegrationWorkflowList = ({
     integration: Integration;
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
-    const {captureIntegrationWorkflowCreated} = useAnalytics();
+    const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
+
+    const hiddenFileInputRef = useRef<HTMLInputElement>(null);
+
+    const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowImported} = useAnalytics();
+    const {alignOffset, buttonGroupRef, dropdownMenuTriggerRef, handleOpenChange} = useButtonGroupDropdownAlign();
 
     const navigate = useNavigate();
+
+    const queryClient = useQueryClient();
 
     const workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasic | undefined;
@@ -44,6 +63,33 @@ const IntegrationWorkflowList = ({
             void navigate(`/embedded/integrations/${integration.id}/integration-workflows/${integrationWorkflowId}`);
         },
     });
+
+    const importIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
+        onSuccess: () => {
+            captureIntegrationWorkflowImported();
+
+            void queryClient.invalidateQueries({
+                queryKey: IntegrationKeys.integrations,
+            });
+
+            if (hiddenFileInputRef.current) {
+                hiddenFileInputRef.current.value = '';
+            }
+
+            toast('Workflow is imported.');
+        },
+    });
+
+    const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files?.length) {
+            importIntegrationWorkflowMutation.mutate({
+                id: integration.id!,
+                workflow: {
+                    definition: await event.target.files[0].text(),
+                },
+            });
+        }
+    };
 
     return !componentDefinitions || !taskDispatcherDefinitions || isIntegrationWorkflowsLoading ? (
         <div className="space-y-3 p-3">
@@ -115,12 +161,27 @@ const IntegrationWorkflowList = ({
                 <div className="flex justify-center py-8">
                     <EmptyList
                         button={
-                            <WorkflowDialog
-                                createWorkflowMutation={createIntegrationWorkflowMutation}
-                                parentId={integration.id}
-                                triggerNode={<Button label="Create Workflow" />}
-                                useGetWorkflowQuery={useGetWorkflowQuery}
-                            />
+                            <ButtonGroup className="mx-auto" ref={buttonGroupRef}>
+                                <Button onClick={() => setShowWorkflowDialog(true)}>Create Workflow</Button>
+
+                                <DropdownMenu onOpenChange={handleOpenChange}>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            aria-label="More Workflow Creation Actions"
+                                            icon={<ChevronDownIcon />}
+                                            ref={dropdownMenuTriggerRef}
+                                        />
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent align="start" alignOffset={alignOffset}>
+                                        <DropdownMenuItem
+                                            icon={<UploadIcon />}
+                                            label="Import Workflow"
+                                            onClick={() => hiddenFileInputRef.current?.click()}
+                                        />
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </ButtonGroup>
                         }
                         icon={<WorkflowIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new workflow."
@@ -128,6 +189,23 @@ const IntegrationWorkflowList = ({
                     />
                 </div>
             )}
+
+            {showWorkflowDialog && (
+                <WorkflowDialog
+                    createWorkflowMutation={createIntegrationWorkflowMutation}
+                    onClose={() => setShowWorkflowDialog(false)}
+                    parentId={integration.id}
+                    useGetWorkflowQuery={useGetWorkflowQuery}
+                />
+            )}
+
+            <input
+                accept=".json,.yaml,.yml"
+                className="hidden"
+                onChange={handleFileChange}
+                ref={hiddenFileInputRef}
+                type="file"
+            />
         </div>
     );
 };

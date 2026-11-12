@@ -39,13 +39,13 @@ describe('IntegrationInstanceConfigurationListItemDropdownMenu', () => {
 
         expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
         expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
-        expect(screen.getByRole('menuitem', {name: 'Update Integration Version'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Change Integration Version'})).toBeInTheDocument();
         expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
     });
 
     it.each([
         ['Edit', 'onEditClick'],
-        ['Update Integration Version', 'onUpdateIntegrationVersionClick'],
+        ['Change Integration Version', 'onUpdateIntegrationVersionClick'],
         ['Move Users', 'onMoveUsersClick'],
         ['Delete', 'onDeleteClick'],
     ] as const)('should call the handler when %s is clicked', async (rowName, handlerName) => {
@@ -61,7 +61,7 @@ describe('IntegrationInstanceConfigurationListItemDropdownMenu', () => {
 
         expect(screen.getAllByRole('menuitem').map((item) => item.textContent)).toEqual([
             'Edit',
-            'Update Integration Version',
+            'Change Integration Version',
             'Move Users…',
             'Delete',
         ]);

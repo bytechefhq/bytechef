@@ -19,6 +19,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogOauth2Step from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogOauth2Step';
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
+import ConfigurationDialogTabs, {ConfigurationDialogTabType} from '@/ee/pages/embedded/shared/ConfigurationDialogTabs';
 import {
     ComponentConnection,
     IntegrationInstanceConfiguration,
@@ -31,7 +32,10 @@ import {
     useUpdateIntegrationInstanceConfigurationMutation,
 } from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
-import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
+import {
+    IntegrationInstanceConfigurationKeys,
+    useGetIntegrationInstanceConfigurationsQuery,
+} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {
     useGetIntegrationVersionWorkflowsQuery,
     useGetIntegrationWorkflowsQuery,
@@ -39,6 +43,7 @@ import {
 import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import useWorkflowTestConfigurationConnections from '@/shared/hooks/useWorkflowTestConfigurationConnections';
 import {Authorization, AuthorizationType} from '@/shared/middleware/platform/configuration';
@@ -69,6 +74,27 @@ const getDefaultAuthorizationType = (authorizations: Authorization[] | undefined
     return (authorizations?.length === 1 ? authorizations[0].type : undefined) as
         IntegrationInstanceConfiguration['authorizationType'] | undefined;
 };
+
+const getDefaultValues = (
+    integrationInstanceConfiguration: IntegrationInstanceConfiguration | undefined,
+    updateIntegrationVersion: boolean
+): DefaultValues<IntegrationInstanceConfiguration> => ({
+    authorizationType: integrationInstanceConfiguration?.authorizationType,
+    description: integrationInstanceConfiguration?.description || undefined,
+    enabled: integrationInstanceConfiguration?.enabled || false,
+    integrationId: integrationInstanceConfiguration?.integrationId || undefined,
+    integrationInstanceConfigurationWorkflows: [],
+    integrationVersion: updateIntegrationVersion
+        ? undefined
+        : integrationInstanceConfiguration?.integrationVersion || undefined,
+    name: integrationInstanceConfiguration?.name || undefined,
+    permissionExpression: integrationInstanceConfiguration?.permissionExpression || undefined,
+    tags:
+        integrationInstanceConfiguration?.tags?.map((tag) => ({
+            ...tag,
+            label: tag.name,
+        })) || [],
+});
 
 const toSavedAuthorizationType = (authorizationType: IntegrationInstanceConfiguration['authorizationType']) =>
     authorizationType === NO_AUTHORIZATION_TYPE ? undefined : authorizationType;
@@ -118,6 +144,8 @@ interface IntegrationInstanceConfigurationDialogProps {
     filterWorkflowUuids?: string[];
     integrationInstanceConfiguration?: IntegrationInstanceConfiguration;
     onClose?: () => void;
+    onSuccess?: (integrationInstanceConfigurationId: number) => void;
+    showTabs?: boolean;
     triggerNode?: ReactNode;
     updateIntegrationVersion?: boolean;
 }
@@ -125,17 +153,23 @@ interface IntegrationInstanceConfigurationDialogProps {
 const IntegrationInstanceConfigurationDialog = ({
     excludeWorkflowIds,
     filterWorkflowUuids,
-    integrationInstanceConfiguration,
+    integrationInstanceConfiguration: integrationInstanceConfigurationProp,
     onClose,
+    onSuccess,
+    showTabs = false,
     triggerNode,
-    updateIntegrationVersion = false,
+    updateIntegrationVersion: updateIntegrationVersionProp = false,
 }: IntegrationInstanceConfigurationDialogProps) => {
-    const [curIntegrationId, setCurIntegrationId] = useState(integrationInstanceConfiguration?.integrationId);
+    const [basicStepTab, setBasicStepTab] = useState<ConfigurationDialogTabType | undefined>();
+    const [curIntegrationId, setCurIntegrationId] = useState(integrationInstanceConfigurationProp?.integrationId);
     const [curIntegrationVersion, setCurIntegrationVersion] = useState<number | undefined>(
-        updateIntegrationVersion ? undefined : integrationInstanceConfiguration?.integrationVersion
+        updateIntegrationVersionProp ? undefined : integrationInstanceConfigurationProp?.integrationVersion
     );
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [isUpdatingCredentials, setIsUpdatingCredentials] = useState(false);
+    const [selectedExistingConfiguration, setSelectedExistingConfiguration] = useState<
+        IntegrationInstanceConfiguration | undefined
+    >();
     const [usePredefinedOAuthApp, setUsePredefinedOAuthApp] = useState(true);
 
     const defaultedAuthorizationsRef = useRef<Authorization[]>(undefined);
@@ -149,23 +183,13 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const {captureIntegrationInstanceConfigurationCreated} = useAnalytics();
 
-    const defaultValues: DefaultValues<IntegrationInstanceConfiguration> = {
-        authorizationType: integrationInstanceConfiguration?.authorizationType,
-        description: integrationInstanceConfiguration?.description || undefined,
-        enabled: integrationInstanceConfiguration?.enabled || false,
-        integrationId: integrationInstanceConfiguration?.integrationId || undefined,
-        integrationInstanceConfigurationWorkflows: [],
-        integrationVersion: updateIntegrationVersion
-            ? undefined
-            : integrationInstanceConfiguration?.integrationVersion || undefined,
-        name: integrationInstanceConfiguration?.name || undefined,
-        permissionExpression: integrationInstanceConfiguration?.permissionExpression || undefined,
-        tags:
-            integrationInstanceConfiguration?.tags?.map((tag) => ({
-                ...tag,
-                label: tag.name,
-            })) || [],
-    };
+    const integrationInstanceConfiguration = selectedExistingConfiguration ?? integrationInstanceConfigurationProp;
+
+    const updateIntegrationVersion = updateIntegrationVersionProp || !!selectedExistingConfiguration;
+
+    const isChangeVersionTab = showTabs && basicStepTab === 'change-version';
+
+    const defaultValues = getDefaultValues(integrationInstanceConfigurationProp, updateIntegrationVersionProp);
 
     const form = useForm<IntegrationInstanceConfiguration>({defaultValues});
 
@@ -174,6 +198,15 @@ const IntegrationInstanceConfigurationDialog = ({
     const credentialsForm = useForm<CredentialsFormI>({defaultValues: {parameters: {}}});
 
     const credentialsParameters = useWatch({control: credentialsForm.control, name: 'parameters'});
+
+    const {data: integrationInstanceConfigurations, isFetching: integrationInstanceConfigurationsIsFetching} =
+        useGetIntegrationInstanceConfigurationsQuery(
+            {
+                environmentId: DEVELOPMENT_ENVIRONMENT,
+                integrationId: integrationInstanceConfigurationProp?.integrationId,
+            },
+            showTabs && isOpen && !!integrationInstanceConfigurationProp?.integrationId
+        );
 
     const {data: allWorkflows, isPending: isWorkflowsPending} = useGetIntegrationVersionWorkflowsQuery(
         curIntegrationId!,
@@ -242,7 +275,7 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const queryClient = useQueryClient();
 
-    const onSuccess = () => {
+    const handleSaveSuccess = (savedIntegrationInstanceConfigurationId?: number) => {
         if (!integrationInstanceConfiguration?.id) {
             captureIntegrationInstanceConfigurationCreated();
         }
@@ -258,18 +291,25 @@ const IntegrationInstanceConfigurationDialog = ({
         });
 
         closeDialog();
+
+        if (onSuccess && savedIntegrationInstanceConfigurationId !== undefined) {
+            onSuccess(savedIntegrationInstanceConfigurationId);
+        }
     };
 
     const createIntegrationInstanceConfigurationMutation = useCreateIntegrationInstanceConfigurationMutation({
-        onSuccess,
+        onSuccess: (createdIntegrationInstanceConfigurationId) =>
+            handleSaveSuccess(createdIntegrationInstanceConfigurationId),
     });
 
     const updateIntegrationInstanceConfigurationMutation = useUpdateIntegrationInstanceConfigurationMutation({
-        onSuccess,
+        onSuccess: () => handleSaveSuccess(integrationInstanceConfiguration?.id),
     });
 
     const updateIntegrationInstanceConfigurationCredentialsMutation =
-        useUpdateIntegrationInstanceConfigurationCredentialsMutation({onSuccess});
+        useUpdateIntegrationInstanceConfigurationCredentialsMutation({
+            onSuccess: () => handleSaveSuccess(integrationInstanceConfiguration?.id),
+        });
 
     const sharedParameterNames = useMemo(
         () => [
@@ -295,7 +335,44 @@ const IntegrationInstanceConfigurationDialog = ({
         integrationInstanceConfiguration.version != null &&
         sharedParameterNames.length > 0;
 
-    const basicStepContent = (
+    const resetToConfiguration = (
+        configuration: IntegrationInstanceConfiguration | undefined,
+        updateVersion: boolean
+    ) => {
+        reset(getDefaultValues(configuration, updateVersion));
+
+        resetWorkflowsEnabledStore();
+
+        setCurIntegrationVersion(updateVersion ? undefined : configuration?.integrationVersion);
+
+        initializedConfigKeyRef.current = '';
+    };
+
+    const handleBasicStepTabChange = (tab: ConfigurationDialogTabType) => {
+        setBasicStepTab(tab);
+
+        if (tab === 'new-configuration' && selectedExistingConfiguration) {
+            setSelectedExistingConfiguration(undefined);
+
+            resetToConfiguration(integrationInstanceConfigurationProp, updateIntegrationVersionProp);
+        }
+    };
+
+    const handleExistingConfigurationSelect = (value: string) => {
+        const existingConfiguration = integrationInstanceConfigurations?.find(
+            (configuration) => String(configuration.id) === value
+        );
+
+        if (!existingConfiguration) {
+            return;
+        }
+
+        setSelectedExistingConfiguration(existingConfiguration);
+
+        resetToConfiguration(existingConfiguration, true);
+    };
+
+    const basicStepFields = (
         <IntegrationInstanceConfigurationDialogBasicStep
             authorizationRequired={authorizationRequired}
             authorizations={authorizations}
@@ -310,6 +387,36 @@ const IntegrationInstanceConfigurationDialog = ({
             updateIntegrationVersion={updateIntegrationVersion}
         />
     );
+
+    const configurationItems = useMemo(
+        () =>
+            (integrationInstanceConfigurations ?? []).map((configuration) => ({
+                label: `${configuration.name} - V${configuration.integrationVersion}`,
+                value: String(configuration.id),
+            })),
+        [integrationInstanceConfigurations]
+    );
+
+    const tabbedBasicStepContent = basicStepTab ? (
+        <ConfigurationDialogTabs
+            activeTab={basicStepTab}
+            changeVersionContent={basicStepFields}
+            configurationItems={configurationItems}
+            emptyTitle="No configurations for this integration yet"
+            newConfigurationContent={basicStepFields}
+            onConfigurationSelect={handleExistingConfigurationSelect}
+            onTabChange={handleBasicStepTabChange}
+            selectedConfigurationValue={
+                selectedExistingConfiguration ? String(selectedExistingConfiguration.id) : undefined
+            }
+        />
+    ) : (
+        <div className="flex justify-center py-12">
+            <LoadingDots />
+        </div>
+    );
+
+    const basicStepContent = showTabs ? tabbedBasicStepContent : basicStepFields;
 
     const oauth2StepContent = oAuth2Authorization && integration && (
         <IntegrationInstanceConfigurationDialogOauth2Step
@@ -336,8 +443,12 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const hasWorkflowsStep = workflows === undefined || workflows.length > 0;
 
+    const isBasicStepBlocked = showTabs && (!basicStepTab || (isChangeVersionTab && !selectedExistingConfiguration));
+
     const basicStepCanProceed =
-        !authorizationTypePending && (hasOauth2Step || hasWorkflowsStep || !!connectionDefinition);
+        !isBasicStepBlocked &&
+        !authorizationTypePending &&
+        (hasOauth2Step || hasWorkflowsStep || !!connectionDefinition);
 
     const steps = useMemo<DialogStepI[]>(() => {
         const dialogSteps: DialogStepI[] = [{canProceed: basicStepCanProceed, id: 'basic', label: 'Basic'}];
@@ -363,6 +474,9 @@ const IntegrationInstanceConfigurationDialog = ({
             credentialsForm.reset({parameters: {}});
 
             setIsUpdatingCredentials(false);
+
+            setBasicStepTab(undefined);
+            setSelectedExistingConfiguration(undefined);
 
             if (onClose) {
                 onClose();
@@ -401,7 +515,7 @@ const IntegrationInstanceConfigurationDialog = ({
                 authorizationType: toSavedAuthorizationType(
                     formData.authorizationType || getDefaultAuthorizationType(authorizations, authorizationRequired)
                 ),
-                environmentId: currentEnvironmentId,
+                environmentId: integrationInstanceConfigurationProp?.environmentId ?? currentEnvironmentId,
                 integrationInstanceConfigurationWorkflows: formData.integrationInstanceConfigurationWorkflows?.map(
                     (integrationInstanceConfigurationWorkflow) => {
                         return {
@@ -436,15 +550,47 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const isWizard = !integrationInstanceConfiguration?.id || updateIntegrationVersion;
 
-    const wizardTitle = updateIntegrationVersion ? 'Upgrade Version' : 'New Configuration';
+    const showsVersionUpdate = updateIntegrationVersion || isChangeVersionTab;
 
-    const wizardDescription = updateIntegrationVersion
+    const wizardTitle = showsVersionUpdate ? 'Change Integration Version' : 'New Configuration';
+
+    const wizardDescription = showsVersionUpdate
         ? 'Move this configuration to another integration version.'
         : 'Run an integration version for connected users.';
 
     const validateStep = useCallback(() => form.trigger(undefined, {shouldFocus: true}), [form]);
 
     const handleCompleteClick = () => handleSubmit(handleSaveClick)();
+
+    useEffect(() => {
+        if (
+            !showTabs ||
+            !isOpen ||
+            basicStepTab ||
+            integrationInstanceConfigurationsIsFetching ||
+            integrationInstanceConfigurations === undefined
+        ) {
+            return;
+        }
+
+        setBasicStepTab(integrationInstanceConfigurations.length > 0 ? 'change-version' : 'new-configuration');
+    }, [
+        basicStepTab,
+        integrationInstanceConfigurations,
+        integrationInstanceConfigurationsIsFetching,
+        isOpen,
+        showTabs,
+    ]);
+
+    useEffect(() => {
+        if (!isChangeVersionTab || selectedExistingConfiguration || integrationInstanceConfigurations?.length !== 1) {
+            return;
+        }
+
+        handleExistingConfigurationSelect(String(integrationInstanceConfigurations[0].id));
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [integrationInstanceConfigurations, isChangeVersionTab, selectedExistingConfiguration]);
 
     useEffect(() => {
         if (!isOpen || integrationInstanceConfiguration?.id || !integration?.name || getValues('name')) {
@@ -642,7 +788,7 @@ const IntegrationInstanceConfigurationDialog = ({
                 ) : (
                     <DialogMain>
                         <Form {...form}>
-                            <DialogHeader title="Edit Instance Configuration" />
+                            <DialogHeader title="Edit Configuration" />
 
                             <DialogBody>
                                 {!isUpdatingCredentials && (

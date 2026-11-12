@@ -3,6 +3,7 @@ import {
     IntegrationApi,
     IntegrationTagApi,
     PublishIntegrationOperationRequest,
+    RestoreIntegrationVersionRequest,
     UpdateIntegrationTagsRequest,
 } from '@/ee/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
@@ -63,6 +64,20 @@ export const usePublishIntegrationMutation = (mutationProps?: PublishIntegration
     useMutation({
         mutationFn: (request: PublishIntegrationOperationRequest) => {
             return new IntegrationApi().publishIntegration(request);
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
+interface RestoreIntegrationVersionMutationProps {
+    onSuccess?: (result: void, variables: RestoreIntegrationVersionRequest) => void;
+    onError?: (error: Error, variables: RestoreIntegrationVersionRequest) => void;
+}
+
+export const useRestoreIntegrationVersionMutation = (mutationProps?: RestoreIntegrationVersionMutationProps) =>
+    useMutation({
+        mutationFn: (request: RestoreIntegrationVersionRequest) => {
+            return new IntegrationApi().restoreIntegrationVersion(request);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,

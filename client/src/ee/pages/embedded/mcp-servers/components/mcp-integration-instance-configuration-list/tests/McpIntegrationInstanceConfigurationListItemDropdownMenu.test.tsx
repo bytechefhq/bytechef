@@ -51,7 +51,7 @@ describe('McpIntegrationInstanceConfigurationListItemDropdownMenu', () => {
 
         expect(screen.getByRole('menu')).toHaveClass('bg-surface-neutral-primary');
         expect(screen.getByRole('menuitem', {name: 'Edit Workflows'})).toHaveClass('text-content-neutral-primary');
-        expect(screen.getByRole('menuitem', {name: 'Update Integration Version'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Change Integration Version'})).toBeInTheDocument();
         expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
     });
 
@@ -66,13 +66,13 @@ describe('McpIntegrationInstanceConfigurationListItemDropdownMenu', () => {
         expect(onEditWorkflowsClick).toHaveBeenCalledTimes(1);
     });
 
-    it('calls onUpdateIntegrationVersionClick when Update Integration Version is clicked', async () => {
+    it('calls onUpdateIntegrationVersionClick when Change Integration Version is clicked', async () => {
         const onUpdateIntegrationVersionClick = vi.fn();
 
         renderMenu({onUpdateIntegrationVersionClick});
 
         await userEvent.click(screen.getByRole('button'));
-        await userEvent.click(screen.getByRole('menuitem', {name: 'Update Integration Version'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Change Integration Version'}));
 
         expect(onUpdateIntegrationVersionClick).toHaveBeenCalledTimes(1);
     });

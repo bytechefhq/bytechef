@@ -75,7 +75,7 @@ const IntegrationInstanceConfigurationsEmptyState = () => {
                                     environmentId: currentEnvironmentId,
                                 } as IntegrationInstanceConfiguration
                             }
-                            triggerNode={<Button label="Create Instance Configuration" size="sm" />}
+                            triggerNode={<Button label="Create Configuration" size="sm" />}
                         />
                     ),
                     description: 'Pick a published version and set it up for this environment.',

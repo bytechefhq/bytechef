@@ -3,7 +3,7 @@ import EmptyState from '@/components/EmptyState/EmptyState';
 import JourneySteps, {type JourneyStepI, type JourneyStepStatusType} from '@/components/JourneySteps/JourneySteps';
 import {EMBEDDED_AUTOMATION_CONFIGURATIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import {useEnvironmentScopeNote} from '@/shared/hooks/useEnvironmentScopeNote';
-import {SlidersHorizontalIcon} from 'lucide-react';
+import {Settings2Icon} from 'lucide-react';
 import {useMemo} from 'react';
 
 const getStepStatus = (complete: boolean, current: boolean): JourneyStepStatusType =>
@@ -44,8 +44,7 @@ const AutomationConfigurationsEmptyState = ({
             {
                 ...(publishVersionStatus === 'current' && {
                     action: goToAutomationsButton,
-                    description:
-                        'Publish the project in the Development environment to get a version you can configure.',
+                    description: 'Publishing creates a read-only version you can configure.',
                 }),
                 id: 'publishVersion',
                 label: 'Publish a version',
@@ -70,7 +69,7 @@ const AutomationConfigurationsEmptyState = ({
                 href: EMBEDDED_AUTOMATION_CONFIGURATIONS_DOCUMENTATION_URL,
                 label: 'How configurations work',
             }}
-            icon={<SlidersHorizontalIcon />}
+            icon={<Settings2Icon />}
             note={environmentScopeNote}
             title="Create your first configuration"
         >

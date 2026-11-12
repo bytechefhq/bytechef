@@ -256,9 +256,17 @@ describe('Projects empty states', () => {
     it('reports a filter miss rather than an empty workspace', () => {
         renderProjects(['/?tagId=1']);
 
-        expect(screen.getByText('No Matching Projects')).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'No matching projects'})).toBeInTheDocument();
+        expect(screen.getByText('Try a different filter.')).toBeInTheDocument();
         expect(screen.queryByText('Create your first project')).not.toBeInTheDocument();
         expect(screen.getByText('No defined tags.')).toBeInTheDocument();
+    });
+
+    it('keeps the page header when a filter matches nothing', () => {
+        renderProjects(['/?tagId=1']);
+
+        expect(screen.getByText('Filter by:')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Create Project'})).toBeInTheDocument();
     });
 });
 

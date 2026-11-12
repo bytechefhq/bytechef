@@ -149,7 +149,7 @@ describe('IntegrationInstanceConfigurationListItem row click', () => {
 
         expect(getWorkflowsTrigger()).toHaveAttribute('aria-expanded', 'false');
 
-        await userEvent.click(screen.getByRole('menuitem', {name: 'Update Integration Version'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Change Integration Version'}));
 
         expect(await screen.findByTestId('integration-instance-configuration-dialog')).toBeInTheDocument();
         expect(getWorkflowsTrigger()).toHaveAttribute('aria-expanded', 'false');
@@ -188,6 +188,44 @@ describe('IntegrationInstanceConfigurationListItem integration icon', () => {
 
         expect(screen.queryByTestId('integration-icon')).not.toBeInTheDocument();
         expect(container.querySelector('svg.lucide-settings-2')).toBeInTheDocument();
+    });
+});
+
+describe('IntegrationInstanceConfigurationListItem last execution', () => {
+    beforeEach(() => {
+        windowResizeObserver();
+    });
+
+    afterEach(() => {
+        resetAll();
+        vi.clearAllMocks();
+    });
+
+    it('should show the latest execution date across the configuration workflows', () => {
+        const latestExecutionDate = new Date('2026-03-04T10:00:00Z');
+
+        renderItem({
+            integrationInstanceConfigurationWorkflows: [
+                {lastExecutionDate: new Date('2026-01-02T10:00:00Z'), workflowId: 'workflow-1'},
+                {lastExecutionDate: latestExecutionDate, workflowId: 'workflow-2'},
+                {workflowId: 'workflow-3'},
+            ],
+            lastModifiedDate: new Date('2026-05-06T10:00:00Z'),
+        } as Partial<IntegrationInstanceConfiguration>);
+
+        expect(
+            screen.getByText(
+                `Executed at ${latestExecutionDate.toLocaleDateString()} ${latestExecutionDate.toLocaleTimeString()}`
+            )
+        ).toBeInTheDocument();
+        expect(screen.queryByText(/Modified at/)).not.toBeInTheDocument();
+    });
+
+    it('should show No executions when no workflow has run, even if the configuration was modified', () => {
+        renderItem({lastModifiedDate: new Date('2026-05-06T10:00:00Z')} as Partial<IntegrationInstanceConfiguration>);
+
+        expect(screen.getByText('No executions')).toBeInTheDocument();
+        expect(screen.queryByText(/Modified at/)).not.toBeInTheDocument();
     });
 });
 

@@ -1,15 +1,20 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
-import {useAutomationProjectsQuery, usePublishAutomationProjectMutation} from '@/shared/middleware/graphql';
+import {
+    useAutomationProjectVersionWorkflowChangesQuery,
+    useAutomationProjectsQuery,
+    usePublishAutomationProjectMutation,
+} from '@/shared/middleware/graphql';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
-import {useQueryClient} from '@tanstack/react-query';
-import {RefObject, useCallback, useEffect, useState} from 'react';
+import {useIsMutating, useQueryClient} from '@tanstack/react-query';
+import {RefObject, useCallback, useEffect, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -23,6 +28,8 @@ interface UseAutomationEditorHeaderProps {
 export const useAutomationEditorHeader = ({bottomResizablePanelRef, projectId}: UseAutomationEditorHeaderProps) => {
     const [jobId, setJobId] = useState<string | null>(null);
 
+    const previousMutatingCountRef = useRef(0);
+
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workflow = useWorkflowDataStore((state) => state.workflow);
     const {setShowBottomPanelOpen, setWorkflowIsRunning, setWorkflowTestExecution, showBottomPanel} =
@@ -34,15 +41,25 @@ export const useAutomationEditorHeader = ({bottomResizablePanelRef, projectId}: 
                 showBottomPanel: state.showBottomPanel,
             }))
         );
+    const setCurrentNode = useWorkflowNodeDetailsPanelStore((state) => state.setCurrentNode);
 
     const {captureProjectWorkflowTested} = useAnalytics();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     const {data: projectsData} = useAutomationProjectsQuery();
 
     const projects = projectsData?.automationProjects ?? [];
 
     const project = projects.find((automationProject) => automationProject.id === projectId);
+
+    const {data: draftWorkflowChangesData, refetch: refetchDraftWorkflowChanges} =
+        useAutomationProjectVersionWorkflowChangesQuery(
+            {id: projectId, projectVersion: project?.version ?? 0},
+            {enabled: !!project?.published && !!project?.version}
+        );
+
+    const mutatingCount = useIsMutating();
 
     const queryClient = useQueryClient();
 
@@ -73,6 +90,10 @@ export const useAutomationEditorHeader = ({bottomResizablePanelRef, projectId}: 
         },
     });
 
+    const hasUnpublishedChanges =
+        !project?.published ||
+        (draftWorkflowChangesData?.automationProjectVersionWorkflowChanges.workflows.length ?? 0) > 0;
+
     const handlePublishProjectSubmit = ({description, onSuccess}: {description?: string; onSuccess: () => void}) => {
         if (project) {
             publishProjectMutation.mutate(
@@ -84,9 +105,45 @@ export const useAutomationEditorHeader = ({bottomResizablePanelRef, projectId}: 
         }
     };
 
-    const handleWorkflowValueChange = (workflowUuid: string) => {
-        void navigate('/embedded/automations/' + workflowUuid + '/editor');
-    };
+    const handleWorkflowValueChange = useCallback(
+        (workflowUuid: string) => {
+            const newSearchParams = new URLSearchParams(searchParams.toString());
+
+            newSearchParams.delete('fromSubflow');
+            newSearchParams.delete('parentChain');
+            newSearchParams.delete('parentProjectWorkflowId');
+            newSearchParams.delete('restoreExecutionPanel');
+
+            const searchString = newSearchParams.toString();
+            const workflowPath = `/embedded/automations/${workflowUuid}/editor${searchString ? `?${searchString}` : ''}`;
+
+            if (useWorkflowEditorStore.getState().workflowIsRunning) {
+                void navigate(workflowPath);
+
+                return;
+            }
+
+            setWorkflowTestExecution(undefined);
+            useWorkflowEditorStore.getState().resetWorkflowTestNodeStates(undefined);
+            setCurrentNode(undefined);
+
+            void navigate(workflowPath);
+
+            setShowBottomPanelOpen(false);
+
+            if (bottomResizablePanelRef.current) {
+                bottomResizablePanelRef.current.resize(0);
+            }
+        },
+        [
+            bottomResizablePanelRef,
+            navigate,
+            searchParams,
+            setCurrentNode,
+            setShowBottomPanelOpen,
+            setWorkflowTestExecution,
+        ]
+    );
 
     const handleProjectValueChange = (selectedProjectId: string) => {
         if (selectedProjectId === projectId) {
@@ -204,6 +261,14 @@ export const useAutomationEditorHeader = ({bottomResizablePanelRef, projectId}: 
         }
     }, [workflowTestStreamError, persistJobId, setWorkflowIsRunning, setStreamRequest]);
 
+    useEffect(() => {
+        if (previousMutatingCountRef.current > 0 && mutatingCount === 0 && project?.published) {
+            void refetchDraftWorkflowChanges();
+        }
+
+        previousMutatingCountRef.current = mutatingCount;
+    }, [mutatingCount, project?.published, refetchDraftWorkflowChanges]);
+
     return {
         handleProjectValueChange,
         handlePublishProjectSubmit,
@@ -211,6 +276,7 @@ export const useAutomationEditorHeader = ({bottomResizablePanelRef, projectId}: 
         handleShowOutputClick,
         handleStopClick,
         handleWorkflowValueChange,
+        hasUnpublishedChanges,
         project,
         projects,
         publishProjectMutationIsPending: publishProjectMutation.isPending,

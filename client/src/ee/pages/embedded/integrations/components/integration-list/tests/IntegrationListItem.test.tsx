@@ -3,10 +3,11 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationListItem from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItem';
 import {IntegrationListItemTabType} from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItemTabs';
 import {Integration, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
-import {fireEvent, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {act, fireEvent, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
+    configurationDialogOnSuccess: {current: undefined as ((id: number) => void) | undefined},
     navigate: vi.fn(),
     onTabChange: vi.fn(),
 }));
@@ -83,17 +84,25 @@ vi.mock(
     () => ({
         default: ({
             integrationInstanceConfiguration,
+            onSuccess,
             triggerNode,
         }: {
             integrationInstanceConfiguration: IntegrationInstanceConfiguration;
+            onSuccess?: (id: number) => void;
             triggerNode: React.ReactNode;
-        }) => (
-            <>
-                {triggerNode}
+        }) => {
+            if (!triggerNode) {
+                hoisted.configurationDialogOnSuccess.current = onSuccess;
+            }
 
-                <span>{`Configuration dialog for integration ${integrationInstanceConfiguration.integrationId} in environment ${integrationInstanceConfiguration.environmentId}`}</span>
-            </>
-        ),
+            return (
+                <>
+                    {triggerNode}
+
+                    <span>{`Configuration dialog for integration ${integrationInstanceConfiguration.integrationId} in environment ${integrationInstanceConfiguration.environmentId}`}</span>
+                </>
+            );
+        },
     })
 );
 
@@ -143,6 +152,8 @@ describe('IntegrationListItem', () => {
     afterEach(() => {
         resetAll();
         vi.clearAllMocks();
+
+        hoisted.configurationDialogOnSuccess.current = undefined;
     });
 
     describe('actions menu', () => {
@@ -259,11 +270,19 @@ describe('IntegrationListItem', () => {
 
             await userEvent.click(menuTrigger!);
 
-            expect(screen.queryByRole('menuitem', {name: 'Publish'})).not.toBeInTheDocument();
+            const publishMenuItem = screen.getByRole('menuitem', {name: 'Publish'});
+
+            expect(publishMenuItem).toHaveAttribute('data-disabled');
             expect(screen.getByRole('menuitem', {name: 'New Configuration'})).not.toHaveAttribute('data-disabled');
+
+            await userEvent.hover(publishMenuItem.parentElement!);
+
+            expect(await screen.findByRole('tooltip')).toHaveTextContent(
+                'Add a workflow before publishing the integration.'
+            );
         });
 
-        it('should keep Publish for a published integration whose draft has no workflows', async () => {
+        it('should disable Publish for a published integration whose draft has no workflows', async () => {
             renderItem({integrationWorkflowIds: []});
 
             const menuTrigger = screen
@@ -273,7 +292,19 @@ describe('IntegrationListItem', () => {
 
             await userEvent.click(menuTrigger!);
 
-            expect(screen.getByRole('menuitem', {name: 'Publish'})).toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'Publish'})).toHaveAttribute('data-disabled');
+        });
+
+        it('should switch to the Configurations tab once New Configuration creates a configuration', async () => {
+            await openMenu();
+
+            await userEvent.click(screen.getByRole('menuitem', {name: 'New Configuration'}));
+
+            expect(hoisted.onTabChange).not.toHaveBeenCalled();
+
+            act(() => hoisted.configurationDialogOnSuccess.current?.(42));
+
+            expect(hoisted.onTabChange).toHaveBeenCalledWith('configurations');
         });
 
         it('should ask for confirmation when Delete is clicked', async () => {

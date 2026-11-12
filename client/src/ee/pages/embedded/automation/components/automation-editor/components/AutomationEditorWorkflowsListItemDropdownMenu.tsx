@@ -1,4 +1,5 @@
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
+import {getPathAfterWorkflowDelete} from '@/ee/pages/embedded/automation/components/automation-editor/utils/getPathAfterWorkflowDelete';
 import AutomationDialog, {
     AutomationFormValuesI,
 } from '@/ee/pages/embedded/automations/components/automation-dialog/AutomationDialog';
@@ -10,7 +11,7 @@ import {
     useUpdateAutomationProjectWorkflowMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {CopyIcon} from 'lucide-react';
+import {CopyIcon, DownloadIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
@@ -53,15 +54,7 @@ const AutomationEditorWorkflowsListItemDropdownMenu = ({
                         return;
                     }
 
-                    const firstRemainingWorkflow = project.workflowTemplates.find(
-                        (workflowTemplate) => workflowTemplate.workflowUuid !== workflow.workflowUuid
-                    );
-
-                    if (firstRemainingWorkflow) {
-                        void navigate(`/embedded/automations/${firstRemainingWorkflow.workflowUuid}/editor`);
-                    } else {
-                        void navigate('/embedded/automations');
-                    }
+                    void navigate(getPathAfterWorkflowDelete(project.workflowTemplates, workflow.workflowUuid));
                 },
             }
         );
@@ -76,6 +69,10 @@ const AutomationEditorWorkflowsListItemDropdownMenu = ({
                 },
             }
         );
+    };
+
+    const handleExportWorkflowClick = () => {
+        window.location.href = '/api/automation/internal/workflows/' + workflow.workflowId + '/export';
     };
 
     const handleEditWorkflowSubmit = (values: AutomationFormValuesI) => {
@@ -111,6 +108,8 @@ const AutomationEditorWorkflowsListItemDropdownMenu = ({
             workflowLabel={workflow.label ?? workflow.workflowUuid}
         >
             <DropdownMenuItem icon={<CopyIcon />} label="Duplicate" onClick={handleDuplicateWorkflowClick} />
+
+            <DropdownMenuItem icon={<DownloadIcon />} label="Export" onClick={handleExportWorkflowClick} />
         </WorkflowListItemDropdownMenu>
     );
 };

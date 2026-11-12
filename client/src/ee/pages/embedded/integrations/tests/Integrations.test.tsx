@@ -134,8 +134,15 @@ describe('Integrations', () => {
         renderIntegrations('/embedded/integrations?tagId=3');
 
         expect(screen.getByTestId('layout-container')).toHaveAttribute('data-left-sidebar-hidden', 'false');
-        expect(screen.getByText('No Matching Integrations')).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'No matching integrations'})).toBeInTheDocument();
+        expect(screen.getByText('Try a different filter.')).toBeInTheDocument();
         expect(screen.queryByText('Create your first integration')).not.toBeInTheDocument();
+    });
+
+    it('keeps the New Integration button in the header when a filter excludes every integration', () => {
+        renderIntegrations('/embedded/integrations?tagId=3');
+
+        expect(screen.getByRole('button', {name: 'Create Integration'})).toHaveTextContent('New Integration');
     });
 
     it('lists integrations with a New Integration button once some exist', () => {

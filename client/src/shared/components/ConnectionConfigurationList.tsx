@@ -123,7 +123,7 @@ const ConnectionConfigurationListFormField = ({
                             </span>
                         ) : (
                             <span className="text-xs text-content-neutral-secondary">
-                                {`(${componentConnection.componentName} - ${componentConnection.workflowNodeName})`}
+                                {`(${componentConnection.workflowNodeName})`}
                             </span>
                         )}
                     </FormLabel>

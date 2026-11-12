@@ -37,6 +37,16 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     },
     useAutomationProjectCategoriesQuery: () => ({data: {automationProjectCategories: []}}),
     useAutomationProjectTagsQuery: () => ({data: {automationProjectTags: []}}),
+    useAutomationProjectVersionWorkflowChangesQuery: () => ({
+        data: {
+            automationProjectVersionWorkflowChanges: {
+                baseVersion: 2,
+                version: 3,
+                workflows: [{changeCount: 1, changeType: 'MODIFIED', label: 'My Workflow Template', workflowUuid: 'w'}],
+            },
+        },
+        refetch: vi.fn(),
+    }),
     useAutomationProjectVersionsQuery: () => ({data: {automationProjectVersions: []}}),
     useAutomationProjectsQuery: () => ({
         data: {
@@ -125,6 +135,7 @@ vi.mock('react-router-dom', () => ({
     useBlocker: () => undefined,
     useNavigate: () => hoisted.navigateMock,
     useParams: () => ({workflowUuid: hoisted.workflowUuid}),
+    useSearchParams: () => [new URLSearchParams('')],
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({

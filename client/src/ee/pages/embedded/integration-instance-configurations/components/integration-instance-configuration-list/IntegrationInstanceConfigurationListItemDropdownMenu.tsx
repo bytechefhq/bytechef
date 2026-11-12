@@ -37,7 +37,7 @@ const IntegrationInstanceConfigurationListItemDropdownMenu = ({
 
                 <DropdownMenuItem
                     icon={<RefreshCcwIcon />}
-                    label="Update Integration Version"
+                    label="Change Integration Version"
                     onClick={onUpdateIntegrationVersionClick}
                 />
 

@@ -15,10 +15,11 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationPublishDialog from '@/ee/pages/embedded/integrations/components/IntegrationPublishDialog';
+import IntegrationListItemPublishMenuItem from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItemPublishMenuItem';
 import IntegrationListItemTabs, {
     IntegrationListItemTabType,
 } from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationListItemTabs';
-import {isIntegrationConfigurable, isIntegrationPublished} from '@/ee/pages/embedded/shared/integrationPublication';
+import {isIntegrationConfigurable} from '@/ee/pages/embedded/shared/integrationPublication';
 import {Integration, IntegrationInstanceConfiguration, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {
     useDeleteIntegrationMutation,
@@ -41,8 +42,7 @@ import {
     EditIcon,
     EllipsisVerticalIcon,
     PlusIcon,
-    SendIcon,
-    SettingsIcon,
+    Settings2Icon,
     Trash2Icon,
     UploadIcon,
     WorkflowIcon,
@@ -88,7 +88,6 @@ const IntegrationListItem = ({
     const configurationCount = integration.developmentConfigurationCount;
     const workflowCount = integration.integrationWorkflowIds?.length ?? 0;
     const hasWorkflows = workflowCount > 0;
-    const isPublished = isIntegrationPublished(integration);
     const isConfigurable = isIntegrationConfigurable(integration);
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
@@ -347,13 +346,10 @@ const IntegrationListItem = ({
                                         onClick={() => setShowEditDialog(true)}
                                     />
 
-                                    {(isPublished || hasWorkflows) && (
-                                        <DropdownMenuItem
-                                            icon={<SendIcon />}
-                                            label="Publish"
-                                            onClick={() => setShowPublishIntegrationDialog(true)}
-                                        />
-                                    )}
+                                    <IntegrationListItemPublishMenuItem
+                                        canPublish={hasWorkflows}
+                                        onClick={() => setShowPublishIntegrationDialog(true)}
+                                    />
                                 </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
@@ -392,7 +388,7 @@ const IntegrationListItem = ({
                                             <span className="block">
                                                 <DropdownMenuItem
                                                     disabled={!isConfigurable}
-                                                    icon={<SettingsIcon />}
+                                                    icon={<Settings2Icon />}
                                                     label="New Configuration"
                                                     onSelect={() => setShowIntegrationInstanceConfigurationDialog(true)}
                                                 />
@@ -515,6 +511,7 @@ const IntegrationListItem = ({
                         } as IntegrationInstanceConfiguration
                     }
                     onClose={() => setShowIntegrationInstanceConfigurationDialog(false)}
+                    onSuccess={() => onTabChange('configurations')}
                 />
             )}
 

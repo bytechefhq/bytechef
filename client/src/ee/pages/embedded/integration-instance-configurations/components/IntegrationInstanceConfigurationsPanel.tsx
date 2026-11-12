@@ -114,17 +114,17 @@ const IntegrationInstanceConfigurationsPanel = ({
                                         integrationId: integration.id,
                                     } as IntegrationInstanceConfiguration
                                 }
-                                triggerNode={<Button label="Create Configuration" />}
+                                triggerNode={<Button icon={<Settings2Icon />} label="Configure" />}
                             />
                         }
-                        description="Create an instance configuration to run this integration's workflows here."
+                        description="Configure this integration to run its workflows here."
                         icon={<Settings2Icon />}
                         title="No configurations in Development"
                     />
                 ) : (
                     <EmptyState
                         actions={<PublishButton onClick={() => setShowPublishIntegrationDialog(true)} />}
-                        description="Instance configurations run a published version of an integration. Publish this integration to create its first version."
+                        description="Configurations run a published, read-only version of an integration. Publish this integration to create its first version."
                         icon={<SendIcon />}
                         title="Publish the integration to configure it"
                     />
