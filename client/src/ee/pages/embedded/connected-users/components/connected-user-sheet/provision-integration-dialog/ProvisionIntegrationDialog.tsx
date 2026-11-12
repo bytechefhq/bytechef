@@ -15,6 +15,7 @@ import ProvisionIntegrationDialogConnectionStep, {
     isOAuth2CodeAuthorizationType,
 } from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/provision-integration-dialog/ProvisionIntegrationDialogConnectionStep';
 import ProvisionIntegrationDialogWorkflowItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/provision-integration-dialog/ProvisionIntegrationDialogWorkflowItem';
+import {ProvisionableIntegration} from '@/ee/shared/middleware/embedded/configuration';
 import {useProvisionIntegrationInstanceMutation} from '@/ee/shared/mutations/embedded/integrationInstances.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
@@ -118,19 +119,15 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
         );
     };
 
-    const handleIntegrationChange = (value: string) => {
-        setValue('integrationId', value ? Number(value) : undefined);
-        setValue('integrationInstanceConfigurationId', undefined);
-        setValue('connectionParameters', {});
-        setValue('workflows', []);
-    };
-
-    const handleConfigurationChange = (value: number) => {
-        const selectedConfiguration = provisionableIntegration?.integrationInstanceConfigurations?.find(
-            (current) => current.integrationInstanceConfiguration?.id === value
+    const selectConfiguration = (
+        integration: ProvisionableIntegration | undefined,
+        configurationId: number | undefined
+    ) => {
+        const selectedConfiguration = integration?.integrationInstanceConfigurations?.find(
+            (current) => current.integrationInstanceConfiguration?.id === configurationId
         )?.integrationInstanceConfiguration;
 
-        setValue('integrationInstanceConfigurationId', value);
+        setValue('integrationInstanceConfigurationId', configurationId);
         setValue('connectionParameters', {});
         setValue(
             'workflows',
@@ -141,6 +138,24 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
             }))
         );
     };
+
+    const handleIntegrationChange = (value: string) => {
+        const nextIntegrationId = value ? Number(value) : undefined;
+
+        const nextIntegration = provisionableIntegrations?.find(
+            (current) => current.integration?.id === nextIntegrationId
+        );
+
+        const selfServeConfigurationId = nextIntegration?.integrationInstanceConfigurations?.find(
+            (current) => current.selfServe
+        )?.integrationInstanceConfiguration?.id;
+
+        setValue('integrationId', nextIntegrationId);
+
+        selectConfiguration(nextIntegration, selfServeConfigurationId);
+    };
+
+    const handleConfigurationChange = (value: number) => selectConfiguration(provisionableIntegration, value);
 
     const handleCodeSuccess = ({code, code_verifier: codeVerifier}: CodePayloadI) => {
         setValue('connectionParameters.code', code);
@@ -218,40 +233,46 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
                         />
                     )}
 
-                    {configuration && !configuration.integrationInstanceConfigurationWorkflows?.length && (
-                        <p className="text-sm text-content-neutral-secondary">
-                            This configuration has no enabled workflows.
-                        </p>
-                    )}
+                    {configuration && (
+                        <fieldset className="space-y-2 border-0 p-0">
+                            <legend className="text-sm font-medium">Workflows</legend>
 
-                    {configuration?.integrationInstanceConfigurationWorkflows?.map(
-                        (configurationWorkflow, workflowIndex) => {
-                            const workflow = integrationWorkflows?.find(
-                                (current) =>
-                                    current.workflowUuid === configurationWorkflow.workflowUuid ||
-                                    current.id === configurationWorkflow.workflowId
-                            );
+                            {!configuration.integrationInstanceConfigurationWorkflows?.length && (
+                                <p className="text-sm text-content-neutral-secondary">
+                                    This configuration has no enabled workflows.
+                                </p>
+                            )}
 
-                            return (
-                                workflow && (
-                                    <ProvisionIntegrationDialogWorkflowItem
-                                        control={control as unknown as Control<FieldValues>}
-                                        formState={formState as unknown as FormState<FieldValues>}
-                                        key={configurationWorkflow.workflowUuid}
-                                        mcpTool={
-                                            !!provisionableIntegration?.mcpWorkflowUuids?.includes(
-                                                configurationWorkflow.workflowUuid!
-                                            )
-                                        }
-                                        onEnabledChange={(enabled) =>
-                                            setValue(`workflows.${workflowIndex}.enabled`, enabled)
-                                        }
-                                        workflow={workflow}
-                                        workflowIndex={workflowIndex}
-                                    />
-                                )
-                            );
-                        }
+                            {configuration.integrationInstanceConfigurationWorkflows?.map(
+                                (configurationWorkflow, workflowIndex) => {
+                                    const workflow = integrationWorkflows?.find(
+                                        (current) =>
+                                            current.workflowUuid === configurationWorkflow.workflowUuid ||
+                                            current.id === configurationWorkflow.workflowId
+                                    );
+
+                                    return (
+                                        workflow && (
+                                            <ProvisionIntegrationDialogWorkflowItem
+                                                control={control as unknown as Control<FieldValues>}
+                                                formState={formState as unknown as FormState<FieldValues>}
+                                                key={configurationWorkflow.workflowUuid}
+                                                mcpTool={
+                                                    !!provisionableIntegration?.mcpWorkflowUuids?.includes(
+                                                        configurationWorkflow.workflowUuid!
+                                                    )
+                                                }
+                                                onEnabledChange={(enabled) =>
+                                                    setValue(`workflows.${workflowIndex}.enabled`, enabled)
+                                                }
+                                                workflow={workflow}
+                                                workflowIndex={workflowIndex}
+                                            />
+                                        )
+                                    );
+                                }
+                            )}
+                        </fieldset>
                     )}
                 </div>
 

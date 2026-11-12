@@ -73,64 +73,66 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     };
 
     return (
-        <li
-            className="flex min-h-12 cursor-pointer items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
-            key={workflow.id}
-            onClick={(event) => {
-                if (isCollapsibleRowClick(event)) {
-                    handleWorkflowClick();
-                }
-            }}
-        >
-            <div className="flex min-w-0 flex-1 items-center gap-2">
-                <div className="flex w-80 shrink-0 items-center gap-2 pr-1">
-                    <button
-                        className="min-w-0 cursor-pointer truncate text-left text-sm font-semibold"
-                        onClick={handleWorkflowClick}
-                        type="button"
-                    >
-                        {workflow.label}
-                    </button>
+        <li key={workflow.id}>
+            <div
+                className="flex min-h-12 cursor-pointer items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
+                onClick={(event) => {
+                    if (isCollapsibleRowClick(event)) {
+                        handleWorkflowClick();
+                    }
+                }}
+                role="presentation"
+            >
+                <div className="flex min-w-0 flex-1 items-center gap-2">
+                    <div className="flex w-80 shrink-0 items-center gap-2 pr-1">
+                        <button
+                            className="min-w-0 cursor-pointer truncate text-left text-sm font-semibold"
+                            onClick={handleWorkflowClick}
+                            type="button"
+                        >
+                            {workflow.label}
+                        </button>
 
-                    {mcpTool && <Badge label="MCP tool" styleType="secondary-filled" />}
+                        {mcpTool && <Badge label="MCP tool" styleType="secondary-filled" />}
+                    </div>
+
+                    <WorkflowTriggerAndComponentsRow
+                        className="hidden sm:flex"
+                        filteredComponentNames={filteredComponentNames}
+                        workflow={workflow}
+                        workflowComponentDefinitions={workflowComponentDefinitions}
+                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                    />
                 </div>
 
-                <WorkflowTriggerAndComponentsRow
-                    className="hidden sm:flex"
-                    filteredComponentNames={filteredComponentNames}
-                    workflow={workflow}
-                    workflowComponentDefinitions={workflowComponentDefinitions}
-                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                />
-            </div>
+                <div className="flex shrink-0 items-center gap-x-4">
+                    <Tooltip>
+                        <TooltipTrigger className="text-xs text-content-neutral-secondary">
+                            {lastExecutionDate
+                                ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
+                                : 'No executions'}
+                        </TooltipTrigger>
 
-            <div className="flex shrink-0 items-center gap-x-4">
-                <Tooltip>
-                    <TooltipTrigger className="text-xs text-content-neutral-secondary">
-                        {lastExecutionDate
-                            ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
-                            : 'No executions'}
-                    </TooltipTrigger>
+                        <TooltipContent side="left">Last Execution Date</TooltipContent>
+                    </Tooltip>
 
-                    <TooltipContent side="left">Last Execution Date</TooltipContent>
-                </Tooltip>
+                    <div className="relative mr-11 flex items-center">
+                        {enableIntegrationInstanceWorkflowMutation.isPending && (
+                            <LoadingIcon className="absolute top-[3px] left-[-15px]" />
+                        )}
 
-                <div className="relative mr-11 flex items-center">
-                    {enableIntegrationInstanceWorkflowMutation.isPending && (
-                        <LoadingIcon className="absolute top-[3px] left-[-15px]" />
-                    )}
-
-                    <Switch
-                        checked={integrationInstanceWorkflow?.enabled}
-                        disabled={!integrationInstanceConfigurationWorkflow?.enabled}
-                        onCheckedChange={(value) => {
-                            enableIntegrationInstanceWorkflowMutation.mutate({
-                                enable: value,
-                                id: integrationInstance.id!,
-                                workflowId: workflow.id!,
-                            });
-                        }}
-                    />
+                        <Switch
+                            checked={integrationInstanceWorkflow?.enabled}
+                            disabled={mcpTool || !integrationInstanceConfigurationWorkflow?.enabled}
+                            onCheckedChange={(value) => {
+                                enableIntegrationInstanceWorkflowMutation.mutate({
+                                    enable: value,
+                                    id: integrationInstance.id!,
+                                    workflowId: workflow.id!,
+                                });
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
         </li>

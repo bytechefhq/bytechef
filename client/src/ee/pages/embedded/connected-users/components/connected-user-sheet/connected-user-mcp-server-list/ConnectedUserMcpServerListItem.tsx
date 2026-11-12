@@ -124,7 +124,7 @@ const ConnectedUserMcpServerListItem = ({
                     </CollapsibleTrigger>
 
                     <div className="flex items-center gap-x-2">
-                        <div className="flex min-w-52 flex-col items-end gap-y-2">
+                        <div className="flex w-72 flex-col items-end gap-y-2">
                             <div className="relative flex min-h-6 items-center">
                                 {enableConnectedUserMcpServerMutation.isPending && (
                                     <LoadingIcon className="absolute top-[3px] left-[-15px]" />

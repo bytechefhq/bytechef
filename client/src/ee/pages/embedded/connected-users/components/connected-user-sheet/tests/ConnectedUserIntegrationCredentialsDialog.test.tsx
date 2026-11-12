@@ -107,6 +107,10 @@ vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () 
     };
 });
 
+vi.mock('@/shared/components/EnvironmentBadge', () => ({
+    default: ({environmentId}: {environmentId: number}) => <span>{`Environment ${environmentId}`}</span>,
+}));
+
 vi.mock('@/shared/components/connection/OAuth2Button', () => ({
     default: ({
         onClick,
@@ -158,9 +162,9 @@ const mockProvisionableConfiguration = (configuration: ReturnType<typeof buildCo
     ]);
 };
 
-const renderDialog = (onClose = vi.fn()) =>
+const renderDialog = (onClose = vi.fn(), queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}})) =>
     render(
-        <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
+        <QueryClientProvider client={queryClient}>
             <ConnectedUserIntegrationCredentialsDialog
                 connectedUserId={9}
                 integrationInstance={integrationInstance}
@@ -186,6 +190,7 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
             authorizationType: 'API_KEY',
             componentName: 'slack',
             connectionVersion: 1,
+            environmentId: 2,
             id: 70,
             name: 'Slack',
             parameters: {},
@@ -202,6 +207,40 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
         expect(screen.getByText('••••••••')).toBeInTheDocument();
         expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
         expect(hoisted.getIntegrationInstanceConnection).toHaveBeenCalledWith({id: 40});
+    });
+
+    it('is laid out like the Edit Connection dialog', async () => {
+        renderDialog();
+
+        expect(await screen.findByRole('heading', {name: 'Edit Connection'})).toBeInTheDocument();
+        expect(await screen.findByText('Environment 2')).toBeInTheDocument();
+        expect(screen.getByText('Environment')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
+    });
+
+    it('shows the credential fields above the read-only parameters without a heading of their own', async () => {
+        renderDialog();
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Update credentials'}));
+
+        const apiKeyInput = screen.getByLabelText('apiKey');
+        const authorizationParametersHeading = screen.getByText('Authorization Parameters');
+
+        expect(
+            apiKeyInput.compareDocumentPosition(authorizationParametersHeading) & Node.DOCUMENT_POSITION_FOLLOWING
+        ).toBeTruthy();
+        expect(screen.queryByText('Connection')).not.toBeInTheDocument();
+    });
+
+    it('goes back to the read-only view without saving', async () => {
+        renderDialog();
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Update credentials'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Back'}));
+
+        expect(screen.queryByLabelText('apiKey')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
+        expect(hoisted.updateIntegrationInstanceCredentials).not.toHaveBeenCalled();
     });
 
     it('resolves the connection definition through the connection version of the connection', async () => {
@@ -232,7 +271,7 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
         expect(screen.queryByLabelText('clientId')).not.toBeInTheDocument();
 
         await userEvent.type(screen.getByLabelText('apiKey'), 'new-key');
-        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Update credentials'}));
 
         await waitFor(() =>
             expect(hoisted.updateIntegrationInstanceCredentials).toHaveBeenCalledWith({
@@ -241,6 +280,22 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
             })
         );
         await waitFor(() => expect(onClose).toHaveBeenCalled());
+    });
+
+    it("refreshes the connected user's connections after the credentials are replaced", async () => {
+        const onClose = vi.fn();
+        const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        renderDialog(onClose, queryClient);
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Update credentials'}));
+        await userEvent.type(screen.getByLabelText('apiKey'), 'new-key');
+        await userEvent.click(screen.getByRole('button', {name: 'Update credentials'}));
+
+        await waitFor(() => expect(onClose).toHaveBeenCalled());
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['embedded_connections']});
     });
 
     it('reloads the connection after a failed save so a retry sends the current version', async () => {
@@ -266,13 +321,13 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
             version: 5,
         });
 
-        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Update credentials'}));
 
         await waitFor(() => expect(hoisted.getIntegrationInstanceConnection).toHaveBeenCalledTimes(2));
 
         expect(onClose).not.toHaveBeenCalled();
 
-        await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Update credentials'}));
 
         await waitFor(() =>
             expect(hoisted.updateIntegrationInstanceCredentials).toHaveBeenLastCalledWith({
@@ -326,7 +381,7 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
         );
         expect(screen.queryByLabelText('clientSecret')).not.toBeInTheDocument();
 
-        expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
         expect(screen.getAllByRole('button', {name: 'Authorize'})).toHaveLength(1);
 
         await userEvent.click(screen.getByRole('button', {name: 'Authorize'}));
@@ -342,7 +397,7 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
         );
     });
 
-    it('offers Save to retry an OAuth2 authorization whose save failed', async () => {
+    it('offers Update credentials to retry an OAuth2 authorization whose save failed', async () => {
         const oAuth2Configuration = buildConfiguration(2, 'OAUTH2_AUTHORIZATION_CODE');
 
         mockProvisionableConfiguration(oAuth2Configuration);
@@ -367,7 +422,7 @@ describe('ConnectedUserIntegrationCredentialsDialog', () => {
         await userEvent.click(await screen.findByRole('button', {name: 'Update credentials'}));
         await userEvent.click(screen.getByRole('button', {name: 'Authorize'}));
 
-        const saveButton = await screen.findByRole('button', {name: 'Save'});
+        const saveButton = await screen.findByRole('button', {name: 'Update credentials'});
 
         expect(screen.queryByRole('button', {name: 'Authorize'})).not.toBeInTheDocument();
 

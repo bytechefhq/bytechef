@@ -35,10 +35,12 @@ export interface ConnectedUserWorkflowTemplateSourceI {
 }
 
 const ConnectedUserProjectWorkflowListItem = ({
+    configurationProjectVersion,
     connectedUserProjectWorkflow,
     projectName,
     workflowTemplate,
 }: {
+    configurationProjectVersion?: number;
     connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType;
     projectName?: string;
     workflowTemplate?: ConnectedUserWorkflowTemplateType;
@@ -104,10 +106,20 @@ const ConnectedUserProjectWorkflowListItem = ({
         ? new Date(Date.parse(connectedUserProjectWorkflow.lastExecutionDate))
         : undefined;
 
-    const isDraft = connectedUserProjectWorkflow.workflowVersion == null;
+    const provisioned = connectedUserProjectWorkflow.automationUuid != null;
+
+    const isDraft = !provisioned && connectedUserProjectWorkflow.workflowVersion == null;
 
     // An unpublished copy has no deployment to switch on; the server rejects enabling it until it is published
     const enableDisabled = isDraft && !connectedUserProjectWorkflow.enabled;
+
+    const versionLabel = useMemo(() => {
+        if (provisioned) {
+            return configurationProjectVersion != null ? `V${configurationProjectVersion}` : undefined;
+        }
+
+        return isDraft ? 'V1 DRAFT' : `V${connectedUserProjectWorkflow.workflowVersion}`;
+    }, [configurationProjectVersion, connectedUserProjectWorkflow.workflowVersion, isDraft, provisioned]);
 
     const {staticWebhookUrl} = connectedUserProjectWorkflow;
 
@@ -134,121 +146,128 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     return (
         <>
-            <li
-                className="flex min-h-12 cursor-pointer items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
-                onClick={(event) => {
-                    if (isCollapsibleRowClick(event)) {
-                        handleWorkflowClick();
-                    }
-                }}
-            >
-                <div className="flex min-w-0 flex-1 items-center gap-2">
-                    <div className="flex w-80 min-w-0 shrink-0 flex-col gap-y-1 pr-1">
-                        <div className="flex min-w-0 items-center gap-2">
-                            <button
-                                className="min-w-0 cursor-pointer truncate text-left text-sm font-semibold"
-                                onClick={handleWorkflowClick}
-                                type="button"
-                            >
-                                {connectedUserProjectWorkflow.workflow.label}
-                            </button>
+            <li>
+                <div
+                    className="flex min-h-12 cursor-pointer items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
+                    onClick={(event) => {
+                        if (isCollapsibleRowClick(event)) {
+                            handleWorkflowClick();
+                        }
+                    }}
+                    role="presentation"
+                >
+                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                        <div className="flex w-80 min-w-0 shrink-0 flex-col gap-y-1 pr-1">
+                            <div className="flex min-w-0 items-center gap-2">
+                                <button
+                                    className="min-w-0 cursor-pointer truncate text-left text-sm font-semibold"
+                                    onClick={handleWorkflowClick}
+                                    type="button"
+                                >
+                                    {connectedUserProjectWorkflow.workflow.label}
+                                </button>
+                            </div>
+
+                            {staticWebhookUrl && (
+                                <div className="flex min-w-0 items-center gap-x-1">
+                                    <span
+                                        className="truncate font-mono text-xs text-content-neutral-secondary"
+                                        title={staticWebhookUrl}
+                                    >
+                                        {staticWebhookUrl}
+                                    </span>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                aria-label="Copy webhook URL"
+                                                icon={<ClipboardIcon />}
+                                                onClick={handleCopyStaticWebhookUrlClick}
+                                                size="iconXs"
+                                                variant="ghost"
+                                            />
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
+                                    </Tooltip>
+                                </div>
+                            )}
                         </div>
 
-                        {staticWebhookUrl && (
-                            <div className="flex min-w-0 items-center gap-x-1">
-                                <span
-                                    className="truncate font-mono text-xs text-content-neutral-secondary"
-                                    title={staticWebhookUrl}
-                                >
-                                    {staticWebhookUrl}
-                                </span>
-
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            aria-label="Copy webhook URL"
-                                            icon={<ClipboardIcon />}
-                                            onClick={handleCopyStaticWebhookUrlClick}
-                                            size="iconXs"
-                                            variant="ghost"
-                                        />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
-                                </Tooltip>
-                            </div>
+                        {workflowTemplate && (
+                            <WorkflowTriggerAndComponentsRow
+                                className="hidden sm:flex"
+                                filteredComponentNames={filteredComponentNames}
+                                workflow={triggerSource}
+                                workflowComponentDefinitions={workflowComponentDefinitions}
+                                workflowTaskDispatcherDefinitions={workflowComponentDefinitions}
+                            />
                         )}
                     </div>
 
-                    {workflowTemplate && (
-                        <WorkflowTriggerAndComponentsRow
-                            className="hidden sm:flex"
-                            filteredComponentNames={filteredComponentNames}
-                            workflow={triggerSource}
-                            workflowComponentDefinitions={workflowComponentDefinitions}
-                            workflowTaskDispatcherDefinitions={workflowComponentDefinitions}
-                        />
-                    )}
-                </div>
+                    <div className="flex items-center gap-x-2">
+                        <div className="flex items-center gap-x-4">
+                            <div className="flex w-28 justify-start">
+                                {versionLabel && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Badge
+                                                label={versionLabel}
+                                                styleType="secondary-filled"
+                                                weight="semibold"
+                                            />
+                                        </TooltipTrigger>
 
-                <div className="flex items-center gap-x-2">
-                    <div className="flex items-center gap-x-4">
-                        <div className="flex w-20 justify-start">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Badge
-                                        label={
-                                            isDraft ? 'V1 DRAFT' : `V${connectedUserProjectWorkflow.workflowVersion}`
-                                        }
-                                        styleType="secondary-filled"
-                                        weight="semibold"
-                                    />
-                                </TooltipTrigger>
-
-                                <TooltipContent>The workflow version</TooltipContent>
-                            </Tooltip>
-                        </div>
-
-                        <div className="flex min-w-52 items-center justify-end gap-x-4">
-                            <Tooltip>
-                                <TooltipTrigger className="text-xs text-content-neutral-secondary">
-                                    {lastExecutionDate
-                                        ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
-                                        : 'No executions'}
-                                </TooltipTrigger>
-
-                                <TooltipContent side="left">Last Execution Date</TooltipContent>
-                            </Tooltip>
-
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <span className="relative flex items-center">
-                                        {enableConnectedUserProjectWorkflowMutation.isPending && (
-                                            <LoadingIcon className="absolute top-[3px] left-[-15px]" />
-                                        )}
-
-                                        <Switch
-                                            aria-label={`Enable ${connectedUserProjectWorkflow.workflow.label}`}
-                                            checked={connectedUserProjectWorkflow.enabled}
-                                            disabled={enableDisabled}
-                                            onCheckedChange={(value) => {
-                                                enableConnectedUserProjectWorkflowMutation.mutate({
-                                                    enable: value,
-                                                    id: connectedUserProjectWorkflow.id,
-                                                });
-                                            }}
-                                        />
-                                    </span>
-                                </TooltipTrigger>
-
-                                {enableDisabled && (
-                                    <TooltipContent side="left">Publish the workflow before enabling it</TooltipContent>
+                                        <TooltipContent>
+                                            {provisioned ? 'The project version' : 'The workflow version'}
+                                        </TooltipContent>
+                                    </Tooltip>
                                 )}
-                            </Tooltip>
-                        </div>
-                    </div>
+                            </div>
 
-                    <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                            <div className="flex w-72 items-center justify-end gap-x-4">
+                                <Tooltip>
+                                    <TooltipTrigger className="text-xs text-content-neutral-secondary">
+                                        {lastExecutionDate
+                                            ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`
+                                            : 'No executions'}
+                                    </TooltipTrigger>
+
+                                    <TooltipContent side="left">Last Execution Date</TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span className="relative flex items-center">
+                                            {enableConnectedUserProjectWorkflowMutation.isPending && (
+                                                <LoadingIcon className="absolute top-[3px] left-[-15px]" />
+                                            )}
+
+                                            <Switch
+                                                aria-label={`Enable ${connectedUserProjectWorkflow.workflow.label}`}
+                                                checked={connectedUserProjectWorkflow.enabled}
+                                                disabled={enableDisabled}
+                                                onCheckedChange={(value) => {
+                                                    enableConnectedUserProjectWorkflowMutation.mutate({
+                                                        enable: value,
+                                                        id: connectedUserProjectWorkflow.id,
+                                                    });
+                                                }}
+                                            />
+                                        </span>
+                                    </TooltipTrigger>
+
+                                    {enableDisabled && (
+                                        <TooltipContent side="left">
+                                            Publish the workflow before enabling it
+                                        </TooltipContent>
+                                    )}
+                                </Tooltip>
+                            </div>
+                        </div>
+
+                        <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                    </div>
                 </div>
             </li>
 

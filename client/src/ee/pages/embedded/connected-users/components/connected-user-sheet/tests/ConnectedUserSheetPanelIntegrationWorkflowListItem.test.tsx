@@ -99,7 +99,7 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
             </TooltipProvider>
         );
 
-        await userEvent.click(screen.getByRole('listitem'));
+        await userEvent.click(screen.getByRole('listitem').firstElementChild as HTMLElement);
 
         expect(
             useIntegrationInstanceConfigurationWorkflowSheetStore.getState()
@@ -147,6 +147,44 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
         );
 
         expect(screen.getByText('MCP tool')).toBeInTheDocument();
+    });
+
+    it('locks the switch of a workflow that an MCP server exposes', () => {
+        render(
+            <TooltipProvider>
+                <ul>
+                    <ConnectedUserSheetPanelIntegrationWorkflowListItem
+                        integrationInstance={integrationInstance}
+                        integrationInstanceConfiguration={integrationInstanceConfiguration}
+                        integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                        integrationInstanceWorkflow={{enabled: true} as IntegrationInstanceWorkflow}
+                        mcpTool
+                        workflow={workflow}
+                    />
+                </ul>
+            </TooltipProvider>
+        );
+
+        expect(screen.getByRole('switch')).toBeDisabled();
+        expect(screen.getByRole('switch')).toBeChecked();
+    });
+
+    it('keeps the switch of a workflow that no MCP server exposes', () => {
+        render(
+            <TooltipProvider>
+                <ul>
+                    <ConnectedUserSheetPanelIntegrationWorkflowListItem
+                        integrationInstance={integrationInstance}
+                        integrationInstanceConfiguration={integrationInstanceConfiguration}
+                        integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                        integrationInstanceWorkflow={{enabled: true} as IntegrationInstanceWorkflow}
+                        workflow={workflow}
+                    />
+                </ul>
+            </TooltipProvider>
+        );
+
+        expect(screen.getByRole('switch')).toBeEnabled();
     });
 
     it('shows no executions for a workflow that never ran for this integration instance', () => {

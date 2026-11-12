@@ -14,6 +14,13 @@ vi.mock(
     () => ({default: () => <div>mcp server list</div>})
 );
 
+vi.mock(
+    '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelConnectionList',
+    () => ({
+        default: ({connectedUserId}: {connectedUserId: number}) => <div>{`connection list ${connectedUserId}`}</div>,
+    })
+);
+
 vi.mock('@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelProfile', () => ({
     default: () => <div>profile</div>,
 }));
@@ -51,6 +58,16 @@ describe('ConnectedUserSheetPanel', () => {
         await userEvent.click(screen.getByRole('tab', {name: 'External Invocations'}));
 
         expect(screen.getByText('external invocation list 7')).toBeInTheDocument();
+    });
+
+    it("shows the connected user's connections on the Connections tab", async () => {
+        render(<ConnectedUserSheetPanel connectedUser={{externalId: 'external-user-1', id: 7} as ConnectedUser} />);
+
+        expect(screen.queryByText('connection list 7')).not.toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('tab', {name: 'Connections'}));
+
+        expect(screen.getByText('connection list 7')).toBeInTheDocument();
     });
 
     it("passes the connected user's name and email to the Workflows tab", async () => {

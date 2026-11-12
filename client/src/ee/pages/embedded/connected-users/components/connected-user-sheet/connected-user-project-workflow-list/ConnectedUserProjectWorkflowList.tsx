@@ -122,6 +122,7 @@ const ConnectedUserProjectWorkflowList = ({
 
             return (
                 <ConnectedUserProjectWorkflowListItem
+                    configurationProjectVersion={group.configuration?.configurationProjectVersion}
                     connectedUserProjectWorkflow={connectedUserProjectWorkflow}
                     key={connectedUserProjectWorkflow.id}
                     projectName={group.projectName}
@@ -132,7 +133,7 @@ const ConnectedUserProjectWorkflowList = ({
 
     return (
         <div>
-            {groups.map((group) => {
+            {groups.map((group, groupIndex) => {
                 const groupName = group.projectName ?? OTHER_GROUP_NAME;
                 const groupOpen = openGroupKeys.has(group.key);
                 const lastExecutionDate = getLastExecutionDate(group.connectedUserProjectWorkflows);
@@ -141,6 +142,7 @@ const ConnectedUserProjectWorkflowList = ({
                 return (
                     <section aria-label={groupName} key={group.key}>
                         <ListGroupHeader
+                            className={groupIndex === 0 ? 'pt-0' : undefined}
                             icon={<FolderIcon aria-hidden="true" className="size-5 shrink-0" />}
                             name={groupName}
                         />
@@ -180,22 +182,24 @@ const ConnectedUserProjectWorkflowList = ({
                                 </div>
 
                                 <div className="flex items-center gap-x-2">
-                                    <div className="flex min-w-52 flex-col items-end gap-y-2">
-                                        <div className="flex min-h-6 items-center">
-                                            {group.configuration && (
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Badge
-                                                            label={`V${group.configuration.configurationProjectVersion}`}
-                                                            styleType="secondary-filled"
-                                                            weight="semibold"
-                                                        />
-                                                    </TooltipTrigger>
+                                    <div className="flex w-28 justify-start">
+                                        {group.configuration && (
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Badge
+                                                        label={`V${group.configuration.configurationProjectVersion}`}
+                                                        styleType="secondary-filled"
+                                                        weight="semibold"
+                                                    />
+                                                </TooltipTrigger>
 
-                                                    <TooltipContent>The project version</TooltipContent>
-                                                </Tooltip>
-                                            )}
-                                        </div>
+                                                <TooltipContent>The project version</TooltipContent>
+                                            </Tooltip>
+                                        )}
+                                    </div>
+
+                                    <div className="flex w-72 flex-col items-end gap-y-2">
+                                        <div aria-hidden="true" className="min-h-6" />
 
                                         <Tooltip>
                                             <TooltipTrigger className="flex min-h-6 items-center text-xs text-content-neutral-secondary">

@@ -1,0 +1,117 @@
+import Badge from '@/components/Badge/Badge';
+import Button from '@/components/Button/Button';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
+import ConnectedUserIntegrationCredentialsDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserIntegrationCredentialsDialog';
+import {CONNECTION_ORIGIN_BADGES} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connectionOriginBadges';
+import {Connection} from '@/ee/shared/middleware/embedded/configuration';
+import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
+import {ComponentIcon, KeyRoundIcon} from 'lucide-react';
+import {useState} from 'react';
+import InlineSVG from 'react-inlinesvg';
+
+interface ConnectedUserSheetPanelConnectionListItemProps {
+    componentTitle?: string;
+    connectedUserId: number;
+    connection: Connection;
+    icon?: string;
+    provisionedIntegrationInstance?: ConnectedUserIntegrationInstance;
+}
+
+const ConnectedUserSheetPanelConnectionListItem = ({
+    componentTitle,
+    connectedUserId,
+    connection,
+    icon,
+    provisionedIntegrationInstance,
+}: ConnectedUserSheetPanelConnectionListItemProps) => {
+    const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
+
+    const originBadge = connection.origin && CONNECTION_ORIGIN_BADGES[connection.origin];
+
+    return (
+        <li className="mb-2 flex items-center justify-between rounded border border-border/50 px-3 hover:bg-surface-neutral-primary-hover">
+            <div className="flex flex-1 items-center gap-x-3 py-3">
+                {icon ? (
+                    <InlineSVG aria-hidden="true" className="size-6 shrink-0" src={icon} />
+                ) : (
+                    <ComponentIcon aria-hidden="true" className="size-6 shrink-0 text-content-neutral-secondary" />
+                )}
+
+                <div className="flex flex-col items-start justify-center gap-y-2">
+                    <span className="flex min-h-6 items-center text-base font-semibold">{connection.name}</span>
+
+                    <div className="flex min-h-6 items-center text-xs font-semibold text-muted-foreground">
+                        <ConnectedUserCredentialStatus
+                            componentTitle={componentTitle || connection.componentName}
+                            credentialStatus={connection.credentialStatus}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-x-2">
+                <div className="flex items-center gap-x-4">
+                    <div className="flex w-28 items-center justify-start">
+                        {provisionedIntegrationInstance && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        aria-label="Credentials"
+                                        icon={<KeyRoundIcon />}
+                                        onClick={() => setShowCredentialsDialog(true)}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </TooltipTrigger>
+
+                                <TooltipContent>Credentials</TooltipContent>
+                            </Tooltip>
+                        )}
+                    </div>
+
+                    <div className="flex w-72 flex-col items-end gap-y-2">
+                        <div className="flex min-h-6 items-center gap-2">
+                            {originBadge && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge
+                                            className="uppercase"
+                                            label={originBadge.label}
+                                            styleType="secondary-outline"
+                                            weight="semibold"
+                                        />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>{originBadge.description}</TooltipContent>
+                                </Tooltip>
+                            )}
+                        </div>
+
+                        {connection.createdDate && (
+                            <Tooltip>
+                                <TooltipTrigger className="flex min-h-6 items-center text-xs text-content-neutral-secondary">
+                                    {`Created at ${connection.createdDate.toLocaleDateString()} ${connection.createdDate.toLocaleTimeString()}`}
+                                </TooltipTrigger>
+
+                                <TooltipContent side="left">Created Date</TooltipContent>
+                            </Tooltip>
+                        )}
+                    </div>
+                </div>
+
+                <div aria-hidden="true" className="size-9 shrink-0" />
+            </div>
+
+            {showCredentialsDialog && provisionedIntegrationInstance && (
+                <ConnectedUserIntegrationCredentialsDialog
+                    connectedUserId={connectedUserId}
+                    integrationInstance={provisionedIntegrationInstance}
+                    onClose={() => setShowCredentialsDialog(false)}
+                />
+            )}
+        </li>
+    );
+};
+
+export default ConnectedUserSheetPanelConnectionListItem;

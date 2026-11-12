@@ -220,7 +220,17 @@ const AutomationProjectConfigurationDialog = ({
         );
     };
 
-    const prefilledName = !configuration && project && !isNameTaken(project.name) ? project.name : '';
+    const getAvailableName = (baseName: string) => {
+        let candidateName = baseName;
+
+        for (let suffix = 2; isNameTaken(candidateName); suffix++) {
+            candidateName = `${baseName} ${suffix}`;
+        }
+
+        return candidateName;
+    };
+
+    const prefilledName = !configuration && project ? getAvailableName(project.name) : '';
 
     const name = enteredName ?? prefilledName;
 

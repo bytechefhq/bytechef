@@ -1,13 +1,7 @@
 import Button from '@/components/Button/Button';
+import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
 import LoadingIcon from '@/components/LoadingIcon';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import {Label} from '@/components/ui/label';
 import ProvisionIntegrationDialogConnectionStep, {
     isOAuth2AppMisconfigured,
     isOAuth2CodeAuthorizationType,
@@ -15,17 +9,20 @@ import ProvisionIntegrationDialogConnectionStep, {
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {useUpdateIntegrationInstanceCredentialsMutation} from '@/ee/shared/mutations/embedded/integrationInstances.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {ConnectionKeys} from '@/ee/shared/queries/embedded/connections.queries';
 import {
     IntegrationInstanceKeys,
     useGetIntegrationInstanceConnectionQuery,
 } from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {useGetProvisionableIntegrationsQuery} from '@/ee/shared/queries/embedded/provisionableIntegrations.queries';
+import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import OAuth2Button from '@/shared/components/connection/OAuth2Button';
 import {CodePayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
 import {useGetConnectionComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
+import {KeyRoundIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {Control, FieldValues, FormState, useForm} from 'react-hook-form';
 
@@ -76,6 +73,7 @@ const ConnectedUserIntegrationCredentialsDialog = ({
         },
         onSuccess: () => {
             void queryClient.invalidateQueries({queryKey: ConnectedUserKeys.connectedUser(connectedUserId)});
+            void queryClient.invalidateQueries({queryKey: ConnectionKeys.connections});
             void queryClient.invalidateQueries({
                 queryKey: IntegrationInstanceKeys.integrationInstance(integrationInstance.id!),
             });
@@ -143,75 +141,100 @@ const ConnectedUserIntegrationCredentialsDialog = ({
 
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open>
-            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl" showCloseButton>
-                <DialogHeader>
-                    <DialogTitle>Credentials</DialogTitle>
+            <DialogContent onInteractOutside={(event) => event.preventDefault()} size="sm">
+                <DialogMain>
+                    <DialogHeader title="Edit Connection" />
 
-                    <DialogDescription>
-                        The credentials of the connection provisioned for this connected user.
-                    </DialogDescription>
-                </DialogHeader>
+                    <DialogBody className="flex min-w-0 flex-col gap-4">
+                        {connectionLoading && <LoadingIcon />}
 
-                <div className="flex flex-col gap-4">
-                    {connectionLoading && <LoadingIcon />}
+                        {connection?.environmentId != null && (
+                            <div className="space-x-2">
+                                <Label>Environment</Label>
 
-                    {connection && connectionDefinition && (
-                        <ConnectionParameters
-                            authorizationParameters={connection.authorizationParameters}
-                            authorizationType={connection.authorizationType}
-                            baseUri={connection.baseUri}
-                            connectionDefinition={connectionDefinition}
-                            connectionParameters={connection.connectionParameters}
-                        />
-                    )}
+                                <EnvironmentBadge environmentId={connection.environmentId} />
+                            </div>
+                        )}
 
-                    {configurationNotProvisionable && (
-                        <p className="text-sm text-content-neutral-secondary">
-                            This integration&apos;s configuration can no longer be provisioned, so its credentials
-                            cannot be replaced.
-                        </p>
-                    )}
+                        {configurationNotProvisionable && (
+                            <p className="text-sm text-content-neutral-secondary">
+                                This integration&apos;s configuration can no longer be provisioned, so its credentials
+                                cannot be replaced.
+                            </p>
+                        )}
 
-                    {updating && provisionableIntegration && provisionableConfiguration && (
-                        <ProvisionIntegrationDialogConnectionStep
-                            componentName={provisionableIntegration.integration!.componentName}
-                            componentVersion={provisionableIntegration.componentVersion}
-                            configuration={provisionableConfiguration}
-                            control={control as unknown as Control<FieldValues>}
-                            formState={formState as unknown as FormState<FieldValues>}
-                        />
-                    )}
-                </div>
-
-                <DialogFooter>
-                    <Button label={updating ? 'Cancel' : 'Close'} onClick={onClose} variant="outline" />
-
-                    {showOAuth2Button &&
-                        provisionableIntegration &&
-                        connection?.version != null &&
-                        oAuth2AuthorizationParameters?.authorizationUrl &&
-                        oAuth2AuthorizationParameters.clientId && (
-                            <OAuth2Button
-                                authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
-                                clientId={oAuth2AuthorizationParameters.clientId}
+                        {updating && provisionableIntegration && provisionableConfiguration && (
+                            <ProvisionIntegrationDialogConnectionStep
                                 componentName={provisionableIntegration.integration!.componentName}
-                                extraQueryParameters={oAuth2AuthorizationParameters.extraQueryParameters}
-                                onClick={(getAuth: () => void) => getAuth()}
-                                onCodeSuccess={handleCodeSuccess}
-                                redirectUri={provisionableConfiguration?.redirectUri || ''}
-                                responseType="code"
-                                scopes={oAuth2AuthorizationParameters.scopes}
+                                componentVersion={provisionableIntegration.componentVersion}
+                                configuration={provisionableConfiguration}
+                                control={control as unknown as Control<FieldValues>}
+                                formState={formState as unknown as FormState<FieldValues>}
+                                showLabel={false}
                             />
                         )}
 
-                    {updating && !showOAuth2Button && (
-                        <Button disabled={!canSave} label="Save" onClick={handleSubmit(handleSave)} />
-                    )}
+                        {connection && connectionDefinition && (
+                            <div className="min-w-0 pt-4">
+                                <ConnectionParameters
+                                    authorizationParameters={connection.authorizationParameters}
+                                    authorizationType={connection.authorizationType}
+                                    baseUri={connection.baseUri}
+                                    connectionDefinition={connectionDefinition}
+                                    connectionParameters={connection.connectionParameters}
+                                />
+                            </div>
+                        )}
+                    </DialogBody>
 
-                    {!updating && provisionableConfiguration && connection && (
-                        <Button label="Update credentials" onClick={() => setUpdating(true)} />
-                    )}
-                </DialogFooter>
+                    <DialogFooter>
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                            <Button label="Cancel" onClick={onClose} type="button" variant="outline" />
+
+                            {!updating && provisionableConfiguration && connection && (
+                                <Button onClick={() => setUpdating(true)} type="button" variant="outline">
+                                    <KeyRoundIcon /> Update credentials
+                                </Button>
+                            )}
+
+                            {updating && (
+                                <Button
+                                    label="Back"
+                                    onClick={() => setUpdating(false)}
+                                    type="button"
+                                    variant="outline"
+                                />
+                            )}
+
+                            {showOAuth2Button &&
+                                provisionableIntegration &&
+                                connection?.version != null &&
+                                oAuth2AuthorizationParameters?.authorizationUrl &&
+                                oAuth2AuthorizationParameters.clientId && (
+                                    <OAuth2Button
+                                        authorizationUrl={oAuth2AuthorizationParameters.authorizationUrl}
+                                        clientId={oAuth2AuthorizationParameters.clientId}
+                                        componentName={provisionableIntegration.integration!.componentName}
+                                        extraQueryParameters={oAuth2AuthorizationParameters.extraQueryParameters}
+                                        onClick={(getAuth: () => void) => getAuth()}
+                                        onCodeSuccess={handleCodeSuccess}
+                                        redirectUri={provisionableConfiguration?.redirectUri || ''}
+                                        responseType="code"
+                                        scopes={oAuth2AuthorizationParameters.scopes}
+                                    />
+                                )}
+
+                            {updating && !showOAuth2Button && (
+                                <Button
+                                    disabled={!canSave}
+                                    label="Update credentials"
+                                    onClick={handleSubmit(handleSave)}
+                                    type="submit"
+                                />
+                            )}
+                        </div>
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );

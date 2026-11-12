@@ -1,11 +1,14 @@
+import {ConnectionOriginEnum} from '@/ee/shared/middleware/embedded/configuration';
+import {windowResizeObserver} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen, waitFor} from '@testing-library/react';
+import {render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProvisionProjectWorkflowDialog from '../ProvisionProjectWorkflowDialog';
 
 const hoisted = vi.hoisted(() => ({
+    connectionsQuery: vi.fn(),
     mutate: vi.fn(),
     mutationOptions: {} as {onSuccess?: () => void},
     provisionableQuery: vi.fn(),
@@ -20,6 +23,32 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     },
     useProvisionableConnectedUserProjectsQuery: hoisted.provisionableQuery,
 }));
+
+vi.mock('@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserNewConnectionDialog', () => ({
+    default: ({
+        componentName,
+        connectedUserId,
+        onConnectionCreate,
+    }: {
+        componentName: string;
+        connectedUserId: number;
+        onConnectionCreate: (connectionId: number) => void;
+    }) => (
+        <button onClick={() => onConnectionCreate(99)} type="button">
+            {`Create ${componentName} connection for user ${connectedUserId}`}
+        </button>
+    ),
+}));
+
+vi.mock('@/ee/shared/queries/embedded/connections.queries', () => ({
+    useGetAllConnectedUserConnectionsQuery: hoisted.connectionsQuery,
+}));
+
+const SLACK_CONNECTIONS = [
+    {componentName: 'slack', id: 31, name: 'Own Slack', origin: ConnectionOriginEnum.SelfServe},
+    {componentName: 'slack', id: 32, name: 'Shared Slack', origin: ConnectionOriginEnum.Internal},
+    {componentName: 'gmail', id: 40, name: 'Own Gmail', origin: ConnectionOriginEnum.SelfServe},
+];
 
 const WORKFLOWS = [
     {
@@ -38,6 +67,44 @@ const WORKFLOWS = [
     },
     {dangling: false, inputs: [], label: 'Already there', provisioned: true, workflowUuid: 'wf-2'},
     {dangling: true, inputs: [], label: 'Broken', provisioned: true, workflowUuid: 'wf-3'},
+    {
+        components: [{icon: null, name: 'slack', title: 'Slack'}],
+        dangling: false,
+        inputs: [],
+        label: 'Notify',
+        provisioned: false,
+        workflowUuid: 'wf-6',
+    },
+];
+
+const SLACK_WORKFLOWS = [
+    {
+        components: [{icon: null, name: 'slack', title: 'Slack'}],
+        dangling: false,
+        inputs: [{label: 'Channel', name: 'channel', required: false, type: 'string'}],
+        label: 'Digest',
+        provisioned: false,
+        workflowUuid: 'wf-7',
+    },
+    {
+        components: [{icon: null, name: 'slack', title: 'Slack'}],
+        dangling: false,
+        inputs: [],
+        label: 'Alert',
+        provisioned: false,
+        workflowUuid: 'wf-8',
+    },
+];
+
+const SLACK_PROJECTS = [
+    {
+        assignedConfigurationId: null,
+        configurations: [{id: '60', name: 'Slack', projectVersion: 1, selfServe: true, workflows: SLACK_WORKFLOWS}],
+        name: 'Slack Project',
+        projectId: '20',
+        projectVersion: 1,
+        workflows: SLACK_WORKFLOWS,
+    },
 ];
 
 const BETA_WORKFLOWS = [{dangling: false, inputs: [], label: 'Beta only', provisioned: false, workflowUuid: 'wf-5'}];
@@ -78,7 +145,14 @@ const renderDialog = (
 
 describe('ProvisionProjectWorkflowDialog', () => {
     beforeEach(() => {
+        windowResizeObserver();
+
+        Element.prototype.hasPointerCapture = vi.fn().mockReturnValue(false);
+        Element.prototype.releasePointerCapture = vi.fn();
+        Element.prototype.setPointerCapture = vi.fn();
+
         hoisted.mutate.mockReset();
+        hoisted.connectionsQuery.mockReturnValue({data: []});
         hoisted.provisionableQuery.mockReturnValue({data: {provisionableConnectedUserProjects: PROJECTS}});
     });
 
@@ -220,7 +294,22 @@ describe('ProvisionProjectWorkflowDialog', () => {
 
         await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
 
-        expect(screen.getByLabelText('Configuration')).toHaveValue('51');
+        const configurationSelect = screen.getByRole('combobox', {name: 'Configuration'});
+
+        expect(within(configurationSelect).getByText('Default')).toBeInTheDocument();
+        expect(within(configurationSelect).getByText('V3')).toBeInTheDocument();
+    });
+
+    it('shows each configuration version as a badge after its name', async () => {
+        renderDialog();
+
+        await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+        await userEvent.click(screen.getByRole('combobox', {name: 'Configuration'}));
+
+        const betaOption = await screen.findByRole('option', {name: /Beta/});
+
+        expect(within(betaOption).getByText('Beta')).toBeInTheDocument();
+        expect(within(betaOption).getByText('V2')).toBeInTheDocument();
     });
 
     it('lists workflows of the selected configuration', async () => {
@@ -231,7 +320,8 @@ describe('ProvisionProjectWorkflowDialog', () => {
         expect(screen.getByRole('checkbox', {name: 'Welcome'})).toBeInTheDocument();
         expect(screen.queryByRole('checkbox', {name: 'Beta only'})).not.toBeInTheDocument();
 
-        await userEvent.selectOptions(screen.getByLabelText('Configuration'), '50');
+        await userEvent.click(screen.getByRole('combobox', {name: 'Configuration'}));
+        await userEvent.click(await screen.findByRole('option', {name: /Beta/}));
 
         expect(screen.getByRole('checkbox', {name: 'Beta only'})).toBeInTheDocument();
         expect(screen.queryByRole('checkbox', {name: 'Welcome'})).not.toBeInTheDocument();
@@ -241,7 +331,8 @@ describe('ProvisionProjectWorkflowDialog', () => {
         renderDialog();
 
         await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
-        await userEvent.selectOptions(screen.getByLabelText('Configuration'), '50');
+        await userEvent.click(screen.getByRole('combobox', {name: 'Configuration'}));
+        await userEvent.click(await screen.findByRole('option', {name: /Beta/}));
         await userEvent.click(screen.getByRole('checkbox', {name: 'Beta only'}));
 
         await waitFor(() => expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled());
@@ -323,5 +414,170 @@ describe('ProvisionProjectWorkflowDialog', () => {
 
         expect(screen.getByText('No configuration available for this user')).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
+    });
+
+    describe('connections', () => {
+        it('preselects the first connection of each component the selected workflows need and sends it', async () => {
+            hoisted.connectionsQuery.mockReturnValue({data: SLACK_CONNECTIONS});
+
+            renderDialog();
+
+            await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+            await userEvent.click(screen.getByRole('checkbox', {name: 'Notify'}));
+
+            const slackConnectionSelect = screen.getByRole('combobox', {name: 'Slack connection'});
+
+            expect(within(slackConnectionSelect).getByText('Own Slack')).toBeInTheDocument();
+
+            await userEvent.click(slackConnectionSelect);
+
+            const options = await screen.findAllByRole('option');
+
+            expect(options).toHaveLength(2);
+            expect(within(options[0]).getByText('Own Slack')).toBeInTheDocument();
+            expect(within(options[0]).getByText('Self-created')).toBeInTheDocument();
+            expect(within(options[1]).getByText('Shared Slack')).toBeInTheDocument();
+            expect(within(options[1]).getByText('Internal')).toBeInTheDocument();
+
+            await userEvent.keyboard('{Escape}');
+
+            await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+            expect(hoisted.mutate).toHaveBeenCalledWith({
+                configurationId: '51',
+                connectedUserId: '7',
+                workflows: [{connections: [{componentName: 'slack', connectionId: '31'}], workflowUuid: 'wf-6'}],
+            });
+        });
+
+        it('sends the connection the admin picks', async () => {
+            hoisted.connectionsQuery.mockReturnValue({data: SLACK_CONNECTIONS});
+
+            renderDialog();
+
+            await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+            await userEvent.click(screen.getByRole('checkbox', {name: 'Notify'}));
+            await userEvent.click(screen.getByRole('combobox', {name: 'Slack connection'}));
+            await userEvent.click(await screen.findByRole('option', {name: /Shared Slack/}));
+            await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+            expect(hoisted.mutate).toHaveBeenCalledWith({
+                configurationId: '51',
+                connectedUserId: '7',
+                workflows: [{connections: [{componentName: 'slack', connectionId: '32'}], workflowUuid: 'wf-6'}],
+            });
+        });
+
+        it('warns that workflows are provisioned disabled when the user has no connection for a component', async () => {
+            renderDialog();
+
+            await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+            await userEvent.click(screen.getByRole('checkbox', {name: 'Notify'}));
+
+            expect(
+                screen.getByText(
+                    'No Slack connection. Create one, or workflows that use Slack will be provisioned disabled.'
+                )
+            ).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'New Slack connection'})).toBeInTheDocument();
+
+            await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+            expect(hoisted.mutate).toHaveBeenCalledWith({
+                configurationId: '51',
+                connectedUserId: '7',
+                workflows: [{workflowUuid: 'wf-6'}],
+            });
+        });
+
+        it('creates a connection for the connected user and selects it', async () => {
+            hoisted.connectionsQuery.mockReturnValue({
+                data: [
+                    ...SLACK_CONNECTIONS,
+                    {componentName: 'slack', id: 99, name: 'New Slack', origin: ConnectionOriginEnum.Provisioned},
+                ],
+            });
+
+            renderDialog();
+
+            await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+            await userEvent.click(screen.getByRole('checkbox', {name: 'Notify'}));
+            await userEvent.click(screen.getByRole('button', {name: 'New Slack connection'}));
+            await userEvent.click(screen.getByRole('button', {name: 'Create slack connection for user 7'}));
+
+            expect(
+                within(screen.getByRole('combobox', {name: 'Slack connection'})).getByText('New Slack')
+            ).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Create slack connection for user 7'})).not.toBeInTheDocument();
+
+            await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+            expect(hoisted.mutate).toHaveBeenCalledWith({
+                configurationId: '51',
+                connectedUserId: '7',
+                workflows: [{connections: [{componentName: 'slack', connectionId: '99'}], workflowUuid: 'wf-6'}],
+            });
+        });
+
+        it("shows a workflow's connections and then its inputs inside the workflow's box", async () => {
+            hoisted.connectionsQuery.mockReturnValue({data: SLACK_CONNECTIONS});
+            hoisted.provisionableQuery.mockReturnValue({data: {provisionableConnectedUserProjects: SLACK_PROJECTS}});
+
+            renderDialog();
+
+            await userEvent.selectOptions(screen.getByLabelText('Project'), '20');
+            await userEvent.click(screen.getByRole('checkbox', {name: 'Digest'}));
+
+            const workflowBox = within(screen.getByRole('group', {name: 'Digest'}));
+
+            const connectionsHeading = workflowBox.getByText('Connections');
+            const connectionSelect = workflowBox.getByRole('combobox', {name: 'Slack connection'});
+            const inputsHeading = workflowBox.getByText('Inputs');
+            const channelInput = workflowBox.getByLabelText('Channel');
+
+            expect(connectionsHeading.compareDocumentPosition(connectionSelect)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+            expect(connectionSelect.compareDocumentPosition(inputsHeading)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+            expect(inputsHeading.compareDocumentPosition(channelInput)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+        });
+
+        it('sends each workflow the connection picked for it', async () => {
+            hoisted.connectionsQuery.mockReturnValue({data: SLACK_CONNECTIONS});
+            hoisted.provisionableQuery.mockReturnValue({data: {provisionableConnectedUserProjects: SLACK_PROJECTS}});
+
+            renderDialog();
+
+            await userEvent.selectOptions(screen.getByLabelText('Project'), '20');
+            await userEvent.click(screen.getByRole('checkbox', {name: 'Digest'}));
+            await userEvent.click(screen.getByRole('checkbox', {name: 'Alert'}));
+            await userEvent.click(
+                within(screen.getByRole('group', {name: 'Alert'})).getByRole('combobox', {name: 'Slack connection'})
+            );
+            await userEvent.click(await screen.findByRole('option', {name: /Shared Slack/}));
+            await userEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+            expect(hoisted.mutate).toHaveBeenCalledWith({
+                configurationId: '60',
+                connectedUserId: '7',
+                workflows: [
+                    {
+                        connections: [{componentName: 'slack', connectionId: '31'}],
+                        inputs: {},
+                        workflowUuid: 'wf-7',
+                    },
+                    {connections: [{componentName: 'slack', connectionId: '32'}], workflowUuid: 'wf-8'},
+                ],
+            });
+        });
+
+        it('shows no connection choice while the selected workflows need none', async () => {
+            hoisted.connectionsQuery.mockReturnValue({data: SLACK_CONNECTIONS});
+
+            renderDialog();
+
+            await userEvent.selectOptions(screen.getByLabelText('Project'), '10');
+            await userEvent.click(screen.getByRole('checkbox', {name: 'Welcome'}));
+
+            expect(screen.queryByRole('combobox', {name: 'Slack connection'})).not.toBeInTheDocument();
+        });
     });
 });

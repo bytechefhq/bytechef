@@ -12,6 +12,7 @@ interface ProvisionIntegrationDialogConnectionStepProps {
     configuration: ProvisionableIntegrationInstanceConfiguration;
     control: Control<FieldValues>;
     formState: FormState<FieldValues>;
+    showLabel?: boolean;
 }
 
 export const isOAuth2CodeAuthorizationType = (authorizationType?: string): boolean =>
@@ -28,6 +29,7 @@ const ProvisionIntegrationDialogConnectionStep = ({
     configuration,
     control,
     formState,
+    showLabel = true,
 }: ProvisionIntegrationDialogConnectionStepProps) => {
     const {data: connectionDefinition} = useGetConnectionDefinitionQuery({componentName, componentVersion});
 
@@ -54,7 +56,7 @@ const ProvisionIntegrationDialogConnectionStep = ({
         <div className="space-y-4">
             {properties.length > 0 && (
                 <div className="space-y-2">
-                    <Label>Connection</Label>
+                    {showLabel && <Label>Connection</Label>}
 
                     <WorkflowMockProvider>
                         <Properties

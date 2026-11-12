@@ -1,5 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import {Label} from '@/components/ui/label';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ProvisionableIntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {ReactNode} from 'react';
 
@@ -17,34 +18,48 @@ const ProvisionIntegrationDialogConfigurationSelect = ({
     value,
 }: ProvisionIntegrationDialogConfigurationSelectProps) => (
     <fieldset className="space-y-2 border-0 p-0">
-        <Label>Configuration</Label>
+        <Label htmlFor="provision-integration-configuration-id">Configuration</Label>
 
-        <div className="flex flex-col gap-2" role="radiogroup">
-            {configurations.map((configuration) => {
-                const {id, integrationVersion, name} = configuration.integrationInstanceConfiguration!;
+        <div className="flex items-center gap-2">
+            <Select
+                onValueChange={(selectedValue) => onChange(Number(selectedValue))}
+                value={value != null ? String(value) : ''}
+            >
+                <SelectTrigger
+                    className="w-full flex-1 *:data-[slot=select-value]:w-full"
+                    id="provision-integration-configuration-id"
+                >
+                    <SelectValue placeholder="Select..." />
+                </SelectTrigger>
 
-                return (
-                    <div className="flex items-center gap-2 rounded border border-border/50 px-3 py-2 text-sm" key={id}>
-                        <label className="flex flex-1 cursor-pointer items-center gap-2">
-                            <input
-                                checked={value === id}
-                                name="integrationInstanceConfigurationId"
-                                onChange={() => onChange(id!)}
-                                type="radio"
-                                value={id}
-                            />
+                <SelectContent>
+                    {configurations.map((configuration) => {
+                        const {id, integrationVersion, name} = configuration.integrationInstanceConfiguration!;
 
-                            <span>{`${name} · v${integrationVersion}`}</span>
+                        return (
+                            <SelectItem
+                                className="pr-2 *:[span]:first:hidden *:[span]:last:w-full"
+                                key={id}
+                                value={String(id)}
+                            >
+                                <div className="flex w-full items-center justify-between gap-2">
+                                    <span className="truncate">{name}</span>
 
-                            {configuration.selfServe && <Badge label="Self-serve" styleType="secondary-filled" />}
-                        </label>
+                                    <Badge
+                                        label={`V${integrationVersion}`}
+                                        styleType="secondary-filled"
+                                        weight="semibold"
+                                    />
+                                </div>
+                            </SelectItem>
+                        );
+                    })}
+                </SelectContent>
+            </Select>
 
-                        {value === id && selectedConfigurationAction && (
-                            <div className="flex items-center gap-2">{selectedConfigurationAction}</div>
-                        )}
-                    </div>
-                );
-            })}
+            {value != null && selectedConfigurationAction && (
+                <div className="flex shrink-0 items-center gap-2">{selectedConfigurationAction}</div>
+            )}
         </div>
     </fieldset>
 );

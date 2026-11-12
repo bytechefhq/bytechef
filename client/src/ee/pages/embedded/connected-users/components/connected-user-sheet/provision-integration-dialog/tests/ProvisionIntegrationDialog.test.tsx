@@ -1,5 +1,7 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
+import {windowResizeObserver} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen, waitFor} from '@testing-library/react';
+import {render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {useController} from 'react-hook-form';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -142,7 +144,9 @@ const buildConfiguration = (id: number, authorizationType: string, selfServe: bo
 const renderDialog = (onClose = vi.fn()) =>
     render(
         <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
-            <ProvisionIntegrationDialog connectedUserId={7} onClose={onClose} />
+            <TooltipProvider>
+                <ProvisionIntegrationDialog connectedUserId={7} onClose={onClose} />
+            </TooltipProvider>
         </QueryClientProvider>
     );
 
@@ -152,8 +156,19 @@ const chooseIntegration = async () => {
     await userEvent.selectOptions(screen.getByRole('combobox', {name: 'Integration'}), '1');
 };
 
+const chooseConfiguration = async (name: string) => {
+    await userEvent.click(screen.getByRole('combobox', {name: 'Configuration'}));
+    await userEvent.click(await screen.findByRole('option', {name: new RegExp(name)}));
+};
+
 describe('ProvisionIntegrationDialog', () => {
     beforeEach(() => {
+        windowResizeObserver();
+
+        Element.prototype.hasPointerCapture = vi.fn().mockReturnValue(false);
+        Element.prototype.releasePointerCapture = vi.fn();
+        Element.prototype.setPointerCapture = vi.fn();
+
         hoisted.getProvisionableIntegrations.mockReset();
         hoisted.provisionIntegrationInstance.mockReset();
         hoisted.toastError.mockReset();
@@ -172,14 +187,23 @@ describe('ProvisionIntegrationDialog', () => {
         ]);
     });
 
-    it('lists only the provisionable configurations and marks the self-serve one', async () => {
+    it('lists only the provisionable configurations and preselects the self-serve one', async () => {
         renderDialog();
 
         await chooseIntegration();
 
-        expect(screen.getAllByRole('radio')).toHaveLength(2);
-        expect(screen.getAllByText('Self-serve')).toHaveLength(1);
-        expect(screen.getByText('Config 2 · v2')).toBeInTheDocument();
+        const configurationSelect = screen.getByRole('combobox', {name: 'Configuration'});
+
+        expect(within(configurationSelect).getByText('Config 2')).toBeInTheDocument();
+
+        await userEvent.click(configurationSelect);
+
+        expect(await screen.findAllByRole('option', {name: /Config/})).toHaveLength(2);
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(screen.queryByText('Self-serve')).not.toBeInTheDocument();
+        expect(screen.getByLabelText('apiKey')).toBeInTheDocument();
     });
 
     it('hides connection fields that the configuration already provides', async () => {
@@ -187,7 +211,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 2/}));
+        await chooseConfiguration('Config 2');
 
         expect(screen.getByLabelText('apiKey')).toBeInTheDocument();
         expect(screen.queryByLabelText('clientId')).not.toBeInTheDocument();
@@ -199,7 +223,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 2/}));
+        await chooseConfiguration('Config 2');
         await userEvent.type(screen.getByLabelText('baseUri'), 'https://api.example.com');
         await userEvent.type(screen.getByLabelText('apiKey'), 'k');
         await userEvent.click(screen.getByRole('button', {name: 'Provision'}));
@@ -219,7 +243,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 2/}));
+        await chooseConfiguration('Config 2');
         await userEvent.type(screen.getByLabelText('apiKey'), 'k');
 
         expect(screen.queryByLabelText('channel')).not.toBeInTheDocument();
@@ -248,7 +272,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 2/}));
+        await chooseConfiguration('Config 2');
         await userEvent.click(screen.getByRole('switch', {name: 'Notify'}));
         await userEvent.click(screen.getByRole('button', {name: 'Provision'}));
 
@@ -266,7 +290,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 2/}));
+        await chooseConfiguration('Config 2');
         await userEvent.click(screen.getByRole('switch', {name: 'Notify'}));
         await userEvent.click(screen.getByRole('switch', {name: 'Notify'}));
         await userEvent.click(screen.getByRole('button', {name: 'Provision'}));
@@ -283,7 +307,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 1/}));
+        await chooseConfiguration('Config 1');
 
         expect(screen.getByRole('button', {name: 'Provision'})).toBeDisabled();
 
@@ -319,7 +343,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 3/}));
+        await chooseConfiguration('Config 3');
         await userEvent.click(screen.getByRole('button', {name: 'Authorize'}));
         await userEvent.click(screen.getByRole('button', {name: 'Provision'}));
 
@@ -336,7 +360,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 1/}));
+        await chooseConfiguration('Config 1');
         await userEvent.click(screen.getByRole('button', {name: 'Authorize'}));
         await userEvent.click(screen.getByRole('button', {name: 'Provision'}));
 
@@ -357,7 +381,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 2/}));
+        await chooseConfiguration('Config 2');
         await userEvent.click(screen.getByRole('button', {name: 'Provision'}));
 
         await waitFor(() => expect(hoisted.provisionIntegrationInstance).toHaveBeenCalled());
@@ -372,7 +396,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 2/}));
+        await chooseConfiguration('Config 2');
 
         expect(hoisted.connectionDefinitionQuery).toHaveBeenCalledWith({componentName: 'slack', componentVersion: 3});
     });
@@ -404,9 +428,11 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 2/}));
+        await chooseConfiguration('Config 2');
 
         expect(await screen.findByText('MCP tool')).toBeInTheDocument();
+        expect(screen.getByRole('switch')).toBeDisabled();
+        expect(screen.getByRole('switch')).not.toBeChecked();
     });
 
     it('does not mark a workflow that no MCP server exposes', async () => {
@@ -414,11 +440,23 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 2/}));
+        await chooseConfiguration('Config 2');
 
-        await screen.findByRole('switch');
+        expect(await screen.findByRole('switch')).toBeEnabled();
 
         expect(screen.queryByText('MCP tool')).not.toBeInTheDocument();
+    });
+
+    it('groups the workflows of the chosen configuration under a Workflows heading', async () => {
+        renderDialog();
+
+        await chooseIntegration();
+
+        await chooseConfiguration('Config 2');
+
+        const workflowSwitch = await screen.findByRole('switch');
+
+        expect(screen.getByRole('group', {name: 'Workflows'})).toContainElement(workflowSwitch);
     });
 
     it('explains when the chosen configuration has no enabled workflows', async () => {
@@ -442,7 +480,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 2/}));
+        await chooseConfiguration('Config 2');
 
         expect(screen.getByText('This configuration has no enabled workflows.')).toBeInTheDocument();
     });
@@ -465,7 +503,7 @@ describe('ProvisionIntegrationDialog', () => {
 
         await chooseIntegration();
 
-        await userEvent.click(screen.getByRole('radio', {name: /Config 1/}));
+        await chooseConfiguration('Config 1');
 
         expect(
             screen.getByText("This configuration's OAuth2 app is missing its authorization URL or client ID.")

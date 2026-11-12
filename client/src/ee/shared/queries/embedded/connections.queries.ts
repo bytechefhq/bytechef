@@ -11,6 +11,12 @@ import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
+    allConnectedUserConnections: (connectedUserId: number) => [
+        ...ConnectionKeys.connections,
+        'connectedUser',
+        connectedUserId,
+        'all',
+    ],
     connectedUserConnections: (connectedUserId: number, filters: RequestI) => [
         ...ConnectionKeys.connections,
         'connectedUser',
@@ -33,6 +39,12 @@ export const getConnectedUserConnectionsQuery = (connectedUserId: number) => (re
             }),
         enabled: enabled === undefined ? true : enabled,
         staleTime: DEFINITION_STALE_TIME,
+    });
+
+export const useGetAllConnectedUserConnectionsQuery = (connectedUserId: number) =>
+    useQuery<Connection[], Error>({
+        queryKey: ConnectionKeys.allConnectedUserConnections(connectedUserId),
+        queryFn: () => new ConnectionApi().getAllConnectedUserConnections({connectedUserId}),
     });
 
 export const useGetConnectionsQuery = (filters: GetConnectionsRequest, enabled?: boolean) =>
