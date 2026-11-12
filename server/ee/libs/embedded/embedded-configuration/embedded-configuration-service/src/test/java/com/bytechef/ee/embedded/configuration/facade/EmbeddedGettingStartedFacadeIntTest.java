@@ -43,7 +43,7 @@ import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocati
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -521,7 +521,7 @@ class EmbeddedGettingStartedFacadeIntTest {
         LastFailedCallDTO lastFailedCallDTO = embeddedGettingStartedDTO.lastFailedCall();
 
         assertThat(lastFailedCallDTO).isNotNull();
-        assertThat(lastFailedCallDTO.outcome()).isEqualTo("CONNECTION_REQUIRED");
+        assertThat(lastFailedCallDTO.status()).isEqualTo("CONNECTION_REQUIRED");
         assertThat(lastFailedCallDTO.errorMessage()).isEqualTo("Connection required");
         assertThat(lastFailedCallDTO.createdDate()).isEqualTo(Instant.parse("2026-11-11T10:00:00Z"));
     }
@@ -628,7 +628,7 @@ class EmbeddedGettingStartedFacadeIntTest {
 
     private void stubFirstCallMade(Environment environment) {
         when(externalInvocationLogService.hasExternalInvocationLog(
-            PlatformType.EMBEDDED, environment.ordinal(), ExternalInvocationOutcome.SUCCESS)).thenReturn(true);
+            PlatformType.EMBEDDED, environment.ordinal(), ExternalInvocationStatus.SUCCESS)).thenReturn(true);
     }
 
     private void stubLastEnabledConnectedUser(Environment environment) {
@@ -695,7 +695,7 @@ class EmbeddedGettingStartedFacadeIntTest {
 
         externalInvocationLog.setCreatedDate(Instant.parse("2026-11-11T10:00:00Z"));
         externalInvocationLog.setErrorMessage("Connection required");
-        externalInvocationLog.setOutcome(ExternalInvocationOutcome.CONNECTION_REQUIRED);
+        externalInvocationLog.setStatus(ExternalInvocationStatus.CONNECTION_REQUIRED);
 
         return externalInvocationLog;
     }

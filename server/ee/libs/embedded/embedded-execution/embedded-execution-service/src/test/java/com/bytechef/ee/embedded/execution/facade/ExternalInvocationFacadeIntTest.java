@@ -17,8 +17,8 @@ import com.bytechef.ee.platform.external.invocation.log.service.ExternalInvocati
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -69,35 +69,35 @@ class ExternalInvocationFacadeIntTest {
 
         ExternalInvocationLog matchingExternalInvocationLog = createExternalInvocationLog(
             PlatformType.EMBEDDED, Environment.STAGING, ExternalInvocationSource.MCP_SERVER,
-            ExternalInvocationOutcome.ERROR,
+            ExternalInvocationStatus.ERROR,
             connectedUserId, inRange);
 
         createExternalInvocationLog(
             PlatformType.EMBEDDED, Environment.STAGING, ExternalInvocationSource.MCP_SERVER,
-            ExternalInvocationOutcome.ERROR,
+            ExternalInvocationStatus.ERROR,
             otherConnectedUserId, inRange);
         createExternalInvocationLog(
             PlatformType.EMBEDDED, Environment.PRODUCTION, ExternalInvocationSource.MCP_SERVER,
-            ExternalInvocationOutcome.ERROR, connectedUserId, inRange);
+            ExternalInvocationStatus.ERROR, connectedUserId, inRange);
         createExternalInvocationLog(
             PlatformType.AUTOMATION, Environment.STAGING, ExternalInvocationSource.MCP_SERVER,
-            ExternalInvocationOutcome.ERROR, connectedUserId, inRange);
+            ExternalInvocationStatus.ERROR, connectedUserId, inRange);
         createExternalInvocationLog(
             PlatformType.EMBEDDED, Environment.STAGING, ExternalInvocationSource.API_TOOL,
-            ExternalInvocationOutcome.ERROR, connectedUserId, inRange);
+            ExternalInvocationStatus.ERROR, connectedUserId, inRange);
         createExternalInvocationLog(
             PlatformType.EMBEDDED, Environment.STAGING, ExternalInvocationSource.MCP_SERVER,
-            ExternalInvocationOutcome.SUCCESS, connectedUserId, inRange);
+            ExternalInvocationStatus.SUCCESS, connectedUserId, inRange);
         createExternalInvocationLog(
             PlatformType.EMBEDDED, Environment.STAGING, ExternalInvocationSource.MCP_SERVER,
-            ExternalInvocationOutcome.ERROR,
+            ExternalInvocationStatus.ERROR,
             connectedUserId, Instant.parse("2026-07-18T12:00:00Z"));
 
         authenticate(EXTERNAL_USER_ID);
 
         Page<ExternalInvocationLog> externalInvocationLogPage = externalInvocationFacade.getExternalInvocations(
             EXTERNAL_USER_ID, Environment.STAGING, ExternalInvocationSource.MCP_SERVER,
-            ExternalInvocationOutcome.ERROR,
+            ExternalInvocationStatus.ERROR,
             START_DATE, END_DATE, 0);
 
         assertThat(externalInvocationLogPage.getContent())
@@ -112,7 +112,7 @@ class ExternalInvocationFacadeIntTest {
 
         createExternalInvocationLog(
             PlatformType.EMBEDDED, Environment.PRODUCTION, ExternalInvocationSource.MCP_SERVER,
-            ExternalInvocationOutcome.SUCCESS, connectedUserId, Instant.now());
+            ExternalInvocationStatus.SUCCESS, connectedUserId, Instant.now());
 
         authenticate("external-user-2");
 
@@ -129,7 +129,7 @@ class ExternalInvocationFacadeIntTest {
 
     private ExternalInvocationLog createExternalInvocationLog(
         PlatformType type, Environment environment, ExternalInvocationSource source,
-        ExternalInvocationOutcome outcome,
+        ExternalInvocationStatus status,
         long connectedUserId, Instant createdDate) {
 
         ExternalInvocationLog externalInvocationLog = new ExternalInvocationLog();
@@ -139,7 +139,7 @@ class ExternalInvocationFacadeIntTest {
         externalInvocationLog.setDurationMs(5);
         externalInvocationLog.setEnvironment(environment.ordinal());
         externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
-        externalInvocationLog.setOutcome(outcome);
+        externalInvocationLog.setStatus(status);
         externalInvocationLog.setSource(source);
         externalInvocationLog.setToolName("slack_send");
         externalInvocationLog.setType(type);

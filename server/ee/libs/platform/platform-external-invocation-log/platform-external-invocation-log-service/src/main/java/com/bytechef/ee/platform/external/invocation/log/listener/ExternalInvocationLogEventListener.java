@@ -72,7 +72,7 @@ public class ExternalInvocationLogEventListener {
         externalInvocationLog.setMcpServerId(event.mcpServerId());
         externalInvocationLog.setA2aServerId(event.a2aServerId());
         externalInvocationLog.setJobId(event.jobId());
-        externalInvocationLog.setOutcome(event.outcome());
+        externalInvocationLog.setStatus(event.status());
         externalInvocationLog.setErrorType(truncate(event.errorType(), MAX_NAME_LENGTH));
         externalInvocationLog.setErrorMessage(truncate(event.errorMessage(), MAX_ERROR_MESSAGE_LENGTH));
         externalInvocationLog.setDurationMs((int) event.durationMs());

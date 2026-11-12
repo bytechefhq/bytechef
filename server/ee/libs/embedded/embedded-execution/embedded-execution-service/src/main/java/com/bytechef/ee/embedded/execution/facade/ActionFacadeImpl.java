@@ -17,9 +17,9 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -82,7 +82,7 @@ public class ActionFacadeImpl implements ActionFacade {
         if (connectionId == null && isConnectionRequired(componentName, componentVersion)) {
             externalInvocationRecorder.record(
                 eventBuilder
-                    .outcome(ExternalInvocationOutcome.CONNECTION_REQUIRED)
+                    .status(ExternalInvocationStatus.CONNECTION_REQUIRED)
                     .build());
 
             return execution.get();

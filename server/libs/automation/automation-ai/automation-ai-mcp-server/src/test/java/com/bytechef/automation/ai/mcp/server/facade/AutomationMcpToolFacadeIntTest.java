@@ -64,9 +64,9 @@ import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorderImpl;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
@@ -695,8 +695,8 @@ class AutomationMcpToolFacadeIntTest {
         ToolCallback toolCallback = getWorkflowToolCallbackAwaiting(job);
 
         assertThat(toolCallback.call("{}")).contains("approval_required");
-        assertThat(captureRecordedExternalInvocationEvent().outcome())
-            .isEqualTo(ExternalInvocationOutcome.APPROVAL_REQUIRED);
+        assertThat(captureRecordedExternalInvocationEvent().status())
+            .isEqualTo(ExternalInvocationStatus.APPROVAL_REQUIRED);
     }
 
     @Test
@@ -712,7 +712,7 @@ class AutomationMcpToolFacadeIntTest {
             .readJobOutputs(outputs);
 
         assertThat(toolCallback.call("{}")).contains("approval_required");
-        assertThat(captureRecordedExternalInvocationEvent().outcome()).isEqualTo(ExternalInvocationOutcome.SUCCESS);
+        assertThat(captureRecordedExternalInvocationEvent().status()).isEqualTo(ExternalInvocationStatus.SUCCESS);
     }
 
     @Test
@@ -774,7 +774,7 @@ class AutomationMcpToolFacadeIntTest {
             .doesNotContain("approval_required")
             .doesNotContain("resumeToken")
             .doesNotContain("formUrl");
-        assertThat(captureRecordedExternalInvocationEvent().outcome()).isEqualTo(ExternalInvocationOutcome.SUSPENDED);
+        assertThat(captureRecordedExternalInvocationEvent().status()).isEqualTo(ExternalInvocationStatus.SUSPENDED);
     }
 
     @Test
@@ -823,7 +823,7 @@ class AutomationMcpToolFacadeIntTest {
 
         ExternalInvocationEvent externalInvocationEvent = captureRecordedExternalInvocationEvent();
 
-        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(externalInvocationEvent.status()).isEqualTo(ExternalInvocationStatus.ERROR);
         assertThat(externalInvocationEvent.errorMessage()).contains("was stopped");
     }
 
@@ -839,7 +839,7 @@ class AutomationMcpToolFacadeIntTest {
 
         ExternalInvocationEvent externalInvocationEvent = captureRecordedExternalInvocationEvent();
 
-        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.TIMEOUT);
+        assertThat(externalInvocationEvent.status()).isEqualTo(ExternalInvocationStatus.TIMEOUT);
         assertThat(externalInvocationEvent.jobId()).isEqualTo(5L);
     }
 
@@ -855,7 +855,7 @@ class AutomationMcpToolFacadeIntTest {
 
         ExternalInvocationEvent externalInvocationEvent = captureRecordedExternalInvocationEvent();
 
-        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(externalInvocationEvent.status()).isEqualTo(ExternalInvocationStatus.ERROR);
         assertThat(externalInvocationEvent.errorType()).isEqualTo("IllegalArgumentException");
         assertThat(externalInvocationEvent.errorMessage()).isEqualTo("Missing required input: email");
         assertThat(externalInvocationEvent.mcpServerId()).isEqualTo(30L);

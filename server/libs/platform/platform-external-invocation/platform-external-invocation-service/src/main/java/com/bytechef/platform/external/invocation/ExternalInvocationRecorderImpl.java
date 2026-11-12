@@ -50,7 +50,7 @@ public class ExternalInvocationRecorderImpl implements ExternalInvocationRecorde
     @Override
     public <V> V record(
         ExternalInvocationEvent.Builder builder, Supplier<V> execution,
-        Function<? super V, ExternalInvocationOutcome> outcomeResolver) {
+        Function<? super V, ExternalInvocationStatus> statusResolver) {
 
         long startNanos = System.nanoTime();
 
@@ -59,7 +59,7 @@ public class ExternalInvocationRecorderImpl implements ExternalInvocationRecorde
 
             emit(
                 builder
-                    .outcome(outcomeResolver.apply(result))
+                    .status(statusResolver.apply(result))
                     .durationMs(elapsedMs(startNanos))
                     .build());
 
@@ -67,7 +67,7 @@ public class ExternalInvocationRecorderImpl implements ExternalInvocationRecorde
         } catch (RuntimeException exception) {
             emit(
                 builder
-                    .outcome(isTimeout(exception) ? ExternalInvocationOutcome.TIMEOUT : ExternalInvocationOutcome.ERROR)
+                    .status(isTimeout(exception) ? ExternalInvocationStatus.TIMEOUT : ExternalInvocationStatus.ERROR)
                     .errorType(exception.getClass()
                         .getSimpleName())
                     .errorMessage(exception.getMessage())
@@ -91,7 +91,7 @@ public class ExternalInvocationRecorderImpl implements ExternalInvocationRecorde
                 Counter.builder(INVOCATION_COUNTER)
                     .tag("source", event.source()
                         .name())
-                    .tag("outcome", event.outcome()
+                    .tag("status", event.status()
                         .name())
                     .register(meterRegistry)
                     .increment();
@@ -99,8 +99,8 @@ public class ExternalInvocationRecorderImpl implements ExternalInvocationRecorde
 
             if (log.isDebugEnabled()) {
                 log.debug(
-                    "External invocation type={} source={} kind={} tool={} outcome={} durationMs={}",
-                    event.type(), event.source(), event.kind(), event.toolName(), event.outcome(),
+                    "External invocation type={} source={} kind={} tool={} status={} durationMs={}",
+                    event.type(), event.source(), event.kind(), event.toolName(), event.status(),
                     event.durationMs());
             }
 

@@ -34,9 +34,9 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -162,7 +162,7 @@ public class ToolFacadeImpl implements ToolFacade {
         if (connectionId == null && isConnectionRequired(result.componentName())) {
             externalInvocationRecorder.record(
                 eventBuilder
-                    .outcome(ExternalInvocationOutcome.CONNECTION_REQUIRED)
+                    .status(ExternalInvocationStatus.CONNECTION_REQUIRED)
                     .build());
 
             return execution.get();

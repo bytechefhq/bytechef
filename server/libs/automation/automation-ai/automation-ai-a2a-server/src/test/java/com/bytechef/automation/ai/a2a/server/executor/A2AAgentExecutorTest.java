@@ -62,9 +62,9 @@ import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -761,7 +761,7 @@ class A2AAgentExecutorTest {
         assertThat(externalInvocationEvent.workspaceId()).isEqualTo(5L);
         assertThat(externalInvocationEvent.environment()).isEqualTo(Environment.DEVELOPMENT.ordinal());
         assertThat(externalInvocationEvent.jobId()).isEqualTo(100L);
-        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.SUCCESS);
+        assertThat(externalInvocationEvent.status()).isEqualTo(ExternalInvocationStatus.SUCCESS);
         assertThat(externalInvocationEvent.errorType()).isNull();
         assertThat(externalInvocationEvent.durationMs()).isNotNegative();
     }
@@ -795,7 +795,7 @@ class A2AAgentExecutorTest {
 
         ExternalInvocationEvent externalInvocationEvent = getRecordedExternalInvocationEvent();
 
-        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(externalInvocationEvent.status()).isEqualTo(ExternalInvocationStatus.ERROR);
         assertThat(externalInvocationEvent.errorType()).isEqualTo("ExecutionException");
         assertThat(externalInvocationEvent.jobId()).isEqualTo(100L);
     }
@@ -817,8 +817,8 @@ class A2AAgentExecutorTest {
         start(CompletableFuture.completedFuture(job), null).result()
             .join();
 
-        assertThat(getRecordedExternalInvocationEvent().outcome())
-            .isEqualTo(ExternalInvocationOutcome.APPROVAL_REQUIRED);
+        assertThat(getRecordedExternalInvocationEvent().status())
+            .isEqualTo(ExternalInvocationStatus.APPROVAL_REQUIRED);
     }
 
     @Test
@@ -837,7 +837,7 @@ class A2AAgentExecutorTest {
         start(CompletableFuture.completedFuture(job), null).result()
             .join();
 
-        assertThat(getRecordedExternalInvocationEvent().outcome()).isEqualTo(ExternalInvocationOutcome.SUSPENDED);
+        assertThat(getRecordedExternalInvocationEvent().status()).isEqualTo(ExternalInvocationStatus.SUSPENDED);
     }
 
     @Test
@@ -850,7 +850,7 @@ class A2AAgentExecutorTest {
 
         ExternalInvocationEvent externalInvocationEvent = getRecordedExternalInvocationEvent();
 
-        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.TIMEOUT);
+        assertThat(externalInvocationEvent.status()).isEqualTo(ExternalInvocationStatus.TIMEOUT);
         assertThat(externalInvocationEvent.errorType()).isEqualTo("TimeoutException");
     }
 
@@ -866,7 +866,7 @@ class A2AAgentExecutorTest {
 
         ExternalInvocationEvent externalInvocationEvent = getRecordedExternalInvocationEvent();
 
-        assertThat(externalInvocationEvent.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(externalInvocationEvent.status()).isEqualTo(ExternalInvocationStatus.ERROR);
         assertThat(externalInvocationEvent.errorType()).isEqualTo("IllegalStateException");
         assertThat(externalInvocationEvent.errorMessage()).isEqualTo("boom");
         assertThat(externalInvocationEvent.jobId()).isNull();

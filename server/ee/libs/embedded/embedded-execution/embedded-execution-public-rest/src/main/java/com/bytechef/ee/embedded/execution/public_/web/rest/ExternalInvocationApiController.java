@@ -12,16 +12,16 @@ import com.bytechef.ee.embedded.execution.facade.ExternalInvocationFacade;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationKindModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationOutcomeModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationPageModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationSourceModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationStatusModel;
 import com.bytechef.ee.platform.external.invocation.log.domain.ExternalInvocationLog;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -58,14 +58,14 @@ public class ExternalInvocationApiController implements ExternalInvocationApi {
     public ResponseEntity<ExternalInvocationPageModel> getExternalInvocationsPage(
         String externalUserId, @Nullable EnvironmentModel xEnvironment,
         @Nullable ExternalInvocationSourceModel source,
-        @Nullable ExternalInvocationOutcomeModel outcome, @Nullable OffsetDateTime startDate,
+        @Nullable ExternalInvocationStatusModel status, @Nullable OffsetDateTime startDate,
         @Nullable OffsetDateTime endDate, @Nullable Integer pageNumber) {
 
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 
         Page<ExternalInvocationLog> externalInvocationLogPage = externalInvocationFacade.getExternalInvocations(
             externalUserId, environment, source == null ? null : ExternalInvocationSource.valueOf(source.name()),
-            outcome == null ? null : ExternalInvocationOutcome.valueOf(outcome.name()), toInstant(startDate),
+            status == null ? null : ExternalInvocationStatus.valueOf(status.name()), toInstant(startDate),
             toInstant(endDate), pageNumber == null ? 0 : pageNumber);
 
         return ResponseEntity.ok(toExternalInvocationPageModel(externalInvocationLogPage));
@@ -75,8 +75,8 @@ public class ExternalInvocationApiController implements ExternalInvocationApi {
         return ExternalInvocationKindModel.valueOf(kind.name());
     }
 
-    static ExternalInvocationOutcomeModel toExternalInvocationOutcomeModel(ExternalInvocationOutcome outcome) {
-        return ExternalInvocationOutcomeModel.valueOf(outcome.name());
+    static ExternalInvocationStatusModel toExternalInvocationStatusModel(ExternalInvocationStatus status) {
+        return ExternalInvocationStatusModel.valueOf(status.name());
     }
 
     static ExternalInvocationSourceModel toExternalInvocationSourceModel(ExternalInvocationSource source) {
@@ -96,7 +96,7 @@ public class ExternalInvocationApiController implements ExternalInvocationApi {
             .jobId(externalInvocationLog.getJobId())
             .kind(toExternalInvocationKindModel(externalInvocationLog.getKind()))
             .operationName(externalInvocationLog.getOperationName())
-            .outcome(toExternalInvocationOutcomeModel(externalInvocationLog.getOutcome()))
+            .status(toExternalInvocationStatusModel(externalInvocationLog.getStatus()))
             .source(toExternalInvocationSourceModel(externalInvocationLog.getSource()))
             .toolName(externalInvocationLog.getToolName());
     }

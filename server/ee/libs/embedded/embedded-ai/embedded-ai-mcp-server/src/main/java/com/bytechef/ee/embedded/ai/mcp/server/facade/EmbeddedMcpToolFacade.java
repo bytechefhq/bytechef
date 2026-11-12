@@ -59,9 +59,9 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.external.invocation.ExternalInvocationEvent;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationRecorder;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.platform.external.invocation.WorkflowToolRunResult;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -408,7 +408,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
                 externalInvocationRecorder.record(
                     eventBuilder
-                        .outcome(ExternalInvocationOutcome.CONNECTION_REQUIRED)
+                        .status(ExternalInvocationStatus.CONNECTION_REQUIRED)
                         .build());
 
                 return connectionRequiredResponse;
@@ -476,7 +476,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
                 externalInvocationRecorder.record(
                     eventBuilder
-                        .outcome(ExternalInvocationOutcome.CONNECTION_REQUIRED)
+                        .status(ExternalInvocationStatus.CONNECTION_REQUIRED)
                         .build());
 
                 return connectionRequiredResponse;
@@ -514,7 +514,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
                     return jobRunResult;
                 },
-                WorkflowToolRunResult::getOutcome);
+                WorkflowToolRunResult::getExternalInvocationStatus);
 
             return workflowToolRunResult.result();
         };

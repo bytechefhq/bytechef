@@ -26,7 +26,7 @@ import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -191,7 +191,7 @@ public class EmbeddedGettingStartedFacadeImpl implements EmbeddedGettingStartedF
 
     private boolean isFirstCallMade(Environment environment) {
         return externalInvocationLogService.hasExternalInvocationLog(
-            PlatformType.EMBEDDED, environment.ordinal(), ExternalInvocationOutcome.SUCCESS);
+            PlatformType.EMBEDDED, environment.ordinal(), ExternalInvocationStatus.SUCCESS);
     }
 
     private boolean isSetupComplete(Environment environment, Set<Long> publishedIntegrationIds) {
@@ -325,10 +325,10 @@ public class EmbeddedGettingStartedFacadeImpl implements EmbeddedGettingStartedF
     }
 
     private static LastFailedCallDTO toLastFailedCallDTO(ExternalInvocationLog externalInvocationLog) {
-        ExternalInvocationOutcome outcome = externalInvocationLog.getOutcome();
+        ExternalInvocationStatus status = externalInvocationLog.getStatus();
 
         return new LastFailedCallDTO(
-            outcome.name(), externalInvocationLog.getErrorMessage(), externalInvocationLog.getCreatedDate());
+            status.name(), externalInvocationLog.getErrorMessage(), externalInvocationLog.getCreatedDate());
     }
 
     private enum CompletionType {

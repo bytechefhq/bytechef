@@ -9,8 +9,8 @@ package com.bytechef.ee.platform.external.invocation.log.domain;
 
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.external.invocation.ExternalInvocationKind;
-import com.bytechef.platform.external.invocation.ExternalInvocationOutcome;
 import com.bytechef.platform.external.invocation.ExternalInvocationSource;
+import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import java.time.Instant;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
@@ -77,8 +77,8 @@ public class ExternalInvocationLog {
     @Column("job_id")
     private Long jobId;
 
-    @Column("outcome")
-    private int outcome;
+    @Column("status")
+    private int status;
 
     @Column("error_type")
     private String errorType;
@@ -163,8 +163,8 @@ public class ExternalInvocationLog {
         return jobId;
     }
 
-    public ExternalInvocationOutcome getOutcome() {
-        return ExternalInvocationOutcome.values()[outcome];
+    public ExternalInvocationStatus getStatus() {
+        return ExternalInvocationStatus.values()[status];
     }
 
     public @Nullable String getErrorType() {
@@ -251,8 +251,8 @@ public class ExternalInvocationLog {
         this.jobId = jobId;
     }
 
-    public void setOutcome(ExternalInvocationOutcome outcome) {
-        this.outcome = outcome.ordinal();
+    public void setStatus(ExternalInvocationStatus status) {
+        this.status = status.ordinal();
     }
 
     public void setErrorType(String errorType) {
@@ -297,7 +297,7 @@ public class ExternalInvocationLog {
             ", source=" + source +
             ", kind=" + kind +
             ", toolName='" + toolName + '\'' +
-            ", outcome=" + outcome +
+            ", status=" + status +
             ", durationMs=" + durationMs +
             '}';
     }

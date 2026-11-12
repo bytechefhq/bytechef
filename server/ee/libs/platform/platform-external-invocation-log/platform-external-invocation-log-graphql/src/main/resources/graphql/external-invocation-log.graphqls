@@ -3,7 +3,7 @@ extend type Query {
         type: PlatformType!
         environmentId: ID
         source: String
-        outcome: String
+        status: String
         mcpServerId: Long
         a2aServerId: Long
         connectedUserId: Long
@@ -17,7 +17,7 @@ extend type Query {
         workspaceId: ID!
         environmentId: ID!
         source: String
-        outcome: String
+        status: String
         mcpServerId: Long
         a2aServerId: Long
         connectedUserId: Long
@@ -46,7 +46,7 @@ type ExternalInvocationLogType {
     a2aServerId: Long
     jobId: Long
     workflowName: String
-    outcome: String!
+    status: String!
     errorType: String
     errorMessage: String
     durationMs: Int!

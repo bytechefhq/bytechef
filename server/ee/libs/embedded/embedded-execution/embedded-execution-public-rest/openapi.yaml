@@ -540,12 +540,12 @@ paths:
           required: false
           schema:
             $ref: "#/components/schemas/ExternalInvocationSource"
-        - name: "outcome"
-          description: "Return only invocations with this outcome."
+        - name: "status"
+          description: "Return only invocations with this status."
           in: "query"
           required: false
           schema:
-            $ref: "#/components/schemas/ExternalInvocationOutcome"
+            $ref: "#/components/schemas/ExternalInvocationStatus"
         - name: "startDate"
           description: "Return only invocations recorded at or after this instant."
           in: "query"
@@ -1206,10 +1206,10 @@ components:
         operationName:
           description: "The name of the action or cluster element the tool ran."
           type: "string"
-        outcome:
-          $ref: "#/components/schemas/ExternalInvocationOutcome"
         source:
           $ref: "#/components/schemas/ExternalInvocationSource"
+        status:
+          $ref: "#/components/schemas/ExternalInvocationStatus"
         toolName:
           description: "The name of the tool."
           type: "string"
@@ -1219,18 +1219,6 @@ components:
       enum:
         - "COMPONENT"
         - "WORKFLOW"
-    ExternalInvocationOutcome:
-      description: "The outcome of a external invocation."
-      type: "string"
-      enum:
-        - "SUCCESS"
-        - "ERROR"
-        - "CONNECTION_REQUIRED"
-        - "TIMEOUT"
-        - "APPROVAL_REQUIRED"
-        - "APPROVAL_DENIED"
-        - "RULE_BLOCKED"
-        - "SUSPENDED"
     ExternalInvocationPage:
       description: "A page of a connected user's external invocations."
       type: "object"
@@ -1262,6 +1250,18 @@ components:
         - "MCP_SERVER"
         - "API_ACTION"
         - "API_TOOL"
+    ExternalInvocationStatus:
+      description: "The status of an external invocation."
+      type: "string"
+      enum:
+        - "SUCCESS"
+        - "ERROR"
+        - "CONNECTION_REQUIRED"
+        - "TIMEOUT"
+        - "APPROVAL_REQUIRED"
+        - "APPROVAL_DENIED"
+        - "RULE_BLOCKED"
+        - "SUSPENDED"
 #    Trigger:
 #      type: "object"
 #      required:

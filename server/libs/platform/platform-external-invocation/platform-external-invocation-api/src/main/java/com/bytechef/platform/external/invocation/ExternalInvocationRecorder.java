@@ -25,12 +25,12 @@ import java.util.function.Supplier;
 public interface ExternalInvocationRecorder {
 
     default <V> V record(ExternalInvocationEvent.Builder builder, Supplier<V> execution) {
-        return record(builder, execution, result -> ExternalInvocationOutcome.SUCCESS);
+        return record(builder, execution, result -> ExternalInvocationStatus.SUCCESS);
     }
 
     <V> V record(
         ExternalInvocationEvent.Builder builder, Supplier<V> execution,
-        Function<? super V, ExternalInvocationOutcome> outcomeResolver);
+        Function<? super V, ExternalInvocationStatus> statusResolver);
 
     void record(ExternalInvocationEvent event);
 }

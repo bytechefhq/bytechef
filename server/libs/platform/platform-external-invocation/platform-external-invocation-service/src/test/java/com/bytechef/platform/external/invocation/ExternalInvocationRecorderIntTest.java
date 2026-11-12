@@ -76,7 +76,7 @@ class ExternalInvocationRecorderIntTest {
 
         ExternalInvocationEvent event = getPublishedEvent();
 
-        assertThat(event.outcome()).isEqualTo(ExternalInvocationOutcome.SUCCESS);
+        assertThat(event.status()).isEqualTo(ExternalInvocationStatus.SUCCESS);
         assertThat(event.source()).isEqualTo(ExternalInvocationSource.MCP_SERVER);
         assertThat(event.kind()).isEqualTo(ExternalInvocationKind.COMPONENT);
         assertThat(event.toolName()).isEqualTo("slack_sendMessage");
@@ -102,7 +102,7 @@ class ExternalInvocationRecorderIntTest {
 
         ExternalInvocationEvent event = getPublishedEvent();
 
-        assertThat(event.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(event.status()).isEqualTo(ExternalInvocationStatus.ERROR);
         assertThat(event.errorType()).isEqualTo("IllegalStateException");
         assertThat(event.errorMessage()).isEqualTo("boom");
     }
@@ -121,7 +121,7 @@ class ExternalInvocationRecorderIntTest {
                         throw new CompletionException(new TimeoutException("timed out"));
                     }));
 
-        assertThat(getPublishedEvent().outcome()).isEqualTo(ExternalInvocationOutcome.TIMEOUT);
+        assertThat(getPublishedEvent().status()).isEqualTo(ExternalInvocationStatus.TIMEOUT);
     }
 
     @Test
@@ -129,7 +129,7 @@ class ExternalInvocationRecorderIntTest {
         ExternalInvocationEvent connectionRequired = ExternalInvocationEvent.builder(
             PlatformType.EMBEDDED, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.COMPONENT,
             "slack_sendMessage")
-            .outcome(ExternalInvocationOutcome.CONNECTION_REQUIRED)
+            .status(ExternalInvocationStatus.CONNECTION_REQUIRED)
             .build();
 
         externalInvocationRecorder.record(connectionRequired);
@@ -157,17 +157,17 @@ class ExternalInvocationRecorderIntTest {
     }
 
     @Test
-    void testRecordResolvesTheOutcomeFromTheResult() {
+    void testRecordResolvesTheStatusFromTheResult() {
         Object result = externalInvocationRecorder.record(
             ExternalInvocationEvent.builder(
                 PlatformType.EMBEDDED, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.WORKFLOW,
                 "runWorkflow"),
             () -> "paused",
-            output -> "paused".equals(output) ? ExternalInvocationOutcome.APPROVAL_REQUIRED
-                : ExternalInvocationOutcome.SUCCESS);
+            output -> "paused".equals(output) ? ExternalInvocationStatus.APPROVAL_REQUIRED
+                : ExternalInvocationStatus.SUCCESS);
 
         assertThat(result).isEqualTo("paused");
-        assertThat(getPublishedEvent().outcome()).isEqualTo(ExternalInvocationOutcome.APPROVAL_REQUIRED);
+        assertThat(getPublishedEvent().status()).isEqualTo(ExternalInvocationStatus.APPROVAL_REQUIRED);
     }
 
     @Test
@@ -189,11 +189,11 @@ class ExternalInvocationRecorderIntTest {
         ExternalInvocationEvent event = getPublishedEvent();
 
         assertThat(event.jobId()).isEqualTo(5L);
-        assertThat(event.outcome()).isEqualTo(ExternalInvocationOutcome.ERROR);
+        assertThat(event.status()).isEqualTo(ExternalInvocationStatus.ERROR);
     }
 
     @Test
-    void testRecordIncrementsTheInvocationCounterTaggedWithSourceAndOutcome() {
+    void testRecordIncrementsTheInvocationCounterTaggedWithSourceAndStatus() {
         externalInvocationRecorder.record(
             ExternalInvocationEvent.builder(
                 PlatformType.EMBEDDED, ExternalInvocationSource.API_TOOL, ExternalInvocationKind.COMPONENT,
@@ -208,7 +208,7 @@ class ExternalInvocationRecorderIntTest {
 
         Counter counter = meterRegistry.find(ExternalInvocationRecorderImpl.INVOCATION_COUNTER)
             .tag("source", "API_TOOL")
-            .tag("outcome", "SUCCESS")
+            .tag("status", "SUCCESS")
             .counter();
 
         assertThat(counter).isNotNull();
