@@ -294,6 +294,7 @@ module.exports = {
             maxWidth: {
                 'data-pill-panel-width': '400px',
                 'select-trigger-width': 'var(--radix-select-trigger-width)',
+                'workflow-connections-sheet-width': '560px',
                 'workflow-execution-sheet-width': '500px',
                 'workflow-inputs-sheet-width': '700px',
                 'workflow-integration-portal-configuration-workflow-sheet-width': '460px',
