@@ -54,6 +54,13 @@ export interface DeleteConnectionRequest {
     id: number;
 }
 
+export interface GetAllConnectedUserConnectionsRequest {
+    /**
+     * The id of a connected user.
+     */
+    connectedUserId: number;
+}
+
 export interface GetConnectedUserConnectionsRequest {
     /**
      * The id of a connected user.
@@ -280,6 +287,53 @@ export class ConnectionApi extends runtime.BaseAPI {
      */
     async deleteConnection(requestParameters: DeleteConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.deleteConnectionRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for getAllConnectedUserConnections without sending the request
+     */
+    async getAllConnectedUserConnectionsRequestOpts(requestParameters: GetAllConnectedUserConnectionsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['connectedUserId'] == null) {
+            throw new runtime.RequiredError(
+                'connectedUserId',
+                'Required parameter "connectedUserId" was null or undefined when calling getAllConnectedUserConnections().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/connected-users/{connectedUserId}/connections`;
+        urlPath = urlPath.replace('{connectedUserId}', encodeURIComponent(String(requestParameters['connectedUserId'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get all connections a connected user can use, across every component.
+     * Get all connections a connected user can use
+     */
+    async getAllConnectedUserConnectionsRaw(requestParameters: GetAllConnectedUserConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Connection>>> {
+        const requestOptions = await this.getAllConnectedUserConnectionsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ConnectionFromJSON));
+    }
+
+    /**
+     * Get all connections a connected user can use, across every component.
+     * Get all connections a connected user can use
+     */
+    async getAllConnectedUserConnections(requestParameters: GetAllConnectedUserConnectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Connection>> {
+        const response = await this.getAllConnectedUserConnectionsRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

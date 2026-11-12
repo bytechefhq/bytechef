@@ -112,6 +112,17 @@ export interface PublishIntegrationOperationRequest {
     publishIntegrationRequest?: PublishIntegrationRequest;
 }
 
+export interface RestoreIntegrationVersionRequest {
+    /**
+     * The id of an integration.
+     */
+    id: number;
+    /**
+     * The version of an integration.
+     */
+    integrationVersion: number;
+}
+
 export interface UpdateIntegrationRequest {
     /**
      * The id of an integration.
@@ -488,6 +499,60 @@ export class IntegrationApi extends runtime.BaseAPI {
      */
     async publishIntegration(requestParameters: PublishIntegrationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.publishIntegrationRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Creates request options for restoreIntegrationVersion without sending the request
+     */
+    async restoreIntegrationVersionRequestOpts(requestParameters: RestoreIntegrationVersionRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling restoreIntegrationVersion().'
+            );
+        }
+
+        if (requestParameters['integrationVersion'] == null) {
+            throw new runtime.RequiredError(
+                'integrationVersion',
+                'Required parameter "integrationVersion" was null or undefined when calling restoreIntegrationVersion().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/integrations/{id}/versions/{integrationVersion}/restore`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{integrationVersion}', encodeURIComponent(String(requestParameters['integrationVersion'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Replaces the draft workflows of an integration with the workflows of a published integration version.
+     * Restores a published integration version into the draft.
+     */
+    async restoreIntegrationVersionRaw(requestParameters: RestoreIntegrationVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.restoreIntegrationVersionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Replaces the draft workflows of an integration with the workflows of a published integration version.
+     * Restores a published integration version into the draft.
+     */
+    async restoreIntegrationVersion(requestParameters: RestoreIntegrationVersionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.restoreIntegrationVersionRaw(requestParameters, initOverrides);
     }
 
     /**

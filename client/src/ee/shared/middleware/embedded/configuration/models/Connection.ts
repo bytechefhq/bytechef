@@ -114,6 +114,10 @@ export interface Connection {
      */
     version?: number;
     /**
+     * How a connected user came to have the connection. INTERNAL is an admin connection shared with connected users, SELF_SERVE one the connected user created, PROVISIONED one an admin created for the connected user. Only set when listing a connected user's connections.
+     */
+    readonly origin?: ConnectionOriginEnum;
+    /**
      * When true, every connected user in the same environment may use this connection. Always forced to false when a connected user creates a connection for themselves.
      */
     shared?: boolean;
@@ -123,6 +127,16 @@ export interface Connection {
     readonly status?: ConnectionStatusEnum;
 }
 
+
+/**
+ * @export
+ */
+export const ConnectionOriginEnum = {
+    Internal: 'INTERNAL',
+    Provisioned: 'PROVISIONED',
+    SelfServe: 'SELF_SERVE',
+} as const;
+export type ConnectionOriginEnum = typeof ConnectionOriginEnum[keyof typeof ConnectionOriginEnum];
 
 /**
  * @export
@@ -174,6 +188,7 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'parameters': json['parameters'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
+        'origin': json['origin'] == null ? undefined : json['origin'],
         'shared': json['shared'] == null ? undefined : json['shared'],
         'status': json['status'] == null ? undefined : json['status'],
     };
@@ -183,7 +198,7 @@ export function ConnectionToJSON(json: any): Connection {
     return ConnectionToJSONTyped(json, false);
 }
 
-export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'status'> | null, ignoreDiscriminator: boolean = false): any {
+export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'origin'|'status'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
