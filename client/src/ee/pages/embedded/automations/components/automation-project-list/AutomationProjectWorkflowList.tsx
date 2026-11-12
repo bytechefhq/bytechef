@@ -35,11 +35,9 @@ const AutomationProjectWorkflowList = ({
     );
 
     return (
-        <div className="pt-3">
+        <div>
             {workflows.length > 0 ? (
                 <>
-                    <h3 className="flex justify-start pl-3 text-sm heading-tertiary">Workflows</h3>
-
                     <ul className="divide-y divide-stroke-neutral-primary">
                         {workflows.map((workflow) => (
                             <AutomationProjectWorkflowListItem

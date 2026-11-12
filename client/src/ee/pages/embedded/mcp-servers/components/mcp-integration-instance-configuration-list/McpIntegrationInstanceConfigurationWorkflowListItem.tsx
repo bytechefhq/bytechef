@@ -82,7 +82,7 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
         <>
             <Popover onOpenChange={(open) => !open && closePopover()} open={isPopoverOpen}>
                 <PopoverAnchor asChild>
-                    <div className="-mx-3 flex min-h-12 items-center gap-2 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+                    <div className="-mx-3 flex min-h-12 items-center gap-2 rounded-md py-1 pl-3 hover:bg-surface-neutral-primary-hover">
                         <WorkflowToolRowLabel
                             canOpenExecutions={canOpenExecutions}
                             filteredComponentNames={filteredComponentNames}
@@ -98,7 +98,7 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
                         <Switch
                             aria-label={`Enable ${workflowLabel}`}
                             checked={mcpIntegrationInstanceConfigurationWorkflow.enabled}
-                            className="mr-2"
+                            className="mr-1"
                             disabled={isEnablePending}
                             onCheckedChange={handleEnabledChange}
                         />

@@ -129,11 +129,7 @@ const AutomationEditorHeader = ({
     );
 
     const loadingIndicator = (isSaving > 0 || !isOnline) && (
-        <LoadingIndicator
-            className="absolute -top-1 -right-1 size-5 rounded-full"
-            isFetching={isSaving}
-            isOnline={isOnline}
-        />
+        <LoadingIndicator className="shrink-0" isFetching={isSaving} isOnline={isOnline} showLabel />
     );
 
     const handleDuplicateWorkflowClick = () => {
@@ -314,7 +310,7 @@ const AutomationEditorHeader = ({
                 copilotLayoutShifted && 'pr-0'
             )}
         >
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2">
                 <LeftSidebarButton
                     onLeftSidebarOpenClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
                     tooltip="See workflows"
@@ -332,6 +328,8 @@ const AutomationEditorHeader = ({
                     project={project}
                     projects={projects}
                 />
+
+                {loadingIndicator}
             </div>
 
             <div className="flex items-center gap-1">
@@ -350,23 +348,19 @@ const AutomationEditorHeader = ({
 
                 <OutputButton onShowOutputClick={handleShowOutputClick} />
 
-                <div className="relative">
-                    <AutomationEditorSettingsMenu
-                        onDeleteProjectClick={handleDeleteProjectClick}
-                        onDeleteWorkflowClick={handleDeleteWorkflowClick}
-                        onDuplicateProjectClick={handleDuplicateProjectClick}
-                        onDuplicateWorkflowClick={handleDuplicateWorkflowClick}
-                        onEditProjectClick={handleEditProjectClick}
-                        onEditWorkflowClick={handleEditWorkflowClick}
-                        onExportProjectClick={handleExportProjectClick}
-                        onExportWorkflowClick={handleExportWorkflowClick}
-                        onImportWorkflowClick={() => workflowFileInputRef.current?.click()}
-                        onNewWorkflowClick={() => setShowCreateWorkflowDialog(true)}
-                        onProjectHistoryClick={handleProjectHistoryClick}
-                    />
-
-                    {loadingIndicator}
-                </div>
+                <AutomationEditorSettingsMenu
+                    onDeleteProjectClick={handleDeleteProjectClick}
+                    onDeleteWorkflowClick={handleDeleteWorkflowClick}
+                    onDuplicateProjectClick={handleDuplicateProjectClick}
+                    onDuplicateWorkflowClick={handleDuplicateWorkflowClick}
+                    onEditProjectClick={handleEditProjectClick}
+                    onEditWorkflowClick={handleEditWorkflowClick}
+                    onExportProjectClick={handleExportProjectClick}
+                    onExportWorkflowClick={handleExportWorkflowClick}
+                    onImportWorkflowClick={() => workflowFileInputRef.current?.click()}
+                    onNewWorkflowClick={() => setShowCreateWorkflowDialog(true)}
+                    onProjectHistoryClick={handleProjectHistoryClick}
+                />
             </div>
 
             <input

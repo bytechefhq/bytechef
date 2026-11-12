@@ -131,13 +131,13 @@ const AutomationProjectConfigurationListItem = ({
 
                 <div className="flex flex-1 items-center py-3">
                     <div className="flex-1">
-                        <div className="flex min-h-8 items-center gap-2">
+                        <div className="flex min-h-6 items-center gap-2">
                             <span className="text-base font-semibold text-content-neutral-primary">
                                 {configuration.name}
                             </span>
                         </div>
 
-                        <div className="mt-2 flex min-h-7 items-center">
+                        <div className="mt-2 flex min-h-6 items-center">
                             {showProjectName && (
                                 <span className="mr-4 flex items-center gap-1 text-xs font-semibold text-muted-foreground">
                                     <FolderIcon aria-hidden="true" className="size-4 shrink-0" />
@@ -178,7 +178,7 @@ const AutomationProjectConfigurationListItem = ({
                         </Tooltip>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-2">
-                            <div className="flex min-h-8 items-center">
+                            <div className="flex min-h-6 items-center">
                                 <Switch
                                     aria-label="Enable Configuration"
                                     checked={configuration.enabled}
@@ -202,7 +202,7 @@ const AutomationProjectConfigurationListItem = ({
                             </div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
+                                <TooltipTrigger className="flex min-h-6 items-center text-sm text-content-neutral-secondary">
                                     {lastExecutionDate ? (
                                         <span className="text-xs">
                                             {`Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`}

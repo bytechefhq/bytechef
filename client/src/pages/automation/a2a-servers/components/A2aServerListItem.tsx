@@ -99,7 +99,7 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
 
                 <div className="flex flex-1 items-center py-3">
                     <div className="flex-1">
-                        <div className="flex min-h-8 items-center gap-2">
+                        <div className="flex min-h-6 items-center gap-2">
                             <CollapsibleTrigger className="text-base font-semibold">
                                 <div className="flex items-center">
                                     <span>{a2aServer.name}</span>
@@ -111,7 +111,7 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                             )}
                         </div>
 
-                        <div className="mt-2 flex min-h-7 items-center gap-4">
+                        <div className="mt-2 flex min-h-6 items-center gap-4">
                             <CollapsibleTrigger
                                 className="group flex items-center gap-1 text-xs font-semibold text-muted-foreground"
                                 ref={toolsCollapsibleTriggerRef}
@@ -144,7 +144,7 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
 
                     <div className="flex items-center justify-end gap-x-6 [&>:last-child]:-ml-3">
                         <div className="flex min-w-52 flex-col items-end gap-y-2">
-                            <div className="flex min-h-8 items-center">
+                            <div className="flex min-h-6 items-center">
                                 {updateA2aServerMutation.isPending && <LoadingIcon />}
 
                                 <Switch
@@ -155,7 +155,7 @@ const A2aServerListItem = ({a2aServer, tags}: A2aServerListItemProps) => {
                                 />
                             </div>
 
-                            <span className="flex min-h-7 items-center text-xs text-content-neutral-secondary">
+                            <span className="flex min-h-6 items-center text-xs text-content-neutral-secondary">
                                 {a2aServer.lastModifiedDate
                                     ? `Modified at ${new Date(a2aServer.lastModifiedDate).toLocaleDateString()} ${new Date(a2aServer.lastModifiedDate).toLocaleTimeString()}`
                                     : 'No modifications'}

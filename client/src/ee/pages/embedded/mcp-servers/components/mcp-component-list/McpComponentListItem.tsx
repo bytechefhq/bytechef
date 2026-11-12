@@ -20,7 +20,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
 
     return (
         <Collapsible className="group rounded-md border border-border/50" onOpenChange={setExpanded} open={expanded}>
-            <div className="relative flex items-center gap-2.5 rounded-md px-3 py-2.5 hover:bg-surface-neutral-primary-hover">
+            <div className="relative flex items-center gap-2.5 rounded-md py-2.5 pl-3 hover:bg-surface-neutral-primary-hover">
                 <ListItemExpandButton
                     className="mr-0 after:absolute after:inset-0"
                     label={expanded ? 'Hide tools' : 'Show tools'}

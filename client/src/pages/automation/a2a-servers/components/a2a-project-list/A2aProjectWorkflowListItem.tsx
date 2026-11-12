@@ -95,7 +95,7 @@ const A2aProjectWorkflowListItem = ({
     };
 
     return (
-        <div className="-mx-3 flex min-h-12 items-center gap-2 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+        <div className="-mx-3 flex min-h-12 items-center gap-2 rounded-md py-1 pl-3 hover:bg-surface-neutral-primary-hover">
             <WorkflowToolRowLabel
                 canOpenExecutions={canOpenExecutions}
                 filteredComponentNames={filteredComponentNames}
@@ -119,7 +119,7 @@ const A2aProjectWorkflowListItem = ({
                 <Switch
                     aria-label={`Enable ${workflowLabel}`}
                     checked={a2aProjectWorkflow.enabled}
-                    className="mr-2"
+                    className="mr-1"
                     disabled={enablePending}
                     onCheckedChange={onEnabledChange}
                 />

@@ -9,7 +9,7 @@ import {
 import {PLATFORM_MODES, getPlatformModePath} from '@/pages/home/constants/platformModes';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {CheckIcon, ChevronDownIcon} from 'lucide-react';
+import {ChevronDownIcon, CircleCheckIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
 export const AppSidebarLogo = () => (
@@ -53,7 +53,7 @@ export function AppSidebarModeSelect({currentMode}: AppSidebarModeSelectProps) {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="start" className="w-72">
-                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Mode</DropdownMenuLabel>
+                <DropdownMenuLabel className="pl-10 text-xs font-normal text-muted-foreground">Mode</DropdownMenuLabel>
 
                 {PLATFORM_MODES.map((mode) => (
                     <DropdownMenuItem
@@ -69,8 +69,13 @@ export function AppSidebarModeSelect({currentMode}: AppSidebarModeSelectProps) {
                             <span className="text-xs text-muted-foreground">{mode.description}</span>
                         </div>
 
-                        {mode.type === currentMode && (
-                            <CheckIcon aria-label="Current mode" className="size-4 shrink-0" />
+                        {mode.type === currentMode ? (
+                            <CircleCheckIcon
+                                aria-label="Current mode"
+                                className="size-4 shrink-0 text-content-brand-primary"
+                            />
+                        ) : (
+                            <span aria-hidden="true" className="size-4 shrink-0" />
                         )}
                     </DropdownMenuItem>
                 ))}
