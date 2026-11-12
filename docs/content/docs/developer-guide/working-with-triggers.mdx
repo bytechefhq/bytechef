@@ -12,12 +12,50 @@ description: "Working with Triggers as a developer"
    ```bash
    ngrok http http://127.0.0.1:9555
    ```
+    - Use the port your ByteChef server listens on: `9555` when you run it from the ByteChef codebase, `8080` when you run the `docker.bytechef.io/bytechef/bytechef` image with Docker or Docker Compose (`ngrok http http://127.0.0.1:8080`).
     - Copy the first address listed under "Forwarding". This will be used as your webhook URL.
     ![ngork example](/ngrok.png)
 
 ## Configure the webhook URL
 
 Where the ngrok URL goes depends on how you run the server.
+
+<Tabs items={['Docker', 'Docker Compose', 'ByteChef Codebase']}>
+<Tab value="Docker">
+
+If you run ByteChef with `docker run`, as in the **Docker (manual)** tab of [Local Docker](/platform/use-bytechef/self-hosted/installation/local-docker), pass the ngrok URL as the `BYTECHEF_WEBHOOK_URL` environment variable, replacing `(first address under Forwarding)` with the ngrok URL you copied:
+
+```bash
+docker run --name bytechef -it -p 8080:8080 \
+    --env BYTECHEF_WEBHOOK_URL=(first address under Forwarding)/webhooks/{id} \
+    ...
+    docker.bytechef.io/bytechef/bytechef:latest
+```
+
+Keep the other options from your existing `docker run` command in place of `...`. An environment variable is read only when the container starts, so remove the old container (`docker rm -f bytechef`) and run the command again.
+
+</Tab>
+<Tab value="Docker Compose">
+
+If you run ByteChef with the `docker-compose.yml` from [Local Docker](/platform/use-bytechef/self-hosted/installation/local-docker), add `BYTECHEF_WEBHOOK_URL` to the `environment` list of the `bytechef` service, replacing `(first address under Forwarding)` with the ngrok URL you copied:
+
+```yaml
+services:
+  bytechef:
+    environment:
+      - BYTECHEF_WEBHOOK_URL=(first address under Forwarding)/webhooks/{id}
+```
+
+Then recreate the container so it picks up the new value:
+
+```bash
+docker compose -f docker-compose.yml up -d
+```
+
+</Tab>
+<Tab value="ByteChef Codebase">
+
+If you run the server from a clone of the ByteChef repository, the setting depends on how you start it.
 
 <Tabs items={['IntelliJ IDEA', 'Without IntelliJ']}>
 <Tab value="IntelliJ IDEA">
@@ -52,6 +90,9 @@ Where the ngrok URL goes depends on how you run the server.
 3. Start the ByteChef application.
 
 **Note:** Docker has to be restarted in order to update any changes made to `BYTECHEF_HOME/server/local.env` file.
+
+</Tab>
+</Tabs>
 
 </Tab>
 </Tabs>
