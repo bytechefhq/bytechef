@@ -150,7 +150,7 @@ The `EMBED_INIT` message carries the parameters that configure the session:
 | `jwtToken` | The connected user's signed token; stored for the session and used to authorize all requests. |
 | `environment` | The environment to run against (defaults to `PRODUCTION`). |
 | `includeComponents` | Restricts the component palette to the listed components. |
-| `connectionDialogAllowed` | Whether the user may open the connect dialog to create new connections. |
+| `connectionDialogAllowed` | **Deprecated.** Use the `connectionDialogAllowed` claim of the JWT instead. While the parameter is still accepted, `false` hides connection creation, but `true` cannot allow what the token denies. |
 
 Messages are only accepted from the parent window and, when allowed parent origins are configured, only from one of those origins.
 
@@ -168,7 +168,7 @@ The builder renders the same canvas as the standard automation editor, with two 
 | **Test / Chat** | Runs the workflow (**Chat** for chat-trigger workflows, **Test** otherwise); becomes **Stop** while running. |
 | **Publish** | Publishes the connected user's workflow. |
 
-Connections created or picked here belong to the connected user. New connections are created against that user's identity, and connection creation is only offered when `connectionDialogAllowed` is enabled.
+Connections created or picked here belong to the connected user. New connections are created against that user's identity. Connection creation is offered unless the user's JWT sets the `connectionDialogAllowed` claim to `false`; the server then also rejects creating a connection with `403`, so the user can only pick existing connections. See [Generate a JWT](/platform/embedded/get-started/quick-start#5-generate-a-jwt-for-an-end-user).
 
 ### Publishing as a connected user
 
