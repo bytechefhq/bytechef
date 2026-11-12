@@ -1,19 +1,23 @@
 import RequiredMark from '@/components/RequiredMark';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {CLUSTER_ELEMENT_EDGE_LABEL_GAP} from '@/shared/constants';
-import {BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath} from '@xyflow/react';
+import {BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath, useInternalNode} from '@xyflow/react';
 import {useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 import useCalledClusterElementEdgeStyle from './useCalledClusterElementEdgeStyle';
 
+const EDGE_LABEL_Z_INDEX_OFFSET = 10;
+
 export default function LabeledClusterElementsEdge({
     id,
+    source,
     sourcePosition,
     sourceX,
     sourceY,
     style,
+    target,
     targetX,
     targetY,
 }: EdgeProps) {
@@ -27,6 +31,9 @@ export default function LabeledClusterElementsEdge({
             nodes: state.nodes,
         }))
     );
+
+    const sourceInternalNode = useInternalNode(source);
+    const targetInternalNode = useInternalNode(target);
 
     const nodes = useMemo(
         () => [...clusterElementsCanvasNodes, ...workflowCanvasNodes],
@@ -58,6 +65,10 @@ export default function LabeledClusterElementsEdge({
 
     const calledClusterElementEdgeStyle = useCalledClusterElementEdgeStyle(targetClusterElement, style);
 
+    const labelZIndex =
+        Math.max(sourceInternalNode?.internals.z ?? 0, targetInternalNode?.internals.z ?? 0) +
+        EDGE_LABEL_Z_INDEX_OFFSET;
+
     function getEdgeLabelPosition() {
         const defaultPosition = `translate(-50%, 0%) translate(${sourceX}px,${sourceY + CLUSTER_ELEMENT_EDGE_LABEL_GAP}px)`;
 
@@ -75,10 +86,11 @@ export default function LabeledClusterElementsEdge({
 
             <EdgeLabelRenderer key={id}>
                 <div
-                    className="z-10 max-w-20 p-0.5 text-center text-xs font-medium text-wrap"
+                    className="max-w-20 p-0.5 text-center text-xs font-medium text-wrap"
                     style={{
                         position: 'absolute',
                         transform: getEdgeLabelPosition(),
+                        zIndex: labelZIndex,
                     }}
                 >
                     {nodeLabel ? (

@@ -7,7 +7,8 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 import LabeledClusterElementsEdge from './LabeledClusterElementsEdge';
 
-const {testNodeStatesState} = vi.hoisted(() => ({
+const {internalNodeZIndexState, testNodeStatesState} = vi.hoisted(() => ({
+    internalNodeZIndexState: {value: {} as Record<string, number>},
     testNodeStatesState: {value: {} as Record<string, {status: 'RUNNING' | 'COMPLETED' | 'FAILED'}>},
 }));
 
@@ -23,6 +24,8 @@ vi.mock('@xyflow/react', async (importOriginal) => ({
         </svg>
     ),
     EdgeLabelRenderer: ({children}: {children: ReactNode}) => <div>{children}</div>,
+    useInternalNode: (nodeId: string) =>
+        nodeId in internalNodeZIndexState.value ? {internals: {z: internalNodeZIndexState.value[nodeId]}} : undefined,
 }));
 
 const MODEL_PLACEHOLDER_NODE: Node = {
@@ -61,7 +64,26 @@ describe('LabeledClusterElementsEdge', () => {
         useClusterElementsDataStore.setState({nodes: []});
         useWorkflowDataStore.setState({nodes: []});
 
+        internalNodeZIndexState.value = {};
         testNodeStatesState.value = {};
+    });
+
+    it('keeps the slot label above the cluster frame when the frame is selected and elevated', () => {
+        internalNodeZIndexState.value = {aiAgent_1: 1000, 'aiAgent_1-model-placeholder-0': 1001};
+
+        useWorkflowDataStore.setState({nodes: [MODEL_PLACEHOLDER_NODE]});
+
+        renderEdge();
+
+        expect(screen.getByText('Model').parentElement!.style.zIndex).toBe('1011');
+    });
+
+    it('keeps the slot label above unselected nodes', () => {
+        useWorkflowDataStore.setState({nodes: [MODEL_PLACEHOLDER_NODE]});
+
+        renderEdge();
+
+        expect(screen.getByText('Model').parentElement!.style.zIndex).toBe('10');
     });
 
     it("colours a tools edge by the called element's status", () => {
