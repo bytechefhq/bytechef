@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {AlertTriangleIcon, BlocksIcon, CableIcon, Code2Icon, SlidersIcon, SparklesIcon} from 'lucide-react';
+import {AlertTriangleIcon, BlocksIcon, CableIcon, Code2Icon, PlugIcon, SlidersIcon, SparklesIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -13,9 +13,11 @@ export interface WorkflowRightSidebarProps {
     issueCount: number;
     issueSeverity?: WorkflowIssueSeverityType;
     issuesSidebarOpen: boolean;
+    missingConnectionCount: number;
     onComponentsAndFlowControlsClick: () => void;
     onCopilotClick: () => void;
     onWorkflowCodeEditorClick: () => void;
+    onWorkflowConnectionsClick: () => void;
     onWorkflowInputsClick: () => void;
     onWorkflowIssuesClick: () => void;
     onWorkflowOutputsClick: () => void;
@@ -28,9 +30,11 @@ const WorkflowRightSidebar = ({
     issueCount,
     issueSeverity,
     issuesSidebarOpen,
+    missingConnectionCount,
     onComponentsAndFlowControlsClick,
     onCopilotClick,
     onWorkflowCodeEditorClick,
+    onWorkflowConnectionsClick,
     onWorkflowInputsClick,
     onWorkflowIssuesClick,
     onWorkflowOutputsClick,
@@ -78,6 +82,21 @@ const WorkflowRightSidebar = ({
                         name: 'Components & Flow Controls',
                         onClick: onComponentsAndFlowControlsClick,
                     },
+                    {
+                        icon: (
+                            <span className="relative">
+                                <PlugIcon />
+
+                                {missingConnectionCount > 0 && (
+                                    <span className="absolute -top-1.5 -right-2 min-w-4 rounded-full bg-content-destructive px-1 text-center text-[10px] leading-4 font-semibold text-white">
+                                        {missingConnectionCount}
+                                    </span>
+                                )}
+                            </span>
+                        ),
+                        name: 'Workflow Connections',
+                        onClick: onWorkflowConnectionsClick,
+                    },
                 ],
                 ...(showWorkflowInputs
                     ? [
@@ -124,6 +143,7 @@ const WorkflowRightSidebar = ({
             issueCount,
             issueSeverity,
             issuesSidebarOpen,
+            missingConnectionCount,
             rightSidebarOpen,
             showCopilot,
         ]
@@ -140,11 +160,16 @@ const WorkflowRightSidebar = ({
                     (item.name === 'Copilot' && copilotPanelOpen) ||
                     (item.name === 'Workflow Issues' && issuesSidebarOpen);
 
+                const ariaLabel =
+                    item.name === 'Workflow Connections' && missingConnectionCount > 0
+                        ? `Workflow Connections, ${missingConnectionCount} missing`
+                        : item.name;
+
                 return (
                     <Tooltip key={item.name}>
                         <TooltipTrigger asChild>
                             <Button
-                                aria-label={item.name}
+                                aria-label={ariaLabel}
                                 className={twMerge(
                                     'text-content-neutral-subtle hover:text-content-neutral-primary',
                                     isActive && activeItemStyling

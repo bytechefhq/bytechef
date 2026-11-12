@@ -79,6 +79,9 @@ export interface WorkflowEditorI {
     showPropertyCodeEditorSheet: boolean;
     setWorkflowIsRunning: (workflowIsRunning: boolean) => void;
 
+    showWorkflowConnectionsSheet: boolean;
+    setShowWorkflowConnectionsSheet: (showWorkflowConnectionsSheet: boolean) => void;
+
     showWorkflowInputsSheet: boolean;
     setShowWorkflowInputsSheet: (showWorkflowInputsSheet: boolean) => void;
 
@@ -228,6 +231,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setShowWorkflowCodeEditorSheet: (showWorkflowCodeEditorSheet) =>
                 set(() => ({
                     showWorkflowCodeEditorSheet,
+                })),
+
+            showWorkflowConnectionsSheet: false,
+            setShowWorkflowConnectionsSheet: (showWorkflowConnectionsSheet) =>
+                set(() => ({
+                    showWorkflowConnectionsSheet,
                 })),
 
             showWorkflowInputsSheet: false,
