@@ -1409,6 +1409,30 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/IntegrationVersion"
+  /integrations/{id}/versions/{integrationVersion}/restore:
+    post:
+      description: "Replaces the draft workflows of an integration with the workflows of a published integration version."
+      summary: "Restores a published integration version into the draft."
+      tags:
+        - "integration"
+      operationId: "restoreIntegrationVersion"
+      parameters:
+        - name: "id"
+          description: "The id of an integration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "integrationVersion"
+          description: "The version of an integration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "204":
+          description: "Successful operation."
   /integrations/{id}/versions/{integrationVersion}/workflows:
     get:
       description: "Get workflows for particular integration version."

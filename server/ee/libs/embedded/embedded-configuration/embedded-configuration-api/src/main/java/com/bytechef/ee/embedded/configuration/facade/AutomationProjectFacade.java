@@ -81,6 +81,15 @@ public interface AutomationProjectFacade {
 
     int publishProject(long projectId, @Nullable String description);
 
+    /**
+     * Restores a published project version into the draft: the draft's workflows are replaced by copies of that
+     * version's workflows, keeping their workflow UUIDs, and the draft workflows the version lacks are removed.
+     *
+     * @param projectId      the automation project id
+     * @param projectVersion the published version to restore
+     */
+    void restoreProjectVersion(long projectId, int projectVersion);
+
     void updateProject(
         long projectId, String name, String description, String category, List<String> tags,
         String permissionExpression);

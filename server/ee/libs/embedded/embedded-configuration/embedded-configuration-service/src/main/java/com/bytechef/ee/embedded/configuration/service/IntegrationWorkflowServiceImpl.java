@@ -41,6 +41,14 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     }
 
     @Override
+    public IntegrationWorkflow addWorkflow(
+        long integrationId, int integrationVersion, String workflowId, UUID uuid) {
+
+        return integrationWorkflowRepository.save(
+            new IntegrationWorkflow(integrationId, integrationVersion, workflowId, uuid));
+    }
+
+    @Override
     public void delete(long integrationId, int integrationVersion, String workflowId) {
         integrationWorkflowRepository
             .findByIntegrationIdAndIntegrationVersionAndWorkflowId(integrationId, integrationVersion, workflowId)

@@ -131,6 +131,9 @@ class AutomationProjectFacadeAuthorizationIntTest {
             assertThatThrownBy(() -> automationProjectFacade.publishProject(5L, null))
                 .as("publish denied to %s", authentication.getName())
                 .isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(() -> automationProjectFacade.restoreProjectVersion(5L, 1))
+                .as("restore denied to %s", authentication.getName())
+                .isInstanceOf(AccessDeniedException.class);
             assertThatThrownBy(() -> automationProjectFacade.getProjects())
                 .as("projects denied to %s", authentication.getName())
                 .isInstanceOf(AccessDeniedException.class);

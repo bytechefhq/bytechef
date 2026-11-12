@@ -528,6 +528,61 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
 
     @Override
     @PreAuthorize("isTenantAdmin()")
+    @Audited(event = AutomationProjectAuditEvents.AUTOMATION_PROJECT_VERSION_RESTORED, data = {
+        @AuditData(key = "projectId", value = "#projectId"),
+        @AuditData(key = "projectVersion", value = "#projectVersion")
+    })
+    public void restoreProjectVersion(long projectId, int projectVersion) {
+        Project project = getProjectOfAutomationProject(projectId);
+
+        projectService.getPublishedProjectVersion(projectId, projectVersion);
+
+        int draftProjectVersion = project.getLastProjectVersion();
+
+        Map<String, ProjectWorkflow> draftProjectWorkflowMap = new HashMap<>();
+
+        for (ProjectWorkflow draftProjectWorkflow : projectWorkflowService.getProjectWorkflows(
+            projectId, draftProjectVersion)) {
+
+            draftProjectWorkflowMap.put(draftProjectWorkflow.getUuidAsString(), draftProjectWorkflow);
+        }
+
+        for (ProjectWorkflow publishedProjectWorkflow : projectWorkflowService.getProjectWorkflows(
+            projectId, projectVersion)) {
+
+            Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(publishedProjectWorkflow.getWorkflowId());
+
+            ProjectWorkflow draftProjectWorkflow = draftProjectWorkflowMap.remove(
+                publishedProjectWorkflow.getUuidAsString());
+
+            if (draftProjectWorkflow == null) {
+                projectWorkflowService.addWorkflow(
+                    projectId, draftProjectVersion, duplicatedWorkflow.getId(), publishedProjectWorkflow.getUuid());
+
+                continue;
+            }
+
+            String draftWorkflowId = draftProjectWorkflow.getWorkflowId();
+
+            draftProjectWorkflow.setWorkflowId(duplicatedWorkflow.getId());
+
+            projectWorkflowService.update(draftProjectWorkflow);
+
+            workflowTestConfigurationService.updateWorkflowId(draftWorkflowId, duplicatedWorkflow.getId());
+            workflowNodeTestOutputService.updateWorkflowId(draftWorkflowId, duplicatedWorkflow.getId());
+
+            deleteDraftWorkflow(draftWorkflowId);
+        }
+
+        for (ProjectWorkflow draftProjectWorkflow : draftProjectWorkflowMap.values()) {
+            projectWorkflowService.delete(List.of(Objects.requireNonNull(draftProjectWorkflow.getId())));
+
+            deleteDraftWorkflow(draftProjectWorkflow.getWorkflowId());
+        }
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
     @Audited(event = AutomationProjectAuditEvents.AUTOMATION_PROJECT_UPDATED, data = {
         @AuditData(key = "projectId", value = "#projectId"),
         @AuditData(key = "name", value = "#name"),
@@ -673,6 +728,16 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
             configuration, template.workflowUuid());
 
         return template.withProvided(providedNames.componentNames(), providedNames.inputNames());
+    }
+
+    private void deleteDraftWorkflow(String workflowId) {
+        for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+            workflowPreDeleteListener.onWorkflowPreDelete(workflowId);
+        }
+
+        workflowTestConfigurationService.delete(workflowId);
+
+        workflowService.delete(workflowId);
     }
 
     private static List<ConnectedUserWorkflowTemplateDTO.Input> toInputs(Workflow workflow) {

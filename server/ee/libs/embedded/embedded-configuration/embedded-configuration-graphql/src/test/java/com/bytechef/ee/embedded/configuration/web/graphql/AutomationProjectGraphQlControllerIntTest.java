@@ -441,6 +441,22 @@ class AutomationProjectGraphQlControllerIntTest {
     }
 
     @Test
+    void testRestoreAutomationProjectVersionDelegatesToFacadeAndReturnsTrue() {
+        this.graphQlTester
+            .document("""
+                mutation {
+                    restoreAutomationProjectVersion(id: "8", projectVersion: 2)
+                }
+                """)
+            .execute()
+            .path("restoreAutomationProjectVersion")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(automationProjectFacade).restoreProjectVersion(8L, 2);
+    }
+
+    @Test
     void testAutomationProjectCategoriesReturnsCategoriesFromFacade() {
         AutomationProjectCategoryDTO categoryOne = new AutomationProjectCategoryDTO(1L, "Finance");
         AutomationProjectCategoryDTO categoryTwo = new AutomationProjectCategoryDTO(2L, "Marketing");

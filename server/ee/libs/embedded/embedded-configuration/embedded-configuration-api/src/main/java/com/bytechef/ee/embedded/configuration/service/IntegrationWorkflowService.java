@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @version ee
@@ -20,6 +21,8 @@ import java.util.Optional;
 public interface IntegrationWorkflowService {
 
     IntegrationWorkflow addWorkflow(long integrationId, int integrationVersion, String workflowId);
+
+    IntegrationWorkflow addWorkflow(long integrationId, int integrationVersion, String workflowId, UUID uuid);
 
     void delete(List<Long> ids);
 

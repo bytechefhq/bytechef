@@ -33,5 +33,7 @@ public interface IntegrationFacade {
 
     int publishIntegration(long id, @Nullable String description);
 
+    void restoreIntegrationVersion(long id, int integrationVersion);
+
     void updateIntegration(IntegrationDTO integration);
 }

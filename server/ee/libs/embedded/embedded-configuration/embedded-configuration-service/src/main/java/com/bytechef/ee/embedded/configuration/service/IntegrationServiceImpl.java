@@ -12,7 +12,9 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
+import com.bytechef.ee.embedded.configuration.exception.IntegrationErrorType;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -92,6 +94,25 @@ public class IntegrationServiceImpl implements IntegrationService {
             .stream()
             .sorted((o1, o2) -> Integer.compare(o2.getVersion(), o1.getVersion()))
             .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public IntegrationVersion getPublishedIntegrationVersion(long id, int integrationVersion) {
+        Integration integration = getIntegration(id);
+
+        IntegrationVersion publishedIntegrationVersion = integration.fetchIntegrationVersion(integrationVersion)
+            .orElseThrow(() -> new ConfigurationException(
+                "Integration version v=%s not found".formatted(integrationVersion),
+                IntegrationErrorType.INTEGRATION_VERSION_NOT_FOUND));
+
+        if (publishedIntegrationVersion.getStatus() != Status.PUBLISHED) {
+            throw new ConfigurationException(
+                "Integration version v=%s is not published".formatted(integrationVersion),
+                IntegrationErrorType.INTEGRATION_VERSION_NOT_PUBLISHED);
+        }
+
+        return publishedIntegrationVersion;
     }
 
     @Override

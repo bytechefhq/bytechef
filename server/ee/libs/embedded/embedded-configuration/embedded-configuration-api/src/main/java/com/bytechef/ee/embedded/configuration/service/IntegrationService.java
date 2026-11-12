@@ -36,6 +36,8 @@ public interface IntegrationService {
 
     List<IntegrationVersion> getIntegrationVersions(Long id);
 
+    IntegrationVersion getPublishedIntegrationVersion(long id, int integrationVersion);
+
     List<Integration> getIntegrations(
         @Nullable Long categoryId, List<Long> ids, @Nullable Long tagId, @Nullable Status status);
 

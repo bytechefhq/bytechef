@@ -281,6 +281,62 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
+    @Audited(event = IntegrationAuditEvents.INTEGRATION_VERSION_RESTORED, data = {
+        @AuditData(key = "integrationId", value = "#id"),
+        @AuditData(key = "integrationVersion", value = "#integrationVersion")
+    })
+    @PreAuthorize("isTenantAdmin()")
+    public void restoreIntegrationVersion(long id, int integrationVersion) {
+        Integration integration = integrationService.getIntegration(id);
+
+        integrationService.getPublishedIntegrationVersion(id, integrationVersion);
+
+        int draftIntegrationVersion = integration.getLastIntegrationVersion();
+
+        Map<String, IntegrationWorkflow> draftIntegrationWorkflowMap = new HashMap<>();
+
+        for (IntegrationWorkflow draftIntegrationWorkflow : integrationWorkflowService.getIntegrationWorkflows(
+            id, draftIntegrationVersion)) {
+
+            draftIntegrationWorkflowMap.put(draftIntegrationWorkflow.getUuidAsString(), draftIntegrationWorkflow);
+        }
+
+        for (IntegrationWorkflow publishedIntegrationWorkflow : integrationWorkflowService.getIntegrationWorkflows(
+            id, integrationVersion)) {
+
+            Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(
+                publishedIntegrationWorkflow.getWorkflowId());
+
+            IntegrationWorkflow draftIntegrationWorkflow = draftIntegrationWorkflowMap.remove(
+                publishedIntegrationWorkflow.getUuidAsString());
+
+            if (draftIntegrationWorkflow == null) {
+                integrationWorkflowService.addWorkflow(
+                    id, draftIntegrationVersion, duplicatedWorkflow.getId(), publishedIntegrationWorkflow.getUuid());
+
+                continue;
+            }
+
+            String draftWorkflowId = draftIntegrationWorkflow.getWorkflowId();
+
+            draftIntegrationWorkflow.setWorkflowId(duplicatedWorkflow.getId());
+
+            integrationWorkflowService.update(draftIntegrationWorkflow);
+
+            workflowTestConfigurationService.updateWorkflowId(draftWorkflowId, duplicatedWorkflow.getId());
+            workflowNodeTestOutputService.updateWorkflowId(draftWorkflowId, duplicatedWorkflow.getId());
+
+            deleteWorkflow(draftWorkflowId);
+        }
+
+        for (IntegrationWorkflow draftIntegrationWorkflow : draftIntegrationWorkflowMap.values()) {
+            integrationWorkflowService.delete(List.of(Objects.requireNonNull(draftIntegrationWorkflow.getId())));
+
+            deleteWorkflow(draftIntegrationWorkflow.getWorkflowId());
+        }
+    }
+
+    @Override
     @Audited(event = IntegrationAuditEvents.INTEGRATION_UPDATED, data = {
         @AuditData(key = "integrationId", value = "#integrationDTO.id"),
         @AuditData(key = "name", value = "#integrationDTO.name")
@@ -303,6 +359,16 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         integration.setTags(tags);
 
         integrationService.update(integration);
+    }
+
+    private void deleteWorkflow(String workflowId) {
+        for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+            workflowPreDeleteListener.onWorkflowPreDelete(workflowId);
+        }
+
+        workflowTestConfigurationService.delete(workflowId);
+
+        workflowService.delete(workflowId);
     }
 
     private Category getCategory(Integration integration) {

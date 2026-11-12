@@ -527,6 +527,91 @@ class AutomationProjectFacadeIntTest {
     }
 
     @Test
+    void testRestoreProjectVersionReplacesTheDraftWithThePublishedWorkflows() {
+        long projectId = automationProjectFacade.createProject("Restore", "", null, List.of(), null);
+
+        String workflowUuid = automationProjectFacade.createProjectWorkflow(
+            projectId, "{\"label\":\"Version 1\",\"tasks\":[]}", null);
+
+        automationProjectFacade.publishProject(projectId);
+
+        automationProjectFacade.updateProjectWorkflow(workflowUuid, "Version 2", "");
+
+        String addedWorkflowUuid = automationProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        String draftWorkflowId = getDraftTemplate(projectId, workflowUuid).workflowId();
+        String addedWorkflowId = getDraftTemplate(projectId, addedWorkflowUuid).workflowId();
+        String publishedWorkflowId = getPublishedTemplate(projectId).workflowId();
+
+        automationProjectFacade.restoreProjectVersion(projectId, 1);
+
+        List<ConnectedUserWorkflowTemplateDTO> draftTemplates = automationProjectFacade.getProject(projectId)
+            .workflowTemplates();
+
+        assertThat(draftTemplates)
+            .extracting(ConnectedUserWorkflowTemplateDTO::workflowUuid, ConnectedUserWorkflowTemplateDTO::label)
+            .containsExactly(tuple(workflowUuid, "Version 1"));
+        assertThat(draftTemplates.getFirst()
+            .workflowId()).isNotIn(draftWorkflowId, publishedWorkflowId);
+
+        assertThat(workflowService.fetchWorkflow(draftWorkflowId)).isEmpty();
+        assertThat(workflowService.fetchWorkflow(addedWorkflowId)).isEmpty();
+
+        ConnectedUserWorkflowTemplateDTO publishedTemplate = getPublishedTemplate(projectId);
+
+        assertThat(publishedTemplate.workflowId()).isEqualTo(publishedWorkflowId);
+        assertThat(publishedTemplate.label()).isEqualTo("Version 1");
+    }
+
+    @Test
+    void testRestoreProjectVersionAddsWorkflowsMissingFromTheDraft() {
+        long projectId = automationProjectFacade.createProject("RestoreDeleted", "", null, List.of(), null);
+
+        String workflowUuid = automationProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        automationProjectFacade.publishProject(projectId);
+
+        automationProjectFacade.deleteProjectWorkflow(workflowUuid);
+
+        assertThat(automationProjectFacade.getProject(projectId)
+            .workflowTemplates()).isEmpty();
+
+        automationProjectFacade.restoreProjectVersion(projectId, 1);
+
+        assertThat(automationProjectFacade.getProject(projectId)
+            .workflowTemplates())
+                .extracting(ConnectedUserWorkflowTemplateDTO::workflowUuid)
+                .containsExactly(workflowUuid);
+    }
+
+    @Test
+    void testRestoreProjectVersionRejectsAnUnpublishedVersion() {
+        long projectId = automationProjectFacade.createProject("RestoreDraft", "", null, List.of(), null);
+
+        automationProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        assertThatThrownBy(() -> automationProjectFacade.restoreProjectVersion(projectId, 1))
+            .isInstanceOf(ConfigurationException.class);
+        assertThatThrownBy(() -> automationProjectFacade.restoreProjectVersion(projectId, 5))
+            .isInstanceOf(ConfigurationException.class);
+    }
+
+    @Test
+    void testRestoreProjectVersionRejectsNonAutomationProject() {
+        Project project = new Project();
+
+        project.setName("Plain " + UUID.randomUUID());
+        project.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
+
+        long projectId = projectService.create(project)
+            .getId();
+
+        assertThatThrownBy(() -> automationProjectFacade.restoreProjectVersion(projectId, 1))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("is not an automation project");
+    }
+
+    @Test
     void testUpdateProjectWorkflowAfterPublishEditsTheDraftNotThePublishedVersion() {
         long projectId = automationProjectFacade.createProject("DraftEdit", "", null, List.of(), null);
 
@@ -1091,6 +1176,15 @@ class AutomationProjectFacadeIntTest {
         return automationProjectFacade.getProject(projectId)
             .workflowTemplates()
             .getFirst();
+    }
+
+    private ConnectedUserWorkflowTemplateDTO getDraftTemplate(long projectId, String workflowUuid) {
+        return automationProjectFacade.getProject(projectId)
+            .workflowTemplates()
+            .stream()
+            .filter(template -> workflowUuid.equals(template.workflowUuid()))
+            .findFirst()
+            .orElseThrow();
     }
 
     private ConnectedUserWorkflowTemplateDTO getPublishedTemplate(long projectId) {

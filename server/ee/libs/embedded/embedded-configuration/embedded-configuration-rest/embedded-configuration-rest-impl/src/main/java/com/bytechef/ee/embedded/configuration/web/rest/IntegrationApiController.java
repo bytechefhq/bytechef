@@ -114,6 +114,14 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
+    public ResponseEntity<Void> restoreIntegrationVersion(Long id, Integer integrationVersion) {
+        integrationFacade.restoreIntegrationVersion(id, integrationVersion);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
     public ResponseEntity<Void> updateIntegration(Long id, IntegrationModel integrationModel) {
         integrationFacade.updateIntegration(
             Validate.notNull(

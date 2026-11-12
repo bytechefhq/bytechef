@@ -62,6 +62,7 @@ extend type Mutation {
     updateAutomationProject(id: ID!, name: String!, description: String, category: String, tags: [String!], permissionExpression: String): Boolean!
     deleteAutomationProject(id: ID!): Boolean!
     publishAutomationProject(id: ID!, description: String): Boolean!
+    restoreAutomationProjectVersion(id: ID!, projectVersion: Int!): Boolean!
     createAutomationProjectWorkflow(projectId: ID!, definition: String, permissionExpression: String): ID!
     updateAutomationProjectWorkflow(workflowUuid: ID!, label: String!, description: String): Boolean!
     updateAutomationProjectWorkflowPermissionExpression(workflowUuid: ID!, permissionExpression: String): Boolean!

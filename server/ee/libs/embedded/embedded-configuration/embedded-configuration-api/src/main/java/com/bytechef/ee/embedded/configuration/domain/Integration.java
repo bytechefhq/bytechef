@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
@@ -134,6 +135,12 @@ public final class Integration {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    public Optional<IntegrationVersion> fetchIntegrationVersion(int version) {
+        return integrationVersions.stream()
+            .filter(integrationVersion -> integrationVersion.getVersion() == version)
+            .findFirst();
     }
 
     public Long getCategoryId() {
