@@ -43,6 +43,25 @@ describe('EmbeddedWorkflowBuilder', () => {
         );
     });
 
+    it('leaves connectionDialogAllowed to the token claim when the prop is omitted', () => {
+        const {container} = render(
+            <EmbeddedWorkflowBuilder baseUrl="https://app.example" jwtToken="jwt-1" workflowUuid="uuid-1" />
+        );
+        const postMessage = vi.fn();
+
+        Object.defineProperty(container.querySelector('iframe')!, 'contentWindow', {value: {postMessage}});
+
+        fireFromIframe({type: 'EMBED_READY'});
+
+        expect(postMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                params: expect.objectContaining({connectionDialogAllowed: undefined}),
+                type: 'EMBED_INIT',
+            }),
+            'https://app.example'
+        );
+    });
+
     it('re-sends EMBED_INIT when the token changes after the iframe is ready', () => {
         const {container, rerender} = render(
             <EmbeddedWorkflowBuilder

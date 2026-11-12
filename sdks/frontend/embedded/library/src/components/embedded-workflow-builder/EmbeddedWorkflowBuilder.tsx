@@ -2,6 +2,7 @@
 
 import {useRef} from 'react';
 
+import useConnectionDialogAllowedDeprecation from '../../shared/useConnectionDialogAllowedDeprecation';
 import useEmbedInit from '../../shared/useEmbedInit';
 
 /**
@@ -19,12 +20,14 @@ interface EmbeddedWorkflowBuilderProps {
 
     /**
      * Whether to allow the connection dialog to be shown in the workflow builder.
-     * When true, users can create and manage connections directly in the workflow builder.
      * When false, users can only use existing connections. Those existing connections can be
      * either connections a tenant admin marked as shared inside ByteChef's '/embedded/connections'
      * page or integration connections created via `ConnectDialog`.
+     * @deprecated Set the `connectionDialogAllowed` claim in the embed JWT instead; the server enforces the claim.
+     * Until the prop is removed, `false` still hides the connection dialog, but `true` cannot grant what the token
+     * denies.
      */
-    connectionDialogAllowed: boolean;
+    connectionDialogAllowed?: boolean;
 
     /**
      * The environment to use for the workflow builder.
@@ -73,6 +76,8 @@ const EmbeddedWorkflowBuilder = ({
     workflowUuid,
 }: EmbeddedWorkflowBuilderProps) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
+
+    useConnectionDialogAllowedDeprecation('EmbeddedWorkflowBuilder', connectionDialogAllowed);
 
     useEmbedInit({
         baseUrl,

@@ -32,7 +32,7 @@ describe('AutomationHub', () => {
         expect(postMessage).toHaveBeenCalledWith(
             {
                 params: {
-                    connectionDialogAllowed: true,
+                    connectionDialogAllowed: undefined,
                     defaultLayout: 'grid',
                     editWorkflowAllowed: true,
                     environment: 'STAGING',
