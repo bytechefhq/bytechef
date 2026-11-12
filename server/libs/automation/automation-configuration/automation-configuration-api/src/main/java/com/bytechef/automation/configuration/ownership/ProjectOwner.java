@@ -24,7 +24,8 @@ import java.util.List;
 public enum ProjectOwner {
 
     EMBEDDED_AUTOMATION_PROJECT("automation_project"),
-    EMBEDDED_CONNECTED_USER_PROJECT("connected_user_project");
+    EMBEDDED_CONNECTED_USER_PROJECT("connected_user_project"),
+    EMBEDDED_TRIGGER_SUBSCRIPTION("connected_user_trigger_subscription");
 
     private final List<String> ownerTables;
 

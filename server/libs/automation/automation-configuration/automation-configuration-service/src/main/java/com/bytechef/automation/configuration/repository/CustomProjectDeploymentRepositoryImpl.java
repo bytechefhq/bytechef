@@ -68,6 +68,9 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
                 conditions.add(
                     projectOwnershipService.getSelectProjectDeploymentsCondition(
                         ProjectDeploymentOwner.EMBEDDED, "project_deployment.id"));
+                conditions.add(
+                    projectOwnershipService.getExcludeProjectsCondition(
+                        EnumSet.of(ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION), "project_deployment.project_id"));
             } else {
                 conditions.add(
                     projectOwnershipService.getExcludeProjectDeploymentsCondition(

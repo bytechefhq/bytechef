@@ -114,7 +114,8 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
-    public void delete(Long id) {
+    @Transactional(readOnly = true)
+    public void checkDeletable(Long id) {
         Connection connection = connectionService.getConnection(id);
 
         validateOwnerOrAdmin(connection);
@@ -123,6 +124,11 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
             throw new ConfigurationException(
                 "Connection id=%s is used".formatted(id), ConnectionErrorType.CONNECTION_IS_USED);
         }
+    }
+
+    @Override
+    public void delete(Long id) {
+        checkDeletable(id);
 
         connectionService.delete(id);
     }

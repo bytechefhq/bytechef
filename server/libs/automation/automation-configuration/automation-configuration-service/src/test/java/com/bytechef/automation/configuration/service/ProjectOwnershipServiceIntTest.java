@@ -502,7 +502,9 @@ public class ProjectOwnershipServiceIntTest {
     public void testAfterSingletonsInstantiatedThrowsWhenTheEnterpriseEditionLacksEmbeddedContributors() {
         ProjectOwnershipServiceImpl projectOwnershipServiceImpl = new ProjectOwnershipServiceImpl(
             jdbcClient, List.of(deploymentOwnerContributor(ProjectDeploymentOwner.API_COLLECTION)),
-            List.of(projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)), true);
+            List.of(projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT),
+                projectOwnerContributor(ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION)),
+            true);
 
         assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
             .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
@@ -524,7 +526,7 @@ public class ProjectOwnershipServiceIntTest {
                 .isInstanceOfSatisfying(OwnerContributorMissingException.class, exception -> {
                     assertThat(exception.getProjectOwners())
                         .containsExactly(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT,
-                            ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT);
+                            ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT, ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION);
                     assertThat(exception.getProjectDeploymentOwners())
                         .containsExactly(ProjectDeploymentOwner.EMBEDDED, ProjectDeploymentOwner.MCP_SERVER);
                 });
@@ -539,7 +541,8 @@ public class ProjectOwnershipServiceIntTest {
             jdbcClient, List.of(deploymentOwnerContributor(ProjectDeploymentOwner.EMBEDDED)),
             List.of(
                 projectOwnerContributor(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT),
-                projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)),
+                projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT),
+                projectOwnerContributor(ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION)),
             true);
 
         assertThatCode(projectOwnershipServiceImpl::afterSingletonsInstantiated).doesNotThrowAnyException();
@@ -723,7 +726,8 @@ public class ProjectOwnershipServiceIntTest {
                     deploymentOwnerContributor(ProjectDeploymentOwner.MCP_SERVER)),
                 List.of(
                     projectOwnerContributor(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT),
-                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION)),
                 true);
 
             assertThatThrownBy(projectOwnershipServiceImpl::afterSingletonsInstantiated)
@@ -750,7 +754,8 @@ public class ProjectOwnershipServiceIntTest {
                     deploymentOwnerContributor(ProjectDeploymentOwner.MCP_SERVER)),
                 List.of(
                     projectOwnerContributor(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT),
-                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION)),
                 true);
 
             assertThatCode(projectOwnershipServiceImpl::afterSingletonsInstantiated).doesNotThrowAnyException();
@@ -771,7 +776,8 @@ public class ProjectOwnershipServiceIntTest {
                     deploymentOwnerContributor(ProjectDeploymentOwner.MCP_SERVER)),
                 List.of(
                     projectOwnerContributor(ProjectOwner.EMBEDDED_AUTOMATION_PROJECT),
-                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT)),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_CONNECTED_USER_PROJECT),
+                    projectOwnerContributor(ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION)),
                 true)
                     .afterSingletonsInstantiated();
 
