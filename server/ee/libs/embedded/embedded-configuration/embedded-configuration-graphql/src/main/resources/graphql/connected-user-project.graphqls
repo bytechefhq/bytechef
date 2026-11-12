@@ -77,6 +77,13 @@ type ProvisionableConnectedUserProjectWorkflow {
     inputs: [ProvisionableConnectedUserProjectWorkflowInputDefinition!]!
     provisioned: Boolean!
     dangling: Boolean!
+    components: [ProvisionableConnectedUserProjectWorkflowComponent!]!
+}
+
+type ProvisionableConnectedUserProjectWorkflowComponent {
+    name: String!
+    title: String
+    icon: String
 }
 
 type ProvisionableConnectedUserProjectWorkflowInputDefinition {
@@ -89,4 +96,10 @@ type ProvisionableConnectedUserProjectWorkflowInputDefinition {
 input ProvisionConnectedUserProjectWorkflowInput {
     workflowUuid: ID!
     inputs: Map
+    connections: [ProvisionConnectedUserProjectWorkflowConnectionInput!]
+}
+
+input ProvisionConnectedUserProjectWorkflowConnectionInput {
+    componentName: String!
+    connectionId: ID!
 }

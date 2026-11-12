@@ -19,14 +19,18 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
@@ -95,6 +99,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -146,6 +151,9 @@ class ConnectedUserProjectAdminFacadeIntTest {
 
     @Autowired
     private ConnectedUserProjectWorkflowRepository connectedUserProjectWorkflowRepository;
+
+    @Autowired
+    private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     private static final AtomicLong NEXT_CONNECTION_ID = new AtomicLong(1000L);
 
@@ -503,6 +511,126 @@ class ConnectedUserProjectAdminFacadeIntTest {
 
         assertThat(needsConnectionWorkflow.attentionReason())
             .isEqualTo(ConnectedUserReferenceAttentionResolver.MISSING_CONNECTION_PREFIX + "slack");
+    }
+
+    @Test
+    void testGetProvisionableProjectsListsTheComponentsAWorkflowNeedsAConnectionFor() {
+        givenSlackAutomationEnvironment();
+
+        ComponentDefinition slackComponentDefinition = mock(ComponentDefinition.class);
+
+        when(slackComponentDefinition.getName()).thenReturn("slack");
+        when(slackComponentDefinition.getTitle()).thenReturn("Slack");
+        when(slackComponentDefinition.isConnectionRequired()).thenReturn(true);
+        when(componentDefinitionService.fetchComponentDefinition(eq("slack"), anyInt()))
+            .thenReturn(Optional.of(slackComponentDefinition));
+
+        long projectId = createProjectWithDefinition("Provisionable Components", SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(projectId);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        ProvisionableAutomationProjectDTO provisionableProject = findProvisionableProject(
+            connectedUserProjectAdminFacade.getProvisionableProjects(connectedUser.getId()), projectId);
+
+        assertThat(provisionableProject.workflows())
+            .singleElement()
+            .satisfies(workflow -> assertThat(workflow.components())
+                .extracting(ConnectedUserWorkflowTemplateDTO.Component::name,
+                    ConnectedUserWorkflowTemplateDTO.Component::title)
+                .containsExactly(tuple("slack", "Slack")));
+    }
+
+    @Test
+    void testGetProvisionableProjectsOmitsTheConnectionsAndInputsTheConfigurationProvides() {
+        givenSlackAutomationEnvironment();
+
+        ComponentDefinition slackComponentDefinition = mock(ComponentDefinition.class);
+
+        when(slackComponentDefinition.getName()).thenReturn("slack");
+        when(slackComponentDefinition.getTitle()).thenReturn("Slack");
+        when(slackComponentDefinition.isConnectionRequired()).thenReturn(true);
+        when(componentDefinitionService.fetchComponentDefinition(eq("slack"), anyInt()))
+            .thenReturn(Optional.of(slackComponentDefinition));
+
+        long projectId = createProjectWithDefinition("Provisionable Provided", CHANNEL_INPUT_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(projectId);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        long administratorConnectionId = NEXT_CONNECTION_ID.getAndIncrement();
+        Connection administratorConnection = new Connection();
+
+        administratorConnection.setComponentName("slack");
+        administratorConnection.setEnvironmentId(Environment.PRODUCTION.ordinal());
+        administratorConnection.setId(administratorConnectionId);
+        administratorConnection.setType(PlatformType.EMBEDDED);
+
+        when(connectionService.fetchConnection(administratorConnectionId))
+            .thenReturn(Optional.of(administratorConnection));
+
+        String workflowUuid = findPublishedProject(connectedUser, projectId).workflowTemplates()
+            .getFirst()
+            .workflowUuid();
+
+        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            getConfigurationId(projectId), workflowUuid, Map.of("slack", administratorConnectionId),
+            Map.of("channel", "#provided"));
+
+        ProvisionableAutomationProjectDTO provisionableProject = findProvisionableProject(
+            connectedUserProjectAdminFacade.getProvisionableProjects(connectedUser.getId()), projectId);
+
+        assertThat(provisionableProject.workflows())
+            .singleElement()
+            .satisfies(workflow -> {
+                assertThat(workflow.components()).isEmpty();
+                assertThat(workflow.inputs()).isEmpty();
+            });
+    }
+
+    @Test
+    void testProvisionProjectWorkflowsWiresTheConnectionChosenForAComponent() {
+        givenSlackAutomationEnvironment();
+
+        long projectId = createProjectWithDefinition("Provision Chosen Connection", SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(projectId);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        long connectedUserId = Objects.requireNonNull(connectedUser.getId());
+        long chosenConnectionId = connectedUserConnectionService.getConnectionIds(connectedUserId)
+            .getFirst();
+        long newerConnectionId = NEXT_CONNECTION_ID.getAndIncrement();
+
+        registerEmbeddedConnection(newerConnectionId, Environment.PRODUCTION);
+
+        connectedUserConnectionService.create(connectedUserId, newerConnectionId);
+
+        String workflowUuid = findPublishedProject(connectedUser, projectId).workflowTemplates()
+            .getFirst()
+            .workflowUuid();
+
+        connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUserId, getConfigurationId(projectId),
+            List.of(
+                new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null, Map.of("slack", chosenConnectionId))));
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade
+            .getConnectedUserWorkflows(connectedUserId)
+            .stream()
+            .filter(
+                connectedUserProjectWorkflow -> workflowUuid.equals(connectedUserProjectWorkflow.getAutomationUuid()))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(
+            Objects.requireNonNull(reference.getProjectDeploymentId())))
+                .flatExtracting(ProjectDeploymentWorkflow::getConnections)
+                .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+                .containsExactly(chosenConnectionId);
     }
 
     @Test

@@ -57,6 +57,6 @@ public record ProvisionableAutomationProjectDTO(
     @SuppressFBWarnings("EI")
     public record Workflow(
         String workflowUuid, String label, List<ConnectedUserWorkflowTemplateDTO.Input> inputs, boolean provisioned,
-        boolean dangling) {
+        boolean dangling, List<ConnectedUserWorkflowTemplateDTO.Component> components) {
     }
 }
