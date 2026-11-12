@@ -1330,6 +1330,13 @@ export type ConnectedUserProjectsQueryVariables = Exact<{
 
 export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, automationUuid: string | null, connectedUserId: string, copiedFromWorkflowUuid: string | null, enabled: boolean, lastExecutionDate: string | null, projectId: string, staticWebhookUrl: string | null, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }>, automationProjectConfigurations: Array<{ projectId: string, configurationId: string, configurationName: string, configurationProjectVersion: number }> }> };
 
+export type ConnectedUserTriggerSubscriptionsQueryVariables = Exact<{
+  connectedUserId: string | number;
+}>;
+
+
+export type ConnectedUserTriggerSubscriptionsQuery = { connectedUserTriggerSubscriptions: Array<{ componentName: string, componentVersion: number, createdDate: any, errorCode: string | null, errorMessage: string | null, externalId: string | null, id: string, lastDeliveryError: string | null, lastDeliveryStatus: string | null, lastEventDate: any, name: string | null, staticWebhookUrl: string | null, status: Types.TriggerSubscriptionStatus, triggerName: string, webhookUrl: string | null }> };
+
 export type CreateAutomationProjectConfigurationMutationVariables = Exact<{
   projectId: string | number;
   environmentId: string | number;
@@ -1422,6 +1429,13 @@ export type DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables =
 
 export type DeleteMcpIntegrationInstanceConfigurationWorkflowMutation = { deleteMcpIntegrationInstanceConfigurationWorkflow: boolean | null };
 
+export type DeleteTriggerSubscriptionMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteTriggerSubscriptionMutation = { deleteTriggerSubscription: boolean | null };
+
 export type DuplicateAutomationProjectMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -1501,6 +1515,14 @@ export type EnableConnectedUserProjectWorkflowMutationVariables = Exact<{
 
 
 export type EnableConnectedUserProjectWorkflowMutation = { enableConnectedUserProjectWorkflow: boolean | null };
+
+export type EnableTriggerSubscriptionMutationVariables = Exact<{
+  id: string | number;
+  enable: boolean;
+}>;
+
+
+export type EnableTriggerSubscriptionMutation = { enableTriggerSubscription: boolean | null };
 
 export type IntegrationVersionWorkflowChangeQueryVariables = Exact<{
   integrationId: string | number;
@@ -1613,6 +1635,20 @@ export type ProvisionableConnectedUserProjectsQueryVariables = Exact<{
 
 export type ProvisionableConnectedUserProjectsQuery = { provisionableConnectedUserProjects: Array<{ projectId: string, name: string, projectVersion: number, assignedConfigurationId: string | null, workflows: Array<{ workflowUuid: string, label: string | null, provisioned: boolean, dangling: boolean, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean }> }>, configurations: Array<{ id: string, name: string, projectVersion: number, selfServe: boolean, workflows: Array<{ workflowUuid: string, label: string | null, provisioned: boolean, dangling: boolean, inputs: Array<{ name: string, label: string | null, type: string | null, required: boolean }> }> }> }> };
 
+export type RotateTriggerSubscriptionWebhookSecretMutationVariables = Exact<{
+  environmentId: string | number;
+}>;
+
+
+export type RotateTriggerSubscriptionWebhookSecretMutation = { rotateTriggerSubscriptionWebhookSecret: { signingSecret: string | null, webhookUrl: string | null } };
+
+export type SendTriggerSubscriptionTestEventMutationVariables = Exact<{
+  environmentId: string | number;
+}>;
+
+
+export type SendTriggerSubscriptionTestEventMutation = { sendTriggerSubscriptionTestEvent: { error: string | null, statusCode: number | null, success: boolean } };
+
 export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables = Exact<{
   integrationInstanceConfigurationId: string | number;
 }>;
@@ -1627,6 +1663,13 @@ export type ToolEligibleIntegrationVersionWorkflowsQueryVariables = Exact<{
 
 
 export type ToolEligibleIntegrationVersionWorkflowsQuery = { toolEligibleIntegrationVersionWorkflows: Array<{ id: string, integrationWorkflowId: string, label: string }> };
+
+export type TriggerSubscriptionWebhookSettingsQueryVariables = Exact<{
+  environmentId: string | number;
+}>;
+
+
+export type TriggerSubscriptionWebhookSettingsQuery = { triggerSubscriptionWebhookSettings: { signingSecret: string | null, webhookUrl: string | null } };
 
 export type UpdateAutomationProjectConfigurationMutationVariables = Exact<{
   id: string | number;
@@ -1729,6 +1772,14 @@ export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables =
 
 
 export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutation = { updateMcpIntegrationInstanceConfigurationWorkflow: { id: string, enabled: boolean, mcpIntegrationInstanceConfigurationId: any, integrationInstanceConfigurationWorkflowId: any, parameters: any } | null };
+
+export type UpdateTriggerSubscriptionWebhookUrlMutationVariables = Exact<{
+  environmentId: string | number;
+  webhookUrl: string;
+}>;
+
+
+export type UpdateTriggerSubscriptionWebhookUrlMutation = { updateTriggerSubscriptionWebhookUrl: { signingSecret: string | null, webhookUrl: string | null } };
 
 export type UpgradeAutomationProjectConfigurationConnectedUsersMutationVariables = Exact<{
   targetId: string | number;
@@ -7282,6 +7333,44 @@ export const useConnectedUserProjectsQuery = <
   }
     )};
 
+export const ConnectedUserTriggerSubscriptionsDocument = new TypedDocumentString(`
+    query connectedUserTriggerSubscriptions($connectedUserId: ID!) {
+  connectedUserTriggerSubscriptions(connectedUserId: $connectedUserId) {
+    componentName
+    componentVersion
+    createdDate
+    errorCode
+    errorMessage
+    externalId
+    id
+    lastDeliveryError
+    lastDeliveryStatus
+    lastEventDate
+    name
+    staticWebhookUrl
+    status
+    triggerName
+    webhookUrl
+  }
+}
+    `);
+
+export const useConnectedUserTriggerSubscriptionsQuery = <
+      TData = ConnectedUserTriggerSubscriptionsQuery,
+      TError = unknown
+    >(
+      variables: ConnectedUserTriggerSubscriptionsQueryVariables,
+      options?: Omit<UseQueryOptions<ConnectedUserTriggerSubscriptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectedUserTriggerSubscriptionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ConnectedUserTriggerSubscriptionsQuery, TError, TData>(
+      {
+    queryKey: ['connectedUserTriggerSubscriptions', variables],
+    queryFn: fetcher<ConnectedUserTriggerSubscriptionsQuery, ConnectedUserTriggerSubscriptionsQueryVariables>(ConnectedUserTriggerSubscriptionsDocument, variables),
+    ...options
+  }
+    )};
+
 export const CreateAutomationProjectConfigurationDocument = new TypedDocumentString(`
     mutation createAutomationProjectConfiguration($projectId: ID!, $environmentId: ID!, $name: String!, $permissionExpression: String, $projectVersion: Int!, $enabled: Boolean!, $automationHubVisible: Boolean!) {
   createAutomationProjectConfiguration(
@@ -7540,6 +7629,25 @@ export const useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation = <
       {
     mutationKey: ['deleteMcpIntegrationInstanceConfigurationWorkflow'],
     mutationFn: (variables?: DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables) => fetcher<DeleteMcpIntegrationInstanceConfigurationWorkflowMutation, DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables>(DeleteMcpIntegrationInstanceConfigurationWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteTriggerSubscriptionDocument = new TypedDocumentString(`
+    mutation deleteTriggerSubscription($id: ID!) {
+  deleteTriggerSubscription(id: $id)
+}
+    `);
+
+export const useDeleteTriggerSubscriptionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteTriggerSubscriptionMutation, TError, DeleteTriggerSubscriptionMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteTriggerSubscriptionMutation, TError, DeleteTriggerSubscriptionMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteTriggerSubscription'],
+    mutationFn: (variables?: DeleteTriggerSubscriptionMutationVariables) => fetcher<DeleteTriggerSubscriptionMutation, DeleteTriggerSubscriptionMutationVariables>(DeleteTriggerSubscriptionDocument, variables)(),
     ...options
   }
     )};
@@ -7828,6 +7936,25 @@ export const useEnableConnectedUserProjectWorkflowMutation = <
       {
     mutationKey: ['enableConnectedUserProjectWorkflow'],
     mutationFn: (variables?: EnableConnectedUserProjectWorkflowMutationVariables) => fetcher<EnableConnectedUserProjectWorkflowMutation, EnableConnectedUserProjectWorkflowMutationVariables>(EnableConnectedUserProjectWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnableTriggerSubscriptionDocument = new TypedDocumentString(`
+    mutation enableTriggerSubscription($id: ID!, $enable: Boolean!) {
+  enableTriggerSubscription(id: $id, enable: $enable)
+}
+    `);
+
+export const useEnableTriggerSubscriptionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableTriggerSubscriptionMutation, TError, EnableTriggerSubscriptionMutationVariables, TContext>) => {
+    
+    return useMutation<EnableTriggerSubscriptionMutation, TError, EnableTriggerSubscriptionMutationVariables, TContext>(
+      {
+    mutationKey: ['enableTriggerSubscription'],
+    mutationFn: (variables?: EnableTriggerSubscriptionMutationVariables) => fetcher<EnableTriggerSubscriptionMutation, EnableTriggerSubscriptionMutationVariables>(EnableTriggerSubscriptionDocument, variables)(),
     ...options
   }
     )};
@@ -8363,6 +8490,51 @@ export const useProvisionableConnectedUserProjectsQuery = <
   }
     )};
 
+export const RotateTriggerSubscriptionWebhookSecretDocument = new TypedDocumentString(`
+    mutation rotateTriggerSubscriptionWebhookSecret($environmentId: ID!) {
+  rotateTriggerSubscriptionWebhookSecret(environmentId: $environmentId) {
+    signingSecret
+    webhookUrl
+  }
+}
+    `);
+
+export const useRotateTriggerSubscriptionWebhookSecretMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RotateTriggerSubscriptionWebhookSecretMutation, TError, RotateTriggerSubscriptionWebhookSecretMutationVariables, TContext>) => {
+    
+    return useMutation<RotateTriggerSubscriptionWebhookSecretMutation, TError, RotateTriggerSubscriptionWebhookSecretMutationVariables, TContext>(
+      {
+    mutationKey: ['rotateTriggerSubscriptionWebhookSecret'],
+    mutationFn: (variables?: RotateTriggerSubscriptionWebhookSecretMutationVariables) => fetcher<RotateTriggerSubscriptionWebhookSecretMutation, RotateTriggerSubscriptionWebhookSecretMutationVariables>(RotateTriggerSubscriptionWebhookSecretDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const SendTriggerSubscriptionTestEventDocument = new TypedDocumentString(`
+    mutation sendTriggerSubscriptionTestEvent($environmentId: ID!) {
+  sendTriggerSubscriptionTestEvent(environmentId: $environmentId) {
+    error
+    statusCode
+    success
+  }
+}
+    `);
+
+export const useSendTriggerSubscriptionTestEventMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SendTriggerSubscriptionTestEventMutation, TError, SendTriggerSubscriptionTestEventMutationVariables, TContext>) => {
+    
+    return useMutation<SendTriggerSubscriptionTestEventMutation, TError, SendTriggerSubscriptionTestEventMutationVariables, TContext>(
+      {
+    mutationKey: ['sendTriggerSubscriptionTestEvent'],
+    mutationFn: (variables?: SendTriggerSubscriptionTestEventMutationVariables) => fetcher<SendTriggerSubscriptionTestEventMutation, SendTriggerSubscriptionTestEventMutationVariables>(SendTriggerSubscriptionTestEventDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const ToolEligibleIntegrationInstanceConfigurationWorkflowsDocument = new TypedDocumentString(`
     query toolEligibleIntegrationInstanceConfigurationWorkflows($integrationInstanceConfigurationId: ID!) {
   toolEligibleIntegrationInstanceConfigurationWorkflows(
@@ -8416,6 +8588,31 @@ export const useToolEligibleIntegrationVersionWorkflowsQuery = <
       {
     queryKey: ['toolEligibleIntegrationVersionWorkflows', variables],
     queryFn: fetcher<ToolEligibleIntegrationVersionWorkflowsQuery, ToolEligibleIntegrationVersionWorkflowsQueryVariables>(ToolEligibleIntegrationVersionWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const TriggerSubscriptionWebhookSettingsDocument = new TypedDocumentString(`
+    query triggerSubscriptionWebhookSettings($environmentId: ID!) {
+  triggerSubscriptionWebhookSettings(environmentId: $environmentId) {
+    signingSecret
+    webhookUrl
+  }
+}
+    `);
+
+export const useTriggerSubscriptionWebhookSettingsQuery = <
+      TData = TriggerSubscriptionWebhookSettingsQuery,
+      TError = unknown
+    >(
+      variables: TriggerSubscriptionWebhookSettingsQueryVariables,
+      options?: Omit<UseQueryOptions<TriggerSubscriptionWebhookSettingsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TriggerSubscriptionWebhookSettingsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<TriggerSubscriptionWebhookSettingsQuery, TError, TData>(
+      {
+    queryKey: ['triggerSubscriptionWebhookSettings', variables],
+    queryFn: fetcher<TriggerSubscriptionWebhookSettingsQuery, TriggerSubscriptionWebhookSettingsQueryVariables>(TriggerSubscriptionWebhookSettingsDocument, variables),
     ...options
   }
     )};
@@ -8707,6 +8904,31 @@ export const useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation = <
       {
     mutationKey: ['updateMcpIntegrationInstanceConfigurationWorkflow'],
     mutationFn: (variables?: UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables) => fetcher<UpdateMcpIntegrationInstanceConfigurationWorkflowMutation, UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables>(UpdateMcpIntegrationInstanceConfigurationWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateTriggerSubscriptionWebhookUrlDocument = new TypedDocumentString(`
+    mutation updateTriggerSubscriptionWebhookUrl($environmentId: ID!, $webhookUrl: String!) {
+  updateTriggerSubscriptionWebhookUrl(
+    environmentId: $environmentId
+    webhookUrl: $webhookUrl
+  ) {
+    signingSecret
+    webhookUrl
+  }
+}
+    `);
+
+export const useUpdateTriggerSubscriptionWebhookUrlMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateTriggerSubscriptionWebhookUrlMutation, TError, UpdateTriggerSubscriptionWebhookUrlMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateTriggerSubscriptionWebhookUrlMutation, TError, UpdateTriggerSubscriptionWebhookUrlMutationVariables, TContext>(
+      {
+    mutationKey: ['updateTriggerSubscriptionWebhookUrl'],
+    mutationFn: (variables?: UpdateTriggerSubscriptionWebhookUrlMutationVariables) => fetcher<UpdateTriggerSubscriptionWebhookUrlMutation, UpdateTriggerSubscriptionWebhookUrlMutationVariables>(UpdateTriggerSubscriptionWebhookUrlDocument, variables)(),
     ...options
   }
     )};
