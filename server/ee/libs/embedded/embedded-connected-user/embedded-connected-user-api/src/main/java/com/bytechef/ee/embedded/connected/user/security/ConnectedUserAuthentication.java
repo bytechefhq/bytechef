@@ -25,4 +25,11 @@ public interface ConnectedUserAuthentication extends NonPlatformUserAuthenticati
     default boolean apiKeyAuthenticated() {
         return false;
     }
+
+    /**
+     * Returns the {@code connectionDialogAllowed} claim of the embed JWT, {@code true} when the token has none.
+     */
+    default boolean connectionDialogAllowed() {
+        return true;
+    }
 }

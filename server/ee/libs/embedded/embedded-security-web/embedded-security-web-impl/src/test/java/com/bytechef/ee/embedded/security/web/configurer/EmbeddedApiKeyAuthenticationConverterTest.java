@@ -314,6 +314,54 @@ class EmbeddedApiKeyAuthenticationConverterTest {
     }
 
     @Test
+    void testConvertWithJwtTokenWithoutConnectionDialogAllowedClaimAllowsTheConnectionDialog()
+        throws NoSuchAlgorithmException {
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) convertWithJwt(
+            "user-a", "/api/embedded/v1/connections");
+
+        assertThat(token.connectionDialogAllowed()).isTrue();
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {
+        false, true
+    })
+    void testConvertWithJwtTokenWithConnectionDialogAllowedClaimCarriesTheClaim(boolean connectionDialogAllowed)
+        throws NoSuchAlgorithmException {
+
+        String jwtToken = createJwtWithConnectionDialogAllowedClaim(connectionDialogAllowed);
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) convertWithJwt(
+            jwtToken, "/api/embedded/v1/connections", "PRODUCTION");
+
+        assertThat(token.connectionDialogAllowed()).isEqualTo(connectionDialogAllowed);
+    }
+
+    @Test
+    void testConvertWithJwtTokenWithNonBooleanConnectionDialogAllowedClaimThrowsBadCredentialsException()
+        throws NoSuchAlgorithmException {
+
+        String jwtToken = createJwtWithConnectionDialogAllowedClaim("false");
+
+        assertThatThrownBy(() -> convertWithJwt(jwtToken, "/api/embedded/v1/connections", "PRODUCTION"))
+            .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenAllowsTheConnectionDialog() {
+        String tenantKey = EncodingUtils.base64EncodeToString("test-tenant:randomData");
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI()).thenReturn("/api/embedded/v1/user123/connections");
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) converter.convert(request);
+
+        assertThat(token.connectionDialogAllowed()).isTrue();
+    }
+
+    @Test
     void testConvertWithJwtTokenWithWrongSignatureThrowsBadCredentialsException() throws NoSuchAlgorithmException {
         KeyPair keyPair = generateKeyPair();
 
@@ -538,6 +586,23 @@ class EmbeddedApiKeyAuthenticationConverterTest {
             .subject(subject)
             .claim(JwtTokenService.ENVIRONMENT_ID_CLAIM, environmentIdClaim)
             .claim("integrationId", 1L)
+            .signWith(keyPair.getPrivate())
+            .compact();
+    }
+
+    private String createJwtWithConnectionDialogAllowedClaim(Object connectionDialogAllowedClaim)
+        throws NoSuchAlgorithmException {
+
+        KeyPair keyPair = generateKeyPair();
+
+        when(signingKeyService.getPublicKey(anyString(), anyLong())).thenReturn(keyPair.getPublic());
+
+        return Jwts.builder()
+            .header()
+            .keyId(EncodingUtils.base64EncodeToString(JWT_TENANT_ID + ":keyId"))
+            .and()
+            .subject("user-a")
+            .claim(JwtTokenService.CONNECTION_DIALOG_ALLOWED_CLAIM, connectionDialogAllowedClaim)
             .signWith(keyPair.getPrivate())
             .compact();
     }

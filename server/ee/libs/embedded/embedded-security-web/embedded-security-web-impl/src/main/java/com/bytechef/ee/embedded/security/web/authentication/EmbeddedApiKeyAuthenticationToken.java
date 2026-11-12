@@ -24,6 +24,7 @@ public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticat
     implements ConnectedUserAuthentication {
 
     private boolean apiKeyAuthenticated;
+    private boolean connectionDialogAllowed = true;
     private long connectedUserId;
     private String externalUserId;
     private String secretKey;
@@ -31,8 +32,16 @@ public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticat
     public EmbeddedApiKeyAuthenticationToken(
         long environmentId, String externalUserId, String secretKey, String tenantId) {
 
+        this(environmentId, externalUserId, secretKey, tenantId, true);
+    }
+
+    public EmbeddedApiKeyAuthenticationToken(
+        long environmentId, String externalUserId, String secretKey, String tenantId,
+        boolean connectionDialogAllowed) {
+
         super(environmentId, tenantId);
 
+        this.connectionDialogAllowed = connectionDialogAllowed;
         this.externalUserId = externalUserId;
         this.secretKey = secretKey;
     }
@@ -43,20 +52,33 @@ public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticat
         this(environmentId, connectedUserId, user, apiKeyAuthenticated, null);
     }
 
-    @SuppressFBWarnings("EI")
     public EmbeddedApiKeyAuthenticationToken(
         long environmentId, long connectedUserId, User user, boolean apiKeyAuthenticated, @Nullable Long apiKeyId) {
+
+        this(environmentId, connectedUserId, user, apiKeyAuthenticated, apiKeyId, true);
+    }
+
+    @SuppressFBWarnings("EI")
+    public EmbeddedApiKeyAuthenticationToken(
+        long environmentId, long connectedUserId, User user, boolean apiKeyAuthenticated, @Nullable Long apiKeyId,
+        boolean connectionDialogAllowed) {
 
         super(environmentId, user, apiKeyId);
 
         this.apiKeyAuthenticated = apiKeyAuthenticated;
         this.connectedUserId = connectedUserId;
+        this.connectionDialogAllowed = connectionDialogAllowed;
         this.externalUserId = user.getUsername();
     }
 
     @Override
     public boolean apiKeyAuthenticated() {
         return apiKeyAuthenticated;
+    }
+
+    @Override
+    public boolean connectionDialogAllowed() {
+        return connectionDialogAllowed;
     }
 
     @Override

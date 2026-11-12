@@ -67,7 +67,7 @@ public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvi
 
         return new EmbeddedApiKeyAuthenticationToken(
             environmentId, connectedUser.getId(), createSpringSecurityUser(externalUserId, connectedUser),
-            secretKey != null, apiKeyId);
+            secretKey != null, apiKeyId, embeddedApiKeyAuthenticationToken.connectionDialogAllowed());
     }
 
     private ConnectedUser createConnectedUser(String externalUserId, long environmentId) {
