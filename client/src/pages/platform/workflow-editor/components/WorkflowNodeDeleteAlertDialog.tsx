@@ -10,6 +10,7 @@ interface WorkflowNodeDeleteAlertDialogProps {
 
 const WorkflowNodeDeleteAlertDialog = ({nodeLabel, onCancel, onConfirm, open}: WorkflowNodeDeleteAlertDialogProps) => (
     <AlertDialog
+        autoFocusConfirm
         cancelLabel="Keep node"
         confirmIcon={<Trash2Icon />}
         confirmLabel="Delete node"
