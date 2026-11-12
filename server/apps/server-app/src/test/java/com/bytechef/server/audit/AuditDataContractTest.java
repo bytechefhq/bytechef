@@ -142,6 +142,8 @@ class AuditDataContractTest {
         Map.entry("McpServerFacadeImpl.updateMcpTool", DELEGATES),
         Map.entry("ProjectCodeWorkflowFacadeImpl.save", DEFINITION_EDIT),
         Map.entry("ProjectTagFacadeImpl.updateProjectTags", TAGS),
+        Map.entry("TriggerSubscriptionAdminFacadeImpl.deleteConnectedUserTriggerSubscriptions", RECORDED_BY_CALLER),
+        Map.entry("TriggerSubscriptionAdminFacadeImpl.disableConnectedUserTriggerSubscriptions", RECORDED_BY_CALLER),
         Map.entry("WorkspaceApiKeyFacadeImpl.create", DELEGATES),
         Map.entry("WorkspaceApiKeyFacadeImpl.delete", DELEGATES),
         Map.entry("WorkspaceMcpServerFacadeImpl.createWorkspaceMcpServer", DELEGATES),

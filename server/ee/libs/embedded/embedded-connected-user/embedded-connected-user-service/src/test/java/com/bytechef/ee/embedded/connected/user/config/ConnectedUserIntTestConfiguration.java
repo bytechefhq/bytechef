@@ -44,6 +44,11 @@ public class ConnectedUserIntTestConfiguration {
     }
 
     @Bean
+    ProjectOwnerContributor embeddedTriggerSubscriptionProjectOwnerContributor() {
+        return ProjectOwnerContributor.of(ProjectOwner.EMBEDDED_TRIGGER_SUBSCRIPTION, MATCH_NOTHING);
+    }
+
+    @Bean
     ProjectDeploymentOwnerContributor embeddedProjectDeploymentOwnerContributor() {
         return ProjectDeploymentOwnerContributor.of(ProjectDeploymentOwner.EMBEDDED, MATCH_NOTHING);
     }

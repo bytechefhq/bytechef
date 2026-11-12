@@ -17,6 +17,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.ee.embedded.configuration.facade.TriggerSubscriptionAdminFacade;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -85,7 +86,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @MockitoBean(types = {
     ConnectedUserConnectionService.class, ConnectedUserProjectFacade.class, ConnectionFacade.class,
     ConnectionService.class, EnvironmentService.class, IntegrationInstanceFacade.class,
-    IntegrationInstanceService.class, IntegrationInstanceConfigurationService.class, IntegrationService.class
+    IntegrationInstanceService.class, IntegrationInstanceConfigurationService.class, IntegrationService.class,
+    TriggerSubscriptionAdminFacade.class
 })
 class ConnectedUserFacadeAuditIntTest {
 

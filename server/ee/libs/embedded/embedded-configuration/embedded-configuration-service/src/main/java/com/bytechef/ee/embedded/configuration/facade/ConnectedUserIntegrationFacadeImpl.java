@@ -25,6 +25,7 @@ import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigur
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscriptionDisableReason;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
@@ -131,6 +132,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     private final OAuth2Service oAuth2Service;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
+    private final TriggerSubscriptionManager triggerSubscriptionManager;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -153,7 +155,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
         McpToolService mcpToolService, OAuth2ParametersFacade oAuth2ParametersFacade, OAuth2Service oAuth2Service,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
-        IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService) {
+        IntegrationWorkflowService integrationWorkflowService, TriggerSubscriptionManager triggerSubscriptionManager,
+        WorkflowService workflowService) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
@@ -181,6 +184,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         this.oAuth2Service = oAuth2Service;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationWorkflowService = integrationWorkflowService;
+        this.triggerSubscriptionManager = triggerSubscriptionManager;
         this.workflowService = workflowService;
     }
 
@@ -241,6 +245,9 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             throw new AccessDeniedException(
                 "Integration instance " + integrationInstanceId + " is not owned by the connected user");
         }
+
+        triggerSubscriptionManager.disableByIntegrationInstanceId(
+            integrationInstanceId, TriggerSubscriptionDisableReason.INTEGRATION_INSTANCE_DELETED);
 
         if (integrationInstance.isEnabled()) {
             disableIntegrationInstanceWorkflows(integrationInstanceId);

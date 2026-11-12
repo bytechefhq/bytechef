@@ -71,6 +71,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
     private final TagService tagService;
+    private final TriggerSubscriptionManager triggerSubscriptionManager;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserConnectionFacadeImpl(
@@ -79,7 +80,8 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         ConnectionDefinitionService connectionDefinitionService, ConnectionFacade connectionFacade,
         ConnectionService connectionService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
-        IntegrationInstanceService integrationInstanceService, TagService tagService) {
+        IntegrationInstanceService integrationInstanceService, TagService tagService,
+        TriggerSubscriptionManager triggerSubscriptionManager) {
 
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectedUserConnectionService = connectedUserConnectionService;
@@ -90,6 +92,7 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
         this.tagService = tagService;
+        this.triggerSubscriptionManager = triggerSubscriptionManager;
     }
 
     @Override
@@ -144,6 +147,10 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     @PreAuthorize("isTenantAdmin() or isCurrentConnectedUser(#connectedUserId)")
     public void deleteConnectedUserConnection(long connectedUserId, long connectionId) {
         requireOwned(connectedUserId, connectionId);
+
+        connectionFacade.checkDeletable(connectionId);
+
+        triggerSubscriptionManager.deleteByConnectionId(connectionId);
 
         connectedUserConnectionService.deleteByConnectionId(connectionId);
 

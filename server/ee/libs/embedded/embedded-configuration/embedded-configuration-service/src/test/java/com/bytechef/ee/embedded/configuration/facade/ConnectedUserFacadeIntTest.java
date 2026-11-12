@@ -14,10 +14,14 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +42,9 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscription;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscriptionDisableReason;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscriptionStatus;
 import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigurationUpdatedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectUserProjectRepository;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserConnectionRepository;
@@ -46,6 +53,8 @@ import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.TriggerSubscriptionService;
+import com.bytechef.ee.embedded.configuration.trigger.subscription.TriggerSubscriptionEventSender;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.facade.ConnectedUserFacade;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -90,9 +99,12 @@ import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,6 +114,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -377,5 +391,138 @@ class ConnectedUserFacadeIntTest {
     private void publishAndPinProject(long projectId) {
         AutomationProjectConfigurationTestSupport.publishAndPinProject(
             automationProjectFacade, automationProjectConfigurationService, projectId);
+    }
+
+    /**
+     * Runs the connected user hooks against the real trigger subscription manager.
+     */
+    @TriggerSubscriptionLifecycleIntTest
+    static class TriggerSubscriptions {
+
+        @Autowired
+        private ConnectedUserFacade connectedUserFacade;
+
+        @Autowired
+        private ConnectedUserService connectedUserService;
+
+        @Autowired
+        private ConnectionDefinitionService connectionDefinitionService;
+
+        @Autowired
+        private ConnectionService connectionService;
+
+        @Autowired
+        private EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
+
+        @Autowired
+        private EnvironmentService environmentService;
+
+        @Autowired
+        private JdbcClient jdbcClient;
+
+        @Autowired
+        private OAuth2Service oAuth2Service;
+
+        @Autowired
+        private PrincipalJobService principalJobService;
+
+        @Autowired
+        private TriggerDefinitionService triggerDefinitionService;
+
+        @Autowired
+        private TriggerLifecycleFacade triggerLifecycleFacade;
+
+        @Autowired
+        private TriggerSubscriptionEventSender triggerSubscriptionEventSender;
+
+        @Autowired
+        private TriggerSubscriptionManager triggerSubscriptionManager;
+
+        @Autowired
+        private TriggerSubscriptionService triggerSubscriptionService;
+
+        private ConnectedUser connectedUser;
+        private long connectionId;
+
+        @BeforeEach
+        void beforeEach() {
+            TriggerSubscriptionLifecycleTestSupport.addConnectionForeignKey(jdbcClient);
+            TriggerSubscriptionLifecycleTestSupport.stubCollaborators(
+                connectionDefinitionService, embeddedPermissionEvaluator, environmentService, oAuth2Service,
+                principalJobService, triggerDefinitionService);
+            TriggerSubscriptionLifecycleTestSupport.authenticateAdmin();
+
+            connectedUser = connectedUserService.createConnectedUser(
+                "trigger-subscription-hook-user-" + UUID.randomUUID(), Environment.PRODUCTION);
+            connectionId = TriggerSubscriptionLifecycleTestSupport.createConnection(connectionService);
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+
+            TriggerSubscriptionLifecycleTestSupport.dropConnectionForeignKey(jdbcClient);
+        }
+
+        @Test
+        void testDisableConnectedUserDisablesItsTriggerSubscriptions() {
+            TriggerSubscription triggerSubscription = createSubscription(null);
+
+            clearInvocations(triggerLifecycleFacade, triggerSubscriptionEventSender);
+
+            connectedUserFacade.enableConnectedUser(connectedUser.getId(), false);
+
+            assertThat(connectedUserService.getConnectedUser(connectedUser.getId())
+                .isEnabled()).isFalse();
+            assertThat(getStatus(triggerSubscription)).isEqualTo(TriggerSubscriptionStatus.DISABLED);
+
+            verify(triggerLifecycleFacade, times(1)).executeTriggerDisable(anyString(), any(), any(), anyMap(), any());
+
+            verifyOneLifecycleEvent(
+                triggerSubscription, "subscription.disabled",
+                TriggerSubscriptionDisableReason.CONNECTED_USER_DISABLED);
+        }
+
+        @Test
+        void testDeleteConnectedUserDeletesItsTriggerSubscriptions() {
+            TriggerSubscription triggerSubscription = createSubscription(null);
+
+            clearInvocations(triggerLifecycleFacade, triggerSubscriptionEventSender);
+
+            connectedUserFacade.deleteConnectedUser(connectedUser.getId());
+
+            assertThat(connectedUserService.fetchConnectedUser(connectedUser.getId())).isEmpty();
+            assertThat(triggerSubscriptionService.fetchTriggerSubscription(triggerSubscription.getId())).isEmpty();
+
+            verify(triggerLifecycleFacade, times(1)).executeTriggerDisable(anyString(), any(), any(), anyMap(), any());
+
+            verifyOneLifecycleEvent(
+                triggerSubscription, "subscription.deleted",
+                TriggerSubscriptionDisableReason.CONNECTED_USER_DELETED);
+        }
+
+        private TriggerSubscription createSubscription(Long integrationInstanceId) {
+            return triggerSubscriptionManager.create(
+                connectedUser, integrationInstanceId, connectionId,
+                TriggerSubscriptionLifecycleTestSupport.WEBHOOK_COMPONENT_NAME, 1,
+                TriggerSubscriptionLifecycleTestSupport.WEBHOOK_TRIGGER_NAME, Map.of(), null, null, null, 0);
+        }
+
+        private TriggerSubscriptionStatus getStatus(TriggerSubscription triggerSubscription) {
+            TriggerSubscription currentTriggerSubscription = triggerSubscriptionService.getTriggerSubscription(
+                triggerSubscription.getId());
+
+            return currentTriggerSubscription.getStatus();
+        }
+
+        private void verifyOneLifecycleEvent(
+            TriggerSubscription triggerSubscription, String type, TriggerSubscriptionDisableReason reason) {
+
+            verify(triggerSubscriptionEventSender, times(1)).sendLifecycleEvent(
+                argThat(curTriggerSubscription -> triggerSubscription.getId()
+                    .equals(curTriggerSubscription.getId())),
+                eq(type), eq(reason));
+            verify(triggerSubscriptionEventSender, times(1)).sendLifecycleEvent(any(), any(), any());
+        }
     }
 }

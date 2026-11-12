@@ -11,8 +11,10 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.TriggerSubscriptionDisableReason;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.ee.embedded.configuration.facade.TriggerSubscriptionAdminFacade;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -40,6 +42,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -74,6 +77,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationService integrationService;
+    private final TriggerSubscriptionAdminFacade triggerSubscriptionAdminFacade;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserFacadeImpl(
@@ -83,7 +87,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
         IntegrationInstanceFacade integrationInstanceFacade,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
-        IntegrationService integrationService) {
+        IntegrationService integrationService, TriggerSubscriptionAdminFacade triggerSubscriptionAdminFacade) {
 
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectedUserProjectFacade = connectedUserProjectFacade;
@@ -95,6 +99,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationService = integrationService;
+        this.triggerSubscriptionAdminFacade = triggerSubscriptionAdminFacade;
     }
 
     @Override
@@ -199,9 +204,22 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     })
     @PreAuthorize("isTenantAdmin()")
     public void deleteConnectedUser(long id) {
-        for (IntegrationInstance integrationInstance : integrationInstanceService.getConnectedUserIntegrationInstances(
-            id)) {
+        Set<Long> connectionIds = new LinkedHashSet<>(connectedUserConnectionService.getConnectionIds(id));
 
+        List<IntegrationInstance> integrationInstances = integrationInstanceService
+            .getConnectedUserIntegrationInstances(id);
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            connectionIds.add(integrationInstance.getConnectionId());
+        }
+
+        for (long connectionId : connectionIds) {
+            connectionFacade.checkDeletable(connectionId);
+        }
+
+        triggerSubscriptionAdminFacade.deleteConnectedUserTriggerSubscriptions(id);
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
             integrationInstanceFacade.deleteIntegrationInstance(integrationInstance.getId());
         }
 
@@ -223,6 +241,11 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     })
     @PreAuthorize("isTenantAdmin()")
     public void enableConnectedUser(long id, boolean enable) {
+        if (!enable) {
+            triggerSubscriptionAdminFacade.disableConnectedUserTriggerSubscriptions(
+                id, TriggerSubscriptionDisableReason.CONNECTED_USER_DISABLED);
+        }
+
         List<IntegrationInstance> integrationInstances = integrationInstanceService
             .getConnectedUserIntegrationInstances(id);
 
