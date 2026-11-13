@@ -74,7 +74,7 @@ const ConnectedUserSheetPanelWorkflowExecutionList = ({
 
     return (
         <>
-            <AnyWorkflowExecutionsTable data={workflowExecutions} showConnectedUser={false} />
+            <AnyWorkflowExecutionsTable className="p-0" data={workflowExecutions} showConnectedUser={false} />
 
             {workflowExecutionPage && workflowExecutionPage.totalPages! > 1 && (
                 <div className="flex justify-center py-3">

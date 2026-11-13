@@ -109,7 +109,7 @@ const McpServers = () => {
                         actions={
                             <McpServerDialog mcpServer={undefined} triggerNode={<Button label="Create MCP Server" />} />
                         }
-                        description="An MCP server lets AI assistants, like Claude or Cursor, call tools for your connected users. You choose which component actions and integration workflows it exposes as tools."
+                        description="An MCP server lets the AI agents you build call tools for your connected users. You choose which component actions and integration workflows it exposes as tools."
                         icon={<ServerIcon />}
                         note={environmentScopeNote}
                         title="Create your first MCP server"

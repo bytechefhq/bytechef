@@ -64,11 +64,12 @@ const getVersion = (row: AnyWorkflowExecutionRowI) => {
 };
 
 interface AnyWorkflowExecutionsTablePropsI {
+    className?: string;
     data: AnyWorkflowExecutionRowI[];
     showConnectedUser?: boolean;
 }
 
-const AnyWorkflowExecutionsTable = ({data, showConnectedUser = true}: AnyWorkflowExecutionsTablePropsI) => {
+const AnyWorkflowExecutionsTable = ({className, data, showConnectedUser = true}: AnyWorkflowExecutionsTablePropsI) => {
     const setAutomationExecutionId = useAutomationExecutionSheetStore((state) => state.setWorkflowExecutionId);
     const setAutomationExecutionSheetOpen = useAutomationExecutionSheetStore(
         (state) => state.setWorkflowExecutionSheetOpen
@@ -128,7 +129,14 @@ const AnyWorkflowExecutionsTable = ({data, showConnectedUser = true}: AnyWorkflo
         onView: handleRowClick,
     });
 
-    return <EmbeddedWorkflowExecutionsTableContent columns={columns} data={data} onRowClick={handleRowClick} />;
+    return (
+        <EmbeddedWorkflowExecutionsTableContent
+            className={className}
+            columns={columns}
+            data={data}
+            onRowClick={handleRowClick}
+        />
+    );
 };
 
 export default AnyWorkflowExecutionsTable;

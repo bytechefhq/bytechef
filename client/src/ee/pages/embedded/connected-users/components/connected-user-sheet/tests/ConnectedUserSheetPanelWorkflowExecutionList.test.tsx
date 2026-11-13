@@ -70,7 +70,7 @@ describe('ConnectedUserSheetPanelWorkflowExecutionList', () => {
 
         expect(screen.getByText('1 executions')).toBeInTheDocument();
         expect(hoisted.anyWorkflowExecutionsTable).toHaveBeenCalledWith(
-            expect.objectContaining({showConnectedUser: false})
+            expect.objectContaining({className: 'p-0', showConnectedUser: false})
         );
         expect(screen.getByText('integration execution sheet')).toBeInTheDocument();
         expect(screen.getByText('automation execution sheet')).toBeInTheDocument();

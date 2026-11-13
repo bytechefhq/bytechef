@@ -14,6 +14,7 @@ import {ColumnDef, RowData, flexRender, useTable} from '@tanstack/react-table';
 import {twMerge} from 'tailwind-merge';
 
 interface EmbeddedWorkflowExecutionsTableContentProps<TData extends RowData> {
+    className?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     columns: ReadonlyArray<ColumnDef<typeof coreTableFeatures, TData, any>>;
     data: TData[];
@@ -21,6 +22,7 @@ interface EmbeddedWorkflowExecutionsTableContentProps<TData extends RowData> {
 }
 
 const EmbeddedWorkflowExecutionsTableContent = <TData extends RowData>({
+    className,
     columns,
     data,
     onRowClick,
@@ -35,7 +37,7 @@ const EmbeddedWorkflowExecutionsTableContent = <TData extends RowData>({
     const rows = reactTable.getRowModel().rows;
 
     return (
-        <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-full">
+        <div className={twMerge('w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-full', className)}>
             <Table>
                 <TableHeader className={EXECUTIONS_TABLE_HEADER_CLASS_NAME}>
                     {headerGroups.map((headerGroup) => (

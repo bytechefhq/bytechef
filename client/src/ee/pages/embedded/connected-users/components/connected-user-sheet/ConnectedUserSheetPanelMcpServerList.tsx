@@ -78,7 +78,7 @@ const ConnectedUserSheetPanelMcpServerList = ({
                 </>
             ) : (
                 <ConnectedUserSheetEmptyState
-                    description="An MCP server lets AI assistants, like Claude or Cursor, call tools on this user's integrations."
+                    description="An MCP server lets the AI agents you build call tools on this user's integrations."
                     icon={<ServerIcon />}
                     nothingToProvision={provisionableMcpServers?.length === 0}
                     nothingToProvisionDescription="No MCP servers are defined yet. Create one on the MCP Servers page and pick the tools it exposes, then provision it for this user."
