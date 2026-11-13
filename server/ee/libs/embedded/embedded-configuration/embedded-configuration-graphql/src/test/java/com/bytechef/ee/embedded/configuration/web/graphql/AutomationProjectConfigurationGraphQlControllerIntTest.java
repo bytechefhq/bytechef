@@ -177,7 +177,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
 
     @Test
     void testAutomationProjectConfigurationWorkflowProvidableValuesReturnsTheComponentReferenceOfAnInput() {
-        when(automationProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(5L, "uuid-one"))
+        when(automationProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(5L, "uuid-one", null))
             .thenReturn(
                 new AutomationProjectConfigurationWorkflowProvidableValuesDTO(
                     List.of(),
@@ -225,9 +225,33 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
     }
 
     @Test
+    void testAutomationProjectConfigurationWorkflowProvidableValuesPassesTheProjectVersion() {
+        when(automationProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(5L, "uuid-one", 3))
+            .thenReturn(
+                new AutomationProjectConfigurationWorkflowProvidableValuesDTO(
+                    List.of(), List.of(), Map.of(), Map.of()));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationProjectConfigurationWorkflowProvidableValues(
+                        id: "5", workflowUuid: "uuid-one", projectVersion: 3) {
+                        providedConnections
+                    }
+                }
+                """)
+            .execute()
+            .path("automationProjectConfigurationWorkflowProvidableValues.providedConnections")
+            .entity(Map.class)
+            .isEqualTo(Map.of());
+
+        verify(automationProjectConfigurationAdminFacade).getConfigurationWorkflowProvidableValues(5L, "uuid-one", 3);
+    }
+
+    @Test
     void testAutomationProjectConfigurationWorkflowInputOptionsPassesTheConnectionAndDependencies() {
         when(automationProjectConfigurationAdminFacade.getConfigurationWorkflowInputOptions(
-            5L, "uuid-one", "channel", "channel", 31L, Map.of("workspace", "acme"), "gen"))
+            5L, "uuid-one", null, "channel", "channel", 31L, Map.of("workspace", "acme"), "gen"))
                 .thenReturn(
                     List.of(
                         new AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption(
@@ -260,7 +284,7 @@ class AutomationProjectConfigurationGraphQlControllerIntTest {
 
     @Test
     void testAutomationProjectConfigurationWorkflowProvidableValuesReturnsSlotsInputsAndProvidedValues() {
-        when(automationProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(5L, "uuid-one"))
+        when(automationProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(5L, "uuid-one", null))
             .thenReturn(
                 new AutomationProjectConfigurationWorkflowProvidableValuesDTO(
                     List.of(

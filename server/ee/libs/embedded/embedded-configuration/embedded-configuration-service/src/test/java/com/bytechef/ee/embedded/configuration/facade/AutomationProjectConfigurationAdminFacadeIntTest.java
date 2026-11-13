@@ -895,7 +895,7 @@ class AutomationProjectConfigurationAdminFacadeIntTest {
 
         AutomationProjectConfigurationWorkflowProvidableValuesDTO providableValues =
             automationProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(
-                configurationId, workflowUuid);
+                configurationId, workflowUuid, null);
 
         assertThat(providableValues.connectionSlots()).extracting(
             AutomationProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot::componentName)
@@ -903,6 +903,41 @@ class AutomationProjectConfigurationAdminFacadeIntTest {
         assertThat(providableValues.inputs()).containsExactly(
             new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
                 "channel", "Channel", "string", true));
+    }
+
+    @Test
+    void testGetProvidableValuesReadsAWorkflowOfTheGivenVersionTheConfigurationIsNotOnYet() {
+        long projectId = createProject("Target Version Slots");
+
+        addWorkflow(projectId, withLabel(NO_INPUT_DEFINITION, "Existing"));
+
+        publish(projectId);
+
+        String addedWorkflowUuid = addWorkflow(projectId, withLabel(SLACK_WITH_CHANNEL_DEFINITION, "Added"));
+
+        publish(projectId);
+
+        givenSlots(new ComponentConnection("slack", 1, "postMessage1", "slack", true));
+
+        long configurationId = automationProjectConfigurationAdminFacade.createConfiguration(
+            projectId, ENVIRONMENT_ID, CONFIGURATION_NAME, null, 1, true, true);
+
+        assertThatThrownBy(
+            () -> automationProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(
+                configurationId, addedWorkflowUuid, null))
+                    .isInstanceOf(ConfigurationException.class)
+                    .hasMessageContaining("is not part of version 1");
+
+        AutomationProjectConfigurationWorkflowProvidableValuesDTO providableValues =
+            automationProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(
+                configurationId, addedWorkflowUuid, 2);
+
+        assertThat(providableValues.connectionSlots()).extracting(
+            AutomationProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot::componentName)
+            .containsExactly("slack");
+        assertThat(providableValues.inputs()).extracting(
+            AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input::name)
+            .containsExactly("channel");
     }
 
     @Test
@@ -923,7 +958,7 @@ class AutomationProjectConfigurationAdminFacadeIntTest {
 
         List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.ConnectionSlot> connectionSlots =
             automationProjectConfigurationAdminFacade
-                .getConfigurationWorkflowProvidableValues(configurationId, workflowUuid)
+                .getConfigurationWorkflowProvidableValues(configurationId, workflowUuid, null)
                 .connectionSlots();
 
         assertThat(connectionSlots).extracting(
@@ -948,7 +983,7 @@ class AutomationProjectConfigurationAdminFacadeIntTest {
         try {
             List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.ProvidableConnection> providable =
                 automationProjectConfigurationAdminFacade
-                    .getConfigurationWorkflowProvidableValues(fixture.configurationId(), fixture.workflowUuid())
+                    .getConfigurationWorkflowProvidableValues(fixture.configurationId(), fixture.workflowUuid(), null)
                     .connectionSlots()
                     .getFirst()
                     .providableConnections();
@@ -984,7 +1019,7 @@ class AutomationProjectConfigurationAdminFacadeIntTest {
 
             assertThat(
                 automationProjectConfigurationAdminFacade
-                    .getConfigurationWorkflowProvidableValues(configurationId, workflowUuid)
+                    .getConfigurationWorkflowProvidableValues(configurationId, workflowUuid, null)
                     .inputs())
                         .containsExactly(
                             new AutomationProjectConfigurationWorkflowProvidableValuesDTO.Input(
@@ -1016,7 +1051,7 @@ class AutomationProjectConfigurationAdminFacadeIntTest {
 
         assertThat(
             automationProjectConfigurationAdminFacade.getConfigurationWorkflowInputOptions(
-                fixture.configurationId(), fixture.workflowUuid(), "channel", "channel", 41L,
+                fixture.configurationId(), fixture.workflowUuid(), null, "channel", "channel", 41L,
                 Map.of("workspace", "acme"), "gen"))
                     .containsExactly(
                         new AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption(
@@ -1034,7 +1069,7 @@ class AutomationProjectConfigurationAdminFacadeIntTest {
         try {
             assertThatThrownBy(
                 () -> automationProjectConfigurationAdminFacade.getConfigurationWorkflowInputOptions(
-                    fixture.configurationId(), fixture.workflowUuid(), "channel", "channel", 42L, Map.of(), null))
+                    fixture.configurationId(), fixture.workflowUuid(), null, "channel", "channel", 42L, Map.of(), null))
                         .isInstanceOf(ConfigurationException.class)
                         .hasMessageContaining("Connection id=42 for component slack belongs to a connected user");
         } finally {
@@ -1050,7 +1085,7 @@ class AutomationProjectConfigurationAdminFacadeIntTest {
 
         assertThatThrownBy(
             () -> automationProjectConfigurationAdminFacade.getConfigurationWorkflowInputOptions(
-                fixture.configurationId(), fixture.workflowUuid(), "channel", "channel", 43L, Map.of(), null))
+                fixture.configurationId(), fixture.workflowUuid(), null, "channel", "channel", 43L, Map.of(), null))
                     .isInstanceOf(ConfigurationException.class)
                     .hasMessageContaining("Connection id=43 belongs to component jira, not slack");
     }
@@ -1063,7 +1098,7 @@ class AutomationProjectConfigurationAdminFacadeIntTest {
 
         assertThatThrownBy(
             () -> automationProjectConfigurationAdminFacade.getConfigurationWorkflowInputOptions(
-                fixture.configurationId(), fixture.workflowUuid(), "topic", "topic", 44L, Map.of(), null))
+                fixture.configurationId(), fixture.workflowUuid(), null, "topic", "topic", 44L, Map.of(), null))
                     .isInstanceOf(ConfigurationException.class)
                     .hasMessageContaining("Input topic of workflow uuid=");
     }
@@ -1079,7 +1114,7 @@ class AutomationProjectConfigurationAdminFacadeIntTest {
 
         AutomationProjectConfigurationWorkflowProvidableValuesDTO providableValues =
             automationProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(
-                fixture.configurationId(), fixture.workflowUuid());
+                fixture.configurationId(), fixture.workflowUuid(), null);
 
         assertThat(providableValues.providedConnections()).isEqualTo(Map.of("slack", 11L));
         assertThat(providableValues.providedInputs()).isEqualTo(Map.of("channel", "general"));

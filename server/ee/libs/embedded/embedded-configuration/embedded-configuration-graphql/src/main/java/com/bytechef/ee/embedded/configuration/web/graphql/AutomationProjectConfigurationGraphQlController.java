@@ -63,21 +63,22 @@ public class AutomationProjectConfigurationGraphQlController {
     @QueryMapping
     public AutomationProjectConfigurationWorkflowProvidableValuesDTO
         automationProjectConfigurationWorkflowProvidableValues(
-            @Argument String id, @Argument String workflowUuid) {
+            @Argument String id, @Argument String workflowUuid, @Argument @Nullable Integer projectVersion) {
 
         return automationProjectConfigurationAdminFacade.getConfigurationWorkflowProvidableValues(
-            Long.parseLong(id), workflowUuid);
+            Long.parseLong(id), workflowUuid, projectVersion);
     }
 
     @QueryMapping
     public List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption>
         automationProjectConfigurationWorkflowInputOptions(
-            @Argument String id, @Argument String workflowUuid, @Argument String inputName,
-            @Argument String propertyName, @Argument String connectionId,
+            @Argument String id, @Argument String workflowUuid, @Argument @Nullable Integer projectVersion,
+            @Argument String inputName, @Argument String propertyName, @Argument String connectionId,
             @Argument @Nullable Map<String, Object> lookupDependsOnValues, @Argument @Nullable String searchText) {
 
         return automationProjectConfigurationAdminFacade.getConfigurationWorkflowInputOptions(
-            Long.parseLong(id), workflowUuid, inputName, propertyName, parseConnectionId(inputName, connectionId),
+            Long.parseLong(id), workflowUuid, projectVersion, inputName, propertyName,
+            parseConnectionId(inputName, connectionId),
             lookupDependsOnValues == null ? Map.of() : lookupDependsOnValues, searchText);
     }
 

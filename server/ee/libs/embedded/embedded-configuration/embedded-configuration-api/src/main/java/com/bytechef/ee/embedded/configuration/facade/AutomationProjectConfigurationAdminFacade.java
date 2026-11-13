@@ -67,16 +67,18 @@ public interface AutomationProjectConfigurationAdminFacade {
      *
      * @param configurationId the configuration id
      * @param workflowUuid    the workflow uuid
-     * @return the providable and provided values at the configuration's pinned project version
+     * @param projectVersion  the project version to read the workflow from, or null for the configuration's pinned one
+     * @return the providable and provided values at that project version
      */
     AutomationProjectConfigurationWorkflowProvidableValuesDTO getConfigurationWorkflowProvidableValues(
-        long configurationId, String workflowUuid);
+        long configurationId, String workflowUuid, @Nullable Integer projectVersion);
 
     /**
      * Loads the options of a component-referencing input of a workflow, using one of the administrator's connections.
      *
      * @param configurationId       the configuration id
      * @param workflowUuid          the workflow uuid
+     * @param projectVersion        the project version to read the workflow from, or null for the configuration's one
      * @param inputName             the workflow input name
      * @param propertyName          the property of the referenced component input group
      * @param connectionId          the administrator's connection of the referenced component
@@ -86,8 +88,8 @@ public interface AutomationProjectConfigurationAdminFacade {
      */
     List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption>
         getConfigurationWorkflowInputOptions(
-            long configurationId, String workflowUuid, String inputName, String propertyName, long connectionId,
-            Map<String, ?> lookupDependsOnValues, @Nullable String searchText);
+            long configurationId, String workflowUuid, @Nullable Integer projectVersion, String inputName,
+            String propertyName, long connectionId, Map<String, ?> lookupDependsOnValues, @Nullable String searchText);
 
     /**
      * Returns what {@link #deleteConfiguration(long)} would remove.

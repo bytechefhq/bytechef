@@ -102,8 +102,8 @@ type ConfigurationMoveSkipped {
 
 extend type Query {
     automationProjectConfigurations(projectId: ID!, environmentId: ID): [AutomationProjectConfiguration!]!
-    automationProjectConfigurationWorkflowProvidableValues(id: ID!, workflowUuid: ID!): AutomationProjectConfigurationWorkflowProvidableValues!
-    automationProjectConfigurationWorkflowInputOptions(id: ID!, workflowUuid: ID!, inputName: String!, propertyName: String!, connectionId: ID!, lookupDependsOnValues: Map, searchText: String): [AutomationProjectConfigurationInputOption!]!
+    automationProjectConfigurationWorkflowProvidableValues(id: ID!, workflowUuid: ID!, projectVersion: Int): AutomationProjectConfigurationWorkflowProvidableValues!
+    automationProjectConfigurationWorkflowInputOptions(id: ID!, workflowUuid: ID!, projectVersion: Int, inputName: String!, propertyName: String!, connectionId: ID!, lookupDependsOnValues: Map, searchText: String): [AutomationProjectConfigurationInputOption!]!
     automationProjectConfigurationVersionImpact(id: ID!, projectVersion: Int!): AutomationProjectConfigurationVersionImpact!
     automationProjectConfigurationDeleteImpact(id: ID!): AutomationProjectConfigurationDeleteImpact!
     automationProjectConfigurationConnectedUsers(id: ID!): [AutomationProjectConfigurationConnectedUser!]!
