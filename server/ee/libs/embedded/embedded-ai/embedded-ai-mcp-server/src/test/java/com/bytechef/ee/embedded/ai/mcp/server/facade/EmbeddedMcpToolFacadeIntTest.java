@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.server.facade;
 
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolCallback.INTEGRATION_ID_META_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,9 +57,11 @@ import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.ai.tool.FromAiResult;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -125,6 +128,14 @@ import org.springframework.test.context.event.RecordApplicationEvents;
 @RecordApplicationEvents
 class EmbeddedMcpToolFacadeIntTest {
 
+    private static final List<? extends Property> CHANNEL_OPTIONS_PROPERTIES = List.of(
+        Property.toProperty(
+            string("channel").options(
+                (com.bytechef.component.definition.ClusterElementDefinition.OptionsFunction<String>) (
+                    inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
+                    context) -> List.of())));
+    private static final Map<String, Object> CHANNEL_TOOL_PARAMETERS = Map.of(
+        "channel", new FromAiResult("channel", "STRING", null, null, List.<Object>of("stale"), true));
     private static final String CLUSTER_ELEMENT_DESCRIPTION =
         "The POST method submits an entity to the specified resource.";
     private static final String CONNECTED_EXTERNAL_USER_ID = "external-user";
@@ -835,6 +846,53 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     @Test
+    void testListedClusterElementToolOffersTheOptionsOfTheConnectionOfItsIntegrationInstance() {
+        McpTool mcpTool = saveMcpTool("post", CHANNEL_TOOL_PARAMETERS, true);
+
+        long connectedUserId = insertConnectedUser();
+        long integrationId = insertIntegration("httpClient");
+        long connectionId = insertConnection();
+
+        long integrationInstanceId = insertIntegrationInstance(integrationId, connectedUserId, connectionId, 0);
+
+        mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), integrationId);
+        mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(
+            integrationInstanceId, Objects.requireNonNull(mcpTool.getId()), true);
+
+        mockPostClusterElementDefinition(CHANNEL_OPTIONS_PROPERTIES);
+
+        when(
+            clusterElementDefinitionFacade.executeOptions(
+                eq("httpClient"), eq(1), eq("post"), eq("channel"), any(), any(), any(), isNull(), eq(connectionId),
+                any(), any()))
+                    .thenReturn(List.of(new Option(option("General", "general"))));
+
+        ToolCallback functionToolCallback = embeddedMcpToolFacade.getFunctionToolCallback(
+            mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+
+        assertThat(functionToolCallback).isNotNull();
+
+        ToolDefinition toolDefinition = functionToolCallback.getToolDefinition();
+
+        assertThat(toolDefinition.inputSchema())
+            .contains("\"general\"")
+            .doesNotContain("stale");
+    }
+
+    @Test
+    void testListedClusterElementToolWithoutConnectionDoesNotLoadOptions() {
+        ToolCallback functionToolCallback = getClusterElementToolCallback(
+            CHANNEL_TOOL_PARAMETERS, null, CHANNEL_OPTIONS_PROPERTIES);
+
+        ToolDefinition toolDefinition = functionToolCallback.getToolDefinition();
+
+        assertThat(toolDefinition.inputSchema()).contains("\"stale\"");
+
+        verify(clusterElementDefinitionFacade, never()).executeOptions(
+            any(), anyInt(), any(), any(), any(), any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
     void testTimedOutJobReturnsAnErrorThatNamesTheJob() {
         ToolCallback toolCallback = getConnectedWorkflowToolCallback(
             List.of(Map.of("name", "requestApproval_1", "type", "approval/v1/requestApproval")));
@@ -1362,7 +1420,14 @@ class EmbeddedMcpToolFacadeIntTest {
     }
 
     private void mockPostClusterElementDefinition() {
+        mockPostClusterElementDefinition(List.of());
+    }
+
+    private void mockPostClusterElementDefinition(List<? extends Property> properties) {
         ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+        doReturn(properties).when(clusterElementDefinition)
+            .getProperties();
 
         when(clusterElementDefinition.getComponentName()).thenReturn("httpClient");
         when(clusterElementDefinition.getComponentVersion()).thenReturn(1);

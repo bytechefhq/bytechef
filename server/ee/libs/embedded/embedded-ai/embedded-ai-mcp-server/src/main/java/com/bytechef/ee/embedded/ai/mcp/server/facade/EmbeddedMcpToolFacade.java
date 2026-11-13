@@ -51,6 +51,7 @@ import com.bytechef.ee.embedded.execution.constant.EmbeddedToolConstants;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.ai.tool.FromAiResult;
+import com.bytechef.platform.ai.tool.ToolOptionsResolver;
 import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
 import com.bytechef.platform.ai.tool.util.ToolParameterDefaultsUtils;
@@ -116,6 +117,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private static final String STOPPED_MESSAGE = "The workflow run was stopped before it finished.";
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
+    private final ToolOptionsResolver toolOptionsResolver;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserMcpAutomationResolver connectedUserMcpAutomationResolver;
@@ -168,6 +170,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         super(evaluator);
 
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
+        this.toolOptionsResolver = new ToolOptionsResolver(clusterElementDefinitionFacade);
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
         this.connectedUserMcpAutomationResolver = connectedUserMcpAutomationResolver;
@@ -216,7 +219,16 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             clusterElementDefinitionService.getClusterElementDefinition(
                 mcpComponent.getComponentName(), mcpComponent.getComponentVersion(), mcpTool.getName());
 
-        List<FromAiResult> fromAiResults = extractFromAiResults(mcpTool.getParameters());
+        Long connectionId = integrationInstance == null ? null : integrationInstance.getConnectionId();
+
+        List<FromAiResult> fromAiResults = applyRuntimeOptions(
+            extractFromAiResults(mcpTool.getParameters()), mcpTool.getParameters(),
+            clusterElementDefinition.getProperties(),
+            property -> connectionId == null
+                ? null
+                : toolOptionsResolver.resolveOptions(
+                    clusterElementDefinition.getComponentName(), clusterElementDefinition.getComponentVersion(),
+                    clusterElementDefinition.getName(), property, mcpTool.getParameters(), connectionId));
 
         String toolName = getToolName(
             clusterElementDefinition.getComponentName(), clusterElementDefinition.getName(), mcpTool.getParameters());

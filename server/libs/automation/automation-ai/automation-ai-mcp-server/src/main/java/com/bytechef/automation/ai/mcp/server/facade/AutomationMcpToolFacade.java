@@ -39,6 +39,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.ai.tool.FromAiResult;
+import com.bytechef.platform.ai.tool.ToolOptionsResolver;
 import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
 import com.bytechef.platform.ai.tool.util.ToolParameterDefaultsUtils;
@@ -113,6 +114,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
     private final ExternalInvocationRecorder externalInvocationRecorder;
+    private final ToolOptionsResolver toolOptionsResolver;
     private final WorkflowService workflowService;
     private final WorkspaceMcpServerService workspaceMcpServerService;
 
@@ -149,6 +151,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
         this.externalInvocationRecorder = externalInvocationRecorder;
+        this.toolOptionsResolver = new ToolOptionsResolver(clusterElementDefinitionFacade);
         this.workflowService = workflowService;
         this.workspaceMcpServerService = workspaceMcpServerService;
     }
@@ -160,7 +163,13 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
             clusterElementDefinitionService.getClusterElementDefinition(
                 mcpComponent.getComponentName(), mcpComponent.getComponentVersion(), mcpTool.getName());
 
-        List<FromAiResult> fromAiResults = extractFromAiResults(mcpTool.getParameters());
+        List<FromAiResult> fromAiResults = applyRuntimeOptions(
+            extractFromAiResults(mcpTool.getParameters()), mcpTool.getParameters(),
+            clusterElementDefinition.getProperties(),
+            property -> toolOptionsResolver.resolveOptions(
+                clusterElementDefinition.getComponentName(), clusterElementDefinition.getComponentVersion(),
+                clusterElementDefinition.getName(), property, mcpTool.getParameters(),
+                mcpComponent.getConnectionId()));
 
         String toolName = getToolName(
             clusterElementDefinition.getComponentName(), clusterElementDefinition.getName(), mcpTool.getParameters());
