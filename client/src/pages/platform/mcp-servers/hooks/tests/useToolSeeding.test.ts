@@ -118,4 +118,52 @@ describe('useToolSeeding', () => {
 
         await expect(result.current.waitForSeeding()).resolves.toEqual({first: {}});
     });
+
+    it('reports the keys whose seed failed', async () => {
+        const seed = vi.fn(async (key: string) => {
+            if (key === 'first') {
+                throw new Error('load failed');
+            }
+
+            return {field: 'value'};
+        });
+
+        const {result} = renderSeeding({keys: ['first', 'second'], seed, seedKey: 'scope'});
+
+        await act(async () => {
+            await result.current.waitForSeeding();
+        });
+
+        expect(result.current.getFailedSeedKeys()).toEqual(['first']);
+    });
+
+    it('forgets a failure once the key is seeded again', async () => {
+        let shouldFail = true;
+
+        const seed = vi.fn(async () => {
+            if (shouldFail) {
+                throw new Error('load failed');
+            }
+
+            return {field: 'value'};
+        });
+
+        const {rerender, result} = renderSeeding({keys: ['first'], seed, seedKey: 'scope'});
+
+        await act(async () => {
+            await result.current.waitForSeeding();
+        });
+
+        expect(result.current.getFailedSeedKeys()).toEqual(['first']);
+
+        shouldFail = false;
+
+        rerender({keys: ['first'], seed, seedKey: 'other-scope'});
+
+        await act(async () => {
+            await result.current.waitForSeeding();
+        });
+
+        expect(result.current.getFailedSeedKeys()).toEqual([]);
+    });
 });

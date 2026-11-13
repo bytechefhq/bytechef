@@ -31,7 +31,7 @@ export default function useMcpWorkflowToolSeeding({
         });
     };
 
-    const {seededValuesByKey, waitForSeeding} = useToolSeeding({
+    const {getFailedSeedKeys, seededValuesByKey, waitForSeeding} = useToolSeeding({
         keys: newWorkflowIds,
         seed: seedWorkflowTool,
         seedKey,
@@ -39,6 +39,7 @@ export default function useMcpWorkflowToolSeeding({
 
     return {
         aiValuesByWorkflowId: seededValuesByKey,
+        getFailedSeedKeys,
         waitForSeeding,
     };
 }

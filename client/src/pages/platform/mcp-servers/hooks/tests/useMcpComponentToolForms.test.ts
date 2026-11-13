@@ -5,15 +5,23 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import useMcpComponentToolForms from '../useMcpComponentToolForms';
 
 const hoisted = vi.hoisted(() => ({
+    failedSeedKeys: [] as string[],
     seededValuesByTool: {} as Record<string, Record<string, string>>,
+    toastWarning: vi.fn(),
     useMcpToolSeeding: vi.fn(),
 }));
+
+vi.mock('sonner', () => ({toast: {warning: hoisted.toastWarning}}));
 
 vi.mock('@/pages/platform/mcp-servers/hooks/useMcpToolSeeding', () => ({
     default: (params: unknown) => {
         hoisted.useMcpToolSeeding(params);
 
-        return {aiValuesByTool: {}, waitForSeeding: async () => hoisted.seededValuesByTool};
+        return {
+            aiValuesByTool: {},
+            getFailedSeedKeys: () => hoisted.failedSeedKeys,
+            waitForSeeding: async () => hoisted.seededValuesByTool,
+        };
     },
 }));
 
@@ -32,7 +40,9 @@ const baseProps: HookPropsType = {
 
 describe('useMcpComponentToolForms', () => {
     beforeEach(() => {
+        hoisted.failedSeedKeys = [];
         hoisted.seededValuesByTool = {};
+        hoisted.toastWarning.mockReset();
         hoisted.useMcpToolSeeding.mockReset();
     });
 
@@ -79,6 +89,32 @@ describe('useMcpComponentToolForms', () => {
             {name: 'sendMessage', parameters: {channel: 'general', toolName: 'send'}},
             {name: 'listChannels', parameters: {filter: {name: '=fromAi(name)'}}},
         ]);
+    });
+
+    it('warns when the settings of a new tool could not be loaded', async () => {
+        hoisted.failedSeedKeys = ['listChannels', 'sendMessage', 'notSelected'];
+
+        const {result} = renderHook(() => useMcpComponentToolForms(baseProps));
+
+        await act(async () => {
+            await result.current.buildToolsPayload([{name: 'sendMessage'}, {name: 'listChannels'}]);
+        });
+
+        expect(hoisted.toastWarning).toHaveBeenCalledTimes(1);
+        expect(hoisted.toastWarning).toHaveBeenCalledWith(
+            "Couldn't load the settings of listChannels",
+            expect.objectContaining({description: expect.stringContaining('without AI values')})
+        );
+    });
+
+    it('does not warn when every new tool was seeded', async () => {
+        const {result} = renderHook(() => useMcpComponentToolForms(baseProps));
+
+        await act(async () => {
+            await result.current.buildToolsPayload([{name: 'sendMessage'}, {name: 'listChannels'}]);
+        });
+
+        expect(hoisted.toastWarning).not.toHaveBeenCalled();
     });
 
     it('adds the changed form values of a registered tool on top of its saved parameters', async () => {

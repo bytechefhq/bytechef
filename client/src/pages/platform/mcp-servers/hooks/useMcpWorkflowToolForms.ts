@@ -2,6 +2,7 @@ import useMcpWorkflowToolSeeding, {
     LoadWorkflowToolPropertiesType,
 } from '@/pages/platform/mcp-servers/hooks/useMcpWorkflowToolSeeding';
 import buildToolParametersPayload from '@/pages/platform/mcp-servers/utils/buildToolParametersPayload';
+import notifyToolSeedingFailure from '@/pages/platform/mcp-servers/utils/notifyToolSeedingFailure';
 import pickChangedValues from '@/pages/platform/mcp-servers/utils/pickChangedValues';
 import {toStoredWorkflowParameters} from '@/pages/platform/mcp-servers/utils/toolParameterConversion';
 import {WorkflowToolParametersInput} from '@/shared/middleware/graphql';
@@ -39,7 +40,7 @@ export default function useMcpWorkflowToolForms({
         [savedParametersByWorkflowId, selectedWorkflowIds]
     );
 
-    const {aiValuesByWorkflowId, waitForSeeding} = useMcpWorkflowToolSeeding({
+    const {aiValuesByWorkflowId, getFailedSeedKeys, waitForSeeding} = useMcpWorkflowToolSeeding({
         loadWorkflowProperties,
         newWorkflowIds,
         seedKey,
@@ -80,6 +81,14 @@ export default function useMcpWorkflowToolForms({
         } finally {
             setIsAwaitingSeeding(false);
         }
+
+        const failedSeedKeys = getFailedSeedKeys();
+
+        const failedWorkflowIds = workflowIds.filter(
+            (workflowId) => isNewWorkflow(workflowId) && failedSeedKeys.includes(workflowId)
+        );
+
+        notifyToolSeedingFailure({failedCount: failedWorkflowIds.length, toolLabel: 'workflow tool'});
 
         return workflowIds.flatMap((workflowId) => {
             const isNew = isNewWorkflow(workflowId);

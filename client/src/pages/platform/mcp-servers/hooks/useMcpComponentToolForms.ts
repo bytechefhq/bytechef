@@ -1,6 +1,7 @@
 import {McpToolFormRegistrationI} from '@/pages/platform/mcp-servers/components/McpComponentDialogToolForm';
 import useMcpToolSeeding from '@/pages/platform/mcp-servers/hooks/useMcpToolSeeding';
 import buildToolParametersPayload from '@/pages/platform/mcp-servers/utils/buildToolParametersPayload';
+import notifyToolSeedingFailure from '@/pages/platform/mcp-servers/utils/notifyToolSeedingFailure';
 import pickChangedValues from '@/pages/platform/mcp-servers/utils/pickChangedValues';
 import {useCallback, useMemo, useRef, useState} from 'react';
 
@@ -66,7 +67,7 @@ export default function useMcpComponentToolForms({
         [savedParametersByToolName, selectedTools]
     );
 
-    const {aiValuesByTool, waitForSeeding} = useMcpToolSeeding({
+    const {aiValuesByTool, getFailedSeedKeys, waitForSeeding} = useMcpToolSeeding({
         componentName,
         componentVersion,
         connectionId,
@@ -92,6 +93,18 @@ export default function useMcpComponentToolForms({
         } finally {
             setIsAwaitingSeeding(false);
         }
+
+        const failedSeedKeys = getFailedSeedKeys();
+
+        const failedToolNames = tools
+            .map((tool) => tool.name)
+            .filter((toolName) => !savedParametersByToolName.has(toolName) && failedSeedKeys.includes(toolName));
+
+        notifyToolSeedingFailure({
+            failedCount: failedToolNames.length,
+            failedNames: failedToolNames,
+            toolLabel: 'tool',
+        });
 
         return tools.map(({name: toolName}) => {
             const isNew = !savedParametersByToolName.has(toolName);

@@ -3,13 +3,13 @@ import {
     LoadPropertyOptionsType,
     collectHiddenToolPaths,
     computeAiFillValues,
-    hasAiFillCandidates,
     isEmptyToolValue,
     loadNoPropertyOptions,
+    summarizeAiFillCandidates,
 } from '@/pages/platform/mcp-servers/utils/mcpToolAiFill';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {PropertyAllType} from '@/shared/types';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {UseFormReturn} from 'react-hook-form';
 
 interface McpToolFormFieldsProps {
@@ -20,11 +20,23 @@ interface McpToolFormFieldsProps {
     values: Record<string, unknown>;
 }
 
+interface OptionsProbeResultI {
+    fillable: boolean;
+    optionsCandidatesKey: string;
+}
+
 const HEADER_PROPERTY_NAMES = new Set(['toolDescription', 'toolName']);
 
 const McpToolFormFields = ({displayConditions, form, loadOptions, properties, values}: McpToolFormFieldsProps) => {
     const [advancedPropertiesOpen, setAdvancedPropertiesOpen] = useState(false);
     const [isFilling, setIsFilling] = useState(false);
+    const [optionsProbeResult, setOptionsProbeResult] = useState<OptionsProbeResultI>();
+
+    const candidateParamsRef = useRef({
+        hiddenPaths: new Set<string>(),
+        includeAdvanced: false,
+        properties,
+    });
 
     const {control, formState} = form;
 
@@ -43,9 +55,9 @@ const McpToolFormFields = ({displayConditions, form, loadOptions, properties, va
         [displayConditions, properties]
     );
 
-    const hasEligibleFields = useMemo(
+    const {hasStaticCandidates, optionsCandidatesKey} = useMemo(
         () =>
-            hasAiFillCandidates({
+            summarizeAiFillCandidates({
                 hiddenPaths,
                 includeAdvanced: advancedPropertiesOpen,
                 includeConditional: true,
@@ -55,6 +67,14 @@ const McpToolFormFields = ({displayConditions, form, loadOptions, properties, va
             }),
         [advancedPropertiesOpen, hiddenPaths, loadOptions, properties, values]
     );
+
+    const hasEligibleFields =
+        hasStaticCandidates ||
+        (optionsCandidatesKey !== '' &&
+            optionsProbeResult?.optionsCandidatesKey === optionsCandidatesKey &&
+            optionsProbeResult.fillable);
+
+    candidateParamsRef.current = {hiddenPaths, includeAdvanced: advancedPropertiesOpen, properties};
 
     const handleClick = async () => {
         setIsFilling(true);
@@ -78,6 +98,33 @@ const McpToolFormFields = ({displayConditions, form, loadOptions, properties, va
             setIsFilling(false);
         }
     };
+
+    useEffect(() => {
+        if (hasStaticCandidates || optionsCandidatesKey === '' || !loadOptions) {
+            return;
+        }
+
+        let cancelled = false;
+
+        const probeOptions = async () => {
+            const aiValues = await computeAiFillValues({
+                ...candidateParamsRef.current,
+                includeConditional: true,
+                loadOptions,
+                values: form.getValues(),
+            }).catch(() => ({}));
+
+            if (!cancelled) {
+                setOptionsProbeResult({fillable: Object.keys(aiValues).length > 0, optionsCandidatesKey});
+            }
+        };
+
+        void probeOptions();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [form, hasStaticCandidates, loadOptions, optionsCandidatesKey]);
 
     return (
         <fieldset className="space-y-4 border-0 p-0">

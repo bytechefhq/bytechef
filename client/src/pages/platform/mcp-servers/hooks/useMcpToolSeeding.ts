@@ -125,7 +125,7 @@ export default function useMcpToolSeeding({
         });
     };
 
-    const {seededValuesByKey, waitForSeeding} = useToolSeeding({
+    const {getFailedSeedKeys, seededValuesByKey, waitForSeeding} = useToolSeeding({
         keys: newToolNames,
         seed: seedTool,
         seedKey: `${componentName}:${componentVersion}:${connectionId ?? ''}:${connectionRequired ?? ''}`,
@@ -133,6 +133,7 @@ export default function useMcpToolSeeding({
 
     return {
         aiValuesByTool: seededValuesByKey,
+        getFailedSeedKeys,
         waitForSeeding,
     };
 }

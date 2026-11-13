@@ -145,7 +145,7 @@ describe('McpComponentToolForm', () => {
         expect(formRef!.getValues('uri')).toBeUndefined();
     });
 
-    it('makes no options request while typing and loads options only on click', async () => {
+    it('checks the options once when they are the only empty field and makes no request while typing', async () => {
         hoisted.loadOptions.mockResolvedValue([{value: 'general'}]);
 
         render(
@@ -168,12 +168,12 @@ describe('McpComponentToolForm', () => {
 
         await waitFor(() => expect(button).toBeEnabled());
 
-        expect(hoisted.loadOptions).not.toHaveBeenCalled();
+        expect(hoisted.loadOptions).toHaveBeenCalledTimes(1);
 
         await userEvent.click(button);
 
         await waitFor(() => expect(formRef!.getValues('channel')).toMatch(/^=fromAi\('channel'/));
 
-        expect(hoisted.loadOptions).toHaveBeenCalledTimes(1);
+        expect(hoisted.loadOptions).toHaveBeenCalledTimes(2);
     });
 });
