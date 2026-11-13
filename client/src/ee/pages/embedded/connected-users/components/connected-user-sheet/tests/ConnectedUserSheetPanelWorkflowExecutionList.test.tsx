@@ -55,7 +55,8 @@ describe('ConnectedUserSheetPanelWorkflowExecutionList', () => {
             'ANY',
             expect.objectContaining({connectedUserId: 7, pageNumber: 0})
         );
-        expect(screen.getByText('Loading...')).toBeInTheDocument();
+        expect(screen.getByRole('status', {name: 'Loading workflow executions'})).toBeInTheDocument();
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
     });
 
     it('lists the executions without a connected user column and mounts the execution sheets', () => {

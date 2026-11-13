@@ -68,7 +68,8 @@ describe('ConnectedUserSheetPanelMcpServerList', () => {
 
         const {rerender} = renderPanel();
 
-        expect(screen.getByText('Loading...')).toBeInTheDocument();
+        expect(screen.getByRole('status', {name: 'Loading MCP servers'})).toBeInTheDocument();
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
 
         hoisted.connectedUserMcpServersQuery.mockReturnValue({data: {connectedUserMcpServers: []}, isLoading: false});
 

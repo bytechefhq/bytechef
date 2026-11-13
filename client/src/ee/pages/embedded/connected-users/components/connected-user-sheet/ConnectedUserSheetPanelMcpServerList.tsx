@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserSheetEmptyState from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetEmptyState';
+import ConnectedUserSheetPanelListSkeleton from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelListSkeleton';
 import ConnectedUserMcpServerListItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItem';
 import ProvisionMcpServerDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/provision-mcp-server-dialog/ProvisionMcpServerDialog';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
@@ -29,7 +30,7 @@ const ConnectedUserSheetPanelMcpServerList = ({
     });
 
     if (isLoading) {
-        return <div className="py-4 text-sm text-muted-foreground">Loading...</div>;
+        return <ConnectedUserSheetPanelListSkeleton label="Loading MCP servers" />;
     }
 
     const mcpServers = data?.connectedUserMcpServers ?? [];

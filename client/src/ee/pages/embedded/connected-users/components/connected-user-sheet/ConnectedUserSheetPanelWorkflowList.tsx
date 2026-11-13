@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserSheetEmptyState from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetEmptyState';
+import ConnectedUserSheetPanelListSkeleton from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelListSkeleton';
 import ConnectedUserProjectWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowList';
 import {ConnectedUserWorkflowTemplateSourceI} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowListItem';
 import ProvisionProjectWorkflowDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/provision-project-workflow-dialog/ProvisionProjectWorkflowDialog';
@@ -60,7 +61,7 @@ const ConnectedUserSheetPanelWorkflowList = ({
     );
 
     if (isLoading || automationProjectsIsLoading) {
-        return <div className="py-4 text-sm text-muted-foreground">Loading...</div>;
+        return <ConnectedUserSheetPanelListSkeleton label="Loading automations" />;
     }
 
     const connectedUserProjects = data?.connectedUserProjects ?? [];

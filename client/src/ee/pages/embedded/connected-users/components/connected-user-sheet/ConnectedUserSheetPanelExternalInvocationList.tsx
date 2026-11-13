@@ -1,5 +1,6 @@
 import EmptyState from '@/components/EmptyState/EmptyState';
 import {Button} from '@/components/ui/button';
+import ConnectedUserSheetPanelTableSkeleton from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelTableSkeleton';
 import {EMBEDDED_EXTERNAL_INVOCATIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import ExternalInvocationDetailsDialog from '@/pages/automation/external-invocations/components/ExternalInvocationDetailsDialog';
 import ExternalInvocationsTable from '@/pages/automation/external-invocations/components/ExternalInvocationsTable';
@@ -25,7 +26,7 @@ const ConnectedUserSheetPanelExternalInvocationList = ({
     });
 
     if (isLoading) {
-        return <div className="py-4 text-sm text-muted-foreground">Loading...</div>;
+        return <ConnectedUserSheetPanelTableSkeleton label="Loading external invocations" />;
     }
 
     if (isError) {
