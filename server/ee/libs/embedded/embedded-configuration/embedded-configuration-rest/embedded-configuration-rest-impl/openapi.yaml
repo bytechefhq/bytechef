@@ -457,6 +457,31 @@ paths:
               schema:
                 type: integer
                 format: int64
+  /connected-users/{connectedUserId}/connections/{connectionId}:
+    delete:
+      description: "Deletes a connection a connected user created or a tenant admin provisioned for them."
+      summary: "Deletes a connection of a connected user"
+      tags:
+        - "connection"
+      operationId: "deleteConnectedUserConnection"
+      parameters:
+        - name: "connectedUserId"
+          description: "The id of a connected user."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "connectionId"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "204":
+          description: "Successful operation."
   /connected-users/{connectedUserId}/connections/{connectionId}/credentials:
     put:
       description: "Replaces the credentials of a connection a tenant admin provisioned for a connected user."
