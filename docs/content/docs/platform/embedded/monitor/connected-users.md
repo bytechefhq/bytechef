@@ -97,7 +97,11 @@ Click on a connected user row to open a side sheet. At the top is a **Profile** 
 
 1. **Integrations** tab (default) -- every integration the user has connected, with the integration's status and the workflows enabled for each integration instance. A workflow's switch is greyed out when its instance configuration does not enable it. A workflow that an embedded MCP server exposes as a tool is listed here only when it also has other triggers, such as a webhook or a schedule; it is marked **MCP tool**, and its switch controls those other triggers. A workflow whose only trigger is the tool trigger is managed on the **MCP Servers** tab. Click a workflow's name to open its executions for this user. Use this tab to inspect and manage the connect-flow side of the relationship, and **Add integration** to provision a new instance for the user (see [Provisioning an Integration](#provisioning-an-integration)).
 2. **MCP Servers** tab -- the MCP servers this user has access to, so you can control which tools are exposed to that user's AI agents. Each server card shows how many component tools and workflow tools it exposes to the user, with a switch that turns all of them on or off at once. Expand a card to see its **Component Tools** and **Workflow Tools**, grouped by component, each with its own switch. A workflow tool's switch only decides whether the user's AI agents see that tool; it does not change the workflow's switch on the **Integrations** tab. When you add tools or workflows to the server, users who have it get them automatically. **Delete** removes the server and all of its tools for this user; the user's integrations and workflows are not affected, and the server can be provisioned for the user again. Shows "No MCP servers expose this user's integrations." when none apply.
-3. **Automations** tab -- the automations associated with this user, grouped under the [automation project](/platform/embedded/build/automations) whose template each one was activated or copied from. Workflows that don't come from a template, such as ones the user built from scratch, are listed last under **Other**. Each row shows the workflow label, the version currently in use for this user, and the last execution date (or "No executions" if it hasn't run yet). Click a workflow's name to open its executions for this user. The tab shows "No automations." when nothing is associated.
+3. **Automations** tab -- the automation workflows this user has, in two kinds of groups:
+   - A group named after an [automation project](/platform/embedded/build/automations), marked **Reference**, holds the workflows provisioned from that project. They follow the project version of the user's configuration. The group's card shows the configuration's name, the number of workflows and the project version, and its ⋮ menu offers **Change configuration…**.
+   - **Created by this user**, marked **Copy**, holds the workflows the user owns and edits in the workflow editor: copies of a template and workflows built from scratch. Each one shows its own version, or **V1 DRAFT** until the user publishes it, and it cannot be enabled before it is published.
+
+   Expand a group to see its workflows. Each row shows the workflow label, its static webhook URL when it has one, its trigger and components, the last execution date (or "No executions" if it hasn't run yet) and a switch that enables or disables the workflow for this user. Click a workflow's name to open its executions for this user. A row's ⋮ menu offers **Delete**, and for a workflow in a project group also **Edit** (see [Editing a Workflow's Connections and Inputs](#editing-a-workflows-connections-and-inputs)). Use **Provision Workflow** to add workflows (see [Provisioning a Workflow](#provisioning-a-workflow)). The tab shows "No automations yet" when the user has none.
 4. **External Invocations** tab -- the user's most recent tool and action calls made through embedded MCP servers and the Component Kit, with the name, source, server, target, status, duration and date of each. Shows "No external invocations have been recorded for this user yet." when there are none. See [External Invocations](/platform/embedded/monitor/external-invocations).
 
 The executions view opens on top of the user sheet and lists only this user's runs of that workflow, with a **Workflow** tab that shows the workflow's definition. Click an execution to see its task-by-task details.
@@ -132,6 +136,31 @@ Provisioning sets an integration up for a connected user from the console, so th
 ByteChef creates the connection, the integration instance on the chosen configuration, and the selected workflows, and the new instance appears on the **Integrations** tab. If any step fails, nothing is kept: the workflows already enabled are disabled and the instance and connection are deleted.
 
 The instance is created in the connected user's own environment. Provisioning always adds a new instance, even when the user already has one for the same integration (for example, two accounts of the same service). The user's own embedded UI then shows that instance's configuration and workflows, not the self-serve one.
+
+### Provisioning a Workflow
+
+Provisioning gives a connected user workflows from one of your automation projects, without the user activating them in the [Automation Hub](/platform/embedded/build/automation-hub).
+
+1. Open the connected user's sheet and click **Provision Workflow** on the **Automations** tab. The button is disabled when no project has a configuration released to the user's environment.
+2. In the **New Workflow** dialog, choose the **Project**. Each project is listed with its version.
+3. Choose the **Configuration**. The self-serve configuration, or the only one, is preselected. If the user is already assigned to a configuration of the project, it is shown read-only; use **Change configuration…** on the project's card to move the user.
+4. Select the workflows to provision. Workflows the user already has are checked and marked **Provisioned**.
+5. For each selected workflow, pick a **connection** for every component that needs one. The list holds the user's own connections for that component, and the **+** button creates a new one. A workflow provisioned without a connection it needs is provisioned disabled.
+6. Fill in the workflow's **inputs**. Required inputs are marked with an asterisk and must be filled before you can save.
+7. Click **Save**.
+
+Connections and inputs that the configuration provides are not listed, because the configuration's values always apply.
+
+### Editing a Workflow's Connections and Inputs
+
+You can change the connections and inputs a provisioned workflow runs with. This applies to workflows in a project group. Workflows under **Created by this user** are edited by the user in the workflow editor.
+
+1. On the **Automations** tab, expand the project group, open the workflow's ⋮ menu and choose **Edit**.
+2. On the **Connections** tab of the dialog, pick another of the user's connections for a component, or create a new one with the **+** button. The workflow's current connection is preselected.
+3. On the **Inputs** tab, change the input values. The current values are prefilled.
+4. Click **Save**.
+
+The workflow keeps its enabled state. As when provisioning, connections and inputs the configuration provides are not listed. **Save** is unavailable when the configuration provides all of them, when the workflow's configuration is not released to the user's environment, or when the workflow needs attention, for example because its project was deleted (see [Dangling references](/platform/embedded/build/automations/automation-code-workflows#dangling-references)).
 
 ### Credentials of provisioned integrations
 
