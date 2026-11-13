@@ -16,13 +16,19 @@
 
 package com.bytechef.platform.ai.tool.facade;
 
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ClusterElementDefinition.OptionsFunction;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.ai.tool.FromAiResult;
+import com.bytechef.platform.component.domain.Property;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,6 +48,9 @@ class AbstractToolFacadeTest {
 
     @Mock
     private Evaluator evaluator;
+
+    private static final OptionsFunction<String> OPTIONS_FUNCTION =
+        (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> List.of();
 
     private AbstractToolFacade createToolFacade() {
         return new AbstractToolFacade(evaluator) {};
@@ -585,5 +594,78 @@ class AbstractToolFacadeTest {
     @Test
     void testToToolNameReturnsNullForALabelWithNothingUsable() {
         assertNull(AbstractToolFacade.toToolName("()"));
+    }
+
+    @Test
+    void testApplyRuntimeOptionsReplacesStoredOptionsWithTheLoadedOnes() {
+        FromAiResult channelFromAiResult = new FromAiResult(
+            "channel", "STRING", null, null, List.<Object>of("stale"), true);
+
+        when(evaluator.evaluate(eq(Map.of("value", "=fromAi('channel')")), eq(Map.of())))
+            .thenReturn(Map.of("value", channelFromAiResult));
+
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        List<FromAiResult> fromAiResults = toolFacade.applyRuntimeOptions(
+            List.of(channelFromAiResult), Map.of("channel", "=fromAi('channel')"),
+            List.of(Property.toProperty(string("channel").options(OPTIONS_FUNCTION))),
+            property -> List.of("general", "random"));
+
+        assertThat(fromAiResults).containsExactly(
+            new FromAiResult("channel", "STRING", null, null, List.of("general", "random"), true));
+    }
+
+    @Test
+    void testApplyRuntimeOptionsKeepsTheStoredOptionsWhenNoneLoad() {
+        FromAiResult channelFromAiResult = new FromAiResult(
+            "channel", "STRING", null, null, List.<Object>of("stored"), false);
+
+        when(evaluator.evaluate(eq(Map.of("value", "=fromAi('channel')")), eq(Map.of())))
+            .thenReturn(Map.of("value", channelFromAiResult));
+
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        List<FromAiResult> fromAiResults = toolFacade.applyRuntimeOptions(
+            List.of(channelFromAiResult), Map.of("channel", "=fromAi('channel')"),
+            List.of(Property.toProperty(string("channel").options(OPTIONS_FUNCTION))), property -> null);
+
+        assertThat(fromAiResults).containsExactly(channelFromAiResult);
+    }
+
+    @Test
+    void testApplyRuntimeOptionsResolvesANestedProperty() {
+        FromAiResult channelFromAiResult = new FromAiResult("target_channel", "STRING", null, null, null, false);
+
+        when(evaluator.evaluate(eq(Map.of("value", "=fromAi('target_channel')")), eq(Map.of())))
+            .thenReturn(Map.of("value", channelFromAiResult));
+
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        List<FromAiResult> fromAiResults = toolFacade.applyRuntimeOptions(
+            List.of(channelFromAiResult), Map.of("target", Map.of("channel", "=fromAi('target_channel')")),
+            List.of(Property.toProperty(object("target").properties(string("channel").options(OPTIONS_FUNCTION)))),
+            property -> List.of(property.getName()));
+
+        assertThat(fromAiResults).containsExactly(
+            new FromAiResult("target_channel", "STRING", null, null, List.of("channel"), false));
+    }
+
+    @Test
+    void testApplyRuntimeOptionsLeavesFixedOptionsAndCompositeExpressionsAlone() {
+        FromAiResult priorityFromAiResult = new FromAiResult(
+            "priority", "STRING", null, null, List.<Object>of("high"), false);
+        FromAiResult channelFromAiResult = new FromAiResult("channel", "STRING", null, null, null, false);
+
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        List<FromAiResult> fromAiResults = toolFacade.applyRuntimeOptions(
+            List.of(priorityFromAiResult, channelFromAiResult),
+            Map.of("priority", "=fromAi('priority')", "channel", "='#' + fromAi('channel')"),
+            List.of(
+                Property.toProperty(string("priority").options(option("High", "high"))),
+                Property.toProperty(string("channel").options(OPTIONS_FUNCTION))),
+            property -> List.of("loaded"));
+
+        assertThat(fromAiResults).containsExactly(priorityFromAiResult, channelFromAiResult);
     }
 }

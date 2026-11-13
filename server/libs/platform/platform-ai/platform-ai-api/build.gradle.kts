@@ -10,6 +10,7 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-model")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-api"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
 
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
     testImplementation(project(":server:libs:test:test-support"))
