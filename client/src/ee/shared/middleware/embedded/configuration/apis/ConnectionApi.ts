@@ -47,6 +47,17 @@ export interface CreateConnectionRequest {
     connection: Connection;
 }
 
+export interface DeleteConnectedUserConnectionRequest {
+    /**
+     * The id of a connected user.
+     */
+    connectedUserId: number;
+    /**
+     * The id of a connection.
+     */
+    connectionId: number;
+}
+
 export interface DeleteConnectionRequest {
     /**
      * The id of a connection.
@@ -256,6 +267,60 @@ export class ConnectionApi extends runtime.BaseAPI {
     async createConnection(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
         const response = await this.createConnectionRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for deleteConnectedUserConnection without sending the request
+     */
+    async deleteConnectedUserConnectionRequestOpts(requestParameters: DeleteConnectedUserConnectionRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['connectedUserId'] == null) {
+            throw new runtime.RequiredError(
+                'connectedUserId',
+                'Required parameter "connectedUserId" was null or undefined when calling deleteConnectedUserConnection().'
+            );
+        }
+
+        if (requestParameters['connectionId'] == null) {
+            throw new runtime.RequiredError(
+                'connectionId',
+                'Required parameter "connectionId" was null or undefined when calling deleteConnectedUserConnection().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/connected-users/{connectedUserId}/connections/{connectionId}`;
+        urlPath = urlPath.replace('{connectedUserId}', encodeURIComponent(String(requestParameters['connectedUserId'])));
+        urlPath = urlPath.replace('{connectionId}', encodeURIComponent(String(requestParameters['connectionId'])));
+
+        return {
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Deletes a connection a connected user created or a tenant admin provisioned for them.
+     * Deletes a connection of a connected user
+     */
+    async deleteConnectedUserConnectionRaw(requestParameters: DeleteConnectedUserConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.deleteConnectedUserConnectionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Deletes a connection a connected user created or a tenant admin provisioned for them.
+     * Deletes a connection of a connected user
+     */
+    async deleteConnectedUserConnection(requestParameters: DeleteConnectedUserConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteConnectedUserConnectionRaw(requestParameters, initOverrides);
     }
 
     /**
