@@ -1,6 +1,6 @@
 #### Webhook Trigger Execution Modes
 
-Use the **Static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. Incoming requests are first validated by checking the CSRF token sent in the `X-Csrf-Token` HTTP header. If validation succeeds, the workflow is executed and the sender receives an **HTTP 200 OK** response.
+Use the **Static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. Incoming requests are first validated by checking the CSRF token sent in the `X-Csrf-Token` HTTP header. If validation succeeds, the workflow is executed and the sender receives an **HTTP 200 OK** response, or the response set with the **Response Type** property. It works the same way as in [Auto Respond](#respond-immediately).
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/86347f45-900a-4bca-8763-5f3982305010?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
@@ -25,10 +25,11 @@ ByteChef checks the token, then sends the response. The workflow runs **after** 
 
 | Situation | Status | Body |
 |:---|:---|:---|
-| The token is correct | `200 OK` | Empty. The workflow starts. |
+| The token is correct | `200 OK`, or the configured response | Empty, or the configured response. The workflow starts. |
+| The token is correct, but the configured response can't be built | `500 Internal Server Error` | Empty. The workflow does not run. |
 | The `X-Csrf-Token` header is missing, or its value is incorrect | `400 Bad Request` | Empty. The workflow does not run. |
 | The workflow is disabled | `410 Gone` | `{"detail": "Workflow is disabled."}`. The token is not checked and the workflow does not run. |
-| A step of the workflow fails | `200 OK` | Empty. The response was sent before the step ran. |
+| A step of the workflow fails | The response above | The response was sent before the step ran. |
 
 If you get `400 Bad Request`, make sure that:
 
