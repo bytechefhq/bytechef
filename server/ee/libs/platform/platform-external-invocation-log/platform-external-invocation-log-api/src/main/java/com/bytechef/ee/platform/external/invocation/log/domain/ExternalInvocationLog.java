@@ -38,8 +38,8 @@ public class ExternalInvocationLog {
     @Column("kind")
     private int kind;
 
-    @Column("tool_name")
-    private String toolName;
+    @Column("invocation_name")
+    private String invocationName;
 
     @Column("component_name")
     private String componentName;
@@ -111,8 +111,8 @@ public class ExternalInvocationLog {
         return ExternalInvocationKind.values()[kind];
     }
 
-    public @Nullable String getToolName() {
-        return toolName;
+    public @Nullable String getInvocationName() {
+        return invocationName;
     }
 
     public @Nullable String getComponentName() {
@@ -199,8 +199,8 @@ public class ExternalInvocationLog {
         this.kind = kind.ordinal();
     }
 
-    public void setToolName(String toolName) {
-        this.toolName = toolName;
+    public void setInvocationName(String invocationName) {
+        this.invocationName = invocationName;
     }
 
     public void setComponentName(String componentName) {
@@ -296,7 +296,7 @@ public class ExternalInvocationLog {
             ", type=" + type +
             ", source=" + source +
             ", kind=" + kind +
-            ", toolName='" + toolName + '\'' +
+            ", invocationName='" + invocationName + '\'' +
             ", status=" + status +
             ", durationMs=" + durationMs +
             '}';

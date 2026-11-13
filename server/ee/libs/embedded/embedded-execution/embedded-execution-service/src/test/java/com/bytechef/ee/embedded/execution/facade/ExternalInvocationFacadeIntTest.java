@@ -141,7 +141,7 @@ class ExternalInvocationFacadeIntTest {
         externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
         externalInvocationLog.setStatus(status);
         externalInvocationLog.setSource(source);
-        externalInvocationLog.setToolName("slack_send");
+        externalInvocationLog.setInvocationName("slack_send");
         externalInvocationLog.setType(type);
 
         return externalInvocationLogService.create(externalInvocationLog);

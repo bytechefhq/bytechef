@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public record ExternalInvocationEvent(
-    PlatformType type, ExternalInvocationSource source, ExternalInvocationKind kind, String toolName,
+    PlatformType type, ExternalInvocationSource source, ExternalInvocationKind kind, String invocationName,
     @Nullable String componentName, @Nullable Integer componentVersion, @Nullable String operationName,
     @Nullable Long connectionId, @Nullable Integer environment, @Nullable Long workspaceId,
     @Nullable String externalUserId, @Nullable Long connectedUserId, @Nullable Long integrationInstanceId,
@@ -33,9 +33,9 @@ public record ExternalInvocationEvent(
     public static final int ERROR_MESSAGE_MAX_LENGTH = 512;
 
     public static Builder builder(
-        PlatformType type, ExternalInvocationSource source, ExternalInvocationKind kind, String toolName) {
+        PlatformType type, ExternalInvocationSource source, ExternalInvocationKind kind, String invocationName) {
 
-        return new Builder(type, source, kind, toolName);
+        return new Builder(type, source, kind, invocationName);
     }
 
     public static final class Builder {
@@ -43,7 +43,7 @@ public record ExternalInvocationEvent(
         private final PlatformType type;
         private final ExternalInvocationSource source;
         private final ExternalInvocationKind kind;
-        private final String toolName;
+        private final String invocationName;
 
         private @Nullable String componentName;
         private @Nullable Integer componentVersion;
@@ -63,11 +63,11 @@ public record ExternalInvocationEvent(
         private long durationMs;
 
         private Builder(PlatformType type, ExternalInvocationSource source, ExternalInvocationKind kind,
-            String toolName) {
+            String invocationName) {
             this.type = type;
             this.source = source;
             this.kind = kind;
-            this.toolName = toolName;
+            this.invocationName = invocationName;
         }
 
         public Builder componentName(@Nullable String componentName) {
@@ -172,7 +172,7 @@ public record ExternalInvocationEvent(
 
         public ExternalInvocationEvent build() {
             return new ExternalInvocationEvent(
-                type, source, kind, toolName, componentName, componentVersion, operationName, connectionId,
+                type, source, kind, invocationName, componentName, componentVersion, operationName, connectionId,
                 environment, workspaceId, externalUserId, connectedUserId, integrationInstanceId, mcpServerId,
                 a2aServerId, jobId, status, errorType, errorMessage, durationMs);
         }

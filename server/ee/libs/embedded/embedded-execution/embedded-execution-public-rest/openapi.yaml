@@ -1197,6 +1197,9 @@ components:
           description: "The id of the integration instance the invocation ran on."
           type: "integer"
           format: "int64"
+        invocationName:
+          description: "The name the caller invoked: a tool name for MCP and tool calls, an action name for action calls."
+          type: "string"
         jobId:
           description: "The id of the workflow run a workflow tool started."
           type: "integer"
@@ -1210,9 +1213,6 @@ components:
           $ref: "#/components/schemas/ExternalInvocationSource"
         status:
           $ref: "#/components/schemas/ExternalInvocationStatus"
-        toolName:
-          description: "The name of the tool."
-          type: "string"
     ExternalInvocationKind:
       description: "What a external invocation ran."
       type: "string"

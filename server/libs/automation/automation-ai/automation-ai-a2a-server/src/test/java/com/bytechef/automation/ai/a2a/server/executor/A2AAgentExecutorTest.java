@@ -755,7 +755,7 @@ class A2AAgentExecutorTest {
         assertThat(externalInvocationEvent.type()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(externalInvocationEvent.source()).isEqualTo(ExternalInvocationSource.A2A_SERVER);
         assertThat(externalInvocationEvent.kind()).isEqualTo(ExternalInvocationKind.WORKFLOW);
-        assertThat(externalInvocationEvent.toolName()).isEqualTo("Label wf1");
+        assertThat(externalInvocationEvent.invocationName()).isEqualTo("Label wf1");
         assertThat(externalInvocationEvent.a2aServerId()).isEqualTo(1L);
         assertThat(externalInvocationEvent.mcpServerId()).isNull();
         assertThat(externalInvocationEvent.workspaceId()).isEqualTo(5L);
@@ -777,7 +777,7 @@ class A2AAgentExecutorTest {
         start(CompletableFuture.completedFuture(completedJob(100L)), null).result()
             .join();
 
-        assertThat(getRecordedExternalInvocationEvent().toolName()).isEqualTo("Summarize");
+        assertThat(getRecordedExternalInvocationEvent().invocationName()).isEqualTo("Summarize");
     }
 
     @Test

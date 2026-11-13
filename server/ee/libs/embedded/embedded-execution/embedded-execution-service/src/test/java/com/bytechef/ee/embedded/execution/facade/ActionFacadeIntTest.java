@@ -96,7 +96,7 @@ class ActionFacadeIntTest {
                 assertThat(externalInvocationLog.getType()).isEqualTo(PlatformType.EMBEDDED);
                 assertThat(externalInvocationLog.getSource()).isEqualTo(ExternalInvocationSource.API_ACTION);
                 assertThat(externalInvocationLog.getKind()).isEqualTo(ExternalInvocationKind.COMPONENT);
-                assertThat(externalInvocationLog.getToolName()).isEqualTo("sendMessage");
+                assertThat(externalInvocationLog.getInvocationName()).isEqualTo("sendMessage");
                 assertThat(externalInvocationLog.getComponentName()).isEqualTo("slack");
                 assertThat(externalInvocationLog.getComponentVersion()).isEqualTo(1);
                 assertThat(externalInvocationLog.getOperationName()).isEqualTo("sendMessage");

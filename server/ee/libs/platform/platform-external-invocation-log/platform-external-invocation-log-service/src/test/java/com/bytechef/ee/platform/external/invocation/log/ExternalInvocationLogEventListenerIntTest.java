@@ -103,7 +103,7 @@ class ExternalInvocationLogEventListenerIntTest {
         assertThat(externalInvocationLog.getType()).isEqualTo(PlatformType.EMBEDDED);
         assertThat(externalInvocationLog.getSource()).isEqualTo(ExternalInvocationSource.MCP_SERVER);
         assertThat(externalInvocationLog.getKind()).isEqualTo(ExternalInvocationKind.COMPONENT);
-        assertThat(externalInvocationLog.getToolName()).isEqualTo("slack_sendMessage");
+        assertThat(externalInvocationLog.getInvocationName()).isEqualTo("slack_sendMessage");
         assertThat(externalInvocationLog.getComponentName()).isEqualTo("slack");
         assertThat(externalInvocationLog.getComponentVersion()).isEqualTo(1);
         assertThat(externalInvocationLog.getOperationName()).isEqualTo("sendMessage");
@@ -146,7 +146,7 @@ class ExternalInvocationLogEventListenerIntTest {
         ExternalInvocationLog externalInvocationLog = externalInvocationLogRepository.findAll()
             .getFirst();
 
-        assertThat(externalInvocationLog.getToolName()).isEqualTo("s".repeat(256));
+        assertThat(externalInvocationLog.getInvocationName()).isEqualTo("s".repeat(256));
         assertThat(externalInvocationLog.getComponentName()).isEqualTo("c".repeat(256));
         assertThat(externalInvocationLog.getOperationName()).isEqualTo("o".repeat(256));
         assertThat(externalInvocationLog.getErrorType()).isEqualTo("t".repeat(256));

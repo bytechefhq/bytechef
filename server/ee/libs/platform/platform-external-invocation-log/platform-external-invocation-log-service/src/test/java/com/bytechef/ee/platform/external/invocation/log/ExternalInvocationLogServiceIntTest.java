@@ -242,7 +242,7 @@ class ExternalInvocationLogServiceIntTest {
         externalInvocationLog.setType(type);
         externalInvocationLog.setSource(ExternalInvocationSource.MCP_SERVER);
         externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
-        externalInvocationLog.setToolName("slack_sendMessage");
+        externalInvocationLog.setInvocationName("slack_sendMessage");
         externalInvocationLog.setEnvironment(environment);
         externalInvocationLog.setStatus(status);
         externalInvocationLog.setDurationMs(5);
@@ -257,7 +257,7 @@ class ExternalInvocationLogServiceIntTest {
         externalInvocationLog.setType(PlatformType.EMBEDDED);
         externalInvocationLog.setSource(source);
         externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
-        externalInvocationLog.setToolName("slack_sendMessage");
+        externalInvocationLog.setInvocationName("slack_sendMessage");
         externalInvocationLog.setEnvironment(environment);
         externalInvocationLog.setStatus(ExternalInvocationStatus.SUCCESS);
         externalInvocationLog.setDurationMs(5);
@@ -272,7 +272,7 @@ class ExternalInvocationLogServiceIntTest {
         externalInvocationLog.setType(PlatformType.AUTOMATION);
         externalInvocationLog.setSource(ExternalInvocationSource.A2A_SERVER);
         externalInvocationLog.setKind(ExternalInvocationKind.WORKFLOW);
-        externalInvocationLog.setToolName("Summarize");
+        externalInvocationLog.setInvocationName("Summarize");
         externalInvocationLog.setA2aServerId(a2aServerId);
         externalInvocationLog.setStatus(ExternalInvocationStatus.SUCCESS);
         externalInvocationLog.setDurationMs(5);
@@ -287,7 +287,7 @@ class ExternalInvocationLogServiceIntTest {
         externalInvocationLog.setType(PlatformType.AUTOMATION);
         externalInvocationLog.setSource(ExternalInvocationSource.MCP_SERVER);
         externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
-        externalInvocationLog.setToolName("slack_sendMessage");
+        externalInvocationLog.setInvocationName("slack_sendMessage");
         externalInvocationLog.setWorkspaceId(workspaceId);
         externalInvocationLog.setEnvironment(environment);
         externalInvocationLog.setMcpServerId(mcpServerId);
@@ -306,7 +306,7 @@ class ExternalInvocationLogServiceIntTest {
         externalInvocationLog.setType(type);
         externalInvocationLog.setSource(ExternalInvocationSource.MCP_SERVER);
         externalInvocationLog.setKind(ExternalInvocationKind.COMPONENT);
-        externalInvocationLog.setToolName("slack_sendMessage");
+        externalInvocationLog.setInvocationName("slack_sendMessage");
         externalInvocationLog.setMcpServerId(mcpServerId);
         externalInvocationLog.setStatus(status);
         externalInvocationLog.setDurationMs(5);

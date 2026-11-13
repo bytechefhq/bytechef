@@ -119,7 +119,7 @@ class ExternalInvocationApiControllerIntTest {
             .andExpect(jsonPath("$.content[0].operationName").value("sendMessage"))
             .andExpect(jsonPath("$.content[0].status").value("ERROR"))
             .andExpect(jsonPath("$.content[0].source").value("API_ACTION"))
-            .andExpect(jsonPath("$.content[0].toolName").value("sendMessage"));
+            .andExpect(jsonPath("$.content[0].invocationName").value("sendMessage"));
     }
 
     @Test
@@ -231,7 +231,7 @@ class ExternalInvocationApiControllerIntTest {
         externalInvocationLog.setOperationName("sendMessage");
         externalInvocationLog.setStatus(status);
         externalInvocationLog.setSource(source);
-        externalInvocationLog.setToolName("sendMessage");
+        externalInvocationLog.setInvocationName("sendMessage");
 
         return externalInvocationLog;
     }

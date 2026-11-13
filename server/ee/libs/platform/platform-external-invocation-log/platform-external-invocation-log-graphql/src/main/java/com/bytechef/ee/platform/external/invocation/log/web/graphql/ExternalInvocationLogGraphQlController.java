@@ -104,7 +104,7 @@ public class ExternalInvocationLogGraphQlController {
                 .name(),
             externalInvocationLog.getKind()
                 .name(),
-            externalInvocationLog.getToolName(), externalInvocationLog.getComponentName(),
+            externalInvocationLog.getInvocationName(), externalInvocationLog.getComponentName(),
             externalInvocationLog.getComponentVersion(), externalInvocationLog.getOperationName(),
             externalInvocationLog.getConnectionId(), externalInvocationLog.getEnvironment(),
             externalInvocationLog.getWorkspaceId(), externalInvocationLog.getExternalUserId(),
@@ -120,7 +120,7 @@ public class ExternalInvocationLogGraphQlController {
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     record ExternalInvocationLogItem(
-        Long id, String source, String kind, String toolName, String componentName, Integer componentVersion,
+        Long id, String source, String kind, String invocationName, String componentName, Integer componentVersion,
         String operationName, Long connectionId, Integer environment, Long workspaceId, String externalUserId,
         Long connectedUserId, Long integrationInstanceId, Long mcpServerId, Long a2aServerId, Long jobId,
         String workflowName, String status, String errorType, String errorMessage, int durationMs, Long createdDate) {

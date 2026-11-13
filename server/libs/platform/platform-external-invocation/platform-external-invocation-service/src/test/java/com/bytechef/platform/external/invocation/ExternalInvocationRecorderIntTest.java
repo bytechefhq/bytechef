@@ -79,7 +79,7 @@ class ExternalInvocationRecorderIntTest {
         assertThat(event.status()).isEqualTo(ExternalInvocationStatus.SUCCESS);
         assertThat(event.source()).isEqualTo(ExternalInvocationSource.MCP_SERVER);
         assertThat(event.kind()).isEqualTo(ExternalInvocationKind.COMPONENT);
-        assertThat(event.toolName()).isEqualTo("slack_sendMessage");
+        assertThat(event.invocationName()).isEqualTo("slack_sendMessage");
         assertThat(event.type()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(event.errorType()).isNull();
     }

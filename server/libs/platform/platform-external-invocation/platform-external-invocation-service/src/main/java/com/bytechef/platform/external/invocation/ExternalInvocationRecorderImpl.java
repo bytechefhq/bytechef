@@ -100,7 +100,7 @@ public class ExternalInvocationRecorderImpl implements ExternalInvocationRecorde
             if (log.isDebugEnabled()) {
                 log.debug(
                     "External invocation type={} source={} kind={} tool={} status={} durationMs={}",
-                    event.type(), event.source(), event.kind(), event.toolName(), event.status(),
+                    event.type(), event.source(), event.kind(), event.invocationName(), event.status(),
                     event.durationMs());
             }
 
