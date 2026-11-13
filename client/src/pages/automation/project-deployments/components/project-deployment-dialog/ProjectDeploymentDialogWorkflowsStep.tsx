@@ -29,7 +29,7 @@ const ProjectDeploymentDialogWorkflowsStep = ({
 
     return (
         <div className="min-h-full space-y-5">
-            {nonSubflowWorkflows?.map((workflow, workflowIndex) => (
+            {nonSubflowWorkflows?.map((workflow) => (
                 <ProjectDeploymentDialogWorkflowsStepItem
                     connections={connections}
                     connectionsGrouped={connectionsGrouped}
@@ -40,7 +40,7 @@ const ProjectDeploymentDialogWorkflowsStep = ({
                     setValue={setValue}
                     showWorkflowToggle
                     workflow={workflow}
-                    workflowIndex={workflowIndex}
+                    workflowIndex={workflows.indexOf(workflow)}
                     workflows={workflows}
                 />
             ))}
