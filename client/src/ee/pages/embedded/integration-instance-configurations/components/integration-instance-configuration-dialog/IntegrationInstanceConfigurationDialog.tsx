@@ -544,7 +544,7 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const showsVersionUpdate = updateIntegrationVersion || isChangeVersionTab;
 
-    const wizardTitle = showsVersionUpdate ? 'Change Integration Version' : 'New Configuration';
+    const wizardTitle = showsVersionUpdate ? 'Change Version' : 'New Configuration';
 
     const wizardDescription = showsVersionUpdate
         ? 'Move this configuration to another integration version.'

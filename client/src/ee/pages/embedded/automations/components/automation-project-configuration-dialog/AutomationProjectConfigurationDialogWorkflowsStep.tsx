@@ -5,16 +5,20 @@ import {ConfigurationDialogWorkflowI, WorkflowDraftI} from './automationProjectC
 
 interface AutomationProjectConfigurationDialogWorkflowsStepProps {
     configurationId?: string;
+    description?: string;
     isLoading: boolean;
     onWorkflowDraftChange: (workflowUuid: string, workflowDraft: WorkflowDraftI) => void;
+    projectVersion?: number;
     workflowDrafts: Record<string, WorkflowDraftI>;
     workflows: ConfigurationDialogWorkflowI[];
 }
 
 const AutomationProjectConfigurationDialogWorkflowsStep = ({
     configurationId,
+    description,
     isLoading,
     onWorkflowDraftChange,
+    projectVersion,
     workflowDrafts,
     workflows,
 }: AutomationProjectConfigurationDialogWorkflowsStepProps) => {
@@ -29,9 +33,10 @@ const AutomationProjectConfigurationDialogWorkflowsStep = ({
     return (
         <div className="min-h-full space-y-5">
             <p className="text-sm text-content-neutral-secondary">
-                {configurationId
-                    ? 'Connections and inputs set here are used by every connected user and cannot be changed by them.'
-                    : 'Every workflow lets each user connect and fill. Provided connections and inputs can be set for each workflow once the configuration is created.'}
+                {description ||
+                    (configurationId
+                        ? 'Connections and inputs set here are used by every connected user and cannot be changed by them.'
+                        : 'Every workflow lets each user connect and fill. Provided connections and inputs can be set for each workflow once the configuration is created.')}
             </p>
 
             {workflows.length > 0 ? (
@@ -40,6 +45,7 @@ const AutomationProjectConfigurationDialogWorkflowsStep = ({
                         configurationId={configurationId}
                         key={workflow.workflowUuid}
                         onWorkflowDraftChange={onWorkflowDraftChange}
+                        projectVersion={projectVersion}
                         workflow={workflow}
                         workflowDraft={workflowDrafts[workflow.workflowUuid]}
                     />

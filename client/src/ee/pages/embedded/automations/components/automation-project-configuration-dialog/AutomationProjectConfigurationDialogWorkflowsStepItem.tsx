@@ -54,6 +54,7 @@ const WorkflowToggleRow = ({enabled, label, onEnabledChange, switchId}: Workflow
 interface AutomationProjectConfigurationDialogWorkflowsStepItemProps {
     configurationId?: string;
     onWorkflowDraftChange: (workflowUuid: string, workflowDraft: WorkflowDraftI) => void;
+    projectVersion?: number;
     workflow: ConfigurationDialogWorkflowI;
     workflowDraft?: WorkflowDraftI;
 }
@@ -61,11 +62,12 @@ interface AutomationProjectConfigurationDialogWorkflowsStepItemProps {
 const AutomationProjectConfigurationDialogWorkflowsStepItem = ({
     configurationId,
     onWorkflowDraftChange,
+    projectVersion,
     workflow,
     workflowDraft = {},
 }: AutomationProjectConfigurationDialogWorkflowsStepItemProps) => {
     const {data: providableValuesData} = useAutomationProjectConfigurationWorkflowProvidableValuesQuery(
-        {id: configurationId ?? '', workflowUuid: workflow.workflowUuid},
+        {id: configurationId ?? '', projectVersion, workflowUuid: workflow.workflowUuid},
         {enabled: !!configurationId}
     );
 
@@ -120,6 +122,7 @@ const AutomationProjectConfigurationDialogWorkflowsStepItem = ({
             onProvidedInputsChange={(changedProvidedInputs) =>
                 handleProvidedValuesChange(providedConnections, changedProvidedInputs)
             }
+            projectVersion={projectVersion}
             providableValues={providableValues}
             providedConnections={providedConnections}
             providedInputs={providedInputs}

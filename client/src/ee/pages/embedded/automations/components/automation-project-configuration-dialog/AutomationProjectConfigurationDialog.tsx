@@ -3,12 +3,9 @@ import Button from '@/components/Button/Button';
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {
     Dialog,
-    DialogBody,
     DialogCancelButton,
     DialogContent,
     DialogFooter,
-    DialogHeader,
-    DialogMain,
     DialogNextButton,
     DialogPreviousButton,
     type DialogStepI,
@@ -29,14 +26,13 @@ import {
     AutomationProjectsQuery,
     useAutomationProjectConfigurationVersionImpactQuery,
     useAutomationProjectConfigurationsQuery,
-    useAutomationProjectVersionWorkflowChangesQuery,
+    useAutomationProjectVersionWorkflowsQuery,
     useAutomationProjectVersionsQuery,
     useCreateAutomationProjectConfigurationMutation,
     useEnableAutomationProjectConfigurationWorkflowMutation,
     useUpdateAutomationProjectConfigurationMutation,
     useUpdateAutomationProjectConfigurationWorkflowMutation,
 } from '@/shared/middleware/graphql';
-import {WorkflowChangeType} from '@/shared/middleware/graphql-types';
 import {useGetEnvironmentsQuery} from '@/shared/queries/platform/environments.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
@@ -138,8 +134,6 @@ const AutomationProjectConfigurationDialog = ({
 
     const projectVersion = chosenProjectVersion || project?.lastPublishedVersion?.toString() || '';
 
-    const isWizard = !updateProjectVersionProp;
-
     const {data: configurationsData} = useAutomationProjectConfigurationsQuery(
         {projectId: project?.id ?? ''},
         {enabled: !!project}
@@ -172,11 +166,10 @@ const AutomationProjectConfigurationDialog = ({
     }
 
     const {data: versionsData} = useAutomationProjectVersionsQuery({id: project?.id ?? ''}, {enabled: !!project});
-    const {data: versionWorkflowChangesData, isLoading: versionWorkflowsLoading} =
-        useAutomationProjectVersionWorkflowChangesQuery(
-            {id: project?.id ?? '', projectVersion: Number(projectVersion)},
-            {enabled: isWizard && !configuration && !!project && projectVersion !== ''}
-        );
+    const {data: versionWorkflowsData, isLoading: versionWorkflowsLoading} = useAutomationProjectVersionWorkflowsQuery(
+        {id: project?.id ?? '', projectVersion: Number(projectVersion)},
+        {enabled: (updateProjectVersionProp || !configuration) && !!project && projectVersion !== ''}
+    );
 
     const changesVersion =
         !!configuration && projectVersion !== '' && Number(projectVersion) !== configuration.projectVersion;
@@ -252,6 +245,17 @@ const AutomationProjectConfigurationDialog = ({
         !!configuration && projectVersion !== '' && Number(projectVersion) < configuration.projectVersion;
 
     const dialogWorkflows = useMemo<ConfigurationDialogWorkflowI[]>(() => {
+        if (configuration && updateProjectVersionProp) {
+            return (versionWorkflowsData?.automationProjectVersionWorkflows ?? []).map((versionWorkflow) => ({
+                enabled:
+                    configuration.workflows.find(
+                        (configurationWorkflow) => configurationWorkflow.workflowUuid === versionWorkflow.workflowUuid
+                    )?.enabled ?? true,
+                label: versionWorkflow.label || versionWorkflow.workflowUuid,
+                workflowUuid: versionWorkflow.workflowUuid,
+            }));
+        }
+
         if (configuration) {
             return configuration.workflows.map((configurationWorkflow) => ({
                 enabled: configurationWorkflow.enabled,
@@ -260,14 +264,12 @@ const AutomationProjectConfigurationDialog = ({
             }));
         }
 
-        return (versionWorkflowChangesData?.automationProjectVersionWorkflowChanges.workflows ?? [])
-            .filter((versionWorkflow) => versionWorkflow.changeType !== WorkflowChangeType.Removed)
-            .map((versionWorkflow) => ({
-                enabled: true,
-                label: versionWorkflow.label || versionWorkflow.workflowUuid,
-                workflowUuid: versionWorkflow.workflowUuid,
-            }));
-    }, [configuration, versionWorkflowChangesData]);
+        return (versionWorkflowsData?.automationProjectVersionWorkflows ?? []).map((versionWorkflow) => ({
+            enabled: true,
+            label: versionWorkflow.label || versionWorkflow.workflowUuid,
+            workflowUuid: versionWorkflow.workflowUuid,
+        }));
+    }, [configuration, updateProjectVersionProp, versionWorkflowsData]);
 
     const impactWarnings = useMemo(() => {
         if (!changesVersion) {
@@ -647,26 +649,34 @@ const AutomationProjectConfigurationDialog = ({
         </>
     );
 
-    const basicStepContent = showTabs
-        ? basicStepTab && (
-              <ConfigurationDialogTabs
-                  activeTab={basicStepTab}
-                  changeVersionContent={
-                      <>
-                          {versionFieldset}
+    const basicStepContent = showTabs ? (
+        basicStepTab && (
+            <ConfigurationDialogTabs
+                activeTab={basicStepTab}
+                changeVersionContent={
+                    <>
+                        {versionFieldset}
 
-                          {environmentBadgeFieldset}
-                      </>
-                  }
-                  configurationItems={configurationItems}
-                  emptyTitle="No configurations for this project yet"
-                  newConfigurationContent={newConfigurationContent}
-                  onConfigurationSelect={handleExistingConfigurationSelect}
-                  onTabChange={handleBasicStepTabChange}
-                  selectedConfigurationValue={selectedExistingConfiguration?.id}
-              />
-          )
-        : newConfigurationContent;
+                        {environmentBadgeFieldset}
+                    </>
+                }
+                configurationItems={configurationItems}
+                emptyTitle="No configurations for this project yet"
+                newConfigurationContent={newConfigurationContent}
+                onConfigurationSelect={handleExistingConfigurationSelect}
+                onTabChange={handleBasicStepTabChange}
+                selectedConfigurationValue={selectedExistingConfiguration?.id}
+            />
+        )
+    ) : updateProjectVersionProp ? (
+        <>
+            {environmentBadgeFieldset}
+
+            {versionFieldset}
+        </>
+    ) : (
+        newConfigurationContent
+    );
 
     const workflowsStepContent = (
         <>
@@ -674,8 +684,14 @@ const AutomationProjectConfigurationDialog = ({
 
             <AutomationProjectConfigurationDialogWorkflowsStep
                 configurationId={configuration?.id}
-                isLoading={!configuration && versionWorkflowsLoading}
+                description={
+                    updateProjectVersionProp
+                        ? `Choose which workflows of V${projectVersion} this configuration runs. Connections and inputs set here are used by every connected user and cannot be changed by them.`
+                        : undefined
+                }
+                isLoading={(updateProjectVersionProp || !configuration) && versionWorkflowsLoading}
                 onWorkflowDraftChange={handleWorkflowDraftChange}
+                projectVersion={updateProjectVersionProp && projectVersion ? Number(projectVersion) : undefined}
                 workflowDrafts={workflowDrafts}
                 workflows={dialogWorkflows}
             />
@@ -703,55 +719,28 @@ const AutomationProjectConfigurationDialog = ({
         >
             <DialogContent
                 aria-label="Configuration Dialog"
-                hasSidebar={isWizard}
+                hasSidebar
                 onInteractOutside={(event) => event.preventDefault()}
             >
-                {isWizard ? (
-                    <DialogWizard
-                        description={wizardDescription}
-                        footer={
-                            <ConfigurationDialogFooter
-                                canSave={canSave}
-                                isSaving={isSaving}
-                                onSave={() => void handleSubmit()}
-                            />
-                        }
-                        icon={<Settings2Icon />}
-                        onComplete={handleSubmit}
-                        steps={steps}
-                        title={wizardTitle}
-                    >
-                        <ConfigurationDialogStepContent
-                            basicStepContent={basicStepContent}
-                            workflowsStepContent={workflowsStepContent}
+                <DialogWizard
+                    description={wizardDescription}
+                    footer={
+                        <ConfigurationDialogFooter
+                            canSave={canSave}
+                            isSaving={isSaving}
+                            onSave={() => void handleSubmit()}
                         />
-                    </DialogWizard>
-                ) : (
-                    <DialogMain>
-                        <form
-                            className="flex min-h-0 flex-1 flex-col"
-                            onSubmit={(event) => {
-                                event.preventDefault();
-
-                                void handleSubmit();
-                            }}
-                        >
-                            <DialogHeader title="Change Project Version" />
-
-                            <DialogBody>
-                                {versionFieldset}
-
-                                {environmentBadgeFieldset}
-                            </DialogBody>
-
-                            <DialogFooter>
-                                <DialogCancelButton />
-
-                                <Button disabled={!canSave} label="Save" type="submit" />
-                            </DialogFooter>
-                        </form>
-                    </DialogMain>
-                )}
+                    }
+                    icon={<Settings2Icon />}
+                    onComplete={handleSubmit}
+                    steps={steps}
+                    title={wizardTitle}
+                >
+                    <ConfigurationDialogStepContent
+                        basicStepContent={basicStepContent}
+                        workflowsStepContent={workflowsStepContent}
+                    />
+                </DialogWizard>
             </DialogContent>
         </Dialog>
     );
