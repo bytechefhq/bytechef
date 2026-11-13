@@ -98,11 +98,17 @@ describe('ProvisionMcpServerDialog', () => {
         expect(
             screen.getByText('Expose an MCP server through the integrations this connected user already has.')
         ).toBeInTheDocument();
-        expect(screen.getByText('Uses Slack, Jira')).toBeInTheDocument();
+        expect(screen.getByText('Uses Slack and Jira')).toBeInTheDocument();
         expect(
-            screen.getByText('Uses Slack. Missing Jira, Asana: add those integrations first to expose them.')
+            screen.getByText(
+                'Uses Slack. Its Jira and Asana tools stay hidden until this user has the Jira and Asana integrations; add them with Provision Integration on the Integrations tab.'
+            )
         ).toBeInTheDocument();
-        expect(screen.getByText('Add Jira, Asana on the Integrations tab first.')).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                'Unavailable: its tools use Jira and Asana, and this user has no Jira and Asana integrations yet. Add them with Provision Integration on the Integrations tab, then come back here.'
+            )
+        ).toBeInTheDocument();
         expect(screen.getByRole('radio', {name: /Full server/})).toBeEnabled();
         expect(screen.getByRole('radio', {name: /Partial server/})).toBeEnabled();
         expect(screen.getByRole('radio', {name: /Uncovered server/})).toBeDisabled();
@@ -126,7 +132,9 @@ describe('ProvisionMcpServerDialog', () => {
         renderDialog();
 
         expect(
-            screen.getByText('Uses Gmail. Missing unknownComponent: add those integrations first to expose them.')
+            screen.getByText(
+                'Uses Gmail. Its unknownComponent tools stay hidden until this user has the unknownComponent integration; add it with Provision Integration on the Integrations tab.'
+            )
         ).toBeInTheDocument();
     });
 
