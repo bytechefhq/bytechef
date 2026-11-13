@@ -1,4 +1,4 @@
-import SubStepList from '@/ee/pages/embedded/getting-started/components/SubStepList';
+import SubStepList from '@/components/GettingStarted/SubStepList';
 import {getIntegrationSubSteps} from '@/ee/pages/embedded/getting-started/getEmbeddedGettingStartedSubSteps';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';

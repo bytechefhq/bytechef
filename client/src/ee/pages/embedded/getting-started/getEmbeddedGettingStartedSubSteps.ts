@@ -1,20 +1,13 @@
+import {GettingStartedSubStepI} from '@/components/GettingStarted/gettingStartedSubStep';
 import {EmbeddedGettingStartedQuery} from '@/shared/middleware/graphql';
 
 type EmbeddedGettingStartedStatusType = EmbeddedGettingStartedQuery['embeddedGettingStarted'];
-
-export interface EmbeddedGettingStartedSubStepI {
-    done: boolean;
-    hint: string;
-    href: string;
-    id: string;
-    label: string;
-}
 
 const CONNECTED_USERS_HREF = '/embedded/connected-users';
 
 const INTEGRATIONS_HREF = '/embedded/integrations';
 
-export function getIntegrationSubSteps(status: EmbeddedGettingStartedStatusType): EmbeddedGettingStartedSubStepI[] {
+export function getIntegrationSubSteps(status: EmbeddedGettingStartedStatusType): GettingStartedSubStepI[] {
     return [
         {
             done: status.integrationCreated,
@@ -56,7 +49,7 @@ export function getIntegrationSubSteps(status: EmbeddedGettingStartedStatusType)
     ];
 }
 
-export function getTestUserSubSteps(status: EmbeddedGettingStartedStatusType): EmbeddedGettingStartedSubStepI[] {
+export function getTestUserSubSteps(status: EmbeddedGettingStartedStatusType): GettingStartedSubStepI[] {
     return [
         {
             done: status.testUserAdded,

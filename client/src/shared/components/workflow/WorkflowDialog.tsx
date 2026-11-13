@@ -22,6 +22,7 @@ interface WorkflowDialogProps {
     additionalContent?: ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     createWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
+    defaultLabel?: string;
     onClose?: () => void;
     onSave?: () => void;
     parentId?: number;
@@ -36,6 +37,7 @@ interface WorkflowDialogProps {
 const WorkflowDialog = ({
     additionalContent,
     createWorkflowMutation,
+    defaultLabel,
     onClose,
     onSave,
     parentId,
@@ -52,7 +54,7 @@ const WorkflowDialog = ({
     const form = useForm({
         defaultValues: {
             description: workflow?.description || '',
-            label: workflow?.label || '',
+            label: workflow?.label || defaultLabel || '',
         } as Workflow,
     });
     const labelInputRef = useRef<HTMLInputElement>(null);
@@ -62,7 +64,6 @@ const WorkflowDialog = ({
     const {isPending, mutate} = createWorkflowMutation ? createWorkflowMutation! : updateWorkflowMutation!;
 
     function closeDialog() {
-        console.log('closeDialog');
         setIsOpen(false);
 
         if (onClose) {
@@ -138,9 +139,9 @@ const WorkflowDialog = ({
     useEffect(() => {
         reset({
             description: workflow?.description || '',
-            label: workflow?.label || '',
+            label: workflow?.label || defaultLabel || '',
         });
-    }, [workflow, reset]);
+    }, [defaultLabel, workflow, reset]);
 
     return (
         <Dialog

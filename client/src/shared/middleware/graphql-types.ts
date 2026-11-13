@@ -533,6 +533,30 @@ export enum AuthorizationType {
   Oauth2ResourceOwnerPassword = 'OAUTH2_RESOURCE_OWNER_PASSWORD'
 }
 
+export type AutomationGettingStarted = {
+  __typename?: 'AutomationGettingStarted';
+  completed: Scalars['Boolean']['output'];
+  deployed: Scalars['Boolean']['output'];
+  firstRun?: Maybe<AutomationGettingStartedRun>;
+  httpClientAdded: Scalars['Boolean']['output'];
+  lastFailedRun?: Maybe<AutomationGettingStartedRun>;
+  live: Scalars['Boolean']['output'];
+  loggerAdded: Scalars['Boolean']['output'];
+  projectCreated: Scalars['Boolean']['output'];
+  published: Scalars['Boolean']['output'];
+  workflowCreated: Scalars['Boolean']['output'];
+};
+
+export type AutomationGettingStartedRun = {
+  __typename?: 'AutomationGettingStartedRun';
+  date: Scalars['String']['output'];
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  jobId: Scalars['ID']['output'];
+  projectDeploymentEnabled?: Maybe<Scalars['Boolean']['output']>;
+  projectDeploymentId: Scalars['ID']['output'];
+  status: Scalars['String']['output'];
+};
+
 export type AutomationProject = {
   __typename?: 'AutomationProject';
   categoryId?: Maybe<Scalars['ID']['output']>;
@@ -1982,6 +2006,7 @@ export type Mutation = {
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
   disconnectConnection: Scalars['Boolean']['output'];
+  dismissAutomationGettingStarted?: Maybe<Scalars['Boolean']['output']>;
   dismissEmbeddedGettingStarted?: Maybe<Scalars['Boolean']['output']>;
   dropDataTable: Scalars['Boolean']['output'];
   duplicateAutomationProject: Scalars['ID']['output'];
@@ -2507,6 +2532,11 @@ export type MutationDeleteWorkspaceMcpServerArgs = {
 
 export type MutationDisconnectConnectionArgs = {
   connectionId: Scalars['ID']['input'];
+};
+
+
+export type MutationDismissAutomationGettingStartedArgs = {
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3479,6 +3509,8 @@ export type Query = {
   auditEventTypes: Array<Scalars['String']['output']>;
   auditEvents: AuditEventPageType;
   authorities: Array<Scalars['String']['output']>;
+  automationGettingStarted: AutomationGettingStarted;
+  automationGettingStartedCompleted: Scalars['Boolean']['output'];
   automationProjectCategories: Array<AutomationProjectCategory>;
   automationProjectConfigurationConnectedUsers: Array<AutomationProjectConfigurationConnectedUser>;
   automationProjectConfigurationDeleteImpact: AutomationProjectConfigurationDeleteImpact;
@@ -3807,6 +3839,16 @@ export type QueryAuditEventsArgs = {
   search?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   toDate?: InputMaybe<Scalars['Long']['input']>;
+};
+
+
+export type QueryAutomationGettingStartedArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryAutomationGettingStartedCompletedArgs = {
+  workspaceId: Scalars['ID']['input'];
 };
 
 

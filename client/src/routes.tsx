@@ -14,6 +14,8 @@ import PasswordResetInit from '@/pages/account/public/PasswordResetInit';
 import Register from '@/pages/account/public/Register';
 import RegisterSuccess from '@/pages/account/public/RegisterSuccess';
 import VerifyEmail from '@/pages/account/public/VerifyEmail';
+import loadAutomationIndexRedirect from '@/pages/automation/getting-started/loadAutomationIndexRedirect';
+import {AUTOMATION_GETTING_STARTED_ROUTE_PATH} from '@/pages/automation/getting-started/resolveAutomationIndexRedirect';
 import DevelopmentProjectDeploymentsRedirect from '@/pages/automation/project-deployments/DevelopmentProjectDeploymentsRedirect';
 import loadProject from '@/pages/automation/project/loadProject';
 import ResumeForm from '@/pages/automation/resume-form/ResumeForm';
@@ -89,6 +91,7 @@ const ApiConnectorImportPage = lazy(
 const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorAiPage'));
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
+const AutomationGettingStarted = lazy(() => import('@/pages/automation/getting-started/AutomationGettingStarted'));
 const EmbeddedGettingStarted = lazy(() => import('@/ee/pages/embedded/getting-started/EmbeddedGettingStarted'));
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
 const AuditEvents = lazy(() => import('@/ee/pages/settings/platform/audit-events/AuditEvents'));
@@ -642,11 +645,21 @@ export const getRouter = (queryClient: QueryClient) =>
                             children: [
                                 {
                                     index: true,
-                                    loader: async () => {
-                                        return redirect('projects');
-                                    },
+                                    loader: async () => redirect(await loadAutomationIndexRedirect(queryClient)),
                                 },
                                 getAccountRoutes('/automation'),
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper>
+                                                <AutomationGettingStarted />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
+                                    loader: async () =>
+                                        redirectOutsideDevelopmentEnvironment('/automation/deployments'),
+                                    path: AUTOMATION_GETTING_STARTED_ROUTE_PATH,
+                                },
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>

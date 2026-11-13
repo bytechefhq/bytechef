@@ -1,6 +1,6 @@
+import SubStepList from '@/components/GettingStarted/SubStepList';
 import ConnectedUserCreateDialog from '@/ee/pages/embedded/connected-users/components/ConnectedUserCreateDialog';
 import useConnectedUserSheetStore from '@/ee/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
-import SubStepList from '@/ee/pages/embedded/getting-started/components/SubStepList';
 import {getTestUserSubSteps} from '@/ee/pages/embedded/getting-started/getEmbeddedGettingStartedSubSteps';
 import {EmbeddedGettingStartedQuery} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';

@@ -1,0 +1,30 @@
+extend type Query {
+    automationGettingStarted(workspaceId: ID!): AutomationGettingStarted!
+    automationGettingStartedCompleted(workspaceId: ID!): Boolean!
+}
+
+extend type Mutation {
+    dismissAutomationGettingStarted(workspaceId: ID!): Boolean
+}
+
+type AutomationGettingStarted {
+    completed: Boolean!
+    deployed: Boolean!
+    firstRun: AutomationGettingStartedRun
+    httpClientAdded: Boolean!
+    lastFailedRun: AutomationGettingStartedRun
+    live: Boolean!
+    loggerAdded: Boolean!
+    projectCreated: Boolean!
+    published: Boolean!
+    workflowCreated: Boolean!
+}
+
+type AutomationGettingStartedRun {
+    date: String!
+    errorMessage: String
+    jobId: ID!
+    projectDeploymentEnabled: Boolean
+    projectDeploymentId: ID!
+    status: String!
+}

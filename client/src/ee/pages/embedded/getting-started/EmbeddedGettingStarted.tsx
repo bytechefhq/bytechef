@@ -1,3 +1,6 @@
+import GettingStartedHelpCard from '@/components/GettingStarted/GettingStartedHelpCard';
+import GettingStartedNextSteps from '@/components/GettingStarted/GettingStartedNextSteps';
+import StepDoneText from '@/components/GettingStarted/StepDoneText';
 import JourneySteps, {JourneyStepI} from '@/components/JourneySteps/JourneySteps';
 import PageLoader from '@/components/PageLoader';
 import ConnectedUserSheet from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheet';
@@ -5,13 +8,11 @@ import useConnectedUserSheetStore from '@/ee/pages/embedded/connected-users/stor
 import buildFirstCallCurl from '@/ee/pages/embedded/getting-started/buildFirstCallCurl';
 import ApiKeyStepAction from '@/ee/pages/embedded/getting-started/components/ApiKeyStepAction';
 import EmbeddedGettingStartedDismissButton from '@/ee/pages/embedded/getting-started/components/EmbeddedGettingStartedDismissButton';
-import EmbeddedGettingStartedHelpCard from '@/ee/pages/embedded/getting-started/components/EmbeddedGettingStartedHelpCard';
-import EmbeddedGettingStartedNextSteps from '@/ee/pages/embedded/getting-started/components/EmbeddedGettingStartedNextSteps';
 import FirstCallStepContent from '@/ee/pages/embedded/getting-started/components/FirstCallStepContent';
 import IntegrationSubSteps from '@/ee/pages/embedded/getting-started/components/IntegrationSubSteps';
-import StepDoneText from '@/ee/pages/embedded/getting-started/components/StepDoneText';
 import TestUserStepContent from '@/ee/pages/embedded/getting-started/components/TestUserStepContent';
 import TestUserSubSteps from '@/ee/pages/embedded/getting-started/components/TestUserSubSteps';
+import {EMBEDDED_NEXT_STEPS} from '@/ee/pages/embedded/getting-started/embeddedNextSteps';
 import {
     getEmbeddedGettingStartedStepStatuses,
     getIntegrationSubStage,
@@ -199,9 +200,9 @@ const EmbeddedGettingStarted = () => {
 
                     <hr className="border-stroke-neutral-secondary" />
 
-                    <EmbeddedGettingStartedNextSteps />
+                    <GettingStartedNextSteps steps={EMBEDDED_NEXT_STEPS} />
 
-                    <EmbeddedGettingStartedHelpCard />
+                    <GettingStartedHelpCard title="Need help integrating ByteChef?" />
                 </div>
 
                 <ConnectedUserSheet />

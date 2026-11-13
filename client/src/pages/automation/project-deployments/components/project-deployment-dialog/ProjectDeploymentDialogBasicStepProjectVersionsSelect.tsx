@@ -21,12 +21,17 @@ const ProjectDeploymentDialogBasicStepProjectVersionsSelect = ({
         [projectVersions]
     );
 
-    const latestPublishedVersion = publishedProjectVersions.reduce<number | undefined>(
-        (latestVersion, publishedProjectVersion) =>
-            latestVersion === undefined || publishedProjectVersion.version! > latestVersion
-                ? publishedProjectVersion.version
-                : latestVersion,
-        undefined
+    const latestPublishedVersion = useMemo(
+        () =>
+            publishedProjectVersions.reduce<number | undefined>(
+                (latestVersion, publishedProjectVersion) =>
+                    publishedProjectVersion.version !== undefined &&
+                    (latestVersion === undefined || publishedProjectVersion.version > latestVersion)
+                        ? publishedProjectVersion.version
+                        : latestVersion,
+                undefined
+            ),
+        [publishedProjectVersions]
     );
 
     useEffect(() => {
