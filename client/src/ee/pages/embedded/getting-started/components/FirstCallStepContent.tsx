@@ -79,7 +79,7 @@ const FirstCallStepContent = ({callReceived, curl, lastFailedCall, listening, mu
                 {lastFailedCall && (
                     <div className="space-y-1 pt-1 text-xs" data-testid="last-failed-call">
                         <p className="text-content-destructive-primary">
-                            {`Calls are arriving, but none has succeeded yet. Latest: ${[lastFailedCall.outcome, lastFailedCall.errorMessage].filter(Boolean).join(' - ')}`}
+                            {`Calls are arriving, but none has succeeded yet. Latest: ${[lastFailedCall.status, lastFailedCall.errorMessage].filter(Boolean).join(' - ')}`}
                         </p>
 
                         <Link

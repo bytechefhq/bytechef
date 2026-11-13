@@ -29,7 +29,7 @@ const ExternalInvocationDetailsDialog = ({externalInvocationLog, onClose}: Exter
             <DialogMain>
                 <DialogHeader
                     description={formatCreatedDate(externalInvocationLog.createdDate)}
-                    title={externalInvocationLog.toolName || targetLabel(externalInvocationLog)}
+                    title={externalInvocationLog.invocationName || targetLabel(externalInvocationLog)}
                 />
 
                 <DialogBody>

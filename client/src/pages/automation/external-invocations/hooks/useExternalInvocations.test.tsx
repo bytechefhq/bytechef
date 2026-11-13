@@ -63,7 +63,7 @@ describe('useExternalInvocations', () => {
             ...emptyQueryResult(),
             data: {
                 workspaceExternalInvocationLogs: {
-                    content: [{id: '1', toolName: 'CRM__SEARCH_RECORDS'}],
+                    content: [{id: '1', invocationName: 'CRM__SEARCH_RECORDS'}],
                     number: 0,
                     size: 50,
                     totalElements: 1,
@@ -79,7 +79,7 @@ describe('useExternalInvocations', () => {
             {enabled: true}
         );
         expect(hoisted.useExternalInvocationLogsQueryMock).toHaveBeenCalledWith(expect.anything(), {enabled: false});
-        expect(result.current.externalInvocationLogs).toEqual([{id: '1', toolName: 'CRM__SEARCH_RECORDS'}]);
+        expect(result.current.externalInvocationLogs).toEqual([{id: '1', invocationName: 'CRM__SEARCH_RECORDS'}]);
         expect(result.current.externalInvocationLogPage?.totalElements).toBe(1);
     });
 
@@ -173,7 +173,7 @@ describe('useExternalInvocations', () => {
         hoisted.useExternalInvocationLogsQueryMock.mockReturnValue({
             data: {
                 externalInvocationLogs: {
-                    content: [{id: '5', toolName: 'slack_sendMessage'}],
+                    content: [{id: '5', invocationName: 'slack_sendMessage'}],
                     number: 0,
                     size: 50,
                     totalElements: 1,
@@ -188,7 +188,7 @@ describe('useExternalInvocations', () => {
 
         const {result} = renderUseExternalInvocations();
 
-        expect(result.current.externalInvocationLogs).toEqual([{id: '5', toolName: 'slack_sendMessage'}]);
+        expect(result.current.externalInvocationLogs).toEqual([{id: '5', invocationName: 'slack_sendMessage'}]);
         expect(result.current.externalInvocationLogPage?.totalElements).toBe(1);
         expect(result.current.externalInvocationLogsIsFetching).toBe(true);
         expect(result.current.externalInvocationLogsIsLoading).toBe(false);

@@ -293,7 +293,7 @@ describe('EmbeddedGettingStarted', () => {
     it('shows the latest failed call', () => {
         mockStatus({
             ...readyStatus,
-            lastFailedCall: {createdDate: 1700000000000, errorMessage: 'Connection missing', outcome: 'ERROR'},
+            lastFailedCall: {createdDate: 1700000000000, errorMessage: 'Connection missing', status: 'ERROR'},
         });
 
         renderPage();

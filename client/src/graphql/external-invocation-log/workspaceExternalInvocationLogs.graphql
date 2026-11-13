@@ -30,7 +30,7 @@ query WorkspaceExternalInvocationLogs(
             id
             source
             kind
-            toolName
+            invocationName
             componentName
             componentVersion
             operationName

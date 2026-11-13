@@ -28,7 +28,7 @@ query ExternalInvocationLogs(
             id
             source
             kind
-            toolName
+            invocationName
             componentName
             componentVersion
             operationName

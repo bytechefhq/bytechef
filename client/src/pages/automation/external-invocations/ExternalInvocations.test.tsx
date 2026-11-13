@@ -70,13 +70,13 @@ const externalInvocationLog = {
     externalUserId: null,
     id: '1',
     integrationInstanceId: null,
+    invocationName: 'slack_sendMessage',
     jobId: null,
     kind: 'COMPONENT',
     mcpServerId: 11,
     operationName: 'sendMessage',
     source: 'MCP_SERVER',
     status: 'SUCCESS',
-    toolName: 'slack_sendMessage',
     workflowName: null,
 };
 
@@ -120,11 +120,11 @@ describe('ExternalInvocations', () => {
                     ...externalInvocationLog,
                     a2aServerId: 4,
                     componentName: null,
+                    invocationName: 'Summarize',
                     kind: 'WORKFLOW',
                     mcpServerId: null,
                     operationName: null,
                     source: 'A2A_SERVER',
-                    toolName: 'Summarize',
                 },
             ],
         });
