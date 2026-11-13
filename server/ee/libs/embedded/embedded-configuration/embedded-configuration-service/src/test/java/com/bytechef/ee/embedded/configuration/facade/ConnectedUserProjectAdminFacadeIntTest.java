@@ -779,7 +779,7 @@ class ConnectedUserProjectAdminFacadeIntTest {
         assertThat(connectedUserProjectAdminFacade.getConnectedUserProjectConfigurations(connectedUser.getId()))
             .containsExactly(
                 new ConnectedUserAutomationProjectConfigurationDTO(
-                    projectId, betaConfiguration.getId(), "Beta", betaConfiguration.getProjectVersion()));
+                    projectId, betaConfiguration.getId(), "Beta", betaConfiguration.getProjectVersion(), true));
     }
 
     @Test
