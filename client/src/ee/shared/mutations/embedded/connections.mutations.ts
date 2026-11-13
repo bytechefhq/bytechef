@@ -30,6 +30,26 @@ export const useCreateConnectionMutation = (mutationProps?: CreateConnectionMuta
         onSuccess: mutationProps?.onSuccess,
     });
 
+interface DeleteConnectedUserConnectionMutationProps {
+    onSuccess?: () => void;
+    onError?: (error: Error, connectionId: number) => void;
+}
+
+export const useDeleteConnectedUserConnectionMutation = (
+    connectedUserId: number,
+    mutationProps?: DeleteConnectedUserConnectionMutationProps
+) =>
+    useMutation<void, Error, number>({
+        mutationFn: (connectionId: number) => {
+            return new ConnectionApi().deleteConnectedUserConnection({
+                connectedUserId,
+                connectionId,
+            });
+        },
+        onError: mutationProps?.onError,
+        onSuccess: mutationProps?.onSuccess,
+    });
+
 interface DeleteConnectionMutationProps {
     onSuccess?: () => void;
     onError?: (error: Error, id: number) => void;
