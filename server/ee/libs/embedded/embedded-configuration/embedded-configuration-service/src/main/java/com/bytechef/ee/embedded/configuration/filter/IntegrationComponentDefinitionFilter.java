@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 public class IntegrationComponentDefinitionFilter implements ComponentDefinitionFilter {
 
     private static final List<String> EXCLUDED_COMPONENT_NAMES = List.of(
-        "apiPlatform", "codeWorkflow", "dataTable", "knowledgeBase", "webhook");
+        "apiPlatform", "codeWorkflow", "dataTable", "knowledgeBase");
 
     /**
      * Returns information if componentDefinition should be retained or skipped within the context of how the enterprise
