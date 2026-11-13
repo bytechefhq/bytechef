@@ -261,12 +261,12 @@ export async function computeAiFillValues({
     const result: Record<string, string> = {};
 
     for (const {path, property} of collectAiFillCandidates(candidateParams)) {
-        let options: Array<{value?: unknown}> | null | undefined;
+        let options: Array<{value?: unknown}> | undefined;
 
         if (property.optionsDataSource) {
-            options = await loadOptions(property, path, candidateParams.values);
+            const loadedOptions = await loadOptions(property, path, candidateParams.values);
 
-            if (options === null || options === undefined) {
+            if (loadedOptions === null || loadedOptions === undefined) {
                 continue;
             }
         } else if (Array.isArray(property.options)) {

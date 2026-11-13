@@ -146,7 +146,7 @@ describe('computeAiFillValues', () => {
         expect(result.labels).toContain("'options': {'a', 'b'}");
     });
 
-    it('includes dynamically loaded options', async () => {
+    it('checks that connection options load but leaves them out of the expression', async () => {
         const loadOptions = vi.fn().mockResolvedValue([{value: 'x'}, {value: 'y'}]);
 
         const result = await compute(
@@ -156,7 +156,8 @@ describe('computeAiFillValues', () => {
         );
 
         expect(loadOptions).toHaveBeenCalledWith(expect.objectContaining({name: 'subject'}), 'subject', {});
-        expect(result.subject).toContain("'options': {'x', 'y'}");
+        expect(result.subject).toMatch(/^=fromAi\('subject'/);
+        expect(result.subject).not.toContain("'options'");
     });
 
     it('leaves dynamic options field empty when options cannot be loaded', async () => {
