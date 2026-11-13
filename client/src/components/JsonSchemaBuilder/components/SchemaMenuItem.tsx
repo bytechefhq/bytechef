@@ -51,6 +51,7 @@ export const TextItem = ({field, onChange, schema}: ItemTypeProps) => (
             autoFocus
             label={field.label}
             onChange={(text) => onChange(setSchemaField(field.value, text, schema))}
+            placeholder={field.placeholder}
             value={getSchemaField(schema, field.value) as string}
         />
     </Item>
