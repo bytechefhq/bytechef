@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.service;
 
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.exception.ProviderException;
@@ -86,6 +87,10 @@ public interface TriggerDefinitionService extends OperationDefinitionService {
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String workflowExecutionId, String webhookUrl, @Nullable ComponentConnection componentConnection,
         long environmentId);
+
+    @Nullable
+    WebhookResponse executeWebhookResponse(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters);
 
     WebhookValidateResponse executeWebhookValidate(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,

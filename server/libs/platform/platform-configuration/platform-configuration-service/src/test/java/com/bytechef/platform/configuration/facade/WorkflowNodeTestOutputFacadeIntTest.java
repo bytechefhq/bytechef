@@ -239,7 +239,7 @@ class WorkflowNodeTestOutputFacadeIntTest {
         when(triggerDefinitionService.getTriggerDefinition("webhook", 1, "autoRespondWithHTTP200"))
             .thenReturn(webhookTriggerDefinition);
         when(triggerDefinitionService.getWebhookTriggerFlags("webhook", 1, "autoRespondWithHTTP200"))
-            .thenReturn(new WebhookTriggerFlags(false, false, false, false));
+            .thenReturn(new WebhookTriggerFlags(false, false, false, false, false));
         when(triggerDefinitionFacade.executeTrigger(
             eq("webhook"), eq(1), eq("autoRespondWithHTTP200"), isNull(), eq(workflowUuid), isNull(), anyMap(),
             any(), eq(webhookRequest), isNull(), eq(ENVIRONMENT_ID), eq(PlatformType.AUTOMATION), eq(true)))

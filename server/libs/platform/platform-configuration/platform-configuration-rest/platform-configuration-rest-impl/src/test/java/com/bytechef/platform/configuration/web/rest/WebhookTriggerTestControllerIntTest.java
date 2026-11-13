@@ -52,7 +52,8 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 class WebhookTriggerTestControllerIntTest {
 
     private static final long ENVIRONMENT_ID = 0L;
-    private static final WebhookTriggerFlags VALIDATION_FLAGS = new WebhookTriggerFlags(false, false, true, false);
+    private static final WebhookTriggerFlags VALIDATION_FLAGS =
+        new WebhookTriggerFlags(false, false, true, false, false);
 
     private final WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
         PlatformType.AUTOMATION, -1L, "workflow-uuid", "trigger_1");

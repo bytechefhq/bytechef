@@ -60,13 +60,13 @@ import org.springframework.test.web.servlet.MockMvc;
 class WebhookTriggerControllerIntTest {
 
     private static final WebhookTriggerFlags ASYNC_EXECUTION_FLAGS =
-        new WebhookTriggerFlags(false, false, false, false);
+        new WebhookTriggerFlags(false, false, false, false, false);
     private static final WebhookTriggerFlags ASYNC_EXECUTION_WITH_VALIDATION_FLAGS =
-        new WebhookTriggerFlags(false, false, true, false);
+        new WebhookTriggerFlags(false, false, true, false, false);
     private static final WebhookTriggerFlags SYNC_EXECUTION_FLAGS =
-        new WebhookTriggerFlags(false, true, false, false);
+        new WebhookTriggerFlags(false, true, false, false, false);
     private static final WebhookTriggerFlags SYNC_EXECUTION_WITH_VALIDATION_FLAGS =
-        new WebhookTriggerFlags(false, true, true, false);
+        new WebhookTriggerFlags(false, true, true, false, false);
 
     private final WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
         PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger_1");
