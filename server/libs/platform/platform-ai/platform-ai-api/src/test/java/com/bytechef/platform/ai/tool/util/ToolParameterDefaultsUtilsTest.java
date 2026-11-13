@@ -116,6 +116,56 @@ class ToolParameterDefaultsUtilsTest {
     }
 
     @Test
+    void testCollectTriggerInputDefaultsReadsSchemaDefaults() {
+        String inputSchema = """
+            {
+                "type": "object",
+                "properties": {
+                    "email": {"type": "string"},
+                    "language": {"type": "string", "default": "en"},
+                    "limit": {"type": "integer", "default": 10},
+                    "ratio": {"type": "number", "default": 0.5},
+                    "notify": {"type": "boolean", "default": false},
+                    "tags": {"type": "array", "items": {"type": "string"}, "default": ["new", "lead"]},
+                    "address": {
+                        "type": "object",
+                        "properties": {
+                            "city": {"type": "string"},
+                            "country": {"type": "string", "default": "HR"}
+                        }
+                    }
+                }
+            }""";
+
+        assertThat(
+            ToolParameterDefaultsUtils.collectTriggerInputDefaults(
+                Map.of(WorkflowConstants.INPUT_SCHEMA, inputSchema)))
+                    .isEqualTo(
+                        Map.of(
+                            "language", "en", "limit", 10L, "ratio", 0.5, "notify", false, "tags",
+                            List.of("new", "lead"), "address", Map.of("country", "HR")));
+    }
+
+    @Test
+    void testCollectTriggerInputDefaultsIgnoresDefaultsOfTheWrongType() {
+        String inputSchema = """
+            {
+                "type": "object",
+                "properties": {
+                    "limit": {"type": "integer", "default": "ten"},
+                    "language": {"type": "string", "default": 5},
+                    "notify": {"type": "boolean", "default": null},
+                    "tags": {"type": "array", "items": {"type": "string"}, "default": ["new", 1]}
+                }
+            }""";
+
+        assertThat(
+            ToolParameterDefaultsUtils.collectTriggerInputDefaults(
+                Map.of(WorkflowConstants.INPUT_SCHEMA, inputSchema)))
+                    .isEmpty();
+    }
+
+    @Test
     void testMergeParametersLetsLaterValuesWinAndMergesNestedObjects() {
         Map<String, Object> defaults = Map.of(
             "length", 8, "body", Map.of("content", "default", "format", "text"), "flag", true);
