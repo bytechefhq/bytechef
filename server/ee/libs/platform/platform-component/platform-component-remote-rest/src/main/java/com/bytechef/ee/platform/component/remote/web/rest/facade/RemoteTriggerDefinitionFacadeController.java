@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.component.remote.web.rest.facade;
 
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.domain.Option;
@@ -201,6 +202,27 @@ public class RemoteTriggerDefinitionFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
+        value = "/execute-webhook-response",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<WebhookResponse> executeWebhookResponse(
+        @Valid @RequestBody WebhookResponseRequest webhookResponseRequest) {
+
+        WebhookResponse webhookResponse = triggerDefinitionFacade.executeWebhookResponse(
+            webhookResponseRequest.componentName, webhookResponseRequest.componentVersion,
+            webhookResponseRequest.triggerName, webhookResponseRequest.inputParameters);
+
+        if (webhookResponse == null) {
+            return ResponseEntity.noContent()
+                .build();
+        }
+
+        return ResponseEntity.ok(webhookResponse);
+    }
+
+    @RequestMapping(
+        method = RequestMethod.POST,
         value = "/execute-webhook-validate",
         produces = {
             "application/json"
@@ -213,6 +235,11 @@ public class RemoteTriggerDefinitionFacadeController {
                 webhookValidateRequest.componentName, webhookValidateRequest.componentVersion,
                 webhookValidateRequest.triggerName, webhookValidateRequest.inputParameters,
                 webhookValidateRequest.webhookRequest, webhookValidateRequest.connectionId));
+    }
+
+    @SuppressFBWarnings("EI")
+    public record WebhookResponseRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, Object> inputParameters) {
     }
 
     @SuppressFBWarnings("EI")
