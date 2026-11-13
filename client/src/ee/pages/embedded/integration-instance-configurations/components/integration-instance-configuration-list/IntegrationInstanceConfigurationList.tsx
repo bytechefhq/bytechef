@@ -78,9 +78,6 @@ const IntegrationInstanceConfigurationList = ({
                                 <IntegrationInstanceConfigurationListItem
                                     integrationInstanceConfiguration={integrationInstanceConfiguration}
                                     key={integrationInstanceConfiguration.id}
-                                    mcpWorkflowIds={mcpWorkflowIdsByConfigurationId.get(
-                                        integrationInstanceConfiguration.id!
-                                    )}
                                     remainingTags={tags?.filter((tag) => !integrationTagIds?.includes(tag.id))}
                                     showIntegrationIcon={showIntegrationIcon}
                                     showTags={showTags}

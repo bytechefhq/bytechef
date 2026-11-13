@@ -1,3 +1,0 @@
-mutation updateMcpIntegrationInstanceConfigurationVersion($id: ID!, $input: UpdateMcpIntegrationInstanceConfigurationVersionInput!) {
-    updateMcpIntegrationInstanceConfigurationVersion(id: $id, input: $input)
-}

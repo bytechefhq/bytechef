@@ -9,6 +9,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     captureIntegrationInstanceConfigurationEnabledMock: vi.fn(),
+    configurationDialogPropsMock: vi.fn(),
     configurationsQueryMock: vi.fn(),
     connectedUsers: [] as unknown[],
     deleteIntegrationInstanceConfigurationMock: vi.fn(),
@@ -77,7 +78,11 @@ vi.mock('@/shared/hooks/useAnalytics', () => ({
 vi.mock(
     '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog',
     () => ({
-        default: () => <div data-testid="integration-instance-configuration-dialog" />,
+        default: (props: object) => {
+            hoisted.configurationDialogPropsMock(props);
+
+            return <div data-testid="integration-instance-configuration-dialog" />;
+        },
     })
 );
 
@@ -113,8 +118,8 @@ const renderItem = (
         </TooltipProvider>
     );
 
-const openMenu = async () => {
-    renderItem();
+const openMenu = async (...renderItemArguments: Parameters<typeof renderItem>) => {
+    renderItem(...renderItemArguments);
 
     screen
         .getAllByRole('button')
@@ -414,6 +419,16 @@ describe('IntegrationInstanceConfigurationListItem Move Users', () => {
         await userEvent.click(screen.getByRole('menuitem', {name: 'Move Users'}));
 
         expect(await screen.findByText(/^2 MCP servers use one of these configurations\./)).toBeInTheDocument();
+    });
+
+    it('lists MCP workflows in the edit dialog', async () => {
+        await openMenu();
+
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
+
+        expect(hoisted.configurationDialogPropsMock).toHaveBeenLastCalledWith(
+            expect.not.objectContaining({excludeWorkflowIds: expect.anything()})
+        );
     });
 
     it('disables Move Users with a tooltip when the integration has no other configuration in the environment', async () => {

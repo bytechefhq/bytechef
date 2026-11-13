@@ -37,7 +37,6 @@ import IntegrationInstanceConfigurationMoveUsersDialog from './IntegrationInstan
 
 interface IntegrationInstanceConfigurationListItemProps {
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
-    mcpWorkflowIds?: Set<string>;
     remainingTags?: Tag[];
     showIntegrationIcon?: boolean;
     showTags?: boolean;
@@ -45,7 +44,6 @@ interface IntegrationInstanceConfigurationListItemProps {
 
 const IntegrationInstanceConfigurationListItem = ({
     integrationInstanceConfiguration,
-    mcpWorkflowIds,
     remainingTags,
     showIntegrationIcon = true,
     showTags = true,
@@ -340,7 +338,6 @@ const IntegrationInstanceConfigurationListItem = ({
 
             {showEditDialog && (
                 <IntegrationInstanceConfigurationDialog
-                    excludeWorkflowIds={mcpWorkflowIds}
                     integrationInstanceConfiguration={integrationInstanceConfiguration}
                     onClose={() => setShowEditDialog(false)}
                 />
@@ -356,7 +353,6 @@ const IntegrationInstanceConfigurationListItem = ({
 
             {showUpdateIntegrationVersionDialog && (
                 <IntegrationInstanceConfigurationDialog
-                    excludeWorkflowIds={mcpWorkflowIds}
                     integrationInstanceConfiguration={integrationInstanceConfiguration}
                     onClose={() => setShowUpdateIntegrationVersionDialog(false)}
                     updateIntegrationVersion={true}

@@ -2,20 +2,15 @@ import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
-import {useEnableIntegrationInstanceWorkflowMutation} from '@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
-import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
-import {
-    IntegrationInstanceKeys,
-    useGetIntegrationInstanceQuery,
-} from '@/ee/shared/queries/embedded/integrationInstances.queries';
+import {useGetIntegrationInstanceQuery} from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import useWorkflowComponentDefinitions, {
     getWorkflowComponentNames,
 } from '@/shared/hooks/useWorkflowComponentDefinitions';
-import {ConnectedUserMcpServerWorkflow} from '@/shared/middleware/graphql';
+import {ConnectedUserMcpServerWorkflow, useEnableConnectedUserMcpWorkflowMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -45,13 +40,9 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
 
     const filteredComponentNames = useMemo(() => getWorkflowComponentNames(integrationWorkflow), [integrationWorkflow]);
 
-    const enableIntegrationInstanceWorkflowMutation = useEnableIntegrationInstanceWorkflowMutation({
+    const enableConnectedUserMcpWorkflowMutation = useEnableConnectedUserMcpWorkflowMutation({
         onSuccess: () => {
             void queryClient.invalidateQueries({queryKey: ['connectedUserMcpServers']});
-            void queryClient.invalidateQueries({queryKey: ConnectedUserKeys.connectedUser(connectedUserId)});
-            void queryClient.invalidateQueries({
-                queryKey: IntegrationInstanceKeys.integrationInstance(Number(workflow.integrationInstanceId)),
-            });
         },
     });
 
@@ -131,18 +122,14 @@ const ConnectedUserMcpServerListItemWorkflowRow = ({
                 </Tooltip>
 
                 <div className="relative mr-11 flex shrink-0 items-center">
-                    {enableIntegrationInstanceWorkflowMutation.isPending && (
+                    {enableConnectedUserMcpWorkflowMutation.isPending && (
                         <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                     )}
 
                     <Switch
                         checked={workflow.enabled}
                         onCheckedChange={(value) => {
-                            enableIntegrationInstanceWorkflowMutation.mutate({
-                                enable: value,
-                                id: Number(workflow.integrationInstanceId),
-                                workflowId: workflow.workflowId,
-                            });
+                            enableConnectedUserMcpWorkflowMutation.mutate({enable: value, id: workflow.id});
                         }}
                     />
                 </div>

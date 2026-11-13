@@ -11,7 +11,6 @@ import {EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
 interface ConnectedUserSheetDeleteDropdownMenuProps {
     changeConfigurationDisabled?: boolean;
     changeConfigurationDisabledReason?: string;
-    deleteDisabledReason?: string;
     onChangeConfigurationClick?: () => void;
     onDeleteClick: () => void;
 }
@@ -19,7 +18,6 @@ interface ConnectedUserSheetDeleteDropdownMenuProps {
 const ConnectedUserSheetDeleteDropdownMenu = ({
     changeConfigurationDisabled,
     changeConfigurationDisabledReason,
-    deleteDisabledReason,
     onChangeConfigurationClick,
     onDeleteClick,
 }: ConnectedUserSheetDeleteDropdownMenuProps) => (
@@ -54,21 +52,7 @@ const ConnectedUserSheetDeleteDropdownMenu = ({
                 </Tooltip>
             )}
 
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <span className="block">
-                        <DropdownMenuItem
-                            disabled={!!deleteDisabledReason}
-                            icon={<Trash2Icon />}
-                            label="Delete"
-                            onClick={onDeleteClick}
-                            variant="destructive"
-                        />
-                    </span>
-                </TooltipTrigger>
-
-                {deleteDisabledReason && <TooltipContent side="left">{deleteDisabledReason}</TooltipContent>}
-            </Tooltip>
+            <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
         </DropdownMenuContent>
     </DropdownMenu>
 );

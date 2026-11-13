@@ -140,7 +140,6 @@ interface CredentialsFormI {
 }
 
 interface IntegrationInstanceConfigurationDialogProps {
-    excludeWorkflowIds?: Set<string>;
     filterWorkflowUuids?: string[];
     integrationInstanceConfiguration?: IntegrationInstanceConfiguration;
     onClose?: () => void;
@@ -151,7 +150,6 @@ interface IntegrationInstanceConfigurationDialogProps {
 }
 
 const IntegrationInstanceConfigurationDialog = ({
-    excludeWorkflowIds,
     filterWorkflowUuids,
     integrationInstanceConfiguration: integrationInstanceConfigurationProp,
     onClose,
@@ -220,24 +218,18 @@ const IntegrationInstanceConfigurationDialog = ({
             return undefined;
         }
 
-        let filteredWorkflows = allWorkflows;
-
-        if (excludeWorkflowIds?.size) {
-            filteredWorkflows = filteredWorkflows.filter((workflow) => !excludeWorkflowIds.has(workflow.id!));
-        }
-
         if (filterWorkflowUuids === undefined) {
-            return filteredWorkflows;
+            return allWorkflows;
         }
 
         if (filterWorkflowUuids.length === 0) {
             return [];
         }
 
-        return filteredWorkflows.filter(
+        return allWorkflows.filter(
             (workflow) => workflow.workflowUuid && filterWorkflowUuids.includes(workflow.workflowUuid)
         );
-    }, [allWorkflows, excludeWorkflowIds, filterWorkflowUuids]);
+    }, [allWorkflows, filterWorkflowUuids]);
 
     const {data: integration} = useGetIntegrationQuery(curIntegrationId!, undefined, !!curIntegrationId);
 

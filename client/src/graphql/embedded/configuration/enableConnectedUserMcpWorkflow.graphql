@@ -1,0 +1,3 @@
+mutation enableConnectedUserMcpWorkflow($id: ID!, $enable: Boolean!) {
+    enableConnectedUserMcpWorkflow(id: $id, enable: $enable)
+}

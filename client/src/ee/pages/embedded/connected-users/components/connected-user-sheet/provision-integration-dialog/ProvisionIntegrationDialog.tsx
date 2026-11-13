@@ -245,6 +245,14 @@ const ProvisionIntegrationDialog = ({connectedUserId, onClose}: ProvisionIntegra
 
                             {configuration.integrationInstanceConfigurationWorkflows?.map(
                                 (configurationWorkflow, workflowIndex) => {
+                                    if (
+                                        provisionableIntegration?.toolOnlyMcpWorkflowUuids?.includes(
+                                            configurationWorkflow.workflowUuid!
+                                        )
+                                    ) {
+                                        return null;
+                                    }
+
                                     const workflow = integrationWorkflows?.find(
                                         (current) =>
                                             current.workflowUuid === configurationWorkflow.workflowUuid ||

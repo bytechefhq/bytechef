@@ -123,7 +123,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
                         <Switch
                             checked={integrationInstanceWorkflow?.enabled}
-                            disabled={mcpTool || !integrationInstanceConfigurationWorkflow?.enabled}
+                            disabled={!integrationInstanceConfigurationWorkflow?.enabled}
                             onCheckedChange={(value) => {
                                 enableIntegrationInstanceWorkflowMutation.mutate({
                                     enable: value,
