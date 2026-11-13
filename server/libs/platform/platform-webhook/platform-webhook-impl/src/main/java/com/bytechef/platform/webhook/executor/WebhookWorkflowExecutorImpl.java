@@ -26,6 +26,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.NumberUtils;
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.evaluator.Evaluator;
@@ -70,6 +71,8 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
+    private static final String DEFAULT_RESPONSE_TYPE = "DEFAULT";
+    private static final String RESPONSE_TYPE = "responseType";
     private static final String TIMEOUT = "timeout";
 
     private static final String SUSPENDING_TASK_MESSAGE =
@@ -317,6 +320,26 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
             taskExecutionCompleteEvent -> collectWebhookResponse(
                 taskExecutionCompleteEvent, collectedWebhookResponse),
             timeout);
+    }
+
+    @Override
+    public @Nullable WebhookResponse getWebhookResponse(WorkflowExecutionId workflowExecutionId) {
+        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(
+            workflowExecutionId.getTriggerName(), workflowService.getWorkflow(getWorkflowId(workflowExecutionId)));
+
+        Map<String, ?> rawParameters = workflowTrigger.getParameters();
+
+        Object responseType = rawParameters.get(RESPONSE_TYPE);
+
+        if (responseType == null || Objects.equals(responseType, DEFAULT_RESPONSE_TYPE)) {
+            return null;
+        }
+
+        Map<String, ?> parameters = workflowTrigger.evaluateParameters(
+            getInputMap(workflowExecutionId), evaluator, true);
+
+        return webhookWorkflowSyncExecutor.executeWebhookResponse(
+            WorkflowNodeType.ofType(workflowTrigger.getType()), parameters);
     }
 
     @Override
