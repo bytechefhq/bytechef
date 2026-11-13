@@ -1,7 +1,7 @@
 const INPUT_REQUIRED_PREFIX = 'INPUT_REQUIRED:';
 const INVALID_WORKFLOW_PREFIX = 'INVALID_WORKFLOW:';
 const MISSING_CONNECTION_PREFIX = 'MISSING_CONNECTION:';
-const TURNED_OFF_BY_ADMINISTRATOR_REASON = 'TURNED_OFF_BY_ADMINISTRATOR';
+export const TURNED_OFF_BY_ADMINISTRATOR_REASON = 'TURNED_OFF_BY_ADMINISTRATOR';
 
 export const describeWorkflowErrors = (errorCount: number | undefined): string => {
     if (errorCount === 1) {

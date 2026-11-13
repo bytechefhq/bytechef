@@ -4,6 +4,7 @@ import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {TURNED_OFF_BY_ADMINISTRATOR_REASON} from '@/ee/pages/embedded/automation-hub/utils/attentionReason';
 import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import ConnectedUserProjectWorkflowEditDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowEditDialog';
@@ -41,7 +42,7 @@ const ConnectedUserProjectWorkflowListItem = ({
     projectName,
     workflowTemplate,
 }: {
-    configuration?: {configurationId: string; projectId: string};
+    configuration?: {configurationEnabled?: boolean; configurationId: string; projectId: string};
     connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType;
     projectName?: string;
     workflowTemplate?: ConnectedUserWorkflowTemplateType;
@@ -119,6 +120,19 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     // An unpublished copy has no deployment to switch on; the server rejects enabling it until it is published
     const enableDisabled = isDraft && !connectedUserProjectWorkflow.enabled;
+
+    const turnedOffByAdministrator =
+        connectedUserProjectWorkflow.attentionReason === TURNED_OFF_BY_ADMINISTRATOR_REASON;
+
+    const enableTooltip = useMemo(() => {
+        if (turnedOffByAdministrator) {
+            return configuration?.configurationEnabled === false
+                ? 'The configuration is disabled. This workflow runs again when the configuration is enabled.'
+                : 'This workflow is disabled in the configuration. It runs again when it is enabled there.';
+        }
+
+        return enableDisabled ? 'Publish the workflow before enabling it' : undefined;
+    }, [configuration?.configurationEnabled, enableDisabled, turnedOffByAdministrator]);
 
     const versionLabel = useMemo(() => {
         if (provisioned) {
@@ -253,8 +267,10 @@ const ConnectedUserProjectWorkflowListItem = ({
 
                                             <Switch
                                                 aria-label={`Enable ${connectedUserProjectWorkflow.workflow.label}`}
-                                                checked={connectedUserProjectWorkflow.enabled}
-                                                disabled={enableDisabled}
+                                                checked={
+                                                    connectedUserProjectWorkflow.enabled && !turnedOffByAdministrator
+                                                }
+                                                disabled={enableDisabled || turnedOffByAdministrator}
                                                 onCheckedChange={(value) => {
                                                     enableConnectedUserProjectWorkflowMutation.mutate({
                                                         enable: value,
@@ -265,11 +281,7 @@ const ConnectedUserProjectWorkflowListItem = ({
                                         </span>
                                     </TooltipTrigger>
 
-                                    {enableDisabled && (
-                                        <TooltipContent side="left">
-                                            Publish the workflow before enabling it
-                                        </TooltipContent>
-                                    )}
+                                    {enableTooltip && <TooltipContent side="left">{enableTooltip}</TooltipContent>}
                                 </Tooltip>
                             </div>
                         </div>

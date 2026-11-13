@@ -59,6 +59,7 @@ const createConnectedUserProjectWorkflow = (
     label: string,
     sourceWorkflowUuids: {automationUuid?: string; copiedFromWorkflowUuid?: string} = {}
 ): ConnectedUserProjectWorkflowType => ({
+    attentionReason: null,
     automationUuid: sourceWorkflowUuids.automationUuid ?? null,
     connectedUserId: '1050',
     copiedFromWorkflowUuid: sourceWorkflowUuids.copiedFromWorkflowUuid ?? null,
@@ -185,6 +186,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
             <ConnectedUserProjectWorkflowList
                 configurations={[
                     {
+                        configurationEnabled: true,
                         configurationId: '51',
                         configurationName: 'Alpha',
                         configurationProjectVersion: 1,
@@ -270,6 +272,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
             <ConnectedUserProjectWorkflowList
                 configurations={[
                     {
+                        configurationEnabled: true,
                         configurationId: '51',
                         configurationName: 'Default',
                         configurationProjectVersion: 3,
@@ -315,11 +318,52 @@ describe('ConnectedUserProjectWorkflowList', () => {
         ).not.toBeInTheDocument();
     });
 
+    it('marks a disabled configuration with a Disabled badge', () => {
+        render(
+            <ConnectedUserProjectWorkflowList
+                configurations={[
+                    {
+                        configurationEnabled: false,
+                        configurationId: '51',
+                        configurationName: 'Default',
+                        configurationProjectVersion: 3,
+                        projectId: '10',
+                    },
+                    {
+                        configurationEnabled: true,
+                        configurationId: '61',
+                        configurationName: 'Beta',
+                        configurationProjectVersion: 2,
+                        projectId: '20',
+                    },
+                ]}
+                connectedUser={{connectedUserId: '1050', externalId: 'ext-1050'}}
+                connectedUserProjectWorkflows={[
+                    createConnectedUserProjectWorkflow('1', 'Greet on Request', {
+                        automationUuid: 'template-greeting',
+                    }),
+                    createConnectedUserProjectWorkflow('2', 'Daily Standup', {
+                        automationUuid: 'template-standup',
+                    }),
+                ]}
+                workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
+            />
+        );
+
+        expect(
+            within(screen.getByRole('region', {name: 'Automation Playground'})).getByText('Disabled')
+        ).toBeInTheDocument();
+        expect(
+            within(screen.getByRole('region', {name: 'Team Rituals'})).queryByText('Disabled')
+        ).not.toBeInTheDocument();
+    });
+
     it('shows the configuration of the source project on a provisioned workflow, which carries no project id of its own', () => {
         render(
             <ConnectedUserProjectWorkflowList
                 configurations={[
                     {
+                        configurationEnabled: true,
                         configurationId: '51',
                         configurationName: 'Default',
                         configurationProjectVersion: 3,
@@ -348,6 +392,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
             <ConnectedUserProjectWorkflowList
                 configurations={[
                     {
+                        configurationEnabled: true,
                         configurationId: '51',
                         configurationName: 'Default',
                         configurationProjectVersion: 3,
@@ -402,12 +447,19 @@ describe('ConnectedUserProjectWorkflowList', () => {
             <ConnectedUserProjectWorkflowList
                 configurations={[
                     {
+                        configurationEnabled: true,
                         configurationId: '51',
                         configurationName: 'Alpha',
                         configurationProjectVersion: 1,
                         projectId: '10',
                     },
-                    {configurationId: '61', configurationName: 'Beta', configurationProjectVersion: 2, projectId: '20'},
+                    {
+                        configurationEnabled: true,
+                        configurationId: '61',
+                        configurationName: 'Beta',
+                        configurationProjectVersion: 2,
+                        projectId: '20',
+                    },
                 ]}
                 connectedUser={{connectedUserId: '1050', externalId: 'ext-1050'}}
                 connectedUserProjectWorkflows={[
@@ -444,12 +496,19 @@ describe('ConnectedUserProjectWorkflowList', () => {
             <ConnectedUserProjectWorkflowList
                 configurations={[
                     {
+                        configurationEnabled: true,
                         configurationId: '51',
                         configurationName: 'Alpha',
                         configurationProjectVersion: 1,
                         projectId: '10',
                     },
-                    {configurationId: '61', configurationName: 'Beta', configurationProjectVersion: 2, projectId: '20'},
+                    {
+                        configurationEnabled: true,
+                        configurationId: '61',
+                        configurationName: 'Beta',
+                        configurationProjectVersion: 2,
+                        projectId: '20',
+                    },
                 ]}
                 connectedUser={{connectedUserId: '1050', externalId: 'ext-1050'}}
                 connectedUserProjectWorkflows={[
