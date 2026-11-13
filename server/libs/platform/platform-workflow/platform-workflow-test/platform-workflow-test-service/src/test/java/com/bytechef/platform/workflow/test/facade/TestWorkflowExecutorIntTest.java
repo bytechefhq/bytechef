@@ -23,6 +23,9 @@ import static com.bytechef.platform.workflow.test.config.TestWorkflowExecutorInt
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -36,6 +39,7 @@ import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRec
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRecorder;
 import com.bytechef.platform.component.definition.ai.agent.ClusterElementCallRef;
 import com.bytechef.platform.component.domain.StringProperty;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -75,6 +79,7 @@ import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * @author Ivica Cardic
@@ -87,6 +92,9 @@ class TestWorkflowExecutorIntTest {
 
     private static final long ENVIRONMENT_ID = 10L;
     private static final long TIMEOUT_SECONDS = 10;
+
+    @MockitoSpyBean
+    private ComponentDefinitionService componentDefinitionService;
 
     @Autowired
     private EvaluationProbe evaluationProbe;
@@ -408,7 +416,9 @@ class TestWorkflowExecutorIntTest {
 
         assertThat(taskGate.awaitEntered(TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
 
-        evaluationProbe.armFailure();
+        doThrow(new IllegalStateException("Execution failed"))
+            .when(componentDefinitionService)
+            .hasComponentDefinition(anyString(), any());
 
         taskGate.release();
 
@@ -1022,6 +1032,57 @@ class TestWorkflowExecutorIntTest {
         assertThat(sseStreamBridge.getEventNames()).contains("error")
             .doesNotContain("result");
         assertThat(waitUntil(taskGate::isInterrupted)).isTrue();
+    }
+
+    @Test
+    void executeSyncReturnsConditionInputWhenFormulaInUntakenBranchFailsToEvaluate() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {
+                            "name": "condition_1",
+                            "type": "condition/v1",
+                            "parameters": {
+                                "rawExpression": true,
+                                "expression": "=length(${dateOfInvoice}) eq 10",
+                                "caseTrue": [
+                                    {
+                                        "name": "monthFolder",
+                                        "type": "testComponent/v1/echo",
+                                        "parameters": {"folderName": "=substring(${dateOfInvoice}, 5, 7)"}
+                                    }
+                                ],
+                                "caseFalse": [
+                                    {
+                                        "name": "notRecognized",
+                                        "type": "testComponent/v1/echo",
+                                        "parameters": {"dateOfInvoice": "${dateOfInvoice}"}
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+                """);
+
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(
+            workflowId, Map.of("dateOfInvoice", ""), null, ENVIRONMENT_ID);
+
+        JobDTO jobDTO = result.job();
+
+        assertThat(jobDTO.status()).isEqualTo(Job.Status.COMPLETED);
+        assertThat(jobDTO.taskExecutions())
+            .filteredOn(taskExecutionDTO -> "condition/v1".equals(taskExecutionDTO.type()))
+            .singleElement()
+            .satisfies(taskExecutionDTO -> {
+                Map<String, ?> input = taskExecutionDTO.input();
+
+                assertThat(input.get("expression")).isEqualTo(false);
+                assertThat(input.get("caseTrue"))
+                    .asString()
+                    .contains("=substring(${dateOfInvoice}, 5, 7)");
+            });
     }
 
     @Test

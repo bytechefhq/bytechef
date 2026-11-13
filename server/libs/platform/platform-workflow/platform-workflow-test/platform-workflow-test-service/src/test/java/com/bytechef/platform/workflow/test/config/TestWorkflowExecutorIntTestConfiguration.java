@@ -16,10 +16,14 @@
 
 package com.bytechef.platform.workflow.test.config;
 
+import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_FALSE;
+import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CASE_TRUE;
+import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.CONDITION;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.atlas.configuration.converter.StringToWorkflowTaskConverter;
 import com.bytechef.atlas.configuration.converter.WorkflowTaskToStringConverter;
+import com.bytechef.atlas.configuration.domain.DeferredEvaluationParameterKeys;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -124,6 +128,10 @@ public class TestWorkflowExecutorIntTestConfiguration {
     public static final String FAILED_TASK_MESSAGE = "Task failed on purpose";
     public static final String GATE = "gate";
     public static final String STREAMED_CHUNK = "streamed";
+
+    static {
+        DeferredEvaluationParameterKeys.register(CONDITION + "/", CASE_TRUE, CASE_FALSE);
+    }
 
     private static final ComponentDefinition COMPONENT_DEFINITION = ComponentDsl.component(COMPONENT_NAME)
         .title(COMPONENT_TITLE)
@@ -379,10 +387,6 @@ public class TestWorkflowExecutorIntTestConfiguration {
         public TypedValue execute(EvaluationContext context, Object target, Object... arguments) {
             Mode currentMode = mode;
 
-            if (currentMode == Mode.FAIL) {
-                throw new IllegalArgumentException("Execution failed");
-            }
-
             if (currentMode == Mode.BLOCK_FIRST_CALL) {
                 blockFirstCall();
             }
@@ -410,10 +414,6 @@ public class TestWorkflowExecutorIntTestConfiguration {
             armedCalls.set(0);
 
             mode = Mode.BLOCK_FIRST_CALL;
-        }
-
-        public void armFailure() {
-            mode = Mode.FAIL;
         }
 
         public void releaseFirstCall() {
@@ -449,7 +449,7 @@ public class TestWorkflowExecutorIntTestConfiguration {
         }
 
         private enum Mode {
-            BLOCK_FIRST_CALL, FAIL, PASS
+            BLOCK_FIRST_CALL, PASS
         }
     }
 

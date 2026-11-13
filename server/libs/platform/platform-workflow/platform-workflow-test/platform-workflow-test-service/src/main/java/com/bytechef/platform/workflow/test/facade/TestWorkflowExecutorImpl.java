@@ -268,7 +268,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
             Map<String, ?> context = taskFileStorage.readContextValue(
                 contextService.peek(taskExecutionId, Context.Classname.TASK_EXECUTION));
 
-            return workflowTask.evaluateParameters(context, evaluator);
+            return workflowTask.evaluateParameters(context, evaluator, true);
         } catch (RuntimeException exception) {
             if (!inProgress) {
                 throw exception;

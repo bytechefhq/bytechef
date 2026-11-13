@@ -446,6 +446,22 @@ class IntegrationWorkflowExecutionFacadeIntTest {
         }
 
         @Test
+        void testGetWorkflowExecutionTaskExecutionKeepsFormulaThatFailsToEvaluateAsInput() {
+            Job job = createJob("workflow", null);
+
+            TaskExecution taskExecution = createTaskExecutionWithData(
+                job, Map.of("folderName", "=substring(${anthropic_1.dateOfInvoice}, 5, 7)"),
+                Map.of("anthropic_1", Map.of("dateOfInvoice", "")));
+
+            TaskExecutionDTO taskExecutionDTO = integrationWorkflowExecutionFacade.getWorkflowExecutionTaskExecution(
+                Objects.requireNonNull(job.getId()), Objects.requireNonNull(taskExecution.getId()));
+
+            assertThat(taskExecutionDTO.input())
+                .isEqualTo(Map.of("folderName", "=substring(${anthropic_1.dateOfInvoice}, 5, 7)"));
+            assertThat(taskExecutionDTO.output()).isEqualTo("output-value");
+        }
+
+        @Test
         void testGetWorkflowExecutionTaskExecutionAcceptsTaskInDescendantJob() {
             Job rootJob = createJob("workflow", null);
 
@@ -799,6 +815,21 @@ class IntegrationWorkflowExecutionFacadeIntTest {
         }
 
         private TaskExecution createTaskExecutionWithData(Job job, Long parentId) {
+            return createTaskExecutionWithData(
+                job, parentId, createWorkflowTask(), Map.of("name", "Ada"));
+        }
+
+        private TaskExecution createTaskExecutionWithData(
+            Job job, Map<String, ?> parameters, Map<String, ?> context) {
+
+            return createTaskExecutionWithData(
+                job, null,
+                new WorkflowTask(Map.of("name", "myAction_1", "type", TASK_TYPE, "parameters", parameters)), context);
+        }
+
+        private TaskExecution createTaskExecutionWithData(
+            Job job, Long parentId, WorkflowTask workflowTask, Map<String, ?> context) {
+
             long jobId = Objects.requireNonNull(job.getId());
 
             FileEntry outputFileEntry = taskFileStorage.storeTaskExecutionOutput(jobId, 0L, "output-value");
@@ -810,15 +841,14 @@ class IntegrationWorkflowExecutionFacadeIntTest {
                     .parentId(parentId)
                     .status(TaskExecution.Status.COMPLETED)
                     .taskNumber(0)
-                    .workflowTask(createWorkflowTask())
+                    .workflowTask(workflowTask)
                     .build());
 
             long taskExecutionId = Objects.requireNonNull(taskExecution.getId());
 
             contextService.push(
                 taskExecutionId, Context.Classname.TASK_EXECUTION,
-                taskFileStorage.storeContextValue(
-                    taskExecutionId, Context.Classname.TASK_EXECUTION, Map.of("name", "Ada")));
+                taskFileStorage.storeContextValue(taskExecutionId, Context.Classname.TASK_EXECUTION, context));
 
             return taskExecution;
         }

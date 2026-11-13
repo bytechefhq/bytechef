@@ -623,7 +623,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                 contextService.peek(Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION));
             WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
-            input = workflowTask.evaluateParameters(context, evaluator);
+            input = workflowTask.evaluateParameters(context, evaluator, true);
             output = taskExecution.getOutput() == null
                 ? null
                 : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
