@@ -122,6 +122,11 @@ class ConnectedUserReferenceDeploymentManager {
         return findMissingRequiredInput(workflowService.getWorkflow(workflowId), inputs);
     }
 
+    public Map<String, Long> getConnectionIdsByComponentName(ProjectDeploymentWorkflow row) {
+        return connectedUserWorkflowConnectionResolver.getConnectionIdsByComponentName(
+            row.getWorkflowId(), row.getConnections());
+    }
+
     public ProjectDeployment getDeployment(long projectDeploymentId) {
         return projectDeploymentService.getProjectDeployment(projectDeploymentId);
     }

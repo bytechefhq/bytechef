@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,15 @@ public interface ConnectedUserWorkflowReferenceFacade {
     ConnectedUserProjectWorkflow getOrCreateReference(
         String externalUserId, String automationUuid, Environment environment,
         Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs);
+
+    /**
+     * Returns the connections and inputs the reference currently runs with, leaving out the ones its configuration
+     * provides.
+     *
+     * @param referenceId the id of the connected user's reference workflow
+     * @return the current connections and inputs
+     */
+    ConnectedUserWorkflowReferenceValuesDTO getReferenceValues(long referenceId);
 
     void updateReferenceInputs(
         String externalUserId, String automationUuid, Map<String, ?> inputs, Environment environment);

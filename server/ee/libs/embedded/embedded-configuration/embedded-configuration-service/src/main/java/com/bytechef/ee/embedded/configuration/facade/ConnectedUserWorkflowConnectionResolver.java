@@ -17,9 +17,11 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
@@ -88,6 +90,24 @@ public class ConnectedUserWorkflowConnectionResolver {
         }
 
         return new ResolvedWorkflowConnections(connections, List.copyOf(missingComponentNames));
+    }
+
+    public Map<String, Long> getConnectionIdsByComponentName(
+        String workflowId, List<ProjectDeploymentWorkflowConnection> connections) {
+
+        Map<String, Long> connectionIds = new LinkedHashMap<>();
+
+        for (ComponentConnection slot : workflowConnectionSlot.getSlots(workflowId)) {
+            for (ProjectDeploymentWorkflowConnection connection : connections) {
+                if (Objects.equals(connection.getWorkflowNodeName(), slot.workflowNodeName()) &&
+                    Objects.equals(connection.getWorkflowConnectionKey(), slot.key())) {
+
+                    connectionIds.putIfAbsent(slot.componentName(), connection.getConnectionId());
+                }
+            }
+        }
+
+        return connectionIds;
     }
 
     public Set<String> getProvidedComponentNames(Map<String, Long> providedConnectionIds) {

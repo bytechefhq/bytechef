@@ -44,6 +44,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
@@ -666,6 +667,86 @@ class ConnectedUserProjectAdminFacadeIntTest {
     }
 
     @Test
+    void testGetProjectWorkflowReferenceValuesReturnsTheChosenConnectionAndInputs() {
+        givenSlackAutomationEnvironment();
+
+        long projectId = createProjectWithDefinition("Reference Values", CHANNEL_INPUT_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(projectId);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        long connectedUserId = Objects.requireNonNull(connectedUser.getId());
+        long chosenConnectionId = connectedUserConnectionService.getConnectionIds(connectedUserId)
+            .getFirst();
+
+        String workflowUuid = findPublishedProject(connectedUser, projectId).workflowTemplates()
+            .getFirst()
+            .workflowUuid();
+
+        connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUserId, getConfigurationId(projectId),
+            List.of(
+                new ProvisionConnectedUserProjectWorkflowDTO(
+                    workflowUuid, Map.of("channel", "#alerts"), Map.of("slack", chosenConnectionId))));
+
+        ConnectedUserWorkflowReferenceValuesDTO referenceValues =
+            connectedUserProjectAdminFacade.getProjectWorkflowReferenceValues(
+                getReferenceId(connectedUserId, workflowUuid));
+
+        assertThat(referenceValues.connectionIds()).isEqualTo(Map.of("slack", chosenConnectionId));
+        assertThat(referenceValues.inputs()).isEqualTo(Map.of("channel", "#alerts"));
+    }
+
+    @Test
+    void testGetProjectWorkflowReferenceValuesLeavesOutTheConnectionsAndInputsTheConfigurationProvides() {
+        givenSlackAutomationEnvironment();
+
+        long projectId = createProjectWithDefinition("Reference Provided Values", CHANNEL_INPUT_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(projectId);
+
+        ConnectedUser connectedUser = createConnectedUserWithConnection();
+
+        long connectedUserId = Objects.requireNonNull(connectedUser.getId());
+        long administratorConnectionId = NEXT_CONNECTION_ID.getAndIncrement();
+        Connection administratorConnection = new Connection();
+
+        administratorConnection.setComponentName("slack");
+        administratorConnection.setEnvironmentId(Environment.PRODUCTION.ordinal());
+        administratorConnection.setId(administratorConnectionId);
+        administratorConnection.setType(PlatformType.EMBEDDED);
+
+        when(connectionService.fetchConnection(administratorConnectionId))
+            .thenReturn(Optional.of(administratorConnection));
+
+        String workflowUuid = findPublishedProject(connectedUser, projectId).workflowTemplates()
+            .getFirst()
+            .workflowUuid();
+
+        automationProjectConfigurationAdminFacade.updateConfigurationWorkflow(
+            getConfigurationId(projectId), workflowUuid, Map.of("slack", administratorConnectionId),
+            Map.of("channel", "#provided"));
+
+        connectedUserProjectAdminFacade.provisionProjectWorkflows(
+            connectedUserId, getConfigurationId(projectId),
+            List.of(new ProvisionConnectedUserProjectWorkflowDTO(workflowUuid, null)));
+
+        ConnectedUserWorkflowReferenceValuesDTO referenceValues =
+            connectedUserProjectAdminFacade.getProjectWorkflowReferenceValues(
+                getReferenceId(connectedUserId, workflowUuid));
+
+        assertThat(referenceValues.connectionIds()).isEmpty();
+        assertThat(referenceValues.inputs()).isEmpty();
+    }
+
+    @Test
+    void testGetProjectWorkflowReferenceValuesRejectsAWorkflowThatIsNotAReference() {
+        assertThatThrownBy(() -> connectedUserProjectAdminFacade.getProjectWorkflowReferenceValues(Long.MAX_VALUE))
+            .isInstanceOf(ConfigurationException.class);
+    }
+
+    @Test
     void testProvisionAssignsTheChosenConfigurationIgnoringItsExpression() {
         givenSlackAutomationEnvironment();
         givenRealPermissionEvaluator();
@@ -1077,5 +1158,17 @@ class ConnectedUserProjectAdminFacadeIntTest {
     private void publishAndPinProject(long projectId) {
         AutomationProjectConfigurationTestSupport.publishAndPinProject(
             automationProjectFacade, automationProjectConfigurationService, projectId);
+    }
+
+    private long getReferenceId(long connectedUserId, String workflowUuid) {
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade
+            .getConnectedUserWorkflows(connectedUserId)
+            .stream()
+            .filter(
+                connectedUserProjectWorkflow -> workflowUuid.equals(connectedUserProjectWorkflow.getAutomationUuid()))
+            .findFirst()
+            .orElseThrow();
+
+        return Objects.requireNonNull(reference.getId());
     }
 }

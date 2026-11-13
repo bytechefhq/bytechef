@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectAdminFacade;
@@ -55,6 +56,21 @@ public class ConnectedUserProjectGraphQlController {
 
         return connectedUserProjectFacade.getConnectedUserProjects(
             connectedUserId, environmentService.getEnvironment(environmentId));
+    }
+
+    @QueryMapping
+    public ConnectedUserProjectWorkflowReferenceValues connectedUserProjectWorkflowReferenceValues(@Argument long id) {
+        ConnectedUserWorkflowReferenceValuesDTO referenceValues =
+            connectedUserProjectFacade.getProjectWorkflowReferenceValues(id);
+
+        Map<String, Long> connectionIds = referenceValues.connectionIds();
+
+        return new ConnectedUserProjectWorkflowReferenceValues(
+            connectionIds.entrySet()
+                .stream()
+                .map(entry -> new ConnectedUserProjectWorkflowReferenceConnection(entry.getKey(), entry.getValue()))
+                .toList(),
+            referenceValues.inputs());
     }
 
     @QueryMapping
@@ -120,6 +136,14 @@ public class ConnectedUserProjectGraphQlController {
         }
 
         return connectionIds;
+    }
+
+    @SuppressFBWarnings("EI")
+    public record ConnectedUserProjectWorkflowReferenceValues(
+        List<ConnectedUserProjectWorkflowReferenceConnection> connections, Map<String, Object> inputs) {
+    }
+
+    public record ConnectedUserProjectWorkflowReferenceConnection(String componentName, long connectionId) {
     }
 
     @SuppressFBWarnings("EI")

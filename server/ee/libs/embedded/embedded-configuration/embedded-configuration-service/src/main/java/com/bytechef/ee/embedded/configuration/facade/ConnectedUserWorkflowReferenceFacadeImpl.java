@@ -18,11 +18,13 @@ import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfigurat
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationTemplateNotVisibleException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ProvidedNames;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ReferenceResolution;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.RowSpec;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
@@ -34,6 +36,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -209,6 +212,53 @@ public class ConnectedUserWorkflowReferenceFacadeImpl implements ConnectedUserWo
 
         return applyWorkflow(
             savedReference, externalUserId, environment, true, ApplyMode.PROVISION, requestedConnectionIds, inputs);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ConnectedUserWorkflowReferenceValuesDTO getReferenceValues(long referenceId) {
+        ConnectedUserProjectWorkflow reference = connectedUserProjectWorkflowRepository.findById(referenceId)
+            .orElseThrow(() -> new ConfigurationException(
+                "No connected user workflow: %s".formatted(referenceId), WorkflowErrorType.WORKFLOW_NOT_FOUND));
+
+        String automationUuid = reference.getAutomationUuid();
+        Long projectDeploymentId = reference.getProjectDeploymentId();
+
+        if (automationUuid == null || projectDeploymentId == null) {
+            throw new ConfigurationException(
+                "Connected user workflow %s is not a reference".formatted(referenceId),
+                WorkflowErrorType.WORKFLOW_NOT_FOUND);
+        }
+
+        Optional<ProjectDeploymentWorkflow> rowOptional = connectedUserReferenceDeploymentManager.fetchRow(
+            projectDeploymentId, automationUuid);
+
+        if (rowOptional.isEmpty()) {
+            return new ConnectedUserWorkflowReferenceValuesDTO(Map.of(), Map.of());
+        }
+
+        ProjectDeploymentWorkflow row = rowOptional.get();
+
+        ConnectedUserProject connectedUserProject = connectedUserProjectService.getConnectedUserProject(
+            reference.getConnectedUserProjectId());
+        ProjectDeployment projectDeployment = connectedUserReferenceDeploymentManager.getDeployment(
+            projectDeploymentId);
+
+        ProvidedNames providedNames = connectedUserReferenceDeploymentManager.getProvidedNames(
+            connectedUserProject.getConnectedUserId(), projectDeployment.getProjectId(), automationUuid);
+
+        Map<String, Long> connectionIds = new LinkedHashMap<>(
+            connectedUserReferenceDeploymentManager.getConnectionIdsByComponentName(row));
+
+        connectionIds.keySet()
+            .removeAll(providedNames.componentNames());
+
+        Map<String, Object> inputs = new LinkedHashMap<>(row.getInputs());
+
+        inputs.keySet()
+            .removeAll(providedNames.inputNames());
+
+        return new ConnectedUserWorkflowReferenceValuesDTO(connectionIds, inputs);
     }
 
     @Override
