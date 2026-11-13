@@ -31,22 +31,26 @@ interface ProvisionableMcpServerI {
     provisioned: boolean;
 }
 
+const joinTitles = (titles: string[]): string =>
+    titles.length > 1 ? `${titles.slice(0, -1).join(', ')} and ${titles[titles.length - 1]}` : (titles[0] ?? '');
+
 const describeMcpServer = (
     {coveredComponentNames, missingComponentNames}: ProvisionableMcpServerI,
     getComponentTitle: (componentName: string) => string
 ): string => {
-    const covered = coveredComponentNames.map(getComponentTitle).join(', ');
-    const missing = missingComponentNames.map(getComponentTitle).join(', ');
+    const covered = joinTitles(coveredComponentNames.map(getComponentTitle));
+    const missing = joinTitles(missingComponentNames.map(getComponentTitle));
+    const missingIntegrations = missingComponentNames.length > 1 ? 'integrations' : 'integration';
 
     if (coveredComponentNames.length === 0) {
-        return `Add ${missing} on the Integrations tab first.`;
+        return `Unavailable: its tools use ${missing}, and this user has no ${missing} ${missingIntegrations} yet. Add ${missingComponentNames.length > 1 ? 'them' : 'it'} with Provision Integration on the Integrations tab, then come back here.`;
     }
 
     if (missingComponentNames.length === 0) {
         return `Uses ${covered}`;
     }
 
-    return `Uses ${covered}. Missing ${missing}: add those integrations first to expose them.`;
+    return `Uses ${covered}. Its ${missing} tools stay hidden until this user has the ${missing} ${missingIntegrations}; add ${missingComponentNames.length > 1 ? 'them' : 'it'} with Provision Integration on the Integrations tab.`;
 };
 
 const ProvisionMcpServerDialog = ({connectedUserId, onClose}: ProvisionMcpServerDialogProps) => {
