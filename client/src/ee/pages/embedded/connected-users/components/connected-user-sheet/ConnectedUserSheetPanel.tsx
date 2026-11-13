@@ -8,9 +8,6 @@ import ConnectedUserSheetPanelWorkflowExecutionList from '@/ee/pages/embedded/co
 import ConnectedUserSheetPanelWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
 
-const tabsTriggerClassName =
-    'grow rounded-none border-0 border-b border-border py-2.5 text-content-neutral-secondary shadow-none hover:text-content-brand-primary group-data-[variant=default]/tabs-list:data-[state=active]:shadow-none data-[state=active]:border-stroke-brand-primary data-[state=active]:bg-transparent data-[state=active]:text-content-brand-primary data-[state=active]:shadow-none';
-
 interface ConnectedUserSheetPanelProps {
     connectedUser: ConnectedUser;
 }
@@ -25,30 +22,18 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
             </div>
 
             <Tabs className="w-full" defaultValue="integrations">
-                <TabsList className="h-auto w-full justify-start rounded-none bg-transparent p-0">
-                    <TabsTrigger className={tabsTriggerClassName} value="integrations">
-                        Integrations
-                    </TabsTrigger>
+                <TabsList>
+                    <TabsTrigger value="integrations">Integrations</TabsTrigger>
 
-                    <TabsTrigger className={tabsTriggerClassName} value="workflows">
-                        Automations
-                    </TabsTrigger>
+                    <TabsTrigger value="workflows">Automations</TabsTrigger>
 
-                    <TabsTrigger className={tabsTriggerClassName} value="mcp-servers">
-                        MCP Servers
-                    </TabsTrigger>
+                    <TabsTrigger value="mcp-servers">MCP Servers</TabsTrigger>
 
-                    <TabsTrigger className={tabsTriggerClassName} value="connections">
-                        Connections
-                    </TabsTrigger>
+                    <TabsTrigger value="connections">Connections</TabsTrigger>
 
-                    <TabsTrigger className={tabsTriggerClassName} value="workflow-executions">
-                        Workflow Executions
-                    </TabsTrigger>
+                    <TabsTrigger value="workflow-executions">Workflow Executions</TabsTrigger>
 
-                    <TabsTrigger className={tabsTriggerClassName} value="external-invocations">
-                        External Invocations
-                    </TabsTrigger>
+                    <TabsTrigger value="external-invocations">External Invocations</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="integrations">
