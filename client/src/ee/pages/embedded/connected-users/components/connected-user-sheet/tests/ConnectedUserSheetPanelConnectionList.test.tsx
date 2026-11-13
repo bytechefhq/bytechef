@@ -28,6 +28,15 @@ vi.mock(
     })
 );
 
+vi.mock(
+    '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserConnectionCredentialsDialog',
+    () => ({
+        default: ({connectedUserId, connection}: {connectedUserId: number; connection: Connection}) => (
+            <div>{`Credentials of connection ${connection.id} of connected user ${connectedUserId}`}</div>
+        ),
+    })
+);
+
 vi.mock('react-inlinesvg', () => ({
     default: ({src}: {src: string}) => <img alt="component icon" src={src} />,
 }));
@@ -119,16 +128,43 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
         ).toBeGreaterThan(0);
     });
 
-    it('offers Credentials only on connections provisioned through an integration', () => {
+    it('offers Credentials only on provisioned connections', () => {
         hoisted.allConnectedUserConnectionsQuery.mockReturnValue({data: connections, isLoading: false});
 
         renderConnectionList(integrationInstances);
 
         expect(
             within(getConnectionRow('Provisioned HubSpot')).getByRole('button', {name: 'Credentials'})
-        ).toBeInTheDocument();
+        ).toBeEnabled();
         expect(within(getConnectionRow('Own Slack')).queryByRole('button')).not.toBeInTheDocument();
-        expect(within(getConnectionRow('Shared GitHub')).queryByRole('button')).not.toBeInTheDocument();
+        expect(within(getConnectionRow('Shared GitHub')).getByRole('button', {name: 'Credentials'})).toBeDisabled();
+    });
+
+    it('offers Credentials on a connection provisioned for automations', async () => {
+        hoisted.allConnectedUserConnectionsQuery.mockReturnValue({data: connections, isLoading: false});
+
+        renderConnectionList();
+
+        await userEvent.click(
+            within(getConnectionRow('Provisioned HubSpot')).getByRole('button', {name: 'Credentials'})
+        );
+
+        expect(screen.getByText('Credentials of connection 2 of connected user 7')).toBeInTheDocument();
+        expect(screen.queryByText(/Credentials of integration instance/)).not.toBeInTheDocument();
+    });
+
+    it('explains that a shared connection is edited on the Connections page', async () => {
+        hoisted.allConnectedUserConnectionsQuery.mockReturnValue({data: connections, isLoading: false});
+
+        renderConnectionList();
+
+        await userEvent.hover(
+            within(getConnectionRow('Shared GitHub')).getByRole('button', {name: 'Credentials'}).parentElement!
+        );
+
+        expect(
+            (await screen.findAllByText('Shared connections are edited on the Connections page')).length
+        ).toBeGreaterThan(0);
     });
 
     it("opens the credentials of the connection's integration instance", async () => {
@@ -141,6 +177,7 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
         );
 
         expect(screen.getByText('Credentials of integration instance 20')).toBeInTheDocument();
+        expect(screen.queryByText(/Credentials of connection/)).not.toBeInTheDocument();
     });
 
     it('shows no origin badge when the origin is unknown', () => {
