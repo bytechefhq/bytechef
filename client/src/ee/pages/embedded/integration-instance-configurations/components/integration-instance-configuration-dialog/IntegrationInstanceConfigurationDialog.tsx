@@ -32,11 +32,15 @@ import {
 } from '@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationTagKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
-import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import {
+    useGetIntegrationVersionWorkflowsQuery,
+    useGetIntegrationWorkflowsQuery,
+} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {IntegrationKeys, useGetIntegrationQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import useWorkflowTestConfigurationConnections from '@/shared/hooks/useWorkflowTestConfigurationConnections';
 import {Authorization, AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -136,6 +140,7 @@ const IntegrationInstanceConfigurationDialog = ({
 
     const defaultedAuthorizationsRef = useRef<Authorization[]>(undefined);
     const initializedConfigKeyRef = useRef<string>('');
+    const prefilledConfigKeyRef = useRef<string>('');
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
@@ -200,6 +205,17 @@ const IntegrationInstanceConfigurationDialog = ({
     }, [allWorkflows, excludeWorkflowIds, filterWorkflowUuids]);
 
     const {data: integration} = useGetIntegrationQuery(curIntegrationId!, undefined, !!curIntegrationId);
+
+    const {data: latestIntegrationWorkflows} = useGetIntegrationWorkflowsQuery(
+        curIntegrationId!,
+        isOpen && !!curIntegrationId
+    );
+
+    const workflowTestConfigurationConnections = useWorkflowTestConfigurationConnections(
+        latestIntegrationWorkflows,
+        currentEnvironmentId,
+        isOpen && !!latestIntegrationWorkflows
+    );
 
     const {data: connectionDefinition} = useGetConnectionDefinitionQuery({
         componentName: integration?.componentName as string,
@@ -519,6 +535,60 @@ const IntegrationInstanceConfigurationDialog = ({
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [curIntegrationId, curIntegrationVersion, workflows]);
+
+    useEffect(() => {
+        const configKey = initializedConfigKeyRef.current;
+
+        if (
+            !configKey ||
+            prefilledConfigKeyRef.current === configKey ||
+            !workflows?.length ||
+            !integration ||
+            !workflowTestConfigurationConnections.isFetched
+        ) {
+            return;
+        }
+
+        prefilledConfigKeyRef.current = configKey;
+
+        const integrationInstanceConfigurationWorkflows = getValues('integrationInstanceConfigurationWorkflows') ?? [];
+
+        integrationInstanceConfigurationWorkflows.forEach((integrationInstanceConfigurationWorkflow, workflowIndex) => {
+            const workflow = workflows.find(
+                (workflow) => workflow.id === integrationInstanceConfigurationWorkflow.workflowId
+            );
+
+            if (!workflow) {
+                return;
+            }
+
+            const componentConnections: ComponentConnection[] = (workflow.tasks ?? [])
+                .flatMap((task) => task.connections ?? [])
+                .concat((workflow.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
+                .filter((connection) => connection.componentName !== integration.componentName);
+
+            componentConnections.forEach((componentConnection, connectionIndex) => {
+                if (integrationInstanceConfigurationWorkflow.connections?.[connectionIndex]?.connectionId != null) {
+                    return;
+                }
+
+                const testConnectionId = workflowTestConfigurationConnections.findConnectionId(
+                    workflow.workflowUuid,
+                    componentConnection.workflowNodeName,
+                    componentConnection.key
+                );
+
+                if (testConnectionId == null) {
+                    return;
+                }
+
+                setValue(
+                    `integrationInstanceConfigurationWorkflows.${workflowIndex}.connections.${connectionIndex}.connectionId`,
+                    testConnectionId
+                );
+            });
+        });
+    }, [getValues, integration, setValue, workflowTestConfigurationConnections, workflows]);
 
     return (
         <Dialog
