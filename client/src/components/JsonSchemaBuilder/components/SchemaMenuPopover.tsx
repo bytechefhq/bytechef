@@ -1,7 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
-import {t} from '@lingui/core/macro';
 import {Trans, useLingui} from '@lingui/react';
 import {X as CloseIcon} from 'lucide-react';
 import {ReactNode, useMemo, useState} from 'react';
@@ -73,7 +72,7 @@ const SchemaMenuPopover = ({children, onChange, onClose, open: controlledOpen, s
                             options={allOptions.filter(
                                 (option) => !displayFields.some((field) => field.value === option.value)
                             )}
-                            placeholder={t`Description, Required, etc.`}
+                            placeholder={i18n._('Description, Required, etc.')}
                             value={null}
                         />
                     </fieldset>
