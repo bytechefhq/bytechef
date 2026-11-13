@@ -1191,6 +1191,7 @@
     "webhookEnable": { },
     "webhookRawBody": false,
     "webhookRequest": { },
+    "webhookResponse": null,
     "webhookValidate": null,
     "webhookValidateOnEnable": null,
     "workflowNodeDescription": null,
