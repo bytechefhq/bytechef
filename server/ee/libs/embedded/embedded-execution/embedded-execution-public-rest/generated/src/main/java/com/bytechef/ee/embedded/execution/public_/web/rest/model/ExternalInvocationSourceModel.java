@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The source a external invocation was made through.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T20:26:51.462029+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T08:33:26.798853+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public enum ExternalInvocationSourceModel {
   
   MCP_SERVER("MCP_SERVER"),

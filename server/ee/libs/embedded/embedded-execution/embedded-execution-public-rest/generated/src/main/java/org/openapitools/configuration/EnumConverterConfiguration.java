@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationKindModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationOutcomeModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationSourceModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationStatusModel;
 
 import jakarta.annotation.Generated;
 
@@ -22,7 +22,7 @@ import org.springframework.core.convert.converter.Converter;
  * correct conversion if the OpenAPI specification is using an `enumPropertyNaming` other than
  * `original` or the specification has an integer enum.
  */
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T15:10:56.439359+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T08:33:26.798853+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 @Configuration(value = "org.openapitools.configuration.enumConverterConfiguration")
 public class EnumConverterConfiguration {
 
@@ -44,21 +44,21 @@ public class EnumConverterConfiguration {
             }
         };
     }
-    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.externalInvocationOutcomeConverter")
-    Converter<String, ExternalInvocationOutcomeModel> externalInvocationOutcomeConverter() {
-        return new Converter<String, ExternalInvocationOutcomeModel>() {
-            @Override
-            public ExternalInvocationOutcomeModel convert(String source) {
-                return ExternalInvocationOutcomeModel.fromValue(source);
-            }
-        };
-    }
     @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.externalInvocationSourceConverter")
     Converter<String, ExternalInvocationSourceModel> externalInvocationSourceConverter() {
         return new Converter<String, ExternalInvocationSourceModel>() {
             @Override
             public ExternalInvocationSourceModel convert(String source) {
                 return ExternalInvocationSourceModel.fromValue(source);
+            }
+        };
+    }
+    @Bean(name = "org.openapitools.configuration.EnumConverterConfiguration.externalInvocationStatusConverter")
+    Converter<String, ExternalInvocationStatusModel> externalInvocationStatusConverter() {
+        return new Converter<String, ExternalInvocationStatusModel>() {
+            @Override
+            public ExternalInvocationStatusModel convert(String source) {
+                return ExternalInvocationStatusModel.fromValue(source);
             }
         };
     }
