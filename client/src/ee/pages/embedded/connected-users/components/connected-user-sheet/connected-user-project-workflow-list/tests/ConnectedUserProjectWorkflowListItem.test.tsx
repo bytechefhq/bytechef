@@ -24,6 +24,27 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     useEnableConnectedUserProjectWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
 
+vi.mock(
+    '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowEditDialog',
+    () => ({
+        default: ({
+            configurationId,
+            connectedUserProjectWorkflowId,
+            projectId,
+            workflowUuid,
+        }: {
+            configurationId: string;
+            connectedUserProjectWorkflowId: string;
+            projectId: string;
+            workflowUuid: string;
+        }) => (
+            <div data-testid="edit-dialog">
+                {`${connectedUserProjectWorkflowId}|${configurationId}|${projectId}|${workflowUuid}`}
+            </div>
+        ),
+    })
+);
+
 vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({
     default: ({
         filteredComponentNames,
@@ -66,14 +87,14 @@ const renderListItem = (
     connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType,
     projectName?: string,
     workflowTemplate?: ConnectedUserWorkflowTemplateType,
-    configurationProjectVersion?: number
+    configuration?: {configurationId: string; projectId: string}
 ) =>
     render(
         <QueryClientProvider client={new QueryClient()}>
             <TooltipProvider>
                 <ul>
                     <ConnectedUserProjectWorkflowListItem
-                        configurationProjectVersion={configurationProjectVersion}
+                        configuration={configuration}
                         connectedUserProjectWorkflow={connectedUserProjectWorkflow}
                         projectName={projectName}
                         workflowTemplate={workflowTemplate}
@@ -93,6 +114,40 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
             projectName: undefined,
             workflow: undefined,
         });
+    });
+
+    it('opens the Edit dialog for a reference under a configuration', async () => {
+        renderListItem(
+            createConnectedUserProjectWorkflow(null, {automationUuid: 'template-uuid'}),
+            'Automation Playground',
+            undefined,
+            {configurationId: '60', projectId: '20'}
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
+
+        expect(screen.getByTestId('edit-dialog')).toHaveTextContent('1052|60|20|template-uuid');
+    });
+
+    it('offers no Edit for a copy', async () => {
+        renderListItem(createConnectedUserProjectWorkflow(null), undefined, undefined, {
+            configurationId: '60',
+            projectId: '20',
+        });
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Edit'})).not.toBeInTheDocument();
+    });
+
+    it('offers no Edit for a reference without a configuration', async () => {
+        renderListItem(createConnectedUserProjectWorkflow(null, {automationUuid: 'template-uuid'}));
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+
+        expect(screen.queryByRole('menuitem', {name: 'Edit'})).not.toBeInTheDocument();
     });
 
     it("opens the workflow's executions for the connected user when the workflow is clicked", async () => {
@@ -150,24 +205,7 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
         expect(screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'})).toBeEnabled();
     });
 
-    it('shows a provisioned workflow at the project version of its configuration and lets it be enabled', () => {
-        renderListItem(
-            createConnectedUserProjectWorkflow(null, {
-                automationUuid: '3f6d2a40-0d6b-4f0e-9a51-6c1a7f1b2c3d',
-                enabled: false,
-                workflowVersion: null,
-            }),
-            undefined,
-            undefined,
-            3
-        );
-
-        expect(screen.queryByText('V1 DRAFT')).not.toBeInTheDocument();
-        expect(screen.getByText('V3')).toBeInTheDocument();
-        expect(screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'})).toBeEnabled();
-    });
-
-    it('shows no version for a provisioned workflow whose configuration is unknown', () => {
+    it('shows no version for a provisioned workflow, whose configuration already shows the project version', () => {
         renderListItem(
             createConnectedUserProjectWorkflow(null, {
                 automationUuid: '3f6d2a40-0d6b-4f0e-9a51-6c1a7f1b2c3d',
@@ -176,7 +214,7 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
             })
         );
 
-        expect(screen.queryByText('V1 DRAFT')).not.toBeInTheDocument();
+        expect(screen.queryByText(/^V\d/)).not.toBeInTheDocument();
         expect(screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'})).toBeEnabled();
     });
 
@@ -205,6 +243,29 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
         expect(screen.getByTestId('trigger-and-components-row')).toHaveTextContent(
             'Await Workflow and Respond|trigger_1|trigger_1,slack'
         );
+    });
+
+    it('shows the template trigger of a provisioned workflow, which carries no triggers of its own', () => {
+        renderListItem(
+            createConnectedUserProjectWorkflow(null, {
+                automationUuid: '3f6d2a40-0d6b-4f0e-9a51-6c1a7f1b2c3d',
+                workflow: {id: 'workflow-1', label: 'Read Airtable record', triggers: []},
+                workflowVersion: null,
+            }),
+            undefined,
+            {
+                components: [{icon: 'airtable.svg', name: 'airtable', title: 'Airtable'}],
+                description: null,
+                label: 'Read Airtable record',
+                lastModifiedDate: null,
+                permissionExpression: null,
+                triggers: [{icon: 'manual.svg', name: 'manual', title: 'Manual'}],
+                workflowId: 'template-workflow-1',
+                workflowUuid: '3f6d2a40-0d6b-4f0e-9a51-6c1a7f1b2c3d',
+            }
+        );
+
+        expect(screen.getByTestId('trigger-and-components-row')).toHaveTextContent('Manual|manual|manual,airtable');
     });
 
     it('shows no components for a workflow without a source template', () => {

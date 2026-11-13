@@ -17,6 +17,7 @@ interface ConnectedUserSheetPanelConnectionListItemProps {
     connection: Connection;
     icon?: string;
     provisionedIntegrationInstance?: ConnectedUserIntegrationInstance;
+    usedByIntegration?: boolean;
 }
 
 const ConnectedUserSheetPanelConnectionListItem = ({
@@ -25,6 +26,7 @@ const ConnectedUserSheetPanelConnectionListItem = ({
     connection,
     icon,
     provisionedIntegrationInstance,
+    usedByIntegration = false,
 }: ConnectedUserSheetPanelConnectionListItemProps) => {
     const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
 
@@ -55,6 +57,24 @@ const ConnectedUserSheetPanelConnectionListItem = ({
 
             <div className="flex items-center gap-x-2">
                 <div className="flex w-72 items-center justify-end gap-x-4">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Badge
+                                label={usedByIntegration ? 'Integration' : 'Automation'}
+                                styleType="secondary-filled"
+                                weight="semibold"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>
+                            {usedByIntegration
+                                ? `Used by this user's ${componentTitle || connection.componentName} integration`
+                                : connection.origin === ConnectionOriginEnum.Internal
+                                  ? 'An admin connection automation configurations provide to their workflows'
+                                  : 'Used by automation workflows'}
+                        </TooltipContent>
+                    </Tooltip>
+
                     {(provisioned || provisionedIntegrationInstance) && (
                         <Tooltip>
                             <TooltipTrigger asChild>

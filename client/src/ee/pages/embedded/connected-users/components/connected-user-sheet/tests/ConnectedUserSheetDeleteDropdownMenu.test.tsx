@@ -41,6 +41,34 @@ describe('ConnectedUserSheetDeleteDropdownMenu', () => {
         expect(screen.getByRole('menuitem', {name: 'Delete'})).toHaveClass('text-content-destructive-primary');
     });
 
+    it('should leave Edit out when no edit handler is given', async () => {
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={hoisted.onDeleteClick} />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+
+        expect(screen.queryByRole('menuitem', {name: 'Edit'})).not.toBeInTheDocument();
+    });
+
+    it('should call onEditClick when clicking Edit', async () => {
+        const onEditClick = vi.fn();
+
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={hoisted.onDeleteClick} onEditClick={onEditClick} />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Edit'}));
+
+        expect(onEditClick).toHaveBeenCalledTimes(1);
+        expect(hoisted.onDeleteClick).not.toHaveBeenCalled();
+    });
+
     it('should call onDeleteClick when clicking Delete', async () => {
         render(
             <TooltipProvider>

@@ -6,13 +6,14 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
 
 interface ConnectedUserSheetDeleteDropdownMenuProps {
     changeConfigurationDisabled?: boolean;
     changeConfigurationDisabledReason?: string;
     onChangeConfigurationClick?: () => void;
     onDeleteClick: () => void;
+    onEditClick?: () => void;
 }
 
 const ConnectedUserSheetDeleteDropdownMenu = ({
@@ -20,6 +21,7 @@ const ConnectedUserSheetDeleteDropdownMenu = ({
     changeConfigurationDisabledReason,
     onChangeConfigurationClick,
     onDeleteClick,
+    onEditClick,
 }: ConnectedUserSheetDeleteDropdownMenuProps) => (
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -32,6 +34,8 @@ const ConnectedUserSheetDeleteDropdownMenu = ({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
+            {onEditClick && <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />}
+
             {onChangeConfigurationClick && (
                 <Tooltip>
                     <TooltipTrigger asChild>

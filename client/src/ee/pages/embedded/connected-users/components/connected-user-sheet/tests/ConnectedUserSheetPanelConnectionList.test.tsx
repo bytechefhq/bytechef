@@ -116,6 +116,23 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
         expect(within(getConnectionRow('Shared GitHub')).getByText('Internal')).toBeInTheDocument();
     });
 
+    it('marks a connection an integration of the user uses as Integration and every other one as Automation', async () => {
+        hoisted.allConnectedUserConnectionsQuery.mockReturnValue({data: connections, isLoading: false});
+
+        renderConnectionList([{connectionId: 1, id: 10, provisioned: false}]);
+
+        expect(within(getConnectionRow('Own Slack')).getByText('Integration')).toBeInTheDocument();
+        expect(within(getConnectionRow('Provisioned HubSpot')).getByText('Automation')).toBeInTheDocument();
+        expect(within(getConnectionRow('Shared GitHub')).getByText('Automation')).toBeInTheDocument();
+
+        await userEvent.hover(within(getConnectionRow('Shared GitHub')).getByText('Automation'));
+
+        expect(
+            (await screen.findAllByText('An admin connection automation configurations provide to their workflows'))
+                .length
+        ).toBeGreaterThan(0);
+    });
+
     it('explains the origin badge in a tooltip', async () => {
         hoisted.allConnectedUserConnectionsQuery.mockReturnValue({data: connections, isLoading: false});
 

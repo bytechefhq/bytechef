@@ -6,6 +6,7 @@ import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useAutomationExecutionsSheetStore from '@/ee/pages/embedded/automations/stores/useAutomationExecutionsSheetStore';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
+import ConnectedUserProjectWorkflowEditDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowEditDialog';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import isCollapsibleRowClick from '@/shared/components/mcp-server/utils/isCollapsibleRowClick';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
@@ -35,17 +36,18 @@ export interface ConnectedUserWorkflowTemplateSourceI {
 }
 
 const ConnectedUserProjectWorkflowListItem = ({
-    configurationProjectVersion,
+    configuration,
     connectedUserProjectWorkflow,
     projectName,
     workflowTemplate,
 }: {
-    configurationProjectVersion?: number;
+    configuration?: {configurationId: string; projectId: string};
     connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType;
     projectName?: string;
     workflowTemplate?: ConnectedUserWorkflowTemplateType;
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showEditDialog, setShowEditDialog] = useState(false);
 
     const openAutomationExecutionsSheet = useAutomationExecutionsSheetStore(
         (state) => state.openAutomationExecutionsSheet
@@ -89,18 +91,23 @@ const ConnectedUserProjectWorkflowListItem = ({
         [workflowTemplate]
     );
 
-    const triggerSource = useMemo(
-        () => ({
-            triggers: connectedUserProjectWorkflow.workflow.triggers.map((trigger) => ({
-                label:
-                    workflowTemplate?.triggers.find((templateTrigger) => templateTrigger.name === trigger.name)
-                        ?.title ?? undefined,
-                type: trigger.type,
-            })),
-            workflowTriggerComponentNames: (workflowTemplate?.triggers ?? []).map((trigger) => trigger.name),
-        }),
-        [connectedUserProjectWorkflow.workflow.triggers, workflowTemplate]
-    );
+    const triggerSource = useMemo(() => {
+        const workflowTriggers = connectedUserProjectWorkflow.workflow.triggers;
+        const templateTriggers = workflowTemplate?.triggers ?? [];
+
+        return {
+            triggers:
+                workflowTriggers.length > 0
+                    ? workflowTriggers.map((trigger) => ({
+                          label:
+                              templateTriggers.find((templateTrigger) => templateTrigger.name === trigger.name)
+                                  ?.title ?? undefined,
+                          type: trigger.type,
+                      }))
+                    : templateTriggers.map((templateTrigger) => ({label: templateTrigger.title ?? undefined})),
+            workflowTriggerComponentNames: templateTriggers.map((trigger) => trigger.name),
+        };
+    }, [connectedUserProjectWorkflow.workflow.triggers, workflowTemplate]);
 
     const lastExecutionDate = connectedUserProjectWorkflow.lastExecutionDate
         ? new Date(Date.parse(connectedUserProjectWorkflow.lastExecutionDate))
@@ -115,13 +122,15 @@ const ConnectedUserProjectWorkflowListItem = ({
 
     const versionLabel = useMemo(() => {
         if (provisioned) {
-            return configurationProjectVersion != null ? `V${configurationProjectVersion}` : undefined;
+            return undefined;
         }
 
         return isDraft ? 'V1 DRAFT' : `V${connectedUserProjectWorkflow.workflowVersion}`;
-    }, [configurationProjectVersion, connectedUserProjectWorkflow.workflowVersion, isDraft, provisioned]);
+    }, [connectedUserProjectWorkflow.workflowVersion, isDraft, provisioned]);
 
-    const {staticWebhookUrl} = connectedUserProjectWorkflow;
+    const {automationUuid, staticWebhookUrl} = connectedUserProjectWorkflow;
+
+    const editable = !!automationUuid && !!configuration;
 
     const handleWorkflowClick = () => {
         openAutomationExecutionsSheet({
@@ -148,7 +157,7 @@ const ConnectedUserProjectWorkflowListItem = ({
         <>
             <li>
                 <div
-                    className="flex min-h-12 cursor-pointer items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
+                    className="flex min-h-12 cursor-pointer items-center justify-between gap-x-4 rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
                     onClick={(event) => {
                         if (isCollapsibleRowClick(event)) {
                             handleWorkflowClick();
@@ -198,6 +207,7 @@ const ConnectedUserProjectWorkflowListItem = ({
                             <WorkflowTriggerAndComponentsRow
                                 className="hidden sm:flex"
                                 filteredComponentNames={filteredComponentNames}
+                                fitToWidth
                                 workflow={triggerSource}
                                 workflowComponentDefinitions={workflowComponentDefinitions}
                                 workflowTaskDispatcherDefinitions={workflowComponentDefinitions}
@@ -206,8 +216,8 @@ const ConnectedUserProjectWorkflowListItem = ({
                     </div>
 
                     <div className="flex items-center gap-x-2">
-                        <div className="flex items-center gap-x-4">
-                            <div className="flex w-28 justify-start">
+                        <div className="flex items-center gap-x-2">
+                            <div className="flex w-28 shrink-0 justify-start">
                                 {versionLabel && (
                                     <Tooltip>
                                         <TooltipTrigger asChild>
@@ -218,14 +228,12 @@ const ConnectedUserProjectWorkflowListItem = ({
                                             />
                                         </TooltipTrigger>
 
-                                        <TooltipContent>
-                                            {provisioned ? 'The project version' : 'The workflow version'}
-                                        </TooltipContent>
+                                        <TooltipContent>The workflow version</TooltipContent>
                                     </Tooltip>
                                 )}
                             </div>
 
-                            <div className="flex w-72 items-center justify-end gap-x-4">
+                            <div className="flex w-72 shrink-0 items-center justify-end gap-x-4">
                                 <Tooltip>
                                     <TooltipTrigger className="text-xs text-content-neutral-secondary">
                                         {lastExecutionDate
@@ -266,7 +274,10 @@ const ConnectedUserProjectWorkflowListItem = ({
                             </div>
                         </div>
 
-                        <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                        <ConnectedUserSheetDeleteDropdownMenu
+                            onDeleteClick={() => setShowDeleteDialog(true)}
+                            onEditClick={editable ? () => setShowEditDialog(true) : undefined}
+                        />
                     </div>
                 </div>
             </li>
@@ -279,6 +290,18 @@ const ConnectedUserProjectWorkflowListItem = ({
                 }
                 open={showDeleteDialog}
             />
+
+            {showEditDialog && automationUuid && configuration && (
+                <ConnectedUserProjectWorkflowEditDialog
+                    configurationId={configuration.configurationId}
+                    connectedUserId={Number(connectedUserProjectWorkflow.connectedUserId)}
+                    connectedUserProjectWorkflowId={connectedUserProjectWorkflow.id}
+                    onClose={() => setShowEditDialog(false)}
+                    projectId={configuration.projectId}
+                    workflowLabel={connectedUserProjectWorkflow.workflow.label}
+                    workflowUuid={automationUuid}
+                />
+            )}
         </>
     );
 };

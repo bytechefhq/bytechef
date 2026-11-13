@@ -5,9 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationProjectConfigurationMoveUsersDialog from '@/ee/pages/embedded/automations/components/automation-project-configuration-list/AutomationProjectConfigurationMoveUsersDialog';
-import {NO_OTHER_CONFIGURATION_REASON} from '@/ee/pages/embedded/connected-users/components/move-connected-users-dialog/moveConnectedUsersReasons';
 import {useAutomationProjectConfigurationsQuery} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon, RefreshCcwIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
@@ -58,7 +56,9 @@ const ConnectedUserProjectConfigurationMenu = ({
         [currentConfiguration]
     );
 
-    const disabledReason = data && targetConfigurations.length === 0 ? NO_OTHER_CONFIGURATION_REASON : undefined;
+    if (targetConfigurations.length === 0) {
+        return <div aria-hidden="true" className="size-9 shrink-0" />;
+    }
 
     return (
         <>
@@ -73,21 +73,12 @@ const ConnectedUserProjectConfigurationMenu = ({
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <span className="block">
-                                <DropdownMenuItem
-                                    aria-label="Change configuration"
-                                    disabled={!data || !!disabledReason}
-                                    icon={<RefreshCcwIcon />}
-                                    label="Change configuration…"
-                                    onClick={() => setShowChangeDialog(true)}
-                                />
-                            </span>
-                        </TooltipTrigger>
-
-                        {disabledReason && <TooltipContent side="left">{disabledReason}</TooltipContent>}
-                    </Tooltip>
+                    <DropdownMenuItem
+                        aria-label="Change configuration"
+                        icon={<RefreshCcwIcon />}
+                        label="Change configuration…"
+                        onClick={() => setShowChangeDialog(true)}
+                    />
                 </DropdownMenuContent>
             </DropdownMenu>
 

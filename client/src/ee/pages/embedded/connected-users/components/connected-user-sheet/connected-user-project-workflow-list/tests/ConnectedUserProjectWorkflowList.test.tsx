@@ -11,21 +11,15 @@ import {
 
 vi.mock('../ConnectedUserProjectWorkflowListItem', () => ({
     default: ({
-        configurationProjectVersion,
         connectedUserProjectWorkflow,
         projectName,
         workflowTemplate,
     }: {
-        configurationProjectVersion?: number;
         connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType;
         projectName?: string;
         workflowTemplate?: ConnectedUserWorkflowTemplateType;
     }) => (
-        <li
-            data-configuration-project-version={configurationProjectVersion ?? ''}
-            data-project-name={projectName ?? ''}
-            data-template-uuid={workflowTemplate?.workflowUuid ?? ''}
-        >
+        <li data-project-name={projectName ?? ''} data-template-uuid={workflowTemplate?.workflowUuid ?? ''}>
             {connectedUserProjectWorkflow.workflow.label}
         </li>
     ),
@@ -101,7 +95,7 @@ describe('ConnectedUserProjectWorkflowList', () => {
                     createConnectedUserProjectWorkflow('1', 'Custom Workflow'),
                     {
                         ...createConnectedUserProjectWorkflow('2', 'Daily standup reminder', {
-                            copiedFromWorkflowUuid: 'template-standup',
+                            automationUuid: 'template-standup',
                         }),
                         projectId: '20',
                     },
@@ -151,10 +145,22 @@ describe('ConnectedUserProjectWorkflowList', () => {
                         automationUuid: 'template-greeting',
                     }),
                     createConnectedUserProjectWorkflow('2', 'Summarize New Email', {
-                        copiedFromWorkflowUuid: 'template-greeting',
+                        automationUuid: 'template-summarize',
                     }),
                 ]}
-                workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
+                workflowTemplateSourcesByWorkflowUuid={
+                    new Map([
+                        ...workflowTemplateSourcesByWorkflowUuid,
+                        [
+                            'template-summarize',
+                            {
+                                projectId: '10',
+                                projectName: 'Automation Playground',
+                                workflowTemplate: createWorkflowTemplate('template-summarize'),
+                            },
+                        ],
+                    ])
+                }
             />
         );
 
@@ -172,6 +178,75 @@ describe('ConnectedUserProjectWorkflowList', () => {
                 .getAllByRole('listitem')
                 .map((item) => item.textContent)
         ).toEqual(['Greet on Request', 'Summarize New Email']);
+    });
+
+    it('lists a copy of a project workflow under Created by this user, apart from the configuration references', async () => {
+        render(
+            <ConnectedUserProjectWorkflowList
+                configurations={[
+                    {
+                        configurationId: '51',
+                        configurationName: 'Alpha',
+                        configurationProjectVersion: 1,
+                        projectId: '10',
+                    },
+                ]}
+                connectedUser={{connectedUserId: '1050', externalId: 'ext-1050'}}
+                connectedUserProjectWorkflows={[
+                    {
+                        ...createConnectedUserProjectWorkflow('1', 'Greet on Request', {
+                            automationUuid: 'template-greeting',
+                        }),
+                        projectId: '10',
+                    },
+                    {
+                        ...createConnectedUserProjectWorkflow('2', 'Greet on Request', {
+                            copiedFromWorkflowUuid: 'template-greeting',
+                        }),
+                        projectId: '99',
+                    },
+                ]}
+                workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
+            />
+        );
+
+        const playgroundGroup = screen.getByRole('region', {name: 'Automation Playground'});
+        const createdByUserGroup = screen.getByRole('region', {name: 'Created by this user'});
+
+        expect(within(playgroundGroup).getByText('Alpha')).toBeInTheDocument();
+        expect(within(playgroundGroup).getByText('1 workflow')).toBeInTheDocument();
+        expect(within(createdByUserGroup).getByText('No configuration')).toBeInTheDocument();
+
+        await userEvent.click(within(createdByUserGroup).getByRole('button', {name: 'Toggle workflows'}));
+
+        expect(within(createdByUserGroup).getByText('Greet on Request')).toHaveAttribute(
+            'data-template-uuid',
+            'template-greeting'
+        );
+    });
+
+    it('marks project groups with a Reference badge and the Created by this user group with a Copy badge', () => {
+        render(
+            <ConnectedUserProjectWorkflowList
+                connectedUserProjectWorkflows={[
+                    createConnectedUserProjectWorkflow('1', 'Custom Workflow'),
+                    {
+                        ...createConnectedUserProjectWorkflow('2', 'Greet on Request', {
+                            automationUuid: 'template-greeting',
+                        }),
+                        projectId: '10',
+                    },
+                ]}
+                workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
+            />
+        );
+
+        expect(
+            within(screen.getByRole('region', {name: 'Automation Playground'})).getByText('Reference')
+        ).toBeInTheDocument();
+        expect(
+            within(screen.getByRole('region', {name: 'Created by this user'})).getByText('Copy')
+        ).toBeInTheDocument();
     });
 
     it('shows workflows created by the user under a folder header with a No configuration card', () => {
@@ -266,41 +341,6 @@ describe('ConnectedUserProjectWorkflowList', () => {
         expect(
             within(playgroundGroup).getByRole('button', {name: 'Change configuration Default 10'})
         ).toBeInTheDocument();
-    });
-
-    it('passes the project version of its configuration to a provisioned workflow', async () => {
-        render(
-            <ConnectedUserProjectWorkflowList
-                configurations={[
-                    {
-                        configurationId: '51',
-                        configurationName: 'Default',
-                        configurationProjectVersion: 3,
-                        projectId: '10',
-                    },
-                ]}
-                connectedUser={{connectedUserId: '1050', externalId: 'ext-1050'}}
-                connectedUserProjectWorkflows={[
-                    {
-                        ...createConnectedUserProjectWorkflow('1', 'Greet on Request', {
-                            automationUuid: 'template-greeting',
-                        }),
-                        projectId: '10',
-                        workflowVersion: null,
-                    },
-                ]}
-                workflowTemplateSourcesByWorkflowUuid={workflowTemplateSourcesByWorkflowUuid}
-            />
-        );
-
-        const playgroundGroup = screen.getByRole('region', {name: 'Automation Playground'});
-
-        await userEvent.click(within(playgroundGroup).getByRole('button', {name: 'Toggle configuration'}));
-
-        expect(within(playgroundGroup).getByText('Greet on Request')).toHaveAttribute(
-            'data-configuration-project-version',
-            '3'
-        );
     });
 
     it('toggles a configured project card when its row is clicked outside the controls', async () => {
