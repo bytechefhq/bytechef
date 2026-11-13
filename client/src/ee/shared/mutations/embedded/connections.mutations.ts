@@ -51,6 +51,23 @@ interface UpdateConnectionCredentialsMutationProps {
     onError?: (error: Error, variables: Connection) => void;
 }
 
+export const getUpdateConnectedUserConnectionCredentials =
+    (connectedUserId: number) => (mutationProps?: UpdateConnectionCredentialsMutationProps) =>
+        useMutation<void, Error, Connection>({
+            mutationFn: (connection: Connection) => {
+                return new ConnectionApi().updateConnectedUserConnectionCredentials({
+                    connectedUserId,
+                    connectionId: connection.id!,
+                    updateConnectionCredentialsRequest: {
+                        parameters: connection.parameters!,
+                        version: connection.version!,
+                    },
+                });
+            },
+            onError: mutationProps?.onError,
+            onSuccess: mutationProps?.onSuccess,
+        });
+
 export const useUpdateConnectionCredentialsMutation = (mutationProps?: UpdateConnectionCredentialsMutationProps) =>
     useMutation<void, Error, Connection>({
         mutationFn: (connection: Connection) => {

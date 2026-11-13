@@ -1,10 +1,11 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ConnectedUserConnectionCredentialsDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserConnectionCredentialsDialog';
 import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
 import ConnectedUserIntegrationCredentialsDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserIntegrationCredentialsDialog';
 import {CONNECTION_ORIGIN_BADGES} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connectionOriginBadges';
-import {Connection} from '@/ee/shared/middleware/embedded/configuration';
+import {Connection, ConnectionOriginEnum} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {ComponentIcon, KeyRoundIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -28,6 +29,8 @@ const ConnectedUserSheetPanelConnectionListItem = ({
     const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
 
     const originBadge = connection.origin && CONNECTION_ORIGIN_BADGES[connection.origin];
+
+    const provisioned = connection.origin === ConnectionOriginEnum.Provisioned;
 
     return (
         <li className="mb-2 flex items-center justify-between rounded border border-border/50 px-3 hover:bg-surface-neutral-primary-hover">
@@ -53,7 +56,7 @@ const ConnectedUserSheetPanelConnectionListItem = ({
             <div className="flex items-center gap-x-2">
                 <div className="flex items-center gap-x-4">
                     <div className="flex w-28 items-center justify-start">
-                        {provisionedIntegrationInstance && (
+                        {(provisioned || provisionedIntegrationInstance) && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
@@ -66,6 +69,24 @@ const ConnectedUserSheetPanelConnectionListItem = ({
                                 </TooltipTrigger>
 
                                 <TooltipContent>Credentials</TooltipContent>
+                            </Tooltip>
+                        )}
+
+                        {connection.origin === ConnectionOriginEnum.Internal && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <span>
+                                        <Button
+                                            aria-label="Credentials"
+                                            disabled
+                                            icon={<KeyRoundIcon />}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+                                    </span>
+                                </TooltipTrigger>
+
+                                <TooltipContent>Shared connections are edited on the Connections page</TooltipContent>
                             </Tooltip>
                         )}
                     </div>
@@ -107,6 +128,14 @@ const ConnectedUserSheetPanelConnectionListItem = ({
                 <ConnectedUserIntegrationCredentialsDialog
                     connectedUserId={connectedUserId}
                     integrationInstance={provisionedIntegrationInstance}
+                    onClose={() => setShowCredentialsDialog(false)}
+                />
+            )}
+
+            {showCredentialsDialog && !provisionedIntegrationInstance && (
+                <ConnectedUserConnectionCredentialsDialog
+                    connectedUserId={connectedUserId}
+                    connection={connection}
                     onClose={() => setShowCredentialsDialog(false)}
                 />
             )}
