@@ -81,14 +81,13 @@ const IntegrationComponentElementList = ({
 
                             <dt className="text-muted-foreground">{idLabel}</dt>
 
-                            <dd className="group/id flex items-center gap-x-1">
+                            <dd className="flex items-center gap-x-1">
                                 <span className="font-mono text-xs leading-5 break-all">{element.id}</span>
 
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
                                             aria-label={`Copy ${idLabel}`}
-                                            className="opacity-0 group-hover/id:opacity-100 focus-visible:opacity-100"
                                             icon={<ClipboardIcon />}
                                             onClick={() => handleCopyIdClick(element.id)}
                                             size="iconXs"
