@@ -16,8 +16,34 @@
 
 package com.bytechef.component.active.campaign;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.Property;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
 /**
  * @author Monika Domiter
  */
 public class ActiveCampaignComponentHandlerTest extends AbstractActiveCampaignComponentHandlerTest {
+
+    @Test
+    void testGetDefinitionAddsEachConnectionPropertyOnceAcrossHandlerInstances() {
+        new ActiveCampaignComponentHandler();
+
+        ComponentDefinition componentDefinition = new ActiveCampaignComponentHandler().getDefinition();
+
+        ConnectionDefinition connectionDefinition = componentDefinition.getConnection()
+            .orElseThrow();
+
+        List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations();
+
+        assertThat(authorizations.getFirst()
+            .getProperties())
+                .extracting(Property::getName)
+                .doesNotHaveDuplicates();
+    }
 }

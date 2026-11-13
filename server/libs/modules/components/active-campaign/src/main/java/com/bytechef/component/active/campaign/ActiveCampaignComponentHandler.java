@@ -66,6 +66,8 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
             List<? extends Property> existingProperties = modifiableAuthorization.getProperties();
             List<Property> properties = new ArrayList<>(existingProperties);
 
+            properties.removeIf(property -> USERNAME.equals(property.getName()));
+
             properties.addFirst(
                 string(USERNAME)
                     .label("Account name")

@@ -58,6 +58,9 @@ public class PipelinerComponentHandler extends AbstractPipelinerComponentHandler
             List<? extends Property> existingProperties = modifiableAuthorization.getProperties();
             List<Property> properties = new ArrayList<>(existingProperties);
 
+            properties
+                .removeIf(property -> SERVER_URL.equals(property.getName()) || SPACE_ID.equals(property.getName()));
+
             properties.addFirst(
                 string(SERVER_URL)
                     .label("Server URL")

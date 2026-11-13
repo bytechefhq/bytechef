@@ -85,6 +85,8 @@ public class AhaComponentHandler extends AbstractAhaComponentHandler {
             List<? extends Property> existingProperties = modifiableAuthorization.getProperties();
             List<Property> properties = new ArrayList<>(existingProperties);
 
+            properties.removeIf(property -> SUBDOMAIN.equals(property.getName()));
+
             properties.addFirst(
                 string(SUBDOMAIN)
                     .label("Subdomain")

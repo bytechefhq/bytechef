@@ -16,8 +16,34 @@
 
 package com.bytechef.component.aha;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.Property;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
 /**
  * @generated
  */
 public class AhaComponentHandlerTest extends AbstractAhaComponentHandlerTest {
+
+    @Test
+    void testGetDefinitionAddsEachConnectionPropertyOnceAcrossHandlerInstances() {
+        new AhaComponentHandler();
+
+        ComponentDefinition componentDefinition = new AhaComponentHandler().getDefinition();
+
+        ConnectionDefinition connectionDefinition = componentDefinition.getConnection()
+            .orElseThrow();
+
+        List<? extends Authorization> authorizations = connectionDefinition.getAuthorizations();
+
+        assertThat(authorizations.getFirst()
+            .getProperties())
+                .extracting(Property::getName)
+                .doesNotHaveDuplicates();
+    }
 }
