@@ -65,6 +65,8 @@ public class JotformComponentHandler extends AbstractJotformComponentHandler {
             List<? extends Property> existingProperties = modifiableAuthorization.getProperties();
             List<Property> properties = new ArrayList<>(existingProperties);
 
+            properties.removeIf(property -> REGION.equals(property.getName()));
+
             properties.addFirst(
                 string(REGION)
                     .label("Region")

@@ -70,6 +70,8 @@ public class HubspotComponentHandler extends AbstractHubspotComponentHandler {
             List<? extends Property> existingProperties = modifiableAuthorization.getProperties();
             List<Property> properties = new ArrayList<>(existingProperties);
 
+            properties.removeIf(property -> HAPIKEY.equals(property.getName()));
+
             properties.addLast(
                 string(HAPIKEY)
                     .label("Hubspot API Key")

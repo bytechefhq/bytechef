@@ -64,6 +64,8 @@ public class AcceloComponentHandler extends AbstractAcceloComponentHandler {
             List<? extends Property> existingProperties = modifiableAuthorization.getProperties();
             List<Property> properties = new ArrayList<>(existingProperties);
 
+            properties.removeIf(property -> DEPLOYMENT.equals(property.getName()));
+
             properties.addFirst(
                 string(DEPLOYMENT)
                     .label("Deployment")

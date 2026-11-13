@@ -64,6 +64,8 @@ public class MattermostComponentHandler extends AbstractMattermostComponentHandl
             List<? extends Property> existingProperties = modifiableAuthorization.getProperties();
             List<Property> properties = new ArrayList<>(existingProperties);
 
+            properties.removeIf(property -> DOMAIN.equals(property.getName()));
+
             properties.addFirst(
                 string(DOMAIN)
                     .label("Domain")
