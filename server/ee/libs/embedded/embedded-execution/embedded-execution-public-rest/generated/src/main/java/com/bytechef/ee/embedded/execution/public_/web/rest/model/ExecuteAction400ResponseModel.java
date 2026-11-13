@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("executeAction_400_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:21.307721+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T08:33:26.798853+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ExecuteAction400ResponseModel {
 
   private List<@Valid ErrorsInnerModel> errors = new ArrayList<>();

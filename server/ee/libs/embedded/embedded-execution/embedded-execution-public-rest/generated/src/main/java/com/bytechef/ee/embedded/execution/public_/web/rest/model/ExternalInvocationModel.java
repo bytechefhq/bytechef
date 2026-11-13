@@ -3,8 +3,8 @@ package com.bytechef.ee.embedded.execution.public_.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationKindModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationOutcomeModel;
 import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationSourceModel;
+import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExternalInvocationStatusModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ExternalInvocation", description = "A record of a single external invocation.")
 @JsonTypeName("ExternalInvocation")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-07T15:10:56.439359+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T08:33:26.798853+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ExternalInvocationModel {
 
   private @Nullable String componentName;
@@ -48,17 +48,17 @@ public class ExternalInvocationModel {
 
   private @Nullable Long integrationInstanceId;
 
+  private @Nullable String invocationName;
+
   private @Nullable Long jobId;
 
   private @Nullable ExternalInvocationKindModel kind;
 
   private @Nullable String operationName;
 
-  private @Nullable ExternalInvocationOutcomeModel outcome;
-
   private @Nullable ExternalInvocationSourceModel source;
 
-  private @Nullable String toolName;
+  private @Nullable ExternalInvocationStatusModel status;
 
   public ExternalInvocationModel componentName(@Nullable String componentName) {
     this.componentName = componentName;
@@ -228,6 +228,27 @@ public class ExternalInvocationModel {
     this.integrationInstanceId = integrationInstanceId;
   }
 
+  public ExternalInvocationModel invocationName(@Nullable String invocationName) {
+    this.invocationName = invocationName;
+    return this;
+  }
+
+  /**
+   * The name the caller invoked: a tool name for MCP and tool calls, an action name for action calls.
+   * @return invocationName
+   */
+  
+  @Schema(name = "invocationName", description = "The name the caller invoked: a tool name for MCP and tool calls, an action name for action calls.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("invocationName")
+  public @Nullable String getInvocationName() {
+    return invocationName;
+  }
+
+  @JsonProperty("invocationName")
+  public void setInvocationName(@Nullable String invocationName) {
+    this.invocationName = invocationName;
+  }
+
   public ExternalInvocationModel jobId(@Nullable Long jobId) {
     this.jobId = jobId;
     return this;
@@ -291,27 +312,6 @@ public class ExternalInvocationModel {
     this.operationName = operationName;
   }
 
-  public ExternalInvocationModel outcome(@Nullable ExternalInvocationOutcomeModel outcome) {
-    this.outcome = outcome;
-    return this;
-  }
-
-  /**
-   * Get outcome
-   * @return outcome
-   */
-  @Valid 
-  @Schema(name = "outcome", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("outcome")
-  public @Nullable ExternalInvocationOutcomeModel getOutcome() {
-    return outcome;
-  }
-
-  @JsonProperty("outcome")
-  public void setOutcome(@Nullable ExternalInvocationOutcomeModel outcome) {
-    this.outcome = outcome;
-  }
-
   public ExternalInvocationModel source(@Nullable ExternalInvocationSourceModel source) {
     this.source = source;
     return this;
@@ -333,25 +333,25 @@ public class ExternalInvocationModel {
     this.source = source;
   }
 
-  public ExternalInvocationModel toolName(@Nullable String toolName) {
-    this.toolName = toolName;
+  public ExternalInvocationModel status(@Nullable ExternalInvocationStatusModel status) {
+    this.status = status;
     return this;
   }
 
   /**
-   * The name of the tool.
-   * @return toolName
+   * Get status
+   * @return status
    */
-  
-  @Schema(name = "toolName", description = "The name of the tool.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("toolName")
-  public @Nullable String getToolName() {
-    return toolName;
+  @Valid 
+  @Schema(name = "status", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("status")
+  public @Nullable ExternalInvocationStatusModel getStatus() {
+    return status;
   }
 
-  @JsonProperty("toolName")
-  public void setToolName(@Nullable String toolName) {
-    this.toolName = toolName;
+  @JsonProperty("status")
+  public void setStatus(@Nullable ExternalInvocationStatusModel status) {
+    this.status = status;
   }
 
   @Override
@@ -371,17 +371,17 @@ public class ExternalInvocationModel {
         Objects.equals(this.errorType, externalInvocation.errorType) &&
         Objects.equals(this.id, externalInvocation.id) &&
         Objects.equals(this.integrationInstanceId, externalInvocation.integrationInstanceId) &&
+        Objects.equals(this.invocationName, externalInvocation.invocationName) &&
         Objects.equals(this.jobId, externalInvocation.jobId) &&
         Objects.equals(this.kind, externalInvocation.kind) &&
         Objects.equals(this.operationName, externalInvocation.operationName) &&
-        Objects.equals(this.outcome, externalInvocation.outcome) &&
         Objects.equals(this.source, externalInvocation.source) &&
-        Objects.equals(this.toolName, externalInvocation.toolName);
+        Objects.equals(this.status, externalInvocation.status);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, createdDate, durationMs, errorMessage, errorType, id, integrationInstanceId, jobId, kind, operationName, outcome, source, toolName);
+    return Objects.hash(componentName, componentVersion, createdDate, durationMs, errorMessage, errorType, id, integrationInstanceId, invocationName, jobId, kind, operationName, source, status);
   }
 
   @Override
@@ -396,12 +396,12 @@ public class ExternalInvocationModel {
     sb.append("    errorType: ").append(toIndentedString(errorType)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integrationInstanceId: ").append(toIndentedString(integrationInstanceId)).append("\n");
+    sb.append("    invocationName: ").append(toIndentedString(invocationName)).append("\n");
     sb.append("    jobId: ").append(toIndentedString(jobId)).append("\n");
     sb.append("    kind: ").append(toIndentedString(kind)).append("\n");
     sb.append("    operationName: ").append(toIndentedString(operationName)).append("\n");
-    sb.append("    outcome: ").append(toIndentedString(outcome)).append("\n");
     sb.append("    source: ").append(toIndentedString(source)).append("\n");
-    sb.append("    toolName: ").append(toIndentedString(toolName)).append("\n");
+    sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("}");
     return sb.toString();
   }

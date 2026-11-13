@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * What a external invocation ran.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T10:03:58.085959+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T08:33:26.798853+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public enum ExternalInvocationKindModel {
   
   COMPONENT("COMPONENT"),

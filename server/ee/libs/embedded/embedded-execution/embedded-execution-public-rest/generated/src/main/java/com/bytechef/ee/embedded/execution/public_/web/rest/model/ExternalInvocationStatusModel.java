@@ -17,11 +17,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The outcome of a external invocation.
+ * The status of an external invocation.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-06T10:03:58.085959+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
-public enum ExternalInvocationOutcomeModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T08:33:26.798853+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+public enum ExternalInvocationStatusModel {
   
   SUCCESS("SUCCESS"),
   
@@ -41,7 +41,7 @@ public enum ExternalInvocationOutcomeModel {
 
   private final String value;
 
-  ExternalInvocationOutcomeModel(String value) {
+  ExternalInvocationStatusModel(String value) {
     this.value = value;
   }
 
@@ -56,8 +56,8 @@ public enum ExternalInvocationOutcomeModel {
   }
 
   @JsonCreator
-  public static ExternalInvocationOutcomeModel fromValue(String value) {
-    for (ExternalInvocationOutcomeModel b : ExternalInvocationOutcomeModel.values()) {
+  public static ExternalInvocationStatusModel fromValue(String value) {
+    for (ExternalInvocationStatusModel b : ExternalInvocationStatusModel.values()) {
       if (b.value.equalsIgnoreCase(value)) {
         return b;
       }
