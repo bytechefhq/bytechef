@@ -2,13 +2,12 @@ import Button from '@/components/Button/Button';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
-import {Input} from '@/components/ui/input';
-import {
-    IntegrationComponentElementI,
-    filterIntegrationComponentElements,
-} from '@/ee/pages/embedded/integrations/components/integration-list/integrationComponentElementUtils';
-import {AlertTriangleIcon, SearchIcon, WrenchIcon} from 'lucide-react';
-import {ReactNode, useMemo, useState} from 'react';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {IntegrationComponentElementI} from '@/ee/pages/embedded/integrations/components/integration-list/integrationComponentElementUtils';
+import {useCopyToClipboard} from '@uidotdev/usehooks';
+import {AlertTriangleIcon, ClipboardIcon, WrenchIcon} from 'lucide-react';
+import {ReactNode} from 'react';
+import {toast} from 'sonner';
 
 interface IntegrationComponentElementListProps {
     elements: IntegrationComponentElementI[];
@@ -29,12 +28,13 @@ const IntegrationComponentElementList = ({
     noun,
     onRetry,
 }: IntegrationComponentElementListProps) => {
-    const [searchText, setSearchText] = useState('');
+    const [, copyToClipboard] = useCopyToClipboard();
 
-    const filteredElements = useMemo(
-        () => filterIntegrationComponentElements(elements, searchText),
-        [elements, searchText]
-    );
+    const handleCopyIdClick = async (id: string) => {
+        await copyToClipboard(id);
+
+        toast(`${idLabel} copied to clipboard`);
+    };
 
     if (isLoading) {
         return (
@@ -68,45 +68,41 @@ const IntegrationComponentElementList = ({
     }
 
     return (
-        <fieldset className="flex flex-col gap-2 border-0">
-            <div className="relative w-full max-w-xs self-end">
-                <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Accordion className="rounded-md border border-border/50" type="multiple">
+            {elements.map((element) => (
+                <AccordionItem className="border-border/50" key={element.id} value={element.id}>
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline">{element.title}</AccordionTrigger>
 
-                <Input
-                    aria-label={`Search ${noun}`}
-                    className="pl-8"
-                    onChange={(event) => setSearchText(event.target.value)}
-                    placeholder={`Search ${noun}...`}
-                    value={searchText}
-                />
-            </div>
+                    <AccordionContent className="px-4">
+                        <dl className="grid grid-cols-[7rem_1fr] gap-x-4 gap-y-2 text-sm">
+                            <dt className="text-muted-foreground">Description</dt>
 
-            {filteredElements.length === 0 ? (
-                <p className="py-4 text-center text-sm text-muted-foreground">No {noun} match your search.</p>
-            ) : (
-                <Accordion className="rounded-md border border-border/50" type="multiple">
-                    {filteredElements.map((element) => (
-                        <AccordionItem className="border-border/50" key={element.id} value={element.id}>
-                            <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                                {element.title}
-                            </AccordionTrigger>
+                            <dd>{element.description || 'No description.'}</dd>
 
-                            <AccordionContent className="px-4">
-                                <dl className="grid grid-cols-[7rem_1fr] gap-x-4 gap-y-2 text-sm">
-                                    <dt className="text-muted-foreground">Description</dt>
+                            <dt className="text-muted-foreground">{idLabel}</dt>
 
-                                    <dd>{element.description || 'No description.'}</dd>
+                            <dd className="flex items-center gap-x-1">
+                                <span className="font-mono text-xs leading-5 break-all">{element.id}</span>
 
-                                    <dt className="text-muted-foreground">{idLabel}</dt>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            aria-label={`Copy ${idLabel}`}
+                                            icon={<ClipboardIcon />}
+                                            onClick={() => handleCopyIdClick(element.id)}
+                                            size="iconXs"
+                                            variant="ghost"
+                                        />
+                                    </TooltipTrigger>
 
-                                    <dd className="font-mono text-xs leading-5 break-all">{element.id}</dd>
-                                </dl>
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
-                </Accordion>
-            )}
-        </fieldset>
+                                    <TooltipContent>Copy {idLabel}</TooltipContent>
+                                </Tooltip>
+                            </dd>
+                        </dl>
+                    </AccordionContent>
+                </AccordionItem>
+            ))}
+        </Accordion>
     );
 };
 

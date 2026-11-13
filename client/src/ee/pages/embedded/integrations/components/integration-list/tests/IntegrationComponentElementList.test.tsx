@@ -1,6 +1,15 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import IntegrationComponentElementList from '@/ee/pages/embedded/integrations/components/integration-list/IntegrationComponentElementList';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {describe, expect, it, vi} from 'vitest';
+
+const hoisted = vi.hoisted(() => ({
+    copyToClipboard: vi.fn(),
+}));
+
+vi.mock('@uidotdev/usehooks', () => ({
+    useCopyToClipboard: () => [null, hoisted.copyToClipboard],
+}));
 
 const elements = [
     {description: 'Sends an email', id: 'GMAIL_SEND_EMAIL', title: 'Send Email'},
@@ -9,15 +18,17 @@ const elements = [
 
 const renderList = (overrides: Partial<Parameters<typeof IntegrationComponentElementList>[0]> = {}) =>
     render(
-        <IntegrationComponentElementList
-            elements={elements}
-            idLabel="Tool ID"
-            isError={false}
-            isLoading={false}
-            noun="tools"
-            onRetry={vi.fn()}
-            {...overrides}
-        />
+        <TooltipProvider>
+            <IntegrationComponentElementList
+                elements={elements}
+                idLabel="Tool ID"
+                isError={false}
+                isLoading={false}
+                noun="tools"
+                onRetry={vi.fn()}
+                {...overrides}
+            />
+        </TooltipProvider>
     );
 
 describe('IntegrationComponentElementList', () => {
@@ -31,21 +42,21 @@ describe('IntegrationComponentElementList', () => {
         expect(screen.getByText('GMAIL_SEND_EMAIL')).toBeInTheDocument();
     });
 
-    it('filters elements by the search text', async () => {
+    it('copies the id of an element to the clipboard', async () => {
         renderList();
 
-        await userEvent.type(screen.getByRole('textbox', {name: 'Search tools'}), 'labels');
+        await userEvent.click(screen.getByRole('button', {name: 'Send Email'}));
+        await userEvent.click(screen.getByRole('button', {name: 'Copy Tool ID'}));
 
-        expect(screen.getByRole('button', {name: 'List Labels'})).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'Send Email'})).not.toBeInTheDocument();
+        expect(hoisted.copyToClipboard).toHaveBeenCalledWith('GMAIL_SEND_EMAIL');
     });
 
-    it('says when no element matches the search text', async () => {
+    it('lists every element', () => {
         renderList();
 
-        await userEvent.type(screen.getByRole('textbox', {name: 'Search tools'}), 'nothing');
-
-        expect(screen.getByText('No tools match your search.')).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'List Labels'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Send Email'})).toBeInTheDocument();
+        expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     });
 
     it('shows an empty state when the component has no elements', () => {
@@ -58,7 +69,6 @@ describe('IntegrationComponentElementList', () => {
         renderList({isLoading: true});
 
         expect(screen.getByText('Loading tools...')).toBeInTheDocument();
-        expect(screen.queryByRole('textbox', {name: 'Search tools'})).not.toBeInTheDocument();
     });
 
     it('offers a retry when loading failed', async () => {

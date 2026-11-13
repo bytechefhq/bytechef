@@ -21,20 +21,3 @@ export const getToolName = (componentName: string, clusterElementName: string): 
 
     return toolName;
 };
-
-export const filterIntegrationComponentElements = (
-    elements: IntegrationComponentElementI[],
-    searchText: string
-): IntegrationComponentElementI[] => {
-    const normalizedSearchText = searchText.trim().toLowerCase();
-
-    if (!normalizedSearchText) {
-        return elements;
-    }
-
-    return elements.filter((element) =>
-        [element.title, element.id, element.description].some((value) =>
-            value?.toLowerCase().includes(normalizedSearchText)
-        )
-    );
-};
