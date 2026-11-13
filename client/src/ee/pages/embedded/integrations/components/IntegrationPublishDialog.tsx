@@ -52,7 +52,11 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
                         <div className="flex flex-col space-y-2">
                             <Label>Description</Label>
 
-                            <Textarea className="h-28" onChange={(event) => setDescription(event.target.value)} />
+                            <Textarea
+                                className="h-28"
+                                onChange={(event) => setDescription(event.target.value)}
+                                placeholder="Describe what changed in this version, e.g. Added a Slack notification for new leads"
+                            />
                         </div>
                     </DialogBody>
 
