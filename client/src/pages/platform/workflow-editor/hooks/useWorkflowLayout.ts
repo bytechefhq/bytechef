@@ -49,12 +49,14 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     const {
         rootClusterElementNodeData,
         setShowWorkflowCodeEditorSheet,
+        setShowWorkflowConnectionsSheet,
         setShowWorkflowInputsSheet,
         setShowWorkflowOutputsSheet,
     } = useWorkflowEditorStore(
         useShallow((state) => ({
             rootClusterElementNodeData: state.rootClusterElementNodeData,
             setShowWorkflowCodeEditorSheet: state.setShowWorkflowCodeEditorSheet,
+            setShowWorkflowConnectionsSheet: state.setShowWorkflowConnectionsSheet,
             setShowWorkflowInputsSheet: state.setShowWorkflowInputsSheet,
             setShowWorkflowOutputsSheet: state.setShowWorkflowOutputsSheet,
         }))
@@ -69,10 +71,13 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         );
     const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
 
-    const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({
-        environmentId: currentEnvironmentId,
-        workflowId: workflow.id!,
-    });
+    // isLoading stays false once the query errors: a workflow without a test configuration yet errors, and that
+    // must read as "nothing assigned", not as loading.
+    const {data: workflowTestConfiguration, isLoading: workflowTestConfigurationLoading} =
+        useGetWorkflowTestConfigurationQuery({
+            environmentId: currentEnvironmentId,
+            workflowId: workflow.id!,
+        });
 
     const testConfigurationDisabled = useMemo(() => {
         const noInputs = (workflow?.inputs ?? []).length === 0;
@@ -177,6 +182,8 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
 
     const handleWorkflowCodeEditorClick = () => setShowWorkflowCodeEditorSheet(true);
 
+    const handleWorkflowConnectionsClick = () => setShowWorkflowConnectionsSheet(true);
+
     const handleWorkflowInputsClick = () => setShowWorkflowInputsSheet(true);
 
     const handleWorkflowOutputsClick = () => setShowWorkflowOutputsSheet(true);
@@ -203,6 +210,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         handleComponentsAndFlowControlsClick,
         handleCopilotClick,
         handleWorkflowCodeEditorClick,
+        handleWorkflowConnectionsClick,
         handleWorkflowInputsClick,
         handleWorkflowIssuesClick,
         handleWorkflowOutputsClick,
@@ -213,5 +221,6 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         taskDispatcherDefinitionsLoading,
         testConfigurationDisabled,
         workflowTestConfiguration,
+        workflowTestConfigurationLoading,
     };
 };
