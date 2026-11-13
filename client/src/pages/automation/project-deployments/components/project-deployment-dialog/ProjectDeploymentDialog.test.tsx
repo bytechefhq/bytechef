@@ -252,4 +252,54 @@ describe('ProjectDeploymentDialog', () => {
             expect.objectContaining({connections: [], enabled: true}),
         ]);
     });
+
+    it('keeps a connection already stored on the deployment instead of the editor connection', async () => {
+        hoisted.connections = [{id: 7}, {id: 42}];
+        hoisted.findTestConnectionId.mockReturnValue(42);
+        hoisted.workflows = [gmailWorkflow];
+
+        render(
+            <MemoryRouter>
+                <TooltipProvider>
+                    <ProjectDeploymentDialog
+                        changeProjectVersion
+                        projectDeployment={{
+                            id: 21,
+                            name: 'Gmail',
+                            projectDeploymentWorkflows: [
+                                {
+                                    connections: [
+                                        {
+                                            connectionId: 7,
+                                            workflowConnectionKey: 'googleMail',
+                                            workflowNodeName: 'googleMail_1',
+                                        },
+                                    ],
+                                    enabled: true,
+                                    workflowId: 'workflow-v0',
+                                    workflowUuid: 'workflow-uuid',
+                                },
+                            ],
+                            projectId: 5,
+                            projectVersion: 1,
+                        }}
+                    />
+                </TooltipProvider>
+            </MemoryRouter>
+        );
+
+        await userEvent.click(await screen.findByRole('button', {name: 'Next'}));
+        await userEvent.click(await screen.findByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(1));
+
+        const submittedDeployment = hoisted.updateMutate.mock.calls[0][0] as ProjectDeployment;
+
+        expect(hoisted.findTestConnectionId).not.toHaveBeenCalled();
+        expect(submittedDeployment.projectDeploymentWorkflows).toEqual([
+            expect.objectContaining({
+                connections: [{connectionId: 7, workflowConnectionKey: 'googleMail', workflowNodeName: 'googleMail_1'}],
+            }),
+        ]);
+    });
 });
