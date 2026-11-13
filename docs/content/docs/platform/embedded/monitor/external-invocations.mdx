@@ -50,7 +50,7 @@ Each call is one row, newest first:
 | Column | What it shows |
 |---|---|
 | **Status** | How the call ended, for example `SUCCESS`, `ERROR`, `CONNECTION_REQUIRED` or `TIMEOUT`. |
-| **Tool** | The tool name the AI agent called, or the action name your code executed. |
+| **Name** | The tool name the AI agent called, or the action name your code executed. |
 | **Type** | What was called: a **Component tool** or a **Workflow tool** through embedded MCP or `POST /{externalUserId}/tools`, or an **Action** through the Embedded API action endpoint. |
 | **Source** | Where the call came in: **MCP**, **API (Action)** or **API (Tool)**. |
 | **Server** | The embedded MCP server the call came through. Embedded API calls show a dash. |
@@ -103,7 +103,7 @@ Authorization: Bearer <API Key>
 X-Environment: PRODUCTION
 ```
 
-The endpoint accepts the same `source`, `outcome`, `startDate` and `endDate` filters as the page, plus
+The endpoint accepts the same `source`, `status`, `startDate` and `endDate` filters as the page, plus
 `pageNumber`. It returns only the calls of the user named in the path. See the
 [API reference](/openapi/backend/embedded-external-invocation).
 
