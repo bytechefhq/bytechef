@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.webhook.executor;
 
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -123,6 +124,17 @@ public interface WebhookWorkflowExecutor {
      * @return {@code true} when the workflow or its trigger is disabled
      */
     boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId);
+
+    /**
+     * Returns the immediate response an asynchronous webhook trigger sends to the caller, built from the trigger
+     * parameters evaluated against the workflow inputs. The incoming request is never used.
+     *
+     * @param workflowExecutionId the unique identifier for the workflow execution containing details such as tenant,
+     *                            type, and trigger
+     * @return the configured response, or {@code null} when the trigger uses the default response
+     */
+    @Nullable
+    WebhookResponse getWebhookResponse(WorkflowExecutionId workflowExecutionId);
 
     /**
      * Validates the provided webhook request against the trigger of the given workflow execution without executing the

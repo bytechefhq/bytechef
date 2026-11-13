@@ -22,6 +22,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -34,6 +36,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.evaluator.Evaluator;
@@ -44,11 +47,11 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
@@ -205,29 +208,69 @@ public class WebhookWorkflowExecutorTest {
     }
 
     @Test
-    public void testValidateAndExecuteAsyncPublishesValidatedRequest() {
-        when(webhookWorkflowSyncExecutor.validate(any(), any())).thenReturn(WebhookValidateResponse.ok());
+    public void testGetWebhookResponseSkipsFacadeWhenResponseTypeIsAbsent() {
+        givenTrigger(Map.of());
 
-        webhookWorkflowExecutor.validateAndExecuteAsync(workflowExecutionId, webhookRequest);
+        assertThat(webhookWorkflowExecutor.getWebhookResponse(workflowExecutionId)).isNull();
 
-        ArgumentCaptor<TriggerWebhookEvent> triggerWebhookEventArgumentCaptor =
-            ArgumentCaptor.forClass(TriggerWebhookEvent.class);
-
-        verify(eventPublisher).publishEvent(triggerWebhookEventArgumentCaptor.capture());
-
-        TriggerWebhookEvent triggerWebhookEvent = triggerWebhookEventArgumentCaptor.getValue();
-
-        assertThat(triggerWebhookEvent.getWebhookRequest()
-            .validated()).isTrue();
+        verify(webhookWorkflowSyncExecutor, never()).executeWebhookResponse(any(), any());
+        verify(evaluator, never()).evaluate(any(), any(), anyBoolean());
     }
 
     @Test
-    public void testValidateAndExecuteAsyncDoesNotPublishInvalidRequest() {
-        when(webhookWorkflowSyncExecutor.validate(any(), any())).thenReturn(WebhookValidateResponse.badRequest());
+    public void testGetWebhookResponseSkipsFacadeWhenResponseTypeIsDefault() {
+        givenTrigger(Map.of("responseType", "DEFAULT"));
 
-        webhookWorkflowExecutor.validateAndExecuteAsync(workflowExecutionId, webhookRequest);
+        assertThat(webhookWorkflowExecutor.getWebhookResponse(workflowExecutionId)).isNull();
 
-        verifyNoInteractions(eventPublisher);
+        verify(webhookWorkflowSyncExecutor, never()).executeWebhookResponse(any(), any());
+    }
+
+    @Test
+    public void testGetWebhookResponseEvaluatesParametersAgainstWorkflowInputs() {
+        Map<String, String> inputMap = Map.of("redirectUrl", "https://example.com/thanks");
+        WebhookResponse expectedWebhookResponse = WebhookResponse.redirect("https://example.com/thanks");
+
+        givenTrigger(Map.of("responseType", "REDIRECT", "redirectUrl", "${redirectUrl}"));
+
+        doReturn(inputMap).when(jobPrincipalAccessor)
+            .getInputMap(anyLong(), anyString());
+        when(evaluator.evaluate(any(), eq(inputMap), eq(true))).thenReturn(
+            Map.of(
+                "name", "trigger_1", "type", "webhook/v1/autoRespondWithHTTP200",
+                "parameters", Map.of("responseType", "REDIRECT", "redirectUrl", "https://example.com/thanks")));
+        when(webhookWorkflowSyncExecutor.executeWebhookResponse(any(), any())).thenReturn(expectedWebhookResponse);
+
+        assertThat(webhookWorkflowExecutor.getWebhookResponse(workflowExecutionId)).isSameAs(expectedWebhookResponse);
+
+        ArgumentCaptor<WorkflowNodeType> workflowNodeTypeArgumentCaptor =
+            ArgumentCaptor.forClass(WorkflowNodeType.class);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, ?>> parametersArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(webhookWorkflowSyncExecutor).executeWebhookResponse(
+            workflowNodeTypeArgumentCaptor.capture(), parametersArgumentCaptor.capture());
+
+        WorkflowNodeType workflowNodeType = workflowNodeTypeArgumentCaptor.getValue();
+
+        assertThat(workflowNodeType.name()).isEqualTo("webhook");
+        assertThat(workflowNodeType.operation()).isEqualTo("autoRespondWithHTTP200");
+        assertThat(parametersArgumentCaptor.getValue()).extractingByKey("redirectUrl")
+            .isEqualTo("https://example.com/thanks");
+    }
+
+    @Test
+    public void testGetWebhookResponseResolvesLastWorkflowForMinusOnePrincipal() {
+        WorkflowExecutionId lastWorkflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, -1L, "workflow-uuid", "trigger_1");
+
+        when(jobPrincipalAccessor.getLastWorkflowId("workflow-uuid")).thenReturn("workflow-id");
+
+        givenTrigger(Map.of());
+
+        assertThat(webhookWorkflowExecutor.getWebhookResponse(lastWorkflowExecutionId)).isNull();
+
+        verify(jobPrincipalAccessor).getLastWorkflowId("workflow-uuid");
     }
 
     @Nested
@@ -405,6 +448,18 @@ public class WebhookWorkflowExecutorTest {
             List.of(
                 new WorkflowTrigger(
                     Map.of("name", triggerName, "type", type, "disabled", disabled, "parameters", Map.of()))));
+        when(workflowService.getWorkflow("workflow-id")).thenReturn(workflow);
+    }
+
+    private void givenTrigger(Map<String, ?> triggerParameters) {
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getExtensions(any(), any(), any())).thenReturn(
+            List.of(
+                new WorkflowTrigger(
+                    Map.of(
+                        "name", "trigger_1", "type", "webhook/v1/autoRespondWithHTTP200",
+                        "parameters", triggerParameters))));
         when(workflowService.getWorkflow("workflow-id")).thenReturn(workflow);
     }
 

@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.constant.MetadataConstants;
@@ -42,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -122,6 +124,13 @@ public class WebhookWorkflowSyncExecutor {
         }
 
         return triggerOutput;
+    }
+
+    public @Nullable WebhookResponse executeWebhookResponse(
+        WorkflowNodeType workflowNodeType, Map<String, ?> triggerParameters) {
+
+        return triggerDefinitionFacade.executeWebhookResponse(
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), triggerParameters);
     }
 
     public WebhookValidateResponse validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
