@@ -47,12 +47,18 @@ type AutomationProjectVersion {
     description: String
 }
 
+type AutomationProjectVersionWorkflow {
+    workflowUuid: ID!
+    label: String
+}
+
 extend type Query {
     automationProjects(environmentId: ID): [AutomationProject!]!
     automationProjectCategories: [AutomationProjectCategory!]!
     automationProjectTags: [AutomationProjectTag!]!
     automationProjectVersions(id: ID!): [AutomationProjectVersion!]!
     automationProjectVersionWorkflowChanges(id: ID!, projectVersion: Int!): VersionWorkflowChanges!
+    automationProjectVersionWorkflows(id: ID!, projectVersion: Int!): [AutomationProjectVersionWorkflow!]!
     automationProjectVersionWorkflowChange(
         id: ID!, projectVersion: Int!, workflowUuid: String!): VersionWorkflowChange!
 }

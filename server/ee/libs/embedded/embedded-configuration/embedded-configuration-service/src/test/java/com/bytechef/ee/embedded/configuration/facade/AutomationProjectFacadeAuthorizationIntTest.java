@@ -144,6 +144,9 @@ class AutomationProjectFacadeAuthorizationIntTest {
                 () -> automationProjectFacade.getProjectVersionWorkflowChange(5L, 1, WORKFLOW_UUID))
                     .as("change denied to %s", authentication.getName())
                     .isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(() -> automationProjectFacade.getProjectVersionWorkflows(5L, 1))
+                .as("version workflows denied to %s", authentication.getName())
+                .isInstanceOf(AccessDeniedException.class);
         }
 
         verifyNoInteractions(automationProjectService, projectService, projectVersionWorkflowChangeService);

@@ -44,6 +44,7 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
@@ -377,6 +378,22 @@ class AutomationProjectFacadeIntTest {
     }
 
     @Test
+    void testGetProjectVersionWorkflowsListsWorkflowsUnchangedSincePreviousVersion() {
+        long projectId = automationProjectFacade.createProject("Unchanged", "", null, List.of(), null);
+
+        String workflowUuid = automationProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        automationProjectFacade.publishProject(projectId);
+        automationProjectFacade.publishProject(projectId);
+
+        assertThat(automationProjectFacade.getProjectVersionWorkflowChanges(projectId, 2)
+            .workflows()).isEmpty();
+        assertThat(automationProjectFacade.getProjectVersionWorkflows(projectId, 2))
+            .extracting(AutomationProjectVersionWorkflowDTO::workflowUuid)
+            .containsExactly(workflowUuid);
+    }
+
+    @Test
     void testGetProjectVersionWorkflowChangesRejectsNonAutomationProject() {
         Project project = new Project();
 
@@ -393,6 +410,9 @@ class AutomationProjectFacadeIntTest {
             () -> automationProjectFacade.getProjectVersionWorkflowChange(projectId, 1, "uuid"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("is not an automation project");
+        assertThatThrownBy(() -> automationProjectFacade.getProjectVersionWorkflows(projectId, 1))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("is not an automation project");
     }
 
     @Test

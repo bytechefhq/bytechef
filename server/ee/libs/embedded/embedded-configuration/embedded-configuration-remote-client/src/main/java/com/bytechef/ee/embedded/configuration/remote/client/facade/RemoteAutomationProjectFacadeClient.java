@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfiguration
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -69,6 +70,11 @@ public class RemoteAutomationProjectFacadeClient implements AutomationProjectFac
 
     @Override
     public VersionWorkflowChanges getProjectVersionWorkflowChanges(long projectId, int projectVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<AutomationProjectVersionWorkflowDTO> getProjectVersionWorkflows(long projectId, int projectVersion) {
         throw new UnsupportedOperationException();
     }
 

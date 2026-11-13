@@ -30,6 +30,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfiguration
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager.ProvidedNames;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
@@ -356,6 +357,21 @@ public class AutomationProjectFacadeImpl implements AutomationProjectFacade {
         getProjectOfAutomationProject(projectId);
 
         return projectVersionWorkflowChangeService.getVersionWorkflowChanges(projectId, projectVersion);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public List<AutomationProjectVersionWorkflowDTO> getProjectVersionWorkflows(long projectId, int projectVersion) {
+        getProjectOfAutomationProject(projectId);
+
+        return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
+            .stream()
+            .map(projectWorkflow -> {
+                Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
+
+                return new AutomationProjectVersionWorkflowDTO(projectWorkflow.getUuidAsString(), workflow.getLabel());
+            })
+            .toList();
     }
 
     @Override
