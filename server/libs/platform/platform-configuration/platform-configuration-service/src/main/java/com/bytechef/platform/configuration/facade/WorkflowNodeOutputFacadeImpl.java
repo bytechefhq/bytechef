@@ -258,11 +258,15 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
                 outputResponse = new OutputResponse(
                     (BaseProperty) items.getFirst(), sampleOutput == null ? null : sampleOutput.getFirst(),
-                    outputResponse.placeholder());
+                    outputResponse.placeholder(), outputResponse.sampleOutputGenerated());
             }
         }
 
         return outputResponse;
+    }
+
+    private static boolean isRealSampleOutput(@Nullable OutputResponse outputResponse) {
+        return outputResponse != null && !outputResponse.sampleOutputGenerated();
     }
 
     private static boolean containsWorkflowTask(List<WorkflowTask> workflowTasks, String workflowNodeName) {
@@ -598,7 +602,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             .or(() -> getClusterElementDynamicOutputResponse(workflowId, clusterElement, environmentId))
             .orElse(null);
 
-        boolean testOutputResponse = outputResponse != null;
+        boolean testOutputResponse = isRealSampleOutput(outputResponse);
 
         if (outputResponse == null) {
             outputResponse = checkOutputSchemaIsFileEntryProperty(clusterElementDefinition.getOutputResponse());
@@ -719,7 +723,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                         outputResponse = getWorkflowTaskDynamicOutputResponse(
                             workflowId, workflowTask, environmentId, sampleOutputsCache);
 
-                        testoutputResponse = outputResponse != null;
+                        testoutputResponse = isRealSampleOutput(outputResponse);
                     } catch (RuntimeException e) {
                         if (!previousNode) {
                             throw e;
@@ -782,7 +786,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         if (outputResponse == null) {
             outputResponse = checkOutputSchemaIsFileEntryProperty(triggerDefinition.getOutputResponse());
         } else {
-            testoutputResponse = true;
+            testoutputResponse = isRealSampleOutput(outputResponse);
         }
 
         outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);

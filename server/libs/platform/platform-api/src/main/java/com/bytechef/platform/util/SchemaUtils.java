@@ -176,8 +176,9 @@ public class SchemaUtils {
         SchemaPropertyFactory propertyFactoryFunction) {
 
         Object sampleOutput = outputResponse.getSampleOutput();
+        boolean sampleOutputGenerated = sampleOutput == null && outputResponse.getOutputSchema() != null;
 
-        if (sampleOutput == null && outputResponse.getOutputSchema() != null) {
+        if (sampleOutputGenerated) {
             sampleOutput = getSampleOutput(outputResponse.getOutputSchema());
         } else if (sampleOutput instanceof String string && !string.isBlank()) {
             String trimmedString = string.trim();
@@ -209,7 +210,8 @@ public class SchemaUtils {
             outputSchema = (BaseValueProperty<?>) getOutputSchema(sampleOutput, propertyFactoryFunction);
         }
 
-        return outputFactoryFunction.apply(outputSchema, sampleOutput, outputResponse.getPlaceholder());
+        return outputFactoryFunction.apply(
+            outputSchema, sampleOutput, outputResponse.getPlaceholder(), sampleOutputGenerated);
     }
 
     public static OutputResponse toOutput(
@@ -329,7 +331,8 @@ public class SchemaUtils {
     @FunctionalInterface
     public interface OutputFactoryFunction {
 
-        OutputResponse apply(BaseProperty outputSchema, Object sampleOutput, Object placeholder);
+        OutputResponse apply(
+            BaseProperty outputSchema, Object sampleOutput, Object placeholder, boolean sampleOutputGenerated);
     }
 
     @FunctionalInterface

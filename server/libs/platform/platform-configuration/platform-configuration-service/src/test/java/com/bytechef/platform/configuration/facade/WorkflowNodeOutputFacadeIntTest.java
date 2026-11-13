@@ -664,6 +664,26 @@ class WorkflowNodeOutputFacadeIntTest {
     }
 
     @Test
+    void testGetClusterElementOutputDoesNotMarkGeneratedDynamicOutputAsTestOutputResponse() {
+        String workflowId = createWorkflow(CLUSTER_ELEMENT_DEFINITION);
+
+        stubClusterElementDefinitions();
+
+        workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
+            workflowId, "hubspot_1", "hubspot_1", 5L, false, ENVIRONMENT_ID);
+
+        when(clusterElementDefinitionFacade.executeOutput(eq("hubspot"), eq(1), eq("createContact"), anyMap(), eq(5L)))
+            .thenReturn(new OutputResponse(null, Map.of("id", "sample id"), null, true));
+
+        ClusterElementOutputDTO clusterElementOutputDTO = workflowNodeOutputFacade.getClusterElementOutput(
+            workflowId, "aiAgent_1", "tools", "hubspot_1", ENVIRONMENT_ID);
+
+        assertThat(clusterElementOutputDTO).isNotNull();
+        assertThat(clusterElementOutputDTO.sampleOutput()).isEqualTo(Map.of("id", "sample id"));
+        assertThat(clusterElementOutputDTO.testOutputResponse()).isFalse();
+    }
+
+    @Test
     void testGetWorkflowNodeOutputMarksDynamicOutputAsTestOutputResponse() {
         String workflowId = createWorkflow(
             """
@@ -692,6 +712,37 @@ class WorkflowNodeOutputFacadeIntTest {
         assertThat(workflowNodeOutputDTO).isNotNull();
         assertThat(workflowNodeOutputDTO.getSampleOutput()).isEqualTo("pero");
         assertThat(workflowNodeOutputDTO.testOutputResponse()).isTrue();
+    }
+
+    @Test
+    void testGetWorkflowNodeOutputDoesNotMarkGeneratedDynamicOutputAsTestOutputResponse() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {"name": "googleMail_1", "type": "googleMail/v1/getEmail", "parameters": {"id": "42"}}
+                    ]
+                }
+                """);
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinitionService.getActionDefinition("googleMail", 1, "getEmail")).thenReturn(actionDefinition);
+        when(actionDefinitionService.isDynamicOutputDefined("googleMail", 1, "getEmail")).thenReturn(true);
+
+        workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
+            workflowId, "googleMail_1", "connection", 7L, false, ENVIRONMENT_ID);
+
+        when(actionDefinitionFacade.executeOutput(
+            "googleMail", 1, "getEmail", Map.of("id", "42"), Map.of("connection", 7L)))
+                .thenReturn(new OutputResponse(null, Map.of("id", "sample id"), null, true));
+
+        WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
+            workflowId, "googleMail_1", ENVIRONMENT_ID);
+
+        assertThat(workflowNodeOutputDTO).isNotNull();
+        assertThat(workflowNodeOutputDTO.getSampleOutput()).isEqualTo(Map.of("id", "sample id"));
+        assertThat(workflowNodeOutputDTO.testOutputResponse()).isFalse();
     }
 
     @Test

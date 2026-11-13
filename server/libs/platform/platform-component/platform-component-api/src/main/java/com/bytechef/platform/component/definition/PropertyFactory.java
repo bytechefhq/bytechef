@@ -90,8 +90,9 @@ public record PropertyFactory() implements SchemaPropertyFactory {
     };
 
     public static final SchemaUtils.OutputFactoryFunction OUTPUT_FACTORY_FUNCTION =
-        (outputSchema, sampleOutput, placeholder) -> new OutputResponse(
-            Property.toProperty((com.bytechef.component.definition.Property) outputSchema), sampleOutput, placeholder);
+        (outputSchema, sampleOutput, placeholder, sampleOutputGenerated) -> new OutputResponse(
+            Property.toProperty((com.bytechef.component.definition.Property) outputSchema), sampleOutput, placeholder,
+            sampleOutputGenerated);
 
     public static final PropertyFactory PROPERTY_FACTORY = new PropertyFactory();
 
