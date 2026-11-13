@@ -3,6 +3,7 @@ import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {Note} from '@/components/Note';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {useResponseSchemaNoteStore} from '@/pages/platform/workflow-editor/stores/useResponseSchemaNoteStore';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {SPACE} from '@/shared/constants';
 import {MessageCircleQuestionIcon} from 'lucide-react';
@@ -21,10 +22,11 @@ interface PropertyJsonSchemaBuilderSheetProps {
 }
 
 const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: PropertyJsonSchemaBuilderSheetProps) => {
-    const [isNoteVisible, setIsNoteVisible] = useState(true);
     const [localSchema, setLocalSchema] = useState<SchemaRecordType | undefined>(schema);
 
     const editorRef = useRef<StandaloneCodeEditorType | null>(null);
+
+    const {setShowResponseSchemaNote, showResponseSchemaNote} = useResponseSchemaNoteStore();
 
     const handleSchemaChange = useCallback(
         (newSchema: SchemaRecordType) => {
@@ -81,11 +83,11 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
                     </header>
 
                     <div className="flex min-h-0 flex-1 flex-col gap-3 p-3">
-                        {title === 'Response Schema' && isNoteVisible && (
+                        {title === 'Response Schema' && showResponseSchemaNote && (
                             <Note
                                 content="Define how you'd like the LLM to structure its responses — essentially a template for its output."
                                 icon={<MessageCircleQuestionIcon />}
-                                onClose={() => setIsNoteVisible(false)}
+                                onClose={() => setShowResponseSchemaNote(false)}
                             />
                         )}
 
