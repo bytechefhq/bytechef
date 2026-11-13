@@ -25,22 +25,25 @@ import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETER
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.webhook.util.WebhookResponseUtils;
 import com.bytechef.component.webhook.util.WebhookUtils;
 import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class WebhookAutoRespondWithHTTP200Trigger {
+public class WebhookAutoRespondTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("autoRespondWithHTTP200")
-        .title("Auto Respond with HTTP 200 Status")
+        .title("Auto Respond")
         .description(
-            "The webhook trigger always replies immediately with an HTTP 200 status code in response to any incoming " +
-                "webhook request. This guarantees execution of the webhook trigger, but does not involve any " +
-                "validation of the received request.")
+            "The webhook trigger replies immediately to any incoming webhook request and then runs the workflow. By " +
+                "default the reply is an empty HTTP 200 response; it can also be a redirect, JSON, raw text or no " +
+                "data. The request is not validated.")
         .type(TriggerType.STATIC_WEBHOOK)
+        .properties(WebhookResponseUtils.withResponseProperties())
         .output(placeholder(Map.of(METHOD, "POST", HEADERS, Map.of(), PARAMETERS, Map.of(), BODY, Map.of())))
-        .help("", "https://docs.bytechef.io/reference/components/webhook_v1#auto-respond-with-http-200-status")
-        .webhookRequest(WebhookUtils::getWebhookResult);
+        .help("", "https://docs.bytechef.io/reference/components/webhook_v1#auto-respond")
+        .webhookRequest(WebhookUtils::getWebhookResult)
+        .webhookResponse(WebhookResponseUtils::getWebhookResponse);
 }

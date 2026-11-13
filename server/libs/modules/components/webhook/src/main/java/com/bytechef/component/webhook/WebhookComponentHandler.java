@@ -22,7 +22,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.webhook.action.WebhookResponseToWebhookRequestAction;
-import com.bytechef.component.webhook.trigger.WebhookAutoRespondWithHTTP200Trigger;
+import com.bytechef.component.webhook.trigger.WebhookAutoRespondTrigger;
 import com.bytechef.component.webhook.trigger.WebhookAwaitWorkflowAndRespondTrigger;
 import com.bytechef.component.webhook.trigger.WebhookValidateAndRespondTrigger;
 import com.google.auto.service.AutoService;
@@ -43,7 +43,7 @@ public class WebhookComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.HELPERS)
         .actions(WebhookResponseToWebhookRequestAction.ACTION_DEFINITION)
         .triggers(
-            WebhookAutoRespondWithHTTP200Trigger.TRIGGER_DEFINITION,
+            WebhookAutoRespondTrigger.TRIGGER_DEFINITION,
             WebhookValidateAndRespondTrigger.TRIGGER_DEFINITION,
             WebhookAwaitWorkflowAndRespondTrigger.TRIGGER_DEFINITION);
 

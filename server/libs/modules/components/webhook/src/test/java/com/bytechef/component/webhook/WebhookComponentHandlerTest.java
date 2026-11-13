@@ -29,7 +29,7 @@ public class WebhookComponentHandlerTest {
 
     @Test
     @Disabled
-    public void testAutoRespondWithHTTP200Trigger() {
+    public void testAutoRespondTrigger() {
         // TODO
     }
 

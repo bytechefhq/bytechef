@@ -1,6 +1,26 @@
 #### Webhook Trigger Execution Modes
 
-Use the **static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. Any request sent to this endpoint will immediately receive an **HTTP 200 OK** response, ensuring the workflow is triggered without validating the incoming request.
+Use the **static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. Any request sent to this endpoint immediately receives a response, by default an empty **HTTP 200 OK**, and the workflow is triggered without validating the incoming request. See [Respond Immediately](#respond-immediately) to send a redirect or another response.
+
+#### Respond Immediately
+
+Use the **Response Type** property to choose what the caller gets right away. The workflow starts after ByteChef has built and checked the response.
+
+| Response Type | Response |
+|:---|:---|
+| **Default** | Empty `200 OK`. |
+| **Redirect** | `302 Found` to the **Redirect URL**. The URL must be an `http` or `https` address, on any host, or a relative path. |
+| **JSON** | The **Body** as JSON, with the **Headers** and **Status Code** you set. |
+| **Raw** | The **Body** as text. Add a `Content-Type` header, such as `text/html`, to send another format. A page sent with your own `Content-Type` runs in a browser sandbox: its scripts and forms don't run. |
+| **No Data** | An empty body with the **Headers** and **Status Code** you set. |
+
+The response is built only from the trigger properties and the workflow inputs, never from the incoming request. For example, set **Redirect URL** to `${contactPageUrl}` to send each customer to their own page. A **JSON**, **Raw** or **No Data** response needs a **Status Code** from `100` to `599`, and can't use a `3xx` status code or a `Location`, `Refresh` or `Set-Cookie` header. Use **Redirect** to send the caller to another page.
+
+If the response can't be built, for example because the **Redirect URL** uses a workflow input that has no value, the caller gets `500 Internal Server Error` and the workflow does not run.
+
+A `HEAD` request gets an empty `200 OK` and does not start the workflow. The test URL in the workflow editor always answers with an empty `200 OK`.
+
+Example: a "Rate this ticket" link in an email points to `<static workflow webhook trigger URL>?ticket=123&rating=4`. With **Response Type** set to **Redirect** and **Redirect URL** set to `https://www.example.com/thank-you`, the customer lands on the thank-you page at once, and the workflow reads `ticket` and `rating` from `parameters` in the trigger output.
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/db326975-06b1-4c41-880e-484eb14bd33d?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
@@ -25,8 +45,10 @@ ByteChef sends the response **before** the workflow runs. The response does not 
 
 | Situation | Status | Body |
 |:---|:---|:---|
-| The request is received | `200 OK` | Empty |
+| The request is received | `200 OK`, or the configured response | Empty, or the configured response. The workflow starts. |
+| The configured response can't be built | `500 Internal Server Error` | Empty. The workflow does not run. |
+| The request uses `HEAD` | `200 OK` | Empty. The workflow does not run. |
 | The workflow is disabled | `410 Gone` | `{"detail": "Workflow is disabled."}`. The workflow does not run. |
-| A step of the workflow fails | `200 OK` | Empty. The response was sent before the step ran. |
+| A step of the workflow fails | The response above | The response was sent before the step ran. |
 
 A `200 OK` response does not confirm that the workflow ran. To see the result, open **Executions** in ByteChef.
