@@ -77,6 +77,14 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
+    public ResponseEntity<Void> deleteConnectedUserConnection(Long connectedUserId, Long connectionId) {
+        connectedUserConnectionFacade.deleteConnectedUserConnection(connectedUserId, connectionId);
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
     public ResponseEntity<Void> deleteConnection(Long id) {
         connectionAdminFacade.deleteConnection(id);
 
