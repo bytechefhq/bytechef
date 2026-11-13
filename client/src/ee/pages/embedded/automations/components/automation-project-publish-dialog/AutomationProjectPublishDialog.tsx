@@ -66,6 +66,7 @@ const AutomationProjectPublishDialog = ({onClose, project}: AutomationProjectPub
                                 className="h-28"
                                 id="automationProjectPublishDescription"
                                 onChange={(event) => setDescription(event.target.value)}
+                                placeholder="Describe what changed in this version, e.g. Added a Slack notification for new leads"
                             />
                         </div>
                     </DialogBody>
