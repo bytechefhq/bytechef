@@ -1,7 +1,6 @@
 import Button from '@/components/Button/Button';
 import SchemaInput from '@/components/JsonSchemaBuilder/components/SchemaInput';
 import {Label} from '@/components/ui/label';
-import {t} from '@lingui/core/macro';
 import {Trans, useLingui} from '@lingui/react';
 import {FormEvent, FunctionComponent, ReactNode, useMemo} from 'react';
 import Select from 'react-select';
@@ -81,6 +80,8 @@ export const BoolItem = ({field, onChange, schema}: ItemTypeProps) => (
 );
 
 export const CreatableMultiSelectItem = ({field, onChange, schema}: ItemTypeProps) => {
+    const {i18n} = useLingui();
+
     const selected = getSchemaField(schema, field.value);
 
     const allOptions = useMemo(() => stringsToOptions(selected as string[]), [selected]);
@@ -95,12 +96,12 @@ export const CreatableMultiSelectItem = ({field, onChange, schema}: ItemTypeProp
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
                     isMulti
-                    noOptionsMessage={() => t`No options`}
+                    noOptionsMessage={() => i18n._('No options')}
                     onChange={(options: readonly {value: string}[]) =>
                         onChange(setSchemaField(field.value, optionsToStrings([...options]), schema))
                     }
                     options={allOptions}
-                    placeholder={t`Options`}
+                    placeholder={i18n._('Options')}
                     value={allOptions}
                 />
             </fieldset>
@@ -131,11 +132,11 @@ export const SelectItem = ({field, onChange, schema}: ItemTypeProps) => {
                     autoFocus
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
-                    noOptionsMessage={() => t`No options`}
+                    noOptionsMessage={() => i18n._('No options')}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     onChange={(option: any) => onChange(setSchemaField(field.value, option.value, schema))}
                     options={options}
-                    placeholder={t`Options`}
+                    placeholder={i18n._('Options')}
                     value={selected}
                 />
             </fieldset>
@@ -144,6 +145,8 @@ export const SelectItem = ({field, onChange, schema}: ItemTypeProps) => {
 };
 
 export const RequiredMultiSelectItem: FunctionComponent<ItemTypeProps> = ({field, onChange, schema}: ItemTypeProps) => {
+    const {i18n} = useLingui();
+
     if (!isSchemaObject(schema) || !hasSchemaProperties(schema)) {
         return null;
     }
@@ -161,12 +164,12 @@ export const RequiredMultiSelectItem: FunctionComponent<ItemTypeProps> = ({field
                     className="w-full min-w-48"
                     classNamePrefix="react-select"
                     isMulti
-                    noOptionsMessage={() => t`No options`}
+                    noOptionsMessage={() => i18n._('No options')}
                     onChange={(options: readonly {value: string}[]) =>
                         onChange(setSchemaField(field.value, optionsToStrings([...options]), schema))
                     }
                     options={allOptions}
-                    placeholder={t`Options`}
+                    placeholder={i18n._('Options')}
                     value={requiredOptions}
                 />
             </fieldset>
