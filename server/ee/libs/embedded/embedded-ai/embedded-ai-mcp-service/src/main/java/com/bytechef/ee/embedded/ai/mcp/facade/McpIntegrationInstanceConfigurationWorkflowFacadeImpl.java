@@ -266,7 +266,7 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
                         + mcpIntegrationInstanceConfigurationWorkflowId));
     }
 
-    static @Nullable WorkflowTrigger getToolCallableTrigger(Workflow workflow) {
+    private static @Nullable WorkflowTrigger getToolCallableTrigger(Workflow workflow) {
         for (WorkflowTrigger workflowTrigger : WorkflowTrigger.ofEnabled(workflow)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 

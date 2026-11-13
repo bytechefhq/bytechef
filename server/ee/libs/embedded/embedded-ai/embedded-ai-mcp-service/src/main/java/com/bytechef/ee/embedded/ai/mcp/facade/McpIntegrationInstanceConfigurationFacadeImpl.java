@@ -7,16 +7,9 @@
 
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
-import static com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceConfigurationWorkflowFacadeImpl.getToolCallableTrigger;
-
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.definition.Property.ArrayProperty;
-import com.bytechef.component.definition.Property.ObjectProperty;
-import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceConfigurationAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
@@ -32,8 +25,6 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
-import com.bytechef.platform.component.constant.WorkflowConstants;
-import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -43,7 +34,6 @@ import com.bytechef.platform.configuration.dto.WorkflowToolParametersDTO;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,8 +44,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,8 +57,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @ConditionalOnEEVersion
 public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegrationInstanceConfigurationFacade {
-
-    private static final Logger log = LoggerFactory.getLogger(McpIntegrationInstanceConfigurationFacadeImpl.class);
 
     private final ComponentConnectionFacade componentConnectionFacade;
     private final ConnectionService connectionService;
