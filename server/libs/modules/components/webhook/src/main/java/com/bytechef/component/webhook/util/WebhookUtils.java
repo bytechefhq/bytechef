@@ -75,7 +75,7 @@ public class WebhookUtils {
         String csrfToken = inputParameters.getString(CSRF_TOKEN);
 
         if (csrfToken == null || csrfToken.isBlank()) {
-            return WebhookValidateResponse.badRequest();
+            return WebhookValidateResponse.ok();
         }
 
         if (Objects.equals(getCsrfToken(headers), csrfToken)) {

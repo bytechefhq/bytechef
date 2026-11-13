@@ -1,6 +1,6 @@
 #### Webhook Trigger Execution Modes
 
-Use the **Static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. Incoming requests are first validated by checking the CSRF token sent in the `X-Csrf-Token` HTTP header. If validation succeeds, the workflow is executed and the sender receives an **HTTP 200 OK** response.
+Use the **Static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. If the **CSRF Token** property is set, incoming requests are first validated by checking the token sent in the `X-Csrf-Token` HTTP header. If the property is empty, every request is accepted. If validation succeeds, the workflow is executed and the sender receives an **HTTP 200 OK** response.
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/86347f45-900a-4bca-8763-5f3982305010?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
@@ -16,7 +16,7 @@ For the URLs, body formats and trigger output, see [Testing Webhooks with Postma
 |:---|:---|
 | Method | `POST` or `GET` |
 | URL | The static workflow webhook trigger URL |
-| Required headers | `X-Csrf-Token`: the value of the **CSRF Token** property. Add `Content-Type` if you send a body. |
+| Headers | `X-Csrf-Token`: the value of the **CSRF Token** property. Required only when the property is set. Add `Content-Type` if you send a body. |
 | Body | Optional. Use any format. |
 
 ##### Response
@@ -25,8 +25,8 @@ ByteChef checks the token, then sends the response. The workflow runs **after** 
 
 | Situation | Status | Body |
 |:---|:---|:---|
-| The token is correct | `200 OK` | Empty. The workflow starts. |
-| The `X-Csrf-Token` header is missing, or its value is incorrect | `400 Bad Request` | Empty. The workflow does not run. |
+| The token is correct, or the **CSRF Token** property is empty | `200 OK` | Empty. The workflow starts. |
+| The **CSRF Token** property is set, and the `X-Csrf-Token` header is missing or its value is incorrect | `400 Bad Request` | Empty. The workflow does not run. |
 | The workflow is disabled | `410 Gone` | `{"detail": "Workflow is disabled."}`. The token is not checked and the workflow does not run. |
 | A step of the workflow fails | `200 OK` | Empty. The response was sent before the step ran. |
 
@@ -36,4 +36,4 @@ If you get `400 Bad Request`, make sure that:
 - The value is the same as the **CSRF Token** property, including uppercase and lowercase letters, with no extra spaces.
 - The deployed version of the workflow has the token that you send. If you change the token in the editor, publish and deploy the workflow again.
 
-The test URL checks the token in the same way. A request with a missing or incorrect token returns `400 Bad Request` and is not recorded as sample output.
+The test URL checks the token in the same way when the property is set. A request with a missing or incorrect token returns `400 Bad Request` and is not recorded as sample output.
