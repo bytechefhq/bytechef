@@ -258,7 +258,7 @@ public class SchemaUtils {
             type = typeJsonNode.stringValue();
         }
 
-        return switch (type) {
+        BaseValueProperty<?> property = switch (type) {
             case "array" -> {
                 BaseValueProperty<?> arrayProperty = factory.create(propertyName, type);
 
@@ -287,6 +287,36 @@ public class SchemaUtils {
             case "string" -> factory.create(propertyName, type);
             default -> throw new IllegalArgumentException("Unsupported JSON schema type: " + type);
         };
+
+        Object defaultValue = getJsonSchemaDefaultValue(type, jsonNode.get("default"));
+
+        if (defaultValue != null) {
+            factory.setDefaultValue(property, defaultValue);
+        }
+
+        return property;
+    }
+
+    private static @Nullable Object getJsonSchemaDefaultValue(String type, @Nullable JsonNode defaultJsonNode) {
+        if (defaultJsonNode == null || defaultJsonNode.isNull()) {
+            return null;
+        }
+
+        Object defaultValue = switch (type) {
+            case "array" -> defaultJsonNode.isArray() ? JsonUtils.read(defaultJsonNode.toString()) : null;
+            case "boolean" -> defaultJsonNode.isBoolean() ? defaultJsonNode.booleanValue() : null;
+            case "integer" -> defaultJsonNode.isIntegralNumber() ? defaultJsonNode.longValue() : null;
+            case "number" -> defaultJsonNode.isNumber() ? defaultJsonNode.doubleValue() : null;
+            case "object" -> defaultJsonNode.isObject() ? JsonUtils.read(defaultJsonNode.toString()) : null;
+            case "string" -> defaultJsonNode.isString() ? defaultJsonNode.stringValue() : null;
+            default -> null;
+        };
+
+        if (defaultValue == null && log.isDebugEnabled()) {
+            log.debug("Ignoring JSON schema 'default' that does not match the '{}' type", type);
+        }
+
+        return defaultValue;
     }
 
     private static void walkThroughArrayProperty(
@@ -326,6 +356,10 @@ public class SchemaUtils {
         BaseValueProperty<?> create(String name, String type);
 
         List<BaseValueProperty<?>> getChildren(BaseValueProperty<?> property);
+
+        @SuppressWarnings("PMD.UnusedFormalParameter")
+        default void setDefaultValue(BaseValueProperty<?> property, Object defaultValue) {
+        }
     }
 
     @FunctionalInterface

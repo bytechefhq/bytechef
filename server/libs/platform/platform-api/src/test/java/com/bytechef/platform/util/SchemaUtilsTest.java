@@ -104,7 +104,14 @@ class SchemaUtilsTest {
                         ((ModifiableObjectProperty) property).getProperties());
                 }
             }
+
+            @Override
+            public void setDefaultValue(BaseValueProperty<?> property, Object defaultValue) {
+                JSON_SCHEMA_DEFAULT_VALUES.put(property.getName(), defaultValue);
+            }
         };
+
+    private static final Map<String, Object> JSON_SCHEMA_DEFAULT_VALUES = new HashMap<>();
 
     // getOutputSchema tests
 
@@ -347,6 +354,55 @@ class SchemaUtilsTest {
         BaseValueProperty<?> result = SchemaUtils.getJsonSchemaProperty(jsonSchema, JSON_SCHEMA_PROPERTY_FACTORY);
 
         assertThat(result).isInstanceOf(BaseNumberProperty.class);
+    }
+
+    @Test
+    void testGetJsonSchemaPropertyPassesTypedDefaultsToTheFactory() {
+        JSON_SCHEMA_DEFAULT_VALUES.clear();
+
+        String jsonSchema = """
+            {
+                "type": "object",
+                "properties": {
+                    "language": {"type": "string", "default": "en"},
+                    "limit": {"type": "integer", "default": 10},
+                    "ratio": {"type": "number", "default": 2},
+                    "notify": {"type": "boolean", "default": true},
+                    "tags": {"type": "array", "items": {"type": "string"}, "default": ["new"]},
+                    "address": {"type": "object", "default": {"country": "HR"}},
+                    "plain": {"type": "string"}
+                }
+            }""";
+
+        SchemaUtils.getJsonSchemaProperty(jsonSchema, JSON_SCHEMA_PROPERTY_FACTORY);
+
+        assertThat(JSON_SCHEMA_DEFAULT_VALUES)
+            .isEqualTo(
+                Map.of(
+                    "language", "en", "limit", 10L, "ratio", 2.0, "notify", true, "tags", List.of("new"), "address",
+                    Map.of("country", "HR")));
+    }
+
+    @Test
+    void testGetJsonSchemaPropertySkipsDefaultsOfTheWrongType() {
+        JSON_SCHEMA_DEFAULT_VALUES.clear();
+
+        String jsonSchema = """
+            {
+                "type": "object",
+                "properties": {
+                    "limit": {"type": "integer", "default": 1.5},
+                    "language": {"type": "string", "default": true},
+                    "notify": {"type": "boolean", "default": "yes"},
+                    "tags": {"type": "array", "default": "new"},
+                    "address": {"type": "object", "default": []},
+                    "empty": {"type": "string", "default": null}
+                }
+            }""";
+
+        SchemaUtils.getJsonSchemaProperty(jsonSchema, JSON_SCHEMA_PROPERTY_FACTORY);
+
+        assertThat(JSON_SCHEMA_DEFAULT_VALUES).isEmpty();
     }
 
     @Test
