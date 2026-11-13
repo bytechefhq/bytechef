@@ -303,7 +303,7 @@ const WorkflowNodeDetailsPanel = ({
                                             aria-busy={errorsLoading}
                                             aria-label={errorsHeading}
                                             className={twMerge(
-                                                'mr-1 h-7 shrink-0 gap-1 rounded-full border px-2 text-xs font-semibold',
+                                                'mr-1 ml-3 h-7 shrink-0 gap-1 rounded-full border px-2 text-xs font-semibold',
                                                 errorsWarningOnly
                                                     ? 'border-stroke-warning-primary bg-surface-warning-secondary text-content-warning-primary hover:bg-surface-warning-secondary-hover hover:text-content-warning-primary dark:hover:bg-surface-warning-secondary-hover'
                                                     : 'border-stroke-destructive-primary bg-surface-destructive-secondary text-content-destructive-primary hover:bg-surface-destructive-secondary-hover hover:text-content-destructive-primary dark:hover:bg-surface-destructive-secondary-hover',
