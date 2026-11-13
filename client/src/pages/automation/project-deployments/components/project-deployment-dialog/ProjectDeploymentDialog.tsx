@@ -23,6 +23,7 @@ import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/s
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import useWorkflowTestConfigurationConnections from '@/shared/hooks/useWorkflowTestConfigurationConnections';
 import {
     ProjectDeployment,
     ProjectDeploymentWorkflow,
@@ -35,7 +36,10 @@ import {
 import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
-import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {
+    useGetProjectVersionWorkflowsQuery,
+    useGetProjectWorkflowsQuery,
+} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {synchronizeGroupedConnections} from '@/shared/util/synchronizeGroupedConnections';
@@ -191,6 +195,7 @@ const ProjectDeploymentDialog = ({
     const effectiveChangeProjectVersion = changeProjectVersion || !!selectedExistingDeployment;
 
     const initializedProjectKeyRef = useRef<string>('');
+    const prefilledProjectKeyRef = useRef<string>('');
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const setCurrentEnvironmentId = useEnvironmentStore((state) => state.setCurrentEnvironmentId);
@@ -263,6 +268,17 @@ const ProjectDeploymentDialog = ({
 
         return projectVersionWorkflows.filter((workflow) => filterWorkflowUuids.includes(workflow.workflowUuid!));
     }, [projectVersionWorkflows, filterWorkflowUuids]);
+
+    const {data: latestProjectWorkflows} = useGetProjectWorkflowsQuery(
+        getValues().projectId!,
+        isOpen && !!getValues().projectId
+    );
+
+    const workflowTestConfigurationConnections = useWorkflowTestConfigurationConnections(
+        latestProjectWorkflows,
+        deploymentEnvironmentId,
+        isOpen && !!latestProjectWorkflows
+    );
 
     const hasVisibleConnections = workflows?.some((workflow) => {
         const isEnabled = workflowEnabledMap.get(workflow.id!);
@@ -433,6 +449,7 @@ const ProjectDeploymentDialog = ({
             reset();
 
             initializedProjectKeyRef.current = '';
+            prefilledProjectKeyRef.current = '';
 
             setTabInitialized(false);
 
@@ -578,6 +595,55 @@ const ProjectDeploymentDialog = ({
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [effectiveProjectDeployment?.id, getValues().projectId, getValues().projectVersion, workflows]);
+
+    useEffect(() => {
+        const projectKey = initializedProjectKeyRef.current;
+
+        if (
+            !projectKey ||
+            prefilledProjectKeyRef.current === projectKey ||
+            !workflows?.length ||
+            !connections ||
+            !workflowTestConfigurationConnections.isFetched
+        ) {
+            return;
+        }
+
+        prefilledProjectKeyRef.current = projectKey;
+
+        const availableConnectionIds = new Set(connections.map((connection) => connection.id));
+
+        const projectDeploymentWorkflows = getValues('projectDeploymentWorkflows') ?? [];
+
+        projectDeploymentWorkflows.forEach((projectDeploymentWorkflow, workflowIndex) => {
+            const workflow = workflows.find((workflow) => workflow.id === projectDeploymentWorkflow.workflowId);
+
+            if (!workflow) {
+                return;
+            }
+
+            getWorkflowComponentConnections(workflow, workflows).forEach((componentConnection, connectionIndex) => {
+                if (projectDeploymentWorkflow.connections?.[connectionIndex]?.connectionId != null) {
+                    return;
+                }
+
+                const testConnectionId = workflowTestConfigurationConnections.findConnectionId(
+                    componentConnection.subflowWorkflowUuid ?? workflow.workflowUuid,
+                    componentConnection.workflowNodeName,
+                    componentConnection.key
+                );
+
+                if (testConnectionId == null || !availableConnectionIds.has(testConnectionId)) {
+                    return;
+                }
+
+                setValue(
+                    `projectDeploymentWorkflows.${workflowIndex}.connections.${connectionIndex}.connectionId`,
+                    testConnectionId
+                );
+            });
+        });
+    }, [connections, getValues, setValue, workflowTestConfigurationConnections, workflows]);
 
     useLayoutEffect(() => {
         if (!isOpen) {

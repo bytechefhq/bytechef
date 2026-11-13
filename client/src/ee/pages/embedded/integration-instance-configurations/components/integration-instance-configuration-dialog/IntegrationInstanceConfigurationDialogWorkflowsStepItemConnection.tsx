@@ -77,10 +77,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                             </span>
                         </FormLabel>
 
-                        <Select
-                            defaultValue={field.value ? field.value.toString() : undefined}
-                            onValueChange={field.onChange}
-                        >
+                        <Select onValueChange={field.onChange} value={field.value ? field.value.toString() : ''}>
                             <FormControl>
                                 <div className="flex space-x-2 bg-surface-neutral-primary">
                                     <SelectTrigger className="shadow-none">

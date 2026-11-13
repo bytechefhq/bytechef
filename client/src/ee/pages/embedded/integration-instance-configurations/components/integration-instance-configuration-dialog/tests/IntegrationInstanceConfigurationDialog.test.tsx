@@ -32,6 +32,11 @@ vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurationTags.queri
 
 vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
     useGetIntegrationVersionWorkflowsQuery: () => ({data: hoisted.workflows, isPending: false}),
+    useGetIntegrationWorkflowsQuery: () => ({data: hoisted.workflows}),
+}));
+
+vi.mock('@/shared/hooks/useWorkflowTestConfigurationConnections', () => ({
+    default: () => ({findConnectionId: () => undefined, isFetched: true}),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrations.queries', () => ({
