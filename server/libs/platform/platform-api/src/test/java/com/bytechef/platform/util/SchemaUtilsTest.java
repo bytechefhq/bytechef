@@ -556,11 +556,13 @@ class SchemaUtilsTest {
     void testToOutputWithValue() {
         OutputResponse result = SchemaUtils.toOutput(
             "hello",
-            (outputSchema, sampleOutput, placeholder) -> new OutputResponse(null, sampleOutput, placeholder),
+            (outputSchema, sampleOutput, placeholder, sampleOutputGenerated) -> new OutputResponse(
+                null, sampleOutput, placeholder, sampleOutputGenerated),
             SCHEMA_PROPERTY_FACTORY);
 
         assertThat(result).isNotNull();
         assertThat(result.sampleOutput()).isEqualTo("hello");
+        assertThat(result.sampleOutputGenerated()).isFalse();
     }
 
     @Test
@@ -571,11 +573,13 @@ class SchemaUtilsTest {
 
         OutputResponse result = SchemaUtils.toOutput(
             outputResponse,
-            (outputSchema, sampleOutput, placeholder) -> new OutputResponse(null, sampleOutput, placeholder),
+            (outputSchema, sampleOutput, placeholder, sampleOutputGenerated) -> new OutputResponse(
+                null, sampleOutput, placeholder, sampleOutputGenerated),
             SCHEMA_PROPERTY_FACTORY);
 
         assertThat(result).isNotNull();
         assertThat(result.sampleOutput()).isEqualTo("sample");
+        assertThat(result.sampleOutputGenerated()).isFalse();
     }
 
     @Test
@@ -586,12 +590,14 @@ class SchemaUtilsTest {
 
         OutputResponse result = SchemaUtils.toOutput(
             outputResponse,
-            (outputSchema, sampleOutput, placeholder) -> new OutputResponse(null, sampleOutput, placeholder),
+            (outputSchema, sampleOutput, placeholder, sampleOutputGenerated) -> new OutputResponse(
+                null, sampleOutput, placeholder, sampleOutputGenerated),
             SCHEMA_PROPERTY_FACTORY);
 
         assertThat(result).isNotNull();
         assertThat(result.sampleOutput()).isInstanceOf(String.class);
         assertThat((String) result.sampleOutput()).startsWith("sample");
+        assertThat(result.sampleOutputGenerated()).isTrue();
     }
 
     private enum TestMethod {

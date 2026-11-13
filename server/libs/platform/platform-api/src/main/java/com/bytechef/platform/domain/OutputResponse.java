@@ -22,9 +22,16 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public record OutputResponse(
-    @Nullable BaseProperty outputSchema, @Nullable Object sampleOutput, @Nullable Object placeholder) {
+    @Nullable BaseProperty outputSchema, @Nullable Object sampleOutput, @Nullable Object placeholder,
+    boolean sampleOutputGenerated) {
 
     public OutputResponse(BaseProperty outputSchema, Object sampleOutput) {
         this(outputSchema, sampleOutput, null);
+    }
+
+    public OutputResponse(
+        @Nullable BaseProperty outputSchema, @Nullable Object sampleOutput, @Nullable Object placeholder) {
+
+        this(outputSchema, sampleOutput, placeholder, false);
     }
 }
