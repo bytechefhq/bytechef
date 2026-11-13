@@ -338,12 +338,12 @@ public class AutomationProjectConfigurationAdminFacadeImpl
     @Override
     @Transactional(readOnly = true)
     public AutomationProjectConfigurationWorkflowProvidableValuesDTO getConfigurationWorkflowProvidableValues(
-        long configurationId, String workflowUuid) {
+        long configurationId, String workflowUuid, @Nullable Integer projectVersion) {
 
         AutomationProjectConfiguration configuration =
             automationProjectConfigurationService.getConfiguration(configurationId);
 
-        ProjectWorkflow projectWorkflow = getProjectWorkflow(configuration, workflowUuid);
+        ProjectWorkflow projectWorkflow = getProjectWorkflow(configuration, workflowUuid, projectVersion);
 
         String workflowId = projectWorkflow.getWorkflowId();
 
@@ -365,13 +365,13 @@ public class AutomationProjectConfigurationAdminFacadeImpl
     @Transactional(readOnly = true)
     public List<AutomationProjectConfigurationWorkflowProvidableValuesDTO.InputOption>
         getConfigurationWorkflowInputOptions(
-            long configurationId, String workflowUuid, String inputName, String propertyName, long connectionId,
-            Map<String, ?> lookupDependsOnValues, @Nullable String searchText) {
+            long configurationId, String workflowUuid, @Nullable Integer projectVersion, String inputName,
+            String propertyName, long connectionId, Map<String, ?> lookupDependsOnValues, @Nullable String searchText) {
 
         AutomationProjectConfiguration configuration =
             automationProjectConfigurationService.getConfiguration(configurationId);
 
-        ProjectWorkflow projectWorkflow = getProjectWorkflow(configuration, workflowUuid);
+        ProjectWorkflow projectWorkflow = getProjectWorkflow(configuration, workflowUuid, projectVersion);
 
         Workflow workflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
 
@@ -1516,13 +1516,18 @@ public class AutomationProjectConfigurationAdminFacadeImpl
     }
 
     private ProjectWorkflow getProjectWorkflow(
-        AutomationProjectConfiguration configuration, String workflowUuid) {
+        AutomationProjectConfiguration configuration, String workflowUuid, @Nullable Integer projectVersion) {
+
+        int workflowProjectVersion = projectVersion == null ? configuration.getProjectVersion() : projectVersion;
+
+        if (projectVersion != null) {
+            validatePublishedProjectVersion(configuration.getProjectId(), workflowProjectVersion);
+        }
 
         return projectWorkflowService
-            .fetchProjectWorkflow(configuration.getProjectId(), configuration.getProjectVersion(), workflowUuid)
+            .fetchProjectWorkflow(configuration.getProjectId(), workflowProjectVersion, workflowUuid)
             .orElseThrow(() -> newInvalidProvidedValueException(
-                "Workflow uuid=%s is not part of version %d".formatted(
-                    workflowUuid, configuration.getProjectVersion())));
+                "Workflow uuid=%s is not part of version %d".formatted(workflowUuid, workflowProjectVersion)));
     }
 
     private void validateAdministratorConnection(
