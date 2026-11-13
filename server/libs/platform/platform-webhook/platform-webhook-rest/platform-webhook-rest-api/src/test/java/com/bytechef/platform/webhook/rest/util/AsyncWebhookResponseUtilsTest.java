@@ -68,4 +68,26 @@ class AsyncWebhookResponseUtilsTest {
     void testRejectsBinaryResponse() {
         assertThat(AsyncWebhookResponseUtils.isAllowed(WebhookResponse.binary(mock(FileEntry.class)))).isFalse();
     }
+
+    @Test
+    void testRejectsStatusCodeOutsideHttpRange() {
+        assertThat(AsyncWebhookResponseUtils.isAllowed(WebhookResponse.noData(Map.of(), 0))).isFalse();
+        assertThat(AsyncWebhookResponseUtils.isAllowed(WebhookResponse.noData(Map.of(), 99))).isFalse();
+        assertThat(AsyncWebhookResponseUtils.isAllowed(WebhookResponse.noData(Map.of(), 600))).isFalse();
+        assertThat(AsyncWebhookResponseUtils.isAllowed(WebhookResponse.json(Map.of(), 1000))).isFalse();
+    }
+
+    @Test
+    void testRejectsUnparseableContentType() {
+        assertThat(AsyncWebhookResponseUtils.isAllowed(WebhookResponse.raw("x", Map.of("Content-Type", "html"), 200)))
+            .isFalse();
+    }
+
+    @Test
+    void testRejectsRefreshHeader() {
+        assertThat(
+            AsyncWebhookResponseUtils.isAllowed(
+                WebhookResponse.raw("x", Map.of("Refresh", "0; url=https://evil.com"), 200)))
+                    .isFalse();
+    }
 }

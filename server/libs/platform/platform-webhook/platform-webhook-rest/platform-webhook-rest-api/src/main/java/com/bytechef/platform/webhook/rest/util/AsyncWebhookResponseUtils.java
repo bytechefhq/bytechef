@@ -19,16 +19,20 @@ package com.bytechef.platform.webhook.rest.util;
 import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.InvalidMediaTypeException;
+import org.springframework.http.MediaType;
 
 /**
- * Checks an immediate asynchronous webhook response before the workflow runs. Only the {@code REDIRECT} type may send
- * the caller elsewhere, so other types cannot use a redirect status code or set {@code Location} or {@code Set-Cookie}.
+ * Checks an immediate asynchronous webhook response before the workflow runs, so a response that would fail while being
+ * sent is rejected before anything runs. Only the {@code REDIRECT} type may send the caller elsewhere, so other types
+ * cannot use a redirect status code or set {@code Location}, {@code Refresh} or {@code Set-Cookie}.
  *
  * @author Ivica Cardic
  */
 public final class AsyncWebhookResponseUtils {
 
-    private static final Set<String> FORBIDDEN_HEADER_NAMES = Set.of("location", "set-cookie");
+    private static final Set<String> FORBIDDEN_HEADER_NAMES = Set.of("location", "refresh", "set-cookie");
 
     private AsyncWebhookResponseUtils() {
     }
@@ -52,18 +56,34 @@ public final class AsyncWebhookResponseUtils {
 
         int statusCode = webhookResponse.getStatusCode();
 
-        if (statusCode >= 300 && statusCode < 400) {
+        if (statusCode < 100 || statusCode > 599 || (statusCode >= 300 && statusCode < 400)) {
             return false;
         }
 
         Map<String, String> headers = webhookResponse.getHeaders();
 
-        for (String headerName : headers.keySet()) {
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            String headerName = header.getKey();
+
             if (FORBIDDEN_HEADER_NAMES.contains(headerName.toLowerCase())) {
+                return false;
+            }
+
+            if (HttpHeaders.CONTENT_TYPE.equalsIgnoreCase(headerName) && !isValidMediaType(header.getValue())) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private static boolean isValidMediaType(String value) {
+        try {
+            MediaType.parseMediaType(value);
+
+            return true;
+        } catch (InvalidMediaTypeException exception) {
+            return false;
+        }
     }
 }
