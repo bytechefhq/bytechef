@@ -170,6 +170,7 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
         const originAndCreatedDateColumn = within(connectionRow).getByText(/^Created at/).parentElement!;
 
         expect(originAndCreatedDateColumn).toContainElement(within(connectionRow).getByText('Provisioned'));
+        expect(originAndCreatedDateColumn).toContainElement(within(connectionRow).getByText('Automation'));
         expect(originAndCreatedDateColumn).not.toContainElement(credentialsButton);
         expect(
             credentialsButton.compareDocumentPosition(originAndCreatedDateColumn) & Node.DOCUMENT_POSITION_FOLLOWING
