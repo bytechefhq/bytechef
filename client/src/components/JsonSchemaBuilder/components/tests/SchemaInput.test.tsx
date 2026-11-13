@@ -4,10 +4,10 @@ import {describe, expect, it, vi} from 'vitest';
 import SchemaInput from '../SchemaInput';
 
 describe('SchemaInput', () => {
-    it('renders with default value', () => {
-        render(<SchemaInput onChange={vi.fn()} />);
+    it('renders empty with the placeholder when no value is given', () => {
+        render(<SchemaInput onChange={vi.fn()} placeholder="e.g. Invoice Number" />);
 
-        expect(screen.getByRole('textbox')).toHaveValue('Untitled');
+        expect(screen.getByPlaceholderText('e.g. Invoice Number')).toHaveValue('');
     });
 
     it('renders with provided value', () => {

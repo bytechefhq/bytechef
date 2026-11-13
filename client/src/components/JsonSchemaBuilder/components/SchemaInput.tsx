@@ -19,14 +19,7 @@ interface SchemaInputProps {
     type?: string;
 }
 
-const SchemaInput = ({
-    autoFocus,
-    label,
-    onChange,
-    placeholder,
-    type = 'text',
-    value = 'Untitled',
-}: SchemaInputProps) => {
+const SchemaInput = ({autoFocus, label, onChange, placeholder, type = 'text', value = ''}: SchemaInputProps) => {
     const [localValue, setLocalValue] = useState<string>(value);
 
     const localValueRef = useRef(localValue);
