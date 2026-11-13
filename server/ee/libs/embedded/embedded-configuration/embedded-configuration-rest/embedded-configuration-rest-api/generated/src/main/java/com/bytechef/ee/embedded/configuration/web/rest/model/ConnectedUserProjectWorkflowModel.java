@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-10-16T17:05:28.001646+02:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T19:43:07.740396+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ConnectedUserProjectWorkflowModel {
 
   private @Nullable Long connectedUserId;

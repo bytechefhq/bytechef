@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "UpdateConnectionCredentialsRequest", description = "Contains the replacement credentials of a connection.")
 @JsonTypeName("UpdateConnectionCredentialsRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T19:09:04.324900+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T19:43:07.740396+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class UpdateConnectionCredentialsRequestModel {
 
   private Map<String, Object> parameters = new HashMap<>();

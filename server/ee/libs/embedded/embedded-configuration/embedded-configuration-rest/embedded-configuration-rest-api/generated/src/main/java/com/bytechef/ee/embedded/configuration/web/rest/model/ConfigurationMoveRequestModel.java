@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConfigurationMoveRequest", description = "The target configuration and the connected users to move to it.")
 @JsonTypeName("ConfigurationMoveRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T02:20:55.684519+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T19:43:07.740396+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ConfigurationMoveRequestModel {
 
   private List<Long> connectedUserIds = new ArrayList<>();

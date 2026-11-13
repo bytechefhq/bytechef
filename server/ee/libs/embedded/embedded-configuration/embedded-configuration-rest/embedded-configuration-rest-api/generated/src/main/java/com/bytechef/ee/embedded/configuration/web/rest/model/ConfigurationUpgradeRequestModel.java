@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConfigurationUpgradeRequest", description = "The connected users to upgrade to the target configuration.")
 @JsonTypeName("ConfigurationUpgradeRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-03T16:14:51.079815+01:00[Europe/Zagreb]", comments = "Generator version: 7.26.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T19:43:07.740396+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ConfigurationUpgradeRequestModel {
 
   private List<Long> connectedUserIds = new ArrayList<>();
