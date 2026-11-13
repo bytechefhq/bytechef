@@ -2,6 +2,7 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import ConnectedUserSheetPanelConnectionList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelConnectionList';
 import {Connection} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -9,10 +10,23 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 const hoisted = vi.hoisted(() => ({
     allConnectedUserConnectionsQuery: vi.fn(),
     componentDefinitionsQuery: vi.fn(),
+    deleteConnectedUserConnection: vi.fn(),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/connections.queries', () => ({
+    ConnectionKeys: {connections: ['embedded_connections']},
     useGetAllConnectedUserConnectionsQuery: hoisted.allConnectedUserConnectionsQuery,
+}));
+
+vi.mock('@/ee/shared/mutations/embedded/connections.mutations', () => ({
+    useDeleteConnectedUserConnectionMutation: (connectedUserId: number, mutationProps?: {onSuccess?: () => void}) => ({
+        isPending: false,
+        mutate: (connectionId: number) => {
+            hoisted.deleteConnectedUserConnection(connectedUserId, connectionId);
+
+            mutationProps?.onSuccess?.();
+        },
+    }),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
@@ -74,14 +88,18 @@ const integrationInstances: ConnectedUserIntegrationInstance[] = [
     {connectionId: 2, id: 20, provisioned: true},
 ];
 
+const queryClient = new QueryClient();
+
 const renderConnectionList = (connectedUserIntegrationInstances: ConnectedUserIntegrationInstance[] = []) =>
     render(
-        <TooltipProvider>
-            <ConnectedUserSheetPanelConnectionList
-                connectedUserId={7}
-                connectedUserIntegrationInstances={connectedUserIntegrationInstances}
-            />
-        </TooltipProvider>
+        <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+                <ConnectedUserSheetPanelConnectionList
+                    connectedUserId={7}
+                    connectedUserIntegrationInstances={connectedUserIntegrationInstances}
+                />
+            </TooltipProvider>
+        </QueryClientProvider>
     );
 
 const getConnectionRow = (name: string) => screen.getByText(name).closest('li') as HTMLElement;
@@ -90,6 +108,7 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
     beforeEach(() => {
         hoisted.allConnectedUserConnectionsQuery.mockReset();
         hoisted.componentDefinitionsQuery.mockReset();
+        hoisted.deleteConnectedUserConnection.mockReset();
 
         hoisted.componentDefinitionsQuery.mockReturnValue({
             data: [{icon: 'slack.svg', name: 'slack', title: 'Slack'}],
@@ -153,8 +172,57 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
         expect(
             within(getConnectionRow('Provisioned HubSpot')).getByRole('button', {name: 'Credentials'})
         ).toBeEnabled();
-        expect(within(getConnectionRow('Own Slack')).queryByRole('button')).not.toBeInTheDocument();
+        expect(
+            within(getConnectionRow('Own Slack')).queryByRole('button', {name: 'Credentials'})
+        ).not.toBeInTheDocument();
         expect(within(getConnectionRow('Shared GitHub')).getByRole('button', {name: 'Credentials'})).toBeDisabled();
+    });
+
+    it('offers Delete on self-created and provisioned connections but not on shared ones', async () => {
+        hoisted.allConnectedUserConnectionsQuery.mockReturnValue({data: connections, isLoading: false});
+
+        renderConnectionList();
+
+        expect(within(getConnectionRow('Own Slack')).getByRole('button', {name: 'More actions'})).toBeInTheDocument();
+        expect(
+            within(getConnectionRow('Shared GitHub')).queryByRole('button', {name: 'More actions'})
+        ).not.toBeInTheDocument();
+
+        await userEvent.click(
+            within(getConnectionRow('Provisioned HubSpot')).getByRole('button', {name: 'More actions'})
+        );
+
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
+    });
+
+    it('deletes a connection of the connected user after the admin confirms', async () => {
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        hoisted.allConnectedUserConnectionsQuery.mockReturnValue({data: connections, isLoading: false});
+
+        renderConnectionList();
+
+        await userEvent.click(
+            within(getConnectionRow('Provisioned HubSpot')).getByRole('button', {name: 'More actions'})
+        );
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
+
+        expect(hoisted.deleteConnectedUserConnection).not.toHaveBeenCalled();
+        expect(
+            screen.getByText(
+                'This action cannot be undone. This will permanently delete the connection Provisioned HubSpot.'
+            )
+        ).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Delete'}));
+
+        expect(hoisted.deleteConnectedUserConnection).toHaveBeenCalledWith(7, 2);
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['embedded_connections']});
+        expect(
+            screen.queryByText(
+                'This action cannot be undone. This will permanently delete the connection Provisioned HubSpot.'
+            )
+        ).not.toBeInTheDocument();
     });
 
     it('puts the Credentials action right before the column with the origin badge and created date', () => {
@@ -254,7 +322,7 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
 
         expect(within(connectionRow).getByText('Self-created')).toBeInTheDocument();
         expect(within(connectionRow).queryByText(/active/i)).not.toBeInTheDocument();
-        expect(within(connectionRow).queryByRole('button')).not.toBeInTheDocument();
+        expect(within(connectionRow).queryByRole('button', {name: /edit/i})).not.toBeInTheDocument();
     });
 
     it("shows the connection's component icon", () => {

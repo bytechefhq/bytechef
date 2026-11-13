@@ -1,12 +1,17 @@
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserConnectionCredentialsDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserConnectionCredentialsDialog';
 import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
 import ConnectedUserIntegrationCredentialsDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserIntegrationCredentialsDialog';
+import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import {CONNECTION_ORIGIN_BADGES} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connectionOriginBadges';
 import {Connection, ConnectionOriginEnum} from '@/ee/shared/middleware/embedded/configuration';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
+import {useDeleteConnectedUserConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
+import {ConnectionKeys} from '@/ee/shared/queries/embedded/connections.queries';
+import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, KeyRoundIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -29,10 +34,26 @@ const ConnectedUserSheetPanelConnectionListItem = ({
     usedByIntegration = false,
 }: ConnectedUserSheetPanelConnectionListItemProps) => {
     const [showCredentialsDialog, setShowCredentialsDialog] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const queryClient = useQueryClient();
+
+    const deleteConnectedUserConnectionMutation = useDeleteConnectedUserConnectionMutation(connectedUserId, {
+        onError: () => setShowDeleteDialog(false),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({
+                queryKey: ConnectionKeys.connections,
+            });
+
+            setShowDeleteDialog(false);
+        },
+    });
 
     const originBadge = connection.origin && CONNECTION_ORIGIN_BADGES[connection.origin];
 
     const provisioned = connection.origin === ConnectionOriginEnum.Provisioned;
+
+    const deletable = connection.id != null && (provisioned || connection.origin === ConnectionOriginEnum.SelfServe);
 
     return (
         <li className="mb-2 flex items-center justify-between rounded border border-border/50 px-3 hover:bg-surface-neutral-primary-hover">
@@ -139,8 +160,22 @@ const ConnectedUserSheetPanelConnectionListItem = ({
                     </div>
                 </div>
 
-                <div aria-hidden="true" className="size-9 shrink-0" />
+                {deletable ? (
+                    <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                ) : (
+                    <div aria-hidden="true" className="size-9 shrink-0" />
+                )}
             </div>
+
+            {deletable && (
+                <AlertDialog
+                    description={`This action cannot be undone. This will permanently delete the connection ${connection.name}.`}
+                    isPending={deleteConnectedUserConnectionMutation.isPending}
+                    onCancel={() => setShowDeleteDialog(false)}
+                    onConfirm={() => deleteConnectedUserConnectionMutation.mutate(connection.id!)}
+                    open={showDeleteDialog}
+                />
+            )}
 
             {showCredentialsDialog && provisionedIntegrationInstance && (
                 <ConnectedUserIntegrationCredentialsDialog
