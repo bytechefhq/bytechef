@@ -19,6 +19,7 @@ package com.bytechef.platform.component.service;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.HttpStatus;
@@ -38,6 +39,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookDisableConsume
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableFunction;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookRequestFunction;
+import com.bytechef.component.definition.TriggerDefinition.WebhookResponseFunction;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateWithConnectionFunction;
 import com.bytechef.component.exception.ProviderException;
@@ -312,6 +314,32 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     @Override
+    public @Nullable WebhookResponse executeWebhookResponse(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
+
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
+
+        Optional<WebhookResponseFunction> webhookResponseFunction = triggerDefinition.getWebhookResponse();
+
+        if (webhookResponseFunction.isEmpty()) {
+            return null;
+        }
+
+        TriggerContext triggerContext = contextFactory.createTriggerContext(
+            componentName, componentVersion, triggerName, null, null, null, null, null, false);
+
+        try {
+            WebhookResponseFunction function = webhookResponseFunction.get();
+
+            return function.apply(ParametersFactory.create(inputParameters), triggerContext);
+        } catch (Exception exception) {
+            throw new ExecutionException(
+                exception, inputParameters, TriggerDefinitionErrorType.WEBHOOK_RESPONSE_FAILED);
+        }
+    }
+
+    @Override
     @WithTokenRefresh
     public WebhookValidateResponse executeWebhookValidate(
         @ComponentNameParam String componentName, int componentVersion, String triggerName,
@@ -406,7 +434,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return new WebhookTriggerFlags(
             triggerDefinition.isWebhookRawBody(), triggerDefinition.isWorkflowSyncExecution(),
-            triggerDefinition.isWorkflowSyncValidation(), triggerDefinition.isWorkflowSyncOnEnableValidation());
+            triggerDefinition.isWorkflowSyncValidation(), triggerDefinition.isWorkflowSyncOnEnableValidation(),
+            triggerDefinition.isWebhookResponse());
     }
 
     @Override

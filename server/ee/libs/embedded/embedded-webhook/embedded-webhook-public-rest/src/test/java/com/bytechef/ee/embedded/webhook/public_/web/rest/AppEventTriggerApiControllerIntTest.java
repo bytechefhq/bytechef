@@ -127,7 +127,7 @@ class AppEventTriggerApiControllerIntTest {
             .build();
 
         when(webhookWorkflowExecutor.getWebhookTriggerFlags(any()))
-            .thenReturn(new WebhookTriggerFlags(false, false, false, false));
+            .thenReturn(new WebhookTriggerFlags(false, false, false, false, false));
     }
 
     @Test

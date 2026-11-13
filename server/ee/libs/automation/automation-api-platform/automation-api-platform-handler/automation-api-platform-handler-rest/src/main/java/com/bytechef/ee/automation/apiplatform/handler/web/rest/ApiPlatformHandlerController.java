@@ -181,7 +181,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> Collections.singletonList(entry.getValue())));
 
             // TODO fetch from New API Request Trigger
-            WebhookTriggerFlags webhookTriggerFlags = new WebhookTriggerFlags(false, true, false, false);
+            WebhookTriggerFlags webhookTriggerFlags = new WebhookTriggerFlags(false, true, false, false, false);
 
             WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 

@@ -67,7 +67,7 @@ public class WebhookRequestUtils {
         HttpServletRequest httpServletRequest, TempFileStorage tempFileStorage) throws IOException, ServletException {
 
         return getWebhookRequest(
-            httpServletRequest, tempFileStorage, new WebhookTriggerFlags(false, false, false, false));
+            httpServletRequest, tempFileStorage, new WebhookTriggerFlags(false, false, false, false, false));
     }
 
     public static WebhookRequest getWebhookRequest(
