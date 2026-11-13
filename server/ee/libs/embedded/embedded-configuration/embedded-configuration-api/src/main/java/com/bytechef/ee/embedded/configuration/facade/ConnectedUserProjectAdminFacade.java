@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -34,6 +35,15 @@ public interface ConnectedUserProjectAdminFacade {
     List<ConnectedUserAutomationProjectConfigurationDTO> getConnectedUserProjectConfigurations(long connectedUserId);
 
     List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment);
+
+    /**
+     * Returns the connections and inputs a provisioned workflow currently runs with, leaving out the ones its
+     * configuration provides.
+     *
+     * @param connectedUserProjectWorkflowId the id of the connected user's provisioned workflow
+     * @return the current connections and inputs
+     */
+    ConnectedUserWorkflowReferenceValuesDTO getProjectWorkflowReferenceValues(long connectedUserProjectWorkflowId);
 
     List<ProvisionableAutomationProjectDTO> getProvisionableProjects(long connectedUserId);
 

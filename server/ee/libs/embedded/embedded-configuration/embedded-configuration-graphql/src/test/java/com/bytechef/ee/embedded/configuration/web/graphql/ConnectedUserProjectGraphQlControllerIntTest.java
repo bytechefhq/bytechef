@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
@@ -146,6 +147,36 @@ class ConnectedUserProjectGraphQlControllerIntTest {
             .path("connectedUserProjects[0].automationProjectConfigurations[0].configurationProjectVersion")
             .entity(Integer.class)
             .isEqualTo(3);
+    }
+
+    @Test
+    void testConnectedUserProjectWorkflowReferenceValues() {
+        when(connectedUserProjectAdminFacade.getProjectWorkflowReferenceValues(5L))
+            .thenReturn(
+                new ConnectedUserWorkflowReferenceValuesDTO(Map.of("slack", 42L), Map.of("channel", "#alerts")));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    connectedUserProjectWorkflowReferenceValues(id: "5") {
+                        connections {
+                            componentName
+                            connectionId
+                        }
+                        inputs
+                    }
+                }
+                """)
+            .execute()
+            .path("connectedUserProjectWorkflowReferenceValues.connections[0].componentName")
+            .entity(String.class)
+            .isEqualTo("slack")
+            .path("connectedUserProjectWorkflowReferenceValues.connections[0].connectionId")
+            .entity(String.class)
+            .isEqualTo("42")
+            .path("connectedUserProjectWorkflowReferenceValues.inputs.channel")
+            .entity(String.class)
+            .isEqualTo("#alerts");
     }
 
     @Test

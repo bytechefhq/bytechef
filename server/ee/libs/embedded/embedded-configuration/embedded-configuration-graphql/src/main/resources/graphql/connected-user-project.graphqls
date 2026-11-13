@@ -1,5 +1,6 @@
 extend type Query {
     connectedUserProjects(connectedUserId: ID, environmentId: ID): [ConnectedUserProject!]!
+    connectedUserProjectWorkflowReferenceValues(id: ID!): ConnectedUserProjectWorkflowReferenceValues!
     provisionableConnectedUserProjects(connectedUserId: ID!): [ProvisionableConnectedUserProject!]!
 }
 
@@ -53,6 +54,16 @@ type ConnectedUserProjectWorkflow {
     version: Int
 }
 
+
+type ConnectedUserProjectWorkflowReferenceValues {
+    connections: [ConnectedUserProjectWorkflowReferenceConnection!]!
+    inputs: Map!
+}
+
+type ConnectedUserProjectWorkflowReferenceConnection {
+    componentName: String!
+    connectionId: ID!
+}
 
 type ProvisionableConnectedUserProject {
     projectId: ID!

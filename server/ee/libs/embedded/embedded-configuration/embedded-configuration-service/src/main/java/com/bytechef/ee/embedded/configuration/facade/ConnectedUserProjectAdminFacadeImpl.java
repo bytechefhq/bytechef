@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfiguration
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
@@ -129,6 +130,13 @@ public class ConnectedUserProjectAdminFacadeImpl implements ConnectedUserProject
     @Override
     public List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment) {
         return connectedUserProjectFacade.getConnectedUserProjects(connectedUserId, environment);
+    }
+
+    @Override
+    public ConnectedUserWorkflowReferenceValuesDTO getProjectWorkflowReferenceValues(
+        long connectedUserProjectWorkflowId) {
+
+        return connectedUserWorkflowReferenceFacade.getReferenceValues(connectedUserProjectWorkflowId);
     }
 
     @Override

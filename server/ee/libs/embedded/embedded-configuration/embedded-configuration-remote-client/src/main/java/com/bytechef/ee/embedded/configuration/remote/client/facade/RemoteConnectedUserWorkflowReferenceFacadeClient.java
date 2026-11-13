@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.remote.client.facade;
 
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -62,6 +63,11 @@ public class RemoteConnectedUserWorkflowReferenceFacadeClient implements Connect
         String externalUserId, String automationUuid, Environment environment,
         Map<String, Long> requestedConnectionIds, @Nullable Map<String, ?> inputs) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ConnectedUserWorkflowReferenceValuesDTO getReferenceValues(long referenceId) {
         throw new UnsupportedOperationException();
     }
 
