@@ -142,6 +142,18 @@ class ConnectionApiControllerIntTest {
     }
 
     @Test
+    void testDeleteConnectedUserConnection() {
+        this.webTestClient
+            .delete()
+            .uri("/internal/connected-users/5/connections/77")
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(connectedUserConnectionFacade).deleteConnectedUserConnection(5L, 77L);
+    }
+
+    @Test
     void testDeleteConnection() {
         this.webTestClient
             .delete()
