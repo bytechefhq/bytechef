@@ -38,12 +38,7 @@ const ProvisionIntegrationDialogWorkflowItem = ({
                     {mcpTool && <Badge label="MCP tool" styleType="secondary-filled" />}
                 </div>
 
-                <Switch
-                    aria-label={label}
-                    checked={!mcpTool && !!enabled}
-                    disabled={mcpTool}
-                    onCheckedChange={onEnabledChange}
-                />
+                <Switch aria-label={label} checked={!!enabled} onCheckedChange={onEnabledChange} />
             </div>
 
             {enabled && inputs.length > 0 && (

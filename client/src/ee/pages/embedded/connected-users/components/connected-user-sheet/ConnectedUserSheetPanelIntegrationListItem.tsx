@@ -48,7 +48,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
     connectedUserIntegrationInstance: ConnectedUserIntegrationInstance;
     connectedUserId: number;
 }) => {
-    const {data: workflows} = useGetIntegrationVersionWorkflowsQuery(
+    const {data: integrationVersionWorkflows} = useGetIntegrationVersionWorkflowsQuery(
         connectedUserIntegrationInstance.integrationId!,
         connectedUserIntegrationInstance.integrationVersion!
     );
@@ -110,13 +110,25 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
 
     const initialSelectedConnectedUserIds = useMemo(() => [connectedUserId], [connectedUserId]);
 
-    const mcpWorkflowUuids = useMemo(
+    const provisionableIntegration = useMemo(
         () =>
             provisionableIntegrations?.find(
-                (provisionableIntegration) =>
-                    provisionableIntegration.integration?.id === connectedUserIntegrationInstance.integrationId
-            )?.mcpWorkflowUuids,
+                (currentProvisionableIntegration) =>
+                    currentProvisionableIntegration.integration?.id === connectedUserIntegrationInstance.integrationId
+            ),
         [connectedUserIntegrationInstance.integrationId, provisionableIntegrations]
+    );
+
+    const mcpWorkflowUuids = provisionableIntegration?.mcpWorkflowUuids;
+
+    const workflows = useMemo(
+        () =>
+            integrationVersionWorkflows?.filter(
+                (workflow) =>
+                    !workflow.workflowUuid ||
+                    !provisionableIntegration?.toolOnlyMcpWorkflowUuids?.includes(workflow.workflowUuid)
+            ),
+        [integrationVersionWorkflows, provisionableIntegration]
     );
 
     const deleteIntegrationInstanceMutation = useDeleteIntegrationInstanceMutation({

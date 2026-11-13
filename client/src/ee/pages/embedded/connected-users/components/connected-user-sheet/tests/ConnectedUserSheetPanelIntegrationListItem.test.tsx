@@ -10,8 +10,11 @@ const hoisted = vi.hoisted(() => ({
     configurationsQueryMock: vi.fn(),
     integrationConfigurations: [] as unknown[] | undefined,
     integrationConfigurationsError: false,
+    integrationInstance: undefined as unknown,
     moveImpactQueryMock: vi.fn(),
     moveMutateAsyncMock: vi.fn(),
+    provisionableIntegrations: undefined as unknown[] | undefined,
+    workflows: [] as unknown[],
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries', () => ({
@@ -38,15 +41,15 @@ vi.mock('@/ee/shared/queries/embedded/integrationInstances.queries', () => ({
         integrationInstanceConnection: (id: number) => ['integrationInstance', id, 'connection'],
     },
     useGetIntegrationInstanceConnectionQuery: () => ({data: undefined}),
-    useGetIntegrationInstanceQuery: () => ({data: undefined}),
+    useGetIntegrationInstanceQuery: () => ({data: hoisted.integrationInstance}),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/provisionableIntegrations.queries', () => ({
-    useGetProvisionableIntegrationsQuery: () => ({data: undefined}),
+    useGetProvisionableIntegrationsQuery: () => ({data: hoisted.provisionableIntegrations}),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
-    useGetIntegrationVersionWorkflowsQuery: () => ({data: []}),
+    useGetIntegrationVersionWorkflowsQuery: () => ({data: hoisted.workflows}),
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstances.mutations', () => ({
@@ -121,6 +124,24 @@ describe('ConnectedUserSheetPanelIntegrationListItem', () => {
 
         hoisted.integrationConfigurations = [];
         hoisted.integrationConfigurationsError = false;
+        hoisted.integrationInstance = undefined;
+        hoisted.provisionableIntegrations = undefined;
+        hoisted.workflows = [];
+    });
+
+    it('leaves tool-only MCP workflows out of the workflows', () => {
+        hoisted.integrationInstance = {id: 40, integrationInstanceWorkflows: []};
+        hoisted.provisionableIntegrations = [
+            {integration: {id: 7}, mcpWorkflowUuids: ['u-1'], toolOnlyMcpWorkflowUuids: ['u-2']},
+        ];
+        hoisted.workflows = [
+            {id: 'workflow-1', label: 'Sync', workflowUuid: 'u-1'},
+            {id: 'workflow-2', label: 'Search', workflowUuid: 'u-2'},
+        ];
+
+        renderItem();
+
+        expect(screen.getByText('1 workflow')).toBeInTheDocument();
     });
 
     it("marks the integration with its component's icon", () => {

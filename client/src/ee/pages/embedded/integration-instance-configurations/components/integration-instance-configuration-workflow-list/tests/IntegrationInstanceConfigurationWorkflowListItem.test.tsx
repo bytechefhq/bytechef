@@ -3,6 +3,7 @@ import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/ee/pages/em
 import {IntegrationInstanceConfigurationWorkflow, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import IntegrationInstanceConfigurationWorkflowListItem from '../IntegrationInstanceConfigurationWorkflowListItem';
@@ -27,7 +28,7 @@ vi.mock('@/ee/shared/queries/embedded/workflows.queries', () => ({
 
 vi.mock(
     '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowListItemDropDownMenu',
-    () => ({default: () => null})
+    () => ({default: () => <div>Workflow menu</div>})
 );
 
 vi.mock(
@@ -51,7 +52,7 @@ const workflow = {
 
 const workflowComponentDefinitions = {hubspot: {icon: 'hubspot.svg', name: 'hubspot', title: 'HubSpot'}};
 
-const renderItem = (showOpenInIntegration?: boolean) =>
+const renderItem = (showOpenInIntegration?: boolean, isMcpWorkflow = false) =>
     render(
         <QueryClientProvider client={new QueryClient()}>
             <TooltipProvider>
@@ -65,7 +66,7 @@ const renderItem = (showOpenInIntegration?: boolean) =>
                         {enabled: true, workflowId: 'workflow1'} as IntegrationInstanceConfigurationWorkflow
                     }
                     integrationVersion={3}
-                    isMcpWorkflow={false}
+                    isMcpWorkflow={isMcpWorkflow}
                     showOpenInIntegration={showOpenInIntegration}
                     workflow={workflow}
                     workflowComponentDefinitions={workflowComponentDefinitions as never}
@@ -109,6 +110,18 @@ describe('IntegrationInstanceConfigurationWorkflowListItem', () => {
                 workflowTaskDispatcherDefinitions: {},
             })
         );
+    });
+
+    it('marks an MCP-exposed workflow without locking it', async () => {
+        const {container} = renderItem(false, true);
+
+        expect(container.querySelector('li')).not.toHaveClass('opacity-50');
+        expect(screen.getByRole('switch')).toBeEnabled();
+        expect(screen.getByText('Workflow menu')).toBeInTheDocument();
+
+        await userEvent.hover(screen.getByText('MCP'));
+
+        expect(await screen.findByRole('tooltip')).toHaveTextContent('Exposed as a tool on an MCP server');
     });
 
     it("opens the workflow's executions sheet when the workflow is clicked", () => {

@@ -95,10 +95,7 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
 
     return (
         <li
-            className={twMerge(
-                'flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover',
-                isMcpWorkflow && 'opacity-50'
-            )}
+            className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
         >
             <div className="relative flex flex-1 items-center">
@@ -123,7 +120,17 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                         />
                     )}
 
-                    {isMcpWorkflow && <Badge label="MCP" styleType="secondary-outline" />}
+                    {isMcpWorkflow && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <span className="relative z-10">
+                                    <Badge label="MCP" styleType="secondary-outline" />
+                                </span>
+                            </TooltipTrigger>
+
+                            <TooltipContent>Exposed as a tool on an MCP server</TooltipContent>
+                        </Tooltip>
+                    )}
                 </div>
 
                 <div className="relative z-10 ml-6 flex items-center gap-1">
@@ -160,20 +167,16 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
 
                         <Switch
                             checked={integrationInstanceConfigurationWorkflow.enabled}
-                            disabled={isMcpWorkflow || enableIntegrationInstanceConfigurationWorkflowMutation.isPending}
+                            disabled={enableIntegrationInstanceConfigurationWorkflowMutation.isPending}
                             onCheckedChange={handleEnableIntegrationInstanceConfigurationWorkflow}
                         />
                     </div>
                 </div>
 
-                {isMcpWorkflow ? (
-                    <div aria-hidden="true" className="size-9 shrink-0" />
-                ) : (
-                    <IntegrationInstanceConfigurationWorkflowListItemDropDownMenu
-                        onEditClick={() => setShowEditWorkflowDialog(true)}
-                        workflow={workflow}
-                    />
-                )}
+                <IntegrationInstanceConfigurationWorkflowListItemDropDownMenu
+                    onEditClick={() => setShowEditWorkflowDialog(true)}
+                    workflow={workflow}
+                />
             </div>
 
             {showEditWorkflowDialog && integrationInstanceConfigurationWorkflow && fetchedWorkflow && (

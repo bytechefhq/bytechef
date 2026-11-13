@@ -149,7 +149,7 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
         expect(screen.getByText('MCP tool')).toBeInTheDocument();
     });
 
-    it('locks the switch of a workflow that an MCP server exposes', () => {
+    it('keeps the switch of a workflow that an MCP server also exposes', () => {
         render(
             <TooltipProvider>
                 <ul>
@@ -165,7 +165,7 @@ describe('ConnectedUserSheetPanelIntegrationWorkflowListItem', () => {
             </TooltipProvider>
         );
 
-        expect(screen.getByRole('switch')).toBeDisabled();
+        expect(screen.getByRole('switch')).toBeEnabled();
         expect(screen.getByRole('switch')).toBeChecked();
     });
 

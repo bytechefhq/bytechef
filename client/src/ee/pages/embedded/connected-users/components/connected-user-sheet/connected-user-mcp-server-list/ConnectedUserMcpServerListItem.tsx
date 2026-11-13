@@ -153,14 +153,7 @@ const ConnectedUserMcpServerListItem = ({
                             </Tooltip>
                         </div>
 
-                        <ConnectedUserSheetDeleteDropdownMenu
-                            deleteDisabledReason={
-                                workflowCount > 0
-                                    ? "Workflow tools come with this user's integrations, so this server can't be deleted. Switch it off instead."
-                                    : undefined
-                            }
-                            onDeleteClick={() => setShowDeleteDialog(true)}
-                        />
+                        <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
                     </div>
                 </div>
 

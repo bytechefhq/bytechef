@@ -414,7 +414,7 @@ describe('ProvisionIntegrationDialog', () => {
         expect(screen.getByRole('button', {name: 'Provision'})).toBeDisabled();
     });
 
-    it('marks a workflow that an MCP server exposes as a tool', async () => {
+    it('marks MCP workflows without saying enabling turns on the tool', async () => {
         hoisted.getProvisionableIntegrations.mockResolvedValue([
             {
                 componentVersion: 3,
@@ -431,8 +431,29 @@ describe('ProvisionIntegrationDialog', () => {
         await chooseConfiguration('Config 2');
 
         expect(await screen.findByText('MCP tool')).toBeInTheDocument();
-        expect(screen.getByRole('switch')).toBeDisabled();
-        expect(screen.getByRole('switch')).not.toBeChecked();
+        expect(screen.getByRole('switch')).toBeEnabled();
+        expect(screen.queryByText(/turns on/)).not.toBeInTheDocument();
+    });
+
+    it('hides tool-only MCP workflows', async () => {
+        hoisted.getProvisionableIntegrations.mockResolvedValue([
+            {
+                componentVersion: 3,
+                integration: {componentName: 'slack', id: 1, name: 'Slack'},
+                integrationInstanceConfigurations: [buildConfiguration(2, 'API_KEY', true)],
+                mcpWorkflowUuids: [],
+                toolOnlyMcpWorkflowUuids: ['u-1'],
+            },
+        ]);
+
+        renderDialog();
+
+        await chooseIntegration();
+
+        await chooseConfiguration('Config 2');
+
+        expect(screen.queryByRole('switch')).not.toBeInTheDocument();
+        expect(screen.queryByText('Notify')).not.toBeInTheDocument();
     });
 
     it('does not mark a workflow that no MCP server exposes', async () => {

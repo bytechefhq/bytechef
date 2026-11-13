@@ -14,6 +14,7 @@ query connectedUserMcpServers($connectedUserId: ID!) {
             enabled
         }
         workflows {
+            id
             integrationInstanceId
             componentName
             integrationVersion

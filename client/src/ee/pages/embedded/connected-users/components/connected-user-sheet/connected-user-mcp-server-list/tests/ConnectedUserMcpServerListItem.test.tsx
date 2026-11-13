@@ -42,10 +42,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
 
         return {isPending: false, mutate: hoisted.enableToolMutate};
     },
-}));
-
-vi.mock('@/ee/shared/mutations/embedded/integrationInstanceWorkflows.mutations', () => ({
-    useEnableIntegrationInstanceWorkflowMutation: (options: MutationOptionsI) => {
+    useEnableConnectedUserMcpWorkflowMutation: (options: MutationOptionsI) => {
         hoisted.enableWorkflowOptions = options;
 
         return {isPending: false, mutate: hoisted.enableWorkflowMutate};
@@ -139,6 +136,7 @@ const mixedMcpServer = {
             componentName: 'gmail',
             description: 'Sends an email',
             enabled: true,
+            id: '201',
             integrationInstanceId: '10',
             integrationVersion: 6,
             lastExecutionDate: '2026-10-05T10:00:00Z',
@@ -149,6 +147,7 @@ const mixedMcpServer = {
             componentName: 'gmail',
             description: null,
             enabled: false,
+            id: '202',
             integrationInstanceId: '10',
             integrationVersion: 6,
             lastExecutionDate: null,
@@ -299,7 +298,7 @@ describe('ConnectedUserMcpServerListItem', () => {
         expect(hoisted.enableToolMutate).toHaveBeenCalledWith({enable: true, id: '101'});
     });
 
-    it('shows last executions and toggles a workflow through the integration instance', async () => {
+    it('switches a workflow with the MCP workflow mutation', async () => {
         renderListItem(mixedMcpServer);
 
         await expandCard();
@@ -313,29 +312,11 @@ describe('ConnectedUserMcpServerListItem', () => {
 
         await userEvent.click(within(archiveEmailRow).getByRole('switch'));
 
-        expect(hoisted.enableWorkflowMutate).toHaveBeenCalledWith({enable: true, id: 10, workflowId: 'workflow-2'});
+        expect(hoisted.enableWorkflowMutate).toHaveBeenCalledWith({enable: true, id: '202'});
     });
 
-    it('disables Delete and explains why for servers with workflow tools', async () => {
-        const {unmount} = renderListItem(mixedMcpServer);
-
-        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
-
-        const deleteMenuItem = await screen.findByRole('menuitem', {name: 'Delete'});
-
-        expect(deleteMenuItem).toHaveAttribute('aria-disabled', 'true');
-
-        await userEvent.hover(deleteMenuItem.parentElement!);
-
-        expect(
-            await screen.findByRole('tooltip', {
-                name: "Workflow tools come with this user's integrations, so this server can't be deleted. Switch it off instead.",
-            })
-        ).toBeInTheDocument();
-
-        unmount();
-
-        renderListItem(toolsOnlyMcpServer);
+    it('lets the admin delete a server that exposes workflows', async () => {
+        renderListItem(mixedMcpServer);
 
         await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
 
@@ -399,6 +380,5 @@ describe('ConnectedUserMcpServerListItem', () => {
         hoisted.enableWorkflowOptions.onSuccess?.();
 
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['connectedUserMcpServers']});
-        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ConnectedUserKeys.connectedUser(5)});
     });
 });
