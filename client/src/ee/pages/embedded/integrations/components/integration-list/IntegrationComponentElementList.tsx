@@ -68,7 +68,10 @@ const IntegrationComponentElementList = ({
     }
 
     return (
-        <Accordion className="rounded-md border border-border/50" type="multiple">
+        <Accordion
+            className="rounded-md border border-border/50 [--radix-collapsible-content-height:auto]"
+            type="multiple"
+        >
             {elements.map((element) => (
                 <AccordionItem className="border-border/50" key={element.id} value={element.id}>
                     <AccordionTrigger className="px-4 py-3 hover:no-underline">{element.title}</AccordionTrigger>
