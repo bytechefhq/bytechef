@@ -221,7 +221,7 @@ by version 1 is not visible to version 2. MongoDB, Cassandra, Neo4j and Vector S
 Chat memory and Auto Memory solve different problems, and an agent can use both at once:
 
 - **Chat memory** (this slot) replays the transcript of the *current conversation* - it is what makes turn five remember turn one. It is keyed by conversation and says nothing across conversations.
-- **Auto Memory** (a tool from the [Agent Utils toolset](#the-agent-utils-toolset)) stores *durable facts* the agent decides are worth keeping - preferences, learned context, decisions - and makes them available in **every future conversation** of the same deployment. Memory is kept per owner **and** per environment. In deployed automation workflows the owner is the project deployment. Connected-user embedded workflows run as automation workflows, so their memory belongs to the connected user's project deployment (it is not shown on the [Memories](/platform/automation/ai/memories) page); embedded integration workflows keep memory per integration instance. During editor test runs the tool is still offered, but every call returns an error explaining that memory works only once the workflow is deployed. In a microservices deployment the tool is unavailable: every call returns an error saying memory requires the ByteChef server application.
+- **Auto Memory** (a tool from the [Agent Utils toolset](#the-agent-utils-toolset)) stores *durable facts* the agent decides are worth keeping - preferences, learned context, decisions - and makes them available in **every future conversation** of the same deployment. Memory is kept per owner **and** per environment. In deployed automation workflows the owner is the project deployment. Connected-user embedded workflows run as automation workflows, so their memory belongs to the connected user's project deployment (it is not shown on the [Memories](/platform/settings/ai/memories) page); embedded integration workflows keep memory per integration instance. During editor test runs the tool is still offered, but every call returns an error explaining that memory works only once the workflow is deployed. In a microservices deployment the tool is unavailable: every call returns an error saying memory requires the ByteChef server application.
 
 This is the same auto-memory capability behind the [AI Hub Memories page](/platform/automation/build/hub): there the assistant saves facts per user; inside an AI Agent the facts belong to the deployed workflow. Attach the **Auto Memory** tool in the Tools slot to enable it - see [the Agent Utils toolset](#the-agent-utils-toolset).
 
@@ -413,7 +413,7 @@ In the latest released version of ByteChef, only **Skills** can be attached to a
 
 | Tool | What the agent can do with it |
 |---|---|
-| **Skills** | Consult operator-authored [skills](/platform/automation/ai/skills) on demand - see [Skills](/platform/automation/ai/skills) for authoring and managing them. |
+| **Skills** | Consult operator-authored [skills](/platform/settings/ai/skills) on demand - see [Skills](/platform/settings/ai/skills) for authoring and managing them. |
 
 The following Agent Utils tools are on the upcoming release track and are not yet available in the
 latest released version of ByteChef:
@@ -433,7 +433,7 @@ latest released version of ByteChef:
 
 ### Skills as tools
 
-Skills are a special kind of tool - operator-authored knowledge packs the agent can consult on demand. See the [Skills](/platform/automation/ai/skills) page for authoring guidelines, supported file formats, and the `.skill` archive structure.
+Skills are a special kind of tool - operator-authored knowledge packs the agent can consult on demand. See the [Skills](/platform/settings/ai/skills) page for authoring guidelines, supported file formats, and the `.skill` archive structure.
 
 {/* TODO screenshot: - agent/agent-tools-attached.png showing a list of attached tool children (Agent Utils + two custom workflow components) under the Tools slot. */}
 

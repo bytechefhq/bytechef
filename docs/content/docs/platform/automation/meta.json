@@ -24,12 +24,10 @@
     "data/knowledge-base",
     "data/data-tables",
     "data/asset-files",
-    "--- AI ---",
-    "ai/memories",
-    "ai/skills",
     "--- Settings ---",
     "settings/users",
     "settings/git-configuration",
-    "settings/api-keys"
+    "settings/api-keys",
+    "settings/workspaces"
   ]
 }
