@@ -16,7 +16,6 @@ const hoisted = vi.hoisted(() => ({
     seedingParams: [] as Array<{
         componentName: string;
         componentVersion: number;
-        connectionRequired?: boolean;
         newToolNames: string[];
     }>,
     updateMutate: vi.fn(),
@@ -45,20 +44,11 @@ vi.mock('@/shared/middleware/graphql', () => ({
 }));
 
 vi.mock('@/pages/platform/mcp-servers/hooks/useMcpToolSeeding', () => ({
-    default: (params: {
-        componentName: string;
-        componentVersion: number;
-        connectionRequired?: boolean;
-        newToolNames: string[];
-    }) => {
+    default: (params: {componentName: string; componentVersion: number; newToolNames: string[]}) => {
         hoisted.seedingParams.push(params);
 
         return {aiValuesByTool: {}, getFailedSeedKeys: () => [], waitForSeeding: hoisted.waitForSeeding};
     },
-}));
-
-vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
-    useGetComponentDefinitionQuery: () => ({data: {connectionRequired: true}}),
 }));
 
 vi.mock('@tanstack/react-query', () => ({
@@ -161,7 +151,6 @@ describe('useMcpComponentDialog', () => {
                 expect.objectContaining({
                     componentName: 'slack',
                     componentVersion: 1,
-                    connectionRequired: true,
                     newToolNames: ['postMessage'],
                 })
             );

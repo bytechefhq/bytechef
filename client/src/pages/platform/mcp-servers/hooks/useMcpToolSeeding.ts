@@ -1,9 +1,9 @@
-import {createMcpToolOptionsLoader} from '@/pages/platform/mcp-servers/hooks/useMcpToolOptionsLoader';
 import useToolSeeding from '@/pages/platform/mcp-servers/hooks/useToolSeeding';
 import {
     collectHiddenToolPaths,
     collectPropertyDefaults,
     computeAiFillValues,
+    loadNoPropertyOptions,
 } from '@/pages/platform/mcp-servers/utils/mcpToolAiFill';
 import {
     ClusterElementDefinitionDocument,
@@ -21,8 +21,6 @@ import {QueryClient, useQueryClient} from '@tanstack/react-query';
 interface UseMcpToolSeedingParamsI {
     componentName: string;
     componentVersion: number;
-    connectionId?: string | null;
-    connectionRequired?: boolean;
     newToolNames: string[];
 }
 
@@ -68,13 +66,7 @@ async function fetchDisplayConditions({
     }
 }
 
-export default function useMcpToolSeeding({
-    componentName,
-    componentVersion,
-    connectionId,
-    connectionRequired,
-    newToolNames,
-}: UseMcpToolSeedingParamsI) {
+export default function useMcpToolSeeding({componentName, componentVersion, newToolNames}: UseMcpToolSeedingParamsI) {
     const queryClient = useQueryClient();
 
     const seedTool = async (toolName: string): Promise<Record<string, string>> => {
@@ -112,14 +104,8 @@ export default function useMcpToolSeeding({
             hiddenPaths: collectHiddenToolPaths(properties, displayConditions),
             includeAdvanced: false,
             includeConditional: !hasConditionalProperties || displayConditions !== undefined,
-            loadOptions: createMcpToolOptionsLoader({
-                componentName,
-                componentVersion,
-                connectionId,
-                connectionRequired,
-                queryClient,
-                toolName,
-            }),
+            loadOptions: loadNoPropertyOptions,
+            optionsLoadable: false,
             properties,
             values: propertyDefaults,
         });
@@ -128,7 +114,7 @@ export default function useMcpToolSeeding({
     const {getFailedSeedKeys, seededValuesByKey, waitForSeeding} = useToolSeeding({
         keys: newToolNames,
         seed: seedTool,
-        seedKey: `${componentName}:${componentVersion}:${connectionId ?? ''}:${connectionRequired ?? ''}`,
+        seedKey: `${componentName}:${componentVersion}`,
     });
 
     return {

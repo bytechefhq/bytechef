@@ -61,8 +61,6 @@ const channelProperty = {
 const defaultedProperty = {controlType: 'TEXT', defaultValue: 'hello', name: 'greeting', type: 'STRING'};
 
 interface SeedingPropsI {
-    connectionId?: string | null;
-    connectionRequired?: boolean;
     newToolNames: string[];
 }
 
@@ -73,12 +71,10 @@ const renderSeeding = (initialProps: SeedingPropsI) => {
         createElement(QueryClientProvider, {client: queryClient}, children);
 
     return renderHook(
-        ({connectionId, connectionRequired, newToolNames}: SeedingPropsI) =>
+        ({newToolNames}: SeedingPropsI) =>
             useMcpToolSeeding({
                 componentName: 'slack',
                 componentVersion: 1,
-                connectionId,
-                connectionRequired,
                 newToolNames,
             }),
         {initialProps, wrapper}
@@ -143,29 +139,10 @@ describe('useMcpToolSeeding', () => {
         expect(definitionFetchesFor('postMessage')).toHaveLength(0);
     });
 
-    it('recomputes the values of a tool when the connection changes', async () => {
-        hoisted.definitionsByTool = {sendMessage: [channelProperty]};
-        hoisted.optionsByConnection = {'7': [{label: 'General', value: 'general'}]};
-
-        const {rerender, result} = renderSeeding({connectionId: null, newToolNames: ['sendMessage']});
-
-        await act(async () => {
-            await result.current.waitForSeeding();
-        });
-
-        expect(result.current.aiValuesByTool.sendMessage).toEqual({});
-
-        rerender({connectionId: '7', newToolNames: ['sendMessage']});
-
-        await waitFor(() => {
-            expect(result.current.aiValuesByTool.sendMessage?.channel).toMatch(/^=fromAi\('channel'/);
-        });
-    });
-
-    it('makes no options request when a required connection is missing', async () => {
+    it('leaves a select whose options load from the connection empty and loads no options', async () => {
         hoisted.definitionsByTool = {sendMessage: [channelProperty, messageProperty]};
 
-        const {result} = renderSeeding({connectionId: null, connectionRequired: true, newToolNames: ['sendMessage']});
+        const {result} = renderSeeding({newToolNames: ['sendMessage']});
 
         let seededValues: Record<string, Record<string, string>> = {};
 
@@ -177,21 +154,19 @@ describe('useMcpToolSeeding', () => {
         expect(Object.keys(seededValues.sendMessage)).toEqual(['message']);
     });
 
-    it('leaves a dependent options field empty without fetching when its dependency is empty', async () => {
+    it('seeds a select with fixed options together with its options', async () => {
         hoisted.definitionsByTool = {
             sendMessage: [
-                {controlType: 'TEXT', name: 'workspace', type: 'STRING'},
                 {
                     controlType: 'SELECT',
-                    name: 'channel',
-                    optionsDataSource: {optionsLookupDependsOn: ['workspace']},
+                    name: 'priority',
+                    options: [{value: 'high'}, {value: 'low'}],
                     type: 'STRING',
                 },
             ],
         };
-        hoisted.optionsByConnection = {'7': [{label: 'General', value: 'general'}]};
 
-        const {result} = renderSeeding({connectionId: '7', connectionRequired: true, newToolNames: ['sendMessage']});
+        const {result} = renderSeeding({newToolNames: ['sendMessage']});
 
         let seededValues: Record<string, Record<string, string>> = {};
 
@@ -199,34 +174,7 @@ describe('useMcpToolSeeding', () => {
             seededValues = await result.current.waitForSeeding();
         });
 
-        expect(optionsFetches()).toHaveLength(0);
-        expect(Object.keys(seededValues.sendMessage)).toEqual(['workspace']);
-    });
-
-    it('seeds a dependent options field when its dependency has a built-in default', async () => {
-        hoisted.definitionsByTool = {
-            sendMessage: [
-                {controlType: 'TEXT', defaultValue: 'acme', name: 'workspace', type: 'STRING'},
-                {
-                    controlType: 'SELECT',
-                    name: 'channel',
-                    optionsDataSource: {optionsLookupDependsOn: ['workspace']},
-                    type: 'STRING',
-                },
-            ],
-        };
-        hoisted.optionsByConnection = {'7': [{label: 'General', value: 'general'}]};
-
-        const {result} = renderSeeding({connectionId: '7', connectionRequired: true, newToolNames: ['sendMessage']});
-
-        let seededValues: Record<string, Record<string, string>> = {};
-
-        await act(async () => {
-            seededValues = await result.current.waitForSeeding();
-        });
-
-        expect(optionsFetches()).toHaveLength(1);
-        expect(Object.keys(seededValues.sendMessage)).toEqual(['channel']);
+        expect(seededValues.sendMessage.priority).toMatch(/^=fromAi\('priority'.*high.*low/);
     });
 
     it('seeds conditional fields visible under the built-in defaults and skips hidden ones', async () => {

@@ -9,7 +9,6 @@ import {
     useUpdateMcpComponentWithToolsMutation,
 } from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {getRoleLabel} from '@/shared/util/role-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo, useState} from 'react';
@@ -55,20 +54,10 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
 
     const queryClient = useQueryClient();
 
-    const {data: componentDefinition} = useGetComponentDefinitionQuery(
-        {
-            componentName: selectedComponent?.name || '',
-            componentVersion: selectedComponent?.version || 1,
-        },
-        !!selectedComponent
-    );
-
     const {aiValuesByTool, buildToolsPayload, isAwaitingSeeding, registerToolForm, savedParametersByToolName} =
         useMcpComponentToolForms({
             componentName: selectedComponent?.name || '',
             componentVersion: selectedComponent?.version ?? 1,
-            connectionId: selectedConnection?.id?.toString(),
-            connectionRequired: componentDefinition?.connectionRequired ?? true,
             existingTools: existingTools?.mcpToolsByComponentId,
             selectedTools,
         });

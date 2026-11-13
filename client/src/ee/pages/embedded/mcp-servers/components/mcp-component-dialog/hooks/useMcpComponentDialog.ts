@@ -6,7 +6,6 @@ import {
     useEmbeddedMcpToolsByComponentIdQuery,
     useUpdateEmbeddedMcpComponentMutation,
 } from '@/shared/middleware/graphql';
-import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
@@ -69,20 +68,10 @@ const useMcpComponentDialog = ({
 
     const queryClient = useQueryClient();
 
-    const {data: componentDefinition} = useGetComponentDefinitionQuery(
-        {
-            componentName: selectedComponent?.name || '',
-            componentVersion: selectedComponent?.version || 1,
-        },
-        !!selectedComponent
-    );
-
     const {aiValuesByTool, buildToolsPayload, isAwaitingSeeding, registerToolForm, savedParametersByToolName} =
         useMcpComponentToolForms({
             componentName: selectedComponent?.name || '',
             componentVersion: selectedComponent?.version ?? 1,
-            connectionId: mcpComponent?.connectionId,
-            connectionRequired: componentDefinition?.connectionRequired ?? true,
             existingTools: existingTools?.embeddedMcpToolsByComponentId,
             selectedTools,
         });

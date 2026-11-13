@@ -17,8 +17,6 @@ interface SelectedToolI {
 interface UseMcpComponentToolFormsParamsI {
     componentName: string;
     componentVersion: number;
-    connectionId?: string | null;
-    connectionRequired?: boolean;
     existingTools?: Array<ExistingToolI | null> | null;
     selectedTools: SelectedToolI[];
 }
@@ -37,8 +35,6 @@ export function pickToolFormChanges({form, initialValues}: McpToolFormRegistrati
 export default function useMcpComponentToolForms({
     componentName,
     componentVersion,
-    connectionId,
-    connectionRequired,
     existingTools,
     selectedTools,
 }: UseMcpComponentToolFormsParamsI) {
@@ -70,8 +66,6 @@ export default function useMcpComponentToolForms({
     const {aiValuesByTool, getFailedSeedKeys, waitForSeeding} = useMcpToolSeeding({
         componentName,
         componentVersion,
-        connectionId,
-        connectionRequired,
         newToolNames,
     });
 
