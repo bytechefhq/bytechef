@@ -93,12 +93,12 @@ public class ExternalInvocationApiController implements ExternalInvocationApi {
             .errorType(externalInvocationLog.getErrorType())
             .id(externalInvocationLog.getId())
             .integrationInstanceId(externalInvocationLog.getIntegrationInstanceId())
+            .invocationName(externalInvocationLog.getInvocationName())
             .jobId(externalInvocationLog.getJobId())
             .kind(toExternalInvocationKindModel(externalInvocationLog.getKind()))
             .operationName(externalInvocationLog.getOperationName())
             .status(toExternalInvocationStatusModel(externalInvocationLog.getStatus()))
-            .source(toExternalInvocationSourceModel(externalInvocationLog.getSource()))
-            .toolName(externalInvocationLog.getToolName());
+            .source(toExternalInvocationSourceModel(externalInvocationLog.getSource()));
     }
 
     private static ExternalInvocationPageModel

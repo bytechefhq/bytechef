@@ -181,7 +181,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
         externalInvocationLog.setId(2L);
         externalInvocationLog.setSource(ExternalInvocationSource.A2A_SERVER);
         externalInvocationLog.setKind(ExternalInvocationKind.WORKFLOW);
-        externalInvocationLog.setToolName("Summarize");
+        externalInvocationLog.setInvocationName("Summarize");
         externalInvocationLog.setA2aServerId(4L);
         externalInvocationLog.setStatus(ExternalInvocationStatus.SUCCESS);
         externalInvocationLog.setDurationMs(42);
@@ -202,6 +202,7 @@ class ExternalInvocationLogGraphQlControllerIntTest {
                     externalInvocationLogs(type: AUTOMATION, source: "A2A_SERVER", a2aServerId: 4) {
                         content {
                             source
+                            invocationName
                             a2aServerId
                             mcpServerId
                         }
@@ -212,6 +213,9 @@ class ExternalInvocationLogGraphQlControllerIntTest {
             .path("externalInvocationLogs.content[0].source")
             .entity(String.class)
             .isEqualTo("A2A_SERVER")
+            .path("externalInvocationLogs.content[0].invocationName")
+            .entity(String.class)
+            .isEqualTo("Summarize")
             .path("externalInvocationLogs.content[0].a2aServerId")
             .entity(Long.class)
             .isEqualTo(4L)

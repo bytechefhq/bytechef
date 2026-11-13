@@ -132,7 +132,7 @@ class ToolFacadeIntTest {
                 assertThat(externalInvocationLog.getType()).isEqualTo(PlatformType.EMBEDDED);
                 assertThat(externalInvocationLog.getSource()).isEqualTo(ExternalInvocationSource.API_TOOL);
                 assertThat(externalInvocationLog.getKind()).isEqualTo(ExternalInvocationKind.COMPONENT);
-                assertThat(externalInvocationLog.getToolName()).isEqualTo("slack_send");
+                assertThat(externalInvocationLog.getInvocationName()).isEqualTo("slack_send");
                 assertThat(externalInvocationLog.getComponentName()).isEqualTo("slack");
                 assertThat(externalInvocationLog.getOperationName()).isEqualTo("send");
                 assertThat(externalInvocationLog.getConnectionId()).isEqualTo(7L);

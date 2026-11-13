@@ -32,7 +32,7 @@ type ExternalInvocationLogType {
     id: ID!
     source: String!
     kind: String!
-    toolName: String
+    invocationName: String
     componentName: String
     componentVersion: Int
     operationName: String

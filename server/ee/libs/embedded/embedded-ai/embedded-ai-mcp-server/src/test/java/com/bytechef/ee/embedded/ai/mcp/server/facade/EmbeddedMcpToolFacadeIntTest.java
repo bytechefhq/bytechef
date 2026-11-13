@@ -771,7 +771,7 @@ class EmbeddedMcpToolFacadeIntTest {
                 assertThat(externalInvocationEvent.type()).isEqualTo(PlatformType.EMBEDDED);
                 assertThat(externalInvocationEvent.source()).isEqualTo(ExternalInvocationSource.MCP_SERVER);
                 assertThat(externalInvocationEvent.kind()).isEqualTo(ExternalInvocationKind.COMPONENT);
-                assertThat(externalInvocationEvent.toolName()).isEqualTo("HTTPCLIENT_POST");
+                assertThat(externalInvocationEvent.invocationName()).isEqualTo("HTTPCLIENT_POST");
                 assertThat(externalInvocationEvent.componentName()).isEqualTo("httpClient");
                 assertThat(externalInvocationEvent.componentVersion()).isEqualTo(1);
                 assertThat(externalInvocationEvent.operationName()).isEqualTo("post");
@@ -860,7 +860,7 @@ class EmbeddedMcpToolFacadeIntTest {
                 assertThat(externalInvocationEvent.type()).isEqualTo(PlatformType.EMBEDDED);
                 assertThat(externalInvocationEvent.source()).isEqualTo(ExternalInvocationSource.MCP_SERVER);
                 assertThat(externalInvocationEvent.kind()).isEqualTo(ExternalInvocationKind.WORKFLOW);
-                assertThat(externalInvocationEvent.toolName()).isEqualTo("mappedTool");
+                assertThat(externalInvocationEvent.invocationName()).isEqualTo("mappedTool");
                 assertThat(externalInvocationEvent.componentName()).isEqualTo("myComponent");
                 assertThat(externalInvocationEvent.environment()).isEqualTo(Environment.PRODUCTION.ordinal());
                 assertThat(externalInvocationEvent.externalUserId()).isEqualTo(CONNECTED_EXTERNAL_USER_ID);
@@ -928,7 +928,7 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThat(getExternalInvocationEvents()).singleElement()
             .satisfies(externalInvocationEvent -> {
                 assertThat(externalInvocationEvent.status()).isEqualTo(ExternalInvocationStatus.CONNECTION_REQUIRED);
-                assertThat(externalInvocationEvent.toolName()).isEqualTo("mappedTool");
+                assertThat(externalInvocationEvent.invocationName()).isEqualTo("mappedTool");
                 assertThat(externalInvocationEvent.externalUserId()).isEqualTo(UNCONNECTED_EXTERNAL_USER_ID);
                 assertThat(externalInvocationEvent.integrationInstanceId()).isNull();
                 assertThat(externalInvocationEvent.jobId()).isNull();
