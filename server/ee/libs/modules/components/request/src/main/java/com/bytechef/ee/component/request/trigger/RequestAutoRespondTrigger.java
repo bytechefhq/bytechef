@@ -11,19 +11,24 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.ee.component.request.util.RequestResponseUtils;
 import com.bytechef.ee.component.request.util.RequestUtils;
 
 /**
  * @author Ivica Cardic
  * @version ee
  */
-public class RequestAutoRespondWithHTTP200Trigger {
+public class RequestAutoRespondTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("autoRespondWithHTTP200")
-        .title("Auto Respond with HTTP 200 Status")
+        .title("Auto Respond")
         .description(
-            "The request trigger always replies immediately with an HTTP 200 status code in response to any incoming workflow request request. This guarantees execution of the request trigger, but does not involve any validation of the received request.")
+            "The request trigger replies immediately to any incoming workflow request and then runs the workflow. By " +
+                "default the reply is an empty HTTP 200 response; it can also be a redirect, JSON, raw text or no " +
+                "data. The request is not validated.")
         .type(TriggerType.STATIC_WEBHOOK)
+        .properties(RequestResponseUtils.withResponseProperties())
         .output()
-        .webhookRequest(RequestUtils::getRequestResult);
+        .webhookRequest(RequestUtils::getRequestResult)
+        .webhookResponse(RequestResponseUtils::getWebhookResponse);
 }
