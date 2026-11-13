@@ -1345,7 +1345,7 @@ export type ConnectedUserProjectsQueryVariables = Exact<{
 }>;
 
 
-export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, automationUuid: string | null, connectedUserId: string, copiedFromWorkflowUuid: string | null, enabled: boolean, lastExecutionDate: string | null, projectId: string, staticWebhookUrl: string | null, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }>, automationProjectConfigurations: Array<{ projectId: string, configurationId: string, configurationName: string, configurationProjectVersion: number }> }> };
+export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, attentionReason: string | null, automationUuid: string | null, connectedUserId: string, copiedFromWorkflowUuid: string | null, enabled: boolean, lastExecutionDate: string | null, projectId: string, staticWebhookUrl: string | null, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }>, automationProjectConfigurations: Array<{ projectId: string, configurationId: string, configurationName: string, configurationProjectVersion: number, configurationEnabled: boolean }> }> };
 
 export type CreateAutomationProjectConfigurationMutationVariables = Exact<{
   projectId: string | number;
@@ -7329,6 +7329,7 @@ export const ConnectedUserProjectsDocument = new TypedDocumentString(`
     }
     connectedUserProjectWorkflows {
       id
+      attentionReason
       automationUuid
       connectedUserId
       copiedFromWorkflowUuid
@@ -7353,6 +7354,7 @@ export const ConnectedUserProjectsDocument = new TypedDocumentString(`
       configurationId
       configurationName
       configurationProjectVersion
+      configurationEnabled
     }
     environmentId
     lastExecutionDate
