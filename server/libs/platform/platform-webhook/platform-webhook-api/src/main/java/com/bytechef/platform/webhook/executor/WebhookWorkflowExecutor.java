@@ -148,19 +148,6 @@ public interface WebhookWorkflowExecutor {
     WebhookValidateResponse validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
     /**
-     * Validates the provided webhook request and executes the associated workflow asynchronously based on the given
-     * workflow execution identifier.
-     *
-     * @param workflowExecutionId the unique identifier for the workflow execution containing details such as tenant,
-     *                            type, and trigger
-     * @param webhookRequest      the webhook request with headers, parameters, and body relevant to the execution
-     * @return a {@link WebhookValidateResponse} instance encapsulating the status, headers, and body of the validation
-     *         and execution process
-     */
-    WebhookValidateResponse validateAndExecuteAsync(
-        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
-
-    /**
      * Validates the provided webhook request during the enablement process of a workflow execution.
      *
      * @param workflowExecutionId the unique identifier for the workflow execution, containing details such as tenant,

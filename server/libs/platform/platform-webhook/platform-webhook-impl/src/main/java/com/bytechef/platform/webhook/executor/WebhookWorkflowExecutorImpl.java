@@ -27,7 +27,6 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
-import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
@@ -345,19 +344,6 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     @Override
     public WebhookValidateResponse validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         return webhookWorkflowSyncExecutor.validate(workflowExecutionId, webhookRequest);
-    }
-
-    @Override
-    public WebhookValidateResponse validateAndExecuteAsync(
-        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-
-        WebhookValidateResponse response = webhookWorkflowSyncExecutor.validate(workflowExecutionId, webhookRequest);
-
-        if (response.status() == HttpStatus.OK.getValue()) {
-            executeAsync(workflowExecutionId, webhookRequest.asValidated());
-        }
-
-        return response;
     }
 
     @Override
