@@ -113,14 +113,21 @@ export const OBJECT_VALID_SCHEMA_PROPERTIES: ObjectValidSchemaFieldType[] = [
     'properties',
 ];
 
-const commonSchemaOptions: CommonSchemaFieldOptionType[] = [{label: 'description', type: 'text', value: 'description'}];
+const commonSchemaOptions: CommonSchemaFieldOptionType[] = [
+    {
+        label: 'description',
+        placeholder: 'What this pill holds, e.g. Name of the company that issued the invoice',
+        type: 'text',
+        value: 'description',
+    },
+];
 
 export const STRING_SCHEMA_OPTIONS: StringSchemaFieldOptionType[] = [
     ...commonSchemaOptions,
     {label: 'requirement.minLength', type: 'number', value: 'minLength'},
     {label: 'requirement.maxLength', type: 'number', value: 'maxLength'},
     {label: 'options', type: 'multi_creatable', value: 'enum'},
-    {label: 'pattern', type: 'text', value: 'pattern'},
+    {label: 'pattern', placeholder: 'Regular expression, e.g. ^[A-Z]{3}-[0-9]+$', type: 'text', value: 'pattern'},
     {
         label: 'format',
         optionList: FORMAT_OPTIONS,

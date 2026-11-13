@@ -28,6 +28,7 @@ export type SchemaFieldOptionType = {
     type: SchemaFieldOptionValueType;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     optionList?: any;
+    placeholder?: string;
 };
 
 export type CommonSchemaFieldOptionType = SchemaFieldOptionType & {
