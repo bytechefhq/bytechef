@@ -124,7 +124,7 @@ By default, Copilot uses the workspace's configured chat model. In the Copilot p
 The picker lists the AI providers your workspace has activated for the current environment, so the same picker works across Development, Staging, and Production with each environment's own credentials. A few extras:
 
 - **Use workspace default** at the top resets the conversation back to the default model.
-- A provider that isn't activated yet shows a **Configure credentials** shortcut that jumps to the [AI Providers](/platform/settings/ai-providers) settings.
+- A provider that isn't activated yet shows a **Configure credentials** shortcut that jumps to the [AI Providers](/platform/settings/ai/ai-providers) settings.
 - Providers that accept an arbitrary model id offer **Choose model by ID**, where you type the exact model name.
 
 If no override is selected (or the selection can't be resolved), Copilot falls back to the workspace default model.
@@ -158,7 +158,7 @@ Copilot is disabled by default. There are two ways to turn it on, and either is 
 
 ### From AI Providers
 
-Activate a provider on the [AI Providers](/platform/settings/ai-providers) settings page and give it
+Activate a provider on the [AI Providers](/platform/settings/ai/ai-providers) settings page and give it
 credentials. Providers are activated **per environment**, so Copilot can be on in Development while
 you are still deciding about Production, and the key is stored and rotated in one place rather than
 baked into the deployment.

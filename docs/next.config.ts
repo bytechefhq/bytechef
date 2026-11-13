@@ -98,6 +98,21 @@ const config: NextConfig = {
         permanent: true,
       },
       {
+        source: '/platform/settings/workspaces',
+        destination: '/platform/automation/settings/workspaces',
+        permanent: true,
+      },
+      {
+        source: '/platform/settings/ai-providers',
+        destination: '/platform/settings/ai/ai-providers',
+        permanent: true,
+      },
+      {
+        source: '/platform/automation/ai/:page(memories|skills)',
+        destination: '/platform/settings/ai/:page',
+        permanent: true,
+      },
+      {
         source: '/platform/automation/monitor/tool-invocations',
         destination: '/platform/automation/monitor/external-invocations',
         permanent: true,
@@ -151,7 +166,7 @@ const config: NextConfig = {
       },
       {
         source: '/platform/enterprise/collaboration-devops/workspaces-projects',
-        destination: '/platform/settings/workspaces',
+        destination: '/platform/automation/settings/workspaces',
         permanent: true,
       },
       {
@@ -166,7 +181,7 @@ const config: NextConfig = {
       },
       {
         source: '/platform/enterprise/data-knowledge/embedding-models',
-        destination: '/platform/settings/ai-providers',
+        destination: '/platform/settings/ai/ai-providers',
         permanent: true,
       },
       {

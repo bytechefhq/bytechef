@@ -4,11 +4,10 @@
   "description": "The platform administration",
   "icon": "Server",
   "pages": [
-    "workspaces",
     "users",
     "identity-providers",
     "connections",
-    "ai-providers",
+    "ai",
     "mcp-server",
     "oauth2-clients",
     "components",

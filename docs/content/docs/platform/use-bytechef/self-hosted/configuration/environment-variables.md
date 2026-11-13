@@ -45,7 +45,7 @@ Settings of the [Agent Utils](/platform/automation/build/workflows/ai/agent/agen
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_AI_AUTO_MEMORY_PROVIDER` | Where AI agent [Auto Memory](/platform/automation/ai/memories#storage-providers) entries are stored (`JDBC`, `FILESYSTEM`, `AWS`). `FILESYSTEM` and `AWS` use the configured file storage; `AWS` requires the Enterprise Edition AWS file-storage module, and selecting a file-backed provider whose storage is not configured fails at startup. The JDBC store is used when unset | `JDBC` |
+| `BYTECHEF_AI_AUTO_MEMORY_PROVIDER` | Where AI agent [Auto Memory](/platform/settings/ai/memories#storage-providers) entries are stored (`JDBC`, `FILESYSTEM`, `AWS`). `FILESYSTEM` and `AWS` use the configured file storage; `AWS` requires the Enterprise Edition AWS file-storage module, and selecting a file-backed provider whose storage is not configured fails at startup. The JDBC store is used when unset | `JDBC` |
 
 ## AI Brave Configuration
 
