@@ -457,6 +457,37 @@ paths:
               schema:
                 type: integer
                 format: int64
+  /connected-users/{connectedUserId}/connections/{connectionId}/credentials:
+    put:
+      description: "Replaces the credentials of a connection a tenant admin provisioned for a connected user."
+      summary: "Replaces the credentials of a provisioned connected user connection"
+      tags:
+        - "connection"
+      operationId: "updateConnectedUserConnectionCredentials"
+      parameters:
+        - name: "connectedUserId"
+          description: "The id of a connected user."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "connectionId"
+          description: "The id of a connection."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateConnectionCredentialsRequest"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /connected-users/{connectedUserId}/integration-instances:
     post:
       description: "Provision an integration instance for the connected user on a chosen integration instance configuration."

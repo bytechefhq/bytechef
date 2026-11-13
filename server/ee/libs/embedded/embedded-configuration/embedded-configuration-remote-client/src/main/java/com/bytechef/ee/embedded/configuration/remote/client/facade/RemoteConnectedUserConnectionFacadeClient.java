@@ -108,6 +108,13 @@ public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserC
     }
 
     @Override
+    public void updateConnectedUserConnectionCredentials(
+        long connectedUserId, long connectionId, Map<String, ?> parameters, int version) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void updateIntegrationInstanceConnectionCredentials(
         long connectedUserId, long connectionId, Map<String, ?> parameters, int version) {
 
