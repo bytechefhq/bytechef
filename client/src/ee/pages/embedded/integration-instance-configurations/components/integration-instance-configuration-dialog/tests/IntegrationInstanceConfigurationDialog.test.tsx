@@ -396,7 +396,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             const user = userEvent.setup();
 
             hoisted.connectionDefinition = {authorizations: [{title: 'Basic Auth', type: 'BASIC_AUTH'}]};
-            hoisted.createMutate.mockImplementation(() => hoisted.createMutationOnSuccess.current?.(42));
+            hoisted.createMutate.mockImplementationOnce(() => hoisted.createMutationOnSuccess.current?.(42));
 
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} onSuccess={onSuccess} />);
 
