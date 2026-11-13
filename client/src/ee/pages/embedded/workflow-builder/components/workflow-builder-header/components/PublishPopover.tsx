@@ -4,6 +4,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {PUBLISH_DESCRIPTION_PLACEHOLDER} from '@/shared/constants';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {SendIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -72,7 +73,7 @@ const PublishPopover = ({
                                         <FormControl>
                                             <Textarea
                                                 className="h-28"
-                                                placeholder="Describe what changed in this version, e.g. Added a Slack notification for new leads"
+                                                placeholder={PUBLISH_DESCRIPTION_PLACEHOLDER}
                                                 {...field}
                                             ></Textarea>
                                         </FormControl>
