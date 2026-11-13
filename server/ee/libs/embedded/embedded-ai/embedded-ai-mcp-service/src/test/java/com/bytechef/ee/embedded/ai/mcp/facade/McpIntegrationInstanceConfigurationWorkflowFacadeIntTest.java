@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -25,19 +26,34 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceConfigurationAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.config.McpRowsIntTestFixture;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowServiceImpl;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowServiceImpl;
+import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowServiceImpl;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.encryption.Encryption;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.repository.McpServerRepository;
+import com.bytechef.platform.mcp.service.McpComponentServiceImpl;
 import com.bytechef.platform.security.web.expression.MethodSecurityExpressionContributor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -156,7 +172,9 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
         properties = {
             "bytechef.edition=ee", "bytechef.workflow.repository.jdbc.enabled=true"
         })
-    @MockitoBean(types = PermissionService.class)
+    @MockitoBean(types = {
+        McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceRows.class, PermissionService.class
+    })
     class ToolEligibleWorkflowsIntTest {
 
         private static final int INTEGRATION_VERSION = 2;
@@ -311,14 +329,20 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
         })
     @MockitoBean(types = {
         IntegrationInstanceConfigurationService.class, IntegrationInstanceConfigurationWorkflowService.class,
-        IntegrationInstanceWorkflowService.class, IntegrationWorkflowService.class, PermissionService.class,
+        IntegrationInstanceWorkflowService.class, IntegrationWorkflowService.class,
+        McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceRows.class, PermissionService.class,
         WorkflowService.class
     })
     class AuditIntTest {
 
+        private static final long INTEGRATION_INSTANCE_CONFIGURATION_ID = 1L;
         private static final long INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ID = 5L;
         private static final long MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID = 3L;
         private static final long MCP_INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ID = 9L;
+        private static final long MCP_SERVER_ID = 2L;
+
+        @Autowired
+        private McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
 
         @Autowired
         private McpIntegrationInstanceConfigurationWorkflowFacade mcpIntegrationInstanceConfigurationWorkflowFacade;
@@ -345,6 +369,14 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
                 mcpIntegrationInstanceConfigurationWorkflowService.create(
                     MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ID))
                         .thenReturn(newMcpIntegrationInstanceConfigurationWorkflow());
+            when(
+                mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(
+                    MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID))
+                        .thenReturn(
+                            Optional.of(
+                                new McpIntegrationInstanceConfiguration(
+                                    MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, INTEGRATION_INSTANCE_CONFIGURATION_ID,
+                                    MCP_SERVER_ID)));
 
             mcpIntegrationInstanceConfigurationWorkflowFacade.createMcpIntegrationInstanceConfigurationWorkflow(
                 MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ID);
@@ -448,6 +480,170 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
             EmbeddedMcpAuditIntTestConfiguration.class, McpIntegrationInstanceConfigurationWorkflowFacadeImpl.class
         })
         static class AuditConfiguration {
+        }
+    }
+
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @SpringBootTest(
+        classes = {
+            EmbeddedMcpIntTestConfiguration.class, LinkIntTest.LinkConfiguration.class
+        },
+        properties = {
+            "bytechef.edition=ee", "bytechef.workflow.repository.jdbc.enabled=true"
+        })
+    @MockitoBean(types = PermissionService.class)
+    class LinkIntTest {
+
+        private static final String SECOND_WORKFLOW_ID = "5eed0000-0000-0000-0000-0000000000c2";
+        private static final String WORKFLOW_ID = "5eed0000-0000-0000-0000-0000000000c1";
+
+        @Autowired
+        private Encryption encryption;
+
+        @Autowired
+        private JdbcTemplate jdbcTemplate;
+
+        @Autowired
+        private McpIntegrationInstanceConfigurationWorkflowFacade mcpIntegrationInstanceConfigurationWorkflowFacade;
+
+        @Autowired
+        private McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
+
+        @Autowired
+        private McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
+
+        @Autowired
+        private McpServerRepository mcpServerRepository;
+
+        private McpRowsIntTestFixture fixture;
+        private long integrationInstanceConfigurationId;
+        private long integrationInstanceId;
+        private long linkId;
+        private long mcpIntegrationInstanceConfigurationId;
+        private long secondIntegrationInstanceConfigurationWorkflowId;
+
+        @BeforeEach
+        void beforeEach() {
+            fixture = new McpRowsIntTestFixture(encryption, jdbcTemplate);
+
+            McpServer mcpServer = mcpServerRepository.save(
+                new McpServer("Google", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
+
+            integrationInstanceConfigurationId = fixture.insertIntegrationInstanceConfiguration(
+                fixture.insertIntegration("gmail"), 1);
+            mcpIntegrationInstanceConfigurationId = fixture.insertMcpIntegrationInstanceConfiguration(
+                mcpServer.getId(), integrationInstanceConfigurationId);
+            linkId = fixture.insertLink(
+                mcpIntegrationInstanceConfigurationId,
+                fixture.insertConfigurationWorkflow(integrationInstanceConfigurationId, WORKFLOW_ID, true), true);
+            secondIntegrationInstanceConfigurationWorkflowId = fixture.insertConfigurationWorkflow(
+                integrationInstanceConfigurationId, SECOND_WORKFLOW_ID, true);
+            integrationInstanceId = fixture.insertIntegrationInstance(
+                integrationInstanceConfigurationId, fixture.insertConnectedUser("user-1"),
+                fixture.insertConnection("gmail"));
+
+            fixture.insertInstanceWorkflow(
+                integrationInstanceId, integrationInstanceConfigurationId, WORKFLOW_ID, true);
+
+            mcpIntegrationInstanceWorkflowService.createMcpIntegrationInstanceWorkflow(
+                integrationInstanceId, linkId, true);
+        }
+
+        @AfterEach
+        void afterEach() {
+            fixture.deleteAll();
+
+            mcpServerRepository.deleteAll();
+        }
+
+        @Test
+        void testDeleteMcpWorkflowKeepsTheIntegrationConfigurationWorkflow() {
+            mcpIntegrationInstanceConfigurationWorkflowFacade.deleteMcpIntegrationInstanceConfigurationWorkflow(
+                linkId);
+
+            assertThat(
+                mcpIntegrationInstanceConfigurationWorkflowService.fetchMcpIntegrationInstanceConfigurationWorkflow(
+                    linkId)).isEmpty();
+            assertThat(
+                jdbcTemplate.queryForList(
+                    "SELECT enabled FROM integration_instance_configuration_workflow WHERE workflow_id = ?",
+                    Boolean.class, WORKFLOW_ID)).containsExactly(true);
+            assertThat(fixture.getInstanceWorkflowEnabled(integrationInstanceId, WORKFLOW_ID)).containsExactly(true);
+            assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
+                .isEmpty();
+        }
+
+        @Test
+        void testRepointingALinkIsRejected() {
+            assertThatThrownBy(
+                () -> mcpIntegrationInstanceConfigurationWorkflowFacade
+                    .updateMcpIntegrationInstanceConfigurationWorkflow(
+                        linkId, null, secondIntegrationInstanceConfigurationWorkflowId))
+                            .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(
+                () -> mcpIntegrationInstanceConfigurationWorkflowFacade
+                    .updateMcpIntegrationInstanceConfigurationWorkflow(
+                        linkId, mcpIntegrationInstanceConfigurationId + 1, null))
+                            .isInstanceOf(IllegalArgumentException.class);
+
+            McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+                mcpIntegrationInstanceConfigurationWorkflowService
+                    .fetchMcpIntegrationInstanceConfigurationWorkflow(linkId)
+                    .orElseThrow();
+
+            assertThat(mcpIntegrationInstanceConfigurationWorkflow.getMcpIntegrationInstanceConfigurationId())
+                .isEqualTo(mcpIntegrationInstanceConfigurationId);
+            assertThat(mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId())
+                .isNotEqualTo(secondIntegrationInstanceConfigurationWorkflowId);
+        }
+
+        @Test
+        void testCreatedLinkReachesConnectedUserWithTheServer() {
+            McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+                mcpIntegrationInstanceConfigurationWorkflowFacade.createMcpIntegrationInstanceConfigurationWorkflow(
+                    mcpIntegrationInstanceConfigurationId, secondIntegrationInstanceConfigurationWorkflowId);
+
+            assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
+                .extracting(
+                    McpIntegrationInstanceWorkflow::getMcpIntegrationInstanceConfigurationWorkflowId,
+                    McpIntegrationInstanceWorkflow::isEnabled)
+                .containsExactlyInAnyOrder(
+                    tuple(linkId, true), tuple(mcpIntegrationInstanceConfigurationWorkflow.getId(), true));
+        }
+
+        @Test
+        void testLinkSwitchedBackOnReachesConnectedUsers() {
+            long secondLinkId = fixture.insertLink(
+                mcpIntegrationInstanceConfigurationId, secondIntegrationInstanceConfigurationWorkflowId, false);
+
+            mcpIntegrationInstanceConfigurationWorkflowFacade.updateMcpIntegrationInstanceConfigurationWorkflowEnabled(
+                secondLinkId, true);
+
+            assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
+                .extracting(McpIntegrationInstanceWorkflow::getMcpIntegrationInstanceConfigurationWorkflowId)
+                .containsExactlyInAnyOrder(linkId, secondLinkId);
+        }
+
+        @Configuration
+        @EnableCaching
+        @Import({
+            IntegrationInstanceConfigurationServiceImpl.class,
+            IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceServiceImpl.class,
+            IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
+            IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
+            McpIntegrationInstanceConfigurationServiceImpl.class,
+            McpIntegrationInstanceConfigurationWorkflowFacadeImpl.class, McpIntegrationInstanceRowsImpl.class
+        })
+        static class LinkConfiguration {
+
+            @Bean
+            WorkflowService workflowService(
+                CacheManager cacheManager, List<WorkflowCrudRepository> workflowCrudRepositories,
+                List<WorkflowRepository> workflowRepositories) {
+
+                return new WorkflowServiceImpl(cacheManager, workflowCrudRepositories, workflowRepositories);
+            }
         }
     }
 

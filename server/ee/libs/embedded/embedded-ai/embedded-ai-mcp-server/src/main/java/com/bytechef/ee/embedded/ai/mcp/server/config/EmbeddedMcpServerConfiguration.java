@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -110,7 +111,8 @@ public class EmbeddedMcpServerConfiguration {
         JobCompletionAwaiter jobCompletionAwaiter, JwtTokenService jwtTokenService,
         McpComponentService mcpComponentService, McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
-        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
+        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
+        McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService, McpServerService mcpServerService,
         PrincipalJobFacade principalJobFacade, TaskExecutionService taskExecutionService,
         ExternalInvocationRecorder externalInvocationRecorder, WorkflowService workflowService) {
 
@@ -120,8 +122,8 @@ public class EmbeddedMcpServerConfiguration {
             integrationInstanceConfigurationWorkflowService, integrationInstanceService,
             integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
             mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
-            mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade,
-            applicationProperties.getPublicUrl(), taskExecutionService, durableTaskFileStorage,
+            mcpIntegrationInstanceToolService, mcpIntegrationInstanceWorkflowService, mcpServerService,
+            principalJobFacade, applicationProperties.getPublicUrl(), taskExecutionService, durableTaskFileStorage,
             externalInvocationRecorder,
             workflowService);
     }

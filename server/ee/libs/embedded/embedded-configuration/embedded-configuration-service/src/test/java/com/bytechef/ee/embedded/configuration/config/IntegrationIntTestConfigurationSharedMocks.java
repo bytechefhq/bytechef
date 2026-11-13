@@ -26,10 +26,12 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
@@ -82,7 +84,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     PrincipalJobService.class, JobFacade.class, JobService.class, McpComponentService.class,
     McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceConfigurationWorkflowService.class,
-    McpIntegrationInstanceToolService.class, McpServerService.class, McpToolService.class, OAuth2Service.class,
+    McpIntegrationInstanceToolService.class,
+    McpIntegrationInstanceWorkflowService.class, McpIntegrationInstanceRows.class, McpServerService.class,
+    McpToolService.class, OAuth2Service.class,
     TaskDispatcherDefinitionService.class, TriggerDefinitionService.class, TriggerExecutionService.class,
     TriggerLifecycleFacade.class,
     ComponentConnectionFacade.class, WorkflowFacade.class, WorkflowNodeParameterFacade.class,

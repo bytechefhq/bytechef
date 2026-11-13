@@ -53,6 +53,11 @@ public class RemoteMcpIntegrationInstanceToolServiceClient implements McpIntegra
     }
 
     @Override
+    public List<Long> getIntegrationInstanceIdsByMcpServerId(long mcpServerId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<McpIntegrationInstanceTool> getMcpIntegrationInstanceTools(long integrationInstanceId) {
         throw new UnsupportedOperationException();
     }

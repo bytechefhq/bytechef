@@ -36,6 +36,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -189,6 +190,7 @@ class EmbeddedMcpToolFacadeIntTest {
     @AfterEach
     void afterEach() {
         jdbcTemplate.update("DELETE FROM mcp_integration_component");
+        jdbcTemplate.update("DELETE FROM mcp_integration_instance_workflow");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_configuration_workflow");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_configuration");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_tool");
@@ -558,6 +560,30 @@ class EmbeddedMcpToolFacadeIntTest {
                 assertThat(externalInvocationEvent.errorMessage()).isNull();
                 assertThat(externalInvocationEvent.jobId()).isEqualTo(5L);
             });
+    }
+
+    @Test
+    void testWorkflowToolHiddenWithoutMcpRow() {
+        List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(
+            Map.of(), List.of(), CONNECTED_EXTERNAL_USER_ID, true, false, null, true);
+
+        assertThat(toolCallbacks).isEmpty();
+    }
+
+    @Test
+    void testWorkflowToolHiddenWhenMcpRowDisabled() {
+        List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(
+            Map.of(), List.of(), CONNECTED_EXTERNAL_USER_ID, true, false, false, true);
+
+        assertThat(toolCallbacks).isEmpty();
+    }
+
+    @Test
+    void testWorkflowToolListedWhenMcpRowEnabledAndInstanceWorkflowDisabled() {
+        List<ToolCallback> toolCallbacks = getWorkflowToolCallbacks(
+            Map.of(), List.of(), CONNECTED_EXTERNAL_USER_ID, true, false, true, false);
+
+        assertThat(toolCallbacks).hasSize(1);
     }
 
     @Test
@@ -970,6 +996,15 @@ class EmbeddedMcpToolFacadeIntTest {
         Map<String, Object> toolParameters, List<Map<String, String>> tasks, @Nullable String externalUserId,
         boolean connected, boolean newerSiblingIntegrationInstance) {
 
+        return getWorkflowToolCallbacks(
+            toolParameters, tasks, externalUserId, connected, newerSiblingIntegrationInstance, true, true);
+    }
+
+    private List<ToolCallback> getWorkflowToolCallbacks(
+        Map<String, Object> toolParameters, List<Map<String, String>> tasks, @Nullable String externalUserId,
+        boolean connected, boolean newerSiblingIntegrationInstance, @Nullable Boolean mcpWorkflowEnabled,
+        boolean integrationInstanceWorkflowEnabled) {
+
         McpServer mcpServer = mcpServerRepository.save(
             new McpServer("test-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true));
 
@@ -1043,12 +1078,13 @@ class EmbeddedMcpToolFacadeIntTest {
                 """,
             mcpServer.getId(), integrationInstanceConfigurationId);
 
-        jdbcTemplate.update(
+        long mcpIntegrationInstanceConfigurationWorkflowId = insert(
             """
                 INSERT INTO mcp_integration_instance_configuration_workflow (mcp_integration_instance_configuration_id,
                     integration_instance_configuration_workflow_id, parameters, created_date, created_by,
                     last_modified_date, last_modified_by, version)
                 VALUES (?, ?, ?, now(), 'system', now(), 'system', 0)
+                RETURNING id
                 """,
             mcpIntegrationInstanceConfigurationId, integrationInstanceConfigurationWorkflowId,
             JsonUtils.write(toolParameters));
@@ -1078,9 +1114,20 @@ class EmbeddedMcpToolFacadeIntTest {
                     INSERT INTO integration_instance_workflow (integration_instance_id,
                         integration_instance_configuration_workflow_id, inputs, enabled, created_date, created_by,
                         last_modified_date, last_modified_by, version)
-                    VALUES (?, ?, '{}', true, now(), 'system', now(), 'system', 0)
+                    VALUES (?, ?, '{}', ?, now(), 'system', now(), 'system', 0)
                     """,
-                integrationInstanceId, integrationInstanceConfigurationWorkflowId);
+                integrationInstanceId, integrationInstanceConfigurationWorkflowId, integrationInstanceWorkflowEnabled);
+
+            if (mcpWorkflowEnabled != null) {
+                jdbcTemplate.update(
+                    """
+                        INSERT INTO mcp_integration_instance_workflow (integration_instance_id,
+                            mcp_integration_instance_configuration_workflow_id, enabled, created_date, created_by,
+                            last_modified_date, last_modified_by, version)
+                        VALUES (?, ?, ?, now(), 'system', now(), 'system', 0)
+                        """,
+                    integrationInstanceId, mcpIntegrationInstanceConfigurationWorkflowId, mcpWorkflowEnabled);
+            }
 
             if (newerSiblingIntegrationInstance) {
                 insertNewerSiblingIntegrationInstance(workflowConnectedUserId, connectionId, environment);
@@ -1252,8 +1299,10 @@ class EmbeddedMcpToolFacadeIntTest {
             JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
             McpIntegrationComponentService mcpIntegrationComponentService,
             McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
-            McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
-            PrincipalJobFacade principalJobFacade, TaskExecutionService taskExecutionService,
+            McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
+            McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService,
+            McpServerService mcpServerService, PrincipalJobFacade principalJobFacade,
+            TaskExecutionService taskExecutionService,
             TaskFileStorage taskFileStorage, ExternalInvocationRecorder externalInvocationRecorder,
             WorkflowService workflowService) {
 
@@ -1263,7 +1312,8 @@ class EmbeddedMcpToolFacadeIntTest {
                 integrationInstanceConfigurationWorkflowService, integrationInstanceService,
                 integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
                 mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
-                mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade, "http://localhost:8080",
+                mcpIntegrationInstanceToolService, mcpIntegrationInstanceWorkflowService, mcpServerService,
+                principalJobFacade, "http://localhost:8080",
                 taskExecutionService, taskFileStorage, externalInvocationRecorder, workflowService);
         }
     }

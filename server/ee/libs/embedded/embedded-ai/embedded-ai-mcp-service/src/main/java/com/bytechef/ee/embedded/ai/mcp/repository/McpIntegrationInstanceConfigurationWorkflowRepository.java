@@ -41,6 +41,18 @@ public interface McpIntegrationInstanceConfigurationWorkflowRepository
     List<McpIntegrationInstanceConfigurationWorkflow> findAllByMcpIntegrationInstanceConfigurationId(
         @Param("mcpIntegrationInstanceConfigurationId") Long mcpIntegrationInstanceConfigurationId);
 
+    @Query("""
+        SELECT miw.* FROM mcp_integration_instance_configuration_workflow miw
+        JOIN integration_instance_configuration_workflow iicw
+            ON miw.integration_instance_configuration_workflow_id = iicw.id
+        WHERE iicw.integration_instance_configuration_id = :integrationInstanceConfigurationId
+        AND iicw.workflow_id = :workflowId
+        ORDER BY miw.id ASC
+        """)
+    List<McpIntegrationInstanceConfigurationWorkflow> findAllByIntegrationInstanceConfigurationIdAndWorkflowId(
+        @Param("integrationInstanceConfigurationId") long integrationInstanceConfigurationId,
+        @Param("workflowId") String workflowId);
+
     Optional<McpIntegrationInstanceConfigurationWorkflow> findByIntegrationInstanceConfigurationWorkflowId(
         long integrationInstanceConfigurationWorkflowId);
 

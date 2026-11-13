@@ -79,6 +79,13 @@ public class RemoteMcpIntegrationInstanceConfigurationWorkflowServiceClient
     }
 
     @Override
+    public List<McpIntegrationInstanceConfigurationWorkflow> getMcpIntegrationInstanceConfigurationWorkflows(
+        long integrationInstanceConfigurationId, String workflowId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public McpIntegrationInstanceConfigurationWorkflow
         update(McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow) {
         throw new UnsupportedOperationException();

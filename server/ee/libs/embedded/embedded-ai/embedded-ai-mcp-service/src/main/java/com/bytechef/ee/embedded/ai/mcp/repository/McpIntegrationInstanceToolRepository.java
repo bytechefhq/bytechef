@@ -11,7 +11,9 @@ import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -32,4 +34,12 @@ public interface McpIntegrationInstanceToolRepository extends ListCrudRepository
     Optional<McpIntegrationInstanceTool> findByIntegrationInstanceIdAndMcpToolId(
         long integrationInstanceId, long mcpToolId);
 
+    @Query("""
+        SELECT DISTINCT mcp_integration_instance_tool.integration_instance_id
+        FROM mcp_integration_instance_tool
+        JOIN mcp_tool ON mcp_tool.id = mcp_integration_instance_tool.mcp_tool_id
+        JOIN mcp_component ON mcp_component.id = mcp_tool.mcp_component_id
+        WHERE mcp_component.mcp_server_id = :mcpServerId
+        """)
+    List<Long> findIntegrationInstanceIdsByMcpServerId(@Param("mcpServerId") long mcpServerId);
 }

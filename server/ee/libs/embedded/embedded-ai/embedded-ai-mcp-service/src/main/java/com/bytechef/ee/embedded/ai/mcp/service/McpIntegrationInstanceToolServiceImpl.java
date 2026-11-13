@@ -71,6 +71,12 @@ public class McpIntegrationInstanceToolServiceImpl implements McpIntegrationInst
 
     @Override
     @Transactional(readOnly = true)
+    public List<Long> getIntegrationInstanceIdsByMcpServerId(long mcpServerId) {
+        return mcpIntegrationInstanceToolRepository.findIntegrationInstanceIdsByMcpServerId(mcpServerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<McpIntegrationInstanceTool> getMcpIntegrationInstanceTools(long integrationInstanceId) {
         return mcpIntegrationInstanceToolRepository.findAllByIntegrationInstanceId(integrationInstanceId);
     }

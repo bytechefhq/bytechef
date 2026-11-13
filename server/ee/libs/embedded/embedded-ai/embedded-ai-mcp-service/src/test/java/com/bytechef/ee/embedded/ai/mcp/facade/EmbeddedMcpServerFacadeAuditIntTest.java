@@ -56,8 +56,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     })
 @MockitoBean(types = {
     ComponentDefinitionService.class, IntegrationInstanceConfigurationService.class, IntegrationService.class,
-    McpComponentService.class, McpIntegrationComponentService.class, McpIntegrationInstanceToolService.class,
-    McpServerService.class, McpToolService.class, PermissionService.class, TagService.class
+    McpComponentService.class, McpIntegrationComponentService.class, McpIntegrationInstanceRows.class,
+    McpIntegrationInstanceToolService.class, McpServerService.class, McpToolService.class, PermissionService.class,
+    TagService.class
 })
 class EmbeddedMcpServerFacadeAuditIntTest {
 

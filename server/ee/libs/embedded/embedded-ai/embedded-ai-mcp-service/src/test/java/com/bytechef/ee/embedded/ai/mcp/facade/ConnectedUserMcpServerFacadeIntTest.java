@@ -10,11 +10,6 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
@@ -25,6 +20,7 @@ import com.bytechef.ee.embedded.ai.mcp.audit.ConnectedUserMcpServerAuditMapper;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerToolDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerWorkflowDTO;
@@ -33,12 +29,13 @@ import com.bytechef.ee.embedded.ai.mcp.exception.ConnectedUserMcpServerErrorType
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
-import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
+import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.encryption.Encryption;
@@ -95,9 +92,6 @@ public class ConnectedUserMcpServerFacadeIntTest {
     @Autowired
     private Encryption encryption;
 
-    @MockitoBean
-    private IntegrationInstanceFacade integrationInstanceFacade;
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -111,6 +105,9 @@ public class ConnectedUserMcpServerFacadeIntTest {
     private McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
 
     @Autowired
+    private McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
+
+    @Autowired
     private McpServerRepository mcpServerRepository;
 
     @Autowired
@@ -122,8 +119,12 @@ public class ConnectedUserMcpServerFacadeIntTest {
     @MockitoBean
     private PrincipalJobService principalJobService;
 
+    private long archiveEmailMcpWorkflowId;
     private long connectedUserId;
+    private long connectionId;
+    private long integrationInstanceConfigurationId;
     private long integrationInstanceId;
+    private long sendEmailMcpWorkflowId;
     private McpServer toolsMcpServer;
     private McpServer workflowsMcpServer;
 
@@ -136,7 +137,7 @@ public class ConnectedUserMcpServerFacadeIntTest {
         workflowsMcpServer = mcpServerRepository.save(
             new McpServer("Workflows only", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
 
-        long connectionId = insert(
+        connectionId = insert(
             """
                 INSERT INTO connection (name, component_name, environment, connection_version, parameters,
                     credential_status, type, created_date, created_by, last_modified_date, last_modified_by, version)
@@ -159,7 +160,7 @@ public class ConnectedUserMcpServerFacadeIntTest {
                 VALUES ('gmail', 'gmail', false, now(), 'system', now(), 'system', 0)
                 RETURNING id
                 """);
-        long integrationInstanceConfigurationId = insert(
+        integrationInstanceConfigurationId = insert(
             """
                 INSERT INTO integration_instance_configuration (integration_id, integration_version, name, enabled,
                     environment, connection_parameters, authorization_type, created_date, created_by,
@@ -199,10 +200,10 @@ public class ConnectedUserMcpServerFacadeIntTest {
                 """,
             workflowsMcpServer.getId(), integrationInstanceConfigurationId);
 
-        insertMcpWorkflow(
+        sendEmailMcpWorkflowId = insertMcpWorkflow(
             SEND_EMAIL_WORKFLOW_ID, "Send Email", "Sends an email", null, true, true,
             integrationInstanceConfigurationId, mcpIntegrationInstanceConfigurationId);
-        insertMcpWorkflow(
+        archiveEmailMcpWorkflowId = insertMcpWorkflow(
             ARCHIVE_EMAIL_WORKFLOW_ID, "Archive Email", null,
             "{\"toolName\":\"archiveEmail\",\"toolDescription\":\"Archives the email\"}", true, false,
             integrationInstanceConfigurationId, mcpIntegrationInstanceConfigurationId);
@@ -222,6 +223,7 @@ public class ConnectedUserMcpServerFacadeIntTest {
 
     @AfterEach
     public void afterEach() {
+        jdbcTemplate.update("DELETE FROM mcp_integration_instance_workflow");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_configuration_workflow");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_configuration");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_tool");
@@ -263,11 +265,11 @@ public class ConnectedUserMcpServerFacadeIntTest {
         assertThat(workflowsConnectedUserMcpServer.workflows())
             .containsExactly(
                 new ConnectedUserMcpServerWorkflowDTO(
-                    integrationInstanceId, "gmail", 6, ARCHIVE_EMAIL_WORKFLOW_ID, "archiveEmail",
-                    "Archives the email", false, null),
+                    archiveEmailMcpWorkflowId, integrationInstanceId, "gmail", 6, ARCHIVE_EMAIL_WORKFLOW_ID,
+                    "archiveEmail", "Archives the email", false, null),
                 new ConnectedUserMcpServerWorkflowDTO(
-                    integrationInstanceId, "gmail", 6, SEND_EMAIL_WORKFLOW_ID, "Send Email", "Sends an email", true,
-                    LAST_EXECUTION_DATE));
+                    sendEmailMcpWorkflowId, integrationInstanceId, "gmail", 6, SEND_EMAIL_WORKFLOW_ID, "Send Email",
+                    "Sends an email", true, LAST_EXECUTION_DATE));
     }
 
     @Test
@@ -293,15 +295,110 @@ public class ConnectedUserMcpServerFacadeIntTest {
     }
 
     @Test
-    public void testEnableConnectedUserMcpServerFlipsOnlyWorkflowsInOtherState() {
+    public void testSwitchingOffAServerKeepsTheInstanceWorkflowsEnabled() {
+        connectedUserMcpServerFacade.enableConnectedUserMcpServer(connectedUserId, workflowsMcpServer.getId(), false);
+
+        assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
+            .allSatisfy(mcpIntegrationInstanceWorkflow -> assertThat(mcpIntegrationInstanceWorkflow.isEnabled())
+                .isFalse());
+        assertThat(getInstanceWorkflowEnabled(SEND_EMAIL_WORKFLOW_ID)).containsExactly(true);
+
         connectedUserMcpServerFacade.enableConnectedUserMcpServer(connectedUserId, workflowsMcpServer.getId(), true);
 
-        verify(integrationInstanceFacade).enableIntegrationInstanceWorkflow(
-            integrationInstanceId, ARCHIVE_EMAIL_WORKFLOW_ID, true);
-        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
-            anyLong(), eq(SEND_EMAIL_WORKFLOW_ID), eq(true));
-        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
-            anyLong(), eq(HIDDEN_WORKFLOW_ID), eq(true));
+        assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
+            .allSatisfy(mcpIntegrationInstanceWorkflow -> assertThat(mcpIntegrationInstanceWorkflow.isEnabled())
+                .isTrue());
+        assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
+            .extracting(McpIntegrationInstanceTool::isEnabled)
+            .containsExactlyInAnyOrder(true, false);
+    }
+
+    @Test
+    public void testLinkedConfigurationWithoutRowsListsNothing() {
+        jdbcTemplate.update("DELETE FROM mcp_integration_instance_workflow");
+
+        assertThat(connectedUserMcpServerFacade.getConnectedUserMcpServers(connectedUserId))
+            .extracting(ConnectedUserMcpServerDTO::name)
+            .containsExactly("Google");
+    }
+
+    @Test
+    public void testDisabledLinkIsNotListed() {
+        jdbcTemplate.update(
+            "UPDATE mcp_integration_instance_configuration_workflow SET enabled = false WHERE id = ?",
+            getLinkId(sendEmailMcpWorkflowId));
+
+        ConnectedUserMcpServerDTO workflowsConnectedUserMcpServer =
+            connectedUserMcpServerFacade.getConnectedUserMcpServers(connectedUserId)
+                .get(1);
+
+        assertThat(workflowsConnectedUserMcpServer.workflows())
+            .extracting(ConnectedUserMcpServerWorkflowDTO::workflowId)
+            .containsExactly(ARCHIVE_EMAIL_WORKFLOW_ID);
+    }
+
+    @Test
+    public void testDeleteRemovesAServerThatExposesWorkflows() {
+        long otherConnectedUserId = insert(
+            """
+                INSERT INTO connected_user (external_id, enabled, environment, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES ('user-2', true, 0, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """);
+        long otherIntegrationInstanceId = insert(
+            """
+                INSERT INTO integration_instance (integration_instance_configuration_id, connected_user_id,
+                    connection_id, enabled, created_date, created_by, last_modified_date, last_modified_by, version)
+                VALUES (?, ?, ?, true, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            integrationInstanceConfigurationId, otherConnectedUserId, connectionId);
+
+        mcpIntegrationInstanceWorkflowService.createMcpIntegrationInstanceWorkflow(
+            otherIntegrationInstanceId, getLinkId(sendEmailMcpWorkflowId), true);
+
+        assertThat(
+            connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, workflowsMcpServer.getId()))
+                .isTrue();
+
+        assertThat(connectedUserMcpServerFacade.getConnectedUserMcpServers(connectedUserId))
+            .extracting(ConnectedUserMcpServerDTO::name)
+            .containsExactly("Google");
+        assertThat(getInstanceWorkflowEnabled(SEND_EMAIL_WORKFLOW_ID)).containsExactly(true);
+        assertThat(
+            mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(otherIntegrationInstanceId))
+                .hasSize(1);
+        assertThat(connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId))
+            .extracting(
+                ProvisionableConnectedUserMcpServerDTO::name, ProvisionableConnectedUserMcpServerDTO::provisioned)
+            .containsExactly(tuple("Google", true), tuple("Workflows only", false));
+    }
+
+    @Test
+    public void testEnableMcpWorkflowFlipsOnlyTheRow() {
+        connectedUserMcpServerFacade.enableMcpWorkflow(sendEmailMcpWorkflowId, false);
+
+        assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflow(sendEmailMcpWorkflowId)
+            .isEnabled()).isFalse();
+        assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflow(archiveEmailMcpWorkflowId)
+            .isEnabled()).isFalse();
+        assertThat(getInstanceWorkflowEnabled(SEND_EMAIL_WORKFLOW_ID)).containsExactly(true);
+        assertThat(findSingleEventData(ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_WORKFLOW_ENABLED_UPDATED))
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("mcpIntegrationInstanceWorkflowId", String.valueOf(sendEmailMcpWorkflowId))
+            .containsEntry("enabled", "false");
+    }
+
+    @Test
+    public void testGetProvisionableMcpServersSkipsDisabledLinks() {
+        jdbcTemplate.update("UPDATE mcp_integration_instance_configuration_workflow SET enabled = false");
+
+        assertThat(connectedUserMcpServerFacade.getProvisionableMcpServers(connectedUserId))
+            .extracting(
+                ProvisionableConnectedUserMcpServerDTO::name,
+                ProvisionableConnectedUserMcpServerDTO::coveredComponentNames)
+            .containsExactly(tuple("Google", List.of("gmail")), tuple("Workflows only", List.of()));
     }
 
     @Test
@@ -310,9 +407,8 @@ public class ConnectedUserMcpServerFacadeIntTest {
 
         assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
             .allSatisfy(mcpIntegrationInstanceTool -> assertThat(mcpIntegrationInstanceTool.isEnabled()).isTrue());
-
-        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
-            anyLong(), anyString(), eq(true));
+        assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflow(archiveEmailMcpWorkflowId)
+            .isEnabled()).isFalse();
     }
 
     @Test
@@ -401,9 +497,6 @@ public class ConnectedUserMcpServerFacadeIntTest {
                     ConfigurationException.class,
                     configurationException -> assertThat(configurationException.getErrorKey())
                         .isEqualTo(ConnectedUserMcpServerErrorType.NO_COVERED_INTEGRATION.getErrorKey()));
-
-        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
-            anyLong(), anyString(), eq(true));
     }
 
     @Test
@@ -503,15 +596,26 @@ public class ConnectedUserMcpServerFacadeIntTest {
     }
 
     @Test
-    public void testProvisionMcpServerEnablesConfigurationWorkflows() {
+    public void testProvisionMcpServerEnablesRowsAndCreatesMissingInstanceWorkflowsDisabled() {
+        connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, workflowsMcpServer.getId());
+
+        jdbcTemplate.update(
+            """
+                DELETE FROM integration_instance_workflow
+                WHERE integration_instance_configuration_workflow_id IN (
+                    SELECT id FROM integration_instance_configuration_workflow WHERE workflow_id = ?)
+                """,
+            ARCHIVE_EMAIL_WORKFLOW_ID);
+
         connectedUserMcpServerFacade.provisionMcpServer(connectedUserId, workflowsMcpServer.getId());
 
-        verify(integrationInstanceFacade).enableIntegrationInstanceWorkflow(
-            integrationInstanceId, ARCHIVE_EMAIL_WORKFLOW_ID, true);
-        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
-            anyLong(), eq(SEND_EMAIL_WORKFLOW_ID), eq(true));
-        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
-            anyLong(), eq(HIDDEN_WORKFLOW_ID), eq(true));
+        assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
+            .hasSize(2)
+            .allSatisfy(mcpIntegrationInstanceWorkflow -> assertThat(mcpIntegrationInstanceWorkflow.isEnabled())
+                .isTrue());
+        assertThat(getInstanceWorkflowEnabled(ARCHIVE_EMAIL_WORKFLOW_ID)).containsExactly(false);
+        assertThat(getInstanceWorkflowEnabled(SEND_EMAIL_WORKFLOW_ID)).containsExactly(true);
+        assertThat(getInstanceWorkflowEnabled(HIDDEN_WORKFLOW_ID)).containsExactly(true);
     }
 
     @Test
@@ -530,8 +634,6 @@ public class ConnectedUserMcpServerFacadeIntTest {
 
         assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
             .hasSize(2);
-        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
-            anyLong(), anyString(), eq(true));
     }
 
     @Test
@@ -557,8 +659,6 @@ public class ConnectedUserMcpServerFacadeIntTest {
 
         assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
             .hasSize(2);
-        verify(integrationInstanceFacade, never()).enableIntegrationInstanceWorkflow(
-            anyLong(), anyString(), eq(true));
     }
 
     @Test
@@ -665,7 +765,28 @@ public class ConnectedUserMcpServerFacadeIntTest {
         return EmbeddedMcpAuditIntTestConfiguration.findSingleEventData(persistenceAuditEventRepository, eventType);
     }
 
-    private void insertMcpWorkflow(
+    private List<Boolean> getInstanceWorkflowEnabled(String workflowId) {
+        return jdbcTemplate.queryForList(
+            """
+                SELECT integration_instance_workflow.enabled
+                FROM integration_instance_workflow
+                JOIN integration_instance_configuration_workflow
+                    ON integration_instance_configuration_workflow.id =
+                        integration_instance_workflow.integration_instance_configuration_workflow_id
+                WHERE integration_instance_workflow.integration_instance_id = ?
+                AND integration_instance_configuration_workflow.workflow_id = ?
+                """,
+            Boolean.class, integrationInstanceId, workflowId);
+    }
+
+    private long getLinkId(long mcpIntegrationInstanceWorkflowId) {
+        McpIntegrationInstanceWorkflow mcpIntegrationInstanceWorkflow =
+            mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflow(mcpIntegrationInstanceWorkflowId);
+
+        return mcpIntegrationInstanceWorkflow.getMcpIntegrationInstanceConfigurationWorkflowId();
+    }
+
+    private long insertMcpWorkflow(
         String workflowId, String label, String description, String toolParameters, boolean configurationEnabled,
         boolean userEnabled, long integrationInstanceConfigurationId, long mcpIntegrationInstanceConfigurationId) {
 
@@ -696,18 +817,25 @@ public class ConnectedUserMcpServerFacadeIntTest {
                 INSERT INTO integration_instance_workflow (integration_instance_id,
                     integration_instance_configuration_workflow_id, inputs, enabled, created_date, created_by,
                     last_modified_date, last_modified_by, version)
-                VALUES (?, ?, '{}', ?, now(), 'system', now(), 'system', 0)
+                VALUES (?, ?, '{}', true, now(), 'system', now(), 'system', 0)
                 """,
-            integrationInstanceId, integrationInstanceConfigurationWorkflowId, userEnabled);
+            integrationInstanceId, integrationInstanceConfigurationWorkflowId);
 
-        jdbcTemplate.update(
+        long mcpIntegrationInstanceConfigurationWorkflowId = insert(
             """
                 INSERT INTO mcp_integration_instance_configuration_workflow (mcp_integration_instance_configuration_id,
                     integration_instance_configuration_workflow_id, parameters, created_date, created_by,
                     last_modified_date, last_modified_by, version)
                 VALUES (?, ?, ?, now(), 'system', now(), 'system', 0)
+                RETURNING id
                 """,
             mcpIntegrationInstanceConfigurationId, integrationInstanceConfigurationWorkflowId, toolParameters);
+
+        McpIntegrationInstanceWorkflow mcpIntegrationInstanceWorkflow =
+            mcpIntegrationInstanceWorkflowService.createMcpIntegrationInstanceWorkflow(
+                integrationInstanceId, mcpIntegrationInstanceConfigurationWorkflowId, userEnabled);
+
+        return mcpIntegrationInstanceWorkflow.getId();
     }
 
     private void saveMcpComponentWithTool(String componentName, McpServer mcpServer) {
@@ -729,8 +857,9 @@ public class ConnectedUserMcpServerFacadeIntTest {
         IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceServiceImpl.class,
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationServiceImpl.class,
-        McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpServerServiceImpl.class,
-        WorkflowServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class
+        McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceRowsImpl.class,
+        McpServerServiceImpl.class, WorkflowServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class,
+        IntegrationWorkflowServiceImpl.class
     })
     static class FacadeIntTestConfiguration {
     }

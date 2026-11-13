@@ -100,6 +100,15 @@ public class McpIntegrationInstanceConfigurationWorkflowServiceImpl
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<McpIntegrationInstanceConfigurationWorkflow> getMcpIntegrationInstanceConfigurationWorkflows(
+        long integrationInstanceConfigurationId, String workflowId) {
+
+        return mcpIntegrationInstanceConfigurationWorkflowRepository
+            .findAllByIntegrationInstanceConfigurationIdAndWorkflowId(integrationInstanceConfigurationId, workflowId);
+    }
+
+    @Override
     public McpIntegrationInstanceConfigurationWorkflow
         update(McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow) {
         McpIntegrationInstanceConfigurationWorkflow currentMcpIntegrationInstanceConfigurationWorkflow =

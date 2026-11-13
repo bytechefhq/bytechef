@@ -19,6 +19,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -66,7 +67,8 @@ class EmbeddedMcpServerConfigurationIntTest {
         JobCompletionAwaiter.class, JwtTokenService.class, McpComponentService.class,
         McpIntegrationComponentService.class, McpIntegrationInstanceConfigurationService.class,
         McpIntegrationInstanceConfigurationWorkflowService.class,
-        McpIntegrationInstanceToolService.class, McpServerService.class, McpToolService.class,
+        McpIntegrationInstanceToolService.class, McpIntegrationInstanceWorkflowService.class, McpServerService.class,
+        McpToolService.class,
         PrincipalJobFacade.class, SigningKeyService.class, TaskExecutionService.class, WorkflowService.class);
 
     @AfterEach

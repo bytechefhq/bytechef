@@ -7,6 +7,7 @@ extend type Mutation {
     deleteConnectedUserMcpServer(connectedUserId: ID!, mcpServerId: ID!): Boolean
     enableConnectedUserMcpServer(connectedUserId: ID!, mcpServerId: ID!, enable: Boolean!): Boolean
     enableConnectedUserMcpTool(id: ID!, enable: Boolean!): Boolean
+    enableConnectedUserMcpWorkflow(id: ID!, enable: Boolean!): Boolean
     provisionConnectedUserMcpServer(connectedUserId: ID!, mcpServerId: ID!): Boolean
 }
 
@@ -38,6 +39,7 @@ type ConnectedUserMcpServerTool {
 }
 
 type ConnectedUserMcpServerWorkflow {
+    id: ID!
     integrationInstanceId: ID!
     componentName: String!
     integrationVersion: Int!

@@ -13,7 +13,9 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.ee.embedded.ai.mcp.event.McpToolBeforeDeleteEventListener;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentServiceImpl;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolServiceImpl;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowServiceImpl;
 import com.bytechef.ee.embedded.configuration.ownership.EmbeddedOwnerContributorConfiguration;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserSecurity;
 import com.bytechef.encryption.Encryption;
@@ -46,7 +48,8 @@ import tools.jackson.databind.ObjectMapper;
 @Import({
     ConnectedUserSecurity.class, EmbeddedOwnerContributorConfiguration.class, EncryptionImpl.class,
     JacksonConfiguration.class, LiquibaseConfiguration.class, McpIntegrationComponentServiceImpl.class,
-    McpIntegrationInstanceToolServiceImpl.class, McpToolBeforeDeleteEventListener.class, McpToolServiceImpl.class,
+    McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolServiceImpl.class,
+    McpIntegrationInstanceWorkflowServiceImpl.class, McpToolBeforeDeleteEventListener.class, McpToolServiceImpl.class,
     PostgreSQLContainerConfiguration.class
 })
 @EnableAutoConfiguration

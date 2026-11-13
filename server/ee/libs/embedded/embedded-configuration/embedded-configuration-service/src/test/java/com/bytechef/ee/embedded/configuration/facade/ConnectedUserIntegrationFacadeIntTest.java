@@ -24,6 +24,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -50,10 +51,13 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -183,6 +187,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     JobFacade.class, JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class,
     McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
+    McpIntegrationInstanceWorkflowService.class, McpIntegrationInstanceRows.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectFacade.class,
     TaskDispatcherDefinitionService.class, TaskExecutionService.class,
@@ -195,7 +200,16 @@ class ConnectedUserIntegrationFacadeIntTest {
 
     private static final long CONNECTION_ID = 42L;
     private static final long MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID = 501L;
+    private static final long MCP_INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ID = 701L;
     private static final long MCP_SERVER_ID = 601L;
+
+    private static final String MULTI_TRIGGER_WORKFLOW_DEFINITION = """
+        {"label":"%s","triggers":[{"name":"trigger_1","type":"workflow/v1/newWorkflowCall","parameters":{}},\
+        {"name":"trigger_2","type":"slack/v1/newMessage","parameters":{}}],"tasks":[]}""";
+
+    private static final String TOOL_ONLY_WORKFLOW_DEFINITION = """
+        {"label":"%s","triggers":[{"name":"trigger_1","type":"workflow/v1/newWorkflowCall","parameters":{}}],\
+        "tasks":[]}""";
 
     private static final String TRIGGER_WORKFLOW_DEFINITION = """
         {"label":"%s","triggers":[{"name":"trigger_1","type":"slack/v1/newMessage","parameters":{}}],\
@@ -239,6 +253,12 @@ class ConnectedUserIntegrationFacadeIntTest {
 
     @Autowired
     private McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
+
+    @Autowired
+    private McpIntegrationInstanceRows mcpIntegrationInstanceRows;
+
+    @Autowired
+    private McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
 
     @Autowired
     private McpServerService mcpServerService;
@@ -543,9 +563,12 @@ class ConnectedUserIntegrationFacadeIntTest {
     private void exposeAsMcpWorkflow(
         long integrationId, long integrationInstanceConfigurationId, IntegrationWorkflow mcpIntegrationWorkflow) {
 
-        IntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
-            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                integrationInstanceConfigurationId, mcpIntegrationWorkflow.getWorkflowId());
+        exposeAsMcpWorkflows(integrationId, integrationInstanceConfigurationId, List.of(mcpIntegrationWorkflow));
+    }
+
+    private void exposeAsMcpWorkflows(
+        long integrationId, long integrationInstanceConfigurationId,
+        List<IntegrationWorkflow> mcpIntegrationWorkflows) {
 
         when(mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurationsByIntegrationId(
             integrationId))
@@ -553,15 +576,35 @@ class ConnectedUserIntegrationFacadeIntTest {
                     new McpIntegrationInstanceConfiguration(
                         MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, integrationInstanceConfigurationId,
                         MCP_SERVER_ID)));
+        when(mcpIntegrationInstanceConfigurationService
+            .getMcpIntegrationInstanceConfigurationsByIntegrationInstanceConfigurationId(
+                integrationInstanceConfigurationId))
+                    .thenReturn(List.of(
+                        new McpIntegrationInstanceConfiguration(
+                            MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, integrationInstanceConfigurationId,
+                            MCP_SERVER_ID)));
         when(mcpServerService.getMcpServer(MCP_SERVER_ID))
             .thenReturn(new McpServer("embedded-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true));
+
+        List<McpIntegrationInstanceConfigurationWorkflow> links = new ArrayList<>();
+
+        for (IntegrationWorkflow mcpIntegrationWorkflow : mcpIntegrationWorkflows) {
+            IntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                    integrationInstanceConfigurationId, mcpIntegrationWorkflow.getWorkflowId());
+
+            McpIntegrationInstanceConfigurationWorkflow link = new McpIntegrationInstanceConfigurationWorkflow(
+                MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, mcpIntegrationInstanceConfigurationWorkflow.getId());
+
+            link.setId(MCP_INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ID + links.size());
+
+            links.add(link);
+        }
+
         when(mcpIntegrationInstanceConfigurationWorkflowService
             .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
                 MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID))
-                    .thenReturn(List.of(
-                        new McpIntegrationInstanceConfigurationWorkflow(
-                            MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID,
-                            mcpIntegrationInstanceConfigurationWorkflow.getId())));
+                    .thenReturn(links);
     }
 
     @Nested
@@ -710,6 +753,94 @@ class ConnectedUserIntegrationFacadeIntTest {
         }
 
         @Test
+        void testConnectCallsAddMissingRowsForIntegrationInstance() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long integrationId = createIntegrationRow(null);
+
+            createIntegrationInstanceConfiguration(integrationId, 1, AuthorizationType.API_KEY);
+
+            stubConnectionCreation();
+
+            IntegrationInstance integrationInstance = connectedUserIntegrationFacade.createIntegrationInstance(
+                externalUserId, integrationId, Map.of(), Environment.PRODUCTION);
+
+            verify(mcpIntegrationInstanceRows).addMissingRowsForIntegrationInstance(integrationInstance.getId());
+        }
+
+        @Test
+        void testInstanceMcpWorkflowIsEnabledByItsRowAndKeepsTheInstanceWorkflowInputs() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            stubSlackConnectionDefinition();
+            stubConnection();
+
+            long integrationId = createIntegrationRow(null);
+            long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+                integrationId, 1, AuthorizationType.API_KEY);
+
+            IntegrationWorkflow mcpIntegrationWorkflow = addWorkflowWithDefinition(
+                TOOL_ONLY_WORKFLOW_DEFINITION.formatted("tool-only"), integrationId,
+                integrationInstanceConfigurationId, 1, true, null);
+
+            exposeAsMcpWorkflow(integrationId, integrationInstanceConfigurationId, mcpIntegrationWorkflow);
+
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+                externalUserId, Environment.PRODUCTION);
+
+            IntegrationInstance integrationInstance = integrationInstanceService.create(
+                connectedUser.getId(), CONNECTION_ID, integrationInstanceConfigurationId);
+
+            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                    integrationInstanceConfigurationId, mcpIntegrationWorkflow.getWorkflowId());
+
+            IntegrationInstanceWorkflow integrationInstanceWorkflow =
+                integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
+                    integrationInstance.getId(), integrationInstanceConfigurationWorkflow.getId());
+
+            integrationInstanceWorkflow.setInputs(Map.of("channel", "#ops"));
+
+            integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
+
+            assertThat(getInstanceMcpWorkflows(externalUserId, integrationId))
+                .extracting(
+                    mcpInstanceWorkflow -> mcpInstanceWorkflow.integrationInstanceWorkflow()
+                        .isEnabled())
+                .containsExactly(false);
+
+            when(mcpIntegrationInstanceWorkflowService.fetchMcpIntegrationInstanceWorkflow(
+                integrationInstance.getId(), MCP_INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ID))
+                    .thenReturn(
+                        Optional.of(
+                            new McpIntegrationInstanceWorkflow(
+                                integrationInstance.getId(), MCP_INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_ID,
+                                true)));
+
+            List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow> mcpInstanceWorkflows =
+                getInstanceMcpWorkflows(externalUserId, integrationId);
+
+            assertThat(mcpInstanceWorkflows).hasSize(1);
+
+            ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow mcpInstanceWorkflow =
+                mcpInstanceWorkflows.getFirst();
+
+            IntegrationInstanceWorkflow listedIntegrationInstanceWorkflow =
+                mcpInstanceWorkflow.integrationInstanceWorkflow();
+
+            Map<String, ?> inputs = listedIntegrationInstanceWorkflow.getInputs();
+
+            assertThat(mcpInstanceWorkflow.workflowUuid()).isEqualTo(mcpIntegrationWorkflow.getUuidAsString());
+            assertThat(listedIntegrationInstanceWorkflow.isEnabled()).isTrue();
+            assertThat(inputs.get("channel")).isEqualTo("#ops");
+            assertThat(
+                integrationInstanceWorkflowService.getIntegrationInstanceWorkflow(
+                    integrationInstance.getId(), mcpIntegrationWorkflow.getWorkflowId())
+                    .isEnabled())
+                        .isFalse();
+        }
+
+        @Test
         void testSelfServeConnectionCarriesTheConfigurationAuthorizationType() {
             String externalUserId = createConnectedUser(Map.of());
 
@@ -771,24 +902,6 @@ class ConnectedUserIntegrationFacadeIntTest {
                 integrationId, targetConfigurationId, 2, "mcp-target", workflowUuid);
 
             exposeAsMcpWorkflow(integrationId, targetConfigurationId, targetIntegrationWorkflow);
-
-            IntegrationInstanceConfigurationWorkflow targetConfigurationWorkflow =
-                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                    targetConfigurationId, targetIntegrationWorkflow.getWorkflowId());
-
-            when(mcpIntegrationInstanceConfigurationWorkflowService
-                .fetchMcpIntegrationInstanceConfigurationWorkflowByIntegrationInstanceConfigurationWorkflowId(
-                    targetConfigurationWorkflow.getId()))
-                        .thenReturn(
-                            Optional.of(
-                                new McpIntegrationInstanceConfigurationWorkflow(
-                                    MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, targetConfigurationWorkflow.getId())));
-            when(mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(
-                MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID))
-                    .thenReturn(
-                        Optional.of(
-                            new McpIntegrationInstanceConfiguration(
-                                MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, targetConfigurationId, MCP_SERVER_ID)));
 
             ConnectedUser connectedUser = connectedUserService.getConnectedUser(
                 externalUserId, Environment.PRODUCTION);
@@ -860,6 +973,39 @@ class ConnectedUserIntegrationFacadeIntTest {
                 .containsExactly(mcpIntegrationWorkflow.getUuidAsString());
 
             assertThat(getVisibleWorkflowUuids(externalUserId, integrationId)).containsExactly(visibleWorkflowUuid);
+        }
+
+        @Test
+        void testMultiTriggerMcpWorkflowIsListedAndMarked() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long integrationId = createIntegrationRow(null);
+            long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integrationId, 1);
+
+            IntegrationWorkflow multiTriggerIntegrationWorkflow = addWorkflowWithDefinition(
+                MULTI_TRIGGER_WORKFLOW_DEFINITION.formatted("multi-trigger"), integrationId,
+                integrationInstanceConfigurationId, 1, true, null);
+            IntegrationWorkflow toolOnlyIntegrationWorkflow = addWorkflowWithDefinition(
+                TOOL_ONLY_WORKFLOW_DEFINITION.formatted("tool-only"), integrationId,
+                integrationInstanceConfigurationId, 1, true, null);
+
+            exposeAsMcpWorkflows(
+                integrationId, integrationInstanceConfigurationId,
+                List.of(multiTriggerIntegrationWorkflow, toolOnlyIntegrationWorkflow));
+
+            ConnectedUserIntegrationDTO connectedUserIntegrationDTO = getConnectedUserIntegration(
+                externalUserId, integrationId);
+
+            assertThat(connectedUserIntegrationDTO.mcpWorkflows())
+                .extracting(
+                    ConnectedUserIntegrationDTO.McpWorkflowInfo::workflowUuid,
+                    ConnectedUserIntegrationDTO.McpWorkflowInfo::toolOnly)
+                .containsExactlyInAnyOrder(
+                    tuple(multiTriggerIntegrationWorkflow.getUuidAsString(), false),
+                    tuple(toolOnlyIntegrationWorkflow.getUuidAsString(), true));
+
+            assertThat(getVisibleWorkflowUuids(externalUserId, integrationId))
+                .containsExactly(multiTriggerIntegrationWorkflow.getUuidAsString());
         }
 
         @Test
@@ -1150,6 +1296,15 @@ class ConnectedUserIntegrationFacadeIntTest {
         }
 
         private List<String> getInstanceMcpWorkflowUuids(String externalUserId, long integrationId) {
+            return getInstanceMcpWorkflows(externalUserId, integrationId)
+                .stream()
+                .map(ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow::workflowUuid)
+                .toList();
+        }
+
+        private List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow> getInstanceMcpWorkflows(
+            String externalUserId, long integrationId) {
+
             ConnectedUserIntegrationDTO connectedUserIntegrationDTO =
                 connectedUserIntegrationFacade.getConnectedUserIntegration(
                     externalUserId, integrationId, true, Environment.PRODUCTION);
@@ -1158,7 +1313,6 @@ class ConnectedUserIntegrationFacadeIntTest {
                 .stream()
                 .flatMap(connectedUserIntegrationInstance -> connectedUserIntegrationInstance.mcpWorkflows()
                     .stream())
-                .map(ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow::workflowUuid)
                 .toList();
         }
 
@@ -1182,8 +1336,17 @@ class ConnectedUserIntegrationFacadeIntTest {
             long integrationId, long integrationInstanceConfigurationId, int integrationVersion, String label,
             boolean enabled, String permissionExpression) {
 
+            return addWorkflowWithDefinition(
+                WORKFLOW_DEFINITION.formatted(label), integrationId, integrationInstanceConfigurationId,
+                integrationVersion, enabled, permissionExpression);
+        }
+
+        private IntegrationWorkflow addWorkflowWithDefinition(
+            String workflowDefinition, long integrationId, long integrationInstanceConfigurationId,
+            int integrationVersion, boolean enabled, String permissionExpression) {
+
             Workflow workflow = workflowService.create(
-                WORKFLOW_DEFINITION.formatted(label), Workflow.Format.JSON, Workflow.SourceType.JDBC);
+                workflowDefinition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
             IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
                 integrationId, integrationVersion, workflow.getId());
@@ -1633,6 +1796,7 @@ class ConnectedUserIntegrationFacadeIntTest {
 
             assertThat(provisionableIntegration.mcpWorkflowUuids())
                 .containsExactly(mcpIntegrationWorkflow.getUuidAsString());
+            assertThat(provisionableIntegration.toolOnlyMcpWorkflowUuids()).isEmpty();
 
             ProvisionableIntegrationInstanceConfiguration version1Configuration =
                 provisionableIntegration.integrationInstanceConfigurations()
@@ -1649,6 +1813,57 @@ class ConnectedUserIntegrationFacadeIntTest {
                     .integrationInstanceConfigurationWorkflows())
                         .extracting(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
                         .contains(mcpIntegrationWorkflow.getUuidAsString(), workflowUuidA, workflowUuidB);
+        }
+
+        @Test
+        void testToolOnlyMcpWorkflowIsLeftOutOfTheWorkflowList() {
+            IntegrationWorkflow toolOnlyIntegrationWorkflow = addConfigurationWorkflowWithDefinition(
+                TOOL_ONLY_WORKFLOW_DEFINITION.formatted("tool-only"), provisioningIntegrationId,
+                version1ConfigurationId, 1, null, true);
+
+            exposeAsMcpWorkflow(provisioningIntegrationId, version1ConfigurationId, toolOnlyIntegrationWorkflow);
+
+            ProvisionableIntegrationDTO provisionableIntegration = connectedUserIntegrationFacade
+                .getProvisionableIntegrations(connectedUserId)
+                .stream()
+                .filter(integration -> Objects.equals(
+                    integration.integration()
+                        .id(),
+                    provisioningIntegrationId))
+                .findFirst()
+                .orElseThrow();
+
+            assertThat(provisionableIntegration.mcpWorkflowUuids()).isEmpty();
+            assertThat(provisionableIntegration.toolOnlyMcpWorkflowUuids())
+                .containsExactly(toolOnlyIntegrationWorkflow.getUuidAsString());
+
+            ProvisionableIntegrationInstanceConfiguration version1Configuration =
+                provisionableIntegration.integrationInstanceConfigurations()
+                    .stream()
+                    .filter(configuration -> Objects.equals(
+                        configuration.integrationInstanceConfiguration()
+                            .id(),
+                        version1ConfigurationId))
+                    .findFirst()
+                    .orElseThrow();
+
+            assertThat(
+                version1Configuration.integrationInstanceConfiguration()
+                    .integrationInstanceConfigurationWorkflows())
+                        .extracting(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
+                        .containsExactlyInAnyOrder(workflowUuidA, workflowUuidB);
+        }
+
+        @Test
+        void testProvisionIntegrationCallsAddMissingRowsOnce() {
+            long instanceId = connectedUserIntegrationFacade.provisionIntegrationInstance(
+                connectedUserId, version1ConfigurationId, Map.of(),
+                List.of(
+                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidA, Map.of()),
+                    new ProvisionIntegrationInstanceWorkflowDTO(workflowUuidB, Map.of())),
+                "admin");
+
+            verify(mcpIntegrationInstanceRows, times(1)).addMissingRowsForIntegrationInstance(instanceId);
         }
 
         @Test
@@ -2207,8 +2422,17 @@ class ConnectedUserIntegrationFacadeIntTest {
             long integrationId, long integrationInstanceConfigurationId, int integrationVersion, String label,
             String permissionExpression, boolean enabled) {
 
+            return addConfigurationWorkflowWithDefinition(
+                TRIGGER_WORKFLOW_DEFINITION.formatted(label), integrationId, integrationInstanceConfigurationId,
+                integrationVersion, permissionExpression, enabled);
+        }
+
+        private IntegrationWorkflow addConfigurationWorkflowWithDefinition(
+            String workflowDefinition, long integrationId, long integrationInstanceConfigurationId,
+            int integrationVersion, String permissionExpression, boolean enabled) {
+
             Workflow workflow = workflowService.create(
-                TRIGGER_WORKFLOW_DEFINITION.formatted(label), Workflow.Format.JSON, Workflow.SourceType.JDBC);
+                workflowDefinition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
             IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
                 integrationId, integrationVersion, workflow.getId());

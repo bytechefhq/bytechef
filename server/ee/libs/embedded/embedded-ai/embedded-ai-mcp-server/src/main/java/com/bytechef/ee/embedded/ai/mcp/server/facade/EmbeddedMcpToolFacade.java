@@ -24,14 +24,15 @@ import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationComponent;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
-import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -120,6 +121,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private final McpComponentService mcpComponentService;
     private final McpIntegrationComponentService mcpIntegrationComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
+    private final McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
     private final McpServerService mcpServerService;
@@ -143,6 +145,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         McpComponentService mcpComponentService, McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
+        McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService,
         McpServerService mcpServerService, PrincipalJobFacade principalJobFacade, String publicUrl,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
         ExternalInvocationRecorder externalInvocationRecorder, WorkflowService workflowService) {
@@ -163,6 +166,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.mcpIntegrationComponentService = mcpIntegrationComponentService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
+        this.mcpIntegrationInstanceWorkflowService = mcpIntegrationInstanceWorkflowService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
         this.mcpServerService = mcpServerService;
         this.principalJobFacade = principalJobFacade;
@@ -255,7 +259,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 environment);
 
             if (integrationInstanceId != null &&
-                !isWorkflowEnabled(integrationInstanceId, mcpIntegrationInstanceConfigurationWorkflow.getId())) {
+                !isWorkflowEnabled(integrationInstanceId, mcpIntegrationInstanceConfigurationWorkflow)) {
                 continue;
             }
 
@@ -609,15 +613,21 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             .orElse(false);
     }
 
-    private boolean isWorkflowEnabled(long integrationInstanceId, long mcpIntegrationInstanceConfigurationWorkflowId) {
-        return mcpIntegrationInstanceConfigurationWorkflowService
-            .fetchMcpIntegrationInstanceConfigurationWorkflow(mcpIntegrationInstanceConfigurationWorkflowId)
-            .map(mcpConfigWorkflow -> integrationInstanceWorkflowService
-                .fetchIntegrationInstanceWorkflow(
-                    integrationInstanceId, mcpConfigWorkflow.getIntegrationInstanceConfigurationWorkflowId())
-                .map(IntegrationInstanceWorkflow::isEnabled)
-                .orElse(false))
+    private boolean isWorkflowEnabled(
+        long integrationInstanceId,
+        McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow) {
+
+        boolean mcpWorkflowEnabled = mcpIntegrationInstanceWorkflowService
+            .fetchMcpIntegrationInstanceWorkflow(integrationInstanceId,
+                mcpIntegrationInstanceConfigurationWorkflow.getId())
+            .map(McpIntegrationInstanceWorkflow::isEnabled)
             .orElse(false);
+
+        return mcpWorkflowEnabled && integrationInstanceWorkflowService
+            .fetchIntegrationInstanceWorkflow(
+                integrationInstanceId,
+                mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId())
+            .isPresent();
     }
 
     private Map<String, Object> getConnectionRequiredResponse(

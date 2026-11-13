@@ -31,6 +31,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
@@ -216,6 +217,9 @@ class IntegrationInstanceConfigurationFacadeIntTest {
 
     @Autowired
     private McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
+
+    @Autowired
+    private McpIntegrationInstanceRows mcpIntegrationInstanceRows;
 
     @Autowired
     private TriggerLifecycleFacade triggerLifecycleFacade;
@@ -802,6 +806,67 @@ class IntegrationInstanceConfigurationFacadeIntTest {
             .executeTriggerEnable(
                 eq(moveFixture.targetWorkflowId()), any(), any(),
                 argThat(parameters -> hasExpression(parameters, NEW_CRON_EXPRESSION)), any(), any(), anyLong());
+    }
+
+    @Test
+    void testEnabledConfigurationWorkflowReachesUsersWithItsMcpServers() {
+        CronFixture cronFixture = createCronFixture(List.of());
+
+        authenticate(admin());
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            getConfigurationWorkflow(cronFixture);
+
+        integrationInstanceConfigurationFacade.enableIntegrationInstanceConfigurationWorkflow(
+            cronFixture.integrationInstanceConfigurationId(), integrationInstanceConfigurationWorkflow.getWorkflowId(),
+            false);
+
+        verify(mcpIntegrationInstanceRows, never()).addMissingRowsForIntegrationInstanceConfiguration(anyLong());
+
+        integrationInstanceConfigurationFacade.enableIntegrationInstanceConfigurationWorkflow(
+            cronFixture.integrationInstanceConfigurationId(), integrationInstanceConfigurationWorkflow.getWorkflowId(),
+            true);
+
+        verify(mcpIntegrationInstanceRows).addMissingRowsForIntegrationInstanceConfiguration(
+            cronFixture.integrationInstanceConfigurationId());
+    }
+
+    @Test
+    void testUpdatedConfigurationReachesUsersWithItsMcpServers() {
+        CronFixture cronFixture = createCronFixture(List.of());
+
+        authenticate(admin());
+
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfiguration(
+            integrationInstanceConfigurationFacade.getIntegrationInstanceConfiguration(
+                cronFixture.integrationInstanceConfigurationId()));
+
+        verify(mcpIntegrationInstanceRows).addMissingRowsForIntegrationInstanceConfiguration(
+            cronFixture.integrationInstanceConfigurationId());
+    }
+
+    @Test
+    void testMoveConnectedUsersRemapsMcpRows() {
+        MoveFixture moveFixture = createMoveFixture(true, AuthorizationType.API_KEY);
+
+        authenticate(admin());
+
+        integrationInstanceConfigurationFacade.moveConnectedUsers(
+            moveFixture.sourceConfigurationId(), moveFixture.targetConfigurationId(), List.of(CONNECTED_USER_ID));
+
+        verify(mcpIntegrationInstanceRows).remapIntegrationInstance(moveFixture.integrationInstanceId());
+    }
+
+    @Test
+    void testSkippedMoveLeavesMcpRowsAlone() {
+        MoveFixture moveFixture = createMoveFixture(false, AuthorizationType.API_KEY);
+
+        authenticate(admin());
+
+        integrationInstanceConfigurationFacade.moveConnectedUsers(
+            moveFixture.sourceConfigurationId(), moveFixture.targetConfigurationId(), List.of(CONNECTED_USER_ID));
+
+        verify(mcpIntegrationInstanceRows, never()).remapIntegrationInstance(anyLong());
     }
 
     @Test

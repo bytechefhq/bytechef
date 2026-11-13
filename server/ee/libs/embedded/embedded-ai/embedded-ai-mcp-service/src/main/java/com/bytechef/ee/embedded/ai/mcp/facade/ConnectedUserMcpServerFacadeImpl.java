@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.ai.mcp.audit.ConnectedUserMcpServerAuditMapper;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerToolDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerWorkflowDTO;
@@ -24,16 +25,14 @@ import com.bytechef.ee.embedded.ai.mcp.exception.ConnectedUserMcpServerErrorType
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
-import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
-import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
-import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -82,15 +81,15 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     private final ConnectedUserService connectedUserService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
-    private final IntegrationInstanceFacade integrationInstanceFacade;
     private final IntegrationInstanceService integrationInstanceService;
-    private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationService integrationService;
     private final JobService jobService;
     private final McpComponentService mcpComponentService;
     private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
+    private final McpIntegrationInstanceRows mcpIntegrationInstanceRows;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
+    private final McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
     private final McpServerService mcpServerService;
     private final McpToolService mcpToolService;
     private final PrincipalJobService principalJobService;
@@ -101,26 +100,27 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         ConnectedUserService connectedUserService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationInstanceFacade integrationInstanceFacade, IntegrationInstanceService integrationInstanceService,
-        IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
+        IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
         JobService jobService, McpComponentService mcpComponentService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
-        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
+        McpIntegrationInstanceRows mcpIntegrationInstanceRows,
+        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
+        McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService, McpServerService mcpServerService,
         McpToolService mcpToolService, PrincipalJobService principalJobService, WorkflowService workflowService) {
 
         this.connectedUserService = connectedUserService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
-        this.integrationInstanceFacade = integrationInstanceFacade;
         this.integrationInstanceService = integrationInstanceService;
-        this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationService = integrationService;
         this.jobService = jobService;
         this.mcpComponentService = mcpComponentService;
         this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
+        this.mcpIntegrationInstanceRows = mcpIntegrationInstanceRows;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
+        this.mcpIntegrationInstanceWorkflowService = mcpIntegrationInstanceWorkflowService;
         this.mcpServerService = mcpServerService;
         this.mcpToolService = mcpToolService;
         this.principalJobService = principalJobService;
@@ -136,9 +136,6 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         })
     @PreAuthorize("isTenantAdmin()")
     public boolean deleteConnectedUserMcpServer(long connectedUserId, long mcpServerId) {
-        // Remove every per-user tool row whose underlying McpComponent points at the given server.
-        // Since the read query rebuilds the (server -> tools) shape from these rows, removing them
-        // makes the server vanish from this user's MCP Servers tab without any soft-delete flag.
         Map<Long, McpComponent> mcpComponentCache = new HashMap<>();
         boolean deleted = false;
 
@@ -166,6 +163,14 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
                 }
 
                 mcpIntegrationInstanceToolService.delete(toolRow.getId());
+
+                deleted = true;
+            }
+
+            for (McpIntegrationInstanceWorkflow mcpIntegrationInstanceWorkflow : getMcpIntegrationInstanceWorkflows(
+                integrationInstance.getId(), mcpServerId)) {
+
+                mcpIntegrationInstanceWorkflowService.delete(mcpIntegrationInstanceWorkflow.getId());
 
                 deleted = true;
             }
@@ -209,18 +214,14 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
 
                 mcpIntegrationInstanceToolService.updateEnabled(toolRow.getId(), enable);
             }
-        }
 
-        Map<Long, List<ConnectedUserMcpServerWorkflowDTO>> workflowsByServerId = getWorkflowsByMcpServerId(
-            integrationInstances);
+            for (McpIntegrationInstanceWorkflow mcpIntegrationInstanceWorkflow : getMcpIntegrationInstanceWorkflows(
+                integrationInstance.getId(), mcpServerId)) {
 
-        for (ConnectedUserMcpServerWorkflowDTO workflow : workflowsByServerId.getOrDefault(mcpServerId, List.of())) {
-            if (workflow.enabled() == enable) {
-                continue;
+                if (mcpIntegrationInstanceWorkflow.isEnabled() != enable) {
+                    mcpIntegrationInstanceWorkflowService.updateEnabled(mcpIntegrationInstanceWorkflow.getId(), enable);
+                }
             }
-
-            integrationInstanceFacade.enableIntegrationInstanceWorkflow(
-                workflow.integrationInstanceId(), workflow.workflowId(), enable);
         }
     }
 
@@ -232,6 +233,16 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     @PreAuthorize("isTenantAdmin()")
     public void enableMcpTool(long mcpIntegrationInstanceToolId, boolean enable) {
         mcpIntegrationInstanceToolService.updateEnabled(mcpIntegrationInstanceToolId, enable);
+    }
+
+    @Override
+    @Audited(event = ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_WORKFLOW_ENABLED_UPDATED, data = {
+        @AuditData(key = "mcpIntegrationInstanceWorkflowId", value = "#mcpIntegrationInstanceWorkflowId"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
+    @PreAuthorize("isTenantAdmin()")
+    public void enableMcpWorkflow(long mcpIntegrationInstanceWorkflowId, boolean enable) {
+        mcpIntegrationInstanceWorkflowService.updateEnabled(mcpIntegrationInstanceWorkflowId, enable);
     }
 
     @Override
@@ -370,54 +381,43 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
                 ConnectedUserMcpServerErrorType.NO_COVERED_INTEGRATION);
         }
 
-        List<IntegrationInstance> integrationInstances = integrationInstanceService
-            .getConnectedUserIntegrationInstances(connectedUserId);
-
-        Map<Long, String> componentNamesByInstanceConfigurationId = new HashMap<>();
-
-        for (McpComponent mcpComponent : mcpComponentService.getMcpServerMcpComponents(mcpServerId)) {
-            for (McpTool mcpTool : mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())) {
-                if (!mcpTool.isEnabled()) {
-                    continue;
-                }
-
-                for (IntegrationInstance integrationInstance : integrationInstances) {
-                    String componentName = componentNamesByInstanceConfigurationId.computeIfAbsent(
-                        integrationInstance.getIntegrationInstanceConfigurationId(), this::getComponentName);
-
-                    if (!componentName.equals(mcpComponent.getComponentName())) {
-                        continue;
-                    }
-
-                    enableMcpIntegrationInstanceTool(integrationInstance.getId(),
-                        Objects.requireNonNull(mcpTool.getId()));
-                }
-            }
-        }
-
-        Map<Long, List<ConnectedUserMcpServerWorkflowDTO>> workflowsByServerId = getWorkflowsByMcpServerId(
-            integrationInstances);
-
-        for (ConnectedUserMcpServerWorkflowDTO workflow : workflowsByServerId.getOrDefault(mcpServerId, List.of())) {
-            if (workflow.enabled()) {
-                continue;
-            }
-
-            integrationInstanceFacade.enableIntegrationInstanceWorkflow(
-                workflow.integrationInstanceId(), workflow.workflowId(), true);
-        }
+        mcpIntegrationInstanceRows.provisionMcpServer(connectedUserId, mcpServerId);
     }
 
-    private void enableMcpIntegrationInstanceTool(long integrationInstanceId, long mcpToolId) {
-        Optional<McpIntegrationInstanceTool> mcpIntegrationInstanceToolOptional = mcpIntegrationInstanceToolService
-            .fetchMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId);
+    private Optional<McpIntegrationInstanceConfiguration> fetchMcpIntegrationInstanceConfiguration(
+        McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow) {
 
-        if (mcpIntegrationInstanceToolOptional.isPresent()) {
-            mcpIntegrationInstanceToolService.updateEnabled(mcpIntegrationInstanceToolOptional.get()
-                .getId(), true);
-        } else {
-            mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId, true);
+        return mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(
+            mcpIntegrationInstanceConfigurationWorkflow.getMcpIntegrationInstanceConfigurationId());
+    }
+
+    private Optional<McpIntegrationInstanceConfigurationWorkflow> fetchMcpIntegrationInstanceConfigurationWorkflow(
+        McpIntegrationInstanceWorkflow mcpIntegrationInstanceWorkflow) {
+
+        return mcpIntegrationInstanceConfigurationWorkflowService.fetchMcpIntegrationInstanceConfigurationWorkflow(
+            mcpIntegrationInstanceWorkflow.getMcpIntegrationInstanceConfigurationWorkflowId());
+    }
+
+    private List<McpIntegrationInstanceWorkflow> getMcpIntegrationInstanceWorkflows(
+        long integrationInstanceId, long mcpServerId) {
+
+        List<McpIntegrationInstanceWorkflow> mcpIntegrationInstanceWorkflows = new ArrayList<>();
+
+        for (McpIntegrationInstanceWorkflow mcpIntegrationInstanceWorkflow : mcpIntegrationInstanceWorkflowService
+            .getMcpIntegrationInstanceWorkflows(integrationInstanceId)) {
+
+            boolean onMcpServer = fetchMcpIntegrationInstanceConfigurationWorkflow(mcpIntegrationInstanceWorkflow)
+                .flatMap(this::fetchMcpIntegrationInstanceConfiguration)
+                .filter(mcpIntegrationInstanceConfiguration -> Objects.equals(
+                    mcpIntegrationInstanceConfiguration.getMcpServerId(), mcpServerId))
+                .isPresent();
+
+            if (onMcpServer) {
+                mcpIntegrationInstanceWorkflows.add(mcpIntegrationInstanceWorkflow);
+            }
         }
+
+        return mcpIntegrationInstanceWorkflows;
     }
 
     private McpServerCoverage getMcpServerCoverage(long mcpServerId, UserInstanceCoverage userInstanceCoverage) {
@@ -481,6 +481,10 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
             .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
                 mcpIntegrationInstanceConfiguration.getId())) {
 
+            if (!mcpIntegrationInstanceConfigurationWorkflow.isEnabled()) {
+                continue;
+            }
+
             IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
                 integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
                     mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
@@ -525,58 +529,59 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         Map<Long, List<ConnectedUserMcpServerWorkflowDTO>> workflowsByServerId = new HashMap<>();
 
         for (IntegrationInstance integrationInstance : integrationInstances) {
-            long integrationInstanceConfigurationId = integrationInstance.getIntegrationInstanceConfigurationId();
+            List<McpIntegrationInstanceWorkflow> mcpIntegrationInstanceWorkflows =
+                mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstance.getId());
 
-            List<McpIntegrationInstanceConfiguration> mcpIntegrationInstanceConfigurations =
-                mcpIntegrationInstanceConfigurationService
-                    .getMcpIntegrationInstanceConfigurationsByIntegrationInstanceConfigurationId(
-                        integrationInstanceConfigurationId);
-
-            if (mcpIntegrationInstanceConfigurations.isEmpty()) {
+            if (mcpIntegrationInstanceWorkflows.isEmpty()) {
                 continue;
             }
 
             IntegrationInstanceConfiguration integrationInstanceConfiguration =
                 integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
-                    integrationInstanceConfigurationId);
+                    integrationInstance.getIntegrationInstanceConfigurationId());
 
             Integration integration = integrationService.getIntegration(
                 integrationInstanceConfiguration.getIntegrationId());
 
-            for (McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration : mcpIntegrationInstanceConfigurations) {
-                List<McpIntegrationInstanceConfigurationWorkflow> mcpIntegrationInstanceConfigurationWorkflows =
-                    mcpIntegrationInstanceConfigurationWorkflowService
-                        .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
-                            mcpIntegrationInstanceConfiguration.getId());
+            for (McpIntegrationInstanceWorkflow mcpIntegrationInstanceWorkflow : mcpIntegrationInstanceWorkflows) {
+                McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+                    fetchMcpIntegrationInstanceConfigurationWorkflow(mcpIntegrationInstanceWorkflow)
+                        .orElse(null);
 
-                for (McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow : mcpIntegrationInstanceConfigurationWorkflows) {
-                    IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
-                        integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                            mcpIntegrationInstanceConfigurationWorkflow
-                                .getIntegrationInstanceConfigurationWorkflowId());
+                if (mcpIntegrationInstanceConfigurationWorkflow == null ||
+                    !mcpIntegrationInstanceConfigurationWorkflow.isEnabled()) {
 
-                    if (!integrationInstanceConfigurationWorkflow.isEnabled()) {
-                        continue;
-                    }
-
-                    Workflow workflow = workflowService.getWorkflow(
-                        integrationInstanceConfigurationWorkflow.getWorkflowId());
-
-                    boolean enabled = integrationInstanceWorkflowService
-                        .fetchIntegrationInstanceWorkflow(
-                            integrationInstance.getId(), integrationInstanceConfigurationWorkflow.getId())
-                        .map(IntegrationInstanceWorkflow::isEnabled)
-                        .orElse(false);
-
-                    workflowsByServerId
-                        .computeIfAbsent(mcpIntegrationInstanceConfiguration.getMcpServerId(), key -> new ArrayList<>())
-                        .add(new ConnectedUserMcpServerWorkflowDTO(
-                            integrationInstance.getId(), integration.getComponentName(),
-                            integrationInstanceConfiguration.getIntegrationVersion(), workflow.getId(),
-                            getWorkflowToolName(mcpIntegrationInstanceConfigurationWorkflow, workflow),
-                            getWorkflowToolDescription(mcpIntegrationInstanceConfigurationWorkflow, workflow), enabled,
-                            getWorkflowLastExecutionDate(integrationInstance.getId(), workflow.getId())));
+                    continue;
                 }
+
+                McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
+                    fetchMcpIntegrationInstanceConfiguration(mcpIntegrationInstanceConfigurationWorkflow)
+                        .orElse(null);
+
+                if (mcpIntegrationInstanceConfiguration == null) {
+                    continue;
+                }
+
+                IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                    integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                        mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+
+                if (!integrationInstanceConfigurationWorkflow.isEnabled()) {
+                    continue;
+                }
+
+                Workflow workflow =
+                    workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
+
+                workflowsByServerId
+                    .computeIfAbsent(mcpIntegrationInstanceConfiguration.getMcpServerId(), key -> new ArrayList<>())
+                    .add(new ConnectedUserMcpServerWorkflowDTO(
+                        mcpIntegrationInstanceWorkflow.getId(), integrationInstance.getId(),
+                        integration.getComponentName(), integrationInstanceConfiguration.getIntegrationVersion(),
+                        workflow.getId(), getWorkflowToolName(mcpIntegrationInstanceConfigurationWorkflow, workflow),
+                        getWorkflowToolDescription(mcpIntegrationInstanceConfigurationWorkflow, workflow),
+                        mcpIntegrationInstanceWorkflow.isEnabled(),
+                        getWorkflowLastExecutionDate(integrationInstance.getId(), workflow.getId())));
             }
         }
 

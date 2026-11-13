@@ -9,7 +9,10 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -17,7 +20,9 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpAuditIntTestConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.config.EmbeddedMcpIntTestConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
@@ -48,6 +53,7 @@ import com.bytechef.platform.mcp.service.McpServerServiceImpl;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -117,6 +123,9 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
     private McpIntegrationInstanceWorkflowFacade mcpIntegrationInstanceWorkflowFacade;
 
     @Autowired
+    private McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
+
+    @Autowired
     private McpServerRepository mcpServerRepository;
 
     @Autowired
@@ -126,8 +135,10 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     private long foreignIntegrationInstanceId;
+    private long integrationInstanceConfigurationId;
     private long integrationInstanceConfigurationWorkflowId;
     private long integrationInstanceId;
+    private long mcpIntegrationInstanceConfigurationWorkflowId;
     private long ownConnectedUserId;
 
     @BeforeEach
@@ -155,7 +166,7 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
                 RETURNING id
                 """);
 
-        long integrationInstanceConfigurationId = insert(
+        integrationInstanceConfigurationId = insert(
             """
                 INSERT INTO integration_instance_configuration (integration_id, integration_version, name, enabled,
                     environment, connection_parameters, authorization_type, created_date, created_by,
@@ -194,24 +205,7 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
         insertIntegrationInstanceWorkflow(integrationInstanceId);
         insertIntegrationInstanceWorkflow(foreignIntegrationInstanceId);
 
-        long mcpIntegrationInstanceConfigurationId = insert(
-            """
-                INSERT INTO mcp_integration_instance_configuration (mcp_server_id,
-                    integration_instance_configuration_id, created_date, created_by, last_modified_date,
-                    last_modified_by, version)
-                VALUES (?, ?, now(), 'system', now(), 'system', 0)
-                RETURNING id
-                """,
-            mcpServer.getId(), integrationInstanceConfigurationId);
-
-        jdbcTemplate.update(
-            """
-                INSERT INTO mcp_integration_instance_configuration_workflow (mcp_integration_instance_configuration_id,
-                    integration_instance_configuration_workflow_id, created_date, created_by, last_modified_date,
-                    last_modified_by, version)
-                VALUES (?, ?, now(), 'system', now(), 'system', 0)
-                """,
-            mcpIntegrationInstanceConfigurationId, integrationInstanceConfigurationWorkflowId);
+        mcpIntegrationInstanceConfigurationWorkflowId = insertLink(mcpServer);
 
         SecurityContextHolder.getContext()
             .setAuthentication(
@@ -226,6 +220,7 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
     void afterEach() {
         SecurityContextHolder.clearContext();
 
+        jdbcTemplate.update("DELETE FROM mcp_integration_instance_workflow");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_configuration_workflow");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_configuration");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_tool");
@@ -265,22 +260,80 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
 
     @Test
     void testEnableMcpIntegrationInstanceWorkflowChecksOwnershipOfOwnInstance() {
-        IntegrationInstanceWorkflow integrationInstanceWorkflow = getIntegrationInstanceWorkflow(integrationInstanceId);
-
         mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(
             integrationInstanceId, WORKFLOW_UUID, true);
 
         verify(connectedUserIntegrationInstanceFacade).validateCurrentPrincipalIntegrationInstanceOwnership(
             integrationInstanceId);
-        verify(integrationInstanceWorkflowService).updateEnabled(integrationInstanceWorkflow.getId(), true);
+        verify(integrationInstanceWorkflowService, never()).updateEnabled(anyLong(), anyBoolean());
 
-        assertThat(getIntegrationInstanceWorkflow(integrationInstanceId).isEnabled()).isTrue();
+        assertThat(getMcpIntegrationInstanceWorkflowEnabled(mcpIntegrationInstanceConfigurationWorkflowId))
+            .contains(true);
+        assertThat(getIntegrationInstanceWorkflow(integrationInstanceId).isEnabled()).isFalse();
         assertThat(
             findSingleEventData(McpIntegrationInstanceAuditEvents.MCP_INTEGRATION_INSTANCE_WORKFLOW_ENABLED_UPDATED))
                 .containsEntry("result", "SUCCESS")
                 .containsEntry("integrationInstanceId", String.valueOf(integrationInstanceId))
                 .containsEntry("workflowUuid", WORKFLOW_UUID)
                 .containsEntry("enabled", "true");
+    }
+
+    @Test
+    void testEnableCreatesRowAndDisabledInstanceWorkflow() {
+        deleteOwnIntegrationInstanceWorkflow();
+
+        mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(
+            integrationInstanceId, WORKFLOW_UUID, true);
+
+        assertThat(getMcpIntegrationInstanceWorkflowEnabled(mcpIntegrationInstanceConfigurationWorkflowId))
+            .contains(true);
+        assertThat(getIntegrationInstanceWorkflow(integrationInstanceId).isEnabled()).isFalse();
+    }
+
+    @Test
+    void testDisableLeavesInstanceWorkflowUntouched() {
+        jdbcTemplate.update(
+            "UPDATE integration_instance_workflow SET enabled = true WHERE integration_instance_id = ?",
+            integrationInstanceId);
+
+        mcpIntegrationInstanceWorkflowService.createMcpIntegrationInstanceWorkflow(
+            integrationInstanceId, mcpIntegrationInstanceConfigurationWorkflowId, true);
+
+        mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(
+            integrationInstanceId, WORKFLOW_UUID, false);
+
+        assertThat(getMcpIntegrationInstanceWorkflowEnabled(mcpIntegrationInstanceConfigurationWorkflowId))
+            .contains(false);
+        assertThat(getIntegrationInstanceWorkflow(integrationInstanceId).isEnabled()).isTrue();
+    }
+
+    @Test
+    void testEnableWorkflowOnTwoServers() {
+        long otherMcpIntegrationInstanceConfigurationWorkflowId = insertLink(
+            mcpServerRepository.save(new McpServer("Other", PlatformType.EMBEDDED, Environment.DEVELOPMENT)));
+
+        mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(
+            integrationInstanceId, WORKFLOW_UUID, true);
+
+        assertThat(getMcpIntegrationInstanceWorkflowEnabled(mcpIntegrationInstanceConfigurationWorkflowId))
+            .contains(true);
+        assertThat(getMcpIntegrationInstanceWorkflowEnabled(otherMcpIntegrationInstanceConfigurationWorkflowId))
+            .contains(true);
+    }
+
+    @Test
+    void testInputsSavedBeforeEnableSurvive() {
+        deleteOwnIntegrationInstanceWorkflow();
+
+        mcpIntegrationInstanceWorkflowFacade.updateMcpIntegrationInstanceWorkflow(
+            integrationInstanceId, WORKFLOW_UUID, Map.of("key", "value"));
+        mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(
+            integrationInstanceId, WORKFLOW_UUID, true);
+
+        IntegrationInstanceWorkflow integrationInstanceWorkflow = getIntegrationInstanceWorkflow(integrationInstanceId);
+
+        assertThat(integrationInstanceWorkflow.getInputs()).isEqualTo(Map.of("key", "value"));
+        assertThat(integrationInstanceWorkflow.isEnabled()).isFalse();
     }
 
     @Test
@@ -310,6 +363,41 @@ class McpIntegrationInstanceWorkflowFacadeIntTest {
         verify(integrationInstanceWorkflowService).update(integrationInstanceWorkflow);
 
         assertThat(integrationInstanceWorkflow.getInputs()).isEqualTo(Map.of("key", "value"));
+    }
+
+    private void deleteOwnIntegrationInstanceWorkflow() {
+        jdbcTemplate.update(
+            "DELETE FROM integration_instance_workflow WHERE integration_instance_id = ?", integrationInstanceId);
+    }
+
+    private Optional<Boolean> getMcpIntegrationInstanceWorkflowEnabled(
+        long mcpIntegrationInstanceConfigurationWorkflowId) {
+
+        return mcpIntegrationInstanceWorkflowService
+            .fetchMcpIntegrationInstanceWorkflow(integrationInstanceId, mcpIntegrationInstanceConfigurationWorkflowId)
+            .map(McpIntegrationInstanceWorkflow::isEnabled);
+    }
+
+    private long insertLink(McpServer mcpServer) {
+        long mcpIntegrationInstanceConfigurationId = insert(
+            """
+                INSERT INTO mcp_integration_instance_configuration (mcp_server_id,
+                    integration_instance_configuration_id, created_date, created_by, last_modified_date,
+                    last_modified_by, version)
+                VALUES (?, ?, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            mcpServer.getId(), integrationInstanceConfigurationId);
+
+        return insert(
+            """
+                INSERT INTO mcp_integration_instance_configuration_workflow (mcp_integration_instance_configuration_id,
+                    integration_instance_configuration_workflow_id, created_date, created_by, last_modified_date,
+                    last_modified_by, version)
+                VALUES (?, ?, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            mcpIntegrationInstanceConfigurationId, integrationInstanceConfigurationWorkflowId);
     }
 
     private IntegrationInstanceWorkflow getIntegrationInstanceWorkflow(long integrationInstanceId) {

@@ -87,6 +87,21 @@ class ConnectedUserMcpServerGraphQlControllerIntTest {
     }
 
     @Test
+    void testEnableConnectedUserMcpWorkflow() {
+        graphQlTester.document("""
+            mutation {
+                enableConnectedUserMcpWorkflow(id: "11", enable: false)
+            }
+            """)
+            .execute()
+            .path("enableConnectedUserMcpWorkflow")
+            .entity(Boolean.class)
+            .isEqualTo(true);
+
+        verify(connectedUserMcpServerFacade).enableMcpWorkflow(11L, false);
+    }
+
+    @Test
     void testProvisionConnectedUserMcpServer() {
         graphQlTester.document("""
             mutation {

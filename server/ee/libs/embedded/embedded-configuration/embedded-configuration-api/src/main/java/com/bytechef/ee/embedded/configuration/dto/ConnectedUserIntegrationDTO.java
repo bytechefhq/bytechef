@@ -163,7 +163,7 @@ public record ConnectedUserIntegrationDTO(
     }
 
     public record McpWorkflowInfo(
-        String label, String description, List<WorkflowInputInfo> inputs, String workflowUuid) {
+        String label, String description, List<WorkflowInputInfo> inputs, String workflowUuid, boolean toolOnly) {
     }
 
     public record WorkflowInputInfo(String name, String label, boolean required, String type) {
