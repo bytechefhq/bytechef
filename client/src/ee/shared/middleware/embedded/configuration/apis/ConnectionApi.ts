@@ -102,6 +102,21 @@ export interface GetConnectionsRequest {
     tagId?: number;
 }
 
+export interface UpdateConnectedUserConnectionCredentialsRequest {
+    /**
+     * The id of a connected user.
+     */
+    connectedUserId: number;
+    /**
+     * The id of a connection.
+     */
+    connectionId: number;
+    /**
+     * 
+     */
+    updateConnectionCredentialsRequest: UpdateConnectionCredentialsRequest;
+}
+
 export interface UpdateConnectionOperationRequest {
     /**
      * The id of a connection.
@@ -495,6 +510,70 @@ export class ConnectionApi extends runtime.BaseAPI {
     async getConnections(requestParameters: GetConnectionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Connection>> {
         const response = await this.getConnectionsRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Creates request options for updateConnectedUserConnectionCredentials without sending the request
+     */
+    async updateConnectedUserConnectionCredentialsRequestOpts(requestParameters: UpdateConnectedUserConnectionCredentialsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['connectedUserId'] == null) {
+            throw new runtime.RequiredError(
+                'connectedUserId',
+                'Required parameter "connectedUserId" was null or undefined when calling updateConnectedUserConnectionCredentials().'
+            );
+        }
+
+        if (requestParameters['connectionId'] == null) {
+            throw new runtime.RequiredError(
+                'connectionId',
+                'Required parameter "connectionId" was null or undefined when calling updateConnectedUserConnectionCredentials().'
+            );
+        }
+
+        if (requestParameters['updateConnectionCredentialsRequest'] == null) {
+            throw new runtime.RequiredError(
+                'updateConnectionCredentialsRequest',
+                'Required parameter "updateConnectionCredentialsRequest" was null or undefined when calling updateConnectedUserConnectionCredentials().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/connected-users/{connectedUserId}/connections/{connectionId}/credentials`;
+        urlPath = urlPath.replace('{connectedUserId}', encodeURIComponent(String(requestParameters['connectedUserId'])));
+        urlPath = urlPath.replace('{connectionId}', encodeURIComponent(String(requestParameters['connectionId'])));
+
+        return {
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateConnectionCredentialsRequestToJSON(requestParameters['updateConnectionCredentialsRequest']),
+        };
+    }
+
+    /**
+     * Replaces the credentials of a connection a tenant admin provisioned for a connected user.
+     * Replaces the credentials of a provisioned connected user connection
+     */
+    async updateConnectedUserConnectionCredentialsRaw(requestParameters: UpdateConnectedUserConnectionCredentialsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const requestOptions = await this.updateConnectedUserConnectionCredentialsRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Replaces the credentials of a connection a tenant admin provisioned for a connected user.
+     * Replaces the credentials of a provisioned connected user connection
+     */
+    async updateConnectedUserConnectionCredentials(requestParameters: UpdateConnectedUserConnectionCredentialsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateConnectedUserConnectionCredentialsRaw(requestParameters, initOverrides);
     }
 
     /**
