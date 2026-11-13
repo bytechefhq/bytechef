@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.mcp.server.facade;
 
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -56,9 +57,11 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.ai.tool.FromAiResult;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -935,6 +938,45 @@ class AutomationMcpToolFacadeIntTest {
         ToolDefinition toolDefinition = functionToolCallback.getToolDefinition();
 
         assertThat(toolDefinition.inputSchema()).doesNotContain("length", "body");
+    }
+
+    @Test
+    void testListedToolOffersTheOptionsOfItsCurrentConnection() {
+        McpTool mcpTool = new McpTool(
+            "sendMessage",
+            Map.of("channel", new FromAiResult("channel", "STRING", null, null, List.<Object>of("stale"), true)), 1L);
+
+        mcpTool.setId(4L);
+
+        when(mcpComponentService.getMcpComponent(1L)).thenReturn(new McpComponent("slack", 1, 1L, 5L));
+
+        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+        when(clusterElementDefinition.getComponentName()).thenReturn("slack");
+        when(clusterElementDefinition.getComponentVersion()).thenReturn(1);
+        when(clusterElementDefinition.getName()).thenReturn("sendMessage");
+        doReturn(
+            List.of(
+                Property.toProperty(
+                    string("channel").options(
+                        (com.bytechef.component.definition.ClusterElementDefinition.OptionsFunction<String>) (
+                            inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
+                            context) -> List.of()))))
+                                .when(clusterElementDefinition)
+                                .getProperties();
+        when(clusterElementDefinitionService.getClusterElementDefinition("slack", 1, "sendMessage"))
+            .thenReturn(clusterElementDefinition);
+        when(clusterElementDefinitionFacade.executeOptions(
+            eq("slack"), eq(1), eq("sendMessage"), eq("channel"), any(), any(), any(), isNull(), eq(5L), any(),
+            any()))
+                .thenReturn(List.of(new Option(option("General", "general"))));
+
+        String inputSchema = facade.getFunctionToolCallback(mcpTool)
+            .getToolDefinition()
+            .inputSchema();
+
+        assertThat(inputSchema).contains("\"general\"")
+            .doesNotContain("stale");
     }
 
     private ToolDefinition getToolDefinition(Map<String, Object> parameters) {
