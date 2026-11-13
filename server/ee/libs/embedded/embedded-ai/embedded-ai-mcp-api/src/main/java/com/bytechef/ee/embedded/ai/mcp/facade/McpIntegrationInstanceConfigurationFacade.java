@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
+import com.bytechef.platform.configuration.dto.WorkflowToolParametersDTO;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -35,7 +36,7 @@ public interface McpIntegrationInstanceConfigurationFacade {
 
     McpIntegrationInstanceConfiguration createMcpIntegrationInstanceConfiguration(
         long mcpServerId, long integrationInstanceConfigurationId, List<String> selectedWorkflowIds,
-        List<WorkflowConfigurationDTO> workflowConfigurations);
+        List<WorkflowConfigurationDTO> workflowConfigurations, List<WorkflowToolParametersDTO> toolParameters);
 
     /**
      * Deletes an MCP integration instance configuration and its associated MCP workflow records. The underlying
@@ -59,7 +60,7 @@ public interface McpIntegrationInstanceConfigurationFacade {
 
     McpIntegrationInstanceConfiguration updateMcpIntegrationInstanceConfiguration(
         long mcpIntegrationInstanceConfigurationId, List<String> selectedWorkflowIds,
-        List<WorkflowConfigurationDTO> workflowConfigurations);
+        List<WorkflowConfigurationDTO> workflowConfigurations, List<WorkflowToolParametersDTO> toolParameters);
 
     @Nullable
     McpIntegrationInstanceConfiguration getMcpIntegrationInstanceConfiguration(long id);

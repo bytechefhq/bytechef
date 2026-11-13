@@ -6,8 +6,12 @@ import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation
 import ServerProjectWorkflowsList from '@/pages/automation/server-workflows/ServerProjectWorkflowsList';
 import useServerProjectWorkflowsForm from '@/pages/automation/server-workflows/useServerProjectWorkflowsForm';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import useMcpWorkflowToolForms, {
+    SavedToolParametersByWorkflowIdType,
+} from '@/pages/platform/mcp-servers/hooks/useMcpWorkflowToolForms';
 import McpServerFormField from '@/shared/components/mcp-server/McpServerFormField';
 import ServerWorkflowsDialogContent from '@/shared/components/server-workflows-dialog/ServerWorkflowsDialogContent';
+import {Workflow} from '@/shared/middleware/automation/configuration';
 import {
     McpServer,
     useCreateMcpProjectMutation,
@@ -22,7 +26,9 @@ import {ReactNode, useCallback, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
+import McpProjectWorkflowToolTab from './McpProjectWorkflowToolTab';
 import {McpProjectItemType} from './mcp-project-workflow-list/hooks/useMcpProjectList';
+import {fetchToolEligibleWorkflowProperties} from './mcpProjectWorkflowToolProperties';
 
 const formSchema = z.object({
     mcpServerId: z.string().min(1),
@@ -99,6 +105,29 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
         [eligibleWorkflowsData]
     );
 
+    const savedToolParametersByWorkflowId: SavedToolParametersByWorkflowIdType = useMemo(() => {
+        if (!isEditMode) {
+            return new Map();
+        }
+
+        const mcpProjectWorkflows = mcpProject.mcpProjectWorkflows ?? [];
+
+        return new Map(
+            mcpProjectWorkflows
+                .filter((mcpProjectWorkflow) => mcpProjectWorkflow?.workflow?.id != null)
+                .map((mcpProjectWorkflow) => {
+                    const parameters = mcpProjectWorkflow!.parameters;
+
+                    return [
+                        mcpProjectWorkflow!.workflow!.id,
+                        parameters && typeof parameters === 'object' && !Array.isArray(parameters)
+                            ? (parameters as Record<string, unknown>)
+                            : undefined,
+                    ];
+                })
+        );
+    }, [isEditMode, mcpProject?.mcpProjectWorkflows]);
+
     const {
         connections,
         form: workflowsForm,
@@ -113,6 +142,19 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
     });
 
     const queryClient = useQueryClient();
+
+    const loadWorkflowProperties = useCallback(
+        (workflowId: string) =>
+            fetchToolEligibleWorkflowProperties(queryClient, {projectId: String(currentProjectId), workflowId}),
+        [currentProjectId, queryClient]
+    );
+
+    const toolForms = useMcpWorkflowToolForms({
+        loadWorkflowProperties,
+        savedParametersByWorkflowId: savedToolParametersByWorkflowId,
+        seedKey: String(currentProjectId ?? ''),
+        selectedWorkflowIds,
+    });
 
     const invalidateAndClose = () => {
         void queryClient.invalidateQueries({
@@ -145,6 +187,11 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
         [setValue]
     );
 
+    const renderToolContent = (workflow: Workflow, enabled: boolean) =>
+        enabled && currentProjectId && workflow.id ? (
+            <McpProjectWorkflowToolTab projectId={currentProjectId} toolForms={toolForms} workflowId={workflow.id} />
+        ) : null;
+
     const handleComplete = async () => {
         const workflowsValid = await workflowsForm.trigger();
 
@@ -155,16 +202,19 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
         await handleSubmit(saveMcpProject)();
     };
 
-    function saveMcpProject() {
+    async function saveMcpProject() {
         const formValues = getValues();
 
         const workflowConfigurations = getWorkflowConfigurations(formValues.selectedWorkflowIds);
+
+        const toolParameters = await toolForms.buildToolParameters(formValues.selectedWorkflowIds);
 
         if (isEditMode) {
             updateMcpProjectMutation.mutate({
                 id: mcpProject.id,
                 input: {
                     selectedWorkflowIds: formValues.selectedWorkflowIds,
+                    toolParameters,
                     workflowConfigurations,
                 },
             });
@@ -175,6 +225,7 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
                     projectId: formValues.projectId.toString(),
                     projectVersion: formValues.projectVersion,
                     selectedWorkflowIds: formValues.selectedWorkflowIds,
+                    toolParameters,
                     workflowConfigurations,
                 },
             });
@@ -284,7 +335,11 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
                 description="Expose workflows (those with a New Workflow Call trigger) as tools of this MCP server."
                 icon={<ServerIcon />}
                 isEditMode={isEditMode}
-                isSubmitPending={createMcpProjectMutation.isPending || updateMcpProjectMutation.isPending}
+                isSubmitPending={
+                    createMcpProjectMutation.isPending ||
+                    updateMcpProjectMutation.isPending ||
+                    toolForms.isAwaitingSeeding
+                }
                 noEligibleWorkflowsMessage="No tool-eligible workflows found for this project version. Only workflows with a New Workflow Call trigger can be added to an MCP server."
                 onComplete={handleComplete}
                 selectedWorkflowIds={selectedWorkflowIds}
@@ -297,6 +352,7 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
                             connections={connections}
                             form={workflowsForm}
                             onSelectedWorkflowIdsChange={handleSelectedWorkflowIdsChange}
+                            renderToolContent={renderToolContent}
                             selectedWorkflowIds={selectedWorkflowIds}
                             workflows={workflows}
                         />

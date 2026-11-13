@@ -9,6 +9,7 @@ const hoisted = vi.hoisted(() => ({
     handleSave: vi.fn(),
     state: {
         currentStep: 'components' as 'components' | 'tools',
+        isSavePending: false,
         selectedTools: [] as unknown[],
     },
 }));
@@ -22,6 +23,7 @@ vi.mock('../hooks/useMcpComponentDialog', () => ({
         handleComponentSelect: vi.fn(),
         handleOpenChange: hoisted.handleOpenChange,
         handleSave: hoisted.handleSave,
+        isSavePending: hoisted.state.isSavePending,
         selectedComponent: undefined,
         selectedTools: hoisted.state.selectedTools,
         setSelectedTools: vi.fn(),
@@ -39,6 +41,7 @@ vi.mock('../McpComponentDialogToolSelectionStep', () => ({
 beforeEach(() => {
     windowResizeObserver();
     hoisted.state.currentStep = 'components';
+    hoisted.state.isSavePending = false;
     hoisted.state.selectedTools = [];
 });
 
@@ -110,6 +113,15 @@ describe('McpComponentDialog', () => {
             render(<McpComponentDialog mcpServerId="1" open />);
 
             expect(screen.getByRole('button', {name: 'Save'})).toBeEnabled();
+        });
+
+        it('should show the save action as pending while the save is pending', () => {
+            hoisted.state.isSavePending = true;
+            hoisted.state.selectedTools = [{name: 'tool'}];
+
+            render(<McpComponentDialog mcpServerId="1" open />);
+
+            expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
         });
 
         it('should label the action Update when editing', () => {

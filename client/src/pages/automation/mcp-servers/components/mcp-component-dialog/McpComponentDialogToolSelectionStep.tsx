@@ -2,7 +2,11 @@ import Button from '@/components/Button/Button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Label} from '@/components/ui/label';
+import McpComponentDialogToolForm, {
+    McpToolFormChangeHandlerType,
+} from '@/pages/platform/mcp-servers/components/McpComponentDialogToolForm';
 import McpToolSelectionListSkeleton from '@/pages/platform/mcp-servers/components/McpToolSelectionListSkeleton';
+import {SavedToolParametersByNameType} from '@/pages/platform/mcp-servers/hooks/useMcpComponentToolForms';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {Connection} from '@/shared/middleware/automation/configuration';
 import {McpComponent, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
@@ -16,6 +20,9 @@ import {useState} from 'react';
 import useMcpComponentDialogToolSelectionStep, {SelectedToolType} from './hooks/useMcpComponentDialogToolSelectionStep';
 
 interface ToolSelectionStepProps {
+    aiValuesByTool: Record<string, Record<string, string>>;
+    onToolFormChange: McpToolFormChangeHandlerType;
+    savedParametersByToolName: SavedToolParametersByNameType;
     open: boolean;
     mcpComponent?: McpComponent;
     selectedComponent: ComponentDefinitionBasic | null;
@@ -27,11 +34,14 @@ interface ToolSelectionStepProps {
 }
 
 const McpComponentDialogToolSelectionStep = ({
+    aiValuesByTool,
     existingTools,
     mcpComponent,
     onConnectionChange,
+    onToolFormChange,
     onToolsChange,
     open,
+    savedParametersByToolName,
     selectedComponent,
     selectedConnection,
     selectedTools,
@@ -166,28 +176,50 @@ const McpComponentDialogToolSelectionStep = ({
                     </div>
 
                     <div className="divide-y">
-                        {toolElements.map((tool) => (
-                            <div
-                                className="flex items-center space-x-3 py-3 hover:bg-surface-neutral-primary-hover"
-                                key={tool.name}
-                            >
-                                <Checkbox
-                                    checked={selectedTools.some((selectedTool) => selectedTool.name === tool.name)}
-                                    id={tool.name}
-                                    onCheckedChange={(checked) => handleToolToggle(tool, checked as boolean)}
-                                />
+                        {toolElements.map((tool) => {
+                            const isSelected = selectedTools.some((selectedTool) => selectedTool.name === tool.name);
 
-                                <div className="flex-1">
-                                    <label className="cursor-pointer text-sm font-medium" htmlFor={tool.name}>
-                                        {tool.title || tool.name}
-                                    </label>
+                            return (
+                                <div key={tool.name}>
+                                    <div className="flex items-center space-x-3 py-3 hover:bg-surface-neutral-primary-hover">
+                                        <Checkbox
+                                            checked={isSelected}
+                                            id={tool.name}
+                                            onCheckedChange={(checked) => handleToolToggle(tool, checked as boolean)}
+                                        />
 
-                                    {tool.description && (
-                                        <p className="mt-1 text-sm text-muted-foreground">{tool.description}</p>
+                                        <div className="flex-1">
+                                            <label className="cursor-pointer text-sm font-medium" htmlFor={tool.name}>
+                                                {tool.title || tool.name}
+                                            </label>
+
+                                            {tool.description && (
+                                                <p className="mt-1 text-sm text-muted-foreground">{tool.description}</p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {isSelected && (
+                                        <fieldset
+                                            aria-label={`${tool.title || tool.name} settings`}
+                                            className="mb-3 ml-7 rounded-md border p-3"
+                                        >
+                                            <McpComponentDialogToolForm
+                                                aiValues={aiValuesByTool[tool.name]}
+                                                componentName={tool.componentName}
+                                                componentVersion={tool.componentVersion}
+                                                connectionId={selectedConnection?.id?.toString()}
+                                                connectionRequired={componentDefinition?.connectionRequired ?? true}
+                                                isNew={!savedParametersByToolName.has(tool.name)}
+                                                onFormChange={onToolFormChange}
+                                                savedParameters={savedParametersByToolName.get(tool.name)}
+                                                toolName={tool.name}
+                                            />
+                                        </fieldset>
                                     )}
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </>
             )}

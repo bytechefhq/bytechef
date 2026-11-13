@@ -694,7 +694,16 @@ class JobSyncExecutorIntTest {
 
         completedJob.setStatus(Job.Status.COMPLETED);
 
-        doReturn(startedJob, completedJob).when(recordingJobService)
+        Thread awaitingThread = Thread.currentThread();
+        AtomicInteger awaitingThreadGetJobCount = new AtomicInteger();
+
+        doAnswer(invocation -> {
+            if (Thread.currentThread() != awaitingThread) {
+                return jobService.getJob(jobId);
+            }
+
+            return awaitingThreadGetJobCount.getAndIncrement() == 0 ? startedJob : completedJob;
+        }).when(recordingJobService)
             .getJob(jobId);
 
         clearInvocations(recordingJobService);

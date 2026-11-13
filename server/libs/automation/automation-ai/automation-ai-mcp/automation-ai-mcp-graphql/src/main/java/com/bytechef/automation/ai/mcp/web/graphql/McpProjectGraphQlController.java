@@ -27,6 +27,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
+import com.bytechef.platform.configuration.dto.WorkflowToolParametersDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -69,7 +70,7 @@ public class McpProjectGraphQlController {
     public McpProject createMcpProject(@Argument CreateMcpProjectInput input) {
         return mcpProjectFacade.createMcpProject(
             input.mcpServerId(), input.projectId(), input.projectVersion(), input.selectedWorkflowIds(),
-            input.workflowConfigurations());
+            input.workflowConfigurations(), input.toolParameters());
     }
 
     @QueryMapping
@@ -113,25 +114,29 @@ public class McpProjectGraphQlController {
 
     @MutationMapping
     public McpProject updateMcpProject(@Argument long id, @Argument UpdateMcpProjectInput input) {
-        return mcpProjectFacade.updateMcpProject(id, input.selectedWorkflowIds(), input.workflowConfigurations());
+        return mcpProjectFacade.updateMcpProject(
+            id, input.selectedWorkflowIds(), input.workflowConfigurations(), input.toolParameters());
     }
 
     @SuppressFBWarnings("EI")
     public record CreateMcpProjectInput(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds,
-        List<WorkflowConfigurationDTO> workflowConfigurations) {
+        List<WorkflowConfigurationDTO> workflowConfigurations, List<WorkflowToolParametersDTO> toolParameters) {
 
         public CreateMcpProjectInput {
             workflowConfigurations = workflowConfigurations == null ? List.of() : workflowConfigurations;
+            toolParameters = toolParameters == null ? List.of() : toolParameters;
         }
     }
 
     @SuppressFBWarnings("EI")
     public record UpdateMcpProjectInput(
-        List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations) {
+        List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations,
+        List<WorkflowToolParametersDTO> toolParameters) {
 
         public UpdateMcpProjectInput {
             workflowConfigurations = workflowConfigurations == null ? List.of() : workflowConfigurations;
+            toolParameters = toolParameters == null ? List.of() : toolParameters;
         }
     }
 }

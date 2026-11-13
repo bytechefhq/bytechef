@@ -1,3 +1,4 @@
+import useMcpComponentToolForms from '@/pages/platform/mcp-servers/hooks/useMcpComponentToolForms';
 import {
     ComponentDefinition,
     McpComponent,
@@ -67,6 +68,14 @@ const useMcpComponentDialog = ({
 
     const queryClient = useQueryClient();
 
+    const {aiValuesByTool, buildToolsPayload, isAwaitingSeeding, registerToolForm, savedParametersByToolName} =
+        useMcpComponentToolForms({
+            componentName: selectedComponent?.name || '',
+            componentVersion: selectedComponent?.version ?? 1,
+            existingTools: existingTools?.embeddedMcpToolsByComponentId,
+            selectedTools,
+        });
+
     const invalidateMcpQueries = () => {
         void queryClient.invalidateQueries({queryKey: ['embeddedMcpComponentsByServerId']});
         void queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
@@ -113,10 +122,12 @@ const useMcpComponentDialog = ({
         setSelectedTools([]);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!selectedComponent?.integrationId) {
             return;
         }
+
+        const tools = await buildToolsPayload(selectedTools);
 
         if (mcpComponent?.id) {
             updateEmbeddedMcpComponentMutation.mutate(
@@ -126,10 +137,7 @@ const useMcpComponentDialog = ({
                         componentName: selectedComponent.name,
                         componentVersion: selectedComponent.version ?? 1,
                         mcpServerId,
-                        tools: selectedTools.map((tool) => ({
-                            name: tool.name,
-                            parameters: {},
-                        })),
+                        tools,
                         version: mcpComponent.version,
                     },
                     integrationId: isIntegrationLocked(mcpComponent, integrationUnavailable)
@@ -145,10 +153,7 @@ const useMcpComponentDialog = ({
                         componentName: selectedComponent.name,
                         componentVersion: selectedComponent.version ?? 1,
                         mcpServerId,
-                        tools: selectedTools.map((tool) => ({
-                            name: tool.name,
-                            parameters: {},
-                        })),
+                        tools,
                     },
                     integrationId: selectedComponent.integrationId,
                 },
@@ -182,7 +187,13 @@ const useMcpComponentDialog = ({
         }
     };
 
+    const isSavePending =
+        isAwaitingSeeding ||
+        createEmbeddedMcpComponentMutation.isPending ||
+        updateEmbeddedMcpComponentMutation.isPending;
+
     return {
+        aiValuesByTool,
         currentStep,
         existingTools,
         handleBack,
@@ -190,6 +201,9 @@ const useMcpComponentDialog = ({
         handleComponentSelect,
         handleOpenChange,
         handleSave,
+        isSavePending,
+        registerToolForm,
+        savedParametersByToolName,
         selectedComponent,
         selectedTools,
         setSelectedTools,

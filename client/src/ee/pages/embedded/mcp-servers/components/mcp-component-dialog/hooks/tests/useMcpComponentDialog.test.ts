@@ -1,5 +1,6 @@
 import {McpComponent} from '@/shared/middleware/graphql';
 import {act, renderHook} from '@testing-library/react';
+import {useForm} from 'react-hook-form';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useMcpComponentDialog from '../useMcpComponentDialog';
@@ -8,22 +9,37 @@ const hoisted = vi.hoisted(() => ({
     createMutate: vi.fn(),
     createMutationOptions: undefined as {onSuccess: () => void} | undefined,
     invalidateQueries: vi.fn(),
+    seededValuesByTool: {} as Record<string, Record<string, string>>,
+    seedingParams: [] as Array<{
+        componentName: string;
+        componentVersion: number;
+        newToolNames: string[];
+    }>,
     updateMutate: vi.fn(),
     updateMutationOptions: undefined as {onSuccess: () => void} | undefined,
     useEmbeddedMcpToolsByComponentIdQuery: vi.fn(),
+    waitForSeeding: vi.fn(),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
     useCreateEmbeddedMcpComponentMutation: (options: {onSuccess: () => void}) => {
         hoisted.createMutationOptions = options;
 
-        return {mutate: hoisted.createMutate};
+        return {isPending: false, mutate: hoisted.createMutate};
     },
     useEmbeddedMcpToolsByComponentIdQuery: hoisted.useEmbeddedMcpToolsByComponentIdQuery,
     useUpdateEmbeddedMcpComponentMutation: (options: {onSuccess: () => void}) => {
         hoisted.updateMutationOptions = options;
 
-        return {mutate: hoisted.updateMutate};
+        return {isPending: false, mutate: hoisted.updateMutate};
+    },
+}));
+
+vi.mock('@/pages/platform/mcp-servers/hooks/useMcpToolSeeding', () => ({
+    default: (params: {componentName: string; componentVersion: number; newToolNames: string[]}) => {
+        hoisted.seedingParams.push(params);
+
+        return {aiValuesByTool: {}, getFailedSeedKeys: () => [], waitForSeeding: hoisted.waitForSeeding};
     },
 }));
 
@@ -49,16 +65,22 @@ describe('useMcpComponentDialog', () => {
         hoisted.updateMutate.mockClear();
         hoisted.useEmbeddedMcpToolsByComponentIdQuery.mockReset();
         hoisted.useEmbeddedMcpToolsByComponentIdQuery.mockReturnValue({data: undefined});
+        hoisted.seededValuesByTool = {};
+        hoisted.seedingParams = [];
+        hoisted.waitForSeeding.mockReset();
+        hoisted.waitForSeeding.mockImplementation(() => Promise.resolve(hoisted.seededValuesByTool));
     });
 
-    it('creates the component through the embedded mutation', () => {
+    it('creates the component through the embedded mutation', async () => {
         const {result} = renderHook(() => useMcpComponentDialog({mcpServerId: '1', open: true}));
 
         act(() =>
             result.current.handleComponentSelect({integrationId: '5', name: 'gmail', title: 'Gmail', version: 1})
         );
 
-        act(() => result.current.handleSave());
+        await act(async () => {
+            await result.current.handleSave();
+        });
 
         expect(hoisted.createMutate).toHaveBeenCalledWith(
             {
@@ -70,10 +92,12 @@ describe('useMcpComponentDialog', () => {
         expect(hoisted.updateMutate).not.toHaveBeenCalled();
     });
 
-    it('updates the component through the embedded mutation', () => {
+    it('updates the component through the embedded mutation', async () => {
         const {result} = renderHook(() => useMcpComponentDialog({mcpComponent, mcpServerId: '1', open: true}));
 
-        act(() => result.current.handleSave());
+        await act(async () => {
+            await result.current.handleSave();
+        });
 
         expect(hoisted.updateMutate).toHaveBeenCalledWith(
             {
@@ -86,12 +110,208 @@ describe('useMcpComponentDialog', () => {
         expect(hoisted.createMutate).not.toHaveBeenCalled();
     });
 
-    it('does not create a component before an integration is selected', () => {
+    describe('tool parameters', () => {
+        const readEmailsTool = {componentName: 'gmail', componentVersion: 1, name: 'readEmails'};
+        const sendEmailTool = {componentName: 'gmail', componentVersion: 1, name: 'sendEmail'};
+
+        const savedTo = "=fromAi('to', 'STRING', {'required': true})";
+        const seededQuery = "=fromAi('query', 'STRING')";
+
+        const savedTools = (mutate: ReturnType<typeof vi.fn>) =>
+            (mutate.mock.calls[mutate.mock.calls.length - 1][0] as {input: {tools: unknown}}).input.tools;
+
+        beforeEach(() => {
+            hoisted.useEmbeddedMcpToolsByComponentIdQuery.mockReturnValue({
+                data: {embeddedMcpToolsByComponentId: [{name: 'sendEmail', parameters: {to: savedTo}}]},
+            });
+        });
+
+        it('keeps saved parameters of kept tools on update', async () => {
+            const {result} = renderHook(() => useMcpComponentDialog({mcpComponent, mcpServerId: '1', open: true}));
+
+            act(() => result.current.setSelectedTools([sendEmailTool]));
+
+            await act(async () => {
+                await result.current.handleSave();
+            });
+
+            expect(savedTools(hoisted.updateMutate)).toEqual([{name: 'sendEmail', parameters: {to: savedTo}}]);
+        });
+
+        it('seeds new tools with ai values', async () => {
+            hoisted.seededValuesByTool = {readEmails: {query: seededQuery}};
+
+            const {result} = renderHook(() => useMcpComponentDialog({mcpComponent, mcpServerId: '1', open: true}));
+
+            act(() => result.current.setSelectedTools([sendEmailTool, readEmailsTool]));
+
+            await act(async () => {
+                await result.current.handleSave();
+            });
+
+            expect(hoisted.seedingParams[hoisted.seedingParams.length - 1]).toEqual(
+                expect.objectContaining({
+                    componentName: 'gmail',
+                    componentVersion: 1,
+                    newToolNames: ['readEmails'],
+                })
+            );
+            expect(savedTools(hoisted.updateMutate)).toEqual([
+                {name: 'sendEmail', parameters: {to: savedTo}},
+                {name: 'readEmails', parameters: {query: seededQuery}},
+            ]);
+        });
+
+        it('does not re-seed existing tools', async () => {
+            hoisted.seededValuesByTool = {sendEmail: {subject: "=fromAi('subject', 'STRING')"}};
+
+            const {result} = renderHook(() => useMcpComponentDialog({mcpComponent, mcpServerId: '1', open: true}));
+
+            act(() => result.current.setSelectedTools([sendEmailTool]));
+
+            await act(async () => {
+                await result.current.handleSave();
+            });
+
+            expect(hoisted.seedingParams[hoisted.seedingParams.length - 1].newToolNames).toEqual([]);
+            expect(savedTools(hoisted.updateMutate)).toEqual([{name: 'sendEmail', parameters: {to: savedTo}}]);
+        });
+
+        it('saves seeded ai values when save is clicked before the form renders', async () => {
+            let resolveSeeding: (values: Record<string, Record<string, string>>) => void = () => {};
+
+            hoisted.waitForSeeding.mockImplementation(
+                () =>
+                    new Promise((resolve) => {
+                        resolveSeeding = resolve;
+                    })
+            );
+
+            const {result} = renderHook(() => useMcpComponentDialog({mcpServerId: '1', open: true}));
+
+            act(() =>
+                result.current.handleComponentSelect({integrationId: '5', name: 'gmail', title: 'Gmail', version: 1})
+            );
+
+            act(() => result.current.setSelectedTools([readEmailsTool]));
+
+            let savePromise: Promise<void> = Promise.resolve();
+
+            act(() => {
+                savePromise = result.current.handleSave();
+            });
+
+            expect(result.current.isSavePending).toBe(true);
+            expect(hoisted.createMutate).not.toHaveBeenCalled();
+
+            await act(async () => {
+                resolveSeeding({readEmails: {query: seededQuery}});
+
+                await savePromise;
+            });
+
+            expect(result.current.isSavePending).toBe(false);
+            expect(savedTools(hoisted.createMutate)).toEqual([{name: 'readEmails', parameters: {query: seededQuery}}]);
+        });
+
+        it('saves an existing tool whose array item was deleted', async () => {
+            hoisted.useEmbeddedMcpToolsByComponentIdQuery.mockReturnValue({
+                data: {embeddedMcpToolsByComponentId: [{name: 'sendEmail', parameters: {cc: ['a', 'b'], to: savedTo}}]},
+            });
+
+            const {result: formResult} = renderHook(() =>
+                useForm<Record<string, unknown>>({defaultValues: {cc: ['a', 'b'], to: savedTo}})
+            );
+
+            const {result} = renderHook(() => useMcpComponentDialog({mcpComponent, mcpServerId: '1', open: true}));
+
+            act(() => result.current.setSelectedTools([sendEmailTool]));
+
+            act(() => {
+                result.current.registerToolForm('sendEmail', {
+                    form: formResult.current,
+                    initialValues: formResult.current.getValues(),
+                });
+
+                formResult.current.setValue('cc', ['a']);
+            });
+
+            await act(async () => {
+                await result.current.handleSave();
+            });
+
+            expect(savedTools(hoisted.updateMutate)).toEqual([
+                {name: 'sendEmail', parameters: {cc: ['a'], to: savedTo}},
+            ]);
+        });
+
+        it('does not re-seed a field the user cleared', async () => {
+            hoisted.seededValuesByTool = {readEmails: {query: seededQuery}};
+
+            const {result: formResult} = renderHook(() =>
+                useForm<Record<string, unknown>>({defaultValues: {query: seededQuery}})
+            );
+
+            const {result} = renderHook(() => useMcpComponentDialog({mcpComponent, mcpServerId: '1', open: true}));
+
+            act(() => result.current.setSelectedTools([readEmailsTool]));
+
+            act(() => {
+                result.current.registerToolForm('readEmails', {
+                    form: formResult.current,
+                    initialValues: formResult.current.getValues(),
+                });
+
+                formResult.current.register('query');
+
+                formResult.current.setValue('query', '', {shouldDirty: true});
+            });
+
+            await act(async () => {
+                await result.current.handleSave();
+            });
+
+            expect(savedTools(hoisted.updateMutate)).toEqual([{name: 'readEmails', parameters: {query: null}}]);
+        });
+
+        it('save is not blocked by empty required fields', async () => {
+            const {result: formResult} = renderHook(() =>
+                useForm<Record<string, unknown>>({defaultValues: {label: ''}})
+            );
+
+            const {result} = renderHook(() => useMcpComponentDialog({mcpServerId: '1', open: true}));
+
+            act(() =>
+                result.current.handleComponentSelect({integrationId: '5', name: 'gmail', title: 'Gmail', version: 1})
+            );
+
+            act(() => result.current.setSelectedTools([readEmailsTool]));
+
+            act(() => {
+                formResult.current.register('label', {required: true});
+
+                result.current.registerToolForm('readEmails', {
+                    form: formResult.current,
+                    initialValues: formResult.current.getValues(),
+                });
+            });
+
+            await act(async () => {
+                await result.current.handleSave();
+            });
+
+            expect(savedTools(hoisted.createMutate)).toEqual([{name: 'readEmails', parameters: {}}]);
+        });
+    });
+
+    it('does not create a component before an integration is selected', async () => {
         const {result} = renderHook(() => useMcpComponentDialog({mcpServerId: '1', open: true}));
 
         act(() => result.current.handleComponentSelect({name: 'gmail', title: 'Gmail', version: 1}));
 
-        act(() => result.current.handleSave());
+        await act(async () => {
+            await result.current.handleSave();
+        });
 
         expect(hoisted.createMutate).not.toHaveBeenCalled();
     });
@@ -105,7 +325,7 @@ describe('useMcpComponentDialog', () => {
         expect(result.current.selectedComponent).toBeNull();
     });
 
-    it('binds a component without an integration to the selected integration when it is updated', () => {
+    it('binds a component without an integration to the selected integration when it is updated', async () => {
         const {result} = renderHook(() =>
             useMcpComponentDialog({mcpComponent: unboundMcpComponent, mcpServerId: '1', open: true})
         );
@@ -116,7 +336,9 @@ describe('useMcpComponentDialog', () => {
 
         expect(result.current.currentStep).toBe('tools');
 
-        act(() => result.current.handleSave());
+        await act(async () => {
+            await result.current.handleSave();
+        });
 
         expect(hoisted.updateMutate).toHaveBeenCalledWith(
             {
@@ -199,14 +421,16 @@ describe('useMcpComponentDialog', () => {
         expect(result.current.selectedComponent).toBeNull();
     });
 
-    it('keeps the tool step after a component bound to an integration is saved', () => {
+    it('keeps the tool step after a component bound to an integration is saved', async () => {
         const onOpenChange = vi.fn();
 
         const {result} = renderHook(() =>
             useMcpComponentDialog({mcpComponent, mcpServerId: '1', onOpenChange, open: true})
         );
 
-        act(() => result.current.handleSave());
+        await act(async () => {
+            await result.current.handleSave();
+        });
 
         const saveOptions = hoisted.updateMutate.mock.calls[0][1];
 
@@ -226,7 +450,7 @@ describe('useMcpComponentDialog', () => {
         expect(result.current.selectedComponent).toBeNull();
     });
 
-    it('rebinds a component whose integration is unavailable to the selected integration', () => {
+    it('rebinds a component whose integration is unavailable to the selected integration', async () => {
         const {result} = renderHook(() =>
             useMcpComponentDialog({integrationUnavailable: true, mcpComponent, mcpServerId: '1', open: true})
         );
@@ -235,7 +459,9 @@ describe('useMcpComponentDialog', () => {
             result.current.handleComponentSelect({integrationId: '6', name: 'gmail', title: 'Gmail Code', version: 1})
         );
 
-        act(() => result.current.handleSave());
+        await act(async () => {
+            await result.current.handleSave();
+        });
 
         expect(hoisted.updateMutate).toHaveBeenCalledWith(
             {
@@ -317,7 +543,7 @@ describe('useMcpComponentDialog', () => {
         expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['embeddedMcpServers']});
     });
 
-    it('closes the dialog and resets to the component step after a new component is saved', () => {
+    it('closes the dialog and resets to the component step after a new component is saved', async () => {
         const onOpenChange = vi.fn();
 
         const {result} = renderHook(() => useMcpComponentDialog({mcpServerId: '1', onOpenChange, open: true}));
@@ -328,7 +554,9 @@ describe('useMcpComponentDialog', () => {
 
         expect(result.current.currentStep).toBe('tools');
 
-        act(() => result.current.handleSave());
+        await act(async () => {
+            await result.current.handleSave();
+        });
 
         const saveOptions = hoisted.createMutate.mock.calls[0][1];
 

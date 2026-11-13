@@ -1,5 +1,5 @@
-import {McpServer} from '@/shared/middleware/graphql';
-import {render, screen, waitFor} from '@/shared/util/test-utils';
+import {McpServer, ToolEligibleWorkflowPropertiesDocument} from '@/shared/middleware/graphql';
+import {render, screen, waitFor, within} from '@/shared/util/test-utils';
 import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -14,8 +14,10 @@ import {McpProjectItemType} from './mcp-project-workflow-list/hooks/useMcpProjec
 const hoisted = vi.hoisted(() => ({
     createMutate: vi.fn(),
     eligibleResult: {data: undefined} as {data: unknown},
+    pendingToolPropertiesLoad: null as Promise<unknown> | null,
     projectDeployment: undefined as unknown,
     projectVersionWorkflows: [] as unknown[],
+    toolPropertiesByWorkflowId: {} as Record<string, unknown[]>,
     updateMutate: vi.fn(),
 }));
 
@@ -26,7 +28,59 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
         ...actual,
         useCreateMcpProjectMutation: () => ({mutate: hoisted.createMutate, reset: vi.fn()}),
         useToolEligibleProjectVersionWorkflowsQuery: () => hoisted.eligibleResult,
+        useToolEligibleWorkflowPropertiesQuery: ({workflowId}: {workflowId: string}) => ({
+            data: {toolEligibleWorkflowProperties: hoisted.toolPropertiesByWorkflowId[workflowId] ?? []},
+            isLoading: false,
+        }),
         useUpdateMcpProjectMutation: () => ({mutate: hoisted.updateMutate, reset: vi.fn()}),
+    };
+});
+
+vi.mock('@/shared/middleware/graphqlFetcher', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/shared/middleware/graphqlFetcher')>();
+
+    return {
+        ...actual,
+        fetcher: (document: unknown, variables: Record<string, unknown>) => {
+            if (document === ToolEligibleWorkflowPropertiesDocument) {
+                if (hoisted.pendingToolPropertiesLoad) {
+                    return () => hoisted.pendingToolPropertiesLoad;
+                }
+
+                return () =>
+                    Promise.resolve({
+                        toolEligibleWorkflowProperties:
+                            hoisted.toolPropertiesByWorkflowId[variables.workflowId as string] ?? [],
+                    });
+            }
+
+            return actual.fetcher(document as never, variables as never);
+        },
+    };
+});
+
+vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', async () => {
+    const {Controller} = await import('react-hook-form');
+
+    return {
+        default: ({control, properties}: {control: never; properties: Array<{name: string}>}) => (
+            <div>
+                {properties.map((property) => (
+                    <Controller
+                        control={control}
+                        key={property.name}
+                        name={property.name}
+                        render={({field}) => (
+                            <input
+                                aria-label={property.name}
+                                onChange={field.onChange}
+                                value={(field.value as string | undefined) ?? ''}
+                            />
+                        )}
+                    />
+                ))}
+            </div>
+        ),
     };
 });
 
@@ -90,13 +144,28 @@ vi.mock(
 
 const mcpServer = {environmentId: '1', id: 's1', name: 'Server'} as McpServer;
 
+const toolProperties = [
+    {controlType: 'TEXT', name: 'toolName', type: 'STRING'},
+    {controlType: 'TEXT_AREA', name: 'toolDescription', type: 'STRING'},
+    {controlType: 'TEXT', description: 'The channel', name: 'channel', required: true, type: 'STRING'},
+    {controlType: 'TEXT', defaultValue: 'hello', name: 'greeting', type: 'STRING'},
+];
+
+const openWorkflowsStep = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(screen.getByText('pick-project'));
+    await user.click(screen.getByText('pick-version'));
+    await user.click(screen.getByRole('button', {name: 'Next'}));
+};
+
 describe('McpProjectWorkflowDialog', () => {
     beforeEach(() => {
         hoisted.createMutate.mockReset();
         hoisted.updateMutate.mockReset();
         hoisted.eligibleResult.data = undefined;
+        hoisted.pendingToolPropertiesLoad = null;
         hoisted.projectDeployment = undefined;
         hoisted.projectVersionWorkflows = [{id: 'w1', inputs: [], label: 'Workflow One', tasks: [], triggers: []}];
+        hoisted.toolPropertiesByWorkflowId = {w1: toolProperties};
 
         Element.prototype.scrollIntoView = vi.fn();
     });
@@ -264,6 +333,7 @@ describe('McpProjectWorkflowDialog', () => {
             id: 'mp1',
             input: {
                 selectedWorkflowIds: ['w1'],
+                toolParameters: [],
                 workflowConfigurations: [
                     {
                         connections: [{connectionId: '5', workflowConnectionKey: 'slack', workflowNodeName: 'slack_1'}],
@@ -273,5 +343,257 @@ describe('McpProjectWorkflowDialog', () => {
                 ],
             },
         });
+    });
+
+    it('shows a tool tab with tool name description and schema fields', async () => {
+        const user = userEvent.setup();
+
+        hoisted.eligibleResult.data = {
+            toolEligibleProjectVersionWorkflows: [{id: 'pw1', workflow: {id: 'w1', label: 'Workflow One'}}],
+        };
+
+        render(<McpProjectWorkflowDialog mcpServer={mcpServer} />);
+
+        await openWorkflowsStep(user);
+
+        await user.click(screen.getByRole('switch', {name: 'Workflow One'}));
+
+        await user.click(screen.getByRole('tab', {name: /Tool/}));
+
+        const toolPanel = screen.getByRole('tabpanel');
+
+        expect(await within(toolPanel).findByLabelText('toolName')).toBeInTheDocument();
+        expect(within(toolPanel).getByLabelText('toolDescription')).toBeInTheDocument();
+        expect(within(toolPanel).getByLabelText('channel')).toBeInTheDocument();
+        expect(within(toolPanel).getByRole('button', {name: 'Let AI fill all'})).toBeInTheDocument();
+
+        await waitFor(() =>
+            expect((within(toolPanel).getByLabelText('channel') as HTMLInputElement).value).toMatch(
+                /^=fromAi\('channel'/
+            )
+        );
+    });
+
+    it('does not show ai controls on the inputs tab', async () => {
+        const user = userEvent.setup();
+
+        hoisted.eligibleResult.data = {
+            toolEligibleProjectVersionWorkflows: [{id: 'pw1', workflow: {id: 'w1', label: 'Workflow One'}}],
+        };
+
+        render(<McpProjectWorkflowDialog mcpServer={mcpServer} />);
+
+        await openWorkflowsStep(user);
+
+        await user.click(screen.getByRole('switch', {name: 'Workflow One'}));
+
+        await user.click(screen.getByRole('tab', {name: /Inputs/}));
+
+        expect(screen.getByTestId('input-configuration-list')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Let AI fill all'})).not.toBeInTheDocument();
+        expect(screen.queryByText(/fromAi/)).not.toBeInTheDocument();
+    });
+
+    it('sends seeded tool parameters for new workflows', async () => {
+        const user = userEvent.setup();
+
+        hoisted.eligibleResult.data = {
+            toolEligibleProjectVersionWorkflows: [{id: 'pw1', workflow: {id: 'w1', label: 'Workflow One'}}],
+        };
+
+        render(<McpProjectWorkflowDialog mcpServer={mcpServer} />);
+
+        await openWorkflowsStep(user);
+
+        await user.click(screen.getByRole('switch', {name: 'Workflow One'}));
+
+        await user.click(screen.getByRole('button', {name: 'Add'}));
+
+        await waitFor(() => expect(hoisted.createMutate).toHaveBeenCalledTimes(1));
+
+        const {toolParameters} = hoisted.createMutate.mock.calls[0][0].input;
+
+        expect(toolParameters).toHaveLength(1);
+        expect(toolParameters[0].workflowId).toBe('w1');
+        expect(toolParameters[0].parameters.channel).toMatch(/^=fromAi\('channel'/);
+        expect(toolParameters[0].parameters).not.toHaveProperty('greeting');
+        expect(toolParameters[0].parameters).not.toHaveProperty('toolName');
+    });
+
+    it('prefills the tool tab from saved parameters in edit mode', async () => {
+        const user = userEvent.setup();
+
+        hoisted.eligibleResult.data = {
+            toolEligibleProjectVersionWorkflows: [{id: 'pw1', workflow: {id: 'w1', label: 'Workflow One'}}],
+        };
+
+        const mcpProject = {
+            id: 'mp1',
+            mcpProjectWorkflows: [
+                {
+                    id: 'mpw1',
+                    parameters: {channel: 'general', toolName: 'Saved tool'},
+                    workflow: {id: 'w1', label: 'Workflow One'},
+                },
+            ],
+            mcpServerId: 's1',
+            project: {id: '10', name: 'Project'},
+            projectVersion: 2,
+        } as unknown as McpProjectItemType;
+
+        render(<McpProjectWorkflowDialog mcpProject={mcpProject} mcpServer={mcpServer} />);
+
+        await user.click(screen.getByRole('tab', {name: /Tool/}));
+
+        const toolPanel = screen.getByRole('tabpanel');
+
+        expect(await within(toolPanel).findByLabelText('channel')).toHaveValue('general');
+        expect(within(toolPanel).getByLabelText('toolName')).toHaveValue('Saved tool');
+        expect(within(toolPanel).getByLabelText('greeting')).toHaveValue('hello');
+
+        await user.type(within(toolPanel).getByLabelText('toolDescription'), 'Posts');
+
+        await user.click(screen.getByRole('tab', {name: /Inputs/}));
+
+        expect(screen.queryByLabelText('toolDescription')).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('tab', {name: /Tool/}));
+
+        expect(await screen.findByLabelText('toolDescription')).toHaveValue('Posts');
+
+        await user.click(screen.getByRole('button', {name: 'Update'}));
+
+        await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(1));
+
+        expect(hoisted.updateMutate.mock.calls[0][0].input.toolParameters).toEqual([
+            {
+                parameters: {channel: 'general', toolDescription: 'Posts', toolName: 'Saved tool'},
+                workflowId: 'w1',
+            },
+        ]);
+    });
+
+    it('drops tool parameters of workflows toggled off', async () => {
+        const user = userEvent.setup();
+
+        hoisted.eligibleResult.data = {
+            toolEligibleProjectVersionWorkflows: [
+                {id: 'pw1', workflow: {id: 'w1', label: 'Workflow One'}},
+                {id: 'pw2', workflow: {id: 'w2', label: 'Workflow Two'}},
+            ],
+        };
+        hoisted.projectVersionWorkflows = [
+            {id: 'w1', inputs: [], label: 'Workflow One', tasks: [], triggers: []},
+            {id: 'w2', inputs: [], label: 'Workflow Two', tasks: [], triggers: []},
+        ];
+        hoisted.toolPropertiesByWorkflowId = {w1: toolProperties, w2: toolProperties};
+
+        render(<McpProjectWorkflowDialog mcpServer={mcpServer} />);
+
+        await openWorkflowsStep(user);
+
+        await user.click(screen.getByRole('switch', {name: 'Workflow One'}));
+        await user.click(screen.getByRole('tab', {name: /Tool/}));
+        await user.type(await screen.findByLabelText('toolDescription'), 'Posts');
+
+        expect(screen.getByLabelText('toolDescription')).toHaveValue('Posts');
+
+        await user.click(screen.getByRole('switch', {name: 'Workflow One'}));
+        await user.click(screen.getByRole('switch', {name: 'Workflow Two'}));
+        await user.click(screen.getByRole('switch', {name: 'Workflow Two'}));
+        await user.click(screen.getByRole('switch', {name: 'Workflow One'}));
+        await user.click(screen.getByRole('tab', {name: /Tool/}));
+
+        await waitFor(() =>
+            expect((screen.getByLabelText('channel') as HTMLInputElement).value).toMatch(/^=fromAi\('channel'/)
+        );
+
+        expect(screen.getByLabelText('toolDescription')).toHaveValue('');
+
+        await user.click(screen.getByRole('button', {name: 'Add'}));
+
+        await waitFor(() => expect(hoisted.createMutate).toHaveBeenCalledTimes(1));
+
+        const {selectedWorkflowIds, toolParameters} = hoisted.createMutate.mock.calls[0][0].input;
+
+        expect(selectedWorkflowIds).toEqual(['w1']);
+        expect(toolParameters.map((toolParameter: {workflowId: string}) => toolParameter.workflowId)).toEqual(['w1']);
+        expect(toolParameters[0].parameters).not.toHaveProperty('toolDescription');
+    });
+
+    it('waits for pending tool property loads before saving', async () => {
+        const user = userEvent.setup();
+
+        let resolveToolProperties: (value: unknown) => void = () => undefined;
+
+        hoisted.eligibleResult.data = {
+            toolEligibleProjectVersionWorkflows: [{id: 'pw1', workflow: {id: 'w1', label: 'Workflow One'}}],
+        };
+        hoisted.pendingToolPropertiesLoad = new Promise((resolve) => {
+            resolveToolProperties = resolve;
+        });
+
+        render(<McpProjectWorkflowDialog mcpServer={mcpServer} />);
+
+        await openWorkflowsStep(user);
+
+        await user.click(screen.getByRole('switch', {name: 'Workflow One'}));
+        await user.click(screen.getByRole('button', {name: 'Add'}));
+
+        expect(await screen.findByRole('button', {name: /Saving/})).toBeInTheDocument();
+
+        expect(hoisted.createMutate).not.toHaveBeenCalled();
+
+        resolveToolProperties({toolEligibleWorkflowProperties: toolProperties});
+
+        await waitFor(() => expect(hoisted.createMutate).toHaveBeenCalledTimes(1));
+
+        const {toolParameters} = hoisted.createMutate.mock.calls[0][0].input;
+
+        expect(toolParameters).toHaveLength(1);
+        expect(toolParameters[0].parameters.channel).toMatch(/^=fromAi\('channel'/);
+    });
+
+    it('seeds a workflow added in edit mode but not the existing one', async () => {
+        const user = userEvent.setup();
+
+        hoisted.eligibleResult.data = {
+            toolEligibleProjectVersionWorkflows: [
+                {id: 'pw1', workflow: {id: 'w1', label: 'Workflow One'}},
+                {id: 'pw2', workflow: {id: 'w2', label: 'Workflow Two'}},
+            ],
+        };
+        hoisted.projectVersionWorkflows = [
+            {id: 'w1', inputs: [], label: 'Workflow One', tasks: [], triggers: []},
+            {id: 'w2', inputs: [], label: 'Workflow Two', tasks: [], triggers: []},
+        ];
+        hoisted.toolPropertiesByWorkflowId = {w1: toolProperties, w2: toolProperties};
+
+        const mcpProject = {
+            id: 'mp1',
+            mcpProjectWorkflows: [{id: 'mpw1', parameters: {}, workflow: {id: 'w1', label: 'Workflow One'}}],
+            mcpServerId: 's1',
+            project: {id: '10', name: 'Project'},
+            projectVersion: 2,
+        } as unknown as McpProjectItemType;
+
+        render(<McpProjectWorkflowDialog mcpProject={mcpProject} mcpServer={mcpServer} />);
+
+        await user.click(screen.getByRole('tab', {name: /Tool/}));
+        await user.type(await screen.findByLabelText('toolDescription'), 'Posts');
+
+        await user.click(screen.getByRole('switch', {name: 'Workflow Two'}));
+
+        await user.click(screen.getByRole('button', {name: 'Update'}));
+
+        await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(1));
+
+        const {selectedWorkflowIds, toolParameters} = hoisted.updateMutate.mock.calls[0][0].input;
+
+        expect(selectedWorkflowIds).toEqual(['w1', 'w2']);
+        expect(toolParameters).toHaveLength(2);
+        expect(toolParameters[0]).toEqual({parameters: {toolDescription: 'Posts'}, workflowId: 'w1'});
+        expect(toolParameters[1].workflowId).toBe('w2');
+        expect(toolParameters[1].parameters.channel).toMatch(/^=fromAi\('channel'/);
     });
 });

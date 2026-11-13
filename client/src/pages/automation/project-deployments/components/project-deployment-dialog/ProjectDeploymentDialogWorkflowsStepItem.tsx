@@ -3,6 +3,7 @@ import ConnectionConfigurationList from '@/shared/components/ConnectionConfigura
 import InputConfigurationList from '@/shared/components/InputConfigurationList';
 import WorkflowConfigurationCard from '@/shared/components/workflow-configuration/WorkflowConfigurationCard';
 import {Connection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
+import {ReactNode} from 'react';
 import {Control, FieldValues, FormState, UseFormSetValue, useWatch} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -22,6 +23,7 @@ export interface ProjectDeploymentDialogWorkflowListItemProps {
     onEnabledChange?: (enabled: boolean) => void;
     setValue: UseFormSetValue<ProjectDeployment>;
     showWorkflowToggle?: boolean;
+    toolContent?: ReactNode;
     workflow: Workflow;
     workflowIndex: number;
     workflows: Workflow[];
@@ -37,6 +39,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     onEnabledChange,
     setValue,
     showWorkflowToggle = false,
+    toolContent,
     workflow,
     workflowIndex,
     workflows,
@@ -114,6 +117,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
             onEnabledChange={handleEnabledChange}
             showWorkflowToggle={showWorkflowToggle}
             switchId={`projectDeploymentWorkflows.${workflowIndex}`}
+            toolContent={toolContent}
         />
     );
 };

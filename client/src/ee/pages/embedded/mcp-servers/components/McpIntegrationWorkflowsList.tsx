@@ -2,12 +2,14 @@ import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogWorkflowsStepItem from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItem';
 import {IntegrationInstanceConfiguration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {ReactNode} from 'react';
 import {UseFormReturn} from 'react-hook-form';
 
 interface McpIntegrationWorkflowsListProps {
     componentName: string;
     form: UseFormReturn<IntegrationInstanceConfiguration>;
     onSelectedWorkflowIdsChange: (selectedWorkflowIds: string[]) => void;
+    renderToolContent?: (workflow: Workflow, enabled: boolean) => ReactNode;
     selectedWorkflowIds: string[];
     workflows: Workflow[];
 }
@@ -16,6 +18,7 @@ const McpIntegrationWorkflowsList = ({
     componentName,
     form,
     onSelectedWorkflowIdsChange,
+    renderToolContent,
     selectedWorkflowIds,
     workflows,
 }: McpIntegrationWorkflowsListProps) => (
@@ -39,6 +42,7 @@ const McpIntegrationWorkflowsList = ({
                         }
                         setValue={form.setValue}
                         showWorkflowToggle
+                        toolContent={renderToolContent?.(workflow, selectedWorkflowIds.includes(workflow.id!))}
                         workflow={workflow}
                         workflowIndex={workflowIndex}
                     />

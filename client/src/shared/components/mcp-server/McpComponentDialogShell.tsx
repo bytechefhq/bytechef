@@ -11,6 +11,7 @@ import {
 } from '@/components/Dialog';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {McpComponent} from '@/shared/middleware/graphql';
+import {Loader2Icon} from 'lucide-react';
 import {ReactNode, useMemo} from 'react';
 
 export interface McpComponentDialogProps {
@@ -25,6 +26,7 @@ interface McpComponentDialogShellProps {
     children: ReactNode;
     currentStep: 'components' | 'tools';
     editing: boolean;
+    isSavePending?: boolean;
     onBack: () => void;
     onOpenChange: (open: boolean) => void;
     onSave: () => void;
@@ -38,6 +40,7 @@ const McpComponentDialogShell = ({
     children,
     currentStep,
     editing,
+    isSavePending,
     onBack,
     onOpenChange,
     onSave,
@@ -101,7 +104,8 @@ const McpComponentDialogShell = ({
                                 {!editing && <Button label="Back" onClick={onBack} variant="outline" />}
 
                                 <Button
-                                    disabled={selectedToolCount === 0}
+                                    disabled={selectedToolCount === 0 || isSavePending}
+                                    icon={isSavePending ? <Loader2Icon className="animate-spin" /> : undefined}
                                     label={editing ? 'Update' : 'Save'}
                                     onClick={onSave}
                                 />

@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
+import com.bytechef.platform.configuration.dto.WorkflowToolParametersDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -59,7 +60,7 @@ class McpIntegrationInstanceConfigurationGraphQlController {
         createMcpIntegrationInstanceConfiguration(@Argument CreateMcpIntegrationInstanceConfigurationInput input) {
         return mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
             input.mcpServerId(), input.integrationInstanceConfigurationId(), input.selectedWorkflowIds(),
-            input.workflowConfigurations());
+            input.workflowConfigurations(), input.toolParameters());
     }
 
     @MutationMapping
@@ -73,7 +74,7 @@ class McpIntegrationInstanceConfigurationGraphQlController {
     McpIntegrationInstanceConfiguration updateMcpIntegrationInstanceConfiguration(
         @Argument long id, @Argument UpdateMcpIntegrationInstanceConfigurationInput input) {
         return mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfiguration(
-            id, input.selectedWorkflowIds(), input.workflowConfigurations());
+            id, input.selectedWorkflowIds(), input.workflowConfigurations(), input.toolParameters());
     }
 
     @QueryMapping
@@ -129,19 +130,22 @@ class McpIntegrationInstanceConfigurationGraphQlController {
     @SuppressFBWarnings("EI")
     record CreateMcpIntegrationInstanceConfigurationInput(
         long mcpServerId, long integrationInstanceConfigurationId, List<String> selectedWorkflowIds,
-        List<WorkflowConfigurationDTO> workflowConfigurations) {
+        List<WorkflowConfigurationDTO> workflowConfigurations, List<WorkflowToolParametersDTO> toolParameters) {
 
         CreateMcpIntegrationInstanceConfigurationInput {
             workflowConfigurations = workflowConfigurations == null ? List.of() : workflowConfigurations;
+            toolParameters = toolParameters == null ? List.of() : toolParameters;
         }
     }
 
     @SuppressFBWarnings("EI")
     record UpdateMcpIntegrationInstanceConfigurationInput(
-        List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations) {
+        List<String> selectedWorkflowIds, List<WorkflowConfigurationDTO> workflowConfigurations,
+        List<WorkflowToolParametersDTO> toolParameters) {
 
         UpdateMcpIntegrationInstanceConfigurationInput {
             workflowConfigurations = workflowConfigurations == null ? List.of() : workflowConfigurations;
+            toolParameters = toolParameters == null ? List.of() : toolParameters;
         }
     }
 }

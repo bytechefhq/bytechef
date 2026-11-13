@@ -24,6 +24,7 @@ interface PropertiesProps<T extends FieldValues = FieldValues> {
     formDisplayConditions?: Record<string, boolean>;
     customClassName?: string;
     hideFromAi?: boolean;
+    onAdvancedPropertiesOpenChange?: (open: boolean) => void;
     operationName?: string;
     formState?: FormState<FieldValues>;
     path?: string;
@@ -39,6 +40,7 @@ const Properties = <T extends FieldValues = FieldValues>({
     formDisplayConditions,
     formState,
     hideFromAi,
+    onAdvancedPropertiesOpenChange,
     operationName,
     path,
     properties,
@@ -83,11 +85,19 @@ const Properties = <T extends FieldValues = FieldValues>({
 
     const advancedPropertyHasIssue = advancedProperties.some((property) => issueParameterNames.has(property.name!));
 
+    const handleAdvancedPropertiesOpenChange = (open: boolean) => {
+        setAdvancedPropertiesOpen(open);
+
+        onAdvancedPropertiesOpenChange?.(open);
+    };
+
     useEffect(() => {
         if (advancedPropertyHasIssue) {
             setAdvancedPropertiesOpen(true);
+
+            onAdvancedPropertiesOpenChange?.(true);
         }
-    }, [advancedPropertyHasIssue]);
+    }, [advancedPropertyHasIssue, onAdvancedPropertiesOpenChange]);
 
     return (
         <FormDisplayConditionsProvider value={formDisplayConditions}>
@@ -114,7 +124,7 @@ const Properties = <T extends FieldValues = FieldValues>({
             {!!advancedProperties.length && (
                 <Collapsible
                     className={twMerge('group mt-2 flex w-full flex-col justify-center', customClassName)}
-                    onOpenChange={setAdvancedPropertiesOpen}
+                    onOpenChange={handleAdvancedPropertiesOpenChange}
                     open={advancedPropertiesOpen}
                 >
                     <CollapsibleTrigger asChild>

@@ -18,4 +18,5 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

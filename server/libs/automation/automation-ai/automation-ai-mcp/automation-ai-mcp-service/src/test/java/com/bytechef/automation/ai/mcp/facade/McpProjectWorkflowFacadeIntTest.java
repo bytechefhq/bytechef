@@ -88,4 +88,22 @@ class McpProjectWorkflowFacadeIntTest {
 
         verify(permissionEvaluator).hasPermission(any(), eq(5L), eq("Project"), eq("WORKFLOW_VIEW"));
     }
+
+    @Test
+    void testGetToolEligibleWorkflowRequiresAProjectWorkflowViewer() {
+        when(permissionEvaluator.hasPermission(any(), eq(5L), eq("Project"), eq("WORKFLOW_VIEW")))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> mcpProjectWorkflowFacade.getToolEligibleWorkflow(5L, "workflow1"))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionEvaluator).hasPermission(any(), eq(5L), eq("Project"), eq("WORKFLOW_VIEW"));
+    }
+
+    @Test
+    void testGetToolEligibleWorkflowRejectsWorkflowOfAnotherProject() {
+        assertThatThrownBy(() -> mcpProjectWorkflowFacade.getToolEligibleWorkflow(5L, "workflowOfAnotherProject"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("workflowOfAnotherProject");
+    }
 }

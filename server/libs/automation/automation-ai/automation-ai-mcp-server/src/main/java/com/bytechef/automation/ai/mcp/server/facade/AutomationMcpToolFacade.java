@@ -39,8 +39,10 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.ai.tool.FromAiResult;
+import com.bytechef.platform.ai.tool.ToolOptionsResolver;
 import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
+import com.bytechef.platform.ai.tool.util.ToolParameterDefaultsUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
@@ -112,6 +114,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
     private final ExternalInvocationRecorder externalInvocationRecorder;
+    private final ToolOptionsResolver toolOptionsResolver;
     private final WorkflowService workflowService;
     private final WorkspaceMcpServerService workspaceMcpServerService;
 
@@ -148,6 +151,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
         this.externalInvocationRecorder = externalInvocationRecorder;
+        this.toolOptionsResolver = new ToolOptionsResolver(clusterElementDefinitionFacade);
         this.workflowService = workflowService;
         this.workspaceMcpServerService = workspaceMcpServerService;
     }
@@ -159,7 +163,13 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
             clusterElementDefinitionService.getClusterElementDefinition(
                 mcpComponent.getComponentName(), mcpComponent.getComponentVersion(), mcpTool.getName());
 
-        List<FromAiResult> fromAiResults = extractFromAiResults(mcpTool.getParameters());
+        List<FromAiResult> fromAiResults = applyRuntimeOptions(
+            extractFromAiResults(mcpTool.getParameters()), mcpTool.getParameters(),
+            clusterElementDefinition.getProperties(),
+            property -> toolOptionsResolver.resolveOptions(
+                clusterElementDefinition.getComponentName(), clusterElementDefinition.getComponentVersion(),
+                clusterElementDefinition.getName(), property, mcpTool.getParameters(),
+                mcpComponent.getConnectionId()));
 
         String toolName = getToolName(
             clusterElementDefinition.getComponentName(), clusterElementDefinition.getName(), mcpTool.getParameters());
@@ -170,7 +180,9 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                 getClusterElementToolCallbackFunction(
                     toolName, clusterElementDefinition.getComponentName(),
                     clusterElementDefinition.getComponentVersion(), clusterElementDefinition.getName(),
-                    mcpTool.getParameters(), mcpComponent.getConnectionId(), mcpComponent.getMcpServerId(),
+                    mcpTool.getParameters(),
+                    ToolParameterDefaultsUtils.collectPropertyDefaults(clusterElementDefinition.getProperties()),
+                    mcpComponent.getConnectionId(), mcpComponent.getMcpServerId(),
                     Objects.requireNonNull(mcpTool.getId())))
             .inputType(Map.class)
             .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
@@ -233,6 +245,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                     toolName,
                     getWorkflowToolCallbackFunction(
                         toolName, projectDeploymentWorkflow, trigger.getName(), workflowParameters,
+                        ToolParameterDefaultsUtils.collectTriggerInputDefaults(trigger.getParameters()),
                         mcpProject.getMcpServerId()))
                 .inputType(Map.class)
                 .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
@@ -255,7 +268,8 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
     private Function<Map<String, Object>, Object> getClusterElementToolCallbackFunction(
         String toolName, String componentName, int componentVersion, String clusterElementName,
-        Map<String, ?> parameters, @Nullable Long connectionId, long mcpServerId, long mcpToolId) {
+        Map<String, ?> parameters, Map<String, Object> propertyDefaults, @Nullable Long connectionId,
+        long mcpServerId, long mcpToolId) {
 
         Long workspaceId = workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId)
             .orElse(null);
@@ -295,13 +309,16 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                     .workspaceId(workspaceId),
                 () -> clusterElementDefinitionFacade.executeTool(
                     componentName, componentVersion, clusterElementName,
-                    MapUtils.concat(request, resolvedParameters), connectionId));
+                    ToolParameterDefaultsUtils.mergeParameters(
+                        ToolParameterDefaultsUtils.removeClearedDefaults(propertyDefaults, parameters),
+                        MapUtils.concat(request, resolvedParameters)),
+                    connectionId));
         };
     }
 
     private Function<Map<String, Object>, Object> getWorkflowToolCallbackFunction(
         String toolName, ProjectDeploymentWorkflow projectDeploymentWorkflow, String triggerName,
-        Map<String, ?> workflowParameters, long mcpServerId) {
+        Map<String, ?> workflowParameters, Map<String, Object> triggerInputDefaults, long mcpServerId) {
 
         Long workspaceId = workspaceMcpServerService.fetchMcpServerWorkspaceId(mcpServerId)
             .orElse(null);
@@ -330,6 +347,12 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
             }
 
             resolvedTriggerInputs.putAll(inputParameters);
+
+            if (!triggerInputDefaults.isEmpty()) {
+                resolvedTriggerInputs = ToolParameterDefaultsUtils.mergeParameters(
+                    ToolParameterDefaultsUtils.removeClearedDefaults(triggerInputDefaults, workflowParameters),
+                    resolvedTriggerInputs);
+            }
 
             inputs.put(triggerName, resolvedTriggerInputs);
             inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, triggerName);

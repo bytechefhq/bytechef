@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import java.util.List;
@@ -50,4 +51,13 @@ public interface McpIntegrationInstanceConfigurationWorkflowFacade {
 
     List<IntegrationWorkflowDTO> getToolEligibleIntegrationInstanceConfigurationWorkflows(
         long integrationInstanceConfigurationId);
+
+    /**
+     * Returns the tool-eligible workflow of the integration version the given integration instance configuration uses,
+     * so its tool properties can be built before it is added as an MCP tool.
+     *
+     * @throws IllegalArgumentException if the workflow is not tool-eligible for the integration instance configuration
+     */
+    Workflow getToolEligibleIntegrationInstanceConfigurationWorkflow(
+        long integrationInstanceConfigurationId, String workflowId);
 }

@@ -1,5 +1,7 @@
 query mcpIntegrationInstanceConfigurationWorkflowProperties($mcpIntegrationInstanceConfigurationWorkflowId: ID!) {
-    mcpIntegrationInstanceConfigurationWorkflowProperties(mcpIntegrationInstanceConfigurationWorkflowId: $mcpIntegrationInstanceConfigurationWorkflowId) {
+    mcpIntegrationInstanceConfigurationWorkflowProperties(
+        mcpIntegrationInstanceConfigurationWorkflowId: $mcpIntegrationInstanceConfigurationWorkflowId
+    ) {
         advancedOption
         description
         displayCondition
@@ -38,6 +40,52 @@ query mcpIntegrationInstanceConfigurationWorkflowProperties($mcpIntegrationInsta
         ... on ArrayProperty {
             arrayDefaultValue: defaultValue
             controlType
+            items {
+                advancedOption
+                description
+                displayCondition
+                expressionEnabled
+                hidden
+                name
+                required
+                type
+                ... on StringProperty {
+                    controlType
+                    defaultValue
+                    label
+                    placeholder
+                }
+                ... on IntegerProperty {
+                    controlType
+                    integerDefaultValue: defaultValue
+                    label
+                    placeholder
+                }
+                ... on NumberProperty {
+                    controlType
+                    label
+                    numberDefaultValue: defaultValue
+                    placeholder
+                }
+                ... on BooleanProperty {
+                    booleanDefaultValue: defaultValue
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on ArrayProperty {
+                    arrayDefaultValue: defaultValue
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on ObjectProperty {
+                    controlType
+                    label
+                    objectDefaultValue: defaultValue
+                    placeholder
+                }
+            }
             label
             placeholder
         }
@@ -46,6 +94,52 @@ query mcpIntegrationInstanceConfigurationWorkflowProperties($mcpIntegrationInsta
             label
             objectDefaultValue: defaultValue
             placeholder
+            properties {
+                advancedOption
+                description
+                displayCondition
+                expressionEnabled
+                hidden
+                name
+                required
+                type
+                ... on StringProperty {
+                    controlType
+                    defaultValue
+                    label
+                    placeholder
+                }
+                ... on IntegerProperty {
+                    controlType
+                    integerDefaultValue: defaultValue
+                    label
+                    placeholder
+                }
+                ... on NumberProperty {
+                    controlType
+                    label
+                    numberDefaultValue: defaultValue
+                    placeholder
+                }
+                ... on BooleanProperty {
+                    booleanDefaultValue: defaultValue
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on ArrayProperty {
+                    arrayDefaultValue: defaultValue
+                    controlType
+                    label
+                    placeholder
+                }
+                ... on ObjectProperty {
+                    controlType
+                    label
+                    objectDefaultValue: defaultValue
+                    placeholder
+                }
+            }
         }
     }
 }
