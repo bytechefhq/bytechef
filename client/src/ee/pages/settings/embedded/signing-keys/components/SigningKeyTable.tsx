@@ -107,11 +107,6 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
 
     return (
         <div className="w-full space-y-8 self-start p-4 pt-0 text-sm 3xl:mx-auto 3xl:w-4/5">
-            <p>
-                Use your Signing Keys to sign requests made from the ByteChef SDK. <a href="#">Read our docs</a> for
-                more information.
-            </p>
-
             <Table>
                 <TableHeader>
                     {headerGroups.map((headerGroup) => (
