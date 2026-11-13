@@ -135,6 +135,19 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
+    public ResponseEntity<Void> updateConnectedUserConnectionCredentials(
+        Long connectedUserId, Long connectionId,
+        UpdateConnectionCredentialsRequestModel updateConnectionCredentialsRequestModel) {
+
+        connectedUserConnectionFacade.updateConnectedUserConnectionCredentials(
+            connectedUserId, connectionId, updateConnectionCredentialsRequestModel.getParameters(),
+            Objects.requireNonNull(updateConnectionCredentialsRequestModel.getVersion()));
+
+        return ResponseEntity.noContent()
+            .build();
+    }
+
+    @Override
     public ResponseEntity<Void> updateConnectionCredentials(
         Long id, UpdateConnectionCredentialsRequestModel updateConnectionCredentialsRequestModel) {
 

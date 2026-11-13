@@ -932,6 +932,113 @@ class ConnectedUserConnectionFacadeIntTest {
     }
 
     @Test
+    void testUpdateConnectedUserConnectionCredentialsReplacesAConnectionProvisionedForAutomations() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        registerConnection(83771L, Environment.PRODUCTION, PlatformType.EMBEDDED);
+
+        connectedUserConnectionService.create(connectedUserId, 83771L, "admin@localhost.com");
+
+        stubOwnedConnectionDTOs(List.of(83771L));
+
+        Map<String, Object> parameters = Map.of("token", "new");
+
+        connectedUserConnectionFacade.updateConnectedUserConnectionCredentials(
+            connectedUserId, 83771L, parameters, 4);
+
+        verify(connectionFacade).updateCredentials(83771L, parameters, 4);
+
+        assertThat(findSingleConnectionEvent(ConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, 83771L).getData())
+            .containsEntry("result", "SUCCESS")
+            .containsEntry("connectedUserId", String.valueOf(connectedUserId))
+            .doesNotContainKey("parameters")
+            .doesNotContainValue("new");
+    }
+
+    @Test
+    void testUpdateConnectedUserConnectionCredentialsKeepsTheConfigurationParametersOfAProvisionedInstance() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createIntegrationInstance(
+            connectedUserId, 83781L, Environment.PRODUCTION,
+            Map.of("clientId", "app-id", "clientSecret", "app-secret"), "admin@localhost.com");
+        stubOwnedConnectionDTOs(List.of(83781L));
+
+        ConnectionDefinition connectionDefinition = new ConnectionDefinition(
+            ComponentDsl.connection()
+                .authorizations(
+                    ComponentDsl.authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                        .properties(
+                            ComponentDsl.string("clientId"), ComponentDsl.string("clientSecret"),
+                            ComponentDsl.string("token"))),
+            "componentName", "Component", null);
+
+        when(connectionDefinitionService.getConnectionConnectionDefinition(any(), anyInt()))
+            .thenReturn(connectionDefinition);
+
+        connectedUserConnectionFacade.updateConnectedUserConnectionCredentials(
+            connectedUserId, 83781L, Map.of("token", "new"), 2);
+
+        verify(connectionFacade).updateCredentials(
+            83781L, Map.of("clientId", "app-id", "clientSecret", "app-secret", "token", "new"), 2);
+    }
+
+    @Test
+    void testUpdateConnectedUserConnectionCredentialsRejectsAConnectionTheUserCreated() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        createConnectedUserConnection(connectedUserId, 83791L, Environment.PRODUCTION);
+        stubOwnedConnectionDTOs(List.of(83791L));
+
+        Map<String, Object> parameters = Map.of("token", "new");
+
+        assertThrows(
+            NoSuchElementException.class,
+            () -> connectedUserConnectionFacade.updateConnectedUserConnectionCredentials(
+                connectedUserId, 83791L, parameters, 0));
+
+        verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+    }
+
+    @Test
+    void testUpdateConnectedUserConnectionCredentialsRejectsAConnectionProvisionedForAnotherUser() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+        long otherConnectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        registerConnection(83801L, Environment.PRODUCTION, PlatformType.EMBEDDED);
+
+        connectedUserConnectionService.create(otherConnectedUserId, 83801L, "admin@localhost.com");
+
+        stubOwnedConnectionDTOs(List.of(83801L));
+
+        Map<String, Object> parameters = Map.of("token", "new");
+
+        assertThrows(
+            NoSuchElementException.class,
+            () -> connectedUserConnectionFacade.updateConnectedUserConnectionCredentials(
+                connectedUserId, 83801L, parameters, 0));
+
+        verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+    }
+
+    @Test
+    void testUpdateConnectedUserConnectionCredentialsRejectsASharedConnection() {
+        long connectedUserId = createConnectedUser(Environment.PRODUCTION);
+
+        stubSharedConnections(Environment.PRODUCTION, 83811L);
+        stubOwnedConnectionDTOs(List.of(83811L));
+
+        Map<String, Object> parameters = Map.of("token", "new");
+
+        assertThrows(
+            NoSuchElementException.class,
+            () -> connectedUserConnectionFacade.updateConnectedUserConnectionCredentials(
+                connectedUserId, 83811L, parameters, 0));
+
+        verify(connectionFacade, never()).updateCredentials(anyLong(), any(), anyInt());
+    }
+
+    @Test
     void testGetConnectedUserConnectionsForAdminStripsSelfActivatedInstanceCredentials() {
         long connectedUserId = createConnectedUser(Environment.PRODUCTION);
 

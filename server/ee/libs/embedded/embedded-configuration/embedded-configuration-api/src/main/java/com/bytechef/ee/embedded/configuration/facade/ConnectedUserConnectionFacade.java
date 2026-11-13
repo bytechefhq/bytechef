@@ -54,6 +54,9 @@ public interface ConnectedUserConnectionFacade {
 
     void reauthorizeConnectedUserConnection(long connectedUserId, long connectionId, Map<String, ?> parameters);
 
+    void updateConnectedUserConnectionCredentials(
+        long connectedUserId, long connectionId, Map<String, ?> parameters, int version);
+
     void updateConnectedUserConnectionTags(long connectedUserId, long connectionId, List<Tag> tags);
 
     void updateIntegrationInstanceConnectionCredentials(

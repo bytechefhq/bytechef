@@ -257,6 +257,28 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     }
 
     @Override
+    @Audited(event = ConnectionAuditEvents.CONNECTION_CREDENTIALS_UPDATED, data = {
+        @AuditData(key = "connectionId", value = "#connectionId"),
+        @AuditData(key = "connectedUserId", value = "#connectedUserId")
+    })
+    @PreAuthorize("isTenantAdmin()")
+    public void updateConnectedUserConnectionCredentials(
+        long connectedUserId, long connectionId, Map<String, ?> parameters, int version) {
+
+        Map<Long, ConnectionOrigin> connectionOrigins = getConnectionOrigins(
+            connectedUserService.getConnectedUser(connectedUserId), List.of(connectionId));
+
+        if (connectionOrigins.get(connectionId) != ConnectionOrigin.PROVISIONED) {
+            throw new NoSuchElementException("Connection id=%s not found".formatted(connectionId));
+        }
+
+        ConnectionDTO connectionDTO = requireOwned(connectedUserId, connectionId);
+
+        connectionFacade.updateCredentials(
+            connectionId, withIntegrationCredentials(connectedUserId, connectionDTO, parameters), version);
+    }
+
+    @Override
     @PreAuthorize("isCurrentConnectedUser(#connectedUserId)")
     public void updateConnectedUserConnectionTags(long connectedUserId, long connectionId, List<Tag> tags) {
         requireOwned(connectedUserId, connectionId);

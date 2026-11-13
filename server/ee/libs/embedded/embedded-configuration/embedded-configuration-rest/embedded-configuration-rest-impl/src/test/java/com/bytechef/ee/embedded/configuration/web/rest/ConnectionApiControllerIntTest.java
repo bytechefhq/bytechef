@@ -522,6 +522,23 @@ class ConnectionApiControllerIntTest {
     }
 
     @Test
+    void testPutConnectedUserConnectionCredentials() {
+        this.webTestClient
+            .put()
+            .uri("/internal/connected-users/7/connections/1/credentials")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(new UpdateConnectionCredentialsRequestModel().parameters(Map.of("token", "secret"))
+                .version(3))
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(connectedUserConnectionFacade).updateConnectedUserConnectionCredentials(
+            7L, 1L, Map.of("token", "secret"), 3);
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void testPutConnectionTags() {
         this.webTestClient
