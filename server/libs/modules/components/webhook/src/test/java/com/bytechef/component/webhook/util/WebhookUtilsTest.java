@@ -65,16 +65,16 @@ class WebhookUtilsTest {
     }
 
     @Test
-    void testGetWebhookValidateReturnsBadRequestWhenCsrfTokenIsNotSet() {
+    void testGetWebhookValidateReturnsOkWhenCsrfTokenIsNotSet() {
         when(httpHeaders.firstValue("X-Csrf-Token")).thenReturn(Optional.of("token"));
 
         WebhookValidateResponse webhookValidateResponse = validate(MockParametersFactory.create(Map.of()));
 
-        assertThat(webhookValidateResponse.status()).isEqualTo(400);
+        assertThat(webhookValidateResponse.status()).isEqualTo(200);
     }
 
     @Test
-    void testGetWebhookValidateReturnsBadRequestWhenCsrfTokenAndHeaderAreNotSet() {
+    void testGetWebhookValidateReturnsOkWhenCsrfTokenAndHeaderAreNotSet() {
         when(httpHeaders.firstValue("X-Csrf-Token")).thenReturn(Optional.empty());
 
         Map<String, Object> inputParameterMap = new HashMap<>();
@@ -82,6 +82,26 @@ class WebhookUtilsTest {
         inputParameterMap.put(CSRF_TOKEN, null);
 
         WebhookValidateResponse webhookValidateResponse = validate(MockParametersFactory.create(inputParameterMap));
+
+        assertThat(webhookValidateResponse.status()).isEqualTo(200);
+    }
+
+    @Test
+    void testGetWebhookValidateReturnsOkWhenCsrfTokenIsBlank() {
+        when(httpHeaders.firstValue("X-Csrf-Token")).thenReturn(Optional.empty());
+
+        WebhookValidateResponse webhookValidateResponse = validate(MockParametersFactory.create(
+            Map.of(CSRF_TOKEN, "  ")));
+
+        assertThat(webhookValidateResponse.status()).isEqualTo(200);
+    }
+
+    @Test
+    void testGetWebhookValidateReturnsBadRequestWhenCsrfTokenIsSetAndHeaderIsMissing() {
+        when(httpHeaders.firstValue("X-Csrf-Token")).thenReturn(Optional.empty());
+
+        WebhookValidateResponse webhookValidateResponse = validate(MockParametersFactory.create(
+            Map.of(CSRF_TOKEN, "token")));
 
         assertThat(webhookValidateResponse.status()).isEqualTo(400);
     }

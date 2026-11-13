@@ -47,9 +47,9 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
             string(CSRF_TOKEN)
                 .label("CSRF Token")
                 .description(
-                    "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP " +
-                        "header value passed by the client.")
-                .required(true),
+                    "If set, the X-Csrf-Token HTTP header value passed by the client must match this token. " +
+                        "Leave empty to accept requests without the header.")
+                .required(false),
             integer("timeout")
                 .label("Timeout (ms)")
                 .description(

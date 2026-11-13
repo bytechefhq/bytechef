@@ -1,6 +1,6 @@
 #### Webhook Trigger Execution Modes
 
-Use the **Static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. Incoming requests are first validated by checking the CSRF token sent in the `X-Csrf-Token HTTP header`. After successful validation, the workflow starts executing, and the HTTP response is sent when the workflow run is complete. Add the [**Webhook/Response to Webhook Request**](/reference/components/webhook_v1#response-to-webhook-request) action to the workflow to define the exact response body, status code and headers returned to the sender.
+Use the **Static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. If the **CSRF Token** property is set, incoming requests are first validated by checking the token sent in the `X-Csrf-Token` HTTP header. If the property is empty, every request is accepted. After successful validation, the workflow starts executing, and the HTTP response is sent when the workflow run is complete. Add the [**Webhook/Response to Webhook Request**](/reference/components/webhook_v1#response-to-webhook-request) action to the workflow to define the exact response body, status code and headers returned to the sender.
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/60d86013-a975-4e96-a7ac-7a7bccb982d7?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
@@ -16,7 +16,7 @@ For the URLs, body formats and trigger output, see [Testing Webhooks with Postma
 |:---|:---|
 | Method | `POST` or `GET` |
 | URL | The static workflow webhook trigger URL |
-| Required headers | `X-Csrf-Token`: the value of the **CSRF Token** property. Add `Content-Type` if you send a body. |
+| Headers | `X-Csrf-Token`: the value of the **CSRF Token** property. Required only when the property is set. Add `Content-Type` if you send a body. |
 | Body | Optional. Use any format. |
 
 ##### Response
@@ -27,13 +27,13 @@ The HTTP connection stays open while the workflow runs. ByteChef sends the respo
 |:---|:---|:---|
 | The workflow runs a **Response to Webhook Request** step | The **Status Code** of that step | The body and headers of that step. See [Response to Webhook Request](#response-to-webhook-request). |
 | The workflow has no **Response to Webhook Request** step | `200 OK` | The outputs of the workflow as JSON. If the workflow has no outputs, the body is empty. |
-| The `X-Csrf-Token` header is missing, or its value is incorrect | `400 Bad Request` | Empty. The workflow does not run. |
+| The **CSRF Token** property is set, and the `X-Csrf-Token` header is missing or its value is incorrect | `400 Bad Request` | Empty. The workflow does not run. |
 | A step of the workflow fails | `500 Internal Server Error` | A JSON error object. The `detail` field contains the error message of the step that failed. |
 | The workflow is disabled | `410 Gone` | `{"detail": "Workflow is disabled."}` |
 
 If the workflow runs more than one **Response to Webhook Request** step, for example in different branches, the last step that runs sets the response.
 
-The test URL checks the token in the same way: a missing or incorrect token returns `400 Bad Request`. It does not wait for the workflow and does not apply **Response to Webhook Request**, so a request with a correct token returns `200 OK` with an empty body. To test the response, use the static workflow webhook trigger URL.
+The test URL checks the token in the same way when the property is set: a missing or incorrect token returns `400 Bad Request`. It does not wait for the workflow and does not apply **Response to Webhook Request**, so a request with a correct token returns `200 OK` with an empty body. To test the response, use the static workflow webhook trigger URL.
 
 ##### Example
 
