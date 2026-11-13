@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectConfiguration
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionWorkflowDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChanges;
@@ -36,6 +37,8 @@ public interface AutomationProjectFacade {
     VersionWorkflowChange getProjectVersionWorkflowChange(long projectId, int projectVersion, String workflowUuid);
 
     VersionWorkflowChanges getProjectVersionWorkflowChanges(long projectId, int projectVersion);
+
+    List<AutomationProjectVersionWorkflowDTO> getProjectVersionWorkflows(long projectId, int projectVersion);
 
     List<AutomationProjectCategoryDTO> getCategories();
 

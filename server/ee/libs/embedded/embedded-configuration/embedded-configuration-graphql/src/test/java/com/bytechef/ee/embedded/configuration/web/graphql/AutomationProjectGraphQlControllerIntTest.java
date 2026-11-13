@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCategoryDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlConfigurationSharedMocks;
@@ -612,6 +613,31 @@ class AutomationProjectGraphQlControllerIntTest {
             .isEqualTo(3);
 
         verify(automationProjectFacade).getProjectVersionWorkflowChanges(5L, 2);
+    }
+
+    @Test
+    void testAutomationProjectVersionWorkflows() {
+        when(automationProjectFacade.getProjectVersionWorkflows(5L, 2))
+            .thenReturn(List.of(new AutomationProjectVersionWorkflowDTO(SOURCE_WORKFLOW_UUID, "Workflow One")));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    automationProjectVersionWorkflows(id: "5", projectVersion: 2) {
+                        workflowUuid
+                        label
+                    }
+                }
+                """)
+            .execute()
+            .path("automationProjectVersionWorkflows[0].workflowUuid")
+            .entity(String.class)
+            .isEqualTo(SOURCE_WORKFLOW_UUID)
+            .path("automationProjectVersionWorkflows[0].label")
+            .entity(String.class)
+            .isEqualTo("Workflow One");
+
+        verify(automationProjectFacade).getProjectVersionWorkflows(5L, 2);
     }
 
     @Test

@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationProjectCategoryDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectVersionWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.dto.VersionWorkflowChange;
@@ -150,6 +151,13 @@ public class AutomationProjectGraphQlController {
         @Argument String id, @Argument int projectVersion) {
 
         return automationProjectFacade.getProjectVersionWorkflowChanges(Long.parseLong(id), projectVersion);
+    }
+
+    @QueryMapping
+    public List<AutomationProjectVersionWorkflowDTO> automationProjectVersionWorkflows(
+        @Argument String id, @Argument int projectVersion) {
+
+        return automationProjectFacade.getProjectVersionWorkflows(Long.parseLong(id), projectVersion);
     }
 
     @QueryMapping
