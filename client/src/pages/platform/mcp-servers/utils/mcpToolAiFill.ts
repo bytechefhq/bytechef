@@ -227,8 +227,31 @@ export function collectHiddenToolPaths(
     return hiddenPaths;
 }
 
-export function hasAiFillCandidates(params: AiFillCandidatesParamsI): boolean {
-    return collectAiFillCandidates(params).length > 0;
+export interface AiFillCandidatesSummaryI {
+    hasStaticCandidates: boolean;
+    optionsCandidatesKey: string;
+}
+
+export function summarizeAiFillCandidates(params: AiFillCandidatesParamsI): AiFillCandidatesSummaryI {
+    const candidates = collectAiFillCandidates(params);
+
+    const optionsCandidates = candidates.filter((candidate) => !!candidate.property.optionsDataSource);
+
+    const optionsCandidateEntries = optionsCandidates.map((candidate) => {
+        const lookupDependsOnPaths =
+            (candidate.property as unknown as {optionsDataSource?: {optionsLookupDependsOn?: string[]}})
+                .optionsDataSource?.optionsLookupDependsOn ?? [];
+
+        return [
+            candidate.path,
+            lookupDependsOnPaths.map((dependencyPath) => readValue(params.values, dependencyPath) ?? null),
+        ];
+    });
+
+    return {
+        hasStaticCandidates: candidates.length > optionsCandidates.length,
+        optionsCandidatesKey: optionsCandidateEntries.length > 0 ? JSON.stringify(optionsCandidateEntries) : '',
+    };
 }
 
 export async function computeAiFillValues({

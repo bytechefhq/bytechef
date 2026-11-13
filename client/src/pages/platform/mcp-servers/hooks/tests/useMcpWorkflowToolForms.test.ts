@@ -4,15 +4,23 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import useMcpWorkflowToolForms, {SavedToolParametersByWorkflowIdType} from '../useMcpWorkflowToolForms';
 
 const hoisted = vi.hoisted(() => ({
+    failedSeedKeys: [] as string[],
     seededValuesByWorkflowId: {} as Record<string, Record<string, string>>,
+    toastWarning: vi.fn(),
     useMcpWorkflowToolSeeding: vi.fn(),
 }));
+
+vi.mock('sonner', () => ({toast: {warning: hoisted.toastWarning}}));
 
 vi.mock('@/pages/platform/mcp-servers/hooks/useMcpWorkflowToolSeeding', () => ({
     default: (params: unknown) => {
         hoisted.useMcpWorkflowToolSeeding(params);
 
-        return {aiValuesByWorkflowId: {}, waitForSeeding: async () => hoisted.seededValuesByWorkflowId};
+        return {
+            aiValuesByWorkflowId: {},
+            getFailedSeedKeys: () => hoisted.failedSeedKeys,
+            waitForSeeding: async () => hoisted.seededValuesByWorkflowId,
+        };
     },
 }));
 
@@ -64,6 +72,25 @@ describe('useMcpWorkflowToolForms', () => {
         });
 
         expect(toolParameters).toEqual([{parameters: {message: '=fromAi(message)'}, workflowId: 'new-workflow'}]);
+    });
+
+    it('warns when the tool settings of a new workflow could not be loaded', async () => {
+        hoisted.failedSeedKeys = ['new-workflow', 'existing-workflow'];
+
+        const {result} = renderToolForms();
+
+        await act(async () => {
+            await result.current.buildToolParameters(['existing-workflow', 'new-workflow']);
+        });
+
+        expect(hoisted.toastWarning).toHaveBeenCalledTimes(1);
+        expect(hoisted.toastWarning).toHaveBeenCalledWith(
+            "Couldn't load the settings of 1 workflow tool",
+            expect.objectContaining({description: expect.stringContaining('without AI values')})
+        );
+
+        hoisted.failedSeedKeys = [];
+        hoisted.toastWarning.mockReset();
     });
 
     it('sends the changed values of an existing workflow on top of its saved parameters', async () => {

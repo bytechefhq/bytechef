@@ -53,7 +53,7 @@ vi.mock('@/pages/platform/mcp-servers/hooks/useMcpToolSeeding', () => ({
     }) => {
         hoisted.seedingParams.push(params);
 
-        return {aiValuesByTool: {}, waitForSeeding: hoisted.waitForSeeding};
+        return {aiValuesByTool: {}, getFailedSeedKeys: () => [], waitForSeeding: hoisted.waitForSeeding};
     },
 }));
 

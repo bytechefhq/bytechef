@@ -5,9 +5,9 @@ import {
     collectHiddenToolPaths,
     collectPropertyDefaults,
     computeAiFillValues,
-    hasAiFillCandidates,
     isEmptyToolValue,
     isFromAiEligibleProperty,
+    summarizeAiFillCandidates,
 } from '../mcpToolAiFill';
 
 const loadOptionsNone = vi.fn().mockResolvedValue(null);
@@ -197,45 +197,73 @@ describe('computeAiFillValues', () => {
     });
 });
 
-describe('hasAiFillCandidates', () => {
+describe('summarizeAiFillCandidates', () => {
     const candidateParams = {includeAdvanced: false, includeConditional: true};
 
-    it('counts an empty dynamic options field as fillable without loading its options', () => {
+    const optionsProperty = stringProperty({
+        controlType: 'SELECT',
+        name: 'channel',
+        optionsDataSource: {optionsLookupDependsOn: ['workspace']},
+    });
+
+    it('reports an empty plain field as a static candidate', () => {
+        expect(summarizeAiFillCandidates({...candidateParams, properties: [stringProperty()], values: {}})).toEqual({
+            hasStaticCandidates: true,
+            optionsCandidatesKey: '',
+        });
+    });
+
+    it('keeps an empty dynamic options field out of the static candidates', () => {
+        const summary = summarizeAiFillCandidates({...candidateParams, properties: [optionsProperty], values: {}});
+
+        expect(summary.hasStaticCandidates).toBe(false);
+        expect(summary.optionsCandidatesKey).not.toBe('');
+    });
+
+    it('changes the options key when a lookup dependency changes and not when another value does', () => {
+        const properties = [optionsProperty];
+
+        const emptyKey = summarizeAiFillCandidates({...candidateParams, properties, values: {}}).optionsCandidatesKey;
+
         expect(
-            hasAiFillCandidates({
-                ...candidateParams,
-                properties: [stringProperty({controlType: 'SELECT', optionsDataSource: {}})],
-                values: {},
-            })
-        ).toBe(true);
+            summarizeAiFillCandidates({...candidateParams, properties, values: {other: 'typed'}}).optionsCandidatesKey
+        ).toBe(emptyKey);
+        expect(
+            summarizeAiFillCandidates({...candidateParams, properties, values: {workspace: 'acme'}})
+                .optionsCandidatesKey
+        ).not.toBe(emptyKey);
     });
 
     it('skips a dynamic options field when options cannot be loaded', () => {
         expect(
-            hasAiFillCandidates({
+            summarizeAiFillCandidates({
                 ...candidateParams,
                 optionsLoadable: false,
-                properties: [stringProperty({controlType: 'SELECT', optionsDataSource: {}})],
+                properties: [optionsProperty],
                 values: {},
             })
-        ).toBe(false);
+        ).toEqual({hasStaticCandidates: false, optionsCandidatesKey: ''});
     });
 
-    it('is false when every eligible field is filled', () => {
+    it('has no candidates when every eligible field is filled', () => {
         expect(
-            hasAiFillCandidates({...candidateParams, properties: [stringProperty()], values: {subject: 'typed'}})
-        ).toBe(false);
+            summarizeAiFillCandidates({
+                ...candidateParams,
+                properties: [stringProperty(), optionsProperty],
+                values: {channel: 'general', subject: 'typed'},
+            })
+        ).toEqual({hasStaticCandidates: false, optionsCandidatesKey: ''});
     });
 
     it('ignores fields under hidden paths', () => {
         expect(
-            hasAiFillCandidates({
+            summarizeAiFillCandidates({
                 ...candidateParams,
                 hiddenPaths: new Set(['subject']),
                 properties: [stringProperty()],
                 values: {},
             })
-        ).toBe(false);
+        ).toEqual({hasStaticCandidates: false, optionsCandidatesKey: ''});
     });
 });
 

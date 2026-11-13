@@ -11,16 +11,19 @@ interface UseToolSeedingParamsI {
 }
 
 interface ToolSeedI {
+    failed: boolean;
     promise: Promise<Record<string, string>>;
     seedKey: string;
 }
 
 const KEY_SEPARATOR = '\u0000';
 
-async function runSeed(seed: SeedToolType, key: string): Promise<Record<string, string>> {
+async function runSeed(seed: SeedToolType, key: string, onFailure: () => void): Promise<Record<string, string>> {
     try {
         return await seed(key);
     } catch {
+        onFailure();
+
         return {};
     }
 }
@@ -59,6 +62,14 @@ export default function useToolSeeding({keys, seed, seedKey}: UseToolSeedingPara
         }
     }, []);
 
+    const getFailedSeedKeys = useCallback(
+        (): string[] =>
+            Array.from(toolSeedsRef.current.entries())
+                .filter(([, toolSeed]) => toolSeed.failed)
+                .map(([key]) => key),
+        []
+    );
+
     useEffect(() => {
         const currentKeys = keysKey ? keysKey.split(KEY_SEPARATOR) : [];
         const toolSeeds = toolSeedsRef.current;
@@ -78,13 +89,15 @@ export default function useToolSeeding({keys, seed, seedKey}: UseToolSeedingPara
         const keysToSeed = currentKeys.filter((key) => toolSeeds.get(key)?.seedKey !== seedKey);
 
         for (const key of keysToSeed) {
-            const promise = runSeed(seedRef.current, key);
+            const toolSeed: ToolSeedI = {failed: false, promise: Promise.resolve({}), seedKey};
 
-            const toolSeed: ToolSeedI = {promise, seedKey};
+            toolSeed.promise = runSeed(seedRef.current, key, () => {
+                toolSeed.failed = true;
+            });
 
             toolSeeds.set(key, toolSeed);
 
-            void promise.then((seededValues) => {
+            void toolSeed.promise.then((seededValues) => {
                 if (toolSeedsRef.current.get(key) !== toolSeed) {
                     return;
                 }
@@ -95,6 +108,7 @@ export default function useToolSeeding({keys, seed, seedKey}: UseToolSeedingPara
     }, [keysKey, seedKey]);
 
     return {
+        getFailedSeedKeys,
         seededValuesByKey,
         waitForSeeding,
     };
