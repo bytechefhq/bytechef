@@ -34,11 +34,19 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
@@ -236,6 +244,15 @@ class ConnectedUserIntegrationFacadeIntTest {
     private McpServerService mcpServerService;
 
     @Autowired
+    private ProjectDeploymentService projectDeploymentService;
+
+    @Autowired
+    private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
+
+    @Autowired
+    private ProjectService projectService;
+
+    @Autowired
     private RecordingDataStorage recordingDataStorage;
 
     @Autowired
@@ -353,6 +370,20 @@ class ConnectedUserIntegrationFacadeIntTest {
     }
 
     @Test
+    void testDeleteHandsTheConnectionUsedByAProjectDeploymentToTheConnectedUser() {
+        integrationInstanceService.updateEnabled(integrationInstanceId, false);
+
+        createProjectDeploymentWorkflowUsingConnection(instanceConnectionId);
+
+        connectedUserIntegrationFacade.deleteIntegrationInstance(ownerExternalUserId, integrationInstanceId);
+
+        verify(connectionService, never()).delete(anyLong());
+
+        assertThat(connectedUserConnectionService.getConnectionIds(ownerConnectedUserId))
+            .containsExactly(instanceConnectionId);
+    }
+
+    @Test
     void testDeleteDisablesTheEnabledWorkflowsOfAnEnabledInstanceBeforeDeletingThem() {
         List<Integer> integrationInstanceWorkflowCountsAtTriggerDisable = new ArrayList<>();
 
@@ -446,6 +477,32 @@ class ConnectedUserIntegrationFacadeIntTest {
             TRIGGER_WORKFLOW_DEFINITION.formatted(label), Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
         return integrationWorkflowService.addWorkflow(integrationId, 1, workflow.getId());
+    }
+
+    private void createProjectDeploymentWorkflowUsingConnection(long connectionId) {
+        Project project = projectService.create(
+            Project.builder()
+                .name("Deployment " + UUID.randomUUID())
+                .workspaceId(Workspace.DEFAULT_WORKSPACE_ID)
+                .build());
+
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setEnvironment(Environment.PRODUCTION);
+        projectDeployment.setName("deployment-" + UUID.randomUUID());
+        projectDeployment.setProjectId(project.getId());
+        projectDeployment.setProjectVersion(1);
+
+        projectDeployment = projectDeploymentService.create(projectDeployment);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setConnections(
+            List.of(new ProjectDeploymentWorkflowConnection(connectionId, "slack", "postMessage1")));
+        projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
+        projectDeploymentWorkflow.setWorkflowId(enabledWorkflowId);
+
+        projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
     }
 
     private void createIntegrationInstanceWorkflow(
