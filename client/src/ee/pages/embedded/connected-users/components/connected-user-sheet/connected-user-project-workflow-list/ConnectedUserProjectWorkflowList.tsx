@@ -18,8 +18,13 @@ const OTHER_GROUP_KEY = 'other';
 
 const OTHER_GROUP_NAME = 'Created by this user';
 
+type ConnectedUserProjectConfigurationType = ConnectedUserCurrentConfigurationI & {
+    configurationEnabled: boolean;
+    projectId: string;
+};
+
 interface ConnectedUserProjectWorkflowGroupI {
-    configuration?: ConnectedUserCurrentConfigurationI & {projectId: string};
+    configuration?: ConnectedUserProjectConfigurationType;
     connectedUserProjectWorkflows: ConnectedUserProjectWorkflowType[];
     key: string;
     projectIds: Set<string>;
@@ -41,7 +46,7 @@ const ConnectedUserProjectWorkflowList = ({
     connectedUserProjectWorkflows,
     workflowTemplateSourcesByWorkflowUuid,
 }: {
-    configurations?: Array<ConnectedUserCurrentConfigurationI & {projectId: string}>;
+    configurations?: ConnectedUserProjectConfigurationType[];
     connectedUser?: {connectedUserId: string; email?: string | null; externalId: string; name?: string | null};
     connectedUserProjectWorkflows: ConnectedUserProjectWorkflowType[];
     workflowTemplateSourcesByWorkflowUuid: Map<string, ConnectedUserWorkflowTemplateSourceI>;
@@ -185,8 +190,26 @@ const ConnectedUserProjectWorkflowList = ({
 
                                 <div className="flex flex-1 flex-col items-start justify-center gap-y-2 py-3">
                                     {group.configuration ? (
-                                        <span className="flex min-h-6 items-center text-base font-semibold">
+                                        <span className="flex min-h-6 items-center gap-x-2 text-base font-semibold">
                                             {group.configuration.configurationName}
+
+                                            {!group.configuration.configurationEnabled && (
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <span className="flex shrink-0">
+                                                            <Badge
+                                                                label="Disabled"
+                                                                styleType="destructive-outline"
+                                                                weight="semibold"
+                                                            />
+                                                        </span>
+                                                    </TooltipTrigger>
+
+                                                    <TooltipContent>
+                                                        Workflows of a disabled configuration do not run for this user
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            )}
                                         </span>
                                     ) : (
                                         <span className="flex min-h-6 items-center text-base font-semibold text-content-neutral-secondary">
