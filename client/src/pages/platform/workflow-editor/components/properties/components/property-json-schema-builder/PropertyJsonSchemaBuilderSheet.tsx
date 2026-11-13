@@ -21,6 +21,7 @@ interface PropertyJsonSchemaBuilderSheetProps {
 }
 
 const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: PropertyJsonSchemaBuilderSheetProps) => {
+    const [isNoteVisible, setIsNoteVisible] = useState(true);
     const [localSchema, setLocalSchema] = useState<SchemaRecordType | undefined>(schema);
 
     const editorRef = useRef<StandaloneCodeEditorType | null>(null);
@@ -80,10 +81,11 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
                     </header>
 
                     <div className="flex min-h-0 flex-1 flex-col gap-3 p-3">
-                        {title === 'Response Schema' && (
+                        {title === 'Response Schema' && isNoteVisible && (
                             <Note
                                 content="Define how you'd like the LLM to structure its responses — essentially a template for its output."
                                 icon={<MessageCircleQuestionIcon />}
+                                onClose={() => setIsNoteVisible(false)}
                             />
                         )}
 
