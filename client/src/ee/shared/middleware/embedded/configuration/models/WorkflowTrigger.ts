@@ -36,6 +36,10 @@ export interface WorkflowTrigger {
      */
     description?: string;
     /**
+     * When true, the trigger is not activated and does not start workflow executions.
+     */
+    disabled?: boolean;
+    /**
      * The human-readable description of the task.
      */
     label?: string;
@@ -82,6 +86,7 @@ export function WorkflowTriggerFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(ComponentConnectionFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
+        'disabled': json['disabled'] == null ? undefined : json['disabled'],
         'label': json['label'] == null ? undefined : json['label'],
         'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'name': json['name'],
@@ -103,6 +108,7 @@ export function WorkflowTriggerToJSONTyped(value?: Omit<WorkflowTrigger, 'connec
     return {
         
         'description': value['description'],
+        'disabled': value['disabled'],
         'label': value['label'],
         'metadata': value['metadata'],
         'name': value['name'],

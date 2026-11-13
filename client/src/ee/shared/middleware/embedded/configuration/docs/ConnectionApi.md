@@ -6,6 +6,7 @@ All URIs are relative to */api/embedded/internal*
 |------------- | ------------- | -------------|
 | [**createConnectedUserConnection**](ConnectionApi.md#createconnecteduserconnection) | **POST** /connected-users/{connectedUserId}/connections | Create a new connection for the connected user |
 | [**createConnection**](ConnectionApi.md#createconnection) | **POST** /connections | Create a new connection |
+| [**deleteConnectedUserConnection**](ConnectionApi.md#deleteconnecteduserconnection) | **DELETE** /connected-users/{connectedUserId}/connections/{connectionId} | Deletes a connection of a connected user |
 | [**deleteConnection**](ConnectionApi.md#deleteconnection) | **DELETE** /connections/{id} | Delete a connection |
 | [**getAllConnectedUserConnections**](ConnectionApi.md#getallconnecteduserconnections) | **GET** /connected-users/{connectedUserId}/connections | Get all connections a connected user can use |
 | [**getConnectedUserConnections**](ConnectionApi.md#getconnecteduserconnections) | **GET** /connected-users/{connectedUserId}/components/{componentName}/connections | Get all connected user\&#39;s connections |
@@ -150,6 +151,76 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The connection id. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## deleteConnectedUserConnection
+
+> deleteConnectedUserConnection(connectedUserId, connectionId)
+
+Deletes a connection of a connected user
+
+Deletes a connection a connected user created or a tenant admin provisioned for them.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ConnectionApi,
+} from '';
+import type { DeleteConnectedUserConnectionRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ConnectionApi();
+
+  const body = {
+    // number | The id of a connected user.
+    connectedUserId: 789,
+    // number | The id of a connection.
+    connectionId: 789,
+  } satisfies DeleteConnectedUserConnectionRequest;
+
+  try {
+    const data = await api.deleteConnectedUserConnection(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **connectedUserId** | `number` | The id of a connected user. | [Defaults to `undefined`] |
+| **connectionId** | `number` | The id of a connection. | [Defaults to `undefined`] |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Successful operation. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
