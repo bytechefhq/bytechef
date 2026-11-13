@@ -134,4 +134,64 @@ describe('McpToolFormFields', () => {
 
         expect(formRef!.getValues('subject')).toBe('Typed meanwhile');
     });
+
+    it('disables let ai fill all when the options of the only empty field do not load', async () => {
+        const loadOptions = vi.fn(async () => null);
+
+        const selectProperties = [
+            {controlType: 'SELECT', name: 'priority', optionsDataSource: {}, type: 'STRING'},
+        ] as Array<PropertyAllType>;
+
+        const OnlyOptions = () => {
+            const form = useForm<Record<string, unknown>>({defaultValues: {}});
+
+            return (
+                <McpToolFormFields
+                    form={form}
+                    loadOptions={loadOptions}
+                    properties={selectProperties}
+                    values={form.watch()}
+                />
+            );
+        };
+
+        render(<OnlyOptions />);
+
+        await waitFor(() => expect(loadOptions).toHaveBeenCalled());
+
+        expect(screen.getByRole('button', {name: 'Let AI fill all'})).toBeDisabled();
+    });
+
+    it('enables let ai fill all once the options of the only empty field load', async () => {
+        const loadOptions = vi.fn(async () => [{value: 'high'}, {value: 'low'}]);
+
+        const selectProperties = [
+            {controlType: 'SELECT', name: 'priority', optionsDataSource: {}, type: 'STRING'},
+        ] as Array<PropertyAllType>;
+
+        const OnlyOptions = () => {
+            const form = useForm<Record<string, unknown>>({defaultValues: {}});
+
+            formRef = form;
+
+            return (
+                <McpToolFormFields
+                    form={form}
+                    loadOptions={loadOptions}
+                    properties={selectProperties}
+                    values={form.watch()}
+                />
+            );
+        };
+
+        render(<OnlyOptions />);
+
+        const button = screen.getByRole('button', {name: 'Let AI fill all'});
+
+        await waitFor(() => expect(button).toBeEnabled());
+
+        await userEvent.click(button);
+
+        await waitFor(() => expect(formRef!.getValues('priority')).toMatch(/^=fromAi\(/));
+    });
 });
