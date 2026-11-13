@@ -43,9 +43,9 @@ describe('SchemaControls', () => {
             {wrapper}
         );
 
-        expect(screen.getByPlaceholderText('Untitled Pill')).toHaveValue('Customer');
+        expect(screen.getByPlaceholderText('e.g. Invoice Number')).toHaveValue('Customer');
         expect(screen.getByRole('combobox')).toHaveTextContent('String');
-        expect(screen.queryByPlaceholderText('Pill Key')).not.toBeInTheDocument();
+        expect(screen.queryByPlaceholderText('e.g. invoiceNumber')).not.toBeInTheDocument();
     });
 
     it('commits an edited pill title into the schema', async () => {
@@ -55,12 +55,27 @@ describe('SchemaControls', () => {
             wrapper,
         });
 
-        const titleInput = screen.getByPlaceholderText('Untitled Pill');
+        const titleInput = screen.getByPlaceholderText('e.g. Invoice Number');
 
         await userEvent.clear(titleInput);
         await userEvent.type(titleInput, 'New title{Enter}');
 
         expect(getLastSchema(onChange)).toEqual({title: 'New title', type: 'string'});
+    });
+
+    it('removes the title from the schema when the pill title is cleared', async () => {
+        const onChange = vi.fn();
+
+        render(<SchemaControls onChange={onChange} schema={{title: 'Old', type: 'string'}} schemakey="key" />, {
+            wrapper,
+        });
+
+        const titleInput = screen.getByPlaceholderText('e.g. Invoice Number');
+
+        await userEvent.clear(titleInput);
+        await userEvent.type(titleInput, '{Enter}');
+
+        expect(getLastSchema(onChange)).toEqual({type: 'string'});
     });
 
     it('renames the pill key through the key input', async () => {
@@ -71,7 +86,7 @@ describe('SchemaControls', () => {
             {wrapper}
         );
 
-        const keyInput = screen.getByPlaceholderText('Pill Key');
+        const keyInput = screen.getByPlaceholderText('e.g. invoiceNumber');
 
         expect(keyInput).toHaveValue('first');
 

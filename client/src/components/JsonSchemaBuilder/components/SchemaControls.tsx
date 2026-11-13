@@ -9,6 +9,7 @@ import {twMerge} from 'tailwind-merge';
 
 import {
     addSchemaProperty,
+    deleteSchemaField,
     getSchemaTitle,
     getSchemaType,
     setSchemaTitle,
@@ -58,13 +59,20 @@ const SchemaControls = ({onAdd, onChange, onChangeKey, onDelete, root, schema, s
 
                 <SchemaInput
                     label="Pill Title"
-                    onChange={(title) => onChange(setSchemaTitle(title, schema))}
-                    placeholder="Untitled Pill"
+                    onChange={(title) =>
+                        onChange(title ? setSchemaTitle(title, schema) : deleteSchemaField('title', schema))
+                    }
+                    placeholder="e.g. Invoice Number"
                     value={getSchemaTitle(schema)}
                 />
 
                 {typeof onChangeKey === 'function' && (
-                    <SchemaInput label="Pill Key" onChange={onChangeKey} placeholder="Pill Key" value={schemakey} />
+                    <SchemaInput
+                        label="Pill Key"
+                        onChange={onChangeKey}
+                        placeholder="e.g. invoiceNumber"
+                        value={schemakey}
+                    />
                 )}
             </div>
 
