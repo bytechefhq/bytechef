@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Defines the contract for a component trigger, the event source that initiates a workflow. A trigger declares its
@@ -239,6 +240,16 @@ public interface TriggerDefinition {
      * @return an {@link Optional} containing the webhook-validate function, or an empty {@link Optional} if none is set
      */
     default Optional<WebhookValidateFunction> getWebhookValidate() {
+        return Optional.empty();
+    }
+
+    /**
+     * Returns the function that builds the immediate response of an asynchronous webhook trigger, when defined. It is
+     * ignored for triggers that execute the workflow synchronously.
+     *
+     * @return an {@link Optional} containing the webhook-response function, or an empty {@link Optional} if none is set
+     */
+    default Optional<WebhookResponseFunction> getWebhookResponse() {
         return Optional.empty();
     }
 
@@ -681,6 +692,23 @@ public interface TriggerDefinition {
             Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
             HttpParameters parameters, WebhookBody body, WebhookMethod method, Parameters webhookEnableOutputParameters,
             TriggerContext context) throws Exception;
+    }
+
+    /**
+     * Builds the response an asynchronous webhook trigger sends to the caller immediately, before the workflow runs.
+     * The response depends only on the trigger configuration, never on the incoming request.
+     */
+    @FunctionalInterface
+    interface WebhookResponseFunction {
+        /**
+         * Builds the immediate webhook response.
+         *
+         * @param inputParameters the trigger input parameters, evaluated against the workflow inputs
+         * @param context         the trigger execution context
+         * @return the response to send, or {@code null} to send the default empty {@code 200} response
+         */
+        ActionDefinition.@Nullable WebhookResponse apply(Parameters inputParameters, TriggerContext context)
+            throws Exception;
     }
 
     /**

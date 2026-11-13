@@ -17,14 +17,18 @@
 package com.bytechef.component.definition;
 
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.component.definition.ActionDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
+import com.bytechef.component.definition.TriggerDefinition.WebhookResponseFunction;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -89,5 +93,28 @@ class ComponentDslTest {
 
         assertTrue(exception.getMessage()
             .contains("inputs"));
+    }
+
+    @Test
+    void testTriggerWebhookResponseDefaultsToEmpty() {
+        assertEquals(Optional.empty(), trigger("t").getWebhookResponse());
+    }
+
+    @Test
+    void testTriggerWebhookResponseIsCarried() {
+        WebhookResponseFunction webhookResponseFunction = (inputParameters, context) -> null;
+
+        Optional<WebhookResponseFunction> webhookResponse = trigger("t")
+            .webhookResponse(webhookResponseFunction)
+            .getWebhookResponse();
+
+        assertSame(webhookResponseFunction, webhookResponse.orElseThrow());
+    }
+
+    @Test
+    void testTriggerWebhookResponseTakesPartInEquals() {
+        WebhookResponseFunction webhookResponseFunction = (inputParameters, context) -> null;
+
+        assertNotEquals(trigger("t"), trigger("t").webhookResponse(webhookResponseFunction));
     }
 }
