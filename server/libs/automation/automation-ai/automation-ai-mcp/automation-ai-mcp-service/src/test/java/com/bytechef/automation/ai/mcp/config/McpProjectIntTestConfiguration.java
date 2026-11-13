@@ -65,9 +65,14 @@ import tools.jackson.databind.ObjectMapper;
         "com.bytechef.platform.connection", "com.bytechef.platform.mcp",
         "com.bytechef.platform.tag"
     },
-    excludeFilters = @Filter(
-        type = FilterType.REGEX,
-        pattern = "com\\.bytechef\\.automation\\.configuration\\.facade\\.AutomationSearchFacadeImpl"))
+    excludeFilters = {
+        @Filter(
+            type = FilterType.REGEX,
+            pattern = "com\\.bytechef\\.automation\\.configuration\\.facade\\.AutomationGettingStartedFacadeImpl"),
+        @Filter(
+            type = FilterType.REGEX,
+            pattern = "com\\.bytechef\\.automation\\.configuration\\.facade\\.AutomationSearchFacadeImpl")
+    })
 @EnableAutoConfiguration
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)

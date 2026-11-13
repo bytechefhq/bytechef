@@ -67,6 +67,9 @@ import tools.jackson.databind.ObjectMapper;
     excludeFilters = {
         @Filter(
             type = FilterType.REGEX,
+            pattern = "com\\.bytechef\\.automation\\.configuration\\.facade\\.AutomationGettingStartedFacadeImpl"),
+        @Filter(
+            type = FilterType.REGEX,
             pattern = "com\\.bytechef\\.automation\\.configuration\\.facade\\.AutomationSearchFacadeImpl"),
         @Filter(
             type = FilterType.REGEX,
