@@ -305,6 +305,21 @@ class ProjectWorkflowExecutionFacadeIntTest {
     }
 
     @Test
+    void testGetWorkflowExecutionTaskExecutionKeepsFormulaThatFailsToEvaluateAsInput() {
+        Job job = saveJob(createWorkflowId(createProject(workspace)), null);
+        TaskExecution taskExecution = saveTaskExecutionWithData(
+            job, Map.of("folderName", "=substring(${anthropic_1.dateOfInvoice}, 5, 7)"),
+            Map.of("anthropic_1", Map.of("dateOfInvoice", "")));
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(
+            getId(job), getId(taskExecution));
+
+        assertThat(taskExecutionDTO.input())
+            .isEqualTo(Map.of("folderName", "=substring(${anthropic_1.dateOfInvoice}, 5, 7)"));
+        assertThat(taskExecutionDTO.output()).isEqualTo("output-value");
+    }
+
+    @Test
     void testGetWorkflowExecutionTaskExecutionAttachesShallowChildJob() {
         String workflowId = createWorkflowId(createProject(workspace));
 
@@ -1242,14 +1257,26 @@ class ProjectWorkflowExecutionFacadeIntTest {
     }
 
     private TaskExecution saveTaskExecutionWithData(Job job, Long parentId) {
-        TaskExecution taskExecution = saveTaskExecution(job, parentId);
+        return saveTaskExecutionWithData(saveTaskExecution(job, parentId), job, Map.of("context", true));
+    }
 
+    private TaskExecution saveTaskExecutionWithData(Job job, Map<String, ?> parameters, Map<String, ?> context) {
+        TaskExecution taskExecution = TaskExecution.builder()
+            .jobId(job.getId())
+            .status(TaskExecution.Status.COMPLETED)
+            .workflowTask(
+                new WorkflowTask(Map.of("name", "task", "type", "myComponent/v1/myAction", "parameters", parameters)))
+            .build();
+
+        return saveTaskExecutionWithData(taskExecutionRepository.save(taskExecution), job, context);
+    }
+
+    private TaskExecution saveTaskExecutionWithData(TaskExecution taskExecution, Job job, Map<String, ?> context) {
         long taskExecutionId = getId(taskExecution);
 
         contextService.push(
             taskExecutionId, Context.Classname.TASK_EXECUTION,
-            taskFileStorage.storeContextValue(
-                taskExecutionId, Context.Classname.TASK_EXECUTION, Map.of("context", true)));
+            taskFileStorage.storeContextValue(taskExecutionId, Context.Classname.TASK_EXECUTION, context));
 
         taskExecution.setOutput(taskFileStorage.storeTaskExecutionOutput(getId(job), taskExecutionId, "output-value"));
 
