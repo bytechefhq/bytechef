@@ -68,10 +68,10 @@ const integrationRow = {
     workflow: {label: 'Notify Slack on New Email'},
 } as unknown as AnyWorkflowExecutionRowI;
 
-const renderTable = (data: AnyWorkflowExecutionRowI[], showConnectedUser?: boolean) =>
+const renderTable = (data: AnyWorkflowExecutionRowI[], showConnectedUser?: boolean, className?: string) =>
     render(
         <TooltipProvider>
-            <AnyWorkflowExecutionsTable data={data} showConnectedUser={showConnectedUser} />
+            <AnyWorkflowExecutionsTable className={className} data={data} showConnectedUser={showConnectedUser} />
         </TooltipProvider>
     );
 
@@ -105,6 +105,21 @@ describe('AnyWorkflowExecutionsTable', () => {
         expect(screen.queryByRole('columnheader', {name: 'Connected user'})).not.toBeInTheDocument();
         expect(screen.queryByText('external-5')).not.toBeInTheDocument();
         expect(screen.getByRole('columnheader', {name: 'Version'})).toBeInTheDocument();
+    });
+
+    it('pads the table by default', () => {
+        renderTable([automationJobRow]);
+
+        expect(screen.getByRole('table').parentElement?.parentElement).toHaveClass('p-4');
+    });
+
+    it('lets the caller replace the padding around the table', () => {
+        renderTable([automationJobRow], false, 'p-0');
+
+        const tableWrapper = screen.getByRole('table').parentElement?.parentElement;
+
+        expect(tableWrapper).toHaveClass('p-0');
+        expect(tableWrapper).not.toHaveClass('p-4');
     });
 
     it('shows the source of each run after the workflow as an icon followed by the project or integration name', () => {

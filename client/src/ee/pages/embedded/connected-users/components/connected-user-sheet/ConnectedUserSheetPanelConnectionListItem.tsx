@@ -54,44 +54,42 @@ const ConnectedUserSheetPanelConnectionListItem = ({
             </div>
 
             <div className="flex items-center gap-x-2">
-                <div className="flex items-center gap-x-4">
-                    <div className="flex w-28 items-center justify-start">
-                        {(provisioned || provisionedIntegrationInstance) && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
+                <div className="flex w-72 items-center justify-end gap-x-4">
+                    {(provisioned || provisionedIntegrationInstance) && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    aria-label="Credentials"
+                                    icon={<KeyRoundIcon />}
+                                    onClick={() => setShowCredentialsDialog(true)}
+                                    size="iconXs"
+                                    variant="ghost"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent>Credentials</TooltipContent>
+                        </Tooltip>
+                    )}
+
+                    {connection.origin === ConnectionOriginEnum.Internal && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <span>
                                     <Button
                                         aria-label="Credentials"
+                                        disabled
                                         icon={<KeyRoundIcon />}
-                                        onClick={() => setShowCredentialsDialog(true)}
-                                        size="icon"
+                                        size="iconXs"
                                         variant="ghost"
                                     />
-                                </TooltipTrigger>
+                                </span>
+                            </TooltipTrigger>
 
-                                <TooltipContent>Credentials</TooltipContent>
-                            </Tooltip>
-                        )}
+                            <TooltipContent>Shared connections are edited on the Connections page</TooltipContent>
+                        </Tooltip>
+                    )}
 
-                        {connection.origin === ConnectionOriginEnum.Internal && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <span>
-                                        <Button
-                                            aria-label="Credentials"
-                                            disabled
-                                            icon={<KeyRoundIcon />}
-                                            size="icon"
-                                            variant="ghost"
-                                        />
-                                    </span>
-                                </TooltipTrigger>
-
-                                <TooltipContent>Shared connections are edited on the Connections page</TooltipContent>
-                            </Tooltip>
-                        )}
-                    </div>
-
-                    <div className="flex w-72 flex-col items-end gap-y-2">
+                    <div className="flex flex-col items-end gap-y-2">
                         <div className="flex min-h-6 items-center gap-2">
                             {originBadge && (
                                 <Tooltip>

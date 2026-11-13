@@ -1,5 +1,5 @@
-import Badge from '@/components/Badge/Badge';
 import Switch from '@/components/Switch/Switch';
+import McpToolBadge from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/McpToolBadge';
 import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import InputConfigurationList from '@/shared/components/InputConfigurationList';
@@ -35,7 +35,7 @@ const ProvisionIntegrationDialogWorkflowItem = ({
                 <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">{label}</span>
 
-                    {mcpTool && <Badge label="MCP tool" styleType="secondary-filled" />}
+                    {mcpTool && <McpToolBadge />}
                 </div>
 
                 <Switch aria-label={label} checked={!!enabled} onCheckedChange={onEnabledChange} />

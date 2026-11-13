@@ -140,6 +140,25 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
         expect(within(getConnectionRow('Shared GitHub')).getByRole('button', {name: 'Credentials'})).toBeDisabled();
     });
 
+    it('puts the Credentials action right before the column with the origin badge and created date', () => {
+        hoisted.allConnectedUserConnectionsQuery.mockReturnValue({
+            data: [{...connections[1], createdDate: new Date('2026-11-13T10:00:00Z')}],
+            isLoading: false,
+        });
+
+        renderConnectionList();
+
+        const connectionRow = getConnectionRow('Provisioned HubSpot');
+        const credentialsButton = within(connectionRow).getByRole('button', {name: 'Credentials'});
+        const originAndCreatedDateColumn = within(connectionRow).getByText(/^Created at/).parentElement!;
+
+        expect(originAndCreatedDateColumn).toContainElement(within(connectionRow).getByText('Provisioned'));
+        expect(originAndCreatedDateColumn).not.toContainElement(credentialsButton);
+        expect(
+            credentialsButton.compareDocumentPosition(originAndCreatedDateColumn) & Node.DOCUMENT_POSITION_FOLLOWING
+        ).toBeTruthy();
+    });
+
     it('offers Credentials on a connection provisioned for automations', async () => {
         hoisted.allConnectedUserConnectionsQuery.mockReturnValue({data: connections, isLoading: false});
 
