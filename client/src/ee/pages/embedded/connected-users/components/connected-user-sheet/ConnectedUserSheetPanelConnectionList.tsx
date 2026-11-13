@@ -33,6 +33,16 @@ const ConnectedUserSheetPanelConnectionList = ({
         [componentDefinitions]
     );
 
+    const integrationConnectionIds = useMemo(
+        () =>
+            new Set(
+                connectedUserIntegrationInstances
+                    .map((integrationInstance) => integrationInstance.connectionId)
+                    .filter((connectionId) => connectionId != null)
+            ),
+        [connectedUserIntegrationInstances]
+    );
+
     const provisionedIntegrationInstancesByConnectionId = useMemo(
         () =>
             new Map(
@@ -81,6 +91,7 @@ const ConnectedUserSheetPanelConnectionList = ({
                     icon={componentDefinitionsByName.get(connection.componentName)?.icon}
                     key={connection.id}
                     provisionedIntegrationInstance={provisionedIntegrationInstancesByConnectionId.get(connection.id)}
+                    usedByIntegration={connection.id != null && integrationConnectionIds.has(connection.id)}
                 />
             ))}
         </ul>

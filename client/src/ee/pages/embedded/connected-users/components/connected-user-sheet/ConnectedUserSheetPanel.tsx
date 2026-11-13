@@ -30,12 +30,12 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                         Integrations
                     </TabsTrigger>
 
-                    <TabsTrigger className={tabsTriggerClassName} value="mcp-servers">
-                        MCP Servers
-                    </TabsTrigger>
-
                     <TabsTrigger className={tabsTriggerClassName} value="workflows">
                         Automations
+                    </TabsTrigger>
+
+                    <TabsTrigger className={tabsTriggerClassName} value="mcp-servers">
+                        MCP Servers
                     </TabsTrigger>
 
                     <TabsTrigger className={tabsTriggerClassName} value="connections">
@@ -61,21 +61,21 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                     )}
                 </TabsContent>
 
-                <TabsContent value="mcp-servers">
-                    {connectedUser.id != null && (
-                        <ConnectedUserSheetPanelMcpServerList
-                            connectedUserId={connectedUser.id}
-                            connectedUserIntegrationInstances={connectedUser.integrationInstances ?? []}
-                        />
-                    )}
-                </TabsContent>
-
                 <TabsContent value="workflows">
                     {connectedUser.id != null && (
                         <ConnectedUserSheetPanelWorkflowList
                             connectedUserEmail={connectedUser.email}
                             connectedUserId={connectedUser.id}
                             connectedUserName={connectedUser.name}
+                        />
+                    )}
+                </TabsContent>
+
+                <TabsContent value="mcp-servers">
+                    {connectedUser.id != null && (
+                        <ConnectedUserSheetPanelMcpServerList
+                            connectedUserId={connectedUser.id}
+                            connectedUserIntegrationInstances={connectedUser.integrationInstances ?? []}
                         />
                     )}
                 </TabsContent>

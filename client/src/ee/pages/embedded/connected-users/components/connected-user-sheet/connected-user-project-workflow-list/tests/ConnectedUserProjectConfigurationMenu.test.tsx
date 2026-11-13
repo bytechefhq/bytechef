@@ -1,6 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
-import {resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
+import {resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {render} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -120,43 +120,19 @@ describe('ConnectedUserProjectConfigurationMenu', () => {
         ]);
     });
 
-    it('disables Change configuration with a tooltip when there is no other configuration', async () => {
+    it('shows no configuration actions when there is no other configuration in the environment', () => {
         hoisted.configurations = [createConfiguration('51'), createConfiguration('54', {environmentId: '1'})];
 
-        const user = userEvent.setup();
-
         renderMenu();
 
-        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
-
-        const item = await screen.findByRole('menuitem', {name: 'Change configuration'});
-
-        expect(item).toHaveAttribute('aria-disabled', 'true');
-
-        await user.hover(item.parentElement as HTMLElement);
-
-        await waitFor(async () =>
-            expect((await screen.findAllByText('No other configuration in this environment')).length).toBeGreaterThan(0)
-        );
+        expect(screen.queryByRole('button', {name: 'Configuration Actions'})).not.toBeInTheDocument();
     });
 
-    it('disables Change configuration without a tooltip while the configurations load', async () => {
+    it('shows no configuration actions while the configurations load', () => {
         hoisted.configurations = undefined;
-
-        const user = userEvent.setup();
 
         renderMenu();
 
-        await user.click(screen.getByRole('button', {name: 'Configuration Actions'}));
-
-        const item = await screen.findByRole('menuitem', {name: 'Change configuration'});
-
-        expect(item).toHaveAttribute('aria-disabled', 'true');
-
-        await user.hover(item.parentElement as HTMLElement);
-
-        await expect(
-            screen.findByText('No other configuration in this environment', {}, {timeout: 1500})
-        ).rejects.toThrow();
+        expect(screen.queryByRole('button', {name: 'Configuration Actions'})).not.toBeInTheDocument();
     });
 });

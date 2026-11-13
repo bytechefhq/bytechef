@@ -52,11 +52,10 @@ const ConnectedUserProjectWorkflowList = ({
         const groupsByKey = new Map<string, ConnectedUserProjectWorkflowGroupI>();
 
         for (const connectedUserProjectWorkflow of connectedUserProjectWorkflows) {
-            const sourceWorkflowUuid =
-                connectedUserProjectWorkflow.automationUuid ?? connectedUserProjectWorkflow.copiedFromWorkflowUuid;
+            const referencedWorkflowUuid = connectedUserProjectWorkflow.automationUuid;
 
-            const workflowTemplateSource = sourceWorkflowUuid
-                ? workflowTemplateSourcesByWorkflowUuid.get(sourceWorkflowUuid)
+            const workflowTemplateSource = referencedWorkflowUuid
+                ? workflowTemplateSourcesByWorkflowUuid.get(referencedWorkflowUuid)
                 : undefined;
 
             const projectId = workflowTemplateSource?.projectId ?? connectedUserProjectWorkflow.projectId;
@@ -122,7 +121,7 @@ const ConnectedUserProjectWorkflowList = ({
 
             return (
                 <ConnectedUserProjectWorkflowListItem
-                    configurationProjectVersion={group.configuration?.configurationProjectVersion}
+                    configuration={group.configuration}
                     connectedUserProjectWorkflow={connectedUserProjectWorkflow}
                     key={connectedUserProjectWorkflow.id}
                     projectName={group.projectName}
@@ -142,6 +141,25 @@ const ConnectedUserProjectWorkflowList = ({
                 return (
                     <section aria-label={groupName} key={group.key}>
                         <ListGroupHeader
+                            action={
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span className="shrink-0">
+                                            <Badge
+                                                label={group.projectName ? 'Reference' : 'Copy'}
+                                                styleType="outline-outline"
+                                                weight="semibold"
+                                            />
+                                        </span>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>
+                                        {group.projectName
+                                            ? "Workflows that follow the configuration's project version"
+                                            : 'Workflows this user owns and edits in the workflow editor'}
+                                    </TooltipContent>
+                                </Tooltip>
+                            }
                             className={groupIndex === 0 ? 'pt-0' : undefined}
                             icon={<FolderIcon aria-hidden="true" className="size-5 shrink-0" />}
                             name={groupName}
@@ -182,7 +200,7 @@ const ConnectedUserProjectWorkflowList = ({
                                 </div>
 
                                 <div className="flex items-center gap-x-2">
-                                    <div className="flex w-28 justify-start">
+                                    <div className="flex w-28 shrink-0 justify-start">
                                         {group.configuration && (
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
@@ -198,7 +216,7 @@ const ConnectedUserProjectWorkflowList = ({
                                         )}
                                     </div>
 
-                                    <div className="flex w-72 flex-col items-end gap-y-2">
+                                    <div className="flex w-72 shrink-0 flex-col items-end gap-y-2">
                                         <div aria-hidden="true" className="min-h-6" />
 
                                         <Tooltip>
