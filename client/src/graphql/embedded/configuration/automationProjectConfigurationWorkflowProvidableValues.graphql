@@ -1,5 +1,9 @@
-query automationProjectConfigurationWorkflowProvidableValues($id: ID!, $workflowUuid: ID!) {
-    automationProjectConfigurationWorkflowProvidableValues(id: $id, workflowUuid: $workflowUuid) {
+query automationProjectConfigurationWorkflowProvidableValues($id: ID!, $workflowUuid: ID!, $projectVersion: Int) {
+    automationProjectConfigurationWorkflowProvidableValues(
+        id: $id
+        workflowUuid: $workflowUuid
+        projectVersion: $projectVersion
+    ) {
         connectionSlots {
             componentName
             title

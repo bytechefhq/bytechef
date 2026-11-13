@@ -1,0 +1,9 @@
+query connectedUserProjectWorkflowReferenceValues($id: ID!) {
+    connectedUserProjectWorkflowReferenceValues(id: $id) {
+        connections {
+            componentName
+            connectionId
+        }
+        inputs
+    }
+}

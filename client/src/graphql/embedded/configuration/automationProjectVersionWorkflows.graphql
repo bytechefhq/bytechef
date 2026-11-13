@@ -1,0 +1,6 @@
+query automationProjectVersionWorkflows($id: ID!, $projectVersion: Int!) {
+    automationProjectVersionWorkflows(id: $id, projectVersion: $projectVersion) {
+        workflowUuid
+        label
+    }
+}

@@ -1,6 +1,7 @@
 query automationProjectConfigurationWorkflowInputOptions(
     $id: ID!
     $workflowUuid: ID!
+    $projectVersion: Int
     $inputName: String!
     $propertyName: String!
     $connectionId: ID!
@@ -10,6 +11,7 @@ query automationProjectConfigurationWorkflowInputOptions(
     automationProjectConfigurationWorkflowInputOptions(
         id: $id
         workflowUuid: $workflowUuid
+        projectVersion: $projectVersion
         inputName: $inputName
         propertyName: $propertyName
         connectionId: $connectionId
