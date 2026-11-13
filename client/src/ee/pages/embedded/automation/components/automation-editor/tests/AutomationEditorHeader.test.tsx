@@ -133,7 +133,7 @@ vi.mock('@/pages/platform/workflow-editor/components/WorkflowActionsButton', () 
     default: () => <button>Test</button>,
 }));
 
-vi.mock('@/ee/pages/embedded/automation/components/automation-editor/components/PublishPopover', () => ({
+vi.mock('@/shared/components/PublishPopover', () => ({
     default: ({disabled}: {disabled?: boolean}) => <button disabled={disabled}>Publish</button>,
 }));
 

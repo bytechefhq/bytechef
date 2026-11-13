@@ -9,19 +9,32 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {SendIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {twMerge} from 'tailwind-merge';
 import * as z from 'zod';
 
 const formSchema = z.object({
     description: z.string().max(256).optional(),
 });
 
-const PublishPopover = ({
-    isPending,
-    onPublishProjectSubmit,
-}: {
+interface PublishPopoverProps {
+    disabled?: boolean;
     isPending: boolean;
-    onPublishProjectSubmit: ({description, onSuccess}: {description?: string; onSuccess: () => void}) => void;
-}) => {
+    onPublishSubmit: ({description, onSuccess}: {description?: string; onSuccess: () => void}) => void;
+    submitButtonClassName?: string;
+    title: string;
+    tooltip: string;
+    triggerButtonClassName?: string;
+}
+
+const PublishPopover = ({
+    disabled,
+    isPending,
+    onPublishSubmit,
+    submitButtonClassName,
+    title,
+    tooltip,
+    triggerButtonClassName,
+}: PublishPopoverProps) => {
     const [open, setOpen] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -30,8 +43,8 @@ const PublishPopover = ({
 
     const {control, handleSubmit, reset} = form;
 
-    const handlePublishProject = ({description}: {description?: string}) => {
-        onPublishProjectSubmit({
+    const handlePublish = ({description}: {description?: string}) => {
+        onPublishSubmit({
             description,
             onSuccess: () => {
                 reset();
@@ -40,27 +53,56 @@ const PublishPopover = ({
         });
     };
 
+    if (disabled) {
+        return (
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <span className="inline-flex">
+                        <Button
+                            className="rounded-r-none"
+                            disabled
+                            icon={<SendIcon />}
+                            id="publish-button"
+                            label="Publish"
+                            variant="outline"
+                        />
+                    </span>
+                </TooltipTrigger>
+
+                <TooltipContent>No changes to publish</TooltipContent>
+            </Tooltip>
+        );
+    }
+
     return (
         <Popover onOpenChange={setOpen} open={open}>
             <Tooltip>
                 <PopoverTrigger asChild>
                     <TooltipTrigger asChild>
                         <Button
-                            className="shadow-none hover:border-stroke-neutral-secondary hover:bg-surface-neutral-primary-hover data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                            className={twMerge(
+                                'data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary',
+                                triggerButtonClassName
+                            )}
+                            icon={<SendIcon />}
+                            id="publish-button"
+                            label="Publish"
                             variant="outline"
-                        >
-                            <SendIcon /> Publish
-                        </Button>
+                        />
                     </TooltipTrigger>
                 </PopoverTrigger>
 
-                <TooltipContent>Publish the project</TooltipContent>
+                <TooltipContent>{tooltip}</TooltipContent>
             </Tooltip>
 
-            <PopoverContent align="end" className="flex h-full w-96 flex-col justify-between space-y-4">
+            <PopoverContent
+                align="end"
+                className="flex h-full w-96 flex-col justify-between space-y-4"
+                id="publish-popover"
+            >
                 <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(handlePublishProject)}>
-                        <h3 className="font-semibold">Publish Project</h3>
+                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(handlePublish)}>
+                        <h3 className="font-semibold">{title}</h3>
 
                         <div className="flex-1">
                             <FormField
@@ -87,14 +129,13 @@ const PublishPopover = ({
                         <div className="flex justify-end">
                             <Button
                                 aria-label="Publish button"
-                                className="bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
+                                className={submitButtonClassName}
                                 disabled={isPending}
+                                icon={isPending ? <LoadingIcon /> : undefined}
+                                label="Publish"
                                 size="sm"
                                 type="submit"
-                            >
-                                {isPending && <LoadingIcon />}
-                                Publish
-                            </Button>
+                            />
                         </div>
                     </form>
                 </Form>

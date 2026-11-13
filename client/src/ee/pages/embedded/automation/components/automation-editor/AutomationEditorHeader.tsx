@@ -5,7 +5,6 @@ import AutomationEditorSettingsMenu from '@/ee/pages/embedded/automation/compone
 import AutomationEditorWorkflowSelect from '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationEditorWorkflowSelect';
 import AutomationProjectVersionHistorySheet from '@/ee/pages/embedded/automation/components/automation-editor/components/AutomationProjectVersionHistorySheet';
 import OutputButton from '@/ee/pages/embedded/automation/components/automation-editor/components/OutputButton';
-import PublishPopover from '@/ee/pages/embedded/automation/components/automation-editor/components/PublishPopover';
 import {useAutomationEditorHeader} from '@/ee/pages/embedded/automation/components/automation-editor/hooks/useAutomationEditorHeader';
 import {useRestoreAutomationProjectVersion} from '@/ee/pages/embedded/automation/components/automation-editor/hooks/useRestoreAutomationProjectVersion';
 import {useAutomationEditorSidebarStore} from '@/ee/pages/embedded/automation/components/automation-editor/stores/useAutomationEditorSidebarStore';
@@ -27,6 +26,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
+import PublishPopover from '@/shared/components/PublishPopover';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import LeftSidebarButton from '@/shared/layout/LeftSidebarButton';
@@ -363,7 +363,9 @@ const AutomationEditorHeader = ({
                     <PublishPopover
                         disabled={!hasUnpublishedChanges}
                         isPending={publishProjectMutationIsPending}
-                        onPublishProjectSubmit={handlePublishProjectSubmit}
+                        onPublishSubmit={handlePublishProjectSubmit}
+                        title="Publish Project"
+                        tooltip="Publish the project"
                     />
 
                     <ConfigureButton
