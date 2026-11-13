@@ -6,7 +6,6 @@ import IntegrationBreadcrumbSkeleton from '@/ee/pages/embedded/integration/compo
 import IntegrationItemSelect from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationItemSelect';
 import IntegrationSkeleton from '@/ee/pages/embedded/integration/components/integration-header/components/IntegrationSkeleton';
 import OutputPanelButton from '@/ee/pages/embedded/integration/components/integration-header/components/OutputButton';
-import PublishPopover from '@/ee/pages/embedded/integration/components/integration-header/components/PublishPopover';
 import SettingsMenu from '@/ee/pages/embedded/integration/components/integration-header/components/settings-menu/SettingsMenu';
 import {useIntegrationHeader} from '@/ee/pages/embedded/integration/components/integration-header/hooks/useIntegrationHeader';
 import useIntegrationsLeftSidebarStore from '@/ee/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
@@ -18,6 +17,7 @@ import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/W
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
+import PublishPopover from '@/shared/components/PublishPopover';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
@@ -148,7 +148,9 @@ const IntegrationHeader = ({
                     <PublishPopover
                         disabled={!hasUnpublishedChanges}
                         isPending={publishIntegrationMutationIsPending}
-                        onPublishIntegrationSubmit={handlePublishIntegrationSubmit}
+                        onPublishSubmit={handlePublishIntegrationSubmit}
+                        title="Publish Integration"
+                        tooltip="Publish the integration"
                     />
 
                     <ConfigureButton

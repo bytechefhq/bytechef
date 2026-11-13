@@ -2,13 +2,13 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {HubBuilderContext} from '@/ee/pages/embedded/automation-hub/hubBuilderContext';
 import OutputPanelButton from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/OutputButton';
-import PublishPopover from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/PublishPopover';
 import WorkflowActionsButton from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/WorkflowActionsButton';
 import WorkflowBuilderSettingsMenu from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/WorkflowBuilderSettingsMenu';
 import {useWorkflowBuilderHeader} from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/hooks/useWorkflowBuilderHeader';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
+import PublishPopover from '@/shared/components/PublishPopover';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
@@ -105,7 +105,11 @@ const WorkflowBuilderHeader = ({
 
                 <PublishPopover
                     isPending={publishProjectMutationIsPending}
-                    onPublishProjectSubmit={handlePublishProjectSubmit}
+                    onPublishSubmit={handlePublishProjectSubmit}
+                    submitButtonClassName="bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active"
+                    title="Publish Project"
+                    tooltip="Publish the project"
+                    triggerButtonClassName="shadow-none hover:border-stroke-neutral-secondary hover:bg-surface-neutral-primary-hover"
                 />
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />

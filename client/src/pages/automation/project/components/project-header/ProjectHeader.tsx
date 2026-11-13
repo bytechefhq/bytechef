@@ -10,7 +10,6 @@ import ProjectBreadcrumbSkeleton from '@/pages/automation/project/components/pro
 import ProjectDeploymentsButton from '@/pages/automation/project/components/project-header/components/ProjectDeploymentsButton';
 import ProjectItemSelect from '@/pages/automation/project/components/project-header/components/ProjectItemSelect';
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
-import PublishPopover from '@/pages/automation/project/components/project-header/components/PublishPopover';
 import SettingsMenu from '@/pages/automation/project/components/project-header/components/settings-menu/SettingsMenu';
 import {useProjectHeader} from '@/pages/automation/project/components/project-header/hooks/useProjectHeader';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
@@ -18,6 +17,7 @@ import WorkflowActionsButton from '@/pages/platform/workflow-editor/components/W
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
+import PublishPopover from '@/shared/components/PublishPopover';
 import useCopilotCompactHeader from '@/shared/components/copilot/hooks/useCopilotCompactHeader';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import LeftSidebarButton from '@/shared/layout/LeftSidebarButton';
@@ -157,7 +157,9 @@ const ProjectHeader = ({
                     <PublishPopover
                         disabled={!hasUnpublishedChanges}
                         isPending={publishProjectMutationIsPending}
-                        onPublishProjectSubmit={handlePublishProjectSubmit}
+                        onPublishSubmit={handlePublishProjectSubmit}
+                        title="Publish Project"
+                        tooltip="Publish the project"
                     />
 
                     <DeployButton onDeploymentSaved={openSavedProjectDeployment} project={project} />

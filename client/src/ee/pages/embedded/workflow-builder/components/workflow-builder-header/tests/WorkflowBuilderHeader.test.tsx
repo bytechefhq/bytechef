@@ -33,7 +33,7 @@ vi.mock(
     })
 );
 
-vi.mock('@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/PublishPopover', () => ({
+vi.mock('@/shared/components/PublishPopover', () => ({
     default: () => null,
 }));
 

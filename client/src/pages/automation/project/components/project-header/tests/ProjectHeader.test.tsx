@@ -44,7 +44,7 @@ vi.mock('@/pages/platform/workflow-editor/components/WorkflowActionsButton', () 
     default: () => <button>Test</button>,
 }));
 
-vi.mock('@/pages/automation/project/components/project-header/components/PublishPopover', () => ({
+vi.mock('@/shared/components/PublishPopover', () => ({
     default: () => <button>Publish</button>,
 }));
 
