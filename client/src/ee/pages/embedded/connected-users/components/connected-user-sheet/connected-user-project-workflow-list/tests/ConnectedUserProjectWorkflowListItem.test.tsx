@@ -65,6 +65,7 @@ const createConnectedUserProjectWorkflow = (
     staticWebhookUrl: string | null,
     overrides: Partial<ConnectedUserProjectWorkflowType> = {}
 ): ConnectedUserProjectWorkflowType => ({
+    attentionReason: null,
     automationUuid: null,
     connectedUserId: '1050',
     copiedFromWorkflowUuid: null,
@@ -87,7 +88,7 @@ const renderListItem = (
     connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType,
     projectName?: string,
     workflowTemplate?: ConnectedUserWorkflowTemplateType,
-    configuration?: {configurationId: string; projectId: string}
+    configuration?: {configurationEnabled?: boolean; configurationId: string; projectId: string}
 ) =>
     render(
         <QueryClientProvider client={new QueryClient()}>
@@ -266,6 +267,70 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
         );
 
         expect(screen.getByTestId('trigger-and-components-row')).toHaveTextContent('Manual|manual|manual,airtable');
+    });
+
+    it('shows a reference of a disabled configuration as switched off and locked', async () => {
+        renderListItem(
+            createConnectedUserProjectWorkflow(null, {
+                attentionReason: 'TURNED_OFF_BY_ADMINISTRATOR',
+                automationUuid: 'template-uuid',
+            }),
+            'Automation Playground',
+            undefined,
+            {configurationEnabled: false, configurationId: '60', projectId: '20'}
+        );
+
+        const enableSwitch = screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'});
+
+        expect(enableSwitch).not.toBeChecked();
+        expect(enableSwitch).toBeDisabled();
+
+        await userEvent.hover(enableSwitch.parentElement as HTMLElement);
+
+        expect(
+            await screen.findByRole('tooltip', {
+                name: 'The configuration is disabled. This workflow runs again when the configuration is enabled.',
+            })
+        ).toBeInTheDocument();
+    });
+
+    it('shows a reference whose workflow is disabled in an enabled configuration as switched off and locked', async () => {
+        renderListItem(
+            createConnectedUserProjectWorkflow(null, {
+                attentionReason: 'TURNED_OFF_BY_ADMINISTRATOR',
+                automationUuid: 'template-uuid',
+            }),
+            'Automation Playground',
+            undefined,
+            {configurationEnabled: true, configurationId: '60', projectId: '20'}
+        );
+
+        const enableSwitch = screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'});
+
+        expect(enableSwitch).not.toBeChecked();
+        expect(enableSwitch).toBeDisabled();
+
+        await userEvent.hover(enableSwitch.parentElement as HTMLElement);
+
+        expect(
+            await screen.findByRole('tooltip', {
+                name: 'This workflow is disabled in the configuration. It runs again when it is enabled there.',
+            })
+        ).toBeInTheDocument();
+    });
+
+    it('keeps the switch on and usable for a reference that needs attention for another reason', () => {
+        renderListItem(
+            createConnectedUserProjectWorkflow(null, {
+                attentionReason: 'MISSING_CONNECTION:slack',
+                automationUuid: 'template-uuid',
+            })
+        );
+
+        const enableSwitch = screen.getByRole('switch', {name: 'Enable WhatsApp Agent - Human reply'});
+
+        expect(enableSwitch).toBeChecked();
+        expect(enableSwitch).toBeEnabled();
     });
 
     it('shows no components for a workflow without a source template', () => {
