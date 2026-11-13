@@ -98,7 +98,11 @@ const PublishPopover = ({
                                         <FormLabel>Description</FormLabel>
 
                                         <FormControl>
-                                            <Textarea className="h-28" {...field}></Textarea>
+                                            <Textarea
+                                                className="h-28"
+                                                placeholder="Describe what changed in this version, e.g. Added a Slack notification for new leads"
+                                                {...field}
+                                            ></Textarea>
                                         </FormControl>
 
                                         <FormMessage />
