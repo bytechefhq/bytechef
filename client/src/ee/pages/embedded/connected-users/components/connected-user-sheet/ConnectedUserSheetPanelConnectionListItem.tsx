@@ -56,7 +56,7 @@ const ConnectedUserSheetPanelConnectionListItem = ({
             </div>
 
             <div className="flex items-center gap-x-2">
-                <div className="flex w-72 items-center justify-end gap-x-4">
+                <div className="flex min-w-72 shrink-0 items-center justify-end gap-x-4">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Badge
@@ -129,7 +129,7 @@ const ConnectedUserSheetPanelConnectionListItem = ({
 
                         {connection.createdDate && (
                             <Tooltip>
-                                <TooltipTrigger className="flex min-h-6 items-center text-xs text-content-neutral-secondary">
+                                <TooltipTrigger className="flex min-h-6 items-center text-xs whitespace-nowrap text-content-neutral-secondary">
                                     {`Created at ${connection.createdDate.toLocaleDateString()} ${connection.createdDate.toLocaleTimeString()}`}
                                 </TooltipTrigger>
 
