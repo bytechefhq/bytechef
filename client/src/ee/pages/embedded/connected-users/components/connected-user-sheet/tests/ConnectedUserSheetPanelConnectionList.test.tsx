@@ -93,7 +93,8 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
         renderConnectionList();
 
         expect(hoisted.allConnectedUserConnectionsQuery).toHaveBeenCalledWith(7);
-        expect(screen.getByText('Loading...')).toBeInTheDocument();
+        expect(screen.getByRole('status', {name: 'Loading connections'})).toBeInTheDocument();
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
     });
 
     it('labels each connection with how the connected user came to have it', () => {

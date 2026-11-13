@@ -49,7 +49,8 @@ describe('ConnectedUserSheetPanelExternalInvocationList', () => {
         );
 
         expect(hoisted.externalInvocationLogsQuery).toHaveBeenCalledWith({connectedUserId: 7, type: 'EMBEDDED'});
-        expect(screen.getByText('Loading...')).toBeInTheDocument();
+        expect(screen.getByRole('status', {name: 'Loading external invocations'})).toBeInTheDocument();
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
     });
 
     it('lists the recorded invocations', () => {

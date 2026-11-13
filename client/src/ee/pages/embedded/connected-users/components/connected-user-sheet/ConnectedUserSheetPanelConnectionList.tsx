@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import EmptyState from '@/components/EmptyState/EmptyState';
 import ConnectedUserSheetPanelConnectionListItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelConnectionListItem';
+import ConnectedUserSheetPanelListSkeleton from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelListSkeleton';
 import {EMBEDDED_CONNECTIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
@@ -43,7 +44,7 @@ const ConnectedUserSheetPanelConnectionList = ({
     );
 
     if (isLoading) {
-        return <div className="py-4 text-sm text-muted-foreground">Loading...</div>;
+        return <ConnectedUserSheetPanelListSkeleton label="Loading connections" />;
     }
 
     if (isError) {

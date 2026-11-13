@@ -112,7 +112,8 @@ describe('ConnectedUserSheetPanelWorkflowList', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText('Loading...')).toBeInTheDocument();
+        expect(screen.getByRole('status', {name: 'Loading automations'})).toBeInTheDocument();
+        expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
 
         hoisted.connectedUserProjectsQuery.mockReturnValue({data: {connectedUserProjects: []}, isLoading: false});
 

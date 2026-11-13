@@ -1,7 +1,9 @@
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
+import {Skeleton} from '@/components/ui/skeleton';
 import AutomationExecutionsSheet from '@/ee/pages/embedded/automations/components/automation-executions-sheet/AutomationExecutionsSheet';
 import ConnectedUserSheetActions from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetActions';
 import ConnectedUserSheetPanel from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanel';
+import ConnectedUserSheetSkeleton from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetSkeleton';
 import ConnectedUserSheetTitle from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetTitle';
 import useConnectedUserSheetStore from '@/ee/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
 import IntegrationInstanceConfigurationWorkflowExecutionsSheet from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-executions-sheet/IntegrationInstanceConfigurationWorkflowExecutionsSheet';
@@ -36,6 +38,8 @@ const ConnectedUserSheet = () => {
             >
                 <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
                     <div className="flex flex-1 items-center">
+                        {connectedUserLoading && <Skeleton className="h-6 w-48" />}
+
                         {connectedUser && <ConnectedUserSheetTitle connectedUser={connectedUser} />}
                     </div>
 
@@ -48,7 +52,7 @@ const ConnectedUserSheet = () => {
 
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
                     {connectedUserLoading ? (
-                        <span>Loading...</span>
+                        <ConnectedUserSheetSkeleton />
                     ) : (
                         connectedUser && <ConnectedUserSheetPanel connectedUser={connectedUser} />
                     )}

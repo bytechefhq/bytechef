@@ -1,6 +1,7 @@
 import EmptyState from '@/components/EmptyState/EmptyState';
 import TablePagination from '@/components/TablePagination';
 import {Button} from '@/components/ui/button';
+import ConnectedUserSheetPanelTableSkeleton from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelTableSkeleton';
 import {EMBEDDED_WORKFLOW_EXECUTIONS_DOCUMENTATION_URL} from '@/ee/pages/embedded/embeddedDocumentationUrls';
 import AnyWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AnyWorkflowExecutionsTable';
 import EmbeddedWorkflowExecutionSheet from '@/ee/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
@@ -42,7 +43,7 @@ const ConnectedUserSheetPanelWorkflowExecutionList = ({
     );
 
     if (workflowExecutionsIsLoading) {
-        return <div className="py-4 text-sm text-muted-foreground">Loading...</div>;
+        return <ConnectedUserSheetPanelTableSkeleton label="Loading workflow executions" />;
     }
 
     if (workflowExecutionsError) {
