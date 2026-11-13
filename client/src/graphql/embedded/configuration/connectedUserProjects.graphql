@@ -8,6 +8,7 @@ query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
         }
         connectedUserProjectWorkflows {
             id
+            attentionReason
             automationUuid
             connectedUserId
             copiedFromWorkflowUuid
@@ -32,6 +33,7 @@ query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
             configurationId
             configurationName
             configurationProjectVersion
+            configurationEnabled
         }
         environmentId
         lastExecutionDate
