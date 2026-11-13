@@ -32,8 +32,6 @@ type HookPropsType = Parameters<typeof useMcpComponentToolForms>[0];
 const baseProps: HookPropsType = {
     componentName: 'slack',
     componentVersion: 1,
-    connectionId: 'connection-1',
-    connectionRequired: true,
     existingTools,
     selectedTools: [{name: 'sendMessage'}, {name: 'listChannels'}],
 };
@@ -53,8 +51,6 @@ describe('useMcpComponentToolForms', () => {
             expect.objectContaining({
                 componentName: 'slack',
                 componentVersion: 1,
-                connectionId: 'connection-1',
-                connectionRequired: true,
                 newToolNames: ['listChannels'],
             })
         );
