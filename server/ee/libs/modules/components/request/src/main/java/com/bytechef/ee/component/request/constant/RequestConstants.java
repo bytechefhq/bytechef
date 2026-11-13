@@ -17,4 +17,7 @@ public class RequestConstants {
     public static final String HEADERS = "headers";
     public static final String METHOD = "method";
     public static final String PARAMETERS = "parameters";
+    public static final String REDIRECT_URL = "redirectUrl";
+    public static final String RESPONSE_TYPE = "responseType";
+    public static final String STATUS_CODE = "statusCode";
 }
