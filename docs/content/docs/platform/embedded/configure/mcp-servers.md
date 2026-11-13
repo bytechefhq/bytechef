@@ -56,7 +56,7 @@ For each exposed component action, you choose which parameters you fix yourself 
 
 The **Add Workflows** dialog has a **Tool** tab next to **Connections** and **Inputs**. It holds the workflow's **Tool Name**, **Tool Description** and the fields of its **New Workflow Call** trigger, the same mapping that **Configure** opens later. Tool settings are stored per workflow and kept when you change the instance configuration's integration version. Fields the new version no longer has are dropped, nested fields included.
 
-The tool forms offer **Let AI fill all**, new tools start with their empty fields set to `fromAi(...)`, and when a component tool runs, a field without a value gets its built-in default. A value you saved wins over the agent's, and a field you cleared stays empty. Workflow tools don't apply defaults yet. See [Let AI fill all](/platform/automation/deploy/mcp-servers#let-ai-fill-all) and [Defaults at call time](/platform/automation/deploy/mcp-servers#defaults-at-call-time).
+The tool forms offer **Let AI fill all**, new tools start with their empty fields set to `fromAi(...)`, and when a tool runs, a field without a value gets its default: the built-in one for a component tool, the `default` of the trigger's input schema for a workflow tool. A value you saved wins over the agent's, and a field you cleared stays empty. See [Let AI fill all](/platform/automation/deploy/mcp-servers#let-ai-fill-all) and [Defaults at call time](/platform/automation/deploy/mcp-servers#defaults-at-call-time).
 
 <!-- TODO screenshot: Add Component dialog on the Select Tools step, showing the list of the component's actions with per-tool selection and the tool properties popover -->
 

@@ -58,16 +58,16 @@ Rename an action when its generated name would not tell the model what it does i
 
 - Fields you filled in are left alone, and so is a field still holding its built-in default.
 - Fields hidden by a display condition are skipped, and so are advanced fields unless **Show Advanced Properties** is expanded.
-- A select field gets its list of options in the expression. If the options can't be loaded, the field stays empty.
+- A select field gets its list of options in the expression. If the options can't be loaded, the field stays empty. When such a field is the only empty one and its options can't be loaded, the button is disabled.
 - A nested field gets an argument named after its full path, so `shipping.city` and `billing.city` become `shipping_city` and `billing_city`.
 
-New tools start this way: when you add an action or a workflow, its empty fields are filled with `fromAi(...)` even if you never open its form. Tools you already exposed are never filled again, and **Edit** keeps their saved settings.
+New tools start this way: when you add an action or a workflow, its empty fields are filled with `fromAi(...)` even if you never open its form. Tools you already exposed are never filled again, and **Edit** keeps their saved settings. If a new tool's settings can't be loaded while you save, the tool is added without those values and a warning names it, so you can set them from its **Configure** panel.
 
 ### Defaults at call time
 
-When a component tool runs, a field without a value gets its built-in default. Workflow tools don't apply defaults yet. Values are applied in this order, each overriding the one before:
+When a tool runs, a field without a value gets its default. For a component tool that is the field's built-in default. For a workflow tool it is the `default` set on that field in the **New Workflow Call** trigger's input schema; a `default` that does not match the field's type is ignored. Values are applied in this order, each overriding the one before:
 
-1. the field's built-in default
+1. the field's default
 2. the value the assistant sends
 3. the value you saved
 
