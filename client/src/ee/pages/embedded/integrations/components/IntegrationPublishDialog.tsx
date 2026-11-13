@@ -13,6 +13,7 @@ import {Textarea} from '@/components/ui/textarea';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/ee/shared/mutations/embedded/integrations.mutations';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
+import {PUBLISH_DESCRIPTION_PLACEHOLDER} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
@@ -55,7 +56,7 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
                             <Textarea
                                 className="h-28"
                                 onChange={(event) => setDescription(event.target.value)}
-                                placeholder="Describe what changed in this version, e.g. Added a Slack notification for new leads"
+                                placeholder={PUBLISH_DESCRIPTION_PLACEHOLDER}
                             />
                         </div>
                     </DialogBody>

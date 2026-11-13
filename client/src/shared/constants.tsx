@@ -67,6 +67,9 @@ export const ON_ERROR_ERROR_BRANCH = 'onErrorBranch';
 export const ON_ERROR_WIRE_KEY_MAIN_BRANCH = 'main-branch';
 export const ON_ERROR_WIRE_KEY_ERROR_BRANCH = 'on-error-branch';
 
+export const PUBLISH_DESCRIPTION_PLACEHOLDER =
+    'Describe what changed in this version, e.g. Added a Slack notification for new leads';
+
 export const DEVELOPMENT_ENVIRONMENT = 0;
 export const STAGING_ENVIRONMENT = 1;
 export const PRODUCTION_ENVIRONMENT = 2;

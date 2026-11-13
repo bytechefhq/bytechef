@@ -10,6 +10,7 @@ import {
 } from '@/components/Dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
+import {PUBLISH_DESCRIPTION_PLACEHOLDER} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
@@ -55,7 +56,7 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
                             <Textarea
                                 className="h-28"
                                 onChange={(event) => setDescription(event.target.value)}
-                                placeholder="Describe what changed in this version, e.g. Added a Slack notification for new leads"
+                                placeholder={PUBLISH_DESCRIPTION_PLACEHOLDER}
                             />
                         </div>
                     </DialogBody>
