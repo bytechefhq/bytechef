@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T19:09:04.324900+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-13T19:43:07.740396+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 @Validated
 @Tag(name = "connection", description = "The Embedded Connection Internal API")
 public interface ConnectionApi {
@@ -107,6 +107,37 @@ public interface ConnectionApi {
     )
     default ResponseEntity<Long> createConnection(
         @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody ConnectionModel connectionModel
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_DELETE_CONNECTED_USER_CONNECTION = "/connected-users/{connectedUserId}/connections/{connectionId}";
+    /**
+     * DELETE /connected-users/{connectedUserId}/connections/{connectionId} : Deletes a connection of a connected user
+     * Deletes a connection a connected user created or a tenant admin provisioned for them.
+     *
+     * @param connectedUserId The id of a connected user. (required)
+     * @param connectionId The id of a connection. (required)
+     * @return Successful operation. (status code 204)
+     */
+    @Operation(
+        operationId = "deleteConnectedUserConnection",
+        summary = "Deletes a connection of a connected user",
+        description = "Deletes a connection a connected user created or a tenant admin provisioned for them.",
+        tags = { "connection" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.DELETE,
+        value = ConnectionApi.PATH_DELETE_CONNECTED_USER_CONNECTION
+    )
+    default ResponseEntity<Void> deleteConnectedUserConnection(
+        @Parameter(name = "connectedUserId", description = "The id of a connected user.", required = true, in = ParameterIn.PATH) @PathVariable("connectedUserId") Long connectedUserId,
+        @Parameter(name = "connectionId", description = "The id of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("connectionId") Long connectionId
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
