@@ -74,6 +74,8 @@ Each configuration row carries an **Enabled** switch and an ellipsis (⋮) menu:
 
 Expand a configuration row to see its workflows. Each workflow has its own enable/disable switch and an **Edit** action that opens the **Edit Workflow** dialog, where you set that workflow's per-configuration input values and connections.
 
+A workflow that an [MCP server](/platform/embedded/configure/mcp-servers) exposes as a tool stays a normal workflow of the configuration. It is marked **MCP**, its switch and menu work like any other workflow's, and it can keep other triggers, such as a webhook or a schedule, next to the tool trigger. Removing it from the MCP server, or deleting the server, leaves it in the configuration.
+
 Click a configuration workflow to open a side panel with two tabs:
 
 - **Executions** - the workflow's executions in this configuration, a page at a time, with a **Connected user** column that names whose instance ran. Click an execution to see its step-by-step results; the refresh button reloads the list.
