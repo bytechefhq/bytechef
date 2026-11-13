@@ -872,6 +872,7 @@ export type ConnectedUser = {
 
 export type ConnectedUserAutomationProjectConfiguration = {
   __typename?: 'ConnectedUserAutomationProjectConfiguration';
+  configurationEnabled: Scalars['Boolean']['output'];
   configurationId: Scalars['ID']['output'];
   configurationName: Scalars['String']['output'];
   configurationProjectVersion: Scalars['Int']['output'];
@@ -950,6 +951,7 @@ export type ConnectedUserProject = {
 
 export type ConnectedUserProjectWorkflow = {
   __typename?: 'ConnectedUserProjectWorkflow';
+  attentionReason?: Maybe<Scalars['String']['output']>;
   automationUuid?: Maybe<Scalars['ID']['output']>;
   connectedUserId: Scalars['ID']['output'];
   copiedFromWorkflowUuid?: Maybe<Scalars['ID']['output']>;
