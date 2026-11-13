@@ -18,12 +18,23 @@ Type: request/v1
 ## Triggers
 
 
-### Auto Respond with HTTP 200 Status
+### Auto Respond
 Name: autoRespondWithHTTP200
 
-`The request trigger always replies immediately with an HTTP 200 status code in response to any incoming workflow request request. This guarantees execution of the request trigger, but does not involve any validation of the received request.`
+`The request trigger replies immediately to any incoming workflow request and then runs the workflow. By default the reply is an empty HTTP 200 response; it can also be a redirect, JSON, raw text or no data. The request is not validated.`
 
 Type: STATIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| responseType | Response Type | STRING <details> <summary> Options </summary> <span>DEFAULT</span>, <span>REDIRECT</span>, <span>JSON</span>, <span>RAW</span>, <span>NO_DATA</span> </details> | The response sent to the caller right away, before the workflow runs. Default sends an empty HTTP 200 response. | false |
+| redirectUrl | Redirect URL | STRING | The http or https URL the caller is redirected to, on any host. It can use workflow inputs, but not the incoming request. | true |
+| body | Body | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The JSON body of the response. | true |
+| body | Body | STRING | The body of the response. Set a Content-Type header to send HTML. | true |
+| headers | Headers | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The headers of the response. Location and Set-Cookie are not allowed. | false |
+| statusCode | Status Code | INTEGER | The status code of the response. Redirect status codes (3xx) are not allowed. | false |
 
 
 #### Output
@@ -33,8 +44,15 @@ The output for this action is dynamic and may vary depending on the input parame
 #### JSON Example
 ```json
 {
-  "label" : "Auto Respond with HTTP 200 Status",
+  "label" : "Auto Respond",
   "name" : "autoRespondWithHTTP200",
+  "parameters" : {
+    "responseType" : "",
+    "redirectUrl" : "",
+    "body" : "",
+    "headers" : { },
+    "statusCode" : 1
+  },
   "type" : "request/v1/autoRespondWithHTTP200"
 }
 ```
