@@ -14,11 +14,14 @@ package com.bytechef.ee.embedded.configuration.dto;
  * @param configurationId             the assigned configuration id
  * @param configurationName           the assigned configuration name
  * @param configurationProjectVersion the project version the assigned configuration pins
+ * @param configurationEnabled        whether the assigned configuration is enabled; a disabled configuration turns off
+ *                                    every workflow the connected user runs from it
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
 public record ConnectedUserAutomationProjectConfigurationDTO(
-    long projectId, long configurationId, String configurationName, int configurationProjectVersion) {
+    long projectId, long configurationId, String configurationName, int configurationProjectVersion,
+    boolean configurationEnabled) {
 }

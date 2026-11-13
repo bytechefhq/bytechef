@@ -86,6 +86,7 @@ class ConnectedUserProjectGraphQlControllerIntTest {
                     connectedUserProjects(connectedUserId: "7", environmentId: "0") {
                         connectedUserProjectWorkflows {
                             id
+                            attentionReason
                             automationUuid
                             copiedFromWorkflowUuid
                         }
@@ -96,6 +97,11 @@ class ConnectedUserProjectGraphQlControllerIntTest {
             .path("connectedUserProjects[0].connectedUserProjectWorkflows[*].id")
             .entityList(String.class)
             .containsExactly("1", "2")
+            .path("connectedUserProjects[0].connectedUserProjectWorkflows[0].attentionReason")
+            .entity(String.class)
+            .isEqualTo("TURNED_OFF_BY_ADMINISTRATOR")
+            .path("connectedUserProjects[0].connectedUserProjectWorkflows[1].attentionReason")
+            .valueIsNull()
             .path("connectedUserProjects[0].connectedUserProjectWorkflows[0].automationUuid")
             .entity(String.class)
             .isEqualTo(AUTOMATION_UUID)
@@ -118,8 +124,8 @@ class ConnectedUserProjectGraphQlControllerIntTest {
         when(connectedUserProjectAdminFacade.getConnectedUserProjectConfigurations(7L))
             .thenReturn(
                 List.of(
-                    new ConnectedUserAutomationProjectConfigurationDTO(5L, 11L, "Beta", 3),
-                    new ConnectedUserAutomationProjectConfigurationDTO(6L, 12L, "DEVELOPMENT", 1)));
+                    new ConnectedUserAutomationProjectConfigurationDTO(5L, 11L, "Beta", 3, true),
+                    new ConnectedUserAutomationProjectConfigurationDTO(6L, 12L, "DEVELOPMENT", 1, false)));
 
         this.graphQlTester
             .document("""
@@ -130,6 +136,7 @@ class ConnectedUserProjectGraphQlControllerIntTest {
                             configurationId
                             configurationName
                             configurationProjectVersion
+                            configurationEnabled
                         }
                     }
                 }
@@ -146,7 +153,10 @@ class ConnectedUserProjectGraphQlControllerIntTest {
             .isEqualTo("Beta")
             .path("connectedUserProjects[0].automationProjectConfigurations[0].configurationProjectVersion")
             .entity(Integer.class)
-            .isEqualTo(3);
+            .isEqualTo(3)
+            .path("connectedUserProjects[0].automationProjectConfigurations[*].configurationEnabled")
+            .entityList(Boolean.class)
+            .containsExactly(true, false);
     }
 
     @Test
@@ -372,7 +382,7 @@ class ConnectedUserProjectGraphQlControllerIntTest {
     private static ConnectedUserProjectDTO createConnectedUserProjectDTO(@Nullable ConnectedUser connectedUser) {
         ConnectedUserProjectWorkflowDTO referenceWorkflow = new ConnectedUserProjectWorkflowDTO(
             1L, 7L, true, null, 0L, null, AUTOMATION_UUID, 1, ConnectedUserProjectWorkflowDTO.Kind.REFERENCE,
-            AUTOMATION_UUID, null, false, List.of(), List.of(), Map.of(), null, null);
+            AUTOMATION_UUID, null, false, List.of(), List.of(), Map.of(), "TURNED_OFF_BY_ADMINISTRATOR", null);
 
         ConnectedUserProjectWorkflowDTO copyWorkflow = new ConnectedUserProjectWorkflowDTO(
             2L, 7L, true, null, 3L, null, "copy-workflow-uuid", 1, ConnectedUserProjectWorkflowDTO.Kind.COPY, null,
