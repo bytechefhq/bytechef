@@ -16,9 +16,12 @@
 
 package com.bytechef.platform.component.service;
 
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,6 +33,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
@@ -45,6 +49,7 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.PlatformType;
@@ -679,5 +684,67 @@ public class TriggerDefinitionServiceTest {
         return triggerDefinitionService.executeTrigger(
             "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), null, webhookRequest, null,
             null, PlatformType.AUTOMATION, false);
+    }
+
+    @Test
+    public void testExecuteWebhookResponseReturnsTheFunctionResult() {
+        WebhookResponse expectedWebhookResponse = WebhookResponse.redirect("https://example.com/thanks");
+        AtomicReference<Parameters> receivedInputParameters = new AtomicReference<>();
+
+        TriggerDefinition triggerDefinition = trigger("testTrigger")
+            .type(TriggerType.STATIC_WEBHOOK)
+            .webhookResponse((inputParameters, context) -> {
+                receivedInputParameters.set(inputParameters);
+
+                return expectedWebhookResponse;
+            });
+
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(triggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        WebhookResponse webhookResponse = triggerDefinitionService.executeWebhookResponse(
+            "testComponent", 1, "testTrigger", Map.of("redirectUrl", "https://example.com/thanks"));
+
+        assertSame(expectedWebhookResponse, webhookResponse);
+
+        Parameters inputParameters = receivedInputParameters.get();
+
+        assertEquals("https://example.com/thanks", inputParameters.getString("redirectUrl"));
+    }
+
+    @Test
+    public void testExecuteWebhookResponseReturnsNullWithoutFunction() {
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(trigger("testTrigger").type(TriggerType.STATIC_WEBHOOK));
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        assertNull(triggerDefinitionService.executeWebhookResponse("testComponent", 1, "testTrigger", Map.of()));
+    }
+
+    @Test
+    public void testGetWebhookTriggerFlagsReportsWebhookResponse() {
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "withResponse"))
+            .thenReturn(
+                trigger("withResponse")
+                    .type(TriggerType.STATIC_WEBHOOK)
+                    .webhookResponse((inputParameters, context) -> null));
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "withoutResponse"))
+            .thenReturn(trigger("withoutResponse").type(TriggerType.STATIC_WEBHOOK));
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        WebhookTriggerFlags withResponseFlags = triggerDefinitionService.getWebhookTriggerFlags(
+            "testComponent", 1, "withResponse");
+        WebhookTriggerFlags withoutResponseFlags = triggerDefinitionService.getWebhookTriggerFlags(
+            "testComponent", 1, "withoutResponse");
+
+        assertTrue(withResponseFlags.webhookResponse());
+        assertFalse(withoutResponseFlags.webhookResponse());
     }
 }

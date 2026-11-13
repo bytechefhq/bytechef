@@ -20,17 +20,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.PlatformType;
@@ -39,6 +44,7 @@ import com.bytechef.platform.webhook.exception.WebhookErrorType;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,13 +66,17 @@ import org.springframework.test.web.servlet.MockMvc;
 class WebhookTriggerControllerIntTest {
 
     private static final WebhookTriggerFlags ASYNC_EXECUTION_FLAGS =
-        new WebhookTriggerFlags(false, false, false, false);
+        new WebhookTriggerFlags(false, false, false, false, false);
+    private static final WebhookTriggerFlags ASYNC_EXECUTION_WITH_RESPONSE_FLAGS =
+        new WebhookTriggerFlags(false, false, false, false, true);
+    private static final WebhookTriggerFlags ASYNC_EXECUTION_WITH_VALIDATION_AND_RESPONSE_FLAGS =
+        new WebhookTriggerFlags(false, false, true, false, true);
     private static final WebhookTriggerFlags ASYNC_EXECUTION_WITH_VALIDATION_FLAGS =
-        new WebhookTriggerFlags(false, false, true, false);
+        new WebhookTriggerFlags(false, false, true, false, false);
     private static final WebhookTriggerFlags SYNC_EXECUTION_FLAGS =
-        new WebhookTriggerFlags(false, true, false, false);
+        new WebhookTriggerFlags(false, true, false, false, false);
     private static final WebhookTriggerFlags SYNC_EXECUTION_WITH_VALIDATION_FLAGS =
-        new WebhookTriggerFlags(false, true, true, false);
+        new WebhookTriggerFlags(false, true, true, false, false);
 
     private final WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
         PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger_1");
@@ -137,7 +147,8 @@ class WebhookTriggerControllerIntTest {
         mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
             .andExpect(status().isGone());
 
-        verify(webhookWorkflowExecutor, never()).validateAndExecuteAsync(any(), any());
+        verify(webhookWorkflowExecutor, never()).validate(any(), any());
+        verify(webhookWorkflowExecutor, never()).executeAsync(any(), any());
     }
 
     @Test
@@ -194,5 +205,150 @@ class WebhookTriggerControllerIntTest {
         assertThatThrownBy(() -> mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString())))
             .rootCause()
             .isSameAs(configurationException);
+    }
+
+    @Test
+    void testAsyncTriggerWithoutResponseReturnsOkAndRuns() throws Exception {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(ASYNC_EXECUTION_FLAGS);
+
+        mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().string(""));
+
+        verify(webhookWorkflowExecutor).executeAsync(any(), any());
+        verify(webhookWorkflowExecutor, never()).getWebhookResponse(any());
+    }
+
+    @Test
+    void testAsyncTriggerRedirectsToExternalHostAndRuns() throws Exception {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(ASYNC_EXECUTION_WITH_RESPONSE_FLAGS);
+        when(webhookWorkflowExecutor.getWebhookResponse(any()))
+            .thenReturn(WebhookResponse.redirect("https://www.cevisio.com/feedback"));
+
+        mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
+            .andExpect(status().isFound())
+            .andExpect(header().string("Location", "https://www.cevisio.com/feedback"));
+
+        verify(webhookWorkflowExecutor).executeAsync(any(), any());
+    }
+
+    @Test
+    void testAsyncTriggerWithFailingResponseReturnsServerErrorWithoutRun() throws Exception {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(ASYNC_EXECUTION_WITH_RESPONSE_FLAGS);
+        doThrow(new IllegalStateException("broken")).when(webhookWorkflowExecutor)
+            .getWebhookResponse(any());
+
+        mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
+            .andExpect(status().isInternalServerError());
+
+        verify(webhookWorkflowExecutor, never()).executeAsync(any(), any());
+    }
+
+    @Test
+    void testAsyncTriggerWithUnresolvedRedirectReturnsServerErrorWithoutRun() throws Exception {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(ASYNC_EXECUTION_WITH_RESPONSE_FLAGS);
+        when(webhookWorkflowExecutor.getWebhookResponse(any())).thenReturn(WebhookResponse.redirect("${redirectUrl}"));
+
+        mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
+            .andExpect(status().isInternalServerError());
+
+        verify(webhookWorkflowExecutor, never()).executeAsync(any(), any());
+    }
+
+    @Test
+    void testAsyncTriggerRejectsLocationHeaderOnJsonResponse() throws Exception {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(ASYNC_EXECUTION_WITH_RESPONSE_FLAGS);
+        when(webhookWorkflowExecutor.getWebhookResponse(any()))
+            .thenReturn(WebhookResponse.json(Map.of(), Map.of("location", "https://evil.com")));
+
+        mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
+            .andExpect(status().isInternalServerError())
+            .andExpect(header().doesNotExist("location"));
+
+        verify(webhookWorkflowExecutor, never()).executeAsync(any(), any());
+    }
+
+    @Test
+    void testAsyncTriggerServesRawHtml() throws Exception {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(ASYNC_EXECUTION_WITH_RESPONSE_FLAGS);
+        when(webhookWorkflowExecutor.getWebhookResponse(any()))
+            .thenReturn(WebhookResponse.raw("<p>Thanks</p>", Map.of("Content-Type", "text/html"), 200));
+
+        mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith("text/html"))
+            .andExpect(content().string("<p>Thanks</p>"))
+            .andExpect(header().string("Content-Security-Policy", "sandbox"))
+            .andExpect(header().string("X-Content-Type-Options", "nosniff"));
+
+        verify(webhookWorkflowExecutor).executeAsync(any(), any());
+    }
+
+    @Test
+    void testValidatingAsyncTriggerReturnsValidationResponseWhenNoResponseConfigured() throws Exception {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any()))
+            .thenReturn(ASYNC_EXECUTION_WITH_VALIDATION_AND_RESPONSE_FLAGS);
+        when(webhookWorkflowExecutor.validate(any(), any())).thenReturn(
+            new WebhookValidateResponse("<Response/>", Map.of("Content-Type", List.of("text/xml")), 200));
+        when(webhookWorkflowExecutor.getWebhookResponse(any())).thenReturn(null);
+
+        mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith("text/xml"))
+            .andExpect(content().string("<Response/>"));
+
+        ArgumentCaptor<WebhookRequest> webhookRequestArgumentCaptor = ArgumentCaptor.forClass(WebhookRequest.class);
+
+        verify(webhookWorkflowExecutor).executeAsync(any(), webhookRequestArgumentCaptor.capture());
+
+        WebhookRequest executedWebhookRequest = webhookRequestArgumentCaptor.getValue();
+
+        assertThat(executedWebhookRequest.validated()).isTrue();
+    }
+
+    @Test
+    void testValidatingAsyncTriggerFailureReturnsValidationResponseWithoutRun() throws Exception {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any()))
+            .thenReturn(ASYNC_EXECUTION_WITH_VALIDATION_AND_RESPONSE_FLAGS);
+        when(webhookWorkflowExecutor.validate(any(), any())).thenReturn(WebhookValidateResponse.badRequest());
+
+        mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
+            .andExpect(status().isBadRequest());
+
+        verify(webhookWorkflowExecutor, never()).getWebhookResponse(any());
+        verify(webhookWorkflowExecutor, never()).executeAsync(any(), any());
+    }
+
+    @Test
+    void testSyncTriggerStillRejectsExternalRedirect() throws Exception {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(SYNC_EXECUTION_FLAGS);
+        when(webhookWorkflowExecutor.executeSync(any(), any())).thenReturn(
+            Map.of(MetadataConstants.WEBHOOK_RESPONSE, WebhookResponse.redirect("https://evil.com")));
+
+        mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testAsyncTriggerWithInvalidStatusCodeReturnsServerErrorWithoutRun() throws Exception {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(ASYNC_EXECUTION_WITH_RESPONSE_FLAGS);
+        when(webhookWorkflowExecutor.getWebhookResponse(any())).thenReturn(WebhookResponse.noData(Map.of(), 0));
+
+        mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
+            .andExpect(status().isInternalServerError());
+
+        verify(webhookWorkflowExecutor, never()).executeAsync(any(), any());
+    }
+
+    @Test
+    void testAsyncTriggerServesPlainRawWithoutSandbox() throws Exception {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(ASYNC_EXECUTION_WITH_RESPONSE_FLAGS);
+        when(webhookWorkflowExecutor.getWebhookResponse(any()))
+            .thenReturn(WebhookResponse.raw("Thanks", Map.of(), 200));
+
+        mockMvc.perform(post("/webhooks/{id}", workflowExecutionId.toString()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith("text/plain"))
+            .andExpect(header().doesNotExist("Content-Security-Policy"));
     }
 }

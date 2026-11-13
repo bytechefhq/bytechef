@@ -140,7 +140,7 @@ class WebhookTriggerTestFacadeIntTest {
         when(triggerDefinitionService.getTriggerDefinition("webhook", 1, "autoRespondWithHTTP200"))
             .thenReturn(webhookTriggerDefinition);
         when(triggerDefinitionService.getWebhookTriggerFlags(anyString(), eq(1), anyString()))
-            .thenReturn(new WebhookTriggerFlags(false, false, false, false));
+            .thenReturn(new WebhookTriggerFlags(false, false, false, false, false));
     }
 
     @AfterEach

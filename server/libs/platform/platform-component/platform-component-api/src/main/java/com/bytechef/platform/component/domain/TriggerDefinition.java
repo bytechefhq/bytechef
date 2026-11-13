@@ -47,6 +47,7 @@ public final class TriggerDefinition {
     protected String title;
     protected TriggerType type;
     private boolean webhookRawBody;
+    private boolean webhookResponse;
     private boolean workflowNodeDescriptionDefined;
     private boolean workflowSyncExecution;
     private boolean workflowSyncValidation;
@@ -82,6 +83,8 @@ public final class TriggerDefinition {
         this.title = getTitle(triggerDefinition);
         this.type = Objects.requireNonNull(triggerDefinition.getType(), "type is required");
         this.webhookRawBody = triggerDefinition.getWebhookRawBody();
+        this.webhookResponse = triggerDefinition.getWebhookResponse()
+            .isPresent();
         this.workflowNodeDescriptionDefined = triggerDefinition.getWorkflowNodeDescription()
             .isPresent();
         this.workflowSyncExecution = triggerDefinition.getWorkflowSyncExecution();
@@ -99,7 +102,7 @@ public final class TriggerDefinition {
 
         return batch == that.batch && componentVersion == that.componentVersion &&
             outputFunctionDefined == that.outputFunctionDefined && outputDefined == that.outputDefined &&
-            webhookRawBody == that.webhookRawBody &&
+            webhookRawBody == that.webhookRawBody && webhookResponse == that.webhookResponse &&
             workflowNodeDescriptionDefined == that.workflowNodeDescriptionDefined &&
             workflowSyncExecution == that.workflowSyncExecution &&
             workflowSyncValidation == that.workflowSyncValidation &&
@@ -115,7 +118,7 @@ public final class TriggerDefinition {
     public int hashCode() {
         return Objects.hash(
             batch, description, componentName, componentVersion, help, name, outputFunctionDefined, outputDefined,
-            outputResponse, outputSchemaDefined, properties, title, type, webhookRawBody,
+            outputResponse, outputSchemaDefined, properties, title, type, webhookRawBody, webhookResponse,
             workflowNodeDescriptionDefined, workflowSyncExecution, workflowSyncValidation,
             workflowSyncOnEnableValidation);
     }
@@ -189,6 +192,10 @@ public final class TriggerDefinition {
         return workflowSyncExecution;
     }
 
+    public boolean isWebhookResponse() {
+        return webhookResponse;
+    }
+
     public boolean isWorkflowSyncValidation() {
         return workflowSyncValidation;
     }
@@ -213,6 +220,7 @@ public final class TriggerDefinition {
             ", outputResponse=" + outputResponse +
             ", outputResponseDefined=" + outputSchemaDefined +
             ", webhookRawBody=" + webhookRawBody +
+            ", webhookResponse=" + webhookResponse +
             ", workflowSyncExecution=" + workflowSyncExecution +
             ", workflowSyncValidation=" + workflowSyncValidation +
             ", workflowSyncOnEnableValidation=" + workflowSyncOnEnableValidation +

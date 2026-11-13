@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.component.remote.client.facade;
 
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
@@ -20,6 +21,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -162,6 +164,17 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
     }
 
     @Override
+    public @Nullable WebhookResponse executeWebhookResponse(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
+
+        return defaultRestClient.post(
+            uriBuilder -> toUri(
+                uriBuilder, componentName, TRIGGER_DEFINITION_FACADE + "/execute-webhook-response"),
+            new WebhookResponseRequest(componentName, componentVersion, triggerName, inputParameters),
+            WebhookResponse.class);
+    }
+
+    @Override
     public WebhookValidateResponse executeWebhookValidate(
         String componentName, int componentVersion, String triggerName,
         Map<String, ?> inputParameters, WebhookRequest webhookRequest, Long connectionId) {
@@ -227,6 +240,10 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters, Object state,
         WebhookRequest webhookRequest, Long connectionId, Long jobPrincipalId, String workflowUuid,
         Long triggerExecutionId, boolean editorEnvironment, PlatformType type, Long environmentId) {
+    }
+
+    private record WebhookResponseRequest(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters) {
     }
 
     private record WebhookValidateRequest(

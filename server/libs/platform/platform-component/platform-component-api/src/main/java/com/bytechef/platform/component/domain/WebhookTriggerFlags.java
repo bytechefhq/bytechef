@@ -21,5 +21,5 @@ package com.bytechef.platform.component.domain;
  */
 public record WebhookTriggerFlags(
     boolean webhookRawBody, boolean workflowSyncExecution, boolean workflowSyncValidation,
-    boolean workflowSyncOnEnableValidation) {
+    boolean workflowSyncOnEnableValidation, boolean webhookResponse) {
 }

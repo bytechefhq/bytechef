@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.webhook.executor;
 
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -125,6 +126,17 @@ public interface WebhookWorkflowExecutor {
     boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId);
 
     /**
+     * Returns the immediate response an asynchronous webhook trigger sends to the caller, built from the trigger
+     * parameters evaluated against the workflow inputs. The incoming request is never used.
+     *
+     * @param workflowExecutionId the unique identifier for the workflow execution containing details such as tenant,
+     *                            type, and trigger
+     * @return the configured response, or {@code null} when the trigger uses the default response
+     */
+    @Nullable
+    WebhookResponse getWebhookResponse(WorkflowExecutionId workflowExecutionId);
+
+    /**
      * Validates the provided webhook request against the trigger of the given workflow execution without executing the
      * workflow.
      *
@@ -134,19 +146,6 @@ public interface WebhookWorkflowExecutor {
      * @return a {@link WebhookValidateResponse} instance encapsulating the status, headers, and body of the validation
      */
     WebhookValidateResponse validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
-
-    /**
-     * Validates the provided webhook request and executes the associated workflow asynchronously based on the given
-     * workflow execution identifier.
-     *
-     * @param workflowExecutionId the unique identifier for the workflow execution containing details such as tenant,
-     *                            type, and trigger
-     * @param webhookRequest      the webhook request with headers, parameters, and body relevant to the execution
-     * @return a {@link WebhookValidateResponse} instance encapsulating the status, headers, and body of the validation
-     *         and execution process
-     */
-    WebhookValidateResponse validateAndExecuteAsync(
-        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
     /**
      * Validates the provided webhook request during the enablement process of a workflow execution.

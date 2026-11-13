@@ -25,6 +25,7 @@ import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
+import com.bytechef.platform.webhook.rest.util.AsyncWebhookResponseUtils;
 import com.bytechef.platform.webhook.rest.util.RedirectValidatorUtils;
 import com.bytechef.platform.webhook.rest.util.WebhookRequestUtils;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -49,8 +50,10 @@ import org.springframework.util.MultiValueMapAdapter;
 import tools.jackson.core.type.TypeReference;
 
 /**
- * Abstract controller for handling webhook triggers. Redirect URLs from workflow responses are validated to prevent
- * open redirect vulnerabilities - only relative paths and same-host redirects are allowed.
+ * Abstract controller for handling webhook triggers. Redirect URLs from synchronous workflow responses are validated to
+ * prevent open redirect vulnerabilities - only relative paths and same-host redirects are allowed. Immediate responses
+ * of asynchronous triggers come from the trigger configuration, never from the request, so they may also redirect to
+ * external http(s) hosts.
  *
  * @author Ivica Cardic
  */
@@ -58,6 +61,9 @@ public abstract class AbstractWebhookTriggerController {
 
     public static final String HEADER_WORKFLOW_EXECUTION_ID = "X-ByteChef-Workflow-Execution-Id";
     public static final String HEADER_PUBLIC_URL = "X-ByteChef-Public-Url";
+
+    private static final String CONTENT_SECURITY_POLICY = "Content-Security-Policy";
+    private static final String X_CONTENT_TYPE_OPTIONS = "X-Content-Type-Options";
 
     private static final Logger log = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
@@ -113,12 +119,12 @@ public abstract class AbstractWebhookTriggerController {
                 responseEntity = toResponseEntity(webhookValidateResponse);
             }
         } else if (webhookTriggerFlags.workflowSyncValidation()) {
-            responseEntity = validateAndExecuteAsync(workflowExecutionId, webhookRequest);
+            responseEntity = validateAndExecuteAsync(
+                workflowExecutionId, webhookRequest, webhookTriggerFlags, httpServletRequest, httpServletResponse);
         } else {
-            webhookWorkflowExecutor.executeAsync(workflowExecutionId, webhookRequest);
-
-            responseEntity = ResponseEntity.ok()
-                .build();
+            responseEntity = executeAsync(
+                workflowExecutionId, webhookRequest, webhookTriggerFlags, null, httpServletRequest,
+                httpServletResponse);
         }
 
         return responseEntity;
@@ -148,18 +154,61 @@ public abstract class AbstractWebhookTriggerController {
         return publicUrl + "/file-entries/%s/content".formatted(fileEntry.toId());
     }
 
+    /**
+     * Starts the asynchronous run and answers the caller. The configured immediate response is computed and checked
+     * before the run starts, so a response that cannot be built answers 500 and nothing runs. Without a configured
+     * response the caller gets the validation response, or an empty 200 when the trigger does not validate.
+     */
+    private ResponseEntity<Object> executeAsync(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest,
+        WebhookTriggerFlags webhookTriggerFlags, @Nullable WebhookValidateResponse webhookValidateResponse,
+        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+
+        WebhookResponse webhookResponse = null;
+
+        if (webhookTriggerFlags.webhookResponse()) {
+            try {
+                webhookResponse = webhookWorkflowExecutor.getWebhookResponse(workflowExecutionId);
+            } catch (RuntimeException exception) {
+                log.error("Failed to build the immediate webhook response for {}", workflowExecutionId, exception);
+
+                return ResponseEntity.internalServerError()
+                    .build();
+            }
+
+            if (webhookResponse != null && !AsyncWebhookResponseUtils.isAllowed(webhookResponse)) {
+                log.error(
+                    "Rejected the immediate webhook response for {}: type={}, statusCode={}", workflowExecutionId,
+                    webhookResponse.getType(), webhookResponse.getStatusCode());
+
+                return ResponseEntity.internalServerError()
+                    .build();
+            }
+        }
+
+        webhookWorkflowExecutor.executeAsync(workflowExecutionId, webhookRequest);
+
+        if (webhookResponse != null) {
+            return renderWebhookResponse(webhookResponse, true, httpServletRequest, httpServletResponse);
+        }
+
+        if (webhookValidateResponse != null) {
+            return toResponseEntity(webhookValidateResponse);
+        }
+
+        return ResponseEntity.ok()
+            .build();
+    }
+
     @SuppressFBWarnings(
         value = "UNVALIDATED_REDIRECT",
-        justification = "Redirect URL is validated by RedirectValidator.isValidRedirect() before use")
-    private ResponseEntity<Object> processWebhookResponse(
-        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Map<?, ?> responseMap)
-        throws IOException {
+        justification = "Async redirects are checked by AsyncWebhookResponseUtils.isAllowed() before the run starts; " +
+            "sync redirects are validated by RedirectValidatorUtils.isValidRedirect() here")
+    private ResponseEntity<Object> renderWebhookResponse(
+        WebhookResponse webhookResponse, boolean async, HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse) throws IOException {
 
         ResponseEntity<Object> responseEntity;
-
-        @SuppressWarnings("unchecked")
-        WebhookResponse webhookResponse = MapUtils.getRequired(
-            (Map<String, ?>) responseMap, MetadataConstants.WEBHOOK_RESPONSE, new TypeReference<>() {});
 
         Map<String, String> headers = webhookResponse.getHeaders();
 
@@ -189,7 +238,12 @@ public abstract class AbstractWebhookTriggerController {
 
                 break;
             case RAW:
-                bodyBuilder.contentType(MediaType.TEXT_PLAIN);
+                if (!async || !hasContentTypeHeader(headers)) {
+                    bodyBuilder.contentType(MediaType.TEXT_PLAIN);
+                } else {
+                    bodyBuilder.header(CONTENT_SECURITY_POLICY, "sandbox");
+                    bodyBuilder.header(X_CONTENT_TYPE_OPTIONS, "nosniff");
+                }
 
                 responseEntity = bodyBuilder.body(String.valueOf(webhookResponse.getBody()));
 
@@ -198,7 +252,7 @@ public abstract class AbstractWebhookTriggerController {
                 String redirectUrl = String.valueOf(webhookResponse.getBody());
                 String serverHost = httpServletRequest.getServerName();
 
-                if (RedirectValidatorUtils.isValidRedirect(redirectUrl, serverHost)) {
+                if (async || RedirectValidatorUtils.isValidRedirect(redirectUrl, serverHost)) {
                     responseEntity = ResponseEntity.noContent()
                         .build();
 
@@ -225,7 +279,11 @@ public abstract class AbstractWebhookTriggerController {
         Object outputs = webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
 
         if (outputs instanceof Map<?, ?> responseMap && responseMap.containsKey(MetadataConstants.WEBHOOK_RESPONSE)) {
-            return processWebhookResponse(httpServletRequest, httpServletResponse, responseMap);
+            @SuppressWarnings("unchecked")
+            WebhookResponse webhookResponse = MapUtils.getRequired(
+                (Map<String, ?>) responseMap, MetadataConstants.WEBHOOK_RESPONSE, new TypeReference<>() {});
+
+            return renderWebhookResponse(webhookResponse, false, httpServletRequest, httpServletResponse);
         }
 
         return ResponseEntity.ok(outputs);
@@ -239,10 +297,31 @@ public abstract class AbstractWebhookTriggerController {
             .body(webhookValidateResponse.body());
     }
 
-    private ResponseEntity<Object> validateAndExecuteAsync(
-        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    private static boolean hasContentTypeHeader(Map<String, String> headers) {
+        for (String headerName : headers.keySet()) {
+            if (HttpHeaders.CONTENT_TYPE.equalsIgnoreCase(headerName)) {
+                return true;
+            }
+        }
 
-        return toResponseEntity(webhookWorkflowExecutor.validateAndExecuteAsync(workflowExecutionId, webhookRequest));
+        return false;
+    }
+
+    private ResponseEntity<Object> validateAndExecuteAsync(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest,
+        WebhookTriggerFlags webhookTriggerFlags, HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse) throws IOException {
+
+        WebhookValidateResponse webhookValidateResponse = webhookWorkflowExecutor.validate(
+            workflowExecutionId, webhookRequest);
+
+        if (webhookValidateResponse.status() != HttpStatus.OK.value()) {
+            return toResponseEntity(webhookValidateResponse);
+        }
+
+        return executeAsync(
+            workflowExecutionId, webhookRequest.asValidated(), webhookTriggerFlags, webhookValidateResponse,
+            httpServletRequest, httpServletResponse);
     }
 
     @SuppressWarnings("unchecked")

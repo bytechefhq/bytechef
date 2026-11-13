@@ -27,6 +27,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
@@ -118,7 +119,7 @@ class RequestTriggerApiControllerIntTest {
             .build();
 
         when(webhookWorkflowExecutor.getWebhookTriggerFlags(any()))
-            .thenReturn(new WebhookTriggerFlags(false, false, false, false));
+            .thenReturn(new WebhookTriggerFlags(false, false, false, false, false));
         when(integrationInstanceWorkflowService.fetchIntegrationInstanceWorkflow(anyLong(), any()))
             .thenReturn(Optional.of(instanceWorkflow(true)));
     }
@@ -139,6 +140,30 @@ class RequestTriggerApiControllerIntTest {
         Assertions.assertEquals("trigger_1", workflowExecutionId.getTriggerName());
 
         verifyNoInteractions(connectedUserWorkflowReferenceFacade);
+    }
+
+    @Test
+    @WithMockUser(username = "user-1")
+    void testIntegrationWorkflowAnswersWithTheConfiguredImmediateResponse() {
+        stubConnectedUser("user-1", 1L);
+        stubIntegrationWorkflow();
+
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any()))
+            .thenReturn(new WebhookTriggerFlags(false, false, false, false, true));
+        when(webhookWorkflowExecutor.getWebhookResponse(any()))
+            .thenReturn(WebhookResponse.json(Map.of("accepted", true), Map.of(), 202));
+
+        webTestClient
+            .post()
+            .uri(WORKFLOW_PATH, "uuid-1")
+            .exchange()
+            .expectStatus()
+            .isAccepted()
+            .expectBody()
+            .jsonPath("$.accepted")
+            .isEqualTo(true);
+
+        captureDispatchedWorkflowExecutionId();
     }
 
     @Test

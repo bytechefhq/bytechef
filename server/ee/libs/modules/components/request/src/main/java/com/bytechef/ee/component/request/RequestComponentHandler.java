@@ -12,7 +12,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.ee.component.request.trigger.RequestAutoRespondWithHTTP200Trigger;
+import com.bytechef.ee.component.request.trigger.RequestAutoRespondTrigger;
 import com.bytechef.ee.component.request.trigger.RequestAwaitWorkflowAndRespondTrigger;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ public class RequestComponentHandler implements ComponentHandler {
         .icon("path:assets/request.svg")
         .categories(ComponentCategory.HELPERS)
         .triggers(
-            RequestAutoRespondWithHTTP200Trigger.TRIGGER_DEFINITION,
+            RequestAutoRespondTrigger.TRIGGER_DEFINITION,
             RequestAwaitWorkflowAndRespondTrigger.TRIGGER_DEFINITION);
 
     @Override
