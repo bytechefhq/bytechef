@@ -122,6 +122,45 @@ public final class RedirectValidatorUtils {
     }
 
     /**
+     * Validates a redirect URL configured by a workflow author for an immediate asynchronous webhook response. The
+     * caller of the webhook cannot influence the value, so absolute {@code http} and {@code https} URLs on any host are
+     * allowed in addition to relative paths. Unresolved expressions, unsafe characters, protocol-relative URLs and
+     * other schemes are rejected.
+     *
+     * @param redirectUrl the URL to validate
+     * @return true if the redirect is safe, false otherwise
+     */
+    public static boolean isValidAuthorRedirect(@Nullable String redirectUrl) {
+        if (redirectUrl == null || redirectUrl.isBlank() || redirectUrl.contains("${")) {
+            return false;
+        }
+
+        if (containsUnsafeCharacters(redirectUrl) || redirectUrl.startsWith("//")) {
+            return false;
+        }
+
+        if (isRelativePath(redirectUrl)) {
+            return true;
+        }
+
+        try {
+            URI uri = new URI(redirectUrl);
+
+            String scheme = uri.getScheme();
+
+            if (scheme == null || uri.getHost() == null) {
+                return false;
+            }
+
+            String lowerCaseScheme = scheme.toLowerCase();
+
+            return lowerCaseScheme.equals("http") || lowerCaseScheme.equals("https");
+        } catch (URISyntaxException exception) {
+            return false;
+        }
+    }
+
+    /**
      * Sanitizes a redirect URL by returning it only if valid, or null if unsafe.
      *
      * @param redirectUrl    the URL to validate
