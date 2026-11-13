@@ -59,6 +59,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
+import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -874,7 +875,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
                 ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO =
                     ConnectedUserProjectWorkflowDTO.ofReference(
-                        connectedUser.getId(), reference, new WorkflowDTO(workflow, List.of(), List.of()),
+                        connectedUser.getId(), reference,
+                        new WorkflowDTO(workflow, List.of(), getReferenceWorkflowTriggers(reference)),
                         template == null ? List.of() : template.components(), inputs,
                         withoutProvidedInputValues(referenceState.inputs(), inputs),
                         referenceState.attentionReason());
@@ -884,6 +886,19 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                         reference.getProjectDeploymentId(), reference.getAutomationUuid()));
             })
             .toList();
+    }
+
+    private List<WorkflowTriggerDTO> getReferenceWorkflowTriggers(ConnectedUserProjectWorkflow reference) {
+        Long projectDeploymentId = reference.getProjectDeploymentId();
+
+        if (reference.isDangling() || projectDeploymentId == null) {
+            return List.of();
+        }
+
+        return projectWorkflowService.fetchProjectWorkflowWorkflowId(projectDeploymentId, reference.getAutomationUuid())
+            .map(workflowFacade::getWorkflow)
+            .map(WorkflowDTO::getTriggers)
+            .orElse(List.of());
     }
 
     private Optional<ConnectedUserWorkflowTemplateDTO> fetchReferenceDeploymentTemplate(

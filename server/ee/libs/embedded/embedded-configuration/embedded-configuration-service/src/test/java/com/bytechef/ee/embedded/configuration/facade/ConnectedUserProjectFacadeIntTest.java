@@ -175,6 +175,12 @@ class ConnectedUserProjectFacadeIntTest {
          "triggers":[],"tasks":[]}
         """;
 
+    private static final String MANUAL_SLACK_WORKFLOW_DEFINITION = """
+        {"label":"Post manually","description":"Posts on demand",
+         "triggers":[{"label":"Manual","name":"trigger_1","type":"manual/v1/manual"}],
+         "tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
     private static final String SLACK_WORKFLOW_DEFINITION = """
         {"label":"Sync leads","description":"Posts new leads","triggers":[],
          "tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
@@ -529,6 +535,25 @@ class ConnectedUserProjectFacadeIntTest {
         assertThatThrownBy(() -> connectedUserProjectFacade.updateProjectWorkflowInputs(
             externalUserId, automationUuid, Map.of("channel", "#alerts"), null))
                 .isInstanceOf(DanglingReferenceException.class);
+    }
+
+    @Test
+    void testGetConnectedUserProjectWorkflowsListsTheTriggersOfAReferencedAutomation() {
+        long automationProjectId = createAutomationProject("Reference Triggers");
+
+        String automationUuid = addAutomation(automationProjectId, MANUAL_SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, automationUuid, Environment.PRODUCTION);
+
+        assertThat(connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION))
+            .singleElement()
+            .satisfies(connectedUserProjectWorkflowDTO -> assertThat(connectedUserProjectWorkflowDTO.workflow()
+                .getTriggers())
+                    .extracting("type")
+                    .containsExactly("manual/v1/manual"));
     }
 
     @Test
