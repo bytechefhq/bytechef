@@ -11,6 +11,7 @@ Name | Type
 `componentVersion` | number
 `integrationInstanceConfigurations` | [Array&lt;ProvisionableIntegrationInstanceConfiguration&gt;](ProvisionableIntegrationInstanceConfiguration.md)
 `mcpWorkflowUuids` | Array&lt;string&gt;
+`toolOnlyMcpWorkflowUuids` | Array&lt;string&gt;
 
 ## Example
 
@@ -23,6 +24,7 @@ const example = {
   "componentVersion": null,
   "integrationInstanceConfigurations": null,
   "mcpWorkflowUuids": null,
+  "toolOnlyMcpWorkflowUuids": null,
 } satisfies ProvisionableIntegration
 
 console.log(example)

@@ -47,9 +47,13 @@ export interface ProvisionableIntegration {
      */
     integrationInstanceConfigurations?: Array<ProvisionableIntegrationInstanceConfiguration>;
     /**
-     * The uuids of the integration's workflows that embedded MCP servers expose as tools.
+     * The uuids of the integration's workflows that embedded MCP servers expose as tools and that also have another trigger.
      */
     mcpWorkflowUuids?: Array<string>;
+    /**
+     * The uuids of the integration's workflows that embedded MCP servers expose as tools and that have no other trigger.
+     */
+    toolOnlyMcpWorkflowUuids?: Array<string>;
 }
 
 /**
@@ -73,6 +77,7 @@ export function ProvisionableIntegrationFromJSONTyped(json: any, ignoreDiscrimin
         'componentVersion': json['componentVersion'] == null ? undefined : json['componentVersion'],
         'integrationInstanceConfigurations': json['integrationInstanceConfigurations'] == null ? undefined : ((json['integrationInstanceConfigurations'] as Array<any>).map(ProvisionableIntegrationInstanceConfigurationFromJSON)),
         'mcpWorkflowUuids': json['mcpWorkflowUuids'] == null ? undefined : json['mcpWorkflowUuids'],
+        'toolOnlyMcpWorkflowUuids': json['toolOnlyMcpWorkflowUuids'] == null ? undefined : json['toolOnlyMcpWorkflowUuids'],
     };
 }
 
@@ -91,6 +96,7 @@ export function ProvisionableIntegrationToJSONTyped(value?: ProvisionableIntegra
         'componentVersion': value['componentVersion'],
         'integrationInstanceConfigurations': value['integrationInstanceConfigurations'] == null ? undefined : ((value['integrationInstanceConfigurations'] as Array<any>).map(ProvisionableIntegrationInstanceConfigurationToJSON)),
         'mcpWorkflowUuids': value['mcpWorkflowUuids'],
+        'toolOnlyMcpWorkflowUuids': value['toolOnlyMcpWorkflowUuids'],
     };
 }
 

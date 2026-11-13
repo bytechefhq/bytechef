@@ -11,6 +11,7 @@ All URIs are relative to */api/embedded/internal*
 | [**getConnectedUserConnections**](ConnectionApi.md#getconnecteduserconnections) | **GET** /connected-users/{connectedUserId}/components/{componentName}/connections | Get all connected user\&#39;s connections |
 | [**getConnection**](ConnectionApi.md#getconnection) | **GET** /connections/{id} | Get a connection by id |
 | [**getConnections**](ConnectionApi.md#getconnections) | **GET** /connections | Get all connections |
+| [**updateConnectedUserConnectionCredentials**](ConnectionApi.md#updateconnecteduserconnectioncredentials) | **PUT** /connected-users/{connectedUserId}/connections/{connectionId}/credentials | Replaces the credentials of a provisioned connected user connection |
 | [**updateConnection**](ConnectionApi.md#updateconnectionoperation) | **PATCH** /connections/{id} | Update an existing connection |
 | [**updateConnectionCredentials**](ConnectionApi.md#updateconnectioncredentialsoperation) | **PUT** /connections/{id}/credentials | Replaces the credentials of an existing connection |
 
@@ -499,6 +500,79 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The list of connections. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## updateConnectedUserConnectionCredentials
+
+> updateConnectedUserConnectionCredentials(connectedUserId, connectionId, updateConnectionCredentialsRequest)
+
+Replaces the credentials of a provisioned connected user connection
+
+Replaces the credentials of a connection a tenant admin provisioned for a connected user.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  ConnectionApi,
+} from '';
+import type { UpdateConnectedUserConnectionCredentialsRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new ConnectionApi();
+
+  const body = {
+    // number | The id of a connected user.
+    connectedUserId: 789,
+    // number | The id of a connection.
+    connectionId: 789,
+    // UpdateConnectionCredentialsRequest
+    updateConnectionCredentialsRequest: ...,
+  } satisfies UpdateConnectedUserConnectionCredentialsRequest;
+
+  try {
+    const data = await api.updateConnectedUserConnectionCredentials(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **connectedUserId** | `number` | The id of a connected user. | [Defaults to `undefined`] |
+| **connectionId** | `number` | The id of a connection. | [Defaults to `undefined`] |
+| **updateConnectionCredentialsRequest** | [UpdateConnectionCredentialsRequest](UpdateConnectionCredentialsRequest.md) |  | |
+
+### Return type
+
+`void` (Empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: `application/json`
+- **Accept**: Not defined
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **204** | Successful operation. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
