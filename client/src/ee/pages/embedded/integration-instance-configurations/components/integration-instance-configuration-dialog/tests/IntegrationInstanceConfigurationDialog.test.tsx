@@ -8,10 +8,11 @@ const hoisted = vi.hoisted(() => ({
     connectionDefinition: undefined as
         {authorizationRequired?: boolean; authorizations: {title: string; type: string}[]} | undefined,
     createMutate: vi.fn(),
+    findTestConnectionId: vi.fn(),
     integration: undefined as {componentName: string} | undefined,
     updateCredentialsMutate: vi.fn(),
     updateMutate: vi.fn(),
-    workflows: [] as {id: string; workflowUuid: string}[],
+    workflows: [] as {id: string; tasks?: unknown[]; triggers?: unknown[]; workflowUuid: string}[],
 }));
 
 vi.mock('@/ee/shared/mutations/embedded/integrationInstanceConfigurations.mutations', () => ({
@@ -37,7 +38,7 @@ vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
 }));
 
 vi.mock('@/shared/hooks/useWorkflowTestConfigurationConnections', () => ({
-    default: () => ({findConnectionId: () => undefined, isFetched: true}),
+    default: () => ({findConnectionId: hoisted.findTestConnectionId, isFetched: true}),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/integrations.queries', () => ({
@@ -713,6 +714,97 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             );
 
             expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
+        });
+    });
+
+    describe('workflow editor connections', () => {
+        const gmailWorkflow = {
+            id: 'workflow-v1',
+            tasks: [
+                {
+                    connections: [
+                        {componentName: 'httpClient', key: 'httpClient', workflowNodeName: 'httpClient_1'},
+                        {
+                            componentName: 'googleMail',
+                            key: 'googleMail',
+                            required: true,
+                            workflowNodeName: 'googleMail_1',
+                        },
+                    ],
+                    name: 'googleMail_1',
+                    type: 'googleMail/v1/getEmail',
+                },
+            ],
+            triggers: [],
+            workflowUuid: 'workflow-uuid',
+        };
+
+        const renderUpgradeAndSave = async (
+            connections: {connectionId: number; workflowConnectionKey: string; workflowNodeName: string}[]
+        ) => {
+            const user = userEvent.setup();
+
+            hoisted.connectionDefinition = {authorizations: [{title: 'API Key', type: 'API_KEY'}]};
+            hoisted.integration = {componentName: 'httpClient'};
+            hoisted.workflows = [gmailWorkflow];
+
+            render(
+                <IntegrationInstanceConfigurationDialog
+                    integrationInstanceConfiguration={{
+                        authorizationType: 'API_KEY',
+                        id: 1,
+                        integrationId: 2,
+                        integrationInstanceConfigurationWorkflows: [
+                            {connections, enabled: true, workflowId: 'workflow-v0', workflowUuid: 'workflow-uuid'},
+                        ],
+                        integrationVersion: 1,
+                        name: 'Existing',
+                    }}
+                    onClose={onClose}
+                    updateIntegrationVersion
+                />
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+            await user.click(await screen.findByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(hoisted.updateMutate).toHaveBeenCalledTimes(1));
+
+            return hoisted.updateMutate.mock.calls[0][0];
+        };
+
+        it('should preselect the connection picked in the workflow editor Connection tab', async () => {
+            hoisted.findTestConnectionId.mockReturnValue(42);
+
+            const submittedConfiguration = await renderUpgradeAndSave([]);
+
+            expect(hoisted.findTestConnectionId).toHaveBeenCalledWith('workflow-uuid', 'googleMail_1', 'googleMail');
+            expect(hoisted.findTestConnectionId).not.toHaveBeenCalledWith(
+                'workflow-uuid',
+                'httpClient_1',
+                'httpClient'
+            );
+            expect(submittedConfiguration.integrationInstanceConfigurationWorkflows).toEqual([
+                expect.objectContaining({
+                    connections: [expect.objectContaining({connectionId: 42, workflowNodeName: 'googleMail_1'})],
+                    enabled: true,
+                }),
+            ]);
+        });
+
+        it('should keep a connection already stored on the configuration', async () => {
+            hoisted.findTestConnectionId.mockReturnValue(42);
+
+            const submittedConfiguration = await renderUpgradeAndSave([
+                {connectionId: 7, workflowConnectionKey: 'googleMail', workflowNodeName: 'googleMail_1'},
+            ]);
+
+            expect(hoisted.findTestConnectionId).not.toHaveBeenCalled();
+            expect(submittedConfiguration.integrationInstanceConfigurationWorkflows).toEqual([
+                expect.objectContaining({
+                    connections: [expect.objectContaining({connectionId: 7, workflowNodeName: 'googleMail_1'})],
+                }),
+            ]);
         });
     });
 });
