@@ -17,7 +17,7 @@ query embeddedGettingStarted {
         lastFailedCall {
             createdDate
             errorMessage
-            outcome
+            status
         }
         testUserAdded
         testUserConnected

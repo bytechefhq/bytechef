@@ -25,13 +25,13 @@ const externalInvocationLog = {
     externalUserId: 'external-user-1',
     id: '1',
     integrationInstanceId: 4,
+    invocationName: 'SLACK_SEND_MESSAGE',
     jobId: null,
     kind: 'COMPONENT',
     mcpServerId: 11,
     operationName: 'sendMessage',
     source: 'MCP_SERVER',
     status: 'SUCCESS',
-    toolName: 'SLACK_SEND_MESSAGE',
 };
 
 describe('ConnectedUserSheetPanelExternalInvocationList', () => {

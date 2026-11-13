@@ -114,7 +114,7 @@ const ExternalInvocationsTable = ({
             <TableRow>
                 <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Status</TableHead>
 
-                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Tool</TableHead>
+                <TableHead className={EXECUTIONS_TABLE_HEAD_CLASS_NAME}>Name</TableHead>
 
                 <TableHead className={twMerge(EXECUTIONS_TABLE_HEAD_CLASS_NAME, 'text-center')}>Type</TableHead>
 
@@ -172,7 +172,7 @@ const ExternalInvocationsTable = ({
                         </TableCell>
 
                         <TableCell className={EXECUTIONS_TABLE_CELL_CLASS_NAME}>
-                            {externalInvocationLog.toolName || '—'}
+                            {externalInvocationLog.invocationName || '—'}
                         </TableCell>
 
                         <TableCell className={twMerge(EXECUTIONS_TABLE_CELL_CLASS_NAME, 'text-center')}>
