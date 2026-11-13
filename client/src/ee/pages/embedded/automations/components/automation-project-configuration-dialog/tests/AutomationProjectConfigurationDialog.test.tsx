@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => ({
     providableValuesQuery: vi.fn(),
     updateMutateAsync: vi.fn(),
     updateWorkflowMutateAsync: vi.fn(),
-    versionWorkflowChangesQuery: vi.fn(),
+    versionWorkflowsQuery: vi.fn(),
 }));
 
 vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
@@ -40,7 +40,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
         return {data: options.enabled ? mocks.impactData.current : undefined};
     },
     useAutomationProjectConfigurationWorkflowProvidableValuesQuery: (
-        variables: {id: string; workflowUuid: string},
+        variables: {id: string; projectVersion?: number; workflowUuid: string},
         options: {enabled: boolean}
     ) => {
         mocks.providableValuesQuery(variables, options);
@@ -72,24 +72,19 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     useAutomationProjectConfigurationsQuery: () => ({
         data: {automationProjectConfigurations: mocks.configurations.current},
     }),
-    useAutomationProjectVersionWorkflowChangesQuery: (
+    useAutomationProjectVersionWorkflowsQuery: (
         variables: {id: string; projectVersion: number},
         options: {enabled: boolean}
     ) => {
-        mocks.versionWorkflowChangesQuery(variables, options);
+        mocks.versionWorkflowsQuery(variables, options);
 
         return {
             data: options.enabled
                 ? {
-                      automationProjectVersionWorkflowChanges: {
-                          baseVersion: null,
-                          version: variables.projectVersion,
-                          workflows: [
-                              {changeCount: 0, changeType: 'ADDED', label: 'Sync Contacts', workflowUuid: 'workflow-1'},
-                              {changeCount: 0, changeType: 'ADDED', label: 'Send Digest', workflowUuid: 'workflow-2'},
-                              {changeCount: 0, changeType: 'REMOVED', label: 'Old Flow', workflowUuid: 'workflow-3'},
-                          ],
-                      },
+                      automationProjectVersionWorkflows: [
+                          {label: 'Sync Contacts', workflowUuid: 'workflow-1'},
+                          {label: 'Send Digest', workflowUuid: 'workflow-2'},
+                      ],
                   }
                 : undefined,
             isLoading: false,
@@ -493,10 +488,9 @@ describe('AutomationProjectConfigurationDialog', () => {
 
             expect(await screen.findByRole('switch', {name: 'Sync Contacts'})).toBeChecked();
             expect(screen.getByRole('switch', {name: 'Send Digest'})).toBeChecked();
-            expect(screen.queryByText('Old Flow')).not.toBeInTheDocument();
             expect(screen.getAllByText('Step 2 of 2').length).toBeGreaterThan(0);
             expect(screen.queryByLabelText(/^Name/)).not.toBeInTheDocument();
-            expect(mocks.versionWorkflowChangesQuery).toHaveBeenLastCalledWith(
+            expect(mocks.versionWorkflowsQuery).toHaveBeenLastCalledWith(
                 {id: 'project-1', projectVersion: 3},
                 {enabled: true}
             );
@@ -647,7 +641,7 @@ describe('AutomationProjectConfigurationDialog', () => {
             expect(mocks.createMutateAsync).not.toHaveBeenCalled();
             expect(mocks.enableWorkflowMutateAsync).not.toHaveBeenCalled();
             expect(mocks.updateWorkflowMutateAsync).not.toHaveBeenCalled();
-            expect(mocks.versionWorkflowChangesQuery).not.toHaveBeenCalledWith(expect.anything(), {enabled: true});
+            expect(mocks.versionWorkflowsQuery).not.toHaveBeenCalledWith(expect.anything(), {enabled: true});
         });
 
         it('edits the enabled state and provided values of the configuration workflows', async () => {
@@ -716,11 +710,12 @@ describe('AutomationProjectConfigurationDialog', () => {
                 </TooltipProvider>
             );
 
-            expect(screen.getByText('Change Project Version')).toBeInTheDocument();
+            expect(screen.getAllByText('Change Project Version').length).toBeGreaterThan(0);
             expect(screen.getByText('Staging')).toBeInTheDocument();
             expect(screen.getByRole('combobox', {name: 'Version'})).toHaveTextContent('V3');
             expect(screen.queryByRole('switch', {name: 'Show in Automation Hub'})).not.toBeInTheDocument();
-            expect(screen.queryByRole('navigation', {name: 'Steps'})).not.toBeInTheDocument();
+            expect(screen.queryByLabelText(/^Name/)).not.toBeInTheDocument();
+            expect(screen.getAllByText('Step 1 of 2').length).toBeGreaterThan(0);
 
             await user.click(screen.getByRole('button', {name: 'Save'}));
 
@@ -734,6 +729,68 @@ describe('AutomationProjectConfigurationDialog', () => {
                 permissionExpression: null,
                 projectVersion: 3,
             });
+            expect(mocks.enableWorkflowMutateAsync).not.toHaveBeenCalled();
+        });
+
+        it('lists the workflows of the chosen version and saves their enabled state and provided values after the version', async () => {
+            const user = userEvent.setup();
+
+            const onClose = vi.fn();
+
+            render(
+                <TooltipProvider>
+                    <AutomationProjectConfigurationDialog
+                        configuration={{
+                            ...existingConfigurationWithWorkflows,
+                            projectVersion: 1,
+                            workflows: [existingConfigurationWithWorkflows.workflows[1]],
+                        }}
+                        onClose={onClose}
+                        project={project}
+                        updateProjectVersion
+                    />
+                </TooltipProvider>
+            );
+
+            await user.click(screen.getByRole('button', {name: 'Next'}));
+
+            expect(await screen.findByText(/Choose which workflows of V3 this configuration runs/)).toBeInTheDocument();
+            expect(screen.getByRole('switch', {name: 'Sync Contacts'})).toBeChecked();
+            expect(screen.getByRole('switch', {name: 'Send Digest'})).not.toBeChecked();
+            expect(mocks.versionWorkflowsQuery).toHaveBeenLastCalledWith(
+                {id: 'project-1', projectVersion: 3},
+                {enabled: true}
+            );
+            expect(mocks.providableValuesQuery).toHaveBeenCalledWith(
+                {id: 'configuration-1', projectVersion: 3, workflowUuid: 'workflow-1'},
+                {enabled: true}
+            );
+
+            await user.click(screen.getByRole('switch', {name: 'Send Digest'}));
+            await user.click(screen.getAllByRole('tab', {name: /Inputs/})[0]);
+            await user.type(screen.getAllByLabelText('Region')[0], 'eu');
+            await user.click(screen.getByRole('button', {name: 'Save'}));
+
+            await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+
+            expect(mocks.updateMutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({id: 'configuration-1', projectVersion: 3})
+            );
+            expect(mocks.enableWorkflowMutateAsync).toHaveBeenCalledTimes(1);
+            expect(mocks.enableWorkflowMutateAsync).toHaveBeenCalledWith({
+                enable: true,
+                id: 'configuration-1',
+                workflowUuid: 'workflow-2',
+            });
+            expect(mocks.updateWorkflowMutateAsync).toHaveBeenCalledWith({
+                id: 'configuration-1',
+                providedConnections: {},
+                providedInputs: {region: 'eu'},
+                workflowUuid: 'workflow-1',
+            });
+            expect(mocks.updateMutateAsync.mock.invocationCallOrder[0]).toBeLessThan(
+                mocks.updateWorkflowMutateAsync.mock.invocationCallOrder[0]
+            );
         });
 
         it('warns that moving to an older version disconnects automations it lacks', async () => {

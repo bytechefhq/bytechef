@@ -668,7 +668,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
         it('should title the dialog for a version upgrade', () => {
             render(<IntegrationInstanceConfigurationDialog onClose={onClose} updateIntegrationVersion />);
 
-            expect(screen.getByRole('heading', {name: 'Change Integration Version - Basic'})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'Change Version - Basic'})).toBeInTheDocument();
             expect(
                 screen.getAllByText('Move this configuration to another integration version.').length
             ).toBeGreaterThan(0);
@@ -1042,7 +1042,7 @@ describe('IntegrationInstanceConfigurationDialog', () => {
             );
 
             expect(await screen.findByRole('tab', {name: 'Change Version', selected: true})).toBeInTheDocument();
-            expect(screen.getByRole('heading', {name: 'Change Integration Version - Basic'})).toBeInTheDocument();
+            expect(screen.getByRole('heading', {name: 'Change Version - Basic'})).toBeInTheDocument();
             expect(screen.queryByTestId('basic-step')).not.toBeInTheDocument();
             expect(screen.getByRole('button', {name: 'Save'})).toBeDisabled();
         });

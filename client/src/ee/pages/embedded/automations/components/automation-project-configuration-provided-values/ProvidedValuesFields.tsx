@@ -133,6 +133,7 @@ interface DynamicOptionsSelectProps {
     label: string;
     lookupDependsOnValues: Record<string, string>;
     onValueChange: (value: string) => void;
+    projectVersion?: number;
     property: ProvidableInputPropertyI;
     providedConnectionId?: string;
     value: string;
@@ -145,6 +146,7 @@ const DynamicOptionsSelect = ({
     label,
     lookupDependsOnValues,
     onValueChange,
+    projectVersion,
     property,
     providedConnectionId,
     value,
@@ -162,6 +164,7 @@ const DynamicOptionsSelect = ({
             id: configurationId,
             inputName: input.name,
             lookupDependsOnValues,
+            projectVersion,
             propertyName: property.name ?? '',
             workflowUuid,
         },
@@ -228,6 +231,7 @@ interface ComponentReferenceMemberProps {
     label: string;
     lookupDependsOnValues: Record<string, string>;
     onValueChange: (value: string) => void;
+    projectVersion?: number;
     property: ProvidableInputPropertyI;
     providedConnectionId?: string;
     value: string;
@@ -240,6 +244,7 @@ const ComponentReferenceMember = ({
     label,
     lookupDependsOnValues,
     onValueChange,
+    projectVersion,
     property,
     providedConnectionId,
     value,
@@ -261,6 +266,7 @@ const ComponentReferenceMember = ({
                 label={label}
                 lookupDependsOnValues={lookupDependsOnValues}
                 onValueChange={onValueChange}
+                projectVersion={projectVersion}
                 property={property}
                 providedConnectionId={providedConnectionId}
                 value={value}
@@ -291,6 +297,7 @@ interface ComponentReferenceInputProps {
     configurationId: string;
     input: ProvidableInputType;
     onValueChange: (value: ProvidedInputValueType) => void;
+    projectVersion?: number;
     providedConnectionId?: string;
     value?: ProvidedInputValueType;
     workflowUuid: string;
@@ -300,6 +307,7 @@ const ComponentReferenceInput = ({
     configurationId,
     input,
     onValueChange,
+    projectVersion,
     providedConnectionId,
     value,
     workflowUuid,
@@ -335,6 +343,7 @@ const ComponentReferenceInput = ({
                     label={inputLabel}
                     lookupDependsOnValues={{}}
                     onValueChange={onValueChange}
+                    projectVersion={projectVersion}
                     property={members[0]}
                     providedConnectionId={providedConnectionId}
                     value={typeof value === 'string' ? value : ''}
@@ -372,6 +381,7 @@ const ComponentReferenceInput = ({
                             label={memberLabel}
                             lookupDependsOnValues={lookupDependsOnValues}
                             onValueChange={(memberValue) => onValueChange({...groupValues, [memberName]: memberValue})}
+                            projectVersion={projectVersion}
                             property={member}
                             providedConnectionId={providedConnectionId}
                             value={groupValues[memberName] ?? ''}
@@ -391,6 +401,7 @@ interface ProvidedValuesFieldsProps {
     onEnabledChange?: (enabled: boolean) => void;
     onProvidedConnectionsChange: (providedConnections: ProvidedConnectionsType) => void;
     onProvidedInputsChange: (providedInputs: ProvidedInputsType) => void;
+    projectVersion?: number;
     providableValues: ProvidableValuesType;
     providedConnections: ProvidedConnectionsType;
     providedInputs: ProvidedInputsType;
@@ -405,6 +416,7 @@ const ProvidedValuesFields = ({
     onEnabledChange = () => undefined,
     onProvidedConnectionsChange,
     onProvidedInputsChange,
+    projectVersion,
     providableValues,
     providedConnections,
     providedInputs,
@@ -451,6 +463,7 @@ const ProvidedValuesFields = ({
                                 input={input}
                                 key={input.name}
                                 onValueChange={handleInputValueChange}
+                                projectVersion={projectVersion}
                                 providedConnectionId={getProvidedConnectionId(providedConnections, input.componentName)}
                                 value={value}
                                 workflowUuid={workflowUuid}
