@@ -217,4 +217,33 @@ class RedirectValidatorUtilsTest {
         assertThat(RedirectValidatorUtils.isValidRedirect("/page:1", SERVER_HOST)).isTrue();
         assertThat(RedirectValidatorUtils.isValidRedirect("page?time=10:00", SERVER_HOST)).isTrue();
     }
+
+    @Test
+    void testIsValidAuthorRedirectAcceptsExternalAndRelativeUrls() {
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("https://www.cevisio.com/feedback")).isTrue();
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("http://example.com/a?b=1")).isTrue();
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("/thanks")).isTrue();
+    }
+
+    @Test
+    void testIsValidAuthorRedirectRejectsBlankValues() {
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect(null)).isFalse();
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("")).isFalse();
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("   ")).isFalse();
+    }
+
+    @Test
+    void testIsValidAuthorRedirectRejectsUnresolvedExpressions() {
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("${redirectUrl}")).isFalse();
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("https://x.com/${path}")).isFalse();
+    }
+
+    @Test
+    void testIsValidAuthorRedirectRejectsUnsafeUrls() {
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("//evil.com")).isFalse();
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("javascript:alert(1)")).isFalse();
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("data:text/html,x")).isFalse();
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("ftp://example.com")).isFalse();
+        assertThat(RedirectValidatorUtils.isValidAuthorRedirect("https://example.com/\r\nSet-Cookie:a=b")).isFalse();
+    }
 }
