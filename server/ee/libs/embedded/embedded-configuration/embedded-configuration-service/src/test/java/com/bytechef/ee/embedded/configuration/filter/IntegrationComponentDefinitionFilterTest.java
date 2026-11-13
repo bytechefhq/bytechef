@@ -27,7 +27,7 @@ class IntegrationComponentDefinitionFilterTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "apiPlatform", "codeWorkflow", "dataTable", "knowledgeBase", "webhook"
+        "apiPlatform", "codeWorkflow", "dataTable", "knowledgeBase"
     })
     void testFilterExcludesAutomationOnlyComponents(String componentName) {
         assertThat(integrationComponentDefinitionFilter.filter(new ComponentDefinition(componentName))).isFalse();
@@ -35,7 +35,7 @@ class IntegrationComponentDefinitionFilterTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "aiAgent", "httpClient", "slack"
+        "aiAgent", "httpClient", "slack", "webhook"
     })
     void testFilterKeepsOtherComponents(String componentName) {
         assertThat(integrationComponentDefinitionFilter.filter(new ComponentDefinition(componentName))).isTrue();
