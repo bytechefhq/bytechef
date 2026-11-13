@@ -14,6 +14,7 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.audit.IntegrationAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
@@ -119,6 +120,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
+    private final McpIntegrationInstanceRows mcpIntegrationInstanceRows;
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
     private final TransactionTemplate requiresNewTransactionTemplate;
@@ -139,7 +141,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
         IntegrationWorkflowService integrationWorkflowService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
-        OAuth2Service oAuth2Service,
+        McpIntegrationInstanceRows mcpIntegrationInstanceRows, OAuth2Service oAuth2Service,
         TagService tagService,
         TriggerExecutionService triggerExecutionService, ComponentConnectionFacade componentConnectionFacade,
         WorkflowService workflowService) {
@@ -160,6 +162,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
+        this.mcpIntegrationInstanceRows = mcpIntegrationInstanceRows;
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
         this.triggerExecutionService = triggerExecutionService;
@@ -355,6 +358,11 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         integrationInstanceConfigurationWorkflowService.updateEnabled(
             integrationInstanceConfigurationWorkflow.getId(), enable);
+
+        if (enable) {
+            mcpIntegrationInstanceRows.addMissingRowsForIntegrationInstanceConfiguration(
+                integrationInstanceConfigurationId);
+        }
     }
 
     @Override
@@ -678,6 +686,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows(),
                 IntegrationInstanceConfigurationWorkflowDTO::toIntegrationInstanceConfigurationWorkflow),
             integrationWorkflowService.getIntegrationWorkflows(integrationInstanceConfiguration.getIntegrationId()));
+
+        mcpIntegrationInstanceRows.addMissingRowsForIntegrationInstanceConfiguration(
+            Objects.requireNonNull(integrationInstanceConfiguration.getId()));
     }
 
     @Override
@@ -1543,6 +1554,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         integrationInstanceService.updateIntegrationInstanceConfigurationId(
             integrationInstanceId, targetConfigurationId);
+
+        mcpIntegrationInstanceRows.remapIntegrationInstance(integrationInstanceId);
     }
 
     private void restoreTriggers(long integrationInstanceId) {

@@ -9,16 +9,22 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,21 +40,27 @@ import org.springframework.transaction.annotation.Transactional;
 class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstanceWorkflowFacade {
 
     private final ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade;
+    private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
+    private final McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
 
     @SuppressFBWarnings("EI")
     public McpIntegrationInstanceWorkflowFacadeImpl(
         ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade,
+        IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
         IntegrationWorkflowService integrationWorkflowService,
-        McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService) {
+        McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
+        McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService) {
 
         this.connectedUserIntegrationInstanceFacade = connectedUserIntegrationInstanceFacade;
+        this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
+        this.mcpIntegrationInstanceWorkflowService = mcpIntegrationInstanceWorkflowService;
     }
 
     @Override
@@ -64,24 +76,36 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
         connectedUserIntegrationInstanceFacade.validateCurrentPrincipalIntegrationInstanceOwnership(
             integrationInstanceId);
 
-        long integrationInstanceConfigurationWorkflowId =
-            getIntegrationInstanceConfigurationWorkflowId(integrationInstanceId, workflowUuid);
+        for (McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow : getMcpIntegrationInstanceConfigurationWorkflows(
+            integrationInstanceId, workflowUuid)) {
 
-        integrationInstanceWorkflowService
-            .fetchIntegrationInstanceWorkflow(integrationInstanceId, integrationInstanceConfigurationWorkflowId)
-            .ifPresentOrElse(
-                integrationInstanceWorkflow -> integrationInstanceWorkflowService
-                    .updateEnabled(integrationInstanceWorkflow.getId(), enable),
-                () -> {
-                    IntegrationInstanceWorkflow integrationInstanceWorkflow =
-                        integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
-                            integrationInstanceId, integrationInstanceConfigurationWorkflowId);
+            long mcpIntegrationInstanceConfigurationWorkflowId = mcpIntegrationInstanceConfigurationWorkflow.getId();
 
-                    if (enable) {
-                        integrationInstanceWorkflowService.updateEnabled(
-                            integrationInstanceWorkflow.getId(), true);
-                    }
-                });
+            Optional<McpIntegrationInstanceWorkflow> mcpIntegrationInstanceWorkflowOptional =
+                mcpIntegrationInstanceWorkflowService.fetchMcpIntegrationInstanceWorkflow(
+                    integrationInstanceId, mcpIntegrationInstanceConfigurationWorkflowId);
+
+            if (mcpIntegrationInstanceWorkflowOptional.isPresent()) {
+                McpIntegrationInstanceWorkflow mcpIntegrationInstanceWorkflow =
+                    mcpIntegrationInstanceWorkflowOptional.get();
+
+                mcpIntegrationInstanceWorkflowService.updateEnabled(mcpIntegrationInstanceWorkflow.getId(), enable);
+            } else {
+                mcpIntegrationInstanceWorkflowService.createMcpIntegrationInstanceWorkflow(
+                    integrationInstanceId, mcpIntegrationInstanceConfigurationWorkflowId, enable);
+            }
+
+            long integrationInstanceConfigurationWorkflowId =
+                mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId();
+
+            if (integrationInstanceWorkflowService
+                .fetchIntegrationInstanceWorkflow(integrationInstanceId, integrationInstanceConfigurationWorkflowId)
+                .isEmpty()) {
+
+                integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
+                    integrationInstanceId, integrationInstanceConfigurationWorkflowId);
+            }
+        }
     }
 
     @Override
@@ -92,8 +116,14 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
         connectedUserIntegrationInstanceFacade.validateCurrentPrincipalIntegrationInstanceOwnership(
             integrationInstanceId);
 
+        List<McpIntegrationInstanceConfigurationWorkflow> mcpIntegrationInstanceConfigurationWorkflows =
+            getMcpIntegrationInstanceConfigurationWorkflows(integrationInstanceId, workflowUuid);
+
+        McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+            mcpIntegrationInstanceConfigurationWorkflows.getFirst();
+
         long integrationInstanceConfigurationWorkflowId =
-            getIntegrationInstanceConfigurationWorkflowId(integrationInstanceId, workflowUuid);
+            mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId();
 
         integrationInstanceWorkflowService
             .fetchIntegrationInstanceWorkflow(integrationInstanceId, integrationInstanceConfigurationWorkflowId)
@@ -114,17 +144,22 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
                 });
     }
 
-    private long getIntegrationInstanceConfigurationWorkflowId(
+    private List<McpIntegrationInstanceConfigurationWorkflow> getMcpIntegrationInstanceConfigurationWorkflows(
         long integrationInstanceId, String workflowUuid) {
+
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+            integrationInstanceId);
 
         String workflowId = integrationWorkflowService.getWorkflowId(integrationInstanceId, workflowUuid);
 
-        McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
-            mcpIntegrationInstanceConfigurationWorkflowService
-                .fetchMcpIntegrationInstanceConfigurationWorkflowByWorkflowId(workflowId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "MCP integration workflow not found for workflow: " + workflowUuid));
+        List<McpIntegrationInstanceConfigurationWorkflow> mcpIntegrationInstanceConfigurationWorkflows =
+            mcpIntegrationInstanceConfigurationWorkflowService.getMcpIntegrationInstanceConfigurationWorkflows(
+                integrationInstance.getIntegrationInstanceConfigurationId(), workflowId);
 
-        return mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId();
+        if (mcpIntegrationInstanceConfigurationWorkflows.isEmpty()) {
+            throw new IllegalArgumentException("MCP integration workflow not found for workflow: " + workflowUuid);
+        }
+
+        return mcpIntegrationInstanceConfigurationWorkflows;
     }
 }

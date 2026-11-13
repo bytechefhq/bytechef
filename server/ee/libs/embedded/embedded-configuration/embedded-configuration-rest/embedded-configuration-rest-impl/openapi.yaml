@@ -1995,7 +1995,12 @@ components:
           items:
             $ref: "#/components/schemas/ProvisionableIntegrationInstanceConfiguration"
         mcpWorkflowUuids:
-          description: "The uuids of the integration's workflows that embedded MCP servers expose as tools."
+          description: "The uuids of the integration's workflows that embedded MCP servers expose as tools and that also have another trigger."
+          type: "array"
+          items:
+            type: "string"
+        toolOnlyMcpWorkflowUuids:
+          description: "The uuids of the integration's workflows that embedded MCP servers expose as tools and that have no other trigger."
           type: "array"
           items:
             type: "string"

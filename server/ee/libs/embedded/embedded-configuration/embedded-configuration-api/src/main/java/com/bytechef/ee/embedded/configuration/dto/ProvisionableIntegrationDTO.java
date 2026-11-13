@@ -21,7 +21,7 @@ import org.jspecify.annotations.Nullable;
 public record ProvisionableIntegrationDTO(
     IntegrationDTO integration, int componentVersion,
     List<ProvisionableIntegrationInstanceConfiguration> integrationInstanceConfigurations,
-    List<String> mcpWorkflowUuids) {
+    List<String> mcpWorkflowUuids, List<String> toolOnlyMcpWorkflowUuids) {
 
     @SuppressFBWarnings("EI")
     public record ProvisionableIntegrationInstanceConfiguration(

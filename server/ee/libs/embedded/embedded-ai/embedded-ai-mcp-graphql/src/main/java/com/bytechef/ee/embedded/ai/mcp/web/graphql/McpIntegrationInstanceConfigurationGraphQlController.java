@@ -76,15 +76,6 @@ class McpIntegrationInstanceConfigurationGraphQlController {
             id, input.selectedWorkflowIds(), input.workflowConfigurations());
     }
 
-    @MutationMapping
-    boolean updateMcpIntegrationInstanceConfigurationVersion(
-        @Argument long id, @Argument UpdateMcpIntegrationInstanceConfigurationVersionInput input) {
-        mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfigurationVersion(id,
-            input.integrationVersion(), input.workflowUuids());
-
-        return true;
-    }
-
     @QueryMapping
     McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration(@Argument long id) {
         return mcpIntegrationInstanceConfigurationFacade.getMcpIntegrationInstanceConfiguration(id);
@@ -152,9 +143,5 @@ class McpIntegrationInstanceConfigurationGraphQlController {
         UpdateMcpIntegrationInstanceConfigurationInput {
             workflowConfigurations = workflowConfigurations == null ? List.of() : workflowConfigurations;
         }
-    }
-
-    @SuppressFBWarnings("EI")
-    record UpdateMcpIntegrationInstanceConfigurationVersionInput(int integrationVersion, List<String> workflowUuids) {
     }
 }

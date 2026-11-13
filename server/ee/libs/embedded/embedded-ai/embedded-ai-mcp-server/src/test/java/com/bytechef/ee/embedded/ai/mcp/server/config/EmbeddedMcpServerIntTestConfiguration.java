@@ -16,6 +16,7 @@ import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentServiceImp
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolServiceImpl;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowServiceImpl;
 import com.bytechef.ee.embedded.configuration.ownership.EmbeddedOwnerContributorConfiguration;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowServiceImpl;
@@ -60,6 +61,7 @@ import tools.jackson.databind.ObjectMapper;
     LiquibaseConfiguration.class, McpComponentServiceImpl.class, McpIntegrationComponentServiceImpl.class,
     McpIntegrationInstanceConfigurationServiceImpl.class,
     McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolServiceImpl.class,
+    McpIntegrationInstanceWorkflowServiceImpl.class,
     McpServerServiceImpl.class, PostgreSQLContainerConfiguration.class, WorkflowServiceImpl.class
 })
 @Configuration

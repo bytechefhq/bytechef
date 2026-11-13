@@ -24,6 +24,8 @@ public interface ConnectedUserMcpServerFacade {
 
     void enableMcpTool(long mcpIntegrationInstanceToolId, boolean enable);
 
+    void enableMcpWorkflow(long mcpIntegrationInstanceWorkflowId, boolean enable);
+
     List<ConnectedUserMcpServerDTO> getConnectedUserMcpServers(long connectedUserId);
 
     List<ProvisionableConnectedUserMcpServerDTO> getProvisionableMcpServers(long connectedUserId);

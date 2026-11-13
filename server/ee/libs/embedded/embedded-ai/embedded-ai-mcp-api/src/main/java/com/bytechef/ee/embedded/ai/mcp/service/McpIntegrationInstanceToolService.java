@@ -30,6 +30,8 @@ public interface McpIntegrationInstanceToolService {
     Optional<McpIntegrationInstanceTool> fetchMcpIntegrationInstanceTool(
         long integrationInstanceId, long mcpToolId);
 
+    List<Long> getIntegrationInstanceIdsByMcpServerId(long mcpServerId);
+
     List<McpIntegrationInstanceTool> getMcpIntegrationInstanceTools(long integrationInstanceId);
 
     void updateEnabled(Long id, boolean enabled);

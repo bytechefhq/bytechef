@@ -100,6 +100,16 @@ public interface McpIntegrationInstanceConfigurationWorkflowService {
     List<McpIntegrationInstanceConfigurationWorkflow> getMcpIntegrationInstanceConfigurationWorkflows();
 
     /**
+     * Gets the MCP integration workflows that link a workflow of the given integration instance configuration.
+     *
+     * @param integrationInstanceConfigurationId the integration instance configuration ID
+     * @param workflowId                         the Atlas workflow ID
+     * @return the MCP integration workflows of every MCP server that exposes the workflow
+     */
+    List<McpIntegrationInstanceConfigurationWorkflow> getMcpIntegrationInstanceConfigurationWorkflows(
+        long integrationInstanceConfigurationId, String workflowId);
+
+    /**
      * Updates an existing MCP integration workflow.
      *
      * @param mcpIntegrationInstanceConfigurationWorkflow the MCP integration workflow to update

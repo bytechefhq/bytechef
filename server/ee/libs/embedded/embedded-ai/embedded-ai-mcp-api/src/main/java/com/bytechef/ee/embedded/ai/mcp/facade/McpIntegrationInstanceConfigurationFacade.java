@@ -61,18 +61,6 @@ public interface McpIntegrationInstanceConfigurationFacade {
         long mcpIntegrationInstanceConfigurationId, List<String> selectedWorkflowIds,
         List<WorkflowConfigurationDTO> workflowConfigurations);
 
-    /**
-     * Updates the integration version of an MCP integration. Deletes MCP integration workflow records that reference
-     * old integration instance configuration workflows before delegating the version update to the configuration layer,
-     * then re-creates MCP integration workflow records for the new version's workflows.
-     *
-     * @param mcpIntegrationInstanceConfigurationId the unique identifier of the MCP integration to update
-     * @param integrationVersion                    the new integration version
-     * @param workflowUuids                         the workflow UUIDs to include in the new version
-     */
-    void updateMcpIntegrationInstanceConfigurationVersion(
-        long mcpIntegrationInstanceConfigurationId, int integrationVersion, List<String> workflowUuids);
-
     @Nullable
     McpIntegrationInstanceConfiguration getMcpIntegrationInstanceConfiguration(long id);
 

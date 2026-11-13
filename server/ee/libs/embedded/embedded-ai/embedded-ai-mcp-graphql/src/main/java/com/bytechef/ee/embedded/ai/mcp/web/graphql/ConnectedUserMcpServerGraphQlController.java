@@ -65,6 +65,13 @@ class ConnectedUserMcpServerGraphQlController {
         return true;
     }
 
+    @MutationMapping
+    boolean enableConnectedUserMcpWorkflow(@Argument long id, @Argument boolean enable) {
+        connectedUserMcpServerFacade.enableMcpWorkflow(id, enable);
+
+        return true;
+    }
+
     @QueryMapping
     List<ProvisionableConnectedUserMcpServerDTO> provisionableConnectedUserMcpServers(
         @Argument long connectedUserId) {

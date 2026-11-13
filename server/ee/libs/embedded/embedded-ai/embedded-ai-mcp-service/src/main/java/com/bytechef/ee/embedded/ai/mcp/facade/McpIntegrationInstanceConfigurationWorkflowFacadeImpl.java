@@ -10,13 +10,13 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceConfigurationAuditEvents;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
-import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
-import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.audit.AuditData;
@@ -45,26 +45,25 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     implements McpIntegrationInstanceConfigurationWorkflowFacade {
 
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
-    private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
-    private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
+    private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
+    private final McpIntegrationInstanceRows mcpIntegrationInstanceRows;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     McpIntegrationInstanceConfigurationWorkflowFacadeImpl(
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
-        IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
         IntegrationWorkflowService integrationWorkflowService,
+        McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
-        WorkflowService workflowService) {
+        McpIntegrationInstanceRows mcpIntegrationInstanceRows, WorkflowService workflowService) {
 
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
-        this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
-        this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationWorkflowService = integrationWorkflowService;
+        this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
+        this.mcpIntegrationInstanceRows = mcpIntegrationInstanceRows;
         this.workflowService = workflowService;
     }
 
@@ -78,24 +77,9 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
         })
     @PreAuthorize("isTenantAdmin()")
     public void deleteMcpIntegrationInstanceConfigurationWorkflow(long mcpIntegrationInstanceConfigurationWorkflowId) {
-        McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
-            mcpIntegrationInstanceConfigurationWorkflowService
-                .fetchMcpIntegrationInstanceConfigurationWorkflow(mcpIntegrationInstanceConfigurationWorkflowId)
-                .orElseThrow(
-                    () -> new IllegalArgumentException(
-                        "McpIntegrationInstanceConfigurationWorkflow not found: "
-                            + mcpIntegrationInstanceConfigurationWorkflowId));
-
-        long integrationInstanceConfigurationWorkflowId =
-            mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId();
-
-        integrationInstanceWorkflowService.deleteByIntegrationInstanceConfigurationWorkflowId(
-            integrationInstanceConfigurationWorkflowId);
+        getMcpIntegrationInstanceConfigurationWorkflowOrThrow(mcpIntegrationInstanceConfigurationWorkflowId);
 
         mcpIntegrationInstanceConfigurationWorkflowService.delete(mcpIntegrationInstanceConfigurationWorkflowId);
-
-        integrationInstanceConfigurationWorkflowService.updateEnabled(integrationInstanceConfigurationWorkflowId,
-            false);
     }
 
     @Override
@@ -112,8 +96,13 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     public McpIntegrationInstanceConfigurationWorkflow createMcpIntegrationInstanceConfigurationWorkflow(
         long mcpIntegrationInstanceConfigurationId, long integrationInstanceConfigurationWorkflowId) {
 
-        return mcpIntegrationInstanceConfigurationWorkflowService.create(
-            mcpIntegrationInstanceConfigurationId, integrationInstanceConfigurationWorkflowId);
+        McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+            mcpIntegrationInstanceConfigurationWorkflowService.create(
+                mcpIntegrationInstanceConfigurationId, integrationInstanceConfigurationWorkflowId);
+
+        addMissingRowsForConnectedUsers(mcpIntegrationInstanceConfigurationId);
+
+        return mcpIntegrationInstanceConfigurationWorkflow;
     }
 
     @Override
@@ -121,6 +110,20 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     public McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflow(
         long id, @Nullable Long mcpIntegrationInstanceConfigurationId,
         @Nullable Long integrationInstanceConfigurationWorkflowId) {
+
+        McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+            getMcpIntegrationInstanceConfigurationWorkflowOrThrow(id);
+
+        if ((mcpIntegrationInstanceConfigurationId != null && !Objects.equals(
+            mcpIntegrationInstanceConfigurationId,
+            mcpIntegrationInstanceConfigurationWorkflow.getMcpIntegrationInstanceConfigurationId())) ||
+            (integrationInstanceConfigurationWorkflowId != null && !Objects.equals(
+                integrationInstanceConfigurationWorkflowId,
+                mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId()))) {
+
+            throw new IllegalArgumentException(
+                "McpIntegrationInstanceConfigurationWorkflow " + id + " cannot be moved to another workflow");
+        }
 
         return mcpIntegrationInstanceConfigurationWorkflowService.update(
             id, mcpIntegrationInstanceConfigurationId, integrationInstanceConfigurationWorkflowId);
@@ -148,7 +151,15 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
     public McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflowEnabled(
         long id, boolean enabled) {
 
-        return mcpIntegrationInstanceConfigurationWorkflowService.updateEnabled(id, enabled);
+        McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+            mcpIntegrationInstanceConfigurationWorkflowService.updateEnabled(id, enabled);
+
+        if (enabled) {
+            addMissingRowsForConnectedUsers(
+                mcpIntegrationInstanceConfigurationWorkflow.getMcpIntegrationInstanceConfigurationId());
+        }
+
+        return mcpIntegrationInstanceConfigurationWorkflow;
     }
 
     @Override
@@ -212,6 +223,28 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeImpl
             })
             .filter(integrationWorkflowDTO -> getToolCallableTrigger(integrationWorkflowDTO.getWorkflow()) != null)
             .toList();
+    }
+
+    private void addMissingRowsForConnectedUsers(long mcpIntegrationInstanceConfigurationId) {
+        McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
+            mcpIntegrationInstanceConfigurationService
+                .fetchMcpIntegrationInstanceConfiguration(mcpIntegrationInstanceConfigurationId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                    "McpIntegrationInstanceConfiguration not found: " + mcpIntegrationInstanceConfigurationId));
+
+        mcpIntegrationInstanceRows.addMissingRowsForConnectedUsers(
+            mcpIntegrationInstanceConfiguration.getMcpServerId());
+    }
+
+    private McpIntegrationInstanceConfigurationWorkflow getMcpIntegrationInstanceConfigurationWorkflowOrThrow(
+        long mcpIntegrationInstanceConfigurationWorkflowId) {
+
+        return mcpIntegrationInstanceConfigurationWorkflowService
+            .fetchMcpIntegrationInstanceConfigurationWorkflow(mcpIntegrationInstanceConfigurationWorkflowId)
+            .orElseThrow(
+                () -> new IllegalArgumentException(
+                    "McpIntegrationInstanceConfigurationWorkflow not found: "
+                        + mcpIntegrationInstanceConfigurationWorkflowId));
     }
 
     private static @Nullable WorkflowTrigger getToolCallableTrigger(Workflow workflow) {

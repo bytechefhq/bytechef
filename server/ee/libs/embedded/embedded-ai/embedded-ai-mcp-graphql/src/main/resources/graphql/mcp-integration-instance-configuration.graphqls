@@ -8,7 +8,6 @@ extend type Mutation {
     createMcpIntegrationInstanceConfiguration(input: CreateMcpIntegrationInstanceConfigurationInput!): McpIntegrationInstanceConfiguration
     deleteMcpIntegrationInstanceConfiguration(id: ID!): Boolean
     updateMcpIntegrationInstanceConfiguration(id: ID!, input: UpdateMcpIntegrationInstanceConfigurationInput!): McpIntegrationInstanceConfiguration
-    updateMcpIntegrationInstanceConfigurationVersion(id: ID!, input: UpdateMcpIntegrationInstanceConfigurationVersionInput!): Boolean
 }
 
 type McpIntegrationInstanceConfiguration {
@@ -36,9 +35,4 @@ input CreateMcpIntegrationInstanceConfigurationInput {
 input UpdateMcpIntegrationInstanceConfigurationInput {
     selectedWorkflowIds: [String!]!
     workflowConfigurations: [WorkflowConfigurationInput!]
-}
-
-input UpdateMcpIntegrationInstanceConfigurationVersionInput {
-    integrationVersion: Int!
-    workflowUuids: [String!]!
 }

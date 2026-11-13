@@ -16,6 +16,6 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public record ConnectedUserMcpServerWorkflowDTO(
-    long integrationInstanceId, String componentName, int integrationVersion, String workflowId, String name,
+    long id, long integrationInstanceId, String componentName, int integrationVersion, String workflowId, String name,
     @Nullable String description, boolean enabled, @Nullable Instant lastExecutionDate) {
 }
