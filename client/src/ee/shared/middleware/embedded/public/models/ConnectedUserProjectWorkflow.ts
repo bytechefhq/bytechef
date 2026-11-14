@@ -102,6 +102,14 @@ export interface ConnectedUserProjectWorkflow {
      * Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>, UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy.
      */
     attentionReason?: string;
+    /**
+     * Whether the workflow is available to AI agents. Null when no MCP server offers it to the user, otherwise true when it is on for at least one server.
+     */
+    mcpEnabled?: boolean;
+    /**
+     * True when the workflow can only be started as an MCP tool, because its only enabled trigger is the workflow call trigger.
+     */
+    toolOnly?: boolean;
 }
 
 
@@ -149,6 +157,8 @@ export function ConnectedUserProjectWorkflowFromJSONTyped(json: any, ignoreDiscr
         'inputValues': json['inputValues'] == null ? undefined : json['inputValues'],
         'connections': json['connections'] == null ? undefined : json['connections'],
         'attentionReason': json['attentionReason'] == null ? undefined : json['attentionReason'],
+        'mcpEnabled': json['mcpEnabled'] == null ? undefined : json['mcpEnabled'],
+        'toolOnly': json['toolOnly'] == null ? undefined : json['toolOnly'],
     };
 }
 
@@ -180,6 +190,8 @@ export function ConnectedUserProjectWorkflowToJSONTyped(value?: ConnectedUserPro
         'inputValues': value['inputValues'],
         'connections': value['connections'],
         'attentionReason': value['attentionReason'],
+        'mcpEnabled': value['mcpEnabled'],
+        'toolOnly': value['toolOnly'],
     };
 }
 

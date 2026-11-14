@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AutomationProjectWorkflowInput", description = "A value the connected user supplies before an automation workflow runs.")
 @JsonTypeName("AutomationProjectWorkflowInput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T16:12:12.795950+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T19:28:21.317912+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class AutomationProjectWorkflowInputModel {
 
   private @Nullable String name;

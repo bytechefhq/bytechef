@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-14T10:22:39.298625+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-15T19:28:21.317912+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ConnectedUserProjectWorkflowModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -105,6 +105,10 @@ public class ConnectedUserProjectWorkflowModel {
   private Map<String, Long> connections = new HashMap<>();
 
   private @Nullable String attentionReason;
+
+  private @Nullable Boolean mcpEnabled;
+
+  private @Nullable Boolean toolOnly;
 
   public ConnectedUserProjectWorkflowModel createdDate(@Nullable OffsetDateTime createdDate) {
     this.createdDate = createdDate;
@@ -495,6 +499,48 @@ public class ConnectedUserProjectWorkflowModel {
     this.attentionReason = attentionReason;
   }
 
+  public ConnectedUserProjectWorkflowModel mcpEnabled(@Nullable Boolean mcpEnabled) {
+    this.mcpEnabled = mcpEnabled;
+    return this;
+  }
+
+  /**
+   * Whether the workflow is available to AI agents. Null when no MCP server offers it to the user, otherwise true when it is on for at least one server.
+   * @return mcpEnabled
+   */
+  
+  @Schema(name = "mcpEnabled", description = "Whether the workflow is available to AI agents. Null when no MCP server offers it to the user, otherwise true when it is on for at least one server.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("mcpEnabled")
+  public @Nullable Boolean getMcpEnabled() {
+    return mcpEnabled;
+  }
+
+  @JsonProperty("mcpEnabled")
+  public void setMcpEnabled(@Nullable Boolean mcpEnabled) {
+    this.mcpEnabled = mcpEnabled;
+  }
+
+  public ConnectedUserProjectWorkflowModel toolOnly(@Nullable Boolean toolOnly) {
+    this.toolOnly = toolOnly;
+    return this;
+  }
+
+  /**
+   * True when the workflow can only be started as an MCP tool, because its only enabled trigger is the workflow call trigger.
+   * @return toolOnly
+   */
+  
+  @Schema(name = "toolOnly", description = "True when the workflow can only be started as an MCP tool, because its only enabled trigger is the workflow call trigger.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("toolOnly")
+  public @Nullable Boolean getToolOnly() {
+    return toolOnly;
+  }
+
+  @JsonProperty("toolOnly")
+  public void setToolOnly(@Nullable Boolean toolOnly) {
+    this.toolOnly = toolOnly;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -520,12 +566,14 @@ public class ConnectedUserProjectWorkflowModel {
         Objects.equals(this.inputs, connectedUserProjectWorkflow.inputs) &&
         Objects.equals(this.inputValues, connectedUserProjectWorkflow.inputValues) &&
         Objects.equals(this.connections, connectedUserProjectWorkflow.connections) &&
-        Objects.equals(this.attentionReason, connectedUserProjectWorkflow.attentionReason);
+        Objects.equals(this.attentionReason, connectedUserProjectWorkflow.attentionReason) &&
+        Objects.equals(this.mcpEnabled, connectedUserProjectWorkflow.mcpEnabled) &&
+        Objects.equals(this.toolOnly, connectedUserProjectWorkflow.toolOnly);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion, kind, automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, connections, attentionReason);
+    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion, kind, automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, connections, attentionReason, mcpEnabled, toolOnly);
   }
 
   @Override
@@ -549,6 +597,8 @@ public class ConnectedUserProjectWorkflowModel {
     sb.append("    inputValues: ").append(toIndentedString(inputValues)).append("\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    attentionReason: ").append(toIndentedString(attentionReason)).append("\n");
+    sb.append("    mcpEnabled: ").append(toIndentedString(mcpEnabled)).append("\n");
+    sb.append("    toolOnly: ").append(toIndentedString(toolOnly)).append("\n");
     sb.append("}");
     return sb.toString();
   }

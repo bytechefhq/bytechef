@@ -5,6 +5,7 @@ apis/ConnectionApi.ts
 apis/IntegrationApi.ts
 apis/IntegrationInstanceApi.ts
 apis/IntegrationInstanceWorkflowApi.ts
+apis/McpAutomationWorkflowApi.ts
 apis/index.ts
 docs/AuthorizationType.md
 docs/AutomationProject.md
@@ -45,6 +46,7 @@ docs/IntegrationInstanceWorkflow.md
 docs/IntegrationInstanceWorkflowApi.md
 docs/IntegrationWorkflow.md
 docs/InvalidWorkflowError.md
+docs/McpAutomationWorkflowApi.md
 docs/McpIntegrationInstanceTool.md
 docs/McpTool.md
 docs/MissingConnectionError.md

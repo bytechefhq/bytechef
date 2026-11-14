@@ -7,3 +7,4 @@ export * from './ConnectionApi';
 export * from './IntegrationApi';
 export * from './IntegrationInstanceApi';
 export * from './IntegrationInstanceWorkflowApi';
+export * from './McpAutomationWorkflowApi';

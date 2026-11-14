@@ -24,6 +24,8 @@ Name | Type
 `inputValues` | { [key: string]: any; }
 `connections` | { [key: string]: number; }
 `attentionReason` | string
+`mcpEnabled` | boolean
+`toolOnly` | boolean
 
 ## Example
 
@@ -49,6 +51,8 @@ const example = {
   "inputValues": null,
   "connections": null,
   "attentionReason": null,
+  "mcpEnabled": null,
+  "toolOnly": null,
 } satisfies ConnectedUserProjectWorkflow
 
 console.log(example)
