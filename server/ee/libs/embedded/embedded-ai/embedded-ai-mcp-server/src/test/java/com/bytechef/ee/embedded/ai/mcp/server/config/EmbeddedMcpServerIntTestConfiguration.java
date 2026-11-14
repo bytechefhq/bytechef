@@ -12,6 +12,9 @@ import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConve
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
+import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationServiceImpl;
+import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationWorkflowServiceImpl;
+import com.bytechef.ee.embedded.ai.mcp.service.McpConnectedUserProjectWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
@@ -58,7 +61,9 @@ import tools.jackson.databind.ObjectMapper;
     IntegrationInstanceConfigurationServiceImpl.class,
     IntegrationInstanceConfigurationWorkflowServiceImpl.class, IntegrationInstanceServiceImpl.class,
     IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class, JacksonConfiguration.class,
-    LiquibaseConfiguration.class, McpComponentServiceImpl.class, McpIntegrationComponentServiceImpl.class,
+    LiquibaseConfiguration.class, McpAutomationProjectConfigurationServiceImpl.class,
+    McpAutomationProjectConfigurationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
+    McpConnectedUserProjectWorkflowServiceImpl.class, McpIntegrationComponentServiceImpl.class,
     McpIntegrationInstanceConfigurationServiceImpl.class,
     McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolServiceImpl.class,
     McpIntegrationInstanceWorkflowServiceImpl.class,

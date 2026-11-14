@@ -14,11 +14,15 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolFacade;
 import com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer.EmbeddedMcpServerSecurityConfigurer;
+import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserMcpAutomationResolver;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -102,14 +106,18 @@ public class EmbeddedMcpServerConfiguration {
     EmbeddedMcpToolFacade embeddedMcpToolFacade(
         ApplicationProperties applicationProperties, ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
-        ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
-        TaskFileStorage durableTaskFileStorage, Evaluator evaluator,
+        ComponentDefinitionService componentDefinitionService,
+        ConnectedUserMcpAutomationResolver connectedUserMcpAutomationResolver,
+        ConnectedUserService connectedUserService, TaskFileStorage durableTaskFileStorage, Evaluator evaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
         JobCompletionAwaiter jobCompletionAwaiter, JwtTokenService jwtTokenService,
-        McpComponentService mcpComponentService, McpIntegrationComponentService mcpIntegrationComponentService,
+        McpAutomationProjectConfigurationWorkflowService mcpAutomationProjectConfigurationWorkflowService,
+        McpComponentService mcpComponentService,
+        McpConnectedUserProjectWorkflowService mcpConnectedUserProjectWorkflowService,
+        McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService, McpServerService mcpServerService,
@@ -118,10 +126,12 @@ public class EmbeddedMcpServerConfiguration {
 
         return new EmbeddedMcpToolFacade(
             clusterElementDefinitionFacade, clusterElementDefinitionService, componentDefinitionService,
-            connectedUserService, evaluator, integrationInstanceConfigurationService,
-            integrationInstanceConfigurationWorkflowService, integrationInstanceService,
-            integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
-            mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
+            connectedUserMcpAutomationResolver, connectedUserService, evaluator,
+            integrationInstanceConfigurationService, integrationInstanceConfigurationWorkflowService,
+            integrationInstanceService, integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter,
+            jwtTokenService, mcpAutomationProjectConfigurationWorkflowService, mcpComponentService,
+            mcpConnectedUserProjectWorkflowService, mcpIntegrationComponentService,
+            mcpIntegrationInstanceConfigurationWorkflowService,
             mcpIntegrationInstanceToolService, mcpIntegrationInstanceWorkflowService, mcpServerService,
             principalJobFacade, applicationProperties.getPublicUrl(), taskExecutionService, durableTaskFileStorage,
             externalInvocationRecorder,
@@ -130,6 +140,7 @@ public class EmbeddedMcpServerConfiguration {
 
     @Bean
     FilterableMcpAsyncServer embeddedMcpAsyncServer(
+        McpAutomationProjectConfigurationService mcpAutomationProjectConfigurationService,
         McpComponentService mcpComponentService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpServerService mcpServerService, McpToolService mcpToolService,
@@ -178,6 +189,15 @@ public class EmbeddedMcpServerConfiguration {
                     .flatMap(mcpIntegrationInstanceConfiguration -> CollectionUtils.stream(
                         embeddedMcpToolFacade.getFunctionToolCallbacks(
                             mcpIntegrationInstanceConfiguration, externalUserId, environment, tenantId)))
+                    .map(McpToolUtils::toAsyncToolSpecification)
+                    .forEach(toolSpecifications::add);
+
+                mcpAutomationProjectConfigurationService
+                    .getMcpServerMcpAutomationProjectConfigurations(mcpServer.getId())
+                    .stream()
+                    .flatMap(mcpAutomationProjectConfiguration -> CollectionUtils.stream(
+                        embeddedMcpToolFacade.getAutomationToolCallbacks(
+                            mcpAutomationProjectConfiguration, externalUserId, environment, tenantId)))
                     .map(McpToolUtils::toAsyncToolSpecification)
                     .forEach(toolSpecifications::add);
 

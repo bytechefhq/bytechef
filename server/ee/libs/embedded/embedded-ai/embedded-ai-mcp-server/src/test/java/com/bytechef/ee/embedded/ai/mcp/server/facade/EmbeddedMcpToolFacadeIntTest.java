@@ -32,11 +32,14 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.server.config.EmbeddedMcpServerIntTestConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserMcpAutomationResolver;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -133,6 +136,9 @@ class EmbeddedMcpToolFacadeIntTest {
 
     @MockitoBean
     private ComponentDefinitionService componentDefinitionService;
+
+    @MockitoBean
+    private ConnectedUserMcpAutomationResolver connectedUserMcpAutomationResolver;
 
     @Autowired
     private EmbeddedMcpToolFacade embeddedMcpToolFacade;
@@ -1290,13 +1296,18 @@ class EmbeddedMcpToolFacadeIntTest {
         EmbeddedMcpToolFacade embeddedMcpToolFacade(
             ClusterElementDefinitionFacade clusterElementDefinitionFacade,
             ClusterElementDefinitionService clusterElementDefinitionService,
-            ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
-            Evaluator evaluator, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+            ComponentDefinitionService componentDefinitionService,
+            ConnectedUserMcpAutomationResolver connectedUserMcpAutomationResolver,
+            ConnectedUserService connectedUserService, Evaluator evaluator,
+            IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
             IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
             IntegrationInstanceService integrationInstanceService,
             IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
             IntegrationService integrationService, JobCompletionAwaiter jobCompletionAwaiter,
-            JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
+            JwtTokenService jwtTokenService,
+            McpAutomationProjectConfigurationWorkflowService mcpAutomationProjectConfigurationWorkflowService,
+            McpComponentService mcpComponentService,
+            McpConnectedUserProjectWorkflowService mcpConnectedUserProjectWorkflowService,
             McpIntegrationComponentService mcpIntegrationComponentService,
             McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
             McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
@@ -1308,10 +1319,12 @@ class EmbeddedMcpToolFacadeIntTest {
 
             return new EmbeddedMcpToolFacade(
                 clusterElementDefinitionFacade, clusterElementDefinitionService, componentDefinitionService,
-                connectedUserService, evaluator, integrationInstanceConfigurationService,
-                integrationInstanceConfigurationWorkflowService, integrationInstanceService,
-                integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jwtTokenService,
-                mcpComponentService, mcpIntegrationComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
+                connectedUserMcpAutomationResolver, connectedUserService, evaluator,
+                integrationInstanceConfigurationService, integrationInstanceConfigurationWorkflowService,
+                integrationInstanceService, integrationInstanceWorkflowService, integrationService,
+                jobCompletionAwaiter, jwtTokenService, mcpAutomationProjectConfigurationWorkflowService,
+                mcpComponentService, mcpConnectedUserProjectWorkflowService, mcpIntegrationComponentService,
+                mcpIntegrationInstanceConfigurationWorkflowService,
                 mcpIntegrationInstanceToolService, mcpIntegrationInstanceWorkflowService, mcpServerService,
                 principalJobFacade, "http://localhost:8080",
                 taskExecutionService, taskFileStorage, externalInvocationRecorder, workflowService);
