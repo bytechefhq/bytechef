@@ -13,6 +13,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
@@ -25,6 +27,8 @@ import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigu
 import com.bytechef.ee.embedded.configuration.web.graphql.config.EmbeddedConfigurationGraphQlTestConfiguration;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
+import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
@@ -112,6 +116,53 @@ class ConnectedUserProjectGraphQlControllerIntTest {
             .path("connectedUserProjects[0].connectedUserProjectWorkflows[1].copiedFromWorkflowUuid")
             .entity(String.class)
             .isEqualTo(COPIED_FROM_WORKFLOW_UUID);
+    }
+
+    @Test
+    void testProjectWorkflowToolOnlyFlag() {
+        when(environmentService.getEnvironment(0L)).thenReturn(Environment.DEVELOPMENT);
+        when(connectedUserProjectAdminFacade.getConnectedUserProjects(7L, Environment.DEVELOPMENT))
+            .thenReturn(
+                List.of(
+                    new ConnectedUserProjectDTO(
+                        3L, null,
+                        List.of(
+                            createReferenceWorkflowDTO(1L,
+                                createWorkflowDTO(createTrigger("workflow/v1/newWorkflowCall", false))),
+                            createReferenceWorkflowDTO(
+                                2L,
+                                createWorkflowDTO(
+                                    createTrigger("workflow/v1/newWorkflowCall", false),
+                                    createTrigger("webhook/v1/webhook", false))),
+                            createReferenceWorkflowDTO(
+                                3L,
+                                createWorkflowDTO(
+                                    createTrigger("workflow/v1/newWorkflowCall", false),
+                                    createTrigger("webhook/v1/webhook", true))),
+                            createReferenceWorkflowDTO(
+                                4L, createWorkflowDTO(createTrigger("workflow/v1/newWorkflowCall", true))),
+                            createReferenceWorkflowDTO(5L, createWorkflowDTO()),
+                            createReferenceWorkflowDTO(6L, null)),
+                        Environment.DEVELOPMENT, 0L, null, 3L, null, null, null, null, null, 0)));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    connectedUserProjects(connectedUserId: "7", environmentId: "0") {
+                        connectedUserProjectWorkflows {
+                            id
+                            toolOnly
+                        }
+                    }
+                }
+                """)
+            .execute()
+            .path("connectedUserProjects[0].connectedUserProjectWorkflows[*].id")
+            .entityList(String.class)
+            .containsExactly("1", "2", "3", "4", "5", "6")
+            .path("connectedUserProjects[0].connectedUserProjectWorkflows[*].toolOnly")
+            .entityList(Boolean.class)
+            .containsExactly(true, false, true, false, false, false);
     }
 
     @Test
@@ -393,6 +444,22 @@ class ConnectedUserProjectGraphQlControllerIntTest {
             3L, connectedUser, List.of(referenceWorkflow, copyWorkflow), Environment.DEVELOPMENT, 0L, null, 3L, null,
             null,
             null, null, null, 0);
+    }
+
+    private static ConnectedUserProjectWorkflowDTO createReferenceWorkflowDTO(long id, @Nullable WorkflowDTO workflow) {
+        return new ConnectedUserProjectWorkflowDTO(
+            id, 7L, true, null, 0L, workflow, AUTOMATION_UUID, 1, ConnectedUserProjectWorkflowDTO.Kind.REFERENCE,
+            AUTOMATION_UUID, null, false, List.of(), List.of(), Map.of(), null, null);
+    }
+
+    private static WorkflowTriggerDTO createTrigger(String type, boolean disabled) {
+        return new WorkflowTriggerDTO(List.of(), null, disabled, Map.of(), "trigger_1", null, Map.of(), null, type);
+    }
+
+    private static WorkflowDTO createWorkflowDTO(WorkflowTriggerDTO... triggers) {
+        return new WorkflowDTO(
+            new Workflow(AUTOMATION_UUID, JsonUtils.write(Map.of("label", "Label")), Workflow.Format.JSON), List.of(),
+            List.of(triggers));
     }
 
     @Configuration

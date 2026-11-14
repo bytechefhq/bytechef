@@ -10,13 +10,18 @@ package com.bytechef.ee.embedded.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserAutomationProjectConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowReferenceValuesDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ProvisionableAutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectAdminFacade;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.component.constant.WorkflowConstants;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
+import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -104,6 +109,31 @@ public class ConnectedUserProjectGraphQlController {
             Objects.requireNonNull(connectedUser.getId()));
     }
 
+    @SchemaMapping(typeName = "ConnectedUserProjectWorkflow")
+    public boolean toolOnly(ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflow) {
+        WorkflowDTO workflow = connectedUserProjectWorkflow.workflow();
+
+        if (workflow == null || workflow.getTriggers() == null) {
+            return false;
+        }
+
+        boolean workflowCallTriggerFound = false;
+
+        for (WorkflowTriggerDTO workflowTrigger : workflow.getTriggers()) {
+            if (workflowTrigger.disabled()) {
+                continue;
+            }
+
+            if (!isWorkflowCallTrigger(workflowTrigger)) {
+                return false;
+            }
+
+            workflowCallTriggerFound = true;
+        }
+
+        return workflowCallTriggerFound;
+    }
+
     @MutationMapping
     public boolean provisionConnectedUserProjectWorkflows(
         @Argument long connectedUserId, @Argument long configurationId,
@@ -117,6 +147,13 @@ public class ConnectedUserProjectGraphQlController {
                 .toList());
 
         return true;
+    }
+
+    private static boolean isWorkflowCallTrigger(WorkflowTriggerDTO workflowTrigger) {
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.type());
+
+        return Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
+            Objects.equals(workflowNodeType.operation(), WorkflowConstants.NEW_WORKFLOW_CALL);
     }
 
     private static Map<String, Long> getConnectionIds(

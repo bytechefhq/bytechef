@@ -46,6 +46,7 @@ type ConnectedUserProjectWorkflow {
     lastExecutionDate: String
     projectId: ID!
     staticWebhookUrl: String
+    toolOnly: Boolean!
     workflow: Workflow!
     workflowUuid: ID!
     workflowVersion: Int
