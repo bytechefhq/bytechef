@@ -1,5 +1,9 @@
 import {AutomationHubKeys} from '@/ee/pages/embedded/automation-hub/queries/automationHub.queries';
-import {ConnectedUserProjectWorkflowApi, ConnectionApi} from '@/ee/shared/middleware/embedded/public';
+import {
+    ConnectedUserProjectWorkflowApi,
+    ConnectionApi,
+    McpAutomationWorkflowApi,
+} from '@/ee/shared/middleware/embedded/public';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
 
 export const BLANK_DEFINITION = JSON.stringify({description: '', label: 'New automation', tasks: [], triggers: []});
@@ -74,6 +78,25 @@ export const useSetAutomationEnabledMutation = () => {
             }
 
             await new ConnectedUserProjectWorkflowApi().disableFrontendProjectWorkflow({workflowUuid});
+        },
+        onSuccess: () => {
+            void queryClient.invalidateQueries({queryKey: AutomationHubKeys.automations});
+        },
+    });
+};
+
+export const useSetAutomationMcpEnabledMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation<void, Error, SetAutomationEnabledRequestI>({
+        mutationFn: async ({enabled, workflowUuid}) => {
+            if (enabled) {
+                await new McpAutomationWorkflowApi().enableFrontendMcpAutomationWorkflow({workflowUuid});
+
+                return;
+            }
+
+            await new McpAutomationWorkflowApi().disableFrontendMcpAutomationWorkflow({workflowUuid});
         },
         onSuccess: () => {
             void queryClient.invalidateQueries({queryKey: AutomationHubKeys.automations});
