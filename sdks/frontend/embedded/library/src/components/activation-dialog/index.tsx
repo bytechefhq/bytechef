@@ -71,6 +71,7 @@ export default function useActivationDialog({
         dialogProps.mode,
         dialogProps.onActivated,
         dialogProps.onEditWorkflow,
+        dialogProps.onSaved,
         dialogProps.workflowTemplateId,
     ]);
 

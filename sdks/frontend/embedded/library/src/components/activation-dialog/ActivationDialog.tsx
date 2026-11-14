@@ -16,6 +16,7 @@ import {
     AutomationTemplateType,
     ConnectedUserWorkflowType,
     ConnectionType,
+    ExistingReferenceType,
     MissingConnectionErrorType,
     ProvidedValueLockedErrorType,
     TemplateComponentType,
@@ -31,6 +32,7 @@ export interface ActivationDialogProps {
     onActivated?: (workflowUuid: string) => void;
     onClose: () => void;
     onEditWorkflow?: (workflowUuid: string) => void;
+    onSaved?: (workflowUuid: string) => void;
     workflowTemplateId: string;
 }
 
@@ -127,8 +129,20 @@ const templateComponents = (template: AutomationTemplateType): TemplateComponent
 const templateInputs = (template: AutomationTemplateType): TemplateInputType[] =>
     (template.inputs ?? []).filter((input) => !!input.name);
 
+const findExistingReference = (
+    workflows: ConnectedUserWorkflowType[] | undefined,
+    workflowTemplateId: string
+): ExistingReferenceType | undefined => {
+    const reference = (workflows ?? []).find(
+        (workflow) => workflow.kind === 'REFERENCE' && workflow.automationUuid === workflowTemplateId
+    );
+
+    return reference ? {connections: reference.connections ?? {}, inputValues: reference.inputValues ?? {}} : undefined;
+};
+
 interface LoadResultType {
     error?: string;
+    existingReference?: ExistingReferenceType;
     key: string;
     template?: AutomationTemplateType;
 }
@@ -222,12 +236,14 @@ interface ActivationBodyProps {
     connectionCreationAllowed: boolean;
     editable: boolean;
     environment: string;
+    existingReference?: ExistingReferenceType;
     fetch: ReturnType<typeof createApiClient>['fetch'];
     jwtToken: string;
     mode?: 'dark' | 'light';
     onActivated?: (workflowUuid: string) => void;
     onClose: () => void;
     onEditWorkflow?: (workflowUuid: string) => void;
+    onSaved?: (workflowUuid: string) => void;
     template: AutomationTemplateType;
 }
 
@@ -237,12 +253,14 @@ const ActivationBody = ({
     connectionCreationAllowed,
     editable,
     environment,
+    existingReference,
     fetch,
     jwtToken,
     mode,
     onActivated,
     onClose,
     onEditWorkflow,
+    onSaved,
     template,
 }: ActivationBodyProps) => {
     const [busy, setBusy] = useState(false);
@@ -251,7 +269,7 @@ const ActivationBody = ({
     const [connectionsByComponent, setConnectionsByComponent] = useState<Record<string, ConnectionType[]>>({});
 
     const [state, dispatch] = useReducer(activationReducer, template, (initialTemplate) =>
-        initialActivationState(templateComponents(initialTemplate), templateInputs(initialTemplate))
+        initialActivationState(templateComponents(initialTemplate), templateInputs(initialTemplate), existingReference)
     );
 
     const components = useMemo(() => templateComponents(template), [template]);
@@ -405,6 +423,87 @@ const ActivationBody = ({
         template.id,
     ]);
 
+    const save = useCallback(async () => {
+        if (!existingReference) {
+            return;
+        }
+
+        const changedConnections = Object.fromEntries(
+            Object.entries(state.selections).filter(
+                (selection): selection is [string, number] =>
+                    selection[1] != null &&
+                    !providedComponentNames.includes(selection[0]) &&
+                    existingReference.connections[selection[0]] !== selection[1]
+            )
+        );
+
+        const editableInputs = inputs.filter((input) => !input.provided);
+
+        const inputsChanged = editableInputs.some(
+            (input) =>
+                toInputValueText(state.inputValues[input.name]) !==
+                toInputValueText(existingReference.inputValues[input.name])
+        );
+
+        if (Object.keys(changedConnections).length === 0 && !inputsChanged) {
+            onClose();
+
+            return;
+        }
+
+        setBusy(true);
+
+        const editableInputValues = Object.fromEntries(
+            Object.entries(state.inputValues).filter(([inputName]) => !providedInputNames.includes(inputName))
+        );
+
+        try {
+            await fetch(`/api/embedded/v1/automation/workflow-templates/${template.id}/provision`, {
+                body: {
+                    connections: Object.keys(changedConnections).length > 0 ? changedConnections : undefined,
+                    inputs: inputsChanged ? editableInputValues : undefined,
+                },
+                method: 'POST',
+            });
+        } catch (error) {
+            console.error(`Failed to save the settings of template ${template.id}:`, error);
+
+            const missingConnectionComponentName = readMissingConnectionComponentName(error);
+
+            if (isProvidedValueLockedError(error)) {
+                dispatch({error: PROVIDED_VALUE_LOCKED_MESSAGE, type: 'FAILED'});
+            } else if (missingConnectionComponentName) {
+                dispatch({componentName: missingConnectionComponentName, type: 'MISSING_CONNECTION'});
+            } else {
+                dispatch({error: describeError(error), type: 'FAILED'});
+            }
+
+            setBusy(false);
+
+            return;
+        }
+
+        dispatch({type: 'ACTIVATED', workflowUuid: template.id});
+        setBusy(false);
+
+        if (onSaved) {
+            runHostCallback('onSaved', () => onSaved(template.id));
+        }
+
+        onClose();
+    }, [
+        existingReference,
+        fetch,
+        inputs,
+        onClose,
+        onSaved,
+        providedComponentNames,
+        providedInputNames,
+        state.inputValues,
+        state.selections,
+        template.id,
+    ]);
+
     const editWorkflow = useCallback(async () => {
         setBusy(true);
 
@@ -518,7 +617,11 @@ const ActivationBody = ({
 
                 {state.step === 'connect' && (
                     <div className={styles.steps}>
-                        <p className={styles.stepHint}>Connect the accounts this automation needs.</p>
+                        <p className={styles.stepHint}>
+                            {existingReference
+                                ? 'Choose the accounts this automation uses.'
+                                : 'Connect the accounts this automation needs.'}
+                        </p>
 
                         {requiredComponents.map((component) => (
                             <ConnectRow
@@ -547,7 +650,11 @@ const ActivationBody = ({
 
                 {state.step === 'configure' && (
                     <div className={styles.steps}>
-                        <p className={styles.stepHint}>This automation needs a few details before it can run.</p>
+                        <p className={styles.stepHint}>
+                            {existingReference
+                                ? 'Change the details this automation uses.'
+                                : 'This automation needs a few details before it can run.'}
+                        </p>
 
                         {inputs.map((input) => (
                             <div className={styles.field} key={input.name}>
@@ -586,7 +693,11 @@ const ActivationBody = ({
                     <div className={styles.steps}>
                         {providedRows}
 
-                        <p className={styles.notice}>Everything is ready. Activate to switch this automation on.</p>
+                        <p className={styles.notice}>
+                            {existingReference
+                                ? 'Save to keep your changes. Saving does not switch this automation on or off.'
+                                : 'Everything is ready. Activate to switch this automation on.'}
+                        </p>
                     </div>
                 )}
             </main>
@@ -623,10 +734,10 @@ const ActivationBody = ({
                                 <button
                                     className={dialogStyles.buttonPrimary}
                                     disabled={busy}
-                                    onClick={() => void activate()}
+                                    onClick={() => void (existingReference ? save() : activate())}
                                     type="button"
                                 >
-                                    Activate
+                                    {existingReference ? 'Save' : 'Activate'}
                                 </button>
                             ) : (
                                 <button
@@ -676,6 +787,7 @@ const ActivationDialog = ({
     onActivated,
     onClose,
     onEditWorkflow,
+    onSaved,
     workflowTemplateId,
 }: ActivationDialogProps) => {
     const [loadResult, setLoadResult] = useState<LoadResultType>();
@@ -690,19 +802,36 @@ const ActivationDialog = ({
 
     const loading = loadResult?.key !== workflowTemplateId;
     const template = loadResult?.template;
+    const existingReference = loadResult?.existingReference;
     const loadError = loadResult?.error;
 
     useEffect(() => {
         let cancelled = false;
 
+        // Activating re-checks the list before it provisions, so a failed check here only means the dialog
+        // opens to activate rather than to edit.
+        const workflowsPromise = fetch<ConnectedUserWorkflowType[]>('/api/embedded/v1/automation/workflows').catch(
+            (error: unknown) => {
+                console.error('Failed to check whether the automation is already active:', error);
+
+                return undefined;
+            }
+        );
+
         fetch<AutomationTemplateType>(
             `/api/embedded/v1/automation/workflow-templates/${encodeURIComponent(workflowTemplateId)}`
         )
-            .then((loadedTemplate) =>
-                loadedTemplate?.id
-                    ? {key: workflowTemplateId, template: loadedTemplate}
-                    : {error: TEMPLATE_NOT_FOUND_MESSAGE, key: workflowTemplateId}
-            )
+            .then(async (loadedTemplate): Promise<LoadResultType> => {
+                if (!loadedTemplate?.id) {
+                    return {error: TEMPLATE_NOT_FOUND_MESSAGE, key: workflowTemplateId};
+                }
+
+                return {
+                    existingReference: findExistingReference(await workflowsPromise, loadedTemplate.id),
+                    key: workflowTemplateId,
+                    template: loadedTemplate,
+                };
+            })
             .catch((error: unknown) => {
                 console.error('Failed to load the automation template:', error);
 
@@ -792,7 +921,9 @@ const ActivationDialog = ({
             >
                 <header className={dialogStyles.dialogHeader}>
                     <div>
-                        <h2 id="bytechef-activation-dialog-title">{template?.label ?? 'Activate automation'}</h2>
+                        <h2 id="bytechef-activation-dialog-title">
+                            {template?.label ?? (existingReference ? 'Edit automation' : 'Activate automation')}
+                        </h2>
                     </div>
 
                     <button
@@ -816,12 +947,14 @@ const ActivationDialog = ({
                         connectionCreationAllowed={connectionCreationAllowed}
                         editable={template.kind !== 'REFERENCE'}
                         environment={environment}
+                        existingReference={existingReference}
                         fetch={fetch}
                         jwtToken={jwtToken}
                         mode={mode}
                         onActivated={onActivated}
                         onClose={onClose}
                         onEditWorkflow={onEditWorkflow}
+                        onSaved={onSaved}
                         key={template.id}
                         template={template}
                     />
