@@ -17,14 +17,20 @@
 package com.bytechef.platform.data.table.execution.facade;
 
 import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
+import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.ExternalIdPatch;
+import com.bytechef.platform.data.table.execution.domain.NewRow;
+import com.bytechef.platform.data.table.execution.domain.UpsertResult;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,21 +53,51 @@ public class DataTableRowFacadeImpl implements DataTableRowFacade {
     }
 
     @Override
-    public void importCsv(String baseName, String csv, long environmentId) {
+    public int importCsv(String baseName, String csv, long environmentId) {
         dataTableStorageService.checkLimit(csv == null ? 0 : csv.getBytes(StandardCharsets.UTF_8).length);
 
-        dataTableRowService.importCsv(baseName, csv, environmentId);
+        return dataTableRowService.importCsv(baseName, csv, environmentId);
     }
 
     @Override
     public DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId) {
-        dataTableStorageService.checkLimit(ESTIMATED_ROW_OVERHEAD_BYTES + getEstimatedValuesBytes(values));
+        return insertRow(baseName, values, null, environmentId);
+    }
 
-        return dataTableRowService.insertRow(baseName, values, environmentId);
+    @Override
+    public DataTableRow insertRow(
+        String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId) {
+
+        dataTableStorageService.checkLimit(getEstimatedRowBytes(values, externalId));
+
+        return dataTableRowService.insertRow(baseName, values, externalId, environmentId);
+    }
+
+    @Override
+    public List<DataTableRow> insertRows(
+        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
+
+        long estimatedBytes = 0;
+
+        for (NewRow newRow : newRows) {
+            estimatedBytes += getEstimatedRowBytes(newRow.values(), newRow.externalId());
+        }
+
+        dataTableStorageService.checkLimit(estimatedBytes);
+
+        return dataTableRowService.insertRows(baseName, newRows, createStrategy, environmentId);
     }
 
     @Override
     public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
+        return updateRow(baseName, id, values, null, environmentId);
+    }
+
+    @Override
+    public DataTableRow updateRow(
+        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long environmentId) {
+
         long incomingBytes = getEstimatedValuesBytes(values);
 
         try {
@@ -86,7 +122,20 @@ public class DataTableRowFacadeImpl implements DataTableRowFacade {
             }
         }
 
-        return dataTableRowService.updateRow(baseName, id, values, environmentId);
+        return dataTableRowService.updateRow(baseName, id, values, externalIdPatch, environmentId);
+    }
+
+    @Override
+    public UpsertResult upsertRow(String baseName, String externalId, Map<String, Object> values, long environmentId) {
+        dataTableStorageService.checkLimit(getEstimatedRowBytes(values, externalId));
+
+        return dataTableRowService.upsertRow(baseName, externalId, values, environmentId);
+    }
+
+    private static long getEstimatedRowBytes(Map<String, Object> values, @Nullable String externalId) {
+        long externalIdBytes = externalId == null ? 0 : externalId.getBytes(StandardCharsets.UTF_8).length;
+
+        return ESTIMATED_ROW_OVERHEAD_BYTES + externalIdBytes + getEstimatedValuesBytes(values);
     }
 
     private static long getEstimatedValuesBytes(Map<String, Object> values) {

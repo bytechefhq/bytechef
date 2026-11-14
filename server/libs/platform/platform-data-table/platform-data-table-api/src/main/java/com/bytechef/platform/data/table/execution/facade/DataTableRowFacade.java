@@ -16,17 +16,35 @@
 
 package com.bytechef.platform.data.table.execution.facade;
 
+import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.ExternalIdPatch;
+import com.bytechef.platform.data.table.execution.domain.NewRow;
+import com.bytechef.platform.data.table.execution.domain.UpsertResult;
+import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface DataTableRowFacade {
 
-    void importCsv(String baseName, String csv, long environmentId);
+    int importCsv(String baseName, String csv, long environmentId);
 
     DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId);
 
+    DataTableRow
+        insertRow(String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId);
+
+    List<DataTableRow> insertRows(
+        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId);
+
     DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId);
+
+    DataTableRow updateRow(
+        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long environmentId);
+
+    UpsertResult upsertRow(String baseName, String externalId, Map<String, Object> values, long environmentId);
 }

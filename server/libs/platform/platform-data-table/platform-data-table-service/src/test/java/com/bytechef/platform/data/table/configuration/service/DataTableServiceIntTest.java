@@ -18,22 +18,28 @@ package com.bytechef.platform.data.table.configuration.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -48,6 +54,9 @@ class DataTableServiceIntTest {
 
     @Autowired
     private DataTableRepository dataTableRepository;
+
+    @Autowired
+    private DataTableRowService dataTableRowService;
 
     @Autowired
     private DataTableService dataTableService;
@@ -77,8 +86,12 @@ class DataTableServiceIntTest {
                 .anyMatch(dataTableInfo -> "registered".equals(dataTableInfo.baseName())),
             "A created table must be visible to listTables, which skips unregistered physical tables");
 
-        assertThrowsExactly(BadSqlGrammarException.class, () -> dataTableService.createTable(
-            "registered", "a description", List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID));
+        DataTableException dataTableException = assertThrowsExactly(
+            DataTableException.class, () -> dataTableService.createTable(
+                "registered", "a description", List.of(new ColumnSpec("title", ColumnType.STRING)),
+                DEV_ENVIRONMENT_ID));
+
+        assertEquals(DataTableErrorType.DATA_TABLE_ALREADY_EXISTS, dataTableException.getErrorType());
 
         dataTableService.createTable(
             "registered", "a description", List.of(new ColumnSpec("title", ColumnType.STRING)), STAGE_ENVIRONMENT_ID);
@@ -156,6 +169,135 @@ class DataTableServiceIntTest {
             dataTableRepository.findByName("dropped")
                 .isPresent(),
             "The registry row must survive while another environment still has the physical table");
+    }
+
+    @Test
+    void testCreatedTableHidesTheReservedColumns() {
+        dataTableService.createTable(
+            "registered", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        Optional<DataTableInfo> dataTableInfoOptional = dataTableService.fetchDataTableInfo(
+            "registered", DEV_ENVIRONMENT_ID);
+
+        assertTrue(dataTableInfoOptional.isPresent());
+        assertEquals(
+            List.of("title"),
+            dataTableInfoOptional.get()
+                .columns()
+                .stream()
+                .map(ColumnSpec::name)
+                .toList());
+        assertTrue(physicalColumnExists("registered", "external_id"));
+        assertTrue(
+            dataTableService.fetchDataTableInfo("missing", DEV_ENVIRONMENT_ID)
+                .isEmpty());
+    }
+
+    @Test
+    void testReservedColumnNamesAreRejected() {
+        for (String columnName : List.of("id", "external_id", "EXTERNAL_ID")) {
+            DataTableException createTableException = assertThrowsExactly(
+                DataTableException.class, () -> dataTableService.createTable(
+                    "registered", null, List.of(new ColumnSpec(columnName, ColumnType.STRING)), DEV_ENVIRONMENT_ID));
+
+            assertEquals(DataTableErrorType.COLUMN_NAME_INVALID, createTableException.getErrorType());
+        }
+
+        dataTableService.createTable(
+            "registered", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        DataTableException addColumnException = assertThrowsExactly(
+            DataTableException.class,
+            () -> dataTableService.addColumn(
+                "registered", new ColumnSpec("external_id", ColumnType.STRING), DEV_ENVIRONMENT_ID));
+
+        assertEquals(DataTableErrorType.COLUMN_NAME_INVALID, addColumnException.getErrorType());
+    }
+
+    @Test
+    void testColumnChangesReportTypedErrors() {
+        dataTableService.createTable(
+            "registered", null,
+            List.of(new ColumnSpec("title", ColumnType.STRING), new ColumnSpec("note", ColumnType.STRING)),
+            DEV_ENVIRONMENT_ID);
+
+        assertEquals(
+            DataTableErrorType.COLUMN_ALREADY_EXISTS,
+            assertThrowsExactly(
+                DataTableException.class,
+                () -> dataTableService.addColumn(
+                    "registered", new ColumnSpec("title", ColumnType.STRING), DEV_ENVIRONMENT_ID))
+                        .getErrorType());
+        assertEquals(
+            DataTableErrorType.COLUMN_NOT_FOUND,
+            assertThrowsExactly(
+                DataTableException.class,
+                () -> dataTableService.removeColumn("registered", "missing", DEV_ENVIRONMENT_ID))
+                    .getErrorType());
+        assertEquals(
+            DataTableErrorType.COLUMN_NOT_FOUND,
+            assertThrowsExactly(
+                DataTableException.class,
+                () -> dataTableService.renameColumn("registered", "missing", "other", DEV_ENVIRONMENT_ID))
+                    .getErrorType());
+        assertEquals(
+            DataTableErrorType.COLUMN_ALREADY_EXISTS,
+            assertThrowsExactly(
+                DataTableException.class,
+                () -> dataTableService.renameColumn("registered", "title", "note", DEV_ENVIRONMENT_ID))
+                    .getErrorType());
+    }
+
+    @Test
+    void testDuplicateTableCopiesTheExternalIds() {
+        dataTableService.createTable(
+            "original", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow("original", Map.of("title", "a"), "ORD-1", DEV_ENVIRONMENT_ID);
+
+        dataTableService.duplicateTable("original", "copy", DEV_ENVIRONMENT_ID);
+
+        Optional<DataTableRow> dataTableRowOptional = dataTableRowService.fetchRowByExternalId(
+            "copy", "ORD-1", DEV_ENVIRONMENT_ID);
+
+        assertTrue(dataTableRowOptional.isPresent());
+        assertEquals(Map.of("title", "a"), dataTableRowOptional.get()
+            .values());
+    }
+
+    @Test
+    void testUpdateDescription() {
+        dataTableService.createTable(
+            "registered", "before", List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        dataTableService.updateDescription("registered", "after");
+
+        assertEquals(
+            "after",
+            dataTableService.fetchDataTableInfo("registered", DEV_ENVIRONMENT_ID)
+                .map(DataTableInfo::description)
+                .orElseThrow());
+
+        dataTableService.updateDescription("registered", null);
+
+        DataTableInfo dataTableInfo = dataTableService.fetchDataTableInfo("registered", DEV_ENVIRONMENT_ID)
+            .orElseThrow();
+
+        assertNull(dataTableInfo.description());
+        assertEquals(
+            DataTableErrorType.DATA_TABLE_NOT_FOUND,
+            assertThrowsExactly(
+                DataTableException.class, () -> dataTableService.updateDescription("missing", "x"))
+                    .getErrorType());
+    }
+
+    private boolean physicalColumnExists(String baseName, String columnName) {
+        Integer count = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = current_schema() "
+                + "AND table_name LIKE ? AND column_name = ?",
+            Integer.class, "%" + baseName + "%", columnName);
+
+        return count != null && count > 0;
     }
 
     private boolean physicalTableExists(String physicalName) {

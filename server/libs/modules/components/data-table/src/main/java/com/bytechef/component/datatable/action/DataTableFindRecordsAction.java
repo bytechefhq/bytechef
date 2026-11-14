@@ -150,18 +150,18 @@ public class DataTableFindRecordsAction {
 
         String sortColumn = inputParameters.getString(SORT_COLUMN);
 
-        DataTableRowSort sort = null;
+        List<DataTableRowSort> sorts = List.of();
 
         if (sortColumn != null && !sortColumn.isBlank()) {
             Direction direction = DataTableUtils.toEnum(
                 Direction.class, inputParameters.getString(SORT_DIRECTION), Direction.ASC, "Sort Direction");
 
-            sort = new DataTableRowSort(sortColumn, direction);
+            sorts = List.of(new DataTableRowSort(sortColumn, direction));
         }
 
         return DataTableUtils.flattenRows(
             dataTableRowService.findRows(
-                baseName, conditions, sort, limit, offset,
+                baseName, conditions, sorts, limit, offset,
                 Objects.requireNonNull(actionContextAware.getEnvironmentId())));
     }
 }
