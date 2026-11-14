@@ -1,6 +1,5 @@
 import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
-import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserConnectionCredentialsDialog from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserConnectionCredentialsDialog';
 import ConnectedUserCredentialStatus from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserCredentialStatus';
@@ -12,7 +11,7 @@ import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/
 import {useDeleteConnectedUserConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
 import {ConnectionKeys} from '@/ee/shared/queries/embedded/connections.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {ComponentIcon, KeyRoundIcon} from 'lucide-react';
+import {ComponentIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
@@ -53,7 +52,13 @@ const ConnectedUserSheetPanelConnectionListItem = ({
 
     const provisioned = connection.origin === ConnectionOriginEnum.Provisioned;
 
+    const shared = connection.origin === ConnectionOriginEnum.Internal;
+
+    const credentialsEditable = provisioned || !!provisionedIntegrationInstance;
+
     const deletable = connection.id != null && (provisioned || connection.origin === ConnectionOriginEnum.SelfServe);
+
+    const hasActions = credentialsEditable || shared || deletable;
 
     return (
         <li className="mb-2 flex items-center justify-between rounded border border-border/50 px-3 hover:bg-surface-neutral-primary-hover">
@@ -77,41 +82,7 @@ const ConnectedUserSheetPanelConnectionListItem = ({
             </div>
 
             <div className="flex items-center gap-x-2">
-                <div className="flex shrink-0 items-center justify-end gap-x-4">
-                    {(provisioned || provisionedIntegrationInstance) && (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    aria-label="Credentials"
-                                    icon={<KeyRoundIcon />}
-                                    onClick={() => setShowCredentialsDialog(true)}
-                                    size="iconXs"
-                                    variant="ghost"
-                                />
-                            </TooltipTrigger>
-
-                            <TooltipContent>Credentials</TooltipContent>
-                        </Tooltip>
-                    )}
-
-                    {connection.origin === ConnectionOriginEnum.Internal && (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <span>
-                                    <Button
-                                        aria-label="Credentials"
-                                        disabled
-                                        icon={<KeyRoundIcon />}
-                                        size="iconXs"
-                                        variant="ghost"
-                                    />
-                                </span>
-                            </TooltipTrigger>
-
-                            <TooltipContent>Shared connections are edited on the Connections page</TooltipContent>
-                        </Tooltip>
-                    )}
-
+                <div className="flex shrink-0 items-center justify-end">
                     <div className="flex flex-col items-end gap-y-2">
                         <div className="flex min-h-6 items-center gap-2">
                             <Tooltip>
@@ -160,8 +131,14 @@ const ConnectedUserSheetPanelConnectionListItem = ({
                     </div>
                 </div>
 
-                {deletable ? (
-                    <ConnectedUserSheetDeleteDropdownMenu onDeleteClick={() => setShowDeleteDialog(true)} />
+                {hasActions ? (
+                    <ConnectedUserSheetDeleteDropdownMenu
+                        credentialsDisabledReason={
+                            shared ? 'Shared connections are edited on the Connections page' : undefined
+                        }
+                        onCredentialsClick={credentialsEditable ? () => setShowCredentialsDialog(true) : undefined}
+                        onDeleteClick={deletable ? () => setShowDeleteDialog(true) : undefined}
+                    />
                 ) : (
                     <div aria-hidden="true" className="size-9 shrink-0" />
                 )}
