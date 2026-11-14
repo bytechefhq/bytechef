@@ -124,12 +124,6 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
         Map<String, WorkflowConfigurationDTO> workflowConfigurationMap = toWorkflowConfigurationMap(
             workflowConfigurations);
 
-        McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
-            new McpIntegrationInstanceConfiguration(integrationInstanceConfigurationId, mcpServerId);
-
-        mcpIntegrationInstanceConfiguration =
-            mcpIntegrationInstanceConfigurationService.create(mcpIntegrationInstanceConfiguration);
-
         List<IntegrationInstanceConfigurationWorkflow> existingWorkflows =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
                 integrationInstanceConfigurationId);
@@ -139,6 +133,17 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
         for (IntegrationInstanceConfigurationWorkflow existingWorkflow : existingWorkflows) {
             existingWorkflowsByWorkflowId.put(existingWorkflow.getWorkflowId(), existingWorkflow);
         }
+
+        for (String workflowId : selectedWorkflowIds) {
+            requireEnabledWorkflow(
+                integrationInstanceConfigurationId, existingWorkflowsByWorkflowId.get(workflowId), workflowId);
+        }
+
+        McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
+            new McpIntegrationInstanceConfiguration(integrationInstanceConfigurationId, mcpServerId);
+
+        mcpIntegrationInstanceConfiguration =
+            mcpIntegrationInstanceConfigurationService.create(mcpIntegrationInstanceConfiguration);
 
         for (String workflowId : selectedWorkflowIds) {
             IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
@@ -259,6 +264,14 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
             workflowConfigurations);
 
         for (String workflowId : selectedWorkflowIds) {
+            if (!existingWorkflowIdMap.containsKey(workflowId)) {
+                requireEnabledWorkflow(
+                    mcpIntegrationInstanceConfiguration.getIntegrationInstanceConfigurationId(),
+                    integrationInstanceConfigurationWorkflowByWorkflowIdMap.get(workflowId), workflowId);
+            }
+        }
+
+        for (String workflowId : selectedWorkflowIds) {
             IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
                 integrationInstanceConfigurationWorkflowByWorkflowIdMap.get(workflowId);
 
@@ -359,43 +372,30 @@ public class McpIntegrationInstanceConfigurationFacadeImpl implements McpIntegra
             Objects.equals(connection.getComponentName(), componentConnection.componentName());
     }
 
+    private static void requireEnabledWorkflow(
+        long integrationInstanceConfigurationId,
+        @Nullable IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow,
+        String workflowId) {
+
+        if (integrationInstanceConfigurationWorkflow == null || !integrationInstanceConfigurationWorkflow.isEnabled()) {
+            throw new IllegalArgumentException(
+                "Workflow " + workflowId + " is turned off in integration instance configuration " +
+                    integrationInstanceConfigurationId);
+        }
+    }
+
     private IntegrationInstanceConfigurationWorkflow saveIntegrationInstanceConfigurationWorkflow(
         IntegrationInstanceConfiguration integrationInstanceConfiguration,
-        @Nullable IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow, String workflowId,
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow, String workflowId,
         @Nullable WorkflowConfigurationDTO workflowConfiguration) {
-
-        if (integrationInstanceConfigurationWorkflow == null) {
-            integrationInstanceConfigurationWorkflow = new IntegrationInstanceConfigurationWorkflow();
-
-            integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
-                integrationInstanceConfiguration.getId());
-            integrationInstanceConfigurationWorkflow.setWorkflowId(workflowId);
-            integrationInstanceConfigurationWorkflow.setEnabled(true);
-            integrationInstanceConfigurationWorkflow.setInputs(Map.of());
-
-            if (workflowConfiguration != null) {
-                integrationInstanceConfigurationWorkflow.setConnections(
-                    toIntegrationInstanceConfigurationWorkflowConnections(
-                        integrationInstanceConfiguration, workflowId, workflowConfiguration.connections()));
-                integrationInstanceConfigurationWorkflow.setInputs(workflowConfiguration.inputs());
-            }
-
-            return integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
-        }
 
         if (workflowConfiguration != null) {
             integrationInstanceConfigurationWorkflow.setConnections(
                 toIntegrationInstanceConfigurationWorkflowConnections(
                     integrationInstanceConfiguration, workflowId, workflowConfiguration.connections()));
-            integrationInstanceConfigurationWorkflow.setEnabled(true);
             integrationInstanceConfigurationWorkflow.setInputs(workflowConfiguration.inputs());
 
             return integrationInstanceConfigurationWorkflowService.update(integrationInstanceConfigurationWorkflow);
-        }
-
-        if (!integrationInstanceConfigurationWorkflow.isEnabled()) {
-            integrationInstanceConfigurationWorkflowService.updateEnabled(
-                integrationInstanceConfigurationWorkflow.getId(), true);
         }
 
         return integrationInstanceConfigurationWorkflow;

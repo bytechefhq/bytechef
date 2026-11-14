@@ -200,6 +200,8 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
             """
                 {"tasks":[]}""");
 
+        createConfigurationWorkflow(WORKFLOW_ID, true);
+
         when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
             .thenReturn(
                 List.of(
@@ -331,6 +333,80 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
+    void testCreateRejectsWorkflowDisabledInConfiguration() {
+        long integrationInstanceConfigurationWorkflowId = getIntegrationInstanceConfigurationWorkflow().getId();
+
+        integrationInstanceConfigurationWorkflowService.updateEnabled(integrationInstanceConfigurationWorkflowId,
+            false);
+
+        assertThatThrownBy(() -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+            mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID), List.of()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(
+                    "Workflow " + WORKFLOW_ID + " is turned off in integration instance configuration " +
+                        integrationInstanceConfigurationId);
+
+        assertThat(getIntegrationInstanceConfigurationWorkflow().isEnabled()).isFalse();
+        assertThat(mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurations()).isEmpty();
+    }
+
+    @Test
+    void testCreateRejectsWorkflowMissingFromConfiguration() {
+        jdbcTemplate.update("DELETE FROM integration_instance_configuration_workflow");
+
+        assertThatThrownBy(() -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+            mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID), List.of()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(
+                    "Workflow " + WORKFLOW_ID + " is turned off in integration instance configuration " +
+                        integrationInstanceConfigurationId);
+
+        assertThat(
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                integrationInstanceConfigurationId)).isEmpty();
+        assertThat(mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurations()).isEmpty();
+    }
+
+    @Test
+    void testUpdateWithConnectionsDoesNotEnableConfigurationWorkflow() {
+        McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
+            mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID));
+
+        long connectionId = createConnection("slack", Environment.DEVELOPMENT);
+
+        integrationInstanceConfigurationWorkflowService.updateEnabled(
+            getIntegrationInstanceConfigurationWorkflow().getId(), false);
+
+        mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfiguration(
+            mcpIntegrationInstanceConfiguration.getId(), List.of(WORKFLOW_ID),
+            List.of(slackWorkflowConfiguration(connectionId, Map.of("subject", "Hi"))));
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            getIntegrationInstanceConfigurationWorkflow();
+
+        assertThat(integrationInstanceConfigurationWorkflow.isEnabled()).isFalse();
+        assertThat(integrationInstanceConfigurationWorkflow.getInputs()).isEqualTo(Map.of("subject", "Hi"));
+    }
+
+    @Test
+    void testUpdateRejectsNewlyAddedWorkflowDisabledInConfiguration() {
+        McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
+            mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID));
+
+        createConfigurationWorkflow(SECOND_WORKFLOW_ID, false);
+
+        assertThatThrownBy(() -> mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfiguration(
+            mcpIntegrationInstanceConfiguration.getId(), List.of(WORKFLOW_ID, SECOND_WORKFLOW_ID)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining(SECOND_WORKFLOW_ID + " is turned off");
+
+        assertThat(getMcpIntegrationInstanceConfigurationWorkflows(mcpIntegrationInstanceConfiguration.getId()))
+            .hasSize(1);
+    }
+
+    @Test
     void testCreateRecordsTheMcpIntegrationInstanceConfiguration() {
         McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
             mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
@@ -450,6 +526,8 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
         mcpIntegrationInstanceRows.provisionMcpServer(
             getConnectedUserId(integrationInstanceId), mcpServerId);
 
+        createConfigurationWorkflow(SECOND_WORKFLOW_ID, true);
+
         mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfiguration(
             mcpIntegrationInstanceConfiguration.getId(), List.of(WORKFLOW_ID, SECOND_WORKFLOW_ID));
 
@@ -462,10 +540,25 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
     }
 
     private void assertNothingWasStored() {
-        assertThat(
-            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
-                integrationInstanceConfigurationId)).isEmpty();
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            getIntegrationInstanceConfigurationWorkflow();
+
+        assertThat(integrationInstanceConfigurationWorkflow.getConnections()).isEmpty();
+        assertThat(integrationInstanceConfigurationWorkflow.getInputs()).isEmpty();
         assertThat(mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurations()).isEmpty();
+    }
+
+    private void createConfigurationWorkflow(String workflowId, boolean enabled) {
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            new IntegrationInstanceConfigurationWorkflow();
+
+        integrationInstanceConfigurationWorkflow.setEnabled(enabled);
+        integrationInstanceConfigurationWorkflow.setInputs(Map.of());
+        integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+            integrationInstanceConfigurationId);
+        integrationInstanceConfigurationWorkflow.setWorkflowId(workflowId);
+
+        integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
     }
 
     private long createIntegrationInstanceWithEnabledWorkflow(String externalId) {
