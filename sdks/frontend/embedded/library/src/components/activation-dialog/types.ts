@@ -39,6 +39,8 @@ export interface ConnectedUserWorkflowType {
     /** The values the user already supplied, keyed by input name. */
     inputValues?: Record<string, unknown>;
     kind?: 'COPY' | 'REFERENCE';
+    mcpEnabled?: boolean | null;
+    toolOnly?: boolean | null;
 }
 
 /** What the user already chose for an automation they activated before, prefilled when the dialog edits it. */
