@@ -630,6 +630,9 @@ class ConnectedUserIntegrationFacadeIntTest {
         private ConnectionService connectionService;
 
         @Autowired
+        private IntegrationFacade integrationFacade;
+
+        @Autowired
         private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
 
         @Autowired
@@ -945,6 +948,29 @@ class ConnectedUserIntegrationFacadeIntTest {
             assertThat(getVisibleWorkflowUuids(externalUserId, integrationId))
                 .containsExactly(openWorkflowUuid)
                 .doesNotContain(gatedWorkflowUuid);
+        }
+
+        @Test
+        void testPublishedVersionKeepsTheWorkflowPermissionExpression() {
+            String freePlanExternalUserId = createConnectedUser(Map.of("plan", "free"));
+            String proPlanExternalUserId = createConnectedUser(Map.of("plan", "pro"));
+
+            long integrationId = createIntegrationRow(null);
+            long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integrationId, 1);
+
+            String gatedWorkflowUuid = addWorkflow(integrationId, integrationInstanceConfigurationId, 1, "gated", true,
+                PRO_PLAN_PERMISSION_EXPRESSION)
+                    .getUuidAsString();
+            String openWorkflowUuid =
+                addWorkflow(integrationId, integrationInstanceConfigurationId, 1, "open", true, null)
+                    .getUuidAsString();
+
+            assertThat(integrationFacade.publishIntegration(integrationId, "first")).isEqualTo(2);
+
+            assertThat(getVisibleWorkflowUuids(freePlanExternalUserId, integrationId))
+                .containsExactly(openWorkflowUuid);
+            assertThat(getVisibleWorkflowUuids(proPlanExternalUserId, integrationId))
+                .containsExactlyInAnyOrder(gatedWorkflowUuid, openWorkflowUuid);
         }
 
         @Test
