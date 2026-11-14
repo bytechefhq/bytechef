@@ -27,7 +27,9 @@ const ConnectDialogHost = ({
     mode?: 'dark' | 'light';
     onClose: () => void;
 }) => {
-    const {closeDialog, openDialog} = useConnectDialog({
+    const openedRef = useRef(false);
+
+    const {openDialog} = useConnectDialog({
         baseUrl,
         environment,
         integrationId,
@@ -38,11 +40,13 @@ const ConnectDialogHost = ({
     });
 
     useEffect(() => {
-        openDialog();
+        if (openedRef.current) {
+            return;
+        }
 
-        return () => {
-            closeDialog();
-        };
+        openedRef.current = true;
+
+        void openDialog();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
