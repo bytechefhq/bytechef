@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
+import java.util.List;
+
 /**
  * @version ee
  *
@@ -15,6 +17,9 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 public interface McpAutomationRows {
 
     void addMissingRowsForLink(long mcpAutomationProjectConfigurationId);
+
+    void addMissingRowsForLinkWorkflows(
+        long mcpAutomationProjectConfigurationId, List<Long> mcpAutomationProjectConfigurationWorkflowIds);
 
     void addMissingRowsForReference(long connectedUserProjectWorkflowId);
 
