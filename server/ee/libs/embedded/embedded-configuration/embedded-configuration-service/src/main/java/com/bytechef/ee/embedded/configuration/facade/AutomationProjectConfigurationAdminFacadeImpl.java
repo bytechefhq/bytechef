@@ -17,6 +17,7 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRows;
 import com.bytechef.ee.embedded.configuration.audit.AutomationProjectAuditEvents;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.AutomationProjectConfigurationWorkflow;
@@ -117,6 +118,7 @@ public class AutomationProjectConfigurationAdminFacadeImpl
     private final ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade;
     private final ConnectionService connectionService;
     private final JobService jobService;
+    private final McpAutomationRows mcpAutomationRows;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TransactionTemplate requiresNewTransactionTemplate;
@@ -138,7 +140,7 @@ public class AutomationProjectConfigurationAdminFacadeImpl
         ConnectedUserReferenceRolloutManager connectedUserReferenceRolloutManager,
         ConnectedUserService connectedUserService,
         ConnectedUserWorkflowReferenceAdminFacade connectedUserWorkflowReferenceAdminFacade,
-        ConnectionService connectionService, JobService jobService,
+        ConnectionService connectionService, JobService jobService, McpAutomationRows mcpAutomationRows,
         PlatformTransactionManager platformTransactionManager, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService,
         WorkflowConnectionSlot workflowConnectionSlot, WorkflowService workflowService) {
@@ -159,6 +161,7 @@ public class AutomationProjectConfigurationAdminFacadeImpl
         this.connectedUserWorkflowReferenceAdminFacade = connectedUserWorkflowReferenceAdminFacade;
         this.connectionService = connectionService;
         this.jobService = jobService;
+        this.mcpAutomationRows = mcpAutomationRows;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowConnectionSlot = workflowConnectionSlot;
@@ -1393,6 +1396,8 @@ public class AutomationProjectConfigurationAdminFacadeImpl
 
         automationProjectConfigurationResolver.assign(
             connectedUserOptional.get(), projectId, targetConfiguration.getId());
+
+        mcpAutomationRows.remapConnectedUser(connectedUserId, sourceConfiguration.getId(), targetConfiguration.getId());
 
         Optional<ConnectedUserReferenceDeployment> referenceDeploymentOptional =
             connectedUserReferenceDeploymentService.fetchConnectedUserReferenceDeployment(connectedUserId, projectId);

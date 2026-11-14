@@ -50,6 +50,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRows;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -173,7 +174,7 @@ import org.springframework.transaction.support.TransactionTemplate;
     JobFacade.class, JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class,
     McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
-    McpIntegrationInstanceWorkflowService.class, McpIntegrationInstanceRows.class,
+    McpIntegrationInstanceWorkflowService.class, McpAutomationRows.class, McpIntegrationInstanceRows.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectFacade.class,
     TaskDispatcherDefinitionService.class, TaskExecutionService.class,
@@ -290,6 +291,9 @@ class ConnectedUserReferenceRolloutManagerIntTest {
 
     @Autowired
     private JobFacade jobFacade;
+
+    @Autowired
+    private McpAutomationRows mcpAutomationRows;
 
     @Autowired
     private PlatformTransactionManager platformTransactionManager;
@@ -2033,6 +2037,35 @@ class ConnectedUserReferenceRolloutManagerIntTest {
             .isEqualTo(targetConfiguration.getId());
         assertThat(getAssignedConfigurationId(secondConnectedUser.getId(), automationProjectId))
             .isEqualTo(targetConfiguration.getId());
+    }
+
+    @Test
+    void testMoveConnectedUserRemapsRows() {
+        long automationProjectId = createAutomationProject("Move Remaps Mcp Rows");
+
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationProjectFacade.publishProject(automationProjectId);
+
+        AutomationProjectConfiguration sourceConfiguration = automationProjectConfigurationService
+            .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Source", null, 1, true, true);
+        AutomationProjectConfiguration targetConfiguration = automationProjectConfigurationService
+            .create(automationProjectId, PRODUCTION_ENVIRONMENT_ID, "Target", null, 1, true, true);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUser connectedUser = assignNewConnectedUser(automationProjectId, sourceConfiguration);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION);
+
+        ConfigurationMoveResultDTO moveResult = automationProjectConfigurationAdminFacade.moveConnectedUsers(
+            sourceConfiguration.getId(), targetConfiguration.getId(), List.of(connectedUser.getId()));
+
+        assertThat(moveResult.movedConnectedUserIds()).containsExactly(connectedUser.getId());
+
+        verify(mcpAutomationRows).remapConnectedUser(
+            connectedUser.getId(), sourceConfiguration.getId(), targetConfiguration.getId());
     }
 
     @Test

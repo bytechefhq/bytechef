@@ -35,6 +35,7 @@ public class McpRowsIntTestFixture {
         jdbcTemplate.update("DELETE FROM mcp_automation_project_configuration_workflow");
         jdbcTemplate.update("DELETE FROM mcp_automation_project_configuration");
         jdbcTemplate.update("DELETE FROM connected_user_project_workflow");
+        jdbcTemplate.update("DELETE FROM connected_user_project_configuration");
         jdbcTemplate.update("DELETE FROM connected_user_project");
         jdbcTemplate.update("DELETE FROM automation_project_configuration");
         jdbcTemplate.update("DELETE FROM project");
@@ -55,31 +56,7 @@ public class McpRowsIntTestFixture {
     }
 
     public long insertAutomationLinkWorkflow(long mcpServerId, String workflowUuid) {
-        long workspaceId = insert(
-            """
-                INSERT INTO workspace (name, created_date, created_by, last_modified_date, last_modified_by, version)
-                VALUES ('test', now(), 'system', now(), 'system', 0)
-                RETURNING id
-                """);
-
-        long projectId = insert(
-            """
-                INSERT INTO project (name, uuid, workspace_id, created_date, created_by, last_modified_date,
-                    last_modified_by, version)
-                VALUES ('template', gen_random_uuid(), ?, now(), 'system', now(), 'system', 0)
-                RETURNING id
-                """,
-            workspaceId);
-
-        long automationProjectConfigurationId = insert(
-            """
-                INSERT INTO automation_project_configuration (project_id, environment_id, project_version, enabled,
-                    automation_hub_visible, name, created_date, created_by, last_modified_date, last_modified_by,
-                    version)
-                VALUES (?, 0, 1, true, true, 'configuration', now(), 'system', now(), 'system', 0)
-                RETURNING id
-                """,
-            projectId);
+        long automationProjectConfigurationId = insertAutomationProjectConfiguration(insertAutomationProject());
 
         long linkId = insert(
             """
@@ -100,6 +77,37 @@ public class McpRowsIntTestFixture {
             linkId, workflowUuid);
     }
 
+    public long insertAutomationProject() {
+        long workspaceId = insert(
+            """
+                INSERT INTO workspace (name, created_date, created_by, last_modified_date, last_modified_by, version)
+                VALUES ('test-' || gen_random_uuid(), now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """);
+
+        return insert(
+            """
+                INSERT INTO project (name, uuid, workspace_id, created_date, created_by, last_modified_date,
+                    last_modified_by, version)
+                VALUES ('template', gen_random_uuid(), ?, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            workspaceId);
+    }
+
+    public long insertAutomationProjectConfiguration(long projectId) {
+        return insert(
+            """
+                INSERT INTO automation_project_configuration (project_id, environment_id, project_version, enabled,
+                    automation_hub_visible, name, created_date, created_by, last_modified_date, last_modified_by,
+                    version)
+                VALUES (?, 0, 1, true, true, 'configuration-' || gen_random_uuid(), now(), 'system', now(),
+                    'system', 0)
+                RETURNING id
+                """,
+            projectId);
+    }
+
     public void insertAutomationRow(long connectedUserId, long linkWorkflowId, String workflowUuid, boolean enabled) {
         long projectId = insert(
             """
@@ -115,6 +123,30 @@ public class McpRowsIntTestFixture {
                 """,
             linkWorkflowId);
 
+        long connectedUserProjectWorkflowId = insertReference(connectedUserId, projectId, workflowUuid, false);
+
+        jdbcTemplate.update(
+            """
+                INSERT INTO mcp_connected_user_project_workflow (connected_user_project_workflow_id,
+                    mcp_automation_project_configuration_workflow_id, enabled, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES (?, ?, ?, now(), 'system', now(), 'system', 0)
+                """,
+            connectedUserProjectWorkflowId, linkWorkflowId, enabled);
+    }
+
+    public void insertAssignment(long connectedUserId, long projectId, long automationProjectConfigurationId) {
+        jdbcTemplate.update(
+            """
+                INSERT INTO connected_user_project_configuration (connected_user_id, project_id,
+                    automation_project_configuration_id, created_date, created_by, last_modified_date,
+                    last_modified_by, version)
+                VALUES (?, ?, ?, now(), 'system', now(), 'system', 0)
+                """,
+            connectedUserId, projectId, automationProjectConfigurationId);
+    }
+
+    public long insertReference(long connectedUserId, long projectId, String automationUuid, boolean dangling) {
         List<Long> existingConnectedUserProjectIds = jdbcTemplate.queryForList(
             "SELECT id FROM connected_user_project WHERE connected_user_id = ? AND project_id = ?", Long.class,
             connectedUserId, projectId);
@@ -134,23 +166,14 @@ public class McpRowsIntTestFixture {
             connectedUserProjectId = existingConnectedUserProjectIds.get(0);
         }
 
-        long connectedUserProjectWorkflowId = insert(
+        return insert(
             """
                 INSERT INTO connected_user_project_workflow (connected_user_project_id, automation_uuid, enabled,
                     dangling, created_date, created_by, last_modified_date, last_modified_by, version)
-                VALUES (?, ?, true, false, now(), 'system', now(), 'system', 0)
+                VALUES (?, ?, true, ?, now(), 'system', now(), 'system', 0)
                 RETURNING id
                 """,
-            connectedUserProjectId, workflowUuid);
-
-        jdbcTemplate.update(
-            """
-                INSERT INTO mcp_connected_user_project_workflow (connected_user_project_workflow_id,
-                    mcp_automation_project_configuration_workflow_id, enabled, created_date, created_by,
-                    last_modified_date, last_modified_by, version)
-                VALUES (?, ?, ?, now(), 'system', now(), 'system', 0)
-                """,
-            connectedUserProjectWorkflowId, linkWorkflowId, enabled);
+            connectedUserProjectId, automationUuid, dangling);
     }
 
     public List<Boolean> getInstanceWorkflowEnabled(long integrationInstanceId, String workflowId) {

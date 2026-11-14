@@ -43,6 +43,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRows;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -162,7 +163,7 @@ import org.springframework.transaction.support.TransactionTemplate;
     JobFacade.class, JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class,
     McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
-    McpIntegrationInstanceWorkflowService.class, McpIntegrationInstanceRows.class,
+    McpIntegrationInstanceWorkflowService.class, McpAutomationRows.class, McpIntegrationInstanceRows.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class,
     TaskDispatcherDefinitionService.class, TaskExecutionService.class,
@@ -247,6 +248,9 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
 
     @Autowired
     private EnvironmentService environmentService;
+
+    @Autowired
+    private McpAutomationRows mcpAutomationRows;
 
     @Autowired
     private PlatformTransactionManager platformTransactionManager;
@@ -666,6 +670,25 @@ class ConnectedUserWorkflowReferenceFacadeIntTest {
                     .containsExactly(new ProjectDeploymentWorkflowConnection(connectionId, "slack", "postMessage1"));
                 assertThat(row.getInputs()).isEqualTo(Map.of("channel", "general"));
             });
+    }
+
+    @Test
+    void testRowCreatedWhenProvisionThrowsMissingConnection() {
+        long automationProjectId = createAutomationProject("Mcp Automation Rows");
+
+        String workflowUuid = addAutomation(automationProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        ConnectedUser connectedUser = createConnectedUser(Environment.PRODUCTION);
+
+        assertThatThrownBy(() -> connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            connectedUser.getExternalId(), workflowUuid, Environment.PRODUCTION))
+                .isInstanceOf(MissingConnectionException.class);
+
+        ConnectedUserProjectWorkflow reference = getOnlyReference(connectedUser);
+
+        verify(mcpAutomationRows).addMissingRowsForReference(reference.getId());
     }
 
     @Test
