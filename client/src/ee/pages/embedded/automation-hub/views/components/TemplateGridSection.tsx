@@ -21,6 +21,7 @@ interface TemplateGridSectionProps {
     onDeleteAutomation: (workflowUuid: string) => Promise<unknown>;
     onDeprovisionReference: (workflowUuid: string) => Promise<unknown>;
     onSetEnabled: (request: SetAutomationEnabledRequestI) => Promise<unknown>;
+    onSetMcpEnabled: (request: SetAutomationEnabledRequestI) => Promise<unknown>;
     onUseTemplate: (template: AutomationProjectWorkflowTemplate) => void;
     newWorkflowEnabled: boolean;
     projects: AutomationProject[];
@@ -37,6 +38,7 @@ const TemplateGridSection = ({
     onDeleteAutomation,
     onDeprovisionReference,
     onSetEnabled,
+    onSetMcpEnabled,
     onUseTemplate,
     projects,
     search,
@@ -94,6 +96,7 @@ const TemplateGridSection = ({
                     onDeleteAutomation={onDeleteAutomation}
                     onDeprovisionReference={onDeprovisionReference}
                     onSetEnabled={onSetEnabled}
+                    onSetMcpEnabled={onSetMcpEnabled}
                     onUseTemplate={() => onUseTemplate(template)}
                     template={template}
                 />
@@ -108,6 +111,7 @@ const TemplateGridSection = ({
                     onDeleteAutomation={onDeleteAutomation}
                     onDeprovisionReference={onDeprovisionReference}
                     onSetEnabled={onSetEnabled}
+                    onSetMcpEnabled={onSetMcpEnabled}
                 />
             ))}
         </div>

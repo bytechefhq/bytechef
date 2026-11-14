@@ -7,6 +7,7 @@ import {describeAttentionReason} from '@/ee/pages/embedded/automation-hub/utils/
 import {canOpenInBuilder, useBuilderAccess} from '@/ee/pages/embedded/automation-hub/utils/builderAccess';
 import {removeAutomation} from '@/ee/pages/embedded/automation-hub/utils/removeAutomation';
 import {reportRemoveError, reportSetEnabledError} from '@/ee/pages/embedded/automation-hub/utils/reportAutomationError';
+import AutomationAiAgentsSwitch from '@/ee/pages/embedded/automation-hub/views/components/AutomationAiAgentsSwitch';
 import AutomationCardMenu from '@/ee/pages/embedded/automation-hub/views/components/AutomationCardMenu';
 import AutomationInputsDialog from '@/ee/pages/embedded/automation-hub/views/components/AutomationInputsDialog';
 import AutomationStatusButton from '@/ee/pages/embedded/automation-hub/views/components/AutomationStatusButton';
@@ -23,6 +24,7 @@ interface TemplateCardProps {
     onDeleteAutomation: (workflowUuid: string) => Promise<unknown>;
     onDeprovisionReference: (workflowUuid: string) => Promise<unknown>;
     onSetEnabled: (request: SetAutomationEnabledRequestI) => Promise<unknown>;
+    onSetMcpEnabled: (request: SetAutomationEnabledRequestI) => Promise<unknown>;
     onUseTemplate: () => void;
     template: AutomationProjectWorkflowTemplate;
 }
@@ -33,6 +35,7 @@ const TemplateCard = ({
     onDeleteAutomation,
     onDeprovisionReference,
     onSetEnabled,
+    onSetMcpEnabled,
     onUseTemplate,
     template,
 }: TemplateCardProps) => {
@@ -72,6 +75,14 @@ const TemplateCard = ({
                 label,
                 onMissingInput: hasEditableInputs ? () => setInputsDialogOpen(true) : undefined,
             });
+        }
+    };
+
+    const handleMcpEnabledChange = async (enabled: boolean) => {
+        try {
+            await onSetMcpEnabled({enabled, workflowUuid: automation!.workflowUuid!});
+        } catch (error) {
+            console.error(`Failed to change whether "${label}" is available to AI agents:`, error);
         }
     };
 
@@ -122,11 +133,17 @@ const TemplateCard = ({
 
                 {automation ? (
                     <>
-                        <AutomationStatusButton
-                            automation={automation}
-                            label={label}
-                            onEnabledChange={handleEnabledChange}
-                        />
+                        {automation.mcpEnabled != null && (
+                            <AutomationAiAgentsSwitch automation={automation} onChange={handleMcpEnabledChange} />
+                        )}
+
+                        {!automation.toolOnly && (
+                            <AutomationStatusButton
+                                automation={automation}
+                                label={label}
+                                onEnabledChange={handleEnabledChange}
+                            />
+                        )}
 
                         {inputsDialogOpen && (
                             <AutomationInputsDialog
