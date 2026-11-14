@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20261114000001-1" author="Ivica Cardic">
+        <createTable tableName="mcp_automation_project_configuration">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="mcp_server_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="automation_project_configuration_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="mcp_automation_project_configuration"
+            baseColumnNames="mcp_server_id"
+            constraintName="fk_mcp_automation_project_configuration_mcp_server"
+            referencedTableName="mcp_server"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="mcp_automation_project_configuration"
+            baseColumnNames="automation_project_configuration_id"
+            constraintName="fk_mcp_automation_project_configuration_apc"
+            referencedTableName="automation_project_configuration"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addUniqueConstraint
+            tableName="mcp_automation_project_configuration"
+            columnNames="mcp_server_id, automation_project_configuration_id"
+            constraintName="uk_mcp_automation_project_configuration"/>
+
+        <createIndex tableName="mcp_automation_project_configuration"
+                     indexName="idx_mcp_automation_project_configuration_apc_id">
+            <column name="automation_project_configuration_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20261114000001-2" author="Ivica Cardic">
+        <createTable tableName="mcp_automation_project_configuration_workflow">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="mcp_automation_project_configuration_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_uuid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parameters" type="TEXT"/>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="mcp_automation_project_configuration_workflow"
+            baseColumnNames="mcp_automation_project_configuration_id"
+            constraintName="fk_mcp_automation_project_configuration_workflow_mcp_apc"
+            referencedTableName="mcp_automation_project_configuration"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addUniqueConstraint
+            tableName="mcp_automation_project_configuration_workflow"
+            columnNames="mcp_automation_project_configuration_id, workflow_uuid"
+            constraintName="uk_mcp_automation_project_configuration_workflow"/>
+    </changeSet>
+
+    <changeSet id="20261114000001-3" author="Ivica Cardic">
+        <createTable tableName="mcp_connected_user_project_workflow">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="connected_user_project_workflow_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mcp_automation_project_configuration_workflow_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="mcp_connected_user_project_workflow"
+            baseColumnNames="connected_user_project_workflow_id"
+            constraintName="fk_mcp_connected_user_project_workflow_cupw"
+            referencedTableName="connected_user_project_workflow"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="mcp_connected_user_project_workflow"
+            baseColumnNames="mcp_automation_project_configuration_workflow_id"
+            constraintName="fk_mcp_connected_user_project_workflow_mcp_apcw"
+            referencedTableName="mcp_automation_project_configuration_workflow"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addUniqueConstraint
+            tableName="mcp_connected_user_project_workflow"
+            columnNames="connected_user_project_workflow_id, mcp_automation_project_configuration_workflow_id"
+            constraintName="uk_mcp_connected_user_project_workflow"/>
+
+        <createIndex tableName="mcp_connected_user_project_workflow"
+                     indexName="idx_mcp_connected_user_project_workflow_mcp_apcw_id">
+            <column name="mcp_automation_project_configuration_workflow_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
