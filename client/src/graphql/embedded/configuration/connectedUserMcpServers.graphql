@@ -24,5 +24,16 @@ query connectedUserMcpServers($connectedUserId: ID!) {
             enabled
             lastExecutionDate
         }
+        automations {
+            id
+            connectedUserProjectWorkflowId
+            automationName
+            workflowUuid
+            name
+            description
+            enabled
+            available
+            lastExecutionDate
+        }
     }
 }

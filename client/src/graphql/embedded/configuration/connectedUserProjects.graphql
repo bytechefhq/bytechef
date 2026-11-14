@@ -16,6 +16,7 @@ query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
             lastExecutionDate
             projectId
             staticWebhookUrl
+            toolOnly
             workflowUuid
             workflowVersion
             workflow {

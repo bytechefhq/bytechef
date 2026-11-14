@@ -5,5 +5,7 @@ query provisionableConnectedUserMcpServers($connectedUserId: ID!) {
         provisioned
         coveredComponentNames
         missingComponentNames
+        coveredAutomationNames
+        missingAutomationNames
     }
 }
