@@ -1,0 +1,106 @@
+import {getCompletionContext} from './completionContextRegistry';
+import {type CompletionItemDraftType, getScriptCompletions} from './scriptCompletions';
+import {getShellCompletions} from './shellCompletions';
+import {getWorkflowDefinitionCompletions} from './workflowDefinitionCompletions';
+
+import type {languages} from 'monaco-editor';
+
+export const COMPLETION_LANGUAGES = ['javascript', 'python', 'ruby', 'shell', 'json', 'yaml'] as const;
+
+type MonacoType = typeof import('monaco-editor');
+
+const IDENTIFIER_BEFORE_CURSOR = /[A-Za-z_$][\w$]*$/;
+
+let completionProvidersRegistered = false;
+
+function toCompletionItemKind(monaco: MonacoType, kind: CompletionItemDraftType['kind']): languages.CompletionItemKind {
+    const kinds = monaco.languages.CompletionItemKind;
+
+    switch (kind) {
+        case 'function':
+            return kinds.Function;
+        case 'method':
+            return kinds.Method;
+        case 'module':
+            return kinds.Module;
+        case 'property':
+            return kinds.Property;
+        case 'value':
+            return kinds.Value;
+        default:
+            return kinds.Variable;
+    }
+}
+
+export function buildCompletionProvider(monaco: MonacoType): languages.CompletionItemProvider {
+    return {
+        async provideCompletionItems(model, position) {
+            const context = getCompletionContext(model.uri.toString());
+
+            if (!context) {
+                return {suggestions: []};
+            }
+
+            try {
+                const source = model.getValue();
+                const cursorOffset = model.getOffsetAt(position);
+
+                let drafts: CompletionItemDraftType[];
+
+                if (context.kind === 'workflowDefinition') {
+                    drafts = await getWorkflowDefinitionCompletions({context, cursorOffset, source});
+                } else if (context.kind === 'shell') {
+                    drafts = getShellCompletions({context, cursorOffset, source});
+                } else {
+                    drafts = await getScriptCompletions({context, cursorOffset, source});
+                }
+
+                const linePrefix = model.getLineContent(position.lineNumber).slice(0, position.column - 1);
+                const identifierLength = IDENTIFIER_BEFORE_CURSOR.exec(linePrefix)?.[0].length ?? 0;
+
+                const rangeOf = (replaceLength: number) => ({
+                    endColumn: position.column,
+                    endLineNumber: position.lineNumber,
+                    startColumn: position.column - Math.min(replaceLength, linePrefix.length),
+                    startLineNumber: position.lineNumber,
+                });
+
+                return {
+                    suggestions: drafts.map((draft) => ({
+                        command: draft.retrigger ? {id: 'editor.action.triggerSuggest', title: 'Suggest'} : undefined,
+                        detail: draft.detail,
+                        documentation: draft.documentation,
+                        filterText: draft.filterText,
+                        insertText: draft.insertText,
+                        insertTextRules: draft.insertAsSnippet
+                            ? monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+                            : undefined,
+                        kind: toCompletionItemKind(monaco, draft.kind),
+                        label: draft.label,
+                        range: rangeOf(draft.replaceLength ?? identifierLength),
+                        sortText: `0${draft.sortText ?? draft.label}`,
+                    })),
+                };
+            } catch (error) {
+                console.error('Monaco completion provider failed', error);
+
+                return {suggestions: []};
+            }
+        },
+        triggerCharacters: ['.', '{', '$', "'", '"', '/'],
+    };
+}
+
+export function registerCompletionProviders(monaco: MonacoType): void {
+    if (completionProvidersRegistered) {
+        return;
+    }
+
+    completionProvidersRegistered = true;
+
+    const provider = buildCompletionProvider(monaco);
+
+    COMPLETION_LANGUAGES.forEach((language) => {
+        monaco.languages.registerCompletionItemProvider(language, provider);
+    });
+}

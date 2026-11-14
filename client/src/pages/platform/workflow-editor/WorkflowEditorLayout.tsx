@@ -150,13 +150,8 @@ const WorkflowEditorLayout = ({
 
     const issues = useWorkflowIssues();
 
-    const {
-        automationProjectId,
-        codeWorkflow,
-        codeWorkflowLanguage,
-        invalidateWorkflowQueries,
-        updateWorkflowMutation,
-    } = useWorkflowEditor();
+    const {automationProjectId, codeWorkflow, codeWorkflowLanguage, invalidateWorkflowQueries, updateWorkflowMutation} =
+        useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     const queryClient = useQueryClient();
@@ -263,6 +258,7 @@ const WorkflowEditorLayout = ({
                             language={codeWorkflowLanguage}
                             onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
                             testConfigurationDisabled={testConfigurationDisabled}
+                            workflowId={workflow.id}
                         />
                     </Suspense>
                 ) : isCodeWorkflow && codeWorkflowLanguage && integrationId ? (
@@ -274,6 +270,7 @@ const WorkflowEditorLayout = ({
                             language={codeWorkflowLanguage}
                             onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
                             testConfigurationDisabled={testConfigurationDisabled}
+                            workflowId={workflow.id}
                         />
                     </Suspense>
                 ) : isCodeWorkflow && codeWorkflowLanguage && projectId ? (
@@ -285,6 +282,7 @@ const WorkflowEditorLayout = ({
                             onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
                             projectId={projectId}
                             testConfigurationDisabled={testConfigurationDisabled}
+                            workflowId={workflow.id}
                         />
                     </Suspense>
                 ) : (

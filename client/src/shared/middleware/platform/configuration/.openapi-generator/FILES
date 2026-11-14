@@ -35,6 +35,7 @@ docs/ComponentDefinition.md
 docs/ComponentDefinitionApi.md
 docs/ComponentDefinitionBasic.md
 docs/ComponentInputReference.md
+docs/ComponentOperationPropertyRequest.md
 docs/ConnectionDefinition.md
 docs/ConnectionDefinitionApi.md
 docs/ConnectionDefinitionBasic.md
@@ -125,6 +126,7 @@ models/ComponentConnection.ts
 models/ComponentDefinition.ts
 models/ComponentDefinitionBasic.ts
 models/ComponentInputReference.ts
+models/ComponentOperationPropertyRequest.ts
 models/ConnectionDefinition.ts
 models/ConnectionDefinitionBasic.ts
 models/ConnectionDefinitionHelp.ts

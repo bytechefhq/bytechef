@@ -689,6 +689,14 @@ The code editor will open, displaying the JSON representation of the workflow. R
 
 ![The editor control that opens the workflow code editor](workflows/code-editor-toggle.png)
 
+### Autocomplete
+
+The code editor suggests what is valid where you type, in both JSON and YAML: component and action names in `type`,
+an action's or trigger's property keys under `parameters`, a property's options as values, earlier tasks and their
+outputs after `${`, built-in functions in `=` formulas, and Script calls inside an inline `script`. Suggestions open
+as you type or with **Ctrl+Space**. See [Code Editor Autocomplete](/platform/automation/build/workflows/code-editor-autocomplete#workflow-definitions-in-json-and-yaml)
+for examples and for which suggestions need a connection.
+
 
 ### Add Component
 

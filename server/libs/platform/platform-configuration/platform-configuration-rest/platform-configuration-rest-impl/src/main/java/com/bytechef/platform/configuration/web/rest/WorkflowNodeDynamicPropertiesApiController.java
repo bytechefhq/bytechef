@@ -19,6 +19,7 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.facade.WorkflowNodeDynamicPropertiesFacade;
+import com.bytechef.platform.configuration.web.rest.model.ComponentOperationPropertyRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -54,6 +55,24 @@ public class WorkflowNodeDynamicPropertiesApiController implements WorkflowNodeD
                 workflowNodeDynamicPropertiesFacade.getClusterElementDynamicProperties(
                     workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, propertyName,
                     lookupDependsOnPaths == null ? List.of() : lookupDependsOnPaths, environmentId),
+                property -> conversionService.convert(property, PropertyModel.class)));
+    }
+
+    @Override
+    public ResponseEntity<List<PropertyModel>> getWorkflowNodeComponentOperationDynamicProperties(
+        String workflowId, String workflowNodeName, String propertyName, Long environmentId,
+        ComponentOperationPropertyRequestModel componentOperationPropertyRequestModel) {
+
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                workflowNodeDynamicPropertiesFacade.getWorkflowNodeComponentOperationDynamicProperties(
+                    workflowId, workflowNodeName,
+                    ComponentOperationPropertyRequests.toClusterElementNode(componentOperationPropertyRequestModel),
+                    ComponentOperationPropertyRequests.toComponentOperation(componentOperationPropertyRequestModel),
+                    propertyName, componentOperationPropertyRequestModel.getConnectionKey(),
+                    ComponentOperationPropertyRequests.parameters(componentOperationPropertyRequestModel),
+                    ComponentOperationPropertyRequests.lookupDependsOnPaths(componentOperationPropertyRequestModel),
+                    environmentId),
                 property -> conversionService.convert(property, PropertyModel.class)));
     }
 

@@ -1,0 +1,474 @@
+---
+title: Code Editor Autocomplete
+description: What the Script, custom component, code workflow and workflow JSON/YAML editors suggest as you type - components, actions, property keys and values, connections, inputs, expressions and node outputs - and what each suggestion needs.
+---
+
+ByteChef's code editors suggest the names that are valid where the cursor is: the components and actions you can
+call, the property keys of the action you are calling, the values a property accepts, your input and connection
+names, and in a workflow definition the expressions, functions and earlier outputs you can reference. The
+suggestions come from the same component definitions the visual editor uses, so they match what the platform will
+accept when the step runs.
+
+## Which editors have it
+
+| Editor | Where you open it | Languages with suggestions |
+|---|---|---|
+| **Script component** | A Script step's code property, **Open Code Editor** | JavaScript, Python, Bash |
+| **Custom component source** | Settings → Custom Components, open a component | JavaScript, Python, Ruby |
+| **Code workflow source** | A code project or code integration opens it in place of the canvas | JavaScript, Python, Ruby |
+| **Workflow code editor** | The code icon in a visual workflow's right panel ([Code Editor](/platform/automation/build/workflows/workflows#code-editor)) | JSON, YAML |
+
+Custom components and code workflows are Enterprise Edition features; see
+[Custom Components](/platform/settings/components/custom-components) and
+[Code Workflows](/platform/automation/build/workflows/code-workflows).
+
+The Script component's Java and R actions, Java custom components and Java code workflows get no suggestions. The
+Java sources are read-only in ByteChef.
+
+## Opening the suggestion list
+
+The list opens by itself after `.`, `{`, `$`, `'`, `"` and `/`, and while you type a name in code. Inside a string,
+the JSON editor and the script editors open it only on those characters, so after typing part of a word there, for
+example `=jo` in a JSON value, open it yourself. The YAML editor opens it while you type in strings too. To open
+the list anywhere, or to bring it back after you close it, press:
+
+| | Open suggestions |
+|---|---|
+| Windows and Linux | **Ctrl+Space** (or **Ctrl+I**) |
+| macOS | **Ctrl+Space** (or **Option+Esc**, **Cmd+I**) |
+
+**Cmd+Space** on macOS opens Spotlight, not the suggestion list.
+
+Use the arrow keys to move through the list and **Enter** or **Tab** to accept. The detail on the right of an item
+shows a property's type and whether it is required, an action's title, or an option's value. An inserted call is a
+snippet: **Tab** moves to the next placeholder.
+
+Suggestions only appear where they apply. In ordinary code the editor keeps its normal behaviour: JavaScript still
+gets Monaco's own language service for keywords, local variables and methods, alongside the ByteChef items.
+
+## What gets suggested
+
+### Calling a component action
+
+In the Script and code workflow editors, `context.component` reaches every component's actions. The editor walks
+the call with you:
+
+| You type | Suggested |
+|---|---|
+| `context.` | the `context` members of this editor (see [Context members](#context-members)) |
+| `context.component.` | every component by title, inserting its name. Components the step has a connection for come first, marked `connected` |
+| `context.component.slack.` | that component's actions, each with its title and description |
+
+Accepting an action inserts the call with the caret inside the parameters object. The connection name argument is
+filled in from the step's connections:
+
+| Connections declared for the component | Inserted |
+|---|---|
+| None | `sendChannelMessage({})` |
+| One, named `slack` | `sendChannelMessage({}, 'slack')` |
+| Several | `sendChannelMessage({}, '')`, with a placeholder for the name |
+
+```javascript tab="JavaScript"
+function perform(input, connection, context) {
+    // Type "context.component.sl", pick Slack, type ".", pick sendChannelMessage:
+    return context.component.slack.sendChannelMessage({}, 'slack');
+}
+```
+
+```python tab="Python"
+def perform(input, connection, context):
+    # The same steps insert a Python dict literal:
+    return context.component.slack.sendChannelMessage({}, 'slack')
+```
+
+In Python the call can also take keyword arguments, `send_email(input={...}, connection='gmail')`, in either order.
+The editor completes the keys of `input=` the same way and reads the connection name from `connection=`.
+
+The editor finds `context` by position, not by name: it reads the parameters of the enclosing `perform` function,
+so `function perform(i, c, ctx)` gets the same suggestions after `ctx.`. With three parameters they are input,
+connection and context; with two, input and context; with one, context.
+
+### Action property keys
+
+Inside the first argument of a `context.component.<component>.<action>(...)` call, the editor lists that action's
+properties:
+
+```javascript
+context.component.httpClient.post({
+    // Cursor here: uri, allowUnauthorizedCerts, responseType, headers, queryParameters, body, ...
+});
+```
+
+- Required properties are listed first, then the rest in definition order. The detail shows the type, for example
+  `STRING · required`.
+- Keys you already wrote in the same object are left out, and hidden properties never appear.
+- Keys can be typed bare (`uri`) or quoted (`'uri'`, `"uri"`), and Ruby's `"uri" =>` hash syntax works too.
+- **Nested objects and arrays** complete as well. Inside `body: {` the editor lists the keys of HTTP Client's `body`
+  object (`bodyContentType`, `bodyContent`, ...), and inside an array of objects it lists the item object's keys.
+
+### Display conditions
+
+A property that has a display condition, such as HTTP Client's `responseContentType` (shown only when
+`responseType == 'BINARY'`), is listed only while its condition holds for the values in the call:
+
+```javascript
+context.component.httpClient.post({
+    uri: 'https://api.example.com/export',
+    responseType: 'BINARY',
+    // responseContentType and responseFilename are now suggested.
+});
+```
+
+The editor evaluates the conditions on the server with the literal values written in the object plus the
+properties' default values. `responseType` defaults to `JSON`, so the two file properties stay out of the list until
+you write `responseType: 'BINARY'`. A property whose condition reads a value you have not written yet, and that has
+no default, stays in the list rather than being hidden on a guess. Values that are not literals, such as a variable
+or a function call, are not part of the evaluation.
+
+### Property values
+
+After a key, the editor suggests the values the property accepts:
+
+| The property has | Suggested |
+|---|---|
+| A fixed list of options | each option by label, inserting its value |
+| An options function (a lookup such as Slack channels or Google spreadsheets) | the options the function returns, [through a connection](#how-suggestions-use-connections) |
+| Type `BOOLEAN` and no options | `true` and `false` (`True` and `False` in Python) |
+
+```javascript
+context.component.httpClient.post({
+    uri: 'https://api.example.com/items',
+    // With the cursor after "responseType: " the list shows JSON, XML, Text and File.
+    // Picking File inserts 'BINARY', the option's value.
+    responseType: 'BINARY'
+});
+```
+
+With no quote typed yet, the value is inserted as a literal in the editor's language, so a string arrives quoted.
+After an opening quote, only the text goes in. The list filters on both an option's label and its value, so a Slack
+channel can be found by its name even though the inserted value is the channel id.
+
+### Dynamic properties
+
+Some properties have no fixed keys. Google Sheets **Insert Row** builds `row` from the sheet's header row, so its keys
+are the column names. Inside a dynamic property the editor asks the component for its keys, passing the values the
+property depends on:
+
+```javascript
+context.component.googleSheets.insertRow({
+    spreadsheetId: '1AbC...',
+    sheetName: 'Leads',
+    isTheFirstRowHeader: true,
+    valueInputOption: 'USER_ENTERED',
+    row: {
+        values: {
+            // The sheet's columns: Name, Email, Company, ...
+        }
+    }
+}, 'googleSheets');
+```
+
+Dynamic properties are resolved [through a connection](#how-suggestions-use-connections). Display conditions are not
+applied to the properties a dynamic property returns, and options functions inside a dynamic property are not
+called; fixed options there are still suggested.
+
+### Inputs and connections
+
+| You type | Script editor | Custom component editor |
+|---|---|---|
+| `input.` | the keys of the step's input, from the editor's **Input** panel | the `name` of each property declared on the enclosing action |
+| `input.customer.` | the keys of the nested object, when `customer` is an object in the input | nothing |
+| `connection.` | the names of the step's connections, from the **Connections** panel | the `name` of each property in the component's `connection.properties` |
+| `connection.slack.` or `connection['slack'].` | that connection's parameter names, including those its authorization types add (`token`, `clientId`, ...) | nothing |
+
+Subscripts work like dots: `input["customer"]["`, `connection['googleMaps']['` and `context["component"]["slack"]["`
+open the same lists, and the name is inserted inside the quotes.
+
+The custom component editor reads both lists from the source you are editing, so a property you add to `properties`
+shows up after the next `.` without saving.
+
+```javascript tab="Script"
+function perform(input, connection, context) {
+    // With {"customer": {"id": 7, "email": "a@example.com"}} in the Input panel:
+    const email = input.customer.email;
+
+    // With a Google Maps connection named googleMaps in the Connections panel:
+    const token = connection['googleMaps'].api_token;
+
+    return {email, token};
+}
+```
+
+```javascript tab="Custom component"
+({
+    name: "acme",
+    version: 1,
+    connection: {
+        properties: [{name: "apiKey", type: "STRING", required: true}]
+    },
+    actions: [
+        {
+            name: "getItem",
+            properties: [{name: "itemId", type: "STRING", required: true}],
+            perform: function (input, connection, context) {
+                // "input." suggests itemId, "connection." suggests apiKey,
+                // "context." suggests http and log.
+                return context.http({
+                    method: "GET",
+                    url: "https://api.acme.example/items/" + input.itemId,
+                    headers: {"X-Api-Key": connection.apiKey}
+                }).body;
+            }
+        }
+    ]
+})
+```
+
+In Python the editor also reads a component built with keyword arguments, such as
+`types.SimpleNamespace(actions=[...], connection=dict(properties=[...]))`, and a code workflow built with
+`dict(name=..., tasks=[dict(...)])`.
+
+Python and Ruby have no Monaco language service, so in those languages the editor also suggests the three
+`perform` parameter names when you start typing a word inside `perform`.
+
+### Context members
+
+| Editor | After `context.` |
+|---|---|
+| Script | `component` |
+| Custom component | `http`, `log` |
+| Code workflow | `component`, `connection`, `input`, `log`, `parameters` |
+
+A custom component cannot call other components, so it has no `context.component`.
+
+In a code workflow, `context.input().` lists the workflow's `inputs` and the names of the tasks that come before the
+current one in the same `tasks` list, which are the entries `context.input()` returns:
+
+```javascript
+({
+    name: "Orders",
+    workflows: [
+        {
+            name: "processOrder",
+            inputs: [{name: "orderId", type: "STRING", required: true}],
+            tasks: [
+                {name: "fetchOrder", perform: (context) => ({total: 42})},
+                {
+                    name: "notify",
+                    connections: [{componentName: "slack", name: "slack-prod"}],
+                    perform: function (context) {
+                        // "context.input()." suggests orderId and fetchOrder.
+                        const order = context.input().fetchOrder;
+
+                        // The action snippet fills in 'slack-prod', the task's Slack connection.
+                        return context.component.slack.sendChannelMessage(
+                            {channel: "C0123456789", text: "Order total: " + order.total}, "slack-prod");
+                    }
+                }
+            ]
+        }
+    ]
+})
+```
+
+In a code workflow the connection name in an action snippet comes from the enclosing task's `connections`, in list
+or map form. In Python, where `perform` is usually a module-level `def` that a task names with
+`"perform": my_function`, the editor finds the task through that reference.
+
+### Bash scripts
+
+The Script component's **Bash** editor completes shell variables and the input:
+
+| You type | Suggested |
+|---|---|
+| `$` or `${` | the task runner variables `BYTECHEF_INPUT_FILE`, `BYTECHEF_OUTPUT_DIR`, `BYTECHEF_WORKING_DIR` and `BYTECHEF_CONNECTIONS_FILE`; an `INPUT_<name>` variable for each input key; the names in the task's **Environment** property; and the variables the script itself assigns, loops over (`for name in`) or `read`s |
+| a word outside quotes | `input.<key>` for each input key, inserting `"$INPUT_<key>"`; and `output.json`, which inserts a command that writes the task's `vars` |
+| a word inside double quotes | `input.<key>`, inserting `$INPUT_<key>` without extra quotes |
+
+```bash
+# With {"name": "Ada"} in the Input panel, typing "input.na" inside the double quotes
+# and accepting the item inserts $INPUT_name:
+greeting="Hello, $INPUT_name"
+
+# Typing "output" and accepting the output.json item inserts:
+printf '{"value": "%s"}\n' "$value" > "$BYTECHEF_OUTPUT_DIR/output.json"
+```
+
+An input key that is not a valid shell variable name has no `INPUT_` variable, so it is not suggested; read it from
+the file in `BYTECHEF_INPUT_FILE` instead. Nothing is suggested inside single quotes, in a comment, or after an
+escaped `\$`. The [Script component reference](/reference/components/script_v1) describes what each variable holds.
+
+### Workflow definitions in JSON and YAML
+
+The workflow code editor completes the parts of a workflow definition that refer to components and data.
+
+**Component and action types.** In the value of a task's or trigger's `type`, the editor lists every component as
+`<component>/v<version>/` and reopens the list after the slash with that component's actions under `tasks`, or
+its triggers under `triggers`:
+
+```json
+{"name": "postToSlack", "type": "slack/v1/sendChannelMessage"}
+```
+
+**Parameter keys.** Under a task's or trigger's `parameters`, the editor lists the operation's properties, with the
+same ordering, nested-object, display-condition and dynamic-property behaviour as in a script. In JSON, type the
+opening `"` of the key to get the list. Tasks nested in flow controls, such as a loop's `iteratee`, are completed
+as actions too.
+
+**Parameter values.** In a string value the editor suggests the property's options. In JSON, after `:` with no
+quote typed, the options are inserted as JSON literals: strings quoted, booleans and numbers bare. In YAML a string option is inserted plain when it is safe and
+quoted when YAML would read it as something else, such as `yes`, `on` or a number.
+
+```yaml tab="YAML"
+tasks:
+  - name: fetch
+    type: httpClient/v1/get
+    parameters:
+      uri: https://api.example.com/items
+      # Typing "resp" offers responseType; after "responseType: " the list shows JSON, XML, Text and File.
+      responseType: BINARY
+```
+
+```json tab="JSON"
+{
+  "name": "fetch",
+  "type": "httpClient/v1/get",
+  "parameters": {
+    "uri": "https://api.example.com/items",
+    "responseType": "BINARY"
+  }
+}
+```
+
+**Expressions and node outputs.** In a string value:
+
+| You type | Suggested |
+|---|---|
+| `${` | the triggers and every task that comes before the current one, by name |
+| `${trigger_1.` | that node's output properties, walked one level per `.`: `${trigger_1.body.` lists the keys under `body` |
+| `${trigger_1['body'].` or `${trigger_1['` | the same properties, for a path written with brackets |
+| `${jo` | the earlier node names, plus the built-in functions that match `jo` |
+| `=jo` | the built-in functions that match `jo`, such as `join(separator, list)`; accepting inserts `join()` with the caret between the parentheses |
+
+A function matches when its name starts with the typed word or its title contains it. A string that starts with `=`
+is a [formula](/platform/automation/build/workflows/data-pills); type at least one letter after `=` for the list.
+
+The output properties are the ones the data pill panel shows: they come from the saved workflow, so a task you have
+only added in the editor is suggested by name but has no properties under it until you save. Saving from the code
+editor refreshes the list.
+
+**Inline scripts.** Inside the `script` parameter of a `script/v1/javascript` or `script/v1/python` task, the
+editor gives the [Script component](#calling-a-component-action) suggestions, with the input keys from the task's
+`parameters.input` and the connection names from its `connections`. In JSON the inserted text is escaped for the
+string; in YAML a `|` block scalar is the easiest way to write a script:
+
+```yaml
+tasks:
+  - name: summarize
+    type: script/v1/python
+    connections:
+      slack:
+        componentName: slack
+        componentVersion: 1
+    parameters:
+      input:
+        orderId: ${trigger_1.orderId}
+      script: |
+        def perform(input, connection, context):
+            # "input." suggests orderId, "context.component.slack." suggests Slack's actions.
+            return context.component.slack.sendChannelMessage({}, 'slack')
+```
+
+## How suggestions use connections
+
+Most suggestions come from component definitions and need nothing else: component and action names, property keys,
+fixed options, `true` and `false`, display conditions, inputs, connection names, functions and node outputs.
+
+Two kinds call the component itself, and a component usually needs credentials to answer:
+
+- **Options functions**, for example Slack's `channel` or Google Sheets' `spreadsheetId`.
+- **Dynamic properties**, for example Google Sheets' `row`.
+
+For these the editor sends the component, the action, the property, the values written so far, and the step's
+workflow node name to the server. The server picks the connection like this:
+
+1. It reads the connections **declared** on that node in the saved workflow, and keeps the ones for the called
+   component. In the Script editor these are the connections in the **Connections** panel; on a Script tool or
+   other cluster element they are the element's own connections; in a code workflow they are the task's
+   `connections`.
+2. If the call passes a connection name as its second argument (`..., 'slack-prod')`), only that one is kept.
+   Otherwise, exactly one declared connection for the component must remain.
+3. It uses the connection **selected** for that declared connection in the current environment: the one picked in
+   the Script editor's **Connections** panel, on the node's **Connection** tab, or in a code workflow's **Test
+   Configuration** dialog.
+
+When the component has no declared connection on the node and no name is passed, the server calls it without a
+connection, which is all a component without credentials needs.
+
+### Without a connection
+
+If no connection can be resolved, the list for that property is empty. Nothing is shown as an error, and the rest
+of the suggestions keep working. That happens when:
+
+- the workflow, or the task you are typing in, is not saved yet, so the server does not know the node;
+- the component needs a connection and none is declared for it on the node;
+- a connection is declared but none is selected for it in the current environment;
+- two or more connections are declared for the component and the call does not name one;
+- the selected connection is for a different component.
+
+To get these suggestions, declare the connection, select a connection for it, save, and name the connection in the
+call when the step has more than one for the same component. Results are cached for a minute per set of values the
+property depends on, so changing `spreadsheetId` loads a fresh list of sheet names.
+
+The custom component editor never resolves connections: a custom component cannot call other components, so its
+suggestions come entirely from the source.
+
+## Samples
+
+The sample repositories are a quick way to try the suggestions on real sources:
+
+- The code workflow samples' `notifySlackOnNewEmail` workflow calls Slack through a declared `slack` connection.
+  Open it in the code workflow editor, select a Slack connection in **Test Configuration**, and the editor suggests
+  your Slack channels for the `channel` property.
+  [JavaScript](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-javascript),
+  [Python](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-python).
+- The embedded variants work the same way:
+  [catalog code project (JavaScript)](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-javascript),
+  [code integration (JavaScript)](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-javascript).
+- The [JavaScript custom component sample](https://github.com/bytechefhq/bytechef-sample-custom-component-javascript)
+  shows the `actions` and `properties` shape the custom component editor reads its input names from. It declares no
+  connection; [Connections](/platform/settings/components/custom-components#connections) shows that shape.
+
+[Sample Repositories](/platform/sample-repositories) lists every sample.
+
+## Limits
+
+- **Only inside `perform`.** Script, custom component and code workflow suggestions fire inside a `perform`
+  function, or the function a task names as its `perform`. Outside one nothing is suggested. A Python
+  `lambda *args:` has no named parameters, so it gets no `context` suggestions.
+- **Not in comments or plain strings.** Inside `perform`, `context.` in a comment or an ordinary string opens no
+  list. Strings that are part of a completion still do: a quoted key or value in an action call, a subscript such
+  as `input['`, and the code inside a JavaScript template `${...}`, a Python f-string `{...}` or a Ruby `"#{...}"`.
+- **Custom component connection names** are the `name`s in `connection.properties`. Parameters an authorization
+  type adds are not listed.
+- **Code workflow options and dynamic properties** are resolved against the workflow open in the project editor.
+  A task in another workflow of the same source gets fixed options but not lookups.
+- **Workflow definitions:**
+  - Only the top-level triggers and tasks are suggested after `${`. Tasks inside a flow control, such as a loop's
+    `iteratee`, are not.
+  - Inline scripts are completed only on top-level `script/v1/javascript` and `script/v1/python` tasks, not on a
+    Script task inside a flow control.
+  - Cluster elements under `clusterElements` are not looked up as cluster elements, so most of their parameters
+    get no suggestions.
+  - Comments in YAML get no suggestions.
+- **No hover help, signature help or type checking.** Suggestions carry a description, and the editors do not mark
+  unknown names or wrong types. A wrong key or value still fails when the step runs.
+
+## See also
+
+- [Script component](/reference/components/script_v1) - the `perform` contract, connections and the Bash action.
+- [Code Workflows](/platform/automation/build/workflows/code-workflows) - the code workflow contract and the task
+  context.
+- [Custom Components](/platform/settings/components/custom-components) - the single-file contract.
+- [Data Pills & Input Modes](/platform/automation/build/workflows/data-pills) - expressions and formulas in property
+  fields.
