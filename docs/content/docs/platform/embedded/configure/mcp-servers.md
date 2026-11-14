@@ -53,14 +53,52 @@ For each exposed action, you choose which parameters you fix yourself and which 
 
 1. On the **Workflow Tools** tab, click **Add Workflows**.
 2. In the **Basic** step, pick the **Integration**, **Integration Version** and **Integration Instance Configuration**.
-3. In the **Workflows** step, switch on the workflows to expose and set each one's **Inputs** and the **Connections** of components other than the integration's own (each connected user supplies the integration's own connection).
+3. In the **Workflows** step, switch on the workflows to expose.
 4. Save the dialog.
 
-Only workflows with a **New Workflow Call** trigger are eligible. A configuration without one shows "No tool-eligible workflows found". The inputs and connections are saved on the instance configuration's workflows. A workflow you add is also added to the instance configuration and enabled there, and every connected user who already has the server gets it as a tool.
+Only workflows with a **New Workflow Call** trigger are eligible. A configuration without one shows "No tool-eligible workflows found". A workflow that is off in the configuration is listed as **Turned off in the configuration** and cannot be added. Adding a workflow does not turn it on and does not change the configuration. Its inputs and connections are set in the instance configuration, not on the MCP server.
 
 The **Workflow Tools** tab groups workflows by instance configuration. Each configuration row has a ⋮ menu with **Edit Workflows**, **Change Integration Version** and **Delete**. Each workflow has a **Configure** button (the tool's property values), a switch, and a ⋮ menu with **Edit** (its connections and inputs in the instance configuration) and **Delete**.
 
-**Delete** removes a workflow from this server only. It stays in the instance configuration, enabled, with its other triggers. Deleting the whole server works the same way: the instance configurations it used, and their workflows, are kept.
+**Delete** removes a workflow from this server only. It stays in the instance configuration, with its other triggers. Deleting the whole server works the same way: the instance configurations it used, and their workflows, are kept.
+
+### Exposing automations
+
+A server can also expose workflows of an [automation project](/platform/embedded/build/automations) as tools. The **Workflow Tools** tab shows an **Automations** section below the integrations.
+
+1. Click **Add Automations**.
+2. In the **Basic** step, pick the **Automation** and its **Automation Configuration**. Only configurations of the server's environment are listed.
+3. In the **Workflows** step, switch on the workflows to expose. Only workflows with a **New Workflow Call** trigger are listed. A workflow that is off in the configuration is listed as **Turned off in the configuration** and cannot be added. Adding a workflow never turns anything on and never changes the configuration.
+4. Optionally set each tool's **name** and **description**. They default to the workflow's label and description, and you can change them later in the tool's popover.
+5. Save the dialog.
+
+Each automation is listed with its project name, its configuration and the version it releases. Its ⋮ menu has **Edit Workflows** and **Delete**. Expand it to see its workflow tools. Each tool row has:
+
+- a **Configure** button, which opens the tool's properties popover. Set the **input mapping** there: fix a value, or let the agent fill it at call time with `fromAi(...)`. See [Supplying tool parameters with fromAi](/platform/automation/build/workflows/ai/agent#supplying-tool-parameters-with-fromai).
+- a switch that turns the tool on or off for the whole server.
+
+A tool is marked **Not available** while its configuration or workflow is off, or when the workflow has lost its **New Workflow Call** trigger.
+
+A connected user gets the tool only after they have activated the automation. When you later add workflows to an automation you already attached, only users who already have the server get them, switched on or off as the server is for them. Changing a tool's name, description or input mapping, or switching it off and on, adds no users.
+
+There are two separate switches:
+
+| Switch | What it controls |
+|---|---|
+| The automation's own switch | Only the automation's event triggers, such as a webhook or a schedule. |
+| The MCP switch | Whether the tool is offered to the user's AI agents. |
+
+The MCP switch is set in these places:
+
+- An admin sets it per server on the **MCP Servers** tab in [Connected Users](/platform/embedded/monitor/connected-users#user-details).
+- The connected user sets it once per automation, across all servers, with the public endpoint `POST /automation/workflows/{workflowUuid}/mcp/enable` (and `DELETE` to turn it off). The variant `/{externalUserId}/automation/workflows/{workflowUuid}/mcp/enable` does the same for a named external user.
+- The connected user sets it with the **Available to AI agents** switch in the SDK or the Automation Hub. The switch is shown only while an MCP server offers the automation: the tool is switched on for the server, and the configuration and its workflow are on.
+
+An automation whose only trigger is the workflow call is a **Tool only** automation. It shows only the **Available to AI agents** switch, and the connected user's **Automations** tab marks it **Tool only**.
+
+If you turn the workflow off in the configuration, the tool is removed for everyone.
+
+If the automation needs a connection the user has not set, the tool is still listed. Calling it returns `connection_required`, and the message tells the user to connect the app for the automation in your application. There is no setup link.
 
 ### Connect tab
 
@@ -130,13 +168,15 @@ A tool that needs a connection does not run until the ConnectedUser has connecte
 }
 ```
 
+This applies to component tools and integration workflow tools. An automation tool answers `connection_required` without a link: its message tells the user to connect the app for the automation in your application.
+
 The message asks the agent to show the link to the user as a markdown link labelled **Connect &lt;component&gt;** rather than as the raw URL. A host that renders tool results itself can read `setupUrl` directly, for example to show a Connect button.
 
 `setupUrl` opens ByteChef's hosted connect page, which shows the same [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) your app uses. Its token identifies the user, the integration and the environment, and is valid for 10 minutes. An expired link shows **Link Expired**, and the next call to the tool returns a fresh one. When the user closes the dialog, the page tells them they can close the tab and return to the application that sent them there.
 
 ### Which tools a user's agent sees
 
-Tools you switched off on the server are never listed. A workflow tool is listed only while its workflow is enabled in the instance configuration.
+Tools you switched off on the server are never listed. A workflow tool is listed only while its workflow is enabled in the instance configuration. An automation tool is listed only while its workflow is on in the automation configuration and the user has turned its MCP switch on (see [Exposing automations](#exposing-automations)).
 
 Before a user connects an integration, the server lists every remaining tool it exposes for that integration. Workflow tools, and component tools whose component needs a connection, return `connection_required` when called. A component tool that needs no connection runs directly.
 
