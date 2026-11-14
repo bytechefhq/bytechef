@@ -5,6 +5,7 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserSheetDeleteDropdownMenu from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetDeleteDropdownMenu';
 import ConnectedUserMcpServerComponentGroup from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerComponentGroup';
+import ConnectedUserMcpServerListItemAutomationRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemAutomationRow';
 import ConnectedUserMcpServerListItemToolRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemToolRow';
 import ConnectedUserMcpServerListItemWorkflowRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemWorkflowRow';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
@@ -27,7 +28,7 @@ const ConnectedUserMcpServerListItem = ({
 }: {
     connectedUserId: number;
     connectedUserIntegrationInstances: ConnectedUserIntegrationInstance[];
-    mcpServer: Omit<ConnectedUserMcpServer, 'automations'>;
+    mcpServer: ConnectedUserMcpServer;
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [open, setOpen] = useState(false);
@@ -52,7 +53,8 @@ const ConnectedUserMcpServerListItem = ({
 
     const toolCount = mcpServer.tools.length;
     const workflowCount = mcpServer.workflows.length;
-    const hasItems = toolCount > 0 || workflowCount > 0;
+    const automationCount = mcpServer.automations.length;
+    const hasItems = toolCount > 0 || workflowCount > 0 || automationCount > 0;
 
     const toolsByComponentName = useMemo(
         () => groupByComponent(mcpServer.tools, (tool) => tool.componentVersion),
@@ -117,6 +119,20 @@ const ConnectedUserMcpServerListItem = ({
                                 {workflowCount > 0 && (
                                     <span>
                                         {workflowCount === 1 ? '1 workflow tool' : `${workflowCount} workflow tools`}
+                                    </span>
+                                )}
+
+                                {(toolCount > 0 || workflowCount > 0) && automationCount > 0 && (
+                                    <span aria-hidden="true" className="mx-2">
+                                        -
+                                    </span>
+                                )}
+
+                                {automationCount > 0 && (
+                                    <span>
+                                        {automationCount === 1
+                                            ? '1 automation tool'
+                                            : `${automationCount} automation tools`}
                                     </span>
                                 )}
                             </div>
@@ -211,7 +227,25 @@ const ConnectedUserMcpServerListItem = ({
                         </div>
                     )}
 
-                    {toolCount === 0 && workflowCount === 0 && (
+                    {automationCount > 0 && (
+                        <div className="flex w-full flex-col gap-y-2 py-3 first:pt-1">
+                            <h3 className="flex justify-start px-3 text-sm font-semibold text-muted-foreground uppercase">
+                                Automation Tools
+                            </h3>
+
+                            <ul className="flex flex-col gap-2 px-3">
+                                {mcpServer.automations.map((automation) => (
+                                    <ConnectedUserMcpServerListItemAutomationRow
+                                        automation={automation}
+                                        connectedUserId={connectedUserId}
+                                        key={automation.id}
+                                    />
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+
+                    {!hasItems && (
                         <div className="px-3 py-3 text-sm text-muted-foreground">No tools enabled for this user.</div>
                     )}
                 </CollapsibleContent>

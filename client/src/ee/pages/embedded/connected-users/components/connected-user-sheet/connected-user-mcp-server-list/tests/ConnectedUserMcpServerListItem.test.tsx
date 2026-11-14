@@ -17,6 +17,8 @@ interface MutationOptionsI {
 const hoisted = vi.hoisted(() => ({
     deleteServerMutate: vi.fn(),
     deleteServerOptions: {} as {onSuccess?: () => void},
+    enableAutomationMutate: vi.fn(),
+    enableAutomationOptions: {} as {onSuccess?: () => void},
     enableServerMutate: vi.fn(),
     enableServerOptions: {} as {onSuccess?: () => void},
     enableToolMutate: vi.fn(),
@@ -31,6 +33,11 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
         hoisted.deleteServerOptions = options;
 
         return {isPending: false, mutate: hoisted.deleteServerMutate};
+    },
+    useEnableConnectedUserMcpAutomationMutation: (options: MutationOptionsI) => {
+        hoisted.enableAutomationOptions = options;
+
+        return {isPending: false, mutate: hoisted.enableAutomationMutate};
     },
     useEnableConnectedUserMcpServerMutation: (options: MutationOptionsI) => {
         hoisted.enableServerOptions = options;
@@ -103,6 +110,7 @@ vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
 const connectedUserIntegrationInstances = [{credentialStatus: 'VALID', id: 10}] as ConnectedUserIntegrationInstance[];
 
 const toolsOnlyMcpServer = {
+    automations: [],
     enabled: true,
     environmentId: '0',
     id: '1',
@@ -127,7 +135,7 @@ const toolsOnlyMcpServer = {
         },
     ],
     workflows: [],
-} as Omit<ConnectedUserMcpServer, 'automations'>;
+} as ConnectedUserMcpServer;
 
 const mixedMcpServer = {
     ...toolsOnlyMcpServer,
@@ -155,9 +163,37 @@ const mixedMcpServer = {
             workflowId: 'workflow-2',
         },
     ],
-} as Omit<ConnectedUserMcpServer, 'automations'>;
+} as ConnectedUserMcpServer;
 
-const renderListItem = (mcpServer: Omit<ConnectedUserMcpServer, 'automations'>, queryClient = new QueryClient()) =>
+const automationMcpServer = {
+    ...toolsOnlyMcpServer,
+    automations: [
+        {
+            automationName: 'Support Desk',
+            available: true,
+            connectedUserProjectWorkflowId: '31',
+            description: 'Escalates a ticket',
+            enabled: true,
+            id: '301',
+            lastExecutionDate: '2026-10-06T10:00:00Z',
+            name: 'Escalate Ticket',
+            workflowUuid: 'uuid-1',
+        },
+        {
+            automationName: 'Support Desk',
+            available: false,
+            connectedUserProjectWorkflowId: '32',
+            description: null,
+            enabled: false,
+            id: '302',
+            lastExecutionDate: null,
+            name: 'Close Ticket',
+            workflowUuid: 'uuid-2',
+        },
+    ],
+} as ConnectedUserMcpServer;
+
+const renderListItem = (mcpServer: ConnectedUserMcpServer, queryClient = new QueryClient()) =>
     render(
         <QueryClientProvider client={queryClient}>
             <TooltipProvider>
@@ -380,5 +416,103 @@ describe('ConnectedUserMcpServerListItem', () => {
         hoisted.enableWorkflowOptions.onSuccess?.();
 
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['connectedUserMcpServers']});
+    });
+
+    it('renders the automation group with a switch per automation', async () => {
+        renderListItem(automationMcpServer);
+
+        expect(screen.getByText('2 automation tools')).toBeInTheDocument();
+
+        await expandCard();
+
+        expect(screen.getByText('Automation Tools')).toBeInTheDocument();
+
+        const escalateRow = screen.getByText('Escalate Ticket').closest('li')!;
+        const closeRow = screen.getByText('Close Ticket').closest('li')!;
+
+        expect(within(escalateRow).getByRole('switch')).toBeChecked();
+        expect(within(closeRow).getByRole('switch')).not.toBeChecked();
+    });
+
+    it('greys out an unavailable automation and cannot switch it on', async () => {
+        renderListItem(automationMcpServer);
+
+        await expandCard();
+
+        const escalateRow = screen.getByText('Escalate Ticket').closest('li')!;
+        const closeRow = screen.getByText('Close Ticket').closest('li')!;
+
+        expect(closeRow.firstElementChild?.className).toContain('opacity-50');
+        expect(within(closeRow).getByRole('switch')).toBeDisabled();
+        expect(escalateRow.firstElementChild?.className).not.toContain('opacity-50');
+        expect(within(escalateRow).getByRole('switch')).toBeEnabled();
+    });
+
+    it('explains an unavailable automation as not available to this user', async () => {
+        renderListItem(automationMcpServer);
+
+        await expandCard();
+
+        await userEvent.hover(screen.getByText('Close Ticket'));
+
+        expect(await screen.findByRole('tooltip')).toHaveTextContent('Not available to this user');
+    });
+
+    it('explains the disabled switch of an unavailable automation as not available to this user', async () => {
+        renderListItem(automationMcpServer);
+
+        await expandCard();
+
+        const closeRow = screen.getByText('Close Ticket').closest('li')!;
+
+        await userEvent.hover(within(closeRow).getByRole('switch').parentElement!);
+
+        expect(await screen.findByRole('tooltip')).toHaveTextContent('Not available to this user');
+    });
+
+    it('toggles an automation with the enable MCP automation mutation only', async () => {
+        const queryClient = new QueryClient();
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        renderListItem(automationMcpServer, queryClient);
+
+        await expandCard();
+
+        const escalateRow = screen.getByText('Escalate Ticket').closest('li')!;
+
+        await userEvent.click(within(escalateRow).getByRole('switch'));
+
+        expect(hoisted.enableAutomationMutate).toHaveBeenCalledWith({
+            connectedUserId: '5',
+            enable: false,
+            id: '301',
+        });
+
+        hoisted.enableAutomationOptions.onSuccess?.();
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['connectedUserMcpServers']});
+        expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({queryKey: ['connectedUserProjects']});
+    });
+
+    it('lets an enabled but unavailable automation be switched off', async () => {
+        renderListItem({
+            ...automationMcpServer,
+            automations: [{...automationMcpServer.automations[1], enabled: true}],
+        });
+
+        await expandCard();
+
+        const closeRow = screen.getByText('Close Ticket').closest('li')!;
+        const closeSwitch = within(closeRow).getByRole('switch');
+
+        expect(closeSwitch).toBeEnabled();
+
+        await userEvent.click(closeSwitch);
+
+        expect(hoisted.enableAutomationMutate).toHaveBeenCalledWith({
+            connectedUserId: '5',
+            enable: false,
+            id: '302',
+        });
     });
 });

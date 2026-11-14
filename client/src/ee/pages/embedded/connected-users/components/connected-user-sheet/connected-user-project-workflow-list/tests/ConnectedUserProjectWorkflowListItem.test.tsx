@@ -74,6 +74,7 @@ const createConnectedUserProjectWorkflow = (
     lastExecutionDate: null,
     projectId: '0',
     staticWebhookUrl,
+    toolOnly: false,
     workflow: {
         id: 'be530417-2226-41d4-aae9-c4fc76f0791a',
         label: 'WhatsApp Agent - Human reply',
@@ -337,5 +338,20 @@ describe('ConnectedUserProjectWorkflowListItem', () => {
         renderListItem(createConnectedUserProjectWorkflow(null));
 
         expect(screen.queryByTestId('trigger-and-components-row')).not.toBeInTheDocument();
+    });
+
+    it('shows no own switch and a Tool only hint for a tool-only automation', () => {
+        renderListItem(createConnectedUserProjectWorkflow(null, {toolOnly: true}));
+
+        expect(screen.queryByRole('switch')).not.toBeInTheDocument();
+        expect(screen.getByText('Tool only')).toBeInTheDocument();
+        expect(screen.getByText('WhatsApp Agent - Human reply')).toBeInTheDocument();
+    });
+
+    it('keeps the own switch and no hint for a regular automation', () => {
+        renderListItem(createConnectedUserProjectWorkflow(null));
+
+        expect(screen.getByRole('switch')).toBeInTheDocument();
+        expect(screen.queryByText('Tool only')).not.toBeInTheDocument();
     });
 });

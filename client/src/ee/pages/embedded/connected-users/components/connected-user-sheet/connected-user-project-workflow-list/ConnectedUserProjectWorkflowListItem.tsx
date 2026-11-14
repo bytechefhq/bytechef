@@ -258,31 +258,46 @@ const ConnectedUserProjectWorkflowListItem = ({
                                     <TooltipContent side="left">Last Execution Date</TooltipContent>
                                 </Tooltip>
 
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <span className="relative flex items-center">
-                                            {enableConnectedUserProjectWorkflowMutation.isPending && (
-                                                <LoadingIcon className="absolute top-[3px] left-[-15px]" />
-                                            )}
+                                {connectedUserProjectWorkflow.toolOnly ? (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <span className="text-xs font-medium text-content-neutral-secondary">
+                                                Tool only
+                                            </span>
+                                        </TooltipTrigger>
 
-                                            <Switch
-                                                aria-label={`Enable ${connectedUserProjectWorkflow.workflow.label}`}
-                                                checked={
-                                                    connectedUserProjectWorkflow.enabled && !turnedOffByAdministrator
-                                                }
-                                                disabled={enableDisabled || turnedOffByAdministrator}
-                                                onCheckedChange={(value) => {
-                                                    enableConnectedUserProjectWorkflowMutation.mutate({
-                                                        enable: value,
-                                                        id: connectedUserProjectWorkflow.id,
-                                                    });
-                                                }}
-                                            />
-                                        </span>
-                                    </TooltipTrigger>
+                                        <TooltipContent side="left">
+                                            Runs only as an MCP tool, so it has no switch of its own
+                                        </TooltipContent>
+                                    </Tooltip>
+                                ) : (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <span className="relative flex items-center">
+                                                {enableConnectedUserProjectWorkflowMutation.isPending && (
+                                                    <LoadingIcon className="absolute top-[3px] left-[-15px]" />
+                                                )}
 
-                                    {enableTooltip && <TooltipContent side="left">{enableTooltip}</TooltipContent>}
-                                </Tooltip>
+                                                <Switch
+                                                    aria-label={`Enable ${connectedUserProjectWorkflow.workflow.label}`}
+                                                    checked={
+                                                        connectedUserProjectWorkflow.enabled &&
+                                                        !turnedOffByAdministrator
+                                                    }
+                                                    disabled={enableDisabled || turnedOffByAdministrator}
+                                                    onCheckedChange={(value) => {
+                                                        enableConnectedUserProjectWorkflowMutation.mutate({
+                                                            enable: value,
+                                                            id: connectedUserProjectWorkflow.id,
+                                                        });
+                                                    }}
+                                                />
+                                            </span>
+                                        </TooltipTrigger>
+
+                                        {enableTooltip && <TooltipContent side="left">{enableTooltip}</TooltipContent>}
+                                    </Tooltip>
+                                )}
                             </div>
                         </div>
 

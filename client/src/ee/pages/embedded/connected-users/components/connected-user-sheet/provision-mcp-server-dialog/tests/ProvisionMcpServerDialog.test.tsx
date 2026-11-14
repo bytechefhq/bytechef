@@ -27,36 +27,46 @@ vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
 
 const MCP_SERVERS = [
     {
+        coveredAutomationNames: [],
         coveredComponentNames: ['Slack', 'Jira'],
         id: '3',
+        missingAutomationNames: [],
         missingComponentNames: [],
         name: 'Full server',
         provisioned: false,
     },
     {
+        coveredAutomationNames: [],
         coveredComponentNames: ['Slack'],
         id: '4',
+        missingAutomationNames: [],
         missingComponentNames: ['Jira', 'Asana'],
         name: 'Partial server',
         provisioned: false,
     },
     {
+        coveredAutomationNames: [],
         coveredComponentNames: [],
         id: '5',
+        missingAutomationNames: [],
         missingComponentNames: ['Jira', 'Asana'],
         name: 'Uncovered server',
         provisioned: false,
     },
     {
+        coveredAutomationNames: [],
         coveredComponentNames: ['Slack'],
         id: '6',
+        missingAutomationNames: [],
         missingComponentNames: [],
         name: 'Existing server',
         provisioned: true,
     },
     {
+        coveredAutomationNames: [],
         coveredComponentNames: ['Jira'],
         id: '8',
+        missingAutomationNames: [],
         missingComponentNames: [],
         name: 'Last server',
         provisioned: false,
@@ -119,8 +129,10 @@ describe('ProvisionMcpServerDialog', () => {
             data: {
                 provisionableConnectedUserMcpServers: [
                     {
+                        coveredAutomationNames: [],
                         coveredComponentNames: ['googleMail'],
                         id: '9',
+                        missingAutomationNames: [],
                         missingComponentNames: ['unknownComponent'],
                         name: 'Google',
                         provisioned: false,
@@ -189,5 +201,32 @@ describe('ProvisionMcpServerDialog', () => {
         expect(invalidateQueries).toHaveBeenCalledWith({queryKey: ['provisionableConnectedUserMcpServers']});
         expect(invalidateQueries).toHaveBeenCalledWith({queryKey: ['connectedUsers', 7]});
         expect(onClose).toHaveBeenCalled();
+    });
+
+    it('lists the covered and missing automations of a server', () => {
+        hoisted.provisionableQuery.mockReturnValue({
+            data: {
+                provisionableConnectedUserMcpServers: [
+                    {
+                        coveredAutomationNames: ['Support Desk'],
+                        coveredComponentNames: [],
+                        id: '10',
+                        missingAutomationNames: ['Billing', 'Onboarding'],
+                        missingComponentNames: [],
+                        name: 'Automation server',
+                        provisioned: false,
+                    },
+                ],
+            },
+        });
+
+        renderDialog();
+
+        expect(
+            screen.getByText(
+                'Uses the Support Desk automation. Its Billing and Onboarding automations stay hidden until this user has them; add them on the Automations tab.'
+            )
+        ).toBeInTheDocument();
+        expect(screen.getByRole('radio', {name: /Automation server/})).toBeEnabled();
     });
 });

@@ -68,6 +68,7 @@ const createConnectedUserProjectWorkflow = (
     lastExecutionDate: null,
     projectId: '0',
     staticWebhookUrl: null,
+    toolOnly: false,
     workflow: {id: `workflow-${id}`, label, triggers: []},
     workflowUuid: `uuid-${id}`,
     workflowVersion: 1,
