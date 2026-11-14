@@ -1,4 +1,4 @@
-import {act, renderHook} from '@testing-library/react';
+import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import useMcpIntegrationWorkflowsForm from '../useMcpIntegrationWorkflowsForm';
@@ -102,7 +102,6 @@ describe('useMcpIntegrationWorkflowsForm', () => {
             expect(hoisted.useGetIntegrationInstanceConfigurationQuery.mock.lastCall?.[1]).toBe(false);
             expect(hoisted.useGetIntegrationVersionWorkflowsQuery).toHaveBeenLastCalledWith(0, 0, true, false);
             expect(result.current.workflows).toBeUndefined();
-            expect(result.current.componentName).toBeUndefined();
         });
     });
 
@@ -111,116 +110,36 @@ describe('useMcpIntegrationWorkflowsForm', () => {
             const {result} = renderWorkflowsForm({eligibleWorkflowIds, integrationInstanceConfigurationId: '44'});
 
             expect(result.current.workflows).toEqual([workflowA, workflowB]);
-            expect(result.current.componentName).toBe('hubspot');
         });
 
         it('is undefined until the eligible workflow ids are known', () => {
             const {result} = renderWorkflowsForm({integrationInstanceConfigurationId: '44'});
 
             expect(result.current.workflows).toBeUndefined();
-            expect(result.current.form.getValues('integrationInstanceConfigurationWorkflows')).toEqual([]);
         });
     });
 
-    describe('form initialization', () => {
-        it('initializes each workflow with its configurable connections and saved values', () => {
-            const {result} = renderWorkflowsForm({eligibleWorkflowIds, integrationInstanceConfigurationId: '44'});
-
-            expect(result.current.form.getValues('integrationInstanceConfigurationWorkflows')).toEqual([
-                {
-                    connections: [
-                        {connectionId: 501, workflowConnectionKey: 'slack', workflowNodeName: 'slack_1'},
-                        {workflowConnectionKey: 'github', workflowNodeName: 'trigger_1'},
+    describe('enabledWorkflowIds', () => {
+        it('lists the workflows turned on in the configuration', () => {
+            hoisted.useGetIntegrationInstanceConfigurationQuery.mockReturnValue({
+                data: {
+                    ...integrationInstanceConfiguration,
+                    integrationInstanceConfigurationWorkflows: [
+                        {enabled: true, workflowId: 'workflow-a'},
+                        {enabled: false, workflowId: 'workflow-b'},
                     ],
-                    inputs: {channel: '#general'},
-                    workflowId: 'workflow-a',
                 },
-                {connections: [], inputs: {}, workflowId: 'workflow-b'},
-            ]);
-        });
-
-        it('keeps user edits when re-rendered with the same workflows', () => {
-            const {rerender, result} = renderWorkflowsForm({
-                eligibleWorkflowIds,
-                integrationInstanceConfigurationId: '44',
             });
-
-            act(() => {
-                result.current.form.setValue('integrationInstanceConfigurationWorkflows.1.inputs', {limit: 5});
-            });
-
-            rerender({eligibleWorkflowIds: [...eligibleWorkflowIds], integrationInstanceConfigurationId: '44'});
-
-            expect(result.current.form.getValues('integrationInstanceConfigurationWorkflows.1.inputs')).toEqual({
-                limit: 5,
-            });
-        });
-
-        it('reinitializes when the eligible workflows change', () => {
-            const {rerender, result} = renderWorkflowsForm({
-                eligibleWorkflowIds,
-                integrationInstanceConfigurationId: '44',
-            });
-
-            rerender({eligibleWorkflowIds: ['workflow-b'], integrationInstanceConfigurationId: '44'});
-
-            expect(result.current.form.getValues('integrationInstanceConfigurationWorkflows')).toEqual([
-                {connections: [], inputs: {}, workflowId: 'workflow-b'},
-            ]);
-        });
-    });
-
-    describe('getWorkflowConfigurations', () => {
-        it('builds the configuration of each selected workflow from the form', () => {
-            const {result} = renderWorkflowsForm({eligibleWorkflowIds, integrationInstanceConfigurationId: '44'});
-
-            act(() => {
-                result.current.form.setValue(
-                    'integrationInstanceConfigurationWorkflows.0.connections.1.connectionId',
-                    777
-                );
-            });
-
-            expect(result.current.getWorkflowConfigurations(['workflow-b', 'workflow-a'])).toEqual([
-                {connections: [], inputs: {}, workflowId: 'workflow-b'},
-                {
-                    connections: [
-                        {connectionId: '501', workflowConnectionKey: 'slack', workflowNodeName: 'slack_1'},
-                        {connectionId: '777', workflowConnectionKey: 'github', workflowNodeName: 'trigger_1'},
-                    ],
-                    inputs: {channel: '#general'},
-                    workflowId: 'workflow-a',
-                },
-            ]);
-        });
-
-        it('skips connections without a numeric connection id', () => {
-            const {result} = renderWorkflowsForm({eligibleWorkflowIds, integrationInstanceConfigurationId: '44'});
-
-            act(() => {
-                result.current.form.setValue(
-                    'integrationInstanceConfigurationWorkflows.0.connections.0.connectionId',
-                    'abc' as unknown as number
-                );
-            });
-
-            expect(result.current.getWorkflowConfigurations(['workflow-a'])).toEqual([
-                {connections: [], inputs: {channel: '#general'}, workflowId: 'workflow-a'},
-            ]);
-        });
-
-        it('skips workflows that are not eligible', () => {
-            const {result} = renderWorkflowsForm({eligibleWorkflowIds, integrationInstanceConfigurationId: '44'});
-
-            expect(result.current.getWorkflowConfigurations(['workflow-c', 'unknown'])).toEqual([]);
-        });
-
-        it('returns nothing while the workflows are loading', () => {
-            hoisted.useGetIntegrationVersionWorkflowsQuery.mockReturnValue({data: undefined});
 
             const {result} = renderWorkflowsForm({eligibleWorkflowIds, integrationInstanceConfigurationId: '44'});
 
-            expect(result.current.getWorkflowConfigurations(['workflow-a'])).toEqual([]);
+            expect(result.current.enabledWorkflowIds).toEqual(['workflow-a']);
+        });
+
+        it('does not expose connections or inputs', () => {
+            const {result} = renderWorkflowsForm({eligibleWorkflowIds, integrationInstanceConfigurationId: '44'});
+
+            expect(Object.keys(result.current).sort()).toEqual(['enabledWorkflowIds', 'workflows']);
         });
     });
 });

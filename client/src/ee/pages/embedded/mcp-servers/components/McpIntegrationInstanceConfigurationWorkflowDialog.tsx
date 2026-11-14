@@ -72,13 +72,7 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
         [eligibleWorkflows]
     );
 
-    const {
-        componentName,
-        enabledWorkflowIds,
-        form: workflowsForm,
-        getWorkflowConfigurations,
-        workflows,
-    } = useMcpIntegrationWorkflowsForm({
+    const {enabledWorkflowIds, workflows} = useMcpIntegrationWorkflowsForm({
         eligibleWorkflowIds,
         integrationInstanceConfigurationId: currentIntegrationInstanceConfigurationId,
     });
@@ -155,14 +149,11 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
     const saveMcpIntegrationInstanceConfiguration = () => {
         const formValues = getValues();
 
-        const workflowConfigurations = getWorkflowConfigurations(formValues.selectedWorkflowIds);
-
         if (isEditMode) {
             updateMcpIntegrationInstanceConfigurationMutation.mutate({
                 id: mcpIntegrationInstanceConfiguration.id,
                 input: {
                     selectedWorkflowIds: formValues.selectedWorkflowIds,
-                    workflowConfigurations,
                 },
             });
         } else {
@@ -171,19 +162,12 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
                     integrationInstanceConfigurationId: formValues.integrationInstanceConfigurationId,
                     mcpServerId: formValues.mcpServerId,
                     selectedWorkflowIds: formValues.selectedWorkflowIds,
-                    workflowConfigurations,
                 },
             });
         }
     };
 
     const handleComplete = async () => {
-        const workflowsValid = await workflowsForm.trigger();
-
-        if (!workflowsValid) {
-            return;
-        }
-
         await handleSubmit(saveMcpIntegrationInstanceConfiguration)();
     };
 
@@ -303,9 +287,7 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
                 workflowsList={
                     workflows && (
                         <McpIntegrationWorkflowsList
-                            componentName={componentName ?? ''}
                             enabledWorkflowIds={enabledWorkflowIds}
-                            form={workflowsForm}
                             onSelectedWorkflowIdsChange={handleSelectedWorkflowIdsChange}
                             selectedWorkflowIds={selectedWorkflowIds}
                             workflows={workflows}
