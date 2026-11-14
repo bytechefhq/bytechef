@@ -35,7 +35,9 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
@@ -56,17 +58,22 @@ public class DataTableUpdateRecordsAction {
 
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
-        return new DataTableUpdateRecordsAction(dataTableService, dataTableRowService).build();
+        return new DataTableUpdateRecordsAction(dataTableService, dataTableRowService, dataTableWorkspaceResolver)
+            .build();
     }
 
-    private DataTableUpdateRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    private DataTableUpdateRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -78,15 +85,16 @@ public class DataTableUpdateRecordsAction {
                     .label("Table")
                     .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
-                DataTableUtils.conditionsProperty(dataTableService)
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, dataTableWorkspaceResolver)),
+                DataTableUtils.conditionsProperty(dataTableService, dataTableWorkspaceResolver)
                     .description(
                         "OR Condition array that contains AND Condition arrays. Every record that meets every " +
                             "condition of at least one AND Condition is updated.")
                     .required(true),
                 dynamicProperties(VALUES)
                     .propertiesLookupDependsOn(TABLE)
-                    .properties(DataTableUtils.createDynamicProperties(dataTableService, true))
+                    .properties(
+                        DataTableUtils.createDynamicProperties(dataTableService, dataTableWorkspaceResolver, true))
                     .required(true))
             .output(this::output)
             .help("", "https://docs.bytechef.io/reference/components/data-table_v1#update-records")
@@ -97,9 +105,14 @@ public class DataTableUpdateRecordsAction {
     private OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
 
-        var rowSchema = DataTableUtils.rowObjectSchema(dataTableService, DEVELOPMENT, baseName);
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, actionContext);
+
+        DataTableInfo dataTableInfo = DataTableUtils.resolveDataTable(
+            dataTableService, workspaceId, name, DEVELOPMENT.ordinal());
+
+        var rowSchema = DataTableUtils.rowObjectSchema(dataTableInfo);
 
         var outputSchema = object()
             .properties(
@@ -109,7 +122,7 @@ public class DataTableUpdateRecordsAction {
                     .label("Records")
                     .items((Property.ValueProperty<?>) rowSchema));
 
-        List<DataTableRow> rows = dataTableRowService.listRows(baseName, 1, 0, DEVELOPMENT.ordinal());
+        List<DataTableRow> rows = dataTableRowService.listRows(dataTableInfo.id(), 1, 0, DEVELOPMENT.ordinal());
 
         if (rows.isEmpty()) {
             return OutputResponse.of(outputSchema);
@@ -118,7 +131,7 @@ public class DataTableUpdateRecordsAction {
         DataTableRow firstRow = rows.getFirst();
 
         Map<String, Object> sampleRecord = DataTableUtils.createSampleOutput(
-            dataTableService, DEVELOPMENT, baseName, firstRow.id(), firstRow.values());
+            dataTableInfo, firstRow.id(), firstRow.values());
 
         return OutputResponse.of(outputSchema, Map.of(UPDATED_COUNT, 1, RECORDS, List.of(sampleRecord)));
     }
@@ -131,7 +144,10 @@ public class DataTableUpdateRecordsAction {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
+
+        long dataTableId = DataTableUtils.resolveDataTableId(
+            dataTableService, dataTableWorkspaceResolver, actionContext, name);
         long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
         Map<String, Object> values = (Map<String, Object>) inputParameters.getRequired(VALUES, Map.class);
 
@@ -146,7 +162,7 @@ public class DataTableUpdateRecordsAction {
         }
 
         List<DataTableRow> updatedDataTableRows = dataTableRowService.updateRows(
-            baseName, conditions, values, environmentId);
+            dataTableId, conditions, values, environmentId);
 
         Map<String, Object> result = new HashMap<>();
 

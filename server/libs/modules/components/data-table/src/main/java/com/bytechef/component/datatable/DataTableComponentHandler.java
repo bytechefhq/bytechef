@@ -37,6 +37,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.facade.DataTableRowFacade;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import org.springframework.stereotype.Component;
@@ -53,10 +54,12 @@ public class DataTableComponentHandler implements ComponentHandler {
 
     public DataTableComponentHandler(
         DataTableService dataTableService, DataTableRowFacade dataTableRowFacade,
-        DataTableRowService dataTableRowService, DataTableWebhookService dataTableWebhookService) {
+        DataTableRowService dataTableRowService, DataTableWebhookService dataTableWebhookService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
         this.componentDefinition = new DataTableComponentDefinitionImpl(
-            dataTableService, dataTableRowFacade, dataTableRowService, dataTableWebhookService);
+            dataTableService, dataTableRowFacade, dataTableRowService, dataTableWebhookService,
+            dataTableWorkspaceResolver);
     }
 
     @Override
@@ -68,26 +71,34 @@ public class DataTableComponentHandler implements ComponentHandler {
 
         public DataTableComponentDefinitionImpl(
             DataTableService dataTableService, DataTableRowFacade dataTableRowFacade,
-            DataTableRowService dataTableRowService, DataTableWebhookService dataTableWebhookService) {
+            DataTableRowService dataTableRowService, DataTableWebhookService dataTableWebhookService,
+            DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
-            super(buildDefinition(dataTableService, dataTableRowFacade, dataTableRowService, dataTableWebhookService));
+            super(
+                buildDefinition(
+                    dataTableService, dataTableRowFacade, dataTableRowService, dataTableWebhookService,
+                    dataTableWorkspaceResolver));
         }
 
         private static ComponentDefinition buildDefinition(
             DataTableService dataTableService, DataTableRowFacade dataTableRowFacade,
-            DataTableRowService dataTableRowService, DataTableWebhookService dataTableWebhookService) {
+            DataTableRowService dataTableRowService, DataTableWebhookService dataTableWebhookService,
+            DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
             ActionDefinition createRecordsAction = DataTableCreateRecordsAction.of(
-                dataTableService, dataTableRowService);
+                dataTableService, dataTableRowService, dataTableWorkspaceResolver);
             ActionDefinition deleteRecordsAction = DataTableDeleteRecordsAction.of(
-                dataTableService, dataTableRowService);
+                dataTableService, dataTableRowService, dataTableWorkspaceResolver);
             ActionDefinition updateRecordAction = DataTableUpdateRecordAction.of(
-                dataTableService, dataTableRowFacade, dataTableRowService);
+                dataTableService, dataTableRowFacade, dataTableRowService, dataTableWorkspaceResolver);
             ActionDefinition updateRecordsAction = DataTableUpdateRecordsAction.of(
-                dataTableService, dataTableRowService);
-            ActionDefinition getRecordAction = DataTableGetRecordAction.of(dataTableService, dataTableRowService);
-            ActionDefinition findRecordsAction = DataTableFindRecordsAction.of(dataTableService, dataTableRowService);
-            ActionDefinition clearTableAction = DataTableClearTableAction.of(dataTableService, dataTableRowService);
+                dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+            ActionDefinition getRecordAction = DataTableGetRecordAction.of(
+                dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+            ActionDefinition findRecordsAction = DataTableFindRecordsAction.of(
+                dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+            ActionDefinition clearTableAction = DataTableClearTableAction.of(
+                dataTableService, dataTableRowService, dataTableWorkspaceResolver);
 
             return component(DATA_TABLE)
                 .title("Data Table")
@@ -111,9 +122,12 @@ public class DataTableComponentHandler implements ComponentHandler {
                     tool(findRecordsAction),
                     tool(clearTableAction))
                 .triggers(
-                    DataTableRecordCreatedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService),
-                    DataTableRecordUpdatedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService),
-                    DataTableRecordDeletedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService));
+                    DataTableRecordCreatedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService, dataTableWorkspaceResolver),
+                    DataTableRecordUpdatedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService, dataTableWorkspaceResolver),
+                    DataTableRecordDeletedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService, dataTableWorkspaceResolver));
         }
     }
 }

@@ -34,7 +34,9 @@ final class DataTableModelMapper {
 
     static DataTableModel toModel(DataTableInfo dataTableInfo, List<Tag> tags) {
         return new DataTableModel()
-            .name(dataTableInfo.baseName())
+            .id(dataTableInfo.id())
+            .workspaceId(dataTableInfo.workspaceId())
+            .name(dataTableInfo.name())
             .description(dataTableInfo.description())
             .columns(dataTableInfo.columns()
                 .stream()

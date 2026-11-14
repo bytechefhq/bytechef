@@ -18,7 +18,6 @@ package com.bytechef.component.datatable.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -42,18 +41,18 @@ import org.junit.jupiter.api.Test;
 class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
 
     private final ModifiableActionDefinition actionDefinition = DataTableDeleteRecordsAction.of(
-        dataTableService, dataTableRowService);
+        dataTableService, dataTableRowService, dataTableWorkspaceResolver);
 
     @Test
     void testPerformDeletesByRecordIdsByDefaultInOneStatement() throws Exception {
-        when(dataTableRowService.deleteRows("conversations", idsCondition(1L, 2L), 1L))
+        when(dataTableRowService.deleteRows(DATA_TABLE_ID, idsCondition(1L, 2L), 1L))
             .thenReturn(List.of(new DataTableRow(1, Map.of())));
 
         assertEquals(
             Map.of("deletedCount", 1, "deletedIds", List.of(1L)),
             perform(actionDefinition, Map.of("table", "conversations", "ids", List.of(1, "2", 1.0))));
 
-        verify(dataTableRowService, never()).deleteRow(any(), anyLong(), anyLong());
+        verify(dataTableRowService, never()).deleteRow(anyLong(), anyLong(), anyLong());
     }
 
     @Test
@@ -70,7 +69,7 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
         DataTableRowConditions conditions = DataTableRowConditions.of(
             List.of(new DataTableRowFilter("status", Operation.EQUALS, "CLOSED")));
 
-        when(dataTableRowService.deleteRows("conversations", conditions, 1L))
+        when(dataTableRowService.deleteRows(DATA_TABLE_ID, conditions, 1L))
             .thenReturn(List.of(new DataTableRow(3, Map.of()), new DataTableRow(4, Map.of())));
 
         assertEquals(
@@ -82,7 +81,7 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
                     "deleteBy", "CONDITIONS",
                     "conditions", List.of(List.of(Map.of("column", "status", "value", "CLOSED"))))));
 
-        verify(dataTableRowService, never()).deleteRow(any(), anyLong(), anyLong());
+        verify(dataTableRowService, never()).deleteRow(anyLong(), anyLong(), anyLong());
     }
 
     @Test
@@ -90,7 +89,7 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
         DataTableRowConditions conditions = DataTableRowConditions.of(
             List.of(new DataTableRowFilter("status", Operation.EQUALS, "CLOSED")));
 
-        when(dataTableRowService.deleteRows("conversations", conditions, 1L))
+        when(dataTableRowService.deleteRows(DATA_TABLE_ID, conditions, 1L))
             .thenReturn(List.of(new DataTableRow(3, Map.of())));
 
         Map<String, Object> conditionsParameter = Map.of(
@@ -111,7 +110,7 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
         DataTableRowConditions conditions = DataTableRowConditions.of(
             List.of(new DataTableRowFilter("status", Operation.EQUALS, "CLOSED")));
 
-        when(dataTableRowService.deleteRows("conversations", conditions, 1L))
+        when(dataTableRowService.deleteRows(DATA_TABLE_ID, conditions, 1L))
             .thenReturn(List.of(new DataTableRow(3, Map.of())));
 
         assertEquals(
@@ -124,12 +123,12 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
                     "ids", List.of(7),
                     "conditions", List.of(List.of(Map.of("column", "status", "value", "CLOSED"))))));
 
-        verify(dataTableRowService, never()).deleteRows("conversations", idsCondition(7L), 1L);
+        verify(dataTableRowService, never()).deleteRows(DATA_TABLE_ID, idsCondition(7L), 1L);
     }
 
     @Test
     void testPerformDeletesByRecordIdsWhenDeleteByIsIdsAndConditionsAreAlsoGiven() throws Exception {
-        when(dataTableRowService.deleteRows("conversations", idsCondition(7L), 1L))
+        when(dataTableRowService.deleteRows(DATA_TABLE_ID, idsCondition(7L), 1L))
             .thenReturn(List.of(new DataTableRow(7, Map.of())));
 
         assertEquals(
@@ -142,12 +141,12 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
                     "ids", List.of(7),
                     "conditions", List.of(List.of(Map.of("column", "status", "value", "CLOSED"))))));
 
-        verify(dataTableRowService, never()).deleteRow(any(), anyLong(), anyLong());
+        verify(dataTableRowService, never()).deleteRow(anyLong(), anyLong(), anyLong());
     }
 
     @Test
     void testPerformDeletesByRecordIdsWhenConditionsAreEmptyWithoutDeleteBy() throws Exception {
-        when(dataTableRowService.deleteRows("conversations", idsCondition(7L), 1L))
+        when(dataTableRowService.deleteRows(DATA_TABLE_ID, idsCondition(7L), 1L))
             .thenReturn(List.of(new DataTableRow(7, Map.of())));
 
         Map<String, Object> idsParameters = Map.of("table", "conversations", "ids", List.of(7));
@@ -271,5 +270,15 @@ class DataTableDeleteRecordsActionTest extends AbstractDataTableActionTest {
         merged.putAll(second);
 
         return merged;
+    }
+
+    @Override
+    protected ModifiableActionDefinition createActionDefinition() {
+        return actionDefinition;
+    }
+
+    @Override
+    protected Map<String, Object> createInputParameters(String tableName) {
+        return Map.of("table", tableName, "ids", List.of(1));
     }
 }

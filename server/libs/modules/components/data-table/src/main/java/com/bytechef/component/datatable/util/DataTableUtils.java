@@ -36,25 +36,34 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import static com.bytechef.platform.configuration.domain.Environment.DEVELOPMENT;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
-import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.TriggerContextAware;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation.Arity;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,6 +73,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalLong;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.Nullable;
@@ -76,47 +86,38 @@ import org.jspecify.annotations.Nullable;
 public final class DataTableUtils {
 
     private static final List<String> CONDITION_KEYS = List.of(COLUMN, OPERATION, VALUE, VALUE_TO, VALUES);
+    private static final String UNRESOLVED_WORKSPACE = "Unable to determine the workspace of this workflow";
 
     private DataTableUtils() {
     }
 
-    /**
-     * Returns an OptionsFunction for action table selection dropdowns.
-     *
-     * @param dataTableService the data table service
-     * @return an OptionsFunction that provides table options
-     */
-    public static ActionDefinition.OptionsFunction<String> getActionTableOptions(DataTableService dataTableService) {
+    public static ActionDefinition.OptionsFunction<String> getActionTableOptions(
+        DataTableService dataTableService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
+
         return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> getTableOptions(
-            searchText, dataTableService);
+            searchText, dataTableService, resolveWorkspaceId(dataTableWorkspaceResolver, context));
     }
 
-    /**
-     * Returns an OptionsFunction for trigger table selection dropdowns.
-     *
-     * @param dataTableService the data table service
-     * @return an OptionsFunction that provides table options
-     */
-    public static TriggerDefinition.OptionsFunction<String> getTriggerTableOptions(DataTableService dataTableService) {
+    public static TriggerDefinition.OptionsFunction<String> getTriggerTableOptions(
+        DataTableService dataTableService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
+
         return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> getTableOptions(
-            searchText, dataTableService);
+            searchText, dataTableService, resolveWorkspaceId(dataTableWorkspaceResolver, context));
     }
 
-    /**
-     * Returns an OptionsFunction listing the columns, including id, of the table selected in the table property.
-     *
-     * @param dataTableService the data table service
-     * @return an OptionsFunction that provides column options
-     */
-    public static ActionDefinition.OptionsFunction<String> getActionColumnOptions(DataTableService dataTableService) {
+    public static ActionDefinition.OptionsFunction<String> getActionColumnOptions(
+        DataTableService dataTableService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
+
         return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> {
-            String baseName = inputParameters.getString(TABLE);
+            String name = inputParameters.getString(TABLE);
 
-            if (baseName == null || baseName.isBlank()) {
+            if (name == null || name.isBlank()) {
                 return List.of();
             }
 
-            DataTableInfo dataTableInfo = getDataTableInfo(dataTableService, baseName, DEVELOPMENT.ordinal());
+            DataTableInfo dataTableInfo = getDataTableInfo(
+                dataTableService, resolveWorkspaceId(dataTableWorkspaceResolver, context), name,
+                DEVELOPMENT.ordinal());
 
             List<Option<String>> columnNames = new ArrayList<>();
 
@@ -138,13 +139,9 @@ public final class DataTableUtils {
         };
     }
 
-    /**
-     * Creates the OR Conditions property shared by the actions that select records by condition.
-     *
-     * @param dataTableService the data table service
-     * @return the conditions property
-     */
-    public static ModifiableArrayProperty conditionsProperty(DataTableService dataTableService) {
+    public static ModifiableArrayProperty conditionsProperty(
+        DataTableService dataTableService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
+
         return array(CONDITIONS)
             .label("OR Conditions")
             .placeholder("Add OR Condition")
@@ -161,7 +158,7 @@ public final class DataTableUtils {
                                 string(COLUMN)
                                     .label("Column")
                                     .description("The column to compare.")
-                                    .options(getActionColumnOptions(dataTableService))
+                                    .options(getActionColumnOptions(dataTableService, dataTableWorkspaceResolver))
                                     .optionsLookupDependsOn(TABLE)
                                     .required(true),
                                 string(OPERATION)
@@ -308,58 +305,113 @@ public final class DataTableUtils {
         }
     }
 
-    public static List<Option<String>> getTableOptions(String searchText, DataTableService dataTableService) {
-        List<DataTableInfo> dataTableInfos = dataTableService.listTables(DEVELOPMENT.ordinal());
+    public static long resolveWorkspaceId(
+        DataTableWorkspaceResolver dataTableWorkspaceResolver, ActionContext actionContext) {
 
-        return dataTableInfos.stream()
-            .filter(
-                dataTableInfo -> searchText == null || dataTableInfo.baseName()
-                    .toLowerCase()
-                    .contains(searchText.toLowerCase()))
-            .<Option<String>>map(
-                dataTableInfo -> option(dataTableInfo.baseName(), dataTableInfo.baseName(),
-                    dataTableInfo.description()))
-            .toList();
+        if (!(actionContext instanceof ActionContextAware actionContextAware)) {
+            throw new IllegalStateException(UNRESOLVED_WORKSPACE);
+        }
+
+        OptionalLong workspaceId = resolveByWorkflowId(dataTableWorkspaceResolver, actionContextAware.getWorkflowId());
+
+        if (workspaceId.isPresent()) {
+            return workspaceId.getAsLong();
+        }
+
+        Long jobPrincipalId = actionContextAware.getJobPrincipalId();
+        PlatformType platformType = actionContextAware.getPlatformType();
+
+        if (jobPrincipalId != null && platformType != null) {
+            workspaceId = dataTableWorkspaceResolver.resolveByJobPrincipalId(jobPrincipalId, platformType);
+
+            if (workspaceId.isPresent()) {
+                return workspaceId.getAsLong();
+            }
+        }
+
+        throw new IllegalStateException(UNRESOLVED_WORKSPACE);
     }
 
-    /**
-     * Fetches a DataTableInfo by base name and environment ID.
-     *
-     * @param dataTableService the data table service
-     * @param baseName         the table base name
-     * @param environmentId    the environment ID
-     * @return the DataTableInfo if found, null otherwise
-     */
+    public static long resolveWorkspaceId(
+        DataTableWorkspaceResolver dataTableWorkspaceResolver, TriggerContext triggerContext) {
+
+        if (!(triggerContext instanceof TriggerContextAware triggerContextAware)) {
+            throw new IllegalStateException(UNRESOLVED_WORKSPACE);
+        }
+
+        OptionalLong workspaceId = resolveByWorkflowId(
+            dataTableWorkspaceResolver, triggerContextAware.getWorkflowId());
+
+        return workspaceId.orElseThrow(() -> new IllegalStateException(UNRESOLVED_WORKSPACE));
+    }
+
+    public static long resolveWorkspaceId(
+        DataTableWorkspaceResolver dataTableWorkspaceResolver, String workflowExecutionId) {
+
+        WorkflowExecutionId parsedWorkflowExecutionId = WorkflowExecutionId.parse(workflowExecutionId);
+
+        long jobPrincipalId = parsedWorkflowExecutionId.getJobPrincipalId();
+
+        OptionalLong workspaceId = jobPrincipalId > 0
+            ? dataTableWorkspaceResolver.resolveByJobPrincipalId(jobPrincipalId, parsedWorkflowExecutionId.getType())
+            : dataTableWorkspaceResolver.resolveByWorkflowUuid(parsedWorkflowExecutionId.getWorkflowUuid());
+
+        return workspaceId.orElseThrow(() -> new IllegalStateException(UNRESOLVED_WORKSPACE));
+    }
+
+    public static DataTableInfo resolveDataTable(
+        DataTableService dataTableService, long workspaceId, String name, long environmentId) {
+
+        DataTable dataTable = dataTableService.fetchDataTable(workspaceId, name)
+            .orElseThrow(() -> createNotFoundException(name));
+
+        return dataTableService.fetchDataTableInfo(dataTable.getId(), environmentId)
+            .orElseThrow(() -> createNotFoundException(name));
+    }
+
+    public static long resolveDataTableId(
+        DataTableService dataTableService, DataTableWorkspaceResolver dataTableWorkspaceResolver,
+        ActionContext actionContext, String name) {
+
+        ActionContextAware actionContextAware = (ActionContextAware) actionContext;
+
+        long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
+
+        DataTableInfo dataTableInfo = resolveDataTable(
+            dataTableService, resolveWorkspaceId(dataTableWorkspaceResolver, actionContext), name, environmentId);
+
+        return dataTableInfo.id();
+    }
+
     @Nullable
     public static DataTableInfo getDataTableInfo(
-        DataTableService dataTableService, String baseName, long environmentId) {
+        DataTableService dataTableService, long workspaceId, String name, long environmentId) {
 
-        List<DataTableInfo> dataTableInfos = dataTableService.listTables(environmentId);
-
-        return dataTableInfos.stream()
-            .filter(dataTableInfo -> {
-                String curBaseName = dataTableInfo.baseName();
-
-                return curBaseName.equalsIgnoreCase(baseName);
-            })
-            .findFirst()
+        return dataTableService.fetchDataTable(workspaceId, name)
+            .flatMap(dataTable -> dataTableService.fetchDataTableInfo(dataTable.getId(), environmentId))
             .orElse(null);
     }
 
-    /**
-     * Creates a OutputResponse for a data table trigger, including schema and sample data from the first row.
-     *
-     * @param dataTableRowService the data table row service
-     * @param dataTableService    the data table service
-     * @param baseName            the table base name
-     * @return an OutputResponse with schema and optional sample data
-     */
+    public static List<Option<String>> getTableOptions(
+        @Nullable String searchText, DataTableService dataTableService, long workspaceId) {
+
+        List<DataTableInfo> dataTableInfos = dataTableService.listTables(workspaceId, DEVELOPMENT.ordinal());
+
+        return dataTableInfos.stream()
+            .filter(dataTableInfo -> searchText == null || Strings.CI.contains(dataTableInfo.name(), searchText))
+            .<Option<String>>map(
+                dataTableInfo -> option(dataTableInfo.name(), dataTableInfo.name(), dataTableInfo.description()))
+            .toList();
+    }
+
     public static OutputResponse createTriggerOutputResponse(
-        DataTableRowService dataTableRowService, DataTableService dataTableService, String baseName) {
+        DataTableRowService dataTableRowService, DataTableService dataTableService, long workspaceId, String name) {
 
-        BaseValueProperty<?> rowSchema = rowObjectSchema(dataTableService, DEVELOPMENT, baseName);
+        DataTableInfo dataTableInfo = resolveDataTable(dataTableService, workspaceId, name, DEVELOPMENT.ordinal());
 
-        List<DataTableRow> rows = dataTableRowService.listRows(baseName, 1, 0, DEVELOPMENT.ordinal());
+        BaseValueProperty<?> rowSchema = rowObjectSchema(dataTableInfo);
+
+        List<DataTableRow> rows = dataTableRowService.listRows(dataTableInfo.id(), 1, 0, DEVELOPMENT.ordinal());
 
         if (rows.isEmpty()) {
             return OutputResponse.of(rowSchema);
@@ -367,17 +419,12 @@ public final class DataTableUtils {
 
         DataTableRow firstRow = rows.getFirst();
 
-        Map<String, Object> sampleOutput = createSampleOutput(
-            dataTableService, DEVELOPMENT, baseName, firstRow.id(), firstRow.values());
+        Map<String, Object> sampleOutput = createSampleOutput(dataTableInfo, firstRow.id(), firstRow.values());
 
         return OutputResponse.of(rowSchema, sampleOutput);
     }
 
-    public static BaseValueProperty<?> rowObjectSchema(
-        DataTableService dataTableService, Environment environment, String baseName) {
-
-        DataTableInfo dataTableInfo = getDataTableInfo(dataTableService, baseName, environment.ordinal());
-
+    public static BaseValueProperty<?> rowObjectSchema(@Nullable DataTableInfo dataTableInfo) {
         List<Property.ValueProperty<?>> properties = new ArrayList<>();
 
         properties.add(integer("id").label("ID"));
@@ -391,21 +438,8 @@ public final class DataTableUtils {
         return object().properties(properties.toArray(Property.ValueProperty[]::new));
     }
 
-    /**
-     * Creates a sample output map from a row's values, filling in sample values for null columns based on their types.
-     *
-     * @param dataTableService the data table service
-     * @param environment      the environment
-     * @param baseName         the table base name
-     * @param rowId            the row id
-     * @param rowValues        the row values map (may contain null values)
-     * @return a map with id and all column values, with sample values for null entries
-     */
     public static Map<String, Object> createSampleOutput(
-        DataTableService dataTableService, Environment environment, String baseName, long rowId,
-        Map<String, Object> rowValues) {
-
-        DataTableInfo dataTableInfo = getDataTableInfo(dataTableService, baseName, environment.ordinal());
+        @Nullable DataTableInfo dataTableInfo, long rowId, Map<String, Object> rowValues) {
 
         Map<String, Object> sampleOutput = new HashMap<>();
 
@@ -463,24 +497,20 @@ public final class DataTableUtils {
         return flattenedPayload;
     }
 
-    /**
-     * Creates a PropertiesFunction for dynamic properties lookup based on table columns.
-     *
-     * @param dataTableService the data table service
-     * @param singleRecord     true to return one property per column, false to return a Records array of column objects
-     * @return a PropertiesFunction that returns properties based on the selected table
-     */
     public static ActionDefinition.PropertiesFunction createDynamicProperties(
-        DataTableService dataTableService, boolean singleRecord) {
+        DataTableService dataTableService, DataTableWorkspaceResolver dataTableWorkspaceResolver,
+        boolean singleRecord) {
 
         return (inputParameters, connectionParameters, dependencyPaths, context) -> {
-            String baseName = inputParameters.getString(TABLE);
+            String name = inputParameters.getString(TABLE);
 
-            if (baseName == null || baseName.isBlank()) {
+            if (name == null || name.isBlank()) {
                 return List.of();
             }
 
-            DataTableInfo dataTableInfo = getDataTableInfo(dataTableService, baseName, DEVELOPMENT.ordinal());
+            DataTableInfo dataTableInfo = getDataTableInfo(
+                dataTableService, resolveWorkspaceId(dataTableWorkspaceResolver, context), name,
+                DEVELOPMENT.ordinal());
 
             if (dataTableInfo == null || dataTableInfo.columns() == null) {
                 return List.of();
@@ -519,6 +549,21 @@ public final class DataTableUtils {
             case DATE_TIME -> LocalDateTime.now();
             case BOOLEAN -> false;
         };
+    }
+
+    private static OptionalLong resolveByWorkflowId(
+        DataTableWorkspaceResolver dataTableWorkspaceResolver, @Nullable String workflowId) {
+
+        if (workflowId == null) {
+            return OptionalLong.empty();
+        }
+
+        return dataTableWorkspaceResolver.resolveByWorkflowId(workflowId);
+    }
+
+    private static DataTableException createNotFoundException(String name) {
+        return new DataTableException(
+            "Data table '" + name + "' not found in this workspace", DataTableErrorType.DATA_TABLE_NOT_FOUND);
     }
 
     private static Property.ValueProperty<?> mapColumn(ColumnSpec columnSpec) {

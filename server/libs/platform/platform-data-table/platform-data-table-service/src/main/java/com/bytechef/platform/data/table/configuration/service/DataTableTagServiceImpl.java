@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
@@ -91,26 +90,16 @@ public class DataTableTagServiceImpl implements DataTableTagService {
     }
 
     @Override
-    public Map<String, List<Tag>> getTagsByTableName() {
-        Map<String, List<Tag>> map = new HashMap<>();
+    public Map<Long, List<Tag>> getTagsByTableId() {
+        Map<Long, List<Tag>> tagsByTableId = new HashMap<>();
 
-        List<DataTable> dataTables = new ArrayList<>();
+        for (DataTable dataTable : dataTableRepository.findAll()) {
+            List<Long> tagIds = dataTable.getTagIds();
 
-        dataTableRepository.findAll()
-            .forEach(dataTables::add);
-
-        Map<String, List<Long>> idsByName = dataTables.stream()
-            .collect(Collectors.toMap(
-                DataTable::getName,
-                dataTable -> dataTable.getTagIds() == null ? List.of() : dataTable.getTagIds()));
-
-        for (Map.Entry<String, List<Long>> entry : idsByName.entrySet()) {
-            List<Long> ids = entry.getValue();
-
-            map.put(entry.getKey(), ids == null || ids.isEmpty() ? List.of() : tagService.getTags(ids));
+            tagsByTableId.put(dataTable.getId(), tagIds.isEmpty() ? List.of() : tagService.getTags(tagIds));
         }
 
-        return map;
+        return tagsByTableId;
     }
 
     @Override

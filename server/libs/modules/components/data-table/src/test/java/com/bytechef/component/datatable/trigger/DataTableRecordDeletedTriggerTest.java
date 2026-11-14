@@ -17,10 +17,9 @@
 package com.bytechef.component.datatable.trigger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
-import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +33,7 @@ class DataTableRecordDeletedTriggerTest extends AbstractDataTableTriggerTest {
         assertEquals(
             Map.of("id", 7, "status", "CLOSED"),
             webhookRequest(
-                DataTableRecordDeletedTrigger.of(null, null, null),
+                createTriggerDefinition(),
                 rowContent("RECORD_DELETED", Map.of("status", "CLOSED"))));
     }
 
@@ -42,17 +41,17 @@ class DataTableRecordDeletedTriggerTest extends AbstractDataTableTriggerTest {
     void testWebhookRequestWithoutPayloadReturnsContent() throws Exception {
         Map<String, Object> content = Map.of("type", "RECORD_DELETED", "table", "conversations");
 
-        assertEquals(content, webhookRequest(DataTableRecordDeletedTrigger.of(null, null, null), content));
+        assertEquals(content, webhookRequest(createTriggerDefinition(), content));
     }
 
-    @Test
-    void testWebhookEnableRegistersTheWorkflowExecutionId() throws Exception {
-        DataTableWebhookService dataTableWebhookService = mock(DataTableWebhookService.class);
+    @Override
+    protected ModifiableTriggerDefinition createTriggerDefinition() {
+        return DataTableRecordDeletedTrigger.of(
+            dataTableRowService, dataTableService, dataTableWebhookService, dataTableWorkspaceResolver);
+    }
 
-        assertEquals(
-            42L,
-            webhookEnable(
-                DataTableRecordDeletedTrigger.of(null, null, dataTableWebhookService), dataTableWebhookService,
-                DataTableWebhookType.RECORD_DELETED));
+    @Override
+    protected DataTableWebhookType getWebhookType() {
+        return DataTableWebhookType.RECORD_DELETED;
     }
 }
