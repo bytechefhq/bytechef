@@ -26,11 +26,21 @@ import com.bytechef.exception.AbstractException;
  */
 public class DataTableException extends AbstractException {
 
+    private final DataTableErrorType errorType;
+
     public DataTableException(String message, DataTableErrorType errorType) {
         super(message, errorType);
+
+        this.errorType = errorType;
     }
 
     public DataTableException(String message, Throwable cause, DataTableErrorType errorType) {
         super(message, cause, errorType);
+
+        this.errorType = errorType;
+    }
+
+    public DataTableErrorType getErrorType() {
+        return errorType;
     }
 }
