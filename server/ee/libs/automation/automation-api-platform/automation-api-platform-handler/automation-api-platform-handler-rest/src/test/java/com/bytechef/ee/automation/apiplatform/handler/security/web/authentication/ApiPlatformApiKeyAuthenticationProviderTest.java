@@ -9,7 +9,10 @@ package com.bytechef.ee.automation.apiplatform.handler.security.web.authenticati
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.security.domain.ApiKey;
@@ -46,6 +49,8 @@ class ApiPlatformApiKeyAuthenticationProviderTest {
         assertThat(authentication.isAuthenticated()).isTrue();
         assertThat(authentication.getName()).isEqualTo("orders");
         assertThat(((ApiPlatformApiKeyAuthenticationToken) authentication).getApiKeyId()).isEqualTo(7L);
+
+        verify(apiKeyService).updateLastUsedDate(7L);
     }
 
     @Test
@@ -64,6 +69,8 @@ class ApiPlatformApiKeyAuthenticationProviderTest {
             () -> apiPlatformApiKeyAuthenticationProvider.authenticate(apiPlatformApiKeyAuthenticationToken))
                 .isInstanceOf(BadCredentialsException.class)
                 .hasMessage("Unknown API secret key");
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     @Test

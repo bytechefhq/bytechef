@@ -30,4 +30,6 @@ public interface SigningKeyService {
     List<SigningKey> getSigningKeys(PlatformType type, long environmentId);
 
     SigningKey update(SigningKey signingKey);
+
+    void updateLastUsedDate(String keyId, long environmentId);
 }

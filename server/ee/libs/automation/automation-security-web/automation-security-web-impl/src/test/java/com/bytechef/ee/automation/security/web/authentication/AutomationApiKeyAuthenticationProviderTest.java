@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.constant.PlatformType;
@@ -36,6 +38,8 @@ class AutomationApiKeyAuthenticationProviderTest {
 
     private static final String SECRET_KEY = "secret-key-value";
 
+    private final ApiKeyService apiKeyService = mock(ApiKeyService.class);
+
     @Test
     void testUnknownSecretKeyIsRejectedAsBadCredentials() {
         assertThatThrownBy(
@@ -50,6 +54,8 @@ class AutomationApiKeyAuthenticationProviderTest {
 
         assertThat(authentication.isAuthenticated()).isTrue();
         assertThat(((AutomationApiKeyAuthenticationToken) authentication).getApiKeyId()).isEqualTo(7L);
+
+        verify(apiKeyService).updateLastUsedDate(7L);
     }
 
     @Test
@@ -57,6 +63,8 @@ class AutomationApiKeyAuthenticationProviderTest {
         assertThatThrownBy(() -> newProvider(null, true, true).authenticate(newToken()))
             .isInstanceOf(BadCredentialsException.class)
             .hasMessage("Automation API key required");
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     @Test
@@ -64,6 +72,8 @@ class AutomationApiKeyAuthenticationProviderTest {
         assertThatThrownBy(() -> newProvider(PlatformType.EMBEDDED, true, true).authenticate(newToken()))
             .isInstanceOf(BadCredentialsException.class)
             .hasMessage("Automation API key required");
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     @Test
@@ -71,6 +81,8 @@ class AutomationApiKeyAuthenticationProviderTest {
         assertThatThrownBy(() -> newProvider(false, true).authenticate(newToken()))
             .isInstanceOf(UserNotActivatedException.class)
             .hasMessage("User admin@localhost.com was not activated");
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     @Test
@@ -78,17 +90,19 @@ class AutomationApiKeyAuthenticationProviderTest {
         assertThatThrownBy(() -> newProvider(true, false).authenticate(newToken()))
             .isInstanceOf(UsernameNotFoundException.class)
             .hasMessage("User 1 was not found in the database");
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     private static AutomationApiKeyAuthenticationToken newToken() {
         return new AutomationApiKeyAuthenticationToken(0, SECRET_KEY, "public");
     }
 
-    private static AutomationApiKeyAuthenticationProvider newProvider(boolean activated, boolean userExists) {
+    private AutomationApiKeyAuthenticationProvider newProvider(boolean activated, boolean userExists) {
         return newProvider(PlatformType.AUTOMATION, activated, userExists);
     }
 
-    private static AutomationApiKeyAuthenticationProvider newProvider(
+    private AutomationApiKeyAuthenticationProvider newProvider(
         PlatformType type, boolean activated, boolean userExists) {
 
         ApiKey apiKey = mock(ApiKey.class);
@@ -96,8 +110,6 @@ class AutomationApiKeyAuthenticationProviderTest {
         when(apiKey.getId()).thenReturn(7L);
         when(apiKey.getType()).thenReturn(type);
         when(apiKey.getUserId()).thenReturn(1L);
-
-        ApiKeyService apiKeyService = mock(ApiKeyService.class);
 
         when(apiKeyService.fetchApiKey(SECRET_KEY, 0L)).thenReturn(Optional.of(apiKey));
 

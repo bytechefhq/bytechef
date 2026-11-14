@@ -24,6 +24,8 @@ import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.repository.UserRepository;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,6 +84,72 @@ class ApiKeyServiceIntTest {
 
         assertThat(apiKeyRepository.findById(deletedApiKey.getId())).isEmpty();
         assertThat(apiKeyRepository.findById(keptApiKey.getId())).isPresent();
+    }
+
+    @Test
+    void testUpdateLastUsedDateSetsTheDateOnFirstUse() {
+        ApiKey apiKey = apiKeyService.create(newApiKey("first use key"));
+
+        assertThat(apiKey.getLastUsedDate()).isNull();
+
+        Instant beforeUse = Instant.now()
+            .truncatedTo(ChronoUnit.SECONDS);
+
+        apiKeyService.updateLastUsedDate(apiKey.getId());
+
+        assertThat(getLastUsedDate(apiKey.getId())).isAfterOrEqualTo(beforeUse);
+    }
+
+    @Test
+    void testUpdateLastUsedDateWithinTheIntervalKeepsTheDate() {
+        ApiKey apiKey = apiKeyService.create(newApiKey("recent use key"));
+
+        apiKeyService.updateLastUsedDate(apiKey.getId());
+
+        Instant firstLastUsedDate = getLastUsedDate(apiKey.getId());
+
+        apiKeyService.updateLastUsedDate(apiKey.getId());
+
+        assertThat(getLastUsedDate(apiKey.getId())).isEqualTo(firstLastUsedDate);
+    }
+
+    @Test
+    void testUpdateLastUsedDateAfterTheIntervalRefreshesTheDate() {
+        ApiKey apiKey = apiKeyService.create(newApiKey("stale use key"));
+
+        Instant staleLastUsedDate = Instant.now()
+            .minus(2, ChronoUnit.MINUTES)
+            .truncatedTo(ChronoUnit.SECONDS);
+
+        apiKey.setLastUsedDate(staleLastUsedDate);
+
+        apiKeyRepository.save(apiKey);
+
+        apiKeyService.updateLastUsedDate(apiKey.getId());
+
+        assertThat(getLastUsedDate(apiKey.getId())).isAfter(staleLastUsedDate.plus(1, ChronoUnit.MINUTES));
+    }
+
+    @Test
+    void testUpdateLastUsedDateDoesNotChangeTheLastModifiedDate() {
+        ApiKey apiKey = apiKeyService.create(newApiKey("last modified key"));
+
+        ApiKey savedApiKey = apiKeyService.getApiKey(apiKey.getId());
+
+        Instant lastModifiedDate = savedApiKey.getLastModifiedDate();
+
+        apiKeyService.updateLastUsedDate(apiKey.getId());
+
+        ApiKey usedApiKey = apiKeyService.getApiKey(apiKey.getId());
+
+        assertThat(usedApiKey.getLastUsedDate()).isNotNull();
+        assertThat(usedApiKey.getLastModifiedDate()).isEqualTo(lastModifiedDate);
+    }
+
+    private Instant getLastUsedDate(long id) {
+        ApiKey apiKey = apiKeyService.getApiKey(id);
+
+        return apiKey.getLastUsedDate();
     }
 
     private ApiKey newApiKey(String name) {

@@ -11,7 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -22,12 +25,14 @@ import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.tenant.TenantContext;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -188,6 +193,50 @@ class EmbeddedApiKeyAuthenticationConverterTest {
         assertThat(token.getExternalUserId()).isEqualTo("jwt-user");
         assertThat(token.getTenantId()).isEqualTo(JWT_TENANT_ID);
         assertThat(token.getEnvironmentId()).isEqualTo(Environment.PRODUCTION.ordinal());
+    }
+
+    @Test
+    void testConvertWithJwtTokenRecordsSigningKeyUseInTheTokenTenant() throws NoSuchAlgorithmException {
+        List<String> tenantIds = new ArrayList<>();
+
+        doAnswer(invocation -> tenantIds.add(TenantContext.getCurrentTenantId()))
+            .when(signingKeyService)
+            .updateLastUsedDate(anyString(), anyLong());
+
+        convertWithJwt("jwt-user", "/api/embedded/v1/me");
+
+        verify(signingKeyService).updateLastUsedDate(
+            EncodingUtils.base64EncodeToString(JWT_TENANT_ID + ":keyId"), Environment.PRODUCTION.ordinal());
+
+        assertThat(tenantIds).containsExactly(JWT_TENANT_ID);
+    }
+
+    @Test
+    void testConvertWithJwtTokenWithWrongSignatureDoesNotRecordSigningKeyUse() throws NoSuchAlgorithmException {
+        KeyPair keyPair = generateKeyPair();
+
+        String jwtToken = Jwts.builder()
+            .header()
+            .keyId(EncodingUtils.base64EncodeToString(JWT_TENANT_ID + ":keyId"))
+            .and()
+            .subject("user-a")
+            .signWith(keyPair.getPrivate())
+            .compact();
+
+        when(signingKeyService.getPublicKey(anyString(), anyLong())).thenReturn(generateKeyPair().getPublic());
+
+        assertThatThrownBy(() -> convertWithJwt(jwtToken, "/api/embedded/v1/connections", "DEVELOPMENT"))
+            .isInstanceOf(BadCredentialsException.class);
+
+        verify(signingKeyService, never()).updateLastUsedDate(anyString(), anyLong());
+    }
+
+    @Test
+    void testConvertWithJwtTokenOnAnotherExternalUserPathDoesNotRecordSigningKeyUse() {
+        assertThatThrownBy(() -> convertWithJwt("user-a", "/api/embedded/v1/user-b/automation/workflows"))
+            .isInstanceOf(BadCredentialsException.class);
+
+        verify(signingKeyService, never()).updateLastUsedDate(anyString(), anyLong());
     }
 
     @Test
