@@ -16,11 +16,16 @@
 
 package com.bytechef.platform.data.table.execution.service;
 
+import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
+import com.bytechef.platform.data.table.execution.domain.ExternalIdPatch;
+import com.bytechef.platform.data.table.execution.domain.NewRow;
+import com.bytechef.platform.data.table.execution.domain.UpsertResult;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -125,18 +130,34 @@ public interface DataTableRowService {
      * @param baseName      the logical table base name
      * @param conditions    the conditions a row must satisfy; {@link DataTableRowConditions#matchAll()} returns every
      *                      row
-     * @param sort          the sort order, or null to order by id ascending
+     * @param sorts         the sort order, column by column; empty to order by id ascending
      * @param limit         maximum number of rows to return; must not be negative
      * @param offset        number of rows to skip; must not be negative
      * @param environmentId the environment ID
      * @return list of matching rows with their data
-     * @throws IllegalArgumentException if limit or offset is negative, the sort names an unknown column, or a filter
+     * @throws IllegalArgumentException if limit or offset is negative, a sort names an unknown column, or a filter
      *                                  names an unknown column, has a value that is not valid for the column type, or
      *                                  uses a text operation on a non-text column
      */
     List<DataTableRow> findRows(
-        String baseName, DataTableRowConditions conditions, @Nullable DataTableRowSort sort, int limit,
+        String baseName, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
         int offset, long environmentId);
+
+    long countRows(String baseName, DataTableRowConditions conditions, long environmentId);
+
+    Optional<DataTableRow> fetchRowByExternalId(String baseName, String externalId, long environmentId);
+
+    DataTableRow
+        insertRow(String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId);
+
+    List<DataTableRow> insertRows(
+        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId);
+
+    DataTableRow updateRow(
+        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long environmentId);
+
+    UpsertResult upsertRow(String baseName, String externalId, Map<String, Object> values, long environmentId);
 
     /**
      * Exports the entire table (excluding the primary key column 'id' in the header) as CSV text. The first row is a
@@ -150,16 +171,18 @@ public interface DataTableRowService {
 
     /**
      * Imports CSV text into the table. The CSV must contain a header row with column names matching existing columns
-     * (case-insensitive). Unknown columns are ignored. The 'id' column, if present, is ignored. The import runs in one
-     * transaction: a cell that is not valid for its column type stops the import and no row is imported.
+     * (case-insensitive). Unknown columns are ignored. The 'id' column, if present, is ignored, and an 'external_id'
+     * column keys each row. The import runs in one transaction: a cell that is not valid for its column type stops the
+     * import and no row is imported.
      *
      * @param baseName      the logical table base name
      * @param csv           CSV text with header row
      * @param environmentId the environment ID
+     * @return the number of imported rows
      * @throws IllegalArgumentException if the header matches no column of the table, or a cell is not valid for its
      *                                  column type; the message names the CSV line
      */
-    void importCsv(String baseName, String csv, long environmentId);
+    int importCsv(String baseName, String csv, long environmentId);
 
     /**
      * Updates a row by its stable id. Returns the updated row.

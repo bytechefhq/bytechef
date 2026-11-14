@@ -8,9 +8,15 @@
 package com.bytechef.ee.platform.data.table.remote.client.facade;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.ExternalIdPatch;
+import com.bytechef.platform.data.table.execution.domain.NewRow;
+import com.bytechef.platform.data.table.execution.domain.UpsertResult;
 import com.bytechef.platform.data.table.execution.facade.DataTableRowFacade;
+import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,7 +29,7 @@ import org.springframework.stereotype.Component;
 public class RemoteDataTableRowFacadeClient implements DataTableRowFacade {
 
     @Override
-    public void importCsv(String baseName, String csv, long environmentId) {
+    public int importCsv(String baseName, String csv, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
@@ -34,6 +40,33 @@ public class RemoteDataTableRowFacadeClient implements DataTableRowFacade {
 
     @Override
     public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DataTableRow insertRow(
+        String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableRow> insertRows(
+        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DataTableRow updateRow(
+        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public UpsertResult upsertRow(String baseName, String externalId, Map<String, Object> values, long environmentId) {
         throw new UnsupportedOperationException();
     }
 }

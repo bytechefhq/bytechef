@@ -17,7 +17,6 @@
 package com.bytechef.component.datatable.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -49,8 +48,8 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
 
     private final ArgumentCaptor<DataTableRowConditions> conditionsArgumentCaptor = ArgumentCaptor.forClass(
         DataTableRowConditions.class);
-    private final ArgumentCaptor<DataTableRowSort> sortArgumentCaptor = ArgumentCaptor.forClass(
-        DataTableRowSort.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<List<DataTableRowSort>> sortArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
     @Test
     void testPerformEmitsFlatRows() throws Exception {
@@ -71,7 +70,7 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
             eq(1L));
 
         assertEquals(DataTableRowConditions.matchAll(), conditionsArgumentCaptor.getValue());
-        assertNull(sortArgumentCaptor.getValue());
+        assertEquals(List.of(), sortArgumentCaptor.getValue());
     }
 
     @Test
@@ -111,7 +110,7 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
                         new DataTableRowFilter("score", Operation.BETWEEN, Arrays.asList("1", "5")),
                         new DataTableRowFilter("closedAt", Operation.EMPTY, null)))),
             conditionsArgumentCaptor.getValue());
-        assertEquals(new DataTableRowSort("score", Direction.DESC), sortArgumentCaptor.getValue());
+        assertEquals(List.of(new DataTableRowSort("score", Direction.DESC)), sortArgumentCaptor.getValue());
     }
 
     @Test
@@ -126,7 +125,7 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
             eq("conversations"), conditionsArgumentCaptor.capture(), sortArgumentCaptor.capture(), eq(100), eq(0),
             eq(1L));
 
-        assertEquals(new DataTableRowSort("score", Direction.DESC), sortArgumentCaptor.getValue());
+        assertEquals(List.of(new DataTableRowSort("score", Direction.DESC)), sortArgumentCaptor.getValue());
     }
 
     @Test
@@ -140,7 +139,7 @@ class DataTableFindRecordsActionTest extends AbstractDataTableActionTest {
             eq("conversations"), conditionsArgumentCaptor.capture(), sortArgumentCaptor.capture(), eq(100), eq(0),
             eq(1L));
 
-        assertNull(sortArgumentCaptor.getValue());
+        assertEquals(List.of(), sortArgumentCaptor.getValue());
     }
 
     @Test
