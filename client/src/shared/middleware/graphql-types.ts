@@ -891,6 +891,7 @@ export type ConnectedUserCodeWorkflowReference = {
 
 export type ConnectedUserMcpServer = {
   __typename?: 'ConnectedUserMcpServer';
+  automations: Array<ConnectedUserMcpServerAutomation>;
   enabled: Scalars['Boolean']['output'];
   environmentId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
@@ -898,6 +899,19 @@ export type ConnectedUserMcpServer = {
   name: Scalars['String']['output'];
   tools: Array<ConnectedUserMcpServerTool>;
   workflows: Array<ConnectedUserMcpServerWorkflow>;
+};
+
+export type ConnectedUserMcpServerAutomation = {
+  __typename?: 'ConnectedUserMcpServerAutomation';
+  automationName: Scalars['String']['output'];
+  available: Scalars['Boolean']['output'];
+  connectedUserProjectWorkflowId: Scalars['ID']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  lastExecutionDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  workflowUuid: Scalars['String']['output'];
 };
 
 export type ConnectedUserMcpServerTool = {
@@ -964,6 +978,7 @@ export type ConnectedUserProjectWorkflow = {
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   projectId: Scalars['ID']['output'];
   staticWebhookUrl?: Maybe<Scalars['String']['output']>;
+  toolOnly: Scalars['Boolean']['output'];
   version?: Maybe<Scalars['Int']['output']>;
   workflow: Workflow;
   workflowUuid: Scalars['ID']['output'];
@@ -1061,6 +1076,13 @@ export type CreateEmbeddedMcpServerInput = {
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+};
+
+export type CreateMcpAutomationProjectConfigurationInput = {
+  automationProjectConfigurationId: Scalars['ID']['input'];
+  mcpServerId: Scalars['ID']['input'];
+  workflowConfigurations?: InputMaybe<Array<McpAutomationWorkflowConfigurationInput>>;
+  workflowUuids: Array<Scalars['String']['input']>;
 };
 
 export type CreateMcpIntegrationInstanceConfigurationInput = {
@@ -1747,6 +1769,33 @@ export type LogPage = {
   totalPages: Scalars['Int']['output'];
 };
 
+export type McpAutomationProjectConfiguration = {
+  __typename?: 'McpAutomationProjectConfiguration';
+  automationProjectConfigurationEnabled: Scalars['Boolean']['output'];
+  automationProjectConfigurationId: Scalars['ID']['output'];
+  automationProjectConfigurationName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  mcpServerId: Scalars['ID']['output'];
+  projectId: Scalars['ID']['output'];
+  projectVersion: Scalars['Int']['output'];
+  workflows: Array<McpAutomationProjectConfigurationWorkflow>;
+};
+
+export type McpAutomationProjectConfigurationWorkflow = {
+  __typename?: 'McpAutomationProjectConfigurationWorkflow';
+  available: Scalars['Boolean']['output'];
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  label?: Maybe<Scalars['String']['output']>;
+  parameters?: Maybe<Scalars['Map']['output']>;
+  workflowUuid: Scalars['String']['output'];
+};
+
+export type McpAutomationWorkflowConfigurationInput = {
+  parameters?: InputMaybe<Scalars['Map']['input']>;
+  workflowUuid: Scalars['String']['input'];
+};
+
 export type McpComponent = {
   __typename?: 'McpComponent';
   componentName: Scalars['String']['output'];
@@ -1950,6 +1999,7 @@ export type Mutation = {
   createEmbeddedMcpServer?: Maybe<McpServer>;
   createIdentityProvider: IdentityProviderType;
   createKnowledgeBase?: Maybe<KnowledgeBase>;
+  createMcpAutomationProjectConfiguration: McpAutomationProjectConfiguration;
   createMcpComponent?: Maybe<McpComponent>;
   createMcpComponentWithTools?: Maybe<McpComponent>;
   createMcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;
@@ -1992,6 +2042,7 @@ export type Mutation = {
   deleteKnowledgeBase?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocument?: Maybe<Scalars['Boolean']['output']>;
   deleteKnowledgeBaseDocumentChunk?: Maybe<Scalars['Boolean']['output']>;
+  deleteMcpAutomationProjectConfiguration?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpComponent?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpIntegrationInstanceConfiguration?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpIntegrationInstanceConfigurationWorkflow?: Maybe<Scalars['Boolean']['output']>;
@@ -2013,6 +2064,7 @@ export type Mutation = {
   enableApiConnector: Scalars['Boolean']['output'];
   enableAutomationProjectConfiguration: Scalars['Boolean']['output'];
   enableAutomationProjectConfigurationWorkflow: Scalars['Boolean']['output'];
+  enableConnectedUserMcpAutomation?: Maybe<ConnectedUserMcpServerAutomation>;
   enableConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   enableConnectedUserMcpTool?: Maybe<Scalars['Boolean']['output']>;
   enableConnectedUserMcpWorkflow?: Maybe<Scalars['Boolean']['output']>;
@@ -2098,6 +2150,9 @@ export type Mutation = {
   updateKnowledgeBaseDocumentTags: Scalars['Boolean']['output'];
   updateKnowledgeBaseTags: Scalars['Boolean']['output'];
   updateManagementMcpServerUrl: Scalars['String']['output'];
+  updateMcpAutomationProjectConfiguration: McpAutomationProjectConfiguration;
+  updateMcpAutomationProjectConfigurationWorkflowEnabled: McpAutomationProjectConfigurationWorkflow;
+  updateMcpAutomationProjectConfigurationWorkflowParameters: McpAutomationProjectConfigurationWorkflow;
   updateMcpComponentWithTools?: Maybe<McpComponent>;
   updateMcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;
   updateMcpIntegrationInstanceConfigurationWorkflow?: Maybe<McpIntegrationInstanceConfigurationWorkflow>;
@@ -2274,6 +2329,11 @@ export type MutationCreateKnowledgeBaseArgs = {
   environmentId: Scalars['ID']['input'];
   knowledgeBase: KnowledgeBaseInput;
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateMcpAutomationProjectConfigurationArgs = {
+  input: CreateMcpAutomationProjectConfigurationInput;
 };
 
 
@@ -2463,6 +2523,11 @@ export type MutationDeleteKnowledgeBaseDocumentChunkArgs = {
 };
 
 
+export type MutationDeleteMcpAutomationProjectConfigurationArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteMcpComponentArgs = {
   id: Scalars['ID']['input'];
 };
@@ -2569,6 +2634,13 @@ export type MutationEnableAutomationProjectConfigurationWorkflowArgs = {
   enable: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
   workflowUuid: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableConnectedUserMcpAutomationArgs = {
+  connectedUserId: Scalars['ID']['input'];
+  enable: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3034,6 +3106,24 @@ export type MutationUpdateKnowledgeBaseTagsArgs = {
 };
 
 
+export type MutationUpdateMcpAutomationProjectConfigurationArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateMcpAutomationProjectConfigurationInput;
+};
+
+
+export type MutationUpdateMcpAutomationProjectConfigurationWorkflowEnabledArgs = {
+  enabled: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateMcpAutomationProjectConfigurationWorkflowParametersArgs = {
+  id: Scalars['ID']['input'];
+  parameters: Scalars['Map']['input'];
+};
+
+
 export type MutationUpdateMcpComponentWithToolsArgs = {
   id: Scalars['ID']['input'];
   input: McpComponentWithToolsInput;
@@ -3387,8 +3477,10 @@ export type ProvisionConnectedUserProjectWorkflowInput = {
 
 export type ProvisionableConnectedUserMcpServer = {
   __typename?: 'ProvisionableConnectedUserMcpServer';
+  coveredAutomationNames: Array<Scalars['String']['output']>;
   coveredComponentNames: Array<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  missingAutomationNames: Array<Scalars['String']['output']>;
   missingComponentNames: Array<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   provisioned: Scalars['Boolean']['output'];
@@ -3587,6 +3679,7 @@ export type Query = {
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
   managementMcpServerCanonicalUrl: Scalars['String']['output'];
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
+  mcpAutomationProjectConfigurationsByServerId: Array<McpAutomationProjectConfiguration>;
   mcpComponent?: Maybe<McpComponent>;
   mcpComponentDefinitions: Array<ComponentDefinition>;
   mcpComponentIntegrations: Array<Integration>;
@@ -4269,6 +4362,11 @@ export type QueryKnowledgeBasesArgs = {
 };
 
 
+export type QueryMcpAutomationProjectConfigurationsByServerIdArgs = {
+  mcpServerId: Scalars['ID']['input'];
+};
+
+
 export type QueryMcpComponentArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -4875,6 +4973,11 @@ export type UpdateKnowledgeBaseDocumentTagsInput = {
 export type UpdateKnowledgeBaseTagsInput = {
   knowledgeBaseId: Scalars['ID']['input'];
   tags?: InputMaybe<Array<TagInput>>;
+};
+
+export type UpdateMcpAutomationProjectConfigurationInput = {
+  workflowConfigurations?: InputMaybe<Array<McpAutomationWorkflowConfigurationInput>>;
+  workflowUuids: Array<Scalars['String']['input']>;
 };
 
 export type UpdateMcpIntegrationInstanceConfigurationInput = {
