@@ -1,0 +1,6 @@
+mutation enableConnectedUserMcpAutomation($connectedUserId: ID!, $id: ID!, $enable: Boolean!) {
+    enableConnectedUserMcpAutomation(connectedUserId: $connectedUserId, id: $id, enable: $enable) {
+        id
+        enabled
+    }
+}
