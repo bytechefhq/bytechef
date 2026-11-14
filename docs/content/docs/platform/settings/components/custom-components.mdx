@@ -1023,6 +1023,15 @@ The source cannot change the component's `name`.
 
 {/* TODO screenshot: custom component detail page - Monaco source editor with a JavaScript component open, the header showing the component title, language and status badges, Back arrow, and the Save and Publish buttons */}
 
+#### Autocomplete
+
+Inside an action's `perform`, the source editor suggests `http` and `log` after `context.`, the action's declared
+property names after `input.`, and the names in `connection.properties` after `connection.`. It reads them from the
+source as you type, so a property you add shows up without saving. See
+[Code Editor Autocomplete](/platform/automation/build/workflows/code-editor-autocomplete#inputs-and-connections) for
+examples and limits, and the [JavaScript sample](https://github.com/bytechefhq/bytechef-sample-custom-component-javascript)
+for the source shape it reads.
+
 ### Importing files
 
 The **Import Custom Component** dialog ("Upload a custom component file to deploy it to the platform.") takes one or

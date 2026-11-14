@@ -894,6 +894,18 @@ over. A workflow removed from the source and later added back under the same nam
 
 Java code workflows are uploaded only; the editor does not open them.
 
+### Autocomplete in the source editor
+
+The source editor suggests names as you type inside a task's `perform`: the `context` members, every component
+under `context.component` and its actions, the action's property keys and option values inside the call's first
+argument, and the workflow's `inputs` and earlier task names after `context.input().`. Picking an action inserts the
+call with the task's declared connection name already in place, and options and dynamic properties that need a
+connection use the one selected in **Test Configuration**. The Script step's editor described under
+[Editing and running a script](#editing-and-running-a-script) completes `context.component` calls the same way,
+plus the step's input keys and connection names. See
+[Code Editor Autocomplete](/platform/automation/build/workflows/code-editor-autocomplete) for examples in each
+language, and try them on a [sample project](/platform/sample-repositories#code-workflows).
+
 ## Deploying through the API
 
 Code workflows also deploy programmatically; the natural home is your CI pipeline - build the artifact, then push it
