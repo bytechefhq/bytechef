@@ -44,6 +44,21 @@ Version: 1
 
 
 
+### OAuth2 Authorization Code with PKCE
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| authorizationUrl | Authorization URL | STRING |  | true |
+| tokenUrl | Token URL | STRING |  | true |
+| clientId | Client Id | STRING |  | true |
+| clientSecret | Client Secret | STRING | Leave empty when the MCP server registered ByteChef as a public client. | false |
+| headerPrefix | Header Prefix | STRING |  | false |
+| scopes | Scopes | STRING | Optional comma-delimited list of scopes | false |
+
+
+
 ### OAuth2 Client Credentials
 
 #### Properties
