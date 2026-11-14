@@ -20,10 +20,9 @@ import com.bytechef.ee.embedded.unified.web.rest.crm.model.CreateUpdateAccountMo
 import com.bytechef.ee.embedded.unified.web.rest.crm.model.CreatedModel;
 import com.bytechef.ee.embedded.unified.web.rest.crm.model.ListAccountsPageableParameterModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,11 +40,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class CrmAccountApiController implements AccountApi {
 
     private final ConversionService conversionService;
+    private final EnvironmentService environmentService;
     private final UnifiedApiFacade unifiedApiFacade;
 
     @SuppressFBWarnings("EI")
-    public CrmAccountApiController(ConversionService conversionService, UnifiedApiFacade unifiedApiFacade) {
+    public CrmAccountApiController(
+        ConversionService conversionService, EnvironmentService environmentService,
+        UnifiedApiFacade unifiedApiFacade) {
+
         this.conversionService = conversionService;
+        this.environmentService = environmentService;
         this.unifiedApiFacade = unifiedApiFacade;
     }
 
@@ -59,7 +63,7 @@ public class CrmAccountApiController implements AccountApi {
                     OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"),
                     conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
                     UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId,
-                    Environment.valueOf(StringUtils.upperCase(environment)),
+                    environmentService.getEnvironment(environment),
                     CrmModelType.ACCOUNT)));
     }
 
@@ -72,7 +76,7 @@ public class CrmAccountApiController implements AccountApi {
                 unifiedApiFacade.get(
                     OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"),
                     accountId, UnifiedApiDefinition.UnifiedApiCategory.CRM,
-                    xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)), CrmModelType.ACCOUNT),
+                    xInstanceId, environmentService.getEnvironment(environment), CrmModelType.ACCOUNT),
                 AccountModel.class));
     }
 
@@ -86,7 +90,7 @@ public class CrmAccountApiController implements AccountApi {
                     OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"),
                     conversionService.convert(pageable, CursorPageRequest.class),
                     UnifiedApiDefinition.UnifiedApiCategory.CRM,
-                    xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)), CrmModelType.ACCOUNT)
+                    xInstanceId, environmentService.getEnvironment(environment), CrmModelType.ACCOUNT)
                 .map(unifiedOutputModel -> conversionService.convert(unifiedOutputModel, AccountModel.class)));
     }
 
@@ -98,7 +102,7 @@ public class CrmAccountApiController implements AccountApi {
             OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), accountId,
             conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
             UnifiedApiDefinition.UnifiedApiCategory.CRM,
-            xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)),
+            xInstanceId, environmentService.getEnvironment(environment),
             CrmModelType.ACCOUNT);
 
         return ResponseEntity.noContent()
