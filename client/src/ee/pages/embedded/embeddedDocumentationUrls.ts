@@ -19,8 +19,8 @@ export const EMBEDDED_EXTERNAL_INVOCATIONS_DOCUMENTATION_URL =
 export const EMBEDDED_COMPONENT_KIT_DOCUMENTATION_URL =
     'https://docs.bytechef.io/platform/embedded/build/component-kit';
 
-export const EMBEDDED_CONNECT_DIALOG_DOCUMENTATION_URL =
-    'https://docs.bytechef.io/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog';
+export const EMBEDDED_SDK_SETUP_DOCUMENTATION_URL =
+    'https://docs.bytechef.io/platform/embedded/get-started/initial-setup/installing-the-sdk';
 
 export const EMBEDDED_SIGNING_KEYS_DOCUMENTATION_URL =
     'https://docs.bytechef.io/platform/embedded/administration/signing-keys';
@@ -31,7 +31,7 @@ export const EMBEDDED_MCP_SERVERS_DOCUMENTATION_URL =
     'https://docs.bytechef.io/platform/embedded/configure/mcp-servers';
 
 export const EMBEDDED_AUTOMATION_HUB_DOCUMENTATION_URL =
-    'https://docs.bytechef.io/platform/embedded/build/automation-hub';
+    'https://docs.bytechef.io/platform/embedded/build/automations/automation-hub';
 
 export const EMBEDDED_API_KEYS_DOCUMENTATION_URL = 'https://docs.bytechef.io/platform/embedded/administration/api-keys';
 
