@@ -64,8 +64,6 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -113,7 +111,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     private final ConnectedUserService connectedUserService;
     private final ConnectedUserWorkflowValidator connectedUserWorkflowValidator;
     private final ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver;
-    private final ConnectionService connectionService;
     private final @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator;
     private final EnvironmentService environmentService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -148,7 +145,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         ConnectedUserReferenceDeploymentManager connectedUserReferenceDeploymentManager,
         ConnectedUserService connectedUserService, ConnectedUserWorkflowValidator connectedUserWorkflowValidator,
         ConnectedUserWorkflowWebhookUrlResolver connectedUserWorkflowWebhookUrlResolver,
-        ConnectionService connectionService,
         @Lazy @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator, EnvironmentService environmentService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService, JobService jobService, PrincipalJobService principalJobService,
@@ -173,7 +169,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         this.connectedUserService = connectedUserService;
         this.connectedUserWorkflowValidator = connectedUserWorkflowValidator;
         this.connectedUserWorkflowWebhookUrlResolver = connectedUserWorkflowWebhookUrlResolver;
-        this.connectionService = connectionService;
         this.copilotWorkflowGenerator = copilotWorkflowGenerator;
         this.environmentService = environmentService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -553,17 +548,16 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
+        Set<Long> entitledConnectionIds = connectedUserProjectWorkflowManager.getEntitledConnectionIds(
+            connectedUserProject.getConnectedUserId(), environment);
+
         List<ProjectDeploymentWorkflowConnection> connections = workflowTestConfigurationService
             .fetchWorkflowTestConfiguration(workflowId, environment.ordinal())
             .map(WorkflowTestConfiguration::getConnections)
             .orElse(List.of())
             .stream()
-            .filter(workflowTestConfigurationConnection -> {
-                Connection connection = connectionService.getConnection(
-                    workflowTestConfigurationConnection.getConnectionId());
-
-                return connection.getEnvironmentId() == environment.ordinal();
-            })
+            .filter(workflowTestConfigurationConnection -> entitledConnectionIds.contains(
+                workflowTestConfigurationConnection.getConnectionId()))
             .map(workflowTestConfigurationConnection -> new ProjectDeploymentWorkflowConnection(
                 workflowTestConfigurationConnection.getConnectionId(),
                 workflowTestConfigurationConnection.getWorkflowConnectionKey(),
