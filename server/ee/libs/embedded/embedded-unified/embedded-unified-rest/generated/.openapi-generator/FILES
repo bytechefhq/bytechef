@@ -10,7 +10,6 @@ src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/CreateUpdateCo
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/CreateUpdateLeadModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/CreateUpdateOpportunityModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/CreatedModel.java
-src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/CreatedRecordModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/EmailsInnerModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/ErrorsInnerMetaModel.java
 src/main/java/com/bytechef/ee/embedded/unified/web/rest/crm/model/ErrorsInnerModel.java
