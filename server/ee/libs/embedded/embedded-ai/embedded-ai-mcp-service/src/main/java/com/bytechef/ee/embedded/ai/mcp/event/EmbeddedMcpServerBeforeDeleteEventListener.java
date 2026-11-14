@@ -7,8 +7,10 @@
 
 package com.bytechef.ee.embedded.ai.mcp.event;
 
+import com.bytechef.ee.embedded.ai.mcp.domain.McpAutomationProjectConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -29,14 +31,17 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class EmbeddedMcpServerBeforeDeleteEventListener extends AbstractRelationalEventListener<McpServer> {
 
+    private final McpAutomationProjectConfigurationService mcpAutomationProjectConfigurationService;
     private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
 
     @SuppressFBWarnings("EI")
     public EmbeddedMcpServerBeforeDeleteEventListener(
+        McpAutomationProjectConfigurationService mcpAutomationProjectConfigurationService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService) {
 
+        this.mcpAutomationProjectConfigurationService = mcpAutomationProjectConfigurationService;
         this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
     }
@@ -45,7 +50,20 @@ public class EmbeddedMcpServerBeforeDeleteEventListener extends AbstractRelation
     protected void onBeforeDelete(BeforeDeleteEvent<McpServer> beforeDeleteEvent) {
         Identifier identifier = beforeDeleteEvent.getId();
 
-        deleteMcpIntegrationInstanceConfigurations((Long) identifier.getValue());
+        long mcpServerId = (Long) identifier.getValue();
+
+        deleteMcpAutomationProjectConfigurations(mcpServerId);
+        deleteMcpIntegrationInstanceConfigurations(mcpServerId);
+    }
+
+    private void deleteMcpAutomationProjectConfigurations(long mcpServerId) {
+        List<McpAutomationProjectConfiguration> mcpAutomationProjectConfigurations =
+            mcpAutomationProjectConfigurationService.getMcpServerMcpAutomationProjectConfigurations(mcpServerId);
+
+        for (McpAutomationProjectConfiguration mcpAutomationProjectConfiguration : mcpAutomationProjectConfigurations) {
+
+            mcpAutomationProjectConfigurationService.delete(mcpAutomationProjectConfiguration.getId());
+        }
     }
 
     private void deleteMcpIntegrationInstanceConfigurations(long mcpServerId) {

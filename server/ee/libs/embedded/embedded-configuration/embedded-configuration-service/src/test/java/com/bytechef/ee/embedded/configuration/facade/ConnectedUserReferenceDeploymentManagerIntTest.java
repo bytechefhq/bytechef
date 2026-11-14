@@ -40,6 +40,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRows;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceRows;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -141,7 +142,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     JobFacade.class, JobService.class, McpComponentService.class, McpIntegrationComponentService.class,
     McpIntegrationInstanceConfigurationService.class,
     McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
-    McpIntegrationInstanceWorkflowService.class, McpIntegrationInstanceRows.class,
+    McpIntegrationInstanceWorkflowService.class, McpAutomationRows.class, McpIntegrationInstanceRows.class,
     McpServerService.class, McpToolService.class, OAuth2ParametersFacade.class, OAuth2Service.class,
     PrincipalJobFacade.class, PrincipalJobService.class, ProjectFacade.class,
     TaskDispatcherDefinitionService.class, TaskExecutionService.class,
