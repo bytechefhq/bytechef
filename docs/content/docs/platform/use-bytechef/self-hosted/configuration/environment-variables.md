@@ -490,6 +490,17 @@ ceiling is not retryable.
 |---|---|---|
 | `BYTECHEF_RESOURCES_WEB` | Web resources location | `file:///opt/bytechef/client/` |
 
+## Script Configuration
+
+Limits of the [script sandbox](/platform/use-bytechef/self-hosted/configuration/script-sandbox) that JavaScript and Python code from the Script component, Script tools, script item processors and AI skill scripts runs in.
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_SCRIPT_SANDBOX_ENABLED` | Apply GraalVM's constrained sandbox policy and the CPU and heap limits to strict JavaScript and Python executions. When `false`, scripts still have no host, file, environment, thread or process access, but run without resource limits | `true` |
+| `BYTECHEF_SCRIPT_SANDBOX_MAX_CPU_TIME` | CPU time one strict script execution may use before it fails. Counts CPU time, not wall-clock time | `5m` |
+| `BYTECHEF_SCRIPT_SANDBOX_MAX_HEAP_MEMORY` | Heap one strict script execution may allocate before it fails. Skipped, with a warning in the server log, on a JVM that cannot enforce it | `512MB` |
+| `BYTECHEF_SCRIPT_SANDBOX_MAX_CONCURRENT_EXECUTIONS` | Number of strict executions started from virtual threads that run at once; further ones wait. Must be at least `1` | larger of `16` and 4 x CPU count |
+
 ## Security Configuration
 
 | Environment Variable | Description | Default Value |
