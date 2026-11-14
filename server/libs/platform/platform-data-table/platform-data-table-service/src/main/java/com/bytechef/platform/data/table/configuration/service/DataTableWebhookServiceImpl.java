@@ -17,7 +17,6 @@
 package com.bytechef.platform.data.table.configuration.service;
 
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhook;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
@@ -26,7 +25,6 @@ import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
@@ -54,7 +52,7 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
 
     @Override
     public long addWebhook(
-        String baseName, String workflowExecutionId, String url, DataTableWebhookType type, long environmentId) {
+        long dataTableId, String workflowExecutionId, String url, DataTableWebhookType type, long environmentId) {
 
         try {
             WorkflowExecutionId.parse(workflowExecutionId);
@@ -63,16 +61,13 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
                 "Data table webhook workflow execution id '" + workflowExecutionId + "' is not valid", exception);
         }
 
-        String normalizedBaseName = DataTableServiceImpl.normalizeBaseName(baseName);
-
-        Optional<DataTable> dataTableOptional = dataTableRepository.findByName(normalizedBaseName);
-
-        DataTable table = dataTableOptional.orElseThrow(
-            () -> new IllegalArgumentException("Table not found: " + normalizedBaseName));
+        if (!dataTableRepository.existsById(dataTableId)) {
+            throw new IllegalArgumentException("Data table with id=" + dataTableId + " not found");
+        }
 
         DataTableWebhook dataTableWebhook = new DataTableWebhook();
 
-        dataTableWebhook.setDataTableId(table.getId());
+        dataTableWebhook.setDataTableId(dataTableId);
         dataTableWebhook.setType(type);
         dataTableWebhook.setUrl(url);
         dataTableWebhook.setWorkflowExecutionId(workflowExecutionId);
@@ -84,21 +79,11 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
     }
 
     @Override
-    public List<Webhook> listWebhooks(String baseName, long environmentId) {
-        String normalizedBaseName = DataTableServiceImpl.normalizeBaseName(baseName);
-
-        Optional<DataTable> dataTableOptional = dataTableRepository.findByName(normalizedBaseName);
-
-        if (dataTableOptional.isEmpty()) {
-            return List.of();
-        }
-
-        DataTable dataTable = dataTableOptional.get();
-
+    public List<Webhook> listWebhooks(long dataTableId, long environmentId) {
         Environment environment = Environment.values()[(int) environmentId];
 
         List<DataTableWebhook> dataTableWebhooks = webhookRepository.findByDataTableIdAndEnvironment(
-            dataTable.getId(), environment.ordinal());
+            dataTableId, environment.ordinal());
 
         List<Webhook> webhooks = new ArrayList<>(dataTableWebhooks.size());
 

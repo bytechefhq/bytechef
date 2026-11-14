@@ -30,21 +30,21 @@ import org.jspecify.annotations.Nullable;
  */
 public interface DataTableRowFacade {
 
-    int importCsv(String baseName, String csv, long environmentId);
+    int importCsv(long dataTableId, String csv, long environmentId);
 
-    DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId);
+    DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId);
 
     DataTableRow
-        insertRow(String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId);
+        insertRow(long dataTableId, Map<String, Object> values, @Nullable String externalId, long environmentId);
 
     List<DataTableRow> insertRows(
-        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId);
+        long dataTableId, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId);
 
-    DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId);
+    DataTableRow updateRow(long dataTableId, long id, Map<String, Object> values, long environmentId);
 
     DataTableRow updateRow(
-        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long dataTableId, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
         long environmentId);
 
-    UpsertResult upsertRow(String baseName, String externalId, Map<String, Object> values, long environmentId);
+    UpsertResult upsertRow(long dataTableId, String externalId, Map<String, Object> values, long environmentId);
 }

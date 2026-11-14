@@ -34,6 +34,8 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
 import com.bytechef.platform.data.table.audit.DataTableAuditMapper;
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
+import com.bytechef.platform.data.table.config.DataTableIntTestUtils;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -48,7 +50,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -68,17 +70,20 @@ class DataTableServiceAuditIntTest {
 
     private static final String ADMIN_LOGIN = "admin";
     private static final long ENVIRONMENT_ID = 0;
-    private static final List<String> BASE_NAMES = List.of("audited", "audited_renamed", "missing");
+    private static final long MISSING_DATA_TABLE_ID = Long.MAX_VALUE;
 
     @Autowired
     private DataTableService dataTableService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private PersistenceAuditEventRepository persistenceAuditEventRepository;
 
     @BeforeEach
     void beforeEach() {
-        dropTestTables();
+        DataTableIntTestUtils.dropAll(jdbcTemplate);
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
@@ -91,16 +96,16 @@ class DataTableServiceAuditIntTest {
     void afterEach() {
         SecurityContextHolder.clearContext();
 
-        dropTestTables();
+        DataTableIntTestUtils.dropAll(jdbcTemplate);
 
         persistenceAuditEventRepository.deleteAll();
     }
 
     @Test
     void testAddColumnRecordsTheColumn() {
-        createAuditedTable();
+        long auditedId = createAuditedTable();
 
-        dataTableService.addColumn("audited", new ColumnSpec("amount", ColumnType.NUMBER), ENVIRONMENT_ID);
+        dataTableService.addColumn(auditedId, new ColumnSpec("amount", ColumnType.NUMBER), ENVIRONMENT_ID);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_COLUMN_ADDED);
 
@@ -108,7 +113,7 @@ class DataTableServiceAuditIntTest {
         assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
-            .containsEntry("baseName", "audited")
+            .containsEntry("dataTableId", String.valueOf(auditedId))
             .containsEntry("columnName", "amount")
             .containsEntry("columnType", ColumnType.NUMBER.name())
             .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
@@ -119,16 +124,16 @@ class DataTableServiceAuditIntTest {
     void testAddColumnToAnUnknownTableRecordsAnError() {
         ColumnSpec columnSpec = new ColumnSpec("amount", ColumnType.NUMBER);
 
-        assertThatThrownBy(() -> dataTableService.addColumn("missing", columnSpec, ENVIRONMENT_ID))
-            .isInstanceOf(BadSqlGrammarException.class);
+        assertThatThrownBy(() -> dataTableService.addColumn(MISSING_DATA_TABLE_ID, columnSpec, ENVIRONMENT_ID))
+            .isInstanceOf(DataTableException.class);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_COLUMN_ADDED);
 
         assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "ERROR")
-            .containsEntry("errorClass", BadSqlGrammarException.class.getName())
-            .containsEntry("baseName", "missing")
+            .containsEntry("errorClass", DataTableException.class.getName())
+            .containsEntry("dataTableId", String.valueOf(MISSING_DATA_TABLE_ID))
             .containsEntry("columnName", "amount")
             .containsEntry("columnType", ColumnType.NUMBER.name())
             .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID));
@@ -136,9 +141,9 @@ class DataTableServiceAuditIntTest {
 
     @Test
     void testDropTableRecordsTheTable() {
-        createAuditedTable();
+        long auditedId = createAuditedTable();
 
-        boolean dropped = dataTableService.dropTable("audited", ENVIRONMENT_ID);
+        boolean dropped = dataTableService.dropTable(auditedId, ENVIRONMENT_ID);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_DELETED);
 
@@ -147,23 +152,23 @@ class DataTableServiceAuditIntTest {
         assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
-            .containsEntry("baseName", "audited")
+            .containsEntry("dataTableId", String.valueOf(auditedId))
             .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
             .doesNotContainKeys("dataError", "errorClass");
     }
 
     @Test
     void testRemoveColumnRecordsTheColumn() {
-        createAuditedTable();
+        long auditedId = createAuditedTable();
 
-        dataTableService.removeColumn("audited", "title", ENVIRONMENT_ID);
+        dataTableService.removeColumn(auditedId, "title", ENVIRONMENT_ID);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_COLUMN_REMOVED);
 
         assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
-            .containsEntry("baseName", "audited")
+            .containsEntry("dataTableId", String.valueOf(auditedId))
             .containsEntry("columnName", "title")
             .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
             .doesNotContainKeys("dataError", "errorClass");
@@ -171,16 +176,16 @@ class DataTableServiceAuditIntTest {
 
     @Test
     void testRenameColumnRecordsBothColumnNames() {
-        createAuditedTable();
+        long auditedId = createAuditedTable();
 
-        dataTableService.renameColumn("audited", "title", "headline", ENVIRONMENT_ID);
+        dataTableService.renameColumn(auditedId, "title", "headline", ENVIRONMENT_ID);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_COLUMN_RENAMED);
 
         assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
-            .containsEntry("baseName", "audited")
+            .containsEntry("dataTableId", String.valueOf(auditedId))
             .containsEntry("fromColumnName", "title")
             .containsEntry("toColumnName", "headline")
             .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
@@ -189,39 +194,37 @@ class DataTableServiceAuditIntTest {
 
     @Test
     void testRenameTableRecordsBothTableNames() {
-        createAuditedTable();
+        long auditedId = createAuditedTable();
 
-        dataTableService.renameTable("audited", "audited_renamed", ENVIRONMENT_ID);
+        dataTableService.renameTable(auditedId, "audited_renamed");
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_RENAMED);
 
         assertThat(persistentAuditEvent.getPlatform()).isEqualTo(PlatformType.AUTOMATION);
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "SUCCESS")
-            .containsEntry("fromBaseName", "audited")
-            .containsEntry("toBaseName", "audited_renamed")
-            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID))
+            .containsEntry("dataTableId", String.valueOf(auditedId))
+            .containsEntry("newName", "audited_renamed")
             .doesNotContainKeys("dataError", "errorClass");
     }
 
     @Test
     void testRenameOfAnUnknownTableRecordsAnError() {
-        assertThatThrownBy(() -> dataTableService.renameTable("missing", "audited_renamed", ENVIRONMENT_ID))
-            .isInstanceOf(BadSqlGrammarException.class);
+        assertThatThrownBy(() -> dataTableService.renameTable(MISSING_DATA_TABLE_ID, "audited_renamed"))
+            .isInstanceOf(DataTableException.class);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(DataTableAuditEvents.DATA_TABLE_RENAMED);
 
         assertThat(persistentAuditEvent.getData())
             .containsEntry("result", "ERROR")
-            .containsEntry("errorClass", BadSqlGrammarException.class.getName())
-            .containsEntry("fromBaseName", "missing")
-            .containsEntry("toBaseName", "audited_renamed")
-            .containsEntry("environmentId", String.valueOf(ENVIRONMENT_ID));
+            .containsEntry("errorClass", DataTableException.class.getName())
+            .containsEntry("dataTableId", String.valueOf(MISSING_DATA_TABLE_ID))
+            .containsEntry("newName", "audited_renamed");
     }
 
     @Test
     void testDropOfAMissingTableIsNotRecorded() {
-        boolean dropped = dataTableService.dropTable("missing", ENVIRONMENT_ID);
+        boolean dropped = dataTableService.dropTable(MISSING_DATA_TABLE_ID, ENVIRONMENT_ID);
 
         Page<PersistentAuditEvent> page = persistenceAuditEventRepository.findAllFiltered(
             AuditEventFilter.empty(), PageRequest.of(0, 25));
@@ -232,15 +235,9 @@ class DataTableServiceAuditIntTest {
             .doesNotContain(DataTableAuditEvents.DATA_TABLE_DELETED);
     }
 
-    private void createAuditedTable() {
-        dataTableService.createTable(
-            "audited", null, List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID);
-    }
-
-    private void dropTestTables() {
-        for (String baseName : BASE_NAMES) {
-            dataTableService.dropTable(baseName, ENVIRONMENT_ID);
-        }
+    private long createAuditedTable() {
+        return dataTableService.createTable(
+            null, "audited", null, List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID);
     }
 
     private PersistentAuditEvent findSingleEvent(String eventType) {

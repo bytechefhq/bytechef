@@ -35,6 +35,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
@@ -58,17 +59,22 @@ public class DataTableDeleteRecordsAction {
 
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
-        return new DataTableDeleteRecordsAction(dataTableService, dataTableRowService).build();
+        return new DataTableDeleteRecordsAction(dataTableService, dataTableRowService, dataTableWorkspaceResolver)
+            .build();
     }
 
-    private DataTableDeleteRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    private DataTableDeleteRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -80,7 +86,7 @@ public class DataTableDeleteRecordsAction {
                     .label("Table")
                     .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, dataTableWorkspaceResolver)),
                 string(DELETE_BY)
                     .label("Delete By")
                     .description("Whether to delete the records with the given IDs or every record that matches " +
@@ -97,7 +103,7 @@ public class DataTableDeleteRecordsAction {
                     .displayCondition("%s != '%s'".formatted(DELETE_BY, DeleteBy.CONDITIONS))
                     .required(true)
                     .items(integer("id")),
-                DataTableUtils.conditionsProperty(dataTableService)
+                DataTableUtils.conditionsProperty(dataTableService, dataTableWorkspaceResolver)
                     .description(
                         "OR Condition array that contains AND Condition arrays; required when Delete By is " +
                             "Conditions. Every record that meets every " +
@@ -124,7 +130,10 @@ public class DataTableDeleteRecordsAction {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
+
+        long dataTableId = DataTableUtils.resolveDataTableId(
+            dataTableService, dataTableWorkspaceResolver, actionContext, name);
         long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
 
         if (getDeleteBy(inputParameters) == DeleteBy.CONDITIONS) {
@@ -135,7 +144,7 @@ public class DataTableDeleteRecordsAction {
                     "Delete by conditions requires at least one condition; use Clear Table to delete every record");
             }
 
-            return deleteRows(baseName, conditions, environmentId);
+            return deleteRows(dataTableId, conditions, environmentId);
         }
 
         List<Long> ids = Arrays.stream(inputParameters.getRequiredArray(IDS))
@@ -150,11 +159,11 @@ public class DataTableDeleteRecordsAction {
         DataTableRowConditions conditions = DataTableRowConditions.of(
             List.of(new DataTableRowFilter("id", Operation.IN, ids)));
 
-        return deleteRows(baseName, conditions, environmentId);
+        return deleteRows(dataTableId, conditions, environmentId);
     }
 
-    private Map<String, Object> deleteRows(String baseName, DataTableRowConditions conditions, long environmentId) {
-        List<Long> deletedIds = dataTableRowService.deleteRows(baseName, conditions, environmentId)
+    private Map<String, Object> deleteRows(long dataTableId, DataTableRowConditions conditions, long environmentId) {
+        List<Long> deletedIds = dataTableRowService.deleteRows(dataTableId, conditions, environmentId)
             .stream()
             .map(DataTableRow::id)
             .toList();

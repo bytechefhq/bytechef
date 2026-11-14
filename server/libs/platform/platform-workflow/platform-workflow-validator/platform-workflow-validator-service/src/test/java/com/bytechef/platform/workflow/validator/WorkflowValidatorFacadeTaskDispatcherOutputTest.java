@@ -283,6 +283,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
     private static final OutputResponse SUBFLOW_OUTPUT = new OutputResponse(
         new ObjectProperty(object("subflow_1").properties(string("message"))), null);
 
+    private final ActionDefinitionFacade actionDefinitionFacade = mock(ActionDefinitionFacade.class);
     private final ActionDefinitionService actionDefinitionService = mock(ActionDefinitionService.class);
     private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
     private final ConnectionService connectionService = mock(ConnectionService.class);
@@ -295,7 +296,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         mock(WorkflowTestConfigurationService.class);
 
     private final WorkflowValidatorFacadeImpl workflowValidatorFacade = new WorkflowValidatorFacadeImpl(
-        mock(ActionDefinitionFacade.class), actionDefinitionService, mock(ClusterElementDefinitionService.class),
+        actionDefinitionFacade, actionDefinitionService, mock(ClusterElementDefinitionService.class),
         componentDefinitionService, connectionService, SpelEvaluator.create(), taskDispatcherDefinitionService,
         mock(TriggerDefinitionFacade.class),
         mock(TriggerDefinitionService.class), workflowNodeTestOutputService, workflowService,
@@ -405,6 +406,26 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         assertEquals(
             List.of("[logger_1] Property 'httpClient_1.quote' does not exist in the output of 'httpClient/v1/get'"),
             result.errors());
+        assertEquals(List.of(), result.warnings());
+    }
+
+    @Test
+    void theDynamicOutputOfASavedWorkflowWithoutTestOutputReceivesTheWorkflowId() {
+        ActionDefinition httpClientActionDefinition = actionDefinition(ComponentDsl.string("uri"));
+
+        when(actionDefinitionService.getActionDefinition("httpClient", 1, "get"))
+            .thenReturn(httpClientActionDefinition);
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput("wf-1", "httpClient_1", 3L))
+            .thenReturn(Optional.empty());
+        when(actionDefinitionFacade.executeOutput(eq("httpClient"), eq(1), eq("get"), anyMap(), anyMap(), eq("wf-1")))
+            .thenReturn(new OutputResponse(
+                Property.toProperty(ComponentDsl.object("httpClient_1")
+                    .properties(ComponentDsl.string("quote"))),
+                null));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(HTTP_CLIENT_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of(), result.errors());
         assertEquals(List.of(), result.warnings());
     }
 

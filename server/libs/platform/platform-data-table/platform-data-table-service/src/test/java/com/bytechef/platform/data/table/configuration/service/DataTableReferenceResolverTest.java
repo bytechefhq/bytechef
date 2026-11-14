@@ -22,13 +22,19 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.definition.BaseProperty.ResourceType;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalLong;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -38,41 +44,84 @@ class DataTableReferenceResolverTest {
 
     private final DataTableRowService dataTableRowService = mock(DataTableRowService.class);
     private final DataTableService dataTableService = mock(DataTableService.class);
-    private final DataTableReferenceResolver resolver =
-        new DataTableReferenceResolver(dataTableRowService, dataTableService);
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver = mock(DataTableWorkspaceResolver.class);
+    private final DataTableReferenceResolver dataTableReferenceResolver = new DataTableReferenceResolver(
+        dataTableRowService, dataTableService, dataTableWorkspaceResolver);
 
     @Test
-    void resourceTypeIsDataTable() {
-        assertEquals(ResourceType.DATA_TABLE, resolver.getResourceType());
+    void testResourceTypeIsDataTable() {
+        assertEquals(ResourceType.DATA_TABLE, dataTableReferenceResolver.getResourceType());
     }
 
     @Test
-    void existingTableResolves() {
-        when(dataTableService.listTables(0L)).thenReturn(List.of(table("conversations")));
-
-        assertNull(resolver.findProblem("Conversations", 0L));
-    }
-
-    @Test
-    void missingTableReportsEnvironment() {
-        when(dataTableService.listTables(1L)).thenReturn(List.of(table("orders")));
+    void testFindProblemReportsATableFromAnotherWorkspace() {
+        when(dataTableWorkspaceResolver.resolveByWorkflowId("workflow-1")).thenReturn(OptionalLong.of(7L));
+        when(dataTableService.fetchDataTable(7L, "orders")).thenReturn(Optional.empty());
 
         assertEquals(
-            "Data table 'conversations' does not exist in this environment", resolver.findProblem("conversations", 1L));
+            "Data table 'orders' does not exist in this workspace and environment",
+            dataTableReferenceResolver.findProblem("orders", 0L, "workflow-1"));
     }
 
     @Test
-    void tableWithoutPrimaryKeyReportsRowServiceReason() {
-        when(dataTableService.listTables(0L)).thenReturn(List.of(table("conversations")));
-        when(dataTableRowService.listRows(eq("conversations"), anyInt(), anyInt(), anyLong()))
-            .thenThrow(new IllegalStateException("Table does not have primary key column 'id': dt_0_conversations"));
+    void testFindProblemReportsATableMissingFromTheEnvironment() {
+        stubExistingTable();
+
+        when(dataTableService.fetchDataTableInfo(1051L, 1L)).thenReturn(Optional.empty());
 
         assertEquals(
-            "Table does not have primary key column 'id': dt_0_conversations",
-            resolver.findProblem("conversations", 0L));
+            "Data table 'orders' does not exist in this workspace and environment",
+            dataTableReferenceResolver.findProblem("orders", 1L, "workflow-1"));
     }
 
-    private static DataTableInfo table(String baseName) {
-        return new DataTableInfo(1L, baseName, null, List.of(), Instant.now());
+    @Test
+    void testFindProblemSkipsTheCheckWithoutAWorkflowId() {
+        assertNull(dataTableReferenceResolver.findProblem("orders", 0L, null));
+
+        verifyNoInteractions(dataTableWorkspaceResolver, dataTableService, dataTableRowService);
+    }
+
+    @Test
+    void testFindProblemSkipsTheCheckWhenTheWorkspaceCannotBeResolved() {
+        when(dataTableWorkspaceResolver.resolveByWorkflowId("workflow-1")).thenReturn(OptionalLong.empty());
+
+        assertNull(dataTableReferenceResolver.findProblem("orders", 0L, "workflow-1"));
+
+        verifyNoInteractions(dataTableService, dataTableRowService);
+    }
+
+    @Test
+    void testFindProblemAcceptsAnExistingTable() {
+        stubExistingTable();
+
+        assertNull(dataTableReferenceResolver.findProblem("orders", 0L, "workflow-1"));
+    }
+
+    @Test
+    void testFindProblemReportsRowServiceReason() {
+        stubExistingTable();
+
+        when(dataTableRowService.listRows(eq(1051L), anyInt(), anyInt(), anyLong()))
+            .thenThrow(new IllegalStateException("Table does not have primary key column 'id': dt_0_1051"));
+
+        assertEquals(
+            "Table does not have primary key column 'id': dt_0_1051",
+            dataTableReferenceResolver.findProblem("orders", 0L, "workflow-1"));
+    }
+
+    @Test
+    void testFindProblemProbesTheTableThroughItsId() {
+        stubExistingTable();
+
+        dataTableReferenceResolver.findProblem("orders", 0L, "workflow-1");
+
+        verify(dataTableRowService).listRows(1051L, 1, 0, 0L);
+    }
+
+    private void stubExistingTable() {
+        when(dataTableWorkspaceResolver.resolveByWorkflowId("workflow-1")).thenReturn(OptionalLong.of(7L));
+        when(dataTableService.fetchDataTable(7L, "orders")).thenReturn(Optional.of(new DataTable(1051L, "orders")));
+        when(dataTableService.fetchDataTableInfo(1051L, 0L)).thenReturn(
+            Optional.of(new DataTableInfo(1051L, "orders", 7L, null, List.of(), Instant.EPOCH)));
     }
 }

@@ -45,7 +45,7 @@ class KnowledgeBaseReferenceResolverTest {
 
         when(knowledgeBaseService.getKnowledgeBases()).thenReturn(List.of(knowledgeBase));
 
-        assertNull(resolver.findProblem("7", 1L));
+        assertNull(resolver.findProblem("7", 1L, "workflow-1"));
     }
 
     @Test
@@ -54,12 +54,14 @@ class KnowledgeBaseReferenceResolverTest {
 
         when(knowledgeBaseService.getKnowledgeBases()).thenReturn(List.of(knowledgeBase));
 
-        assertEquals("Knowledge base with id 7 does not exist in this environment", resolver.findProblem("7", 1L));
+        assertEquals(
+            "Knowledge base with id 7 does not exist in this environment",
+            resolver.findProblem("7", 1L, "workflow-1"));
     }
 
     @Test
     void nonNumericReferenceIsReported() {
-        assertEquals("Knowledge base reference 'abc' is not a valid id", resolver.findProblem("abc", 0L));
+        assertEquals("Knowledge base reference 'abc' is not a valid id", resolver.findProblem("abc", 0L, null));
     }
 
     private static KnowledgeBase knowledgeBase(long id, long environmentId) {

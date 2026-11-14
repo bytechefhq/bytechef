@@ -31,106 +31,106 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class RemoteDataTableRowServiceClient implements DataTableRowService {
     @Override
-    public List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId) {
+    public List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<DataTableRow> findRows(
-        String baseName, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
+        long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
         int offset, long environmentId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId) {
+    public DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<DataTableRow> insertRows(String baseName, List<Map<String, Object>> rowValues, long environmentId) {
+    public List<DataTableRow> insertRows(long dataTableId, List<Map<String, Object>> rowValues, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
+    public DataTableRow updateRow(long dataTableId, long id, Map<String, Object> values, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<DataTableRow> updateRows(
-        String baseName, DataTableRowConditions conditions, Map<String, Object> values, long environmentId) {
+        long dataTableId, DataTableRowConditions conditions, Map<String, Object> values, long environmentId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean deleteRow(String baseName, long id, long environmentId) {
+    public boolean deleteRow(long dataTableId, long id, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<DataTableRow> deleteAllRows(String baseName, long environmentId) {
+    public List<DataTableRow> deleteAllRows(long dataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<DataTableRow> deleteRows(
-        String baseName, DataTableRowConditions conditions, long environmentId) {
+        long dataTableId, DataTableRowConditions conditions, long environmentId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public DataTableRow getRow(String baseName, long id, long environmentId) {
+    public DataTableRow getRow(long dataTableId, long id, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String exportCsv(String baseName, long environmentId) {
+    public String exportCsv(long dataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public int importCsv(String baseName, String csv, long environmentId) {
+    public int importCsv(long dataTableId, String csv, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public long countRows(String baseName, DataTableRowConditions conditions, long environmentId) {
+    public long countRows(long dataTableId, DataTableRowConditions conditions, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<DataTableRow> fetchRowByExternalId(String baseName, String externalId, long environmentId) {
+    public Optional<DataTableRow> fetchRowByExternalId(long dataTableId, String externalId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public DataTableRow insertRow(
-        String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId) {
+        long dataTableId, Map<String, Object> values, @Nullable String externalId, long environmentId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<DataTableRow> insertRows(
-        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
+        long dataTableId, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
     public DataTableRow updateRow(
-        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long dataTableId, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
         long environmentId) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public UpsertResult upsertRow(String baseName, String externalId, Map<String, Object> values, long environmentId) {
+    public UpsertResult upsertRow(long dataTableId, String externalId, Map<String, Object> values, long environmentId) {
         throw new UnsupportedOperationException();
     }
 }

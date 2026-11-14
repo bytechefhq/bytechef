@@ -24,6 +24,7 @@ import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.message.event.MessageEventPreSendProcessor;
 import com.bytechef.message.event.listener.MessageEventListener;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -55,6 +56,11 @@ import org.springframework.scheduling.annotation.EnableAsync;
 })
 @Configuration
 public class DataTableIntTestConfiguration {
+
+    @Bean
+    DataTableWorkspaceResolver dataTableWorkspaceResolver() {
+        return mock(DataTableWorkspaceResolver.class);
+    }
 
     @Bean
     DisabledWorkflowJobPrincipalAccessor disabledWorkflowJobPrincipalAccessor() {

@@ -35,6 +35,7 @@ import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTabl
 import com.bytechef.ee.automation.data.table.public_.web.rest.config.AutomationDataTablePublicRestTestConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
@@ -89,15 +90,18 @@ import org.springframework.test.web.servlet.MockMvc;
 class DataTableRowApiControllerIntTest {
 
     private static final String BASE_PATH = "/api/automation/v1";
-    private static final String BATCH_ROWS_PATH = BASE_PATH + "/data-tables/{name}/rows/batch";
-    private static final String CLEAR_ROWS_PATH = BASE_PATH + "/data-tables/{name}/rows/clear";
-    private static final String EXPORT_ROWS_PATH = BASE_PATH + "/data-tables/{name}/rows/export";
-    private static final String IMPORT_ROWS_PATH = BASE_PATH + "/data-tables/{name}/rows/import";
+    private static final String BATCH_ROWS_PATH = BASE_PATH + "/workspaces/{workspaceId}/data-tables/{name}/rows/batch";
+    private static final String CLEAR_ROWS_PATH = BASE_PATH + "/workspaces/{workspaceId}/data-tables/{name}/rows/clear";
+    private static final String EXPORT_ROWS_PATH =
+        BASE_PATH + "/workspaces/{workspaceId}/data-tables/{name}/rows/export";
+    private static final String IMPORT_ROWS_PATH =
+        BASE_PATH + "/workspaces/{workspaceId}/data-tables/{name}/rows/import";
     private static final long PRODUCTION_ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
     private static final String ROW_BY_EXTERNAL_ID_PATH =
-        BASE_PATH + "/data-tables/{name}/rows/by-external-id/{externalId}";
-    private static final String ROW_PATH = BASE_PATH + "/data-tables/{name}/rows/{id}";
-    private static final String ROWS_PATH = BASE_PATH + "/data-tables/{name}/rows";
+        BASE_PATH + "/workspaces/{workspaceId}/data-tables/{name}/rows/by-external-id/{externalId}";
+    private static final String ROW_PATH = BASE_PATH + "/workspaces/{workspaceId}/data-tables/{name}/rows/{id}";
+    private static final String ROWS_PATH = BASE_PATH + "/workspaces/{workspaceId}/data-tables/{name}/rows";
+    private static final long WORKSPACE_ID = 1L;
 
     @MockitoBean
     private DataTableService dataTableService;
@@ -128,7 +132,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                get(ROWS_PATH, "orders")
+                get(ROWS_PATH, WORKSPACE_ID, "orders")
                     .param("filter", "total:GTE:5", "externalId:EQ:k")
                     .param("sort", "total:DESC")
                     .param("pageNumber", "0")
@@ -164,7 +168,7 @@ class DataTableRowApiControllerIntTest {
                     .thenReturn(new PageImpl<>(List.of()));
 
         mockMvc
-            .perform(get(ROWS_PATH, "orders").param("filter", "total:IN:1,2"))
+            .perform(get(ROWS_PATH, WORKSPACE_ID, "orders").param("filter", "total:IN:1,2"))
             .andExpect(status().isOk());
 
         ArgumentCaptor<DataTableRowConditions> conditionsArgumentCaptor =
@@ -194,7 +198,7 @@ class DataTableRowApiControllerIntTest {
                     .thenReturn(new PageImpl<>(List.of()));
 
         mockMvc
-            .perform(get(ROWS_PATH, "orders").param("filter", "total:EQ:10:30"))
+            .perform(get(ROWS_PATH, WORKSPACE_ID, "orders").param("filter", "total:EQ:10:30"))
             .andExpect(status().isOk());
 
         ArgumentCaptor<DataTableRowConditions> conditionsArgumentCaptor =
@@ -217,7 +221,7 @@ class DataTableRowApiControllerIntTest {
         stubOrdersTable();
 
         mockMvc
-            .perform(get(ROWS_PATH, "orders").param("filter", "missing:EQ:1"))
+            .perform(get(ROWS_PATH, WORKSPACE_ID, "orders").param("filter", "missing:EQ:1"))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errorKey").value(112))
             .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.FILTER_INVALID.getErrorKey()))
@@ -240,7 +244,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                get(ROWS_PATH, "orders")
+                get(ROWS_PATH, WORKSPACE_ID, "orders")
                     .param("pageNumber", "0")
                     .param("pageSize", "1")
                     .accept(MediaType.APPLICATION_JSON))
@@ -258,7 +262,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(ROWS_PATH, "orders")
+                post(ROWS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -280,7 +284,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(ROWS_PATH, "orders")
+                post(ROWS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -298,7 +302,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(ROWS_PATH, "orders")
+                post(ROWS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -319,7 +323,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(ROWS_PATH, "orders")
+                post(ROWS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -338,7 +342,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(ROWS_PATH, "orders")
+                post(ROWS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -351,12 +355,12 @@ class DataTableRowApiControllerIntTest {
 
     @Test
     void testGetRowReturnsOk() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.getRow(7L, 3L, PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(new DataTableRow(3L, null, Map.of("total", BigDecimal.ONE)));
 
         mockMvc
-            .perform(get(ROW_PATH, "orders", 3L).accept(MediaType.APPLICATION_JSON))
+            .perform(get(ROW_PATH, WORKSPACE_ID, "orders", 3L).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(3));
     }
@@ -370,7 +374,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                patch(ROW_PATH, "orders", 3L)
+                patch(ROW_PATH, WORKSPACE_ID, "orders", 3L)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -380,7 +384,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                patch(ROW_PATH, "orders", 3L)
+                patch(ROW_PATH, WORKSPACE_ID, "orders", 3L)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -390,7 +394,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                patch(ROW_PATH, "orders", 3L)
+                patch(ROW_PATH, WORKSPACE_ID, "orders", 3L)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -414,7 +418,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                patch(ROW_PATH, "orders", 3L)
+                patch(ROW_PATH, WORKSPACE_ID, "orders", 3L)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -428,11 +432,11 @@ class DataTableRowApiControllerIntTest {
 
     @Test
     void testDeleteRowReturnsNoContent() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.deleteRow(7L, 3L, PRODUCTION_ENVIRONMENT_ID)).thenReturn(true);
 
         mockMvc
-            .perform(delete(ROW_PATH, "orders", 3L))
+            .perform(delete(ROW_PATH, WORKSPACE_ID, "orders", 3L))
             .andExpect(status().isNoContent());
 
         verify(workspaceDataTableFacade).deleteRow(7L, 3L, PRODUCTION_ENVIRONMENT_ID);
@@ -440,11 +444,11 @@ class DataTableRowApiControllerIntTest {
 
     @Test
     void testDeleteRowFalseIsRowNotFound() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.deleteRow(7L, 3L, PRODUCTION_ENVIRONMENT_ID)).thenReturn(false);
 
         mockMvc
-            .perform(delete(ROW_PATH, "orders", 3L))
+            .perform(delete(ROW_PATH, WORKSPACE_ID, "orders", 3L))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.ROW_NOT_FOUND.getErrorKey()))
             .andExpect(jsonPath("$.entityClass").value("DataTableErrorType"));
@@ -452,24 +456,24 @@ class DataTableRowApiControllerIntTest {
 
     @Test
     void testGetRowByExternalIdReturnsOk() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.fetchRowByExternalId(7L, "k", PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(Optional.of(new DataTableRow(1L, "k", Map.of())));
 
         mockMvc
-            .perform(get(ROW_BY_EXTERNAL_ID_PATH, "orders", "k").accept(MediaType.APPLICATION_JSON))
+            .perform(get(ROW_BY_EXTERNAL_ID_PATH, WORKSPACE_ID, "orders", "k").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.externalId").value("k"));
     }
 
     @Test
     void testGetRowByExternalIdEmptyIsRowNotFound() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.fetchRowByExternalId(7L, "missing", PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(Optional.empty());
 
         mockMvc
-            .perform(get(ROW_BY_EXTERNAL_ID_PATH, "orders", "missing").accept(MediaType.APPLICATION_JSON))
+            .perform(get(ROW_BY_EXTERNAL_ID_PATH, WORKSPACE_ID, "orders", "missing").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.ROW_NOT_FOUND.getErrorKey()));
     }
@@ -484,7 +488,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                put(ROW_BY_EXTERNAL_ID_PATH, "orders", "k")
+                put(ROW_BY_EXTERNAL_ID_PATH, WORKSPACE_ID, "orders", "k")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -495,7 +499,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                put(ROW_BY_EXTERNAL_ID_PATH, "orders", "k")
+                put(ROW_BY_EXTERNAL_ID_PATH, WORKSPACE_ID, "orders", "k")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -511,7 +515,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                put(ROW_BY_EXTERNAL_ID_PATH, "orders", " ")
+                put(ROW_BY_EXTERNAL_ID_PATH, WORKSPACE_ID, "orders", " ")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -525,11 +529,11 @@ class DataTableRowApiControllerIntTest {
 
     @Test
     void testDeleteRowByExternalIdReturnsNoContent() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.deleteRowByExternalId(7L, "k", PRODUCTION_ENVIRONMENT_ID)).thenReturn(true);
 
         mockMvc
-            .perform(delete(ROW_BY_EXTERNAL_ID_PATH, "orders", "k"))
+            .perform(delete(ROW_BY_EXTERNAL_ID_PATH, WORKSPACE_ID, "orders", "k"))
             .andExpect(status().isNoContent());
 
         verify(workspaceDataTableFacade).deleteRowByExternalId(7L, "k", PRODUCTION_ENVIRONMENT_ID);
@@ -537,12 +541,12 @@ class DataTableRowApiControllerIntTest {
 
     @Test
     void testDeleteRowByExternalIdFalseIsRowNotFound() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.deleteRowByExternalId(7L, "missing", PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(false);
 
         mockMvc
-            .perform(delete(ROW_BY_EXTERNAL_ID_PATH, "orders", "missing"))
+            .perform(delete(ROW_BY_EXTERNAL_ID_PATH, WORKSPACE_ID, "orders", "missing"))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.ROW_NOT_FOUND.getErrorKey()));
     }
@@ -558,7 +562,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(BATCH_ROWS_PATH, "orders")
+                post(BATCH_ROWS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -582,7 +586,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(BATCH_ROWS_PATH, "orders")
+                post(BATCH_ROWS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -604,7 +608,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(BATCH_ROWS_PATH, "orders")
+                post(BATCH_ROWS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(rowsJson))
             .andExpect(status().isBadRequest())
@@ -619,7 +623,7 @@ class DataTableRowApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(BATCH_ROWS_PATH, "orders")
+                post(BATCH_ROWS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -634,7 +638,7 @@ class DataTableRowApiControllerIntTest {
     @Test
     void testDeleteRowsRejectsEmptyIds() throws Exception {
         mockMvc
-            .perform(delete(ROWS_PATH, "orders").param("ids", ""))
+            .perform(delete(ROWS_PATH, WORKSPACE_ID, "orders").param("ids", ""))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.ROW_VALUE_INVALID.getErrorKey()));
 
@@ -648,7 +652,7 @@ class DataTableRowApiControllerIntTest {
             .collect(Collectors.joining(","));
 
         mockMvc
-            .perform(delete(ROWS_PATH, "orders").param("ids", ids))
+            .perform(delete(ROWS_PATH, WORKSPACE_ID, "orders").param("ids", ids))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.BATCH_TOO_LARGE.getErrorKey()));
 
@@ -657,12 +661,12 @@ class DataTableRowApiControllerIntTest {
 
     @Test
     void testDeleteRowsReturnsOkWithTheDeletedIds() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.deleteRows(7L, List.of(1L, 2L), PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(List.of(1L, 2L));
 
         mockMvc
-            .perform(delete(ROWS_PATH, "orders").param("ids", "1,2"))
+            .perform(delete(ROWS_PATH, WORKSPACE_ID, "orders").param("ids", "1,2"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.deletedCount").value(2))
             .andExpect(jsonPath("$.deletedIds.length()").value(2))
@@ -672,23 +676,23 @@ class DataTableRowApiControllerIntTest {
 
     @Test
     void testClearRowsReturnsTheDeletedCount() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.clearRows(7L, PRODUCTION_ENVIRONMENT_ID)).thenReturn(42L);
 
         mockMvc
-            .perform(post(CLEAR_ROWS_PATH, "orders"))
+            .perform(post(CLEAR_ROWS_PATH, WORKSPACE_ID, "orders"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.deletedCount").value(42));
     }
 
     @Test
     void testImportRowsReturnsTheImportedCount() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.importCsv(7L, "total\n1\n", PRODUCTION_ENVIRONMENT_ID)).thenReturn(1);
 
         mockMvc
             .perform(
-                post(IMPORT_ROWS_PATH, "orders")
+                post(IMPORT_ROWS_PATH, WORKSPACE_ID, "orders")
                     .contentType("text/csv")
                     .content("total\n1\n"))
             .andExpect(status().isOk())
@@ -699,13 +703,13 @@ class DataTableRowApiControllerIntTest {
 
     @Test
     void testImportRowsIllegalArgumentIsBadRequest() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.importCsv(7L, "total\nlots\n", PRODUCTION_ENVIRONMENT_ID))
             .thenThrow(new IllegalArgumentException("Invalid CSV"));
 
         mockMvc
             .perform(
-                post(IMPORT_ROWS_PATH, "orders")
+                post(IMPORT_ROWS_PATH, WORKSPACE_ID, "orders")
                     .contentType("text/csv")
                     .content("total\nlots\n"))
             .andExpect(status().isBadRequest())
@@ -716,11 +720,11 @@ class DataTableRowApiControllerIntTest {
 
     @Test
     void testExportRowsSetsCsvHeaders() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.exportCsv(7L, PRODUCTION_ENVIRONMENT_ID)).thenReturn("external_id,total\n,1\n");
 
         mockMvc
-            .perform(get(EXPORT_ROWS_PATH, "orders").accept("text/csv"))
+            .perform(get(EXPORT_ROWS_PATH, WORKSPACE_ID, "orders").accept("text/csv"))
             .andExpect(status().isOk())
             .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "text/csv;charset=UTF-8"))
             .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"orders.csv\""))
@@ -728,10 +732,16 @@ class DataTableRowApiControllerIntTest {
     }
 
     private void stubOrdersTable() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(
                 new DataTableInfo(
-                    7L, "orders", null, List.of(new ColumnSpec("total", ColumnType.NUMBER)), Instant.EPOCH));
+                    7L, "orders", WORKSPACE_ID, null, List.of(new ColumnSpec("total", ColumnType.NUMBER)),
+                    Instant.EPOCH));
+    }
+
+    private void stubDataTable(String name, long dataTableId) {
+        when(dataTableService.fetchDataTable(WORKSPACE_ID, name))
+            .thenReturn(Optional.of(new DataTable(dataTableId, name)));
     }
 }

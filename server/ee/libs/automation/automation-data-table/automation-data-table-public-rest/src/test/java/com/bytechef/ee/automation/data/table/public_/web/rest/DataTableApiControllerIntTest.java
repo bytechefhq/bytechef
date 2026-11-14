@@ -32,6 +32,7 @@ import com.bytechef.ee.automation.data.table.public_.web.rest.config.AutomationD
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
@@ -43,6 +44,7 @@ import jakarta.servlet.ServletException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,13 +73,16 @@ import org.springframework.test.web.servlet.MockMvc;
 class DataTableApiControllerIntTest {
 
     private static final String BASE_PATH = "/api/automation/v1";
-    private static final String COLUMN_PATH = BASE_PATH + "/data-tables/{name}/columns/{column}";
-    private static final String COLUMNS_PATH = BASE_PATH + "/data-tables/{name}/columns";
-    private static final String DATA_TABLE_PATH = BASE_PATH + "/data-tables/{name}";
+    private static final String COLUMN_PATH =
+        BASE_PATH + "/workspaces/{workspaceId}/data-tables/{name}/columns/{column}";
+    private static final String COLUMNS_PATH = BASE_PATH + "/workspaces/{workspaceId}/data-tables/{name}/columns";
+    private static final String DATA_TABLE_PATH = BASE_PATH + "/workspaces/{workspaceId}/data-tables/{name}";
     private static final long PRODUCTION_ENVIRONMENT_ID = Environment.PRODUCTION.ordinal();
-    private static final String RENAME_COLUMN_PATH = BASE_PATH + "/data-tables/{name}/columns/{column}/rename";
+    private static final String RENAME_COLUMN_PATH =
+        BASE_PATH + "/workspaces/{workspaceId}/data-tables/{name}/columns/{column}/rename";
     private static final long STAGING_ENVIRONMENT_ID = Environment.STAGING.ordinal();
     private static final String WORKSPACE_DATA_TABLES_PATH = BASE_PATH + "/workspaces/{workspaceId}/data-tables";
+    private static final long WORKSPACE_ID = 1L;
 
     @MockitoBean
     private DataTableService dataTableService;
@@ -100,8 +105,8 @@ class DataTableApiControllerIntTest {
     @Test
     void testListDataTablesFiltersByTagAndMapsColumns() throws Exception {
         DataTableInfo ordersDataTableInfo = new DataTableInfo(
-            7L, "orders", "d", List.of(new ColumnSpec("total", ColumnType.NUMBER)), Instant.EPOCH);
-        DataTableInfo otherDataTableInfo = new DataTableInfo(8L, "other", null, List.of(), Instant.EPOCH);
+            7L, "orders", WORKSPACE_ID, "d", List.of(new ColumnSpec("total", ColumnType.NUMBER)), Instant.EPOCH);
+        DataTableInfo otherDataTableInfo = new DataTableInfo(8L, "other", WORKSPACE_ID, null, List.of(), Instant.EPOCH);
 
         when(workspaceDataTableFacade.listTables(1L, STAGING_ENVIRONMENT_ID))
             .thenReturn(List.of(ordersDataTableInfo, otherDataTableInfo));
@@ -123,8 +128,9 @@ class DataTableApiControllerIntTest {
 
     @Test
     void testListDataTablesWithNoTagFilterReturnsEveryTable() throws Exception {
-        DataTableInfo ordersDataTableInfo = new DataTableInfo(7L, "orders", "d", List.of(), Instant.EPOCH);
-        DataTableInfo otherDataTableInfo = new DataTableInfo(8L, "other", null, List.of(), Instant.EPOCH);
+        DataTableInfo ordersDataTableInfo =
+            new DataTableInfo(7L, "orders", WORKSPACE_ID, "d", List.of(), Instant.EPOCH);
+        DataTableInfo otherDataTableInfo = new DataTableInfo(8L, "other", WORKSPACE_ID, null, List.of(), Instant.EPOCH);
 
         when(workspaceDataTableFacade.listTables(1L, PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(List.of(ordersDataTableInfo, otherDataTableInfo));
@@ -149,9 +155,9 @@ class DataTableApiControllerIntTest {
 
     @Test
     void testCreateDataTableValidatesNamesThenCreatesThenReturnsTheTable() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        when(workspaceDataTableFacade.createTable(anyString(), any(), anyList(), eq(1L), anyLong())).thenReturn(7L);
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
-            .thenReturn(new DataTableInfo(7L, "orders", "d", List.of(), Instant.EPOCH));
+            .thenReturn(new DataTableInfo(7L, "orders", WORKSPACE_ID, "d", List.of(), Instant.EPOCH));
         when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of());
 
         mockMvc
@@ -168,6 +174,8 @@ class DataTableApiControllerIntTest {
                             }
                             """))
             .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").value(7))
+            .andExpect(jsonPath("$.workspaceId").value(1))
             .andExpect(jsonPath("$.name").value("orders"));
 
         verify(workspaceDataTableFacade).createTable(
@@ -182,9 +190,9 @@ class DataTableApiControllerIntTest {
 
     @Test
     void testCreateDataTableWithoutTagsNeverCallsUpdateTags() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        when(workspaceDataTableFacade.createTable(anyString(), any(), anyList(), eq(1L), anyLong())).thenReturn(7L);
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
-            .thenReturn(new DataTableInfo(7L, "orders", null, List.of(), Instant.EPOCH));
+            .thenReturn(new DataTableInfo(7L, "orders", WORKSPACE_ID, null, List.of(), Instant.EPOCH));
         when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of());
 
         mockMvc
@@ -253,17 +261,19 @@ class DataTableApiControllerIntTest {
 
     @Test
     void testGetDataTable() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(
                 new DataTableInfo(
-                    7L, "orders", "d", List.of(new ColumnSpec("total", ColumnType.NUMBER)), Instant.EPOCH));
-        when(workspaceDataTableFacade.getWorkspaceId(7L)).thenReturn(1L);
+                    7L, "orders", WORKSPACE_ID, "d", List.of(new ColumnSpec("total", ColumnType.NUMBER)),
+                    Instant.EPOCH));
         when(workspaceDataTableFacade.getTagsByTableId(1L)).thenReturn(Map.of(7L, List.of(new Tag("hot"))));
 
         mockMvc
-            .perform(get(DATA_TABLE_PATH, "orders").accept(MediaType.APPLICATION_JSON))
+            .perform(get(DATA_TABLE_PATH, WORKSPACE_ID, "orders").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(7))
+            .andExpect(jsonPath("$.workspaceId").value(1))
             .andExpect(jsonPath("$.name").value("orders"))
             .andExpect(jsonPath("$.columns[0].type").value("NUMBER"))
             .andExpect(jsonPath("$.tags.length()").value(1))
@@ -271,25 +281,39 @@ class DataTableApiControllerIntTest {
     }
 
     @Test
+    void testGetDataTableOfAnotherWorkspaceIsNotFound() throws Exception {
+        stubDataTable("orders", 7L);
+
+        when(dataTableService.fetchDataTable(2L, "orders")).thenReturn(Optional.empty());
+
+        mockMvc
+            .perform(get(DATA_TABLE_PATH, 2L, "orders").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.DATA_TABLE_NOT_FOUND.getErrorKey()));
+
+        verify(workspaceDataTableFacade, never()).getTable(anyLong(), anyLong());
+    }
+
+    @Test
     void testAccessDeniedOnAnItemUrlIsNotFound() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
             .thenThrow(new AccessDeniedException("denied"));
 
         mockMvc
-            .perform(get(DATA_TABLE_PATH, "orders").accept(MediaType.APPLICATION_JSON))
+            .perform(get(DATA_TABLE_PATH, WORKSPACE_ID, "orders").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.DATA_TABLE_NOT_FOUND.getErrorKey()));
     }
 
     @Test
     void testExecutionExceptionWithADataTableKeyIsHandledTheSameWay() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
             .thenThrow(new ExecutionException("Data table not found", DataTableErrorType.DATA_TABLE_NOT_FOUND));
 
         mockMvc
-            .perform(get(DATA_TABLE_PATH, "orders").accept(MediaType.APPLICATION_JSON))
+            .perform(get(DATA_TABLE_PATH, WORKSPACE_ID, "orders").accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.DATA_TABLE_NOT_FOUND.getErrorKey()))
             .andExpect(jsonPath("$.entityClass").value("DataTableErrorType"));
@@ -297,13 +321,13 @@ class DataTableApiControllerIntTest {
 
     @Test
     void testUpdateDataTableMissingInTheEnvironmentChangesNothing() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
             .thenThrow(new DataTableException("Data table not found", DataTableErrorType.DATA_TABLE_NOT_FOUND));
 
         mockMvc
             .perform(
-                patch(DATA_TABLE_PATH, "orders")
+                patch(DATA_TABLE_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -322,7 +346,7 @@ class DataTableApiControllerIntTest {
 
         mockMvc
             .perform(
-                patch(DATA_TABLE_PATH, "orders")
+                patch(DATA_TABLE_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -340,7 +364,7 @@ class DataTableApiControllerIntTest {
 
         mockMvc
             .perform(
-                patch(DATA_TABLE_PATH, "orders")
+                patch(DATA_TABLE_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -362,7 +386,7 @@ class DataTableApiControllerIntTest {
 
         mockMvc
             .perform(
-                patch(DATA_TABLE_PATH, "orders")
+                patch(DATA_TABLE_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -374,7 +398,7 @@ class DataTableApiControllerIntTest {
 
         mockMvc
             .perform(
-                patch(DATA_TABLE_PATH, "orders")
+                patch(DATA_TABLE_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -386,7 +410,7 @@ class DataTableApiControllerIntTest {
 
         mockMvc
             .perform(
-                patch(DATA_TABLE_PATH, "orders")
+                patch(DATA_TABLE_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -403,10 +427,10 @@ class DataTableApiControllerIntTest {
 
     @Test
     void testDeleteDataTableIsNoContent() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
 
         mockMvc
-            .perform(delete(DATA_TABLE_PATH, "orders"))
+            .perform(delete(DATA_TABLE_PATH, WORKSPACE_ID, "orders"))
             .andExpect(status().isNoContent());
 
         verify(workspaceDataTableFacade).dropTable(7L, PRODUCTION_ENVIRONMENT_ID);
@@ -418,7 +442,7 @@ class DataTableApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(COLUMNS_PATH, "orders")
+                post(COLUMNS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -428,7 +452,7 @@ class DataTableApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(RENAME_COLUMN_PATH, "orders", "qty")
+                post(RENAME_COLUMN_PATH, WORKSPACE_ID, "orders", "qty")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -437,7 +461,7 @@ class DataTableApiControllerIntTest {
             .andExpect(status().isOk());
 
         mockMvc
-            .perform(delete(COLUMN_PATH, "orders", "quantity"))
+            .perform(delete(COLUMN_PATH, WORKSPACE_ID, "orders", "quantity"))
             .andExpect(status().isNoContent());
 
         verify(workspaceDataTableFacade).addColumn(
@@ -450,7 +474,7 @@ class DataTableApiControllerIntTest {
     void testCreateColumnRejectsAReservedNameBeforeTouchingTheFacade() throws Exception {
         mockMvc
             .perform(
-                post(COLUMNS_PATH, "orders")
+                post(COLUMNS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -473,7 +497,7 @@ class DataTableApiControllerIntTest {
 
         mockMvc
             .perform(
-                post(COLUMNS_PATH, "orders")
+                post(COLUMNS_PATH, WORKSPACE_ID, "orders")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -485,22 +509,27 @@ class DataTableApiControllerIntTest {
 
     @Test
     void testDeleteMissingColumnIsNotFound() throws Exception {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
 
         doThrow(new DataTableException("Column not found", DataTableErrorType.COLUMN_NOT_FOUND))
             .when(workspaceDataTableFacade)
             .removeColumn(7L, "quantity", PRODUCTION_ENVIRONMENT_ID);
 
         mockMvc
-            .perform(delete(COLUMN_PATH, "orders", "quantity"))
+            .perform(delete(COLUMN_PATH, WORKSPACE_ID, "orders", "quantity"))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.COLUMN_NOT_FOUND.getErrorKey()));
     }
 
     private void stubOrdersTable() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubDataTable("orders", 7L);
         when(workspaceDataTableFacade.getTable(7L, PRODUCTION_ENVIRONMENT_ID))
-            .thenReturn(new DataTableInfo(7L, "orders", "d", List.of(), Instant.EPOCH));
+            .thenReturn(new DataTableInfo(7L, "orders", WORKSPACE_ID, "d", List.of(), Instant.EPOCH));
         when(workspaceDataTableFacade.getTagsByTableId(anyLong())).thenReturn(Map.of());
+    }
+
+    private void stubDataTable(String name, long dataTableId) {
+        when(dataTableService.fetchDataTable(WORKSPACE_ID, name))
+            .thenReturn(Optional.of(new DataTable(dataTableId, name)));
     }
 }

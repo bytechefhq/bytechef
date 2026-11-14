@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 class DataTableUpdateRecordsActionTest extends AbstractDataTableActionTest {
 
     private final ModifiableActionDefinition actionDefinition = DataTableUpdateRecordsAction.of(
-        dataTableService, dataTableRowService);
+        dataTableService, dataTableRowService, dataTableWorkspaceResolver);
 
     @Test
     void testPerformUpdatesEveryRecordMatchingConditions() throws Exception {
@@ -46,7 +46,7 @@ class DataTableUpdateRecordsActionTest extends AbstractDataTableActionTest {
                 List.of(new DataTableRowFilter("priority", Operation.GREATER, "3"))));
         Map<String, Object> values = Map.of("status", "HUMAN");
 
-        when(dataTableRowService.updateRows("conversations", conditions, values, 1L))
+        when(dataTableRowService.updateRows(DATA_TABLE_ID, conditions, values, 1L))
             .thenReturn(
                 List.of(
                     new DataTableRow(3, Map.of("status", "HUMAN")), new DataTableRow(4, Map.of("status", "HUMAN"))));
@@ -92,5 +92,15 @@ class DataTableUpdateRecordsActionTest extends AbstractDataTableActionTest {
         assertEquals("Update Records requires a value for at least one column", illegalArgumentException.getMessage());
 
         verifyNoInteractions(dataTableRowService);
+    }
+
+    @Override
+    protected ModifiableActionDefinition createActionDefinition() {
+        return actionDefinition;
+    }
+
+    @Override
+    protected Map<String, Object> createInputParameters(String tableName) {
+        return Map.of("table", tableName, "values", Map.of("status", "HUMAN"));
     }
 }
