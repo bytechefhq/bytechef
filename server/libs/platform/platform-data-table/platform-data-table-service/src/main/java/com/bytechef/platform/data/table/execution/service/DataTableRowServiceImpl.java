@@ -19,12 +19,19 @@ package com.bytechef.platform.data.table.execution.service;
 import com.bytechef.commons.util.BooleanUtils;
 import com.bytechef.commons.util.DateUtils;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.ReservedColumns;
+import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
+import com.bytechef.platform.data.table.execution.domain.ExternalIdPatch;
+import com.bytechef.platform.data.table.execution.domain.NewRow;
+import com.bytechef.platform.data.table.execution.domain.UpsertResult;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
@@ -79,6 +86,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -97,6 +105,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     private static final Logger log = LoggerFactory.getLogger(DataTableRowServiceImpl.class);
 
     static final int MAX_ARRAY_PARAMETER_LENGTH = 50_000;
+
+    private static final int MAX_EXTERNAL_ID_LENGTH = 255;
 
     private static final long MIN_EPOCH_MILLISECONDS = 100_000_000_000L;
 
@@ -300,7 +310,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             for (String columnName : columnNames) {
                 Map<String, Object> values = dataTableRow.values();
 
-                Object value = values.get(columnName);
+                Object value = ReservedColumns.EXTERNAL_ID.equalsIgnoreCase(columnName)
+                    ? dataTableRow.externalId() : values.get(columnName);
 
                 curValues.add(toCsvValue(value));
             }
@@ -321,7 +332,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @Override
     @Transactional
-    public void importCsv(String baseName, String csv, long environmentId) {
+    public int importCsv(String baseName, String csv, long environmentId) {
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -329,7 +340,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         checkHasId(baseName, physicalName);
 
         if (csv == null) {
-            return;
+            return 0;
         }
 
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
@@ -376,9 +387,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     if (mappedColumnNames.stream()
                         .allMatch(Objects::isNull)) {
 
-                        List<String> tableColumnNames = columnNames.stream()
-                            .filter(columnName -> !columnName.equalsIgnoreCase("id"))
-                            .toList();
+                        List<String> tableColumnNames = getUserColumnNames(columnSpecs);
 
                         throw new IllegalArgumentException(
                             "CSV header %s matches no column of table '%s'; its columns are %s; no row was imported"
@@ -408,10 +417,18 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     values.put(curColumnName, (field == null || field.isEmpty()) ? null : field);
                 }
 
+                String externalId = toExternalId(values.remove(ReservedColumns.EXTERNAL_ID));
+
                 try {
                     insertedDataTableRows.add(
                         insertRowWithoutEvent(
-                            baseName, physicalName, columnSpecs, values, environmentId, new HashSet<>()));
+                            baseName, physicalName, columnSpecs, values, externalId, environmentId,
+                            new HashSet<>()));
+                } catch (DataTableException dataTableException) {
+                    throw new DataTableException(
+                        "CSV line %d: %s; no row was imported".formatted(
+                            csvRow.getOriginalLineNumber(), dataTableException.getMessage()),
+                        dataTableException, dataTableException.getErrorType());
                 } catch (IllegalArgumentException exception) {
                     throw new IllegalArgumentException(
                         "CSV line %d: %s; no row was imported".formatted(
@@ -428,6 +445,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }
 
         publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, insertedDataTableRows, environmentId);
+
+        return insertedDataTableRows.size();
     }
 
     /**
@@ -441,6 +460,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId) {
+        return insertRow(baseName, values, null, environmentId);
+    }
+
+    @Override
+    public DataTableRow insertRow(
+        String baseName, Map<String, Object> values, @Nullable String externalId, long environmentId) {
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -450,7 +476,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         Set<String> ignoredColumnNames = new LinkedHashSet<>();
 
         DataTableRow dataTableRow = insertRowWithoutEvent(
-            baseName, physicalName, listColumns(physicalName), values, environmentId, ignoredColumnNames);
+            baseName, physicalName, listColumns(physicalName), values, externalId, environmentId,
+            ignoredColumnNames);
 
         logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
 
@@ -476,7 +503,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             try {
                 insertedDataTableRows.add(
                     insertRowWithoutEvent(
-                        baseName, physicalName, columnSpecs, rowValues.get(index), environmentId, ignoredColumnNames));
+                        baseName, physicalName, columnSpecs, rowValues.get(index), null, environmentId,
+                        ignoredColumnNames));
             } catch (IllegalArgumentException exception) {
                 IllegalArgumentException illegalArgumentException = new IllegalArgumentException(
                     "Record %d: %s; no record was inserted".formatted(index + 1, exception.getMessage()));
@@ -495,6 +523,82 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, insertedDataTableRows, environmentId);
 
         return insertedDataTableRows;
+    }
+
+    @Override
+    @Transactional
+    public List<DataTableRow> insertRows(
+        String baseName, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
+
+        Objects.requireNonNull(createStrategy, "createStrategy");
+
+        if (createStrategy == CreateStrategy.UPSERT && newRows.stream()
+            .anyMatch(DataTableRowServiceImpl::hasNoExternalId)) {
+
+            throw new DataTableException(
+                "Every row needs an external id under the UPSERT strategy",
+                DataTableErrorType.ROW_EXTERNAL_ID_REQUIRED);
+        }
+
+        validateBaseName(baseName);
+
+        String physicalName = buildPhysicalName(environmentId, baseName);
+
+        checkHasId(baseName, physicalName);
+
+        List<ColumnSpec> columnSpecs = listColumns(physicalName);
+        List<DataTableRow> dataTableRows = new ArrayList<>();
+        List<DataTableRow> createdDataTableRows = new ArrayList<>();
+        List<DataTableRow> updatedDataTableRows = new ArrayList<>();
+        Set<String> ignoredColumnNames = new LinkedHashSet<>();
+
+        for (int index = 0; index < newRows.size(); index++) {
+            NewRow newRow = newRows.get(index);
+
+            try {
+                if (createStrategy == CreateStrategy.UPSERT) {
+                    UpsertResult upsertResult = upsertRowWithoutEvent(
+                        baseName, physicalName, columnSpecs, newRow.externalId(), newRow.values(), environmentId,
+                        ignoredColumnNames);
+
+                    dataTableRows.add(upsertResult.row());
+
+                    if (upsertResult.created()) {
+                        createdDataTableRows.add(upsertResult.row());
+                    } else {
+                        updatedDataTableRows.add(upsertResult.row());
+                    }
+                } else {
+                    DataTableRow dataTableRow = insertRowWithoutEvent(
+                        baseName, physicalName, columnSpecs, newRow.values(), newRow.externalId(), environmentId,
+                        ignoredColumnNames);
+
+                    dataTableRows.add(dataTableRow);
+                    createdDataTableRows.add(dataTableRow);
+                }
+            } catch (DataTableException dataTableException) {
+                throw new DataTableException(
+                    "Record %d: %s; no record was inserted".formatted(index + 1, dataTableException.getMessage()),
+                    dataTableException, dataTableException.getErrorType());
+            } catch (IllegalArgumentException exception) {
+                IllegalArgumentException illegalArgumentException = new IllegalArgumentException(
+                    "Record %d: %s; no record was inserted".formatted(index + 1, exception.getMessage()));
+
+                illegalArgumentException.addSuppressed(exception);
+
+                throw illegalArgumentException;
+            } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+                throw withRowPosition(
+                    "Record " + (index + 1), "no record was inserted", dataIntegrityViolationException);
+            }
+        }
+
+        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
+
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_CREATED, createdDataTableRows, environmentId);
+        publishWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, updatedDataTableRows, environmentId);
+
+        return dataTableRows;
     }
 
     private static DataIntegrityViolationException withRowPosition(
@@ -526,12 +630,16 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     private DataTableRow insertRowWithoutEvent(
         String baseName, String physicalName, List<ColumnSpec> columnSpecs, Map<String, Object> values,
-        long environmentId, Set<String> ignoredColumnNames) {
+        @Nullable String externalId, long environmentId, Set<String> ignoredColumnNames) {
 
         List<String> allColumnNames = getColumnNames(columnSpecs);
 
-        List<ColumnValue> columnValues = getColumnValues(
-            columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames);
+        List<ColumnValue> columnValues = new ArrayList<>(
+            getColumnValues(columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames));
+
+        if (externalId != null) {
+            columnValues.add(toExternalIdColumnValue(baseName, columnSpecs, externalId));
+        }
 
         String columnsClause = columnValues.stream()
             .map(columnValue -> {
@@ -550,11 +658,16 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         DataTableRow result;
 
-        if (isReturningSupported()) {
-            result = insertRowReturningValues(physicalName, valuesClause, allColumnNames, preparedStatementSetter);
-        } else {
-            result = insertRowAfterInserting(
-                baseName, physicalName, valuesClause, environmentId, preparedStatementSetter);
+        try {
+            if (isReturningSupported()) {
+                result = insertRowReturningValues(
+                    physicalName, valuesClause, allColumnNames, preparedStatementSetter);
+            } else {
+                result = insertRowAfterInserting(
+                    baseName, physicalName, valuesClause, environmentId, preparedStatementSetter);
+            }
+        } catch (DuplicateKeyException duplicateKeyException) {
+            throw toExternalIdConflict(externalId, duplicateKeyException);
         }
 
         if (result == null) {
@@ -566,7 +679,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @Override
     public List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId) {
-        return findRows(baseName, DataTableRowConditions.matchAll(), null, limit, offset, environmentId);
+        return findRows(baseName, DataTableRowConditions.matchAll(), List.of(), limit, offset, environmentId);
     }
 
     /**
@@ -580,10 +693,11 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public List<DataTableRow> findRows(
-        String baseName, DataTableRowConditions conditions, @Nullable DataTableRowSort sort, int limit,
+        String baseName, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int limit,
         int offset, long environmentId) {
 
         Objects.requireNonNull(conditions, "conditions");
+        Objects.requireNonNull(sorts, "sorts");
 
         if (limit < 0 || offset < 0) {
             throw new IllegalArgumentException(
@@ -602,15 +716,19 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         WhereClause whereClause = buildWhereClause(columnSpecs, conditions);
 
-        String orderByClause = " ORDER BY \"id\"";
+        StringBuilder orderByClause = new StringBuilder(" ORDER BY ");
 
-        if (sort != null) {
+        for (DataTableRowSort sort : sorts) {
             ColumnSpec sortColumnSpec = getColumnSpec(columnSpecs, sort.column());
             DataTableRowSort.Direction direction = sort.direction();
 
-            orderByClause = " ORDER BY " + escapeIdentifier(sortColumnSpec.name()) + " " + direction.name() +
-                " NULLS LAST, \"id\"";
+            orderByClause.append(escapeIdentifier(sortColumnSpec.name()))
+                .append(' ')
+                .append(direction.name())
+                .append(" NULLS LAST, ");
         }
+
+        orderByClause.append("\"id\"");
 
         String sql = "SELECT " + buildSelectColumns(columnNames) + " FROM " + escapeIdentifier(physicalName) +
             whereClause.sql() + orderByClause + " LIMIT ? OFFSET ?";
@@ -625,7 +743,53 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public long countRows(String baseName, DataTableRowConditions conditions, long environmentId) {
+        Objects.requireNonNull(conditions, "conditions");
+
+        validateBaseName(baseName);
+
+        String physicalName = buildPhysicalName(environmentId, baseName);
+
+        checkHasId(baseName, physicalName);
+
+        WhereClause whereClause = buildWhereClause(listColumns(physicalName), conditions);
+
+        Long count = jdbcTemplate.query(
+            "SELECT COUNT(*) FROM " + escapeIdentifier(physicalName) + whereClause.sql(),
+            preparedStatement -> setFilterParameters(preparedStatement, 1, whereClause.filterParameters()),
+            resultSet -> {
+                if (!resultSet.next()) {
+                    return 0L;
+                }
+
+                return resultSet.getLong(1);
+            });
+
+        return count == null ? 0L : count;
+    }
+
+    @Override
+    public Optional<DataTableRow> fetchRowByExternalId(String baseName, String externalId, long environmentId) {
+        Assert.hasText(externalId, "externalId must not be empty");
+
+        List<DataTableRow> dataTableRows = findRows(
+            baseName, externalIdConditions(externalId), List.of(), 1, 0, environmentId);
+
+        return dataTableRows.stream()
+            .findFirst();
+    }
+
+    @Override
     public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
+        return updateRow(baseName, id, values, null, environmentId);
+    }
+
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public DataTableRow updateRow(
+        String baseName, long id, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long environmentId) {
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -638,8 +802,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         Set<String> ignoredColumnNames = new LinkedHashSet<>();
 
-        List<ColumnValue> columnValues = getColumnValues(
-            columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames);
+        List<ColumnValue> columnValues = new ArrayList<>(
+            getColumnValues(columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames));
+
+        if (externalIdPatch != null) {
+            columnValues.add(toExternalIdColumnValue(baseName, columnSpecs, externalIdPatch.externalId()));
+        }
 
         logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
 
@@ -663,12 +831,17 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         DataTableRow updatedDataTableRow;
 
-        if (isReturningSupported()) {
-            updatedDataTableRow = updateRowReturningValues(
-                physicalName, setClause, allColumnNames, preparedStatementSetter);
-        } else {
-            updatedDataTableRow = updateRowAfterUpdating(
-                baseName, physicalName, setClause, id, environmentId, preparedStatementSetter);
+        try {
+            if (isReturningSupported()) {
+                updatedDataTableRow = updateRowReturningValues(
+                    physicalName, setClause, allColumnNames, preparedStatementSetter);
+            } else {
+                updatedDataTableRow = updateRowAfterUpdating(
+                    baseName, physicalName, setClause, id, environmentId, preparedStatementSetter);
+            }
+        } catch (DuplicateKeyException duplicateKeyException) {
+            throw toExternalIdConflict(
+                externalIdPatch == null ? null : externalIdPatch.externalId(), duplicateKeyException);
         }
 
         if (updatedDataTableRow == null) {
@@ -678,6 +851,122 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         publishWebhookEvent(baseName, DataTableWebhookType.RECORD_UPDATED, List.of(updatedDataTableRow), environmentId);
 
         return updatedDataTableRow;
+    }
+
+    @Override
+    @Transactional
+    public UpsertResult upsertRow(
+        String baseName, String externalId, Map<String, Object> values, long environmentId) {
+
+        validateBaseName(baseName);
+
+        String physicalName = buildPhysicalName(environmentId, baseName);
+
+        checkHasId(baseName, physicalName);
+
+        Set<String> ignoredColumnNames = new LinkedHashSet<>();
+
+        UpsertResult upsertResult = upsertRowWithoutEvent(
+            baseName, physicalName, listColumns(physicalName), externalId, values, environmentId,
+            ignoredColumnNames);
+
+        logIgnoredColumnNames(baseName, environmentId, ignoredColumnNames);
+
+        publishWebhookEvent(
+            baseName,
+            upsertResult.created() ? DataTableWebhookType.RECORD_CREATED : DataTableWebhookType.RECORD_UPDATED,
+            List.of(upsertResult.row()), environmentId);
+
+        return upsertResult;
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private UpsertResult upsertRowWithoutEvent(
+        String baseName, String physicalName, List<ColumnSpec> columnSpecs, @Nullable String externalId,
+        Map<String, Object> values, long environmentId, Set<String> ignoredColumnNames) {
+
+        if (externalId == null || externalId.isBlank()) {
+            throw new DataTableException(
+                "An upsert needs an external id", DataTableErrorType.ROW_EXTERNAL_ID_REQUIRED);
+        }
+
+        ColumnValue externalIdColumnValue = toExternalIdColumnValue(baseName, columnSpecs, externalId);
+
+        List<ColumnValue> columnValues = getColumnValues(
+            columnSpecs, values, ValuePolicy.SINGLE_ROW, ignoredColumnNames);
+
+        if (!isReturningSupported()) {
+            Optional<DataTableRow> existingDataTableRow = findRows(
+                baseName, externalIdConditions(externalId), List.of(), 1, 0, environmentId).stream()
+                    .findFirst();
+
+            if (existingDataTableRow.isEmpty()) {
+                return new UpsertResult(
+                    insertRowWithoutEvent(
+                        baseName, physicalName, columnSpecs, values, externalId, environmentId, ignoredColumnNames),
+                    true);
+            }
+
+            DataTableRow dataTableRow = existingDataTableRow.get();
+
+            if (columnValues.isEmpty()) {
+                return new UpsertResult(dataTableRow, false);
+            }
+
+            String setClause = buildSetClause(columnValues);
+
+            DataTableRow updatedDataTableRow = updateRowAfterUpdating(
+                baseName, physicalName, setClause, dataTableRow.id(), environmentId, preparedStatement -> {
+                    int index = setColumnValues(preparedStatement, 1, columnValues);
+
+                    preparedStatement.setLong(index, dataTableRow.id());
+                });
+
+            return new UpsertResult(Objects.requireNonNull(updatedDataTableRow, "updatedDataTableRow"), false);
+        }
+
+        List<ColumnValue> insertedColumnValues = new ArrayList<>();
+
+        insertedColumnValues.add(externalIdColumnValue);
+        insertedColumnValues.addAll(columnValues);
+
+        String columnsClause = insertedColumnValues.stream()
+            .map(columnValue -> {
+                ColumnSpec columnSpec = columnValue.columnSpec();
+
+                return escapeIdentifier(columnSpec.name());
+            })
+            .collect(Collectors.joining(", "));
+
+        List<ColumnValue> updatedColumnValues = columnValues.isEmpty() ? List.of(externalIdColumnValue) : columnValues;
+
+        String updateClause = updatedColumnValues.stream()
+            .map(columnValue -> {
+                ColumnSpec columnSpec = columnValue.columnSpec();
+
+                String column = escapeIdentifier(columnSpec.name());
+
+                return column + " = EXCLUDED." + column;
+            })
+            .collect(Collectors.joining(", "));
+
+        List<String> columnNames = getNonIdColumnNames(columnSpecs);
+
+        String sql = "INSERT INTO " + escapeIdentifier(physicalName) + " (" + columnsClause + ") VALUES (" +
+            buildPlaceholders(insertedColumnValues.size()) + ") ON CONFLICT (" +
+            escapeIdentifier(ReservedColumns.EXTERNAL_ID) + ") DO UPDATE SET " + updateClause + " RETURNING " +
+            buildSelectColumns(columnNames) + ", (xmax = 0) AS \"created\"";
+
+        UpsertResult upsertResult = jdbcTemplate.query(
+            sql, preparedStatement -> setColumnValues(preparedStatement, 1, insertedColumnValues), resultSet -> {
+                if (!resultSet.next()) {
+                    return null;
+                }
+
+                return new UpsertResult(toDataTableRow(resultSet, columnNames), resultSet.getBoolean("created"));
+            });
+
+        return Objects.requireNonNull(upsertResult, "upsertResult");
     }
 
     /**
@@ -836,6 +1125,14 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 continue;
             }
 
+            if (ReservedColumns.EXTERNAL_ID.equalsIgnoreCase(columnName)) {
+                if (valuePolicy == ValuePolicy.BULK_UPDATE) {
+                    throw new IllegalArgumentException("The external_id column cannot be updated by conditions");
+                }
+
+                continue;
+            }
+
             if (valuePolicy == ValuePolicy.BULK_UPDATE
                 && (value == null || (value instanceof String string && string.isBlank()))) {
                 throw new IllegalArgumentException(
@@ -859,7 +1156,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             if (valuePolicy == ValuePolicy.BULK_UPDATE || columnValues.isEmpty()) {
                 throw new IllegalArgumentException(
                     "Unknown column(s): %s; available columns: %s".formatted(
-                        String.join(", ", unknownColumnNames), String.join(", ", getNonIdColumnNames(columnSpecs))));
+                        String.join(", ", unknownColumnNames), String.join(", ", getUserColumnNames(columnSpecs))));
             }
 
             ignoredColumnNames.addAll(unknownColumnNames);
@@ -887,6 +1184,60 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .map(ColumnSpec::name)
             .filter(name -> !"id".equalsIgnoreCase(name))
             .toList();
+    }
+
+    private static List<String> getUserColumnNames(List<ColumnSpec> columnSpecs) {
+        return columnSpecs.stream()
+            .map(ColumnSpec::name)
+            .filter(name -> !ReservedColumns.isReserved(name))
+            .toList();
+    }
+
+    private static DataTableRowConditions externalIdConditions(String externalId) {
+        return DataTableRowConditions.anyOf(
+            List.of(
+                List.of(
+                    new DataTableRowFilter(
+                        ReservedColumns.EXTERNAL_ID, DataTableRowFilter.Operation.EQUALS, externalId))));
+    }
+
+    private static ColumnValue toExternalIdColumnValue(
+        String baseName, List<ColumnSpec> columnSpecs, @Nullable String externalId) {
+
+        ColumnSpec externalIdColumnSpec = findColumnSpec(columnSpecs, ReservedColumns.EXTERNAL_ID)
+            .orElseThrow(() -> new IllegalStateException(
+                "Table '%s' has no external_id column".formatted(baseName)));
+
+        if (externalId != null && (externalId.isBlank() || externalId.length() > MAX_EXTERNAL_ID_LENGTH)) {
+            throw new DataTableException(
+                "An external id must be 1-%d characters".formatted(MAX_EXTERNAL_ID_LENGTH),
+                DataTableErrorType.ROW_VALUE_INVALID);
+        }
+
+        return new ColumnValue(externalIdColumnSpec, externalId);
+    }
+
+    private static RuntimeException toExternalIdConflict(
+        @Nullable String externalId, DuplicateKeyException duplicateKeyException) {
+
+        if (externalId == null) {
+            return duplicateKeyException;
+        }
+
+        return new DataTableException(
+            "External id '%s' is already used by another row".formatted(externalId), duplicateKeyException,
+            DataTableErrorType.ROW_EXTERNAL_ID_CONFLICT);
+    }
+
+    private static @Nullable String toExternalId(@Nullable Object value) {
+        if (value == null) {
+            return null;
+        }
+
+        String externalId = String.valueOf(value)
+            .trim();
+
+        return externalId.isEmpty() ? null : externalId;
     }
 
     private void publishWebhookEvent(
@@ -1470,8 +1821,15 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     private static DataTableRow toDataTableRow(ResultSet resultSet, List<String> columnNames) throws SQLException {
         Map<String, Object> values = new HashMap<>();
+        String externalId = null;
 
         for (String columnName : columnNames) {
+            if (ReservedColumns.EXTERNAL_ID.equalsIgnoreCase(columnName)) {
+                externalId = resultSet.getString(columnName);
+
+                continue;
+            }
+
             Object value = resultSet.getObject(columnName);
 
             if (value instanceof Timestamp) {
@@ -1481,7 +1839,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             values.put(columnName, value);
         }
 
-        return new DataTableRow(resultSet.getLong("id"), values);
+        return new DataTableRow(resultSet.getLong("id"), externalId, values);
     }
 
     private List<ColumnSpec> listColumns(String physicalName) {
@@ -1585,6 +1943,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             }
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         }
+    }
+
+    private static boolean hasNoExternalId(NewRow newRow) {
+        String externalId = newRow.externalId();
+
+        return externalId == null || externalId.isBlank();
     }
 
     private static BigDecimal toBigDecimal(Number number) {

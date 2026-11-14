@@ -30,15 +30,21 @@ import static org.mockito.Mockito.mockingDetails;
 
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
 import com.bytechef.platform.data.table.execution.domain.DataTableRowSort.Direction;
+import com.bytechef.platform.data.table.execution.domain.ExternalIdPatch;
+import com.bytechef.platform.data.table.execution.domain.NewRow;
+import com.bytechef.platform.data.table.execution.domain.UpsertResult;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.lang.reflect.Method;
@@ -54,6 +60,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.LongStream;
 import javax.sql.DataSource;
@@ -484,7 +491,7 @@ class DataTableRowServiceIntTest {
 
         List<DataTableRow> dataTableRows = dataTableRowService.findRows(
             "items", DataTableRowConditions.of(List.of(filter("amount", Operation.GREATER, 5))),
-            new DataTableRowSort("amount", Direction.ASC), 2, 1, DEV_ENVIRONMENT_ID);
+            List.of(new DataTableRowSort("amount", Direction.ASC)), 2, 1, DEV_ENVIRONMENT_ID);
 
         assertEquals(
             List.of(itemIds.get(4), itemIds.get(2)),
@@ -548,11 +555,11 @@ class DataTableRowServiceIntTest {
     void testFindRowsRejectsNegativePaging() {
         assertMessageContains(
             "must not be negative",
-            () -> dataTableRowService.findRows("items", DataTableRowConditions.matchAll(), null, -1, 0,
+            () -> dataTableRowService.findRows("items", DataTableRowConditions.matchAll(), List.of(), -1, 0,
                 DEV_ENVIRONMENT_ID));
         assertMessageContains(
             "must not be negative",
-            () -> dataTableRowService.findRows("items", DataTableRowConditions.matchAll(), null, 10, -1,
+            () -> dataTableRowService.findRows("items", DataTableRowConditions.matchAll(), List.of(), 10, -1,
                 DEV_ENVIRONMENT_ID));
     }
 
@@ -810,7 +817,7 @@ class DataTableRowServiceIntTest {
         IllegalArgumentException illegalArgumentException = assertThrows(
             IllegalArgumentException.class,
             () -> dataTableRowService.findRows(
-                "missing", DataTableRowConditions.matchAll(), null, 100, 0, DEV_ENVIRONMENT_ID));
+                "missing", DataTableRowConditions.matchAll(), List.of(), 100, 0, DEV_ENVIRONMENT_ID));
 
         assertEquals("Table 'missing' not found", illegalArgumentException.getMessage());
     }
@@ -846,7 +853,7 @@ class DataTableRowServiceIntTest {
                     List.of(
                         filter("amount", Operation.IN, List.of(5, 20)), filter("title", Operation.NOT_EMPTY, null)),
                     List.of(filter("amount", Operation.BETWEEN, List.of(25, 35))))),
-            new DataTableRowSort("amount", Direction.DESC), 2, 1, DEV_ENVIRONMENT_ID);
+            List.of(new DataTableRowSort("amount", Direction.DESC)), 2, 1, DEV_ENVIRONMENT_ID);
 
         assertEquals(
             List.of(itemIds.get(2), itemIds.get(0)),
@@ -1428,7 +1435,7 @@ class DataTableRowServiceIntTest {
                     filter("active", Operation.EQUALS, false), filter("price", Operation.EQUALS, "3.25"),
                     filter("due", Operation.EQUALS, "2026-03-01"),
                     filter("created", Operation.EQUALS, "2026-03-01T09:30:00"))),
-            null, 100, 0, DEV_ENVIRONMENT_ID);
+            List.of(), 100, 0, DEV_ENVIRONMENT_ID);
 
         assertEquals(
             expectedIds, matchingDataTableRows.stream()
@@ -1455,6 +1462,241 @@ class DataTableRowServiceIntTest {
                 .values(),
             dataTableRows.get(4)
                 .values());
+    }
+
+    @Test
+    void testInsertRowWithAnExternalIdReturnsItOutsideTheValues() {
+        DataTableRow dataTableRow = dataTableRowService.insertRow(
+            "rows", Map.of("title", "a"), "ORD-1", DEV_ENVIRONMENT_ID);
+
+        assertEquals("ORD-1", dataTableRow.externalId());
+        assertEquals(Map.of("title", "a"), dataTableRow.values());
+
+        DataTableRow readDataTableRow = dataTableRowService.getRow("rows", dataTableRow.id(), DEV_ENVIRONMENT_ID);
+
+        assertNotNull(readDataTableRow);
+        assertEquals("ORD-1", readDataTableRow.externalId());
+        assertEquals(Map.of("title", "a"), readDataTableRow.values());
+    }
+
+    @Test
+    void testInsertRowWithoutAnExternalIdLeavesItNull() {
+        DataTableRow dataTableRow = dataTableRowService.insertRow("rows", Map.of("title", "a"), DEV_ENVIRONMENT_ID);
+
+        assertNull(dataTableRow.externalId());
+    }
+
+    @Test
+    void testInsertRowIgnoresAnExternalIdPassedAsAValue() {
+        DataTableRow dataTableRow = dataTableRowService.insertRow(
+            "rows", Map.of("title", "a", "external_id", "ORD-1"), DEV_ENVIRONMENT_ID);
+
+        assertNull(dataTableRow.externalId());
+        assertEquals(Map.of("title", "a"), dataTableRow.values());
+    }
+
+    @Test
+    void testFetchRowByExternalId() {
+        dataTableRowService.insertRow("rows", Map.of("title", "a"), "ORD-1", DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRow("rows", Map.of("title", "b"), "ORD-2", DEV_ENVIRONMENT_ID);
+
+        Optional<DataTableRow> dataTableRowOptional = dataTableRowService.fetchRowByExternalId(
+            "rows", "ORD-2", DEV_ENVIRONMENT_ID);
+
+        assertTrue(dataTableRowOptional.isPresent());
+        assertEquals("b", dataTableRowOptional.get()
+            .values()
+            .get("title"));
+        assertTrue(
+            dataTableRowService.fetchRowByExternalId("rows", "missing", DEV_ENVIRONMENT_ID)
+                .isEmpty());
+    }
+
+    @Test
+    void testFindRowsFiltersAndSortsByExternalId() {
+        dataTableRowService.insertRow("rows", Map.of("title", "a"), "ORD-2", DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRow("rows", Map.of("title", "b"), "ORD-1", DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRow("rows", Map.of("title", "c"), DEV_ENVIRONMENT_ID);
+
+        List<DataTableRow> dataTableRows = dataTableRowService.findRows(
+            "rows", DataTableRowConditions.of(List.of(filter("external_id", Operation.STARTS_WITH, "ORD-"))),
+            List.of(new DataTableRowSort("external_id", Direction.ASC)), 10, 0, DEV_ENVIRONMENT_ID);
+
+        assertEquals(
+            List.of("ORD-1", "ORD-2"),
+            dataTableRows.stream()
+                .map(DataTableRow::externalId)
+                .toList());
+    }
+
+    @Test
+    void testInsertRowWithATakenExternalIdIsATypedConflict() {
+        dataTableRowService.insertRow("rows", Map.of("title", "a"), "ORD-1", DEV_ENVIRONMENT_ID);
+
+        DataTableException dataTableException = assertThrows(
+            DataTableException.class,
+            () -> dataTableRowService.insertRow("rows", Map.of("title", "b"), "ORD-1", DEV_ENVIRONMENT_ID));
+
+        assertEquals(DataTableErrorType.ROW_EXTERNAL_ID_CONFLICT, dataTableException.getErrorType());
+    }
+
+    @Test
+    void testUpdateRowSetsKeepsAndClearsTheExternalId() {
+        DataTableRow dataTableRow = dataTableRowService.insertRow("rows", Map.of("title", "a"), DEV_ENVIRONMENT_ID);
+
+        DataTableRow keyedDataTableRow = dataTableRowService.updateRow(
+            "rows", dataTableRow.id(), Map.of(), new ExternalIdPatch("ORD-9"), DEV_ENVIRONMENT_ID);
+
+        assertEquals("ORD-9", keyedDataTableRow.externalId());
+
+        DataTableRow untouchedDataTableRow = dataTableRowService.updateRow(
+            "rows", dataTableRow.id(), Map.of("title", "b"), DEV_ENVIRONMENT_ID);
+
+        assertEquals("ORD-9", untouchedDataTableRow.externalId());
+        assertEquals("b", untouchedDataTableRow.values()
+            .get("title"));
+
+        DataTableRow clearedDataTableRow = dataTableRowService.updateRow(
+            "rows", dataTableRow.id(), Map.of(), new ExternalIdPatch(null), DEV_ENVIRONMENT_ID);
+
+        assertNull(clearedDataTableRow.externalId());
+    }
+
+    @Test
+    void testUpsertRowCreatesThenMerges() {
+        int createdEventCount = getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size();
+        int updatedEventCount = getWebhookEvents(DataTableWebhookType.RECORD_UPDATED).size();
+
+        UpsertResult createdUpsertResult = dataTableRowService.upsertRow(
+            "rows", "ORD-1", Map.of("title", "a"), DEV_ENVIRONMENT_ID);
+
+        assertTrue(createdUpsertResult.created());
+        assertEquals("ORD-1", createdUpsertResult.row()
+            .externalId());
+
+        UpsertResult updatedUpsertResult = dataTableRowService.upsertRow(
+            "rows", "ORD-1", Map.of("title", "b"), DEV_ENVIRONMENT_ID);
+
+        assertFalse(updatedUpsertResult.created());
+        assertEquals(
+            createdUpsertResult.row()
+                .id(),
+            updatedUpsertResult.row()
+                .id());
+        assertEquals("b", updatedUpsertResult.row()
+            .values()
+            .get("title"));
+        assertEquals(1, dataTableRowService.countRows("rows", DataTableRowConditions.matchAll(), DEV_ENVIRONMENT_ID));
+        assertEquals(createdEventCount + 1, getWebhookEvents(DataTableWebhookType.RECORD_CREATED).size());
+        assertEquals(updatedEventCount + 1, getWebhookEvents(DataTableWebhookType.RECORD_UPDATED).size());
+    }
+
+    @Test
+    void testUpsertRowWithoutValuesReturnsTheExistingRowUnchanged() {
+        dataTableRowService.upsertRow("rows", "ORD-1", Map.of("title", "a"), DEV_ENVIRONMENT_ID);
+
+        UpsertResult upsertResult = dataTableRowService.upsertRow("rows", "ORD-1", Map.of(), DEV_ENVIRONMENT_ID);
+
+        assertFalse(upsertResult.created());
+        assertEquals("a", upsertResult.row()
+            .values()
+            .get("title"));
+    }
+
+    @Test
+    void testInsertRowsUpsertsKeyedRowsInOrder() {
+        dataTableRowService.insertRow("rows", Map.of("title", "old"), "ORD-1", DEV_ENVIRONMENT_ID);
+
+        List<DataTableRow> dataTableRows = dataTableRowService.insertRows(
+            "rows",
+            List.of(new NewRow(Map.of("title", "new"), "ORD-1"), new NewRow(Map.of("title", "other"), "ORD-2")),
+            CreateStrategy.UPSERT, DEV_ENVIRONMENT_ID);
+
+        assertEquals(
+            List.of("new", "other"),
+            dataTableRows.stream()
+                .map(dataTableRow -> dataTableRow.values()
+                    .get("title"))
+                .toList());
+        assertEquals(2, dataTableRowService.countRows("rows", DataTableRowConditions.matchAll(), DEV_ENVIRONMENT_ID));
+    }
+
+    @Test
+    void testInsertRowsUnderUpsertRequiresEveryExternalId() {
+        DataTableException dataTableException = assertThrows(
+            DataTableException.class,
+            () -> dataTableRowService.insertRows(
+                "rows", List.of(new NewRow(Map.of("title", "a"), null)), CreateStrategy.UPSERT, DEV_ENVIRONMENT_ID));
+
+        assertEquals(DataTableErrorType.ROW_EXTERNAL_ID_REQUIRED, dataTableException.getErrorType());
+        assertEquals(0, dataTableRowService.countRows("rows", DataTableRowConditions.matchAll(), DEV_ENVIRONMENT_ID));
+    }
+
+    @Test
+    void testInsertRowsRollsBackOnATakenExternalId() {
+        dataTableRowService.insertRow("rows", Map.of("title", "a"), "ORD-1", DEV_ENVIRONMENT_ID);
+
+        DataTableException dataTableException = assertThrows(
+            DataTableException.class,
+            () -> dataTableRowService.insertRows(
+                "rows",
+                List.of(new NewRow(Map.of("title", "b"), "ORD-2"), new NewRow(Map.of("title", "c"), "ORD-1")),
+                CreateStrategy.INSERT, DEV_ENVIRONMENT_ID));
+
+        assertEquals(DataTableErrorType.ROW_EXTERNAL_ID_CONFLICT, dataTableException.getErrorType());
+        assertTrue(dataTableException.getMessage()
+            .startsWith("Record 2: "));
+        assertEquals(1, dataTableRowService.countRows("rows", DataTableRowConditions.matchAll(), DEV_ENVIRONMENT_ID));
+    }
+
+    @Test
+    void testCountRowsAppliesTheConditions() {
+        assertEquals(
+            2, dataTableRowService.countRows(
+                "items", DataTableRowConditions.of(List.of(filter("amount", Operation.GREATER, 15))),
+                DEV_ENVIRONMENT_ID));
+        assertEquals(5, dataTableRowService.countRows("items", DataTableRowConditions.matchAll(), DEV_ENVIRONMENT_ID));
+    }
+
+    @Test
+    void testFindRowsSortsByEverySortInOrder() {
+        insertItem("Apple", 1);
+
+        List<DataTableRow> dataTableRows = dataTableRowService.findRows(
+            "items", DataTableRowConditions.of(List.of(filter("title", Operation.EQUALS, "Apple"))),
+            List.of(new DataTableRowSort("title", Direction.ASC), new DataTableRowSort("amount", Direction.DESC)),
+            10, 0, DEV_ENVIRONMENT_ID);
+
+        assertEquals(
+            List.of(5L, 1L),
+            dataTableRows.stream()
+                .map(dataTableRow -> ((Number) dataTableRow.values()
+                    .get("amount")).longValue())
+                .toList());
+    }
+
+    @Test
+    void testCsvRoundTripCarriesTheExternalId() {
+        dataTableRowService.insertRow("rows", Map.of("title", "a"), "ORD-1", DEV_ENVIRONMENT_ID);
+
+        String csv = dataTableRowService.exportCsv("rows", DEV_ENVIRONMENT_ID);
+
+        assertTrue(csv.startsWith("external_id,title"), csv);
+        assertTrue(csv.contains("ORD-1,a"), csv);
+
+        dataTableService.dropTable("rows", DEV_ENVIRONMENT_ID);
+        dataTableService.createTable(
+            "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        assertEquals(1, dataTableRowService.importCsv("rows", csv, DEV_ENVIRONMENT_ID));
+
+        Optional<DataTableRow> dataTableRowOptional = dataTableRowService.fetchRowByExternalId(
+            "rows", "ORD-1", DEV_ENVIRONMENT_ID);
+
+        assertTrue(dataTableRowOptional.isPresent());
+        assertEquals("a", dataTableRowOptional.get()
+            .values()
+            .get("title"));
     }
 
     private static void assertMessageContains(String expectedMessagePart, Executable executable) {
@@ -1546,7 +1788,7 @@ class DataTableRowServiceIntTest {
 
     private List<Long> findItemIds(List<DataTableRowFilter> filters, DataTableRowSort sort) {
         List<DataTableRow> dataTableRows = dataTableRowService.findRows(
-            "items", toConditions(filters), sort, 100, 0, DEV_ENVIRONMENT_ID);
+            "items", toConditions(filters), sort == null ? List.of() : List.of(sort), 100, 0, DEV_ENVIRONMENT_ID);
 
         return dataTableRows.stream()
             .map(DataTableRow::id)
@@ -1561,7 +1803,8 @@ class DataTableRowServiceIntTest {
         List<List<DataTableRowFilter>> conditions, DataTableRowSort sort) {
 
         List<DataTableRow> dataTableRows = dataTableRowService.findRows(
-            "items", DataTableRowConditions.anyOf(conditions), sort, 100, 0, DEV_ENVIRONMENT_ID);
+            "items", DataTableRowConditions.anyOf(conditions), sort == null ? List.of() : List.of(sort), 100, 0,
+            DEV_ENVIRONMENT_ID);
 
         return dataTableRows.stream()
             .map(DataTableRow::id)
@@ -1570,7 +1813,7 @@ class DataTableRowServiceIntTest {
 
     private List<Long> findTypedIds(List<DataTableRowFilter> filters) {
         List<DataTableRow> dataTableRows = dataTableRowService.findRows(
-            "typed", toConditions(filters), null, 100, 0, DEV_ENVIRONMENT_ID);
+            "typed", toConditions(filters), List.of(), 100, 0, DEV_ENVIRONMENT_ID);
 
         return dataTableRows.stream()
             .map(DataTableRow::id)
