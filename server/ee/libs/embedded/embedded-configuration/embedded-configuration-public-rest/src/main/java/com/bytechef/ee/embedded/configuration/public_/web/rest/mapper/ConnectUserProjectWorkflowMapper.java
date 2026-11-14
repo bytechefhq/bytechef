@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.mapper;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.EmbeddedConfigurationPublicMapperSpringConfig;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
+import com.bytechef.ee.embedded.configuration.util.ToolOnlyWorkflowUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
@@ -20,7 +21,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(
-    config = EmbeddedConfigurationPublicMapperSpringConfig.class, implementationName = "EmbeddedPublic<CLASS_NAME>Impl")
+    config = EmbeddedConfigurationPublicMapperSpringConfig.class, implementationName = "EmbeddedPublic<CLASS_NAME>Impl",
+    imports = ToolOnlyWorkflowUtils.class)
 public interface ConnectUserProjectWorkflowMapper
     extends Converter<ConnectedUserProjectWorkflowDTO, ConnectedUserProjectWorkflowModel> {
 
@@ -36,5 +38,9 @@ public interface ConnectUserProjectWorkflowMapper
     @Mapping(target = "dangling", source = "dangling")
     @Mapping(target = "components", source = "components")
     @Mapping(target = "attentionReason", source = "attentionReason")
+    @Mapping(target = "mcpEnabled", ignore = true)
+    @Mapping(
+        target = "toolOnly",
+        expression = "java(ToolOnlyWorkflowUtils.isToolOnly(connectedUserProjectWorkflowDTO.workflow()))")
     ConnectedUserProjectWorkflowModel convert(ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO);
 }

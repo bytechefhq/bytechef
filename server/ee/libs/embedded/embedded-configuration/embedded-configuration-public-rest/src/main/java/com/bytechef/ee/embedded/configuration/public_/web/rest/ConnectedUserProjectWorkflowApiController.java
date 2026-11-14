@@ -9,6 +9,8 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.AutomationTemplateNotVisibleException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectionNotEntitledException;
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
@@ -65,16 +67,18 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
     private final ConversionService conversionService;
     private final EnvironmentService environmentService;
+    private final McpAutomationWorkflowFacade mcpAutomationWorkflowFacade;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectWorkflowApiController(
         ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade,
         ConnectedUserProjectFacade connectedUserProjectFacade, ConversionService conversionService,
-        EnvironmentService environmentService) {
+        EnvironmentService environmentService, McpAutomationWorkflowFacade mcpAutomationWorkflowFacade) {
         this.connectedUserWorkflowReferenceFacade = connectedUserWorkflowReferenceFacade;
         this.connectedUserProjectFacade = connectedUserProjectFacade;
         this.conversionService = conversionService;
         this.environmentService = environmentService;
+        this.mcpAutomationWorkflowFacade = mcpAutomationWorkflowFacade;
     }
 
     @Override
@@ -176,11 +180,10 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     public ResponseEntity<ConnectedUserProjectWorkflowModel> getFrontendProjectWorkflow(
         String workflowUuid, EnvironmentModel xEnvironment) {
         return ResponseEntity.ok(
-            conversionService.convert(
+            toModel(
                 connectedUserProjectFacade.getConnectedUserProjectWorkflow(
                     OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid,
-                    (long) getEnvironment(xEnvironment).ordinal()),
-                ConnectedUserProjectWorkflowModel.class));
+                    (long) getEnvironment(xEnvironment).ordinal())));
     }
 
     @Override
@@ -188,33 +191,28 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
     public ResponseEntity<List<ConnectedUserProjectWorkflowModel>> getFrontendProjectWorkflows(
         EnvironmentModel xEnvironment) {
         return ResponseEntity.ok(
-            connectedUserProjectFacade
-                .getConnectedUserProjectWorkflows(
+            toModels(
+                connectedUserProjectFacade.getConnectedUserProjectWorkflows(
                     OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"),
-                    getEnvironment(xEnvironment))
-                .stream()
-                .map(workflow -> conversionService.convert(workflow, ConnectedUserProjectWorkflowModel.class))
-                .toList());
+                    getEnvironment(xEnvironment))));
     }
 
     @Override
     public ResponseEntity<ConnectedUserProjectWorkflowModel> getProjectWorkflow(
         String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
         return ResponseEntity.ok(
-            conversionService.convert(
+            toModel(
                 connectedUserProjectFacade.getConnectedUserProjectWorkflow(
-                    externalUserId, workflowUuid, (long) getEnvironment(xEnvironment).ordinal()),
-                ConnectedUserProjectWorkflowModel.class));
+                    externalUserId, workflowUuid, (long) getEnvironment(xEnvironment).ordinal())));
     }
 
     @Override
     public ResponseEntity<List<ConnectedUserProjectWorkflowModel>> getProjectWorkflows(
         String externalUserId, EnvironmentModel xEnvironment) {
         return ResponseEntity.ok(
-            connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, getEnvironment(xEnvironment))
-                .stream()
-                .map(workflow -> conversionService.convert(workflow, ConnectedUserProjectWorkflowModel.class))
-                .toList());
+            toModels(
+                connectedUserProjectFacade.getConnectedUserProjectWorkflows(
+                    externalUserId, getEnvironment(xEnvironment))));
     }
 
     @Override
@@ -545,6 +543,48 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
     private Environment getEnvironment(EnvironmentModel xEnvironment) {
         return environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
+    }
+
+    private ConnectedUserProjectWorkflowModel toModel(ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO) {
+        return toModel(
+            connectedUserProjectWorkflowDTO,
+            mcpAutomationWorkflowFacade
+                .getMcpEnabledByAutomationUuid(connectedUserProjectWorkflowDTO.connectedUserId()));
+    }
+
+    private ConnectedUserProjectWorkflowModel toModel(
+        ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO,
+        Map<String, Boolean> mcpEnabledByAutomationUuid) {
+
+        ConnectedUserProjectWorkflowModel connectedUserProjectWorkflowModel = Objects.requireNonNull(
+            conversionService.convert(connectedUserProjectWorkflowDTO, ConnectedUserProjectWorkflowModel.class));
+
+        String automationUuid = connectedUserProjectWorkflowDTO.automationUuid();
+
+        if (automationUuid != null) {
+            connectedUserProjectWorkflowModel.setMcpEnabled(mcpEnabledByAutomationUuid.get(automationUuid));
+        }
+
+        return connectedUserProjectWorkflowModel;
+    }
+
+    private List<ConnectedUserProjectWorkflowModel> toModels(
+        List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflowDTOs) {
+
+        if (connectedUserProjectWorkflowDTOs.isEmpty()) {
+            return List.of();
+        }
+
+        ConnectedUserProjectWorkflowDTO firstConnectedUserProjectWorkflowDTO =
+            connectedUserProjectWorkflowDTOs.getFirst();
+
+        Map<String, Boolean> mcpEnabledByAutomationUuid = mcpAutomationWorkflowFacade.getMcpEnabledByAutomationUuid(
+            firstConnectedUserProjectWorkflowDTO.connectedUserId());
+
+        return connectedUserProjectWorkflowDTOs.stream()
+            .map(
+                connectedUserProjectWorkflowDTO -> toModel(connectedUserProjectWorkflowDTO, mcpEnabledByAutomationUuid))
+            .toList();
     }
 
     private static ResponseEntity<String> workflowUuidResponse(String workflowUuid) {

@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationWorkflowFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceToolFacade;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceWorkflowFacade;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
@@ -46,7 +47,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ConnectedUserIntegrationFacade.class,
     ConnectedUserIntegrationInstanceFacade.class, ConnectedUserProjectFacade.class, ConnectedUserService.class,
     IntegrationInstanceConfigurationWorkflowService.class, IntegrationInstanceWorkflowService.class,
-    IntegrationWorkflowService.class, McpComponentService.class, McpIntegrationInstanceConfigurationService.class,
+    IntegrationWorkflowService.class, McpAutomationWorkflowFacade.class, McpComponentService.class,
+    McpIntegrationInstanceConfigurationService.class,
     McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolFacade.class,
     McpIntegrationInstanceToolService.class, McpIntegrationInstanceWorkflowFacade.class, McpServerService.class,
     McpToolService.class, WorkflowService.class
