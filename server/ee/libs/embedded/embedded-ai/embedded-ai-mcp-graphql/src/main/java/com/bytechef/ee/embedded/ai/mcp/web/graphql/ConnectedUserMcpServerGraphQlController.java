@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.ai.mcp.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerAutomationDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ProvisionableConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.facade.ConnectedUserMcpServerFacade;
@@ -47,6 +48,13 @@ class ConnectedUserMcpServerGraphQlController {
         connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, mcpServerId);
 
         return true;
+    }
+
+    @MutationMapping
+    ConnectedUserMcpServerAutomationDTO enableConnectedUserMcpAutomation(
+        @Argument long connectedUserId, @Argument long id, @Argument boolean enable) {
+
+        return connectedUserMcpServerFacade.enableMcpAutomation(connectedUserId, id, enable);
     }
 
     @MutationMapping

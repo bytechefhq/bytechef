@@ -5,6 +5,7 @@ extend type Query {
 
 extend type Mutation {
     deleteConnectedUserMcpServer(connectedUserId: ID!, mcpServerId: ID!): Boolean
+    enableConnectedUserMcpAutomation(connectedUserId: ID!, id: ID!, enable: Boolean!): ConnectedUserMcpServerAutomation
     enableConnectedUserMcpServer(connectedUserId: ID!, mcpServerId: ID!, enable: Boolean!): Boolean
     enableConnectedUserMcpTool(id: ID!, enable: Boolean!): Boolean
     enableConnectedUserMcpWorkflow(id: ID!, enable: Boolean!): Boolean
@@ -17,6 +18,8 @@ type ProvisionableConnectedUserMcpServer {
     provisioned: Boolean!
     coveredComponentNames: [String!]!
     missingComponentNames: [String!]!
+    coveredAutomationNames: [String!]!
+    missingAutomationNames: [String!]!
 }
 
 type ConnectedUserMcpServer {
@@ -27,6 +30,7 @@ type ConnectedUserMcpServer {
     lastModifiedDate: String
     tools: [ConnectedUserMcpServerTool!]!
     workflows: [ConnectedUserMcpServerWorkflow!]!
+    automations: [ConnectedUserMcpServerAutomation!]!
 }
 
 type ConnectedUserMcpServerTool {
@@ -47,5 +51,17 @@ type ConnectedUserMcpServerWorkflow {
     name: String!
     description: String
     enabled: Boolean!
+    lastExecutionDate: String
+}
+
+type ConnectedUserMcpServerAutomation {
+    id: ID!
+    connectedUserProjectWorkflowId: ID!
+    automationName: String!
+    workflowUuid: String!
+    name: String!
+    description: String
+    enabled: Boolean!
+    available: Boolean!
     lastExecutionDate: String
 }

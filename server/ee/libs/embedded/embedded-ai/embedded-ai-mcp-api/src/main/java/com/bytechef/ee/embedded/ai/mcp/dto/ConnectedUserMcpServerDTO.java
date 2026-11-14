@@ -19,5 +19,6 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record ConnectedUserMcpServerDTO(
     long id, String name, boolean enabled, long environmentId, Instant lastModifiedDate,
-    List<ConnectedUserMcpServerToolDTO> tools, List<ConnectedUserMcpServerWorkflowDTO> workflows) {
+    List<ConnectedUserMcpServerToolDTO> tools, List<ConnectedUserMcpServerWorkflowDTO> workflows,
+    List<ConnectedUserMcpServerAutomationDTO> automations) {
 }

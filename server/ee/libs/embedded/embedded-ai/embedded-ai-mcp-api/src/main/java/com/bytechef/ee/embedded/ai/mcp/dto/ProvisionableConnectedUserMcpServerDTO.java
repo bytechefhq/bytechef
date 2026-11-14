@@ -18,5 +18,5 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record ProvisionableConnectedUserMcpServerDTO(
     long id, String name, boolean provisioned, List<String> coveredComponentNames,
-    List<String> missingComponentNames) {
+    List<String> missingComponentNames, List<String> coveredAutomationNames, List<String> missingAutomationNames) {
 }

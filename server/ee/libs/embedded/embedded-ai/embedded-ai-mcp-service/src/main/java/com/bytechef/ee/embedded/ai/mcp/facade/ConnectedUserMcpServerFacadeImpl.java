@@ -13,15 +13,18 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.ee.embedded.ai.mcp.audit.ConnectedUserMcpServerAuditEvents;
 import com.bytechef.ee.embedded.ai.mcp.audit.ConnectedUserMcpServerAuditMapper;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerAutomationDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerToolDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ConnectedUserMcpServerWorkflowDTO;
 import com.bytechef.ee.embedded.ai.mcp.dto.ProvisionableConnectedUserMcpServerDTO;
 import com.bytechef.ee.embedded.ai.mcp.exception.ConnectedUserMcpServerErrorType;
+import com.bytechef.ee.embedded.ai.mcp.service.McpConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -78,13 +81,16 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     private static final String TOOL_DESCRIPTION = "toolDescription";
     private static final String TOOL_NAME = "toolName";
 
+    private final ConnectedUserMcpAutomations connectedUserMcpAutomations;
     private final ConnectedUserService connectedUserService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
     private final JobService jobService;
+    private final McpAutomationRows mcpAutomationRows;
     private final McpComponentService mcpComponentService;
+    private final McpConnectedUserProjectWorkflowService mcpConnectedUserProjectWorkflowService;
     private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
     private final McpIntegrationInstanceRows mcpIntegrationInstanceRows;
@@ -96,12 +102,14 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public ConnectedUserMcpServerFacadeImpl(
-        ConnectedUserService connectedUserService,
+        ConnectedUserMcpAutomations connectedUserMcpAutomations, ConnectedUserService connectedUserService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
-        JobService jobService, McpComponentService mcpComponentService,
+        JobService jobService, McpAutomationRows mcpAutomationRows, McpComponentService mcpComponentService,
+        McpConnectedUserProjectWorkflowService mcpConnectedUserProjectWorkflowService,
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceRows mcpIntegrationInstanceRows,
@@ -109,13 +117,16 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService, McpServerService mcpServerService,
         McpToolService mcpToolService, PrincipalJobService principalJobService, WorkflowService workflowService) {
 
+        this.connectedUserMcpAutomations = connectedUserMcpAutomations;
         this.connectedUserService = connectedUserService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
         this.jobService = jobService;
+        this.mcpAutomationRows = mcpAutomationRows;
         this.mcpComponentService = mcpComponentService;
+        this.mcpConnectedUserProjectWorkflowService = mcpConnectedUserProjectWorkflowService;
         this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
         this.mcpIntegrationInstanceRows = mcpIntegrationInstanceRows;
@@ -176,6 +187,14 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
             }
         }
 
+        for (McpConnectedUserProjectWorkflow mcpConnectedUserProjectWorkflow : connectedUserMcpAutomations
+            .getMcpServerRows(connectedUserId, mcpServerId)) {
+
+            mcpConnectedUserProjectWorkflowService.delete(mcpConnectedUserProjectWorkflow.getId());
+
+            deleted = true;
+        }
+
         return deleted;
     }
 
@@ -223,6 +242,31 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
                 }
             }
         }
+
+        for (McpConnectedUserProjectWorkflow mcpConnectedUserProjectWorkflow : connectedUserMcpAutomations
+            .getMcpServerRows(connectedUserId, mcpServerId)) {
+
+            if (mcpConnectedUserProjectWorkflow.isEnabled() != enable) {
+                mcpConnectedUserProjectWorkflowService.updateEnabled(mcpConnectedUserProjectWorkflow.getId(), enable);
+            }
+        }
+    }
+
+    @Override
+    @Audited(event = ConnectedUserMcpServerAuditEvents.CONNECTED_USER_MCP_AUTOMATION_ENABLED_UPDATED, data = {
+        @AuditData(key = "connectedUserId", value = "#connectedUserId"),
+        @AuditData(key = "mcpConnectedUserProjectWorkflowId", value = "#mcpConnectedUserProjectWorkflowId"),
+        @AuditData(key = "enabled", value = "#enable")
+    })
+    @PreAuthorize("isTenantAdmin()")
+    public ConnectedUserMcpServerAutomationDTO enableMcpAutomation(
+        long connectedUserId, long mcpConnectedUserProjectWorkflowId, boolean enable) {
+
+        connectedUserMcpAutomations.requireConnectedUserRow(connectedUserId, mcpConnectedUserProjectWorkflowId);
+
+        mcpConnectedUserProjectWorkflowService.updateEnabled(mcpConnectedUserProjectWorkflowId, enable);
+
+        return connectedUserMcpAutomations.getAutomation(connectedUserId, mcpConnectedUserProjectWorkflowId);
     }
 
     @Override
@@ -285,9 +329,13 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
         Map<Long, List<ConnectedUserMcpServerWorkflowDTO>> workflowsByServerId = getWorkflowsByMcpServerId(
             integrationInstances);
 
+        Map<Long, List<ConnectedUserMcpServerAutomationDTO>> automationsByServerId =
+            connectedUserMcpAutomations.getAutomationsByMcpServerId(connectedUserId);
+
         Set<Long> mcpServerIds = new LinkedHashSet<>(toolsByServerId.keySet());
 
         mcpServerIds.addAll(workflowsByServerId.keySet());
+        mcpServerIds.addAll(automationsByServerId.keySet());
 
         List<ConnectedUserMcpServerDTO> connectedUserMcpServers = new ArrayList<>();
 
@@ -305,16 +353,23 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
             workflows
                 .sort(Comparator.comparing(ConnectedUserMcpServerWorkflowDTO::name, String.CASE_INSENSITIVE_ORDER));
 
+            List<ConnectedUserMcpServerAutomationDTO> automations = automationsByServerId.getOrDefault(
+                mcpServerId, List.of());
+
             // "enabled for user" is computed per-user, not taken from the workspace-level flag: the
-            // server is considered active for this user when at least one of their tools or workflows is enabled.
+            // server is considered active for this user when at least one of their tools, workflows or automations
+            // is enabled.
             boolean enabledForUser = tools.stream()
                 .anyMatch(ConnectedUserMcpServerToolDTO::enabled) ||
                 workflows.stream()
-                    .anyMatch(ConnectedUserMcpServerWorkflowDTO::enabled);
+                    .anyMatch(ConnectedUserMcpServerWorkflowDTO::enabled)
+                ||
+                automations.stream()
+                    .anyMatch(ConnectedUserMcpServerAutomationDTO::enabled);
 
             connectedUserMcpServers.add(new ConnectedUserMcpServerDTO(
                 mcpServer.getId(), mcpServer.getName(), enabledForUser, mcpServer.getEnvironmentId(),
-                mcpServer.getLastModifiedDate(), tools, workflows));
+                mcpServer.getLastModifiedDate(), tools, workflows, automations));
         }
 
         connectedUserMcpServers.sort(Comparator.comparing(ConnectedUserMcpServerDTO::name));
@@ -345,10 +400,15 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
 
             McpServerCoverage mcpServerCoverage = getMcpServerCoverage(mcpServer.getId(), userInstanceCoverage);
 
+            ConnectedUserMcpAutomations.AutomationCoverage automationCoverage = connectedUserMcpAutomations
+                .getCoverage(connectedUserId, mcpServer.getId());
+
             provisionableMcpServers.add(new ProvisionableConnectedUserMcpServerDTO(
                 mcpServer.getId(), mcpServer.getName(), provisionedMcpServerIds.contains(mcpServer.getId()),
                 new ArrayList<>(mcpServerCoverage.coveredComponentNames()),
-                new ArrayList<>(mcpServerCoverage.missingComponentNames())));
+                new ArrayList<>(mcpServerCoverage.missingComponentNames()),
+                new ArrayList<>(automationCoverage.coveredNames()),
+                new ArrayList<>(automationCoverage.missingNames())));
         }
 
         provisionableMcpServers.sort(
@@ -372,16 +432,19 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
                 "MCP server %d cannot be provisioned for connected user %d".formatted(mcpServerId, connectedUserId),
                 ConnectedUserMcpServerErrorType.MCP_SERVER_NOT_PROVISIONABLE));
 
-        List<String> coveredComponentNames = provisionableMcpServer.coveredComponentNames();
+        if (provisionableMcpServer.coveredComponentNames()
+            .isEmpty() &&
+            provisionableMcpServer.coveredAutomationNames()
+                .isEmpty()) {
 
-        if (coveredComponentNames.isEmpty()) {
             throw new ConfigurationException(
-                "MCP server %d has no integration covered by connected user %d".formatted(
+                "MCP server %d has no integration or automation covered by connected user %d".formatted(
                     mcpServerId, connectedUserId),
                 ConnectedUserMcpServerErrorType.NO_COVERED_INTEGRATION);
         }
 
         mcpIntegrationInstanceRows.provisionMcpServer(connectedUserId, mcpServerId);
+        mcpAutomationRows.provisionMcpServer(connectedUserId, mcpServerId);
     }
 
     private Optional<McpIntegrationInstanceConfiguration> fetchMcpIntegrationInstanceConfiguration(
