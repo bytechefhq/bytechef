@@ -16,8 +16,8 @@ describe('ConnectDialog — internalOnly inputs', () => {
                     {
                         enabled: true,
                         inputs: [
-                            {label: 'Channel', name: 'channel', type: 'string'},
-                            {internalOnly: true, label: 'API Key', name: 'apiKey', type: 'string'},
+                            {label: 'Channel', name: 'channel', type: 'STRING'},
+                            {internalOnly: true, label: 'API Key', name: 'apiKey', type: 'STRING'},
                         ],
                         label: 'Test Workflow',
                         workflowUuid: 'workflow-abc',

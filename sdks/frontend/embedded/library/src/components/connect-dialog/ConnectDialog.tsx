@@ -794,7 +794,7 @@ const renderWorkflowInput = ({
     workflowInputOptions,
     workflowUuid,
 }: RenderWorkflowInputArgs) => {
-    if (input.type === 'field_mapping') {
+    if (input.type === 'FIELD_MAPPING') {
         const objectName = input.objectName ?? input.name;
         const rawConfig = mapObjectFields?.[objectName];
 

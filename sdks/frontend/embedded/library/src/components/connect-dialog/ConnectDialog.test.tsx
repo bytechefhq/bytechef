@@ -53,7 +53,7 @@ describe('ConnectDialog', () => {
                     {
                         name: 'input1',
                         label: 'Input 1',
-                        type: 'string' as const,
+                        type: 'STRING' as const,
                         value: 'test value',
                     },
                 ],
@@ -487,6 +487,46 @@ describe('ConnectDialog', () => {
         });
     });
 
+    describe('Field Mapping Tests', () => {
+        it('renders the field mapping UI for a FIELD_MAPPING input', async () => {
+            const executeAction = vi.fn();
+            const getObjectTypes = vi.fn().mockResolvedValue([{label: 'Contacts', value: 'contacts'}]);
+
+            render(
+                <ConnectDialog
+                    {...editConnectionProps}
+                    executeAction={executeAction}
+                    mapObjectFields={{
+                        Contacts: {
+                            applicationFields: {fields: [{label: 'Email', value: 'email'}]},
+                            integrationFields: {get: vi.fn().mockResolvedValue([])},
+                            objectTypes: {get: getObjectTypes},
+                        },
+                    }}
+                    mergedWorkflows={[
+                        {
+                            enabled: true,
+                            inputs: [
+                                {
+                                    label: 'Contact Mapping',
+                                    name: 'contactMapping',
+                                    objectName: 'Contacts',
+                                    type: 'FIELD_MAPPING',
+                                },
+                            ],
+                            label: 'Test Workflow',
+                            workflowUuid: 'workflow-123',
+                        },
+                    ]}
+                />
+            );
+
+            expect(await screen.findByRole('option', {name: 'Contacts'})).toBeInTheDocument();
+            expect(screen.getByText('Email')).toBeInTheDocument();
+            expect(getObjectTypes).toHaveBeenCalledWith(expect.objectContaining({executeAction}));
+        });
+    });
+
     describe('Form Submission Tests', () => {
         it('calls handleSubmit when form is submitted', () => {
             const handleClickMock = vi.fn();
@@ -494,7 +534,7 @@ describe('ConnectDialog', () => {
             const props = {
                 ...createConnectionProps,
                 integration: {name: 'Test Integration'} as IntegrationType,
-                properties: [{name: 'field1', label: 'Field 1', type: 'string'} as PropertyType],
+                properties: [{name: 'field1', label: 'Field 1', type: 'STRING'} as PropertyType],
                 form: createFormMock(),
                 handleClick: handleClickMock,
             };
