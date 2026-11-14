@@ -890,6 +890,27 @@ class ConnectedUserProjectFacadeIntTest {
     }
 
     @Test
+    void testGetConnectedUserProjectWorkflowsReturnsTheConnectionEachComponentOfAReferenceUses() {
+        long automationProjectId = createAutomationProject("Connections");
+
+        String automationUuid =
+            addAutomation(automationProjectId, SLACK_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            externalUserId, automationUuid, Environment.PRODUCTION);
+
+        List<ConnectedUserProjectWorkflowDTO> connectedUserProjectWorkflowDTOs =
+            connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION);
+
+        assertThat(connectedUserProjectWorkflowDTOs)
+            .singleElement()
+            .satisfies(connectedUserProjectWorkflowDTO -> assertThat(connectedUserProjectWorkflowDTO.connections())
+                .isEqualTo(Map.of("slack", 777L)));
+    }
+
+    @Test
     void testEnableProjectWorkflowOnAReferenceTurnedOffByTheAdministratorReturnsTheAttentionReason() {
         long automationProjectId = createAutomationProject("Enable Turned Off");
 

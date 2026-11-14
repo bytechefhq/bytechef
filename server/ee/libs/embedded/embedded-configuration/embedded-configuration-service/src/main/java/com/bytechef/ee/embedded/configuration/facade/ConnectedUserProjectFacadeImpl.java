@@ -872,13 +872,21 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                 ReferenceState referenceState = connectedUserReferenceAttentionResolver.resolve(reference);
 
                 List<ConnectedUserWorkflowTemplateDTO.Input> inputs = template == null ? List.of() : template.inputs();
+                List<ConnectedUserWorkflowTemplateDTO.Component> components =
+                    template == null ? List.of() : template.components();
+                List<ConnectedUserWorkflowTemplateDTO.Component> connectionComponents = template == null
+                    ? List.of()
+                    : CollectionUtils.concat(
+                        Objects.requireNonNullElse(template.triggers(), List.of()),
+                        Objects.requireNonNullElse(template.components(), List.of()));
 
                 ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO =
                     ConnectedUserProjectWorkflowDTO.ofReference(
                         connectedUser.getId(), reference,
-                        new WorkflowDTO(workflow, List.of(), getReferenceWorkflowTriggers(reference)),
-                        template == null ? List.of() : template.components(), inputs,
+                        new WorkflowDTO(workflow, List.of(), getReferenceWorkflowTriggers(reference)), components,
+                        inputs,
                         withoutProvidedInputValues(referenceState.inputs(), inputs),
+                        withoutProvidedConnections(referenceState.connections(), connectionComponents),
                         referenceState.attentionReason());
 
                 return connectedUserProjectWorkflowDTO.withStaticWebhookUrl(
@@ -931,6 +939,20 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                 workflowComponentResolver.getTriggerComponents(workflow),
                 workflowComponentResolver.getTaskComponents(workflow), toInputs(workflow), null))
             .map(template -> template.withProvided(providedNames.componentNames(), providedNames.inputNames()));
+    }
+
+    private static Map<String, Long> withoutProvidedConnections(
+        Map<String, Long> connections, List<ConnectedUserWorkflowTemplateDTO.Component> components) {
+
+        Map<String, Long> userConnections = new LinkedHashMap<>(connections);
+
+        for (ConnectedUserWorkflowTemplateDTO.Component component : components) {
+            if (component.provided()) {
+                userConnections.remove(component.name());
+            }
+        }
+
+        return userConnections;
     }
 
     private static Map<String, ?> withoutProvidedInputValues(
