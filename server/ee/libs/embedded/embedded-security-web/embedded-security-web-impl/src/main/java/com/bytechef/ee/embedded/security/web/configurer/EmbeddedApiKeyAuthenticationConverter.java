@@ -43,8 +43,7 @@ import org.springframework.util.StringUtils;
  */
 class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
 
-    static final Pattern EXTERNAL_USER_ID_PATTERN = Pattern.compile(".*/v\\d+/([^/]+)/.*");
-    static final Pattern PUBLIC_API_EXTERNAL_USER_ID_PATTERN = Pattern.compile("^/api/embedded/v\\d+/([^/]+)(?:/.*)?$");
+    static final Pattern EXTERNAL_USER_ID_PATTERN = Pattern.compile("^/api/embedded/v\\d+/([^/]+)(?:/.*)?$");
     static final Pattern JWT_TOKEN_PATTERN =
         Pattern.compile("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_.+/=]*$");
 
@@ -81,7 +80,10 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
 
             String pathExternalUserId = fetchPathExternalUserId(request);
 
-            if (pathExternalUserId != null && !pathExternalUserId.equals(externalUserId)) {
+            if (pathExternalUserId != null &&
+                !ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS.contains(pathExternalUserId) &&
+                !pathExternalUserId.equals(externalUserId)) {
+
                 throw new BadCredentialsException("Token subject does not match the external user in the request path");
             }
 
@@ -95,12 +97,9 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
                 environment.ordinal(), externalUserId, null, tenantKey.getTenantId(),
                 getConnectionDialogAllowedClaim(payload));
         } else {
-            String externalUserId;
-            Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());
+            String externalUserId = fetchPathExternalUserId(request);
 
-            if (matcher.matches()) {
-                externalUserId = matcher.group(1);
-            } else {
+            if (externalUserId == null) {
                 throw new BadCredentialsException("externalUserId parameter is required");
             }
 
@@ -130,19 +129,13 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
             requestPath = requestPath.substring(contextPath.length());
         }
 
-        Matcher matcher = PUBLIC_API_EXTERNAL_USER_ID_PATTERN.matcher(requestPath);
+        Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(requestPath);
 
         if (!matcher.matches()) {
             return null;
         }
 
-        String pathExternalUserId = StringUtils.uriDecode(matcher.group(1), StandardCharsets.UTF_8);
-
-        if (ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS.contains(pathExternalUserId)) {
-            return null;
-        }
-
-        return pathExternalUserId;
+        return StringUtils.uriDecode(matcher.group(1), StandardCharsets.UTF_8);
     }
 
     private static boolean getConnectionDialogAllowedClaim(Claims payload) {

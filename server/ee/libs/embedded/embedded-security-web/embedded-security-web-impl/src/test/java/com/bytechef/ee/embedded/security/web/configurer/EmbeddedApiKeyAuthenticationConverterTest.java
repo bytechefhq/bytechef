@@ -548,6 +548,86 @@ class EmbeddedApiKeyAuthenticationConverterTest {
     }
 
     @Test
+    void testConvertWithNonJwtTokenAndBareExternalUserPathReturnsAuthentication() {
+        Authentication result = convertWithApiKey("/api/embedded/v1/user-1");
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) result;
+
+        assertThat(token.getExternalUserId()).isEqualTo("user-1");
+        assertThat(token.getTenantId()).isEqualTo("test-tenant");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenAndExternalUserSubPathReturnsAuthentication() {
+        Authentication result = convertWithApiKey("/api/embedded/v1/user-1/integrations");
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) result;
+
+        assertThat(token.getExternalUserId()).isEqualTo("user-1");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenAndContextPathBareExternalUserPathReturnsAuthentication() {
+        when(request.getContextPath()).thenReturn("/context");
+
+        Authentication result = convertWithApiKey("/context/api/embedded/v1/user-1");
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) result;
+
+        assertThat(token.getExternalUserId()).isEqualTo("user-1");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenAndPercentEncodedExternalUserPathReturnsDecodedExternalUserId() {
+        Authentication result = convertWithApiKey("/api/embedded/v1/user%40example.com");
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) result;
+
+        assertThat(token.getExternalUserId()).isEqualTo("user@example.com");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenAndNestedVersionSegmentUsesTheFirstPathSegment() {
+        Authentication result = convertWithApiKey("/api/embedded/v1/user-1/automation/workflows/v2/other-user/x");
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) result;
+
+        assertThat(token.getExternalUserId()).isEqualTo("user-1");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "app-events", "automation", "components", "connections", "external", "integration-instances", "integrations",
+        "me", "unified", "workflows"
+    })
+    void testConvertWithNonJwtTokenAndBareReservedSegmentThrowsBadCredentialsException(String reservedSegment) {
+        assertThatThrownBy(() -> convertWithApiKey("/api/embedded/v1/" + reservedSegment))
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("Non-JWT tokens are not accepted on this endpoint");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "/api/embedded/v1/%69ntegrations", "/api/embedded/v1/%69ntegrations/1", "/api/embedded/v1/%6De"
+    })
+    void testConvertWithNonJwtTokenAndPercentEncodedReservedSegmentThrowsBadCredentialsException(String requestUri) {
+        assertThatThrownBy(() -> convertWithApiKey(requestUri))
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("Non-JWT tokens are not accepted on this endpoint");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "/api/embedded/v1", "/api/embedded/v1/", "/api/platform/internal/workflows/v1/user-1/x",
+        "/api/embedded/internal/v1/user-1/connections"
+    })
+    void testConvertWithNonJwtTokenAndNonExternalUserPathThrowsBadCredentialsException(String requestUri) {
+        assertThatThrownBy(() -> convertWithApiKey(requestUri))
+            .isInstanceOf(BadCredentialsException.class)
+            .hasMessage("externalUserId parameter is required");
+    }
+
+    @Test
     void testFrontendPathNeverReachesProviderSoNoConnectedUserIsCreated() {
         ApiKeyService apiKeyService = mock(ApiKeyService.class);
         ConnectedUserService connectedUserService = mock(ConnectedUserService.class);
@@ -562,6 +642,16 @@ class EmbeddedApiKeyAuthenticationConverterTest {
 
         verifyNoInteractions(connectedUserService);
         verifyNoInteractions(apiKeyService);
+    }
+
+    private Authentication convertWithApiKey(String requestUri) {
+        String tenantKey = EncodingUtils.base64EncodeToString("test-tenant" + ":randomData");
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI()).thenReturn(requestUri);
+
+        return converter.convert(request);
     }
 
     private Authentication convertWithJwt(String jwtToken, String requestUri, String environment) {
