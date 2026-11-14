@@ -862,6 +862,41 @@ class ConnectedUserIntegrationFacadeIntTest {
         }
 
         @Test
+        void testCreateIntegrationInstanceNotVisibleWhenIntegrationExpressionFails() {
+            String externalUserId = createConnectedUser(Map.of("plan", "free"));
+
+            long integrationId = createIntegrationRow(PRO_PLAN_PERMISSION_EXPRESSION);
+
+            createIntegrationInstanceConfiguration(integrationId, 1, AuthorizationType.API_KEY);
+
+            stubConnectionCreation();
+
+            assertThatThrownBy(
+                () -> connectedUserIntegrationFacade.createIntegrationInstance(
+                    externalUserId, integrationId, Map.of(), Environment.PRODUCTION))
+                        .isInstanceOf(EmbeddedIntegrationNotVisibleException.class);
+
+            verify(connectionFacade, never()).create(any(ConnectionDTO.class), any());
+        }
+
+        @Test
+        void testCreateIntegrationInstanceSucceedsWhenIntegrationExpressionPasses() {
+            String externalUserId = createConnectedUser(Map.of("plan", "pro"));
+
+            long integrationId = createIntegrationRow(PRO_PLAN_PERMISSION_EXPRESSION);
+            long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(
+                integrationId, 1, AuthorizationType.API_KEY);
+
+            stubConnectionCreation();
+
+            IntegrationInstance integrationInstance = connectedUserIntegrationFacade.createIntegrationInstance(
+                externalUserId, integrationId, Map.of(), Environment.PRODUCTION);
+
+            assertThat(integrationInstance.getIntegrationInstanceConfigurationId())
+                .isEqualTo(integrationInstanceConfigurationId);
+        }
+
+        @Test
         void testCreateIntegrationInstanceFailsWhenNoConfigurationQualifies() {
             String externalUserId = createConnectedUser(Map.of("beta", "false"));
 
