@@ -30,6 +30,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationIns
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacadeImpl;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
+import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
@@ -40,6 +41,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserServiceImpl;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.encryption.Encryption;
+import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
@@ -463,6 +465,11 @@ class McpIntegrationInstanceToolFacadeIntTest {
         EmbeddedMcpAuditIntTestConfiguration.class
     })
     static class FacadeIntTestConfiguration {
+
+        @Bean
+        EmbeddedPermissionEvaluator embeddedPermissionEvaluator() {
+            return new EmbeddedPermissionEvaluator(SpelEvaluator.create());
+        }
 
         @Bean
         PermissionService permissionService() {

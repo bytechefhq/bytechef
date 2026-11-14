@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendIntegrationInstanceRequestConnectionModel;
@@ -20,9 +21,11 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -103,6 +106,12 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
         connectedUserIntegrationFacade.deleteIntegrationInstance(externalUserId, id);
 
         return ResponseEntity.noContent()
+            .build();
+    }
+
+    @ExceptionHandler(EmbeddedIntegrationNotVisibleException.class)
+    public ResponseEntity<Void> handleEmbeddedIntegrationNotVisibleException() {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .build();
     }
 

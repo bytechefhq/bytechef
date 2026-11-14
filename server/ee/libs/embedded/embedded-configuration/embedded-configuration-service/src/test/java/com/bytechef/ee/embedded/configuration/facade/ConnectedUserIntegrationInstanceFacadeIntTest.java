@@ -136,6 +136,8 @@ class ConnectedUserIntegrationInstanceFacadeIntTest {
 
     private static final long CONNECTION_ID = 42L;
 
+    private static final String PRO_PLAN_PERMISSION_EXPRESSION = "metadata['plan'] == 'pro'";
+
     private static final String WORKFLOW_DEFINITION = """
         {"label":"Sync contacts","inputs":[],"triggers":[],"tasks":[]}
         """;
@@ -170,8 +172,10 @@ class ConnectedUserIntegrationInstanceFacadeIntTest {
     @Autowired
     private WorkflowService workflowService;
 
+    private long integrationId;
     private long integrationInstanceConfigurationWorkflowId;
     private long integrationInstanceId;
+    private long integrationWorkflowId;
     private String otherExternalUserId;
     private String ownerExternalUserId;
     private String workflowId;
@@ -194,6 +198,8 @@ class ConnectedUserIntegrationInstanceFacadeIntTest {
 
         integration = integrationService.create(integration);
 
+        integrationId = integration.getId();
+
         Workflow workflow = workflowService.create(WORKFLOW_DEFINITION, Workflow.Format.JSON, Workflow.SourceType.JDBC);
 
         workflowId = workflow.getId();
@@ -201,6 +207,7 @@ class ConnectedUserIntegrationInstanceFacadeIntTest {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
             integration.getId(), 1, workflowId);
 
+        integrationWorkflowId = integrationWorkflow.getId();
         workflowUuid = integrationWorkflow.getUuidAsString();
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
@@ -316,6 +323,66 @@ class ConnectedUserIntegrationInstanceFacadeIntTest {
                     .isInstanceOf(EmbeddedIntegrationNotVisibleException.class);
 
         assertThat(fetchIntegrationInstanceWorkflow()).isEmpty();
+    }
+
+    @Test
+    void testEnableIntegrationInstanceWorkflowDeniedWhenWorkflowExpressionHidesIt() {
+        integrationWorkflowService.updatePermissionExpression(integrationWorkflowId, PRO_PLAN_PERMISSION_EXPRESSION);
+
+        connectedUserService.updateConnectedUser(ownerExternalUserId, Environment.PRODUCTION, Map.of("plan", "free"));
+
+        assertThatThrownBy(
+            () -> connectedUserIntegrationInstanceFacade.enableIntegrationInstanceWorkflow(
+                ownerExternalUserId, integrationInstanceId, workflowUuid))
+                    .isInstanceOf(EmbeddedIntegrationNotVisibleException.class);
+
+        assertThat(fetchIntegrationInstanceWorkflow()).isEmpty();
+    }
+
+    @Test
+    void testEnableIntegrationInstanceWorkflowAllowedWhenWorkflowExpressionPasses() {
+        integrationWorkflowService.updatePermissionExpression(integrationWorkflowId, PRO_PLAN_PERMISSION_EXPRESSION);
+
+        connectedUserService.updateConnectedUser(ownerExternalUserId, Environment.PRODUCTION, Map.of("plan", "pro"));
+
+        connectedUserIntegrationInstanceFacade.enableIntegrationInstanceWorkflow(
+            ownerExternalUserId, integrationInstanceId, workflowUuid);
+
+        assertThat(fetchIntegrationInstanceWorkflow())
+            .hasValueSatisfying(integrationInstanceWorkflow -> assertThat(integrationInstanceWorkflow.isEnabled())
+                .isTrue());
+    }
+
+    @Test
+    void testEnableIntegrationInstanceWorkflowDeniedWhenIntegrationExpressionHidesIt() {
+        Integration integration = integrationService.getIntegration(integrationId);
+
+        integration.setPermissionExpression(PRO_PLAN_PERMISSION_EXPRESSION);
+
+        integrationService.update(integration);
+
+        connectedUserService.updateConnectedUser(ownerExternalUserId, Environment.PRODUCTION, Map.of("plan", "free"));
+
+        assertThatThrownBy(
+            () -> connectedUserIntegrationInstanceFacade.enableIntegrationInstanceWorkflow(
+                ownerExternalUserId, integrationInstanceId, workflowUuid))
+                    .isInstanceOf(EmbeddedIntegrationNotVisibleException.class);
+
+        assertThat(fetchIntegrationInstanceWorkflow()).isEmpty();
+    }
+
+    @Test
+    void testDisableIntegrationInstanceWorkflowAllowedWhenWorkflowExpressionHidesIt() {
+        createEnabledIntegrationInstanceWorkflow();
+
+        integrationWorkflowService.updatePermissionExpression(integrationWorkflowId, PRO_PLAN_PERMISSION_EXPRESSION);
+
+        connectedUserIntegrationInstanceFacade.disableIntegrationInstanceWorkflow(
+            ownerExternalUserId, integrationInstanceId, workflowUuid);
+
+        assertThat(fetchIntegrationInstanceWorkflow())
+            .hasValueSatisfying(integrationInstanceWorkflow -> assertThat(integrationInstanceWorkflow.isEnabled())
+                .isFalse());
     }
 
     @Test
