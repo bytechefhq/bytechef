@@ -152,13 +152,14 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
 
         Assert.notNull(integrationWorkflow, "'integrationWorkflow' must not be null");
 
-        update(integrationWorkflow);
+        IntegrationWorkflow draftIntegrationWorkflow = update(integrationWorkflow);
 
-        integrationWorkflow = new IntegrationWorkflow(
-            integrationId, oldIntegrationVersion, oldWorkflowId,
-            UUID.fromString(integrationWorkflow.getUuidAsString()));
+        IntegrationWorkflow publishedIntegrationWorkflow = new IntegrationWorkflow(
+            integrationId, oldIntegrationVersion, oldWorkflowId, draftIntegrationWorkflow.getUuid());
 
-        integrationWorkflowRepository.save(integrationWorkflow);
+        publishedIntegrationWorkflow.setPermissionExpression(draftIntegrationWorkflow.getPermissionExpression());
+
+        integrationWorkflowRepository.save(publishedIntegrationWorkflow);
     }
 
     @Override

@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.ee.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -68,6 +69,39 @@ public class IntegrationWorkflowServiceIntTest {
         assertThat(
             integrationWorkflowService.getWorkflowIds(integration.getId(), integration.getLastIntegrationVersion()))
                 .contains("workflow2");
+    }
+
+    @Test
+    public void testPublishWorkflowKeepsThePermissionExpressionOnThePublishedVersion() {
+        Integration integration = integrationRepository.save(getIntegration());
+
+        long integrationId = Validate.notNull(integration.getId(), "id");
+
+        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
+            integrationId, 1, "publishedWorkflow");
+
+        integrationWorkflow = integrationWorkflowService.updatePermissionExpression(
+            Validate.notNull(integrationWorkflow.getId(), "id"), "metadata['plan'] == 'pro'");
+
+        integrationWorkflow.setIntegrationVersion(2);
+        integrationWorkflow.setWorkflowId("draftWorkflow");
+
+        integrationWorkflowService.publishWorkflow(integrationId, 1, "publishedWorkflow", integrationWorkflow);
+
+        assertThat(integrationWorkflowService.getIntegrationWorkflows(integrationId, 1))
+            .singleElement()
+            .satisfies(publishedIntegrationWorkflow -> {
+                assertThat(publishedIntegrationWorkflow.getWorkflowId()).isEqualTo("publishedWorkflow");
+                assertThat(publishedIntegrationWorkflow.getPermissionExpression())
+                    .isEqualTo("metadata['plan'] == 'pro'");
+            });
+        assertThat(integrationWorkflowService.getIntegrationWorkflows(integrationId, 2))
+            .singleElement()
+            .satisfies(draftIntegrationWorkflow -> {
+                assertThat(draftIntegrationWorkflow.getWorkflowId()).isEqualTo("draftWorkflow");
+                assertThat(draftIntegrationWorkflow.getPermissionExpression())
+                    .isEqualTo("metadata['plan'] == 'pro'");
+            });
     }
 
     private Integration getIntegration() {
