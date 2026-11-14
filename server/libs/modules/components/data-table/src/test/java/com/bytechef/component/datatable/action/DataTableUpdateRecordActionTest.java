@@ -34,11 +34,11 @@ class DataTableUpdateRecordActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformEmitsFlatRow() throws Exception {
-        when(dataTableRowService.updateRow(anyString(), anyLong(), anyMap(), anyLong()))
+        when(dataTableRowFacade.updateRow(anyString(), anyLong(), anyMap(), anyLong()))
             .thenReturn(new DataTableRow(7, Map.of("status", "BOT")));
 
         ModifiableActionDefinition actionDefinition = DataTableUpdateRecordAction.of(
-            dataTableService, dataTableRowService);
+            dataTableService, dataTableRowFacade, dataTableRowService);
 
         assertEquals(
             Map.of("id", 7L, "status", "BOT"),

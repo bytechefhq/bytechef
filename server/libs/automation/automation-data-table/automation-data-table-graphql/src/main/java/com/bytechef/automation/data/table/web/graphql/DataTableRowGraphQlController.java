@@ -19,6 +19,7 @@ package com.bytechef.automation.data.table.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.facade.DataTableRowFacade;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -38,12 +39,15 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class DataTableRowGraphQlController {
 
+    private final DataTableRowFacade dataTableRowFacade;
     private final DataTableRowService dataTableRowService;
     private final DataTableService dataTableService;
 
     public DataTableRowGraphQlController(
-        DataTableRowService dataTableRowService, DataTableService dataTableService) {
+        DataTableRowFacade dataTableRowFacade, DataTableRowService dataTableRowService,
+        DataTableService dataTableService) {
 
+        this.dataTableRowFacade = dataTableRowFacade;
         this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
     }
@@ -89,7 +93,7 @@ public class DataTableRowGraphQlController {
         Long environmentId = input.environmentId();
         String baseName = dataTableService.getBaseNameById(input.tableId());
 
-        DataTableRow dataTableRow = dataTableRowService.insertRow(
+        DataTableRow dataTableRow = dataTableRowFacade.insertRow(
             baseName, input.values(), environmentId);
 
         return new Row(dataTableRow.id(), dataTableRow.values());
@@ -100,7 +104,7 @@ public class DataTableRowGraphQlController {
         Long environmentId = input.environmentId();
         String baseName = dataTableService.getBaseNameById(input.tableId());
 
-        DataTableRow row = dataTableRowService.updateRow(
+        DataTableRow row = dataTableRowFacade.updateRow(
             baseName, input.id(), input.values(), environmentId);
 
         return new Row(row.id(), row.values());
@@ -127,7 +131,7 @@ public class DataTableRowGraphQlController {
 
         String baseName = dataTableService.getBaseNameById(input.tableId());
 
-        dataTableRowService.importCsv(baseName, input.csv(), environmentId);
+        dataTableRowFacade.importCsv(baseName, input.csv(), environmentId);
 
         return true;
     }
