@@ -12,6 +12,9 @@ import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConve
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.ee.embedded.ai.mcp.event.McpToolBeforeDeleteEventListener;
+import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationServiceImpl;
+import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationWorkflowServiceImpl;
+import com.bytechef.ee.embedded.ai.mcp.service.McpConnectedUserProjectWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowServiceImpl;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolServiceImpl;
@@ -47,7 +50,9 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Import({
     ConnectedUserSecurity.class, EmbeddedOwnerContributorConfiguration.class, EncryptionImpl.class,
-    JacksonConfiguration.class, LiquibaseConfiguration.class, McpIntegrationComponentServiceImpl.class,
+    JacksonConfiguration.class, LiquibaseConfiguration.class, McpAutomationProjectConfigurationServiceImpl.class,
+    McpAutomationProjectConfigurationWorkflowServiceImpl.class, McpConnectedUserProjectWorkflowServiceImpl.class,
+    McpIntegrationComponentServiceImpl.class,
     McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolServiceImpl.class,
     McpIntegrationInstanceWorkflowServiceImpl.class, McpToolBeforeDeleteEventListener.class, McpToolServiceImpl.class,
     PostgreSQLContainerConfiguration.class

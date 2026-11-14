@@ -1,0 +1,158 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.ai.mcp.domain;
+
+import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
+import java.time.Instant;
+import java.util.Objects;
+import org.apache.commons.lang3.Validate;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+@Table("mcp_connected_user_project_workflow")
+public final class McpConnectedUserProjectWorkflow {
+
+    @Id
+    private Long id;
+
+    @Column("connected_user_project_workflow_id")
+    private AggregateReference<ConnectedUserProjectWorkflow, Long> connectedUserProjectWorkflowId;
+
+    @Column("mcp_automation_project_configuration_workflow_id")
+    private AggregateReference<McpAutomationProjectConfigurationWorkflow, Long> mcpAutomationProjectConfigurationWorkflowId;
+
+    @Column
+    private boolean enabled;
+
+    @CreatedBy
+    @Column("created_by")
+    private String createdBy;
+
+    @Column("created_date")
+    @CreatedDate
+    private Instant createdDate;
+
+    @Column("last_modified_by")
+    @LastModifiedBy
+    private String lastModifiedBy;
+
+    @Column("last_modified_date")
+    @LastModifiedDate
+    private Instant lastModifiedDate;
+
+    @Version
+    private int version;
+
+    public McpConnectedUserProjectWorkflow() {
+    }
+
+    public McpConnectedUserProjectWorkflow(
+        long connectedUserProjectWorkflowId, long mcpAutomationProjectConfigurationWorkflowId, boolean enabled) {
+
+        this.connectedUserProjectWorkflowId = AggregateReference.to(connectedUserProjectWorkflowId);
+        this.mcpAutomationProjectConfigurationWorkflowId = AggregateReference.to(
+            mcpAutomationProjectConfigurationWorkflowId);
+        this.enabled = enabled;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getConnectedUserProjectWorkflowId() {
+        return Validate.notNull(connectedUserProjectWorkflowId, "connectedUserProjectWorkflowId")
+            .getId();
+    }
+
+    public Long getMcpAutomationProjectConfigurationWorkflowId() {
+        return Validate.notNull(
+            mcpAutomationProjectConfigurationWorkflowId, "mcpAutomationProjectConfigurationWorkflowId")
+            .getId();
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public Instant getCreatedDate() {
+        return createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public Instant getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof McpConnectedUserProjectWorkflow mcpConnectedUserProjectWorkflow)) {
+            return false;
+        }
+
+        return Objects.equals(id, mcpConnectedUserProjectWorkflow.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "McpConnectedUserProjectWorkflow{" +
+            "id=" + id +
+            ", connectedUserProjectWorkflowId=" + connectedUserProjectWorkflowId +
+            ", mcpAutomationProjectConfigurationWorkflowId=" + mcpAutomationProjectConfigurationWorkflowId +
+            ", enabled=" + enabled +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
+            ", version=" + version +
+            '}';
+    }
+}
