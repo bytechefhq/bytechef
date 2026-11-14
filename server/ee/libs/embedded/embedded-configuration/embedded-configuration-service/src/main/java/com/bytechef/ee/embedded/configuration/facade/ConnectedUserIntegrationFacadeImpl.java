@@ -203,10 +203,15 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
+        Integration integration = integrationService.getIntegration(integrationId);
+
+        validateIntegrationVisible(integration, connectedUser);
+
         IntegrationInstanceConfiguration integrationInstanceConfiguration = getSelfServeConfiguration(
             integrationId, environment, connectedUser);
 
-        return createIntegrationInstance(connectedUser, integrationInstanceConfiguration, connectionParameters);
+        return createIntegrationInstance(
+            connectedUser, integration, integrationInstanceConfiguration, connectionParameters);
     }
 
     private IntegrationInstanceConfiguration getSelfServeConfiguration(
@@ -226,11 +231,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     }
 
     private IntegrationInstance createIntegrationInstance(
-        ConnectedUser connectedUser, IntegrationInstanceConfiguration integrationInstanceConfiguration,
-        Map<String, Object> connectionParameters) {
-
-        Integration integration = integrationService.getIntegration(
-            integrationInstanceConfiguration.getIntegrationId());
+        ConnectedUser connectedUser, Integration integration,
+        IntegrationInstanceConfiguration integrationInstanceConfiguration, Map<String, Object> connectionParameters) {
 
         long connectionId = createConnection(
             connectedUser, integration, integrationInstanceConfiguration, connectionParameters);
@@ -448,9 +450,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         Integration integration = integrationService.getIntegration(
             integrationInstanceConfiguration.getIntegrationId());
 
-        if (!embeddedPermissionEvaluator.evaluate(integration.getPermissionExpression(), connectedUser)) {
-            throw new EmbeddedIntegrationNotVisibleException(integration.getId());
-        }
+        validateIntegrationVisible(integration, connectedUser);
 
         Map<String, Map<String, Object>> inputsByWorkflowId = getProvisionedWorkflowInputs(
             connectedUser, integration, integrationInstanceConfiguration, workflows == null ? List.of() : workflows);
@@ -733,6 +733,12 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     private boolean isIntegrationVisible(IntegrationDTO integrationDTO, ConnectedUser connectedUser) {
         return embeddedPermissionEvaluator.evaluate(integrationDTO.permissionExpression(), connectedUser);
+    }
+
+    private void validateIntegrationVisible(Integration integration, ConnectedUser connectedUser) {
+        if (!embeddedPermissionEvaluator.evaluate(integration.getPermissionExpression(), connectedUser)) {
+            throw new EmbeddedIntegrationNotVisibleException(integration.getId());
+        }
     }
 
     private IntegrationInstanceConfigurationDTO filterWorkflows(

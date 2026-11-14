@@ -7,11 +7,15 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
+import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.security.ConnectedUserAuthentications;
@@ -48,23 +52,28 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
 
     private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ConnectedUserService connectedUserService;
+    private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationInstanceFacade integrationInstanceFacade;
+    private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserIntegrationInstanceFacadeImpl(
         ComponentDefinitionFacade componentDefinitionFacade, ConnectedUserService connectedUserService,
+        EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService, IntegrationInstanceFacade integrationInstanceFacade,
-        IntegrationWorkflowService integrationWorkflowService) {
+        IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService) {
 
         this.componentDefinitionFacade = componentDefinitionFacade;
         this.connectedUserService = connectedUserService;
+        this.embeddedPermissionEvaluator = embeddedPermissionEvaluator;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceFacade = integrationInstanceFacade;
+        this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
     }
 
@@ -147,12 +156,20 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
 
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(id);
 
-        if (!isOwnedByConnectedUser(externalUserId, id, integrationInstance)) {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
+
+        if (!isOwnedByConnectedUser(externalUserId, id, integrationInstance, integrationInstanceConfiguration)) {
             throw new EmbeddedIntegrationNotVisibleException(id);
         }
 
-        integrationInstanceFacade.enableIntegrationInstanceWorkflow(
-            id, integrationWorkflowService.getWorkflowId(id, workflowUuid), enable);
+        String workflowId = integrationWorkflowService.getWorkflowId(id, workflowUuid);
+
+        if (enable) {
+            validateWorkflowVisible(externalUserId, id, integrationInstanceConfiguration, workflowId);
+        }
+
+        integrationInstanceFacade.enableIntegrationInstanceWorkflow(id, workflowId, enable);
     }
 
     public static Optional<Long> fetchCurrentPrincipalEnvironmentId() {
@@ -166,6 +183,25 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
 
         return Optional.ofNullable(
             apiKeyAuthenticationToken.getEnvironmentId() == -1 ? null : apiKeyAuthenticationToken.getEnvironmentId());
+    }
+
+    private void validateWorkflowVisible(
+        String externalUserId, long id, IntegrationInstanceConfiguration integrationInstanceConfiguration,
+        String workflowId) {
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+            externalUserId, integrationInstanceConfiguration.getEnvironment());
+
+        Integration integration =
+            integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId());
+
+        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
+
+        if (!embeddedPermissionEvaluator.evaluate(integration.getPermissionExpression(), connectedUser) ||
+            !embeddedPermissionEvaluator.evaluate(integrationWorkflow.getPermissionExpression(), connectedUser)) {
+
+            throw new EmbeddedIntegrationNotVisibleException(id);
+        }
     }
 
     private boolean isOwnedByConnectedUser(String externalUserId, long id, IntegrationInstance integrationInstance) {
