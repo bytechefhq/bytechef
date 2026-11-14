@@ -1,0 +1,25 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.automation.data.table.public_.web.rest.config;
+
+import com.bytechef.jackson.config.JacksonConfiguration;
+import com.bytechef.web.rest.jackson.PageJsonSerializer;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+@Configuration
+@Import({
+    JacksonConfiguration.class, PageJsonSerializer.class
+})
+public class AutomationDataTablePublicRestTestConfiguration {
+}
