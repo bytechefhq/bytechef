@@ -65,6 +65,7 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
+    private final McpServerMembership mcpServerMembership;
     private final McpToolService mcpToolService;
 
     @SuppressFBWarnings("EI")
@@ -77,7 +78,8 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
         McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
-        McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService, McpToolService mcpToolService) {
+        McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService,
+        McpServerMembership mcpServerMembership, McpToolService mcpToolService) {
 
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
@@ -90,6 +92,7 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
         this.mcpIntegrationInstanceWorkflowService = mcpIntegrationInstanceWorkflowService;
+        this.mcpServerMembership = mcpServerMembership;
         this.mcpToolService = mcpToolService;
     }
 
@@ -144,52 +147,13 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
     @Override
     @Transactional(readOnly = true)
     public Set<Long> getConnectedUserIds(long mcpServerId) {
-        Set<Long> integrationInstanceIds = new LinkedHashSet<>(
-            mcpIntegrationInstanceToolService.getIntegrationInstanceIdsByMcpServerId(mcpServerId));
-
-        integrationInstanceIds.addAll(
-            mcpIntegrationInstanceWorkflowService.getIntegrationInstanceIdsByMcpServerId(mcpServerId));
-
-        Set<Long> connectedUserIds = new LinkedHashSet<>();
-
-        if (integrationInstanceIds.isEmpty()) {
-            return connectedUserIds;
-        }
-
-        for (IntegrationInstance integrationInstance : integrationInstanceService.getIntegrationInstances(
-            new ArrayList<>(integrationInstanceIds))) {
-
-            connectedUserIds.add(integrationInstance.getConnectedUserId());
-        }
-
-        return connectedUserIds;
+        return mcpServerMembership.getConnectedUserIds(mcpServerId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Set<Long> getMcpServerIds(long connectedUserId) {
-        Set<Long> mcpServerIds = new LinkedHashSet<>();
-
-        for (IntegrationInstance integrationInstance : integrationInstanceService
-            .getConnectedUserIntegrationInstances(connectedUserId)) {
-
-            long integrationInstanceId = Objects.requireNonNull(integrationInstance.getId());
-
-            for (McpIntegrationInstanceTool mcpIntegrationInstanceTool : mcpIntegrationInstanceToolService
-                .getMcpIntegrationInstanceTools(integrationInstanceId)) {
-
-                fetchToolMcpServerId(mcpIntegrationInstanceTool.getMcpToolId()).ifPresent(mcpServerIds::add);
-            }
-
-            for (McpIntegrationInstanceWorkflow mcpIntegrationInstanceWorkflow : mcpIntegrationInstanceWorkflowService
-                .getMcpIntegrationInstanceWorkflows(integrationInstanceId)) {
-
-                fetchLinkMcpServerId(mcpIntegrationInstanceWorkflow.getMcpIntegrationInstanceConfigurationWorkflowId())
-                    .ifPresent(mcpServerIds::add);
-            }
-        }
-
-        return mcpServerIds;
+        return mcpServerMembership.getMcpServerIds(connectedUserId);
     }
 
     @Override
@@ -306,9 +270,10 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
                     integrationInstanceId));
         }
 
-        boolean enabled = hasEnabledRow(
-            mcpIntegrationInstanceToolsByIntegrationInstanceId, mcpIntegrationInstanceWorkflowsByIntegrationInstanceId,
-            mcpServerOffer);
+        Optional<Boolean> connectedUserState = mcpServerMembership.getConnectedUserState(
+            connectedUserId, mcpServerOffer.mcpServerId);
+
+        boolean enabled = connectedUserState.orElse(false);
 
         for (IntegrationInstance integrationInstance : integrationInstances) {
             long integrationInstanceId = Objects.requireNonNull(integrationInstance.getId());
@@ -393,20 +358,6 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
         }
     }
 
-    private Optional<Long> fetchLinkMcpServerId(long mcpIntegrationInstanceConfigurationWorkflowId) {
-        return mcpIntegrationInstanceConfigurationWorkflowService
-            .fetchMcpIntegrationInstanceConfigurationWorkflow(mcpIntegrationInstanceConfigurationWorkflowId)
-            .flatMap(link -> mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(
-                link.getMcpIntegrationInstanceConfigurationId()))
-            .map(McpIntegrationInstanceConfiguration::getMcpServerId);
-    }
-
-    private Optional<Long> fetchToolMcpServerId(long mcpToolId) {
-        return mcpToolService.fetchMcpTool(mcpToolId)
-            .map(mcpTool -> mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId()))
-            .map(McpComponent::getMcpServerId);
-    }
-
     private String getComponentName(long integrationInstanceConfigurationId) {
         IntegrationInstanceConfiguration integrationInstanceConfiguration =
             integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
@@ -442,7 +393,6 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
 
     private McpServerOffer getMcpServerOffer(long mcpServerId) {
         Map<String, List<Long>> enabledMcpToolIdsByComponentName = new HashMap<>();
-        Set<Long> mcpToolIds = new HashSet<>();
 
         for (McpComponent mcpComponent : mcpComponentService.getMcpServerMcpComponents(mcpServerId)) {
             List<Long> enabledMcpToolIds = enabledMcpToolIdsByComponentName.computeIfAbsent(
@@ -453,8 +403,6 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
 
                 long mcpToolId = Objects.requireNonNull(mcpTool.getId());
 
-                mcpToolIds.add(mcpToolId);
-
                 if (mcpTool.isEnabled()) {
                     enabledMcpToolIds.add(mcpToolId);
                 }
@@ -463,7 +411,6 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
 
         Map<Long, List<McpIntegrationInstanceConfigurationWorkflow>> offeredLinksByIntegrationInstanceConfigurationId =
             new HashMap<>();
-        Set<Long> linkIds = new HashSet<>();
 
         for (McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration : mcpIntegrationInstanceConfigurationService
             .getMcpServerMcpIntegrationInstanceConfigurations(mcpServerId)) {
@@ -476,8 +423,6 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
             for (McpIntegrationInstanceConfigurationWorkflow link : mcpIntegrationInstanceConfigurationWorkflowService
                 .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
                     mcpIntegrationInstanceConfiguration.getId())) {
-
-                linkIds.add(link.getId());
 
                 if (!link.isEnabled()) {
                     continue;
@@ -494,7 +439,7 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
         }
 
         return new McpServerOffer(
-            enabledMcpToolIdsByComponentName, mcpToolIds, offeredLinksByIntegrationInstanceConfigurationId, linkIds);
+            enabledMcpToolIdsByComponentName, mcpServerId, offeredLinksByIntegrationInstanceConfigurationId);
     }
 
     private String getWorkflowUuid(long integrationInstanceConfigurationWorkflowId) {
@@ -508,55 +453,19 @@ public class McpIntegrationInstanceRowsImpl implements McpIntegrationInstanceRow
         return integrationWorkflow.getUuidAsString();
     }
 
-    private boolean hasEnabledRow(
-        Map<Long, List<McpIntegrationInstanceTool>> mcpIntegrationInstanceToolsByIntegrationInstanceId,
-        Map<Long, List<McpIntegrationInstanceWorkflow>> mcpIntegrationInstanceWorkflowsByIntegrationInstanceId,
-        McpServerOffer mcpServerOffer) {
-
-        for (List<McpIntegrationInstanceTool> mcpIntegrationInstanceTools : mcpIntegrationInstanceToolsByIntegrationInstanceId
-            .values()) {
-
-            for (McpIntegrationInstanceTool mcpIntegrationInstanceTool : mcpIntegrationInstanceTools) {
-                if (mcpIntegrationInstanceTool.isEnabled() &&
-                    mcpServerOffer.mcpToolIds.contains(mcpIntegrationInstanceTool.getMcpToolId())) {
-
-                    return true;
-                }
-            }
-        }
-
-        for (List<McpIntegrationInstanceWorkflow> mcpIntegrationInstanceWorkflows : mcpIntegrationInstanceWorkflowsByIntegrationInstanceId
-            .values()) {
-
-            for (McpIntegrationInstanceWorkflow mcpIntegrationInstanceWorkflow : mcpIntegrationInstanceWorkflows) {
-                if (mcpIntegrationInstanceWorkflow.isEnabled() &&
-                    mcpServerOffer.linkIds.contains(
-                        mcpIntegrationInstanceWorkflow.getMcpIntegrationInstanceConfigurationWorkflowId())) {
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     private final class McpServerOffer {
 
         private final Map<Long, String> componentNameByIntegrationInstanceConfigurationId = new HashMap<>();
         private final Map<String, List<Long>> enabledMcpToolIdsByComponentName;
-        private final Set<Long> linkIds;
-        private final Set<Long> mcpToolIds;
+        private final long mcpServerId;
         private final Map<Long, List<McpIntegrationInstanceConfigurationWorkflow>> offeredLinksByIntegrationInstanceConfigurationId;
 
         private McpServerOffer(
-            Map<String, List<Long>> enabledMcpToolIdsByComponentName, Set<Long> mcpToolIds,
-            Map<Long, List<McpIntegrationInstanceConfigurationWorkflow>> offeredLinksByIntegrationInstanceConfigurationId,
-            Set<Long> linkIds) {
+            Map<String, List<Long>> enabledMcpToolIdsByComponentName, long mcpServerId,
+            Map<Long, List<McpIntegrationInstanceConfigurationWorkflow>> offeredLinksByIntegrationInstanceConfigurationId) {
 
             this.enabledMcpToolIdsByComponentName = enabledMcpToolIdsByComponentName;
-            this.linkIds = linkIds;
-            this.mcpToolIds = mcpToolIds;
+            this.mcpServerId = mcpServerId;
             this.offeredLinksByIntegrationInstanceConfigurationId = offeredLinksByIntegrationInstanceConfigurationId;
         }
 

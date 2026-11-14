@@ -31,6 +31,14 @@ public class McpRowsIntTestFixture {
     }
 
     public void deleteAll() {
+        jdbcTemplate.update("DELETE FROM mcp_connected_user_project_workflow");
+        jdbcTemplate.update("DELETE FROM mcp_automation_project_configuration_workflow");
+        jdbcTemplate.update("DELETE FROM mcp_automation_project_configuration");
+        jdbcTemplate.update("DELETE FROM connected_user_project_workflow");
+        jdbcTemplate.update("DELETE FROM connected_user_project");
+        jdbcTemplate.update("DELETE FROM automation_project_configuration");
+        jdbcTemplate.update("DELETE FROM project");
+        jdbcTemplate.update("DELETE FROM workspace");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_workflow");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_configuration_workflow");
         jdbcTemplate.update("DELETE FROM mcp_integration_instance_configuration");
@@ -44,6 +52,105 @@ public class McpRowsIntTestFixture {
         jdbcTemplate.update("DELETE FROM connected_user");
         jdbcTemplate.update("DELETE FROM connection");
         jdbcTemplate.update("DELETE FROM workflow");
+    }
+
+    public long insertAutomationLinkWorkflow(long mcpServerId, String workflowUuid) {
+        long workspaceId = insert(
+            """
+                INSERT INTO workspace (name, created_date, created_by, last_modified_date, last_modified_by, version)
+                VALUES ('test', now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """);
+
+        long projectId = insert(
+            """
+                INSERT INTO project (name, uuid, workspace_id, created_date, created_by, last_modified_date,
+                    last_modified_by, version)
+                VALUES ('template', gen_random_uuid(), ?, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            workspaceId);
+
+        long automationProjectConfigurationId = insert(
+            """
+                INSERT INTO automation_project_configuration (project_id, environment_id, project_version, enabled,
+                    automation_hub_visible, name, created_date, created_by, last_modified_date, last_modified_by,
+                    version)
+                VALUES (?, 0, 1, true, true, 'configuration', now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            projectId);
+
+        long linkId = insert(
+            """
+                INSERT INTO mcp_automation_project_configuration (mcp_server_id, automation_project_configuration_id,
+                    created_date, created_by, last_modified_date, last_modified_by, version)
+                VALUES (?, ?, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            mcpServerId, automationProjectConfigurationId);
+
+        return insert(
+            """
+                INSERT INTO mcp_automation_project_configuration_workflow (mcp_automation_project_configuration_id,
+                    workflow_uuid, enabled, created_date, created_by, last_modified_date, last_modified_by, version)
+                VALUES (?, ?, true, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            linkId, workflowUuid);
+    }
+
+    public void insertAutomationRow(long connectedUserId, long linkWorkflowId, String workflowUuid, boolean enabled) {
+        long projectId = insert(
+            """
+                SELECT automation_project_configuration.project_id
+                FROM mcp_automation_project_configuration_workflow
+                JOIN mcp_automation_project_configuration
+                    ON mcp_automation_project_configuration.id =
+                        mcp_automation_project_configuration_workflow.mcp_automation_project_configuration_id
+                JOIN automation_project_configuration
+                    ON automation_project_configuration.id =
+                        mcp_automation_project_configuration.automation_project_configuration_id
+                WHERE mcp_automation_project_configuration_workflow.id = ?
+                """,
+            linkWorkflowId);
+
+        List<Long> existingConnectedUserProjectIds = jdbcTemplate.queryForList(
+            "SELECT id FROM connected_user_project WHERE connected_user_id = ? AND project_id = ?", Long.class,
+            connectedUserId, projectId);
+
+        long connectedUserProjectId;
+
+        if (existingConnectedUserProjectIds.isEmpty()) {
+            connectedUserProjectId = insert(
+                """
+                    INSERT INTO connected_user_project (connected_user_id, project_id, created_date, created_by,
+                        last_modified_date, last_modified_by, version)
+                    VALUES (?, ?, now(), 'system', now(), 'system', 0)
+                    RETURNING id
+                    """,
+                connectedUserId, projectId);
+        } else {
+            connectedUserProjectId = existingConnectedUserProjectIds.get(0);
+        }
+
+        long connectedUserProjectWorkflowId = insert(
+            """
+                INSERT INTO connected_user_project_workflow (connected_user_project_id, automation_uuid, enabled,
+                    dangling, created_date, created_by, last_modified_date, last_modified_by, version)
+                VALUES (?, ?, true, false, now(), 'system', now(), 'system', 0)
+                RETURNING id
+                """,
+            connectedUserProjectId, workflowUuid);
+
+        jdbcTemplate.update(
+            """
+                INSERT INTO mcp_connected_user_project_workflow (connected_user_project_workflow_id,
+                    mcp_automation_project_configuration_workflow_id, enabled, created_date, created_by,
+                    last_modified_date, last_modified_by, version)
+                VALUES (?, ?, ?, now(), 'system', now(), 'system', 0)
+                """,
+            connectedUserProjectWorkflowId, linkWorkflowId, enabled);
     }
 
     public List<Boolean> getInstanceWorkflowEnabled(long integrationInstanceId, String workflowId) {
