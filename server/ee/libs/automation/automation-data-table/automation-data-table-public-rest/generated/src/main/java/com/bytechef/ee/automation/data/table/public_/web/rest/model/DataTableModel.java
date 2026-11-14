@@ -27,8 +27,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("DataTable")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-14T18:03:12.597132+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-14T20:58:12.896819+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class DataTableModel {
+
+  private Long id;
+
+  private Long workspaceId;
 
   private @Nullable String name;
 
@@ -41,17 +45,71 @@ public class DataTableModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private @Nullable OffsetDateTime lastModifiedDate;
 
+  public DataTableModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public DataTableModel(Long id, Long workspaceId) {
+    this.id = id;
+    this.workspaceId = workspaceId;
+  }
+
+  public DataTableModel id(Long id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * The id of the data table.
+   * @return id
+   */
+  @NotNull 
+  @Schema(name = "id", description = "The id of the data table.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("id")
+  public Long getId() {
+    return id;
+  }
+
+  @JsonProperty("id")
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public DataTableModel workspaceId(Long workspaceId) {
+    this.workspaceId = workspaceId;
+    return this;
+  }
+
+  /**
+   * The id of the workspace the table belongs to; the name is unique within it.
+   * @return workspaceId
+   */
+  @NotNull 
+  @Schema(name = "workspaceId", description = "The id of the workspace the table belongs to; the name is unique within it.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("workspaceId")
+  public Long getWorkspaceId() {
+    return workspaceId;
+  }
+
+  @JsonProperty("workspaceId")
+  public void setWorkspaceId(Long workspaceId) {
+    this.workspaceId = workspaceId;
+  }
+
   public DataTableModel name(@Nullable String name) {
     this.name = name;
     return this;
   }
 
   /**
-   * The table name; its identity.
+   * The table name, unique within its workspace.
    * @return name
    */
   
-  @Schema(name = "name", description = "The table name; its identity.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "name", description = "The table name, unique within its workspace.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("name")
   public @Nullable String getName() {
     return name;
@@ -171,7 +229,9 @@ public class DataTableModel {
       return false;
     }
     DataTableModel dataTable = (DataTableModel) o;
-    return Objects.equals(this.name, dataTable.name) &&
+    return Objects.equals(this.id, dataTable.id) &&
+        Objects.equals(this.workspaceId, dataTable.workspaceId) &&
+        Objects.equals(this.name, dataTable.name) &&
         Objects.equals(this.description, dataTable.description) &&
         Objects.equals(this.columns, dataTable.columns) &&
         Objects.equals(this.tags, dataTable.tags) &&
@@ -180,13 +240,15 @@ public class DataTableModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, description, columns, tags, lastModifiedDate);
+    return Objects.hash(id, workspaceId, name, description, columns, tags, lastModifiedDate);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class DataTableModel {\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    workspaceId: ").append(toIndentedString(workspaceId)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    columns: ").append(toIndentedString(columns)).append("\n");
