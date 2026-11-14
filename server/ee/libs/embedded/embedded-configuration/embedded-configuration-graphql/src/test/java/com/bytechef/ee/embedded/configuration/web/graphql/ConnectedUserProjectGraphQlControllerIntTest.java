@@ -372,11 +372,11 @@ class ConnectedUserProjectGraphQlControllerIntTest {
     private static ConnectedUserProjectDTO createConnectedUserProjectDTO(@Nullable ConnectedUser connectedUser) {
         ConnectedUserProjectWorkflowDTO referenceWorkflow = new ConnectedUserProjectWorkflowDTO(
             1L, 7L, true, null, 0L, null, AUTOMATION_UUID, 1, ConnectedUserProjectWorkflowDTO.Kind.REFERENCE,
-            AUTOMATION_UUID, null, false, List.of(), List.of(), Map.of(), null, null);
+            AUTOMATION_UUID, null, false, List.of(), List.of(), Map.of(), Map.of(), null, null);
 
         ConnectedUserProjectWorkflowDTO copyWorkflow = new ConnectedUserProjectWorkflowDTO(
             2L, 7L, true, null, 3L, null, "copy-workflow-uuid", 1, ConnectedUserProjectWorkflowDTO.Kind.COPY, null,
-            COPIED_FROM_WORKFLOW_UUID, false, List.of(), List.of(), Map.of(), null, null);
+            COPIED_FROM_WORKFLOW_UUID, false, List.of(), List.of(), Map.of(), Map.of(), null, null);
 
         return new ConnectedUserProjectDTO(
             3L, connectedUser, List.of(referenceWorkflow, copyWorkflow), Environment.DEVELOPMENT, 0L, null, 3L, null,

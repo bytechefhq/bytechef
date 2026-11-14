@@ -65,11 +65,16 @@ const {openDialog} = useActivationDialog({
 ```
 
 `<ActivationDialog …/>` is the same flow as a component for apps that render it themselves. Props: `baseUrl`,
-`environment`, `jwtToken`, `workflowTemplateId`, `onClose`, `onActivated`, `onEditWorkflow`, `mode` (`'light'` or
+`environment`, `jwtToken`, `workflowTemplateId`, `onClose`, `onActivated`, `onEditWorkflow`, `onSaved`, `mode` (`'light'` or
 `'dark'`) and `connectionCreationAllowed` (default `true`; `false` hides Connect so users can only pick existing
 accounts). "Edit workflow" is not offered for templates from code-workflow projects, which can only be activated. A component whose
 integration has no enabled instance configuration in the environment shows "isn't set up yet — ask your administrator";
 set the integration up first.
+
+Opened on a template the user already activated, the dialog edits it instead: it prefills the connection each
+component uses and the input values from `GET /api/embedded/v1/automation/workflows`, offers **Save** instead of
+**Activate**, sends only what changed to `/provision`, and calls `onSaved`. Saving never switches the automation on or
+off.
 
 Only one connect dialog renders per page: don't keep a `useConnectDialog` instance mounted on the same page while the
 activation dialog's Connect is in use.

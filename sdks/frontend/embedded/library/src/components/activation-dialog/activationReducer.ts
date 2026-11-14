@@ -1,4 +1,4 @@
-import {TemplateComponentType, TemplateInputType} from './types';
+import {ExistingReferenceType, TemplateComponentType, TemplateInputType} from './types';
 
 export type ActivationStepType = 'activate' | 'configure' | 'connect' | 'done';
 
@@ -37,7 +37,8 @@ export function toInputValueText(value: unknown): string {
 
 export function initialActivationState(
     components: TemplateComponentType[],
-    inputs: TemplateInputType[]
+    inputs: TemplateInputType[],
+    existingReference?: ExistingReferenceType
 ): ActivationStateI {
     const requiredComponents: string[] = [];
     const unavailableComponents: string[] = [];
@@ -54,11 +55,30 @@ export function initialActivationState(
         }
     }
 
+    const selections: Record<string, number | undefined> = {};
+    const inputValues: Record<string, unknown> = {};
+
+    if (existingReference) {
+        for (const componentName of requiredComponents) {
+            const connectionId = existingReference.connections[componentName];
+
+            if (connectionId !== undefined && connectionId !== null) {
+                selections[componentName] = connectionId;
+            }
+        }
+
+        for (const input of inputs) {
+            if (!input.provided && input.name in existingReference.inputValues) {
+                inputValues[input.name] = existingReference.inputValues[input.name];
+            }
+        }
+    }
+
     return {
-        inputValues: {},
+        inputValues,
         inputs,
         requiredComponents,
-        selections: {},
+        selections,
         step: getFirstStep(requiredComponents, inputs),
         unavailableComponents,
     };

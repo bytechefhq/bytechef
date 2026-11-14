@@ -46,6 +46,7 @@ export function ActivateButton({jwtToken, templateId}: {jwtToken: string; templa
 | `mode` | `'dark' \| 'light'` | `'light'` | The dialog's color mode. See [Theming and Localization](/platform/embedded/build/theming-and-localization#styling-the-dialogs). |
 | `onActivated` | `(workflowUuid: string) => void` | - | Runs after the template is activated. |
 | `onEditWorkflow` | `(workflowUuid: string) => void` | - | Runs after **Edit workflow** copies the template, with the uuid of the copy. Omit it to hide **Edit workflow**. |
+| `onSaved` | `(workflowUuid: string) => void` | - | Runs after **Save** stores changes to an automation the user already activated. See [Edit an activated automation](#edit-an-activated-automation). |
 | `onClose` | `() => void` | - | Runs when the dialog closes. Required on `<ActivationDialog />`; optional on the hook. |
 
 ## The flow
@@ -59,6 +60,26 @@ The dialog has up to three steps. A step with nothing to show is skipped.
 ## What Activate does
 
 **Activate** provisions a reference to the template with the chosen connections and inputs, then enables it. If this fails, the dialog removes the reference it created so the user can try again. A reference that already existed before the attempt is left in place.
+
+## Edit an activated automation
+
+Open the dialog with the template id of an automation the user already activated, and it edits that automation instead of activating it again. The dialog finds it in `GET /api/embedded/v1/automation/workflows`, the row whose `kind` is `REFERENCE` and whose `automationUuid` is the template id, and opens with the user's choices filled in: the connection each component uses (the row's `connections`) and the input values (`inputValues`). The last step offers **Save** instead of **Activate**.
+
+```tsx
+const {openDialog} = useActivationDialog({
+    baseUrl: 'https://your-bytechef-host.example.com',
+    environment: 'PRODUCTION',
+    jwtToken,
+    onSaved: () => refreshAutomations(),
+    workflowTemplateId: automation.automationUuid,
+});
+```
+
+**Save** sends the changes with the provision endpoint, `POST /api/embedded/v1/automation/workflow-templates/{workflowTemplateId}/provision`. It sends only the connections the user changed, and the inputs only when one of them changed. If nothing changed, the dialog closes without a request.
+
+Saving only changes what the user chooses: their connections and input values. The workflow itself, its name, description, steps and the inputs it asks for, comes from the template and changes only when you publish a new version. Saving also does not switch the automation on or off; leave that to your own control, such as a switch that calls `POST` or `DELETE /api/embedded/v1/automation/workflows/{workflowUuid}/enable`. If the automation still needs a connection, the dialog returns to **Connect** and highlights that component.
+
+If the dialog cannot load the user's automations, it opens to activate. **Activate** checks the list again before it provisions, so an automation that already exists is never removed.
 
 ## What Edit workflow does
 
