@@ -66,6 +66,8 @@ public class PlatformApiKeyAuthenticationProvider implements AuthenticationProvi
             .map(this::createSpringSecurityUser)
             .orElseThrow(() -> new UsernameNotFoundException("User " + userId + " was not found in the database"));
 
+        apiKeyService.updateLastUsedDate(apiKey.getId());
+
         return new PlatformApiKeyAuthenticationToken(platformApiKeyAuthenticationToken.getEnvironmentId(), user,
             apiKey.getId());
     }

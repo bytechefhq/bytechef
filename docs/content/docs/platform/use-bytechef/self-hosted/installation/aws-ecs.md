@@ -1,9 +1,9 @@
 ---
 title: AWS ECS
-description: Learn how to deploy ByteChef on AWS ECS
+description: Run the ByteChef container as an Amazon ECS service on Fargate, with Amazon RDS for PostgreSQL and an Application Load Balancer.
 ---
 
-Amazon ECS runs the ByteChef container image, `docker.bytechef.io/bytechef/bytechef:latest`, as a managed service - a good fit when you want AWS to handle scheduling, health, and rolling deployments rather than managing an EC2 host yourself. This guide targets **Fargate** (serverless), but the same task definition works on EC2-backed ECS.
+Amazon ECS runs the ByteChef container image, `docker.bytechef.io/bytechef/bytechef:latest`, as a managed service, so AWS handles scheduling, health checks and rolling deployments instead of an EC2 host you manage. This guide targets **Fargate** (serverless), but the same task definition works on EC2-backed ECS.
 
 ## Prerequisites
 
@@ -25,8 +25,8 @@ Define a single container that runs the image and exposes port `8080`:
   "family": "bytechef",
   "requiresCompatibilities": ["FARGATE"],
   "networkMode": "awsvpc",
-  "cpu": "1024",
-  "memory": "2048",
+  "cpu": "2048",
+  "memory": "4096",
   "containerDefinitions": [
     {
       "name": "bytechef",
@@ -48,7 +48,7 @@ Define a single container that runs the image and exposes port `8080`:
 }
 ```
 
-Adjust CPU/memory to your workload - 1 vCPU / 2 GB is a reasonable starting point.
+Adjust CPU and memory to your workload. 2 vCPU and 4 GB match the minimum memory recommended for an EC2 host; see [Instance sizing](/platform/use-bytechef/self-hosted/installation/aws-ec2#instance-sizing).
 
 ## 3. Create the service behind a load balancer
 
@@ -58,7 +58,7 @@ Create an ECS service from the task definition and attach it to an ALB target gr
 - **Health check path:** `/actuator/health/readiness`.
 - Set `BYTECHEF_PUBLIC_URL` to the ALB's public HTTPS URL so webhook and OAuth2 redirect URLs resolve correctly.
 
-Because schema migrations run at container startup, keep the service at a single task during the first deploy and any upgrade, then scale out once the schema is current. When running multiple tasks, review the multi-instance settings in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances) - a shared message broker and cache, and a shared encryption key.
+Because schema migrations run at container startup, keep the service at a single task during the first deploy and any upgrade, then scale out once the schema is current. Every task runs the coordinator, and more than one coordinator requires Enterprise Edition. Before you run more than one task, apply the settings in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances): a shared encryption key, a shared message broker (on AWS, `AWS` with `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=REDIS`), shared file storage, a shared session store and cache provider, and a clustered scheduler.
 
 ## Applying it from the CLI
 
@@ -123,7 +123,7 @@ container owns the migration. See [Upgrades](/platform/use-bytechef/self-hosted/
 
 ### Do not run PostgreSQL as a Fargate task
 
-It is tempting to add a second service running the `postgres` image next to ByteChef. Do not:
+Do not add a second service that runs the `postgres` image next to ByteChef.
 Fargate task storage is ephemeral, so the database is destroyed whenever the task is replaced -
 by a deployment, a scale event, or a health-check failure. Use RDS, as in the prerequisites.
 

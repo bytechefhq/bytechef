@@ -1,16 +1,11 @@
 ---
 title: AI Providers
-description: Activate LLM and AI providers once, per environment, and reuse them across Universal AI components, the Copilot, the Knowledge Base, and the AI Hub.
+description: Activate AI providers per environment and reuse their credentials across Universal AI components, the Knowledge Base, and other AI features.
 ---
 
-**AI Providers** is the central catalog where an admin activates the AI providers (OpenAI, Anthropic, Mistral, and others) that power ByteChef's AI features. You enter a provider's API key once, and every AI feature that needs a model resolves its credentials from this catalog - so keys live in one place instead of being re-entered per workflow.
+**AI Providers** is the catalog where an administrator activates the AI providers (OpenAI, Anthropic, Mistral, and others) used by ByteChef's AI features. You enter a provider's API key once, and every AI feature that needs a model reads the credentials from this catalog instead of from a per-workflow connection.
 
-> Activating providers is restricted to **admins**.
-
-> A provider can also be configured without the UI, through configuration properties / environment variables
-> such as `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY`. See [Self-hosting: static keys](#self-hosting-static-keys).
-
-Keys are stored **per environment**, so Development, Staging, and Production can each use their own provider and credentials.
+The page requires the `ADMIN` authority. Keys are stored **per environment**, so Development, Staging, and Production can each use their own providers and credentials. Self-hosted deployments can also supply keys through environment variables such as `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY`. See [Self-hosting: static keys](#self-hosting-static-keys).
 
 ---
 
@@ -18,62 +13,68 @@ Keys are stored **per environment**, so Development, Staging, and Production can
 
 ## Activate a provider
 
-1. Go to **Settings → AI Providers** in the Automation workspace.
-2. Select the **environment** you're configuring (Development, Staging, or Production).
-3. Flip the provider's **enable toggle on**. If the provider has no credentials yet, its row expands to the credentials form automatically.
-4. Enter the credential - the provider's **API Key** for most providers, a **Base URL** and an optional **API Key** for Ollama, or an **Endpoint** plus API key for Azure OpenAI - and click **Save**. A saved API key shows masked; leave it as is to keep it. Ollama's key is optional, so clearing that field removes it.
+1. Go to **Settings → AI → Providers**.
+2. Select the environment (Development, Staging, or Production) in the environment selector in the left sidebar.
+3. Turn on the provider's toggle. If the provider has no credentials yet, its row expands to the credentials form.
+4. Enter the credentials and click **Save**:
+   - Most providers: **API Key**.
+   - Azure OpenAI: **API Key** and **Endpoint** (for example `https://<resource>.openai.azure.com`).
+   - Ollama: **Base URL** (default `http://localhost:11434`) and an optional **API Key** for Ollama's hosted API. Clearing the Ollama key removes it.
 
-Once saved, the toggle stays on. To review or change a credential, expand the row and click **Edit**; to stop using a provider, toggle it off.
+   A saved API key is shown masked. Leave it unchanged to keep it.
+
+After you save, the toggle stays on. To review or change a credential, expand the row and click **Edit**. To stop using a provider, turn off its toggle.
 
 ![A provider expanded to show its API Key field](ai-providers/ai-provider-key.png)
 
-The API key is encrypted at rest, and the row only ever shows it back in obfuscated form. Repeat per environment - activating OpenAI in Development does not activate it in Production.
+The API key is encrypted at rest and is only shown in obfuscated form. Repeat the steps for each environment: activating OpenAI in Development does not activate it in Production.
 
 ### Available providers
 
-The catalog includes Anthropic, OpenAI, Azure OpenAI, Mistral, Groq, NVIDIA, Vertex Gemini, Perplexity, DeepSeek, Hugging Face, Stability, and Ollama. Each row is tagged with badges for the capabilities it supports:
+The catalog lists Anthropic, Azure Open AI, Groq, Mistral, NVIDIA, Open AI, Stability, Vertex Gemini, Perplexity, DeepSeek, and Ollama. Each row has badges for the capabilities the provider supports. Hover a badge to see its description.
 
-- **Text** - chat / text generation (most providers).
-- **Image** - image generation (OpenAI, Azure OpenAI, Vertex Gemini, Stability).
-- **Embeddings** - the embedding model used for semantic search (OpenAI, Mistral, Ollama).
-- **Copilot Docs** - the provider currently backing the Copilot documentation corpus.
+| Badge | Meaning | Providers |
+|---|---|---|
+| **Text** | Chat models for text generation, used by AI components and agents. | All except Stability |
+| **Image** | Image generation from text prompts. | Azure Open AI, Open AI, Stability, Vertex Gemini |
+| **Embeddings** | Embedding models for knowledge bases and semantic search. | Mistral, Open AI, Ollama |
+| **Copilot Docs** | The provider whose embeddings Copilot uses to search the ByteChef documentation. | The provider currently configured for it |
 
 ---
 
 ## What uses activated providers
 
-Once a provider is activated for an environment, it is available to:
+A provider activated for an environment is available to:
 
-- **Universal AI components** - workflow steps where you pick a provider from the catalog and then a model, instead of managing a separate connection.
+- **Universal AI components** - workflow steps where you pick a provider from the catalog and then a model, without a separate connection.
 - **The Copilot model picker** *(coming soon)* - choose which activated provider and model answers a Copilot conversation.
 - **The AI Hub** *(coming soon)* - the same catalog backs the AI Hub's model selection.
-- **The Knowledge Base** - document embedding uses the environment's activated embedding provider (OpenAI by default; Mistral and Ollama also provide embedding models).
+- **The Knowledge Base** - document embedding uses the first activated embedding provider in the environment, checked in the order Mistral, OpenAI, Ollama.
 
-Each feature resolves the key for the **current environment**, so the same workflow or conversation automatically uses the right credentials as it moves from Development to Production.
+Each feature reads the key for the **current environment**, so a workflow uses that environment's credentials as it moves from Development to Production.
 
 ---
 
 ## Default models
 
-Every provider ships with a default model per kind - chat, embedding, and (for OpenAI) image generation - defined in configuration: `bytechef.ai.provider.{chat,embedding,image}.<provider>.options.model`, overridable through the matching environment variables. See the [chat](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-chat-model-configuration), [embedding](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-embedding-model-configuration), and [image](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-image-model-configuration) model references. Model names are configuration-only - the AI Providers page stores credentials and enablement, not models.
+Each provider has a default model per kind (chat, embedding, and, for OpenAI, image generation), defined in configuration as `bytechef.ai.provider.{chat,embedding,image}.<provider>.options.model` and overridable through the matching environment variables. See the [chat](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-chat-model-configuration), [embedding](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-embedding-model-configuration), and [image](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-image-model-configuration) model references. The AI Providers page stores credentials and enablement, not model names.
 
-The page still decides **which** default applies: features where ByteChef picks the model for you - the Copilot default, the workflow converter, the property Copilot, Knowledge Base embedding, and AI Hub image generation - resolve to the first **enabled** provider in the current environment (or the provider preferred via `BYTECHEF_AI_COPILOT_PROVIDER`, when set and enabled) and use that provider's configured model. Enabling or disabling a provider per environment redirects these features at the next request, without a restart. Universal AI workflow steps are unaffected - their authors pick the model per step.
+The page decides **which** default applies. Features where ByteChef picks the model (Knowledge Base embedding and, once available, the Copilot default, the workflow converter, the property Copilot, and AI Hub image generation) use the first **enabled** provider in the current environment, or the provider set in `BYTECHEF_AI_COPILOT_PROVIDER` when it is enabled, together with that provider's configured model. Enabling or disabling a provider takes effect at the next request, without a restart. Universal AI workflow steps are not affected, because their authors pick the model per step.
 
 Two providers work differently:
 
-- **Azure OpenAI** has **no** default model on purpose, and is skipped by the default resolution until you set one: the "model" is your deployment name; set `BYTECHEF_AI_PROVIDER_CHAT_AZURE_OPEN_AI_OPTIONS_MODEL` to it.
-- **Ollama** uses the models installed on your Ollama server. The AI model picker lists its chat models, read live from the server. Unless you set `BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL` (e.g. `qwen3:8b`), the default chat model is the first **local** chat model the server reports; Ollama lists the most recently pulled model first. Cloud models (names ending in `:cloud`) are listed after local ones and never become the default. Knowledge Base embedding works the same way with the installed embedding models, or `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` (e.g. `nomic-embed-text`).
+- **Azure OpenAI** has no default model, and the default resolution skips it until you set one. The model is your deployment name: set `BYTECHEF_AI_PROVIDER_CHAT_AZURE_OPEN_AI_OPTIONS_MODEL` to it.
+- **Ollama** uses the models installed on your Ollama server. The AI model picker lists its chat models, read from the server. Unless you set `BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL` (for example `qwen3:8b`), the default chat model is the first **local** chat model the server reports. Ollama lists the most recently pulled model first. Cloud models (names ending in `:cloud`) are listed after local ones and never become the default. Knowledge Base embedding works the same way with the installed embedding models, or with `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` (for example `nomic-embed-text`).
 
 <Callout title="Choosing an embedding model">
-    Pick the embedding model deliberately: documents already stored in Knowledge Bases are embedded with the model that was active at upload time, and switching to a different embedding model degrades semantic search over existing documents until they are re-embedded.
+    Documents already stored in knowledge bases keep the embeddings produced by the model that was active at upload time. Switching to a different embedding model degrades semantic search over existing documents until they are uploaded again.
 </Callout>
 
 ---
 
 ## Embedding models
 
-Embeddings are the vectors behind [Knowledge Base](/platform/automation/data/knowledge-base) search.
-Three of the catalog's providers offer them:
+Embeddings are the vectors behind [Knowledge Base](/platform/automation/data/knowledge-base) search. Three providers in the catalog offer them:
 
 | Provider | Default model | Configuration key |
 |---|---|---|
@@ -81,44 +82,28 @@ Three of the catalog's providers offer them:
 | **Mistral** | `mistral-embed` | `BYTECHEF_AI_PROVIDER_EMBEDDING_MISTRAL_OPTIONS_MODEL` |
 | **Ollama** | *(first embedding model installed on the server)* | `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` |
 
-The corresponding property form is `bytechef.ai.provider.embedding.<provider>.options.model`. For
-the full list of embedding keys see the
-[AI Embedding Model configuration reference](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-embedding-model-configuration).
+The corresponding property form is `bytechef.ai.provider.embedding.<provider>.options.model`. For the full list of embedding keys, see the [AI Embedding Model configuration reference](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-embedding-model-configuration).
 
-Anthropic publishes no embedding models - an Anthropic-backed deployment still needs OpenAI, Mistral,
-or Ollama activated for embeddings.
+Anthropic publishes no embedding models. A deployment that uses Anthropic for chat still needs OpenAI, Mistral, or Ollama activated for embeddings.
 
 <Callout title="Models are configuration">
-    The model itself is always configuration - the AI Providers page stores credentials and
-    enablement, never model names. The one exception is Ollama with no model configured: ByteChef
-    then picks one of the models installed on the server. The API key can be configuration too
-    (`BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY` and friends), so a deployment can set the embedding model
-    and the key it authenticates with entirely by property.
+    The model is always set in configuration. The AI Providers page stores credentials and enablement, not model names. The exception is Ollama with no model configured: ByteChef then picks one of the models installed on the server. The API key can also be set in configuration (for example `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY`), so a deployment can set both the embedding model and its key through properties.
 </Callout>
 
 ### Vector dimensions are fixed per deployment
 
-Embedding models produce vectors of different widths - `text-embedding-3-small` is 1536 dimensions,
-`text-embedding-3-large` is 3072 - and a pgvector column is declared with one width. The vector store
-ships configured for **1536 dimensions**
-(`bytechef.ai.vectorstore.pgvector.dimensions`, or `BYTECHEF_AI_VECTORSTORE_PGVECTOR_DIMENSIONS`), so
-switching to a model of a different width means changing that property as well; a mismatch fails at
-write time rather than degrading quietly.
+Embedding models produce vectors of different widths (`text-embedding-3-small` produces 1536 dimensions, `text-embedding-3-large` produces 3072), and a pgvector column has one width. The vector store is configured for **1536 dimensions** by default (`bytechef.ai.vectorstore.pgvector.dimensions`, or `BYTECHEF_AI_VECTORSTORE_PGVECTOR_DIMENSIONS`). When you switch to a model of a different width, change that property as well. A mismatch fails at write time.
 
 ### Changing the embedding model
 
-Chunks are embedded once, when their document is ingested. There is no re-embedding operation:
-changing the model affects documents added afterwards, and existing documents keep the vectors they
-were written with. Retrieval quality across the two sets degrades until the older documents are
-deleted and re-uploaded, which re-runs the whole pipeline. Plan a model change as a re-ingestion,
-and do it per environment so a Production knowledge base is not half-migrated.
+Chunks are embedded once, when their document is ingested. There is no re-embedding operation. Changing the model affects documents added afterwards, and existing documents keep their vectors. Retrieval quality degrades until the older documents are deleted and uploaded again. Plan a model change as a re-ingestion, per environment.
 
 ---
 
 ## Self-hosting: static keys
 
-Instead of (or in addition to) activating providers through the UI, a self-hosted deployment can supply provider keys as configuration - for example `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY` or `BYTECHEF_AI_PROVIDER_ANTHROPIC_API_KEY`. See the [environment variables reference](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-provider-api-keys).
+A self-hosted deployment can supply provider keys as configuration instead of, or in addition to, the UI. For example, set `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY` or `BYTECHEF_AI_PROVIDER_ANTHROPIC_API_KEY`. See the [environment variables reference](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-provider-api-keys).
 
-**Precedence:** a provider activated through the UI for an environment always wins. The static configuration key is used only as a fallback when no provider is activated for that environment. This lets an operator ship a default key while still letting each environment override it through the UI.
+**Precedence:** a provider configured through the UI for an environment always wins. The configuration key is used only as a fallback when the provider has no settings saved for that environment.
 
-> The Copilot documentation corpus is a special case: it is instance-global and embeds with its own dedicated key rather than the per-environment catalog. See [AI Copilot → Documentation embeddings](/platform/automation/build/ai-copilot#documentation-embeddings).
+> The Copilot documentation corpus is an exception: it is shared by the whole instance and embeds with its own key rather than the per-environment catalog. See [AI Copilot → Documentation embeddings](/platform/automation/build/ai-copilot#documentation-embeddings).

@@ -14,7 +14,6 @@
     "build/integration-marketplace",
     "build/workflows",
     "build/automations",
-    "build/automation-hub",
     "build/permission-expressions",
     "build/app-events",
     "build/request-triggers",

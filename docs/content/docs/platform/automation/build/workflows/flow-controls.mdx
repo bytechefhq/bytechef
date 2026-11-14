@@ -1,51 +1,334 @@
 ---
 title: "Flow Controls"
-description: Branch, loop, parallelize, and error-handle your workflows with the built-in task dispatchers.
+description: Branch, loop, run in parallel, route with a graph, and handle errors with the built-in flow controls.
 ---
 
-Flow controls are the structural building blocks of a workflow - they decide *which* steps run, *how many times*, and *what happens when something fails*. In the editor they appear alongside components in the step picker; under the hood each one is a task dispatcher that orchestrates its child tasks.
+Flow controls decide which steps run, how many times, and what happens when a step fails. In the editor they appear next to components in the step picker. On the server each flow control is a task dispatcher that runs its child tasks.
 
-| Flow control | What it does |
+| Flow control | Description |
 |---|---|
-| **Condition** | Run one of two branches depending on a boolean expression. |
-| **Branch** | Route to one of several cases by matching a value (switch-style). |
-| **Loop** | Repeat its child steps over a list or a fixed number of iterations, with access to the current item and index. |
-| **Loop Break** | End the enclosing Loop early from inside one of its iterations. |
-| **Each** | Execute child steps once per item of a list. |
-| **Map** | Transform a list by running child steps for every item and collecting the results. |
-| **Parallel** | Run several child steps at the same time and continue when all finish. |
-| **Fork/Join** | Split into multiple named branches that run concurrently, then join their results. |
-| **Subflow** | Invoke another workflow as a step and use its output - see [Subflows](/platform/automation/build/workflows/subflows). |
-| **Approval** | Pause the workflow until a human approves or rejects - see [Human-in-the-Loop](/platform/automation/build/workflows/human-in-the-loop). |
-| **On Error** | Catch a failing step and run a recovery branch instead of failing the run. |
-| **Terminate** | End the workflow immediately from inside a branch. |
-| **Graph** | Route through named nodes and expression-based transitions, with cycles allowed - a state machine *(coming soon)*. |
+| **Condition** | Runs one of two branches depending on a boolean expression. |
+| **Branch** | Runs one of several cases by matching the value of an expression (switch-style). |
+| **Loop** | Runs its child steps sequentially for each item of a list, or indefinitely with **Loop Forever** until a **Loop Break** step runs. The current item and index are available to child steps. |
+| **Loop Break** | Ends the enclosing Loop. |
+| **Each** | Runs its child step for every item of a list in parallel. Completion order is not guaranteed. |
+| **Map** | Runs child steps for every item of a list in parallel and returns a list of results in source-list order. |
+| **Parallel** | Runs several child steps at the same time and continues when all finish. |
+| **Fork/Join** | Runs several branches in parallel, each as an isolated sub-flow, then joins their results. Steps inside a branch run in sequence. |
+| **Subflow** | Runs another workflow as a step and returns its response. See [Subflows](/platform/automation/build/workflows/subflows). |
+| **Graph** | Runs named nodes connected by transitions, with cycles allowed (a state machine). See [Graph](#graph). |
+| **Error Handler** | Runs an error branch with an error object when a step in the main branch fails. |
+| **Stop Job** | Stops the job with the status `STOPPED` and an optional message giving the reason. |
+| **Wait for Approval** | Deprecated. Use the **Request Approval** action of the Approval component. See [Human-in-the-Loop](/platform/automation/build/workflows/human-in-the-loop). |
 
-Every flow control's inputs and outputs are documented in the [flow-controls reference](/reference/flow-controls). Flow controls nest freely - a Loop inside a Condition inside a Fork branch is a normal workflow.
+The inputs and outputs of each flow control are documented in the [flow controls reference](/reference/flow-controls). Flow controls can be nested, for example a Loop inside a Condition inside a Fork/Join branch.
 
 ### Outputs
 
-**Map** returns a value today: a list of each iteration's last-task output, in source-list order - reference it downstream as `${mapNodeName}`.
+| Flow control | Output | Reference |
+|---|---|---|
+| **Map** | A list with the output of each iteration's last task, in source-list order. | `${mapNodeName}` |
+| **Condition** | The output of the last task of the branch that ran. An empty branch returns `null`. | `${conditionNodeName}` |
+| **Branch** | The output of the last task of the case that ran. An empty case returns `null`. A case defined with a literal value instead of tasks returns that value. | `${branchNodeName}` |
+| **Fork/Join** | An object with keys `branch_0`, `branch_1`, and so on, in branch declaration order. Each value is the output of that branch's last task. | `${forkJoinNodeName}` |
+| **Graph** | The output of the terminal node, or `null` when the terminal node produced no output. | `${graphNodeName}` |
 
-> **Coming soon.** Condition, Branch, and Fork/Join return values are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+### Definition examples
 
-Once released, **Condition** and **Branch** will return the last task's output from whichever case actually ran - an empty case returns nothing (`null`), and a Branch case with a literal value instead of tasks returns that value directly. **Fork/Join** will return an object keyed `branch_0`, `branch_1`, … in branch declaration order, each value being that branch's last task's output.
+The examples below show how each flow control is stored in the workflow JSON that the [code editor](/platform/automation/build/workflows/workflows#code-editor) displays. The child steps of a flow control are nested in its `parameters`. The editor names a new flow control node after its type, for example `condition_1`, `loop_1` or `forkJoin_1`. The examples assume a webhook trigger, so the request body is `${trigger_1.body}`.
+
+#### Condition
+
+`conditions` is a list of OR groups, and each group is a list of AND comparisons. Each comparison has a `type` (`boolean`, `dateTime`, `number` or `string`), `value1`, `operation` and `value2`. This condition is true when the order amount is greater than 1000:
+
+```json
+{
+  "name": "condition_1",
+  "type": "condition/v1",
+  "parameters": {
+    "conditions": [
+      [
+        {
+          "type": "number",
+          "value1": "${trigger_1.body.amount}",
+          "operation": "GREATER",
+          "value2": 1000
+        }
+      ]
+    ],
+    "caseTrue": [
+      {
+        "name": "slack_1",
+        "type": "slack/v1/sendChannelMessage",
+        "parameters": {
+          "channel": "C01234567",
+          "text": "Large order ${trigger_1.body.orderId}: ${trigger_1.body.amount}"
+        }
+      }
+    ],
+    "caseFalse": []
+  }
+}
+```
+
+Number comparisons support `LESS`, `LESS_EQUALS`, `EQUALS`, `NOT_EQUALS`, `GREATER` and `GREATER_EQUALS`. String comparisons support `EQUALS`, `EQUALS_IGNORE_CASE`, `NOT_EQUALS`, `CONTAINS`, `NOT_CONTAINS`, `STARTS_WITH`, `ENDS_WITH`, `REGEX` and `EMPTY`. Date and time comparisons support `AFTER` and `BEFORE`, and boolean comparisons support `EQUALS` and `NOT_EQUALS`.
+
+To write the whole condition as one [formula](/platform/automation/build/workflows/data-pills#formula-mode), set `rawExpression` to `true` and put the formula in `expression`:
+
+```json
+{
+  "name": "condition_1",
+  "type": "condition/v1",
+  "parameters": {
+    "rawExpression": true,
+    "expression": "=${trigger_1.body.amount} > 1000 && ${trigger_1.body.country} == 'US'",
+    "caseTrue": [],
+    "caseFalse": []
+  }
+}
+```
+
+#### Branch
+
+`expression` is evaluated once, and its value is compared with the `key` of each case. The tasks of the first matching case run. If no case matches, the `default` tasks run.
+
+```json
+{
+  "name": "branch_1",
+  "type": "branch/v1",
+  "parameters": {
+    "expression": "${trigger_1.body.priority}",
+    "cases": [
+      {
+        "key": "high",
+        "tasks": [
+          {
+            "name": "logger_1",
+            "type": "logger/v1/info",
+            "parameters": { "text": "Escalating ticket ${trigger_1.body.id}" }
+          }
+        ]
+      },
+      {
+        "key": "low",
+        "tasks": [
+          {
+            "name": "logger_2",
+            "type": "logger/v1/info",
+            "parameters": { "text": "Queueing ticket ${trigger_1.body.id}" }
+          }
+        ]
+      }
+    ],
+    "default": []
+  }
+}
+```
+
+#### Loop and Loop Break
+
+`items` is the list to iterate over, and `iteratee` is the list of steps that run for each item. Inside the loop, `${loop_1.item}` is the current item and `${loop_1.index}` is its zero-based position. This loop logs the SKU of each order line and stops after the first 10 lines:
+
+```json
+{
+  "name": "loop_1",
+  "type": "loop/v1",
+  "parameters": {
+    "items": "${trigger_1.body.lines}",
+    "iteratee": [
+      {
+        "name": "condition_1",
+        "type": "condition/v1",
+        "parameters": {
+          "conditions": [
+            [
+              {
+                "type": "number",
+                "value1": "${loop_1.index}",
+                "operation": "GREATER_EQUALS",
+                "value2": 10
+              }
+            ]
+          ],
+          "caseTrue": [
+            { "name": "loopBreak_1", "type": "loopBreak/v1" }
+          ],
+          "caseFalse": [
+            {
+              "name": "logger_1",
+              "type": "logger/v1/info",
+              "parameters": { "text": "Line ${loop_1.index}: ${loop_1.item.sku}" }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+```
+
+For a loop with no list, set `"loopForever": true` instead of `items`. The loop then runs until a **Loop Break** step runs.
+
+#### Each
+
+Each runs one child step per item, in parallel. Unlike Loop, its `iteratee` is a single task object, not a list. The current item is `${each_1.item}`.
+
+```json
+{
+  "name": "each_1",
+  "type": "each/v1",
+  "parameters": {
+    "items": "${trigger_1.body.recipients}",
+    "iteratee": {
+      "name": "slack_1",
+      "type": "slack/v1/sendDirectMessage",
+      "parameters": {
+        "channel": "${each_1.item.slackUserId}",
+        "text": "Your report is ready."
+      }
+    }
+  }
+}
+```
+
+#### Map
+
+Map takes a list of steps in `iteratee`, like Loop, and returns a list with the output of the last step of each iteration. This Map returns the full name of each customer, so `${map_1}` is a list of strings:
+
+```json
+{
+  "name": "map_1",
+  "type": "map/v1",
+  "parameters": {
+    "items": "${trigger_1.body.customers}",
+    "iteratee": [
+      {
+        "name": "var_1",
+        "type": "var/v1/set",
+        "parameters": {
+          "type": "STRING",
+          "value": "=concat(${map_1.item.firstName}, ' ', ${map_1.item.lastName})"
+        }
+      }
+    ]
+  }
+}
+```
+
+#### Parallel
+
+The steps in `tasks` start at the same time. The workflow continues when all of them finish.
+
+```json
+{
+  "name": "parallel_1",
+  "type": "parallel/v1",
+  "parameters": {
+    "tasks": [
+      {
+        "name": "httpClient_1",
+        "type": "httpClient/v1/get",
+        "parameters": { "uri": "https://api.example.com/inventory" }
+      },
+      {
+        "name": "httpClient_2",
+        "type": "httpClient/v1/get",
+        "parameters": { "uri": "https://api.example.com/prices" }
+      }
+    ]
+  }
+}
+```
+
+#### Fork/Join
+
+`branches` is a list of task lists. The branches run in parallel, and the steps inside one branch run in sequence. After the join, `${forkJoin_1.branch_0}` and `${forkJoin_1.branch_1}` hold the output of the last step of each branch.
+
+```json
+{
+  "name": "forkJoin_1",
+  "type": "fork-join/v1",
+  "parameters": {
+    "branches": [
+      [
+        {
+          "name": "httpClient_1",
+          "type": "httpClient/v1/get",
+          "parameters": { "uri": "https://api.example.com/customers/${trigger_1.body.customerId}" }
+        }
+      ],
+      [
+        {
+          "name": "httpClient_2",
+          "type": "httpClient/v1/get",
+          "parameters": { "uri": "https://api.example.com/orders?customerId=${trigger_1.body.customerId}" }
+        }
+      ]
+    ]
+  }
+}
+```
+
+#### Error Handler
+
+The steps in `main-branch` run first. If one of them fails, the remaining steps of the main branch are skipped and the steps in `on-error-branch` run instead.
+
+```json
+{
+  "name": "onError_1",
+  "type": "on-error/v1",
+  "parameters": {
+    "main-branch": [
+      {
+        "name": "httpClient_1",
+        "type": "httpClient/v1/post",
+        "parameters": {
+          "uri": "https://api.example.com/invoices",
+          "body": { "bodyContentType": "JSON", "bodyContent": "${trigger_1.body}" }
+        }
+      }
+    ],
+    "on-error-branch": [
+      {
+        "name": "slack_1",
+        "type": "slack/v1/sendChannelMessage",
+        "parameters": {
+          "channel": "C01234567",
+          "text": "Invoice sync failed for order ${trigger_1.body.orderId}"
+        }
+      }
+    ]
+  }
+}
+```
+
+#### Stop Job
+
+**Stop Job** ends the run with the status `STOPPED`. Steps after it do not run. `message` is the reason for stopping.
+
+```json
+{
+  "name": "terminate_1",
+  "type": "terminate/v1",
+  "parameters": {
+    "message": "Order was cancelled before fulfillment"
+  }
+}
+```
 
 ### Graph
 
-> **Coming soon.** The Graph flow control is on the upcoming release track and is not yet available in the latest released version of ByteChef.
-
-Where Loop repeats a fixed body and Condition/Branch pick one of a small, fixed set of paths, **Graph** is a state machine: a set of named nodes wired together by transitions that decide which node runs next. A transition can point forward, sideways, or back to a node that already ran - the shape you'd otherwise hand-build out of nested Loop and Condition steps for a "retry until it passes" or "send it back for another pass" flow.
+**Graph** is a state machine: a set of named nodes connected by transitions that decide which node runs next. A transition can point forward, sideways or back to a node that already ran. Use Graph for flows such as "retry until it passes" or "send it back for another pass", which otherwise need nested Loop and Condition steps.
 
 #### Nodes and transitions
 
-A graph's `nodes` list is an ordinary task list - each node **is** one task, and its `name` is the same task name you'd give any step elsewhere in the workflow, unique across the whole workflow. A node can be any task, including another flow control or a nested graph.
+The `nodes` list is an ordinary task list. Each node is one task, and its `name` is a task name that must be unique across the whole workflow. A node can be any task, including another flow control or a nested graph.
 
 The `transitions` list is separate from `nodes` and holds the graph's edges. Each transition has:
 
 - **`from`** - the node the transition leaves.
-- **`to`** - the node the transition enters. Either a plain node name (a static edge) or a formula-mode expression that resolves to one, evaluated against the accumulated run context (a dynamic edge - see the LLM-routed example below).
-- **`condition`** - an optional formula-mode expression evaluated against the accumulated run context. Blank or absent means the transition is unconditional. The expression must evaluate to a boolean - any other value, including a number, a string such as `"true"` or `null`, fails the run with an error that names the source node, so `condition: "=${count}"` does not work; compare explicitly instead, e.g. `condition: "=${count} > 0"`.
+- **`to`** - the node the transition enters: a node name (a static edge), or a formula-mode expression that resolves to a node name against the accumulated run context (a dynamic edge; see the LLM-routed example below).
+- **`condition`** - an optional formula-mode expression evaluated against the accumulated run context. Blank or absent means the transition is unconditional. The expression must evaluate to a boolean. Any other value, including a number, the string `"true"` or `null`, fails the run with an error that names the source node. For example, `condition: "=${count}"` fails; use `condition: "=${count} > 0"`.
 
 ```yaml
 - name: triage
@@ -74,35 +357,53 @@ The `transitions` list is separate from `nodes` and holds the graph's edges. Eac
         to: approve
 ```
 
-**Evaluation rule:** on node completion, take that node's outgoing transitions; evaluate the conditional ones in declared order, the first `condition` that evaluates true wins; if none matched take the first unconditional one; if there is none the node is terminal. If a node has more than one unconditional transition, the first declared one is taken - the editor warns about this, but it's also the runtime rule.
+**Evaluation rule.** When a node completes, the graph evaluates its outgoing transitions:
 
-Once a transition is chosen, its target must name a real node. If `to` is blank, or a dynamic `to` resolves to nothing, the run fails with an error that names the source node; evaluation does not move on to the next candidate, so give a dynamic `to` its own fallback with the Elvis operator (`"=${classify.decision} ?: 'escalate'"`). If `to` resolves to a value that isn't one of the graph's declared node names, the run fails too - the error names the source node and the value that was produced (`Unknown graph transition target node: '<to>' resolved from node '<from>'`) rather than the graph silently stalling.
+1. Conditional transitions, in declared order. The first `condition` that evaluates to true wins.
+2. If none matched, the first unconditional transition.
+3. If there is none, the node is terminal and the graph ends.
 
-A routing failure - a non-boolean condition, a missing or unknown target, or an exhausted transition budget - fails the graph step itself. The node that just completed stays completed and is not retried, even when it has retries configured.
+If a node has more than one unconditional transition, the first declared one is taken. The editor shows a warning for this case.
+
+The chosen transition must target a declared node. If `to` is blank, or a dynamic `to` resolves to nothing, the run fails with an error that names the source node. Evaluation does not fall through to the next candidate, so give a dynamic `to` a fallback with the Elvis operator (`"=${classify.decision} ?: 'escalate'"`). If `to` resolves to a name that is not a declared node, the run fails with `Unknown graph transition target node: '<to>' resolved from node '<from>'`.
+
+A routing failure (a non-boolean condition, a missing or unknown target, or an exhausted transition budget) fails the graph step. The node that just completed stays completed and is not retried, even when it has retries configured.
 
 A run starts at `startNode` if set, otherwise the first declared node.
 
 #### Cycles and the transition budget
 
-Because a transition can target a node that already ran - including the node it leaves from - a graph can express review loops and retry-until-done flows directly: `review` transitioning back to `classify` above is a normal edge, not an error. To keep a cycling graph from running forever, every graph carries a **transition budget**, `maxTransitions` (default 100). Every node-to-node hop counts against it; once the budget is used up the run fails cleanly instead of looping indefinitely.
+A transition can target a node that already ran, including the node it leaves. In the example above, `review` transitioning back to `classify` is a normal edge. To stop a cycling graph from running forever, every graph has a transition budget, `maxTransitions` (default `100`). Every node-to-node transition counts against it. When the budget is used up, the run fails.
 
-Context accumulates across the whole run the normal way: it is last-write-wins, so a node that runs a second time (after a cycle back to it) sees everything produced so far, including its own earlier run, and a data pill referencing a step inside that node resolves to that step's *most recent* execution.
+Context accumulates across the run with last-write-wins semantics. A node that runs a second time sees everything produced so far, including its own earlier run. A data pill that references a step inside a node resolves to that step's most recent execution.
 
 #### Outputs
 
-`${graphName}` resolves to the **terminal node's output** - the same convention as Condition and Branch above. When the terminal node produced no output, `${graphName}` is `null`.
+`${graphName}` resolves to the terminal node's output, the same convention as Condition and Branch. When the terminal node produced no output, `${graphName}` is `null`.
 
 #### In the editor
 
-The graph's canvas is a free-form box: drag nodes to arrange them however makes sense for the flow, drag from a node's transition handle to another node to connect them with a transition, and click an edge to set its `condition`. To make a dynamic edge, flip the formula switch next to **To** in that popover and enter an expression such as `${review}` instead of picking a node. Because its target is only known at run time, a dynamic transition is drawn as a dashed loop labelled **dynamic** on the node it leaves; the loop does not mean the node runs again. The box header carries **Add node**, which picks a component to add to the graph, and **Auto-arrange**, which lays every node and edge out automatically when you'd rather not position them by hand.
+On the canvas, a graph is a free-form box.
 
-A **Start** pill marks where the run begins; drag the edge leaving it onto a different node to change `startNode`. Selecting the graph node itself lists every **transition** in its Properties tab, grouped by the node each one leaves. Some things only that list can show: the order each group is evaluated in, conditional transitions first in their declared order and unconditional ones after them; a warning when a node has more than one unconditional transition; a warning when `startNode` names a node the graph does not declare; and a transition whose `from` or `to` names a node the graph no longer declares, which cannot be drawn on the canvas at all.
+- Drag nodes to arrange them.
+- Drag from a node's transition handle to another node to create a transition.
+- Click an edge to set its `condition`.
+- To create a dynamic edge, turn on the formula switch next to **To** in the edge popover and enter an expression such as `${review}`. A dynamic transition is drawn as a dashed loop labelled **dynamic** on the node it leaves, because its target is known only at run time. The loop does not mean the node runs again.
+- **Add node** in the box header adds a component to the graph. **Auto-arrange** lays out all nodes and edges.
+- The **Start** pill marks where the run begins. Drag the edge leaving it to another node to change `startNode`.
+
+Select the graph node to see all transitions in its **Properties** tab, grouped by source node. Only this list shows:
+
+- The evaluation order of each group: conditional transitions in declared order, then unconditional ones.
+- A warning when a node has more than one unconditional transition.
+- A warning when `startNode` names a node the graph does not declare.
+- Transitions whose `from` or `to` names a node the graph no longer declares. These cannot be drawn on the canvas.
 
 #### An LLM-routed example: ticket triage
 
-A common use of Graph is letting an AI Agent node choose the next node itself instead of hand-writing the routing logic. Give the agent a **structured output** schema with an enum of the possible next states, and point a transition's `to` straight at the field the model fills in.
+An AI Agent node can choose the next node. Give the agent a structured output schema with an enum of the possible next nodes, and point a transition's `to` at the field the model fills in.
 
-Take a support-ticket triage flow: an AI Agent node classifies an incoming ticket, and the graph routes to whichever node handles that outcome.
+In this support-ticket triage flow, an AI Agent node classifies an incoming ticket and the graph routes to the node that handles that category.
 
 ```yaml
 - name: triage
@@ -146,11 +447,11 @@ Take a support-ticket triage flow: an AI Agent node classifies an incoming ticke
         to: "=${classify.decision} ?: 'escalate'"
 ```
 
-Setting `response.responseFormat` to `JSON` (with a `response.responseSchema` describing the shape) is what turns the AI Agent's reply from free text into a structured object - the model's answer is parsed against the schema, and its properties become data pills exactly like any other step's output: `${classify.decision}`, `${classify.confidence}`. The transition's `to` expression then does nothing more than forward the model's own `decision` as the target node name, falling back to `'escalate'` with the Elvis operator (`?:`) if the model produced no usable answer at all - a parsing failure or an empty response - so a bad turn from the model routes to a safe node instead of failing the whole run.
+With `response.responseFormat` set to `JSON` and a `response.responseSchema`, the AI Agent returns a structured object. Its properties are available as data pills: `${classify.decision}` and `${classify.confidence}`. The transition's `to` uses `decision` as the target node name. The Elvis operator (`?:`) falls back to `'escalate'` when the model returns no usable answer (a parsing failure or an empty response), so the run continues instead of failing.
 
-Because the schema's enum only ever produces one of `refund`, `technical`, `escalate`, or `resolved`, every value the model *can* return already names a real node in the graph - the fallback exists for "the model produced nothing," not for an out-of-vocabulary answer.
+The schema's enum limits `decision` to `refund`, `technical`, `escalate` or `resolved`, which are all declared nodes. The fallback covers an empty answer, not an unknown value.
 
-**Gating on confidence.** A dynamic `to` doesn't have to trust the model outright. Declare two transitions off the same node and let `condition` pick between them:
+**Gating on confidence.** Declare two transitions from the same node and let `condition` choose between them:
 
 ```yaml
 transitions:
@@ -161,4 +462,4 @@ transitions:
     to: human_review
 ```
 
-The first transition, whose `to` reads the model's own `decision`, only matches when confidence clears the threshold; anything less certain falls through to the second, unconditional transition and lands on a `human_review` node instead - worth adding to the graph with a task that notifies a person and lets them pick a category before the graph continues.
+The first transition matches only when the confidence is above `0.7`. Otherwise the second, unconditional transition routes to a `human_review` node, for example a task that asks a person to choose the category before the graph continues.

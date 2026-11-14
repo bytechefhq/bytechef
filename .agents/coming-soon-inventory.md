@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**44 whole-page** (20 hidden) · **31 partial** pages (7 with a commented-out section)
+**25 whole-page** (9 hidden) · **31 partial** pages (7 with a commented-out section)
 
 ---
 
@@ -33,28 +33,19 @@ Both are reversible and neither deletes anything.
 
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
-| Memories | [`/platform/settings/ai/memories`](/platform/settings/ai/memories) | CE | visible |
 | AI Copilot | [`/platform/automation/build/ai-copilot`](/platform/automation/build/ai-copilot) | EE | visible |
 | AI Hub | [`/platform/automation/build/hub`](/platform/automation/build/hub) | — | **hidden** |
-| Workflow Chats | [`/platform/automation/build/hub/workflow-chats`](/platform/automation/build/hub/workflow-chats) | — | **hidden** |
-| Advanced Behavior | [`/platform/automation/build/hub/workflow-chats/advanced`](/platform/automation/build/hub/workflow-chats/advanced) | — | **hidden** |
-| Embed the Chat Widget | [`/platform/automation/build/hub/workflow-chats/chat-widget`](/platform/automation/build/hub/workflow-chats/chat-widget) | — | **hidden** |
-| Enable Chat on a Workflow | [`/platform/automation/build/hub/workflow-chats/enable-chat`](/platform/automation/build/hub/workflow-chats/enable-chat) | — | **hidden** |
-| Start a Workflow Chat | [`/platform/automation/build/hub/workflow-chats/using-chats`](/platform/automation/build/hub/workflow-chats/using-chats) | — | **hidden** |
 | Testing Voice In The Editor | [`/platform/automation/build/voice/editor-testing`](/platform/automation/build/voice/editor-testing) | — | **hidden** |
 | Voice Quickstart | [`/platform/automation/build/voice/quickstart`](/platform/automation/build/voice/quickstart) | — | **hidden** |
 | Evals | [`/platform/automation/build/workflows/ai/agent/evals`](/platform/automation/build/workflows/ai/agent/evals) | CE | visible |
-| Code Workflows | [`/platform/automation/build/workflows/code-workflows`](/platform/automation/build/workflows/code-workflows) | EE | visible |
 | Data Streams | [`/platform/automation/build/workflows/data-streams`](/platform/automation/build/workflows/data-streams) | CE | visible |
 | Error Workflows | [`/platform/automation/build/workflows/error-workflows`](/platform/automation/build/workflows/error-workflows) | CE | visible |
 | Asset Files | [`/platform/automation/data/asset-files`](/platform/automation/data/asset-files) | CE | visible |
 | Sources | [`/platform/automation/data/knowledge-base/sources`](/platform/automation/data/knowledge-base/sources) | CE | **hidden** |
-| A2A Servers | [`/platform/automation/deploy/a2a-servers`](/platform/automation/deploy/a2a-servers) | CE | **hidden** |
 | API Platform | [`/platform/automation/deploy/api-platform`](/platform/automation/deploy/api-platform) | — | visible |
 | Guardrails | [`/platform/automation/settings/ai-agents/guardrails`](/platform/automation/settings/ai-agents/guardrails) | EE | **hidden** |
 | System Prompt | [`/platform/automation/settings/ai-agents/system-prompt`](/platform/automation/settings/ai-agents/system-prompt) | EE | **hidden** |
 | AI Hub Connectors | [`/platform/automation/settings/ai-hub-connectors`](/platform/automation/settings/ai-hub-connectors) | EE | **hidden** |
-| API Keys | [`/platform/automation/settings/api-keys`](/platform/automation/settings/api-keys) | EE | visible |
 | Git Configuration | [`/platform/automation/settings/git-configuration`](/platform/automation/settings/git-configuration) | EE | visible |
 | Users | [`/platform/automation/settings/users`](/platform/automation/settings/users) | EE | visible |
 
@@ -62,46 +53,26 @@ Both are reversible and neither deletes anything.
 
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
-| Automation Code Workflows | [`/platform/embedded/build/automations/automation-code-workflows`](/platform/embedded/build/automations/automation-code-workflows) | CE | **hidden** |
-| Automation workflows | [`/platform/embedded/build/automations/automation-workflows`](/platform/embedded/build/automations/automation-workflows) | EE | visible |
-| Theming and Localization | [`/platform/embedded/build/theming-and-localization`](/platform/embedded/build/theming-and-localization) | — | visible |
+| Automation Code Workflows | [`/platform/embedded/build/automations/automation-code-workflows`](/platform/embedded/build/automations/automation-code-workflows) | CE | visible |
 | Unified API | [`/platform/embedded/build/unified-api`](/platform/embedded/build/unified-api) | — | **hidden** |
-| Field Mapping | [`/platform/embedded/build/workflows/field-mapping`](/platform/embedded/build/workflows/field-mapping) | — | visible |
 
 ### Platform Settings
 
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
 | Admin API Keys | [`/platform/settings/admin-api-keys`](/platform/settings/admin-api-keys) | EE | visible |
-| Audit Events | [`/platform/settings/audit-events`](/platform/settings/audit-events) | EE | visible |
-| API Connectors | [`/platform/settings/components/api-connectors`](/platform/settings/components/api-connectors) | — | **hidden** |
+| API Connectors | [`/platform/settings/components/api-connectors`](/platform/settings/components/api-connectors) | — | visible |
 | Component Visibility | [`/platform/settings/components/component-visibility`](/platform/settings/components/component-visibility) | EE | visible |
 | Custom Components | [`/platform/settings/components/custom-components`](/platform/settings/components/custom-components) | EE | visible |
-| Connections | [`/platform/settings/connections`](/platform/settings/connections) | EE | visible |
 | Identity Providers | [`/platform/settings/identity-providers`](/platform/settings/identity-providers) | — | visible |
 | License | [`/platform/settings/license`](/platform/settings/license) | EE | visible |
 | MCP Server | [`/platform/settings/mcp-server`](/platform/settings/mcp-server) | CE | visible |
-| OAuth2 Clients | [`/platform/settings/oauth2-clients`](/platform/settings/oauth2-clients) | EE | **hidden** |
-| Users | [`/platform/settings/users`](/platform/settings/users) | — | visible |
 
 ### Self-Hosted
 
 | Page | Path | Edition | Sidebar |
 |---|---|---|---|
 | Distributed (Coordinator/Worker) | [`/platform/use-bytechef/self-hosted/installation/distributed`](/platform/use-bytechef/self-hosted/installation/distributed) | CE | **hidden** |
-
-### Your Account
-
-| Page | Path | Edition | Sidebar |
-|---|---|---|---|
-| Appearance | [`/platform/your-account/appearance`](/platform/your-account/appearance) | CE | visible |
-
-### API Reference
-
-| Page | Path | Edition | Sidebar |
-|---|---|---|---|
-| Deploy a new code based project | [`/openapi/automation-project-code-workflow/deployProject`](/openapi/automation-project-code-workflow/deployProject) | — | **hidden** |
-| Custom Components | [`/openapi/custom-components`](/openapi/custom-components) | — | **hidden** |
 
 ---
 

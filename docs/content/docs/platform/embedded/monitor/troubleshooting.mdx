@@ -1,59 +1,62 @@
 ---
 title: Troubleshooting
-description: The shape of an embedded API error, what the common failures mean, and where to look when a connected user reports that something is broken.
+description: The embedded API error response, what common failures mean, and where to look when a connected user reports a problem.
 ---
 
-Most embedded problems fall into three buckets: the request never authenticated, the connected user's credential went stale, or the workflow ran and failed. They surface in different places, so the first job is telling them apart.
+Most embedded problems fall into three groups: the request did not authenticate, the connected user's credential is no longer valid, or the workflow ran and failed. Each group shows up in a different place, so start by telling them apart.
 
-## The error envelope
+## The error response
 
-Every embedded API error returns the same JSON shape, whatever the status code:
+An embedded API error that reaches a controller returns a problem detail body (`application/problem+json`, [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457)):
 
 ```json
 {
-  "errors": [
-    {
-      "id": "9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5",
-      "status": "400",
-      "code": "MISSING_REQUIRED_FIELD",
-      "title": "Property values were not valid",
-      "detail": "..."
-    }
-  ]
+  "type": "about:blank",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "Property values were not valid",
+  "instance": "/api/embedded/v1/user-42/integration-instances"
 }
 ```
 
-`errors` is an array - a single request can report more than one problem. **`id` is the one field worth logging**: it identifies that specific occurrence, and quoting it is the fastest way for support to find the failure. `code` is stable enough to branch on; `title` and `detail` are for humans and their wording can change.
+| Field | Description |
+|---|---|
+| `status` | The HTTP status code. |
+| `detail` | A human-readable description. Its wording can change, so do not branch on it. |
+| `type`, `title` | The problem type (`about:blank`, or a `https://www.bytechef.io/problem/...` URI for ByteChef domain errors) and a short title. |
+| `instance` | The request path. |
+| `errorKey`, `entityClass`, `inputParameters` | Present on ByteChef domain errors. |
+| `errorCode` | `ACCESS_DENIED` on a `403`. |
 
-<Callout type="warn" title="problem_type is deprecated">
-    Older responses also carry `problem_type`, which duplicates `code`. Read `code`.
+Authentication failures are rejected before a controller runs. They return `401` with no problem detail body.
+
+<Callout type="info" title="The Errors schema in the API reference">
+    The API reference describes an `errors` array with `id`, `code` and the deprecated `problem_type` field. The current server does not return that shape.
 </Callout>
 
-## What the status codes mean here
+## What the status codes mean
 
 | Status | In embedded, this usually means |
 |---|---|
-| **401** | The credential was rejected - a bad API Key, or a JWT that is expired, signed with the wrong key, or carries a `kid` that does not match a Signing Key. |
-| **403** | The credential authenticated but is not allowed to do this. A disabled connected user also lands here. |
-| **404** | The integration, instance, or workflow does not exist **in the environment the request resolved to** - the most common cause is a missing or wrong `X-Environment`. |
-| **409** | The request conflicts with current state, e.g. creating an instance that already exists. |
-| **422** | The request parsed but the values were not acceptable - a required input missing, or a value the provider rejects. |
-| **500** | A ByteChef-side failure. Log the error `id` and send it to support. |
-
-There is also a **remote provider error** response, used when the third-party API is what failed rather than ByteChef. Treat it as a signal to check the provider's own status, not your integration.
+| **400** | The request was not valid: a required input is missing, a value is not accepted, or a ByteChef domain rule rejected it. |
+| **401** | The credential was rejected: an unknown API Key, an API Key from another environment, a JWT that is expired, signed with the wrong key or carries an unknown `kid`, a JWT whose `sub` does not match the path, or a disabled connected user. |
+| **403** | The credential authenticated but is not allowed to do this, for example an admin operation by a user who is not a tenant admin. |
+| **404** | The integration, instance or workflow does not exist in the environment the request resolved to, or the connected user is not allowed to see the integration. A missing or wrong `X-Environment` header is the most common cause. |
+| **409** | The request conflicts with a concurrent change. Reload and retry. |
+| **500** | A ByteChef-side failure. Log the request and the response and send them to support. |
 
 ## Authentication problems
 
-Both credentials fail as a `401`, but for different reasons:
+API Keys and Signing Key JWTs both fail with `401`, for different reasons:
 
-- **API Key** - the key does not exist in that environment. Keys are environment-scoped, so a Development key against Production fails exactly like an invalid one.
-- **Signing Key JWT** - the usual causes are an expired token (keep the TTL short and mint per session), a `kid` header that does not match a Signing Key, or signing with a rotated private key.
+- **API Key** - the key does not exist in the request's environment. Keys are scoped to an environment, so a Development key sent to Production fails like an invalid key. Without an `X-Environment` header the request goes to `PRODUCTION`.
+- **Signing Key JWT** - the usual causes are an expired token (keep the TTL short and mint one per session), a `kid` header that does not match a Signing Key in the request's environment, or a token signed with the private key of a deleted Signing Key.
 
-A **disabled connected user** is a distinct case: the token is valid and the user exists, but requests are refused until an admin re-enables them under **Embedded → Connected Users**. If a single customer is failing while everyone else is fine, check their enabled state first.
+A **disabled connected user** is a separate case: the token is valid and the user exists, but requests are rejected with `401` until an admin enables the user again under **Embedded → Connected Users**. If one customer fails while everyone else works, check that user's enabled state first.
 
 A JWT whose `sub` does not match the `{externalUserId}` segment of the request path (`/api/embedded/v1/{externalUserId}/...`) is also rejected with a `401`, before the request reaches the endpoint. A token minted for one connected user cannot act on another user's path. Mint the token with the same id you put in the URL. The server URL-decodes the path segment before comparing.
 
-Calling a frontend operation with an API Key is also rejected. Those paths carry no `{externalUserId}` segment, so there is no user for the key to act as - see [the reference's authentication section](/openapi#authentication).
+Calling a frontend operation with an API Key is also rejected. Those paths carry no `{externalUserId}` segment, so there is no user for the key to act as. See [the reference's authentication section](/openapi#authentication).
 
 ## Admin operations
 
@@ -61,14 +64,14 @@ Embedded admin operations require a **tenant admin**. This covers integrations, 
 
 ## Credential problems
 
-A connection whose credential has gone bad is marked **`INVALID`** - the only two states are `VALID` and `INVALID`. This is what a revoked OAuth grant, a rotated API key at the provider, or a password change looks like from ByteChef's side.
+A connection whose credential no longer works is marked `INVALID`. The two states are `VALID` and `INVALID`. A revoked OAuth grant, a rotated API key at the provider, or a password change all appear this way.
 
-An invalid credential does not fail the API call that lists it; it fails the workflow that tries to use it. So the symptom a customer reports is "my automation stopped working", not an error in your UI. Two places show it:
+An invalid credential does not fail the API call that lists it. It fails the workflow that uses it, so the customer reports that an automation stopped working, not an error in your UI. Two places show it:
 
-- The **Connected Users** table has a status column and a filter for invalid credentials - see [Connected Users](/platform/embedded/monitor/connected-users).
+- The **Connected Users** table has a status column and a filter for invalid credentials. See [Connected Users](/platform/embedded/monitor/connected-users).
 - Your own app can read it per connection from [Connections](/openapi/backend/embedded-configuration-connection).
 
-The fix is always the same: have the user reconnect through the Connect dialog, which replaces the credential in place.
+To fix it, have the user reconnect through the Connect dialog, which replaces the credential in place.
 
 ## Embedding problems
 
@@ -80,12 +83,19 @@ The workflow builder, Automation Hub and Integration Marketplace render in an if
 
 ## Execution problems
 
-If the request authenticated and the credential is valid, the failure is in the run itself. Workflow executions record every step with its inputs, outputs, and error - see [Workflow Executions](/platform/embedded/monitor/workflow-executions) for reading them, and [Failures and Retries](/platform/embedded/monitor/failures-and-retries) for what the engine does before a run is finally marked failed.
+If the request authenticated and the credential is valid, the failure is in the run itself. Workflow executions record every step with its inputs, outputs and error. See [Workflow Executions](/platform/embedded/monitor/workflow-executions) for reading them, and [Failures and Retries](/platform/embedded/monitor/failures-and-retries) for what the engine does before it marks a run failed.
 
 ## A checklist for a report you cannot reproduce
 
-1. **Which environment?** Development, Staging, and Production hold entirely separate connected users, connections, and instances. A large share of "it does not exist" reports are the wrong environment.
+1. **Which environment?** Development, Staging and Production hold separate connected users, connections and instances. Many "it does not exist" reports come from the wrong environment.
 2. **Is the connected user enabled?**
 3. **Is their connection `VALID`?**
-4. **Did a run actually start?** No execution record means the trigger never fired - check that the workflow is enabled for that user's instance.
-5. **What is the error `id`?** With it, support can go straight to the occurrence.
+4. **Did a run start?** No execution record means the trigger never fired. Check that the workflow is enabled for that user's instance.
+5. **What did the API return?** Keep the request path, the time and the response body for support.
+
+## Related
+
+- [Workflow Executions](/platform/embedded/monitor/workflow-executions)
+- [Failures and Retries](/platform/embedded/monitor/failures-and-retries)
+- [Signing Keys](/platform/embedded/administration/signing-keys)
+- [API Keys](/platform/embedded/administration/api-keys)

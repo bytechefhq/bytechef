@@ -1,26 +1,51 @@
 ---
 title: "Templates"
-description: Start from pre-built project and workflow templates, or share your own via import links.
+description: Start from pre-built project and workflow templates, or share your own projects and workflows through import links.
 ---
 
-Templates let you start from a working automation instead of a blank canvas.
+Templates are pre-built projects and workflows that you import into your workspace as a starting point. You can also share your own project or workflow as a template through an import link.
 
-## Browse the gallery
+## Create a project from a template
 
-- **Project templates** - open **Projects** → **Templates** to browse the gallery of pre-built projects. Selecting one imports it into your workspace as a regular project you can edit, publish, and deploy.
-- **Workflow templates** - inside a project, browse workflow templates and import one as a new workflow.
+1. Go to **Projects**.
+2. Click the arrow next to **New Project** and select **From Template**.
+3. Find a template. Use the search box (**Search projects...**) or the category filter to narrow the list. Each card shows the components the template uses.
+4. Open a template. The template page lists its workflows and the components they use.
+5. Click **Import now**.
 
-Each gallery has a **search box** and a **category filter** to narrow the cards; every card shows the components the template uses as icons. On a template's import page, the connected-components list tells you which apps you'll need to connect before the imported automation can run.
-
-Templates are fetched from ByteChef's template catalog through the GitHub proxy - self-hosted instances behind a firewall can point at a mirror via [`GITHUB_PROXY_BASE_URL`](/platform/use-bytechef/self-hosted/configuration/environment-variables#github-proxy-configuration).
+The import creates a regular project that you can edit, publish and deploy.
 
 {/* TODO screenshot: project templates gallery - card grid with template titles, descriptions, and component icons */}
 
-## Share and import
+## Create a workflow from a template
 
-A project or workflow can be shared as an **import link**. Anyone with the link (and access to a ByteChef instance) opens it and gets a guided import:
+1. Open the project that should contain the workflow.
+2. Click the arrow next to **New Workflow** in the left sidebar and select **From Template**. The same item is in the project settings menu and in the **New Workflow** drop-down of an expanded project row on the **Projects** list.
+3. Select a template and click **Import now**.
 
-- `/import/shared/...` - import something another user shared from their workspace.
-- `/import/template/...` - import a catalog template directly.
+## Share a project or workflow
 
-The import creates a copy in the target workspace - connections and credentials are never carried across; the importer connects their own accounts.
+1. Open the actions menu of a project or workflow and click **Share**. The **Share project as template** (or **Share workflow as template**) dialog opens.
+2. Enter a **Description**. It is required.
+3. Click **Export and generate template link**.
+4. Click **Copy link** and send the link.
+
+The link has the form `<public URL>/import/shared/projects/<uuid>` or `<public URL>/import/shared/workflows/<uuid>`. To disable the link, turn off the switch at the top of the dialog. When you change the project later, the dialog shows that an older version is shared; click **Update template based on the current version** to update the template. See [Share Projects and Workflows as Templates](/platform/automation/build/workflows/projects#share-projects-and-workflows-as-templates).
+
+Catalog templates open at `/import/template/projects/<id>` and `/import/template/workflows/<id>`.
+
+If the instance has a template submission form configured, the actions menu also shows **Share with Community**, which opens that form.
+
+## How the import works
+
+- The import creates a copy in the target workspace.
+- Connections and credentials are never copied. Connect your own accounts for each component the template uses before you run it.
+
+## Template catalog source
+
+ByteChef fetches the template catalog through the ByteChef GitHub proxy (`https://github-proxy.bytechef.io/` by default). A self-hosted instance that cannot reach it can point at a mirror with [`GITHUB_PROXY_BASE_URL`](/platform/use-bytechef/self-hosted/configuration/environment-variables#github-proxy-configuration).
+
+## Related
+
+- [Projects](/platform/automation/build/workflows/projects)
+- [Workflows](/platform/automation/build/workflows/workflows)

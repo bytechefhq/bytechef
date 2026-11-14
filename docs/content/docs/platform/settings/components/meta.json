@@ -3,6 +3,7 @@
   "title": "Components",
   "pages": [
     "custom-components",
+    "api-connectors",
     "component-visibility"
   ]
 }

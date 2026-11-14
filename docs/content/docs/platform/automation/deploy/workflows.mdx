@@ -1,332 +1,264 @@
 ---
 title: "Workflows"
-description: "Learn how to deploy projects and workflows in ByteChef."
+description: "Publish a project version and deploy it to an environment so its workflows run without the editor."
 ---
 
-Deploying workflows inside a project in ByteChef brings your automation to life. Deployment allows workflows to run
-independently without further user input, enabling seamless, hands-off execution of your automated processes.
+A deployment runs the workflows of a published project version without further input from you: triggers fire,
+schedules run, and webhook URLs accept requests. You publish a project in the editor and deploy it from the editor,
+the **Projects** page, or the **Project Deployments** page.
 
-## Publishing and deploying are two operations
+## Publishing and deploying
 
-Building a workflow and running it in an environment are deliberately separate steps:
+Building a workflow and running it in an environment are separate steps:
 
-- **Publish** takes the project's current draft and freezes it as a numbered, immutable **version**.
-  Every workflow in the project is snapshotted together; the editor then continues on a fresh draft,
-  so nothing you type afterwards changes the published version.
+- **Publish** freezes the project's current draft as a numbered, immutable **version**. All workflows in the project
+  are included. The editor continues on a new draft, so later edits do not change the published version.
 - **Deploy** creates a **project deployment**: one published version bound to one
-  [environment](/platform/automation/deploy/environments), with its own name, tags, its own set of
-  enabled workflows, and its own connection wiring.
+  [environment](/platform/automation/deploy/environments), with its own name, description, tags, set of enabled
+  workflows, and connections.
 
-That split is what lets you edit all afternoon without touching what is running, and what lets the
-*same* version run in Staging and in Production against different credentials - the artifact is
-identical, only the deployment around it differs.
+You can edit the draft without affecting what is running, and the same version can run in Staging and in Production
+against different credentials.
 
-### What a version does and doesn't carry
+### What a version contains
 
-A published version holds the workflow definitions - tasks, ordering, parameters, expressions, the
-component versions they reference, trigger configuration, and input and output schemas - plus the
-publish description and timestamp.
+A published version contains the workflow definitions (tasks, ordering, parameters, expressions, the component
+versions they reference, trigger configuration, and input and output schemas), the publish description, and the
+publish date.
 
-It does **not** hold connections or credentials. Connections are wired on the deployment, so the same
-version runs in Development against a sandbox account and in Production against the live one, and a
-credential rotation does not invalidate any version.
+A version does **not** contain connections or credentials. Connections are selected on the deployment, so the same
+version can use a sandbox account in Development and the live account in Production. Rotating a credential does not
+invalidate any version.
 
-### Reviewing versions
+### Review versions
 
-Open a project in the editor and use the **Settings** menu → **Project** tab → **Project History**.
-Each entry shows the version number, its published date, a Draft or Published badge, and the
-description supplied at publish time - which is why writing a real description at publish time is
-worth the ten seconds.
+1. Open the project in the editor.
+2. Open the **Settings** menu (gear icon), select the **Project** tab, and click **Project History**.
 
-### Rolling back
+The **Project Version History** panel lists each version with its number, published date, a **Draft** or
+**Published** badge, and the description entered at publish time. From the panel you can:
 
-There is nothing to rebuild. Use **Change Project Version** on the deployment (below) to point it at
-the earlier version; the version is still stored and still runnable. Rolling forward again is the
-same operation in the other direction.
+- **Export** a version from its **⋮** menu.
+- **Delete** a published version from its **⋮** menu. This cannot be undone.
+- Select a version and click **Apply selected version** to replace the current draft with the workflows of that
+  version. Unpublished changes in the draft are lost.
 
-### Hotfixes
+### Roll back or apply a hotfix
 
-Deployments run published versions, so a fix is not applied in place. Edit the draft, publish it, and
-change the affected deployment to the new version - a Production deployment can be pointed at a new
-version without first deploying it anywhere else, so this is no slower than editing live would be,
-and it leaves a version history behind.
+Deployments run published versions, so you never change a running deployment in place.
 
-## Deploy Project
+- **Roll back** - use [Change Project Version](#change-the-project-version) on the deployment and select the earlier
+  version. Earlier versions stay stored and deployable.
+- **Hotfix** - edit the draft, publish it, and change the affected deployment to the new version. A Production
+  deployment can move to a new version without that version being deployed anywhere else first.
+
+## Deploy a project
+
+<Callout>
+  A deployment is created in the environment that is currently selected in the left sidebar. The dialog shows it as a
+  read-only **Environment** badge. To deploy to Staging or Production (Enterprise Edition), switch the
+  [environment](/platform/automation/deploy/environments) first.
+</Callout>
+
+<Steps>
+<Step>
+
+Open the deployment dialog in one of these ways:
+
+- In the editor, click **Deploy** in the header. The button is disabled until the project has a published version.
+- On the **Projects** page, expand the project, open its **Deployments** tab, and click **Deploy** (or
+  **New Deployment** when the project already has deployments). The project's **⋮** menu also has a
+  **New Deployment** item.
+- On the **Project Deployments** page, click **New Deployment** (or **Create Deployment** when the list is empty). In
+  the Development environment this page is not in the sidebar; use the **Projects** page instead.
+
+</Step>
+<Step>
+
+On the **Basic** step, check or set the fields:
+
+| Field | Description |
+|---|---|
+| **Project** | The project to deploy. Preselected and locked when you open the dialog from a project. |
+| **Environment** | The current environment. Read-only. |
+| **Name** | Required. Defaults to the project name. |
+| **Version** | Required. Defaults to the latest published version. |
+| **Description** | Optional. |
+| **Tags** | Optional. Used to filter the **Project Deployments** page. |
+
+When you open the dialog from the editor and the project already has deployments, the **Basic** step has two tabs:
+**New** creates a deployment, and **Change Version** moves an existing deployment to another version.
 
 ![The New Deployment dialog with a project and published version selected](workflows/new-deployment.png)
 
-Once saved, the deployment appears in the list. Use the toggle on its row to enable it.
+</Step>
+<Step>
+
+Click **Next**. On the **Workflows** step, turn on each workflow to include. For each enabled workflow, select a
+connection for every component that needs one on the **Connections** tab, and fill in workflow inputs on the
+**Inputs** tab. Turn on **Group Connections** to group the connection fields by app.
+
+![The Workflows step: a workflow with its Connections and Inputs tabs](workflows/deployment-connections.png)
+
+</Step>
+<Step>
+
+Click **Save**. **Save** is disabled until at least one workflow is enabled.
+
+</Step>
+<Step>
+
+Turn on the switch on the deployment's row to enable it.
 
 ![A deployment row with its version badge and enable toggle](workflows/deployment-row.png)
 
-<Steps>
-<Step>
-
-Go to **Project Deployments**. In the Development environment that page is not in the sidebar:
-open **Projects**, expand the project and select its **Deployments** tab instead.
-
-</Step>
-<Step>
-
-Click on **New Deployment** (on the Project Deployments page the button reads **Create Deployment**
-when no deployment exists yet).
-
-</Step>
-<Step>
-
-Select **Project** you want to deploy. When you open the dialog from a project, that project is already selected and cannot be changed.
-
-</Step>
-<Step>
-
-The latest published **Version** is selected. Pick another version to deploy an older one.
-
-</Step>
-<Step>
-
-Enter **Name** and **Description** of the deployment.
-
-</Step>
-<Step>
-
-Select **Environment** to which you want to deploy the project.
-
-</Step>
-<Step>
-
-Enter **Tags** for easier organization of deployments.
-
-</Step>
-<Step>
-
-Enable desired workflows.
-
-</Step>
-<Step>
-
-Set up required connections for the enabled workflows.
-
-</Step>
-<Step>
-
-Click on **Save**.
-
-</Step>
-<Step>
-
-Enable the project deployment.
-
-</Step>
-<Step>
-
-Project is now deployed.
-
 </Step>
 </Steps>
 
+Where you land after saving depends on the environment:
 
-## View a Project's Deployments
+- **Development** - you stay where you are. On the **Projects** page the project opens on its **Deployments** tab; in
+  the editor the **Project Deployments** panel opens. The new deployment is expanded.
+- **Staging** or **Production** - ByteChef switches to that environment and opens the **Project Deployments** page with
+  the new deployment expanded.
 
-You don't have to leave a project to check on its deployments.
+## View a project's deployments
 
-**On the Projects page** (Development), expand a project and select its **Deployments** tab. It lists
-the project's Development deployments, each expanded to show its workflows. Each row is the same as on
-the Project Deployments page: the enable toggle, the **⋮** menu, the tags, and the arrow that expands
-the deployment's workflows. Clicking a workflow opens its
-[workflow executions](/platform/automation/monitor/workflow-executions). **New Deployment** on the
-right of the tabs opens the deployment dialog for this project; it is disabled, with the tooltip
-"Publish the project first", until the project has a published version.
+- **Projects page (Development)** - expand a project and open its **Deployments** tab. It lists the project's
+  Development deployments. Each row has the enable switch, the **⋮** menu, the tags, and an arrow that expands the
+  deployment's workflows. Clicking a workflow opens its
+  [workflow executions](/platform/automation/monitor/workflow-executions).
+- **Editor** - the **Project Deployments** button (list icon) next to **Deploy** opens a side panel with the project's
+  deployments in the current environment. The panel header takes the environment's color, and its refresh button
+  reloads the list.
+- **Project Deployments page** - lists all deployments in the current environment. Filter by project or tag in the
+  left sidebar.
 
-In Development, the **Project Deployments** page is not in the sidebar. Links that still point to it,
-such as a link to one project's deployments, open that project's **Deployments** tab on the Projects
-page instead.
+When the project has no deployment in the current environment, the tab and the panel show a **Deploy** button. A
+project that has never been published shows **Publish the project to deploy it**.
 
-**In the project editor**, the **Project Deployments** button (rocket icon) next to **Deploy** opens a
-side panel listing the project's deployments in the current environment; the panel header takes the
-environment's color. The **Refresh** button in the header reloads the list, and
-**Open in Projects** in the footer opens the project's **Deployments** tab on the Projects page.
+In Development, the **Project Deployments** page is not in the sidebar. Links to it open the project's **Deployments**
+tab on the **Projects** page instead.
 
-When the project has no deployment in the current environment, the tab and the panel show a
-**Deploy** button instead. A project that has never been published shows "Publish the project to
-deploy it", since a deployment always runs a published version.
-
-Where you land after saving a deployment depends on its environment:
-
-- **Development** - you stay where you are. On the Projects page the project opens on its
-  **Deployments** tab; in the editor the side panel opens. Either way the new deployment is expanded.
-- **Staging** or **Production** - ByteChef switches to that environment and opens the Project
-  Deployments page with the new deployment expanded.
-
-
-## Update Project Version
+## Change the project version
 
 <Steps>
 <Step>
 
-Click on the three dots next to the name of the project deployment you want to update.
-
-</Step>
-<Step>
-
-Click on **Change Project Version**.
-
-</Step>
-<Step>
-
-Select desired project version.
-
-</Step>
-<Step>
-
-Click on **Next**.
-
-</Step>
-<Step>
-
-Enable workflows you want to deploy.
-
-</Step>
-<Step>
-
-Update connections if necessary.
-
-</Step>
-<Step>
-
-Click on **Save**.
-
-</Step>
-</Steps>
-
-![The Change Project Version dialog](workflows/change-project-version.png)
-
-
-
-## Update Project Deployment
-
-<Steps>
-<Step>
-
-Click on the three dots next to the name of the project deployment you want to edit.
-
-</Step>
-<Step>
-
-Click on **Edit**.
-
-</Step>
-<Step>
-
-Change name, description or tags.
-
-</Step>
-<Step>
-
-Click on **Save**.
-
-</Step>
-</Steps>
+Open the deployment's **⋮** menu and click **Change Project Version**.
 
 ![The deployment actions menu, showing Edit, Change Project Version and Delete](workflows/deployment-actions-menu.png)
 
-
-
-## Update Workflow Connections
-
-![A workflow's Connections tab, mapping each component to a connection](workflows/deployment-connections.png)
-
-<Steps>
+</Step>
 <Step>
 
-Click on the arrow under the project deployment name.
+Select the **Version** and click **Next**.
+
+![The Change Project Version dialog](workflows/change-project-version.png)
 
 </Step>
 <Step>
 
-Click on three dots next to the name of the workflow you want to edit.
-
-</Step>
-<Step>
-
-Click on **Edit**.
-
-</Step>
-<Step>
-
-Click on **+** button.
-
-</Step>
-<Step>
-
-Create new connection.
-
-</Step>
-<Step>
-
-Click on **Save**.
-
-</Step>
-<Step>
-
-Choose the new connection.
+Enable the workflows to run, update connections and inputs if needed, and click **Save**.
 
 </Step>
 </Steps>
 
+## Edit a deployment
 
-## Delete Project Deployment
+1. Open the deployment's **⋮** menu and click **Edit**.
+2. Change the name, description, or tags.
+3. Click **Save**.
+
+The **⋮** menu also has **Open Project** (when available) and **Delete**.
+
+## Update a workflow's connections and inputs
 
 <Steps>
 <Step>
 
-Click on the three dots next to the name of the project deployment you want to delete.
+Click the arrow under the deployment name to expand its workflows.
 
 </Step>
 <Step>
 
-Select **Delete** from the dropdown menu.
+Open the workflow's **⋮** menu and click **Edit**. The item is disabled when the workflow has no connections and no
+inputs.
 
 </Step>
 <Step>
 
-Confirm the deletion if prompted.
+In the **Edit &lt;workflow&gt; Workflow** dialog, select a different connection, or click **+** to create one. Update
+inputs if needed.
+
+</Step>
+<Step>
+
+Click **Save**.
 
 </Step>
 </Steps>
+
+The workflow's **⋮** menu also has **Open in Project**, which opens the workflow in the editor.
+
+## Run a workflow manually
+
+A deployed workflow without a trigger, or with a **Manual** trigger, shows a run button (play icon, tooltip **Run
+workflow manually**) on its row. The button is enabled when both the deployment and the workflow are enabled. Click it
+to start a run; ByteChef shows **Workflow request sent.**
+
+## Delete a deployment
+
+1. Open the deployment's **⋮** menu and click **Delete**.
+2. Click **Delete** in the confirmation dialog.
+
+Deleting a deployment cannot be undone. The project and its workflows are not affected.
 
 ![The delete confirmation dialog for a deployment](workflows/delete-deployment.png)
 
+## Get a webhook URL
 
-## Get Webhook URL
-
-A workflow that starts with a webhook (static) trigger exposes a webhook URL once its deployment is enabled. In the example below we added a static trigger to a workflow and deployed it to show how to retrieve that URL.
+A workflow that starts with a static webhook trigger exposes a webhook URL on its deployment.
 
 <Steps>
 <Step>
 
-Click on the arrow under the project deployment name to expand its workflow list.
+Click the arrow under the deployment name to expand its workflows.
 
 </Step>
 <Step>
 
-Find the workflow that uses a static webhook trigger.
+On the workflow's row, click the clipboard icon (tooltip **Copy static workflow webhook trigger url**). The URL is
+copied to the clipboard. The icon is disabled while the workflow is disabled.
 
 </Step>
 <Step>
 
-Hover over the clipboard icon on that workflow row (tooltip: **Copy static workflow webhook trigger url**).
-
-</Step>
-<Step>
-
-Click the icon to copy the webhook URL to your clipboard. Use this URL in the external service that should trigger the workflow.
+Use the URL in the external service that triggers the workflow.
 
 </Step>
 </Steps>
+
+The URL has the form `<public URL>/webhooks/<id>` and accepts `GET` and `POST` requests. To try it from a terminal,
+send a JSON body to the copied URL:
+
+```bash
+curl -X POST "https://your-bytechef-host.example.com/webhooks/<id>" \
+  -H "Content-Type: application/json" \
+  -d '{"orderId": 1042, "status": "paid"}'
+```
+
+The run then appears in [Workflow Executions](/platform/automation/monitor/workflow-executions).
 
 ![An expanded deployment; the workflow with a webhook trigger shows a clipboard icon](workflows/webhook-url.png)
 
 <Callout type="info">
-  Workflows that start with a **form** or **chat** trigger show a form or chat icon instead of the clipboard icon - clicking it opens the hosted page rather than copying a URL.
+  Workflows that start with a **form** or **chat** trigger show a form or chat icon instead of the clipboard icon.
+  Clicking it opens the hosted page instead of copying a URL.
 </Callout>
 
+## Related
+
+- [Environments](/platform/automation/deploy/environments)
+- [Projects](/platform/automation/build/workflows/projects)
+- [Workflow executions](/platform/automation/monitor/workflow-executions)

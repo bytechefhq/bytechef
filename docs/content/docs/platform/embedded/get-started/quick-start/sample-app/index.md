@@ -7,11 +7,11 @@ description: A reference Next.js + Fastify implementation that demonstrates the 
 
 ---
 
-[**bytechef-embedded-sample-app**](https://github.com/bytechefhq/bytechef-embedded-sample-app) is a runnable reference implementation of an embedded integration. Clone it to see how every piece described in the rest of this section fits together in a real app.
+[**bytechef-embedded-sample-app**](https://github.com/bytechefhq/bytechef-embedded-sample-app) is a runnable reference implementation of an embedded integration. It shows how the pieces described in this section work together in one application.
 
-Looking for the smallest possible host app instead? The ByteChef repository itself carries a minimal Next.js host at [`sdks/frontend/embedded/test-apps`](https://github.com/bytechefhq/bytechef/tree/master/sdks/frontend/embedded/test-apps) - just server-side JWT minting (`app/api/generate-jwt`) and an integrations proxy around the `@bytechef/embedded` React SDK. It doubles as the SDK's development harness, so it always tracks the current SDK version.
+For a minimal host app, the ByteChef repository contains a small Next.js host at [`sdks/frontend/embedded/test-apps`](https://github.com/bytechefhq/bytechef/tree/master/sdks/frontend/embedded/test-apps). It has server-side JWT minting (`app/api/generate-jwt`), an integrations proxy (`app/api/integrations`) and an Automation Hub page (`app/hub`). It is also the SDK's development harness, so it tracks the current SDK version.
 
-It's split into two pieces:
+The sample app has two parts:
 
 - **`back-end/`** - a small Fastify + TypeScript server that signs JWTs (`RS256`) for end-user sessions using a Signing Key.
 - **`front-end/`** - a Next.js app that consumes those JWTs to drive the embedded SDK and several embedded APIs.
@@ -27,7 +27,7 @@ It's split into two pieces:
 | **ComponentKit Playground** (`/component-kit`) | Invoking a single component action directly, without authoring a workflow first. | `POST /api/embedded/v1/{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}` |
 | **Chat MCP** (`/chat-mcp`) | Using a ByteChef **MCP Server** as the tool source for an AI assistant chat. | MCP transport against your MCP Server URL, authenticated with the end-user JWT |
 | **Chat Component Kit** (`/chat-component-kit`) | Exposing every component action available to a user as tools for an AI assistant. | `GET /api/embedded/v1/{externalUserId}/tools` |
-| **Generate a workflow from a prompt** (on `/automations`) | Creating a workflow for the user from a natural-language prompt. | [`POST /api/embedded/v1/automation/workflows/generate`](/platform/embedded/get-started/quick-start#let-your-users-build-their-own-workflows-optional) *(depends on the AI Copilot - coming soon)* |
+| **Generate a workflow from a prompt** (on `/automations`) | Creating a workflow for the user from a natural-language prompt. | [`POST /api/embedded/v1/automation/workflows/generate`](/platform/embedded/get-started/quick-start#let-your-users-build-their-own-workflows-optional) (requires AI Copilot enabled on the server, `BYTECHEF_AI_COPILOT_ENABLED=true`) |
 | **App Event** (`/app-event`) | Firing an **App Event** from your application to start every one of the connected user's enabled App Event-triggered workflows. | [`POST /api/embedded/v1/app-events`](/openapi/frontend/embedded-webhook-app-event-trigger) |
 | **Request** (`/request`) | Triggering a single workflow synchronously via its **Request trigger** and reading the workflow's response back. | [`POST /api/embedded/v1/workflows/{workflowUuid}`](/openapi/frontend/embedded-webhook-request-trigger) |
 
@@ -66,7 +66,7 @@ Together these cover the most common embedded integration patterns: the connect 
         (app.bytechef.io or self-hosted :8080)
 ```
 
-The back-end never proxies ByteChef traffic - it only mints JWTs. The browser (or the Next.js API routes acting on its behalf) calls ByteChef directly with that JWT.
+The back-end does not proxy ByteChef traffic; it only mints JWTs. The browser, or the Next.js API routes acting for it, calls ByteChef directly with the JWT.
 
 ---
 
@@ -143,13 +143,13 @@ npm run dev
 # Frontend on http://localhost:3000
 ```
 
-Open `http://localhost:3000`, visit the **Integrations** page, click an integration card, complete the connect dialog, and you'll see your new connection appear in **Embedded → Connections** in the ByteChef UI.
+Open `http://localhost:3000`, go to the **Integrations** page, click an integration card and complete the Connect dialog. The new connection appears in the user's detail sheet under **Embedded → Connected Users** in the ByteChef UI.
 
 ---
 
 ## Developing against a local SDK build
 
-If you're modifying the embedded React SDK and want the sample app to pick up your changes:
+To test changes to the embedded React SDK in the sample app:
 
 ```bash
 # Terminal 1 - rebuild the SDK on save
@@ -163,7 +163,7 @@ rm -rf .next
 npm run dev
 ```
 
-`--install-links` is required because Next.js Turbopack can't resolve symlinked packages - the flag copies the SDK build into the sample's `node_modules` instead of symlinking.
+`--install-links` is required because Next.js Turbopack cannot resolve symlinked packages. The flag copies the SDK build into the sample's `node_modules` instead of creating a symlink.
 
 ---
 
@@ -180,4 +180,4 @@ npm run dev
 | Triggering a workflow via its Request trigger | `front-end/src/app/request/page.tsx` + `front-end/src/app/api/request/route.ts` |
 | The JWT signing reference | `back-end/src/index.ts` |
 
-Once you have the sample running, the rest of the docs in this section describe the corresponding admin UI surface that backs each demo.
+The other pages in this section describe the ByteChef admin UI behind each demo.

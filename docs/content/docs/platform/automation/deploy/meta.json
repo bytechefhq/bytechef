@@ -3,10 +3,11 @@
   "title": "Deploy",
   "description": "Deploy workflows and expose them to callers and agents.",
   "pages": [
-    "deploy-workflows",
-    "chats",
+    "workflows",
     "environments",
-    "api-platform",
-    "mcp-servers"
+    "chats",
+    "mcp-servers",
+    "a2a-servers",
+    "api-platform"
   ]
 }

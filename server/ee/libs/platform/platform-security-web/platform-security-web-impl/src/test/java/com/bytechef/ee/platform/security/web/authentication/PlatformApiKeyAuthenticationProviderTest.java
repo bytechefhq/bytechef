@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.constant.PlatformType;
@@ -38,6 +40,8 @@ class PlatformApiKeyAuthenticationProviderTest {
     private static final long ENVIRONMENT_ID = 0;
     private static final String SECRET_KEY = "secret";
 
+    private final ApiKeyService apiKeyService = mock(ApiKeyService.class);
+
     @Test
     void testAuthenticateAcceptsAdminApiKey() {
         Authentication authentication = newProvider(null).authenticate(newToken());
@@ -64,6 +68,8 @@ class PlatformApiKeyAuthenticationProviderTest {
         assertThatThrownBy(() -> newProvider(PlatformType.AUTOMATION).authenticate(newToken()))
             .isInstanceOf(BadCredentialsException.class)
             .hasMessage("Admin API key required");
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     @Test
@@ -71,6 +77,8 @@ class PlatformApiKeyAuthenticationProviderTest {
         assertThatThrownBy(() -> newProvider(PlatformType.EMBEDDED).authenticate(newToken()))
             .isInstanceOf(BadCredentialsException.class)
             .hasMessage("Admin API key required");
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     @Test
@@ -78,6 +86,8 @@ class PlatformApiKeyAuthenticationProviderTest {
         assertThatThrownBy(() -> newProvider(null, null).authenticate(newToken()))
             .isInstanceOf(BadCredentialsException.class)
             .hasMessage("API key has no owner");
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     @Test
@@ -85,6 +95,8 @@ class PlatformApiKeyAuthenticationProviderTest {
         assertThatThrownBy(() -> newProvider(null, 1L, false, true).authenticate(newToken()))
             .isInstanceOf(UserNotActivatedException.class)
             .hasMessage("User admin@localhost.com was not activated");
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     @Test
@@ -92,6 +104,8 @@ class PlatformApiKeyAuthenticationProviderTest {
         assertThatThrownBy(() -> newProvider(null, 1L, true, false).authenticate(newToken()))
             .isInstanceOf(UsernameNotFoundException.class)
             .hasMessage("User 1 was not found in the database");
+
+        verify(apiKeyService, never()).updateLastUsedDate(anyLong());
     }
 
     @Test
@@ -107,21 +121,23 @@ class PlatformApiKeyAuthenticationProviderTest {
         Authentication authentication = newProvider(null).authenticate(newToken());
 
         assertThat(((PlatformApiKeyAuthenticationToken) authentication).getApiKeyId()).isEqualTo(7L);
+
+        verify(apiKeyService).updateLastUsedDate(7L);
     }
 
     private static PlatformApiKeyAuthenticationToken newToken() {
         return new PlatformApiKeyAuthenticationToken((int) ENVIRONMENT_ID, SECRET_KEY, "public");
     }
 
-    private static PlatformApiKeyAuthenticationProvider newProvider(PlatformType platformType) {
+    private PlatformApiKeyAuthenticationProvider newProvider(PlatformType platformType) {
         return newProvider(platformType, 1L);
     }
 
-    private static PlatformApiKeyAuthenticationProvider newProvider(PlatformType platformType, Long userId) {
+    private PlatformApiKeyAuthenticationProvider newProvider(PlatformType platformType, Long userId) {
         return newProvider(platformType, userId, true, true);
     }
 
-    private static PlatformApiKeyAuthenticationProvider newProvider(
+    private PlatformApiKeyAuthenticationProvider newProvider(
         PlatformType platformType, Long userId, boolean activated, boolean userExists) {
 
         ApiKey apiKey = mock(ApiKey.class);
@@ -130,8 +146,6 @@ class PlatformApiKeyAuthenticationProviderTest {
 
         when(apiKey.getType()).thenReturn(platformType);
         when(apiKey.getUserId()).thenReturn(userId);
-
-        ApiKeyService apiKeyService = mock(ApiKeyService.class);
 
         when(apiKeyService.fetchApiKey(SECRET_KEY)).thenReturn(Optional.of(apiKey));
 

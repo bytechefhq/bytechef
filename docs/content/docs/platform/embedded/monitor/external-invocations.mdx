@@ -1,13 +1,12 @@
 ---
 title: "External Invocations"
-description: "A log of the tools and actions your connected users' AI agents and your own code ran through ByteChef - which one ran, for whom, how it ended, and how long it took."
+description: "A log of the MCP tools and Embedded API actions and tools run for your connected users: what ran, for whom, how it ended, and how long it took."
 ---
 
 When a connected user's AI agent calls a tool on an [embedded MCP server](/platform/embedded/configure/mcp-servers),
 or your backend executes an action or a tool through the [Component Kit](/platform/embedded/build/component-kit),
 ByteChef records the call. **External Invocations** lists those records, so you can see which tools your
-customers use, which ones fail, and how long they take. Open it from **External Invocations** in the left
-sidebar, next to **Workflow Executions**.
+customers use, which ones fail, and how long they take. Open it under **Embedded → External Invocations**.
 
 The page is available on Enterprise Edition only.
 
@@ -54,13 +53,16 @@ Each call is one row, newest first:
 | **Type** | What was called: a **Component tool** or a **Workflow tool** through embedded MCP or `POST /{externalUserId}/tools`, or an **Action** through the Embedded API action endpoint. |
 | **Source** | Where the call came in: **MCP**, **API (Action)** or **API (Tool)**. |
 | **Server** | The embedded MCP server the call came through. Embedded API calls show a dash. |
+| **Connected User** | The connected user the call was made for. |
 | **Target** | What ran: the component and operation, such as `slack / sendMessage`, or the name of the workflow a workflow tool ran. |
 | **Duration** | How long the call took, in milliseconds. |
 | **Date** | When the call was made. |
 | **Actions** | **View** opens the workflow run a workflow tool started, with the input and output of each step. **Stop** stops that run while it is still going: the call ended with `TIMEOUT`, `APPROVAL_REQUIRED` or `SUSPENDED`. Both are unavailable for component tool and action calls, which start no workflow run. |
 
-The list shows 50 rows per page. Use the **Refresh** button in the page header to load the latest
-calls.
+The list shows 50 rows per page. Click the refresh button in the page header to load the latest calls.
+
+Click a row to open its details: **Status**, **Target**, **Component version**, **Source**, **Duration**,
+**External user**, and for a failed call the **Error type** and **Error** message.
 
 ### How a workflow tool call ends
 
@@ -107,20 +109,64 @@ The endpoint accepts the same `source`, `status`, `startDate` and `endDate` filt
 `pageNumber`. It returns only the calls of the user named in the path. See the
 [API reference](/openapi/backend/embedded-external-invocation).
 
+For example, to list the failed tool calls of `user-123` since May 1:
+
+```bash
+curl -G "https://your-bytechef-host.example.com/api/embedded/v1/user-123/external-invocations" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "X-Environment: PRODUCTION" \
+  --data-urlencode "source=API_TOOL" \
+  --data-urlencode "status=ERROR" \
+  --data-urlencode "startDate=2026-05-01T00:00:00Z"
+```
+
+`source` takes `MCP_SERVER`, `API_ACTION` or `API_TOOL`. `status` takes `SUCCESS`, `ERROR`, `CONNECTION_REQUIRED`,
+`TIMEOUT`, `APPROVAL_REQUIRED`, `APPROVAL_DENIED`, `RULE_BLOCKED` or `SUSPENDED`. The response is a page of up to 50 records,
+without the tool inputs and outputs:
+
+```json
+{
+  "content": [
+    {
+      "id": 3107,
+      "createdDate": "2026-05-18T10:00:00Z",
+      "source": "API_TOOL",
+      "kind": "COMPONENT",
+      "status": "ERROR",
+      "invocationName": "SLACK_SEND_CHANNEL_MESSAGE",
+      "componentName": "slack",
+      "componentVersion": 1,
+      "operationName": "sendChannelMessage",
+      "integrationInstanceId": 1052,
+      "durationMs": 412,
+      "errorType": "<error type>",
+      "errorMessage": "<error message>"
+    }
+  ],
+  "number": 0,
+  "numberOfElements": 1,
+  "size": 50,
+  "totalElements": 1,
+  "totalPages": 1
+}
+```
+
+A workflow tool's record has `kind` `WORKFLOW` and carries the `jobId` of the run it started.
+
 ---
 
 ## Scope
 
 The list is scoped to the current environment.
-Switching the environment in the left sidebar reloads the list and clears the filters. A call made in
+Switching the environment in the application sidebar reloads the list and clears the filters. A call made in
 Production does not appear while you are looking at Development.
 
 ---
 
 ## Who can see it
 
-The page and the connected user tab are shown to organization admins. Connected users cannot read the
-log through the ByteChef UI; your backend reads a user's history with the API call above.
+Reading the log requires a tenant admin. Connected users cannot read the log through the ByteChef UI.
+Your backend reads a user's history with the API call above.
 
 ---
 

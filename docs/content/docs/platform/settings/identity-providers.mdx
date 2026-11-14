@@ -7,7 +7,7 @@ comingSoon: true
 
 <EEBadge />
 
-Enterprise SSO replaces ByteChef's local user store with your existing identity provider, so identity, group membership, and de-provisioning are managed in one place rather than in a second directory kept in sync by hand.
+Identity providers let users sign in to ByteChef through your organization's SAML 2.0 or OIDC identity provider (IdP) instead of a local password. Administrators register each provider on **Settings → Identity Providers** and route users to it by email domain.
 
 <Callout title="Availability">
     External identity provider federation is an Enterprise Edition feature, enabled with `bytechef.security.sso.enabled` (`BYTECHEF_SECURITY_SSO_ENABLED`). The **Settings → Identity Providers** page is behind the `ff-1040` feature flag and requires the `ADMIN` authority. Community Edition ships local email/password login, plus optional [social login](#social-login) with Google and GitHub.
@@ -17,14 +17,14 @@ Enterprise SSO replaces ByteChef's local user store with your existing identity 
 
 ## Protocols
 
-Both protocols are first-class:
+Two protocols are supported:
 
-- **SAML 2.0** - assertion-based SSO, typical of ADFS, Shibboleth, and other large-enterprise IdPs.
-- **OIDC / OAuth 2.0** - for OIDC-native IdPs such as Okta, Auth0, Google Workspace, Keycloak, and Azure AD / Entra ID.
+- **SAML 2.0** - assertion-based SSO, used by ADFS, Shibboleth, and similar IdPs.
+- **OIDC** - for IdPs such as Okta, Auth0, Google Workspace, Keycloak, and Microsoft Entra ID.
 
-If your IdP advertises a SAML metadata URL or an OIDC discovery document, it will plug in.
+The IdP must publish a SAML metadata URL or an OIDC discovery document (`.well-known/openid-configuration`).
 
-Providers are registered at runtime - metadata URLs, client IDs, secrets, and attribute mappings are all admin-editable without a redeploy. That matters most for multi-tenant deployments where each tenant brings its own IdP, and for onboarding a new identity domain without an outage window.
+Providers are registered at runtime. Metadata URLs, client IDs and secrets can be changed without a redeploy, and in a multi-tenant deployment each tenant registers its own providers.
 
 ## The providers list
 
@@ -38,43 +38,45 @@ The dialog is titled **Add Identity Provider** (or **Edit Identity Provider**) a
 
 | Field | Applies to | Purpose |
 |---|---|---|
-| **Type** | Both | `OIDC` or `SAML`. Fixed once created - the selector is disabled on edit. |
+| **Type** | Both | `OIDC` or `SAML`. Cannot be changed after the provider is created. |
 | **Name** | Both | Display name for the provider, e.g. `Acme Corp SSO`. |
 | **Issuer URI** | OIDC | Issuer whose `.well-known/openid-configuration` is auto-discovered, e.g. `https://accounts.google.com`. |
 | **Client ID** / **Client Secret** | OIDC | OAuth client credentials. The secret can be left blank on edit to keep the current one. |
 | **Scopes** | OIDC | Requested scopes, e.g. `openid,profile,email`. |
 | **Metadata URI** | SAML | IdP metadata URL used to auto-configure endpoints and certificates. |
-| **Signing Certificate** | SAML | Optional PEM certificate, when not carried in the metadata. |
-| **NameID Format** | SAML | Optional NameID format - Email Address, Persistent, Transient, Unspecified, or the metadata default. |
+| **Signing Certificate (optional)** | SAML | PEM certificate, when the metadata does not carry one. |
+| **NameID Format (optional)** | SAML | Email Address, Unspecified, Persistent, Transient, or **Default (from metadata)**. |
 | **Email Domains** | Both | Domains that route users to this provider at login, added and removed as chips. |
-| **Default Role** | Both | `ROLE_USER` or `ROLE_ADMIN` granted to users arriving from this provider. |
+| **Default Role** | Both | `ROLE_USER` or `ROLE_ADMIN`, granted to users created through this provider. |
 
 Four checkboxes control behavior:
 
-- **Auto-provision users on first SSO login**
-- **Enforce SSO (block password login for matching domains)**
-- **Enabled**
-- **Require MFA (policy only)** - with an **MFA Method** selector (TOTP or Email). This is a policy flag; enforcement is planned for a future release and the selector is disabled.
+| Checkbox | Description |
+|---|---|
+| **Auto-provision users on first SSO login** | Creates a ByteChef account, with the **Default Role**, the first time an unknown user signs in through the provider. |
+| **Enforce SSO (block password login for matching domains)** | Users whose email domain is listed in **Email Domains** cannot sign in with a password. |
+| **Enabled** | Turns the provider on or off without deleting it. |
+| **Require MFA (policy only)** | Stores an MFA policy flag. The **MFA Method** selector (TOTP or Email) is disabled, and the flag is not enforced. |
 
 For SAML, editing a saved provider exposes a **Download SP Metadata** button to hand to your IdP.
 
 ### MCP servers
 
-Identity providers configured here are used for signing in to ByteChef. Their tokens are not accepted on MCP servers yet. To connect an automation MCP client with a token from an external issuer, the installation must list that issuer in its configuration - see [MCP Servers → JWT from a trusted issuer](/platform/automation/deploy/mcp-servers#jwt-from-a-trusted-issuer-optional).
+Identity providers configured here are used for signing in to ByteChef. MCP servers do not accept their tokens. To connect an automation MCP client with a token from an external issuer, list that issuer in the installation's configuration. See [MCP Servers → JWT from a trusted issuer](/platform/automation/deploy/mcp-servers#jwt-from-a-trusted-issuer-optional).
 
 ## What gets federated
 
-- **Authentication** - your IdP performs the login; ByteChef trusts the assertion or ID token.
-- **Identity attributes** - email, display name, and, configurably, group membership.
-- **Group-to-role mapping** - IdP group claims map onto ByteChef [roles](/platform/settings/users#roles-and-permissions), so adding a new hire to an IdP group grants the corresponding ByteChef permissions automatically.
+- **Authentication** - the IdP performs the login, and ByteChef trusts the SAML assertion or OIDC ID token.
+- **Identity attributes** - email and display name.
+- **Provisioning** - with **Auto-provision users on first SSO login**, accounts are created at first sign-in. Multi-tenant deployments also expose SCIM 2.0 endpoints under `/api/scim/v2` (`Users`, `Groups`), authenticated with the identity provider's SCIM API key as a bearer token. The dialog does not expose this key. SCIM groups map to organization authorities, not to workspace roles.
 
 ## What does not get federated
 
-Service-account credentials - the API keys, OAuth tokens, and basic-auth secrets that workflows use - stay in ByteChef's encrypted [connection](/platform/settings/connections) storage. SSO governs **human** identities, not machine credentials.
+Service credentials that workflows use (API keys, OAuth tokens, and basic-auth secrets) stay in ByteChef's encrypted [connection](/platform/settings/connections) storage. SSO governs user identities, not workflow credentials.
 
 ## Migrating from local accounts
 
-Existing local accounts are matched by email. Once SSO is live, tick **Enforce SSO** on the provider to block password login for its email domains, so users cannot fall back to a local password.
+Existing local accounts are matched by email. After SSO works for your users, select **Enforce SSO** on the provider to block password login for its email domains.
 
 ---
 
@@ -84,7 +86,7 @@ Existing local accounts are matched by email. Once SSO is live, tick **Enforce S
     Social login is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 </Callout>
 
-In addition to local email/password, users can sign in with **Google** or **GitHub**. Enable it with `bytechef.security.social-login.enabled` (`BYTECHEF_SECURITY_SOCIAL_LOGIN_ENABLED`) and supply each provider's client id and secret. This is separate from the IdP federation above - social login targets Community Edition and small teams, where a full IdP is overkill.
+In addition to local email and password, users can sign in with **Google** or **GitHub**. Enable it with `bytechef.security.social-login.enabled` (`BYTECHEF_SECURITY_SOCIAL_LOGIN_ENABLED`) and supply each provider's client ID and secret. Social login is separate from the IdP federation above and is available in Community Edition.
 
 ## Two-factor authentication
 

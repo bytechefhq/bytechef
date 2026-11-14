@@ -69,6 +69,8 @@ public class AutomationApiKeyAuthenticationProvider implements AuthenticationPro
             .map(this::createSpringSecurityUser)
             .orElseThrow(() -> new UsernameNotFoundException("User " + userId + " was not found in the database"));
 
+        apiKeyService.updateLastUsedDate(apiKey.getId());
+
         return new AutomationApiKeyAuthenticationToken(automationApiKeyAuthenticationToken.getEnvironmentId(), user,
             apiKey.getId());
     }

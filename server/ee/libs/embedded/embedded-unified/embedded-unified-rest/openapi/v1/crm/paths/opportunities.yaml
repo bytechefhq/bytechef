@@ -25,7 +25,7 @@ post:
       content:
         application/json:
           schema:
-            $ref: ../../../common/components/schemas/created.yaml
+            $ref: ../openapi.yaml#/components/schemas/created_record
 #            type: object
 #            properties:
 #              record:

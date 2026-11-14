@@ -2,18 +2,7 @@
 title: Automation editor
 description: Author workflow templates in the Automation editor and let connected users refine their own workflows in the embeddable white-label Workflow Builder.
 ee: true
-comingSoon: true
 ---
-
-<Callout title="Feature flag">
-    The Automation editor and the embeddable builder are behind a deployment feature flag.
-    The surfaces below appear only where that flag is enabled.
-</Callout>
-
-<Callout title="Enterprise Edition only">
-    They are part of ByteChef **Embedded**, which requires an Enterprise Edition deployment
-    (`bytechef.edition=EE`).
-</Callout>
 
 There are two workflow-building surfaces in Embedded, and they serve different people:
 
@@ -141,6 +130,12 @@ When the builder loads inside your app it:
 
 The allowed parent origins are set on the ByteChef server with `BYTECHEF_EMBEDDED_ALLOWED_PARENT_ORIGINS` (property `bytechef.embedded.allowed-parent-origins`): a comma-separated list of exact origins such as `https://app.example.com,https://admin.example.com`, with no path and no wildcard. The server also sends them as `Content-Security-Policy: frame-ancestors` on the builder, Automation Hub and Integration Marketplace pages, so the browser refuses to render those pages inside any other site. Set it in production. When it is empty, any website can embed the pages and send them `EMBED_INIT`, and the pages log a warning in the browser console.
 
+For example, on the ByteChef server:
+
+```bash
+BYTECHEF_EMBEDDED_ALLOWED_PARENT_ORIGINS=https://app.example.com,https://admin.example.com
+```
+
 If you build the client yourself, `VITE_EMBEDDED_PARENT_ORIGINS` sets a build-time list with the same format. It applies only when the server list is empty; a non-empty server list replaces it.
 
 The `EMBED_INIT` message carries the parameters that configure the session:
@@ -153,6 +148,57 @@ The `EMBED_INIT` message carries the parameters that configure the session:
 | `connectionDialogAllowed` | **Deprecated.** Use the `connectionDialogAllowed` claim of the JWT instead. While the parameter is still accepted, `false` hides connection creation, but `true` cannot allow what the token denies. |
 
 Messages are only accepted from the parent window and, when allowed parent origins are configured, only from one of those origins.
+
+With React, the `EmbeddedWorkflowBuilder` component runs the handshake for you. It loads the builder for one workflow uuid:
+
+```tsx
+'use client';
+import {EmbeddedWorkflowBuilder} from '@bytechef/embedded';
+
+export function WorkflowEditor({jwtToken, workflowUuid}: {jwtToken: string; workflowUuid: string}) {
+    return (
+        <div style={{height: 800, position: 'relative'}}>
+            <EmbeddedWorkflowBuilder
+                baseUrl="https://your-bytechef-host.example.com"
+                environment="PRODUCTION"
+                includeComponents={['slack', 'googleMail']}
+                jwtToken={jwtToken}
+                workflowUuid={workflowUuid}
+            />
+        </div>
+    );
+}
+```
+
+Without React, load `workflow-builder.html#/embedded/builder/{workflowUuid}` in an iframe and answer `EMBED_READY` yourself. This is what the component does:
+
+```html
+<iframe
+    id="bytechef-builder"
+    src="https://your-bytechef-host.example.com/workflow-builder.html#/embedded/builder/<workflow-uuid>"
+    style="border: none; height: 800px; width: 100%"
+    title="Workflow Builder"
+></iframe>
+
+<script>
+    const byteChefOrigin = 'https://your-bytechef-host.example.com';
+    const builderIframe = document.getElementById('bytechef-builder');
+
+    window.addEventListener('message', (event) => {
+        if (event.origin !== byteChefOrigin || event.data?.type !== 'EMBED_READY') {
+            return;
+        }
+
+        builderIframe.contentWindow.postMessage(
+            {
+                params: {environment: 'PRODUCTION', includeComponents: ['slack'], jwtToken: '<jwt>'},
+                type: 'EMBED_INIT',
+            },
+            byteChefOrigin
+        );
+    });
+</script>
+```
 
 Your app can send `EMBED_INIT` again at any time, for example after refreshing the user's token. The builder replaces the stored token and environment with the new values; an `EMBED_INIT` without a `jwtToken` clears the stored token. The `@bytechef/embedded` components do this for you whenever their props change.
 

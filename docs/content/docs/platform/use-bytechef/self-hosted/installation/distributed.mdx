@@ -1,6 +1,6 @@
 ---
 title: Distributed (Coordinator/Worker)
-description: Run ByteChef as separate coordinator, worker, and domain services instead of the monolith
+description: Run ByteChef Enterprise Edition as separate coordinator, worker and domain services instead of the single server.
 ee: true
 comingSoon: true
 ---
@@ -33,7 +33,6 @@ own orchestration.
 | Worker | `worker-app` | Executes task executions consumed from the broker. This is the only app with the component modules (all 180+) on its classpath - scale it horizontally for throughput. |
 | Scheduler | `scheduler-app` | Quartz-backed (JDBC job store) schedule and polling-trigger service. |
 | Webhook | `webhook-app` | Receives inbound `/webhooks/**` requests and turns them into trigger events. |
-| AI gateway | `ai-gateway-app` | Routes and meters model traffic (`/api/ai-gateway/**`). Optional. |
 | AI copilot | `ai-copilot-app` | Workflow copilot assistant service. Optional; carries its own full local configuration. |
 | Runtime job | `runtime-job-app` | One-shot workflow runner (an `ApplicationRunner`, not a long-lived server) with a self-contained in-memory configuration. Not part of the cluster wiring below. |
 
@@ -175,7 +174,6 @@ load balancer resolves it against the Redis registry. Every internal request car
 - `/api/automation/**`, `/api/embedded/**`, `/api/platform/**` → `configuration-app` (with
   `connection-app` and `execution-app` matching their own overlapping predicates - route order
   matters)
-- `/api/ai-gateway/**` → `ai-gateway-app`
 - `/webhooks/**` → `webhook-app`
 
 ## Worker queues and scaling
@@ -342,7 +340,7 @@ again on another worker.
 3. Domain services: `configuration-app`, `connection-app`, `execution-app`, `scheduler-app`
    (each runs its Liquibase context against the shared database).
 4. `coordinator-app` and one or more `worker-app` instances.
-5. `webhook-app`, and optionally `ai-gateway-app` / `ai-copilot-app`.
+5. `webhook-app`, and optionally `ai-copilot-app`.
 6. `api-gateway-app` last, once its route targets are registered in discovery.
 
 ## Current limitations

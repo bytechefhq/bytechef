@@ -1,14 +1,16 @@
 ---
 title: "Workflows"
-description: "Learn how to create, edit, and manage workflows effectively."
+description: "Create, build, test, edit and delete workflows in the workflow editor."
 ---
+
+A workflow is a trigger followed by a sequence of steps (components and flow controls) that runs on the ByteChef workflow engine. Workflows belong to a [project](/platform/automation/build/workflows/projects) and are published and deployed with it. This page describes how to build a workflow in the visual editor, test it, and manage it.
 
 ## Create Workflow
 
 <Steps>
 <Step>
 
-Click **+ Workflow** on the row of the project you want to add a workflow to.
+On the **Projects** page, expand the project and click **New Workflow** on the **Workflows** tab. In the workflow editor, you can also click **New Workflow** in the left sidebar.
 
 </Step>
 <Step>
@@ -31,7 +33,7 @@ Click **Save** to create the workflow.
 <Steps>
 <Step>
 
-Click on the **+** icon to add a new component to the workflow.
+Click the **+** icon to add a new component to the workflow.
 
 </Step>
 <Step>
@@ -61,12 +63,12 @@ For **Second Number**, input the second value (e.g., `3`).
 </Step>
 <Step>
 
-Click **Run**.
+Click **Test** in the editor header.
 
 </Step>
 <Step>
 
-In the lower panel, examine the input and output for the addition action to verify the results.
+In the Output panel at the bottom of the editor, check the input and output of the addition action.
 
 </Step>
 </Steps>
@@ -79,7 +81,7 @@ In the lower panel, examine the input and output for the addition action to veri
 <Steps>
 <Step>
 
-Click on the **+** icon to add a new component to the workflow.
+Click the **+** icon to add a new component to the workflow.
 
 </Step>
 <Step>
@@ -94,7 +96,7 @@ Select the **Ask** action from the list.
 </Step>
 <Step>
 
-Click on the **OpenAI** component to open its configuration panel.
+Click the **OpenAI** component to open its configuration panel.
 
 </Step>
 <Step>
@@ -104,7 +106,7 @@ In the **Connection** tab, click **Create Connection**.
 </Step>
 <Step>
 
-Enter a connection name and paste the **API Token** from OpenAI.
+Enter a connection name and paste your OpenAI API key into **Token**.
 
 </Step>
 <Step>
@@ -114,7 +116,7 @@ Click **Save**.
 </Step>
 <Step>
 
-Click on **Choose Connection**.
+Click **Choose Connection**.
 
 </Step>
 <Step>
@@ -134,7 +136,7 @@ For **Model**, choose the desired model (e.g., `gpt-4`).
 </Step>
 <Step>
 
-Leave **Format** on **Simple** - the default, which asks for a prompt rather than a full message list.
+Leave **Format** on **Simple** (the default), which asks for a prompt instead of a message list.
 
 </Step>
 <Step>
@@ -144,27 +146,27 @@ For **Prompt**, enter the prompt text, such as `Tell me something about this num
 </Step>
 <Step>
 
-After clicking on the prompt field, the Data Pill Panel will open on the left. Use the data pill to insert output from a previous component.
+Click the prompt field. The Data Pill Panel opens on the left. Use it to insert output from a previous component.
 
 </Step>
 <Step>
 
-Click on **Math Helper** component in Data Pill Panel.
+Click the **Math Helper** component in the Data Pill Panel.
 
 </Step>
 <Step>
 
-Click on **mathHelper_1**, which is the output of the addition action for the Math Helper component.
+Click **mathHelper_1**, which is the output of the addition action for the Math Helper component.
 
 </Step>
 <Step>
 
-Output of Math Helper component is now inserted into the prompt field. Click **Run**.
+The output of the Math Helper component is now inserted into the prompt field. Click **Test** in the editor header.
 
 </Step>
 <Step>
 
-In the lower panel, review the input and output for each action in the workflow. Click on **OpenAI**.
+In the Output panel, review the input and output of each action in the workflow. Click **OpenAI**.
 
 </Step>
 <Step>
@@ -184,7 +186,7 @@ Each component in a workflow can be tested individually to verify its output. In
 <Steps>
 <Step>
 
-Click on the component you want to test within your workflow.
+Click the component you want to test within your workflow.
 
 </Step>
 <Step>
@@ -229,10 +231,10 @@ Use **Test Action** to run the action for real, or the **…** menu beside it fo
 To summarize:
 
 - **Test Action**: Executes the action and displays the real output.
-- **Upload Sample Output Data**: Allows you to upload your own sample output data.
+- **Upload Sample Output**: Uploads your own sample output data.
 - **Reset**: Displays the structure of the output data with sample values.
 
-**Note:** Some components does not have predefined output schema because their output is dynamic. In that case you have to test the component to see the output.
+Some components have no predefined output schema because their output is dynamic. Test the component to see its output.
 
 
 ### Add Trigger
@@ -245,7 +247,7 @@ Hover the trigger node, open its **⋮ Node actions** menu, and choose **Replace
 </Step>
 <Step>
 
-Search for and select Schedule.
+Search for and select **Schedule**.
 
 </Step>
 <Step>
@@ -255,17 +257,17 @@ Select **Cron**.
 </Step>
 <Step>
 
-Click on "Properties".
+Click the **Properties** tab.
 
 </Step>
 <Step>
 
-Enter "* * ? * *" as the expression.
+In **Cron Expression**, enter `* * ? * *`. The expression has five fields (minute, hour, day of month, month, day of week), without seconds.
 
 </Step>
 <Step>
 
-Select your timezone.
+Select a **Timezone**.
 
 </Step>
 </Steps>
@@ -306,17 +308,28 @@ A disabled trigger still needs its connections to be set up before you deploy.
 
 The last enabled trigger cannot be disabled, so a workflow always keeps at least one. Manual triggers cannot be disabled.
 
+### Node actions
+
+Hover a node and open its **⋮** menu, or right-click the node.
+
+| Node | Actions |
+|---|---|
+| Trigger | **Replace**, **Rename**, **Disable** / **Enable**, **Info**, **Delete** (only when the workflow has more than one trigger) |
+| Task | **Cut**, **Replace**, **Copy**, **Paste**, **Rename**, **Disable** / **Enable**, **Reset position** (only when the node was moved), **Info**, **Delete** |
+
+A disabled task is skipped during execution. It keeps its configuration and is shown muted with a **Disabled** badge.
+
 ### Edit Component
 
 <Steps>
 <Step>
 
-Click on the component you want to edit.
+Click the component you want to edit.
 
 </Step>
 <Step>
 
-Change title and add some notes.
+On the **Description** tab, change the **Title** and add **Notes**.
 
 </Step>
 </Steps>
@@ -326,11 +339,13 @@ Change title and add some notes.
 
 ### Stream data in bulk
 
-For moving large volumes of records between systems (bulk sync, export, migration), use a **[Data Stream](/platform/automation/build/workflows/data-streams)** node *(coming soon)* instead of looping over single-record actions.
+<Callout type="warn" title="Coming soon">The Data Stream node for bulk record transfer is not available yet.</Callout>
+
+For moving large volumes of records between systems (bulk sync, export, migration), use a **[Data Stream](/platform/automation/build/workflows/data-streams)** node instead of looping over single-record actions.
 
 ### Canvas Layout
 
-The editor arranges your nodes automatically in a tidy top-down flow as you build. Nodes are locked in place by default; unlock them with the **Unlock node movement** button in the canvas toolbar and you can drag any node to a custom position - those positions are saved with the workflow.
+The editor arranges nodes automatically in a top-down flow as you build. Nodes are locked in place by default. Click **Unlock node movement** in the canvas toolbar to drag nodes to custom positions; the positions are saved with the workflow.
 
 To discard your manual positions and snap everything back to the automatic layout, click the **Reset layout** button (the broom icon) in the canvas toolbar. To reset a single node instead, open that node's menu and choose **Reset position** (shown only when the node has been moved).
 
@@ -365,7 +380,9 @@ Sticky notes are saved with the workflow, so everyone who opens it sees the same
 
 ### Canvas Controls
 
-A toolbar in the corner of the canvas gives you control over how the workflow is laid out and viewed. None of these controls change what the workflow does - they only affect the editing view.
+Two groups of controls change how the workflow is laid out and viewed. They do not change what the workflow does.
+
+The toolbar in the bottom-left corner of the canvas:
 
 ![The canvas toolbar](workflows/canvas-toolbar.png)
 
@@ -373,29 +390,30 @@ A toolbar in the corner of the canvas gives you control over how the workflow is
 |---|---|
 | **Zoom in** / **Zoom out** | Scale the canvas up or down. |
 | **Fit to screen** | Frame the whole workflow in the viewport. |
-| **Switch to horizontal / vertical layout** | Flip the auto-layout direction; the choice is remembered per workflow. |
-| **Reset layout** | Re-run auto-layout to tidy the nodes back into place. |
-| **Undo** / **Redo** | Step backward or forward through your recent edits. |
-| **Lock** / **Unlock node movement** | Prevent, or re-allow, dragging nodes around the canvas. Nodes are locked by default. |
-| **Add note** | Drop a [sticky note](#add-sticky-notes) in the middle of the visible canvas. |
+| **Switch to horizontal layout** / **Switch to vertical layout** | Switch the auto-layout direction. The choice is saved per workflow. |
+| **Reset layout** | Run the auto-layout again and discard manual node positions. |
+| **Add note** | Add a [sticky note](#add-sticky-notes) in the middle of the visible canvas. |
+| **Lock node movement** / **Unlock node movement** | Prevent or allow dragging nodes. Nodes are locked by default. |
+| **Undo** / **Redo** | Step backward or forward through recent edits. |
 
-> **Coming soon.** **Switch layout engine** (toggle between the standard and the experimental layout
-> engine) and the cluster elements view toggle (**Show cluster elements inline** / **Show cluster
-> elements in the editor dialog**) are on the upcoming release track and are not yet available in the
-> latest released version of ByteChef.
+The two buttons in the top-left corner of the canvas:
 
-> **Coming soon.** A cluster root - an AI agent, for example - can be drawn as a frame on the main
-> canvas with its model, memory, RAG, guardrails and tools laid out inside it, instead of opening the
-> cluster element editor in a dialog. The inline frame is the default. The canvas toolbar control
-> switches between the two views: it reads **Show cluster elements in the editor dialog** while the
-> frame is shown and **Show cluster elements inline** while the dialog is in use, and the choice is
-> remembered. Inside the frame each element type gets its own lane. The frame starts locked, so
-> unlock it from the frame header to drag its elements; the header also resets the elements' layout
-> and collapses the frame back to the compact card.
+![The layout engine and cluster view buttons](workflows/canvas-view-controls.png)
+
+| Control | What it does |
+|---|---|
+| **Switch to experimental layout engine** / **Switch to standard layout engine** | Switch between the standard and the experimental layout engine. When the workflow contains a flow control the experimental engine does not support, the button is disabled with the tooltip "Experimental layout does not support this workflow yet". |
+| **Show cluster elements in the editor dialog** / **Show cluster elements inline** | Switch how cluster roots such as AI agents are shown. See [Cluster roots on the canvas](#cluster-roots-on-the-canvas). |
+
+### Cluster roots on the canvas
+
+A cluster root, such as an AI agent, is drawn by default as a frame on the main canvas, with its model, memory, RAG, guardrails and tools laid out inside it. Each element type has its own lane. The button in the top-left corner of the canvas switches between the inline frame and the cluster element editor dialog. It reads **Show cluster elements in the editor dialog** while the frame is shown and **Show cluster elements inline** while the dialog is used. The choice is remembered in your browser.
+
+The frame starts locked. Unlock it from the frame header to drag its elements. The frame header also resets the elements' layout and collapses the frame to a compact card.
 
 ## Workflow Inputs
 
-Workflow inputs are values supplied to a run from the outside - a caller's parameters, a deployment configuration, or a test value you enter in the editor. Open the **Workflow Inputs** panel from the right sidebar to define them.
+Workflow inputs are values supplied to a run from outside: a caller's parameters, a deployment configuration value, or a test value you enter in the editor. Define them in the **Workflow Inputs** panel.
 
 ![The Workflow Inputs sheet with the Create a new Input dialog open](workflows/workflow-inputs.png)
 
@@ -407,7 +425,15 @@ In the workflow editor, click the **Workflow Inputs** icon in the right sidebar.
 </Step>
 <Step>
 
-Click **+** to add an input, then set its fields: - **Type** - one of Boolean, Date, Date Time, Integer, Number, String, or Time. (Two further types, **Field Mapping** and **Component property**, are on the upcoming release track and are not yet available in the latest released version of ByteChef.) - **Name** - the key used to reference the input as a dynamic value. - **Label** - the human-readable label shown when the input is filled in. - **Required** - whether a value must be provided. - **Test Value** - a value used only when you run the workflow in the editor's test mode.
+Click **New Input** and set the fields of the **Create a new Input** dialog:
+
+- **Name** (required) - the key used to reference the input.
+- **Label** (required) - the label shown when the input is filled in.
+- **Type** (required) - one of Boolean, Date, Date Time, Integer, Number, String or Time.
+- **Required** - whether a value must be provided. Default `False`.
+- **Test Value** - a value used only when you test the workflow in the editor.
+
+Click **Save**.
 
 </Step>
 <Step>
@@ -419,7 +445,24 @@ Use the row actions to edit or delete an existing input.
 
 Defined inputs are available downstream as [data pills](/platform/automation/build/workflows/data-pills) under the workflow's inputs.
 
+In the workflow definition, inputs are stored in the top-level `inputs` list. The **Test Value** is not part of the definition; it is kept in the editor's test configuration.
+
+```json
+"inputs": [
+  {
+    "label": "Customer ID",
+    "name": "customerId",
+    "required": true,
+    "type": "string"
+  }
+]
+```
+
+A step references an input by its name alone, without a node name: `${customerId}`.
+
 ## Workflow Outputs
+
+<Callout type="warn" title="Coming soon">The **Workflow Outputs** panel is not available yet.</Callout>
 
 Workflow outputs declare what the workflow returns to its caller. Open the **Workflow Outputs** panel from the right sidebar.
 
@@ -436,7 +479,7 @@ The panel lists each output as a **Name** / **Value** row.
 </Step>
 <Step>
 
-Click **+** to add an output, then set its **Name** and **Value**. The value is built with data pills or a [formula expression](/platform/automation/build/workflows/data-pills#input-modes), so an output can reference the result of any earlier step.
+Click **New Output**, then set its **Name** and **Value**. The value is built with data pills or a [formula expression](/platform/automation/build/workflows/data-pills#input-modes), so an output can reference the result of any earlier step.
 
 </Step>
 <Step>
@@ -446,17 +489,21 @@ Use the row actions to edit or delete an existing output.
 </Step>
 </Steps>
 
+## Workflow actions
+
+The settings menu (gear icon in the editor header) has a **Workflow** tab with **Edit**, **Duplicate**, **Share**, **Share with Community** (only when a template submission form is configured), **Export** and **Delete**. **Share** works as described in [Share Projects and Workflows as Templates](/platform/automation/build/workflows/projects#share-projects-and-workflows-as-templates).
+
 ## Edit Workflow
 
 <Steps>
 <Step>
 
-Click on the settings icon in the top right corner.
+Click the gear icon in the editor header and open the **Workflow** tab.
 
 </Step>
 <Step>
 
-Choose **Edit** from the dropdown menu.
+Choose **Edit**.
 
 </Step>
 <Step>
@@ -471,7 +518,7 @@ Click **Save** to apply your changes.
 </Step>
 </Steps>
 
-![A workflow's actions menu, showing Edit, Duplicate, Export and Delete](workflows/workflow-actions-menu.png)
+![A workflow's actions menu](workflows/workflow-actions-menu.png)
 
 
 ## Duplicate Workflow
@@ -479,12 +526,12 @@ Click **Save** to apply your changes.
 <Steps>
 <Step>
 
-Click on the settings icon in the top right corner.
+Click the gear icon in the editor header and open the **Workflow** tab.
 
 </Step>
 <Step>
 
-Choose **Duplicate** from the dropdown menu.
+Choose **Duplicate**.
 
 </Step>
 </Steps>
@@ -497,12 +544,12 @@ Choose **Duplicate** from the dropdown menu.
 <Steps>
 <Step>
 
-Click on the settings icon in the top right corner.
+Click the gear icon in the editor header and open the **Workflow** tab.
 
 </Step>
 <Step>
 
-Choose **Export** from the dropdown menu to download the workflow JSON file.
+Choose **Export** to download the workflow JSON file.
 
 </Step>
 </Steps>
@@ -512,20 +559,22 @@ Choose **Export** from the dropdown menu to download the workflow JSON file.
 
 ## Publish Workflow
 
+Publishing creates a new version of the whole project, including all its workflows. See [Projects](/platform/automation/build/workflows/projects#a-project-is-the-unit-you-publish).
+
 <Steps>
 <Step>
 
-Click on **Publish**.
+Click **Publish** in the editor header.
 
 </Step>
 <Step>
 
-Enter description of the published project.
+Enter a description of the changes in this version.
 
 </Step>
 <Step>
 
-Click on **Publish**.
+Click **Publish**.
 
 </Step>
 </Steps>
@@ -535,77 +584,69 @@ Click on **Publish**.
 
 ## Editor Header Controls
 
-The project editor's header, next to **Publish**, carries the rest of the run/deploy loop for the
-project you're currently editing.
+The editor header, next to **Publish**, contains the controls for testing and deploying the current project.
 
 ### Deploy
 
-**Deploy** opens the same [Create Deployment](/platform/automation/build/workflows/projects) dialog
-used from the project's **Deployments** tab on the Projects page (or, outside Development, from the
-Project Deployments page), pre-scoped to the current project. Its tooltip reads
-"Deploy the published project version". It's disabled - with a "Publish the project to enable
-deployment" tooltip - until the project has at least one published version, since a deployment
-always targets a published version, never a draft. Its **New** tab creates a fresh deployment
-(**Environment**, **Version**, **Name**, **Description**, **Tags**); its **Change Version** tab
-repoints an existing deployment at a different published version.
+**Deploy** (tooltip "Deploy the published project version") opens the deployment dialog for the current
+project, the same dialog as on the project's **Deployments** tab. See
+[Deploy Workflows](/platform/automation/deploy/workflows). Until the project has a published version,
+**Deploy** is disabled with the tooltip "Publish the project before deploying it.", because a
+deployment always uses a published version. The dialog has two tabs:
+
+- **New** - creates a deployment (**Environment**, **Version**, **Name**, **Description**, **Tags**).
+- **Change Version** - points an existing deployment to a different published version.
 
 ### Project Deployments
 
-The rocket icon button next to **Deploy** (tooltip: "Project Deployments") opens a side panel
-listing the project's deployments in the current environment, so you can enable a deployment,
-change its version, or open a workflow's executions without leaving the editor. See
+The **Project Deployments** button next to **Deploy** opens a side panel that lists the project's
+deployments in the current environment. Use it to enable a deployment, change its version or open a
+workflow's executions without leaving the editor. See
 [View a Project's Deployments](/platform/automation/deploy/workflows#view-a-projects-deployments).
 
 ### Run, Test, and the Output panel
 
-The header's **Test** button runs the current workflow from its trigger and streams the run's
-progress and result into the **Output panel** at the bottom of the editor; while a run is
-in-flight, the button turns into a **Stop** button that cancels it. In a workflow with
+**Test** in the header runs the current workflow from its trigger and shows progress and results in
+the **Output panel** at the bottom of the editor. While a run is in progress, the button changes to
+**Stop**, which cancels the run. In a workflow with
 [multiple triggers](#multiple-triggers), the run starts from the trigger whose panel is open if it is enabled, otherwise from
 the first enabled trigger. If the trigger the run starts from is a
-chat trigger, the same button is labeled **Chat** instead - clicking it opens the
-[test chat panel](#test-with-chat) rather than starting a run immediately, and you drive the run by
-sending it messages.
+chat trigger, the button is labeled **Chat** and opens the [test chat panel](#test-with-chat); you run
+the workflow by sending messages.
 
-The icon button after **Publish** and **Deploy** (tooltip: "Show the current workflow test
-execution output") toggles the Output panel open or closed on its own, so you can revisit the last
-run's result without triggering a new one.
+The button after **Publish** and **Deploy** (tooltip "Show the current workflow test execution output")
+opens or closes the Output panel, so you can see the last run's result without starting a new run.
 
-> **Coming soon.** The canvas follows a test run as it executes. A task turns blue while it runs, then
-> green with its duration when it completes or red when it fails, and the wires along the path the run
-> took are coloured the same way, so a branch the run did not take stays grey. A task that runs more
-> than once, inside a loop for example, shows its total time once the run has finished. Stopping a run,
-> or a run that fails, clears the tasks that were still running. The Output panel lays out its task
-> list and details panes as soon as the run starts, filling them in as tasks report back.
->
-> The tools an [AI Agent](/platform/automation/build/workflows/ai/agent#seeing-which-tools-ran)
-> calls are coloured the same way inside its frame and in the cluster element dialog. When the agent is
-> drawn as a compact card, the card takes the agent's own status and each element icon gets a ring in
-> the colour of the elements behind it - red if any of them failed, blue if any is still running,
-> otherwise green.
+The canvas follows a test run as it executes. A task shows a blue status while it runs, then green with
+its duration when it completes, or red when it fails. Edges along the path the run took are colored the
+same way, so a branch the run did not take stays grey. A task that runs more than once, for example
+inside a loop, shows its total time when the run has finished. Stopping a run, or a failed run, clears
+the status of tasks that were still running.
+
+The tools an [AI Agent](/platform/automation/build/workflows/ai/agent#seeing-which-tools-ran) calls are
+colored the same way inside its frame and in the cluster element dialog. When the agent is drawn as a
+compact card, the card shows the agent's own status and each element icon gets a ring: red if any
+element of that type failed, blue if any is still running, otherwise green.
 
 ### Settings menu
 
-The gear icon at the right end of the header opens the settings menu, with a **Workflow** tab for the
-workflow you're editing and a **Project** tab for its project. Besides editing, sharing, and
-exporting the project, the **Project** tab adds workflows to it without leaving the editor:
-**New Workflow**, **Workflow from Template**, **Import Workflow**, and **Import n8n Workflow** - the
-same options the project's row offers on the Projects page. A small indicator on the gear shows
-while changes are being saved, and turns red when you're offline.
+The gear icon in the header opens the settings menu. It has a **Workflow** tab for the current
+workflow and a **Project** tab for its project. The **Project** tab contains **Edit**, **Duplicate**,
+**Share**, **Export**, **New Workflow**, **Workflow from Template**, **Import Workflow**, **Import n8n
+Workflow** (requires an enabled AI provider), **Project History** and **Delete**. A small indicator on
+the gear shows while changes are being saved and turns red when you are offline.
 
 The left workflows sidebar offers the same actions: the **New Workflow** button creates a workflow in
-the selected project, and its arrow menu holds **From Template**, **Import Workflow**, and
+the selected project, and its arrow menu contains **From Template**, **Import Workflow** and
 **Import n8n Workflow**. The **+** button beside the project selector creates a new project from
 scratch, from a template, or by importing one.
 
 ### Project History
 
-The settings menu's **Project** tab has a **Project History** entry that opens a side sheet listing
-every version of the project - version number, publish date, a **Published**/**Draft** badge, and
-the version's description. It's the project-scoped, always-available counterpart to the
-environment-pinning story covered in
-[Deploying workflows](/platform/automation/deploy/workflows): Project History shows
-every version regardless of which environment, if any, currently has it pinned.
+**Project History** on the settings menu's **Project** tab opens a side sheet that lists every
+version of the project: version number, publish date, a **Published** or **Draft** badge, and the
+version description. It shows every version, regardless of which environment, if any, deploys it.
+For deployments per environment, see [Deploy Workflows](/platform/automation/deploy/workflows).
 
 ![Project Version History, listing the draft and each published version](workflows/project-history.png)
 
@@ -629,8 +670,8 @@ Values of sensitive parameters such as passwords, tokens and API keys are shown 
 ### Test with Chat
 
 For a chat-triggered workflow, the test chat panel lets you exchange messages with the workflow the
-same way an end user would through a deployed [chat](/platform/automation/deploy/chats) - type a
-message, send it, and the reply streams into the same thread as the run executes.
+same way an end user does through a deployed [chat](/platform/automation/deploy/chats). Type a
+message and send it; the reply streams into the thread as the run executes.
 
 {/* Voice test sessions are coming soon - not in the latest released version, so this section is
 commented out until the browser/v1/voiceSession trigger ships. Tracked in
@@ -650,17 +691,17 @@ error inline in the panel. */}
 <Steps>
 <Step>
 
-Click on the settings icon in the top right corner.
+Click the gear icon in the editor header and open the **Workflow** tab.
 
 </Step>
 <Step>
 
-Choose **Delete** from the dropdown menu.
+Choose **Delete**.
 
 </Step>
 <Step>
 
-Click **Delete**.
+Confirm with **Delete**.
 
 </Step>
 </Steps>
@@ -670,29 +711,58 @@ Click **Delete**.
 
 ## Code Editor
 
-Every workflow is represented as a JSON file, allowing you to edit it using the code editor. Changes made in the code editor are reflected in the UI and vice versa. This feature is particularly useful for resolving UI issues or making bulk changes to the workflow.
+Every workflow is stored as a JSON definition that you can edit in the code editor. Changes in the code editor are reflected on the canvas and the other way around. Use the code editor for bulk changes or to fix problems that are hard to fix on the canvas.
 
 ### Access the Code Editor
 
 <Steps>
 <Step>
 
-Click on the code icon in the right panel.
+Click the **Workflow Code Editor** icon in the right sidebar of the editor.
 
 </Step>
 <Step>
 
-The code editor will open, displaying the JSON representation of the workflow. Review this structure to understand how the workflow is organized.
+The code editor opens and shows the JSON definition of the workflow.
 
 </Step>
 </Steps>
 
 ![The editor control that opens the workflow code editor](workflows/code-editor-toggle.png)
 
+A definition has a `label`, an optional `description`, the workflow `inputs`, the `triggers` list and the `tasks` list. Each trigger and task has a unique `name`, a `type` in the form `component/version/operation`, and its `parameters`. A minimal workflow with a manual trigger and one Logger step looks like this:
+
+```json
+{
+  "label": "Log a greeting",
+  "description": "",
+  "inputs": [],
+  "triggers": [
+    {
+      "label": "Manual",
+      "name": "trigger_1",
+      "type": "manual/v1/manual"
+    }
+  ],
+  "tasks": [
+    {
+      "label": "Logger",
+      "name": "logger_1",
+      "parameters": {
+        "text": "Hello from ByteChef"
+      },
+      "type": "logger/v1/info"
+    }
+  ]
+}
+```
+
+The editor may also add a `metadata` object to a task. It holds editor state, such as the node position on the canvas, and does not change how the task runs.
+
 
 ### Add Component
 
-Adding components to your workflow allows you to extend its functionality and tailor it to your specific needs. Each component comes with detailed documentation that guides you through its features and actions. By following these steps, you can seamlessly integrate new components into your workflow.
+To add a component in the code editor, look up its action and properties in the component reference and add a task object to the definition.
 
 <Steps>
 <Step>
@@ -702,22 +772,17 @@ Go to the [Component Reference](/reference) page.
 </Step>
 <Step>
 
-Search for the component you want to add. For this example, we'll add the **Random Helper** component.
+Search for the component you want to add. This example uses the **Random Helper** component.
 
 </Step>
 <Step>
 
-Click on the **Random Helper** component to view its documentation.
+Click the **Random Helper** component to view its documentation.
 
 </Step>
 <Step>
 
-In the Actions section, find the list of available actions. We'll choose the **Random Integer** action.
-
-</Step>
-<Step>
-
-Let's write code to add the **Random Integer** action to the workflow.
+In the Actions section, find the **Random Integer** action.
 
 </Step>
 <Step>
@@ -749,7 +814,7 @@ Add the `type` for this task: `randomHelper/v1/randomInt`. The `randomHelper/v1`
 
 ![The workflow code editor, showing the trigger and task definitions](workflows/code-editor.png)
 
-This part of code will look like this:
+The task looks like this:
 
  ```json
   {
@@ -766,7 +831,7 @@ This part of code will look like this:
 <Steps>
 <Step>
 
-Click on save icon to add the component to your workflow.
+Click the save icon (tooltip "Save current workflow"). Saving is disabled while the definition has errors.
 
 </Step>
 </Steps>

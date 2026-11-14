@@ -1,116 +1,117 @@
 ---
 title: Sanitize Text
-description: The non-blocking parent action that runs configured sanitizers and rewrites matched spans with placeholders
+description: The guardrail parent that masks matched values in AI Agent input and output instead of blocking.
 ---
 
-`Sanitize Text` is the **rewrite-in-place** counterpart of `Check For Violations`. It runs the configured child sanitizers over the input (or the LLM's response) and replaces matched spans with placeholders rather than blocking the request.
+**Sanitize Text** is the masking guardrail parent. It runs every attached sanitizer on the user input before the model is called and on the model response before it is returned, and replaces matched values with placeholders such as `<EMAIL_ADDRESS>`, `<AWS_ACCESS_KEY>`, or `<URL>`. The request and the response always go through; only the matched values change.
 
-The two parents share the same child architecture; the only difference is the verdict path: `Check For Violations` blocks on any violation; `Sanitize Text` rewrites and forwards.
+Use it when masking is more useful than refusing: personal data a user pastes into a prompt, or a secret, address, or internal URL the model repeats from a tool result or a retrieved document.
 
----
+## Add Sanitize Text
 
-## When to Use It
-
-The most common pattern is wiring `Sanitize Text` to the **outbound** side of an agent - run it on the LLM's response before the user sees it, so anything the model accidentally surfaces (PII from a tool result, a leaked URL from a documentation passage, a secret embedded in a code sample) is masked.
-
-For inbound text you usually want `Check For Violations` instead - blocking is the right default for adversarial signals like jailbreak attempts, NSFW content, off-topic redirects.
-
-```
-                          inbound                               outbound
-user input  →  Check For Violations  →  AI Agent  →  Sanitize Text  →  user-visible reply
-```
-
----
-
-## Compatible Children
-
-`Sanitize Text` accepts the **Sanitize** variant of every preflight rule-based check:
-
-- **PII** (sanitize variant)
-- **Secret Keys** (sanitize variant)
-- **URLs** (sanitize variant)
-- **Custom Regex** (sanitize variant)
-- **Keywords** (sanitize variant)
-- **LLM PII** (sanitize variant)
-
-LLM-stage classifiers (Jailbreak, NSFW, Topical Alignment, Custom) do **not** have sanitize variants - they emit verdicts on whole inputs, not span-level matches, so masking doesn't apply. For those checks use `Check For Violations`.
-
-**Keywords** has both flavours: use the **Check** variant under `Check For Violations` to block on a deny-list match, or the **Sanitize** variant under `Sanitize Text` to mask matched keywords with `<KEYWORD>` placeholders instead.
-
----
+1. In the AI Agent's advanced editor, add **Sanitize Text** to the agent's **Guardrails** slot. An agent accepts only one.
+2. Add sanitizers to the parent's **Sanitize Text** slot.
+3. If you added **LLM PII**, add a chat model to the parent's **Model** slot.
+4. On each sanitizer, use **Validate Input** and **Validate Output** to choose whether it masks the user input, the model response, or both (both default to `true`).
 
 ## Properties
 
-`Sanitize Text` itself is a thin parent; the per-sanitizer properties (allowlists, thresholds, `validateInput`, `validateOutput`) live on the child sanitizers. A **Model** child is required only if you attach the **LLM PII** sanitizer; pure rule-based sanitizers work without a model.
+**Sanitize Text** has no properties of its own. All settings are on the sanitizers.
 
----
+## Cluster element slots
 
-## Mask Merging
+| Slot | Required | Accepts |
+|---|---|---|
+| **Model** | Only when LLM PII is attached | One chat model. The editor marks the slot as required. |
+| **Sanitize Text** | No | Any number of sanitizers. |
 
-When multiple sanitizers fire on overlapping spans (an email contains a domain that's also matched by URLs; a JWT contains base64 fragments), the system merges every sanitizer's mask entities and applies them **longest-first**. The longest match wins, so the output is `<EMAIL_ADDRESS>` rather than being split across `<EMAIL_ADDRESS>` and `<URL>`.
+## Sanitizers
 
-This is the same merge logic `Check For Violations` uses for its preflight stage, just applied to sanitize-only output.
+| Sanitizer | Stage | Placeholder |
+|---|---|---|
+| [PII](/platform/automation/build/workflows/ai/agent/guardrails/pii) | Preflight | `<ENTITY_TYPE>`, for example `<EMAIL_ADDRESS>` |
+| [Secret Keys](/platform/automation/build/workflows/ai/agent/guardrails/secret-keys) | Preflight | `<SECRET_TYPE>`, for example `<GITHUB_PAT>` |
+| [URLs](/platform/automation/build/workflows/ai/agent/guardrails/urls) | Preflight | `<URL>` |
+| [Keywords](/platform/automation/build/workflows/ai/agent/guardrails/keywords) | Preflight | `<KEYWORD>` |
+| [Custom Regex](/platform/automation/build/workflows/ai/agent/guardrails/custom-regex) | Preflight | `[name]`, the pattern's own name in square brackets |
+| [LLM PII](/platform/automation/build/workflows/ai/agent/guardrails/llm-pii) | LLM | `<ENTITY_TYPE>` |
 
----
+Jailbreak, NSFW, Topical Alignment, and Custom produce a verdict on the whole text, not on individual values, so they are only available under [Check for Violations](/platform/automation/build/workflows/ai/agent/guardrails/check-for-violations).
 
-## Failure Behavior
+## How masking works
 
-A failing sanitizer is fail-closed: even though `Sanitize Text` itself is non-blocking by design, a sanitizer that cannot run means the masking pass was incomplete, so the advisor replaces the response with a withheld-placeholder rather than risk leaking unredacted text. See the [Guardrails overview](./) for the platform-wide failure-behavior contract.
+For each side, the sanitizers run in this order:
 
----
+1. **Preflight sanitizers** run in the order they are attached. PII, Secret Keys, URLs, and Keywords collect their matches without changing the text yet. Custom Regex replaces its matches immediately, so preflight sanitizers attached after it see the `[name]` placeholders.
+2. **Mask pass.** The collected matches are merged and replaced in one longest-match-first pass. When two matches overlap, the longer one wins, so an email address is replaced by one `<EMAIL_ADDRESS>` rather than a mix of partial placeholders.
+3. **LLM PII** runs last, on the already masked text.
+
+On the input side, Sanitize Text masks user messages and a human's answer returned to a tool. Other messages, such as the system prompt and tool results, are not changed.
+
+When both parents are attached, **Check for Violations** checks the original input before Sanitize Text masks it, and checks the response after Sanitize Text has masked it.
+
+## When a sanitizer fails
+
+If any sanitizer cannot run (for example, LLM PII cannot reach its model, or a Custom Regex pattern is invalid), the masking is incomplete. Sanitize Text then replaces the whole text with a fixed placeholder reporting that the sanitizer failed and the response was withheld:
+
+- A failure on the input side returns the placeholder without calling the model.
+- A failure on the output side replaces the model's response.
+
+The step output then includes `"guardrail": { "guardrail.sanitizeWithheld": true }`. See [Guardrails, monitoring guardrail results](/platform/automation/build/workflows/ai/agent/guardrails#monitoring-guardrail-results).
+
+If LLM PII is attached and the **Model** slot is empty, the agent run fails before the model is called.
 
 ## Example
 
-Outbound mask: scrub PII, secrets, and unrecognised URLs from the LLM's response:
+An AI Agent task that blocks jailbreak attempts on the input and masks PII, secrets, and unknown URLs on both sides:
 
 ```json
 {
-  "type": "sanitizeText/v1/sanitizeText",
-  "extensions": {
-    "clusterElements": {
-      "sanitizeText": [
-        { "type": "pii/v1/piiSanitize",        "parameters": { "type": "ALL" } },
-        { "type": "secretKeys/v1/secretKeysSanitize", "parameters": { "permissiveness": "BALANCED" } },
-        {
-          "type": "urls/v1/urlsSanitize",
-          "parameters": {
-            "allowedUrls": ["https://docs.example.com"],
-            "allowedSchemes": ["https"],
-            "allowSubdomain": true
-          }
-        }
-      ]
-    }
-  }
-}
-```
-
-Inbound + outbound combined. Both parents are children of the AI Agent's `guardrails` slot, which
-accepts more than one:
-
-```json
-{
+  "name": "aiAgent_1",
   "type": "aiAgent/v1/chat",
-  "extensions": {
-    "clusterElements": {
-      "model": { "type": "openAi/v1/model", "parameters": { "model": "gpt-4o-mini" } },
-      "guardrails": [
-        { "type": "checkForViolations/v1/checkForViolations",
-          "extensions": { "clusterElements": {
-            "model": { "type": "openAi/v1/model", "parameters": { "model": "gpt-4o-mini" } },
-            "checkForViolations": [
-              { "type": "jailbreak/v1/jailbreak", "parameters": {} },
-              { "type": "nsfw/v1/nsfw",           "parameters": {} },
-              { "type": "pii/v1/piiCheck",        "parameters": { "type": "ALL" } }
-            ]
-          } } },
-        { "type": "sanitizeText/v1/sanitizeText",
-          "extensions": { "clusterElements": { "sanitizeText": [
-            { "type": "pii/v1/piiSanitize" },
-            { "type": "secretKeys/v1/secretKeysSanitize" }
-          ] } } }
-      ]
-    }
+  "parameters": { "userPrompt": "${trigger_1.message}" },
+  "clusterElements": {
+    "model": { "name": "openAi_1", "type": "openAi/v1/model", "parameters": { "model": "gpt-4o" } },
+    "guardrails": [
+      {
+        "name": "checkForViolations_1",
+        "type": "checkForViolations/v1/checkForViolations",
+        "parameters": {},
+        "clusterElements": {
+          "model": { "name": "openAi_2", "type": "openAi/v1/model", "parameters": { "model": "gpt-4o-mini" } },
+          "checkForViolations": [
+            { "name": "jailbreak_1", "type": "jailbreak/v1/jailbreak", "parameters": { "validateOutput": false } }
+          ]
+        }
+      },
+      {
+        "name": "sanitizeText_1",
+        "type": "sanitizeText/v1/sanitizeText",
+        "parameters": {},
+        "clusterElements": {
+          "sanitizeText": [
+            { "name": "pii_1", "type": "pii/v1/piiSanitize", "parameters": { "type": "ALL" } },
+            { "name": "secretKeys_1", "type": "secretKeys/v1/secretKeysSanitize", "parameters": { "permissiveness": "BALANCED" } },
+            {
+              "name": "urls_1",
+              "type": "urls/v1/urlsSanitize",
+              "parameters": { "allowedUrls": ["docs.example.com"], "allowedSchemes": ["https"], "allowSubdomain": true }
+            }
+          ]
+        }
+      }
+    ]
   }
 }
 ```
+
+## Limitations
+
+- With the **Stream Chat** action, the response is masked chunk by chunk. A value split across two chunks is not masked, and a chunk that was already sent cannot be recalled. Use the **Chat** action when every value must be masked.
+- Placeholders replace the value only. The model and the caller see that a value was there, and of which type.
+
+## Related
+
+- [Check for Violations](/platform/automation/build/workflows/ai/agent/guardrails/check-for-violations)
+- [Guardrails overview](/platform/automation/build/workflows/ai/agent/guardrails)
+- [sanitizeText/v1 reference](/reference/components/sanitizeText_v1)

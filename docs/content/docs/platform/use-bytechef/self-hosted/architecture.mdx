@@ -1,6 +1,6 @@
 ---
 title: "Architecture"
-description: "What runs when you self-host ByteChef, what you have to provide, and what to scale when it gets busy."
+description: "The processes a self-hosted ByteChef deployment runs, the infrastructure it depends on, and what to scale as load grows."
 ---
 
 This page is for whoever operates the deployment. It covers what processes run, what infrastructure
@@ -49,7 +49,7 @@ flowchart LR
 
 ## What happens when a workflow runs
 
-Worth knowing because it explains what to watch and what to scale:
+The run lifecycle determines what to monitor and what to scale:
 
 1. Something **starts** the run - a schedule fires, a webhook arrives, a user clicks Run, or another
    workflow calls this one.
@@ -76,24 +76,24 @@ flowchart LR
 `}
 />
 
-Two consequences fall out of this. Work is **queued, not held on a request thread**, so a long task
+This has two consequences. Work is **queued, not held on a request thread**, so a long task
 does not tie up a web worker - but a backlog shows up as queue depth rather than slow responses.
 And because each step is persisted before the next begins, a process that dies mid-run leaves a job
 whose completed steps are on record rather than lost.
 
 ## Scaling
 
-**Start with one instance and make it bigger.** A single container handles a lot, and one instance
-needs no broker, no shared file storage, and no coordination.
+**Start with one instance and give it more resources.** A single instance uses the in-memory broker
+and local storage, and needs no coordination with other nodes.
 
-When one instance is not enough, the constraint tells you what to do:
+When one instance is not enough, the symptom points to the change:
 
 | Symptom | What to do |
 |---|---|
-| Tasks queue up while CPU is idle | More workers - the executing side scales horizontally |
-| The UI is slow but runs are fine | More instances behind a load balancer |
-| Runs are slow and the database is the bottleneck | A bigger database before more instances |
-| Task execution is the bottleneck | Run more copies of the same image as headless executors - see [Splitting coordinator and worker roles](/platform/use-bytechef/self-hosted/configuration#splitting-coordinator-and-worker-roles) |
+| Tasks queue up while CPU and memory are idle | Raise worker concurrency with `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_DEFAULT` (default `10`) |
+| Task execution saturates the instance | Run more copies of the same image as headless executors - see [Splitting coordinator and worker roles](/platform/use-bytechef/self-hosted/configuration#splitting-coordinator-and-worker-roles) |
+| The UI and API are slow but runs are fine | Add coordinators behind a load balancer. More than one coordinator requires Enterprise Edition - see [Node roles](/platform/use-bytechef/self-hosted/configuration/node-roles) |
+| Runs are slow and the database is the bottleneck | Scale the database before adding instances |
 
 Running more than one instance means a few settings have to agree across them: the **encryption
 key**, a **shared message broker**, **shared file storage**, and in Enterprise Edition a **shared
@@ -159,7 +159,7 @@ Four consequences to plan for:
   exports, not in a join.
 - **Encryption is per deployment, not per tenant.** One key protects everything; separation comes
   from the schema boundary. See [Encryption of stored credentials](/platform/use-bytechef/self-hosted/configuration#encryption-of-stored-credentials).
-- **Logs carry the tenant**, so you can give one tenant their own audit trail without guessing.
+- **Logs carry the tenant.** Every log line includes the tenant id in the `tenantId` MDC field, so you can filter logs per tenant.
 
 If you are embedding ByteChef in your own product, [Tenant-Isolated Security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security)
 covers the same boundary from your customers' point of view.

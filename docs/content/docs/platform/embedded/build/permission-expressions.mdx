@@ -1,12 +1,12 @@
 ---
 title: "Permission Expressions"
-description: "Gate which integrations, automation projects, and workflows each connected end-user sees with a per-resource expression evaluated against the user's identity and metadata. Fails closed."
+description: "Control which integrations, automation projects and workflows each connected user sees with a SpEL expression evaluated against the user's identity and metadata."
 ---
 
-In an [embedded](/platform/embedded/get-started) deployment, not every customer should see every integration or automation. A free-tier user shouldn't see the Salesforce integration you sell as a premium add-on; an EU customer shouldn't see an integration that isn't GDPR-cleared; a beta feature should reach only the accounts you've flagged. **Permission expressions** let you encode those rules directly on an integration, an automation workflow project, or one of their workflows, evaluated per connected user at request time.
+A **permission expression** controls which connected users see an integration, an automation project or one of their workflows in an [embedded](/platform/embedded/get-started) deployment. ByteChef evaluates the expression per connected user at request time. Typical uses: offer a premium integration only to paying plans, hide an integration from customers in a region it does not support, or limit a beta workflow to flagged accounts. Tenant admins set expressions when they build integrations and automations.
 
 <Callout type="info">
-  Permission expressions are an **Enterprise, embedded-edition** feature. They gate visibility for **connected users** - the end-users of your product who authenticate through your backend - not the admins who build integrations in the ByteChef UI.
+  Permission expressions are an **Enterprise Edition** feature. They control visibility for **connected users** (the end users of your product who authenticate through your backend), not for the admins who build integrations in the ByteChef UI.
 </Callout>
 
 ## How it works
@@ -29,9 +29,9 @@ For each integration / project / workflow:
 
 The evaluator **fails closed**, which is the safe default for an access decision:
 
-- A **blank or absent** expression means *no restriction* - the integration is visible to everyone. (Most integrations have no expression.)
-- An expression that evaluates to **`true`** makes the integration visible.
-- **Anything else hides it** - `false`, a malformed expression, a null dereference, any evaluation error. A typo in an expression hides the integration rather than exposing it.
+- A **blank or absent** expression means no restriction: the resource is visible to everyone.
+- An expression that evaluates to **`true`** makes the resource visible.
+- **Anything else hides it**: `false`, a malformed expression, a null dereference or any other evaluation error. A typo in an expression hides the resource rather than exposing it.
 
 ## What the expression can reference
 
@@ -39,13 +39,31 @@ The expression is evaluated against a context built from the requesting connecte
 
 | Variable | Type | Meaning |
 |---|---|---|
-| `metadata` | map of string → string | The key/value metadata your backend attached to the connected user (plan tier, region, feature flags, account ID, …). Values are stored as **strings**, whatever JSON type you sent - compare against a quoted literal. |
-| `externalId` | string | The user's ID in *your* system - the external user ID you provisioned them with. |
+| `metadata` | map of string to string | The key/value metadata your backend attached to the connected user, such as plan tier, region or account ID. Values are stored as **strings**, whatever JSON type you sent, so compare against a quoted literal. |
+| `externalId` | string | The user's ID in your system: the external user ID (the JWT `sub` claim). |
 | `email` | string | The connected user's email. |
 | `name` | string | The connected user's display name. |
 | `environment` | string | The environment name (`DEVELOPMENT`, `STAGING`, `PRODUCTION`) the request is scoped to. |
 
-`metadata` is the workhorse. Your backend writes it with `PATCH /api/embedded/v1/me` (end-user JWT) or `PATCH /api/embedded/v1/{externalUserId}` (API Key), sending a flat JSON object; `name` and `email` are lifted onto the connected user and everything else is stored as metadata. That lets you drive integration visibility off your own entitlement model without ByteChef needing to know what a "plan" or a "region" is.
+Most expressions use `metadata`. Your backend writes it with `PATCH /api/embedded/v1/me` (end-user JWT) or `PATCH /api/embedded/v1/{externalUserId}` (API Key), sending a flat JSON object; `name` and `email` are lifted onto the connected user and everything else is stored as metadata. This lets you base visibility on your own entitlement model.
+
+For example, your backend records a user's plan and region:
+
+```bash
+curl -X PATCH "https://your-bytechef-host.example.com/api/embedded/v1/user-123" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "X-Environment: PRODUCTION" \
+  -d '{"email": "ada@example.com", "plan": "enterprise", "region": "eu"}'
+```
+
+For that user, `email` is `ada@example.com`, `externalId` is `user-123`, `environment` is `PRODUCTION`, and `metadata` holds `plan` and `region`. This expression evaluates to `true`, so the resource is visible to them:
+
+```
+metadata['plan'] == 'enterprise' && metadata['region'] == 'eu'
+```
+
+A user whose metadata has no `plan` key gets `null` for `metadata['plan']`, so the comparison is `false` and the resource stays hidden.
 
 ## Examples
 
@@ -61,7 +79,7 @@ Restrict a workflow to a specific region:
 metadata['region'] == 'eu'
 ```
 
-Gate a beta integration to explicitly flagged accounts (note the quotes - metadata values are strings):
+Limit a beta integration to flagged accounts (metadata values are strings, so quote the literal):
 
 ```
 metadata['betaIntegrations'] == 'true'
@@ -81,13 +99,13 @@ Each expression is a multi-line **Permission Expression** text field, scoped to 
 
 **Integrations:**
 
-- In **Embedded → Integrations**, the integration create/edit dialog (**New Integration** / edit) has a **Permission Expression** field alongside the component, name, description, category, and tags - it gates the whole integration.
-- In the integration's workflow list, each workflow row exposes its own **Permission Expression** field so you can gate individual workflows inside an otherwise broadly visible integration.
+- In **Embedded > Integrations**, the **Create Integration** and **Edit Integration** dialogs have a **Permission Expression** field. It applies to the whole integration.
+- In the integration's workflow list, open a workflow's menu and choose **Edit**. The workflow dialog has its own **Permission Expression** field, so you can restrict individual workflows inside an otherwise visible integration.
 
 **Automation projects:**
 
-- The project dialog (**Create Project** / **Edit Project**, in **Embedded → Automations**) has a project-level **Permission Expression** field.
-- Each workflow's dialog (**Create Workflow** / **Edit Workflow**) has its own **Permission Expression** field.
+- The **Create Project** and **Edit Project** dialogs (in **Embedded > Automations**) have a project-level **Permission Expression** field.
+- The **Create Workflow** and **Edit Workflow** dialogs have a workflow-level **Permission Expression** field.
 
 **Configurations:**
 
@@ -95,20 +113,20 @@ Each expression is a multi-line **Permission Expression** text field, scoped to 
 
 ## Setting an expression through the admin API
 
-The same expressions are settable programmatically, scoped to the resource they gate.
+You can also set the expressions through the admin GraphQL API, scoped to the resource they apply to.
 
 **Integrations:**
 
 - The integration-level expression is set as part of the integration update (a `permissionExpression` field on the integration), so it is saved together with the rest of the integration in a single write.
-- `updateIntegrationWorkflowPermissionExpression` - sets the expression on a single workflow within an integration.
+- `updateIntegrationWorkflowPermissionExpression` sets the expression on a single workflow within an integration.
 
 **Automation projects:**
 
 - The project-level expression is folded into `createAutomationProject` / `updateAutomationProject` as a `permissionExpression` argument, so it is saved with the rest of the project in a single write. A `null` argument leaves any stored expression unchanged; an empty string clears it.
 - A workflow's expression can be passed on `createAutomationProjectWorkflow`, and changed later with `updateAutomationProjectWorkflowPermissionExpression`.
 
-A workflow-level expression lets you ship an integration or automation project broadly while still gating individual workflows inside it - e.g., the project is visible to everyone, but its "bulk export" workflow only to enterprise accounts. The project-level expression behaves like the integration-level one: when it evaluates `false`, the whole project (and all its workflows) drops out of that connected user's catalog.
+A workflow-level expression lets you offer an integration or automation project broadly while restricting individual workflows inside it. For example, the project is visible to everyone, but its "bulk export" workflow only to enterprise accounts. The project-level expression behaves like the integration-level one: when it evaluates `false`, the whole project (and all its workflows) drops out of that connected user's catalog.
 
 ## Where it fits
 
-Permission expressions are an **advisory visibility filter**, not a hard security boundary on execution. They decide what a connected user is *offered*; [tenant-isolated security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security) is what guarantees one tenant can't reach another's data or credentials. Use expressions to shape each customer's catalog; rely on tenant isolation for the actual blast-radius guarantee.
+Permission expressions are a **visibility filter**, not a security boundary on execution. They decide what a connected user is offered. [Tenant-isolated security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security) is what keeps one tenant from reaching another's data or credentials. Use expressions to shape each customer's catalog, and rely on tenant isolation for data separation.

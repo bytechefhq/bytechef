@@ -89,7 +89,12 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
 
             JwsHeader header = jws.getHeader();
 
-            TenantKey tenantKey = TenantKey.parse(header.getKeyId());
+            String keyId = header.getKeyId();
+
+            TenantKey tenantKey = TenantKey.parse(keyId);
+
+            TenantContext.runWithTenantId(
+                tenantKey.getTenantId(), () -> signingKeyService.updateLastUsedDate(keyId, environment.ordinal()));
 
             return new EmbeddedApiKeyAuthenticationToken(
                 environment.ordinal(), externalUserId, null, tenantKey.getTenantId(),

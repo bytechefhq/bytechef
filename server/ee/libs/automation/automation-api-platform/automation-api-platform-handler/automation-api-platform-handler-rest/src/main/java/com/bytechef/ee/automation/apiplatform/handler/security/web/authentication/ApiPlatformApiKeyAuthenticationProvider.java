@@ -40,6 +40,8 @@ public class ApiPlatformApiKeyAuthenticationProvider implements AuthenticationPr
                 apiPlatformApiKeyAuthenticationToken.getEnvironmentId())
             .orElseThrow(() -> new BadCredentialsException("Unknown API secret key"));
 
+        apiKeyService.updateLastUsedDate(apiKey.getId());
+
         return new ApiPlatformApiKeyAuthenticationToken(
             apiPlatformApiKeyAuthenticationToken.getEnvironmentId(), createSpringSecurityUser(apiKey.getName()),
             apiKey.getId());

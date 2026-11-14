@@ -68,7 +68,12 @@ class EmbeddedMcpServerApiKeyAuthenticationConverter extends AbstractApiKeyAuthe
 
         JwsHeader header = jws.getHeader();
 
-        TenantKey tenantKey = TenantKey.parse(header.getKeyId());
+        String keyId = header.getKeyId();
+
+        TenantKey tenantKey = TenantKey.parse(keyId);
+
+        TenantContext.runWithTenantId(
+            tenantKey.getTenantId(), () -> signingKeyService.updateLastUsedDate(keyId, environment.ordinal()));
 
         return new EmbeddedMcpServerApiKeyAuthenticationToken(
             environment.ordinal(), environmentRequested, externalUserId, tenantKey.getTenantId(), mcpServerSecretKey);

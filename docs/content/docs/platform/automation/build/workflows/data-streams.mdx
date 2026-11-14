@@ -4,23 +4,23 @@ description: Transfer large volumes of records from one system to another with a
 comingSoon: true
 ---
 
-A **Data Stream** is a workflow step built for bulk record transfer - syncing contacts between CRMs, exporting rows to a warehouse, migrating data between systems. Instead of looping over items one action at a time, the Data Stream node reads records from a **source**, optionally transforms each record through a **processor**, and writes them to a **destination** as a managed batch job.
+A **Data Stream** is a workflow step for bulk record transfer, for example syncing contacts between CRMs, exporting rows to a warehouse or migrating data between systems. The Data Stream node reads records from a **source**, optionally transforms each record through a **processor**, and writes them to a **destination** as a managed batch job, instead of looping over items one action at a time.
 
-Like the AI Agent, the Data Stream node is a *cluster root*: its source, processor, and destination are cluster elements hosted inside the node rather than separate workflow steps.
+Like the AI Agent, the Data Stream node is a *cluster root*: its source, processor and destination are cluster elements inside the node, not separate workflow steps.
 
 ## The slots
 
 | Slot | Role |
 |---|---|
-| **Source** | Where records are read from - a component operation that streams items (e.g. read rows, list records). |
+| **Source** | Where records are read from: a component operation that streams items (for example, read rows or list records). |
 | **Processor** (optional) | Transforms each record in flight. The standard processor is the **Field Mapper**, which maps source fields onto the destination's shape. |
-| **Destination** | Where records are written - a component operation that accepts items in bulk. |
+| **Destination** | Where records are written: a component operation that accepts items in bulk. |
 
 ## Simple vs Advanced editor
 
-Clicking the Data Stream node opens its editor, which has two modes with a toggle in the header:
+Click the Data Stream node to open the **Data Stream Editor**. It has two modes. Switch to the advanced mode with **Advanced** in the header.
 
-- **Simple editor** (default) - a step-by-step wizard whose top nav walks through four steps in order: **Source** (pick the source component and operation), **Destination** (pick the destination component and operation), **Mapping** (the Field Mapper's source-to-destination field assignments), and **Test** (run the stream). Each step unlocks once the previous one is configured. On the Mapping step, **Auto-map matching fields** fills in assignments where source and destination field names line up. It's all done without touching the underlying element graph.
+- **Simple editor** (default) - a wizard with four steps: **Source** (select the source component, connection and properties), **Destination** (the same for the destination), **Mapping** (the Field Mapper's field assignments) and **Test** (run the mapping and inspect the output schema). Use **Previous**, **Next** and **Finish** to move through the steps. Each step unlocks when the previous one is configured. On the Mapping step, **Auto-map matching fields** creates assignments for fields whose names match.
 
   {/* TODO screenshot: Data Stream simple editor on the Mapping step - step nav (Source / Destination / Mapping / Test) at the top, field-mapping rows and the Auto-map matching fields button in the body */}
 
@@ -28,6 +28,6 @@ Clicking the Data Stream node opens its editor, which has two modes with a toggl
 
   {/* TODO screenshot: Data Stream advanced editor - cluster-elements canvas with Source, Field Mapper processor, and Destination nodes wired to the Data Stream root */}
 
-The simple wizard is available only while the processor slot holds the standard **Field Mapper**. If you replace it with a different processor in the advanced editor, the node opens in advanced mode from then on - the wizard has no way to represent a custom processor.
+The simple wizard is available only while the processor slot holds the standard **Field Mapper**. If you replace it with a different processor in the advanced editor, the node opens in advanced mode from then on, because the wizard cannot represent another processor.
 
 Both modes edit the same configuration, and your last mode choice is remembered per node.

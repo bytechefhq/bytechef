@@ -3,7 +3,7 @@ title: Request Triggers
 description: Call one of a connected user's workflows from your application over HTTP and get the workflow's result back in the same response.
 ---
 
-![Request Triggers illustration](request-triggers/request-triggers-overview.png)
+![The Request trigger in the workflow editor, with the Await Workflow and Respond operation and its Timeout (ms) property](request-triggers/request-trigger-properties.png)
 
 A **Request trigger** lets your application start one specific workflow for a connected user and, if you want, wait for the workflow's answer. Where an [App Event](/platform/embedded/build/app-events) fans out to every subscribed workflow and returns nothing, a request addresses a single workflow by its uuid and returns what that workflow produces.
 
@@ -28,7 +28,7 @@ A **Request trigger** lets your application start one specific workflow for a co
 3. To control the response, end the workflow with the **Webhook** component's **Response to Webhook Request** action. It sets the **Response Type** (JSON, Raw, Binary, Redirect or No Data), the **Status Code**, the **Headers** and the **Body**.
 4. Save and publish.
 
-The trigger's output gives the workflow the incoming request: `body`, `method`, `headers` and `parameters` (the query string). The body is parsed by content type: JSON, XML, form data and multipart forms become structured data, other `application/*` types arrive as a file, and anything else arrives as text.
+The trigger's output gives the workflow the incoming request: `body`, `method`, `headers` and `parameters` (the query string). The body is parsed by content type: JSON, XML, form data and multipart forms become structured data, other `application/*` types arrive as a file, and anything else arrives as text. For the JSON body `{"orderId": "1234"}` sent in the examples below, a later step reads the order id as `${trigger_1.body.orderId}`.
 
 ## Calling the workflow
 
@@ -75,7 +75,7 @@ The `workflowUuid` is resolved against the connected user in this order:
 3. **A catalog reference.** A catalog workflow uuid the user holds a reference to runs that workflow in the version the environment's configuration points at, with the user's own connections.
 4. **A copy of a catalog template.** A catalog template uuid the user has already copied runs the user's copy.
 
-The call never adds a workflow for the user. A catalog uuid the user has no reference to and no copy of returns `404`. Add the workflow first, through the [Automation Hub](/platform/embedded/build/automation-hub) or the copy and provision endpoints described in [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows).
+The call never adds a workflow for the user. A catalog uuid the user has no reference to and no copy of returns `404`. Add the workflow first, through the [Automation Hub](/platform/embedded/build/automations/automation-hub) or the copy and provision endpoints described in [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows).
 
 ## The response
 

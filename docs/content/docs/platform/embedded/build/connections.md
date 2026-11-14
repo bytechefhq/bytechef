@@ -5,6 +5,8 @@ description: Manage authentication credentials and connection configurations for
 
 ![Connections overview](connections/connections-overview.png)
 
+A connection stores the credentials a component needs to act in a third-party service, such as an API key or an OAuth2 sign-in. The **Connections** page lists the connections tenant admins create for embedded workflows. A connection marked shared is available to every connected user in the environment. Connected users' own connections are managed through the embedded API, described in [Connections for connected users](#connections-for-connected-users).
+
 ---
 
 ## Key Features
@@ -14,7 +16,7 @@ description: Manage authentication credentials and connection configurations for
 | Component filtering | Filter connections by component (third-party service) using the left sidebar. |
 | Tag filtering | Organize and filter connections by assigned tags. |
 | Environment scoping | Connections are scoped to the current environment (Development, Staging, Production). |
-| Status indicator | Each connection shows **Active** / **Not Active** when its credential is valid, or the credential status itself (e.g. `INVALID`) when it is not. |
+| Status indicator | Each connection shows **Active** / **Not Active** when its credential is valid, or the credential status itself (for example `INVALID`) when it is not. |
 | Shared connections | Mark a connection shared so every connected user in the environment can use it. |
 | Creation date | See when each connection was created. |
 
@@ -22,12 +24,12 @@ description: Manage authentication credentials and connection configurations for
 
 Each connection in the list displays:
 
-- **Component icon** -- the icon of the third-party service.
-- **Component name** -- the name of the connected service (e.g., Gmail, Slack, AWS S3).
-- **Status** -- **Active** when the credential is valid and something references the connection, **Not Active** when the credential is valid but nothing uses it yet, or the credential status (e.g. `INVALID`) when the credential itself is the problem.
-- **Shared** -- a badge shown on connections marked shared.
-- **Tags** -- assigned tags for organization.
-- **Creation date** -- when the connection was created.
+- **Component icon** - the icon of the third-party service.
+- **Component name** - the name of the connected service (for example Gmail, Slack or AWS S3).
+- **Status** - **Active** when the credential is valid and something references the connection, **Not Active** when the credential is valid but nothing uses it yet, or the credential status (for example `INVALID`) when the credential itself is the problem.
+- **Shared** - a badge shown on connections marked shared.
+- **Tags** - assigned tags for organization.
+- **Creation date** - when the connection was created.
 
 ---
 
@@ -35,20 +37,20 @@ Each connection in the list displays:
 
 ### Creating a Connection
 
-1. Click the **New Connection** button in the top-right corner.
+1. Click **New Connection** in the top-right corner. On an empty page, click **Create Connection**.
 2. Select the component (third-party service) you want to connect to.
 3. Provide the required authentication credentials (API key, OAuth, etc.).
 4. Optionally turn on **Shared Connection** (see [Shared connections](#shared-connections)).
 5. Assign tags if desired.
 6. Click **Save** to create the connection.
 
-A newly created connection shows **Not Active** until a workflow, integration instance, or test configuration actually references it - the badge reports usage, not reachability.
+A newly created connection shows **Not Active** until a workflow, integration instance or test configuration references it. The badge reports usage, not reachability.
 
 ### Managing Connections
 
-- **Edit** -- change the connection's name, tags, or **Shared Connection** setting, or replace its credentials.
-- **Delete** -- remove a connection (confirmed via an alert dialog). Deletion fails while a workflow still uses the connection.
-- **Tag** -- add or remove tags to organize connections.
+- **Edit** - change the connection's name, tags or **Shared Connection** setting, or replace its credentials.
+- **Delete** - remove a connection after confirming in an alert dialog. Deletion fails while a workflow still uses the connection.
+- **Tag** - add or remove tags to organize connections.
 
 Only the user who created a connection, or an admin, can edit, tag, or delete it. Anyone else gets an access-denied error.
 
@@ -66,12 +68,12 @@ A connected user can select a shared connection in their own workflows, but cann
 
 Use the left sidebar to filter the connection list:
 
-- **Components** -- the sidebar lists all components that have at least one connection. Click a component name to show only its connections, or select "All Components" to view everything.
-- **Tags** -- click a tag to filter by that tag.
+- **Components** - the sidebar lists all components that have at least one connection. Click a component name to show only its connections, or select "All Components" to view everything.
+- **Tags** - click a tag to filter by that tag.
 
 ### Environment Selection
 
-Connections are scoped to environments. Use the environment selector in the left sidebar header to switch between Development, Staging, and Production. Each environment maintains its own set of connections, allowing you to use different credentials for testing and production.
+Connections are scoped to environments. Use the environment selector in the app sidebar to switch between Development, Staging and Production. Each environment has its own set of connections, so you can use different credentials for testing and production. When more than one environment is available, the page header notes which environment you are viewing.
 
 ### Connection Status
 
@@ -91,9 +93,9 @@ A connected user can use the connections they own plus the shared connections in
 
 The connection list endpoints return only these connections. They take an optional `connectionIds` query parameter that narrows the result to those ids; ids the user is not entitled to are left out.
 
-A connection created from the Connect dialog, including from the [activation dialog](/platform/embedded/build/activation-dialog), belongs to an integration instance. It is available to both the user's integrations and automations. When a connection backed by an integration instance is reconnected, the authorization parameters of the integration's configuration, such as an OAuth2 app's client id and secret, are restored unless the form supplies them.
+A connection created from the Connect dialog, including from the [activation dialog](/platform/embedded/build/automations/activation-dialog), belongs to an integration instance. It is available to both the user's integrations and automations. When a connection backed by an integration instance is reconnected, the authorization parameters of the integration's configuration, such as an OAuth2 app's client id and secret, are restored unless the form supplies them.
 
-Assigning a connection the user is not entitled to - for example when a catalog workflow is set up for the user - fails with `400 Bad Request`.
+Assigning a connection the user is not entitled to (for example when a catalog workflow is set up for the user) fails with `400 Bad Request`.
 
 Each returned connection carries two flags:
 
@@ -117,5 +119,51 @@ Paths are relative to `/api/embedded/v1`.
 - **Delete** returns `404` when the connection does not exist or the user does not own it, and `409` with `{"reason": "CONNECTION_IS_USED"}` while a workflow still uses it.
 - **Reauthorize** replaces the authorization parameters as a whole: a parameter you leave out is cleared, so send the complete set. Connection-level properties stay unchanged. A successful call marks the credentials valid again. It returns `404` when the user does not own the connection.
 
-The [Automation Hub](/platform/embedded/build/automation-hub#connections) uses these endpoints: its **Reconnect** action opens a **Reconnect &lt;component&gt;** dialog that asks only for the credentials and saves them with **Update credentials**.
+For example, to create an Airtable connection, which uses a bearer token, send the component's connection version, its authorization type and the parameters that authorization asks for. The response is the new connection id:
+
+```bash
+curl -X POST "https://your-bytechef-host.example.com/api/embedded/v1/components/airtable/connections" \
+  -H "Authorization: Bearer <jwt>" \
+  -H "Content-Type: application/json" \
+  -H "X-Environment: PRODUCTION" \
+  -d '{
+    "name": "My Airtable",
+    "connectionVersion": 1,
+    "authorizationType": "BEARER_TOKEN",
+    "parameters": {"token": "<airtable-personal-access-token>"}
+  }'
+```
+
+`authorizationType` is the authorization's constant name, such as `API_KEY`, `BEARER_TOKEN` or `OAUTH2_AUTHORIZATION_CODE`. Leave it out for a component whose connection has no authorization.
+
+To replace the token later, send the complete parameter set to `reauthorize`. The response is `204` with no body:
+
+```bash
+curl -X POST "https://your-bytechef-host.example.com/api/embedded/v1/connections/1051/reauthorize" \
+  -H "Authorization: Bearer <jwt>" \
+  -H "Content-Type: application/json" \
+  -H "X-Environment: PRODUCTION" \
+  -d '{"parameters": {"token": "<new-airtable-personal-access-token>"}}'
+```
+
+The list endpoints return the connections with their flags:
+
+```json
+[
+  {
+    "id": 1051,
+    "name": "My Airtable",
+    "componentName": "airtable",
+    "connectionVersion": 1,
+    "authorizationType": "BEARER_TOKEN",
+    "environment": "PRODUCTION",
+    "credentialStatus": "VALID",
+    "createdDate": "2026-05-18T10:00:00Z",
+    "shared": false,
+    "editable": true
+  }
+]
+```
+
+The [Automation Hub](/platform/embedded/build/automations/automation-hub#connections) uses these endpoints: its **Reconnect** action opens a **Reconnect &lt;component&gt;** dialog that asks only for the credentials and saves them with **Update credentials**.
 

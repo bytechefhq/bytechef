@@ -1,14 +1,11 @@
 ---
 title: Automations
 description: Author and publish the workflow templates that back the automations you ship to connected users.
-comingSoon: true
 ---
 
 ![Automations overview](automations-overview.png)
 
 ---
-
-> **Feature flag.** Automations are behind a deployment feature flag. The **Automations** entry appears in the Embedded sidebar only where that flag is enabled; without it the pages below are not linked from the UI.
 
 The **Automations** page is the authoring surface for your **workflow templates**. Templates are grouped under **Projects**, organized by **Category** and **Tag**, and made available to end users by publishing the project and releasing a version to an environment through a **configuration**.
 
@@ -82,7 +79,7 @@ Expand a row to list the workflows of that version, each with its own switch. Tu
 - **Environment** -- the environment the configuration belongs to. It is fixed when you edit a configuration.
 - **Version** -- the published versions of the project. Pointing a configuration at an older version is allowed, which is how you roll an environment back.
 - **Enabled** -- whether the configuration is on.
-- **Show in Automation Hub** -- list the project through the API for this environment, and so in the [Automation Hub](/platform/embedded/build/automation-hub) and in custom UIs. Turn it off for flows you only activate by UUID; they can still be provisioned. Turning off the configuration or a workflow is what stops provisioning and running.
+- **Show in Automation Hub** -- list the project through the API for this environment, and so in the [Automation Hub](/platform/embedded/build/automations/automation-hub) and in custom UIs. Turn it off for flows you only activate by UUID; they can still be provisioned. Turning off the configuration or a workflow is what stops provisioning and running.
 - **Assignment rule** -- optional. An expression that decides which new users can be placed on this configuration on their own. Empty means everyone. See [Several configurations in one environment](#several-configurations-in-one-environment).
 
 The **New Configuration** button is disabled, with the tooltip "Publish the project first", until the project has a published version.
@@ -147,7 +144,7 @@ Click a workflow in an expanded configuration row to open a side panel with two 
 3. Optionally enter a **Permission Expression** to limit which connected users see the project. See [Permission Expressions](/platform/embedded/build/permission-expressions).
 4. Submit. The new project appears in the list as a `DRAFT`.
 
-Showing the project in the [Automation Hub](/platform/embedded/build/automation-hub) is set per environment on its configuration, not on the project.
+Showing the project in the [Automation Hub](/platform/embedded/build/automations/automation-hub) is set per environment on its configuration, not on the project.
 
 If no projects exist yet, the empty state shows a **Create Project** button that opens the same dialog.
 
@@ -200,8 +197,8 @@ Switching environment from the selector in the left sidebar (next to the user me
 
 ## Related
 
-- [Automation Hub](/platform/embedded/build/automation-hub) - the embeddable catalog where connected users find published projects.
-- [Activate templates from your app](/platform/embedded/build/activation-dialog) - open the activation dialog for a published template from your own page.
+- [Automation Hub](/platform/embedded/build/automations/automation-hub) - the embeddable catalog where connected users find published projects.
+- [Activate templates from your app](/platform/embedded/build/automations/activation-dialog) - open the activation dialog for a published template from your own page.
 - [Permission Expressions](/platform/embedded/build/permission-expressions) - limit which connected users see a project or workflow.
 - [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows) - references, provisioning and dangling references.
 - [Request Triggers](/platform/embedded/build/request-triggers) - run a connected user's workflow and get its result in the response.

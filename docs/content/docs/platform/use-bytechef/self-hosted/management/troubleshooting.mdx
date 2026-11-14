@@ -3,8 +3,9 @@ title: Troubleshooting
 description: Inspect a running ByteChef instance, restart it after a configuration change, and diagnose the failures that come up most often
 ---
 
-Configuration is read once, at startup - so most "I changed it and nothing happened" reports are a
-missing restart rather than a wrong value. This page covers how to see what a running instance
+This page is for operators of a self-hosted ByteChef instance. Configuration is read once, at
+startup, so a changed value that has no effect usually means the instance was not restarted. This
+page covers how to see what a running instance
 actually resolved, how to restart it, and how to diagnose the failures that come up most often.
 
 ## Inspecting a running instance
@@ -33,8 +34,9 @@ kubectl get secret bytechef-secrets -o yaml
 kubectl get pods -l app.kubernetes.io/name=bytechef
 ```
 
-The ConfigMap and Secret are named after the Helm release, so `bytechef-envs` and
-`bytechef-secrets` assume `helm install bytechef ...`. Substitute your release name otherwise.
+The chart names the ConfigMap and Secret `<release>-bytechef-envs` and `<release>-bytechef-secrets`,
+or `<release>-envs` and `<release>-secrets` when the release name already contains `bytechef`. The
+names above assume `helm install bytechef ...`.
 
 ByteChef also serves its resolved configuration over Actuator - see
 [Verifying the resolved configuration](/platform/use-bytechef/self-hosted/configuration#verifying-the-resolved-configuration),
@@ -101,11 +103,13 @@ application uses:
 
 ```bash
 # Docker
-docker exec bytechef nc -zv postgres 5432
+docker exec bytechef bash -c 'echo > /dev/tcp/postgres/5432' && echo "port open"
 
 # Kubernetes
-kubectl exec deployment/bytechef -- nc -zv postgres 5432
+kubectl exec deployment/bytechef -- bash -c 'echo > /dev/tcp/postgres/5432' && echo "port open"
 ```
+
+The server image does not include `nc`, so the check uses the shell's `/dev/tcp` device.
 
 If the host resolves but the port refuses, the database is up but not accepting connections from
 this network - check the security group, firewall rule, or `pg_hba.conf`.
@@ -116,9 +120,10 @@ this network - check the security group, firewall rule, or `pg_hba.conf`.
 docker exec bytechef env | grep BYTECHEF_MAIL
 ```
 
-`MailService` warn-skips rather than failing when no mail host is configured, so a missing
-`BYTECHEF_MAIL_HOST` produces silence in the application and a warning in the log, not an error to
-the user. See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#mail-configuration)
+`BYTECHEF_MAIL_HOST` defaults to `localhost` on port `25`, so an instance with no mail settings tries
+to deliver to a mail server inside its own container and the send fails in the log. When the host is
+set to an empty value, the server skips sending and logs `Mail server is not configured, not sending
+mails`; the user sees no error in either case. See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#mail-configuration)
 for the full set.
 
 ### OAuth2 callbacks fail

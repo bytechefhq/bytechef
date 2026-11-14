@@ -1,50 +1,31 @@
 ---
 title: API Keys
-description: Manage API Keys for your embedded integration.
+description: Create API keys for server-to-server calls from your backend to the embedded public API.
 ---
 
 <!-- TODO screenshot: Embedded → Settings - the settings landing page showing the available sections -->
 
----
+An embedded API Key is a bearer token for server-to-server calls from your backend to the embedded public API, for example listing a user's integrations, executing a component action, or reading workflow executions. Do not expose an API Key in a browser or other client-side code. Browser-side calls use a JWT signed with a [Signing Key](/platform/embedded/administration/signing-keys).
 
-## API Keys
+An API Key acts on behalf of the connected user named in the request path. It is accepted only on the `/api/embedded/v1/{externalUserId}/…` routes. A request without an external user id in the path is rejected. If no connected user exists for that id, ByteChef creates one on the first request.
+
+API Keys are managed under **Embedded → Settings → API Keys**. Only tenant admins can open the page.
 
 <!-- TODO screenshot: Embedded → Settings → API Keys - the keys table and the New API Key button -->
 
-API Keys are bearer tokens for **server-to-server** calls from your backend to the embedded public API - for example listing a user's integrations, executing a component action, or reading their workflow executions.
+## Creating an API Key
 
-They act on behalf of a connected user, just like a Signing Key JWT does; the difference is only in how that user is named. An API Key is accepted **only** on the `/api/embedded/v1/{externalUserId}/…` routes, where the path segment names the user. A request without that segment has no user to resolve and is rejected, so browser-originated calls (which have no user id in the path) still need a JWT signed with a Signing Key.
+1. Select the environment (Development, Staging or Production) in which the key is used. A key authenticates only requests sent to the same environment.
+2. Go to **Embedded → Settings → API Keys** and click **New API Key**.
+3. Enter a **Name** (at least 2 characters).
+4. Click **Create API Key**.
+5. Click **Copy** and store the secret key in your backend. The dialog shows it once. After you click **Done**, it cannot be displayed again.
 
-### Key Features
+To rename a key, click the edit icon in its row, change the **Name** and click **Save**. To revoke a key, click the delete icon in its row.
 
-| Feature | Description |
-|---|---|
-| One-time secret display | The secret key appears once at creation. Save it securely. |
-| Environment scoping | API keys are created against a specific environment (Development / Stage / Production). |
-| Last Used Date | When the key was last used to authenticate a request. |
+## Using an API Key
 
-### Table Columns
-
-| Column | Description |
-|---|---|
-| Name | The friendly name you gave the key. |
-| Secret Key | Obfuscated. Visible only at creation. |
-| Created Date | When the key was created. |
-| Last Used Date | When the key was last used. Empty if never used. |
-| Created By | Username of the admin who created it. |
-
-### How to Use
-
-#### Creating an API Key
-
-1. Click **New API Key** in the top-right corner.
-2. Enter a **Name**.
-3. Click **Save**.
-4. **Copy the secret key now** - like Signing Keys, the secret appears once and is gone after you close the dialog.
-
-#### Using the key
-
-Pass it as a bearer token against the public API's `/{externalUserId}`-prefixed routes - the connected user is identified by the path segment:
+Send the secret as a bearer token and name the connected user in the path:
 
 ```http
 GET /api/embedded/v1/user-42/integrations HTTP/1.1
@@ -52,8 +33,28 @@ Authorization: Bearer <your-api-key-secret>
 X-Environment: DEVELOPMENT
 ```
 
-API Keys are not accepted on the `/api/embedded/internal` endpoints: those carry no user id in the path, so they are reached either from a ByteChef admin session or with a Signing Key JWT (which is how the embedded workflow builder authenticates from your end user's browser).
+| Header | Description |
+|---|---|
+| `Authorization` | `Bearer <secret>`. Only API Keys created on this page (type Embedded) are accepted. |
+| `X-Environment` | `DEVELOPMENT`, `STAGING` or `PRODUCTION` (case-insensitive). Defaults to `PRODUCTION`. Must match the environment the key was created in. |
 
-#### Losing an API Key
+API Keys are not accepted on the `/api/embedded/internal` endpoints. Those carry no user id in the path and are reached from a ByteChef admin session or with a Signing Key JWT (which is how the embedded workflow builder authenticates from your end user's browser). Requests for a connected user that an admin has disabled are rejected.
 
-If you lose the secret, you cannot recover it. Delete the lost key and create a replacement.
+## Table columns
+
+| Column | Description |
+|---|---|
+| **Name** | The name you gave the key. |
+| **Secret Key** | Obfuscated. The full value is shown only at creation. |
+| **Created Date** | When the key was created. |
+| **Last Used Date** | When the key last authenticated a request. Updated at most once a minute. |
+| **Created By** | The admin who created the key. |
+
+## Replacing a lost key
+
+A lost secret cannot be recovered. Create a new key, deploy it to your backend, and delete the lost key.
+
+## Related
+
+- [Signing Keys](/platform/embedded/administration/signing-keys)
+- [Quick Start](/platform/embedded/get-started/quick-start)

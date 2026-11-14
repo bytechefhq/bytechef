@@ -23,6 +23,7 @@ import com.bytechef.platform.security.audit.ApiKeyAuditMapper;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.tenant.domain.TenantKey;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +38,8 @@ import org.springframework.util.Assert;
 @Service
 @Transactional
 public class ApiKeyServiceImpl implements ApiKeyService {
+
+    private static final Duration LAST_USED_DATE_UPDATE_INTERVAL = Duration.ofMinutes(1);
 
     private final ApiKeyRepository apiKeyRepository;
 
@@ -129,11 +132,8 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     public void updateLastUsedDate(long id) {
-        apiKeyRepository.findById(id)
-            .ifPresent(apiKey -> {
-                apiKey.setLastUsedDate(Instant.now());
+        Instant now = Instant.now();
 
-                apiKeyRepository.save(apiKey);
-            });
+        apiKeyRepository.updateLastUsedDate(id, now, now.minus(LAST_USED_DATE_UPDATE_INTERVAL));
     }
 }

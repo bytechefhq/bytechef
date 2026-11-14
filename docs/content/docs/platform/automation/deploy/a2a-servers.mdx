@@ -1,11 +1,10 @@
 ---
 title: A2A Servers
 description: Expose project workflows as the skills of an A2A (Agent2Agent) server so external agents can discover and call them.
-comingSoon: true
 ---
 
 An **A2A Server** exposes workflows from your projects over the [Agent2Agent (A2A) protocol](https://a2a-protocol.org)
-so that external A2A clients - another agent or your own code - can discover them through an **agent card** and send
+so that external A2A clients (another agent or your own code) can discover them through an **agent card** and send
 them tasks. Where an [MCP Server](/platform/automation/deploy/mcp-servers) publishes your tools *to* an assistant, an
 A2A Server publishes an **agent** that other agents can delegate work to. Each exposed workflow becomes one **skill**
 of that agent.
@@ -24,35 +23,33 @@ POST https://<your-host>/api/automation/a2a/<secretKey>
 
 The endpoint supports the `message/send`, `message/stream`, `tasks/get` and `tasks/cancel` methods.
 
----
-
 ## Create an A2A server
 
 1. In the Automation workspace, open **A2A Servers** from the sidebar.
 2. Click **New A2A Server** (or **Create A2A Server** while the list is empty).
-3. Give it a **name** and a **description** - both appear on the agent card that external clients read.
-4. Choose whether to **Require authentication** (see [Authentication](#authentication) below). It is on by default.
+3. Enter a **Name** and a **Description**. Both appear on the agent card that external clients read.
+4. Choose whether to **Require authentication** (see [Authentication](#authentication)). It is on by default.
+5. Click **Save**.
 
-A new server is enabled straight away; switch it off or on with the toggle on its card. The server belongs to the
-environment selected in the application sidebar when you create it (Development, Staging, or Production), and keeps
-it - so you can expose a different agent per environment. The list shows the servers of the selected environment.
+A new server is enabled immediately; switch it off or on with the **Enabled** toggle on its row. Servers that require
+authentication show an **Auth required** badge. The server belongs to the environment selected in the left sidebar
+when you create it (Development, Staging, or Production) and keeps it, so you can expose a different agent per
+environment. The list shows the servers of the selected environment.
 
 Creating, editing and deleting servers, and changing their skills, requires the editor role in the server's workspace
-(or tenant admin). The secret key - and so the URLs on the server's **Connect** tab - is visible to the same users;
-viewers see the servers but not their URLs.
+(or tenant admin). The secret key, and therefore the URLs on the server's **Connect** tab, is visible to the same
+users; viewers see the servers but not their URLs.
 
 A server exposes nothing until you add a project to it.
 
----
-
 ## Expose workflows as skills
 
-1. Expand the server's card, open the **Workflow Skills** tab and click **Add Workflows**.
+1. Expand the server's row, open the **Workflow Skills** tab, and click **Add Workflows**.
 2. On the **Basic** step, **select a project** and a published **version**, then click **Next**.
 3. On the **Workflows** step, switch on the workflows to expose. Only workflows with a **New Workflow Call** trigger
-   (`workflow/v1/newWorkflowCall`) are listed - that trigger is what lets the workflow be invoked as a skill. A
-   workflow whose trigger input schema requires any input other than `message` is left out too: an A2A call only
-   fills `message`, with the text of the caller's message, so the other inputs could never be supplied.
+   (`workflow/v1/newWorkflowCall`) are listed; that trigger lets the workflow be invoked as a skill. A workflow whose
+   trigger input schema requires any input other than `message` is also left out: an A2A call fills only `message`,
+   with the text of the caller's message.
 4. For each switched-on workflow, pick its **Connections** and fill in its **Inputs**, then click **Add**. Every
    required connection must be set; a connection must belong to the server's environment.
 
@@ -81,8 +78,8 @@ Each workflow row has a **Configure** button, a toggle and a menu:
 
 ### Tags and filters
 
-Tag servers with the **Tags** control on each card. The sidebar filters the list by **Projects** - the projects exposed
-by any server in the selected environment - and by **Tags**; the active filter is shown above the list.
+Tag servers with the **Tags** control on each row. The left sidebar filters the list by **Projects** (the projects
+exposed by any server in the selected environment) and by **Tags**. The active filter is shown above the list.
 
 ### How a task runs
 
@@ -96,11 +93,45 @@ When a client sends `message/send`:
 - ByteChef starts the workflow and waits up to 300 seconds for it to finish. A finished run returns its response
   output, or the run's outputs, as a `completed` task; a failed run returns a `failed` task. A run that is still going
   returns a `working` task to poll with `tasks/get`.
-- The reply text is the output itself when it is text, and the value when the output holds a single text value - such
-  as the `message` of a **Response to Workflow Call** step. Any other output is sent as JSON.
+- The reply text is the output itself when it is text, or the value when the output holds a single text value (such
+  as the `message` of a **Response to Workflow Call** step). Any other output is sent as JSON.
 - A run that pauses on an [approval](/platform/automation/build/workflows/human-in-the-loop) step returns an
   `input-required` task, with the approval form link when ByteChef's public URL is configured. Once the decision is
   made, poll `tasks/get` for the result.
+
+A `message/send` request to a server with **Require authentication** on looks like this. Replace `<skill-id>` with
+an `id` from the agent card's `skills` list; leave out `metadata` when the server exposes a single skill:
+
+```bash
+curl -X POST "https://your-bytechef-host.example.com/api/automation/a2a/<secretKey>" \
+  -H "Authorization: Bearer <your-api-key>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": "1",
+    "method": "message/send",
+    "params": {
+      "message": {
+        "kind": "message",
+        "messageId": "message-1",
+        "role": "user",
+        "parts": [{"kind": "text", "text": "Summarize yesterday'\''s failed orders"}]
+      },
+      "metadata": {"skillId": "<skill-id>"}
+    }
+  }'
+```
+
+When the reply is a `working` task, poll it with `tasks/get`, passing the task `id` from the reply:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "2",
+  "method": "tasks/get",
+  "params": {"id": "<task-id>"}
+}
+```
 
 The task id identifies the workflow run, so `tasks/get` works for any task of the server, not only recent ones.
 `tasks/cancel` does not stop a run: it answers that the task cannot be canceled.
@@ -113,14 +144,12 @@ The task id identifies the workflow run, so `tasks/get` works for any task of th
 
 ### The agent card
 
-The server's **Connect** tab shows the agent card URL and the JSON-RPC endpoint, each with a copy button, and whether
-requests need an API key.
+The server's **Connect** tab shows the **Agent Card URL** and the **Endpoint URL**, each with a copy button, and the
+**Authorization header** to send when the server requires authentication.
 
 The card carries the server's name and description, protocol version `0.3.0`, the JSON-RPC transport, text input and
 output, and one entry per skill. Its `url` is built from ByteChef's public URL when one is configured, and from the
 request URL otherwise.
-
----
 
 ## Authentication
 
@@ -128,7 +157,7 @@ Every A2A server belongs to a workspace, like an MCP server. Workspace members s
 
 The secret key in the URL identifies the server and the tenant that owns it. On top of that:
 
-- **Require authentication on** (default): every request - the agent card included - must present a ByteChef
+- **Require authentication on** (default): every request, including the agent card request, must present a ByteChef
   workspace **API key** as a `Bearer` token in the `Authorization` header. The key must be an Automation key of the
   server's workspace whose environment matches the server's environment, and its user must be active. Other requests
   are rejected with `401`.
@@ -138,33 +167,29 @@ The secret key in the URL identifies the server and the tenant that owns it. On 
 In both modes a request may name an environment in the `X-ENVIRONMENT` header, but it must be the server's own;
 another one is rejected with `401`.
 
-An unknown secret key is answered with `401`. A disabled server answers a request with a valid API key - or any request, when it does not require authentication - with `403` and the JSON body `{"error": "server_disabled", "message": "…"}`; a request without a valid API key still gets `401`.
-
----
+An unknown secret key is answered with `401`. A disabled server answers a request with a valid API key (or any request, when it does not require authentication) with `403` and the JSON body `{"error": "server_disabled", "message": "…"}`; a request without a valid API key still gets `401`.
 
 ## Call an A2A agent from an AI Agent
 
 The **A2A** component lets an [AI Agent](/platform/automation/build/workflows/ai/agent) delegate tasks to a remote A2A
-agent - an A2A Server of this or another ByteChef, or an agent built on another framework.
+agent: an A2A Server of this or another ByteChef instance, or an agent built on another framework.
 
 1. Attach the **A2A Agent Tool** to the AI Agent's **Tools** slot.
-2. Set **Agent URL** to the remote agent's address - for a ByteChef A2A Server, the endpoint URL from the server's
-   **Connect** tab. Pasting the agent card URL also works.
-3. When the agent requires authentication, pick an **A2A** connection - create one with the agent's **Bearer Token**,
-   for a ByteChef A2A Server with **Require authentication** on a workspace API key. It is sent as an
+2. Set **Agent URL** to the remote agent's address. For a ByteChef A2A Server, use the **Endpoint URL** from the
+   server's **Connect** tab. The agent card URL also works.
+3. When the agent requires authentication, pick an **A2A** connection created with the agent's **Bearer Token** (for a
+   ByteChef A2A Server with **Require authentication** on, a workspace API key). It is sent as an
    `Authorization: Bearer` header on the agent card request and on every message. The connection is optional: leave it
    out for an agent that accepts unauthenticated requests.
 
 The model sees the tool as `sendTaskToRemoteAgent` with a generic description. Give each A2A Agent Tool its own **Tool
-Name** and **Tool Description** - for example `askJavaReleaseExpert` - so the model knows what the remote agent is for
+Name** and **Tool Description** (for example `askJavaReleaseExpert`) so the model knows what the remote agent is for
 and can tell several remote agents apart. The tool reads the agent card from `<Agent URL>/.well-known/agent-card.json`,
 sends the task as an A2A message to the Agent URL, and returns the remote agent's text reply.
 
 The tool refuses an Agent URL whose host resolves to a private, loopback or link-local address. To call an agent on an
 internal network, including an A2A Server of the same ByteChef reached through `localhost`, add its host to
 [`BYTECHEF_AI_AGENT_UTILS_ALLOWED_PRIVATE_HOSTS`](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-agent-utils-configuration).
-
----
 
 ## Monitoring skill calls
 
@@ -174,10 +199,14 @@ Filter by **A2A Server** to see one server's calls. Each call also starts an ord
 which appears in [Workflow Executions](/platform/automation/monitor/workflow-executions) with its
 inputs, outputs and per-step trace.
 
----
-
 ## Deleting
 
 - Deleting an A2A server removes its projects, their skills and the deployments the server created.
 - Deleting a project from a server removes its skills and that project's deployment.
 - Deleting a workflow removes the skill that exposed it.
+
+## Related
+
+- [MCP Servers](/platform/automation/deploy/mcp-servers)
+- [API keys](/platform/automation/settings/api-keys)
+- [External invocations](/platform/automation/monitor/external-invocations)

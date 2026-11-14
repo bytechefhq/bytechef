@@ -71,9 +71,7 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                         Drop files here or click to browse
                                     </p>
 
-                                    <p className="mt-1 text-xs text-content-neutral-tertiary">
-                                        .JAR, .JS, .PY, .RB files
-                                    </p>
+                                    <p className="mt-1 text-xs text-content-neutral-tertiary">.JAR, .JS, .PY files</p>
 
                                     <input
                                         accept=".jar,.js,.py"

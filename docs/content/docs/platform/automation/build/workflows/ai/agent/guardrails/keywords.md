@@ -1,81 +1,61 @@
 ---
 title: Keywords
-description: Word-boundary-aware match against a configured keyword list, run at PREFLIGHT against the raw input. Available as both a Check (block) and a Sanitize (mask) variant.
+description: Whole-word matching against a keyword list, to block or mask listed terms.
 ---
 
-`Keywords` flags or masks any of a configured list of words when they appear in the input. It runs in the **PREFLIGHT stage** of `Check For Violations` or `Sanitize Text`, against the raw input text before sibling masking detectors (PII, Secret Keys, URLs) rewrite tokens.
-
-This is a deliberate design choice: a keyword list authored against masked text would break the moment the secret-key detector ate the prefix or the PII detector replaced the local-part of an email - the deny-list token would have been replaced with `<AWS_ACCESS_KEY>` or `<EMAIL_ADDRESS>` before the keyword check ever saw it. Running at PREFLIGHT against raw input means deny-list entries always match the characters the operator actually wrote.
-
-The **Check** variant emits a violation listing the matched keywords - wire it under `Check For Violations` to block on a deny-list match. The **Sanitize** variant replaces every matched keyword with the `<KEYWORD>` placeholder via the shared mask-entity pass - wire it under `Sanitize Text` when the right action is to redact the keyword rather than block the request.
-
----
+**Keywords** finds the words and phrases in a list you configure. It runs in the preflight stage and needs no model. Attach it under [Check for Violations](/platform/automation/build/workflows/ai/agent/guardrails/check-for-violations) to block text that contains a listed keyword, or under [Sanitize Text](/platform/automation/build/workflows/ai/agent/guardrails/sanitize-text) to replace each occurrence with `<KEYWORD>`. Typical uses are competitor names, internal code names, and banned terms.
 
 ## Properties
 
-| Property | Description |
-|---|---|
-| **Keywords** | List of words to detect. At least one entry is required |
-| **Case Sensitive** | When off, matching is case-insensitive (default). When on, matches must match casing exactly |
+| Property | Type | Default | Description |
+|---|---|---|---|
+| **Validate Input** | Boolean | `true` | Check the user input before it is sent to the model. |
+| **Validate Output** | Boolean | `true` | Check the model response before it is returned. |
+| **Keywords** | Array of strings | None | The words or phrases to find. Required, with at least one entry; an empty list is an execution failure. |
+| **Case Sensitive** | Boolean | `false` | When `false`, matching ignores case. |
 
----
+## Matching rules
 
-## Word-Boundary Matching
+- **Whole words.** A keyword matches only when it is not directly preceded or followed by a letter, digit, or underscore (in any language). The keyword `cat` matches `the cat sat`, `cat,`, and `cat!`, but not `cats`, `category`, or `caterpillar`.
+- **Literal text.** Each keyword is matched exactly as written. Regular-expression characters such as `.` or `*` have no special meaning, and punctuation or spaces in an entry are part of the keyword: `foo,` matches only `foo` followed by a comma.
+- **Raw text.** Under Check for Violations, Keywords never masks and always sees the text as the user wrote it, so a keyword that overlaps an email address or a secret still matches.
+- Empty entries are skipped.
 
-Keywords uses Unicode-aware word boundaries (`\p{L}|\p{N}|_`) so a keyword `"cat"`:
+## Results
 
-- **does** match: `"the cat sat"`, `"cat,"`, `"cat."`, `"cat!"` (punctuation boundary)
-- **does not** match: `"caterpillar"`, `"category"`, `"cats"` (letter on either side)
-
-This is symmetric - if your keyword itself starts or ends with a non-word character (e.g., `":hashtag"`, `"#promo"`), the matcher relaxes the boundary on that side automatically. You don't need to escape regex metacharacters; the matcher quotes them for you.
-
----
-
-## Cluster Elements
-
-- **Keywords (check)** - emits a violation listing the matched keywords. Wire it as a child of `Check For Violations` to block requests when any deny-list keyword fires.
-- **Keywords (sanitize)** - replaces every matched keyword with a `<KEYWORD>` placeholder through the shared mask-entity pass. Wire it as a child of `Sanitize Text` to redact keywords from inputs or model responses without blocking.
-
----
+- **Under Check for Violations** (`keywordsCheck`): one violation, with `matchCount` set to the number of distinct keywords found.
+- **Under Sanitize Text** (`keywordsSanitize`): every occurrence is replaced with `<KEYWORD>`. When a keyword overlaps a longer match from PII, Secret Keys, or URLs, the longer match wins.
 
 ## Examples
 
-Block any of three competitor names:
+Block three competitor names:
 
 ```json
 {
+  "name": "keywords_1",
   "type": "keywords/v1/keywordsCheck",
-  "parameters": {
-    "keywords": ["CompetitorA", "CompetitorB", "CompetitorC"],
-    "caseSensitive": false
-  }
+  "parameters": { "keywords": ["CompetitorA", "CompetitorB", "CompetitorC"], "caseSensitive": false }
 }
 ```
 
-Mask competitor names in the model's response instead of blocking:
+Mask the same names in the model response instead of blocking:
 
 ```json
 {
+  "name": "keywords_1",
   "type": "keywords/v1/keywordsSanitize",
-  "parameters": {
-    "keywords": ["CompetitorA", "CompetitorB", "CompetitorC"],
-    "caseSensitive": false
-  }
+  "parameters": { "keywords": ["CompetitorA", "CompetitorB", "CompetitorC"], "validateInput": false }
 }
 ```
 
----
+## When to use another detector
 
-## When NOT to Use
+| Need | Use |
+|---|---|
+| Structured values such as account numbers or ticket IDs | [Custom Regex](/platform/automation/build/workflows/ai/agent/guardrails/custom-regex) |
+| Misspellings, paraphrases, or indirect mentions | [Custom](/platform/automation/build/workflows/ai/agent/guardrails/custom) with a classifier prompt |
+| Emails, phone numbers, and other personal data | [PII](/platform/automation/build/workflows/ai/agent/guardrails/pii) |
 
-- For **structured patterns** (account numbers, ticket IDs, URLs), use `Custom Regex` instead. Keywords are literal strings.
-- For **fuzzy matching** ("anything that mentions our brand even with typos"), use `Custom` with an LLM classifier prompt. Literal keywords don't catch typos or alternate spellings.
-- For **PII** (emails, phone numbers, etc.), use `PII` - the rule-based detector is designed for these shapes and word-boundary keyword matching would miss most of them.
+## Related
 
----
-
-## Edge Cases
-
-- **Empty keyword list** is treated as a configuration error and forces fail-closed.
-- **`null` and empty-string entries** are silently skipped by the matcher. Other entries (including whitespace-only strings and entries containing punctuation) are matched as literal text - they go straight to `Pattern.quote(...)`, so a list entry like `"foo,"` matches the literal substring `"foo,"` (comma included), not `"foo"`. Sanitize your list at authoring time if you need leading/trailing punctuation trimmed.
-- **Regex metacharacters** in a keyword are matched literally - `.` only matches a period, `.*` only matches the two-character sequence, `(?:` does not throw at request-time. The matcher escapes user input before compiling the pattern.
+- [keywords/v1 reference](/reference/components/keywords_v1)

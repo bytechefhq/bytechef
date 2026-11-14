@@ -7,12 +7,12 @@ comingSoon: true
 
 <EEBadge />
 
-An **API connector** turns a REST API into a first-class ByteChef component - one action per endpoint, typed inputs and outputs - without writing or building any code. You describe or import the API's endpoints, ByteChef stores the resulting OpenAPI specification, and once enabled the connector appears in the workflow editor like any built-in component.
+An **API connector** turns a REST API into a ByteChef component, with one action per endpoint and typed inputs and outputs, without writing or building code. You describe or import the API's endpoints, ByteChef stores the resulting OpenAPI specification, and once enabled the connector appears in the workflow editor like any built-in component.
 
 Unlike a [custom component](/platform/settings/components/custom-components), an API connector has no source you maintain: the component definition is derived from the stored specification, and you manage the whole thing from the UI.
 
 <Callout title="Availability">
-    API connectors are an Enterprise Edition feature, behind the `ff-207` feature flag. Creating, editing, enabling, and deleting connectors requires the `ADMIN` authority - the check sits on the facade and the service, so it applies to every caller.
+    API connectors are an Enterprise Edition feature, behind the `ff-207` feature flag. Creating, editing, enabling, and deleting connectors requires the `ADMIN` authority, which the server enforces for every caller.
 </Callout>
 
 ---
@@ -25,7 +25,7 @@ Connector names are the runtime registry's lookup key, so uniqueness is enforced
 
 ## Where connectors live
 
-**Settings → Components** opens on the **Custom Components** list, with an **API Connectors** tab alongside it. Each connector row shows:
+Connectors are listed on **Settings → API Connectors**, headed "Turn a REST API into a component from its OpenAPI specification." With no connectors yet, the page shows the **No API Connectors** empty state. Each connector row shows:
 
 | Element | Meaning |
 |---|---|
@@ -33,7 +33,7 @@ Connector names are the runtime registry's lookup key, so uniqueness is enforced
 | **Endpoint count** | `N endpoints` - a collapsible toggle. Click the chevron to expand the endpoint list inline. |
 | **Enable/disable switch** | Turns the connector on or off. |
 | **Modified date** | When the connector last changed. |
-| **Ellipsis menu** | **Edit**, **Edit YAML**, and **Delete**. |
+| **Ellipsis menu** | **Edit** and **Delete**. |
 
 ![The API Connectors page - each connector with its endpoint count](api-connectors/api-connectors.png)
 
@@ -45,10 +45,10 @@ Click an endpoint to open its **detail panel** - a side sheet showing the method
 
 ![An endpoint's detail panel - method, path, connector, description and the read-only spec](api-connectors/endpoint-detail.png)
 
-Each endpoint row also has its own ellipsis menu holding a single **Edit** item, which is **disabled** and titled *"Edit workflow (coming soon)"*. Editing an endpoint today means editing the connector's specification - through **Edit** or **Edit YAML** on the connector row, below.
+Each endpoint row also has its own ellipsis menu holding a single **Edit** item, which is **disabled** and titled *"Edit workflow (coming soon)"*. Editing an endpoint today means editing the connector's specification and uploading it again with **Edit** on the connector row, below.
 
 <Callout title="Unparseable specifications degrade, they don't break the page">
-    If a stored specification cannot be parsed, the connector lists with zero endpoints rather than failing the whole connectors query. A connector showing no endpoints when you expect some is a signal to open **Edit YAML** and check the document.
+    If a stored specification cannot be parsed, the connector lists with zero endpoints rather than failing the whole connectors query. A connector showing no endpoints when you expect some is a signal to fix the specification file and upload it again with **Edit**.
 </Callout>
 
 ## Creating a connector
@@ -127,19 +127,11 @@ Steps: **Basic Info → Select Endpoints → Review**. This route uses AI to rea
 
 ## Editing a connector
 
-Two entries in the row's ellipsis menu, for two different jobs:
+Choose **Edit** from the row's ellipsis menu to open the **Edit API Connector** dialog. The **Name** is read-only. Upload a new **Icon** (`.svg`), a new **Open API Specification** (`.yml` or `.yaml`), or both, and click **Save**. A new specification replaces the stored one, and the endpoint list is rebuilt from it.
 
-- **Edit** opens the full **Edit API Connector** wizard - the same **Basic Info → Define Endpoints → Review** flow as the manual route, hydrated from the stored specification. This is the rename-safe path.
-- **Edit YAML** opens a dialog with a disabled **Name** field, an **Icon** uploader, and the **Open API Specification** editor, for replacing the document wholesale.
+![The Edit API Connector dialog with the read-only Name, the Icon upload and the Open API Specification upload](api-connectors/edit-api-connector-dialog.png)
 
-{/* TODO screenshot: the Edit API Connector wizard on its Define Endpoints step, hydrated from an existing connector's specification */}
-
-Two conflicts are reported as typed errors rather than silent overwrites:
-
-| Error | Cause |
-|---|---|
-| `API_CONNECTOR_NAME_ALREADY_EXISTS` | The new name is already taken by another connector. |
-| `API_CONNECTOR_VERSION_CONFLICT` | Someone else changed the connector since you loaded it. Reload and reapply your edit. |
+To add, change or remove an endpoint, edit the specification file and upload it with **Edit**.
 
 ## Enabling a connector
 
@@ -149,11 +141,7 @@ Once enabled, the connector behaves like any built-in component: open a workflow
 
 ## Deleting a connector
 
-Choose **Delete** from the row's ellipsis menu and confirm in the **Are you absolutely sure?** dialog. Deletion is permanent and removes the connector as a usable component, so migrate any workflow that references it first. Deleting a connector also releases both of its stored blobs.
-
-### Cleaning up orphaned files
-
-An import stores its blobs before the connector row commits, so a failed import can leave files behind. The **`deleteOrphanedApiConnectorFiles`** admin mutation sweeps those historical orphans and reports how many it removed. It is deliberately manual rather than automatic, because an in-flight import legitimately has blobs with no row yet.
+Choose **Delete** from the row's ellipsis menu and confirm in the **Are you absolutely sure?** dialog. Deletion is permanent and removes the connector as a usable component, so migrate any workflow that references it first.
 
 ## See also
 

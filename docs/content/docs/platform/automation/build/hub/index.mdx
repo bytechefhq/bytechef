@@ -11,7 +11,7 @@ import {Bot, MessageSquare, Sparkles} from "lucide-react";
 
 {/* TODO screenshot: AI Hub home - chats sidebar on the left (New Chat / More above the Chats list), the home composer in the main panel with the model picker open */}
 
-The **AI Hub** is the conversational home of your automation workspace. It gathers every way you talk to AI in ByteChef - the general-purpose assistant, chat-enabled workflows, and deployed AI agents - into one sidebar of chats, with shared attachments, memory, and model selection.
+The **AI Hub** is the chat interface of an automation workspace. It lists chats with the general-purpose assistant, chat-enabled workflows, and deployed AI agents in one sidebar, with shared attachments, memory, and model selection.
 
 ## What lives in the AI Hub
 
@@ -23,7 +23,7 @@ The **AI Hub** is the conversational home of your automation workspace. It gathe
     Chats bound to a chat-enabled workflow - a message triggers the workflow and the reply streams back.
   </Card>
   <Card icon={<Bot className="text-amber-300" />} title="Agent Chats">
-    Chats with a deployed AI agent (**Build → Agents**) whose workflow exposes a hosted chat trigger. An agent chat is a workflow chat against the agent's own generated workflow.
+    Chats with a deployed AI agent (**Build > Agents**) whose workflow exposes a hosted chat trigger. An agent chat is a workflow chat against the agent's own generated workflow.
   </Card>
 </Cards>
 
@@ -34,21 +34,21 @@ The left sidebar is the AI Hub's navigation. Above the chat list sit two entries
 - **New Chat** - returns to the home view with an empty composer.
 - **More** - a menu linking to **Connectors**, **Memories**, and **Skills**.
 
-Below them, **Chats** lists **your own** chats in the current workspace and environment - chats are per-user, so you never see another user's threads - with a search box and an **Archive** toggle.
+Below them, **Chats** lists your own chats in the current workspace and environment, with a search box and an **Archive** toggle. Chats are per user; other users' chats are not visible.
 
 ## Starting a chat
 
-The composer's **provider popup** - the model picker in the composer, on the home view - is the single launcher for every kind of chat. Opening it shows a provider search box and then two cascades above the provider list:
+The **provider popup** (the model picker in the home view's composer) starts every kind of chat. It shows a provider search box and two cascades above the provider list:
 
-- **Agents** - every deployed AI agent (from **Build → Agents**) whose enabled deployment exposes a hosted chat trigger, listed by the agent's title. When none qualifies, the submenu says so rather than disappearing.
+- **Agents** - every deployed AI agent (from **Build > Agents**) whose enabled deployment exposes a hosted chat trigger, listed by the agent's title. When none qualifies, the submenu says so.
 - **Workflows** - every chat-enabled workflow deployed in the selected environment, listed as `project - workflow`. Every pick starts a fresh chat; earlier chats against the same workflow stay in the list.
 
-Agents live in hidden backing projects, so an agent never also appears under **Workflows** - the two lists are disjoint.
+Agents live in hidden backing projects, so an agent never appears under **Workflows** as well.
 
 Below the cascades, the same popup selects which provider and model answers the chat.
 
-<Callout title="No more Workflow Chats page">
-  The AI Hub used to carry a separate **Workflow Chats** page in its sidebar. It's gone: the provider popup's **Agents** and **Workflows** cascades launch those chats directly, so there is one way in instead of two. Community Edition, which has no AI Hub, still has its own standalone **Chats** page - see [Workflow Chats](/platform/automation/build/hub/workflow-chats).
+<Callout title="Chats page">
+  The AI Hub has no separate workflow chats page; the provider popup's **Agents** and **Workflows** cascades start those chats. Without the AI Hub, use the standalone **Chats** page described in [Workflow Chats](/platform/automation/build/hub/workflow-chats).
 </Callout>
 
 ## Working in a chat

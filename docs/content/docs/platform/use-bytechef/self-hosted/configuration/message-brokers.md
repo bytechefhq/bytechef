@@ -3,10 +3,9 @@ title: Message Brokers
 description: Choose the broker that carries task dispatches between the coordinator and the workers - memory, Redis, RabbitMQ, Kafka, JMS, or AWS SQS.
 ---
 
-The message broker is how ByteChef's coordinator hands task executions to workers and how workers
-hand results back. It is a runtime choice: the same workflow definition, the same component code,
-and the same execution history run on top of any supported broker. Switching brokers is a
-configuration change, not a rewrite.
+The message broker carries task executions from ByteChef's coordinator to the workers and carries
+the results back. The broker is a runtime setting: the same workflow definitions, component code and
+execution history work with any supported broker, and switching brokers is a configuration change.
 
 ## Supported providers
 
@@ -52,17 +51,19 @@ The abstraction lives in `server/libs/core/message`:
   `MessageBrokerConfigurer`, so each provider registers its own listener endpoints.
 
 Coordinator and worker code never references a provider. Each backend is a self-contained adapter,
-which is why a bug in one cannot leak into another and why a workflow behaves the same locally on
-`MEMORY` as it does in production on Kafka.
+so a workflow behaves the same locally on `MEMORY` as it does in production on Kafka.
 
 ## Picking a provider
 
-- **Already running Kafka?** Use `KAFKA`. Reusing infrastructure you already operate beats
-  introducing a new piece.
-- **AWS-only deployment?** `AWS` (SQS) - managed, and the IAM story is straightforward.
-- **Single-region, mid-scale, no existing broker?** `REDIS`. If you already run Redis, this adds no new dependency. In EE the
-  broker also carries cache invalidation between nodes.
-- **Existing JMS or RabbitMQ estate?** `JMS` or `AMQP`.
+| Situation | Provider |
+|---|---|
+| You already run Kafka | `KAFKA`, to reuse infrastructure you already operate. |
+| AWS-only deployment | `AWS` (SQS, Enterprise Edition), a managed service controlled through IAM. |
+| Single region, mid-scale, no existing broker | `REDIS`. If you already run Redis, it adds no new dependency. |
+| Existing JMS or RabbitMQ infrastructure | `JMS` or `AMQP`. |
+
+In Enterprise Edition, every provider except `MEMORY` also carries cache invalidation between nodes
+(with `AWS`, only when `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER=REDIS`).
 
 ## Operational notes
 
@@ -104,6 +105,33 @@ At startup, the `AWS` provider logs a warning when `control-provider` is `SQS`.
    (`BYTECHEF_KAFKA_*`, `BYTECHEF_RABBITMQ_*`, `BYTECHEF_REDIS_*`, or the AWS credentials under
    `BYTECHEF_CLOUD_AWS_*`).
 3. Restart the instance (every instance, if you run more than one).
+
+For example, these environment variables point every node at a shared Redis:
+
+```bash
+BYTECHEF_MESSAGE_BROKER_PROVIDER=REDIS
+BYTECHEF_REDIS_HOST=redis.internal.example.com
+BYTECHEF_REDIS_PORT=6379
+BYTECHEF_REDIS_PASSWORD=<redis-password>
+```
+
+RabbitMQ uses the `AMQP` provider with the `BYTECHEF_RABBITMQ_*` variables:
+
+```bash
+BYTECHEF_MESSAGE_BROKER_PROVIDER=AMQP
+BYTECHEF_RABBITMQ_HOST=rabbitmq.internal.example.com
+BYTECHEF_RABBITMQ_PORT=5672
+BYTECHEF_RABBITMQ_USERNAME=bytechef
+BYTECHEF_RABBITMQ_PASSWORD=<rabbitmq-password>
+```
+
+Kafka takes a comma-separated list of bootstrap servers:
+
+```bash
+BYTECHEF_MESSAGE_BROKER_PROVIDER=KAFKA
+BYTECHEF_KAFKA_BOOTSTRAP_SERVERS=kafka-1.internal.example.com:9092,kafka-2.internal.example.com:9092
+BYTECHEF_KAFKA_CONSUMER_GROUP_ID=bytechef
+```
 
 Workflow definitions, execution history, and component code are unchanged by the swap - the broker
 is the substrate, not the record.
