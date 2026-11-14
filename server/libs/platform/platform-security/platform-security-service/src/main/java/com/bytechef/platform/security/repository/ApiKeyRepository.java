@@ -17,9 +17,13 @@
 package com.bytechef.platform.security.repository;
 
 import com.bytechef.platform.security.domain.ApiKey;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Modifying;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -37,4 +41,12 @@ public interface ApiKeyRepository extends ListCrudRepository<ApiKey, Long> {
     List<ApiKey> findAllByEnvironmentAndTypeIsNull(int environment);
 
     List<ApiKey> findAllByEnvironmentAndType(int environment, int type);
+
+    @Modifying
+    @Query("""
+        UPDATE api_key SET last_used_date = :lastUsedDate
+        WHERE id = :id AND (last_used_date IS NULL OR last_used_date < :staleBefore)
+        """)
+    int updateLastUsedDate(
+        @Param("id") long id, @Param("lastUsedDate") Instant lastUsedDate, @Param("staleBefore") Instant staleBefore);
 }

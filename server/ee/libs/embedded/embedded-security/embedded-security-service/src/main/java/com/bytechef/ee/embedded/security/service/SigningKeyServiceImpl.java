@@ -21,6 +21,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -43,6 +45,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
     private static final Base64.Decoder DECODER = Base64.getDecoder();
     private static final Base64.Encoder MIME_ENCODER = Base64.getMimeEncoder();
     private static final KeyPairGenerator KEY_PAIR_GENERATOR;
+    private static final Duration LAST_USED_DATE_UPDATE_INTERVAL = Duration.ofMinutes(1);
 
     static {
         try {
@@ -118,6 +121,14 @@ public class SigningKeyServiceImpl implements SigningKeyService {
         curSigningKey.setName(Validate.notNull(signingKey.getName(), "name"));
 
         return signingKeyRepository.save(curSigningKey);
+    }
+
+    @Override
+    public void updateLastUsedDate(String keyId, long environmentId) {
+        Instant now = Instant.now();
+
+        signingKeyRepository.updateLastUsedDate(
+            keyId, (int) environmentId, now, now.minus(LAST_USED_DATE_UPDATE_INTERVAL));
     }
 
     @SuppressFBWarnings("VA")
