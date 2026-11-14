@@ -1,7 +1,6 @@
 ---
 title: Custom Components
 description: Extend the component catalog with your own - a JavaScript or Python source file or a Java jar, uploaded and enabled without forking the platform.
-comingSoon: true
 ee: true
 ---
 
@@ -359,7 +358,10 @@ A multipart request with a `componentFile` part whose extension selects the lang
 
 ## Authoring with the AI Hub
 
-In the [AI Hub](/platform/automation/build/hub), the `buildCustomComponent` specialist lists, explains, creates, and updates custom components on your behalf. It can open any custom component in the Hub's right-hand panel, where it is editable exactly as on the detail page.
+<Callout title="Not yet available">
+    The [AI Hub](/platform/automation/build/hub) has no specialist for custom components yet. Write the source in the
+    detail page's editor or in your own build.
+</Callout>
 
 ## Runtime and isolation
 
@@ -369,16 +371,12 @@ Custom components are loaded at runtime through a sandboxed classloader:
 - A buggy component cannot reach into platform internals.
 - Loading a new component version does not require a process restart.
 
-### Hardening options for Java uploads
+### Java uploads
 
-Two properties let administrators tighten how Java custom components are handled:
-
-| Property | Default | Effect |
-|---|---|---|
-| `bytechef.component.custom-component.java-enabled` (`BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED`) | `true` | Set `false` to reject new Java (jar) uploads while JavaScript and Python components - and previously uploaded Java components - keep working. Use this when you want scripting-language extensibility without accepting arbitrary JVM bytecode. |
-| `bytechef.component.custom-component.java-loader` (`BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_LOADER`) | `CLASS_LOADER` | Set `ESPRESSO` to execute Java custom components inside a sandboxed GraalVM Espresso guest JVM instead of the in-process isolating classloader, adding a stronger boundary between component code and the host process. |
-
-The same pair exists for Java code workflows: `bytechef.workflow.code-workflow.java-enabled` and `bytechef.workflow.code-workflow.java-loader`, with the same defaults. See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#component-configuration).
+There is no switch that turns off Java custom component uploads: an administrator can upload a `.jar` whenever custom
+components are available. Java code workflows have one, `bytechef.workflow.code-workflow.java-enabled`
+(`BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED`, default `true`); see
+[Restricting Java code workflows](/platform/automation/build/workflows/code-workflows#restricting-java-code-workflows).
 
 ## Scaffolding with the CLI
 

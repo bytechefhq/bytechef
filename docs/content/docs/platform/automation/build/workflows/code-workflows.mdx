@@ -1,7 +1,6 @@
 ---
 title: Code Workflows
 description: Define a whole workflow in code - the Java, JavaScript and Python contracts, the task context, typed authoring, editing in ByteChef and deploying through the API.
-comingSoon: true
 ee: true
 ---
 
@@ -44,13 +43,45 @@ turn off Java uploads; see [Restricting Java code workflows](#restricting-java-c
 ## Sample projects
 
 Every combination has a sample repository with a working project, a local check that evaluates the file the way the
-server does, and deploy instructions. [Sample Repositories](/platform/sample-repositories) lists every ByteChef sample.
+server does, and deploy instructions. Start from one of them: clone it, run its check, and deploy the file it names.
+[Sample Repositories](/platform/sample-repositories) lists every ByteChef sample.
 
 | | Java | JavaScript | Python |
 |---|---|---|---|
 | Automation project | [java](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-java) | [javascript](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-javascript) | [python](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-python) |
 | Embedded catalog project | [java](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-java) | [javascript](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-javascript) | [python](https://github.com/bytechefhq/bytechef-embedded-automation-sample-code-workflow-python) |
 | Embedded code integration | [java](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-java) | [javascript](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-javascript) | [python](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-python) |
+
+The three automation project samples define the same project, named "Sample Code Project JavaScript", "Sample Code
+Project Python" or "Sample Code Project Java", with four workflows:
+
+- `sampleWorkflow1` takes a required `name` input and returns `Hello, <name>!` as its `greeting` output.
+- `summarizeNewEmail` starts with the Gmail **New Email** polling trigger (`googleMail/v1/newEmailPolling`) and returns a
+  one-line summary of each new email.
+- `fetchRecentEmails` takes an optional `from` input and calls the Gmail **Search Email** action through a declared
+  `gmail` connection.
+- `notifySlackOnNewEmail` posts each new email to Slack through a declared `slack` connection. Its `channel` input takes
+  its options from Slack's own `channel` input.
+
+To check a sample locally and find the file to deploy:
+
+| Sample | Local check | File to deploy |
+|---|---|---|
+| JavaScript | `npm run check` | `src/sample_code_project.js` |
+| Python | `python3 scripts/check.py src/sample_code_project.py name=Ada` | `src/sample_code_project.py` |
+| Java | `./gradlew build` (JDK 25) | `build/libs/sample-code-project-java-1.0.0.jar` |
+
+The JavaScript and Python checks evaluate the file the way the server does, check its shape and run each task once
+against a stub context that stands in for Gmail. They need only Node.js or Python 3.9 or later; there is nothing to
+install. Deploy the file from Automation → **Projects** (see [Creating and editing in ByteChef](#creating-and-editing-in-bytechef))
+or through the [deploy endpoint](#deploying-through-the-api):
+
+```bash
+curl -X POST "$BYTECHEF_URL/api/automation/v1/projects/deploy?workspaceId=1" \
+  -H "Authorization: Bearer $BYTECHEF_API_KEY" \
+  -H "X-ENVIRONMENT: DEVELOPMENT" \
+  -F "projectFile=@src/sample_code_project.js"
+```
 
 ---
 
@@ -103,22 +134,26 @@ A [code integration](/platform/embedded/build/code-integrations) replaces `name`
 
 ### A complete example
 
-A project with one workflow that takes a `name` input, runs one task and returns its result as the `greeting` output:
+The `sampleWorkflow1` workflow of the [automation project samples](#sample-projects), with the project's other three
+workflows left out. It takes a `name` input, runs one task and returns its result as the `greeting` output:
 
 ```javascript tab="JavaScript"
 ({
-    name: "Sample Code Project",
+    name: "Sample Code Project JavaScript",
     version: "1",
+    description: "Sample code project description.",
     workflows: [
         {
             name: "sampleWorkflow1",
             label: "Sample workflow 1",
+            description: "Greets the name it is given.",
             inputs: [{name: "name", label: "Name", type: "STRING", required: true}],
             outputs: [{name: "greeting", task: "greet"}],
             tasks: [
                 {
                     name: "greet",
                     label: "Greet",
+                    description: "Builds a greeting from the name input.",
                     perform: function (context) {
                         const name = context.input("name");
 
@@ -134,24 +169,39 @@ A project with one workflow that takes a `name` input, runs one task and returns
 ```
 
 ```python tab="Python"
-def greet(context):
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from bytechef_workflow_api import ProjectDefinition, TaskContext
+
+
+def greet(context: "TaskContext") -> str:
     name = context.input("name")
 
-    context.log("info", "Greeting " + name)
+    context.log("info", f"Greeting {name}")
 
-    return "Hello, " + name + "!"
+    return f"Hello, {name}!"
 
 
-project = {
-    "name": "Sample Code Project",
+project: "ProjectDefinition" = {
+    "name": "Sample Code Project Python",
     "version": "1",
+    "description": "Sample code project description.",
     "workflows": [
         {
             "name": "sampleWorkflow1",
             "label": "Sample workflow 1",
+            "description": "Greets the name it is given.",
             "inputs": [{"name": "name", "label": "Name", "type": "STRING", "required": True}],
             "outputs": [{"name": "greeting", "task": "greet"}],
-            "tasks": [{"name": "greet", "label": "Greet", "perform": greet}],
+            "tasks": [
+                {
+                    "name": "greet",
+                    "label": "Greet",
+                    "description": "Builds a greeting from the name input.",
+                    "perform": greet,
+                }
+            ],
         }
     ],
 }
@@ -160,30 +210,51 @@ project
 ```
 
 ```java tab="Java"
+@AutoService(ProjectHandler.class)
 public class SampleProjectHandler implements ProjectHandler {
+
+    private static final ProjectDefinition PROJECT_DEFINITION = project("Sample Code Project Java")
+        .description("Sample code project description.")
+        .workflows(SampleWorkflow1.WORKFLOW_DEFINITION);
 
     @Override
     public ProjectDefinition getDefinition() {
-        return ProjectDsl.project("Sample Code Project")
-            .version("1")
-            .workflows(
-                WorkflowDsl.workflow("sampleWorkflow1")
-                    .label("Sample workflow 1")
-                    .inputs(WorkflowDsl.input("name").label("Name").required(true))
-                    .outputs(WorkflowDsl.output("greeting").task("greet"))
-                    .tasks(
-                        WorkflowDsl.task("greet")
-                            .label("Greet")
-                            .perform(context -> {
-                                Object name = context.input("name");
+        return PROJECT_DEFINITION;
+    }
+}
 
-                                context.log(TaskContext.LogLevel.INFO, "Greeting " + name);
+public class SampleWorkflow1 {
 
-                                return "Hello, " + name + "!";
-                            })));
+    public static final ModifiableWorkflowDefinition WORKFLOW_DEFINITION = workflow("sampleWorkflow1")
+        .label("Sample workflow 1")
+        .description("Greets the name it is given.")
+        .inputs(
+            input("name")
+                .label("Name")
+                .type("STRING")
+                .required(true))
+        .outputs(
+            output("greeting")
+                .task("greet"))
+        .tasks(
+            task("greet")
+                .label("Greet")
+                .description("Builds a greeting from the name input.")
+                .perform(SampleWorkflow1::greet));
+
+    private static Object greet(TaskContext context) {
+        Object name = context.input("name");
+
+        context.log(TaskContext.LogLevel.INFO, "Greeting " + name);
+
+        return "Hello, " + name + "!";
     }
 }
 ```
+
+The Python file imports the [type definitions](#typed-authoring) only under `TYPE_CHECKING`, so the server, which skips
+that block, never needs them. The Java classes use static imports from `ProjectDsl` and `WorkflowDsl`; see the
+[Java sample](https://github.com/bytechefhq/bytechef-automation-sample-code-workflow-java) for the full sources.
 
 ## The task context
 
@@ -560,8 +631,9 @@ there fails with an error saying so.
 
 ## Running a step on a task runner
 
-A code workflow's tasks run inside ByteChef, in the same sandbox as a [script](#scripting-languages): no native
-libraries, no filesystem, and a CPU and memory budget. When one step needs more - pandas or numpy, an npm package, or
+A JavaScript or Python code workflow's tasks run inside ByteChef, in the same sandbox as a
+[script](#scripting-languages): no native libraries, no filesystem, and a [CPU time and memory limit](#limits). When
+one step needs more - pandas or numpy, an npm package, or
 a long computation that shouldn't hold a worker - hand just that step to the **Script component** and run it on a
 **task runner**: a local process or a Docker container. The task around it stays where it is and keeps calling
 components and reading connections as usual.
@@ -661,6 +733,8 @@ Things to know:
 - **A runner costs start-up time.** A container start adds noticeably more latency than an in-process call, so keep
   runner steps for work that needs them.
 
+[Task Runners](/platform/automation/build/workflows/task-runners) covers setting the runners up.
+
 ## Typed authoring
 
 The script contract has type definitions for TypeScript and Python, so an editor or a type checker catches a missing
@@ -668,7 +742,27 @@ The script contract has type definitions for TypeScript and Python, so an editor
 `perform`. Both packages carry types only: ByteChef evaluates the file as a plain script, so nothing they add
 survives to runtime. Both describe projects (`ProjectDefinition`) and code integrations (`IntegrationDefinition`).
 
-**TypeScript** - install [`@bytechef/workflow-api`](https://github.com/bytechefhq/bytechef/tree/master/sdks/backend/typescript/workflow-api)
+<Callout type="warn" title="Install the type packages from source">
+    `@bytechef/workflow-api` and `bytechef-workflow-api` are not published to npm or PyPI yet, so installing them by
+    name fails, and so do the samples' `npm install`, `npm run check:ts` and `pip install -r requirements-dev.txt`
+    steps. Their sources live in the ByteChef repository, under
+    [`sdks/backend/typescript/workflow-api`](https://github.com/bytechefhq/bytechef/tree/master/sdks/backend/typescript/workflow-api)
+    and [`sdks/backend/python/workflow-api`](https://github.com/bytechefhq/bytechef/tree/master/sdks/backend/python/workflow-api).
+    Until they are published, install them from a ByteChef checkout, as below. The samples' plain `npm run check`
+    and `python3 scripts/check.py` checks need neither package.
+</Callout>
+
+```bash
+# TypeScript: build the package, then add it to your project as a dev dependency
+npm --prefix <bytechef>/sdks/backend/typescript/workflow-api install
+npm --prefix <bytechef>/sdks/backend/typescript/workflow-api run build
+npm install --save-dev <bytechef>/sdks/backend/typescript/workflow-api
+
+# Python
+pip install <bytechef>/sdks/backend/python/workflow-api mypy
+```
+
+**TypeScript** - add [`@bytechef/workflow-api`](https://github.com/bytechefhq/bytechef/tree/master/sdks/backend/typescript/workflow-api)
 as a dev dependency, reference it with a triple-slash directive and check the project with `satisfies`. A code
 workflow file can't `import` anything, so the types live in the global `ByteChef` namespace:
 
@@ -699,12 +793,18 @@ workflow file can't `import` anything, so the types live in the global `ByteChef
 ```
 
 Compile the file with `tsc` and deploy the emitted `.js` file. `satisfies` and the directive leave nothing behind, so
-the output is the plain object expression ByteChef expects. Plain JavaScript files get the same checks through
-`// @ts-check` and a JSDoc `@type {ByteChef.ProjectDefinition}` annotation.
+the output is the plain object expression ByteChef expects. Don't `import` or `export` anything in the `.ts` file:
+either one turns it into a module, and the output stops being a bare expression. Plain JavaScript files get the same
+checks through `// @ts-check` and a JSDoc `@type {ByteChef.ProjectDefinition}` annotation.
+
+Each JavaScript sample carries a TypeScript version of its project next to the `.js` file, for example
+`src/sample_code_project.ts` in the automation sample. `npm run check:ts` compiles it to `dist/` and runs the same check
+on the output; deploy the `.js` file from `dist/`. The TypeScript project has a name of its own ("Sample Code Project
+TypeScript"), so deploying it creates a second project next to the JavaScript one.
 
 **Python** - install [`bytechef-workflow-api`](https://github.com/bytechefhq/bytechef/tree/master/sdks/backend/python/workflow-api)
 where your type checker runs (mypy, Pyright) and import it under `TYPE_CHECKING`, since the ByteChef runtime can't
-import it:
+import it. Standard-library imports are fine in a code workflow; nothing else is available on the server:
 
 ```python
 from typing import TYPE_CHECKING, Any
@@ -742,7 +842,7 @@ project
 ```
 
 The types follow the definition as a `dict`; a `SimpleNamespace` definition loads too, but a type checker can't check
-it.
+it. The Python samples are annotated this way; type check one with `mypy --strict src scripts`.
 
 ## The Java contract
 
@@ -766,13 +866,21 @@ same library without colliding.
 ## Creating and editing in ByteChef
 
 JavaScript and Python code workflows can be created and edited directly in ByteChef, without a separate build and
-upload step. On the **Projects** page, the arrow next to **New Project** opens a menu with **New Code Workflow** and
-**Import Code Project**:
+upload step. On an Enterprise Edition deployment, the arrow next to **New Project** on Automation → **Projects** opens a
+menu with **New Project**, **From Template**, **Import Project**, **New Code Project** and **Import Code Project**. The
+Community Edition menu has no code project items:
 
-- **New Code Workflow** asks for a name, a language (JavaScript or Python), a description, a category and tags, then
-  creates the project as a draft from a starter source and opens it in the code editor.
-- **Import Code Project** uploads a file - a `.jar`, `.js` or `.py` - and publishes it, exactly like the
-  [deploy endpoint](#deploying-through-the-api).
+- **New Code Project** opens a dialog that asks for a **Language** (JavaScript or Python), a **Project Name**, and an
+  optional **Description**, **Category** and **Tags**. ByteChef creates the project as a draft from a starter source and
+  opens it in the code editor. The name must not already be used in the workspace and must not contain quotes,
+  backslashes or line breaks.
+- **Import Code Project** uploads a `.js`, `.py` or `.jar` file and publishes it, like the
+  [deploy endpoint](#deploying-through-the-api) without `enable`: existing deployments stay on the version they run.
+  The dialog offers `.jar` only while [Java uploads](#restricting-java-code-workflows) are allowed.
+
+A code project's row shows a language badge, and its workflow rows list the components its tasks declare connections
+to. The actions that change a project's workflow structure, such as **New Workflow**, are hidden for a code project:
+its workflows come from the source.
 
 A code project opens a **source editor** in place of the visual canvas. Saves are checked before they are stored -
 source that fails to load is rejected with the loader's error and the draft stays as it was - and they are
@@ -797,22 +905,23 @@ POST /api/automation/v1/projects/deploy
 
 A `multipart/form-data` request:
 
-| Part | |
+| Parameter | |
 |---|---|
-| `projectFile` (file part) | The `.jar`, `.js` or `.py` file. The file name's extension picks the language. |
-| `workspaceId` | Required. The workspace the project belongs to. |
+| `projectFile` (file part) | Required. The `.jar`, `.js` or `.py` file. The file name's extension picks the language. |
+| `workspaceId` | Required. The workspace the project belongs to. Send it as a query parameter or as a form field. |
 | `enable` (query parameter) | Optional, `false` by default. See below. |
+| `X-ENVIRONMENT` (header) | Optional. `DEVELOPMENT`, `STAGING` or `PRODUCTION` (case-insensitive); `PRODUCTION` when absent. |
 
 It is part of the public [Projects API](/openapi/automation-project-code-workflow). Authenticate with
 `Authorization: Bearer <API key>`, using a workspace API key (Settings → Current Workspace → **API Keys**) that
-belongs to an administrator - deploying requires the admin role. The key is looked up in the environment named by the
-`X-Environment` header (`DEVELOPMENT`, `STAGING` or `PRODUCTION`; `PRODUCTION` when the header is absent), so send
-the environment the key was created in. A successful deploy returns `204 No Content`.
+belongs to an administrator - deploying requires the admin role. Only an automation workspace key is accepted: an
+Embedded API key is rejected. The key is looked up in the environment named by the `X-ENVIRONMENT` header, so send the
+environment the key was created in; the same header picks the environment `enable` acts on.
 
 ```bash
 curl -X POST "$BYTECHEF_URL/api/automation/v1/projects/deploy?workspaceId=1&enable=true" \
   -H "Authorization: Bearer $BYTECHEF_API_KEY" \
-  -H "X-Environment: DEVELOPMENT" \
+  -H "X-ENVIRONMENT: DEVELOPMENT" \
   -F "projectFile=@src/sample_code_project.py"
 ```
 
@@ -820,11 +929,31 @@ What the endpoint does:
 
 - **It saves *and* publishes.** The upload is saved as the project's draft and published in the same call, so the
   deployed version becomes the published one. An upload replaces any unpublished editor changes.
-- **It upserts by name.** The project is matched on the `name` in the definition. The first deploy creates the
-  project; every deploy after that publishes a new version of it, and each workflow keeps its identity by name.
+- **It upserts by name.** The project is matched on the `name` in the definition within the workspace. The first
+  deploy creates the project; every deploy after that publishes a new version of it, and each workflow keeps its
+  identity by name.
+- **Without `enable`, deployments don't move.** Existing deployments keep running the version they are on until you
+  move them in the UI.
 - **`enable=true` makes it live in the request's environment.** When the project has no deployment there, ByteChef
-  creates and enables one; otherwise it moves the existing deployment to the published version and enables it.
-  Without `enable`, existing deployments keep running the version they are on.
+  creates one at the published version and enables it; otherwise it moves the existing deployment to the published
+  version and enables it if it was disabled.
+
+With `enable=true`, a workflow that can't run without configuration is added to the deployment but left **disabled**:
+one that declares a required input, or whose trigger or tasks need a connection. Every other workflow is enabled,
+and so is the deployment. Open the deployment, set the input values and pick the connections for those workflows,
+then enable them. On a move to a new version this applies to workflows the version adds; workflows that were already
+deployed keep their enabled state, their input values and their connections. In the
+[automation samples](#sample-projects), `sampleWorkflow1` (required `name` input) and the three Gmail workflows
+(Gmail trigger or connection, plus Slack for `notifySlackOnNewEmail`) all wait for configuration this way.
+
+Responses:
+
+| Status | When |
+|---|---|
+| `204 No Content` | The project was saved and published, and enabled when `enable=true`. |
+| `400 Bad Request` | The file is missing or fails to load, its language is unsupported or Java uploads are disabled, or a required parameter is missing. The body names the reason. |
+| `401 Unauthorized` | The API key is unknown in that environment, is not a workspace API key, or `X-ENVIRONMENT` is not a valid environment. |
+| `403 Forbidden` | The key's user is not an administrator. |
 
 A second endpoint, `POST /api/automation/v1/projects/{id}/git/pull`, pulls a project from its configured Git
 repository instead of taking an upload.
@@ -898,15 +1027,22 @@ reach. Saving is a normal workflow save.
 
 ### Limits
 
-Script steps execute in the [script sandbox](/platform/use-bytechef/self-hosted/configuration/script-sandbox):
-no host class access, no filesystem access, no environment access, no subprocess execution, no thread
-creation. Concurrency inside a script is therefore not available - use the workflow's own
-[flow controls](/platform/automation/build/workflows/flow-controls) to parallelize.
+Scripts, and the tasks of a JavaScript or Python code workflow, execute in a GraalVM guest context with no host class
+access, no filesystem access, no environment access, no subprocess execution and no thread creation. Concurrency inside a script is
+therefore not available - use the workflow's own
+[flow controls](/platform/automation/build/workflows/flow-controls), or a code workflow's
+[task groups](#running-tasks-concurrently), to parallelize.
 
-Each JavaScript or Python execution also runs under a CPU time limit (5 minutes by default) and a heap
-limit (512 MB by default), which the operator sets with `bytechef.script.sandbox.*`. A script that goes
-past either fails its task. For unbounded or long-running computation, write a
-[custom component](/platform/settings/components/custom-components) instead.
+The guest context also runs inside a resource **sandbox**, on by default. Each execution gets a CPU time limit (5
+minutes by default) and a heap memory limit (512 MB by default), and the number of guest executions that run at once is
+capped; an execution that passes a limit is stopped and its task fails. Operators tune these under
+`bytechef.script.sandbox` (`max-cpu-time`, `max-heap-memory`, `max-concurrent-executions`, `enabled`); see
+[Script Sandbox](/platform/use-bytechef/self-hosted/configuration/script-sandbox). On a JVM that can't enforce the heap
+limit, the server logs a warning and only the CPU limit applies.
+
+For work the sandbox doesn't allow - native libraries, packages from npm or PyPI, long computations - run the step on a
+[task runner](/platform/automation/build/workflows/task-runners) instead: a local process or a container. See
+[Running a step on a task runner](#running-a-step-on-a-task-runner).
 
 ### Script or custom component?
 
@@ -916,22 +1052,16 @@ past either fails its task. For unbounded or long-running computation, write a
 | It is genuinely one-off. | It deserves its own typed schema. |
 | You're iterating. | You're shipping behaviour others will depend on. |
 
-A common progression: prototype in a script, promote it to a custom component once it stabilizes.
-
-One cost worth knowing about when you make that call: every script execution builds a fresh guest
-context and re-evaluates the source, so a script step pays a small start-up cost on each run that a
-custom component - initialized once - does not. For most workflows the difference is invisible; for a
-step on a very hot path it is a reason to promote.
+A common progression: prototype in a script, promote it to a custom component once it stabilizes. Make that call
+for reuse and schema. When a step needs more CPU, memory or packages than the sandbox allows, the answer is a
+[task runner](/platform/automation/build/workflows/task-runners), not a custom component.
 
 ---
 
 ## Not yet available
 
-Everything in this section is on the upcoming release track.
-
 ### Copilot
 
-The in-editor [AI Copilot](/platform/automation/build/ai-copilot) panel routes to code-workflow-aware Ask and Build
-assistants whenever a code-backed project or integration is open, on both the automation and embedded surfaces. In
-the [AI Hub](/platform/automation/build/hub), the `buildCodeWorkflow` specialist lists, explains, creates, and
-updates code workflows, and can open one in its right panel.
+The [AI Copilot](/platform/automation/build/ai-copilot) and the [AI Hub](/platform/automation/build/hub) don't know
+about code workflows yet: there is no code-workflow-aware assistant in the code editor and no AI Hub specialist that
+creates or edits a code workflow. Write the source yourself, starting from a [sample](#sample-projects).

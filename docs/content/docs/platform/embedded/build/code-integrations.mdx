@@ -1,7 +1,6 @@
 ---
 title: Code Integrations
 description: Build an embedded integration's workflows in JavaScript, Python or Java - create and edit it in ByteChef or deploy it from CI, then publish it to your connected users.
-comingSoon: true
 ee: true
 ---
 
@@ -18,6 +17,9 @@ project declares `name`.
 <Callout title="Enterprise Edition only">
     Code integrations require an Enterprise Edition deployment (`bytechef.edition=ee`).
 </Callout>
+
+The fastest way in is a [sample integration](#sample-integrations): the Gmail integration below, in JavaScript, Python
+and Java, with a local check and deploy instructions.
 
 ## The definition
 
@@ -254,8 +256,37 @@ To type-check a JavaScript or Python integration, use `ByteChef.IntegrationDefin
 | JavaScript | [bytechef-embedded-integration-sample-code-workflow-javascript](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-javascript) |
 | Python | [bytechef-embedded-integration-sample-code-workflow-python](https://github.com/bytechefhq/bytechef-embedded-integration-sample-code-workflow-python) |
 
-Each sample is the Gmail integration above, with a local check that evaluates the file the way the server does and runs
-each task once against a stub that returns a sample email.
+Each sample is the Gmail integration above (the JavaScript and Python files are exactly the listings on this page),
+with a local check that evaluates the file the way the server does and runs each task once against a stub that returns
+a sample email:
+
+| Sample | Local check | File to deploy |
+|---|---|---|
+| JavaScript | `npm run check` | `src/sample_code_integration.js` |
+| Python | `python3 scripts/check.py src/sample_code_integration.py` | `src/sample_code_integration.py` |
+| Java | `./gradlew build` (JDK 25) | `build/libs/sample-code-integration-java-1.0.0.jar` |
+
+The JavaScript and Python checks need only Node.js or Python 3.9 or later. The JavaScript sample also has a TypeScript
+version, `src/sample_code_integration.ts`, typed with `ByteChef.IntegrationDefinition`; `npm run check:ts` compiles and
+checks it, but needs the type package, which is
+[not published yet](/platform/automation/build/workflows/code-workflows#typed-authoring). The Java sample compiles
+against `integration-api-1.0.jar` and `workflow-api-1.0.jar` in its `libs/` folder, built from
+`sdks/backend/java/embedded/integration-api` and `sdks/backend/java/workflow-api` in the ByteChef repository; they are
+`compileOnly`, because the server provides them.
+
+Deploy the file through **Import Code Integration** (see [Creating a code integration](#creating-a-code-integration))
+or the [deploy endpoint](#deploying-through-the-api). Once a connected user has connected the integration and enabled
+`fetchRecentEmails` on their instance, call it with their JWT:
+
+```bash
+curl -X POST "$BYTECHEF_URL/api/embedded/v1/workflows/$WORKFLOW_UUID" \
+  -H "Authorization: Bearer $CONNECTED_USER_JWT" \
+  -H "X-ENVIRONMENT: DEVELOPMENT" \
+  -H "Content-Type: application/json" \
+  -d '{"from": "ada@example.com", "maxResults": 5}'
+```
+
+The body is optional. `summarizeNewEmail` needs no call: once enabled, it runs whenever a new email arrives.
 
 ## Connections
 
@@ -301,10 +332,16 @@ syntax in each language.
 On Embedded → **Integrations**, the arrow next to **New Integration** opens a menu with **New Code Integration** and
 **Import Code Integration**.
 
-- **New Code Integration** asks for the component, a language (JavaScript or Python), a name, a description, a
-  category, tags and an optional [permission expression](/platform/embedded/build/permission-expressions). ByteChef
-  creates the integration as an unpublished draft from a starter source and opens it in the code editor.
-- **Import Code Integration** uploads a `.js`, `.py` or `.jar` file and publishes it.
+- **New Code Integration** asks for a **Language** (JavaScript or Python), the **Component**, a **Name**, and an
+  optional **Description**, **Category**, [**Permission Expression**](/platform/embedded/build/permission-expressions)
+  and **Tags**. ByteChef creates the integration as an unpublished draft from a starter source and opens it in the
+  code editor.
+- **Import Code Integration** uploads a `.js`, `.py` or `.jar` file and publishes it, like the
+  [deploy endpoint](#deploying-through-the-api) without `enable`. The dialog offers `.jar` only while Java uploads are
+  allowed.
+
+The project sidebar of a code integration hides **New Workflow** and the workflow item actions, because its workflows
+come from the source.
 
 ## Editing in ByteChef
 
@@ -326,21 +363,24 @@ Java code integrations are uploaded only; the editor does not open them.
 POST /api/embedded/v1/integration-code-workflows/deploy
 ```
 
-A `multipart/form-data` request with one file part, `integrationFile`: the `.js`, `.py` or `.jar` file. The file
-name's extension picks the language. An optional `enable` query parameter (`false` by default) makes the published
-integration live in the request's environment: ByteChef creates and enables its instance configuration when it has
-none there, otherwise it moves the existing one to the published version and enables it.
+A `multipart/form-data` request:
+
+| Parameter | |
+|---|---|
+| `integrationFile` (file part) | Required. The `.js`, `.py` or `.jar` file. The file name's extension picks the language. |
+| `enable` (query parameter) | Optional, `false` by default. See below. |
+| `X-ENVIRONMENT` (header) | Optional. `DEVELOPMENT`, `STAGING` or `PRODUCTION` (case-insensitive); `PRODUCTION` when absent. |
 
 Authenticate with an **Embedded API key** (Embedded → Settings → **API Keys**) that belongs to an administrator -
-deploying requires the admin role, and an organization admin key is rejected with `401`. The key is looked up in the
-environment named by the `X-Environment` header (`DEVELOPMENT`, `STAGING` or `PRODUCTION`; `PRODUCTION` when absent),
-and the request runs as the key's own ByteChef user, not as a connected user. A successful deploy returns
-`204 No Content`.
+deploying requires the admin role. Only an Embedded API key is accepted: an automation workspace key or an organization
+admin key (Settings → Organization → **Admin API Keys**) is rejected with `401`. The key is looked up in the
+environment named by `X-ENVIRONMENT`, so send the environment the key was created in; the same header picks the
+environment `enable` acts on. The request runs as the key's own ByteChef user, not as a connected user.
 
 ```bash
 curl -X POST "$BYTECHEF_URL/api/embedded/v1/integration-code-workflows/deploy?enable=true" \
   -H "Authorization: Bearer $BYTECHEF_EMBEDDED_API_KEY" \
-  -H "X-Environment: DEVELOPMENT" \
+  -H "X-ENVIRONMENT: DEVELOPMENT" \
   -F "integrationFile=@src/sample_code_integration.py"
 ```
 
@@ -352,6 +392,30 @@ What the endpoint does:
   publishes a new version of it. If more than one code integration is built on the same component (possible when they
   were created in ByteChef), an upload can't tell which one to update and is refused - edit the one you mean in the
   source editor instead.
+- **Without `enable`, instance configurations don't move.** Connected users keep the version their environment's
+  instance configuration points at.
+- **`enable=true` makes it live in the request's environment.** When the integration has no instance configuration
+  there, ByteChef creates one at the published version and enables it. When it has one, ByteChef moves it to the
+  published version and enables it if it was disabled. With several instance configurations in that environment, it
+  moves the one that is enabled; when none or more than one is enabled, the deploy is refused as ambiguous.
+
+With `enable=true`, a workflow whose tasks or trigger need a connection to a component other than the integration's
+own stays disabled until an administrator picks that connection in the instance configuration and enables the workflow;
+in the sample that is `notifySlackOnNewEmail`. Every other workflow is enabled. On a move to a new version this applies
+to workflows the version adds; workflows that were already configured keep their connections, inputs and enabled state.
+
+Creating the instance configuration is refused when the component authorizes only through OAuth2 with client
+credentials that an administrator registers (the Gmail sample needs them unless ByteChef has a predefined OAuth app for Gmail): create the
+instance configuration on its page first, with those credentials, and later deploys with `enable=true` move it.
+
+Responses:
+
+| Status | When |
+|---|---|
+| `204 No Content` | The integration was saved and published, and enabled when `enable=true`. |
+| `400 Bad Request` | The file is missing or fails to load, its language is unsupported or Java uploads are disabled, the component is ambiguous, or `enable=true` can't create or pick the instance configuration. The body names the reason. |
+| `401 Unauthorized` | The API key is unknown in that environment, is not an Embedded API key, or `X-ENVIRONMENT` is not a valid environment. |
+| `403 Forbidden` | The key's user is not an administrator. |
 
 Java uploads follow the
 [`BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED`](/platform/automation/build/workflows/code-workflows#restricting-java-code-workflows)
