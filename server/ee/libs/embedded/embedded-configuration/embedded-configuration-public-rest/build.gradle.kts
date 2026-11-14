@@ -22,9 +22,14 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
 sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 
 val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+    configOptions.set(
+        mapOf(
+            "importFileExtension" to ".js"
+        )
+    )
     generatorName.set("typescript-fetch")
     inputSpec.set("$projectDir/openapi.yaml")
-    outputDir.set("$rootDir/client/src/ee/shared/middleware/embedded/public")
+    outputDir.set("$rootDir/sdks/api/typescript/src/configuration")
 }
 
 tasks.register("generateOpenAPI") {
@@ -76,6 +81,7 @@ dependencies {
     testImplementation(project(":server:libs:test:test-support"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-api"))
     testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
+    testImplementation(project(":server:libs:platform:platform-user:platform-user-api"))
     testImplementation(project(":spring-ai:spring-ag-ui:utils:json"))
 
     testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-api"))

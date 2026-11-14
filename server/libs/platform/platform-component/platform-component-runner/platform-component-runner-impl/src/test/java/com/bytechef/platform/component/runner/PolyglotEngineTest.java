@@ -159,6 +159,14 @@ class PolyglotEngineTest {
     }
 
     @Test
+    void testExecutePythonReadsInputKeyNamedLikeDictMethodBySubscript() {
+        Object result = execute(
+            "python", "def perform(input, context):\n\treturn input[\"items\"]", Map.of("items", List.of(1, 2)));
+
+        assertThat(result).isEqualTo(List.of(1, 2));
+    }
+
+    @Test
     void testExecutePythonWithInputContextAndOptionalParameter() {
         Object result = execute(
             "python",

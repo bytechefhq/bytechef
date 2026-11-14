@@ -267,7 +267,7 @@ The Context Store sync engine writes records to Postgres by default (the same da
 | `BYTECHEF_COMPONENT_CLAUDE_CODE_WORKSPACE_IDLE_RETENTION` | Remove deployed Claude Code workspaces in which nothing changed for this long. When empty, they are kept while their deployment exists | |
 | `BYTECHEF_COMPONENT_CLAUDE_CODE_WORKSPACE_MAX_SIZE` | Largest size of one Claude Code workspace. Write, Edit and MultiEdit are refused past it, and only cleanup commands run while a workspace is over it. `0` means no limit | `1GB` |
 | `BYTECHEF_COMPONENT_CLAUDE_CODE_WORKSPACE_TEST_RETENTION` | How long the Claude Code workspaces of editor test runs are kept | `24h` |
-| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED` | Enable uploading of Java (jar) custom components. When disabled, Java custom component uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java custom components continue to work. *Coming soon - upcoming release* | `true` |
+| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED` | Enable uploading of Java (jar) custom components. When disabled, Java custom component uploads are rejected while other languages (JavaScript, Python) and previously uploaded Java custom components continue to work. *Coming soon - upcoming release* | `true` |
 | `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_LOADER` | Loader used to run Java custom components (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java custom components inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. *Coming soon - upcoming release* | `CLASS_LOADER` |
 | `BYTECHEF_COMPONENT_REGISTRY_EXCLUDE` | List of components to exclude from registry | - |
 
@@ -629,7 +629,7 @@ When a runner is configured both in a YAML file and through environment variable
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED` | Enable uploading of Java (jar) code workflows. When disabled, Java code workflow uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java code workflows continue to work. *Coming soon - upcoming release* | `true` |
+| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED` | Enable uploading of Java (jar) code workflows. When disabled, Java code workflow uploads are rejected while other languages (JavaScript, Python) and previously uploaded Java code workflows continue to work. | `true` |
 | `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_LOADER` | Loader used to run Java code workflows (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java code workflows inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. *Coming soon - upcoming release* | `CLASS_LOADER` |
 
 ### Output Storage

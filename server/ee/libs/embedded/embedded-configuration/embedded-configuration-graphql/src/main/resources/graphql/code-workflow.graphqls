@@ -1,0 +1,22 @@
+extend type Query {
+    integrationCodeWorkflowSource(integrationId: ID!): String!
+}
+
+extend type Mutation {
+    updateIntegrationCodeWorkflowSource(integrationId: ID!, content: String!): Boolean!
+    createIntegrationCodeWorkflow(componentName: String!, language: CodeWorkflowLanguage!, name: String, description: String, categoryId: ID, tags: [String!], permissionExpression: String): ID!
+}
+
+extend type Query {
+    automationProjectCodeWorkflowSource(automationProjectId: ID!): AutomationProjectCodeWorkflowSource!
+}
+
+extend type Mutation {
+    createAutomationProjectCodeWorkflow(name: String!, language: CodeWorkflowLanguage!, description: String, category: String, tags: [String!], permissionExpression: String): ID!
+    updateAutomationProjectCodeWorkflowSource(automationProjectId: ID!, content: String!): Boolean!
+}
+
+type AutomationProjectCodeWorkflowSource {
+    content: String!
+    language: CodeWorkflowLanguage!
+}

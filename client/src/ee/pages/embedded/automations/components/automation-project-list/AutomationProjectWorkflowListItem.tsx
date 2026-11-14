@@ -13,6 +13,7 @@ type AutomationProjectWorkflowTemplateType =
     AutomationProjectsQuery['automationProjects'][number]['workflowTemplates'][number];
 
 interface AutomationProjectWorkflowListItemProps {
+    codeWorkflowProject?: boolean;
     onDeleteWorkflow: (workflowUuid: string) => void;
     onEditWorkflow: (workflow: AutomationProjectWorkflowTemplateType) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
@@ -20,6 +21,7 @@ interface AutomationProjectWorkflowListItemProps {
 }
 
 const AutomationProjectWorkflowListItem = ({
+    codeWorkflowProject = false,
     onDeleteWorkflow,
     onEditWorkflow,
     onSelectWorkflow,
@@ -130,18 +132,22 @@ const AutomationProjectWorkflowListItem = ({
                     </Tooltip>
                 )}
 
-                <WorkflowListRowDropdownMenu
-                    exportUrl={`/api/automation/internal/workflows/${workflow.workflowId}/export`}
-                    onDeleteClick={() => onDeleteWorkflow(workflow.workflowUuid)}
-                    onEditClick={() => onEditWorkflow(workflow)}
-                    workflowLabel={workflow.label || workflow.workflowUuid}
-                >
-                    <DropdownMenuItem
-                        icon={<CopyIcon />}
-                        label="Duplicate"
-                        onClick={() => duplicateWorkflowMutation.mutate({workflowUuid: workflow.workflowUuid})}
-                    />
-                </WorkflowListRowDropdownMenu>
+                {codeWorkflowProject ? (
+                    <div aria-hidden className="size-9 shrink-0" />
+                ) : (
+                    <WorkflowListRowDropdownMenu
+                        exportUrl={`/api/automation/internal/workflows/${workflow.workflowId}/export`}
+                        onDeleteClick={() => onDeleteWorkflow(workflow.workflowUuid)}
+                        onEditClick={() => onEditWorkflow(workflow)}
+                        workflowLabel={workflow.label || workflow.workflowUuid}
+                    >
+                        <DropdownMenuItem
+                            icon={<CopyIcon />}
+                            label="Duplicate"
+                            onClick={() => duplicateWorkflowMutation.mutate({workflowUuid: workflow.workflowUuid})}
+                        />
+                    </WorkflowListRowDropdownMenu>
+                )}
             </div>
         </li>
     );

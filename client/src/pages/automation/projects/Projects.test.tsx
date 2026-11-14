@@ -8,6 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 const mockProjectsState = vi.hoisted(() => ({
     captureEmptyStateAction: vi.fn(),
     captureProjectImported: vi.fn(),
+    edition: 'CE',
     navigate: vi.fn(),
     projects: [] as unknown[],
 }));
@@ -27,13 +28,25 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: (selector: any) => selector({currentWorkspaceId: 1}),
 }));
 
-vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
-    useApplicationInfoStore: () => ({
-        analytics: {enabled: false, postHog: {apiKey: '', host: ''}},
-        application: {edition: 'CE'},
-        featureFlags: {},
-    }),
-}));
+vi.mock('@/shared/stores/useApplicationInfoStore', async () => {
+    const actual = await vi.importActual<typeof import('@/shared/stores/useApplicationInfoStore')>(
+        '@/shared/stores/useApplicationInfoStore'
+    );
+
+    return {
+        EditionType: actual.EditionType,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        useApplicationInfoStore: (selector?: (state: any) => unknown) => {
+            const state = {
+                analytics: {enabled: false, postHog: {apiKey: '', host: ''}},
+                application: {edition: mockProjectsState.edition},
+                featureFlags: {},
+            };
+
+            return selector ? selector(state) : state;
+        },
+    };
+});
 
 vi.mock('@/shared/hooks/useAnalytics', () => ({
     useAnalytics: () => ({
@@ -118,6 +131,7 @@ beforeEach(() => {
     mockImportMutate.mockClear();
     mockProjectsState.captureEmptyStateAction.mockClear();
     mockProjectsState.captureProjectImported.mockClear();
+    mockProjectsState.edition = 'CE';
     mockProjectsState.navigate.mockClear();
     mockProjectsState.projects = [];
 });
@@ -207,6 +221,57 @@ describe('Projects Import Functionality', () => {
         await waitFor(() => {
             expect(mockProjectsState.captureProjectImported).toHaveBeenCalledTimes(1);
         });
+    });
+});
+
+describe('Projects create menu', () => {
+    const openCreateMenu = async () => {
+        const buttons = screen.getAllByRole('button');
+        const chevronButton = buttons.find((button) => !/create project/i.test(button.textContent || ''))!;
+
+        await userEvent.click(chevronButton);
+    };
+
+    it('lists New Project first, followed by the other create actions, without code projects on CE', async () => {
+        renderProjects();
+
+        await openCreateMenu();
+
+        const menuItems = await screen.findAllByRole('menuitem');
+
+        expect(menuItems.map((menuItem) => menuItem.textContent?.trim())).toEqual([
+            'New Project',
+            'From Template',
+            'Import Project',
+        ]);
+    });
+
+    it('lists the code project actions on EE', async () => {
+        mockProjectsState.edition = 'EE';
+
+        renderProjects();
+
+        await openCreateMenu();
+
+        const menuItems = await screen.findAllByRole('menuitem');
+
+        expect(menuItems.map((menuItem) => menuItem.textContent?.trim())).toEqual([
+            'New Project',
+            'From Template',
+            'Import Project',
+            'New Code Project',
+            'Import Code Project',
+        ]);
+    });
+
+    it('opens the project dialog from the New Project menu item', async () => {
+        renderProjects();
+
+        await openCreateMenu();
+
+        await userEvent.click(await screen.findByRole('menuitem', {name: 'New Project'}));
+
+        expect(await screen.findByPlaceholderText('My CRM Project')).toBeInTheDocument();
     });
 });
 

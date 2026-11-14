@@ -537,6 +537,9 @@ export enum AuthorizationType {
 export type AutomationProject = {
   __typename?: 'AutomationProject';
   categoryId?: Maybe<Scalars['ID']['output']>;
+  codeWorkflowDraftPublishable?: Maybe<Scalars['Boolean']['output']>;
+  codeWorkflowLanguage?: Maybe<CodeWorkflowLanguage>;
+  codeWorkflowProject: Scalars['Boolean']['output'];
   configurationCount: Scalars['Int']['output'];
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
@@ -554,6 +557,12 @@ export type AutomationProjectCategory = {
   __typename?: 'AutomationProjectCategory';
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+};
+
+export type AutomationProjectCodeWorkflowSource = {
+  __typename?: 'AutomationProjectCodeWorkflowSource';
+  content: Scalars['String']['output'];
+  language: CodeWorkflowLanguage;
 };
 
 export type AutomationProjectComponent = {
@@ -754,6 +763,13 @@ export type ClusterElementType = {
   required?: Maybe<Scalars['Boolean']['output']>;
 };
 
+export enum CodeWorkflowLanguage {
+  Java = 'JAVA',
+  Javascript = 'JAVASCRIPT',
+  Python = 'PYTHON',
+  Ruby = 'RUBY'
+}
+
 export type ColumnInput = {
   name: Scalars['String']['input'];
   type: ColumnType;
@@ -854,6 +870,16 @@ export type ConnectedUserAutomationProjectConfiguration = {
   configurationName: Scalars['String']['output'];
   configurationProjectVersion: Scalars['Int']['output'];
   projectId: Scalars['ID']['output'];
+};
+
+export type ConnectedUserCatalogWorkflowCopy = {
+  __typename?: 'ConnectedUserCatalogWorkflowCopy';
+  connectedUserEmail?: Maybe<Scalars['String']['output']>;
+  connectedUserName?: Maybe<Scalars['String']['output']>;
+  copiedFromWorkflowUuid: Scalars['ID']['output'];
+  enabled: Scalars['Boolean']['output'];
+  externalUserId: Scalars['String']['output'];
+  workflowUuid: Scalars['ID']['output'];
 };
 
 export type ConnectedUserCodeWorkflowReference = {
@@ -1921,12 +1947,15 @@ export type Mutation = {
   createApiKey: Scalars['String']['output'];
   createApprovalTask?: Maybe<ApprovalTask>;
   createAutomationProject: Scalars['ID']['output'];
+  createAutomationProjectCodeWorkflow: Scalars['ID']['output'];
   createAutomationProjectConfiguration: Scalars['ID']['output'];
   createAutomationProjectWorkflow: Scalars['ID']['output'];
+  createCodeWorkflow: Scalars['ID']['output'];
   createDataTable: Scalars['Boolean']['output'];
   createEmbeddedMcpComponent?: Maybe<McpComponent>;
   createEmbeddedMcpServer?: Maybe<McpServer>;
   createIdentityProvider: IdentityProviderType;
+  createIntegrationCodeWorkflow: Scalars['ID']['output'];
   createKnowledgeBase?: Maybe<KnowledgeBase>;
   createMcpComponent?: Maybe<McpComponent>;
   createMcpComponentWithTools?: Maybe<McpComponent>;
@@ -2053,10 +2082,12 @@ export type Mutation = {
   updateApiKey: Scalars['Boolean']['output'];
   updateApprovalTask?: Maybe<ApprovalTask>;
   updateAutomationProject: Scalars['Boolean']['output'];
+  updateAutomationProjectCodeWorkflowSource: Scalars['Boolean']['output'];
   updateAutomationProjectConfiguration: Scalars['Boolean']['output'];
   updateAutomationProjectConfigurationWorkflow: Scalars['Boolean']['output'];
   updateAutomationProjectWorkflow: Scalars['Boolean']['output'];
   updateAutomationProjectWorkflowPermissionExpression: Scalars['Boolean']['output'];
+  updateCodeWorkflowSource: Scalars['Boolean']['output'];
   /**
    * Replace an existing connection's authorization parameters. A parameter that is not submitted is cleared.
    * Succeeding means the values were stored, not that they work.
@@ -2071,6 +2102,7 @@ export type Mutation = {
   updateEmbeddedMcpTool?: Maybe<McpTool>;
   updateEmbeddedMcpToolEnabled?: Maybe<McpTool>;
   updateIdentityProvider: IdentityProviderType;
+  updateIntegrationCodeWorkflowSource: Scalars['Boolean']['output'];
   updateIntegrationWorkflowPermissionExpression?: Maybe<IntegrationWorkflow>;
   updateKnowledgeBase?: Maybe<KnowledgeBase>;
   updateKnowledgeBaseDocumentChunk?: Maybe<KnowledgeBaseDocumentChunk>;
@@ -2210,6 +2242,16 @@ export type MutationCreateAutomationProjectArgs = {
 };
 
 
+export type MutationCreateAutomationProjectCodeWorkflowArgs = {
+  category?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  language: CodeWorkflowLanguage;
+  name: Scalars['String']['input'];
+  permissionExpression?: InputMaybe<Scalars['String']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
 export type MutationCreateAutomationProjectConfigurationArgs = {
   automationHubVisible: Scalars['Boolean']['input'];
   enabled: Scalars['Boolean']['input'];
@@ -2225,6 +2267,16 @@ export type MutationCreateAutomationProjectWorkflowArgs = {
   definition?: InputMaybe<Scalars['String']['input']>;
   permissionExpression?: InputMaybe<Scalars['String']['input']>;
   projectId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateCodeWorkflowArgs = {
+  categoryId?: InputMaybe<Scalars['ID']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  language: CodeWorkflowLanguage;
+  name: Scalars['String']['input'];
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2246,6 +2298,17 @@ export type MutationCreateEmbeddedMcpServerArgs = {
 
 export type MutationCreateIdentityProviderArgs = {
   input: IdentityProviderInput;
+};
+
+
+export type MutationCreateIntegrationCodeWorkflowArgs = {
+  categoryId?: InputMaybe<Scalars['ID']['input']>;
+  componentName: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  language: CodeWorkflowLanguage;
+  name?: InputMaybe<Scalars['String']['input']>;
+  permissionExpression?: InputMaybe<Scalars['String']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -2897,6 +2960,12 @@ export type MutationUpdateAutomationProjectArgs = {
 };
 
 
+export type MutationUpdateAutomationProjectCodeWorkflowSourceArgs = {
+  automationProjectId: Scalars['ID']['input'];
+  content: Scalars['String']['input'];
+};
+
+
 export type MutationUpdateAutomationProjectConfigurationArgs = {
   automationHubVisible: Scalars['Boolean']['input'];
   enabled: Scalars['Boolean']['input'];
@@ -2925,6 +2994,12 @@ export type MutationUpdateAutomationProjectWorkflowArgs = {
 export type MutationUpdateAutomationProjectWorkflowPermissionExpressionArgs = {
   permissionExpression?: InputMaybe<Scalars['String']['input']>;
   workflowUuid: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateCodeWorkflowSourceArgs = {
+  content: Scalars['String']['input'];
+  projectId: Scalars['ID']['input'];
 };
 
 
@@ -2982,6 +3057,12 @@ export type MutationUpdateEmbeddedMcpToolEnabledArgs = {
 export type MutationUpdateIdentityProviderArgs = {
   id: Scalars['ID']['input'];
   input: IdentityProviderInput;
+};
+
+
+export type MutationUpdateIntegrationCodeWorkflowSourceArgs = {
+  content: Scalars['String']['input'];
+  integrationId: Scalars['ID']['input'];
 };
 
 
@@ -3482,6 +3563,7 @@ export type Query = {
   auditEvents: AuditEventPageType;
   authorities: Array<Scalars['String']['output']>;
   automationProjectCategories: Array<AutomationProjectCategory>;
+  automationProjectCodeWorkflowSource: AutomationProjectCodeWorkflowSource;
   automationProjectConfigurationConnectedUsers: Array<AutomationProjectConfigurationConnectedUser>;
   automationProjectConfigurationDeleteImpact: AutomationProjectConfigurationDeleteImpact;
   automationProjectConfigurationMoveImpact: AutomationProjectConfigurationMoveImpact;
@@ -3504,12 +3586,14 @@ export type Query = {
   clusterElementMissingRequiredProperties: Array<Scalars['String']['output']>;
   clusterElementOptions: Array<Option>;
   clusterElementScriptInput?: Maybe<Scalars['Map']['output']>;
+  codeWorkflowSource: Scalars['String']['output'];
   componentDefinition: ComponentDefinition;
   componentDefinitionSearch: Array<ComponentDefinition>;
   componentDefinitionVersions: Array<ComponentDefinition>;
   componentDefinitions: Array<ComponentDefinition>;
   componentPropertyDisplayConditions: Scalars['Map']['output'];
   connectedUser?: Maybe<ConnectedUser>;
+  connectedUserCatalogWorkflowCopies: Array<ConnectedUserCatalogWorkflowCopy>;
   connectedUserCodeWorkflowReferences: Array<ConnectedUserCodeWorkflowReference>;
   connectedUserMcpServers: Array<ConnectedUserMcpServer>;
   connectedUserProjectWorkflowReferenceValues: ConnectedUserProjectWorkflowReferenceValues;
@@ -3545,6 +3629,7 @@ export type Query = {
   generationJobStatus?: Maybe<GenerationJobStatus>;
   identityProvider?: Maybe<IdentityProviderType>;
   identityProviders: Array<Maybe<IdentityProviderType>>;
+  integrationCodeWorkflowSource: Scalars['String']['output'];
   integrationVersionWorkflowChange: VersionWorkflowChange;
   integrationVersionWorkflowChanges: VersionWorkflowChanges;
   integrationWorkflows: Array<IntegrationWorkflow>;
@@ -3812,6 +3897,11 @@ export type QueryAuditEventsArgs = {
 };
 
 
+export type QueryAutomationProjectCodeWorkflowSourceArgs = {
+  automationProjectId: Scalars['ID']['input'];
+};
+
+
 export type QueryAutomationProjectConfigurationConnectedUsersArgs = {
   id: Scalars['ID']['input'];
 };
@@ -3963,6 +4053,11 @@ export type QueryClusterElementScriptInputArgs = {
 };
 
 
+export type QueryCodeWorkflowSourceArgs = {
+  projectId: Scalars['ID']['input'];
+};
+
+
 export type QueryComponentDefinitionArgs = {
   componentName: Scalars['String']['input'];
   componentVersion: Scalars['Int']['input'];
@@ -4004,8 +4099,15 @@ export type QueryConnectedUserArgs = {
 };
 
 
+export type QueryConnectedUserCatalogWorkflowCopiesArgs = {
+  automationUuids: Array<Scalars['ID']['input']>;
+  environmentId: Scalars['ID']['input'];
+};
+
+
 export type QueryConnectedUserCodeWorkflowReferencesArgs = {
   automationUuids: Array<Scalars['ID']['input']>;
+  environmentId: Scalars['ID']['input'];
 };
 
 
@@ -4161,6 +4263,11 @@ export type QueryGenerationJobStatusArgs = {
 
 export type QueryIdentityProviderArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryIntegrationCodeWorkflowSourceArgs = {
+  integrationId: Scalars['ID']['input'];
 };
 
 

@@ -10,7 +10,10 @@ package com.bytechef.ee.automation.configuration.repository;
 import com.bytechef.ee.automation.configuration.domain.ProjectCodeWorkflow;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -23,4 +26,24 @@ import org.springframework.stereotype.Repository;
 public interface ProjectCodeWorkflowRepository extends ListCrudRepository<ProjectCodeWorkflow, Long> {
 
     List<ProjectCodeWorkflow> findAllByProjectId(long projectId);
+
+    @Query("SELECT DISTINCT project_id FROM project_code_workflow")
+    List<Long> findDistinctProjectIds();
+
+    @Query("""
+        SELECT * FROM project_code_workflow
+        WHERE project_id = :projectId
+        ORDER BY id DESC
+        LIMIT 1
+        """)
+    Optional<ProjectCodeWorkflow> findFirstByProjectIdOrderByIdDesc(@Param("projectId") Long projectId);
+
+    @Query("""
+        SELECT * FROM project_code_workflow
+        WHERE project_id = :projectId AND project_version < :projectVersion
+        ORDER BY id DESC
+        LIMIT 1
+        """)
+    Optional<ProjectCodeWorkflow> findFirstByProjectIdAndProjectVersionLessThanOrderByIdDesc(
+        @Param("projectId") Long projectId, @Param("projectVersion") int projectVersion);
 }

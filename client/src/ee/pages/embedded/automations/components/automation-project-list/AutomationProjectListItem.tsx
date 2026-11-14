@@ -20,21 +20,28 @@ import {
     useDeleteAutomationProjectMutation,
     useDuplicateAutomationProjectMutation,
 } from '@/shared/middleware/graphql';
+import getCodeWorkflowLanguageLabel from '@/shared/util/codeWorkflowLanguage-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {
+    CodeIcon,
     CopyIcon,
     DownloadIcon,
     EditIcon,
     EllipsisVerticalIcon,
     PlusIcon,
+    SendIcon,
     Settings2Icon,
     Trash2Icon,
     UploadIcon,
+    UsersIcon,
     WorkflowIcon,
 } from 'lucide-react';
 import {MouseEvent, useCallback, useMemo, useRef, useState} from 'react';
 import {toast} from 'sonner';
 import {twMerge} from 'tailwind-merge';
+
+import isEditableCodeLanguage from '../../utils/isEditableCodeLanguage';
+import AutomationProjectUsageSheet from '../AutomationProjectUsageSheet';
 
 type AutomationProjectType = AutomationProjectsQuery['automationProjects'][number];
 type EmbeddedTagType = AutomationProjectTagsQuery['automationProjectTags'][number];
@@ -43,6 +50,7 @@ interface AutomationProjectListItemProps {
     onCreateConfiguration: (project: AutomationProjectType) => void;
     onCreateWorkflow: (projectId: string) => void;
     onEditProject: (project: AutomationProjectType) => void;
+    onEditProjectSource: (projectId: string) => void;
     onImportWorkflow: (projectId: string) => void;
     onPublishProject: (projectId: string) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
@@ -55,6 +63,7 @@ const AutomationProjectListItem = ({
     onCreateConfiguration,
     onCreateWorkflow,
     onEditProject,
+    onEditProjectSource,
     onImportWorkflow,
     onPublishProject,
     onSelectWorkflow,
@@ -63,6 +72,7 @@ const AutomationProjectListItem = ({
     tags,
 }: AutomationProjectListItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showUsageSheet, setShowUsageSheet] = useState(false);
 
     const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
@@ -179,6 +189,17 @@ const AutomationProjectListItem = ({
                                     {project.name}
                                 </button>
                             )}
+
+                            {project.codeWorkflowProject && (
+                                <Badge
+                                    label={
+                                        getCodeWorkflowLanguageLabel(project.codeWorkflowLanguage ?? undefined) ??
+                                        'Code'
+                                    }
+                                    styleType="secondary-filled"
+                                    weight="semibold"
+                                />
+                            )}
                         </div>
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
@@ -272,10 +293,20 @@ const AutomationProjectListItem = ({
                                         onClick={() => onEditProject(project)}
                                     />
 
-                                    <ProjectListItemPublishMenuItem
-                                        hasWorkflows={project.workflowTemplates.length > 0}
-                                        onClick={() => onPublishProject(project.id)}
-                                    />
+                                    {project.codeWorkflowProject ? (
+                                        <DropdownMenuItem
+                                            aria-label="Publish Project"
+                                            disabled={!project.codeWorkflowDraftPublishable}
+                                            icon={<SendIcon />}
+                                            label="Publish"
+                                            onClick={() => onPublishProject(project.id)}
+                                        />
+                                    ) : (
+                                        <ProjectListItemPublishMenuItem
+                                            hasWorkflows={project.workflowTemplates.length > 0}
+                                            onClick={() => onPublishProject(project.id)}
+                                        />
+                                    )}
 
                                     <DropdownMenuItem
                                         aria-label="Duplicate Project"
@@ -292,24 +323,45 @@ const AutomationProjectListItem = ({
                                             (window.location.href = `/api/automation/internal/projects/${project.id}/export`)
                                         }
                                     />
+
+                                    {project.codeWorkflowProject &&
+                                        isEditableCodeLanguage(project.codeWorkflowLanguage) && (
+                                            <DropdownMenuItem
+                                                aria-label="Edit Source"
+                                                icon={<CodeIcon />}
+                                                label="Edit Source"
+                                                onClick={() => onEditProjectSource(project.id)}
+                                            />
+                                        )}
+
+                                    <DropdownMenuItem
+                                        aria-label="Usage"
+                                        icon={<UsersIcon />}
+                                        label="Usage"
+                                        onClick={() => setShowUsageSheet(true)}
+                                    />
                                 </DropdownMenuGroup>
 
                                 <DropdownMenuSeparator />
 
                                 <DropdownMenuGroup aria-label="Workflow Actions">
-                                    <DropdownMenuItem
-                                        aria-label="New Workflow"
-                                        icon={<PlusIcon />}
-                                        label="New Workflow"
-                                        onClick={() => onCreateWorkflow(project.id)}
-                                    />
+                                    {!project.codeWorkflowProject && (
+                                        <>
+                                            <DropdownMenuItem
+                                                aria-label="New Workflow"
+                                                icon={<PlusIcon />}
+                                                label="New Workflow"
+                                                onClick={() => onCreateWorkflow(project.id)}
+                                            />
 
-                                    <DropdownMenuItem
-                                        aria-label="Import Workflow"
-                                        icon={<UploadIcon />}
-                                        label="Import Workflow"
-                                        onClick={() => onImportWorkflow(project.id)}
-                                    />
+                                            <DropdownMenuItem
+                                                aria-label="Import Workflow"
+                                                icon={<UploadIcon />}
+                                                label="Import Workflow"
+                                                onClick={() => onImportWorkflow(project.id)}
+                                            />
+                                        </>
+                                    )}
 
                                     {project.workflowTemplates.length > 0 && (
                                         <DropdownMenuItem
@@ -370,6 +422,15 @@ const AutomationProjectListItem = ({
                 onConfirm={() => deleteProjectMutation.mutate({id: project.id})}
                 open={showDeleteDialog}
             />
+
+            {showUsageSheet && (
+                <AutomationProjectUsageSheet
+                    codeWorkflowProject={project.codeWorkflowProject}
+                    onClose={() => setShowUsageSheet(false)}
+                    projectName={project.name}
+                    workflowTemplates={project.workflowTemplates}
+                />
+            )}
         </>
     );
 };

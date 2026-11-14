@@ -40,6 +40,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
+import com.bytechef.ee.embedded.configuration.exception.CodeWorkflowNotCopyableException;
 import com.bytechef.ee.embedded.configuration.exception.ConnectedUserProjectWorkflowErrorType;
 import com.bytechef.ee.embedded.configuration.exception.InvalidWorkflowException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
@@ -57,6 +58,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
@@ -98,6 +100,8 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 @SkipAutomationAuthorization
 public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacade {
+
+    private static final String NEW_WORKFLOW_LABEL = "New Workflow";
 
     private final AutomationProjectConfigurationResolver automationProjectConfigurationResolver;
     private final AutomationProjectConfigurationService automationProjectConfigurationService;
@@ -217,6 +221,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         }
 
         AutomationProjectDTO releasedProject = releasedProjectOptional.get();
+
+        if (releasedProject.codeWorkflowProject()) {
+            throw new CodeWorkflowNotCopyableException(workflowUuid);
+        }
 
         ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
@@ -673,6 +681,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             projectWorkflow.getWorkflowId(), connectedUserProject.getProjectId(), environment.ordinal(), prompt,
             systemPrompt, allowedComponentNames);
 
+        nameUnnamedWorkflowFromPrompt(projectWorkflow.getWorkflowId(), prompt);
+
         return workflowUuid;
     }
 
@@ -952,7 +962,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         return inputs.stream()
             .map(input -> new ConnectedUserWorkflowTemplateDTO.Input(
-                input.name(), input.label(), input.type(), input.required()))
+                input.name(), input.label(), input.type(), input.required(),
+                new WorkflowInput(input).getComponentInputReference()))
             .toList();
     }
 
@@ -1057,6 +1068,22 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         definitionMap.put("tasks", List.of());
 
         return JsonUtils.write(definitionMap);
+    }
+
+    private void nameUnnamedWorkflowFromPrompt(String workflowId, String prompt) {
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        String label = workflow.getLabel();
+
+        if (StringUtils.isNotBlank(label) && !Objects.equals(label, NEW_WORKFLOW_LABEL)) {
+            return;
+        }
+
+        Map<String, Object> definitionMap = new LinkedHashMap<>(JsonUtils.readMap(workflow.getDefinition()));
+
+        definitionMap.put("label", toWorkflowLabel(prompt));
+
+        workflowService.update(workflowId, JsonUtils.write(definitionMap), workflow.getVersion());
     }
 
     private static String toWorkflowLabel(String prompt) {

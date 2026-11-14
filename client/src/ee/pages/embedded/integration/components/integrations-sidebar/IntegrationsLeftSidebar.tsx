@@ -93,6 +93,8 @@ const IntegrationsLeftSidebar = ({
 
     const selectedIntegration = integrations?.find((integration) => integration.id === selectedIntegrationId);
 
+    const targetIntegration = integrations?.find((integration) => integration.id === targetIntegrationId);
+
     const filteredWorkflowsList = useMemo(
         () => getFilteredWorkflows(workflows, sortBy, searchValue),
         [workflows, sortBy, searchValue, getFilteredWorkflows]
@@ -167,36 +169,38 @@ const IntegrationsLeftSidebar = ({
                     sortBy={sortBy}
                 />
 
-                <ButtonGroup className="w-full">
-                    <Button
-                        className="flex-1 [&_svg]:size-5"
-                        icon={<PlusIcon />}
-                        label="New Workflow"
-                        onClick={() => setShowWorkflowDialog(true)}
-                        variant="secondary"
-                    />
+                {!targetIntegration?.codeWorkflow && (
+                    <ButtonGroup className="w-full">
+                        <Button
+                            className="flex-1 [&_svg]:size-5"
+                            icon={<PlusIcon />}
+                            label="New Workflow"
+                            onClick={() => setShowWorkflowDialog(true)}
+                            variant="secondary"
+                        />
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                aria-label="More workflow options"
-                                className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
-                                icon={<ChevronDownIcon />}
-                                size="icon"
-                                variant="secondary"
-                            />
-                        </DropdownMenuTrigger>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    aria-label="More workflow options"
+                                    className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary [&_svg]:size-5"
+                                    icon={<ChevronDownIcon />}
+                                    size="icon"
+                                    variant="secondary"
+                                />
+                            </DropdownMenuTrigger>
 
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                                className="cursor-pointer"
-                                onClick={() => workflowFileInputRef.current?.click()}
-                            >
-                                <UploadIcon /> Import Workflow
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </ButtonGroup>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() => workflowFileInputRef.current?.click()}
+                                >
+                                    <UploadIcon /> Import Workflow
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </ButtonGroup>
+                )}
             </div>
 
             <ScrollArea className="mb-3 min-h-0 w-full flex-1 [&_[data-radix-scroll-area-viewport]>div]:block!">

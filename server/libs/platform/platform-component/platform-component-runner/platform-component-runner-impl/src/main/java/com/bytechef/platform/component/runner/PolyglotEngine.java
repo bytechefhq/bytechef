@@ -31,8 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
-import org.graalvm.polyglot.proxy.ProxyHashMap;
-import org.graalvm.polyglot.proxy.ProxyObject;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -64,9 +62,6 @@ public class PolyglotEngine {
         @Nullable Map<String, ComponentConnection> componentConnections, boolean exposeConnectionParameters,
         JobContextAware jobContextAware) {
 
-        Map<String, ComponentConnection> scriptComponentConnections =
-            componentConnections == null ? Map.of() : componentConnections;
-
         return PolyglotSandbox.call(mode, languageId, timeout, polyglotContext -> {
             polyglotContext.eval(languageId, inputParameters.getString(SCRIPT, switch (languageId) {
                 case "java" ->
@@ -76,6 +71,8 @@ public class PolyglotEngine {
                 default -> throw new IllegalArgumentException("languageId: %s does not exist".formatted(languageId));
             }));
 
+            Map<String, ComponentConnection> scriptComponentConnections =
+                componentConnections == null ? Map.of() : componentConnections;
             Map<String, Object> inputMap = removeNotEvaluatedEntries(
                 inputParameters.getMap(INPUT, Object.class, Map.of()));
 
@@ -101,7 +98,9 @@ public class PolyglotEngine {
 
                 value = performFunction.execute(
                     PolyglotValues.copyToGuestValue(inputMap, languageId),
-                    copyConnectionsToGuestValue(exposedComponentConnections, languageId), contextProxyObject);
+                    PolyglotValues.copyToGuestMemberAndHashMap(
+                        toConnectionMap(exposedComponentConnections), languageId),
+                    contextProxyObject);
             } else {
                 value = performFunction.execute(
                     PolyglotValues.copyToGuestValue(inputMap, languageId), contextProxyObject);
@@ -127,26 +126,16 @@ public class PolyglotEngine {
         return parameterCount.fitsInInt() ? parameterCount.asInt() : 2;
     }
 
-    private static MapProxyObject copyConnectionsToGuestValue(
-        Map<String, ComponentConnection> componentConnections, String languageId) {
-
+    private static Map<String, Object> toConnectionMap(Map<String, ComponentConnection> componentConnections) {
         Map<String, Object> connectionMap = new HashMap<>();
 
         for (Map.Entry<String, ComponentConnection> entry : componentConnections.entrySet()) {
             ComponentConnection componentConnection = entry.getValue();
 
-            Map<String, ?> parameters = componentConnection.getParameters();
-            Map<String, Object> parameterMap = new HashMap<>();
-
-            for (Map.Entry<String, ?> parameterEntry : parameters.entrySet()) {
-                parameterMap.put(
-                    parameterEntry.getKey(), PolyglotValues.copyToGuestValue(parameterEntry.getValue(), languageId));
-            }
-
-            connectionMap.put(entry.getKey(), new MapProxyObject(parameterMap));
+            connectionMap.put(entry.getKey(), componentConnection.getParameters());
         }
 
-        return new MapProxyObject(connectionMap);
+        return connectionMap;
     }
 
     @SuppressWarnings("unchecked")
@@ -168,62 +157,4 @@ public class PolyglotEngine {
         return newMap;
     }
 
-    private static final class MapProxyObject implements ProxyHashMap, ProxyObject {
-
-        private final ProxyHashMap proxyHashMap;
-        private final ProxyObject proxyObject;
-
-        @SuppressWarnings({
-            "rawtypes", "unchecked"
-        })
-        private MapProxyObject(Map<String, Object> map) {
-            this.proxyHashMap = ProxyHashMap.from((Map) map);
-            this.proxyObject = ProxyObject.fromMap(map);
-        }
-
-        @Override
-        public Object getHashEntriesIterator() {
-            return proxyHashMap.getHashEntriesIterator();
-        }
-
-        @Override
-        public long getHashSize() {
-            return proxyHashMap.getHashSize();
-        }
-
-        @Override
-        public Object getHashValue(Value key) {
-            return proxyHashMap.getHashValue(key);
-        }
-
-        @Override
-        public Object getMember(String key) {
-            return proxyObject.getMember(key);
-        }
-
-        @Override
-        public Object getMemberKeys() {
-            return proxyObject.getMemberKeys();
-        }
-
-        @Override
-        public boolean hasHashEntry(Value key) {
-            return proxyHashMap.hasHashEntry(key);
-        }
-
-        @Override
-        public boolean hasMember(String key) {
-            return proxyObject.hasMember(key);
-        }
-
-        @Override
-        public void putHashEntry(Value key, Value value) {
-            proxyHashMap.putHashEntry(key, value);
-        }
-
-        @Override
-        public void putMember(String key, Value value) {
-            proxyObject.putMember(key, value);
-        }
-    }
 }

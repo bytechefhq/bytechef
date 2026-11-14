@@ -109,14 +109,10 @@ The imported project, together with its workflows, appears in the project list.
 </Step>
 </Steps>
 
-## New Code Workflow
+## New Code Project
 
-<Callout type="warn" title="Coming soon">
-    Creating a code workflow from the Projects page is on the upcoming release track and is not yet
-    available in the latest released version of ByteChef. Today a code workflow is authored outside
-    the product and deployed through the API - see
-    [Code Workflows](/platform/automation/build/workflows/code-workflows).
-</Callout>
+A code project defines its workflows in JavaScript or Python source instead of on the canvas. Code projects require an
+Enterprise Edition deployment.
 
 <Steps>
 <Step>
@@ -126,17 +122,30 @@ Click the dropdown arrow next to the **New Project** button in the top right cor
 </Step>
 <Step>
 
-Select **New Code Workflow** from the dropdown menu.
+Select **New Code Project** from the dropdown menu.
 
 </Step>
 <Step>
 
-Give the code workflow a name and pick its language, then edit the workflow definition directly in code.
+Pick the **Language** (JavaScript or Python), give the project a **Project Name**, and optionally add a
+**Description**, a **Category** and **Tags**. ByteChef creates the project as a draft from a starter source and opens
+it in the code editor.
+
+</Step>
+<Step>
+
+Edit the source and save. Saves change the draft only; publish the project from its header when you're ready, exactly
+like a visual project.
 
 </Step>
 </Steps>
 
-A code workflow runs on the same engine as a visually built one - see [Build Approaches](/platform/automation/build/workflows/build-approaches) for when to choose full-code.
+To bring in an existing code project instead - a `.js`, `.py` or Java `.jar` file - pick **Import Code Project** from
+the same menu; the upload is published right away. The
+[sample repositories](/platform/sample-repositories#code-workflows) have a ready-made project in each language. A code
+project runs on the same engine as a visually built one - see
+[Code Workflows](/platform/automation/build/workflows/code-workflows) for the contract and
+[Build Approaches](/platform/automation/build/workflows/build-approaches) for when to choose full-code.
 
 ## Edit Project
 

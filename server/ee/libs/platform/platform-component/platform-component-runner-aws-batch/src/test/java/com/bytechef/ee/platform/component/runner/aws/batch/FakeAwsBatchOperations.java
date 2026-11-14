@@ -14,8 +14,10 @@ import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import software.amazon.awssdk.services.batch.model.EcsPropertiesDetail;
 import software.amazon.awssdk.services.batch.model.EcsTaskDetails;
@@ -53,6 +56,7 @@ final class FakeAwsBatchOperations implements AwsBatchOperations {
     final List<Duration> presignValidities = new ArrayList<>();
     final List<Duration> sessionDurations = new ArrayList<>();
     final Map<String, JobDetail> describedById = new LinkedHashMap<>();
+    final List<String> stagedFilePermissions = new ArrayList<>();
 
     List<JobSummary> listedJobs = List.of();
     @Nullable
@@ -84,6 +88,14 @@ final class FakeAwsBatchOperations implements AwsBatchOperations {
 
         try {
             objects.put(bucket + "/" + key, Files.readAllBytes(file));
+
+            FileSystem fileSystem = file.getFileSystem();
+
+            Set<String> supportedFileAttributeViews = fileSystem.supportedFileAttributeViews();
+
+            if (supportedFileAttributeViews.contains("posix")) {
+                stagedFilePermissions.add(PosixFilePermissions.toString(Files.getPosixFilePermissions(file)));
+            }
         } catch (IOException exception) {
             throw new UncheckedIOException(exception);
         }
