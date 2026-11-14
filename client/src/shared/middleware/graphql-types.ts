@@ -3679,6 +3679,7 @@ export type Query = {
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
   managementMcpServerCanonicalUrl: Scalars['String']['output'];
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
+  mcpAutomationProjectConfigurationWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
   mcpAutomationProjectConfigurationsByServerId: Array<McpAutomationProjectConfiguration>;
   mcpComponent?: Maybe<McpComponent>;
   mcpComponentDefinitions: Array<ComponentDefinition>;
@@ -4359,6 +4360,11 @@ export type QueryKnowledgeBaseEmbeddingActiveArgs = {
 export type QueryKnowledgeBasesArgs = {
   environmentId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryMcpAutomationProjectConfigurationWorkflowPropertiesArgs = {
+  mcpAutomationProjectConfigurationWorkflowId: Scalars['ID']['input'];
 };
 
 

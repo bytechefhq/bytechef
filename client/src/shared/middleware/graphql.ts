@@ -1594,6 +1594,26 @@ export type IntegrationWorkflowsByIntegrationIdQueryVariables = Exact<{
 
 export type IntegrationWorkflowsByIntegrationIdQuery = { integrationWorkflowsByIntegrationId: Array<{ id: string, label: string, description: string | null, integrationWorkflowId: string, workflowUuid: string | null, permissionExpression: string | null, workflowTaskComponentNames: Array<string>, workflowTriggerComponentNames: Array<string>, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any }> };
 
+export type McpAutomationProjectConfigurationWorkflowPropertiesQueryVariables = Exact<{
+  mcpAutomationProjectConfigurationWorkflowId: string | number;
+}>;
+
+
+export type McpAutomationProjectConfigurationWorkflowPropertiesQuery = { mcpAutomationProjectConfigurationWorkflowProperties: Array<
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+    | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, maxLength: number | null, minLength: number | null, placeholder: string | null, regex: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+   | null> | null };
+
 export type McpAutomationProjectConfigurationsByServerIdQueryVariables = Exact<{
   mcpServerId: string | number;
 }>;
@@ -8339,6 +8359,78 @@ export const useIntegrationWorkflowsByIntegrationIdQuery = <
       {
     queryKey: ['integrationWorkflowsByIntegrationId', variables],
     queryFn: fetcher<IntegrationWorkflowsByIntegrationIdQuery, IntegrationWorkflowsByIntegrationIdQueryVariables>(IntegrationWorkflowsByIntegrationIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const McpAutomationProjectConfigurationWorkflowPropertiesDocument = new TypedDocumentString(`
+    query mcpAutomationProjectConfigurationWorkflowProperties($mcpAutomationProjectConfigurationWorkflowId: ID!) {
+  mcpAutomationProjectConfigurationWorkflowProperties(
+    mcpAutomationProjectConfigurationWorkflowId: $mcpAutomationProjectConfigurationWorkflowId
+  ) {
+    advancedOption
+    description
+    displayCondition
+    expressionEnabled
+    hidden
+    name
+    required
+    type
+    ... on StringProperty {
+      controlType
+      defaultValue
+      label
+      maxLength
+      minLength
+      placeholder
+      regex
+    }
+    ... on IntegerProperty {
+      controlType
+      integerDefaultValue: defaultValue
+      label
+      placeholder
+    }
+    ... on NumberProperty {
+      controlType
+      label
+      numberDefaultValue: defaultValue
+      placeholder
+    }
+    ... on BooleanProperty {
+      booleanDefaultValue: defaultValue
+      controlType
+      label
+      placeholder
+    }
+    ... on ArrayProperty {
+      arrayDefaultValue: defaultValue
+      controlType
+      label
+      placeholder
+    }
+    ... on ObjectProperty {
+      controlType
+      label
+      objectDefaultValue: defaultValue
+      placeholder
+    }
+  }
+}
+    `);
+
+export const useMcpAutomationProjectConfigurationWorkflowPropertiesQuery = <
+      TData = McpAutomationProjectConfigurationWorkflowPropertiesQuery,
+      TError = unknown
+    >(
+      variables: McpAutomationProjectConfigurationWorkflowPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<McpAutomationProjectConfigurationWorkflowPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpAutomationProjectConfigurationWorkflowPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<McpAutomationProjectConfigurationWorkflowPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['mcpAutomationProjectConfigurationWorkflowProperties', variables],
+    queryFn: fetcher<McpAutomationProjectConfigurationWorkflowPropertiesQuery, McpAutomationProjectConfigurationWorkflowPropertiesQueryVariables>(McpAutomationProjectConfigurationWorkflowPropertiesDocument, variables),
     ...options
   }
     )};
