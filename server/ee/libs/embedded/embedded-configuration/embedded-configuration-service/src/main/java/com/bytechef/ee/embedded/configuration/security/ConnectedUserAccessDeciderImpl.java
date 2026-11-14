@@ -15,8 +15,8 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -60,7 +60,7 @@ public class ConnectedUserAccessDeciderImpl implements ConnectedUserAccessDecide
     private static final String DEPLOYMENT_SCOPE_PREFIX = "DEPLOYMENT_";
     private static final String WORKFLOW_VIEW = "WORKFLOW_VIEW";
 
-    private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private final AutomationProjectFacade automationProjectFacade;
     private final ConnectedUserConnectionService connectedUserConnectionService;
     private final ConnectedUserProjectService connectedUserProjectService;
     private final IntegrationInstanceService integrationInstanceService;
@@ -71,14 +71,14 @@ public class ConnectedUserAccessDeciderImpl implements ConnectedUserAccessDecide
 
     @SuppressFBWarnings("EI")
     public ConnectedUserAccessDeciderImpl(
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
+        AutomationProjectFacade automationProjectFacade,
         ConnectedUserConnectionService connectedUserConnectionService,
         ConnectedUserProjectService connectedUserProjectService, IntegrationInstanceService integrationInstanceService,
         ProjectService projectService, ProjectWorkflowService projectWorkflowService,
         List<ResourceEnvironmentResolver> resourceEnvironmentResolvers,
         List<ResourceOwnershipResolver> resourceOwnershipResolvers) {
 
-        this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
+        this.automationProjectFacade = automationProjectFacade;
         this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectedUserProjectService = connectedUserProjectService;
         this.integrationInstanceService = integrationInstanceService;
@@ -257,7 +257,7 @@ public class ConnectedUserAccessDeciderImpl implements ConnectedUserAccessDecide
 
         String workflowUuid = projectWorkflow.getUuidAsString();
 
-        List<AutomationWorkflowProjectDTO> publishedProjects = automationWorkflowProjectFacade.getPublishedProjects(
+        List<AutomationProjectDTO> publishedProjects = automationProjectFacade.getPublishedProjects(
             connectedUser.externalUserId(), toEnvironment(connectedUser));
 
         return publishedProjects.stream()
