@@ -121,20 +121,6 @@ public class ScriptComponentHandlerIntTest {
         Assertions.assertEquals(6000, outputs.get("result"));
     }
 
-    @Disabled
-    @Test
-    public void testPerformR() {
-        Job job = componentJobTestExecutor.execute(
-            ENCODER.encodeToString("script_v1_r".getBytes(StandardCharsets.UTF_8)),
-            Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
-
-        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
-
-        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
-
-        Assertions.assertEquals(6000, outputs.get("result"));
-    }
-
     @ComponentScan(basePackages = "com.bytechef.component.script")
     @TestConfiguration
     public static class ScriptComponentHandlerIntTestConfiguration {
