@@ -1,178 +1,183 @@
 ---
 title: Custom Components
-description: Extend the component catalog with your own - a JavaScript or Python source file or a Java jar, uploaded and enabled without forking the platform.
+description: Extend the component catalog with your own components - a JavaScript or Python source file written in ByteChef or uploaded, or a Java jar - with drafts, publishing, versions and an API for CI deploys.
 ee: true
 ---
 
-A component is ByteChef's unit of integration - a bundle of actions, triggers, and connection logic wrapping a single external system or capability. When the built-in catalog doesn't cover what you need, you write a custom component.
+A component is ByteChef's unit of integration: a bundle of actions, triggers and a connection definition that wraps
+one external system or capability. When the built-in catalog does not cover what you need, you write a **custom
+component**. Once published it appears in the workflow editor next to the built-in components, with its own typed
+properties, output schema, connection type and triggers.
 
 <Callout title="Availability">
-    Custom components are an Enterprise Edition feature requiring the `ADMIN` or `USER` authority, gated by the
-    `ff-1024` feature flag. With the flag off, the settings entry is hidden. [API
-    Connectors](/platform/settings/components/api-connectors) is a separate entry behind its own `ff-207` flag.
+    Custom components are an Enterprise Edition feature. **Settings → Custom Components** is shown when the `ff-1024`
+    feature flag is on and is open to the `ADMIN` and `USER` authorities. Creating, importing, editing the source of
+    and publishing a component require `ADMIN`. [API Connectors](/platform/settings/components/api-connectors) is a
+    separate entry behind its own `ff-207` flag.
 </Callout>
 
 ---
 
-## When a component is the right reach
+## When to write a custom component
 
-Anything you can do in a component you can also do in a script step. A component earns its extra ceremony when:
+ByteChef gives you four ways to add your own logic. Pick the lightest one that fits.
 
-- **The integration is reused across many workflows.** Define it once; use it everywhere.
-- **The integration has a meaningful schema.** Components expose typed input and output properties, so the visual editor can show them in the data-pill picker with validation.
-- **The integration has authentication.** Components declare connection types, which plug into encrypted credential storage, [connection visibility](/platform/settings/connections), and the standard OAuth flow.
-- **You want to surface the integration as an MCP tool.** Components are what get exposed over MCP.
-
-## Two implementation paths
-
-### Java components
-
-A Java component implements `ComponentHandler` and is annotated `@AutoService(ComponentHandler.class)` for ServiceLoader discovery, or `@Component` for Spring DI when it needs framework beans. It defines a static `ComponentDefinition` describing its actions, triggers, and connection:
-
-```java
-@AutoService(ComponentHandler.class)
-public class MyComponentHandler implements ComponentHandler {
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("my-system")
-        .title("My System")
-        .connection(CONNECTION_DEFINITION)
-        .actions(MyAction.ACTION_DEFINITION)
-        .triggers(MyTrigger.TRIGGER_DEFINITION);
-}
-```
-
-Java components are built outside ByteChef and uploaded as a `.jar`. See the [developer guide](/developer-guide) for the full authoring reference.
-
-### Script components
-
-JavaScript and Python components are written as a single source file and uploaded. No local toolchain is required.
-
-## The Custom Components list
-
-**Settings → Custom Components** lists what is installed. Each row shows the component title and name, a version badge, a language badge, an enable/disable toggle, and a **Delete** action. Expanding a row with its chevron shows the component's resolved definition - its actions and triggers - read-only.
-
-**Import Component** in the header opens the **Import Custom Component** dialog - "Upload a custom component JAR file to deploy it to the platform." - which takes `.jar`, `.js` and `.py` files by drag-and-drop or file browse. An upload is deployed immediately; there is no separate release step.
-
-{/* TODO screenshot: Settings → Custom Components - list of custom component rows each showing title, name, version + language badges, an enable/disable switch, and the Import Component button in the header */}
-
-## Authoring in the UI
-
-### The detail page
-
-Opening a **JavaScript or Python** component navigates to its detail page: an editable **Monaco source editor** with **Save** and **Publish** buttons. **Save** is compile-gated - the edited source is loaded before it is persisted, and invalid source is rejected with the loader's error rather than being saved.
-
-**Java** components do not open the editor; their source lives in your build. Instead the list row expands inline via its chevron to show the resolved definition - the component's actions and triggers - read-only. Attempting to edit Java source is rejected as `JAVA_SOURCE_NOT_EDITABLE`.
-
-{/* TODO screenshot: custom component detail page - Monaco source editor with a JavaScript component open, the header showing the component title + language badge, Back arrow, and Save button */}
-
-### Create from scratch
-
-In the page header, the **New Component** dropdown offers **Custom Component** and **Import Custom Component**.
-
-- **Custom Component** opens the **New Custom Component** dialog - a **Name** field and a **Language** selector (JavaScript today) - and generates an empty starter you flesh out in the editor. A new component starts as a **draft**.
-- **Import Custom Component** opens an upload dialog accepting one or more `.jar` / `.js` / `.py` files by drag-and-drop or file browse.
-
-Unlike editor saves, imports and CLI deploys **publish immediately** - deploying is an explicit release action.
-
-## Draft and publish
-
-Saving and publishing are separate steps:
-
-- A **draft** is editable but invisible to workflows.
-- A **published** component is immutable through the editor. Editing one requires bumping `version` in the source above the highest existing version, which spawns a new draft row (the editor navigates to it) while the published version keeps serving workflows untouched.
-- **Publish** - enabled on a clean draft - makes the draft live. Older published versions of the same name continue to coexist.
-
-Only **one draft per component name** exists at a time.
-
-### Versioning
-
-A custom component's identity is its **name plus the `version` declared in the source**. Versions of one component coexist as independent rows: workflows pin the version they use, so publishing v2 never changes what a workflow bound to v1 executes.
-
-To release a new version of a published component:
-
-1. Open it in the editor and raise `version` in the source above the highest existing version (`version: 1` → `version: 2`).
-2. **Save** - a new draft row for the new version is created and the editor navigates to it.
-3. Iterate with normal saves. A draft may change its declared version freely, as long as it does not collide with an existing version of the same name.
-4. **Publish** when ready.
-
-The save path returns typed errors rather than failing vaguely:
-
-| Error | Cause |
+| You need | Use |
 |---|---|
-| `VERSION_NOT_BUMPED` | Saving a published component without raising `version`. |
-| `DRAFT_ALREADY_EXISTS` | Another draft of the same name already exists - publish or delete it first. |
-| `VERSION_ALREADY_EXISTS` | The declared version collides with an existing version of the same name. |
-| `COMPONENT_NOT_DRAFT` | Publish was called on something that is not a draft. |
-| `COMPONENT_ALREADY_EXISTS` | Creating a component whose name is taken. |
-| `INVALID_COMPONENT_NAME` | The name is not a valid component name. |
-| `SOURCE_RENAME_UNSUPPORTED` | The edited source renames the component. |
-| `LANGUAGE_NOT_SUPPORTED` | The file extension maps to no supported language. |
-| `JAVA_CUSTOM_COMPONENT_UPLOAD_DISABLED` | A `.jar` upload arrived while Java uploads are turned off. |
+| A few lines of logic used in one workflow | A [Script step](/platform/automation/build/workflows/code-workflows#scripting-languages) |
+| A whole workflow, or a project of workflows, kept in Git | A [code workflow](/platform/automation/build/workflows/code-workflows) |
+| A REST API with an OpenAPI specification and no custom logic | An [API connector](/platform/settings/components/api-connectors) |
+| A reusable integration with its own schema, connection, triggers or AI tools | A custom component |
 
-Upload, CLI deploy, and the API endpoint publish immediately: a deployed artifact whose source declares a new version creates that version already published, and re-deploying an existing published version updates it in place. An upload targeting a version currently owned by a draft is rejected - publish or delete the draft first.
+A custom component is worth the extra structure when:
 
-## The single-file contract
+- **It is reused across many workflows.** Define it once and every workflow picks it from the catalog.
+- **It has a meaningful schema.** Declared properties and outputs give the editor typed inputs, validation and data
+  pills for downstream steps.
+- **It authenticates.** A declared connection plugs into encrypted credential storage, the Connections page and the
+  platform's OAuth2 flow.
+- **It starts workflows.** Polling and webhook triggers are only available in components.
+- **An AI agent should call it.** An action marked as a tool becomes an AI agent tool.
 
-A script-language custom component is a **single file** whose completion value is an object exposing these members:
+A code workflow and a custom component do different jobs. A code workflow is a workflow: it calls components. A
+custom component is a building block: workflows, including code workflows, call it. A script custom component cannot
+call other components.
 
-| Member | Type | Required |
+## Languages and artifacts
+
+The language comes from the file extension.
+
+| Language | Artifact | Extension | Create in ByteChef | Edit source in ByteChef |
+|---|---|---|---|---|
+| JavaScript | one source file | `.js` | Yes | Yes |
+| Python | one source file | `.py` | No, upload only | Yes |
+| Java | jar | `.jar` | No, upload only | No |
+
+JavaScript and Python components run in the GraalVM polyglot sandbox. Java components run in the server JVM behind an
+isolating class loader. An administrator can turn off Java uploads; see [Restricting Java uploads](#restricting-java-uploads).
+
+Ruby (`.rb`) is recognized by the language detection but uploads are rejected with `LANGUAGE_NOT_SUPPORTED`. Any other
+extension is rejected as an unsupported language.
+
+## Sample repositories
+
+| Language | Repository | Walkthrough |
 |---|---|---|
-| `name` | String | Yes |
-| `version` | Integer | Yes |
-| `title` | String | No |
-| `description` | String | No |
-| `icon` | String - an inline SVG shown in lists and on the canvas | No |
-| `connection` | `{ baseUri, authorizations, properties }` (see below) | No |
-| `actions` | array of `{ name, title, description, properties, output, sampleOutput, tool, perform }` | No |
-| `triggers` | array of triggers (see below) | No |
+| Java | [bytechef-sample-custom-component-java](https://github.com/bytechefhq/bytechef-sample-custom-component-java) | [Java sample](#example-the-java-sample) |
+| JavaScript | [bytechef-sample-custom-component-javascript](https://github.com/bytechefhq/bytechef-sample-custom-component-javascript) | [JavaScript sample](#example-the-javascript-sample) |
 
-The object is expressed in each language's natural shape:
+There is no Python sample repository. The [Python example](#a-python-component) below shows the same contract in
+Python. [Sample Repositories](/platform/sample-repositories) lists every ByteChef sample.
 
-- **JavaScript** - a bare object literal, `({ ... })`.
-- **Python** - a `types.SimpleNamespace`.
+---
 
-### The action perform contract
+## Identity, versions and status
 
-Each action's `perform` is invoked as `perform(inputParameters, connectionParameters, context)`:
+A custom component is identified by its **name** and its **version**, both declared in the component itself. Each
+version is a separate row in the list, and workflows pin the version they use: publishing version 2 does not change
+what a workflow bound to version 1 runs. In a workflow, an action is referenced as
+`<name>/v<version>/<actionName>`, for example `sampleCustomComponentJavaScript/v1/sampleAction1`.
 
-- `inputParameters` - the values the workflow configured for the action's declared `properties` (`[{name, type, label, required, ...}]`, the same property shape the connection uses). An action with no declared properties receives an empty map.
-- `connectionParameters` - the parameters of the connection selected for the component, empty when none is configured.
-- `context` - two capabilities: `context.http(request)` executes an HTTP call through the platform's HTTP client, and `context.log(level, message)` writes to the task's execution log. `http` takes a single request object and returns `{ statusCode, headers, body }`.
+Each version has a **status**:
 
-```javascript
-perform: function (inputParameters, connectionParameters, context) {
-    const response = context.http({
-        method: "GET",
-        url: "https://api.example.com/items/" + inputParameters.itemId,
-        headers: {"Authorization": "Bearer " + connectionParameters.accessToken}
-    });
+| Status | Editable in ByteChef | Visible to workflows |
+|---|---|---|
+| **Draft** | Yes | No |
+| **Published** | No: saving a change starts a new draft version | Yes |
 
-    context.log("info", "fetched item " + inputParameters.itemId);
+and an **enabled** switch. A disabled component is left out of the component catalog, so it cannot be added to new
+steps. Steps that already reference that name and version keep resolving it.
 
-    return response.body;
-}
-```
+There is at most **one draft per component name**.
 
-The request's members:
+---
 
-| Member | | |
-| --- | --- | --- |
-| `url` | required | the full URL |
-| `method` | required | `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD` |
-| `headers` | optional | `{name: value}`; a value may be a string or an array of strings |
-| `queryParameters` | optional | same shape as `headers` |
-| `body` | optional | **a wrapper, not the payload** - see below |
-| `configuration` | optional | see below |
+## The script contract
 
-`body` is `{content, contentType, mimeType?}`, not the payload itself - writing `body: {id: 1}` fails, because `contentType` is required and read first:
+This section applies to JavaScript and Python components. For Java, see [The Java contract](#the-java-contract).
+
+### The file
+
+A script component is **one file**. ByteChef evaluates it and reads the value it evaluates to:
+
+- **JavaScript**: the file's completion value is the definition, usually one parenthesized object expression,
+  `({ ... })`. Do not use `export`, `module.exports` or a bundler: they hide the object from the server.
+- **Python**: the file's **last expression** is the definition, a `types.SimpleNamespace`. Define your functions with
+  `def` above it. The members inside it (actions, properties, connection) are ordinary `dict`s and `list`s.
+
+ByteChef evaluates the file again for every call: loading the definition, each action run, each trigger poll or webhook
+request, each options lookup. Top-level code should only build the definition. Nothing you store in a variable survives
+from one call to the next; a polling trigger carries its state in `closureParameters` instead.
+
+### Component
+
+| Member | Type | Required | |
+|---|---|---|---|
+| `name` | string | Yes | The component's identity. Cannot change once the component exists. A letter followed by letters and digits (camelCase, for example `acmeTasks`), at most 128 characters, and not the name of a built-in component. |
+| `version` | integer | Yes | The component version. |
+| `title` | string | No | Shown in the catalog and the list. |
+| `description` | string | No | |
+| `icon` | string | No | An inline SVG, shown in lists and on the canvas. |
+| `connection` | object | No | See [Connections](#connections). |
+| `actions` | list of actions | No | See [Actions](#actions). |
+| `triggers` | list of triggers | No | See [Triggers](#triggers). |
+
+### Actions
+
+| Member | Type | Required | |
+|---|---|---|---|
+| `name` | string | Yes | Unique within the component. A letter followed by letters and digits, for example `createTask`. Trigger names follow the same rule. |
+| `perform` | function | Yes | Called as `perform(input, connection, context)`. Its return value is the action's output. |
+| `title` | string | No | |
+| `description` | string | No | For a tool, the text the model reads. |
+| `properties` | list of properties | No | The action's inputs. See [Properties](#properties). |
+| `output` | property | No | The output schema. See [Output](#output). |
+| `sampleOutput` | any | No | A sample of the output. |
+| `tool` | boolean | No | `true` also exposes the action as an AI agent tool. See [Tools](#tools). |
+
+### The perform function
+
+`perform(input, connection, context)` receives three arguments, named like the
+[Script component's](/platform/automation/build/workflows/code-workflows#scripting-languages):
+
+| Argument | Holds |
+|---|---|
+| `input` | The values the step configured for the action's `properties`, keyed by property name. Empty when the action declares none. |
+| `connection` | The parameters of the connection selected for the step, keyed by connection property name (for OAuth2, the platform's token values such as `access_token`). Empty when no connection is configured. |
+| `context` | Two functions: `context.http(request)` and `context.log(level, message)`. |
+
+Return any JSON-like value: an object, a list, a string, a number, a boolean or `null`. It becomes the step's output.
+
+In JavaScript, a `perform` that declares fewer parameters still works, because JavaScript ignores extra arguments. In
+Python, declare all three.
+
+#### context.http
+
+`context.http(request)` executes an HTTP request through the platform's HTTP client, the same client built-in
+components use, so the selected connection's authorization (for example the bearer token or API key header) is applied
+to the request unless you turn it off. It returns `{statusCode, headers, body}`.
+
+| Request member | Required | |
+|---|---|---|
+| `url` | Yes | The full URL. |
+| `method` | Yes | `GET`, `POST`, `PUT`, `PATCH`, `DELETE` or `HEAD`. |
+| `headers` | No | `{name: value}`. A value is a string or a list of strings. |
+| `queryParameters` | No | Same shape as `headers`. |
+| `body` | No | A wrapper around the payload, `{content, contentType, mimeType}`. See below. |
+| `configuration` | No | Request options. See below. |
+
+`body` is not the payload itself. `contentType` is required and is one of `JSON`, `FORM_URL_ENCODED`, `FORM_DATA`,
+`RAW` or `XML`. `mimeType` applies to `RAW` and `XML` only. `BINARY` bodies are not supported in the sandbox and fail
+when the action runs.
 
 ```javascript
 body: {content: {id: 1}, contentType: "JSON"}
 body: {content: "a,b\n1,2", contentType: "RAW", mimeType: "text/csv"}
 ```
 
-`contentType` is one of `JSON`, `FORM_URL_ENCODED`, `FORM_DATA`, `RAW`, `XML`. `mimeType` applies to `RAW` and `XML` only. **`BINARY` bodies are not supported** in the sandbox and fail at run time.
-
-`configuration` carries the request options: `timeoutMillis`, `followRedirect`, `followAllRedirects`, `allowUnauthorizedCerts`, `disableAuthorization`, and `responseType` (`JSON`, `TEXT`, `BINARY`, …).
+`configuration` takes `timeoutMillis` (a number), `responseType` (`JSON`, `TEXT`, `XML` or `BINARY`), and the
+booleans `followRedirect`, `followAllRedirects`,
+`allowUnauthorizedCerts` and `disableAuthorization`.
 
 ```javascript
 const response = context.http({
@@ -181,22 +186,130 @@ const response = context.http({
     body: {content: {name: "widget"}, contentType: "JSON"},
     configuration: {timeoutMillis: 10000, responseType: "JSON"}
 });
+
+return response.body;
 ```
 
 <Callout type="warn">
-    Every enumerated value above is resolved by name on the host, so a wrong string - a lowercase `"get"`, a `contentType` of `"application/json"` - fails when the action runs rather than when it is saved.
+    Enumerated values are resolved by name on the server, so they are case sensitive. A lowercase `"get"` or a
+    `contentType` of `"application/json"` fails when the action runs, not when the component is saved.
 </Callout>
 
-Zero-argument perform functions keep working - the arguments are simply not passed to them. Script custom components run in a strict GraalVM sandbox: no host access, no filesystem or network IO besides `context.http`, no environment access. They deliberately cannot invoke other components - that capability belongs to code workflow tasks.
+#### context.log
 
-### Declaring an action's output
+`context.log(level, message)` writes a line to the step's execution log. `level` is `TRACE`, `DEBUG`, `INFO`, `WARN`
+or `ERROR`, in upper case. Any other value, including the lower-case forms, is logged at `INFO`.
 
-Without an output declaration an action publishes no schema, so downstream steps see nothing in the data-pill picker. Declare `output` - a property, usually an object with nested `properties` - and/or a `sampleOutput`:
+```javascript
+context.log("WARN", "item " + input.itemId + " has no owner");
+```
+
+`console.log` in JavaScript and `print` in Python do not reach the execution log. They go to the server log, prefixed
+with `[guest]`.
+
+### Properties
+
+Actions, triggers and connections declare their inputs as a list of properties, each an object with a `name` and a
+`type`.
+
+| Type | Type-specific members |
+|---|---|
+| `STRING` | `minLength`, `maxLength`, `regex`, `defaultValue`, `options`, `controlType` |
+| `INTEGER` | `minValue`, `maxValue`, `defaultValue`, `options` |
+| `NUMBER` | `minValue`, `maxValue`, `defaultValue`, `options` |
+| `BOOLEAN` | `defaultValue` |
+| `DATE`, `DATE_TIME`, `TIME` | |
+| `OBJECT` | `properties`, `additionalProperties` (lists of properties) |
+| `ARRAY` | `items` (a list of properties), `minItems`, `maxItems`, `multipleValues` |
+| `FILE_ENTRY` | |
+| `NULL` | |
+| `DYNAMIC_PROPERTIES` | `properties` (a function), `propertiesLookupDependsOn`. Actions only; see [Dynamic properties](#dynamic-properties). |
+
+Every type also takes `label`, `description`, `placeholder`, `required`, `advancedOption`, `hidden`,
+`expressionEnabled` and `displayCondition`. `controlType` is the name of an editor control, such as `TEXT_AREA`,
+`PASSWORD`, `EMAIL` or `URL`, and applies to `STRING` properties. `optionsLookupDependsOn` lists the names of the
+properties whose values an options function reads.
+
+Static `options` are a list of `{label, value}` entries whose values match the property's type:
 
 ```javascript
 {
-    name: "getThing",
-    properties: [{name: "thingId", type: "STRING", required: true}],
+    name: "priority",
+    type: "STRING",
+    label: "Priority",
+    options: [
+        {label: "Low", value: "low"},
+        {label: "High", value: "high"}
+    ],
+    defaultValue: "low"
+}
+```
+
+An unknown `type` fails the load with `Unsupported property type`.
+
+#### Dynamic options
+
+On an action property of type `STRING`, `INTEGER` or `NUMBER`, `options` can be a function. The editor calls it when
+the user opens the dropdown, so the choices can depend on the other inputs and on the selected connection:
+
+```javascript
+{
+    name: "projectId",
+    type: "STRING",
+    label: "Project",
+    required: true,
+    options: function (input, connection, searchText) {
+        return [
+            {label: "Website", value: "p-1"},
+            {label: "Mobile App", value: "p-2"}
+        ];
+    }
+}
+```
+
+The function receives the action's current input values, the selected connection's parameters and the search text
+the user typed (or `null`). It returns a list of `{label, value}` entries, or a list of plain values, each used as both
+label and value. Values are passed to the editor as strings. To re-run the lookup when another field changes, list
+that field in `optionsLookupDependsOn`.
+
+#### Dynamic properties
+
+A property of type `DYNAMIC_PROPERTIES` stands for a set of properties computed at edit time, for example the fields of
+a record type the user picked:
+
+```javascript
+{
+    name: "fields",
+    type: "DYNAMIC_PROPERTIES",
+    propertiesLookupDependsOn: ["recordType"],
+    properties: function (input, connection) {
+        if (input.recordType === "contact") {
+            return [
+                {name: "email", type: "STRING", label: "Email", required: true},
+                {name: "phone", type: "STRING", label: "Phone"}
+            ];
+        }
+
+        return [{name: "title", type: "STRING", label: "Title"}];
+    }
+}
+```
+
+The function receives the action's current input values and the connection's parameters, and returns a list of
+properties in the same shape as a static `properties` list. It must not return another `DYNAMIC_PROPERTIES` property.
+
+Dynamic options and dynamic properties are supported on **action** properties. Trigger and connection properties are
+static.
+
+### Output
+
+Without an output declaration an action publishes no schema, and downstream steps have no data pills to pick from.
+Declare `output` as a property, usually an `OBJECT` with nested `properties`, and optionally a `sampleOutput`:
+
+```javascript
+{
+    name: "getItem",
+    properties: [{name: "itemId", type: "STRING", required: true}],
     output: {
         type: "OBJECT",
         properties: [
@@ -205,48 +318,53 @@ Without an output declaration an action publishes no schema, so downstream steps
         ]
     },
     sampleOutput: {id: "42", name: "Widget"},
-    perform: function (inputParameters, connectionParameters, context) { /* ... */ }
+    perform: function (input, connection, context) { /* ... */ }
 }
 ```
 
-### Dynamic property options
+A `sampleOutput` without an `output` is accepted too. Triggers take the same two members.
 
-A property's `options` can be a static list or a **function** evaluated when the editor opens the dropdown, so choices can come from a live API call:
+### Tools
 
-```javascript
-{
-    name: "region",
-    type: "STRING",
-    options: function (inputParameters, connectionParameters, searchText) {
-        return [
-            {label: "Europe", value: "eu"},
-            {label: "United States", value: "us"}
-        ];
-    }
-}
-```
-
-The function receives the action's current input parameters, the selected connection's parameters, and the user's search text, and must return a list of `{label, value}` entries. A list of plain strings works too, using each entry as both label and value. Supported on `STRING`, `INTEGER`, and `NUMBER` properties.
-
-### Exposing an action as an AI tool
-
-A tool is an action - same properties, output, and perform - so an action opts in with `tool: true` and also becomes a `TOOLS` cluster element the [AI Agent](/platform/automation/build/workflows/ai/agent) can call. It stays usable as a normal action too. The `description` is what the model reads to decide when to call it, so write it for the model:
+An action with `tool: true` is also registered as a `TOOLS` cluster element, so an
+[AI agent](/platform/automation/build/workflows/ai/agent) can call it. It stays available as a normal action. The
+model decides when to call the tool from its `description`, so write the description for the model:
 
 ```javascript
 {
     name: "lookupCustomer",
     title: "Lookup Customer",
-    description: "Finds a customer by their email address.",
+    description: "Finds a customer by their email address and returns the customer's id.",
     tool: true,
     properties: [{name: "email", type: "STRING", required: true}],
     output: {type: "OBJECT", properties: [{name: "id", type: "STRING"}]},
-    perform: function (inputParameters, connectionParameters, context) { /* ... */ }
+    perform: function (input, connection, context) { /* ... */ }
 }
 ```
 
-### Polling triggers
+### Triggers
 
-A `POLLING` trigger declares a `poll` function called on a schedule with the state the previous poll returned, so it can carry a cursor:
+A trigger has a `name`, a `type` and, optionally, `title`, `description`, `properties`, `output` and `sampleOutput`.
+Three types are supported. A trigger without a `type` is a `POLLING` trigger.
+
+| Type | Functions | Fires when |
+|---|---|---|
+| `POLLING` | `poll` | The scheduled poll returns records. |
+| `STATIC_WEBHOOK` | `webhookRequest` | A request reaches the workflow's webhook URL, which you register with the provider yourself. |
+| `DYNAMIC_WEBHOOK` | `webhookEnable`, `webhookDisable`, `webhookRequest` | A request reaches the webhook URL the trigger registered with the provider when the workflow was enabled. |
+
+`LISTENER` triggers are rejected when the component loads: a listener holds a live connection open, and a script that
+is evaluated per call has nowhere to keep it.
+
+#### Polling triggers
+
+`poll(input, connection, closureParameters)` is called on a schedule. `closureParameters` holds what the previous poll
+returned, empty on the first poll. Return `{records, closureParameters, pollImmediately}`:
+
+- `records`: a list. Each record starts one workflow run.
+- `closureParameters`: an object handed to the next poll. Use it for a cursor or a last-seen timestamp.
+- `pollImmediately`: `true` polls again right away instead of waiting for the next scheduled poll, for paging
+  through a backlog.
 
 ```javascript
 triggers: [
@@ -254,65 +372,89 @@ triggers: [
         name: "newItem",
         title: "New Item",
         type: "POLLING",
-        properties: [{name: "folder", type: "STRING"}],
+        properties: [{name: "folder", type: "STRING", required: true}],
         output: {type: "OBJECT", properties: [{name: "id", type: "STRING"}]},
-        poll: function (inputParameters, connectionParameters, closureParameters) {
-            const since = closureParameters.cursor ?? 0;
+        poll: function (input, connection, closureParameters) {
+            const since = closureParameters.cursor || 0;
 
-            // fetch what changed since `since` …
+            const items = [{id: "1", createdAt: since + 1}];
 
-            return {records: [{id: "1"}], closureParameters: {cursor: since + 1}};
+            return {records: items, closureParameters: {cursor: since + 1}};
         }
     }
 ]
 ```
 
-Return `{records, closureParameters}` - each record starts one workflow run, and `closureParameters` is handed back on the next poll. Add `pollImmediately: true` to poll again right away instead of waiting for the next scheduled tick.
+<Callout title="Every function gets a context">
+    The same `context` that `perform` receives is passed as the last argument to the other functions too: trigger
+    functions (`poll(input, connection, closureParameters, context)`, `webhookRequest`, `webhookEnable`,
+    `webhookDisable`), options functions (`options(input, connection, searchText, context)`), dynamic properties
+    functions (`properties(input, connection, context)`) and connection URL and `apply` functions
+    (`tokenUrl(connection, context)`). A polling trigger can call the provider's API with `context.http`, and a
+    `DYNAMIC_WEBHOOK` trigger's `webhookEnable` can register the URL with it. The argument is optional: a function that
+    does not declare it is called without it, in Python as well as in JavaScript.
+</Callout>
 
-### Static webhook triggers
+#### Static webhook triggers
 
-A `STATIC_WEBHOOK` trigger fires when a request arrives at the workflow's webhook URL, which you paste into the provider yourself:
-
-```javascript
-triggers: [
-    {
-        name: "onPush",
-        title: "On Push",
-        type: "STATIC_WEBHOOK",
-        webhookRequest: function (inputParameters, connectionParameters, request) {
-            return {event: request.body.event, sender: request.headers["x-sender"]};
-        }
-    }
-]
-```
-
-The request arrives as one object - `{headers, parameters, body, method}` - and whatever you return becomes the trigger's output.
-
-### Dynamic webhook triggers
-
-A `DYNAMIC_WEBHOOK` trigger registers itself with the provider. Add `webhookEnable` and `webhookDisable` alongside `webhookRequest`:
+`webhookRequest(input, connection, request)` is called for each request that reaches the workflow's webhook URL.
+`request` is `{headers, parameters, body, method}`, and the return value becomes the trigger's output:
 
 ```javascript
 {
-    name: "onPush", type: "DYNAMIC_WEBHOOK",
-    webhookEnable: function (inputParameters, connectionParameters, args) {
-        // args.webhookUrl is the URL the platform minted for this workflow
-        return {subscriptionId: "..."};          // kept and handed back later
-    },
-    webhookDisable: function (inputParameters, connectionParameters, args) {
-        // args carries whatever webhookEnable returned
-    },
-    webhookRequest: function (inputParameters, connectionParameters, request) { /* ... */ }
+    name: "onPush",
+    title: "On Push",
+    type: "STATIC_WEBHOOK",
+    webhookRequest: function (input, connection, request) {
+        return {event: request.body.event, sender: request.headers["x-sender"]};
+    }
 }
 ```
 
-Whatever `webhookEnable` returns is retained by the platform and passed back to `webhookDisable`.
+#### Dynamic webhook triggers
 
-`LISTENER` is rejected at save time: enabling one opens a live, long-lived listener rather than making a call, and a per-invocation sandbox has nowhere to keep it.
+A `DYNAMIC_WEBHOOK` trigger registers its URL with the provider. Add `webhookEnable` and `webhookDisable` alongside
+`webhookRequest`:
 
-### Declaring a connection
+```javascript
+{
+    name: "onIssue",
+    title: "On Issue",
+    type: "DYNAMIC_WEBHOOK",
+    webhookEnable: function (input, connection, args) {
+        // args.webhookUrl is the URL the platform minted for this workflow.
+        return {subscriptionId: "sub-123"};
+    },
+    webhookDisable: function (input, connection, args) {
+        // args holds what webhookEnable returned, for example args.subscriptionId.
+    },
+    webhookRequest: function (input, connection, request) {
+        return request.body;
+    }
+}
+```
 
-The optional `connection` member declares the component's connection the same way built-in components do - the Connections page can then create connections of this type, the workflow editor offers wiring, and `perform` receives the values as `connectionParameters`:
+`webhookEnable` runs when a workflow using the trigger is enabled. Whatever object it returns is stored and passed to
+`webhookDisable` when the workflow is disabled. A `DYNAMIC_WEBHOOK` trigger without one of the three functions fails
+when that function would run.
+
+### Connections
+
+The optional `connection` member declares the component's connection type. The Connections page can then create
+connections of that type, the workflow editor offers them on the component's steps, and `perform` receives the selected
+connection's parameters as its `connection` argument.
+
+| Member | |
+|---|---|
+| `baseUri` | A string, the API's base URL. |
+| `authorizations` | A list of authorizations. A connection without it, but with `properties`, gets one implicit `CUSTOM` authorization. |
+| `properties` | Connection-level properties. They apply to every authorization that declares no `properties` of its own. |
+
+An authorization has a `type` and optional `properties`, `authorizationUrl`, `tokenUrl`, `refreshUrl`, `scopes` (a list
+of strings) and `apply`. `type` is one of `API_KEY`, `BASIC_AUTH`, `BEARER_TOKEN`, `CUSTOM`, `DIGEST_AUTH`,
+`OAUTH2_AUTHORIZATION_CODE`, `OAUTH2_AUTHORIZATION_CODE_PKCE`, `OAUTH2_CLIENT_CREDENTIALS`, `OAUTH2_IMPLICIT_CODE` or
+`OAUTH2_RESOURCE_OWNER_PASSWORD`. For OAuth2 types the platform runs the whole flow: the authorization redirect, the
+callback, the token exchange and the refresh. The component only declares the endpoints.
 
 ```javascript
 connection: {
@@ -322,99 +464,717 @@ connection: {
             type: "OAUTH2_AUTHORIZATION_CODE",
             authorizationUrl: "https://example.com/oauth/authorize",
             tokenUrl: "https://example.com/oauth/token",
-            scopes: ["read", "write"]
+            scopes: ["read", "write"],
+            properties: [
+                {name: "clientId", type: "STRING", label: "Client Id", required: true},
+                {name: "clientSecret", type: "STRING", label: "Client Secret", required: true}
+            ]
         }
-    ],
-    properties: [
-        {name: "clientId", type: "STRING", required: true},
-        {name: "clientSecret", type: "STRING", required: true}
     ]
 }
 ```
 
-All authorization types are supported: `API_KEY`, `BEARER_TOKEN`, `BASIC_AUTH`, `CUSTOM`, and the OAuth2 grant types (`OAUTH2_AUTHORIZATION_CODE`, `OAUTH2_AUTHORIZATION_CODE_PKCE`, `OAUTH2_CLIENT_CREDENTIALS`). The platform runs the whole OAuth flow - authorize redirect, callback, token exchange, refresh - your component only declares the endpoints.
-
-`authorizationUrl`, `tokenUrl`, and `refreshUrl` accept either a string constant or a function of the connection parameters, for region- or tenant-dependent endpoints:
+`authorizationUrl`, `tokenUrl` and `refreshUrl` take a string or a function of the connection parameters, for region-
+or tenant-specific endpoints. The function must return a string:
 
 ```javascript
-tokenUrl: function (connectionParameters) {
-    return "https://" + connectionParameters.region + ".example.com/oauth/token";
+tokenUrl: function (connection) {
+    return "https://" + connection.region + ".example.com/oauth/token";
 }
 ```
 
-An authorization may also declare `apply: function (connectionParameters) { return {headers: {...}, queryParameters: {...}}; }` to override how credentials decorate outgoing requests. A custom `apply` runs on **every** request the connection makes, so it is an opt-in cost.
+An authorization's `apply(connection)` function overrides how the credentials decorate outgoing requests. It returns
+`{headers, queryParameters}`, each an object whose values are strings or lists of strings:
 
-Connection-level `properties` attach to each declared authorization, or to an implicit `CUSTOM` authorization when none is declared.
+```javascript
+{
+    type: "CUSTOM",
+    properties: [{name: "token", type: "STRING", label: "Token", required: true}],
+    apply: function (connection) {
+        return {headers: {"X-Api-Token": connection.token}};
+    }
+}
+```
 
-## Deploying programmatically
+`apply` runs on every request the connection makes, so each request pays for one more evaluation of the file.
 
-The same components can be deployed through the public API:
+### A complete JavaScript component
+
+A component with an API key connection, an action with dynamic options and a polling trigger:
+
+```javascript
+({
+    name: "acmeTasks",
+    title: "Acme Tasks",
+    description: "Create and watch tasks in Acme.",
+    version: 1,
+    connection: {
+        baseUri: "https://api.acme.example",
+        authorizations: [
+            {
+                type: "BEARER_TOKEN",
+                properties: [{name: "token", type: "STRING", label: "API Token", required: true}]
+            }
+        ]
+    },
+    actions: [
+        {
+            name: "createTask",
+            title: "Create Task",
+            description: "Creates a task in a project.",
+            tool: true,
+            properties: [
+                {
+                    name: "projectId",
+                    type: "STRING",
+                    label: "Project",
+                    required: true,
+                    options: function (input, connection, searchText) {
+                        return [
+                            {label: "Website", value: "p-1"},
+                            {label: "Mobile App", value: "p-2"}
+                        ];
+                    }
+                },
+                {name: "title", type: "STRING", label: "Title", required: true},
+                {name: "notes", type: "STRING", label: "Notes", controlType: "TEXT_AREA"}
+            ],
+            output: {
+                type: "OBJECT",
+                properties: [
+                    {name: "id", type: "STRING"},
+                    {name: "title", type: "STRING"}
+                ]
+            },
+            perform: function (input, connection, context) {
+                const response = context.http({
+                    method: "POST",
+                    url: "https://api.acme.example/projects/" + input.projectId + "/tasks",
+                    body: {content: {title: input.title, notes: input.notes}, contentType: "JSON"},
+                    configuration: {responseType: "JSON"}
+                });
+
+                context.log("INFO", "Created task " + response.body.id);
+
+                return response.body;
+            }
+        }
+    ],
+    triggers: [
+        {
+            name: "newTask",
+            title: "New Task",
+            type: "POLLING",
+            properties: [{name: "projectId", type: "STRING", label: "Project ID", required: true}],
+            output: {type: "OBJECT", properties: [{name: "id", type: "STRING"}]},
+            poll: function (input, connection, closureParameters) {
+                const lastSeen = closureParameters.lastSeen || 0;
+
+                return {records: [], closureParameters: {lastSeen: lastSeen}};
+            }
+        }
+    ]
+})
+```
+
+### A Python component
+
+The same contract in Python. Define the functions with `def`, then end the file with the `types.SimpleNamespace`:
+
+```python
+import types
+
+
+def list_projects(input, connection, search_text):
+    return [
+        {"label": "Website", "value": "p-1"},
+        {"label": "Mobile App", "value": "p-2"},
+    ]
+
+
+def create_task(input, connection, context):
+    response = context.http({
+        "method": "POST",
+        "url": "https://api.acme.example/projects/" + input["projectId"] + "/tasks",
+        "body": {"content": {"title": input["title"]}, "contentType": "JSON"},
+        "configuration": {"responseType": "JSON"},
+    })
+
+    context.log("INFO", "Created a task")
+
+    return response["body"]
+
+
+types.SimpleNamespace(
+    name="acmeTasksPython",
+    title="Acme Tasks (Python)",
+    version=1,
+    connection={
+        "baseUri": "https://api.acme.example",
+        "authorizations": [
+            {
+                "type": "BEARER_TOKEN",
+                "properties": [{"name": "token", "type": "STRING", "label": "API Token", "required": True}],
+            }
+        ],
+    },
+    actions=[
+        {
+            "name": "createTask",
+            "title": "Create Task",
+            "properties": [
+                {"name": "projectId", "type": "STRING", "label": "Project", "required": True,
+                 "options": list_projects},
+                {"name": "title", "type": "STRING", "label": "Title", "required": True},
+            ],
+            "perform": create_task,
+        }
+    ],
+)
+```
+
+---
+
+## The Java contract
+
+A Java custom component is a jar that contains a `ComponentHandler` implementation, exactly like a built-in
+component. The [Developer Guide](/developer-guide) and the
+[component specification](/developer-guide/component-specification/component) cover the full Java DSL: components,
+[actions](/developer-guide/component-specification/action), [triggers](/developer-guide/component-specification/trigger),
+[connections](/developer-guide/component-specification/connection) and
+[properties](/developer-guide/component-specification/property).
+
+What the loader requires of the jar:
+
+- **A `ComponentHandler` registered for `ServiceLoader`.** Annotate the handler with
+  `@AutoService(ComponentHandler.class)` (or write `META-INF/services/com.bytechef.component.ComponentHandler` by hand).
+  The loader uses the first handler it finds, so put one component in each jar.
+- **An icon at `assets/sample.svg`.** The loader reads the component's icon from that path in the jar, whatever the
+  handler's own `.icon(...)` says. A jar without that file fails to load.
+- **Everything except the ByteChef API inside the jar.** Classes in `java.*`, `jdk.*` and `com.bytechef.*` come from the
+  server; every other class is loaded only from your jar, with no fallback to the server's class path. Build against
+  the ByteChef `component-api` and `definition-api` without bundling them, and bundle every other runtime dependency
+  (a fat or shaded jar). Do not put your own classes in a `com.bytechef` package.
+
+The component's `name` and `version` come from the `ComponentDefinition` (`component("name").version(2)`; the version
+defaults to `1`).
+
+Java components cannot be edited in ByteChef. To change one, rebuild the jar and upload it again; see
+[Versions and drafts](#versions-and-drafts) for what an upload does to an existing version.
+
+---
+
+## Example: the Java sample
+
+[bytechef-sample-custom-component-java](https://github.com/bytechefhq/bytechef-sample-custom-component-java) is a
+Gradle project with one component, `sampleCustomComponentJava`, that has one action, `sampleAction`. The ByteChef API
+jars it compiles against are checked in under `libs/`. The listings below omit the files' license headers.
+
+`build.gradle.kts`:
+
+```kotlin
+plugins {
+    id("java")
+}
+
+group = "org.sample"
+version = "1.0.0"
+
+repositories {
+    mavenCentral()
+
+    flatDir {
+        dirs("lib")
+    }
+}
+
+dependencies {
+    annotationProcessor("com.google.auto.service:auto-service:1.1.1")
+
+    implementation("com.google.auto.service:auto-service:1.1.1")
+    implementation(files("libs/component-api-1.0.jar"))
+    implementation(files("libs/definition-api-1.0.jar"))
+
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+tasks.jar {
+    archiveBaseName.set("sample-custom-component-java")
+}
+```
+
+`src/main/java/org/sample/customcomponent/SampleComponentHandler.java` registers the handler and assembles the
+component:
+
+```java
+package org.sample.customcomponent;
+
+import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDefinition;
+import com.google.auto.service.AutoService;
+import org.sample.customcomponent.connection.SampleConnection;
+import org.sample.customcomponent.action.SampleAction;
+
+import static com.bytechef.component.definition.ComponentDsl.component;
+import static org.sample.customcomponent.constant.SampleConstants.SAMPLE_CUSTOM_COMPONENT;
+
+/**
+ * @author Ivica Cardic
+ */
+@AutoService(ComponentHandler.class)
+public class SampleComponentHandler implements ComponentHandler {
+
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(SAMPLE_CUSTOM_COMPONENT)
+        .title("Sample Custom Component")
+        .description("Sample custom component description.")
+        .icon("path:assets/sample.svg")
+        .categories(ComponentCategory.HELPERS)
+        .connection(SampleConnection.CONNECTION_DEFINITION)
+        .actions(SampleAction.ACTION_DEFINITION);
+
+    @Override
+    public ComponentDefinition getDefinition() {
+        return COMPONENT_DEFINITION;
+    }
+}
+```
+
+`src/main/java/org/sample/customcomponent/action/SampleAction.java` declares one string property and an object
+output with `key` and `message`, and returns a record built from it:
+
+```java
+package org.sample.customcomponent.action;
+
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Parameters;
+
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static org.sample.customcomponent.constant.SampleConstants.SAMPLE_ACTION;
+
+/**
+ * @author Mario Cvjetojevic
+ */
+public final class SampleAction {
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SAMPLE_ACTION)
+        .title("Sample Action")
+        .description("Sample action description")
+        .properties(
+            string("property1")
+                .label("Property1")
+        )
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string("key"),
+                        string("message"))))
+        .perform(SampleAction::perform);
+
+    private SampleAction() {
+    }
+
+    public static Record perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        return new Result("key1", "Hello " + inputParameters.get("property1"));
+    }
+
+    record Result(String key, String message) {
+    }
+}
+```
+
+`src/main/java/org/sample/customcomponent/connection/SampleConnection.java` is a bearer token connection against the
+placeholder base URI `https://api.example.com`, so using the component in a workflow needs a connection with any token
+value. Point the base URI at your API and swap the authorization for the one it needs:
+
+```java
+package org.sample.customcomponent.connection;
+
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
+public class SampleConnection {
+
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://api.example.com")
+        .authorizations(
+            authorization(AuthorizationType.BEARER_TOKEN)
+                .title("Bearer Token")
+                .properties(
+                    string(Authorization.TOKEN)
+                        .label("Token")
+                        .required(true)));
+
+    private SampleConnection() {
+    }
+}
+```
+
+`src/main/java/org/sample/customcomponent/constant/SampleConstants.java` holds the names:
+
+```java
+package org.sample.customcomponent.constant;
+
+/**
+ * @author Ivica Cardic
+ */
+public final class SampleConstants {
+
+    public static final String SAMPLE_ACTION = "sampleAction";
+    public static final String SAMPLE_CUSTOM_COMPONENT = "sampleCustomComponentJava";
+
+    private SampleConstants() {
+    }
+}
+```
+
+The icon lives at `src/main/resources/assets/sample.svg`, the path the loader reads.
+
+### Build
+
+The Gradle wrapper (Gradle 9.4.1) needs JDK 25:
+
+```bash
+git clone https://github.com/bytechefhq/bytechef-sample-custom-component-java.git
+cd bytechef-sample-custom-component-java
+./gradlew jar
+```
+
+The jar is written to `build/libs/sample-custom-component-java-1.0.0.jar`. Check that it contains
+`META-INF/services/com.bytechef.component.ComponentHandler` and `assets/sample.svg`:
+
+```bash
+unzip -l build/libs/sample-custom-component-java-1.0.0.jar
+```
+
+### Deploy
+
+Upload the jar from **Settings → Custom Components → New Component → Import Component**, or through the
+[API](#deploying-through-the-api):
+
+```bash
+curl -X POST "$BYTECHEF_URL/api/platform/v1/custom-components/deploy" \
+  -H "Authorization: Bearer $BYTECHEF_ADMIN_API_KEY" \
+  -F "componentFile=@build/libs/sample-custom-component-java-1.0.0.jar"
+```
+
+The component appears as **Sample Custom Component**, version 1, published and enabled. Add its **Sample Action** to a
+workflow, fill in **Property1** and run the step: the output is `{"key": "key1", "message": "Hello <value>"}`.
+
+---
+
+## Example: the JavaScript sample
+
+[bytechef-sample-custom-component-javascript](https://github.com/bytechefhq/bytechef-sample-custom-component-javascript)
+contains one file that matters, `src/sample_custom_component.js`, and that file is what you upload. There is no build
+step:
+
+```javascript
+({
+  name: 'sampleCustomComponentJavaScript',
+  title: 'Sample Custom Component',
+  description: 'A sample custom component written in JavaScript.',
+  version: 1,
+  actions: [
+    {
+      name: 'sampleAction1',
+      title: 'Sample Action 1',
+      description: 'Builds a greeting for a name.',
+      properties: [
+        {
+          name: 'name',
+          type: 'STRING',
+          label: 'Name',
+          required: true,
+        },
+      ],
+      output: {
+        type: 'OBJECT',
+        properties: [
+          { name: 'message', type: 'STRING' },
+        ],
+      },
+      sampleOutput: { message: 'Hello, ByteChef' },
+      perform(input, connection, context) {
+        context.log('INFO', `Greeting ${input.name}`);
+
+        return { message: `Hello, ${input.name}` };
+      },
+    },
+  ],
+});
+```
+
+The file is one parenthesized object expression, so the value it evaluates to is the definition. Do not use `export`,
+`module.exports`, `require` or a bundler: they hide the definition from the server. The action has one required
+`STRING` property, `name`, and an `OBJECT` output that declares `message`, so downstream steps get a data pill for it.
+`perform(input, connection, context)` logs `Greeting <name>` with `context.log('INFO', ...)`, which writes to the step's
+execution log (`console.log` goes to the server log instead), and returns `{"message": "Hello, <name>"}`. The component
+declares no connection; see [Connections](#connections) to add one.
+
+### Check
+
+```bash
+git clone https://github.com/bytechefhq/bytechef-sample-custom-component-javascript.git
+cd bytechef-sample-custom-component-javascript
+npm install
+npm run check
+```
+
+`npm run check` evaluates `src/sample_custom_component.js` the way the server does and checks that it declares a name, a
+version and a `perform` function for each action. It prints:
+
+```
+sampleCustomComponentJavaScript v1: sampleAction1
+```
+
+`npm run lint` runs ESLint over the project.
+
+### Deploy
+
+From the UI, **Settings → Custom Components → New Component → Import Component**, then pick
+`src/sample_custom_component.js`. Through the API:
+
+```bash
+curl -X POST "$BYTECHEF_URL/api/platform/v1/custom-components/deploy" \
+  -H "Authorization: Bearer $BYTECHEF_ADMIN_API_KEY" \
+  -F "componentFile=@src/sample_custom_component.js"
+```
+
+The file must keep its `.js` extension: ByteChef picks the language from it. The component appears as **Sample Custom
+Component**, version 1, published. Add **Sample Action 1** to a workflow, fill in **Name** and run the step. Because it
+is a script component, clicking its row opens the source editor, so you can continue in ByteChef: raise `version` to
+`2`, save, and a draft of version 2 is created next to the published version 1.
+
+---
+
+## Working in the UI
+
+### The Custom Components page
+
+**Settings → Custom Components** lists every version of every custom component, sorted by name. Each row shows the
+title with a version badge, the name, a language badge (`JAVASCRIPT`, `PYTHON`, `JAVA`), a **Draft** or **Published**
+badge, an enable/disable switch, the last modified time, and a **⋮** menu with **Delete**.
+
+- Clicking a **JavaScript or Python** row opens its [source editor](#the-source-editor).
+- A **Java** row is not clickable. Its chevron expands the row to show the component's actions and triggers, read-only.
+
+**Delete** asks for confirmation, then removes that version and its stored file. It does not check whether workflows
+still use the version.
+
+{/* TODO screenshot: Settings → Custom Components - list of custom component rows each showing title, name, version, language and status badges, an enable/disable switch, and the New Component button in the header */}
+
+### The New Component menu
+
+**New Component** in the page header (or in the empty state, when there are no custom components yet) opens a menu
+with two entries:
+
+- **New Component** opens the [create dialog](#creating-a-component).
+- **Import Component** opens the [import dialog](#importing-files).
+
+### Creating a component
+
+The **New Custom Component** dialog ("Create an empty custom component and start building it.") has two fields:
+
+| Field | |
+|---|---|
+| **Name** | Required, up to 256 characters. It becomes the component's `name` and `title`. It must not contain quotes, backslashes or line breaks, and must not be taken. Use an identifier such as `acmeTasks`: the name is part of every step type that uses the component. |
+| **Language** | **JavaScript**, the only language that can be created in ByteChef. To start in Python, write the file and import it. |
+
+**Create** generates a starter component, version 1, as a **draft**, and opens it in the source editor. The starter
+declares one action, `myAction`, with one `input` property, a `perform(input, connection, context)` that returns its
+input, and commented-out examples of a connection, `context.log` and `context.http`.
+
+### The source editor
+
+The editor page shows a back arrow, the component's title, its language badge and its **Draft** or **Published**
+badge, with **Save** and **Publish** buttons, above a Monaco editor with the source.
+
+- **Save** is enabled once you change the source. The server loads the edited source before it stores it, so source
+  that does not evaluate, or that breaks the contract, is rejected with the loader's error and nothing is saved.
+- **Publish** is enabled on a draft with no unsaved changes. It makes the draft visible to workflows.
+
+What **Save** does depends on the version you are editing:
+
+- **A draft**: the draft is updated in place. You may change its `version`, as long as no other version of the
+  component has that number.
+- **A published version**: you must raise `version` above the highest existing version of the component. **Save**
+  then creates a new draft with that version and the editor switches to it. The published version is unchanged and
+  keeps serving workflows.
+
+The source cannot change the component's `name`.
+
+{/* TODO screenshot: custom component detail page - Monaco source editor with a JavaScript component open, the header showing the component title, language and status badges, Back arrow, and the Save and Publish buttons */}
+
+### Importing files
+
+The **Import Custom Component** dialog ("Upload a custom component file to deploy it to the platform.") takes one or
+more files: click the drop zone to browse. It accepts `.jar`, `.js` and `.py` files, or only `.js` and `.py` when
+[Java uploads are off](#restricting-java-uploads). **Import** uploads the files one by one and shows the result of each.
+
+An import publishes immediately; see [Versions and drafts](#versions-and-drafts).
+
+### Versions and drafts
+
+To release a new version of a published script component:
+
+1. Open the published version and raise `version` in the source above the highest existing version, for example from
+   `version: 1` to `version: 2`.
+2. **Save**. A draft of version 2 is created and opened.
+3. Keep editing and saving the draft.
+4. **Publish** when it is ready. Version 1 stays published next to version 2, and each workflow keeps the version it
+   was built with until you change its steps.
+
+An upload, through the import dialog or the API, works by name and version instead:
+
+| The uploaded file declares | Result |
+|---|---|
+| A name and version that do not exist yet | A new version, already **published** and enabled. |
+| The name and version of a **published** version | That version's file, title, description and icon are replaced in place. Workflows using it pick up the change. |
+| The name and version of a **draft** | Rejected with `VERSION_ALREADY_EXISTS`. Publish or delete the draft first. |
+
+### Errors
+
+| Error | Cause |
+|---|---|
+| `VERSION_NOT_BUMPED` | Saving a published version without raising `version` above the highest existing version. |
+| `DRAFT_ALREADY_EXISTS` | Saving a published version while the component already has a draft. Edit, publish or delete that draft. |
+| `VERSION_ALREADY_EXISTS` | A draft's new `version` collides with another version, or an upload targets a version owned by a draft. |
+| `COMPONENT_NOT_DRAFT` | Publishing something that is not a draft. |
+| `COMPONENT_ALREADY_EXISTS` | Creating a component whose name is taken. |
+| `INVALID_COMPONENT_NAME` | Creating a component with a blank name, or one containing quotes, backslashes or line breaks. |
+| `SOURCE_RENAME_UNSUPPORTED` | The edited source declares a different `name`. |
+| `JAVA_SOURCE_NOT_EDITABLE` | Reading or saving the source of a Java component. |
+| `LANGUAGE_NOT_SUPPORTED` | Creating a component in a language other than JavaScript, or uploading a Ruby file. |
+| `JAVA_CUSTOM_COMPONENT_UPLOAD_DISABLED` | Uploading a `.jar` while Java uploads are off. |
+
+---
+
+## Deploying through the API
+
+Deploy from CI or a script with the public endpoint:
 
 ```
 POST /api/platform/v1/custom-components/deploy
 ```
 
-A multipart request with a `componentFile` part whose extension selects the language (`.jar`, `.js`, `.py`). The endpoint is admin-only and returns `204` on success.
+| | |
+|---|---|
+| Body | `multipart/form-data` with one file part, `componentFile`. |
+| Language | Taken from the file name's extension: `.jar`, `.js` or `.py`. |
+| Authentication | `Authorization: Bearer <key>` with an [Admin API key](/platform/settings/admin-api-keys). Workspace and embedded API keys are rejected. |
+| Authorization | The key's owner must have the `ADMIN` authority. |
+| Success | `204 No Content`. |
 
-## Authoring with the AI Hub
+The upload follows the rules in [Versions and drafts](#versions-and-drafts): a new name and version is created
+published, an existing published version is replaced in place, and a version owned by a draft is rejected. A rule
+violation, such as `JAVA_CUSTOM_COMPONENT_UPLOAD_DISABLED` or `VERSION_ALREADY_EXISTS`, answers `400` with a problem
+detail. A key whose owner is not an administrator answers `403`.
 
-<Callout title="Not yet available">
-    The [AI Hub](/platform/automation/build/hub) has no specialist for custom components yet. Write the source in the
-    detail page's editor or in your own build.
-</Callout>
+```bash
+curl -X POST "$BYTECHEF_URL/api/platform/v1/custom-components/deploy" \
+  -H "Authorization: Bearer $BYTECHEF_ADMIN_API_KEY" \
+  -F "componentFile=@acme_tasks.js"
+```
 
-## Runtime and isolation
+`BYTECHEF_URL` is the server's base URL, for example `http://localhost:9555` for a local development server. The
+deploy endpoint runs on the instance that hosts the coordinator.
 
-Custom components are loaded at runtime through a sandboxed classloader:
+The import dialog uses a second endpoint, `POST /api/platform/internal/custom-components/deploy`, with the same body
+and the same `204` response. It authenticates with the signed-in user's session cookie and CSRF token instead of an API
+key, and is meant for the ByteChef client, not for scripts.
 
-- Each component lives in an isolated classloader, so version conflicts between components cannot poison each other.
-- A buggy component cannot reach into platform internals.
-- Loading a new component version does not require a process restart.
+---
 
-### Java uploads
+## Restricting Java uploads
 
-There is no switch that turns off Java custom component uploads: an administrator can upload a `.jar` whenever custom
-components are available. Java code workflows have one, `bytechef.workflow.code-workflow.java-enabled`
-(`BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED`, default `true`); see
-[Restricting Java code workflows](/platform/automation/build/workflows/code-workflows#restricting-java-code-workflows).
+A Java custom component is arbitrary bytecode running in the server JVM. To accept only sandboxed script components,
+turn Java uploads off:
 
-## Scaffolding with the CLI
+| Property | Environment variable | Default |
+|---|---|---|
+| `bytechef.component.custom-component.java-enabled` | `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED` | `true` |
 
-The CLI can scaffold a Java component from scratch or from an OpenAPI spec:
+With `false`:
+
+- Uploading a `.jar`, through the import dialog or the API, fails with `JAVA_CUSTOM_COMPONENT_UPLOAD_DISABLED`.
+- The import dialog accepts only `.js` and `.py` files.
+- JavaScript and Python components, and Java components uploaded before the switch, keep working.
+
+Code workflows have their own switch, `bytechef.workflow.code-workflow.java-enabled`. See
+[Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#component-configuration).
+
+---
+
+## How custom components run
+
+A published, enabled custom component is part of the component catalog: it appears in the workflow editor, its
+connection type appears on the Connections page, its tools appear among the AI agent's tools, and
+[Component Visibility](/platform/settings/components/component-visibility) policies apply to it like to a built-in
+component. Drafts are not in the catalog, so a draft cannot be run from a workflow. Publish it, or test the logic in a
+[Script step](/platform/automation/build/workflows/code-workflows#scripting-languages) first.
+
+- **JavaScript and Python** components run in the strict GraalVM sandbox, the same one behind the Script component:
+  no host class access, no file system, process or thread creation, no environment access, and only the network
+  access `context.http` provides. Each call gets a fresh guest context that evaluates the file again, and the sandbox's
+  CPU, memory and time limits apply to each call. See [Script Sandbox](/platform/use-bytechef/self-hosted/configuration/script-sandbox)
+  for the limits and how to tune them, and [Task Runners](/platform/automation/build/workflows/task-runners) for
+  running guest code outside the server process.
+- **Java** components are loaded in the server JVM through an isolating class loader per component version, so two
+  components cannot see each other's classes. The loaded handler is cached and reused across calls. A new upload is
+  picked up without a restart.
+
+If a component fails to load, for example because its source no longer evaluates, it is left out of the catalog and
+the server logs a warning naming it. The other components keep working.
+
+## Audit
+
+Every upload, through the import dialog or the API, is recorded in the [audit log](/platform/settings/audit-events) as
+`CUSTOM_COMPONENT_SAVED`, with the component's id, name, version and language.
+
+## Scaffolding a Java component with the CLI
+
+The ByteChef CLI generates a Java component project from an OpenAPI specification:
 
 ```bash
 bytechef component init --name my-component --open-api-path ./openapi.yaml --output-path .
 ```
 
-`--name` and `--output-path` are required; `--open-api-path` accepts a local file or an `http(s)` URL. `--base-package-name` (default `com.bytechef.component`) and `--version` (default `1`) round out the options.
-
-That generates a full module skeleton - handler class, action and trigger stubs, tests, and a README template - that you fill in. The generated code is yours: it lives in your repo, you can edit it, and it ships through the same pipeline as a hand-written component.
-
-<Callout title="Coming soon">
-    A higher-level generator that turns an OpenAPI spec straight into a component, without the intermediate module, is on the roadmap. The CLI scaffolding above is the manual path available today. For a spec-driven connector that needs no code at all, see [API Connectors](/platform/settings/components/api-connectors).
-</Callout>
-
-Working starter projects live in the samples repository:
-
-- [Java custom component sample](https://github.com/bytechefhq/bytechef-sample-custom-component-java)
-- [JavaScript custom component sample](https://github.com/bytechefhq/bytechef-sample-custom-component-javascript)
-
-## Distribution
-
-| Distribution method | When to use |
+| Option | |
 |---|---|
-| **Upload via UI** | One-off custom components for a single tenant - the **Import Custom Component** dialog, or authoring in the editor. |
-| **Bundle into the build** | First-party, vendored components shipped with your own build. This is how the built-in catalog itself ships: each component is a Gradle module under `server/libs/modules/components/` whose handler is discovered by ServiceLoader through `@AutoService(ComponentHandler.class)`. |
-| **Marketplace / shared registry** | *Coming soon* - a community pattern for sharing components across workspaces. |
+| `--name`, `-n` | Required. The component name; it is lower-cased. |
+| `--output-path`, `-o` | Required. Where to write the generated project. |
+| `--open-api-path` | A local file or an `http(s)` URL. The command generates nothing without it. |
+| `--base-package-name` | The package of the generated classes. Defaults to `com.bytechef.component`. Change it for a custom component, since classes in `com.bytechef` packages are not loaded from a custom component jar. |
+| `--version`, `-v` | The component version. Defaults to `1`. |
+| `--internal-component` | `true` for a component that ships with the platform. Defaults to `false`. |
 
-## Lifecycle
-
-Components evolve through versions. Old workflows continue to reference older versions; new workflows use the latest. Removing a component version means migrating any workflow that still references it.
-
-Every lifecycle action is recorded in the [audit log](/platform/settings/audit-events): `CUSTOM_COMPONENT_CREATED`, `CUSTOM_COMPONENT_UPDATED`, `CUSTOM_COMPONENT_PUBLISHED`, `CUSTOM_COMPONENT_ENABLED`, `CUSTOM_COMPONENT_DISABLED`, and `CUSTOM_COMPONENT_DELETED`.
+The generated code is yours to edit. Build it into a jar that meets [the Java contract](#the-java-contract) and upload
+it. For a REST API that needs no code at all, an [API connector](/platform/settings/components/api-connectors) turns
+the specification into a component directly.
 
 ## See also
 
-- [Developer guide](/developer-guide) - the full component author reference.
-- [API Connectors](/platform/settings/components/api-connectors) - turn a REST API into a component from its OpenAPI specification, with no code.
-- [Component Visibility](/platform/settings/components/component-visibility) - custom components can be switched off tenant-wide like any built-in one.
+- [Developer Guide](/developer-guide) - the full Java component reference.
+- [Code Workflows](/platform/automation/build/workflows/code-workflows) - whole workflows in Java, JavaScript or Python.
+- [API Connectors](/platform/settings/components/api-connectors) - a component from an OpenAPI specification, with no code.
+- [Component Visibility](/platform/settings/components/component-visibility) - switch custom components off tenant-wide like any built-in one.
+- [Admin API Keys](/platform/settings/admin-api-keys) - the credential for the deploy endpoint.
+- [Sample Repositories](/platform/sample-repositories) - every ByteChef sample.

@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import org.springframework.cache.CacheManager;
@@ -28,6 +30,9 @@ import org.springframework.util.StreamUtils;
  * @author Ivica Cardic
  */
 class ComponentHandlerClassLoader extends IsolatingClassLoader<ComponentHandler> {
+
+    private static final String DEFAULT_ICON_PATH = "assets/sample.svg";
+    private static final String PATH_PREFIX = "path:";
 
     private final String cacheKey;
 
@@ -42,7 +47,11 @@ class ComponentHandlerClassLoader extends IsolatingClassLoader<ComponentHandler>
                 ServiceLoader<ComponentHandler> loader = ServiceLoader.load(ComponentHandler.class, classLoader);
 
                 for (ComponentHandler componentHandler : loader) {
-                    return new ContextClassLoaderComponentHandler(componentHandler, readIcon(classLoader), classLoader);
+                    ComponentDefinition componentDefinition = ClassLoaderUtils.loadWithClassLoader(
+                        classLoader, componentHandler::getDefinition);
+
+                    return new ContextClassLoaderComponentHandler(
+                        componentHandler, readIcon(componentDefinition, classLoader), classLoader);
                 }
 
                 return null;
@@ -60,11 +69,41 @@ class ComponentHandlerClassLoader extends IsolatingClassLoader<ComponentHandler>
         return get(cacheKey);
     }
 
-    private static String readIcon(IsolatingClassLoader<ComponentHandler> classLoader) {
-        try {
-            try (InputStream inputStream = classLoader.getResourceAsStream("assets/sample.svg")) {
-                return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+    static String readIcon(ComponentDefinition componentDefinition, ClassLoader classLoader) {
+        String icon = componentDefinition.getIcon()
+            .orElse(null);
+
+        if (icon != null && !icon.startsWith(PATH_PREFIX)) {
+            return icon;
+        }
+
+        List<String> iconPaths = new ArrayList<>();
+
+        if (icon != null) {
+            iconPaths.add(icon.substring(PATH_PREFIX.length()));
+        }
+
+        iconPaths.add("assets/" + componentDefinition.getName() + ".svg");
+        iconPaths.add(DEFAULT_ICON_PATH);
+
+        for (String iconPath : iconPaths) {
+            String iconContent = readResource(classLoader, iconPath);
+
+            if (iconContent != null) {
+                return iconContent;
             }
+        }
+
+        return null;
+    }
+
+    private static String readResource(ClassLoader classLoader, String path) {
+        try (InputStream inputStream = classLoader.getResourceAsStream(path)) {
+            if (inputStream == null) {
+                return null;
+            }
+
+            return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

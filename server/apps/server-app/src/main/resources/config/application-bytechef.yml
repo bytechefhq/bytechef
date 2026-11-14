@@ -175,6 +175,8 @@ bytechef:
         test-retention: 24h
         # Largest size of one Claude Code workspace; 0 means no limit
         max-size: 1GB
+    custom-component:
+      java-enabled: true
   coordinator:
     # Whether this instance runs the coordinator (orchestrates job and trigger execution)
     enabled: true

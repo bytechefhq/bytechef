@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.audit.aspect;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,6 +18,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.audit.config.AuditIntTestConfiguration;
 import com.bytechef.ee.platform.audit.domain.AuditEventFilter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
@@ -38,6 +40,7 @@ import java.util.jar.JarOutputStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -188,8 +191,17 @@ class CustomComponentAuditIntTest {
         CustomComponentFacade customComponentFacade(
             CustomComponentFileStorage customComponentFileStorage, CustomComponentService customComponentService) {
 
+            ApplicationProperties applicationProperties = new ApplicationProperties();
+
+            ApplicationProperties.Component component = applicationProperties.getComponent();
+
+            ApplicationProperties.Component.CustomComponent customComponent = component.getCustomComponent();
+
+            customComponent.setJavaEnabled(true);
+
             return new CustomComponentFacadeImpl(
-                new ConcurrentMapCacheManager(), customComponentService, customComponentFileStorage);
+                applicationProperties, new ConcurrentMapCacheManager(), customComponentService,
+                customComponentFileStorage, mock(ObjectProvider.class));
         }
     }
 }

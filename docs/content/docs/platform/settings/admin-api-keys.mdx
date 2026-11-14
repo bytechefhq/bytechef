@@ -9,11 +9,7 @@ comingSoon: true
 
 An **Admin API key** is scoped to your account and a single environment. Use it for programmatic administration and as the Bearer credential for the [management MCP server](/platform/settings/mcp-server).
 
-It is also the intended credential for the account-wide `/api/platform/v1` API - see the [Custom Components API](/openapi/custom-components). Those operations act on the whole tenant rather than one workspace or environment.
-
-<Callout type="warn" title="Coming soon">
-  Enforcing that - rejecting a workspace or embedded API key on `/api/platform/v1` - is on the upcoming release track. In the latest released version any API key valid for the environment authenticates there, and access is decided by the owning user's admin authority alone.
-</Callout>
+It is also the only credential the account-wide `/api/platform/v1` API accepts; workspace and embedded API keys are rejected there. See [deploying custom components through the API](/platform/settings/components/custom-components#deploying-through-the-api). Those operations act on the whole tenant rather than one workspace or environment.
 
 <Callout title="Availability">
     Admin API keys are Enterprise Edition, behind the `ff-1024` feature flag. When the flag is off, the page is hidden from the Settings sidebar.

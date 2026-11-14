@@ -3594,6 +3594,11 @@ public class ApplicationProperties {
         private ClaudeCode claudeCode = new ClaudeCode();
 
         /**
+         * Custom component configuration
+         */
+        private CustomComponent customComponent = new CustomComponent();
+
+        /**
          * Component registry configuration
          */
         private Registry registry = new Registry();
@@ -3602,12 +3607,20 @@ public class ApplicationProperties {
             return claudeCode;
         }
 
+        public CustomComponent getCustomComponent() {
+            return customComponent;
+        }
+
         public Registry getRegistry() {
             return registry;
         }
 
         public void setClaudeCode(ClaudeCode claudeCode) {
             this.claudeCode = claudeCode;
+        }
+
+        public void setCustomComponent(CustomComponent customComponent) {
+            this.customComponent = customComponent;
         }
 
         public void setRegistry(Registry registry) {
@@ -3698,6 +3711,26 @@ public class ApplicationProperties {
                 public void setTestRetention(Duration testRetention) {
                     this.testRetention = testRetention;
                 }
+            }
+        }
+
+        /**
+         * Custom component settings.
+         */
+        public static class CustomComponent {
+
+            /**
+             * Whether uploading of Java (jar) custom components is enabled. When disabled, Java custom component upload
+             * requests are rejected while other languages and previously uploaded Java custom components keep working.
+             */
+            private boolean javaEnabled;
+
+            public boolean isJavaEnabled() {
+                return javaEnabled;
+            }
+
+            public void setJavaEnabled(boolean javaEnabled) {
+                this.javaEnabled = javaEnabled;
             }
         }
 

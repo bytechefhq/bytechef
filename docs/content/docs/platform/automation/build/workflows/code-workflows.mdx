@@ -1044,6 +1044,9 @@ For work the sandbox doesn't allow - native libraries, packages from npm or PyPI
 [task runner](/platform/automation/build/workflows/task-runners) instead: a local process or a container. See
 [Running a step on a task runner](#running-a-step-on-a-task-runner).
 
+JavaScript and Python custom components run in the same sandbox as a script; a Java custom component runs
+in-process, outside it.
+
 ### Script or custom component?
 
 | Reach for a script when… | Reach for a custom component when… |
@@ -1055,6 +1058,10 @@ For work the sandbox doesn't allow - native libraries, packages from npm or PyPI
 A common progression: prototype in a script, promote it to a custom component once it stabilizes. Make that call
 for reuse and schema. When a step needs more CPU, memory or packages than the sandbox allows, the answer is a
 [task runner](/platform/automation/build/workflows/task-runners), not a custom component.
+
+One cost worth knowing about: every script execution builds a fresh guest context and re-evaluates the source, so a
+script step pays a small start-up cost on each run that a Java custom component, loaded once, does not. A JavaScript or
+Python custom component re-evaluates its source on every call too. For most workflows the difference is invisible.
 
 ---
 

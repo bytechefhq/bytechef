@@ -1,6 +1,7 @@
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {useQueryClient} from '@tanstack/react-query';
-import {ChangeEvent, useCallback, useState} from 'react';
+import {ChangeEvent, DragEvent, useCallback, useState} from 'react';
 
 interface SelectedFileI {
     file: File;
@@ -9,13 +10,21 @@ interface SelectedFileI {
 }
 
 export default function useUploadCustomComponentDialog() {
+    const [dragging, setDragging] = useState(false);
     const [open, setOpen] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<SelectedFileI[]>([]);
     const [uploading, setUploading] = useState(false);
 
+    const javaEnabled = useApplicationInfoStore((state) => state.component.customComponent.javaEnabled);
+
     const queryClient = useQueryClient();
 
+    const acceptedExtensions = javaEnabled ? '.jar,.js,.py' : '.js,.py';
+
+    const acceptedExtensionList = acceptedExtensions.split(',');
+
     const resetForm = useCallback(() => {
+        setDragging(false);
         setSelectedFiles([]);
         setUploading(false);
     }, []);
@@ -34,7 +43,7 @@ export default function useUploadCustomComponentDialog() {
 
             formData.append('componentFile', file);
 
-            const response = await fetch('/api/platform/v1/custom-components/deploy', {
+            const response = await fetch('/api/platform/internal/custom-components/deploy', {
                 body: formData,
                 headers: {
                     'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
@@ -87,15 +96,55 @@ export default function useUploadCustomComponentDialog() {
         }, 500);
     }, [selectedFiles, uploadFile, queryClient, resetForm]);
 
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const newFiles = Array.from(event.target.files).map((file) => ({
+    const addFiles = (files: File[]) => {
+        const newFiles = files
+            .filter((file) => acceptedExtensionList.some((extension) => file.name.toLowerCase().endsWith(extension)))
+            .map((file) => ({
                 file,
                 status: 'pending' as const,
             }));
 
-            setSelectedFiles((prev) => [...prev, ...newFiles]);
+        setSelectedFiles((prev) => [...prev, ...newFiles]);
+    };
+
+    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            addFiles(Array.from(event.target.files));
         }
+    };
+
+    const handleDragOver = (event: DragEvent<HTMLElement>) => {
+        event.preventDefault();
+
+        if (uploading) {
+            event.dataTransfer.dropEffect = 'none';
+
+            return;
+        }
+
+        event.dataTransfer.dropEffect = 'copy';
+
+        setDragging(true);
+    };
+
+    const handleDragLeave = (event: DragEvent<HTMLElement>) => {
+        if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            return;
+        }
+
+        setDragging(false);
+    };
+
+    const handleDrop = (event: DragEvent<HTMLElement>) => {
+        event.preventDefault();
+
+        setDragging(false);
+
+        if (uploading) {
+            return;
+        }
+
+        addFiles(Array.from(event.dataTransfer.files));
     };
 
     const removeFile = (index: number) => {
@@ -131,8 +180,13 @@ export default function useUploadCustomComponentDialog() {
     };
 
     return {
+        acceptedExtensions,
         canSubmit,
+        dragging,
         formatFileSize,
+        handleDragLeave,
+        handleDragOver,
+        handleDrop,
         handleFileChange,
         handleOpenChange,
         handleSubmit,

@@ -102,8 +102,6 @@ const GROUP_META: Record<
     title: 'Automation Projects',
     navTitle: 'Projects',
     description: 'Deploy a code-based project.',
-    // Deploys a code-based project, whose feature page is itself comingSoon.
-    comingSoonOperations: ['deployProject'],
   },
   'automation-project-git': {
     title: 'Automation Git',
@@ -161,7 +159,6 @@ const GROUP_META: Record<
   'custom-components': {
     title: 'Custom Components',
     description: 'Public REST API for deploying a custom component to the platform.',
-    comingSoon: true,
   },
 };
 

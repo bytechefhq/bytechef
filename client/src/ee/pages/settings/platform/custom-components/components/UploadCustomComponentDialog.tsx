@@ -21,8 +21,13 @@ interface UploadCustomComponentDialogProps {
 
 const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps) => {
     const {
+        acceptedExtensions,
         canSubmit,
+        dragging,
         formatFileSize,
+        handleDragLeave,
+        handleDragOver,
+        handleDrop,
         handleFileChange,
         handleOpenChange,
         handleSubmit,
@@ -33,6 +38,11 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
         uploading,
     } = useUploadCustomComponentDialog();
 
+    const acceptedExtensionsLabel = acceptedExtensions
+        .split(',')
+        .map((extension) => extension.replace('.', '').toUpperCase())
+        .join(', ');
+
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogTrigger asChild>
@@ -42,7 +52,7 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
             <DialogContent size="md">
                 <DialogMain>
                     <DialogHeader
-                        description="Upload a custom component JAR file to deploy it to the platform."
+                        description="Upload a custom component file to deploy it to the platform."
                         title="Import Custom Component"
                     />
 
@@ -56,11 +66,17 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                         'flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-stroke-neutral-tertiary p-6',
                                         uploading
                                             ? 'cursor-not-allowed opacity-50'
-                                            : 'cursor-pointer hover:bg-surface-neutral-primary-hover'
+                                            : 'cursor-pointer hover:bg-surface-neutral-primary-hover',
+                                        dragging && 'border-stroke-brand-primary bg-surface-neutral-primary-hover'
                                     )}
+                                    data-testid="component-file-drop-zone"
                                     onClick={() =>
                                         !uploading && document.getElementById('component-file-upload')?.click()
                                     }
+                                    onDragEnter={handleDragOver}
+                                    onDragLeave={handleDragLeave}
+                                    onDragOver={handleDragOver}
+                                    onDrop={handleDrop}
                                     onKeyDown={handleActivationKeyDown}
                                     role="button"
                                     tabIndex={0}
@@ -72,11 +88,11 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                     </p>
 
                                     <p className="mt-1 text-xs text-content-neutral-tertiary">
-                                        .JAR, .JS, .PY, .RB files
+                                        {acceptedExtensionsLabel} files
                                     </p>
 
                                     <input
-                                        accept=".jar,.js,.py"
+                                        accept={acceptedExtensions}
                                         className="hidden"
                                         disabled={uploading}
                                         id="component-file-upload"
@@ -94,7 +110,7 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                     <div className="max-h-[250px] space-y-2 overflow-y-auto">
                                         {selectedFiles.map((file, index) => (
                                             <div
-                                                className="flex items-center justify-between rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary p-2 px-3"
+                                                className="flex items-center justify-between rounded-md border border-stroke-neutral-secondary bg-surface-neutral-secondary p-2 px-3"
                                                 key={index}
                                             >
                                                 <div className="flex flex-1 items-center space-x-2 overflow-hidden">
