@@ -29,9 +29,9 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
-import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
+import com.bytechef.ee.embedded.configuration.dto.AutomationProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -64,7 +64,7 @@ class ConnectedUserAccessDeciderTest {
     private static final String TEMPLATE_WORKFLOW_UUID = "7a9d4a52-2b0f-4f5e-9a3e-6c1b2d3e4f50";
 
     @Mock
-    private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private AutomationProjectFacade automationProjectFacade;
 
     @Mock
     private ConnectedUserConnectionService connectedUserConnectionService;
@@ -97,7 +97,7 @@ class ConnectedUserAccessDeciderTest {
         projectResolver = resolver("Project");
 
         decider = new ConnectedUserAccessDeciderImpl(
-            automationWorkflowProjectFacade, connectedUserConnectionService, connectedUserProjectService,
+            automationProjectFacade, connectedUserConnectionService, connectedUserProjectService,
             integrationInstanceService, projectService, projectWorkflowService,
             List.of(projectDeploymentEnvironmentResolver, projectDeploymentWorkflowEnvironmentResolver),
             List.of(projectDeploymentResolver, projectDeploymentWorkflowResolver, projectResolver));
@@ -234,7 +234,7 @@ class ConnectedUserAccessDeciderTest {
         when(projectService.fetchWorkflowProject("wf-template")).thenReturn(Optional.of(template));
         when(projectWorkflowService.getWorkflowProjectWorkflow("wf-template"))
             .thenReturn(projectWorkflow(TEMPLATE_WORKFLOW_UUID, 3));
-        when(automationWorkflowProjectFacade.getPublishedProjects("ext-1", Environment.PRODUCTION))
+        when(automationProjectFacade.getPublishedProjects("ext-1", Environment.PRODUCTION))
             .thenReturn(List.of(templateDto(TEMPLATE_PROJECT_ID, 3, TEMPLATE_WORKFLOW_UUID)));
 
         assertThat(decider.decideWorkflow("wf-template", "WORKFLOW_VIEW")).isEqualTo(Decision.GRANT);
@@ -250,7 +250,7 @@ class ConnectedUserAccessDeciderTest {
         when(projectService.fetchWorkflowProject("wf-hidden")).thenReturn(Optional.of(template));
         when(projectWorkflowService.getWorkflowProjectWorkflow("wf-hidden"))
             .thenReturn(projectWorkflow("0b6f2c1e-8f7d-4c5b-a1e2-3d4c5b6a7f80", 3));
-        when(automationWorkflowProjectFacade.getPublishedProjects("ext-1", Environment.PRODUCTION))
+        when(automationProjectFacade.getPublishedProjects("ext-1", Environment.PRODUCTION))
             .thenReturn(List.of(templateDto(TEMPLATE_PROJECT_ID, 3, TEMPLATE_WORKFLOW_UUID)));
 
         assertThat(decider.decideWorkflow("wf-hidden", "WORKFLOW_VIEW")).isEqualTo(Decision.DENY);
@@ -265,7 +265,7 @@ class ConnectedUserAccessDeciderTest {
         when(projectService.fetchWorkflowProject("wf-draft")).thenReturn(Optional.of(template));
         when(projectWorkflowService.getWorkflowProjectWorkflow("wf-draft"))
             .thenReturn(projectWorkflow(TEMPLATE_WORKFLOW_UUID, 4));
-        when(automationWorkflowProjectFacade.getPublishedProjects("ext-1", Environment.PRODUCTION))
+        when(automationProjectFacade.getPublishedProjects("ext-1", Environment.PRODUCTION))
             .thenReturn(List.of(templateDto(TEMPLATE_PROJECT_ID, 3, TEMPLATE_WORKFLOW_UUID)));
 
         assertThat(decider.decideWorkflow("wf-draft", "WORKFLOW_VIEW")).isEqualTo(Decision.DENY);
@@ -437,13 +437,13 @@ class ConnectedUserAccessDeciderTest {
         return resourceOwnershipResolver;
     }
 
-    private static AutomationWorkflowProjectDTO templateDto(
+    private static AutomationProjectDTO templateDto(
         long projectId, int lastPublishedVersion, String workflowUuid) {
 
         ConnectedUserWorkflowTemplateDTO workflowTemplate = new ConnectedUserWorkflowTemplateDTO(
             workflowUuid, "Template", null, null, List.of(), List.of(), List.of(), null, null);
 
-        return new AutomationWorkflowProjectDTO(
+        return new AutomationProjectDTO(
             projectId, "Templates", null, null, List.of(), true, lastPublishedVersion + 1, lastPublishedVersion,
             List.of(workflowTemplate), null, false, 0, null);
     }
