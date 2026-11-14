@@ -58,6 +58,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-component:platform-component-service"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-graphql"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
+    testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     testImplementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
     testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest"))

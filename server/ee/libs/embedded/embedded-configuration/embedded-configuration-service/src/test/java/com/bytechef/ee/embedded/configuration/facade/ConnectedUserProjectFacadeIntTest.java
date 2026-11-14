@@ -31,6 +31,7 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -56,6 +57,7 @@ import com.bytechef.ee.embedded.configuration.listener.AutomationProjectConfigur
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.AutomationProjectConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
@@ -72,6 +74,8 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
@@ -104,6 +108,7 @@ import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade.Workflow
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -210,6 +215,9 @@ class ConnectedUserProjectFacadeIntTest {
     private ConnectedUserConnectionFacade connectedUserConnectionFacade;
 
     @Autowired
+    private ConnectedUserConnectionService connectedUserConnectionService;
+
+    @Autowired
     private ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @Autowired
@@ -259,6 +267,9 @@ class ConnectedUserProjectFacadeIntTest {
 
     @Autowired
     private WorkflowService workflowService;
+
+    @Autowired
+    private WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Autowired
     private WorkflowValidatorFacade workflowValidatorFacade;
@@ -456,6 +467,28 @@ class ConnectedUserProjectFacadeIntTest {
         verify(copilotWorkflowGenerator).generateWorkflow(
             eq(projectWorkflowService.getLastWorkflowId(workflowUuid)), anyLong(), anyLong(),
             eq("Post new leads to Slack"), eq("Use the sales channel"), any());
+    }
+
+    @Test
+    void testPublishProjectWorkflowLeavesOutAnotherConnectedUsersConnection() {
+        String otherExternalUserId = createConnectedUser();
+
+        long otherConnectionId = createOwnedConnection(otherExternalUserId);
+
+        List<ProjectDeploymentWorkflowConnection> connections = publishWithTestConnection(otherConnectionId);
+
+        assertThat(connections).isEmpty();
+    }
+
+    @Test
+    void testPublishProjectWorkflowDeploysTheConnectedUsersOwnConnection() {
+        long ownConnectionId = createOwnedConnection(externalUserId);
+
+        List<ProjectDeploymentWorkflowConnection> connections = publishWithTestConnection(ownConnectionId);
+
+        assertThat(connections)
+            .extracting(ProjectDeploymentWorkflowConnection::getConnectionId)
+            .containsExactly(ownConnectionId);
     }
 
     @Test
@@ -1096,6 +1129,57 @@ class ConnectedUserProjectFacadeIntTest {
     private long createAutomationProject(String name) {
         return automationProjectFacade.createProject(
             name + " " + UUID.randomUUID(), "", null, List.of(), null);
+    }
+
+    private long createOwnedConnection(String connectionExternalUserId) {
+        UUID connectionUuid = UUID.randomUUID();
+
+        long connectionId = connectionUuid.getMostSignificantBits() & Long.MAX_VALUE;
+
+        long connectedUserId = connectedUserService.getConnectedUser(connectionExternalUserId, Environment.PRODUCTION)
+            .getId();
+
+        connectedUserConnectionService.create(connectedUserId, connectionId, null);
+
+        Connection connection = new Connection();
+
+        connection.setComponentName("slack");
+        connection.setEnvironmentId(Environment.PRODUCTION.ordinal());
+        connection.setId(connectionId);
+        connection.setType(PlatformType.EMBEDDED);
+
+        when(connectionService.getConnections(argThat((List<Long> connectionIds) -> connectionIds != null &&
+            connectionIds.contains(connectionId))))
+                .thenReturn(List.of(connection));
+        when(connectionService.getConnection(connectionId)).thenReturn(connection);
+
+        return connectionId;
+    }
+
+    private List<ProjectDeploymentWorkflowConnection> publishWithTestConnection(long connectionId) {
+        String workflowUuid = connectedUserProjectFacade.createProjectWorkflow(
+            externalUserId, SLACK_WORKFLOW_DEFINITION, Environment.PRODUCTION);
+
+        String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+
+        WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration();
+
+        workflowTestConfiguration.setConnections(
+            List.of(new WorkflowTestConfigurationConnection(connectionId, "slack", "postMessage1")));
+        workflowTestConfiguration.setEnvironmentId(Environment.PRODUCTION.ordinal());
+        workflowTestConfiguration.setWorkflowId(workflowId);
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(
+            workflowId, Environment.PRODUCTION.ordinal()))
+                .thenReturn(Optional.of(workflowTestConfiguration));
+
+        connectedUserProjectFacade.publishProjectWorkflow(externalUserId, workflowUuid, "published", null);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
+            .getProjectDeploymentWorkflow(
+                getCopyProjectDeploymentId(externalUserId), getPublishedCopyWorkflowId(externalUserId, workflowUuid));
+
+        return projectDeploymentWorkflow.getConnections();
     }
 
     private String createConnectedUser() {
