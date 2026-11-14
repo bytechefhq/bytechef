@@ -2172,6 +2172,14 @@ components:
             \ the configuration provides are left out."
           type: "object"
           additionalProperties: true
+        connections:
+          description: "For REFERENCE rows, the id of the connection each component uses, keyed by component name:\
+            \ the same shape as the connections of a provision request. Components whose connection the configuration\
+            \ provides are left out. Empty for COPY rows."
+          type: "object"
+          additionalProperties:
+            type: "integer"
+            format: "int64"
         attentionReason:
           description: "Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>,\
             \ UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy."
