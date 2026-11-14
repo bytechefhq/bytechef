@@ -1,9 +1,10 @@
 ---
 title: Local Docker
-description: Run ByteChef locally with Docker for development
+description: Run ByteChef on one machine with Docker Compose, a single H2 container, or plain Docker, and start the development stack from source.
 ---
 
-This guide covers running ByteChef locally using Docker. There are three approaches depending on your needs.
+This guide covers running ByteChef on a single machine with Docker, for evaluation, local use and
+small deployments. It also covers the Docker-based development stack for contributors.
 
 ## Run ByteChef locally
 
@@ -14,7 +15,7 @@ unavailable.
 <Tabs items={['Docker Compose', 'Single container (H2)', 'Docker (manual)']}>
 <Tab value="Docker Compose">
 
-The fastest way to run ByteChef locally. This starts both PostgreSQL and ByteChef in a single command.
+This starts PostgreSQL and ByteChef with one command.
 
 **Requirement:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
@@ -23,7 +24,7 @@ curl -O https://raw.githubusercontent.com/bytechefhq/bytechef/master/docker-comp
 docker compose -f docker-compose.yml up
 ```
 
-Once running, open [http://localhost:8080/login](http://localhost:8080/login) and click **Create account** to register the first user and get started.
+Once running, open [http://localhost:8080/login](http://localhost:8080/login) and click **Create account** to register the first user. The published image creates no default users.
 
 ![The ByteChef login screen on a fresh install, with the Create account link](local-docker/login.png)
 
@@ -144,13 +145,16 @@ docker network create -d bridge bytechef_network
 
 ```bash
 docker run --name postgres -d -p 5432:5432 \
+    --env POSTGRES_DB=bytechef \
     --env POSTGRES_USER=postgres \
     --env POSTGRES_PASSWORD=postgres \
     --hostname postgres \
     --network bytechef_network \
     -v /opt/postgre/data:/var/lib/postgresql/data \
-    postgres:15-alpine
+    postgres:16-alpine
 ```
+
+`POSTGRES_DB` creates the `bytechef` database that the datasource URL in the next step points at.
 
 </Step>
 <Step>
@@ -247,12 +251,14 @@ services:
 
 This approach is intended for contributors who want to work on the client codebase while running the server in Docker.
 
-The `docker-compose.dev.server.yml` file starts the full development stack including PostgreSQL, pgvector, Redis, Mailpit, and the ByteChef server built from source.
+The `docker-compose.dev.server.yml` file starts the development stack: PostgreSQL, pgvector, Redis, Mailpit, and the ByteChef server built from source with the `dev` profile.
 
 ### Prerequisites
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - A local clone of the [ByteChef repository](https://github.com/bytechefhq/bytechef)
+- A `server/.env` file that sets `PASSWORD_FROM_LOCAL_DOT_ENV_FILE`, the password the stack uses for both PostgreSQL databases, for example `PASSWORD_FROM_LOCAL_DOT_ENV_FILE=postgres`
+- A `server/local.env` file. The server service loads it with `env_file`, so it must exist; it can be empty or hold extra `BYTECHEF_*` variables such as AI provider keys. It is ignored by Git.
 
 ### Steps
 
@@ -271,11 +277,11 @@ The first command removes any previously built local images to ensure a clean bu
 |-----------|----------------|------------------------------------|
 | postgres  | 5432           | Main PostgreSQL database           |
 | pgvector  | 5433           | PostgreSQL with pgvector extension |
-| redis     | 6379           | Redis for message brokering        |
+| redis     | 6379           | Redis                              |
 | mailpit   | 1025, 8025     | Local mail server for testing      |
 | server-app | 9555          | ByteChef server application        |
 
-The server API is available at [http://localhost:9555](http://localhost:9555) and the Scalar API reference at [http://localhost:9555/scalar](http://localhost:9555/scalar).
+The server API is available at [http://localhost:9555](http://localhost:9555), and the Swagger UI of the API at [http://localhost:9555/swagger-ui.html](http://localhost:9555/swagger-ui.html).
 
 ### Connecting the Client
 
@@ -286,11 +292,13 @@ npm install
 npm run dev
 ```
 
-The client connects to the backend at `http://127.0.0.1:9555` by default.
+`npm run dev` prints the local URL of the Vite development server (`http://127.0.0.1:5173` unless the port is taken). It proxies API requests to the server at `http://localhost:9555`.
 
-## Initial Login Credentials
+### Development login credentials
 
-| Username              | Password |
+The `dev` profile seeds two users into an empty database. They do not exist in the published image.
+
+| Email                 | Password |
 |-----------------------|----------|
 | admin@localhost.com   | admin    |
 | user@localhost.com    | user     |

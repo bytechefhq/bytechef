@@ -21,10 +21,10 @@ The header reads **Users**, described as "Manage organization users: invite or d
 |---|---|
 | **Email** | The user's email address. |
 | **Name** | First and last name, when set. |
-| **External ID** | The ID the identity provider sent over SCIM, or `—` for users not provisioned through SCIM. |
-| **Role** | The organization authority, shown verbatim - `ROLE_ADMIN` or `ROLE_USER`. Every Community Edition account reads `ROLE_ADMIN`. |
+| **External ID** | The ID the identity provider sent over SCIM, or a dash for users not provisioned through SCIM. |
+| **Role** | The organization authority without its `ROLE_` prefix: **Admin** for `ROLE_ADMIN`, **User** for `ROLE_USER`. Every Community Edition account reads **Admin**. |
 | **Status** | **Active** when the account is activated, **Pending** otherwise. |
-| *(actions)* | Per-row **edit** (pencil) and **delete** (trash) buttons. The edit button is Enterprise Edition only - it exists to change a role, and Community Edition has none to change. |
+| *(actions)* | Per-row **edit** (pencil) and **delete** (trash) buttons. The edit button is Enterprise Edition only, because it only changes a role. |
 
 When there are more users than fit on one page, pagination controls appear in the footer. If no users match, the table shows **No users found.**
 
@@ -32,18 +32,16 @@ When there are more users than fit on one page, pagination controls appear in th
 
 1. Click **Invite User**. The dialog explains: "The invitee receives an email with a link on which they set their own password. The link expires after 3 days."
 2. Enter the **Email** address.
-3. Choose a **Role**. The options come from the organization's configured authorities; the first one is preselected. This step is Enterprise Edition only - Community Edition shows no **Role** field and invites every account as an administrator.
+3. Choose a **Role** (**Admin** or **User**). The options come from the organization's configured authorities, and the first one is preselected. This step is Enterprise Edition only: Community Edition shows no **Role** field and invites every account as an administrator.
 4. Click **Invite**.
 
-The **Invite** button stays disabled until an email address is set; in Enterprise Edition a role must be chosen too. An invalid role is rejected before any account row is created, so a bad request cannot leave an orphaned user behind. Inviting needs a configured mail server: without one the invitation is refused, because the invitee could never receive their link.
+The **Invite** button stays disabled until an email address is set. In Enterprise Edition a role must be chosen too. An invalid role is rejected before any account is created. Inviting requires a configured mail server. Without one, the invitation is refused, because the invitee cannot receive the link.
 
 ![The Invite User dialog](users/invite-user.png)
 
-Nobody chooses a password for the invitee and no password travels by email. The invitation email carries a link to `/accept-invitation?key=…`, where the invitee sets their own password; doing so activates the account in the same step. Until then the account is **not activated**, so it shows **Pending** in the table and cannot sign in.
+The administrator does not set a password for the invitee, and no password is sent by email. The invitation email contains a link to `/accept-invitation?key=…`, where the invitee sets their own password. Setting the password activates the account. Until then the account shows **Pending** in the table and cannot sign in.
 
-The link is valid for 3 days and works once. After that it no longer works: delete the pending user and invite them again to send a new one. A nightly cleanup at 01:00 also removes accounts whose invitation expired, in every tenant. Inviting an email address that already has an account is rejected.
-
-An invited account occupies a seat against the deployment's member quota from the moment the invitation is sent, not from the moment it is claimed.
+The link is valid for 3 days and works once. To send a new link, delete the pending user and invite them again. A cleanup job runs every day at 01:00 and deletes accounts that were not activated within 3 days, in every tenant. Inviting an email address that already has an account is rejected.
 
 ## Change a user's role
 
@@ -55,11 +53,11 @@ An invited account occupies a seat against the deployment's member quota from th
 2. The dialog shows the selected **User** (their email) and a **Role** dropdown set to their current role.
 3. Pick a new **Role** and click **Save**.
 
-Only the organization role is editable here - email and name are not. Workspace roles are managed separately, per workspace.
+Only the organization role is editable here. Email and name are not. Workspace roles are managed separately, per workspace.
 
 ## Remove a user
 
-Click the **delete** (trash) icon on the row and confirm. The confirmation warns that the action cannot be undone. Removing a user revokes their access to the organization.
+Click the **delete** (trash) icon on the row and confirm. The deletion cannot be undone. Removing a user revokes their access to the organization.
 
 ## What differs between editions
 
@@ -69,11 +67,11 @@ Community Edition has one level of access. There is nothing to assign, so the co
 |---|---|---|
 | List, invite, remove users | Yes | Yes |
 | **Role** field in the invite dialog | Not shown - invites as administrator | Choose from the configured authorities |
-| **Role** column in the table | Always `ROLE_ADMIN` | The account's authority |
+| **Role** column in the table | Always **Admin** | The account's authority |
 | **edit** action / **Edit User** dialog | Not shown | Change the role |
 | Workspace roles and permission scopes | Not available | See below |
 
-The workspace role model below - roles, permission scopes and per-workspace membership - is Enterprise Edition throughout, and each section carries the badge.
+The workspace role model below (roles, permission scopes and per-workspace membership) is Enterprise Edition only.
 
 ---
 
@@ -87,8 +85,8 @@ The workspace role model below - roles, permission scopes and per-workspace memb
 
 ByteChef separates two things that are easy to confuse:
 
-- The **organization role** (`ROLE_ADMIN` / `ROLE_USER`) - the authority assigned on this page. It governs the administrative surfaces: Settings pages, user management, licensing.
-- The **workspace role** - assigned per workspace, and what governs day-to-day work on projects, workflows, connections, and data.
+- The **organization role** (`ROLE_ADMIN` / `ROLE_USER`) - the authority assigned on this page. It governs the administrative surfaces: Settings pages and user management.
+- The **workspace role** - assigned per workspace. It governs day-to-day work on projects, workflows, connections, and data.
 
 Permissions are scoped to **workspaces**. There are no per-project roles and no per-resource ACLs: a user can be an admin in one workspace, an editor in another, and have no access at all to a third.
 
@@ -136,7 +134,7 @@ Declaring the same scope name with two different minimum roles fails the applica
 
 <EEBadge />
 
-Workspace membership has two surfaces. The current workspace's members are managed on its own page, **Settings → Current Workspace → [Users](/platform/automation/settings/users)**. To reach *another* workspace's members without switching to it, use **Settings → [Workspaces](/platform/automation/settings/workspaces)**: each workspace row's **⋮** menu has a **Members** entry that opens the **Workspace Members** dialog. The dialog lists members with **User**, **Role**, and **Added** columns. An admin changes a member's role inline through the **Role** dropdown, removes a member with the trash action, and adds one through the **Add user** row - search by email, pick a role, confirm. The role dropdown is derived from the server-side role enum, so a role added server-side appears without a client change.
+Workspace membership has two surfaces. The current workspace's members are managed on its own page, **Settings → Current Workspace → [Users](/platform/automation/settings/users)**. To reach another workspace's members without switching to it, use **Settings → [Workspaces](/platform/automation/settings/workspaces)**: each workspace row's **⋮** menu has a **Members** entry that opens the **Workspace Members** dialog. The dialog lists members with **User**, **Role**, and **Added** columns. An admin changes a member's role in the **Role** dropdown, removes a member with the trash action, and adds a member through the **Add user** row (search by email, pick a role, confirm).
 
 Only a workspace **Admin** sees the role dropdown, the remove action, and the add row; everyone else sees the membership list read-only. Removing a user at the workspace level revokes their access to every project in that workspace at once.
 
@@ -146,13 +144,13 @@ Only a workspace **Admin** sees the role dropdown, the remove action, and the ad
 
 <EEBadge />
 
-If you federate authentication through an external identity provider, group claims can drive workspace roles automatically. See [Identity Providers](/platform/settings/identity-providers).
+Users who sign in through an external identity provider are matched to accounts by email. IdP group claims do not assign workspace roles; assign those per workspace. See [Identity Providers](/platform/settings/identity-providers).
 
 ### What gets logged
 
 <EEBadge />
 
-Membership and role changes are recorded in the [audit log](/platform/settings/audit-events) as `WORKSPACE_USER_ADDED`, `WORKSPACE_USER_REMOVED`, and `WORKSPACE_USER_ROLE_UPDATED`; account lifecycle as `USER_CREATED`, `USER_ACTIVATED`, `USER_PASSWORD_CHANGED`, and `USER_DELETED`.
+Membership and role changes are recorded in the [audit log](/platform/settings/audit-events) as `WORKSPACE_USER_ADDED`, `WORKSPACE_USER_REMOVED`, and `WORKSPACE_USER_ROLE_UPDATED`. Changes made on this page are recorded as `USER_INVITED`, `USER_ROLE_UPDATED`, and `USER_DELETED`.
 
 ## See also
 

@@ -1,48 +1,50 @@
 ---
 title: Data Tables
-description: Create typed relational tables inside ByteChef and read or write them from workflows - no external database required.
+description: Create typed tables inside ByteChef and read or write them from workflows without an external database.
 ---
 
-Data Tables give you first-class relational storage inside ByteChef. Create a table with typed columns, manage rows in a spreadsheet-like grid (or by importing a CSV), and read or write that data from your workflows - without standing up an external database.
+Data Tables are relational tables stored inside ByteChef. You create a table with typed columns, manage its rows in a spreadsheet-like grid or by importing a CSV file, and read or write the rows from workflows. No external database is required.
 
-Use them for lookup tables, configuration, queues, feature flags, deduplication keys, or any small structured dataset your automations need to share.
+Use them for lookup tables, configuration, queues, feature flags, deduplication keys, or any small structured dataset that workflows share.
 
-Data Tables are **workspace-scoped** and **per-environment**: each table belongs to a workspace, and the rows you see depend on the selected environment (Development, Staging, Production).
+Each table belongs to a workspace, and its rows belong to an environment. The rows you see depend on the selected environment (Development, Staging, or Production).
 
 ---
 
 ## Create a table
 
-1. In the Automation workspace, open **Data Tables** from the sidebar.
-2. Click **New Table**.
-3. Enter a **name** and an optional **description**.
-4. Define at least one **column** - give it a name and a type (see below).
+1. Click **Data Tables** in the Automation sidebar.
+2. Click **New Table** (or **Create Table** when no table exists yet).
+3. Enter a **Base name** and an optional **Description**.
+4. Under **Columns**, click **Add column** and enter a **Column name** and a **Type** for each column. Define at least one column.
 5. Click **Create**.
 
-Every table automatically has an `id` column that uniquely identifies each row, so `id` is reserved and can't be used as a column name.
+![The Create Data Table dialog with a base name, description and five typed columns](data-tables/create-data-table-dialog.png)
+
+Every table has an automatic `id` column that uniquely identifies each row. `id` is reserved and cannot be used as a column name.
 
 ### Column types
 
 | Type | Stores |
 |---|---|
-| **String** | Text |
-| **Number** | Decimal numbers |
-| **Integer** | Whole numbers |
-| **Boolean** | `true` / `false` |
-| **Date** | A calendar date |
-| **Date Time** | A date and time |
+| `STRING` | Text |
+| `NUMBER` | Decimal numbers |
+| `INTEGER` | Whole numbers |
+| `DATE` | A calendar date |
+| `DATE_TIME` | A date and time |
+| `BOOLEAN` | `true` or `false` |
 
-Values are coerced to the column's type, so a row written from a workflow or imported from CSV is stored in the correct shape.
+Values written from a workflow or imported from CSV are converted to the column's type.
 
 ---
 
 ## Manage columns
 
-Open a table and use its column menu to:
+Open a table to manage its columns:
 
-- **Add a column** - pick a name and type.
-- **Rename a column.**
-- **Delete a column** - removes that column's values from every row.
+- **Add a column** - Click the **Add column** button at the right end of the header row, then enter a **Name** and a **Type** and click **Add**.
+- **Rename a column** - Open the column header's menu and click **Rename**.
+- **Delete a column** - Open the column header's menu and click **Delete**. This removes the column's values from every row.
 
 ---
 
@@ -50,29 +52,31 @@ Open a table and use its column menu to:
 
 The table opens in a spreadsheet-like grid where you can:
 
-- **Add a row** - fill in the new empty row at the bottom.
-- **Edit a cell** - click it and type; changes save when you move off the cell. Each cell uses an editor matched to its column type (text, number, checkbox, date, or date-time picker).
-- **Delete rows** - select one or more with the row checkboxes and delete them.
-- **Import a CSV** - from the grid's **⋮** actions menu, bulk-load rows from a file whose header matches your column names. Header columns the table does not have are skipped, but a header that matches none of them, for example because the file uses semicolons instead of commas, stops the import. A cell that does not fit its column type stops the import and no row is imported; the error names the CSV line to fix.
-- **Export a CSV** - from the same **⋮** menu, download the current rows.
+- **Add a row** - Click **Add row** (**+**) below the last row.
+- **Edit a cell** - Click the cell and type. Changes are saved when you leave the cell. Each cell uses an editor for its column type (text, number, checkbox, date, or date-time picker).
+- **Delete rows** - Select rows with the row checkboxes, click **Delete (n)** in the header, and confirm.
+- **Import a CSV** - In the **⋮** actions menu, click **Import CSV** and select a file whose header row matches the column names. Header columns that the table does not have are skipped. A header that matches no column (for example, a file that uses semicolons instead of commas) stops the import. A cell that does not fit its column type also stops the import, and no row is imported; the error names the CSV line to fix.
+- **Export a CSV** - In the same menu, click **Export CSV** to download the current rows.
+
+The actions menu also has **Rename Table** and **Delete Table**.
 
 ![The Data Table grid - typed columns, two rows selected with the row checkboxes, and a number cell open in its editor](data-tables/data-table-grid.png)
 
 ![The grid's actions menu, with Import CSV, Export CSV, Rename Table and Delete Table](data-tables/data-table-actions-menu.png)
 
-Larger tables load more rows as you scroll. Use **tags** to organize tables once you have several.
+Larger tables load more rows as you scroll. The footer shows the total row count.
 
-On the **Data Tables** list page you can **rename**, **duplicate**, or **delete** a table from its row, and filter the list by tag from the left sidebar.
+On the **Data Tables** list page, each table's menu has **Rename**, **Duplicate**, **Export CSV**, and **Delete**. Add tags to a table on its row, and filter the list by tag in the left sidebar.
 
 ---
 
 ## Use a table in workflows
 
-Add the **Data Table** component to a workflow to read and write your tables as part of an automation. Select the target table, and the action's inputs adapt to that table's columns.
+Add the **Data Table** component to a workflow to read and write tables. Select the target **Table**; the action's inputs adapt to that table's columns.
 
 ### Actions
 
-| Action | What it does |
+| Action | Description |
 |---|---|
 | **Create Record(s)** | Insert one or more new rows; an invalid record stops the step and no row is inserted |
 | **Get Record** | Fetch a single row by its `id` |
@@ -81,8 +85,6 @@ Add the **Data Table** component to a workflow to read and write your tables as 
 | **Update Records** | Update every row that matches **OR Conditions** with the same values |
 | **Delete Record(s)** | Delete rows by their `id`s, or set **Delete By** to **Conditions** to delete every matching row |
 | **Clear Table** | Remove every row from the table |
-
-Select the table on any action and its inputs adapt to that table's columns.
 
 ### Finding records
 
@@ -155,26 +157,24 @@ a Data Table action (**Clear Table** included), from editing rows in the table, 
 the change is saved; a change that is rolled back starts none. The rows of one change may run in any order, and a run
 that fails shows up in the workflow's execution history like any other run.
 
-This makes Data Tables a lightweight event source - for example, "when a row is added to the *Customers* table, send a welcome email."
+For example, a workflow with **Record Created** on a *Customers* table can send a welcome email for each new row.
 
 ---
 
 ## Scope and access
 
-- **Workspace-scoped** - a table is available to every project and workflow in its workspace.
-- **Per-environment** - the rows are tied to the selected environment, so Development data stays separate from Production.
-- **Workspace membership** - a table is reachable by the members of its workspace. There is no
-  per-operation role split for data tables in the latest released version: a member who can open the
-  workspace can read and write its tables. Finer-grained viewer/editor enforcement is on the upcoming
-  release track.
+- **Workspace** - A table is available to every project and workflow in its workspace.
+- **Environment** - Rows belong to an environment, so Development data stays separate from Production.
+- **Access** - Any member who can open the workspace can read and write its tables. There are no
+  separate viewer and editor permissions for data tables.
 
 ---
 
 ## Storage limits
 
-> **Coming soon.** Storage limits are on the upcoming release track and are not yet enforced in the latest released version of ByteChef.
+> **Coming soon.** Storage limits are not enforced in the latest released version of ByteChef.
 
-The total size of all data tables in a tenant is capped - by default at **50 MB**. As usage approaches the cap, a warning alert appears in the Data Tables UI; once the cap is reached, writes that would grow the data (inserting rows, importing CSV, updating rows) are rejected with a limit-exceeded error until space is freed.
+The total size of all data tables in a tenant is limited to **50 MB** by default. As usage approaches the limit, the Data Tables page shows a warning. When the limit is reached, writes that would grow the data (inserting rows, importing CSV, updating rows) fail with a limit-exceeded error until space is freed.
 
 {/* TODO screenshot: Data Tables page with the storage-usage warning alert visible (usage approaching the cap) */}
 
@@ -184,8 +184,8 @@ Self-hosted administrators can change or remove the cap with the [`BYTECHEF_DATA
 
 ## When to use a Data Table
 
-A Data Table is a small relational store you get without provisioning anything. That makes it the
-right shape for some jobs and the wrong shape for others.
+A Data Table is a small relational store that needs no infrastructure. It fits some jobs and not
+others.
 
 ### Patterns it fits
 
@@ -204,15 +204,15 @@ right shape for some jobs and the wrong shape for others.
   is no transaction spanning several workflow steps and no multi-writer locking. If several systems
   write the same data concurrently, point the workflow at a real database through the matching
   component instead.
-- **Not a data warehouse.** The bound to plan against is total stored size, not a row count - see
-  [Storage limits](#storage-limits) above. How many rows fit under a given size depends entirely on
-  how wide they are, so size the data, not the row count.
+- **Not a data warehouse.** Plan for small datasets. When [storage limits](#storage-limits) apply,
+  they cap total stored size, not row count, so the number of rows that fit depends on how wide
+  they are.
 - **Not a search index.** For matching by meaning rather than by column value, use the
   [Knowledge Base](/platform/automation/data/knowledge-base).
 
 ### Data Table or external database
 
-| Reach for a Data Table when… | Reach for an external database when… |
+| Use a Data Table when | Use an external database when |
 |---|---|
 | The dataset is small. | The dataset is large. |
 | Workflows are the only writers. | Several external services write the same data. |

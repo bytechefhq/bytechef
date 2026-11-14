@@ -1,10 +1,11 @@
 ---
 title: "Workflow Executions"
-description: "Learn how to monitor projects and workflows in ByteChef."
+description: "Find, filter, and inspect the runs of deployed workflows, and restart or stop a run."
 ---
 
-After a project is deployed and executed, its workflow activity appears here-allowing you to review how your automation
-is performing and explore the details of each execution.
+The **Workflow Executions** page (**Executions** > **Workflow Executions** in the left sidebar) lists every run of a
+deployed workflow in the current workspace and environment. Use it to check whether runs succeed, filter them, open a
+run to inspect each task's input and output, and restart or stop a run.
 
 ## Where runs come from
 
@@ -46,18 +47,17 @@ Executions can be narrowed by any combination of these filters:
 | Filter | Narrows the list to |
 |---|---|
 | **Source** | Runs from every source, or from one: project deployments, MCP servers, A2A servers or API collections. See [Where runs come from](#where-runs-come-from) |
-| **Environment** | Runs from deployments in one environment |
 | **Status** | Runs in one execution state |
 | **Start date** / **End date** | Runs that began or ended within a date range |
 | **Project** | Runs belonging to one project |
-| **Deployment** | Runs from one project deployment. Shown for the Any and Projects sources only |
+| **Deployment** | Runs from one project deployment. Shown for the **Any** and **Project Deployments** sources only |
 | **Workflow** | Runs of one workflow |
 
 The **Status** filter offers `STARTED`, `COMPLETED`, `CREATED`, `STOPPED`, and `FAILED`. The
-**Environment** selector in the left sidebar header scopes the whole list, and is available on Enterprise
-Edition only - a Community Edition instance works in a single environment and shows no selector.
+[environment](/platform/automation/deploy/environments) selector in the left sidebar header scopes the whole list. It
+is available in Enterprise Edition only; a Community Edition instance works in a single environment.
 
-Use the **Refresh** button in the page header to reload the executions list with the latest runs.
+Click the refresh button in the page header to reload the list.
 
 ## Actions on a run
 
@@ -74,15 +74,15 @@ From a row's **⋮** menu:
 The detail opens as two panes:
 
 - **Left** - the run's task list, one entry per task with its status. Selecting a task shows its
-  **Input** and **Output**, and the error for a failed task. A task that ran a subflow is navigable
-  through a breadcrumb back to its parent.
-- **Right** - the workflow rendered read-only on the canvas, so the selected task is visible in the
-  context of the whole workflow.
+  **Input**, **Output**, and **Logs**, and an **Error** tab for a failed task. From a subflow run, **Back to parent**
+  returns to the parent run.
+- **Right** - the workflow rendered read-only on the canvas. Toggle it with the panel icon in the top-right corner of
+  the details.
 
-The read-only canvas is coloured from the stored run: each task that ran is green
-with its duration or red if it failed, the wires along the path the run took follow, and tasks the
-run never reached stay grey. A task that ran more than once shows its total time. Each AI Agent is
-drawn as a frame holding its elements, and the tools it called are coloured the same way, so a failed
+The read-only canvas is colored from the stored run: each task that ran is green
+with its duration or red if it failed, the edges along the path the run took are colored too, and
+tasks the run never reached stay gray. A task that ran more than once shows its total time. Each AI Agent is
+drawn as a frame holding its elements, and the tools it called are colored the same way, so a failed
 run shows which tool failed.
 
 Each tool the agent called is also a row nested under the agent's task, and a Task Tool sub-agent's
@@ -91,7 +91,7 @@ only that call's entries. Input and Output are read from the call's log entry, s
 external provider, such as an MCP Client tool, shows only that entry in its Logs. See
 [Seeing which tools ran](/platform/automation/build/workflows/ai/agent#seeing-which-tools-ran).
 
-On a normal run an agent's model, chat memory, RAG and guardrail elements stay grey. The element that
+On a normal run an agent's model, chat memory, RAG, and guardrail elements stay gray. The element that
 raised an error turns red and the agent fails, including an error from below a guardrail. A Check for
 Violations check that blocked the input or output turns amber with its frame, and the agent stays green
 with a Blocked badge. A Sanitize Text sanitizer that changed the text turns blue, and its row's Details
@@ -100,54 +100,39 @@ Withheld badge. These
 rows show a Details tab with the side (input or output) and the match count or confidence score, never the matched or redacted text.
 
 <Callout type="warn">
-    Task inputs and outputs are recorded verbatim. They are serialized to JSON and stored as-is, with
-    no redaction of sensitive values - a password, token, or customer record that a task receives or
-    returns is readable in that task's Input and Output panels by anyone who can open the execution.
-    Treat the execution history as carrying the same sensitivity as the data flowing through the
-    workflow, and keep secrets in connections, whose parameters are never returned in the clear.
+    Task inputs and outputs are recorded verbatim. They are serialized to JSON and stored without
+    redaction: a password, token, or customer record that a task receives or returns is readable in that
+    task's Input and Output panels by anyone who can open the execution. Treat the execution history as
+    being as sensitive as the data flowing through the workflow, and keep secrets in connections, whose
+    parameters are never returned in the clear.
 </Callout>
 
 
-## Execution Details - Completed
+## View an execution
 
 <Steps>
 <Step>
 
-Click on the desired execution to view its details.
+Click a row, or choose **View** from its **⋮** menu. The execution detail opens.
 
 </Step>
 <Step>
 
-In the newly opened panel, you can inspect the input and output of each workflow component.
+Select a task in the task list to inspect its **Input**, **Output**, and **Logs**.
+
+To see the workflow graph next to the task list, click **Show workflow** (the panel icon in the top-right corner of the detail). The graph colors each task that ran: green for completed, red for failed.
+
+![A completed execution: the task list, the selected task's output, and the workflow graph](workflow-executions/execution-completed.png)
+
+</Step>
+<Step>
+
+For a failed run, select the task marked with an error icon. Its **Error** tab shows the error message.
+
+![A failed execution: the failed task is flagged and an Error tab carries the message](workflow-executions/execution-failed.png)
 
 </Step>
 </Steps>
-
-![A completed execution - the task list, the selected task's output, and the workflow graph](workflow-executions/execution-completed.png)
-
-
-## Execution Details - Failed
-
-![A failed execution - the failed task is flagged and an Error tab carries the message](workflow-executions/execution-failed.png)
-
-<Steps>
-<Step>
-
-Click on the desired execution to view its details.
-
-</Step>
-<Step>
-
-In the newly opened panel, you can inspect the input and output of each workflow component.
-
-</Step>
-<Step>
-
-If the execution fails, you’ll see which component encountered the error, along with a detailed message explaining what went wrong.
-
-</Step>
-</Steps>
-
 
 ## Reading executions programmatically
 
@@ -156,3 +141,9 @@ If the execution fails, you’ll see which component encountered the error, alon
 The same records are readable through the Workflow Executions API: `GET
 /workflow-executions` for the filtered page, and `GET /workflow-executions/{id}` for one run
 including its inputs, outputs, error, and task executions.
+
+## Related
+
+- [Deploy workflows](/platform/automation/deploy/workflows)
+- [External invocations](/platform/automation/monitor/external-invocations)
+- [Environments](/platform/automation/deploy/environments)

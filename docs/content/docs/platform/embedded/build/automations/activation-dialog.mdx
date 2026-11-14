@@ -3,7 +3,7 @@ title: Activate templates from your app
 description: Open the activation dialog from your own page so a connected user can connect accounts, fill in inputs, and turn on a published automation template.
 ---
 
-The **activation dialog** is the same flow the [Automation Hub](/platform/embedded/build/automation-hub) uses to activate a template, available on its own. Use it when you render your own list of automations and want ByteChef to handle the activation. It renders in your page, not in an iframe.
+The **activation dialog** is the same flow the [Automation Hub](/platform/embedded/build/automations/automation-hub) uses to activate a template, available on its own. Use it when you render your own list of automations and want ByteChef to handle the activation. It renders in your page, not in an iframe.
 
 ## Before you start
 
@@ -43,7 +43,7 @@ export function ActivateButton({jwtToken, templateId}: {jwtToken: string; templa
 | `baseUrl` | `string` | `https://app.bytechef.io` | Your ByteChef host. |
 | `environment` | `string` | `'PRODUCTION'` | The environment whose templates and connections the dialog uses. |
 | `connectionCreationAllowed` | `boolean` | `true` | Whether users can create a connection from the dialog. When `false`, **Connect** is hidden and they can only pick existing connections. |
-| `mode` | `'dark' \| 'light'` | `'light'` | The dialog's color mode. See [Theming and Localization](/platform/embedded/build/theming-and-localization#styling-the-dialogs). |
+| `mode` | `'dark' \| 'light'` | `'light'` | The dialog's color mode. See [Theming and Localization](/platform/embedded/build/theming-and-localization#styling-the-connect-and-activation-dialogs). |
 | `onActivated` | `(workflowUuid: string) => void` | - | Runs after the template is activated. |
 | `onEditWorkflow` | `(workflowUuid: string) => void` | - | Runs after **Edit workflow** copies the template, with the uuid of the copy. Omit it to hide **Edit workflow**. |
 | `onClose` | `() => void` | - | Runs when the dialog closes. Required on `<ActivationDialog />`; optional on the hook. |
@@ -87,6 +87,6 @@ Only one Connect dialog renders per page. Do not keep a `useConnectDialog` insta
 
 ## Related
 
-- [Automation Hub](/platform/embedded/build/automation-hub) - the iframe catalog that uses the same flow.
+- [Automation Hub](/platform/embedded/build/automations/automation-hub) - the iframe catalog that uses the same flow.
 - [Displaying the Connect Dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) - the Connect dialog and its modes.
 - [Automations](/platform/embedded/build/automations) - authoring and publishing templates.

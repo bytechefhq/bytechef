@@ -1,98 +1,132 @@
 ---
 title: Connections
-description: Organization-level view of shared connections and who can reach them.
-ee: true
-comingSoon: true
+description: Edit connection properties, replace connection credentials, and control who can see and reuse a connection.
 ---
 
-A connection's secret material is encrypted at rest. **Visibility** governs something different: who can see that a connection exists and reuse it. **Settings → Connections** is the organization-wide end of that model - the connections every workspace can reach - and the visibility control on each individual connection is what decides which connections get there.
+A connection stores the credentials and settings a component needs to reach an external service. Its secret values are encrypted at rest. This page covers how administrators and connection owners maintain an existing automation connection (editing its properties and replacing its credentials) and, in Enterprise Edition, how connection **visibility** controls who can see that a connection exists and reuse it.
 
-The page requires the `ADMIN` authority, and both it and the visibility model are Enterprise Edition.
+For creating and using connections in workflows, see [Connections](/platform/automation/build/connections).
+
+---
+
+## Editing connection properties
+
+Some connections have properties besides their credentials, for example the base URI of an HTTP Client connection.
+
+1. In the automation **Connections** list, choose **Edit** on the connection. The dialog shows the connection's name, its properties filled in with the stored values, and its tags.
+2. Change the values you need.
+3. Click **Save**.
+
+- Only the connection's properties are changed. The stored credentials are kept. To replace them, use **Update credentials** (see [Replacing credentials](#replacing-credentials)).
+- A property you clear is removed from the connection.
+- If someone else changed the connection after you opened it, the save is rejected. Reload and try again.
+
+## Replacing credentials
+
+When a connection's credentials stop working, for example after a password change or a revoked token, you can enter new credentials instead of creating a new connection. Every workflow that uses the connection keeps using it.
+
+1. In the automation **Connections** list, choose **Edit** on the connection. When the connection's credentials were rejected, the dialog opens on the credentials form. Otherwise, click **Update credentials** in the dialog footer.
+2. Enter the new values.
+3. Click **Update credentials**. The dialog confirms with "Credentials updated".
+
+Behavior:
+
+- The new values **replace** the stored authorization parameters. A credential field you leave blank is cleared, not kept. Tokens saved for the previous credentials, such as an OAuth2 refresh token, are discarded.
+- Properties outside the authorization, such as a base URL or region, are not changed. The authorization type cannot be switched.
+- Saving stores the values without testing them. A wrong credential is flagged as invalid the next time the connection runs.
+- Saving clears the connection's invalid-credentials flag, so workflows that were blocked by it run again.
+- The replacement is refused when someone changed the connection after you opened it (reload and try again), and on a connection that is not active.
+- Managed connections do not offer **Update credentials**.
+
+Only the connection's owner (the user who created it) or a tenant admin can replace its credentials. The server rejects the request for anyone else. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` [audit event](/platform/settings/audit-events). The event holds the connection ID only. Credential values are never recorded.
+
+This applies to automation connections. Embedded connections are covered in [Embedded connections](/platform/embedded/build/connections).
 
 ---
 
 ## Organization Connections
 
-The page is headed **Organization Connections**, described as "Manage organization-wide shared connections.", with a **New Connection** button. Connections belong to the environment selected in the left sidebar header.
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    The **Settings → Connections** page and connection visibility are not available in the latest released version of ByteChef.
+</Callout>
+
+The page is headed **Organization Connections**, described as "Manage organization-wide shared connections.", with a **New Connection** button. It requires the `ADMIN` authority. Connections belong to the environment selected in the left sidebar header.
 
 | Column | Description |
 |---|---|
 | **Name** | The connection's name. |
-| **Component** | The component it authenticates, with its icon. A connection can outlive the component that defined it, in which case the raw component name is shown. |
+| **Component** | The component the connection authenticates, with its icon. If the component no longer exists, the raw component name is shown. |
 | **Environment** | The environment the connection belongs to. |
-| **Created By** | Who created it. |
-| **Last Modified** | When it last changed. |
+| **Created By** | The user who created the connection. |
+| **Last Modified** | When the connection last changed. |
 
-Creating one opens the standard connection dialog, so an organization connection gets the same component picker, the component's real connection properties, and the same OAuth2 flow as any other connection. Organization connections are **deleted rather than demoted** - this scope is terminal.
+**New Connection** opens the standard connection dialog, with the same component picker, connection properties and OAuth2 flow as any other connection. Organization connections cannot be narrowed to a smaller visibility. To remove one, delete it.
 
 {/* TODO screenshot: Settings → Connections - the Organization Connections table with Name / Component / Environment / Created By / Last Modified columns, and the New Connection button */}
 
 ## The visibility model
 
-Every connection carries exactly one visibility, ordered `PRIVATE < WORKSPACE < ORGANIZATION`:
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    Connection visibility is not available in the latest released version of ByteChef.
+</Callout>
+
+Every connection has exactly one visibility, ordered `PRIVATE < WORKSPACE < ORGANIZATION`:
 
 | Visibility | Who can reach it | Typical use |
 |---|---|---|
 | **PRIVATE** | The owner, plus anyone named in a grant. | A personal sandbox credential. |
-| **WORKSPACE** | Every member of the owning workspace. | A shared infrastructure credential used across a workspace's projects. |
-| **ORGANIZATION** | Every member of every workspace in the organization. | A corp-wide credential. |
+| **WORKSPACE** | Every member of the owning workspace. | A credential shared across a workspace's projects. |
+| **ORGANIZATION** | Every member of every workspace in the organization. | An organization-wide credential. |
 
-**Every connection is created WORKSPACE-visible** - shared with its workspace unless its owner withholds it. That is the default for every resource type, not a special case for connections.
+New connections are created with `WORKSPACE` visibility by default.
 
-The picker on the connection dialog offers three states:
+The visibility picker in the connection dialog offers three choices:
 
-- **Shared with workspace** - `WORKSPACE`. Not gated on admin: it is the default, so gating it would fail every ordinary create.
-- **Private** - `PRIVATE`, withheld from the workspace.
-- **Specific people** - also stored as `PRIVATE`, distinguished only by the presence of grant rows naming individual users.
+| Choice | Stored value |
+|---|---|
+| **Shared with workspace** | `WORKSPACE` (default). |
+| **Private** | `PRIVATE`, withheld from the workspace. |
+| **Specific people** | `PRIVATE`, plus grants that name individual users. |
 
-"Specific people" is deliberately not a fourth stored value. Keeping one stored state machine means the server never has to reconcile a value that would be indistinguishable from `PRIVATE` the moment its last grant was revoked. Moving away from **Specific people** leaves the grants in place rather than deleting them, so demoting again restores the same audience.
+Switching away from **Specific people** keeps the grants, so switching back restores the same audience.
 
-`ORGANIZATION` is not offered in that picker - it is reached through the Organization Connections page above. Asking for it at creation time is rejected with "Only PRIVATE or WORKSPACE visibility can be set on connection creation".
+`ORGANIZATION` is not offered in the picker. It is set by creating the connection on the **Organization Connections** page. A request that asks for `ORGANIZATION` at creation time is rejected with "Only PRIVATE or WORKSPACE visibility can be set on connection creation".
 
-Grants live in a polymorphic `resource_grant` table keyed by resource type, resource id, and user id, with a unique constraint across the three; granting the same user twice is a no-op rather than an error.
+Granting the same user twice has no effect.
 
 ### Per-edition behavior
 
-- **Community Edition** - every connection is force-written `WORKSPACE`. There is no picker and no grants, because CE has no authorization boundary between workspace members.
-- **Embedded** - every connection is force-written `PRIVATE`. An embedded connection belongs to a connected end user of your product, not to a workspace member, so workspace reach would be wrong in a way that crosses customers.
+| Edition or platform | Behavior |
+|---|---|
+| Community Edition | Every connection is stored as `WORKSPACE`. There is no picker and there are no grants. |
+| Embedded | Every connection is stored as `PRIVATE`, because it belongs to one connected user of your product. |
 
-Both overrides are applied in the facade, ignoring the request body, so a hand-crafted request cannot bypass them.
+Both rules are applied on the server and ignore the request body.
 
-### What sharing actually exposes
+### What sharing exposes
 
-`WORKSPACE` grants **use plus existence**, not read plus write. Both connection REST controllers obfuscate `authorizationParameters` and return `parameters` as null, and the only connection API that changes authorization parameters after creation, `updateConnectionCredentials`, is limited to the connection's owner and tenant admins (see [Replacing credentials](#replacing-credentials)). Editing a connection's properties, such as its base URI, is limited to the same people (see [Editing connection properties](#editing-connection-properties)). A colleague can run a workflow against your account; they cannot extract the credential or repoint it somewhere else.
+`WORKSPACE` visibility lets members **use** a connection and see that it exists. It does not let them read or change the credential:
 
-Visibility is also a **precondition** of the permission check, not a filter running beside it - without that, a member holding `CONNECTION_EDIT` would pass a by-id check for a connection the list correctly hides.
+- The connection APIs obfuscate `authorizationParameters` and return `parameters` as null.
+- Only the connection's owner and tenant admins can replace credentials or edit connection properties.
 
-## Editing connection properties
+A colleague can run a workflow with a shared connection but cannot extract the credential or point it at another account.
 
-Some connections have properties besides their credentials, for example the base URI of an HTTP Client connection. In the automation **Connections** list, choose **Edit** on the connection. The dialog shows the connection's name, its properties filled in with the stored values, and its tags. Change what you need and click **Save**.
-
-- Only the connection's properties are changed. The stored credentials are kept; replace them with **Update credentials** (see [Replacing credentials](#replacing-credentials)).
-- A property you clear is removed from the connection.
-- Only the connection's owner (the user who created it) or a tenant admin can save the changes.
-- If someone else changed the connection after you opened it, the save is rejected. Reload and try again.
-
-## Replacing credentials
-
-When a connection's credentials stop working, for example after a password change or a revoked token, you can enter new ones instead of creating a new connection. Every workflow that uses the connection keeps it.
-
-In the automation **Connections** list, choose **Edit** on the connection. The dialog opens on the credentials form by itself when the connection's credentials were rejected; otherwise click **Update credentials** in the dialog footer. Enter the new values, click **Update credentials** again, and the dialog confirms with "Credentials updated".
-
-- The new values **replace** the stored authorization parameters. A credential field you leave blank is cleared, not kept, and tokens saved for the previous credentials, such as an OAuth2 refresh token, are discarded.
-- Properties outside the authorization, such as a base URL or region, are not changed, and the authorization type cannot be switched.
-- Saving stores the values; it does not test them. A wrong credential is flagged as invalid the next time the connection runs.
-- Saving clears the connection's invalid-credentials flag, so workflows that were blocked by it run again.
-- The replacement is refused when someone changed the connection after you opened it (reload and try again), and on a connection that is not active.
-- Managed connections cannot be changed this way.
-
-Only the connection's owner (the user who created it) or a tenant admin can replace its credentials, and the **Update credentials** button is shown only to them. Each replacement is recorded as a `CONNECTION_CREDENTIALS_UPDATED` audit event. The event holds the connection id only; credential values are never recorded.
-
-This applies to automation connections only. Embedded connections are covered in [Embedded connections](/platform/embedded/build/connections).
+Visibility is checked before permissions. A member who holds `CONNECTION_EDIT` still cannot act on a connection that is hidden from them.
 
 ## Changing visibility
 
-Every connection in the automation **Connections** list carries a **scope badge** next to its name, showing where the connection currently reaches:
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    Connection visibility is not available in the latest released version of ByteChef.
+</Callout>
+
+Every connection in the automation **Connections** list shows a **scope badge** next to its name:
 
 | Badge | Icon | Meaning |
 |---|---|---|
@@ -101,48 +135,37 @@ Every connection in the automation **Connections** list carries a **scope badge*
 | **Workspace** | building | "Visible to every member of the current workspace." |
 | **Organization** | globe | "Visible to every member across all workspaces in the organization." |
 
-The badge is a button. Click it and the visibility picker opens beneath, with the same three choices as the creation dialog.
+Click the badge to open the visibility picker.
 
-**To share a connection with the whole workspace**, click the badge and choose **Shared with workspace**.
+- **Share with the whole workspace** - choose **Shared with workspace**.
+- **Share with named colleagues** - choose **Specific people** and add users from the workspace member list. Removing a user from the list revokes their access. The badge then shows **Specific people** with the number of people named.
+- **Withhold the connection** - choose **Private**. Named people keep their grants, so switching back restores the same audience.
 
-**To share a connection with named colleagues**, click the badge, choose **Specific people**, and add them from the workspace-member list that appears. Removing someone from that list revokes their access. The badge then reads **Specific people** with the number of people named.
+Changes apply immediately. There is no separate save step.
 
-**To withhold a connection**, choose **Private**. Any people you had named keep their grants, so switching back restores the same audience rather than starting from an empty list.
+In Community Edition, and on screens without a workspace context, no badge is shown.
 
-Changes apply as you make them - there is no separate save step. Adding or removing people is applied as a difference against the current list rather than as a wholesale replacement, so the platform never revokes and re-adds every grant on each edit.
+### API operations
 
-Where the feature is unavailable - Community Edition, or any surface with no workspace context - **no badge appears at all**. There is no read-only fallback: a connection simply shows its name, and visibility is not part of the UI. A badge that renders without opening a picker means something else: the feature is on, but the connection has no id yet, as with one that has not been saved.
-
-### At the API level
-
-The picker is backed by four operations, all owner-or-admin:
+All four operations are limited to the connection's owner and tenant admins:
 
 | Operation | Effect |
 |---|---|
-| `setConnectionVisibility(workspaceId, connectionId, visibility)` | Sets a connection's reach. Rejects `ORGANIZATION` (set through `createOrganizationConnection` instead) and refuses to narrow to `PRIVATE` while an active deployment uses the connection. |
+| `setConnectionVisibility(workspaceId, connectionId, visibility)` | Sets a connection's visibility. Rejects `ORGANIZATION`, and refuses to narrow to `PRIVATE` while an active deployment uses the connection. |
 | `grantConnectionAccess(workspaceId, connectionId, userId)` | Names one user on a `PRIVATE` connection. Idempotent. |
 | `revokeConnectionAccess(workspaceId, connectionId, userId)` | Removes that user's grant. |
-| `connectionGrants(workspaceId, connectionId)` | Lists who a connection was handed to. |
+| `connectionGrants(workspaceId, connectionId)` | Lists the users a connection is shared with. |
 
-There is deliberately no set-grants operation - expressing the picker's list as one would mean revoking every grant and re-adding it on each keystroke.
-
-A grantee must already be a member of the owning workspace, and a rejection reuses the unknown-connection error so user ids cannot be enumerated through it. `connectionGrants` is owner-or-admin for the same reason: a plain viewer must not learn who else holds access.
-
-Grants are deleted with the connection.
+A grantee must be a member of the owning workspace. Grants are deleted with the connection.
 
 ## What gets audited
 
-| Event | When |
-|---|---|
-| `CONNECTION_CREATED` | A connection was created. |
-| `CONNECTION_DELETED` | A connection was deleted. |
-| `CONNECTION_VISIBILITY_CHANGED` | A connection's reach changed. |
-| `CONNECTION_ACCESS_GRANTED` | A user was named on a private connection. |
-| `CONNECTION_ACCESS_REVOKED` | A user's grant was removed. |
-| `CONNECTION_REASSIGNED` | A connection's owner changed. |
+| Event | When | Availability |
+|---|---|---|
+| `CONNECTION_CREDENTIALS_UPDATED` | A connection's credentials were replaced. | Available |
+| `CONNECTION_DISCONNECTED` | A connection was detached from deployments and test configurations. | Available |
+| `CONNECTION_VISIBILITY_CHANGED` | A connection's visibility changed. | Coming soon |
+| `CONNECTION_ACCESS_GRANTED` | A user was named on a private connection. | Coming soon |
+| `CONNECTION_ACCESS_REVOKED` | A user's grant was removed. | Coming soon |
 
 See [Audit Events](/platform/settings/audit-events).
-
-## Metrics
-
-`bytechef_connection_create` (counter) increments on every connection created through the workspace facade, tagged `visibility=PRIVATE|WORKSPACE`, so you can watch how much credential sharing actually happens against how much stays private. The tag reads the *persisted* visibility rather than the request body, so it reflects the CE and embedded overrides. Organization connections are created through their own facade and are not counted here.

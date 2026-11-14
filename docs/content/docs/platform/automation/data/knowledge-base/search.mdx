@@ -3,19 +3,20 @@ title: Search
 description: Run semantic queries against a knowledge base and inspect the matching chunks and relevance scores.
 ---
 
-The **Search** tab is a built-in playground for querying a knowledge base the same way a
-workflow or agent would. Use it to sanity-check that your documents were ingested well and
-that a given question retrieves the chunks you expect - before you wire the knowledge base
-into anything.
+The **Search** tab queries a knowledge base the same way a workflow or agent does. Use it to
+check that documents were ingested correctly and that a question retrieves the expected chunks
+before you use the knowledge base in a workflow.
 
 ## Running a query
 
 1. Open a knowledge base and switch to the **Search** tab.
-2. Type a natural-language query. Search is **semantic**: it matches on meaning, so
-   "how do I cancel" will find a chunk titled "Terminating a subscription" even though no
-   words overlap.
-3. (Optional) Add a **metadata filter** as JSON to restrict which chunks can match.
-4. Submit. Results come back ranked by relevance.
+2. Enter a natural-language query in **Search Query**. Search is **semantic**: it matches on
+   meaning, so "how do I cancel" can find a chunk titled "Terminating a subscription" even though
+   no words overlap.
+3. Optionally, enter a JSON object in **Metadata Filters (JSON, optional)** to restrict which chunks can match.
+4. Click **Search**. Results are ranked by relevance.
+
+The result count appears above the results. Click **Clear Search** to reset.
 
 {/* TODO screenshot: knowledge base Search tab - query box with a natural-language query, optional metadata filter, and result cards showing source document, chunk index, and relevance score */}
 
@@ -23,25 +24,24 @@ into anything.
 
 Each result card shows:
 
-- The **source document** the chunk came from.
-- The **chunk index** - which slice of the document matched.
-- A **relevance score** from 0–100%, where higher means a closer semantic match.
-- The chunk's **metadata**, including the file name and anything attached during ingestion.
+- The result number and the **source document** (the file name) the chunk came from.
+- **Chunk** - The index of the matching chunk within the document.
+- **Score** - The relevance from 0 to 100%; higher means a closer match.
+- **Metadata** - The chunk's metadata, including the file name and metadata added during ingestion.
 
-If a query you expect to work returns nothing useful, check that the relevant document is
-**Ready** (see [Add documents](/platform/automation/data/knowledge-base/add-documents)), and consider
+If a query returns no useful results, check that the relevant document is
+**Ready** (see [Add documents](/platform/automation/data/knowledge-base/add-documents)), and check
 whether the [chunk settings](/platform/automation/data/knowledge-base/create-a-knowledge-base#choosing-chunk-settings)
 are splitting the content too finely or too coarsely.
 
 ## Metadata filters
 
-The metadata filter narrows the candidate set before ranking. It accepts a JSON object
-whose keys are matched against each chunk's stored metadata, for example:
+The metadata filter narrows the candidates before ranking. It accepts a JSON object whose keys
+are matched against each chunk's stored metadata, for example:
 
 ```json
 {"file_name": "refund-policy.pdf"}
 ```
 
-Only chunks whose metadata satisfies the filter are eligible to be returned. This is the
-playground equivalent of the metadata and [tag filters](/platform/automation/data/knowledge-base/use-in-workflows#filtering-by-tag)
-you'll use from workflows and agents.
+Only chunks whose metadata matches the filter can be returned. Workflows and agents use the
+equivalent metadata and [tag filters](/platform/automation/data/knowledge-base/use-in-workflows#filtering-by-tag).

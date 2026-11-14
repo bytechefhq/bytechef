@@ -1,12 +1,11 @@
 ---
 title: Profile
-description: Your own account - name and email, password, two-factor authentication, and linked social accounts.
+description: Your own account - name and email, password, two-factor authentication and linked social accounts.
 ---
 
-**Your Account → Profile** is where you change the things that belong to you rather than to the
-deployment. It is reachable by every signed-in user; nothing on it requires an administrator.
+**Your Account → Profile** holds the settings of your own account. Every signed-in user can open it; nothing on it requires an administrator.
 
-The page is headed **Your profile** and stacks four sections.
+The page is headed **Your profile**, with the description "Manage your name, email address, and password, and the security options that protect your account." It shows the **Profile** and **Change password** sections. The **Two-Factor Authentication** and **Linked Accounts** sections appear only when the `ff-1040` feature flag is on.
 
 ![The Profile page - the Profile and Change password sections](profile/profile.png)
 
@@ -20,57 +19,40 @@ Three fields, all editable:
 |---|---|
 | **First name** | Required. |
 | **Last name** | Required. |
-| **Email** | Required, must be a valid address, at most 254 characters. |
+| **Email** | Required. Must be a valid address of at most 191 characters. |
 
-Click **Save**; an "Account has been updated." toast confirms it. Changing your email to one another
-account already uses is rejected. Your login name is not shown and is not editable here - editing the
-email does not change it.
+Click **Save**. An "Account has been updated." toast confirms the change. An email address that another account already uses is rejected. Your login name is not shown and cannot be edited here; changing the email does not change it.
 
 ## Change password
 
-Enter your **Current password** and a **New password** and click **Save**. A "Password has been
-changed." toast confirms it.
+Enter your **Current Password** and a **New Password**, then click **Change password**. A "Password has been changed." toast confirms the change.
 
-The new password is validated server-side and must be **8 to 100 characters with at least one
-uppercase letter and at least one digit**. The form's own check is laxer than that, so a password the
-form accepts can still be rejected on save.
+The server requires the new password to be **8 to 100 characters with at least one uppercase letter and at least one digit**. The form only checks for 4 to 50 characters, so a password the form accepts can still be rejected on save.
 
-There is no "log out other sessions" step attached to a password change - see
-[Active Sessions](/platform/your-account/active-sessions) for that.
+A password change does not sign out your other sessions. To end them, use [Active Sessions](/platform/your-account/active-sessions).
 
 ## Two-Factor Authentication
 
 <Callout type="warn" title="Coming soon">
-    Two-factor authentication is on the upcoming release track and is not yet available in the latest
-    released version of ByteChef.
+    Two-factor authentication is behind the `ff-1040` feature flag and is not generally available yet.
 </Callout>
 
-Described as "Add an extra layer of security to your account using an authenticator app."
+The section is described as "Add an extra layer of security to your account using an authenticator app."
 
-1. Click **Set up 2FA**. The section shows a QR code and the secret in text form, for authenticator
-   apps that cannot scan.
-2. Scan it, then type the rotating code into the verification field and click **Verify & Enable**.
-   **Cancel** abandons the setup.
-3. Once enabled, the section reads "Two-factor authentication is enabled." and offers **Disable 2FA**,
-   which asks for your password and a current code before turning it off.
+1. Click **Set up 2FA**. The section shows a QR code and the secret as text, for authenticator apps that cannot scan.
+2. Scan the code, enter the current code from the app and click **Verify & Enable**. **Cancel** abandons the setup.
+3. When 2FA is on, the section reads "Two-factor authentication is enabled." and offers **Disable 2FA**, which opens the **Disable Two-Factor Authentication** dialog and asks for your current password and a code.
 
 ## Linked Accounts
 
 <Callout type="warn" title="Coming soon">
-    Social login is on the upcoming release track and is not yet available in the latest released
-    version of ByteChef.
+    Linked accounts are behind the `ff-1040` feature flag and are not generally available yet.
 </Callout>
 
-Described as "Manage external identity providers linked to your account."
+The section is described as "Manage external identity providers linked to your account."
 
-With no provider linked, the section offers **Link Google** and **Link GitHub**, each starting that
-provider's authorization flow. With one linked, it shows the provider name and the account identifier
-it returned, plus an **Unlink** button that confirms first.
+With no provider linked, the section offers **Link Google** and **Link GitHub**. Each starts that provider's authorization flow. With a provider linked, the section shows the provider name, the account identifier the provider returned and an **Unlink** button. **Unlink** opens the **Unlink Provider** confirmation, and a "Provider has been unlinked." toast confirms the change.
 
-**Unlink** is disabled while your account has no password, and the section says so: "Set a password
-before unlinking your provider to maintain account access." Set a password in **Change password**
-first, or you would be unlinking the only way you can sign in.
+**Unlink** is disabled while your account has no password, and the section shows "Set a password before unlinking your provider to maintain account access." Set a password in **Change password** first, otherwise unlinking would remove your only way to sign in.
 
-This is per-user linking of *your* account. Federating a whole organization's identities is a
-different, administrator-level feature - see
-[Identity Providers](/platform/settings/identity-providers).
+Linked accounts apply to your own account only. Federating the identities of a whole organization is an administrator feature; see [Identity Providers](/platform/settings/identity-providers).

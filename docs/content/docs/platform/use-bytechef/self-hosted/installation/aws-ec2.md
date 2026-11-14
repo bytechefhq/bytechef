@@ -1,9 +1,9 @@
 ---
 title: AWS EC2
-description: Learn how to deploy ByteChef on AWS EC2
+description: Run the ByteChef container on an Amazon EC2 instance with an Amazon RDS for PostgreSQL database.
 ---
 
-ByteChef is distributed as a single container image, `docker.bytechef.io/bytechef/bytechef:latest`, listening on port `8080`. Running it on an EC2 instance is a matter of sizing the instance, installing Docker, provisioning a PostgreSQL database, and starting the container with the required configuration.
+ByteChef is distributed as a single container image, `docker.bytechef.io/bytechef/bytechef:latest`, listening on port `8080`. To run it on EC2, size the instance, install Docker, provision a PostgreSQL database, and start the container with the required configuration.
 
 ## Prerequisites
 
@@ -122,4 +122,5 @@ Browse to `http://<instance-public-dns>:8080/login` (or your `BYTECHEF_PUBLIC_UR
 ## Next steps
 
 - [Docker installation](/platform/use-bytechef/self-hosted/installation/local-docker) - the container options in detail
-- [Kubernetes](/platform/use-bytechef/self-hosted/installation/kubernetes) - for high-availability deployments
+- [Kubernetes](/platform/use-bytechef/self-hosted/installation/kubernetes) - deploy with the Helm chart
+- [Node roles and high availability](/platform/use-bytechef/self-hosted/configuration/node-roles) - run more than one node

@@ -1,30 +1,31 @@
 ---
 title: Cloud
-description: Use ByteChef on our managed, hosted deployment - no infrastructure to manage.
+description: ByteChef Cloud is the hosted ByteChef service at app.bytechef.io, operated by the ByteChef team.
 ---
 
 import {Card, Cards} from "fumadocs-ui/components/card";
 import {LayoutTemplate, LogIn, Workflow} from "lucide-react";
 
-**ByteChef Cloud** is our managed, hosted deployment at [app.bytechef.io](https://app.bytechef.io/). Sign up and start building integrations and automations immediately - no servers, databases, or upgrades to manage.
+**ByteChef Cloud** is the hosted ByteChef service at [app.bytechef.io](https://app.bytechef.io/). The ByteChef team runs the servers, database and upgrades; you sign up and build workflows and integrations in the browser.
 
-## Why Cloud
+## Cloud compared with self-hosted
 
-Cloud is the fastest way to get a workspace running: sign up, connect the apps you use, and start building - updates, scaling, and infrastructure are handled for you.
-
-- **Zero infrastructure** - no Docker, Kubernetes, or database to provision or patch.
-- **Always up to date** - new features and connectors land automatically, no upgrade step.
-- **Scales with you** - from a first workflow to production traffic, without capacity planning.
+| Concern | Cloud | Self-hosted |
+|---|---|---|
+| Infrastructure | Operated by ByteChef. No Docker, Kubernetes or database to provision. | You provision and operate the server, PostgreSQL and any broker or storage. |
+| Upgrades | Applied by ByteChef; new features and components appear without an upgrade step. | You choose when to deploy a new image. |
+| Data location and network | ByteChef's hosting. | Your infrastructure and network. |
+| Configuration | Managed by ByteChef. | Every instance-wide option is yours to set. |
 
 <Callout type="info">
-  Need full control over data residency, networking, or custom infrastructure instead? See [Self-Hosted](/platform/use-bytechef/self-hosted).
+  To control data residency, networking or infrastructure yourself, see [Self-Hosted](/platform/use-bytechef/self-hosted).
 </Callout>
 
 ## Get started
 
 <Cards>
   <Card icon={<LogIn className="text-blue-300" />} title="Sign up" href="https://app.bytechef.io/">
-    Create your workspace at app.bytechef.io - no installation required.
+    Create your workspace at app.bytechef.io.
   </Card>
 
   <Card icon={<Workflow className="text-green-300" />} title="Automation Quick Start" href="/platform/automation/get-started/quick-start/build-first-workflow">

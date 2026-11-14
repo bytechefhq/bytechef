@@ -3,9 +3,9 @@ title: Automation Hub
 description: Embed a ready-made catalog where your end users browse your automation templates, activate them with their own accounts, and manage what is running.
 ---
 
-![Automation Hub illustration](automation-hub/automation-hub-overview.png)
+![The Automation Hub Automations tab, listing the templates available to a connected user](automation-hub/automation-hub-catalog.png)
 
-The **Automation Hub** is an end-user surface you drop into your product with one React component. Your connected users see the [automation templates](/platform/embedded/build/automations) you released to their environment through a configuration, activate one in the [activation dialog](/platform/embedded/build/activation-dialog), and turn their automations on and off. They do all of this without leaving your app or seeing ByteChef.
+The **Automation Hub** is an end-user surface you drop into your product with one React component. Your connected users see the [automation templates](/platform/embedded/build/automations) you released to their environment through a configuration, activate one in the [activation dialog](/platform/embedded/build/automations/activation-dialog), and turn their automations on and off. They do all of this without leaving your app or seeing ByteChef.
 
 It renders in an iframe and has two tabs:
 
@@ -94,7 +94,7 @@ A template the user has not activated shows **Use**, which opens the activation 
 
 ### The activation dialog
 
-The activation dialog has up to three steps. It is the same dialog you can open from your own page - see [Activate templates from your app](/platform/embedded/build/activation-dialog).
+The activation dialog has up to three steps. It is the same dialog you can open from your own page - see [Activate templates from your app](/platform/embedded/build/automations/activation-dialog).
 
 1. **Connect** - one row per component that needs a connection. **Connect** reuses the user's existing connection for that integration without showing a form when its credentials are valid; otherwise it opens the Connect dialog for the integration behind that component (an existing connection with invalid credentials is reconnected in the form). When [connection creation](#connection-creation) is turned off, **Connect** is hidden and the user picks an existing connection. The new connection is an integration instance connection that the user's integrations share. If the component's integration has no enabled configuration in the environment, the row shows `<App> isn't set up yet — ask your administrator` and activation cannot continue. Skipped when the template needs no connections.
 2. **Configure** - one field per workflow input. Required inputs must be filled. Skipped when the template has no inputs.
@@ -156,6 +156,6 @@ Colors are hex values or any value the browser accepts as a CSS color. The same 
 ## Related
 
 - [Integration Marketplace](/platform/embedded/build/integration-marketplace) - the embeddable catalog of integrations.
-- [Activate templates from your app](/platform/embedded/build/activation-dialog) - open the activation dialog from your own page.
+- [Activate templates from your app](/platform/embedded/build/automations/activation-dialog) - open the activation dialog from your own page.
 - [Automations](/platform/embedded/build/automations) - authoring and publishing the templates the hub lists.
 - [Troubleshooting](/platform/embedded/monitor/troubleshooting#embedding-problems) - a blank iframe or a hub stuck on loading.

@@ -1,60 +1,132 @@
 ---
 title: Theming and Localization
-description: What of the embedded surfaces you can brand today, and what is still fixed - styling, copy, language, and the URLs and emails your customers see.
-comingSoon: true
+description: Reference for styling the embedded surfaces, and the parts of the embedded UI that cannot be changed.
 ---
 
-White-labelling has two halves. The **placement** half is available today: your product chrome wraps the embedded surfaces, and your customer never navigates to a ByteChef URL. The **appearance** half is partly configurable - colors, font, corner radius and light or dark mode on some surfaces - and this page is the honest inventory of what you can change and what is fixed.
+The embedded surfaces render inside your product: the Automation Hub, the Integration Marketplace and the workflow builder in an iframe, and the Connect and activation dialogs directly in your page. This page lists which styling options each surface accepts, and which parts of the UI are fixed.
 
-## What you control today
+## Styling options by surface
 
-- **Where the surfaces sit.** The Connect dialog opens from your own UI, and the Automation Hub, Integration Marketplace and workflow builder render in an iframe you position and size. Your layout, your navigation, your typography around them.
-- **The look of the Automation Hub and Integration Marketplace.** Both components take a `theme` prop. It sets `mode` (`'dark'` or `'light'`), `primaryColor`, `fontFamily`, `borderRadius`, the surface colors (`surfaceColor`, `cardColor`, `activeBorderColor`, `enableColor`, `disableColor`, `onAccentColor`, `segmentColor`) and `cssVariables`, a map of any CSS custom properties starting with `--`. Colors that the browser does not recognize, and a `borderRadius` that is not a `px`, `rem`, `em` or `%` length, are ignored. The hub's theme also applies to the workflow builder the hub opens. See [Theming](/platform/embedded/build/automation-hub#theming) on the Automation Hub page.
-- **The Connect and activation dialogs.** `useConnectDialog` and `useActivationDialog` take `mode: 'dark' | 'light'` (default `'light'`) and read `--bytechef-dialog-*` CSS variables. See [Styling the dialogs](#styling-the-dialogs). The Integration Marketplace passes its `theme.mode` to the dialog it opens. See [Displaying the Connect Dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog).
-- **What is in the catalog.** `includeComponents` restricts the workflow builder, standalone or opened from the Automation Hub, to the components you choose, and [permission expressions](/platform/embedded/build/permission-expressions) narrow what each connected user is offered. Your customers do not see the full ByteChef catalog unless you want them to.
-- **Which workflows exist.** You author the templates; customers configure them rather than starting from a blank canvas.
+| Surface | How it renders | Styling options |
+|---|---|---|
+| [Automation Hub](/platform/embedded/build/automations/automation-hub) | iframe (`automation-hub.html`) | `theme` prop. Also applies to the workflow builder and the dialogs that the hub opens. |
+| [Integration Marketplace](/platform/embedded/build/integration-marketplace) | iframe (`integration-marketplace.html`) | `theme` prop. `theme.mode` is passed to the Connect dialog that the marketplace opens. |
+| `EmbeddedWorkflowBuilder` | iframe (`workflow-builder.html`) | None. Renders the default light theme. |
+| Connect dialog (`useConnectDialog`) | In your page | `mode` option and `--bytechef-dialog-*` CSS variables. |
+| Activation dialog (`useActivationDialog`) | In your page | `mode` option and `--bytechef-dialog-*` CSS variables. |
 
-## Styling the dialogs
+## The `theme` prop
 
-The Connect dialog and the activation dialog render in your page, not in an iframe, and read these CSS variables. Set them on `:root` or any ancestor of the dialog.
+`AutomationHub` and `IntegrationMarketplace` accept the same `theme` object. Every key is optional. A key you do not set keeps the default value.
 
-| Variable | Used for |
+```tsx
+<AutomationHub
+    jwtToken={jwtToken}
+    theme={{
+        borderRadius: '0.5rem',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        mode: 'dark',
+        primaryColor: '#2563eb',
+    }}
+/>
+```
+
+| Key | Type | Effect |
+|---|---|---|
+| `mode` | `'dark' \| 'light'` | Color scheme. Any value other than `'dark'` renders light. |
+| `primaryColor` | color | Buttons, focus rings and brand accents. The text color on top of it is set to black or white, whichever has more contrast. |
+| `fontFamily` | string | Value of the `font-family` used by the surface. |
+| `borderRadius` | length | Corner radius. Accepts `px`, `rem`, `em` or `%`, for example `8px` or `0.5rem`. |
+| `surfaceColor` | color | Page background. |
+| `cardColor` | color | Cards, dialogs and popovers. |
+| `activeBorderColor` | color | Border of enabled automation cards. |
+| `enableColor` | color | **Enable** button. |
+| `disableColor` | color | **Disable** button. |
+| `onAccentColor` | color | Text on accent-colored surfaces. |
+| `segmentColor` | color | Selected item in segmented controls. |
+| `cssVariables` | `Record<string, string>` | Additional CSS custom properties, for example `{'--my-variable': '4px'}`. Keys that do not start with `--` are ignored. |
+
+### Validation
+
+- A color is a hex value (`#2563eb`, `#25e`) or any value the browser accepts as a CSS color (`rgb(37 99 235)`, `rebeccapurple`). An unrecognized color is ignored.
+- A `borderRadius` that is not a number followed by `px`, `rem`, `em` or `%` is ignored.
+- `cssVariables` values are not validated.
+
+### Fonts
+
+The surface renders in an iframe, so `@font-face` rules declared in your page do not apply inside it. Use a font that the iframe can load without your stylesheet, such as a system font stack.
+
+### Updating the theme
+
+When the `theme` prop changes, the component sends the new values to the iframe. The iframe does not reload.
+
+## Styling the Connect and activation dialogs
+
+The Connect dialog and the activation dialog render in your page, not in an iframe.
+
+### `mode`
+
+Both `useConnectDialog` and `useActivationDialog` accept `mode: 'dark' | 'light'`. The default is `'light'`. `'dark'` switches the default surface, border, text and hover colors to a dark palette.
+
+### CSS variables
+
+The dialogs read the following CSS custom properties. Set them on `:root` or on any ancestor of the dialog. A variable you do not set uses the default for the current `mode`.
+
+| Variable | Applies to | Light default | Dark default |
+|---|---|---|---|
+| `--bytechef-dialog-surface` | Dialog background | `#fff` | `#111827` |
+| `--bytechef-dialog-surface-raised` | Raised areas inside the dialog | `#fff` | `#1f2937` |
+| `--bytechef-dialog-border` | Borders | `#e5e7eb` | `#374151` |
+| `--bytechef-dialog-text` | Text | `#0a0a0a` | `#f9fafb` |
+| `--bytechef-dialog-text-muted` | Secondary text | `#6b7280` | `#9ca3af` |
+| `--bytechef-dialog-hover` | Hover backgrounds | `#f1f5f9` | `#374151` |
+| `--bytechef-dialog-primary` | Primary buttons and accents | `#1071e5` | `#1071e5` |
+| `--bytechef-dialog-primary-hover` | Primary button hover | `#0b50a3` | `#0b50a3` |
+| `--bytechef-dialog-primary-foreground` | Text on primary buttons | `#fff` | `#fff` |
+
+```css
+:root {
+    --bytechef-dialog-primary: #2563eb;
+    --bytechef-dialog-primary-hover: #1d4ed8;
+    --bytechef-dialog-surface: #ffffff;
+}
+```
+
+When the Automation Hub opens a dialog, it sets these variables from its `theme`: `primaryColor` sets the three `primary` variables, `cardColor` sets the surface and text variables, `surfaceColor` sets the hover variable, and `activeBorderColor` sets the border variable.
+
+## Localization
+
+<Callout type="warn" title="Coming soon">Localization of the embedded surfaces is not available. No surface accepts a locale.</Callout>
+
+All embedded surfaces display their labels, messages and validation errors in English. No component or hook accepts a locale or replacement text.
+
+## Fixed elements
+
+The following parts of the embedded experience cannot be configured from the SDK.
+
+| Element | Behavior |
 |---|---|
-| `--bytechef-dialog-surface` | Dialog background. |
-| `--bytechef-dialog-surface-raised` | Raised areas inside the dialog. |
-| `--bytechef-dialog-border` | Borders. |
-| `--bytechef-dialog-text` | Text. |
-| `--bytechef-dialog-text-muted` | Secondary text. |
-| `--bytechef-dialog-hover` | Hover backgrounds. |
-| `--bytechef-dialog-primary` | Primary buttons and accents. |
-| `--bytechef-dialog-primary-hover` | Primary button hover. |
-| `--bytechef-dialog-primary-foreground` | Text on primary buttons. |
+| Labels and messages | Fixed text, in English, on every surface. This includes validation messages in the Connect dialog. |
+| Connect dialog footer | Always shows a **Powered by ByteChef** link. |
+| Standalone workflow builder appearance | `EmbeddedWorkflowBuilder` has no `theme` prop and renders the default light theme. To apply a theme to the builder, open it from the Automation Hub. |
+| Engine error messages | Shown in English in execution history, as produced by the workflow engine and the components. |
+| Component documentation links | Component help in the workflow builder links to the ByteChef documentation. |
 
-A variable you do not set falls back to a built-in color. `mode: 'dark'` switches the surface, border, text and hover fallbacks to a dark palette.
+## Host names and URLs
 
-The Automation Hub maps its `theme` onto these variables, so the dialogs it opens match the hub.
+The iframes load from the `baseUrl` you pass to the SDK components, and the APIs and webhook URLs are served by the same ByteChef deployment. On a self-hosted deployment you choose its host names:
 
-## What is fixed
+| Variable | Controls | Default |
+|---|---|---|
+| `BYTECHEF_PUBLIC_URL` | Public base URL of the ByteChef UI, used for OAuth2 redirect URIs and mail links | `http://127.0.0.1:8080` |
+| `BYTECHEF_WEBHOOK_URL` | URL template of the webhook URLs that ByteChef registers with trigger providers and shows in the workflow builder | `BYTECHEF_PUBLIC_URL/webhooks/{id}` |
 
-The standalone `EmbeddedWorkflowBuilder` component has no `theme` prop - it takes only the host, the environment, the token, the workflow and its connection and component options, and renders ByteChef's default light appearance. To theme the builder, open it from the Automation Hub. No surface accepts copy or a locale.
-
-| Surface | Status |
-|---|---|
-| **Colors, fonts, radius** | Configurable on the Automation Hub and Integration Marketplace through `theme`, and on the Connect and activation dialogs through `mode` and the `--bytechef-dialog-*` variables. Fixed on the standalone workflow builder. |
-| **Language** | English only. No locale option, and no translation files to supply. |
-| **Copy and labels** | Fixed, including validation messages inside the Connect dialog. |
-| **Engine error messages** | Fixed and in English. Surfaced as-is in execution history. |
-| **Webhook URLs** | Served from your ByteChef host, not a domain of yours. |
-| **Customer-facing email** | Not sent from your domain or with your templates. |
-| **Documentation links** | Component help points at ByteChef docs, not your help center. |
-
-## What this means in practice
-
-For most embedded products the gap is smaller than it looks: the surfaces are modal or iframed inside your app, so the visual seam is a panel rather than a page. The two that tend to matter first are **language**, if you sell outside English-speaking markets, and **webhook URLs**, if your customers paste them into a third-party system and would see a ByteChef host.
-
-If either is a requirement rather than a preference, raise it before you build - they are roadmap items, not configuration you have missed.
+Set them, and the `baseUrl` you pass to the SDK, to a domain you control (for example `https://automations.example.com`) to keep ByteChef host names out of the URLs your customers see. The values apply to the whole deployment; they cannot be set per connected user. See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables).
 
 ## Related
 
-- [White-Label Execution](/platform/embedded/get-started/white-label-execution) - what your customers experience, and the tenant isolation behind it.
-- [Component Kit](/platform/embedded/build/component-kit) - the tools API, where the names and descriptions your agent surfaces come from the components themselves rather than from your copy.
+- [Automation Hub](/platform/embedded/build/automations/automation-hub#theming) - `theme` prop in context.
+- [Integration Marketplace](/platform/embedded/build/integration-marketplace) - the embeddable integration catalog.
+- [Displaying the Connect Dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) - `useConnectDialog` options.
+- [Activate templates from your app](/platform/embedded/build/automations/activation-dialog) - `useActivationDialog` options.
+- [White-Label Execution](/platform/embedded/get-started/white-label-execution) - what connected users see, and tenant isolation.

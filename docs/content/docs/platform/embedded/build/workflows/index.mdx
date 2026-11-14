@@ -1,11 +1,11 @@
 ---
 title: "Workflows"
-description: "Author the workflows inside an integration using the integration-scoped workflow editor - switch between an integration's workflows, test them, and publish a new integration version."
+description: "Build the workflows inside an integration in the integration workflow editor, test them and publish a new integration version."
 ---
 
-The **integration workflow editor** is where your team builds the workflows that make up an integration. You open it from the [Integrations](/platform/embedded/build/integrations) list - click an integration's name or use its **View Workflows** menu action - and it opens on one of the integration's workflows.
+The **integration workflow editor** is where your team builds the workflows that make up an integration. You open it from the [Integrations](/platform/embedded/build/integrations) list by clicking an integration's name or its **View Workflows** menu action. It opens on one of the integration's workflows.
 
-The visual canvas itself (adding triggers and actions, wiring nodes, configuring properties, using data pills) works exactly the same as the automation project editor. This page covers only what is **specific to integrations**: the workflows sidebar, the integration breadcrumb, the settings menu, test execution, and integration versioning/publishing. For the canvas mechanics, see **[Building Workflows](/platform/automation/build/workflows/projects)**.
+The visual canvas itself (adding triggers and actions, wiring nodes, configuring properties, using data pills) works exactly the same as the automation project editor. This page covers only what is **specific to integrations**: the workflows sidebar, the breadcrumb, the header actions, the settings menu, test runs, and integration versioning and publishing. For the canvas mechanics, see **[Building Workflows](/platform/automation/build/workflows/projects)**.
 
 {/* TODO screenshot: the full integration workflow editor - left workflows sidebar, integration + workflow breadcrumb, canvas, and the header action buttons on the right */}
 
@@ -15,10 +15,10 @@ The visual canvas itself (adding triggers and actions, wiring nodes, configuring
 
 | Area | What it is |
 |---|---|
-| **Workflows sidebar** (left) | Switch between the workflows in the integration, search and sort them, and add a new workflow or integration or import a workflow. Toggle it with the sidebar button at the far left of the header. |
-| **Breadcrumb** (header, left) | Shows the integration name and a **workflow selector** dropdown for switching workflows. |
-| **Header actions** (header, right) | Test/chat, publish, output panel, and settings menu - in that order. |
-| **Canvas** (center) | The visual workflow editor - same as the [automation workflow editor](/platform/automation/build/workflows/projects). |
+| **Workflows sidebar** (left) | Switch between the workflows in the integration, search and sort them, add a workflow or an integration, or import a workflow. Toggle it with the sidebar button (tooltip **See integrations**) at the far left of the header. |
+| **Breadcrumb** (header, left) | **Integrations** (back to the list), the integration name (a selector for switching integration), and a **workflow selector** dropdown for switching workflows. |
+| **Header actions** (header, right) | In order: **Test** (or **Chat**), **Publish**, **Configure**, **Integration Configurations**, the output panel button, and the settings menu. |
+| **Canvas** (center) | The visual workflow editor, the same as the [automation workflow editor](/platform/automation/build/workflows/projects). |
 
 ---
 
@@ -26,7 +26,7 @@ The visual canvas itself (adding triggers and actions, wiring nodes, configuring
 
 An integration can contain many workflows. There are two ways to move between them:
 
-- **Breadcrumb workflow selector** - click the workflow name in the header breadcrumb and pick another workflow from the **Workflows** dropdown.
+- **Breadcrumb workflow selector** - click the workflow name in the header breadcrumb and pick another workflow from the **Workflows** dropdown. Click the integration name to switch to another integration; integrations without workflows are disabled.
 - **Workflows sidebar** - click any workflow card in the left sidebar. The currently open workflow is highlighted.
 
 ### Using the workflows sidebar
@@ -34,9 +34,9 @@ An integration can contain many workflows. There are two ways to move between th
 {/* TODO screenshot: the left workflows sidebar showing the integration selector with the New integration button, search box, sort menu, New Workflow button with its import menu, and workflow cards */}
 
 1. Open the sidebar with the sidebar toggle button at the far left of the header (if it is collapsed).
-2. Use the **integration selector** at the top of the sidebar to change which integration's workflows are listed. Type to filter the integrations by name. Selecting **All integrations** lists workflows across every integration, grouped by integration.
+2. Use the **integration selector** at the top of the sidebar to change which integration's workflows are listed: **Current integration**, **All integrations** (workflows across every integration, grouped by integration) or a specific integration. Type to filter the integrations by name. The **+** button next to it creates a new integration.
 3. Type in the **Search workflows** box to filter the list by name.
-4. Click the **sort** button (funnel icon) to reorder the list:
+4. Click the **Sort by** button (filter icon) to reorder the list:
 
    | Option | Order |
    |---|---|
@@ -45,7 +45,7 @@ An integration can contain many workflows. There are two ways to move between th
    | **A-Z** | Alphabetical by workflow name. |
    | **Z-A** | Reverse alphabetical. |
 
-5. Each workflow card shows the workflow's component icons, its name, and when it was last edited. Click a card to open that workflow.
+5. Each workflow card shows the workflow's component icons, its name and when it was last edited. Click a card to open that workflow. The card's menu offers **Edit**, **Export** and **Delete**.
 
 ### Adding a workflow
 
@@ -55,7 +55,7 @@ Click **New Workflow** in the sidebar, **New Workflow** in the settings menu's *
 
 ## Settings menu
 
-Click the **settings** (gear) button at the right end of the header to open the settings menu. It has two tabs: **Workflow** and **Integration**. While changes are being saved, a **Saving…** indicator shows next to the workflow selector. It reads **Offline** when you're offline.
+Click the **settings** (gear) button at the right end of the header to open the settings menu. It has two tabs: **Workflow** and **Integration**. While changes are being saved, a saving indicator shows next to the workflow selector. It reads **Offline** when you are offline.
 
 {/* TODO screenshot: the settings menu open, showing the Workflow and Integration tabs */}
 
@@ -71,7 +71,7 @@ Click the **settings** (gear) button at the right end of the header to open the 
 
 | Action | Description |
 |---|---|
-| **Edit** | Open the integration dialog to change the integration's name, category, tags, or [permission expression](/platform/embedded/build/permission-expressions). |
+| **Edit** | Open the integration dialog to change the integration's name, category, description, tags or [permission expression](/platform/embedded/build/permission-expressions). |
 | **New Workflow** | Add a new, empty workflow to the integration and open it in the editor. |
 | **Import Workflow** | Add a workflow to the integration by uploading a `.json`, `.yaml`, or `.yml` workflow definition file. |
 | **Integration History** | Open the version history panel (see [below](#integration-version-history)). |
@@ -91,15 +91,15 @@ Use the header action buttons on the right to run and inspect the workflow you a
 
 | Button | Action |
 |---|---|
-| **Test** | Run the current workflow once for testing. In a workflow with several triggers, the run starts from the trigger whose panel is open, or from the first trigger when no trigger panel is open. The label changes based on that trigger - for a chat-based trigger the button reads **Chat** instead and starts the chat. |
+| **Test** | Run the current workflow once for testing. In a workflow with several triggers, the run starts from the trigger whose panel is open, or from the first trigger when no trigger panel is open. For a chat-based trigger the button reads **Chat** and starts the chat. |
 | **Stop** | Appears while a test run is in progress. Click it to stop the running workflow. |
-| **Output** (icon button after **Publish**) | Toggle the output panel that shows the current workflow's most recent test execution output. |
+| **Output** (icon button after **Integration Configurations**) | Toggle the output panel that shows the current workflow's most recent test execution output. |
 
-{/* TODO screenshot: the header action buttons - Test/Chat, Publish, Output, and Settings - with the output panel open below the canvas */}
+{/* TODO screenshot: the header action buttons (Test/Chat, Publish, Configure, Integration Configurations, Output, Settings) with the output panel open below the canvas */}
 
 The **Test** button is disabled until every required workflow input parameter, connection, and component property is set. Hover the button to see why it is disabled.
 
-Test runs execute against the **draft** version of the integration and are for building and verifying workflows - they do not affect connected users. Connected users only ever run **published** versions activated through [Integration Configurations](/platform/embedded/configure/instance-configurations).
+Test runs execute against the **draft** version of the integration and do not affect connected users. Connected users only ever run **published** versions activated through [Integration Configurations](/platform/embedded/configure/instance-configurations).
 
 ---
 
@@ -107,7 +107,7 @@ Test runs execute against the **draft** version of the integration and are for b
 
 Publishing snapshots the integration's current draft workflows into a new, immutable **published version** that you can then activate for connected users.
 
-1. Click **Publish** in the header.
+1. Click **Publish** in the header. The button is disabled, with the tooltip "No changes to publish", when the draft has no unpublished changes.
 2. In the popover, optionally enter a **Description** (up to 256 characters) summarizing what changed in this version.
 3. Click **Publish**.
 
@@ -121,6 +121,13 @@ When you publish, ByteChef:
 
 Editing continues on the draft; published versions are never changed. Only published versions can be activated in an environment through [Integration Configurations](/platform/embedded/configure/instance-configurations).
 
+### Configuring from the editor
+
+Two header buttons next to **Publish** work with the integration's Development [instance configurations](/platform/embedded/configure/instance-configurations):
+
+- **Configure** opens the instance configuration dialog to create a configuration or change the version one uses. It is disabled, with the tooltip "Publish the integration before configuring it.", until the integration has a published version.
+- **Integration Configurations** opens a side sheet that lists the integration's configurations.
+
 ### Integration version history
 
 Open **Integration History** from the settings menu's **Integration** tab to view the **Integration Version History** panel.
@@ -131,7 +138,7 @@ Each entry shows:
 
 - The version number (for example, `V1`, `V2`).
 - The publish date and time (published versions only).
-- A status badge - **PUBLISHED** or **DRAFT**.
+- A status badge: **PUBLISHED** or **DRAFT**.
 - The description you entered when publishing, expandable to read the full text ("No description." when none was provided).
 
 The current draft version appears at the top. It has no publish date or description yet, but you can expand it like any other version.
@@ -140,7 +147,7 @@ Expanding a version also lists the workflows that changed in it compared with th
 
 Click a workflow in the list to open its changes in a dialog with three tabs:
 
-- **Changes** - workflow-level changes such as the label and description, and the trigger, task, cluster element, input and output changes, with old → new values for every changed parameter. An added or removed workflow says so instead of listing changes.
+- **Changes** - workflow-level changes such as the label and description, and the trigger, task, cluster element, input and output changes, with old and new values for every changed parameter. Shown only for a modified workflow; an added or removed workflow opens on **Canvas**.
 - **Canvas** - a read-only canvas of the workflow with added nodes in green, modified nodes in amber, moved nodes in blue and removed nodes in red. A toggle switches between the previous and the selected version.
 - **Definition** - a side-by-side diff of the workflow definition.
 
@@ -152,7 +159,7 @@ Values of sensitive parameters such as passwords, tokens and API keys are shown 
 
 > **Coming soon.** The AI Copilot is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 
-The integration workflow editor includes the [AI Copilot](/platform/automation/build/ai-copilot) panel - an integration-scoped assistant with **Ask** and **Build** modes for understanding and building the current integration's workflows. Copilot is an Enterprise Edition feature and is disabled by default.
+The integration workflow editor includes the [AI Copilot](/platform/automation/build/ai-copilot) panel, an assistant scoped to the current integration with **Ask** and **Build** modes for understanding and building its workflows. Copilot is an Enterprise Edition feature and is disabled by default.
 
 ---
 

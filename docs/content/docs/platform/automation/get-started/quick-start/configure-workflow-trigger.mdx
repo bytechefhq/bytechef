@@ -1,295 +1,170 @@
 ---
 title: Configure Workflow Trigger
-description: Learn how to create and configure a workflow with a trigger in ByteChef.
+description: Create a workflow that starts on a Google Calendar event, summarizes the event with OpenAI, and runs as a deployment.
 ---
 
-In this guide, you will learn how to create a workflow in ByteChef and configure it with a trigger. We will walk you
-through the steps to add a trigger, connect it to a Google Calendar component, set up an action using the OpenAI
-component, publish the project, create a deployment, and monitor the workflow execution.
+This guide builds a workflow that starts when an event is created or updated in Google Calendar, sends the event to
+OpenAI for a one-sentence summary, and runs as a deployment. It covers adding a trigger, creating an OAuth 2.0
+connection, passing data with a data pill, publishing the project, creating a deployment, and reading the execution.
 
-**Note**: If you are testing ByteChef locally, be sure to check out our [Working with Triggers](/developer-guide/working-with-triggers) guide for detailed instructions.
+## Before you start
 
-## 1. Create Workflow
+- A ByteChef project. See [Build First Workflow](/platform/automation/get-started/quick-start/build-first-workflow).
+- A Google OAuth 2.0 client with the Google Calendar API enabled. See [Create an OAuth 2.0 client](#create-an-oauth-20-client) and [Enable the Google Calendar API](#enable-the-google-calendar-api).
+- An OpenAI API key. See [Create an OpenAI API key](#create-an-openai-api-key).
+
+<Callout>
+  **New or Updated Event** is a webhook trigger: Google must be able to reach your ByteChef instance over a public
+  URL. If you run ByteChef locally, expose it with a tunnel first. See [Working with Triggers](/developer-guide/working-with-triggers).
+</Callout>
+
+## 1. Create the workflow
 
 <Steps>
 <Step>
 
-Expand the project you want to add a workflow to and, on its **Workflows** tab, click **Create Workflow**. Once a project has workflows, the same button reads **New Workflow**.
+On the **Projects** page, expand your project. On its **Workflows** tab, click **Create Workflow** (or **New Workflow** when the project already has workflows).
 
 </Step>
 <Step>
 
-Enter a label for your workflow and optionally provide a description.
-
-</Step>
-<Step>
-
-Click **Save**.
-
-</Step>
-</Steps>
+Enter a **Label**, optionally a **Description**, and click **Save**.
 
 ![The Create Workflow dialog](configure-workflow-trigger/create-workflow.png)
 
+</Step>
+</Steps>
 
-
-## 2. Add Trigger
+## 2. Add the trigger
 
 <Steps>
 <Step>
 
-Right-click the trigger node, or hover it and open its **⋮ Node actions** menu, and choose **Replace**.
+Right-click the **Manual** trigger node, or hover it and open its **Node actions** menu (**⋮**), and choose **Replace**.
 
 </Step>
 <Step>
 
-Find and select **Google Calendar** component.
-
-</Step>
-<Step>
-
-Select **New or Updated Event** trigger.
-
-</Step>
-<Step>
-
-The trigger's panel opens on the **Connection** tab.
-
-</Step>
-<Step>
-
-Click **Create Connection**.
-
-</Step>
-<Step>
-
-Enter a connection name and paste the **Client ID** and **Client Secret** from Google.
-
-</Step>
-<Step>
-
-Click **Next**.
-
-</Step>
-<Step>
-
-Click **Connect**.
-
-</Step>
-<Step>
-
-Select your account.
-
-</Step>
-<Step>
-
-Click **Continue**.
-
-</Step>
-<Step>
-
-Select all and click **Continue** (allow Bytechef access to your Google account).
-
-</Step>
-<Step>
-
-Click on **Choose Connection** and select the connection you just created.
-
-</Step>
-<Step>
-
-Go to the **Properties** tab.
-
-</Step>
-<Step>
-
-For **Calendar Identifier**, select the calendar you want to monitor.
-
-</Step>
-</Steps>
+Search for **Google Calendar**, select it, and choose the **New or Updated Event** trigger.
 
 ![Google Calendar's trigger list, with New or Updated Event](configure-workflow-trigger/select-trigger.png)
 
-With the trigger in place, open its **Connection** tab and click **Create Connection**.
+</Step>
+<Step>
+
+The trigger's panel opens on the **Connection** tab. Click **Create Connection**.
 
 ![The trigger's Connection tab, prompting you to create a connection](configure-workflow-trigger/trigger-connection.png)
 
+</Step>
+<Step>
 
-## 3. Add Action
+Enter a connection name, paste the **Client ID** and **Client Secret** of your Google OAuth 2.0 client, and click **Next**.
+
+</Step>
+<Step>
+
+Click **Connect**. In the Google window, select your account, click **Continue**, grant ByteChef access to the requested scopes, and click **Continue** again. The new connection is selected in the **Choose Connection...** list.
+
+</Step>
+<Step>
+
+Open the **Properties** tab and, in **Calendar ID**, select the calendar to watch.
+
+</Step>
+</Steps>
+
+## 3. Add the OpenAI action
 
 <Steps>
 <Step>
 
-Click on the **+** button to add component.
+Click the **+** button below the trigger, search for **OpenAI**, and choose the **Ask** action.
 
 </Step>
 <Step>
 
-Find and select the **OpenAI** component and choose the **Ask** action.
+On the step's **Connection** tab, click **Create Connection**, enter a connection name, paste your OpenAI API key into **Token**, and click **Save**.
 
 </Step>
 <Step>
 
-Click on the **OpenAI** component to open its configuration panel.
-
-</Step>
-<Step>
-
-In the **Connection** tab, click **Create Connection**.
-
-</Step>
-<Step>
-
-Enter a connection name and paste the **API Token** from OpenAI.
-
-</Step>
-<Step>
-
-Click **Save**.
-
-</Step>
-<Step>
-
-Click on **Choose Connection** and select the connection you just created.
-
-</Step>
-<Step>
-
-Go to the **Properties** tab.
-
-</Step>
-<Step>
-
-For **Model**, choose the desired model (e.g., `gpt-5-mini`).
-
-</Step>
-<Step>
-
-For **Prompt**, enter the prompt text, such as `Summarise this calendar event in one sentence:`.
-
-</Step>
-</Steps>
+Open the **Properties** tab. In **Model**, choose a model, for example `gpt-5-mini`. In **Prompt**, enter `Summarise this calendar event in one sentence:`.
 
 ![The OpenAI Ask action's Properties tab, with a model and prompt set](configure-workflow-trigger/openai-properties.png)
 
+</Step>
+</Steps>
 
-## 4. Use Data Pill
+## 4. Insert the event with a data pill
 
 <Steps>
 <Step>
 
-After clicking on the **Prompt** field, the Data Pill Panel will open on the left. Use the data pill to insert output from a previous component.
+Click into the **Prompt** field. The **Data Pill Panel** opens next to the step's panel.
 
 </Step>
 <Step>
 
-Click the **Google Calendar** row in the Data Pill Panel to expand it.
-
-</Step>
-<Step>
-
-Click on **trigger_1**, which is the output of the trigger for the Google Calendar component.
-
-</Step>
-<Step>
-
-Output of Google Calendar trigger is now inserted into the **Prompt** field.
-
-</Step>
-</Steps>
+Expand the **Google Calendar** row and click **trigger_1**. The trigger's output is inserted into **Prompt** as a data pill.
 
 ![The Data Pill Panel open beside the prompt, offering the trigger's output](configure-workflow-trigger/data-pill-panel.png)
 
+</Step>
+</Steps>
 
-## 5. Publish Project and Create Deployment
+## 5. Publish the project and create a deployment
 
 <Steps>
 <Step>
 
-Click **Publish**.
+Click **Publish** in the editor header, optionally enter a description for the version, and click **Publish**.
 
 </Step>
 <Step>
 
-Optionally, provide a description for this published version and click **Publish**.
+Go to **Projects**, expand your project, and open its **Deployments** tab. Click **Deploy** (or **New Deployment** when the project already has deployments). The **New Deployment** dialog opens with the project and the latest published version selected.
+
+![The New Deployment dialog with a project and version selected](configure-workflow-trigger/create-deployment.png)
 
 </Step>
 <Step>
 
-Navigate to **Projects**, expand your project and select its **Deployments** tab.
+Click **Next**. On the **Workflows** step, turn on the workflow and select a connection for each component that needs one.
 
 </Step>
 <Step>
 
-Click **Deploy** (once the project has deployments, the button reads **New Deployment**). The **New Deployment** dialog opens with the project already selected.
-
-</Step>
-<Step>
-
-The latest published version is already selected. Choose another one only if you want to deploy an older version.
-
-</Step>
-<Step>
-
-Click **Next**.
-
-</Step>
-<Step>
-
-Turn on all workflows you want to include in the deployment.
-
-</Step>
-<Step>
-
-Setup connection for each component.
-
-</Step>
-<Step>
-
-Click **Save**.
-
-</Step>
-<Step>
-
-Enable the deployment. Your workflow will now run whenever a new or updated event is detected in your Google Calendar.
+Click **Save**, then turn on the deployment's switch to enable it. The workflow now runs whenever an event is created or updated in the selected calendar.
 
 </Step>
 </Steps>
 
-![The New Deployment dialog with a project and version selected](configure-workflow-trigger/create-deployment.png)
-
-
-## 6. Monitor Workflow Execution
+## 6. Monitor the execution
 
 <Steps>
 <Step>
 
-In the left sidebar, open **Executions** and choose **Workflow Executions**. Here you can see the status of your workflow executions.
+In the left sidebar, open **Executions** and choose **Workflow Executions**. The list shows the status of each run.
 
 </Step>
 <Step>
 
-Click on an execution to see the details of each component in the workflow.
-
-</Step>
-<Step>
-
-Review the input and output of the Google Calendar trigger. Click on the **OpenAI** component to see the result of the Ask action.
+Click an execution to open its details. Select the Google Calendar trigger to review its output, and the **OpenAI** step to read the summary.
 
 </Step>
 <Step>
 
 Click the panel icon in the top-right corner of the details to show the workflow graph beside them.
 
+![An execution's detail panel: the task list, the selected task's output, and the workflow graph](configure-workflow-trigger/execution-detail.png)
+
 </Step>
 </Steps>
 
-![An execution's detail panel - the task list, the selected task's output, and the workflow graph](configure-workflow-trigger/execution-detail.png)
+## Reference
 
-
-## Additional Instructions
-
-### Create OAuth 2.0 Application
+### Create an OAuth 2.0 client
 
 <Steps>
 <Step>
@@ -299,7 +174,7 @@ Go to the [Google Cloud Console](https://console.cloud.google.com/).
 </Step>
 <Step>
 
-Click on the project dropdown in the top navigation bar.
+Click the project dropdown in the top navigation bar.
 
 </Step>
 <Step>
@@ -314,7 +189,7 @@ Enter a project name and click **Create**.
 </Step>
 <Step>
 
-Click on the project dropdown again.
+Click the project dropdown again.
 
 </Step>
 <Step>
@@ -324,12 +199,12 @@ Select the project you just created.
 </Step>
 <Step>
 
-Go to the **APIs & Services**.
+Go to **APIs & Services**.
 
 </Step>
 <Step>
 
-Go to the **OAuth consent screen**.
+Go to **OAuth consent screen**.
 
 </Step>
 <Step>
@@ -364,7 +239,7 @@ Go to **Data Access**.
 </Step>
 <Step>
 
-Click on **Add or Remove Scopes**.
+Click **Add or Remove Scopes**.
 
 </Step>
 <Step>
@@ -384,17 +259,17 @@ Click **Save**.
 </Step>
 <Step>
 
-Go to the **Clients**.
+Go to **Clients**.
 
 </Step>
 <Step>
 
-Click on **Create Client**.
+Click **Create Client**.
 
 </Step>
 <Step>
 
-Click on application type dropdown.
+Click application type dropdown.
 
 </Step>
 <Step>
@@ -404,17 +279,17 @@ Choose **Web application** as the application type.
 </Step>
 <Step>
 
-Click on **Add Uri**.
+Click **Add Uri**.
 
 </Step>
 <Step>
 
-Enter a redirect URI, e.g., `https://app.bytechef.io/callback`, `http://127.0.0.1:5173/callback`. Click **Create**.
+Enter the redirect URI of your ByteChef instance, `<public URL>/callback` (for example `https://app.bytechef.io/callback`, or `http://localhost:8080/callback` for a local instance). Click **Create**.
 
 </Step>
 <Step>
 
-Click on the client you just created.
+Click the client you just created.
 
 </Step>
 <Step>
@@ -425,7 +300,7 @@ Copy the **Client ID** and **Client Secret**. Use these credentials to create a 
 </Steps>
 
 
-### Enable Google Calendar API
+### Enable the Google Calendar API
 
 <Steps>
 <Step>
@@ -435,12 +310,12 @@ In the [Google Cloud Console](https://console.cloud.google.com/), select your pr
 </Step>
 <Step>
 
-Go to the **APIs & Services**.
+Go to **APIs & Services**.
 
 </Step>
 <Step>
 
-Click on **ENABLE APIS AND SERVICES**.
+Click **ENABLE APIS AND SERVICES**.
 
 </Step>
 <Step>
@@ -450,7 +325,7 @@ Search for "calendar" in the search bar.
 </Step>
 <Step>
 
-Click on **Google Calendar API**.
+Click **Google Calendar API**.
 
 </Step>
 <Step>
@@ -461,7 +336,7 @@ Click **Enable**.
 </Steps>
 
 
-### Create OpenAI Connection
+### Create an OpenAI API key
 
 <Steps>
 <Step>
@@ -471,7 +346,7 @@ Go to the [OpenAI API](https://platform.openai.com/settings/organization/general
 </Step>
 <Step>
 
-In the left sidebar, click on **API Keys**.
+In the left sidebar, click **API Keys**.
 
 </Step>
 <Step>
@@ -486,7 +361,7 @@ Enter a name and select the project for the key and click **Create secret key**.
 </Step>
 <Step>
 
-Copy the API key and use it to create a connection in ByteChef.
+Copy the API key. Paste it into the **Token** field of the OpenAI connection in ByteChef.
 
 </Step>
 </Steps>

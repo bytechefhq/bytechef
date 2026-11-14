@@ -4,8 +4,8 @@
 
 # HITL approvals
 
-User docs: `docs/content/docs/platform/automation/build/workflows/human-in-the-loop.mdx`,
-`docs/content/docs/platform/automation/monitor/approval-tasks.mdx`. Load-bearing pieces:
+User docs: `docs/content/docs/platform/automation/build/workflows/human-in-the-loop.mdx` (including the Approval
+Tasks inbox section). Load-bearing pieces:
 
 - **Two primitives, disjoint jobs.** **Approval** is a decision: resume data carries a boolean `approved`, plus
   `comment` (valid on BOTH outcomes) and `approvedBy`. **AskUserQuestion** (`aiAgentUtils` `askUserQuestion` tool)

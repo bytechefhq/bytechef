@@ -1,6 +1,7 @@
 ---
 title: "External Invocations"
-description: "A log of the calls made from outside ByteChef through your MCP servers and A2A servers - which tool or skill ran, how it ended, and how long it took."
+description: "A log of the calls made from outside ByteChef through your MCP servers and A2A servers: which tool or skill ran, how it ended, and how long it took."
+ee: true
 ---
 
 When an AI client calls a tool on one of your [MCP servers](/platform/automation/deploy/mcp-servers),
@@ -15,8 +16,6 @@ The page is available on Enterprise Edition only.
     A record holds the identity and outcome of a call only: which tool or skill ran, through which
     server, how it ended, and how long it took. The input parameters and the output are never stored.
 </Callout>
-
----
 
 ## What is recorded
 
@@ -43,8 +42,6 @@ page.
 Tool calls an AI Agent makes while a workflow runs are not recorded here either. They appear in the
 run's execution view, in the agent's call list, together with any approval a reviewer gave or refused.
 
----
-
 ## The invocations table
 
 Each call is one row, newest first:
@@ -61,7 +58,7 @@ Each call is one row, newest first:
 | **Date** | When the call was made. |
 | **Actions** | **View** opens the workflow run a workflow tool or skill started, with the input and output of each step. **Stop** stops that run while it is still going: the call ended with `TIMEOUT`, `APPROVAL_REQUIRED` or `SUSPENDED`. Both are unavailable for component tool calls, which start no workflow run. |
 
-The list shows 50 rows per page. Use the **Refresh** button in the page header to load the latest
+The list shows 50 rows per page. Click the refresh button in the page header to load the latest
 calls.
 
 ### How a workflow call ends
@@ -77,8 +74,6 @@ the call returned:
 | `APPROVAL_REQUIRED` | Paused at an approval step and waits for a person to decide. |
 | `SUSPENDED` | Paused at a step such as a delay and continues on its own later. |
 
----
-
 ## Filter invocations
 
 | Filter | Narrows the list to |
@@ -89,8 +84,6 @@ the call returned:
 | **A2A Server** | Calls made through one A2A server. The filter appears when the workspace has at least one A2A server. |
 | **Start date** / **End date** | Calls made within a date range. |
 
----
-
 ## Scope
 
 The list is scoped to the current workspace and the current
@@ -98,16 +91,12 @@ The list is scoped to the current workspace and the current
 reloads the list and clears the filters. A call made through a server in Production does not appear
 while you are looking at Development.
 
----
-
 ## Who can see it
 
 Organization admins see every workspace's invocations. Other users see a workspace's invocations when
 their [workspace role](/platform/automation/settings/users) lets them view workflows, which the
 built-in Viewer, Editor and Admin roles all do. Connected users of an embedded integration cannot read
 the log.
-
----
 
 ## Retention
 
@@ -119,9 +108,7 @@ the others.
 |---|---|
 | `bytechef.external-invocation-log.retention-days` | How many days a record is kept. Defaults to `90`. |
 
----
-
-## See also
+## Related
 
 - [MCP Servers](/platform/automation/deploy/mcp-servers) - expose component actions and workflows as
   tools to AI clients.

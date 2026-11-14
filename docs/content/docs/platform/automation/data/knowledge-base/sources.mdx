@@ -4,23 +4,21 @@ description: Keep a knowledge base in sync with an external system on a schedule
 comingSoon: true
 ---
 
-A **source** connects a knowledge base to an external system and keeps it up to date
-automatically. Instead of re-uploading files whenever your content changes, you point a
-source at the system of record and ByteChef re-ingests on a schedule.
+A **source** connects a knowledge base to an external system and keeps it up to date on a
+schedule, so you do not upload files again when the content changes.
 
 Sources are managed from the **Sources** tab of a knowledge base.
 
 <Callout title="Admin action">
-  Adding a source is an administrator action. Each source is backed by an automatically
-  generated sync workflow, so creating one provisions a small amount of workflow
-  infrastructure on your behalf.
+  Only administrators can add a source. Each source is backed by an automatically generated
+  sync workflow.
 </Callout>
 
 ## What a source captures
 
 Each source row shows:
 
-| Column | Meaning |
+| Column | Description |
 | --- | --- |
 | **Name** | A label for the source. |
 | **Source** | The component the records come from (for example a database or an API). |
@@ -30,10 +28,10 @@ Each source row shows:
 
 ## How syncing works
 
-Under the hood a source is a generated data-stream workflow: it reads records from the
-configured component, transforms each record into a document, and writes it into the
-knowledge base - where it is chunked and embedded exactly like an uploaded file. A
-connection supplies any credentials the source component needs.
+A source is a generated data-stream workflow. It reads records from the configured component,
+transforms each record into a document, and writes it into the knowledge base, where it is chunked
+and embedded like an uploaded file. A connection supplies the credentials the source component
+needs.
 
 ### Sync modes
 
@@ -45,6 +43,6 @@ connection supplies any credentials the source component needs.
 
 ## Managing a source
 
-From a source's row menu you can refresh it on demand, enable or disable the schedule, or
+A source's row menu has actions to refresh it immediately, enable or disable the schedule, and
 delete it. Disabling a source stops future syncs but leaves the documents it has already
 contributed in the knowledge base; deleting a source removes its sync workflow.

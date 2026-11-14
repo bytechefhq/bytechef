@@ -3,18 +3,17 @@ title: "Data Pills & Input Modes"
 description: "Reference outputs from earlier steps with data pills, and switch fields between Text and Formula input modes."
 ---
 
-When you configure a component, every property field can hold more than a typed-in constant. It can
-pull in the output of the trigger or an earlier component (a **data pill**), or compute a value with
-a **formula**. This page explains data pills and the two input modes every field has: **Text** and
-**Formula**.
+A property field can hold a constant, a reference to the output of the trigger or an earlier step
+(a **data pill**), or a computed value (a **formula**). This page describes data pills and the two
+input modes of every field: **Text** and **Formula**.
 
 ## Data Pills
 
-A **data pill** is a reference to a piece of data produced earlier in the workflow - the trigger's
-payload or the output of a component that runs before the current step. Instead of hard-coding a
-value, you drop in a pill and ByteChef resolves it to the real value at run time.
+A **data pill** is a reference to data produced earlier in the workflow: the trigger payload or the
+output of a step that runs before the current step. ByteChef resolves the pill to its value at run
+time.
 
-Under the hood a pill is stored as a `${...}` reference, for example:
+A pill is stored as a `${...}` reference, for example:
 
 - `${mathHelper_1}` - the whole output of the step named `mathHelper_1`.
 - `${trigger_1.body.email}` - a nested field inside an earlier step's output.
@@ -24,8 +23,57 @@ are named after their component (`mathHelper_1`, `slack_1`); the trigger node is
 always named `trigger_1` whichever component provides it, so a webhook trigger's
 body is `${trigger_1.body...}`.
 
-You never have to type this syntax by hand - the editor inserts it for you and renders it as a
-colored pill - but it is what gets saved in the workflow's JSON.
+The editor inserts this syntax for you and renders it as a colored pill. The `${...}` form is what
+the workflow JSON stores.
+
+### Example: a webhook payload as data pills
+
+Suppose a webhook trigger receives this request:
+
+```bash
+curl -X POST "<webhook URL>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Ada",
+    "email": "ada@example.com",
+    "order-id": "A-1001",
+    "items": [
+      {"sku": "KB-01", "quantity": 2},
+      {"sku": "MS-07", "quantity": 1}
+    ]
+  }'
+```
+
+The trigger output has `method`, `headers`, `parameters` (the query parameters) and `body`. The
+fields of the JSON body are pills under `body`:
+
+| Data pill | Resolves to |
+| --- | --- |
+| `${trigger_1.body.firstName}` | `Ada` |
+| `${trigger_1.body['order-id']}` | `A-1001` |
+| `${trigger_1.body.items}` | The whole `items` list |
+| `${trigger_1.body.items[0].sku}` | `KB-01` |
+
+A key that contains characters other than letters, digits, `_` and `$`, such as `order-id`, is
+written in bracket notation. The editor does this for you when you insert the pill.
+
+When you insert a field from inside a list, the pill points to the first item, `[0]`. Click the
+index on the pill to pick another item. To process every item, use a
+[Loop](/platform/automation/build/workflows/flow-controls#loop-and-loop-break) or a
+[projection](#lists-of-objects) instead.
+
+In the workflow JSON, the pills are stored inside the step's `parameters`:
+
+```json
+{
+  "name": "slack_1",
+  "type": "slack/v1/sendChannelMessage",
+  "parameters": {
+    "channel": "C01234567",
+    "text": "New order ${trigger_1.body['order-id']} from ${trigger_1.body.firstName} (${trigger_1.body.email})"
+  }
+}
+```
 
 ### Use the Data Pill Panel
 
@@ -47,15 +95,15 @@ never reference the output of a step that runs after it.
 
 ### Make sure the output schema is available
 
-Data pills are built from each step's **output schema**. If a component hasn't been tested and has no
-predefined schema, its fields won't show up as pills yet. Open the component's **Output** tab and use
+Data pills are built from each step's **output schema**. If a component has not been tested and has
+no predefined schema, its fields do not appear as pills. Open the component's **Output** tab and use
 one of:
 
 - **Test Action** - runs the action and reads the real output structure.
 - **Upload Sample Output Data** - provide your own representative output.
 - **Reset** - show the structure with placeholder sample values.
 
-See the [Output section](./workflows#output) on the Workflows page for the full walkthrough.
+See [Output](/platform/automation/build/workflows/workflows#output) on the Workflows page.
 
 ## Input Modes
 
@@ -185,31 +233,33 @@ by category.
 | Function | Purpose | Example |
 | --- | --- | --- |
 | `config` | Read a configuration property value by name | `=config('some.property')` |
+| `exists` | `true` if a data pill resolves to a non-null value, for example the output of a step that may not have run. A missing value does not leave the formula unresolved. | `=exists(${judge}) ? ${judge.answers.score} : 0` |
+| `getOrDefault` | The value of a data pill, or the default value when the pill does not resolve or is null. Works for boolean, number, string, list and map values. | `=getOrDefault(${forceMistake}, false)` |
 | `uuid` | Generate a random UUID (version 4) | `=uuid()` |
 
 #### Operators
 
-Beyond the functions above, expressions support the standard operators for arithmetic,
-comparison, and conditional logic - combine them freely with data pills and functions.
+Expressions support the standard operators for arithmetic, comparison and conditional logic. You
+can combine them with data pills and functions.
 
 | Operator | Purpose | Example |
 | --- | --- | --- |
 | `+` `-` `*` `/` `%` | Arithmetic (`+` also concatenates strings) | `=${trigger_1.body.price} * 1.2` |
 | `==` `!=` `>` `>=` `<` `<=` | Comparison | `=${trigger_1.body.total} >= 100` |
 | `&&` `\|\|` `!` | Logical and / or / not | `=${trigger_1.body.active} && ${trigger_1.body.total} > 0` |
-| `? :` | Ternary - pick one of two values on a condition | `=${trigger_1.body.count} > 0 ? 'has items' : 'empty'` |
-| `?:` | Elvis - fall back to a default when the left side is null | `=${trigger_1.body.name} ?: 'Anonymous'` |
+| `? :` | Ternary: one of two values depending on a condition | `=${trigger_1.body.count} > 0 ? 'has items' : 'empty'` |
+| `?:` | Elvis: use a default when the left side is null | `=${trigger_1.body.name} ?: 'Anonymous'` |
 
 #### Lists of objects
 
-To pull one property out of every object in a list, or keep only the objects that match a
-condition, use projection and selection - no Loop needed. Inside the brackets, `#this` is the
+To read one property from every object in a list, or keep only the objects that match a
+condition, use projection and selection instead of a Loop. Inside the brackets, `#this` is the
 current item.
 
 | Syntax | Purpose | Example |
 | --- | --- | --- |
-| `.![…]` | Projection - build a new list with one value per item | `=${step_1.users}.![#this['email']]` |
-| `.?[…]` | Selection - keep only the items that match a condition | `=${step_1.users}.?[#this['active'] == true]` |
+| `.![…]` | Projection: a new list with one value per item | `=${step_1.users}.![#this['email']]` |
+| `.?[…]` | Selection: only the items that match a condition | `=${step_1.users}.?[#this['active'] == true]` |
 | `.^[…]` | First item that matches a condition | `=${step_1.users}.^[#this['role'] == 'admin']` |
 | `.$[…]` | Last item that matches a condition | `=${step_1.users}.$[#this['role'] == 'admin']` |
 

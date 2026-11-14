@@ -3,20 +3,22 @@ title: Displaying the Connect Dialog
 description: Open the hosted Connect dialog from your app so end users can authorize integrations and enable workflows.
 ---
 
-The **Connect dialog** is the embedded surface your end users interact with: it walks them through authorizing the third-party account (OAuth consent, API key entry), enabling the integration's workflows, and filling in any workflow inputs - and it stores the resulting credentials as a **Connection** under their **Connected User** record. You never handle or refresh their tokens yourself.
+The **Connect dialog** is the embedded surface where an end user connects an integration. It walks them through authorizing the third-party account (OAuth consent or API key entry), enabling the integration's workflows and filling in workflow inputs. It stores the resulting credentials as a **Connection** under the user's **Connected User** record. ByteChef stores and refreshes the tokens; your application never handles them.
+
+The dialog renders in your page (not in an iframe), opened by the `useConnectDialog` hook.
 
 ## 1. Activate the integration
 
 The dialog only offers integrations that are live in the target environment:
 
-- The integration is **published** (has a `PUBLISHED` version).
-- An **instance configuration** for that version exists in the environment and is toggled **on**.
+- The integration has a **published** version.
+- A **configuration** for that version exists in the environment and is turned **on**.
 
 Both steps are covered in [Adding an Integration](/platform/embedded/get-started/initial-setup/adding-an-integration#5-publish-and-deploy).
 
 ## 2. Display the Connect dialog in your app
 
-First, make sure your backend can mint an end-user JWT - see [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk). Then hand the token and the integration's id to `useConnectDialog`:
+Your backend must be able to mint an end-user JWT. See [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk). Pass the token and the integration's id to `useConnectDialog`:
 
 ```tsx
 'use client';
@@ -39,9 +41,9 @@ export function ConnectGmailButton({jwtToken, integrationId}: {
 
 {/* TODO screenshot: the ByteChef Connect dialog as it renders inside a host application, showing the integration list and a Connect button */}
 
-If you do not want to build your own list, the [Integration Marketplace](/platform/embedded/build/integration-marketplace) component is a ready-made catalog that opens this dialog in your page.
+For a ready-made catalog, use the [Integration Marketplace](/platform/embedded/build/integration-marketplace) component, which opens this dialog in your page.
 
-To build an integrations catalog page yourself (and get each `integrationId`), list the integrations available to the current user from the embedded API:
+To build an integrations catalog yourself, and to get each `integrationId`, list the integrations available to the current user from the embedded API:
 
 ```ts
 const response = await fetch(`${baseUrl}/api/embedded/v1/integrations`, {
@@ -54,13 +56,13 @@ const response = await fetch(`${baseUrl}/api/embedded/v1/integrations`, {
 const integrations = await response.json();
 ```
 
-Each returned integration includes its id, title, description, and icon - plus the user's existing instances, so you can render "Connect" vs "Connected" states. The [Sample App](/platform/embedded/get-started/quick-start/sample-app) implements this exact page.
+Each returned integration includes `id`, `name`, `componentName`, `description`, `icon`, `integrationVersion`, `multipleInstances` and the user's existing `integrationInstances`, so you can render "Connect" and "Connected" states. The [Sample App](/platform/embedded/get-started/quick-start/sample-app) implements this page.
 
-For an **already-connected** integration, pass the instance's id as `integrationInstanceId` alongside `integrationId` - the dialog then opens directly in the workflows view for that instance (the manage/edit path: toggle workflows, adjust inputs) instead of the first-time connect flow.
+For an integration the user already connected, pass the instance's id as `integrationInstanceId` together with `integrationId`. The dialog then opens in the workflows view for that instance, where the user turns workflows on or off and edits inputs, instead of the first-time connect flow.
 
 When one of your [MCP Servers](/platform/embedded/configure/mcp-servers#which-tools-a-users-agent-sees) exposes tools for the integration, the manage view also shows a **Tools** tab. There the user enables the tools their AI agent may call. Tools start disabled.
 
-To react when the dialog closes, for example to refresh your integrations list, pass `onClose`. It runs whenever the dialog closes. If the integration fails to load, the dialog stays open and shows the error, and `onClose` runs once the user closes it:
+To react when the dialog closes, for example to refresh your integrations list, pass `onClose`. It runs whenever the dialog closes. If the integration fails to load, the dialog stays open and shows the error, and `onClose` runs when the user closes it:
 
 ```tsx
 const {openDialog} = useConnectDialog({
@@ -72,7 +74,7 @@ const {openDialog} = useConnectDialog({
 });
 ```
 
-To match a dark host page, pass `mode: 'dark'`. It switches the dialog's surfaces, borders and text to a dark palette. The default is `'light'`. For finer control, set the `--bytechef-dialog-*` CSS variables described in [Theming and Localization](/platform/embedded/build/theming-and-localization#styling-the-dialogs):
+To match a dark host page, pass `mode: 'dark'`. It switches the dialog's surfaces, borders and text to a dark palette. The default is `'light'`. For finer control, set the `--bytechef-dialog-*` CSS variables described in [Theming and Localization](/platform/embedded/build/theming-and-localization#styling-the-connect-and-activation-dialogs):
 
 ```tsx
 const {openDialog} = useConnectDialog({
@@ -88,7 +90,7 @@ const {openDialog} = useConnectDialog({
 
 Two optional modes narrow what the dialog does. They are exclusive: pass one or neither, and TypeScript rejects `connectionOnly` together with `reauthorizeConnectionId`, and each callback outside its mode.
 
-- **`connectionOnly: true`** with `onConnected(integrationInstanceId, connectionId)`. The dialog closes as soon as the integration instance exists, instead of continuing to the workflows view. If the user already has an instance with valid credentials, `onConnected` runs at once without showing the dialog. In this mode `onClose` also runs after `onConnected`, whether the connection already existed or was just created. If its credentials are invalid, the user reconnects first.
+- **`connectionOnly: true`** with `onConnected(integrationInstanceId, connectionId)`. The dialog closes as soon as the integration instance exists, instead of continuing to the workflows view. If the user already has an instance with valid credentials, `onConnected` runs at once without showing the dialog; pass `newConnection: true` to create another instance anyway. If the existing instance's credentials are invalid, the user reconnects first. In this mode `onClose` also runs after `onConnected`, whether the connection already existed or was just created.
 - **`reauthorizeConnectionId`** with `onReauthorized(connectionId)`. The dialog shows the connection form for that existing connection and replaces its credentials.
 
 ```tsx
@@ -102,7 +104,27 @@ const {openDialog} = useConnectDialog({
 });
 ```
 
-Only one Connect dialog renders per page. Do not keep a `useConnectDialog` instance mounted while the [activation dialog](/platform/embedded/build/activation-dialog)'s **Connect** is in use.
+Only one Connect dialog renders per page. Do not keep a `useConnectDialog` instance mounted while the [activation dialog](/platform/embedded/build/automations/activation-dialog)'s **Connect** is in use.
+
+### Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `baseUrl` | `string` | `https://app.bytechef.io` | URL of your ByteChef instance. |
+| `environment` | `string` | `'PRODUCTION'` | `DEVELOPMENT`, `STAGING` or `PRODUCTION`. |
+| `integrationId` | `string` | - | Id of the integration to connect. Required. |
+| `integrationInstanceId` | `string` | - | Opens the workflows view of an existing instance. |
+| `jwtToken` | `string` | - | End-user JWT. Required. |
+| `mapObjectFields` | `MapObjectFieldsType` | - | Enables the [Field Mapping](/platform/embedded/build/workflows/field-mapping) step. |
+| `mode` | `'dark' \| 'light'` | `'light'` | Color palette of the dialog. |
+| `onClose` | `() => void` | - | Runs whenever the dialog closes. |
+| `connectionOnly` | `boolean` | `false` | Closes the dialog once the integration instance exists. |
+| `newConnection` | `boolean` | `false` | With `connectionOnly`, creates a new instance even if one with valid credentials exists. |
+| `onConnected` | `(integrationInstanceId: number, connectionId: number \| undefined) => void` | - | With `connectionOnly`, runs once the instance exists. |
+| `reauthorizeConnectionId` | `number` | - | Opens the connection form for an existing connection and replaces its credentials. |
+| `onReauthorized` | `(connectionId: number) => void` | - | With `reauthorizeConnectionId`, runs after the credentials are replaced. |
+
+The hook returns `openDialog` and `closeDialog`.
 
 <Callout title="The dialog can collect more than credentials">
     Beyond the account authorization step, the dialog renders any end-user-facing **workflow inputs** (including live dropdowns fetched against the user's new connection) and, when configured, a **[Field Mapping](/platform/embedded/build/workflows/field-mapping)** step where the user maps your application's fields to the integration's fields.
@@ -119,10 +141,9 @@ Either way, the credential is stored server-side as a Connection scoped to the C
 
 ## 4. Verify the connection
 
-After a user connects, confirm everything landed:
+After a user connects, check the result in the ByteChef UI:
 
-- **Embedded → Connected Users** - the user appears with the integrations they connected.
-- **Embedded → Connections** - the authorized credential, with its status.
+- **Embedded → Connected Users** - the user appears in the list. Open the user to see, on the **Integrations** tab, the connected integration, its credential status and its enabled workflows. Connections owned by connected users are not listed on **Embedded → Connections**, which shows only admin-created connections.
 - **Embedded → Workflow Executions** - runs of the integration's workflows as they start firing.
 
 ## Next steps

@@ -1,12 +1,12 @@
 ---
 title: Star Repository on GitHub
-description: Learn how to connect your GitHub account to ByteChef and star a repository.
+description: Connect a GitHub account to ByteChef with an OAuth app and run a workflow that stars a repository.
 ---
 
-In this guide you will connect your GitHub account to ByteChef and automate starring a repository. You will create a project, add a workflow to it, configure the GitHub **Star Repository** action, and run it.
+This guide connects a GitHub account to ByteChef and builds a workflow that stars a repository. You create a project, add a workflow, configure the GitHub **Star Repository** action with an OAuth 2.0 connection, and test it.
 
 <Callout type="info">
-  Step 3 asks for a GitHub **Client ID** and **Client Secret**. If you do not have them yet, create an OAuth app first - see [Connect your GitHub account](#connect-your-github-account) at the end of this guide.
+  Step 3 asks for the **Client ID** and **Client Secret** of a GitHub OAuth app. If you do not have them yet, create the app first. See [Connect your GitHub account](#connect-your-github-account) at the end of this guide.
 </Callout>
 
 ## 1. Create a project
@@ -16,7 +16,7 @@ A project is the container that holds your workflows.
 <Steps>
 <Step>
 
-Open the **Projects** page and click **Create Project** - the button reads **New Project** once you already have projects.
+Open the **Projects** page and click **New Project** (or **Create Project** when the list is empty).
 
 </Step>
 <Step>
@@ -36,7 +36,7 @@ Enter a project name. Optionally add a description, choose a category, and add t
 Your new project's row opens with an empty **Workflows** tab. Click **Create Workflow**. Once a project has workflows, the same button reads **New Workflow**.
 
 <Callout type="info">
-  The chevron next to the button opens additional creation options, such as starting from a template or importing an existing workflow definition.
+  The chevron next to the button opens more options: **From Template**, **Import Workflow**, and **Import n8n Workflow**.
 </Callout>
 
 </Step>
@@ -74,19 +74,19 @@ With GitHub selected, its actions are listed on the right.
 
 Open the **Connection** tab and click **Create Connection**.
 
-![The GitHub node's Connection tab with a connection selected](star-repository-on-github/connection-tab.png)
-
 </Step>
 <Step>
 
-Enter a connection name, paste the **Client ID** and **Client Secret** from your GitHub OAuth app, and click **Next**. Then click **Connect** and authorize ByteChef in the GitHub window that opens.
+Enter a connection name, paste the Client ID and Client Secret of your GitHub OAuth app into **Client id** and **Client secret**, and click **Next**. Then click **Connect** and authorize ByteChef in the GitHub window that opens.
 
 ![The Create Connection dialog for GitHub, with Name, Client id and Client secret fields](star-repository-on-github/create-connection.png)
 
 </Step>
 <Step>
 
-Back in the **Connection** tab, click **Choose Connection** and select the connection you just created.
+Back on the **Connection** tab, make sure the new connection is selected. If it is not, select it in the connection list.
+
+![The GitHub node's Connection tab with a connection selected](star-repository-on-github/connection-tab.png)
 
 </Step>
 <Step>
@@ -111,15 +111,14 @@ Click **Test** to run the workflow. ByteChef executes the **Star Repository** ac
 ![The test run panel showing a DONE status and the executed Star Repository task](star-repository-on-github/test-run.png)
 
 <Callout type="info">
-  The **Output** tab reads *No output data*, which is expected - GitHub's star endpoint returns an
-  empty `204 No Content` response. The green **DONE** badge and the task's green check are what tell
-  you the call succeeded.
+  The **Output** tab reads *No output data*. This is expected: GitHub's star endpoint returns an empty
+  `204 No Content` response. The green **DONE** badge and the task's green check show that the call succeeded.
 </Callout>
 
 </Step>
 <Step>
 
-Verify the result by opening the **Stars** tab on your GitHub profile - the repository you configured now appears there.
+Open the **Stars** tab on your GitHub profile. The repository you configured appears there.
 
 </Step>
 </Steps>
@@ -147,14 +146,14 @@ Fill in the application details:
 |---|---|
 | **Application name** | A name for your app, for example `Test App` |
 | **Homepage URL** | Your application's homepage, for example `https://www.bytechef.io/` |
-| **Authorization callback URL** | Where GitHub returns users after authorization, for example `http://127.0.0.1:5173/callback` |
+| **Authorization callback URL** | `<public URL of your ByteChef instance>/callback`, for example `https://app.bytechef.io/callback`, or `http://localhost:8080/callback` for a local instance |
 
 Then click **Register application**.
 
 </Step>
 <Step>
 
-Click **Generate a new client secret**, then copy both the **Client ID** and the **Client Secret** - you will paste them into ByteChef in step 3.
+Click **Generate a new client secret**, then copy the **Client ID** and the **Client Secret**. You paste them into ByteChef in step 3.
 
 <Callout type="warn">
   GitHub shows the client secret only once. Copy it before leaving the page.

@@ -1,31 +1,57 @@
 ---
 title: Limits and Concurrency
-description: What ByteChef caps for an embedded deployment, what it does not, and where you have to impose limits yourself.
+description: Reference for the execution limits that apply to an embedded deployment, and the per-customer limits you enforce outside ByteChef.
 ---
 
-Embedded runs on the ByteChef deployment you operate, which means the capacity question is not "what is my quota" but "what stops one of my customers from consuming the whole thing". Today the answer is mostly *you*.
+All connected users of an embedded deployment run their workflows on the same ByteChef engine. The engine applies deployment-wide concurrency limits and timeouts. It does not apply limits per connected user or per tenant.
 
-## What is enforced today
+## Deployment-wide limits
 
-**Nothing per connected user, and nothing per tenant.** A deployment does not cap how many requests a customer makes, how many workflows run at once, or how much execution time any one of them consumes. Runs from every customer share the same queues and the same worker pool.
+These limits apply to all workflow runs on a node, regardless of which connected user started them. Configure them with environment variables on the ByteChef server.
 
-The practical consequence is that **one noisy customer can affect another's latency**. Their data stays isolated - a run cannot read another tenant's data, connections, or history - but throughput is shared. See [tenant-isolated security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security) for exactly where that boundary sits.
+| Limit | Environment variable | Default | Behavior when reached |
+|---|---|---|---|
+| Concurrent workflow tasks | `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_DEFAULT` | `10` | Further tasks wait for a free slot. |
+| Concurrent synchronous executions | `BYTECHEF_WORKER_TASK_SYNC_CONCURRENCY_LIMIT` | `5` | Further synchronous callers wait for a free slot. |
+| Task timeout | `BYTECHEF_WORKER_TASK_DEFAULT_TIMEOUT` | 24 hours | The task fails. A task's own `timeout` parameter overrides the default. |
+| Polling trigger interval | `BYTECHEF_COORDINATOR_TRIGGER_POLLING_CHECK_PERIOD` | `5` (minutes) | Polling triggers check for new data at this interval. |
+| Request trigger wait | - | 5 minutes | The run is marked failed and the caller receives an error. See [Request Triggers](/platform/embedded/build/request-triggers#the-response). |
+| External invocation log retention | `BYTECHEF_EXTERNAL_INVOCATION_LOG_RETENTION_DAYS` | `90` (days) | Older [external invocation](/platform/embedded/monitor/external-invocations) records are deleted. |
 
-## What you should impose
+For the full list of server settings, see [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables).
 
-- [ ] **Rate-limit per customer at your own ingress.** This is the single most important control, and the only one that exists today. Your API gateway knows which customer a request belongs to before ByteChef does.
-- [ ] **Throttle your own triggers.** App Events fan out to every subscribed workflow for a user; firing them in a tight loop multiplies into runs.
-- [ ] **Bound what a workflow can do.** Component-level pagination and batch sizes are the lever you have inside a workflow - an unbounded sync over a large dataset is a long-running job whichever customer starts it.
-- [ ] **Watch execution volume per customer.** Executions are attributable, so you can see which customer's workflows dominate before it becomes a support ticket.
+## Limits that are not enforced
 
-## Plan limits *(coming soon)*
+ByteChef does not limit, per connected user or per tenant:
 
-Deployment-level enforcement is being added: token-bucket rate limits, a bounded number of concurrently running jobs per tenant, a monthly cost cap, and quotas for workspaces, members, and storage. Rejections will be an HTTP **429** with `Retry-After` for the rate and concurrency limits, and a **403** for quotas, which are a ceiling rather than something to retry against.
+- the number of API requests, App Events or Request trigger calls;
+- the number of workflow runs, or how many run at the same time;
+- the execution time a connected user's workflows consume.
 
-Self-hosted deployments will default to unlimited, so nothing changes for an existing installation until a tier or an individual override is configured. The full behaviour is described in [Plan Limits](/platform/use-bytechef/self-hosted/configuration/plan-limits).
+Connected users therefore share worker capacity. A connected user who starts many runs increases the queue time of other connected users' runs. Data stays isolated: a run cannot read another tenant's data, connections or execution history. See [Tenant-isolated security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security).
 
-Until then, treat your ingress as the enforcement point and size the deployment for peak, not average.
+## Enforcing per-customer limits
 
-## Timeouts and long-running work
+Apply per-customer limits in your own application, before requests reach ByteChef.
 
-A synchronous call - the Request trigger - returns the workflow's result, so it is bounded by how long that workflow takes. Anything that fans out, loops over a large dataset, or waits on a slow provider belongs behind an asynchronous trigger instead, where the caller is not holding a connection open.
+| Control | Where | Purpose |
+|---|---|---|
+| Rate limit per customer | Your API gateway or backend | Caps calls to the embedded API for each customer. Your gateway identifies the customer before ByteChef does. |
+| Throttle App Events | Your backend | Each App Event starts every workflow subscribed to it for that connected user, so one event can start several runs. |
+| Bound workflow work | Workflow design | Use pagination and batch sizes in components so that one run does not process an unbounded data set. |
+| Monitor volume per customer | [Workflow Executions](/platform/embedded/monitor/workflow-executions) | Executions are attributed to connected users, so you can identify the customers that generate the most load. |
+
+Use asynchronous triggers (App Events, webhooks, polling or scheduled triggers) for workflows that loop over large data sets or call slow providers. A Request trigger with **Await Workflow and Respond** holds the HTTP connection open until the workflow finishes, up to the 5-minute limit.
+
+## Plan limits
+
+<Callout type="warn" title="Coming soon">Per-tenant plan limits are not available. A deployment has no per-tenant rate, concurrency, cost or quota limits.</Callout>
+
+Plan limits add per-tenant enforcement: rate limits, a maximum number of concurrently running jobs, a monthly cost cap, and quotas for workspaces, members and storage. Rate and concurrency rejections return HTTP `429` with a `Retry-After` header. Quota rejections return HTTP `403`. Self-hosted deployments default to no limits. See [Plan Limits](/platform/use-bytechef/self-hosted/configuration/plan-limits).
+
+## Related
+
+- [Request Triggers](/platform/embedded/build/request-triggers) - synchronous workflow calls and their timeout.
+- [App Events](/platform/embedded/build/app-events) - asynchronous fan-out to subscribed workflows.
+- [Workflow Executions](/platform/embedded/monitor/workflow-executions) - runs per connected user.
+- [White-Label Execution](/platform/embedded/get-started/white-label-execution) - tenant isolation.

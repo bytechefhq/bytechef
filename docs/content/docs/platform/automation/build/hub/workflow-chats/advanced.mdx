@@ -1,53 +1,61 @@
 ---
 title: Advanced Behavior
-description: Human-in-the-loop questions inside a chat, embedded chat interfaces, and the current limits of workflow chats.
-ee: true
-comingSoon: true
+description: Questions and approvals inside a chat, embedded chat interfaces, and the current limits of workflow chats.
 ---
 
-## Human-in-the-loop inside a chat
+## Questions and approvals inside a chat
 
-A workflow turn doesn't have to be a single request and response. A workflow can pause
-mid-run to ask the user a question and resume once they answer - all inside the same
-conversation.
+A workflow turn does not have to be a single request and response. A workflow can pause mid-run
+and resume after the user responds, inside the same conversation:
 
-When the workflow suspends with a question, the chat renders the prompt and waits.
-The user's answer is sent back to the running execution, which resumes from where it
-paused. This is the same suspend/resume mechanism described in
-[Human in the Loop](/platform/automation/build/workflows/human-in-the-loop), surfaced conversationally: instead
-of an approval inbox or a Slack button, the question appears in the chat thread.
+- **Questions** - When an AI Agent asks the user a question, the chat shows the question. The
+  user's next message is sent as the answer, and the run resumes.
+- **Approvals** - When the run reaches an approval step, the chat shows an approval card. The
+  user approves or rejects it in the chat.
 
-Use it for flows that need a clarification before continuing - confirming an action,
-collecting a missing field, or choosing between options - without leaving the chat.
+This uses the suspend and resume mechanism described in
+[Human in the Loop](/platform/automation/build/workflows/human-in-the-loop).
+
+A chat can pause a run only when the reply is streamed. If the workflow has no streaming step
+after the pausing step, the chat shows an error that says the chat cannot pause the run for an
+approval or wait step. Add a streaming step, such as an AI Agent, after it.
 
 ## Embedded chat
 
-Setting the trigger's **Mode** to **Embedded Chat** keeps the workflow out of the hosted chat
-listings - the AI Hub composer's **Workflows** cascade and the Community Edition **Chats**
-page - and lets you drive it from your own UI. Your interface calls the
-[New Chat Request webhook](/platform/automation/build/hub/workflow-chats/enable-chat#the-request-shape) with the
-same `{ message, conversationId, attachments }` body and renders the streamed reply however
-you like. The workflow contract is identical; only the front end changes.
+Setting the trigger's **Mode** to **Embedded Chat** removes the workflow from the **Chats** page.
+Your own interface calls the workflow's webhook with the same
+[`message`, `conversationId`, and `attachments` fields](/platform/automation/build/hub/workflow-chats/enable-chat#output)
+and renders the reply. The workflow logic is the same in both modes; only the front end differs.
+The [`@bytechef/chat` widget](/platform/automation/build/hub/workflow-chats/chat-widget) provides a
+ready-made front end.
 
-This is the path to embedding a branded assistant in your own product while still building
-the logic as an ordinary ByteChef workflow.
+For example, this request sends one turn with an attached file, the same way the hosted chat does.
+Reuse the same `conversationId` on the next turn to continue the conversation:
+
+```bash
+curl -X POST "https://<your-host>/webhooks/<webhook-id>" \
+  -F "conversationId=c3f1a6e0-2b7d-4f0e-9a51-0c8e2d4b7a19" \
+  -F "message=Where is my order A-1001?" \
+  -F "attachments=@invoice.pdf"
+```
+
+In the workflow, the fields are `${trigger_1.message}`, `${trigger_1.conversationId}` and
+`${trigger_1.attachments}`. Append `/sse` to the URL to receive the reply as a stream.
 
 ## Limitations
 
-Keep these in mind when designing a chat workflow:
-
-- **The chat trigger runs synchronously.** A turn occupies the chat until it
-  returns; design workflows so a turn completes in a reasonable time, and lean on streamed
-  output for long answers.
-- **Access follows the workflow.** A user who can see a workflow's chat can run it; scope
-  chat workflows the same way you scope any other workflow.
-- **Conversations are environment-isolated.** A conversation is bound to the environment and
-  workflow version it started against.
-- **A workflow chat is not the assistant.** It runs your workflow, not the AI Hub agent, so the
-  assistant's tools, memories, and specialist subagents don't apply inside it.
+- **The chat trigger runs synchronously.** A turn occupies the chat until the workflow returns.
+  Design workflows so that a turn completes in a reasonable time, and stream output for long
+  answers.
+- **Access follows the workspace.** A user who can open the **Chats** page in a workspace can run
+  every hosted chat workflow deployed there in the selected environment.
+- **Conversations are environment-isolated.** A conversation runs against the environment and
+  deployed workflow version it started in.
+- **Hosted conversations are not stored.** The **Chats** page keeps conversations in the browser
+  only, until you leave or reload the page.
 
 <Callout title="Keep turns responsive">
-  If a chat feels slow, stream partial output early in the workflow and defer heavy work, so
-  the user sees progress instead of a spinner. See
+  If a chat is slow, stream partial output early in the workflow and defer heavy work, so the
+  user sees progress. See
   [Streamed replies](/platform/automation/build/hub/workflow-chats/using-chats#streamed-replies).
 </Callout>

@@ -111,6 +111,27 @@ reference is enabled, so a workflow with required inputs comes out enabled in on
   section).
 - A requested connection that isn't one of the connected user's connections returns `400`. A catalog
   workflow the connected user can't see returns `404`.
+- A connection or input value that the configuration already provides for every connected user can't be
+  overridden: naming it in `connections` or `inputs` returns `409` with `{"providedComponentName": "slack"}`
+  or `{"providedInputName": "channel"}`.
+
+A complete call from your backend, with an API Key, that picks the Slack connection and sets an input:
+
+```bash
+curl -X POST "https://your-bytechef-host.example.com/api/embedded/v1/user-123/automation/workflow-templates/$WORKFLOW_UUID/provision" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "X-Environment: PRODUCTION" \
+  -d '{"connections": {"slack": 42}, "inputs": {"channel": "#alerts"}}'
+```
+
+A `204` means the reference was created, enabled unless a required input still has no value. If the workflow also
+uses a component the body does not name, for example Google Mail, and the user has no connection for it, the
+reference is created disabled and the response is `409`:
+
+```json
+{"missingConnectionComponentName": "googleMail"}
+```
 
 Calling provision again for an existing reference doesn't re-run auto-wiring. It only catches the
 reference up to the version its environment's configuration points at and, if the body names
@@ -137,7 +158,8 @@ A reference is addressed by its catalog workflow uuid on the same workflow endpo
 - `PUT /api/embedded/v1/{externalUserId}/automation/workflows/{workflowUuid}/inputs` stores the
   connected user's input values, with an `inputs` object keyed by input name. On an enabled
   reference, a change that leaves a required input without a value is rejected with `409`
-  `{"missingInputName": ...}`.
+  `{"missingInputName": ...}`, and an input the configuration provides is rejected with `409`
+  `{"providedInputName": ...}`.
 
 Enabling a dangling reference, or storing inputs on one, fails with an error naming the reference as
 dangling. The frontend routes (without `{externalUserId}`, with the end user's JWT) behave the same.
