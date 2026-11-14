@@ -1,11 +1,19 @@
 ---
 title: Environment Variables
-description: Configuration options for ByteChef through environment variables
+description: Reference of the environment variables that configure a self-hosted ByteChef server.
 ---
 
-ByteChef can be configured using environment variables. This page documents all available environment variables, organized by category.
+This page lists the environment variables a self-hosted ByteChef server reads, grouped by area. Each variable maps to a Spring property under the `bytechef.*` prefix unless the table says otherwise.
 
-Every name below is the property path uppercased with dots **and dashes** replaced by underscores - `bytechef.ai.provider.open-ai.api-key` becomes `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY`. Dropping the underscore that stands for a dash (`..._OPENAI_API_KEY`) produces a name that binds to nothing: as an environment variable it is silently ignored, and the same key in a YAML file fails the boot, because `bytechef.*` binds with `ignoreUnknownFields = false`.
+## Naming rule
+
+Every name is the property path in upper case, with dots **and dashes** replaced by underscores. For example, `bytechef.ai.provider.open-ai.api-key` becomes `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY`.
+
+Keep the underscore that stands for a dash. `..._OPENAI_API_KEY` binds to nothing: as an environment variable it is silently ignored, and the same key in a YAML file fails startup, because `bytechef.*` binds with `ignoreUnknownFields = false`.
+
+List properties take a comma-separated value (`BYTECHEF_FEATURE_FLAGS=ff-123,ff-456`) or one indexed variable per item (`BYTECHEF_FEATURE_FLAGS_0=ff-123`).
+
+Defaults are the values in the server's base configuration. Where the `prod` profile used by the published container image overrides a default, the table says so.
 
 ## AI Copilot Configuration
 
@@ -20,8 +28,6 @@ Every name below is the property path uppercased with dots **and dashes** replac
 
 ## AI Agent Utils Configuration
 
-> **Coming soon.** AI Agent Utils configuration is on the upcoming release track and is not yet available in the latest released version of ByteChef.
-
 Settings of the [Agent Utils](/platform/automation/build/workflows/ai/agent/agent-utils) tools.
 
 | Environment Variable | Description | Default Value |
@@ -31,7 +37,7 @@ Settings of the [Agent Utils](/platform/automation/build/workflows/ai/agent/agen
 | `BYTECHEF_AI_AGENT_UTILS_WORKSPACE_CLEANUP_INTERVAL` | How often each server removes expired test workspaces and the workspaces of deleted deployments, integration instances, workflows and tenants from its disk | `1h` |
 | `BYTECHEF_AI_AGENT_UTILS_WORKSPACE_IDLE_RETENTION` | Remove the workspace of a deployed workflow when nothing in it has changed for this long. When unset, workspaces are kept while their deployment exists | - |
 | `BYTECHEF_AI_AGENT_UTILS_WORKSPACE_TEST_RETENTION` | How long the workspaces of editor test runs are kept | `24h` |
-| `BYTECHEF_AI_AGENT_UTILS_WORKSPACE_MAX_SIZE` | Largest size of one agent [workspace](/platform/automation/build/workflows/ai/agent/agent-utils#agent-workspace); writes that would go past it are refused. `0` means no limit. Coming soon: not yet available in the latest released version | `1GB` |
+| `BYTECHEF_AI_AGENT_UTILS_WORKSPACE_MAX_SIZE` | Largest size of one agent [workspace](/platform/automation/build/workflows/ai/agent/agent-utils#agent-workspace); writes that would go past it are refused. `0` means no limit | `1GB` |
 | `BYTECHEF_AI_AGENT_UTILS_FILE_SYSTEM_ENABLED` | Offer the [File System, Glob, Grep and List Directory](/platform/automation/build/workflows/ai/agent/agent-utils#file-system-glob-grep-and-shell) tools to AI agents. They read and write files on the server's disk | `false` |
 | `BYTECHEF_AI_AGENT_UTILS_SHELL_ENABLED` | Offer the [Shell Tools](/platform/automation/build/workflows/ai/agent/agent-utils#shell-tools) element to AI agents. Keep it disabled on a server shared by several tenants (see [Multi-tenant installations](/platform/automation/build/workflows/ai/agent/agent-utils#multi-tenant-installations)) | `false` |
 | `BYTECHEF_AI_AGENT_UTILS_SHELL_ALLOW_LOCAL` | Allow Shell Tools elements to run commands directly on the server instead of in a Docker container. Local commands are not confined to the agent workspace; allow only on trusted single-tenant installations | `false` |
@@ -41,15 +47,11 @@ Settings of the [Agent Utils](/platform/automation/build/workflows/ai/agent/agen
 
 ## AI Auto Memory Configuration
 
-> **Coming soon.** Auto Memory is on the upcoming release track and is not yet available in the latest released version of ByteChef.
-
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_AUTO_MEMORY_PROVIDER` | Where AI agent [Auto Memory](/platform/settings/ai/memories#storage-providers) entries are stored (`JDBC`, `FILESYSTEM`, `AWS`). `FILESYSTEM` and `AWS` use the configured file storage; `AWS` requires the Enterprise Edition AWS file-storage module, and selecting a file-backed provider whose storage is not configured fails at startup. The JDBC store is used when unset | `JDBC` |
 
 ## AI Brave Configuration
-
-> **Coming soon.** Brave Search configuration is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
@@ -112,7 +114,7 @@ fragment while this heading was hidden - give it back.
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_KNOWLEDGE_BASE_ENABLED` | Enable or disable knowledge base AI features | `false` |
-| `BYTECHEF_AI_KNOWLEDGE_BASE_MAX_SIZE_BYTES` | Maximum total size in bytes of all knowledge base documents in a tenant. `0` means unlimited. *Coming soon - upcoming release* | `1073741824` (1 GB) |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_MAX_SIZE_BYTES` | Maximum total size in bytes of all knowledge base documents in a tenant. Uploads that would exceed it are rejected. `0` means unlimited | `1073741824` (1 GB) |
 | `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_PROVIDER` | OCR provider for knowledge base documents (NONE, AZURE, MISTRAL) | `NONE` |
 | `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_MISTRAL_API_KEY` | Mistral OCR API key (sensitive) | - |
 | `BYTECHEF_AI_KNOWLEDGE_BASE_SUBSCRIPTIONS_DOCUMENT_PROCESS_EVENTS` | Number of subscribers for document process events | `1` |
@@ -207,9 +209,6 @@ fragment while this heading was hidden - give it back.
 | `BYTECHEF_WEBHOOK_DISCORD_PUBLIC_KEY` | Public key of the Discord app whose Interactions Endpoint URL is `<public-url>/discord/interactivity`. It verifies the signature of the Approve and Discard button callbacks; set the same key on the Discord connection | - |
 | `BYTECHEF_WEBHOOK_WHATSAPP_VERIFY_TOKEN` | Token that Meta sends back when it verifies the WhatsApp interactivity webhook at `<public-url>/whatsapp/interactivity`. Without it, the verification request is refused | - |
 
-<!-- Commented out until this ships; tracked in .agents/coming-soon-inventory.md (Context Store).
-When restoring: automation/data/context-store.md linked to #context-store-configuration and lost
-the fragment while this heading was hidden - give it back.
 ## Audit Configuration
 
 Audit events are an Enterprise Edition feature, see [Audit Events](/platform/settings/audit-events).
@@ -223,6 +222,9 @@ Audit events are an Enterprise Edition feature, see [Audit Events](/platform/set
 | `BYTECHEF_AUDIT_RETENTION_CRON` | When the purge of old entries runs, as a cron expression in the JVM time zone | `0 0 2 * * *` |
 | `BYTECHEF_AUDIT_RETENTION_DAYS` | Age in days at which an entry is purged. Zero or a negative value disables the purge | `365` |
 
+<!-- Commented out until this ships; tracked in .agents/coming-soon-inventory.md (Context Store).
+When restoring: automation/data/context-store.md linked to #context-store-configuration and lost
+the fragment while this heading was hidden - give it back.
 ## Context Store Configuration
 
 > **Coming soon.** The Context Store is on the upcoming release track and is not yet available in the latest released version of ByteChef.
@@ -267,8 +269,8 @@ The Context Store sync engine writes records to Postgres by default (the same da
 | `BYTECHEF_COMPONENT_CLAUDE_CODE_WORKSPACE_IDLE_RETENTION` | Remove deployed Claude Code workspaces in which nothing changed for this long. When empty, they are kept while their deployment exists | |
 | `BYTECHEF_COMPONENT_CLAUDE_CODE_WORKSPACE_MAX_SIZE` | Largest size of one Claude Code workspace. Write, Edit and MultiEdit are refused past it, and only cleanup commands run while a workspace is over it. `0` means no limit | `1GB` |
 | `BYTECHEF_COMPONENT_CLAUDE_CODE_WORKSPACE_TEST_RETENTION` | How long the Claude Code workspaces of editor test runs are kept | `24h` |
-| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED` | Enable uploading of Java (jar) custom components. When disabled, Java custom component uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java custom components continue to work. *Coming soon - upcoming release* | `true` |
-| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_LOADER` | Loader used to run Java custom components (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java custom components inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. *Coming soon - upcoming release* | `CLASS_LOADER` |
+| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED` | Enable uploading of Java (jar) custom components. When disabled, Java custom component uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java custom components continue to work. Coming soon: this setting is not available yet | `true` |
+| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_LOADER` | Loader used to run Java custom components (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java custom components inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. Coming soon: this setting is not available yet | `CLASS_LOADER` |
 | `BYTECHEF_COMPONENT_REGISTRY_EXCLUDE` | List of components to exclude from registry | - |
 
 ## Coordinator Configuration
@@ -325,7 +327,7 @@ does not support.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_DATA_TABLE_MAX_SIZE_BYTES` | Maximum total size in bytes of all data tables in a tenant. `0` means unlimited. *Coming soon - upcoming release* | `52428800` (50 MB) |
+| `BYTECHEF_DATA_TABLE_MAX_SIZE_BYTES` | Maximum total size in bytes of all data tables in a tenant. `0` means unlimited. Coming soon: this setting is not available yet | `52428800` (50 MB) |
 
 ## Discovery Service Configuration
 
@@ -338,6 +340,12 @@ does not support.
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_EDITION` | ByteChef edition (CE, EE) | `EE` |
+
+## External Invocation Log Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_EXTERNAL_INVOCATION_LOG_RETENTION_DAYS` | Number of days external invocation records are kept before the retention job deletes them. Enterprise Edition | `90` |
 
 ## Embedded Configuration
 
@@ -362,7 +370,7 @@ does not support.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_FEATURE_FLAGS` | List of enabled feature flags | - |
+| `BYTECHEF_FEATURE_FLAGS` | Comma-separated list of enabled feature flags, for example `ff-123,ff-456` | - |
 
 ## File Storage Configuration
 
@@ -388,8 +396,8 @@ does not support.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_KAFKA_BOOTSTRAP_SERVERS` | Comma-separated list of Kafka bootstrap servers (`host:port`) | - |
-| `BYTECHEF_KAFKA_CONSUMER_GROUP_ID` | Kafka consumer group identifier | - |
+| `BYTECHEF_KAFKA_BOOTSTRAP_SERVERS` | Comma-separated list of Kafka bootstrap servers (`host:port`) | `localhost:9092` |
+| `BYTECHEF_KAFKA_CONSUMER_GROUP_ID` | Kafka consumer group identifier | `bytechef` |
 
 ## Mail Configuration
 
@@ -412,7 +420,8 @@ does not support.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_MESSAGE_BROKER_PROVIDER` | Message broker provider (AMQP, AWS, JMS, KAFKA, MEMORY, REDIS) | `MEMORY` |
+| `BYTECHEF_MESSAGE_BROKER_PROVIDER` | Message broker between coordinator and workers (`AMQP`, `AWS`, `JMS`, `KAFKA`, `MEMORY`, `REDIS`). See [Message brokers](./message-brokers) | `MEMORY` |
+| `BYTECHEF_MESSAGE_BROKER_AWS_CONTROL_PROVIDER` | With the `AWS` broker, the transport for control messages that must reach every node (`SQS`, `REDIS`). `SQS` uses one shared queue and is correct for a single node only; set `REDIS` when more than one node runs | `SQS` |
 
 ## OAuth2 Configuration
 
@@ -421,15 +430,13 @@ does not support.
 | `BYTECHEF_OAUTH2_REDIRECT_URI` | OAuth2 redirect URI | `BYTECHEF_PUBLIC_URL/callback` |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_ID` | Client ID for predefined OAuth2 app (sensitive) | - |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_SECRET` | Client secret for predefined OAuth2 app (sensitive) | - |
-| `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED` | Enable the embedded OAuth2 authorization server. When disabled, the authorization server endpoints and the OAuth2 resource-server support on the MCP endpoints are not exposed | `false` |
+| `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED` | Enable the embedded OAuth2 authorization server (clients are managed under **Settings > OAuth2 Clients**, Enterprise Edition). When disabled, the authorization server endpoints and the OAuth2 resource-server support on the MCP endpoints are not exposed | `false` |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI` | Issuer identifier (`iss` claim / issuer URI) whose JWTs are trusted on the MCP endpoints. Repeat with `_1_`, `_2_`, … for additional issuers | - |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM` | JWT claim whose value is the ByteChef tenant id (for the embedded authorization server this is the minted `tenant_id` claim) | - |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUTHORITIES_CLAIM` | JWT claim (e.g. `groups`, `roles`) whose values are mapped to granted authorities. When unset, authorities are resolved from the ByteChef user identified by `sub` | - |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUTHORITIES_0` | Authority granted to every token from this issuer, in addition to any mapped from the authorities claim | - |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_SELF` | Whether this issuer is the ByteChef embedded authorization server; when `true`, audience validation enforces that a token's `aud` contains the requested MCP endpoint URL | `false` |
 | `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUDIENCE` | For an external issuer, the fixed audience value its tokens must carry. When unset, audience validation is skipped for this issuer | - |
-
-> **Coming soon.** The `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_*` and `BYTECHEF_OAUTH2_RESOURCE_SERVER_*` variables are on the upcoming release track and are not yet available in the latest released version of ByteChef.
 
 ## Plan Limits Configuration
 
@@ -463,26 +470,26 @@ ceiling is not retryable.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_PUBLIC_URL` | Public URL of the ByteChef instance | `http://127.0.0.1:8080` |
+| `BYTECHEF_PUBLIC_URL` | Public URL of the ByteChef instance. Used to build webhook, OAuth2 redirect and email links, so set it to the address users and external services reach | empty; `http://127.0.0.1:8080` in the published image |
 
 ## RabbitMQ Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_RABBITMQ_HOST` | RabbitMQ server hostname | - |
+| `BYTECHEF_RABBITMQ_HOST` | RabbitMQ server hostname | `localhost` |
 | `BYTECHEF_RABBITMQ_PORT` | RabbitMQ server port | `5672` |
-| `BYTECHEF_RABBITMQ_USERNAME` | RabbitMQ username (sensitive) | - |
-| `BYTECHEF_RABBITMQ_PASSWORD` | RabbitMQ password (sensitive) | - |
+| `BYTECHEF_RABBITMQ_USERNAME` | RabbitMQ username (sensitive) | `guest` |
+| `BYTECHEF_RABBITMQ_PASSWORD` | RabbitMQ password (sensitive) | `guest` |
 
 ## Redis Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_REDIS_HOST` | Redis server hostname | - |
+| `BYTECHEF_REDIS_HOST` | Redis server hostname | `localhost` |
 | `BYTECHEF_REDIS_PORT` | Redis server port | `6379` |
 | `BYTECHEF_REDIS_PASSWORD` | Redis password (sensitive) | - |
 | `BYTECHEF_REDIS_DATABASE` | Redis database index | `0` |
-| `BYTECHEF_REDIS_TIMEOUT` | Connection timeout in milliseconds | `0` |
+| `BYTECHEF_REDIS_TIMEOUT` | Command timeout in milliseconds | `60000` |
 
 ## Resources Configuration
 
@@ -501,12 +508,12 @@ ceiling is not retryable.
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret (sensitive) | - |
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_ID` | GitHub OAuth2 client ID (sensitive) | - |
 | `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_SECRET` | GitHub OAuth2 client secret (sensitive) | - |
-| `BYTECHEF_SECURITY_SSO_ENABLED` | Enable Single Sign-On via an external identity provider (SAML 2.0 / OIDC). Enterprise Edition only; Community Edition supports local login and social login | `false` |
+| `BYTECHEF_SECURITY_SSO_ENABLED` | Enable Single Sign-On via an external identity provider (SAML 2.0 / OIDC). Enterprise Edition only; Community Edition supports local login and social login. Coming soon: the **Settings > Identity Providers** page that configures the identity providers is not generally available yet | `false` |
 | `BYTECHEF_SECURITY_TWO_FACTOR_AUTHENTICATION_ENABLED` | Enable two-factor authentication | `false` |
 | `BYTECHEF_SECURITY_SYSTEM_USERNAME` | System administrator username | `system_admin` |
 | `BYTECHEF_SECURITY_SYSTEM_PASSWORD` | System administrator password (sensitive) | - |
 
-System administrator is used for accessing protected data reachable through /actuator/** endpoints. For example /actuator/env returns all environment properties.
+The system administrator account protects the `/actuator/**` endpoints that expose sensitive data. For example, `/actuator/env` returns all environment properties.
 
 ## Scheduler Configuration
 
@@ -548,12 +555,22 @@ System administrator is used for accessing protected data reachable through /act
 | `BYTECHEF_USER_GUIDING_ENABLED` | Enable or disable user guiding (in-application tutorials). `false` in the base configuration; the `prod` profile used by the published container image sets it to `true`. | `true` in the published image |
 | `BYTECHEF_USER_GUIDING_CONTAINER_ID` | Container ID for the UserGuiding SDK | `38U111210PF6ID` |
 
-## Webhook URL Configuration
+## Webhook Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_WEBHOOK_ENABLED` | Serve the public webhook endpoints on this node | `true` |
-| `BYTECHEF_WEBHOOK_URL` | Webhook URL | `BYTECHEF_PUBLIC_URL/webhooks/{id}` |
+| `BYTECHEF_WEBHOOK_ENABLED` | Serve the public webhook endpoints (`/webhooks`, `/callback`, `/approvals`, `/job/resume`, `/file-entries/{id}/content`) on this node | `true` |
+| `BYTECHEF_WEBHOOK_URL` | Webhook URL template | `BYTECHEF_PUBLIC_URL/webhooks/{id}` |
+
+## Webhook Delivery Configuration
+
+Outbound webhook calls: job status and task started webhooks, notification webhooks and Slack notifications.
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_WEBHOOK_DELIVERY_ALLOWED_HOSTS` | Comma-separated hosts that notification webhook and Slack URLs may use even when they resolve to a private or loopback address (matched exactly). When empty, every private address is blocked | - |
+| `BYTECHEF_WEBHOOK_DELIVERY_CONCURRENCY_LIMIT` | Outbound webhook POSTs in flight at once across all endpoints. Each endpoint receives one delivery at a time | `10` |
+| `BYTECHEF_WEBHOOK_DELIVERY_MAX_PENDING_DELIVERIES` | Deliveries to one endpoint that may wait or run at the same time. Further deliveries are dropped and logged | `1000` |
 
 ## Observability Configuration
 
@@ -593,14 +610,20 @@ System administrator is used for accessing protected data reachable through /act
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED` | Enable uploading of Java (jar) code workflows. When disabled, Java code workflow uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java code workflows continue to work. *Coming soon - upcoming release* | `true` |
-| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_LOADER` | Loader used to run Java code workflows (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java code workflows inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. *Coming soon - upcoming release* | `CLASS_LOADER` |
+| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED` | Enable uploading of Java (jar) code workflows. When disabled, Java code workflow uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java code workflows continue to work. Coming soon: this setting is not available yet | `true` |
+| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_LOADER` | Loader used to run Java code workflows (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java code workflows inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. Coming soon: this setting is not available yet | `CLASS_LOADER` |
 
 ### Output Storage
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_WORKFLOW_OUTPUT_STORAGE_PROVIDER` | Output storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
+
+### Test Output
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_WORKFLOW_TEST_OUTPUT_MAX_SAMPLE_ITEMS` | Maximum number of items kept from each list in an output saved by **Test Action** in the workflow editor | `100` |
 
 ### Repository Configuration
 
@@ -615,5 +638,5 @@ System administrator is used for accessing protected data reachable through /act
 | `BYTECHEF_WORKFLOW_REPOSITORY_GIT_BRANCH` | Git repository branch | - |
 | `BYTECHEF_WORKFLOW_REPOSITORY_GIT_USERNAME` | Git username (sensitive) | - |
 | `BYTECHEF_WORKFLOW_REPOSITORY_GIT_PASSWORD` | Git password (sensitive) | - |
-| `BYTECHEF_WORKFLOW_REPOSITORY_GIT_SEARCH_PATHS` | Git search paths | - |
+| `BYTECHEF_WORKFLOW_REPOSITORY_GIT_SEARCH_PATHS` | Comma-separated paths within the repository to search for workflows | - |
 | `BYTECHEF_WORKFLOW_REPOSITORY_JDBC_ENABLED` | Enable JDBC repository | `true` |

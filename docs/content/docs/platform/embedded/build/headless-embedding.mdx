@@ -1,21 +1,21 @@
 ---
 title: Headless Embedding
-description: Build your own connect UI against the embedded API when the React SDK does not fit - a non-React frontend, a native app, or a flow you need full control over.
+description: Build your own connect UI against the embedded API when the React SDK does not fit, for example in a non-React frontend or a native app.
 ---
 
-`@bytechef/embedded` is a React SDK. If your product is not React, or the Connect dialog's flow is not the flow you want, everything it does is available as API calls you can make yourself. The dialog holds no privileged state - it is a client of the same public endpoints your code can call.
+`@bytechef/embedded` is a React SDK. If your product is not built with React, or you need a different connect flow than the Connect dialog's, you can call the same public endpoints the dialog uses. The dialog holds no privileged state.
 
-<Callout type="warn" title="You take on the OAuth dance">
-    The SDK's main value is not the markup, it is handling the OAuth 2.0 popup, the state check, and the code exchange. Going headless means implementing that yourself. For non-OAuth connections the saving is smaller and the work is mostly a form.
+<Callout type="warn" title="You implement the OAuth flow">
+    Besides the form, the SDK handles the OAuth 2.0 popup, the state check and the code exchange. A headless implementation has to do this itself. For non-OAuth connections the work is mostly a form.
 </Callout>
 
 ## Which credential
 
-Use a **Signing Key JWT**, the same one the SDK takes. It authenticates one of your end users directly from the browser, so the operations you call are the ones under [Frontend](/openapi/frontend/embedded-configuration-integration) in the API reference - they resolve the user from the token's `sub` claim and carry no user id in the path.
+Use a **Signing Key JWT**, the same one the SDK takes. It authenticates one of your end users directly from the browser, so the operations you call are the ones under [Frontend](/openapi/frontend/embedded-configuration-integration) in the API reference. They resolve the user from the token's `sub` claim and carry no user id in the path.
 
 You can drive the same flow from your backend with an API Key against the `{externalUserId}` paths instead. Do that when the connect step is server-driven; use the JWT when the browser is making the calls, so your API Key never reaches the client.
 
-Mint tokens as described in [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk#2-generate-a-user-token-in-your-backend) - the private key stays on your server and the token is short-lived.
+Mint tokens as described in [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk#2-generate-a-user-token-in-your-backend). The private key stays on your server and the token is short-lived.
 
 ## The flow
 
@@ -30,20 +30,43 @@ const response = await fetch(`${baseUrl}/api/embedded/v1/integrations/${integrat
 });
 ```
 
-The payload describes everything you need to render: the integration's components, the inputs to collect, and - for OAuth integrations - a `connectionConfig.oauth2` object carrying the `authorizationUrl`, `clientId`, `redirectUri`, and `scopes`. That last part is what makes a headless implementation possible at all.
+The payload describes what you need to render: the integration's workflows and the connection's `connectionConfig`, which holds the `authorizationType`, the `inputs` to collect and, for OAuth2 integrations, an `oauth2` object with `authorizationUrl`, `clientId`, `redirectUri`, `scopes` and `extraQueryParameters`. The call returns `404` when the integration's [permission expression](/platform/embedded/build/permission-expressions) hides it from the user.
+
+For an Airtable integration, whose connection takes a bearer token, an abbreviated response looks like this:
+
+```json
+{
+  "id": 1050,
+  "name": "Airtable",
+  "componentName": "airtable",
+  "multipleInstances": false,
+  "connectionConfig": {
+    "authorizationType": "BEARER_TOKEN",
+    "inputs": [
+      {"name": "token", "label": "Token", "type": "STRING", "required": true}
+    ]
+  },
+  "workflows": [
+    {"workflowUuid": "<workflow-uuid>", "label": "Sync new records", "inputs": []}
+  ],
+  "integrationInstances": []
+}
+```
+
+Each entry in `connectionConfig.inputs` is one field to render. For an OAuth2 `authorizationType`, `inputs` is empty and `oauth2` carries the authorization parameters instead.
 
 ### 2. Authorize
 
-For an OAuth integration, send the user to the `authorizationUrl` with those parameters, in a popup or a redirect. Two things the SDK does that are easy to miss:
+For an OAuth integration, send the user to the `authorizationUrl` with those parameters, in a popup or a redirect. The SDK also does the following, and so must your implementation:
 
 - **Generate a `state` value and verify it on return.** A mismatch means the response did not come from the flow you started, and must be rejected.
 - **Match the response type to the grant.** Authorization Code returns a `code` to exchange; implicit-style grants return a token directly.
 
-For a non-OAuth integration there is nothing to authorize - collect the inputs the payload described and go straight to the next step.
+For a non-OAuth integration there is nothing to authorize. Collect the inputs the payload described and continue with the next step.
 
 ### 3. Create the integration instance
 
-Post the connection along with the workflows the user is enabling:
+Post the connection parameters. The body holds only the connection; workflows are enabled afterwards:
 
 ```ts
 await fetch(`${baseUrl}/api/embedded/v1/integrations/${integrationId}/instances`, {
@@ -53,39 +76,81 @@ await fetch(`${baseUrl}/api/embedded/v1/integrations/${integrationId}/instances`
         'Content-Type': 'application/json',
         'X-Environment': 'PRODUCTION',
     },
-    body: JSON.stringify({ /* connection parameters and workflow configuration */ }),
+    body: JSON.stringify({connection: {parameters: {/* the collected inputs or OAuth2 tokens */}}}),
 });
 ```
 
-This is the step that creates the **Connected User** record if the token's `sub` has never been seen before - see [Syncing Connected Users](/platform/embedded/get-started/initial-setup/syncing-connected-users-programmatically).
+For the Airtable integration above, `parameters` is `{"token": "<airtable-personal-access-token>"}`: one key per `connectionConfig.inputs` entry, named by its `name`.
+
+The response is the new integration instance id. ByteChef attaches it to the enabled [instance configuration](/platform/embedded/configure/instance-configurations) of the integration that admits the user through its permission expression, preferring the highest integration version (then the newest configuration). When none admits the user, the call fails. The **Connected User** record already exists at this point: it is created on the user's first authenticated request (see [Syncing Connected Users](/platform/embedded/get-started/initial-setup/syncing-connected-users-programmatically)).
 
 ### 4. Configure and toggle workflows
 
 Afterwards, the instance's workflows are managed individually:
 
-- `PATCH /api/embedded/v1/integration-instances/{id}/workflows/{workflowUuid}` - set a workflow's inputs.
-- `PATCH /api/embedded/v1/integration-instances/{id}/workflows/{workflowUuid}/enable` - turn it on or off.
-- `PATCH /api/embedded/v1/integration-instances/{id}` - update the instance itself.
+| Method and path | Description |
+|---|---|
+| `PUT /api/embedded/v1/integration-instances/{id}/workflows/{workflowUuid}` | Set a workflow's `inputs`. |
+| `POST /api/embedded/v1/integration-instances/{id}/workflows/{workflowUuid}/enable` | Enable the workflow. |
+| `DELETE /api/embedded/v1/integration-instances/{id}/workflows/{workflowUuid}/enable` | Disable the workflow. |
+| `DELETE /api/embedded/v1/integration-instances/{id}` | Delete the instance. Its enabled workflows are disabled first. |
+
+For example, set a workflow's inputs and then enable it. Input names come from the workflow's `inputs` in the integration payload; both calls return `204`:
+
+```ts
+const instanceWorkflowUrl = `${baseUrl}/api/embedded/v1/integration-instances/${integrationInstanceId}/workflows/${workflowUuid}`;
+
+await fetch(instanceWorkflowUrl, {
+    method: 'PUT',
+    headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        'Content-Type': 'application/json',
+        'X-Environment': 'PRODUCTION',
+    },
+    body: JSON.stringify({inputs: {tableName: 'Leads'}}),
+});
+
+await fetch(`${instanceWorkflowUrl}/enable`, {
+    method: 'POST',
+    headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        'X-Environment': 'PRODUCTION',
+    },
+});
+```
 
 See [Instance Workflows](/openapi/frontend/embedded-configuration-integration-instance-workflow) for the exact bodies.
 
 ### 5. Dynamic dropdowns
 
-Inputs whose options come from the user's own account - a list of their Salesforce objects, say - are resolved at render time:
+Inputs whose options come from the user's own account, such as a list of their Salesforce objects, are resolved at render time:
 
 ```
 POST /api/embedded/v1/integration-instances/{id}/component-input-options
 ```
 
-It runs the component's options function against that user's connection and returns the choices. Without this, any input backed by live provider data renders empty.
+The body names the component input group from the input's `componentReference`, the property to resolve, and the current values of the properties it depends on:
+
+```json
+{
+  "componentName": "<componentReference.componentName>",
+  "componentVersion": 1,
+  "groupName": "<componentReference.groupName>",
+  "propertyName": "<property name in the group>",
+  "lookupDependsOnValues": {},
+  "searchText": ""
+}
+```
+
+It runs the component's options function against that user's connection and returns the choices as a list of `{"label": "...", "value": "..."}` objects. Without this, any input backed by live provider data renders empty.
 
 ## Reconnecting
 
-Pass the existing instance id when you want the user to re-authorize rather than connect fresh. This is what fixes a connection whose credential has gone `INVALID` - it replaces the credential in place instead of creating a second instance. See [Troubleshooting](/platform/embedded/monitor/troubleshooting) for how an invalid credential presents.
+To fix a connection whose credential has become `INVALID`, replace its credentials in place instead of creating a second instance: call `POST /api/embedded/v1/connections/{id}/reauthorize` with the complete set of authorization parameters. A parameter you leave out is cleared. See [Connections for connected users](/platform/embedded/build/connections#frontend-endpoints) for the endpoint rules and [Troubleshooting](/platform/embedded/monitor/troubleshooting) for how an invalid credential presents.
 
 ## What you give up
 
 - **The Connect dialog's field rendering**, including validation and the [field mapping](/platform/embedded/build/workflows/field-mapping) UI, which you would rebuild.
-- **Updates.** New input types and connection features arrive in the SDK; a headless implementation adopts them only when you write them.
+- **Updates.** New input types and connection features arrive in the SDK; a headless implementation adopts them only when you implement them.
 
-The workflow builder is a different matter: it is an iframe, not a component library, so there is no headless equivalent. If you need it, embed it.
+The workflow builder has no headless equivalent: it is an iframe, not a component library. To offer it, embed it.

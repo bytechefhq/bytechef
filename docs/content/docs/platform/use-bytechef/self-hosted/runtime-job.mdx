@@ -9,7 +9,7 @@ opposite: an on-demand, single-shot binary that boots, executes exactly one work
 and shuts down with an exit code that reflects the outcome. On Kubernetes it maps one-to-one onto a
 `Job` - the pod is created, the workflow runs, the pod terminates.
 
-Reach for it for batch processing, for runs whose schedule already lives in another system
+Use it for batch processing, for runs whose schedule already lives in another system
 (Kubernetes `CronJob`, Airflow, a CI pipeline), and for embedding workflow execution into products
 that own their own orchestration.
 
@@ -284,8 +284,8 @@ cadence; ByteChef owns the execution.
 
 The app compiles in a curated set of components (HTTP client, script, the AI/LLM providers, the
 database components, the Google and Microsoft suites, and the most-used SaaS connectors) plus every
-control-flow task dispatcher: `approval`, `branch`, `condition`, `each`, `fork-join`, `loop`,
-`map`, `parallel`, and `subflow`. It is a subset of the full platform's component catalog -
+control-flow task dispatcher: `approval`, `branch`, `condition`, `each`, `fork-join`, `graph`,
+`loop`, `map`, `parallel`, and `subflow`. It is a subset of the full platform's component catalog -
 check the app's `build.gradle.kts` if you need to confirm a specific component is present.
 
 Deliberately absent, because a single-shot process has no use for them:

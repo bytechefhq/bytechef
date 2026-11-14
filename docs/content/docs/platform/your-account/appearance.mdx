@@ -1,11 +1,9 @@
 ---
 title: Appearance
-description: Choose the light, dark, or system theme for the ByteChef interface.
-comingSoon: true
+description: Choose the light, dark or system theme for the ByteChef interface.
 ---
 
-**Your Account → Appearance** carries one setting: the **Theme**, described as "Select the theme for
-the dashboard."
+**Your Account → Appearance** has one setting: the **Theme**, described as "Select the theme for the dashboard."
 
 ![The Appearance page - the Light, Dark and System theme options](appearance/appearance.png)
 
@@ -13,25 +11,21 @@ the dashboard."
 
 ## The three choices
 
-Three preview cards, each a radio option:
+The theme is chosen from three preview cards, each a radio option:
 
 | Choice | Effect |
 |---|---|
 | **Light** | Always the light palette, whatever the operating system is set to. |
 | **Dark** | Always the dark palette. |
-| **System** | Follows the operating system's light/dark preference. |
+| **System** | Follows the light or dark preference of the operating system. |
 
-**System** is the default for a fresh browser. Picking a card applies it immediately - there is no
-**Save** button.
+**System** is the default in a browser that has no stored choice. Selecting a card applies it immediately; there is no **Save** button.
 
 ## Where the choice is stored
 
-The theme is stored in your **browser's local storage**, not on your ByteChef account. Two
-consequences worth knowing:
+The theme is stored in the **local storage** of your browser under the `bytechef.ui-theme` key, not on your ByteChef account. As a result:
 
-- The choice does not follow you to another browser, another device, or a private window. Set it once
-  per browser.
-- Clearing site data resets you to **System**.
+- The choice does not follow you to another browser, another device or a private window. Set it once per browser.
+- Clearing site data resets the theme to **System**.
 
-Under **System**, the operating system's preference is read when the app loads. Changing your OS
-between light and dark while a ByteChef tab is already open does not repaint that tab; reload it.
+Under **System**, an open ByteChef tab switches between light and dark as soon as the operating system preference changes.

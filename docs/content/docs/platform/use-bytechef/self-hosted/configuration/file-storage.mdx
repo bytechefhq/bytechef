@@ -64,7 +64,9 @@ they are stored as files.
 
 ### `AWS` (S3)
 
-**Enterprise Edition.** Bytes live in an S3 bucket. Two variables select it, and both are required:
+**Enterprise Edition.** Bytes live in an S3 bucket. `BYTECHEF_CLOUD_PROVIDER` and
+`BYTECHEF_FILE_STORAGE_PROVIDER` are both required to select it; the other variables configure the
+bucket and credentials:
 
 | Variable | Purpose |
 |---|---|
@@ -72,8 +74,19 @@ they are stored as files.
 | `BYTECHEF_FILE_STORAGE_PROVIDER=AWS` | Points file storage at S3. |
 | `BYTECHEF_FILE_STORAGE_AWS_BUCKET` | Bucket name. |
 | `BYTECHEF_CLOUD_AWS_REGION` | AWS region. |
-| `BYTECHEF_CLOUD_AWS_ACCESS_KEY_ID` / `BYTECHEF_CLOUD_AWS_SECRET_ACCESS_KEY` | Credentials, when not using an instance role. |
+| `BYTECHEF_CLOUD_AWS_ACCESS_KEY_ID` / `BYTECHEF_CLOUD_AWS_SECRET_ACCESS_KEY` | Credentials of the IAM user that reads and writes the bucket. Required: ByteChef uses these static keys and does not fall back to an instance role. |
 | `BYTECHEF_CLOUD_AWS_ACCOUNT_ID` | AWS account id. |
+
+A minimal S3 setup looks like this:
+
+```bash
+BYTECHEF_CLOUD_PROVIDER=AWS
+BYTECHEF_CLOUD_AWS_REGION=eu-central-1
+BYTECHEF_CLOUD_AWS_ACCESS_KEY_ID=<access-key-id>
+BYTECHEF_CLOUD_AWS_SECRET_ACCESS_KEY=<secret-access-key>
+BYTECHEF_FILE_STORAGE_PROVIDER=AWS
+BYTECHEF_FILE_STORAGE_AWS_BUCKET=my-bytechef-files
+```
 
 ByteChef enables `spring.cloud.aws.s3.enabled` - which ships `false` - when
 `BYTECHEF_FILE_STORAGE_PROVIDER` is `AWS`, compared case-insensitively. Leaving
@@ -81,7 +94,7 @@ ByteChef enables `spring.cloud.aws.s3.enabled` - which ships `false` - when
 and simply never registers. Nothing logs a warning when this happens; the first symptom is a workflow
 failing to read or write a file.
 
-Beyond those two, there is no bean override or extra YAML to write. The backend is plain Spring Cloud
+Beyond these variables, there is no bean override or extra YAML to write. The backend is plain Spring Cloud
 AWS underneath, so any `spring.cloud.aws.s3.*` property applies; ByteChef does not surface
 `bytechef.*` aliases for them.
 

@@ -1,160 +1,155 @@
 ---
 title: "Forms"
-description: "Put a public web form in front of a workflow. A submission triggers the workflow, runs it, and returns the result to the submitter."
+description: "Put a hosted web form in front of a workflow. Each submission triggers the workflow with typed field values."
 ---
 
-A **form** turns a workflow into a public web page that anyone can fill in. A
-visitor submits the form, the submission triggers the workflow, the workflow
-runs, and - because the form runs synchronously - the result comes back to the
-submitter in the same request. It's the simplest way to collect structured
-input from people outside ByteChef without building any UI of your own.
+A **form** is a hosted web page that starts a workflow. You define the fields in the workflow trigger, deploy the workflow, and share the form link. Each submission triggers the workflow, and the submitted values are available to later steps as typed data. Use forms to collect input from people outside ByteChef without building your own UI.
 
-Forms are provided by the [**Form**](/reference/components/form_v1) component
-through its single trigger, **New Form Request**. For the full, generated list
-of trigger properties and the JSON shape, see the
-[component reference](/reference/components/form_v1) - this page covers the
-concepts and how to build with it.
+Forms are provided by the [**Form**](/reference/components/form_v1) component. For the generated list of properties and the JSON example, see the [component reference](/reference/components/form_v1).
 
----
+## Use cases
 
-## When to use a form
+- **Intake** - contact requests, support tickets, lead capture, job applications.
+- **Surveys and feedback** - collect typed answers and route them to other systems.
+- **Internal data entry** - push records into a CRM, a spreadsheet or a [data table](/platform/automation/data/data-tables).
+- **File collection** - accept uploads as the first step of a processing workflow.
 
-- **Intake** - contact requests, support tickets, lead capture, job
-  applications.
-- **Surveys and feedback** - collect typed answers and route them downstream.
-- **Internal data entry** - a quick branded page to push records into a CRM,
-  spreadsheet, or [data table](/platform/automation/data/data-tables) without a
-  custom front end.
-- **File collection** - accept uploads (documents, images) as the first step of
-  a processing workflow.
+For a conversational front end, use [Chats](/platform/automation/deploy/chats). To pause a running workflow for a person's decision, use [Human-in-the-Loop](/platform/automation/build/workflows/human-in-the-loop).
 
-If you instead need a *conversational* front end, use the
-[Chats page](/platform/automation/deploy/chats); if you need to pause an
-*already-running* workflow for a human decision, use
-[human-in-the-loop approval](/platform/automation/build/workflows/human-in-the-loop).
+## Triggers
 
----
+The Form component has two triggers. Both are static webhooks with the same properties and output.
 
-## How it works
+| Trigger | Behavior |
+|---|---|
+| **New Form Request** | Runs the workflow synchronously. The submission request waits until the workflow finishes. |
+| **New Form Request (Respond Immediately)** | Responds to the submitter at once; the workflow runs in the background. |
 
-The **New Form Request** trigger is a `STATIC_WEBHOOK`: every deployed workflow
-that uses it gets a fixed webhook URL, and ByteChef serves a rendered form page
-built from the input fields you define. The two are different paths sharing one
-id - the webhook is `/webhooks/{id}`, the public form page is
-`/form/{environmentId}/{id}`. The deployment's workflow list links straight to
-the form page, so you don't have to assemble it by hand. When a visitor submits:
+A synchronous run cannot pause. If the workflow contains a step that can pause it, such as an approval, use **New Form Request (Respond Immediately)**.
 
-1. The browser `POST`s the form values to the trigger's webhook URL.
-2. The trigger runs **synchronously** (`workflowSyncExecution`) - the workflow
-   executes and its output is returned to the submitter in the same response,
-   so the page can show a result rather than just firing and forgetting.
-3. `submittedAt` is stamped on the payload (a UTC instant by default), and each
-   field becomes a typed value available to downstream tasks.
+## Prerequisites
 
-> **Public URL required.** The hosted form is served from the server's public
-> URL (`bytechef.public-url` / `BYTECHEF_PUBLIC_URL`). Set it to something form
-> visitors can actually reach (your domain, or an ngrok tunnel for local dev).
+- The server public URL (`bytechef.public-url`, environment variable `BYTECHEF_PUBLIC_URL`) must be reachable by the people who fill in the form, for example your domain or a tunnel for local development.
 
----
-
-## Building a form
+## Build a form
 
 {/* TODO screenshot: workflow editor form trigger/step configuration - the form fields builder and page options */}
 
-1. In the workflow editor, click the trigger slot and search for **Form**.
-2. Select the **New Form Request** trigger.
-3. Set the page-level options - **Form Title**, **Form Description**, and
-   **Button Label** - which control the heading, subtitle, and submit button of
-   the hosted page.
-4. Add one or more **Form Inputs** (see [Field types](#field-types) below). Each
-   field needs a **Field Name** - that name becomes the key of the submitted
-   value and the data pill downstream tasks reference.
-5. Wire downstream tasks to read the submitted fields from the trigger output.
-   The trigger node is named `trigger_1`, so the pills read
-   `${trigger_1.body.email}` and `${trigger_1.submittedAt}`.
+1. In the workflow editor, click the trigger and search for **Form**.
+2. Select **New Form Request** or **New Form Request (Respond Immediately)**.
+3. Set **Form Title**, **Form Description** and **Button Label**. They control the page heading, the subtitle and the submit button.
+4. Add fields under **Form Inputs**. For each field, select a **Field Type** and enter a **Field Name**. The field name is the key of the submitted value.
+5. In later steps, reference the submitted values from the trigger output, for example `${trigger_1.body.email}` and `${trigger_1.submittedAt}`.
+6. Deploy the workflow. In the deployment's workflow list, click the **Open form** icon to open the hosted form page.
+
+## Share the form
+
+The hosted form page has the path `/form/{environmentId}/{id}`. The form submits to the trigger's webhook URL, `/webhooks/{id}`, which uses the same id. After a successful submission the page shows **Thank you!** and **Your response has been submitted.** If the request fails, the page shows the error. The page does not display the workflow output.
+
+## Reference
+
+### Page properties
+
+| Property | Type | Default | Description |
+|---|---|---|---|
+| **Form Title** | Text | | Main page title. |
+| **Form Description** | Text | | Subtitle under the title. Use `\n` or `<br>` for line breaks. |
+| **Button Label** | Text | | Label of the submit button. |
+| **Ignore Bots** | Boolean | `false` | Ignores requests from bots and link previewers, matched on the `User-Agent` header. |
+| **Use Workflow Timezone** | Boolean | `false` | When `false`, the server overwrites `submittedAt` with its own UTC timestamp. When `true`, the submitted value is kept. |
+| **Append Attribution** | Boolean | `true` | Shows a "powered by" footer on the form. |
+| **Custom Form Styling (CSS)** | Text area | | CSS that overrides the default form styles. |
+| **Form Inputs** | Array | | The form fields. See the next table. |
+
+### Field properties
+
+| Property | Applies to | Description |
+|---|---|---|
+| **Field Type** | All | One of the types in [Field types](#field-types). |
+| **Field Label** | All | Label shown next to the field. |
+| **Field Name** | All except Custom HTML | Key of the submitted value in `body`. |
+| **Field Description** | All | Help text for the field. |
+| **Placeholder** | Input, Email, Number, Password, Textarea | Placeholder text. |
+| **Default value** | All | Initial value. For Custom HTML, a multi-line box that holds the HTML to render. |
+| **Field Options** | Radio Button, Select | List of **Label** / **Value** pairs. |
+| **Multiple Choice** | Select | Allows more than one selection. Default `false`. |
+| **Min selection** / **Max selection** | Select with Multiple Choice | Minimum and maximum number of selected options. |
+| **Required** | All | Makes the field mandatory. Default `false`. |
 
 ### Field types
 
-A form input can be any of the following types:
+| Field type | Description | Output type |
+|---|---|---|
+| **Input** | Single-line text. | string |
+| **Textarea** | Multi-line text. | string |
+| **Email** | Text validated as an email address. | string |
+| **Number** | Numeric input. | number |
+| **Password** | Masked text. | string |
+| **Checkbox** | Boolean value. | boolean |
+| **Date Picker** | Date. | date |
+| **Datetime Picker** | Date and time. | date-time |
+| **Radio Button** | One option from **Field Options**. | string |
+| **Select** | Drop-down; optionally multiple choice. | string, or array of strings with **Multiple Choice** |
+| **File** | File upload. | file entry |
+| **Hidden Field** | Preset value not shown to the visitor. | string |
+| **Custom HTML** | HTML rendered between fields, for headings or instructions. Collects no value. | none |
 
-| Field type | Notes |
-|---|---|
-| **Input** | Single-line text. |
-| **Textarea** | Multi-line text. |
-| **Email** | Text input validated as an email. |
-| **Number** | Numeric input. |
-| **Password** | Masked text input. |
-| **Checkbox** | Boolean true/false. |
-| **Date Picker** | Date value. |
-| **Datetime Picker** | Date-and-time value. |
-| **Radio Button** | Pick one of a set of label/value options. |
-| **Select** | Dropdown; can allow **multiple choice** with optional min/max selection. |
-| **File** | File upload, surfaced downstream as a file entry. |
-| **Hidden Field** | A pre-set value the visitor doesn't see. |
-| **Custom HTML** | Raw HTML rendered inline - for headings, instructions, or layout between fields. |
+### Output
 
-Some per-field options only appear for certain types: **Placeholder** applies to
-the text-like inputs (Input, Email, Number, Password, Textarea); **Field
-Options** (the label/value list) applies to Radio and Select; **Multiple
-Choice** plus **Min/Max selection** apply to Select. Every field can be marked
-**Required** and given a **Default value**; Custom HTML is the one type with no
-**Field Name**, since it renders content rather than collecting a value, and its
-**Default value** is the multi-line box holding the HTML to render.
+The trigger output is generated from the field definitions:
 
----
+- `submittedAt` - the submission timestamp.
+- `body` - an object with one property per field, keyed by **Field Name** and typed as in the table above.
 
-## Form output
+For example, `${trigger_1.body.dueDate}` resolves to a date and `${trigger_1.body.tags}` (a multiple-choice Select) resolves to an array, without a conversion step.
 
-The trigger's output is generated dynamically from your field definitions, so
-downstream tasks get correctly-typed data - you don't parse a raw blob. The
-output is an object with:
+### Example
 
-- `submittedAt` - a timestamp string for when the form was submitted.
-- `body` - an object with one property per field, keyed by **Field Name** and
-  typed to match the field:
+This trigger defines a contact form with a name, an email address and a multiple-choice Select. In the workflow definition, **Field Type** is stored as a number: `6` is Input, `8` is Email and `7` is Select. The full list of values is in the [component reference](/reference/components/form_v1).
 
-| Field type | Output type |
-|---|---|
-| Checkbox | boolean |
-| Date Picker | date |
-| Datetime Picker | date-time |
-| Number | number |
-| File | file entry |
-| Select (multiple choice) | array of strings |
-| Select (single) and all others | string |
+```json
+{
+  "name": "trigger_1",
+  "type": "form/v1/newFormRequestRespondImmediately",
+  "parameters": {
+    "formTitle": "Contact us",
+    "formDescription": "We reply within one business day.",
+    "buttonLabel": "Send",
+    "inputs": [
+      {"fieldType": 6, "fieldLabel": "Full name", "fieldName": "fullName", "required": true},
+      {"fieldType": 8, "fieldLabel": "Email", "fieldName": "email", "required": true},
+      {
+        "fieldType": 7,
+        "fieldLabel": "Topics",
+        "fieldName": "topics",
+        "multipleChoice": true,
+        "fieldOptions": [
+          {"label": "Billing", "value": "billing"},
+          {"label": "API", "value": "api"}
+        ]
+      }
+    ]
+  }
+}
+```
 
-Because the schema is known ahead of time, references like
-`${trigger_1.body.dueDate}` resolve to a real date and `${trigger_1.body.tags}`
-(a multi-select) resolves to an array, with no follow-up conversion step.
+A submission produces trigger output like this:
 
----
+```json
+{
+  "submittedAt": "2026-11-14T09:30:12.345Z",
+  "body": {
+    "fullName": "Ada Lovelace",
+    "email": "ada@example.com",
+    "topics": ["billing", "api"]
+  }
+}
+```
 
-## Page options
-
-Beyond the fields themselves, the trigger exposes a few options that shape the
-hosted page and its behavior:
-
-- **Ignore Bots** - drops requests from bots and link previewers (matched on the
-  `User-Agent`), so crawler previews don't accidentally trigger the workflow.
-  Off by default.
-- **Use Workflow Timezone** - controls who stamps `submittedAt`. Off by default,
-  in which case ByteChef overwrites the field with the server's own UTC instant.
-  Turn it on and the value submitted with the form is kept as-is instead.
-- **Append Attribution** - shows a small "powered by" footer on the public form.
-  On by default; turn it off for a clean branded page.
-- **Custom Form Styling (CSS)** - override the default form styles with your own
-  CSS for full control over the page's look.
-
-See the [Form component reference](/reference/components/form_v1) for the exact
-property names, defaults, and the full JSON example.
-
----
+Later steps reference the values as `${trigger_1.body.fullName}`, `${trigger_1.body.email}` and `${trigger_1.body.topics}`.
 
 ## Related
 
-- [`form/v1`](/reference/components/form_v1) - the generated Form component
-  reference (trigger properties, output, JSON example).
-- [Chats](/platform/automation/deploy/chats) - a conversational front end for
-  a workflow.
-- [Human-in-the-loop (Approval)](/platform/automation/build/workflows/human-in-the-loop) - pause a
-  running workflow for a person to approve or fill in input.
+- [Form component reference](/reference/components/form_v1)
+- [Chats](/platform/automation/deploy/chats)
+- [Human-in-the-Loop](/platform/automation/build/workflows/human-in-the-loop)

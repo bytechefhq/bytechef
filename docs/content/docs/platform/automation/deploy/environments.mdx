@@ -1,36 +1,33 @@
 ---
 title: Environments
-description: Development, Staging, and Production - how workflows, connections, and configuration are scoped per environment.
+description: How Development, Staging, and Production scope connections, deployments, and execution history in a workspace.
 ee: true
 ---
 
-<EEBadge />
+Every workspace has the same three environments: **Development**, **Staging**, and **Production**.
+Most records you create in ByteChef belong to exactly one of them. The selected environment determines
+which connections you can pick, which deployments are listed, and which runs appear in the execution
+history.
 
-Every workspace has the same three environments - **Development**, **Staging**, and **Production** -
-and most of what you create in ByteChef belongs to exactly one of them. Selecting an environment
-changes which connections you can pick, which deployments are listed, and which runs show up in the
-execution history.
-
-The set is fixed. These three are defined by the platform and cannot be renamed, removed, or added
-to. That uniformity is what lets the rest of the platform assume an environment exists on every
-record.
+The set is fixed. The platform defines the three environments; you cannot rename, remove, or add
+environments.
 
 <Callout title="Community Edition">
     The environment selector appears on Enterprise Edition only. A Community Edition instance works in
     a single environment and shows no selector, so nothing on this page needs configuring there.
 </Callout>
 
----
-
 ## Choosing an environment
 
-The selector sits in the left sidebar header, beside the ByteChef name, and applies to the whole
-application rather than to one page. Switching it changes what the pages below it list - it never
-migrates anything. The sidebar takes on a colour for the selected environment, so the current one stays
-visible after you have looked away; collapse the sidebar and the selector shrinks to the environment's
-icon.
+The selector is the round environment icon in the left sidebar header, next to the workspace menu. It
+applies to the whole application, not to one page. Switching it changes what the pages list; it never
+moves or copies records between environments. The sidebar takes on the color of the selected
+environment.
 
-![The environment selector in the left sidebar header, beside the ByteChef name](environments/environment-selector.png)
+1. Click the environment icon in the left sidebar header.
+2. Select **Development**, **Staging**, or **Production**.
+
+![The environment selector in the left sidebar header](environments/environment-selector.png)
 
 | Environment | Intended for |
 |---|---|
@@ -38,36 +35,33 @@ icon.
 | **Staging** | Final testing, QA, and validation before release. |
 | **Production** | Live traffic. |
 
-Development is the default for a new session.
+Development is selected by default when you sign in.
 
 ![The open selector, listing Development, Staging and Production with a description for each and a check against the current one](environments/environment-selector-menu.png)
 
----
-
 ## What carries an environment
 
-Practically everything you can create:
+Most records you create:
 
-- **Connections** - a connection belongs to one environment, so the Stripe connection you pick in
+- **Connections** - a connection belongs to one environment. The Stripe connection you pick in
   Development is a different record, with different keys, from the one in Production.
 - **Project deployments** - a deployment binds a published project version to one environment. See
   [Deploy Workflows](/platform/automation/deploy/workflows).
-- **Data tables** - the table definition is workspace-wide, but its **rows** are per environment, so
-  Development data never leaks into Production.
-- **Knowledge bases**, **asset files**, and **context stores**.
+- **Data tables** - the table definition is workspace-wide, but its **rows** are per environment.
+  Development data is not visible in Production.
+- **Knowledge bases**.
 - **API keys** - a key is issued for one environment and only authenticates requests for it.
 - **MCP servers**, **A2A servers**, and **API collections** - each publishes a different set of tools
   or endpoints per environment.
-- **AI provider credentials** - activated per environment, so a cheap model in Development and a
-  production key in Production is a configuration choice, not a workflow change.
+- **AI providers** - activated per environment, so Development and Production can use different
+  models and keys without a workflow change.
 - **Workflow executions**, **approval tasks**, and [external invocations](/platform/automation/monitor/external-invocations) -
   history is listed per environment.
 
-Projects and their **workflows** are the notable exception: a project is not environment-scoped. It
-holds one editable draft and a series of published versions, and a version reaches an environment by
-being deployed there.
-
----
+Projects and their **workflows** are not environment-scoped. A project holds one editable draft and a
+series of published versions. A version reaches an environment when you deploy it there. In Enterprise
+Edition the **Projects** page is shown only in Development; in Staging and Production you work with
+**Project Deployments**.
 
 ## How work moves forward
 
@@ -80,30 +74,27 @@ draft  ──publish──▶  version 3  ──deploy──▶  Development
 
 Editing always happens on the draft. Publishing freezes it as a version, and deploying binds that
 version to an environment. The same version can back deployments in all three environments at once,
-each with its own connections - which is the point: Staging and Production run identical definitions,
-so a difference in behavior is a difference in configuration, never in build.
+each with its own connections. Staging and Production therefore run identical definitions, and any
+difference in behavior comes from configuration.
 
-Because triggers are enabled per deployment, a schedule or a webhook only fires for the deployments
-where it is enabled - a cron trigger being present in a Development deployment does not make it fire
-in Production. Webhook URLs are issued per deployment for the same reason, so each environment's
-deployment has its own URL.
+A deployment is created in the environment that is selected when you open the **New Deployment**
+dialog; the dialog shows it as a read-only **Environment** badge. To deploy to Staging or Production,
+switch the environment selector first.
 
----
+Triggers are enabled per deployment, so a schedule or a webhook fires only for the deployments where
+it is enabled. A cron trigger in a Development deployment does not fire in Production. Webhook URLs are
+issued per deployment, so each environment's deployment has its own URL.
 
 ## Environments in the API
 
-Public API keys are issued for one environment, and requests carry the environment in an
-`X-ENVIRONMENT` header, defaulting to `PRODUCTION` when it is omitted. The header must agree with the
-key: a Development key cannot reach Production data by asking for it. A script that creates
-deployments or manages connections should therefore name its environment explicitly rather than
-relying on the default.
-
----
+Workspace API keys are issued for one environment. Requests carry the environment in the
+`X-ENVIRONMENT` header (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`, case-insensitive). When the header is
+omitted, the environment is `PRODUCTION`. The header must match the key: a Development key cannot
+reach Production data. Scripts that call the API should set the header explicitly.
 
 ## When three environments are not enough
 
-The fixed set is a deliberate constraint, and the need behind wanting a fourth is usually something
-else:
+The set of environments is fixed. Model other kinds of separation as follows:
 
 | What you actually want | Model it as |
 |---|---|
@@ -111,7 +102,12 @@ else:
 | Per-customer isolation | One workspace per tenant |
 | A load-testing or canary slice | A dedicated workspace whose Production points at a test backend |
 
-What does *not* work is using workspaces as stages. Environments already exist inside every
-workspace, and deployments already select a version per environment - replacing that with three
-workspaces means copying projects by hand and losing the shared version history that makes a rollback
-one setting change.
+Do not use workspaces as stages. Environments already exist inside every workspace, and deployments
+select a version per environment. Three workspaces used as stages require copying projects by hand
+and lose the shared version history that makes a rollback a single version change.
+
+## Related
+
+- [Deploy workflows](/platform/automation/deploy/workflows)
+- [Workspaces](/platform/automation/settings/workspaces)
+- [API keys](/platform/automation/settings/api-keys)

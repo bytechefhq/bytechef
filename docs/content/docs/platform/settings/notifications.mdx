@@ -19,9 +19,9 @@ channel in a workflow is a separate feature of the Slack component and is not af
 
 ## The page
 
-The header reads **Notifications**, with a **New Notification** button. With no rules yet, the body
-shows an empty state titled **No Notifications** with the message "You do not have any Notifications
-created yet."
+The header reads **Notifications**, with a **New Notification** button once at least one rule exists. With no rules yet, the body
+shows an empty state titled **No Notifications** with the message "Get an email, Slack message or webhook call when a
+workflow run starts, completes or fails." and a **New Notification** button.
 
 | Column | Description |
 |---|---|
@@ -35,7 +35,7 @@ created yet."
 
 1. Click **New Notification**. The **Create Notification** dialog opens, described as "Define
    notification parameters."
-2. Enter a **Name** - required, up to 256 characters.
+2. Enter a **Name** (required, up to 256 characters).
 3. Pick one or more **Events** from the multi-select. At least one is required.
 4. Choose a **Type**.
 5. Fill in the type's fields.
@@ -59,8 +59,11 @@ Events are job lifecycle transitions. The full set:
 | `JOB_CANCELLED` | A run was cancelled before it ever started. |
 | `JOB_STOPPED` | A run was stopped mid-execution. |
 
-The list is not per-workspace or per-project: a notification subscribes to an event across the whole
-deployment.
+A notification subscribes to an event across the whole deployment, not per workspace or per project.
+
+<Callout type="warn" title="Coming soon">
+    Scoping a notification to one workspace is not available in the latest released version of ByteChef.
+</Callout>
 
 ## Delivery types
 
@@ -80,15 +83,13 @@ Email subject and body come from the platform's message bundle, parameterised wi
 label and the job id. A Slack message carries the same text as the email body, prefixed with an emoji. There is no
 per-notification template for Email and Slack; only Webhook has a [body template](#body-template).
 
-Email and Slack messages now end with the same details lines, one per line, each shown only when the
+Email and Slack messages end with the same detail lines, one per line, each shown only when the
 value is known: `Workflow`, `Project` (with the version, for example `CRM (v3)`), `Environment`,
 `Failed task` (with the task type), `Error` and `Execution` (the link to the run).
 
 ### Webhook requests
 
-Each delivery is a single `POST` with a `Content-Type: application/json` body. The body starts with the
-fields it has always had (`eventType`, `jobId`, `jobName` and `timestamp`). These are unchanged. A summary of the event is added beside
-them:
+Each delivery is a single `POST` with a `Content-Type: application/json` body. The body contains `eventType`, `jobId`, `jobName` and `timestamp`, plus a summary of the event:
 
 | Field | Type | Present when |
 |---|---|---|
@@ -512,12 +513,8 @@ function verifyByteChefSignature(rawBody, signatureHeader, secret) {
 `rawBody` must be the request body as received, for example `req.body.toString('utf8')` with
 `express.raw({type: 'application/json'})`, not a re-serialised object.
 
-Slack notification URLs are also stored encrypted now, and show as `********` when you edit a Slack
+Slack notification URLs are also stored encrypted, and show as `********` when you edit a Slack
 notification.
-
-<Callout type="warn" title="Coming soon">
-    Per-workspace scoping of a notification is on the upcoming release track and is not yet available.
-</Callout>
 
 ## Testing a notification
 

@@ -3,30 +3,29 @@ title: "Basic Authentication"
 description: "Learn how to use Basic Authentication to connect to third-party services in ByteChef"
 ---
 
-Basic Authentication is a simple authentication scheme built into the HTTP protocol. It uses a username and a password to authenticate requests.
+Basic Authentication is an authentication scheme built into HTTP. It authenticates each request with a username and a password.
 
-## How it Works
+## How it works
 
-When using Basic Authentication, ByteChef combines your username and password, encodes them using Base64, and includes them in the `Authorization` header of every HTTP request.
+ByteChef joins the username and password with a colon, encodes the result with Base64, and sends it in the `Authorization` header of every HTTP request.
 
 Example header:
 `Authorization: Basic ZGVtbzpwQDU1dzByZA==`
 
-## Setting Up Basic Auth Connections
+## Set up a Basic Auth connection
 
 {/* TODO screenshot: Create Connection dialog for a Basic Auth component showing the Username and Password fields with the Save button */}
 
-To set up a Basic Authentication connection in ByteChef:
-
-1. Go to the **Connections** tab.
+1. Click **Connections** in the main sidebar.
 2. Click **New Connection** and select a service that uses Basic Auth.
-3. Enter your **Username** (sometimes an email address or an API token).
-4. Enter your **Password** or **Secret**.
-5. Click **Save** to create the connection.
+3. Enter a **Name** for the connection.
+4. Enter the **Username**. Some services expect an email address or an API token here.
+5. Enter the **Password**.
+6. Click **Save**.
 
 ## Security
 
-While Basic Authentication is simple, it should always be used over HTTPS to ensure that your credentials are not transmitted in plain text. ByteChef stores your credentials securely, encrypted at rest with AES-GCM.
+Base64 is an encoding, not encryption. Use Basic Authentication only over HTTPS so that credentials are not sent in plain text. ByteChef encrypts stored credentials at rest with AES-GCM.
 
 ---
 

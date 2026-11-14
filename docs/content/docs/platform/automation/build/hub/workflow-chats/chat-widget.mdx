@@ -1,11 +1,9 @@
 ---
 title: Embed the Chat Widget
 description: Drop the @bytechef/chat React widget into your own app and point it at a chat-enabled workflow.
-ee: true
-comingSoon: true
 ---
 
-When a chat-enabled workflow runs in [Embedded Chat mode](/platform/automation/build/hub/workflow-chats/enable-chat), you bring your own UI. The **`@bytechef/chat`** React package is that UI - a ready-made chat widget that speaks the New Chat Request webhook contract, including streamed replies and voice.
+A chat-enabled workflow in [Embedded Chat mode](/platform/automation/build/hub/workflow-chats/enable-chat#hosted-vs-embedded) needs your own UI. The **`@bytechef/chat`** React package provides a chat widget that calls the New Chat Request webhook and renders the replies, including streamed replies, questions, and approval requests.
 
 ## Install
 
@@ -13,9 +11,9 @@ When a chat-enabled workflow runs in [Embedded Chat mode](/platform/automation/b
 npm install @bytechef/chat
 ```
 
-## Drop in the widget
+## Add the widget
 
-Point the widget at your workflow's chat webhook URL:
+Set `webhookUrl` to your workflow's chat webhook URL. Append `/sse` to receive streamed replies:
 
 ```tsx
 import {AutomationChat} from '@bytechef/chat';
@@ -30,22 +28,38 @@ export function SupportChat() {
                     {label: 'Manage billing', prompt: 'Cancel my subscription', title: 'Cancel my subscription'},
                 ],
                 title: 'Support Assistant',
-                webhookUrl: 'https://<your-host>/webhooks/<webhook-id>',
+                webhookUrl: 'https://<your-host>/webhooks/<webhook-id>/sse',
             }}
         />
     );
 }
 ```
 
-Three components are exported:
+## Components
 
-| Export | What it renders |
+| Export | Description |
 |---|---|
-| `AutomationChat` | The full chat surface, inline in your page. |
-| `AutomationChatModal` | A floating launcher button that opens the chat in a modal (`position` defaults to `bottom-right`). |
-| `AutomationChatProvider` | The context provider underneath both - exported for fully custom layouts, together with building blocks like `Thread` and the `useSSE` hook. |
+| `AutomationChat` | The full chat surface, rendered inline in your page. |
+| `AutomationChatModal` | A floating launcher button that opens the chat in a modal. The `position` prop accepts `bottom-right` (default), `bottom-left`, `top-right`, or `top-left`. |
+| `AutomationChatProvider` | The context provider used by both components. Use it with the exported `Thread` component and `useSSE` hook to build a custom layout. |
 
-The widget sends `{ message, conversationId, attachments }` to the webhook and renders the reply; when the webhook URL ends in `/sse`, replies stream token by token.
+## Configuration
+
+Pass the configuration as the `config` prop.
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `webhookUrl` | `string` | - | Required. The workflow's webhook URL. When it ends with `/sse`, replies are streamed. |
+| `title` | `string` | `Hello there!` (`Chat` in the modal) | Welcome message title. In `AutomationChatModal`, the modal title. |
+| `description` | `string` | `How can I help you today?` | Welcome message description. In `AutomationChatModal`, the modal's accessible description. |
+| `suggestions` | `{title, label, prompt}[]` | - | Suggested prompts shown on the welcome screen. |
+
+The widget sends `message`, `conversationId`, and `attachments` to the webhook as `multipart/form-data` and renders the reply.
+
+## Related
+
+- [Enable chat on a workflow](/platform/automation/build/hub/workflow-chats/enable-chat)
+- [Advanced behavior](/platform/automation/build/hub/workflow-chats/advanced)
 
 {/* @coming-soon Voice is coming soon - the browser/v1/voiceSession trigger and the widget's voiceMode are
 not in the latest released version, so this section is commented out. Tracked in

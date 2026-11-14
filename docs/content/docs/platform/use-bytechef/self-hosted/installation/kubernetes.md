@@ -1,6 +1,6 @@
 ---
 title: Kubernetes
-description: Deploy ByteChef on Kubernetes
+description: Deploy the ByteChef server on a Kubernetes cluster with the Helm chart from the repository.
 ---
 
 ByteChef ships a Helm chart for deploying the single-node application on a Kubernetes cluster. The chart lives in the repository at [`kubernetes/helm/bytechef`](https://github.com/bytechefhq/bytechef/tree/master/kubernetes/helm/bytechef).
@@ -22,7 +22,7 @@ cd bytechef/kubernetes/helm/bytechef
 
 ## 2. Configure values
 
-The chart is driven by `values.yaml`. The settings you almost always need to change are the image tag, the database connection, and the encryption and remember-me secrets. Configuration is split into two blocks under `env`:
+The chart is driven by `values.yaml`. Set at least the image tag, the database connection, and the encryption and remember-me secrets. Configuration is split into two blocks under `env`:
 
 - `env.normal` - non-sensitive environment variables rendered into a ConfigMap.
 - `env.secret` - sensitive environment variables rendered into a Secret.
@@ -47,6 +47,8 @@ env:
     BYTECHEF_ENCRYPTION_PROPERTY_KEY: "<stable-encryption-key>"
     BYTECHEF_SECURITY_REMEMBER_ME_KEY: "<stable-remember-me-key>"
 ```
+
+Values you pass are merged with the chart's `values.yaml`, which already sets `BYTECHEF_ENCRYPTION_PROVIDER: PROPERTY`, `BYTECHEF_FEATURE_FLAGS_0: ff-1057`, `BYTECHEF_SIGN_UP_ACTIVATION_REQUIRED: false` and placeholder mail settings. Override the mail variables (`BYTECHEF_MAIL_*`) with your SMTP server's values, or sign-up and invitation emails are not delivered.
 
 Use `BYTECHEF_ENCRYPTION_PROVIDER: PROPERTY` with a fixed `BYTECHEF_ENCRYPTION_PROPERTY_KEY` on Kubernetes. The default `FILESYSTEM` provider writes a key to the pod's local disk, which does not survive pod restarts and is not shared across replicas - either would leave stored connection credentials undecryptable. See [Encryption of stored credentials](/platform/use-bytechef/self-hosted/configuration#the-key) for the full reasoning.
 
@@ -77,7 +79,7 @@ The chart includes optional resources for production exposure:
 | Autoscaling | `autoscaling.enabled` | Disabled by default. When enabled it creates a HorizontalPodAutoscaler between `minReplicas` and `maxReplicas` on `targetCPUUtilizationPercentage`. |
 | Replicas | `replicaCount` | Static replica count when autoscaling is off (default `1`). |
 
-When running more than one replica, align the multi-instance settings described in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances) - shared encryption key, a shared message broker and cache, and coordinated schema migrations.
+The chart sets no message broker, session store or cache variables, so its defaults run the in-memory broker. Every replica the chart creates runs the coordinator, and more than one coordinator requires Enterprise Edition. Before you raise `replicaCount` or enable autoscaling, add the settings described in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances) under `env.normal` and `env.secret`: a shared encryption key, a shared message broker, shared file storage, a shared session store and cache provider, a clustered scheduler, and coordinated schema migrations.
 
 ## Health probes
 
@@ -86,7 +88,7 @@ The chart wires the Kubernetes probes to ByteChef's Actuator health endpoints ou
 - **Startup / liveness:** `GET /actuator/health/liveness` on port `8080`.
 - **Readiness:** `GET /actuator/health/readiness` on port `8080`.
 
-These are the same probes documented under [Observability](/platform/use-bytechef/self-hosted/management/observability).
+These are the probes documented under [Monitoring](/platform/use-bytechef/self-hosted/management/monitoring). The startup probe allows up to 60 minutes (180 failures at 20-second intervals) for the first start, which covers schema migrations.
 
 ## Upgrading
 

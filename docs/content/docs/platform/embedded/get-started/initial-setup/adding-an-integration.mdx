@@ -3,21 +3,23 @@ title: Adding an Integration
 description: Choose a component, register a developer app with the provider, and publish the integration your users will connect.
 ---
 
-An **Integration** is what your end users see in the [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog): a component (Gmail, Slack, Salesforce, …) plus the workflows you ship with it. This page walks through creating one and wiring up the third-party credentials it needs.
+An **Integration** is what your end users see in the [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog): a component (Gmail, Slack, Salesforce and so on) plus the workflows you ship with it. This page describes how to create an integration, register the provider's developer app, and make the integration available in an environment.
+
+Create integrations in the **Development** environment. The **Integrations** page is shown only there.
 
 ## 1. Choose a component
 
 1. In the ByteChef UI, go to **Embedded** → **Integrations** and click **New Integration**.
-2. Pick the component you want to offer (e.g. **Gmail**) and give the integration a name.
-3. ByteChef opens the workflow editor with a default workflow - add the triggers and actions that make up the integration's behavior.
+2. In the **Create Integration** dialog, select the **Component** you want to offer (for example **Gmail**). The **Name** defaults to the component title. Optionally set **Category**, **Description**, **Permission Expression** and **Tags**, then click **Save**.
+3. The new integration opens on its **Workflows** tab. Click **Create Workflow** (or **Import Workflow**), then add the triggers and actions that make up the integration's behavior in the workflow editor.
 
-{/* TODO screenshot: New Integration dialog with the component picker open and a component (e.g. Gmail) selected */}
+![The Create Integration dialog with the Component picker open on Gmail](adding-an-integration/create-integration-dialog.png)
 
 See [Integrations](/platform/embedded/build/integrations) for versioning, categories, and the rest of the authoring surface.
 
 ## 2. Create a developer app
 
-For OAuth2-based components, the third-party provider requires a registered **developer app** - that's what your end users will see on the OAuth consent screen ("*YourProduct* wants to access your Gmail"). Register one in the provider's developer console (Google Cloud Console, Slack API dashboard, …). You'll get back a **Client ID** and **Client Secret**.
+For OAuth2-based components, the third-party provider requires a registered **developer app**. Your end users see its name on the provider's consent screen ("*YourProduct* wants to access your Gmail"). Register the app in the provider's developer console (Google Cloud Console, Slack API dashboard and so on). The provider issues a **Client ID** and a **Client Secret**.
 
 When the provider asks for an **authorized redirect URL**, use your ByteChef instance's OAuth callback:
 
@@ -25,7 +27,7 @@ When the provider asks for an **authorized redirect URL**, use your ByteChef ins
 https://<your-bytechef-host>/callback
 ```
 
-(Configurable via `BYTECHEF_OAUTH2_REDIRECT_URI`; it defaults to `<public-url>/callback`.)
+The callback URL is set with `BYTECHEF_OAUTH2_REDIRECT_URI`. The default is `<BYTECHEF_PUBLIC_URL>/callback`.
 
 <Callout title="Provider-specific setup">
     Some components ship an application-setup guide with exact console steps - see for example the [Google application setup](/reference/components/google-application-setup_v1) and [Microsoft Graph application setup](/reference/components/microsoft-graph-application-setup_v1) references.
@@ -33,30 +35,41 @@ https://<your-bytechef-host>/callback
 
 ## 3. Connect your developer app to ByteChef
 
-Give ByteChef the developer app's credentials as a **predefined OAuth2 app**, keyed by component name, so the Connect dialog never asks your end users for a client id or secret:
+Your end users never enter a client id or secret. Give ByteChef the developer app's credentials in one of two ways:
 
-```
-BYTECHEF_OAUTH2_PREDEFINED_APPS_<COMPONENT_NAME>_CLIENT_ID=<client id>
-BYTECHEF_OAUTH2_PREDEFINED_APPS_<COMPONENT_NAME>_CLIENT_SECRET=<client secret>
-```
+- **Per configuration.** When you create the integration's configuration (step 5), the **OAuth2 Connection** step asks for the **OAuth2 Credentials**. Enter the client id and secret there. Each configuration can use its own developer app.
+- **Instance-wide predefined app.** Set the credentials as server environment variables, keyed by component name:
 
-Whenever a connection is created without its own client credentials, ByteChef falls back to the predefined app registered for that component. Components using API keys or other non-OAuth authorization need no developer app - the Connect dialog collects the credential from the end user directly.
+  ```
+  BYTECHEF_OAUTH2_PREDEFINED_APPS_<COMPONENT_NAME>_CLIENT_ID=<client id>
+  BYTECHEF_OAUTH2_PREDEFINED_APPS_<COMPONENT_NAME>_CLIENT_SECRET=<client secret>
+  ```
+
+  When a predefined app exists for the component, the **OAuth2 Connection** step uses it by default. Click **I want to use my own app credentials** to enter different ones for that configuration.
+
+Components that use API keys or other non-OAuth authorization need no developer app. The Connect dialog collects the credential from the end user.
 
 ## 4. Configure scopes
 
-The OAuth scopes a connection requests come from the component's connection definition. Make sure the scopes enabled on your developer app (in the provider's console) cover what the component requests - a mismatch surfaces as a provider-side consent error when your user connects.
+The OAuth scopes a connection requests come from the component's connection definition. The scopes enabled on your developer app in the provider's console must cover what the component requests. A mismatch appears as a consent error at the provider when your user connects.
 
 ## 5. Publish and deploy
 
-An integration becomes connectable once it's published and deployed to an environment:
+An integration becomes connectable once a version is published and a configuration for it is enabled in an environment:
 
-1. In the workflow editor header, click the **Publish** button, optionally add a version **Description** in the popover, and confirm - this freezes a version (`V1 PUBLISHED`).
+1. In the workflow editor header, click **Publish**, optionally enter a **Description** in the **Publish Integration** popover, and click **Publish**. This freezes the current version (V1) and opens the next version as a draft, so the header badge then shows `V2 DRAFT`.
 
-   {/* TODO screenshot: the integration editor header with the Publish control open */}
+   ![The integration editor header with the Publish Integration popover open](adding-an-integration/publish-popover.png)
 
-2. Go to **Embedded** → **Integration Configurations**, create a **New Instance Configuration** for the published version in your target environment, and toggle it **on**. In the Development environment that page is not in the sidebar: open **Integrations**, expand the integration, select its **Configurations** tab and click **Create Configuration** (**New Configuration** once the integration has configurations) instead.
+2. Create a configuration for the published version. Any of these opens the **New Configuration** dialog:
+   - In the editor header, click **Configure**.
+   - In Development, open **Integrations**, expand the integration, select its **Configurations** tab and click **Create Configuration** (**New Configuration** once the integration has configurations).
+   - In Staging or Production, go to **Embedded** → **Integration Configurations** and click **New Configuration**. That page is not shown in Development.
+3. In the **Basic** step, select the **Integration** and **Version**, and enter a **Name**. The **Environment** is the one selected in the sidebar. Complete the **OAuth2 Connection** step (OAuth2 components only) and the **Workflows** step, then save.
 
-   {/* TODO screenshot: the New Instance Configuration dialog with its integration, environment and connection fields */}
+   ![The Basic step of the New Configuration dialog, with the Integration, Name, Version, Authorization and Environment fields](adding-an-integration/new-configuration-dialog.png)
+
+4. In the configuration list, turn on the configuration's switch.
 
 See [Integration Configurations](/platform/embedded/configure/instance-configurations) for per-environment settings and internal-only workflow inputs.
 

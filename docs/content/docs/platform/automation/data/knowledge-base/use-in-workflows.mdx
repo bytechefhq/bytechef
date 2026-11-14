@@ -1,65 +1,70 @@
 ---
-title: Use it in Workflows & Agents
-description: Retrieve chunks from a workflow step or wire a knowledge base into an AI agent as its RAG layer.
+title: Use it in Workflows and Agents
+description: Retrieve chunks from a workflow step, or connect a knowledge base to an AI agent for retrieval-augmented generation.
 ---
 
-A knowledge base is only useful once something queries it. ByteChef exposes it through the
-**Knowledge Base** component, which can be used directly as a workflow action or attached to
-an [AI agent](/platform/automation/build/workflows/ai/agent) as its retrieval layer.
+Workflows and AI agents query a knowledge base through the **Knowledge Base** component. Use it as
+a workflow action or attach it to an [AI agent](/platform/automation/build/workflows/ai/agent) as a
+tool or vector store.
 
 ## Search from a workflow step
 
-Add the Knowledge Base **Search Data** action to a workflow to fetch the most relevant chunks
-for a query. The action takes:
+Add the Knowledge Base **Search Data** action to a workflow to fetch the most relevant chunks for a
+query.
 
-- **Knowledge base** - which knowledge base to query.
-- **Query** - the natural-language text to match against. Leave it empty for a filter-only search.
-- **Tags** - restrict the search to documents carrying one of the given tags.
-- **Top K** - how many chunks to return.
-- **Similarity threshold** - a floor on the relevance score (0.0–1.0); lower-scoring chunks are
-  dropped.
-- **Metadata filter** - an optional list of metadata key-value pairs applied before ranking.
-  Entries within a group are ANDed; groups are ORed.
+| Property | Type | Default | Description |
+|---|---|---|---|
+| **Knowledge Base** | Select | - | Required. The knowledge base to search. |
+| **Query** | String | - | The natural-language text to match. Leave it empty for a filter-only search. |
+| **Tags** | Array | - | Restrict the search to documents with at least one of the given tags. |
+| **Metadata Filter** | Array | - | Metadata key-value pairs applied before ranking. Entries within a group are combined with AND; groups are combined with OR. |
+| **Top K** | Integer | `10` | Maximum number of chunks to return. |
+| **Similarity Threshold** | Number | `0.0` | Minimum relevance score (0.0 to 1.0). Chunks with a lower score are dropped. |
 
-It returns an array of matching chunks, each with its content, relevance score, and
-metadata - ready to feed into a prompt, a condition, or any downstream step.
+The action returns an array of matching chunks, each with its content, relevance score, and
+metadata, for use in a prompt, a condition, or another step.
 
 ## Ground an AI agent (RAG)
 
-Attach a knowledge base to an [AI agent](/platform/automation/build/workflows/ai/agent) so the agent can retrieve
-context on its own:
+Attach the Knowledge Base component to an [AI agent](/platform/automation/build/workflows/ai/agent)
+so the agent retrieves context from your documents:
 
-- **As the agent's vector store** - the agent searches the knowledge base automatically
-  when answering, grounding its responses in your documents.
-- **As a tool** - the agent decides when to call the knowledge base, issuing a search only
-  when it needs supporting facts.
+| Cluster element | Description |
+|---|---|
+| **Knowledge Base VectorStore** | The agent searches the knowledge base automatically when it answers. Optionally restrict it with **Tags**. |
+| **Knowledge Base Search** (tool) | The agent decides when to search the knowledge base. |
+| **Load Knowledge Base Documents** (tool) | The agent can add text content to the knowledge base. |
+| **Update Knowledge Base Documents** (tool) | The agent can update documents or chunks in the knowledge base. |
 
-Either way the pattern is the same:
+In both retrieval modes, the flow is:
 
 ```
 User question → embed → nearest chunks from the knowledge base → chunks added to the prompt → model answers
 ```
 
-This is what keeps an agent's answers grounded in your content instead of the model's
-training data alone.
-
 ## Filtering by tag
 
-When a single knowledge base holds distinct kinds of content, pass a **tag filter** so a
-given workflow or agent only retrieves from the documents you intend. Tag matching is
-inclusive - any document carrying one of the requested tags is eligible - so an agent
-scoped to `policy` never surfaces a chunk from an untagged product spec in the same
-knowledge base.
+When one knowledge base holds distinct kinds of content, set **Tags** so a workflow or agent
+retrieves only the intended documents. A document matches when it has at least one of the
+requested tags. For example, an agent restricted to `policy` never retrieves a chunk from an
+untagged product specification in the same knowledge base.
 
-<Callout title="Keep ingestion and retrieval aligned">
-  Retrieval quality starts at ingestion. If an agent gives vague answers, check the
+<Callout title="Retrieval quality depends on ingestion">
+  If an agent gives vague answers, check the
   [chunk settings](/platform/automation/data/knowledge-base/create-a-knowledge-base#choosing-chunk-settings)
-  and confirm the documents you expect are **Ready** before blaming the prompt.
+  and confirm that the expected documents are **Ready**.
 </Callout>
 
-## Feeding a knowledge base from a workflow
+## Write to a knowledge base from a workflow
 
-The Knowledge Base component also has a **write** side used by
-[sources](/platform/automation/data/knowledge-base/sources): a workflow can upsert records into a
-knowledge base as documents, which are then chunked and embedded like any uploaded file.
-This is how external systems keep a knowledge base current without manual uploads.
+The Knowledge Base component also has actions that change a knowledge base:
+
+| Action | Description |
+|---|---|
+| **Load Data** | Loads data into the knowledge base as documents, using the document reader configured on the step. Optionally adds **Additional Metadata**. The documents are chunked and embedded like uploaded files. |
+| **Update Documents** | Updates the content of a **Document** or a **Document Chunk**, or of multiple documents matched by **Metadata Filter** when **Update Multiple** is on. |
+| **Delete Documents** | Deletes documents that match a metadata filter. |
+
+<Callout type="warn" title="Coming soon">
+  Scheduled [sources](/platform/automation/data/knowledge-base/sources) that keep a knowledge base in sync with an external system are not available in the latest released version of ByteChef.
+</Callout>

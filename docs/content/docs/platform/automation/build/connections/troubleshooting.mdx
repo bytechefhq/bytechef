@@ -1,42 +1,57 @@
 ---
 title: "Troubleshooting"
-description: "Common issues and solutions when setting up or using connections in ByteChef."
+description: "Common connection errors and how to fix them."
 ---
 
 ## OAuth 2.0 Issues
 
 ### *Redirect URI Mismatch*
-This error usually occurs when the Redirect URI configured in the third-party application (e.g., Google Cloud Console, GitHub Developer Settings) doesn't match the one ByteChef is using.
-- **Solution**: When you configure an OAuth 2.0 connection with your own app credentials, the connection dialog shows a read-only **Redirect URI** field with a copy button. Copy that exact value and register it as the authorized redirect (callback) URI in your service provider's settings. It typically ends in `/callback` (for example `http://127.0.0.1:5173/callback` when running locally). If you are using a ByteChef predefined app instead, no redirect URI configuration is required.
+The redirect URI registered in the third-party application (for example, Google Cloud Console or GitHub Developer Settings) does not match the one ByteChef sends.
+- **Solution**: When you use your own app credentials, the connection dialog shows a read-only **Redirect URI** field with a copy button. Copy that exact value and register it as the authorized redirect (callback) URI in the provider's settings. It ends in `/callback` (for example, `http://127.0.0.1:5173/callback` when running locally). A [predefined app](/platform/automation/build/connections/authentication/oauth2#predefined-apps) needs no redirect URI configuration.
 
 ### *Access Denied* or *Invalid Permissions*
-This happens when the user doesn't have sufficient permissions to authorize ByteChef or when the requested scopes are not allowed by the service provider.
-- **Solution**: Check that your account has the necessary administrative rights and that the required scopes are enabled in the service provider's application settings.
+Your account cannot authorize ByteChef, or the service provider does not allow the requested scopes.
+- **Solution**: Check that your account has the required administrative rights and that the required scopes are enabled in the provider's application settings.
 
 ## API Key, Bearer and Basic Auth Issues
 
 ### *Unauthorized* or 401 Errors
-This usually means the API key, token, username, or password is incorrect.
-- **Solution**: Double-check your credentials and ensure they are active. Some API keys or tokens might have expiration dates or restricted permissions.
+The API key, token, username, or password is incorrect, expired, or revoked. The connection's credential status badge may show **INVALID**.
+- **Solution**: Check that the credentials are correct and active. To replace them, open the connection's ellipsis menu, click **Edit**, and click [**Update credentials**](/platform/automation/build/connections#update-credentials).
+
+To find out whether the problem is the credential or the connection setup, call the service's API directly with the same credential. Use an endpoint from the service's API documentation, and put the credential where that documentation says:
+
+```bash
+# Bearer token
+curl -i -H "Authorization: Bearer <your_token>" "https://api.example.com/v1/me"
+
+# API key in a header (the header name depends on the service)
+curl -i -H "X-API-Key: <your_api_key>" "https://api.example.com/v1/me"
+
+# Basic Auth (curl builds the Base64 header from the username and password)
+curl -i -u "<username>:<password>" "https://api.example.com/v1/me"
+```
+
+If the service also answers `401` here, the credential itself is wrong or revoked. If it answers `200`, check that you entered the credential in the right field of the connection, and that the connection belongs to the environment the workflow runs in.
 
 ### *Forbidden* or 403 Errors
-The credentials are correct, but the account doesn't have permission to perform the requested action.
-- **Solution**: Verify that your API key, token, or account has the necessary permissions (scopes) for the specific operation you're trying to perform in your workflow.
+The credentials are valid, but the account is not allowed to perform the requested action.
+- **Solution**: Check that the API key, token, or account has the permissions (scopes) the workflow step needs.
 
 ## General Connection Issues
 
 ### Connection Timeouts
-ByteChef may time out if the third-party service is slow to respond.
-- **Solution**: Check the service provider's status page to see if they are experiencing any downtime.
+The request times out when the third-party service responds slowly.
+- **Solution**: Check the service provider's status page for outages.
 
 ### Can't Delete a Connection
-The **Delete** action is disabled while a connection is still in use.
-- **Solution**: A connection that is currently **Active** must be detached from every workflow first. Open the connection's ellipsis menu, choose **Disconnect from all**, then delete it.
+The **Delete** action is disabled while the connection is **Active** (used by at least one workflow).
+- **Solution**: Open the connection's ellipsis menu, click **Disconnect from all**, and then click **Delete**.
 
 ### Wrong Environment
-Connections are scoped per environment, so a connection created in *development* will not appear when a project is deployed to *production*.
-- **Solution**: Use the environment selector in the left sidebar header to confirm you are viewing (and creating) connections in the correct environment.
+Connections are scoped per environment. A connection created in *development* is not available when a project is deployed to *production*.
+- **Solution**: Use the environment selector in the left sidebar header to view and create connections in the correct environment.
 
 ---
 
-Still having trouble? Reach out to our support team or join our community Discord.
+If the problem persists, contact ByteChef support or ask in the community Discord.

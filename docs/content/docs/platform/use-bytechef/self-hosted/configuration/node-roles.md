@@ -159,6 +159,8 @@ Like `docker-compose.yml`, the file uses fixed credentials (PostgreSQL `postgres
 | `BYTECHEF_SESSION_STORE` | `REDIS` | `REDIS`, `JDBC` (both `EE` only; a CE node keeps memory sessions) |
 | `BYTECHEF_TENANT_MODE` | `SINGLE` | `SINGLE`, `MULTI` (`EE` only) |
 | `BYTECHEF_IMAGE` | `docker.bytechef.io/bytechef/bytechef:latest` | a locally built image |
+| `BYTECHEF_PUBLIC_URL` | `http://localhost:8080` | the address users and external services reach |
+| `BYTECHEF_FEATURE_FLAGS` | empty | comma-separated feature flags |
 | `BYTECHEF_PORT` | `8080` | published port of the load balancer |
 | `RABBITMQ_MANAGEMENT_PORT` | `15672` | port of the RabbitMQ management UI on `127.0.0.1` (user `bytechef`, password `bytechef`) |
 

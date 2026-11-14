@@ -1,9 +1,9 @@
 ---
 title: Configuration
-description: Learn how to configure your ByteChef instance
+description: How a self-hosted ByteChef server reads its configuration, and the settings a production instance needs.
 ---
 
-ByteChef is configured entirely through **externalized configuration** - there is no settings screen inside the application for instance-wide options. Everything from the database connection to the AI provider keys is supplied before the process starts, so the same container image behaves differently per environment based on the values you pass in.
+A self-hosted ByteChef server reads its instance-wide options from **externalized configuration**: environment variables or Spring property files supplied before the process starts. Everything from the database connection to the AI provider keys is set this way, so the same container image behaves differently per environment based on the values you pass in. This page explains how configuration is supplied, which settings a production instance needs, and how stored credentials are encrypted.
 
 ## How configuration is supplied
 
@@ -38,8 +38,8 @@ Beyond the defaults, a single-node deployment needs only a handful of settings:
 | Setting | Why it matters |
 |---|---|
 | `BYTECHEF_DATASOURCE_URL`, `BYTECHEF_DATASOURCE_USERNAME`, `BYTECHEF_DATASOURCE_PASSWORD` | Point ByteChef at your PostgreSQL 15+ database. Schema migrations run automatically on startup. |
-| `BYTECHEF_SECURITY_REMEMBER_ME_KEY` | A fixed secret used to sign "remember me" tokens. Set it to a stable random value so existing sessions survive restarts. |
-| `BYTECHEF_PUBLIC_URL` | The externally reachable base URL of the instance (default `http://127.0.0.1:8080`). It is the base for webhook URLs, the OAuth2 redirect URI, and links in outgoing mail. |
+| `BYTECHEF_SECURITY_REMEMBER_ME_KEY` | The secret that signs "remember me" tokens. When unset, the server generates one on first start and stores it in `~/.bytechef/remember-me-key`, so it survives restarts only while that directory persists. Set a fixed value when the home directory is not persistent or when more than one instance runs. |
+| `BYTECHEF_PUBLIC_URL` | The externally reachable base URL of the instance (the published image defaults to `http://127.0.0.1:8080`). It is the base for webhook URLs, the OAuth2 redirect URI, and links in outgoing mail. |
 | `BYTECHEF_ENCRYPTION_PROVIDER` / `BYTECHEF_ENCRYPTION_PROPERTY_KEY` | Controls how stored credentials are encrypted at rest - see below. |
 
 ## Encryption of stored credentials
@@ -105,8 +105,13 @@ no workflow change and no redeploy.
 
 ## Data retention
 
-ByteChef does not delete your data unless you tell it to, and there is no consolidated retention
-settings screen today. Execution history is kept until you delete it.
+Workflow execution history is kept until you delete it; there is no retention setting for it. Two
+Enterprise Edition logs have their own retention:
+
+| Variable | Default | What it purges |
+|---|---|---|
+| `BYTECHEF_AUDIT_RETENTION_DAYS` | `365` | Audit events older than this many days. |
+| `BYTECHEF_EXTERNAL_INVOCATION_LOG_RETENTION_DAYS` | `90` | External invocation records older than this many days. |
 
 ## More configuration topics
 
@@ -143,7 +148,8 @@ To scale horizontally, run several ByteChef instances against the same database.
 | **Encryption key** | Use `BYTECHEF_ENCRYPTION_PROVIDER=PROPERTY` with the same `BYTECHEF_ENCRYPTION_PROPERTY_KEY` on every instance, so all replicas can decrypt the same stored credentials. |
 | **Schema migrations** | Run Liquibase once in a one-shot container (`liquibase` command, `BYTECHEF_UPGRADE_ENABLED=true`) and set `BYTECHEF_UPGRADE_ENABLED=false` on every node. |
 | **Message broker** | Move off the default in-memory broker to a shared one (`BYTECHEF_MESSAGE_BROKER_PROVIDER` = `REDIS`, `KAFKA`, `AMQP`, …) so tasks dispatched on one node can be executed on another. |
-| **Cache** | Caches stay per node on Caffeine; in EE evictions reach every node over the message broker. |
+| **Cache** | Caches stay in each node's memory (Caffeine). In EE, evictions reach every node over the message broker, and `BYTECHEF_CACHE_PROVIDER=REDIS` keeps the few shared state caches in Redis; set it when more than one coordinator runs. |
+| **File storage** | Use storage every node can read: a shared volume (NFS, EFS), the `AWS` provider (EE) or the `JDBC` provider. See [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage). |
 | **Sessions** | In EE, set `BYTECHEF_SESSION_STORE` to `REDIS` or `JDBC` so any coordinator serves any request without sticky sessions. |
 | **Scheduler** | Set `BYTECHEF_SCHEDULER_QUARTZ_CLUSTERED=true` when more than one coordinator runs (EE). |
 | **Remember-me key** | Set a single fixed `BYTECHEF_SECURITY_REMEMBER_ME_KEY` across all instances so sessions remain valid regardless of which node serves a request. |
@@ -163,9 +169,8 @@ switch, and both default to on:
 | `BYTECHEF_WEBHOOK_ENABLED` | `true` | The node stops serving the public webhook endpoints (`/webhooks`, `/callback`, `/approvals`, `/job/resume`, `/file-entries/{id}/content`). |
 
 > **Disabling the coordinator also disables the API.** The switch does not gate job coordination
-> alone - it gates the application surface. Of the 224 classes behind it, 211 are controllers: 87
-> REST API controllers and 104 GraphQL controllers, including account, workflow, connection and
-> project endpoints. A node with `BYTECHEF_COORDINATOR_ENABLED=false` executes tasks and answers
+> alone: it also gates the REST and GraphQL controllers, including the account, workflow, connection
+> and project endpoints. A node with `BYTECHEF_COORDINATOR_ENABLED=false` executes tasks and answers
 > nothing else.
 
 That gives you one useful topology: **one node with both halves on**, serving the API and UI and

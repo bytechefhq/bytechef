@@ -11,7 +11,7 @@ import {Blocks, Cloud, LayoutTemplate, Server, Terminal, Workflow} from "lucide-
 
 ByteChef is an open-source platform for building and running workflow automations and AI agents across the applications, APIs, and databases you already use.
 
-The core is licensed under Apache 2.0 and runs anywhere Docker runs, or as a managed service on ByteChef Cloud. You build workflows in a visual editor, from a library of more than 270 connectors and flow controls, and add code steps in JavaScript, Python or Java where a connector is not enough. AI agents are first-class workflow steps: give an agent a model, tools drawn from the same connectors, memory and guardrails, and let it act inside a workflow that you can pause for a human approval and resume. The same engine can be embedded in your own product, so your customers connect their accounts and run integrations without leaving your app.
+The core is licensed under Apache 2.0 and runs anywhere Docker runs, or as a managed service on ByteChef Cloud. You build workflows in a visual editor, from a library of more than 270 connectors and flow controls, and add code steps in JavaScript, Python or Java where a connector is not enough. AI agents are workflow steps: an agent gets a model, tools drawn from the same connectors, memory and guardrails, and runs inside a workflow that can pause for a human approval and resume. The same engine can be embedded in your own product, so your customers connect their accounts and run integrations without leaving your app.
 
 These docs are organized by what you want to do. **Platform** explains how to use ByteChef, from your first workflow to enterprise settings. The [Reference](/reference) documents every component, its actions and triggers, and the [expression syntax](/reference/expressions) used to pass data between steps. The [Developer Guide](/developer-guide) covers running ByteChef from source and building your own connectors, and the [API reference](/openapi) describes the public REST APIs for automation, embedded integrations and custom components. Agents can read any page as markdown by requesting it with `Accept: text/markdown`, and start from [llms.txt](/llms.txt).
 
@@ -19,11 +19,11 @@ These docs are organized by what you want to do. **Platform** explains how to us
 
 <Cards>
   <Card icon={<Cloud className="text-blue-300" />} title='Cloud' href="/platform/use-bytechef/cloud">
-    Run ByteChef on our managed, hosted deployment - no infrastructure to manage.
+    Run ByteChef on the managed, hosted deployment, with no infrastructure to operate.
   </Card>
 
   <Card icon={<Server className="text-purple-300" />} title='Self-Hosted' href="/platform/use-bytechef/self-hosted">
-    Deploy and operate ByteChef on your own infrastructure - Docker, Kubernetes, AWS, Azure, Google Cloud, or DigitalOcean.
+    Deploy and operate ByteChef on your own infrastructure: Docker, Kubernetes, AWS, Azure, Google Cloud or DigitalOcean.
   </Card>
 </Cards>
 
@@ -31,11 +31,11 @@ These docs are organized by what you want to do. **Platform** explains how to us
 
 <Cards>
   <Card icon={<Workflow className="text-purple-300" />} title='Automation' href="/platform/automation/get-started">
-    Easily build and run smart workflows that connect your apps, automate routine tasks, and include AI-driven decisions-no heavy coding needed.
+    Build and run workflows that connect your apps, automate routine tasks and include AI steps, in a visual editor.
   </Card>
 
   <Card icon={<LayoutTemplate className="text-blue-300" />} title='Embedded' href="/platform/embedded/get-started">
-    Bring the power of ByteChef directly into your product-embed the workflow builder, run automations behind the scenes, and let your users create workflows inside your app.
+    Embed ByteChef in your product: embed the workflow builder, run integrations for your users and let them create workflows inside your app.
   </Card>
 </Cards>
 
@@ -43,7 +43,7 @@ These docs are organized by what you want to do. **Platform** explains how to us
 
 <Cards>
   <Card icon={<Blocks />} title='Developer Guide' href='/developer-guide'>
-    Build a component by hand or generate one from an OpenAPI specification, and learn the DSL for actions, triggers, connections, and properties.
+    Build a component by hand or generate one from an OpenAPI specification. Covers the DSL for actions, triggers, connections and properties.
   </Card>
 
   <Card icon={<Terminal />} title='Reference' href='/reference'>
@@ -53,16 +53,16 @@ These docs are organized by what you want to do. **Platform** explains how to us
 
 ## Community support
 
-For help, you can use one of these channels to ask a question:
+Ask a question through one of these channels:
 
-- [Discord](https://discord.gg/VKvNxHjpYx) - Discussions with the community and the team.
-- [GitHub](https://github.com/bytechefhq/bytechef/issues) - For bug reports and feature requests.
-- [X/Twitter](https://twitter.com/bytechefhq) - Get the product updates easily.
+- [Discord](https://discord.gg/VKvNxHjpYx) - discussion with the community and the team.
+- [GitHub](https://github.com/bytechefhq/bytechef/issues) - bug reports and feature requests.
+- [X/Twitter](https://twitter.com/bytechefhq) - product updates.
 
 ## Roadmap
 
-Check out our [roadmap](https://github.com/bytechefhq/bytechef/milestones) to get informed of the latest features released and the upcoming ones.
+The [roadmap](https://github.com/bytechefhq/bytechef/milestones) lists released and upcoming features.
 
 ### Contributing
 
-If you'd like to contribute, kindly read our [Contributing Guide](https://github.com/bytechefhq/bytechef/blob/master/CONTRIBUTING.md) to learn and understand about our development process, how to propose bug fixes and improvements, and how to build and test your changes to ByteChef.
+The [Contributing Guide](https://github.com/bytechefhq/bytechef/blob/master/CONTRIBUTING.md) describes the development process, how to propose bug fixes and improvements, and how to build and test your changes.

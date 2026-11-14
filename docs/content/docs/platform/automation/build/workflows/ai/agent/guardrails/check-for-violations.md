@@ -1,79 +1,113 @@
 ---
-title: Check For Violations
-description: The blocking parent action that runs configured guardrails and short-circuits the request when any child flags a violation
+title: Check for Violations
+description: The guardrail parent that blocks an AI Agent request or response when any attached check fires.
 ---
 
-`Check For Violations` is the **blocking** parent of the guardrails system. It runs every configured child guardrail against the input. If any child returns a violation, the request is short-circuited and a blocked response is emitted carrying the violation details on the response metadata. The LLM is never called.
+**Check for Violations** is the blocking guardrail parent. It runs every attached detector on the user input before the model is called and on the model response before it is returned. If any detector fires on the input, the agent returns the **Blocked Message** and the model is not called. If any detector fires on the response, the response is replaced with the **Blocked Message**.
 
-Use **Check For Violations** for adversarial signals where blocking is the right default - jailbreak attempts, NSFW content, off-topic inputs, secret leaks, PII exposure.
+Use it for signals where refusing is the right outcome: jailbreak attempts, unsafe content, off-topic requests, and secrets or personal data that must never be sent or returned.
 
----
+## Add Check for Violations
+
+1. In the AI Agent's advanced editor, add **Check for Violations** to the agent's **Guardrails** slot. An agent accepts only one.
+2. Add detectors to the parent's **Check for Violations** slot. See [Detectors](#detectors).
+3. If any detector is LLM-based, add a chat model to the parent's **Model** slot. This model is separate from the agent's own model.
+4. Optionally change the **Blocked Message**.
 
 ## Properties
 
-| Property | Description |
+| Property | Type | Default | Description |
+|---|---|---|---|
+| **Customize System Message** | Boolean | `false` | Replace the system message sent to the LLM-based detectors. |
+| **System Message** | String | Built-in classifier rubric | The system message for Jailbreak, NSFW, Topical Alignment, and Custom. Shown only when **Customize System Message** is `true`. |
+| **Blocked Message** | String | `I cannot process this request due to content policy.` | The text the agent returns instead of the response when a check fires or fails. |
+
+The built-in system message tells the model to return exactly two fields, `confidenceScore` and `flagged`, and defines an 11-step confidence scale from `0.0` (certain not violative) to `1.0` (certain violative). If you replace it, keep both field names: a response without them is an execution failure. LLM PII does not use this system message.
+
+## Cluster element slots
+
+| Slot | Required | Accepts |
+|---|---|---|
+| **Model** | Only when an LLM-based detector is attached | One chat model. The editor marks the slot as required. |
+| **Check for Violations** | No | Any number of detectors. |
+
+## Detectors
+
+| Detector | Stage | Needs Model |
+|---|---|:---:|
+| [PII](/platform/automation/build/workflows/ai/agent/guardrails/pii) | Preflight | No |
+| [Secret Keys](/platform/automation/build/workflows/ai/agent/guardrails/secret-keys) | Preflight | No |
+| [URLs](/platform/automation/build/workflows/ai/agent/guardrails/urls) | Preflight | No |
+| [Custom Regex](/platform/automation/build/workflows/ai/agent/guardrails/custom-regex) | Preflight | No |
+| [Keywords](/platform/automation/build/workflows/ai/agent/guardrails/keywords) | Preflight | No |
+| [Jailbreak](/platform/automation/build/workflows/ai/agent/guardrails/jailbreak) | LLM | Yes |
+| [NSFW](/platform/automation/build/workflows/ai/agent/guardrails/nsfw) | LLM | Yes |
+| [Topical Alignment](/platform/automation/build/workflows/ai/agent/guardrails/topical-alignment) | LLM | Yes |
+| [Custom](/platform/automation/build/workflows/ai/agent/guardrails/custom) | LLM | Yes |
+| [LLM PII](/platform/automation/build/workflows/ai/agent/guardrails/llm-pii) | LLM | Yes |
+| Jev Input Guardrail, Jev Output Guardrail ([TypeSafe AI](/reference/components/typesafe_v1)) | LLM | No, uses its own connection |
+
+If an LLM-based detector is attached and the **Model** slot is empty, the agent run fails when it builds the guardrail.
+
+## How checks run
+
+On each side (input and output), the parent runs the detectors whose **Validate Input** or **Validate Output** setting is on:
+
+1. **Preflight stage.** Rule-based detectors run against the raw text. PII, Secret Keys, URLs, and Custom Regex also report their matches as mask entities. Keywords does not mask, so its keyword list always matches the text the user typed.
+2. **Mask pass.** The mask entities from all preflight detectors are merged and replaced with `<TYPE>` placeholders in one longest-match-first pass. This masked text is used only for the LLM stage; it is not forwarded to the agent's model.
+3. **LLM stage.** LLM-based detectors classify the masked text, so personal data and secrets matched in the preflight stage are not sent to the guardrail model.
+
+Every detector runs even after another one has fired, so the result lists all violations at once. Input checks also cover a human's answer returned to a tool (for example, from an approval or a question to the user).
+
+When the agent has a chat memory, input checks in the LLM stage (except LLM PII) also receive the earlier turns of the conversation.
+
+## When a check fires or fails
+
+The agent returns the **Blocked Message** as its response, and the step output includes a `guardrail.violations` list. Each entry has:
+
+| Field | Description |
 |---|---|
-| **Blocked Message** | The text returned to the user when a violation blocks the request. Defaults to "I cannot process this request due to content policy." |
-| **Customize System Message** | If on, lets you override the system message used by LLM-stage child guardrails. Most operators don't need this - it's an escape hatch for highly customised setups |
-| **System Message** | The custom system message (visible only when **Customize System Message** is on) |
+| `guardrail` | The detector that fired, for example `piiCheck`, `jailbreak`, or the name of a Custom classifier. |
+| `matchCount` | Number of matched values for rule-based detectors and LLM PII. `0` for classifier verdicts. |
+| `executionFailed` | `true` when the detector could not run. |
+| `info` | Detector details, such as `entityTypes`, `providerTypes`, or `patternNames`. Matched text is never included. |
+| `confidenceScore` | The classifier score, for classifier violations. |
+| `failureKind` | The failure type, for execution failures. |
 
-The body of the action runs through the configured cluster element children - that's where the actual checking happens.
-
----
-
-## Cluster Elements
-
-`Check For Violations` accepts the following children:
-
-- **Model** (required if any LLM-stage child is attached) - a single shared `ChatClient` that every LLM-based child uses for classification. A small fast model (gpt-4o-mini, claude-3-5-haiku, gemini-1.5-flash) is sufficient.
-- **Check For Violations children** - one or more guardrail checks. The full catalogue:
-  - **Preflight (rule-based)**: PII, Secret Keys, URLs, Custom Regex, Keywords
-  - **LLM stage**: Jailbreak, NSFW, Topical Alignment, Custom, LLM PII
-
-If you don't attach a **Model** child, only rule-based checks (PII, Secret Keys, URLs, Custom Regex, Keywords) work. Attaching an LLM-stage child without a Model child is a configuration error and forces fail-closed.
-
----
-
-## How It Aggregates
-
-Every child runs, even after a sibling flags a violation. The advisor does not short-circuit on the first hit. The returned violations capture matches, classifier scores, and any execution failures side by side, so the operator can see all findings at once.
-
-When a check cannot run (LLM outage, missing Model, bad configuration), an execution-failure violation is emitted alongside the rest and the request is blocked. Every guardrail is fail-closed; the platform does not offer a "fail open" mode. The failure shows up in the blocked response's `guardrail.violations` metadata with `executionFailed=true` and a `failureKind` tag so operators can distinguish configuration bugs from upstream outages from policy hits.
-
----
-
-## Preflight Stage
-
-Rule-based guardrails (PII, Secret Keys, URLs, Custom Regex, Keywords) run in the preflight stage. The masking variants (PII, Secret Keys, URLs, Custom Regex) record a violation **and** add their detected spans to a shared entity map; the merged map is applied as a single longest-first pass after every preflight check has run, so the masking siblings never blind each other or downstream checks.
-
-Keywords participates in this same PREFLIGHT pass but does not mask - it only emits violations. Running Keywords at PREFLIGHT (against the raw input) is deliberate: if it ran after the masking pass, a deny-list keyword that overlapped with PII / secret / URL substrings would already have been replaced with a placeholder and never fire. Running it at PREFLIGHT against raw text guarantees deny-list entries match the characters the operator actually wrote.
-
-LLM-based guardrails (Jailbreak, NSFW, Topical Alignment, Custom, LLM PII) then run against the **masked** text from the preflight pass. This prevents PII from being sent to the classifier model while still giving it enough context to judge prompt-injection, safety, and on-topic-ness signals.
-
----
+A detector that cannot run (guardrail model error, invalid configuration) produces a violation with `executionFailed: true`, so the request is blocked. See [Guardrails, monitoring guardrail results](/platform/automation/build/workflows/ai/agent/guardrails#monitoring-guardrail-results) for the full output shape.
 
 ## Example
 
-A typical inbound chain - block adversarial inputs, secret leaks, PII:
+An AI Agent task with a **Check for Violations** parent that blocks PII, secrets, and jailbreak attempts:
 
 ```json
 {
-  "type": "checkForViolations/v1/checkForViolations",
-  "parameters": {
-    "blockedMessage": "I cannot process this request due to content policy."
-  },
-  "extensions": {
-    "clusterElements": {
-      "model": {
-        "type": "openAi/v1/model",
-        "parameters": { "model": "gpt-4o-mini" }
-      },
-      "checkForViolations": [
-        { "type": "pii/v1/piiCheck",        "parameters": { "type": "ALL" } },
-        { "type": "secretKeys/v1/secretKeysCheck", "parameters": { "permissiveness": "BALANCED" } },
-        { "type": "jailbreak/v1/jailbreak",       "parameters": { "threshold": 0.7 } }
-      ]
-    }
+  "name": "aiAgent_1",
+  "type": "aiAgent/v1/chat",
+  "parameters": { "userPrompt": "${trigger_1.message}" },
+  "clusterElements": {
+    "model": { "name": "openAi_1", "type": "openAi/v1/model", "parameters": { "model": "gpt-4o" } },
+    "guardrails": [
+      {
+        "name": "checkForViolations_1",
+        "type": "checkForViolations/v1/checkForViolations",
+        "parameters": { "blockedMessage": "I can't help with that request." },
+        "clusterElements": {
+          "model": { "name": "openAi_2", "type": "openAi/v1/model", "parameters": { "model": "gpt-4o-mini" } },
+          "checkForViolations": [
+            { "name": "pii_1", "type": "pii/v1/piiCheck", "parameters": { "type": "ALL" } },
+            { "name": "secretKeys_1", "type": "secretKeys/v1/secretKeysCheck", "parameters": { "permissiveness": "BALANCED" } },
+            { "name": "jailbreak_1", "type": "jailbreak/v1/jailbreak", "parameters": { "validateOutput": false, "threshold": 0.7 } }
+          ]
+        }
+      }
+    ]
   }
 }
 ```
+
+## Related
+
+- [Sanitize Text](/platform/automation/build/workflows/ai/agent/guardrails/sanitize-text)
+- [Guardrails overview](/platform/automation/build/workflows/ai/agent/guardrails)
+- [checkForViolations/v1 reference](/reference/components/checkForViolations_v1)

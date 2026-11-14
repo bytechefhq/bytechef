@@ -1,11 +1,11 @@
 ---
 title: "Component Kit"
-description: One API that exposes a connected user's integrations twice - as actions your code calls, and as tools a language model calls.
+description: An API that exposes a connected user's integrations as actions your code calls and as tools a language model calls.
 ---
 
-**AI ComponentKit** is one API for AI-native products: it exposes what a [connected user](/platform/embedded/monitor/connected-users) has connected as operations you can execute under that user's own credentials. One API covers every integration, so your product acts through the user's ByteChef connections without you writing per-integration glue.
+**AI ComponentKit** is an API that exposes what a [connected user](/platform/embedded/monitor/connected-users) has connected as operations you run under that user's own credentials. One API covers every integration, so your backend acts through the user's ByteChef connections without per-integration code. Developers use it to call third-party operations from their own code or to give a language model tools.
 
-It exposes them twice, for two different callers - **actions** for your code, **tools** for a model - and the difference is worth getting straight before you pick an endpoint.
+It exposes the same operations to two callers: **actions** for your code and **tools** for a model.
 
 ## Actions and tools
 
@@ -13,25 +13,25 @@ An **action** is the unit ByteChef executes: one operation on one component, suc
 
 A **tool** is an action projected for a language model. A component publishes selected actions as tools; the platform gives each one a flat name, a description, and a JSON Schema, hands that catalogue to your model, and the model chooses.
 
-The execution underneath is the same, and so is the connection. The caller is not, so the two surfaces differ in more than their URL:
+The execution and the connection are the same for both. The two surfaces differ as follows:
 
 |  | Action | Tool |
 |---|---|---|
 | **Who chooses it** | Your code, before the call | The model, at inference time |
 | **Endpoint** | `POST /{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}` | `POST /{externalUserId}/tools` |
-| **Address** | Component, version, and action name, in the path | One flat name in the body - `SLACK_SEND_CHANNEL_MESSAGE` |
+| **Address** | Component, version and action name, in the path | One flat name in the body, for example `SLACK_SEND_CHANNEL_MESSAGE` |
 | **Coverage** | Every action the component defines | Only the actions the component publishes as tools |
 | **Versioning** | Pinned in the path | Resolved server-side, always the component's current version |
-| **Discovery** | None - your code already knows what it is calling | `GET /{externalUserId}/tools`, scoped to that user |
+| **Discovery** | None. Your code already knows what it calls. | `GET /{externalUserId}/tools`, scoped to that user |
 | **Request body** | `{ "input": { ... } }` | `{ "name": ..., "parameters": { ... } }` |
 | **Response** | `{ "result": ... }` | The result, unwrapped |
 | **File input** | Binary and form-data uploads supported | Not supported |
 
-The rule of thumb: **if a model is choosing, use tools; if your code has already decided, call the action.**
+Use tools when a model chooses the operation. Call the action when your code has already decided.
 
-Both live under `/api/embedded/v1`, authenticate with an embedded **[API key](/platform/embedded/administration/api-keys)** (`Authorization: Bearer`), and take an `X-Environment` header selecting `DEVELOPMENT`, `STAGING`, or `PRODUCTION`. Neither ever sees the user's credential: it is resolved server-side from the connected user, and if that user has more than one instance of the same integration, the optional `X-Instance-Id` header picks which.
+Both live under `/api/embedded/v1` and authenticate with an embedded [API key](/platform/embedded/administration/api-keys) (`Authorization: Bearer`). The optional `X-Environment` header selects `DEVELOPMENT`, `STAGING` or `PRODUCTION` and defaults to `PRODUCTION`. Your code never sees the user's credential: ByteChef resolves it from the connected user. If that user has more than one instance of the same integration, the optional `X-Instance-Id` header selects one.
 
-The same tool catalogue is also reachable over **MCP**: an [MCP Server](/platform/embedded/configure/mcp-servers) wraps the same actions - and, unlike ComponentKit, whole workflows - for agents that speak that protocol. ComponentKit is the plain-HTTP path, MCP is the protocol path; pick whichever your agent already talks.
+The same tool catalogue is also reachable over **MCP**. An [MCP Server](/platform/embedded/configure/mcp-servers) exposes the same actions, and also whole workflows, to agents that speak that protocol. ComponentKit is the plain-HTTP path; MCP is the protocol path.
 
 ## Listing a user's tools
 
@@ -52,17 +52,17 @@ The same tool catalogue is also reachable over **MCP**: an [MCP Server](/platfor
 }
 ```
 
-Two things about that shape are worth knowing before you wire it up:
+Note two details of that shape:
 
 - **`parameters` is a JSON Schema carried as a string**, not a nested object. Parse it before handing it to your model client.
-- **A tool name is an address, not a label.** It is the component name uppercased, then the action name in `SCREAMING_SNAKE_CASE` - `sendChannelMessage` on `slack` becomes `SLACK_SEND_CHANNEL_MESSAGE`. Executing a tool splits that name back apart to find the component and the action, which is why the call carries no component field and no version.
+- **A tool name is an address, not a label.** It is the component name uppercased, then the action name in `SCREAMING_SNAKE_CASE`: `sendChannelMessage` on `slack` becomes `SLACK_SEND_CHANNEL_MESSAGE`. Executing a tool splits that name back apart to find the component and the action, which is why the call carries no component field and no version.
 
-Narrow the catalogue with the `categories`, `components`, and `tools` query parameters. Useful when a user has connected far more than a given conversation should be allowed to reach.
+Narrow the catalogue with the `categories`, `components` and `tools` query parameters, for example when a conversation should reach only some of the user's integrations.
 
 ### What ends up in the catalogue
 
 - **Only actions published as tools.** A component opts its actions in one at a time; an action it does not opt in never appears in `GET /tools`, though your own code can still call it as an action.
-- **Only integrations that user has connected.** The catalogue is derived from that user's own integration instances, so it differs per user and grows the moment they connect something new - with no redeploy on your side.
+- **Only integrations that user has connected.** The catalogue is derived from that user's own integration instances, so it differs per user and grows as soon as they connect something new, with no redeploy on your side.
 - **Actions, not workflows.** To let an agent run a whole workflow, expose it through an [MCP server](/platform/embedded/configure/mcp-servers) or trigger it with an [App Event](/platform/embedded/build/app-events).
 
 ## Running a tool

@@ -1,6 +1,6 @@
 ---
 title: DigitalOcean
-description: Learn how to deploy ByteChef on DigitalOcean's cloud platform
+description: Run the ByteChef container on DigitalOcean App Platform or a Droplet with a DigitalOcean Managed PostgreSQL database.
 ---
 
 ByteChef runs on DigitalOcean as the container image `docker.bytechef.io/bytechef/bytechef:latest` on port `8080`. Two managed paths are common: the **App Platform** (fully managed containers) or a **Droplet** running Docker. Both pair with a DigitalOcean **Managed PostgreSQL** database.
@@ -19,7 +19,7 @@ PostgreSQL database.
 <Tab value="App Platform">
 
 1. Create a new App and choose **Docker Hub / Container Registry** as the source, pointing at `docker.bytechef.io/bytechef/bytechef:latest`.
-2. Set the **HTTP port** to `8080`.
+2. Set the **HTTP port** to `8080`, and choose an instance size with at least 4 GB of RAM.
 3. Add the environment variables below, marking the secret ones as encrypted:
 
    ```bash

@@ -1,9 +1,9 @@
 ---
 title: MCP Servers
-description: Publish your components and workflows as Model Context Protocol tools for AI assistants like Claude, Cursor, and Windsurf.
+description: Publish component actions and workflows as Model Context Protocol tools that AI assistants such as Claude, Cursor, and Windsurf can call.
 ---
 
-An **MCP Server** turns the things you build in ByteChef into tools that AI assistants can call. You choose which component actions and which workflows to expose, ByteChef gives you a single [Model Context Protocol (MCP)](https://modelcontextprotocol.io) URL, and any MCP-aware client - Claude, Cursor, Windsurf, or your own agent - can discover and invoke them.
+An **MCP Server** turns the things you build in ByteChef into tools that AI assistants can call. You choose which component actions and workflows to expose. ByteChef gives you a single [Model Context Protocol (MCP)](https://modelcontextprotocol.io) URL, and any MCP client (Claude, Cursor, Windsurf, or your own agent) can discover and call them.
 
 A server can expose two kinds of tools:
 
@@ -12,47 +12,41 @@ A server can expose two kinds of tools:
 
 > **MCP Servers vs. the Management MCP Server.** This page is about *publishing your own tools* to external assistants. If you instead want an assistant to *manage* ByteChef itself - create and edit projects, workflows, and components - see the [Management MCP Server](/platform/settings/mcp-server).
 
-The MCP servers you create here need no server-side switch - the per-server endpoint is always mounted. (The separate
-`BYTECHEF_AI_MCP_SERVER_ENABLED` variable gates the [Management MCP Server](/platform/settings/mcp-server), which is on
-by default; setting it to `false` turns that one off and leaves these unaffected.)
+The MCP servers you create here need no server-side configuration: the per-server endpoint is always available. The
+separate `BYTECHEF_AI_MCP_SERVER_ENABLED` variable controls only the [Management MCP Server](/platform/settings/mcp-server)
+(default `true`).
 
 For exposing integrations to your product's own customers instead, see [Embedded → MCP Servers](/platform/embedded/configure/mcp-servers).
-
----
 
 ## Create an MCP server
 
 ![Create MCP Server dialog](mcp-servers/mcp-create-server-dialog.png)
 
 1. In the Automation workspace, open **MCP Servers** from the sidebar.
-2. Click **New MCP Server**.
-3. Give it a **name** and decide whether to **Require authentication** (see [Authentication](#authentication) below).
+2. Click **New MCP Server** (or **Create MCP Server** when the list is empty).
+3. Enter a **Name**, choose whether to **Require authentication** (see [Authentication](#authentication)), and click **Save**.
 
-A server created from the dialog starts **disabled**; turn it on with the **Enabled** switch on the server's row in the list, once its tools are in place (see [Turning the server on](#turning-the-server-on) below). Each server belongs to your workspace and a single environment (Development, Staging, or Production), so you can publish a different set of tools - with different credentials - per environment. Tags are assigned from the server row and let you filter the list as it grows.
+A server created from the dialog starts **disabled**; turn it on with the **Enabled** switch on the server's row in the list, once its tools are in place (see [Turning the server on](#turning-the-server-on) below). Each server belongs to your workspace and a single environment (Development, Staging, or Production), so you can publish a different set of tools, with different credentials, per environment. Tags are assigned from the server row. Filter the list by component, project, or tag in the left sidebar.
 
 A server exposes nothing until you add components or workflows to it.
-
----
 
 ## Expose component actions
 
 1. Expand the server's row, open its **Component Tools** tab and click **Add Component**.
 2. **Select a component** from the available components.
 3. **Select the actions** (tools) from that component you want to expose. Only the actions you pick become callable; everything else stays hidden.
-4. If the actions need authentication, attach one of your **connections** to the component. The assistant then runs those actions using that connection's credentials.
-5. Optionally pick the component's **Required Authorities** - the roles a caller must hold, one of them at least, to see this component's tools when the server has [Enforce tool authorization](#enforce-tool-authorization) on. The list of authorities is available on the Enterprise Edition, and the picker is shown only when the `ff-6383` feature flag is on.
+4. If the actions need authentication, select one of your **connections** for the component, or create one with the **+** button. The assistant runs those actions with that connection's credentials.
+5. Optionally pick the component's **Required Authorities**: a caller must hold at least one of them to see this component's tools when the server has [Enforce tool authorization](#enforce-tool-authorization) on. The list of authorities is available in Enterprise Edition, and the picker is shown only when the `ff-6383` feature flag is on.
 
-You can add multiple components to one server, and enable or disable individual tools at any time: each tool row has a **Configure** button, its own **Enabled** toggle and an actions menu (**⋮**), and a disabled tool disappears from the server's tool list - connected assistants no longer see or can call it, as if it did not exist. Existing and newly added tools default to enabled. Switching a tool is a change to the workspace's MCP server, so it needs permission to edit that workspace's MCP servers. This complements the server-level toggle, which turns the whole server on or off at once. **Configure** opens the properties panel below, and the actions menu holds **Delete**.
+You can add multiple components to one server and enable or disable individual tools at any time. Each tool row has a **Configure** button, an **Enabled** toggle, and an actions menu (**⋮**). A disabled tool is removed from the server's tool list: connected assistants can no longer see or call it. New tools are enabled by default. Switching a tool requires permission to edit the workspace's MCP servers. The server-level toggle turns the whole server on or off. **Configure** opens the properties panel below, and the actions menu holds **Delete**. The component's own **⋮** menu has **Edit** (change the selected tools and connection) and **Delete**.
 
 ![Tool properties panel for a component action, with Tool Name and Tool Description above the action's own parameters](mcp-servers/mcp-component-tool-properties.png)
 
-For each exposed action you decide which parameters you fix yourself (a constant the assistant can't change) and which the assistant fills at call time, using the `fromAi(...)` expression - the same mechanism as attaching tools to an AI Agent. See [Supplying tool parameters with fromAi](/platform/automation/build/workflows/ai/agent#supplying-tool-parameters-with-fromai) for the syntax.
+For each exposed action you decide which parameters you set yourself (a constant the assistant cannot change) and which the assistant fills at call time with the `fromAi(...)` expression, the same mechanism used for AI Agent tools. See [Supplying tool parameters with fromAi](/platform/automation/build/workflows/ai/agent#supplying-tool-parameters-with-fromai) for the syntax.
 
-The same properties control also offers a **Tool Name** and a **Tool Description**, both optional and both what the model sees. Left blank, the name falls back to `COMPONENT_ACTION` in upper snake case - `sendChannelMessage` on Slack becomes `SLACK_SEND_CHANNEL_MESSAGE` - and the description falls back to the action's own. A tool name is limited to 64 characters made up of letters, digits, `_`, `-`, `.` and `/`; anything else, a space included, is rejected as you type.
+The properties panel also has **Tool Name** and **Tool Description** fields. Both are optional, and both are what the model sees. When blank, the name defaults to `COMPONENT_ACTION` in upper snake case (`sendChannelMessage` on Slack becomes `SLACK_SEND_CHANNEL_MESSAGE`), and the description defaults to the action's own. A tool name is limited to 64 characters made up of letters, digits, `_`, `-`, `.` and `/`; anything else, a space included, is rejected as you type.
 
 Rename an action when its generated name would not tell the model what it does in your context, or when two servers should surface the same action differently. The override is stored on the server's attachment to the tool, not on the component, so it does not follow the action anywhere else.
-
----
 
 ## Expose workflows
 
@@ -62,15 +56,15 @@ Rename an action when its generated name would not tell the model what it does i
 2. On the **Basic** step, **select a project** and a **published version**, then click **Next**.
 3. On the **Workflows** step, switch on the workflows from that version you want to expose. Only workflows that start with the **Workflow → New Workflow Call** trigger are listed; a version without any says so.
 4. For each switched-on workflow, pick its **Connections** and fill in its **Inputs**, then click **Add**. Every required connection must be set; a connection must belong to the server's environment.
-5. Complete each workflow's **tool mapping**: click **Configure** on its row in the expanded server. The mapping offers a **Tool Name** and a **Tool Description** - both what the model sees - plus one field per input declared on the workflow's trigger schema. A tool name is limited to 64 characters made up of letters, digits, `_`, `-`, `.` and `/`; anything else, a space included, is rejected as you type.
+5. Complete each workflow's **tool mapping**: click **Configure** on its row in the expanded server. The mapping has a **Tool Name** and a **Tool Description** (both shown to the model), plus one field per input declared on the workflow's trigger schema. A tool name is limited to 64 characters made up of letters, digits, `_`, `-`, `.` and `/`; anything else, a space included, is rejected as you type.
 
-Adding a project version does not touch your own deployments. The server deploys the selected workflows itself, in a deployment of its own in the server's environment that does not appear in the Deployments list. The attachment stays pinned to that version: to expose another version, choose **Change Project Version** from the project's menu.
+Adding a project version does not touch your own deployments. The server deploys the selected workflows itself, in a deployment of its own in the server's environment that does not appear in the Deployments list. The attachment stays pinned to that version. To expose another version, choose **Change Project Version** from the project's **⋮** menu, which also has **Edit Workflows** and **Delete**.
 
 Each workflow row has its own **Enabled** toggle, like a component tool: a disabled workflow is left out of the server's tool list until you switch it back on, and new workflows start enabled. **Configure** opens the tool mapping, and the row's actions menu holds **Edit** (the workflow's connections and inputs in the server's deployment) and **Delete**.
 
 Each exposed workflow becomes one tool. Per-input values can be fixed constants or `fromAi(...)` expressions the assistant fills at call time. When the assistant calls the tool, ByteChef runs the workflow with those inputs and waits up to 300 seconds for it to finish. It returns the workflow's response if the workflow sends one, and otherwise the run's outputs. A run that pauses on an [approval](/platform/automation/build/workflows/human-in-the-loop) step returns `status: approval_required` together with the approval form link; MCP clients that support elicitation ask the user to approve or reject inline instead.
 
-The mapping lives on the MCP server's attachment to the workflow, not in the workflow definition - so the same workflow can be exposed under different tool names on different servers, and adding a workflow does not by itself make it callable.
+The mapping is stored on the MCP server's attachment to the workflow, not in the workflow definition. The same workflow can therefore be exposed under different tool names on different servers, and adding a workflow does not by itself make it callable.
 
 <Callout type="warn" title="Why a workflow might not appear in the tool list">
     A workflow is silently skipped when the server lists its tools if any of these is true:
@@ -87,15 +81,14 @@ The mapping lives on the MCP server's attachment to the workflow, not in the wor
 
 ### Choosing what to expose
 
-Prefer exposing a workflow over pointing an assistant at the upstream API it wraps. The practical
-differences:
+Prefer exposing a workflow over giving an assistant direct access to the upstream API it wraps:
 
 - The assistant is handed a tool, never a credential.
 - Retry and error handling live in the workflow, so every caller behaves the same way without each
   client reimplementing them.
 - Every tool call runs as an ordinary workflow execution and appears in
   [Workflow Executions](/platform/automation/monitor/workflow-executions) with its inputs, outputs,
-  and per-step trace, so a misbehaving assistant is debugged like anything else.
+  and per-step trace, so you can debug an assistant's calls like any other run.
 - Changing what a tool does is a new project version attached to the server, not an update to every
   connected client.
 
@@ -105,15 +98,13 @@ Switching a server on is refused with an *incomplete tool mapping* error, naming
 fault, while any exposed workflow has no tool name or leaves a required trigger input unmapped.
 A blank **Tool Name** counts as set when the workflow's label can stand in for it, as in the tool
 list; only a label without letters or digits leaves the workflow nameless. Complete those mappings
-first, then flip the **Enabled** switch.
+first, then turn on the **Enabled** switch.
 
-While a server is off, a request with a valid credential - or any request, when the server does not require authentication - is answered with `403` and the JSON body `{"error": "server_disabled", "message": "…"}`. The response carries no sign-in challenge, so an MCP client reports the server as unavailable instead of asking you to sign in. A request without a valid credential to a server that requires one still gets `401`, whether the server is on or off.
-
----
+While a server is off, a request with a valid credential (or any request, when the server does not require authentication) is answered with `403` and the JSON body `{"error": "server_disabled", "message": "…"}`. The response carries no sign-in challenge, so an MCP client reports the server as unavailable instead of asking you to sign in. A request without a valid credential to a server that requires one still gets `401`, whether the server is on or off.
 
 ## Get the server URL
 
-Expand the server's row and open its **Connect** tab. It presents the URL inside ready-to-copy configuration snippets, grouped into per-client tabs - **Claude**, **Cursor**, **Windsurf**, and **Other**. The URL has the form:
+Expand the server's row and open its **Connect** tab. It shows the URL inside ready-to-copy configuration snippets, grouped into per-client tabs: **Claude**, **Cursor**, **Windsurf**, and **Other**. The URL has the form:
 
 ```
 https://<your-host>/api/automation/<secret-key>/mcp
@@ -123,20 +114,18 @@ https://<your-host>/api/automation/<secret-key>/mcp
 
 Whether the URL alone is enough to connect depends on the server's [Require authentication](#require-authentication) setting.
 
----
-
 ## Authentication
 
-The URL secret identifies the server. When the server has **Require authentication** enabled, a separate credential also authenticates the caller, and requests without a valid one are rejected with `401`. Whether a credential is required is a per-server setting - see [Require authentication](#require-authentication) below.
+The URL secret identifies the server. When the server has **Require authentication** enabled, a separate credential also authenticates the caller, and requests without a valid one are rejected with `401`. Whether a credential is required is a per-server setting. See [Require authentication](#require-authentication).
 
 ### Require authentication
 
 Each MCP server has a **Require authentication** checkbox, in both the create and the edit dialog:
 
 - **On** - every request must carry a valid API key or a JWT from a trusted issuer; token-less requests get `401`. This is the default for **newly created** servers.
-- **Off** - the URL secret alone is enough; requests are served without a credential, and an API key that *is* sent is ignored. Servers created before this setting existed default to **off**, so they keep working unchanged - except servers that already had **Enforce tool authorization** on, which default to **on**.
+- **Off** - the URL secret alone is enough; requests are served without a credential, and an API key that *is* sent is ignored. Servers created before this setting existed default to **off**, except servers that already had **Enforce tool authorization** on, which default to **on**.
 
-Keep the URL secret private in both modes - it is the server's only protection when authentication is off.
+Keep the URL secret private in both modes. It is the server's only protection when authentication is off.
 
 ### Enforce tool authorization
 
@@ -150,7 +139,7 @@ It depends on authentication: an anonymous caller has no identity to authorize, 
 
 ### API key (default)
 
-Create a workspace API key under **Settings** → **API Keys** in the Automation workspace (an Enterprise Edition page, available to admins) and send it with every request as a Bearer header:
+Create a [workspace API key](/platform/automation/settings/api-keys) under **Settings** → **API Keys** in Automation, in the server's environment, and send it with every request as a Bearer header:
 
 ```
 Authorization: Bearer <your-api-key>
@@ -160,15 +149,13 @@ Only workspace API keys are accepted; an admin API key is rejected with `401`. W
 
 ### Sign in with ByteChef (optional)
 
-When the embedded OAuth2 authorization server is turned on, an OAuth-capable MCP client can connect to the server URL without an API key: you sign in with your ByteChef account and approve the `mcp:automation` scope. The server then accepts the client only if you are a member of the server's workspace (or a tenant administrator), and only for that server - the token does not work on another MCP server. A request that names another environment in `X-ENVIRONMENT` is rejected with `403`. See [MCP Server → Sign in with ByteChef](/platform/settings/mcp-server#sign-in-with-bytechef-optional) for the setup and how long tokens last.
+When the embedded OAuth2 authorization server is turned on, an OAuth-capable MCP client can connect to the server URL without an API key: you sign in with your ByteChef account and approve the `mcp:automation` scope. The server then accepts the client only if you are a member of the server's workspace (or a tenant administrator), and only for that server. The token does not work on another MCP server. A request that names another environment in `X-ENVIRONMENT` is rejected with `403`. See [MCP Server → Sign in with ByteChef](/platform/settings/mcp-server#sign-in-with-bytechef-optional) for the setup and how long tokens last.
 
 ### JWT from a trusted issuer (optional)
 
-The MCP endpoints can also accept JWTs from an external issuer that your installation trusts. List each trusted issuer under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties - see [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration). JWT support stays off until at least one issuer is configured. A token from an issuer that is not listed is rejected with `401`, and a token for these endpoints must carry the `mcp:automation` scope. API keys keep working alongside JWTs.
+The MCP endpoints can also accept JWTs from an external issuer that your installation trusts. List each trusted issuer under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties. See [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration). JWT support stays off until at least one issuer is configured. A token from an issuer that is not listed is rejected with `401`, and a token for these endpoints must carry the `mcp:automation` scope. API keys keep working alongside JWTs.
 
 > **Per-account identity providers are not used here yet.** Trusted issuers are set by whoever runs the ByteChef installation, in its configuration, and apply to every account. Identity providers added under [Settings → Identity Providers](/platform/settings/identity-providers) are used for signing in to ByteChef only; their tokens are not accepted on MCP servers.
-
----
 
 ## Connect an AI assistant
 
@@ -261,11 +248,28 @@ https://<your-host>/api/automation/<secret-key>/mcp
 
 When the server requires authentication, send an API key with every request as an `Authorization: Bearer` header, or a JWT from a [trusted issuer](#jwt-from-a-trusted-issuer-optional).
 
+To check the URL and the key before configuring a client, send the MCP `initialize` request yourself:
+
+```bash
+curl -i -X POST "https://<your-host>/api/automation/<secret-key>/mcp" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": {"name": "curl", "version": "1.0"}}}'
+```
+
+A working server answers `200` with its server info and an `Mcp-Session-Id` response header. A `401` means the key is missing, invalid, or from another workspace or environment.
+
 </Tab>
 </Tabs>
 
----
-
 ## How requests are handled
 
-When a client connects, ByteChef authenticates the caller's credential (when the server requires one), identifies the server from the secret key in the URL, and returns **only** the tools that server exposes - the enabled actions and workflows you selected, in that server's environment. Disabling the server, disabling a tool, removing a tool, or regenerating the secret key takes effect immediately for new requests.
+When a client connects, ByteChef authenticates the caller's credential (when the server requires one), identifies the server from the secret key in the URL, and returns **only** the tools that server exposes: the enabled actions and workflows you selected, in that server's environment. Disabling the server, disabling a tool, removing a tool, or regenerating the secret key takes effect immediately for new requests.
+
+## Related
+
+- [Management MCP Server](/platform/settings/mcp-server)
+- [API keys](/platform/automation/settings/api-keys)
+- [External invocations](/platform/automation/monitor/external-invocations)
+- [Embedded MCP Servers](/platform/embedded/configure/mcp-servers)

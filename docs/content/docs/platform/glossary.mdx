@@ -1,35 +1,35 @@
 ---
 title: Glossary
-description: Terms used in ByteChef platform.
+description: Terms used in the ByteChef platform.
 icon: Library
 ---
 
-In this document, you will find a list of terms used in ByteChef's platform. Here are the definitions:
+This page defines the main terms used in the ByteChef platform.
 
 ## Projects
 
-Projects are containers that hold one or more workflows. Projects help organize and manage workflows, making it easier to group related automation processes together. Users can create, edit, duplicate, import, and delete projects to streamline their automation efforts.
+A project is a container for one or more workflows. Projects group related workflows so they can be managed, published and deployed together. You can create, edit, duplicate, import and delete projects.
 
 ## Workflows
 
-Workflows are a series of actions and triggers that automate processes within the ByteChef platform. Workflows can be created by combining various components and configuring them to work together seamlessly. Users can also customize workflows by adding conditions, loops, and other logic to create more complex automation processes.
+A workflow is a trigger followed by a sequence of steps that automates a process. Steps are actions of components and flow controls, such as conditions, loops and branches, that add logic to the sequence.
 
 ## Components
 
-In ByteChef, a component is a modular building block that encapsulates specific functionalities within the platform. Each component is designed to interact with external services or perform particular tasks, making it an essential part of creating workflows.
+A component is a building block that wraps one external service or one capability of the platform. Workflows use components to interact with external services or to perform specific tasks.
 
-A component is made up of actions and triggers. Most also define a connection, which holds the credentials and settings its actions and triggers need to reach the external service, and some expose cluster elements - the models, tools, and memory an AI agent step can be wired to.
+A component is made up of actions and triggers. Most components also define a connection, which holds the credentials and settings their actions and triggers need to reach the external service. Some components expose cluster elements: the models, tools and memory that an AI agent step can be wired to.
 
 Every built-in component is listed, action by action, in the [component reference](/reference/components).
 
 ## Connections
 
-Connections are used to connect a component to an external service or application. They provide the necessary information for the component to interact with the external service, such as authentication details, base URL, and other properties.
+A connection links a component to an external service or application. It holds the information the component needs to call the service, such as authentication details, the base URL and other properties.
 
 ## Triggers
 
-These are events that initiate a workflow. Triggers listen for specific occurrences, such as receiving a new email, a change in a database, or a scheduled time event, and start the workflow when these events occur.
+A trigger is the event that starts a workflow. Examples are a new email, a change in a database, a webhook call or a scheduled time.
 
 ## Actions
 
-These are operations that a component can perform. Actions typically involve sending data to an external service, retrieving information, or manipulating data within the workflow. For example, an action might send an email, update a database record, or fetch user details from an API.
+An action is an operation that a component performs. Actions send data to an external service, retrieve information or transform data within the workflow. For example, an action can send an email, update a database record or fetch user details from an API.

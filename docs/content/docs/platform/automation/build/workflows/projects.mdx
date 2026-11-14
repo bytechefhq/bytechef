@@ -1,20 +1,19 @@
 ---
 title: "Projects"
-description: "Learn how to create, manage, and organize projects within ByteChef."
+description: "Create, import, publish, share and delete projects, and add workflows to them."
 ---
 
-Every project on ByteChef consists of one or more workflows. Projects help organize and manage workflows, making it
-easier to group related automation processes together.
+A project groups related workflows. It is also the unit that ByteChef versions, publishes and deploys. This page
+describes how to create and manage projects and add workflows to them.
 
 ## A project is the unit you publish
 
-A project is not only a folder. It is the thing that gets versioned and deployed, so where you draw
-the project boundary decides what ships together.
+The project boundary decides which workflows are released together.
 
-- **Workflows in one project are published together.** Publishing snapshots *every* workflow in the
-  project into one immutable version - you cannot publish half a project.
-- **Versions are immutable.** Once a version is published, its workflows are frozen; further edits
-  go to a fresh draft. A published version is what a deployment runs, and it stays available for
+- **Workflows in one project are published together.** Publishing saves every workflow in the project
+  into one immutable version. You cannot publish part of a project.
+- **Versions are immutable.** After a version is published, its workflows do not change; further edits
+  go to a new draft. A published version is what a deployment runs, and it stays available for
   rolling back. See [Deploy Workflows](/platform/automation/deploy/workflows).
 - **Deployment is separate from publishing.** A project deployment binds one published version to
   one [environment](/platform/automation/deploy/environments), with its own connections and its own
@@ -27,8 +26,8 @@ Access is governed by [workspace roles](/platform/settings/users#roles-and-permi
 Editor, or Viewer - granted per member on the workspace and applying to every project inside it.
 There are no per-project roles.
 
-A project has two states, not three: a live **draft** that the editor writes to, and any number of
-**published** versions. Deleting a project is permanent - export it first if you might want it back.
+A project has a **draft** that the editor writes to, and any number of **published** versions.
+Deleting a project is permanent; export it first if you might need it again.
 
 ## Create Project
 
@@ -111,12 +110,7 @@ The imported project, together with its workflows, appears in the project list.
 
 ## New Code Workflow
 
-<Callout type="warn" title="Coming soon">
-    Creating a code workflow from the Projects page is on the upcoming release track and is not yet
-    available in the latest released version of ByteChef. Today a code workflow is authored outside
-    the product and deployed through the API - see
-    [Code Workflows](/platform/automation/build/workflows/code-workflows).
-</Callout>
+<Callout type="warn" title="Coming soon">Creating a code workflow from the Projects page is not available yet; deploy code workflows through the API as described in [Code Workflows](/platform/automation/build/workflows/code-workflows).</Callout>
 
 <Steps>
 <Step>
@@ -136,7 +130,7 @@ Give the code workflow a name and pick its language, then edit the workflow defi
 </Step>
 </Steps>
 
-A code workflow runs on the same engine as a visually built one - see [Build Approaches](/platform/automation/build/workflows/build-approaches) for when to choose full-code.
+A code workflow runs on the same engine as a visually built one. See [Build Approaches](/platform/automation/build/workflows/build-approaches) for when to choose full-code.
 
 ## Edit Project
 
@@ -163,7 +157,16 @@ Click **Save** to apply your changes.
 </Step>
 </Steps>
 
-![The project actions menu, showing Publish, Edit, Duplicate, View Workflows, Export and Delete](projects/project-actions-menu.png)
+![The project actions menu](projects/project-actions-menu.png)
+
+The project actions menu (three dots on the project row) contains:
+
+| Group | Items |
+|---|---|
+| Project | **Edit**, **Publish**, **Duplicate**, **Share**, **Share with Community** (only when a template submission form is configured), **Export** |
+| Workflows | **New Workflow**, **Import Workflow**, **View Workflows** (only when the project has workflows) |
+| Deployments | **New Deployment** |
+| | **Delete** |
 
 
 ## Duplicate Project
@@ -305,17 +308,17 @@ Click on the three dots next to the project name you wish to publish.
 </Step>
 <Step>
 
-Select **Publish** from the dropdown menu.
+Select **Publish** from the dropdown menu. **Publish** is disabled until the project has at least one workflow.
 
 </Step>
 <Step>
 
-Provide a description for this published version to document any changes or updates.
+In the **Publish Project** dialog, enter a **Description** of the changes in this version.
 
 </Step>
 <Step>
 
-Click **Publish** to make the project available.
+Click **Publish**. The new version can now be deployed.
 
 </Step>
 </Steps>
@@ -325,9 +328,8 @@ Click **Publish** to make the project available.
 
 ## Share Projects and Workflows as Templates
 
-Beyond [exporting a project](#export-project) to a `.zip` file for your own backups, a project - or
-an individual workflow, from its own three-dot menu - can be shared as a **template** that anyone
-with the link can import into their own workspace.
+A project, or a single workflow from its own actions menu, can be shared as a **template**. Anyone
+with the link can import it into their own workspace. To back up a project instead, [export it](#export-project).
 
 <Steps>
 <Step>
@@ -337,29 +339,29 @@ Click on the three dots next to the project (or workflow) name and choose **Shar
 </Step>
 <Step>
 
-Write a **Description** of what it does - this is required before you can export it.
+Enter a **Description** of what it does. The description is required.
 
 </Step>
 <Step>
 
-Click **Export and generate template link**. The dialog turns into a link card with a **Copy link** button; anyone who opens the link can import it through `/import/shared/projects/{uuid}` (workflows use `/import/shared/workflows/{uuid}`).
+Click **Export and generate template link**. The dialog shows the link and a **Copy link** button. The link has the form `/import/shared/projects/{uuid}` (workflows use `/import/shared/workflows/{uuid}`).
 
 </Step>
 <Step>
 
-Use the toggle at the top of the dialog to **disable** the link at any time - the existing link stops working - and to re-enable it later, which generates a fresh export.
+To disable the link, turn off the switch at the top of the dialog. The existing link stops working. Turn the switch on again to export the current version and re-enable the link.
 
 </Step>
 <Step>
 
-If you keep editing the project after sharing it, the dialog notes that "an older version... is shared as a template" and offers an **Update template based on the current version** button, so the link always points at what you intend.
+If you change the project after sharing it, the dialog shows that an older version is shared. Click **Update template based on the current version** to share the current version.
 
 </Step>
 </Steps>
 
-A second, separate action - **Share with Community** - opens ByteChef's public template submission
-form in a new tab, for projects and workflows you want listed in the official gallery (see
-[Templates](/platform/automation/build/workflows/templates)) rather than shared privately by link.
+**Share with Community** is a separate action. It opens the template submission form in a new tab, for
+projects and workflows that you want listed in the public gallery (see
+[Templates](/platform/automation/build/workflows/templates)).
 
 ## Delete Project
 
@@ -376,7 +378,7 @@ Select **Delete** from the dropdown menu.
 </Step>
 <Step>
 
-Confirm the deletion if prompted.
+Confirm the deletion. The project and its workflows are deleted permanently.
 
 </Step>
 </Steps>

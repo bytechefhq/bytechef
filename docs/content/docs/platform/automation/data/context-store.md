@@ -5,41 +5,40 @@ ee: true
 comingSoon: true
 ---
 
+The Context Store keeps a synchronized copy of records from external systems (CRMs, ticket systems, knowledge bases) inside ByteChef. AI agents and workflows search and read these records without calling the source system each time.
 
-The Context Store keeps a synced replica of records from external systems (CRMs, ticket systems, knowledge bases) inside ByteChef so AI agents and workflows can search and read them without round-tripping to the source on every call.
+Each **Context Store source** binds an external connector (for example HubSpot, Salesforce, or a JSON file) to a sync cadence and a set of **entities**. An entity is a named record shape with declared indexed fields. The sync engine runs on the configured cadence, writes new and changed records into the store, and marks records that no longer exist upstream as deleted (tombstones).
 
-Each **Context Store source** binds an external connector (HubSpot, Salesforce, a JSON file, etc.) to a sync cadence and a set of **entities** - named record shapes with declared indexed fields. The sync engine runs on the configured cadence, writes new and changed records into the store, and tombstones rows that have disappeared from upstream.
-
-Open **Context Store** from the automation sidebar (under the **Deployments** group) to see your sources, then use **Add Source** to walk the wizard that binds a connector and defines the entity.
+Open **Context Store** from the automation sidebar (in the **Deployments** group) to see your sources. Click **Add Source** to bind a connector and define an entity.
 
 <!-- TODO screenshot: Context Store page - list of sources with their sync status and the per-row actions menu (Refresh now / Disable / Delete) -->
 <!-- TODO screenshot: Add Context Source dialog on step 1 (Connection) - the Context Store select, Source Name field, and the component grid picker -->
 
 ## Add a source
 
-**Add Source** opens a four-step wizard (**Connection → Record shape → Cadence → Review**). Use **Next** and **Back** to move between steps; **Create Source** on the final step provisions the source and its first sync.
+**Add Source** opens a four-step wizard: **Connection**, **Record shape**, **Cadence**, and **Review**. Use **Next** and **Back** to move between steps. **Create Source** on the last step creates the source and starts its first sync.
 
-1. **Connection** - choose the target **Context Store**, name the source, then pick a component from the grid and one of its data-stream-compatible connections. Only components with such a connection appear; create one on the Connections page first if the grid is empty.
-2. **Record shape** - name the **Entity**, add an optional description, fill any source-specific configuration the connector exposes, choose the **ID Field** (the upstream record's unique key), and add **Indexed Fields** - the named columns you want to filter and search on, each with a declared type.
-3. **Cadence** - set the **Sync Cadence** (how often fresh records are pulled) and, optionally, a less-frequent **Full Re-sync Cadence** that detects upstream deletions, plus the **Tombstone Strategy** for how disappeared rows are retired.
-4. **Review** - confirm the store, name, connection, entity, cadence, and tombstone strategy, then create.
+1. **Connection** - Select the target **Context Store**, name the source, then select a component from the grid and one of its data-stream-compatible connections. Only components with such a connection appear. If the grid is empty, create a connection on the **Connections** page first.
+2. **Record shape** - Name the **Entity**, add an optional description, and fill in any source-specific configuration. Select the **ID Field** (the upstream record's unique key) and add **Indexed Fields**: the typed columns to filter and search on.
+3. **Cadence** - Set the **Sync Cadence** (how often new records are pulled), an optional less frequent **Full Re-sync Cadence** that detects upstream deletions, and the **Tombstone Strategy** that decides how deleted records are retired.
+4. **Review** - Confirm the store, name, connection, entity, cadence, and tombstone strategy, then click **Create Source**.
 
 <!-- TODO screenshot: source detail dialog - the entity's indexed fields, cadence, and last-sync details -->
 
-A source's row on the Context Store page carries an actions menu with **Refresh now** (trigger an immediate sync), **Disable** / **Enable**, and **Delete**.
+Each source row on the Context Store page has an actions menu with **Refresh now** (start a sync immediately), **Disable** or **Enable**, and **Delete**.
 
 ---
 
 ## Records backend
 
-The records backend is a **deployment-wide** choice made by the operator, not a per-source setting - there is no backend selector in the Add Source wizard. Every source in the deployment persists to whichever backend is active:
+The records backend is a deployment-wide setting chosen by the operator. The Add Source wizard has no backend selector. Every source stores its records in the active backend:
 
-- **Postgres** (default): records live in the same Postgres database as the rest of ByteChef. Supports the full query path including filter expressions and semantic search. Recommended for most workloads.
-- **ClickHouse** (optional): records live in a separate ClickHouse server with per-entity typed-projection tables. Designed for very large record counts where Postgres scans would be expensive. Semantic search is not supported on ClickHouse-backed sources in this release.
+- **Postgres** (default) - Records are stored in the ByteChef Postgres database. Supports filter expressions and semantic search. Recommended for most workloads.
+- **ClickHouse** (optional) - Records are stored in a separate ClickHouse server, in one typed table per entity. Intended for very large record counts. Semantic search is not supported.
 
 ### Enabling ClickHouse
 
-The ClickHouse backend is opt-in and switches the **entire deployment** over. To enable it:
+Enabling ClickHouse switches the entire deployment to it.
 
 1. Provision a ClickHouse instance reachable from the ByteChef server.
 2. Set the three environment variables (see [Configuration → Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables)):
@@ -48,7 +47,7 @@ The ClickHouse backend is opt-in and switches the **entire deployment** over. To
    - `BYTECHEF_CONTEXT_STORE_CLICKHOUSE_PASSWORD`
 3. Restart ByteChef.
 
-Setting the URL wires the ClickHouse datasource, and its repository then overrides the Postgres adapter for every source's record reads and writes. When the URL is unset the whole ClickHouse bean tree stays uninstantiated and Postgres is the only records backend - Postgres-only deployments see no change. Switching backends does not migrate existing records; re-run each source's sync to repopulate the newly active backend.
+When `BYTECHEF_CONTEXT_STORE_CLICKHOUSE_URL` is set, all sources read and write records in ClickHouse. When it is unset, Postgres is the only records backend. Switching backends does not migrate existing records; run each source's sync again to fill the new backend.
 
 ### What ClickHouse does differently
 
@@ -56,26 +55,26 @@ Setting the URL wires the ClickHouse datasource, and its repository then overrid
 |---|---|---|
 | Sync writes (insert, update, tombstone) | ✓ | ✓ |
 | Composite-key lookups | ✓ | ✓ |
-| Filter-expression search (typed column dispatch) | ✓ | Not in this release |
-| Semantic search | ✓ | Not in this release |
-| Chunker pipeline + admin record delete | ✓ | Not in this release |
+| Filter-expression search (typed column dispatch) | ✓ | Not supported |
+| Semantic search | ✓ | Not supported |
+| Chunker pipeline and admin record delete | ✓ | Not supported |
 | In-place `indexedFields` schema changes | JSONB whitelist (no DDL) | `ALTER TABLE` migration |
 
-Calling search against a ClickHouse-backed source returns an explicit error rather than silent empty results - the UI doesn't expose search for these sources.
+A search against a ClickHouse-backed source returns an error instead of empty results. The UI does not offer search for these sources.
 
 ### `indexedFields` schema migrations
 
-Editing an entity's `indexedFields` on a Postgres-backed source is a metadata update - the next sync rebuilds the affected index rows.
+On a Postgres-backed source, editing an entity's `indexedFields` is a metadata update. The next sync rebuilds the affected index rows.
 
-On a ClickHouse-backed source the same edit is a real schema migration: `ALTER TABLE ADD COLUMN` for new fields, `ALTER TABLE DROP COLUMN` for removed ones, and `ALTER TABLE MODIFY COLUMN` for type changes when ClickHouse accepts the conversion. When a type conversion is rejected (e.g. `TEXT` → `TIMESTAMP`), the migrator falls back to drop-and-add - the typed projection resets to `NULL` for existing rows, though the JSON `_payload` preserves the field's value. Subsequent sync writes repopulate the column.
+On a ClickHouse-backed source, the same edit is a schema migration: `ALTER TABLE ADD COLUMN` for new fields, `ALTER TABLE DROP COLUMN` for removed fields, and `ALTER TABLE MODIFY COLUMN` for type changes that ClickHouse accepts. When ClickHouse rejects a type conversion (for example `TEXT` to `TIMESTAMP`), the column is dropped and added again. The typed column is `NULL` for existing rows until the next sync writes it; the JSON `_payload` keeps the value.
 
-The migration runs synchronously inside the entity-update transaction; a ClickHouse failure aborts the update with no Postgres state change.
+The migration runs synchronously inside the entity update transaction. If ClickHouse fails, the update is aborted and Postgres is not changed.
 
 ---
 
 ## Per-entity ClickHouse tables
 
-For each entity on a ClickHouse-backed source, the facade provisions a table named `cs_w{workspaceId}_c{contextStoreId}_s{sourceId}_{entityName}` (sanitised) using the `ReplacingMergeTree(_last_seen_at)` engine. The schema is:
+For each entity on a ClickHouse-backed source, ByteChef creates a table named `cs_w{workspaceId}_c{contextStoreId}_s{sourceId}_{entityName}` (sanitised) using the `ReplacingMergeTree(_last_seen_at)` engine. The schema is:
 
 ```sql
 CREATE TABLE cs_w1_c5_s42_contacts (
@@ -91,16 +90,15 @@ CREATE TABLE cs_w1_c5_s42_contacts (
 ) ENGINE = ReplacingMergeTree(_last_seen_at) ORDER BY (_id)
 ```
 
-The `c{contextStoreId}` segment is what keeps the environments apart: each Context Store is
-env-stamped, so the same logical entity gets physically separate tables in Development, Staging and
-Production.
+The `c{contextStoreId}` segment separates environments: each Context Store belongs to one
+environment, so the same entity has separate tables in Development, Staging, and Production.
 
-`_id` is the `sourceRecordId` from upstream; the RMT engine deduplicates on it at background-merge time. Tombstones use `ALTER TABLE ... UPDATE _deleted_at = ?`, which is asynchronous in ClickHouse - the next sync run sees the tombstone state regardless, so eventual visibility is acceptable for the sync use case.
+`_id` is the upstream `sourceRecordId`. The `ReplacingMergeTree` engine deduplicates on it during background merges. Tombstones use `ALTER TABLE ... UPDATE _deleted_at = ?`, which ClickHouse applies asynchronously; the next sync sees the tombstone state either way.
 
 ---
 
 ## Backup, replication, and operational concerns
 
-ClickHouse operational tasks (backup, replication, retention policies, per-table tuning) are intentionally out of scope for ByteChef's Context Store wiring. Treat the ClickHouse server as an external dependency that the deployment team manages on its own terms - ByteChef writes to it and reads from it, but doesn't take responsibility for its lifecycle.
+ByteChef does not manage ClickHouse backup, replication, retention, or table tuning. Operate the ClickHouse server as an external dependency.
 
-The Postgres `context_store_source` and `context_store_entity` rows remain the source of truth for which records *should* exist; if ClickHouse data is lost, re-running the sync from the source connector rebuilds it.
+The Postgres `context_store_source` and `context_store_entity` rows define which records should exist. If ClickHouse data is lost, run the source sync again to rebuild it.

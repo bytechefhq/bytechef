@@ -1,23 +1,53 @@
 ---
 title: Monitoring
-description: Learn how to monitor your ByteChef instance
+description: Health probes for a self-hosted ByteChef instance and the system administrator account that protects the Actuator endpoints.
 ---
+
+A self-hosted ByteChef server exposes Spring Boot Actuator endpoints for health checks and
+diagnostics. This page covers the health probes and access control; metrics, tracing and logs are
+covered in [Observability](/platform/use-bytechef/self-hosted/management/observability).
 
 ## Health checks
 
-ByteChef exposes Spring Boot Actuator health probes, split into Kubernetes-friendly groups:
+The health endpoint is split into groups for Kubernetes probes and load balancers:
 
-- `GET /actuator/health/liveness` - is the process alive? Use for liveness probes and load-balancer up/down checks.
-- `GET /actuator/health/readiness` - is it ready to serve traffic (database reachable, migrations applied)? Use for readiness probes.
-- `GET /actuator/health` - full detail. All three are **unauthenticated**, and health details ship as `always`, so anyone who can reach the port sees component-level health.
+| Endpoint | Checks | Use for |
+|---|---|---|
+| `GET /actuator/health/liveness` | The application's liveness state. | Liveness probes and load-balancer up/down checks. |
+| `GET /actuator/health/readiness` | The application's readiness state and the database connection. | Readiness probes. |
+| `GET /actuator/health` | Every health indicator, with details. | Troubleshooting. |
+
+All three are **unauthenticated**, and `management.endpoint.health.show-details` is `always`, so
+anyone who can reach the port sees component-level health.
+
+For example, a load balancer or a deploy script can wait for readiness like this:
+
+```bash
+curl -f "https://your-bytechef-host.example.com/actuator/health/readiness"
+```
+
+The endpoint answers `200` with `"status":"UP"` once the instance is ready and the database is reachable, and `503`
+while it is not, so `curl -f` exits with an error until the instance can take traffic.
 
 See [Observability](/platform/use-bytechef/self-hosted/management/observability) for metrics, tracing, and the complete Actuator surface.
 
 ## Administrative access to the management surface
 
-The Actuator endpoints that expose sensitive data - `/actuator/env`, `/actuator/configprops`, `/actuator/loggers`, `/actuator/threaddump` and `/actuator/logfile` - are gated behind a **system administrator** account (HTTP Basic), separate from application users. The health, info, metrics and Prometheus endpoints are deliberately left open for probes and scrapers. Set the administrator credentials with:
+The Actuator endpoints that expose sensitive data (`/actuator/env`, `/actuator/configprops`, `/actuator/loggers`, `/actuator/threaddump`, `/actuator/logfile`, `/actuator/caches` and `/actuator/liquibase`) require a **system administrator** account (HTTP Basic), separate from application users. The health, info and Prometheus endpoints are left open for probes and scrapers. Set the administrator credentials with:
 
 - `BYTECHEF_SECURITY_SYSTEM_USERNAME` (default `system_admin`)
 - `BYTECHEF_SECURITY_SYSTEM_PASSWORD`
 
-Because the health, info, metrics and Prometheus endpoints are open, put the whole `/actuator/**` surface behind your ingress or network policy in production so it is reachable only by your platform team, your scraper, and health probes.
+Send them as HTTP Basic credentials. For example, to raise the log level of ByteChef's own packages at runtime
+without a restart:
+
+```bash
+curl -u "system_admin:<system-password>" \
+  -X POST "https://your-bytechef-host.example.com/actuator/loggers/com.bytechef" \
+  -H "Content-Type: application/json" \
+  -d '{"configuredLevel": "DEBUG"}'
+```
+
+The change lasts until the instance restarts. Send `{"configuredLevel": null}` to reset the level.
+
+Because the health, info and Prometheus endpoints are open, put the whole `/actuator/**` surface behind your ingress or network policy in production so it is reachable only by your platform team, your scraper, and health probes.

@@ -1,51 +1,53 @@
 ---
 title: Custom Regex
-description: Operator-supplied regex patterns with named placeholders for project-specific identifiers
+description: Your own named regular expressions, for identifiers that no built-in detector covers.
 ---
 
-`Custom Regex` runs operator-supplied regex patterns against the input. It runs in the **preflight stage** so its matches are masked before LLM-stage checks run, and so its placeholders merge with PII / Secret Keys / URL placeholders in the parent's longest-first mask pass.
-
-This is the right component when no built-in detector covers your domain - internal ticket IDs, proprietary order numbers, customer-account formats, study identifiers, etc.
-
----
+**Custom Regex** runs your own named regular expressions against the text. It runs in the preflight stage and needs no model. Use it for values specific to your business, such as internal ticket IDs, order numbers, account formats, or study identifiers. Attach it under [Check for Violations](/platform/automation/build/workflows/ai/agent/guardrails/check-for-violations) to block text with a match, or under [Sanitize Text](/platform/automation/build/workflows/ai/agent/guardrails/sanitize-text) to replace each match with `[name]`.
 
 ## Properties
 
-| Property | Description |
+| Property | Type | Default | Description |
+|---|---|---|---|
+| **Validate Input** | Boolean | `true` | Check the user input before it is sent to the model. |
+| **Validate Output** | Boolean | `true` | Check the model response before it is returned. |
+| **Patterns** | Array of objects | None | The named patterns. Required, with at least one entry. |
+
+Each entry in **Patterns** has:
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| **Name** | String | Yes | The placeholder `[name]` under Sanitize Text, and the violation name under Check for Violations. |
+| **Regex** | String | Yes | A Java regular expression, or a `/pattern/flags` literal. |
+
+## Regex syntax
+
+- **Plain Java regex**, for example `ORD-\d{4}`. Matching is case-sensitive.
+- **Literal with flags**, for example `/ssn-\d{4}/i`. Supported flags:
+
+| Flag | Effect |
 |---|---|
-| **Patterns** | Array of named regex entries. Each entry has a **Name** (used as the placeholder `[name]` in sanitize mode and as the violation identifier in check mode) and a **Regex** (a Java regular expression). At least one entry is required |
+| `i` | Case-insensitive (Unicode-aware) |
+| `m` | Multiline: `^` and `$` match at line breaks |
+| `s` | Dot-all: `.` matches line breaks |
+| `u` | Unicode character classes |
+| `x` | Comments: whitespace and `#` comments in the pattern are ignored |
+| `g` | Accepted and ignored. All matches are always found. |
 
-### Regex Syntax
+Any other flag is an error.
 
-Each entry's **Regex** field accepts two forms:
+## Results
 
-- **Plain Java regex**: `ORD-\d{4}` - matched with default flags (case-sensitive).
-- **JavaScript-style literal**: `/pattern/flags` - supports `i` (case-insensitive), `m` (multiline), `s` (dotall), and `u` (Unicode). Example: `/ssn-\d{4}/i`.
-
-Both forms are validated up front:
-
-- Maximum expression length so a workflow author can't paste a multi-megabyte pathological pattern.
-- Per-match character budget so catastrophic-backtracking inputs abort with an execution-budget error rather than hanging the worker thread.
-
-A bad pattern is treated as a **configuration error** and the request is blocked - a broken regex is an operator bug, not a transient outage, and silently allowing requests through a dead detector is worse than blocking until someone fixes it.
-
----
-
-## Two Variants
-
-- **Custom Regex (check)** - flags every match. The violation diagnostic info carries the pattern names so you can see which entries fired (useful when several entries are configured).
-- **Custom Regex (sanitize)** - replaces each match with `[name]` (the entry's own name in square brackets). Stable, operator-controlled placeholder.
-
-The sanitize variant uses `[name]` rather than the shared `<TYPE>` convention used by PII / Secret Keys / URLs because the operator owns the naming. Name your entries in upper-case (`CUSTOMER_ID`) if you want LLM-stage downstream checks to see entries as the same shape as built-in masks - the classifier doesn't care about the brackets vs. angle brackets.
-
----
+- **Under Check for Violations** (`customRegexCheck`): one violation. If one pattern matched, the violation is named after that pattern; if several matched, it is named `customRegex`. `info.patternNames` lists the patterns that matched, and `matchCount` is the number of matches.
+- **Under Sanitize Text** (`customRegexSanitize`): each match is replaced with `[name]`. The patterns are applied one after another in the order listed, and Custom Regex rewrites the text immediately, so sanitizers attached after it see the placeholders. Special characters in a name, such as `$` or `\`, are inserted literally.
 
 ## Examples
 
-One internal-ID pattern, with a JS-style literal for case insensitivity:
+Block order IDs, case-insensitively:
 
 ```json
 {
+  "name": "customRegex_1",
   "type": "customRegex/v1/customRegexCheck",
   "parameters": {
     "patterns": [
@@ -55,26 +57,40 @@ One internal-ID pattern, with a JS-style literal for case insensitivity:
 }
 ```
 
-Multiple named patterns running together, mask in place:
+Mask several identifiers:
 
 ```json
 {
+  "name": "customRegex_1",
   "type": "customRegex/v1/customRegexSanitize",
   "parameters": {
     "patterns": [
       { "name": "internal-id", "regex": "MY-INTERNAL-\\d{4}" },
-      { "name": "ticket",      "regex": "TCK-\\d{6}" },
-      { "name": "study-id",    "regex": "STUDY-[A-Z]{2}-\\d{3}" }
+      { "name": "ticket", "regex": "TCK-\\d{6}" },
+      { "name": "study-id", "regex": "STUDY-[A-Z]{2}-\\d{3}" }
     ]
   }
 }
 ```
 
-A workflow run with `"ref MY-INTERNAL-1234 for TCK-987654"` produces `"ref [internal-id] for [ticket]"`.
+With this configuration, `ref MY-INTERNAL-1234 for TCK-987654` becomes `ref [internal-id] for [ticket]`.
 
----
+## Limits and errors
 
-## Edge Cases
+Each of the following is an execution failure, so the request is blocked (Check for Violations) or the text is withheld (Sanitize Text):
 
-- **Replacement-string metacharacters**: a pattern name containing `$` or `\` would normally be interpreted as a regex back-reference. The sanitize variant quotes them safely so a name like `$1\0` renders literally as `[$1\0]`.
-- **Multiple-entry budget failures**: each entry runs in its own try/catch. If two entries are pathological, both surface in the aggregated exception (as suppressed causes) so you can fix all bad patterns at once instead of finding them one at a time across runs.
+| Condition | Limit |
+|---|---|
+| **Patterns** is empty, or an entry has an empty **Name** or **Regex** | None |
+| The regex does not compile, or uses an unsupported flag | None |
+| The regex is too long | 4,096 characters |
+| The text to scan is too long | 1,048,576 characters |
+| A match takes too long (for example, catastrophic backtracking) | 10,000,000 character reads per scan |
+
+When several patterns exceed the match limit, all of them are reported in one error.
+
+## Related
+
+- [PII](/platform/automation/build/workflows/ai/agent/guardrails/pii)
+- [Keywords](/platform/automation/build/workflows/ai/agent/guardrails/keywords)
+- [customRegex/v1 reference](/reference/components/customRegex_v1)

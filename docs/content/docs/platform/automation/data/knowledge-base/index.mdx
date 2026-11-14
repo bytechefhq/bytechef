@@ -1,6 +1,6 @@
 ---
 title: "Knowledge Base"
-description: "Upload documents, let ByteChef chunk and embed them, and give your workflows and AI agents semantic search over your own content."
+description: "Upload documents that ByteChef chunks and embeds, and search them by meaning from workflows and AI agents."
 ---
 
 import {Card, Cards} from "fumadocs-ui/components/card";
@@ -12,16 +12,17 @@ keywords. It is the retrieval layer behind Retrieval-Augmented Generation (RAG):
 workflow or AI agent asks a question, the knowledge base returns the most relevant chunks,
 and the model answers grounded in your own content.
 
-Knowledge bases live under **Automation → Knowledge Base**. Each one is scoped to a
-workspace and an environment, so the documents an agent retrieves in `DEVELOPMENT` are
-isolated from `PRODUCTION`.
+Open knowledge bases from **Knowledge Base** in the Automation sidebar. Each knowledge base is
+scoped to a workspace and an environment, so documents in `DEVELOPMENT` are isolated from
+`PRODUCTION`.
 
-<Callout title="Availability">
-  The Knowledge Base is enabled through configuration
-  (`bytechef.ai.knowledge-base.enabled`). If you don't see **Knowledge Base** in the
-  Automation navigation, ask your administrator to enable it. The vector store is backed by
-  Postgres with the `pgvector` extension - there is no separate vector database to operate.
-</Callout>
+## Prerequisites
+
+- The Knowledge Base is enabled with `BYTECHEF_AI_KNOWLEDGE_BASE_ENABLED=true` (default `false`).
+  Without it, **Knowledge Base** does not appear in the Automation sidebar.
+- An embedding model is enabled for the environment in [AI Providers](/platform/settings/ai/ai-providers)
+  (OpenAI, Mistral, or Ollama). Without one, the page shows **Turn on an embedding model** with a
+  **Go to AI Providers** button, and you cannot upload or search documents.
 
 ## What you can do
 
@@ -38,15 +39,14 @@ isolated from `PRODUCTION`.
     Run semantic queries and inspect the matching chunks and scores.
   </Card>
 
-  <Card icon={<Workflow />} title="Use it in workflows & agents" href="/platform/automation/data/knowledge-base/use-in-workflows">
-    Retrieve chunks from a workflow step or wire it into an AI agent as RAG.
+  <Card icon={<Workflow />} title="Use it in workflows and agents" href="/platform/automation/data/knowledge-base/use-in-workflows">
+    Retrieve chunks from a workflow step or connect it to an AI agent for RAG.
   </Card>
 </Cards>
 
 ## How it works
 
-1. **Ingest** - You upload a file (or a [source](/platform/automation/data/knowledge-base/sources) syncs
-   records in). ByteChef extracts text, running OCR first for scanned PDFs and images.
+1. **Ingest** - You upload a file. ByteChef extracts its text, running OCR first for scanned PDFs and images when OCR is configured.
 2. **Chunk** - The text is split into overlapping chunks sized by the knowledge base's
    chunking settings.
 3. **Embed** - Each chunk is turned into a vector by the configured embedding model and
@@ -56,14 +56,12 @@ isolated from `PRODUCTION`.
 
 ## Where the vectors live
 
-There is no separate vector database to provision, back up, or patch. Chunks and their embedding
-vectors are stored in Postgres through the [`pgvector`](https://github.com/pgvector/pgvector)
-extension, so the knowledge base is covered by whatever backup and monitoring you already run for
-the ByteChef database. Because the vectors are ordinary columns, one query can filter on chunk
-metadata and rank by vector similarity in the same round trip.
+Chunks and their embedding vectors are stored in Postgres through the
+[`pgvector`](https://github.com/pgvector/pgvector) extension; there is no separate vector database.
+The backup and monitoring of the ByteChef database cover the knowledge base. Because the vectors are
+ordinary columns, one query can filter on chunk metadata and rank by vector similarity.
 
-pgvector can point at a database separate from the main one - useful when you want the vector
-workload on its own instance:
+To run the vector workload on its own instance, point pgvector at a separate database:
 
 | Variable | Purpose | Default |
 |---|---|---|
@@ -72,32 +70,33 @@ workload on its own instance:
 | `BYTECHEF_AI_VECTORSTORE_PGVECTOR_USERNAME` / `_PASSWORD` | Credentials for that database. | - |
 | `BYTECHEF_AI_VECTORSTORE_PGVECTOR_DIMENSIONS` | Width of the stored embedding vectors. | `1536` |
 
-The index uses an **HNSW** index, **cosine distance**, and **1536** dimensions - the size of the
-default OpenAI embedding model. Changing to an embedding model with a different vector width means
-setting `BYTECHEF_AI_VECTORSTORE_PGVECTOR_DIMENSIONS` to match; see
+The index uses **HNSW**, **cosine distance**, and **1536** dimensions, the size of the default
+OpenAI embedding model. If you use an embedding model with a different vector width, set
+`BYTECHEF_AI_VECTORSTORE_PGVECTOR_DIMENSIONS` to match. See
 [AI Providers → Embedding models](/platform/settings/ai/ai-providers#embedding-models).
 
 See the [AI Vectorstore configuration reference](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-vectorstore-configuration)
 for the full list.
 
-## OCR for scanned documents
+## Configuration
 
-Text extraction handles digital PDFs on its own. Scanned pages and images need OCR, which is a
-deployment-level choice:
+Text extraction handles digital PDFs without OCR. Scanned pages and images need OCR, which is
+configured per deployment.
 
 | Variable | Purpose | Default |
 |---|---|---|
 | `BYTECHEF_AI_KNOWLEDGE_BASE_ENABLED` | Master switch for the Knowledge Base. | `false` |
 | `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_PROVIDER` | `NONE`, `AZURE`, or `MISTRAL`. | `NONE` |
 | `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_MISTRAL_API_KEY` | Mistral OCR API key. | - |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_MAX_SIZE_BYTES` | Maximum total size, in bytes, of all knowledge base documents in a tenant. `0` means unlimited. An upload that would exceed it fails with an error that asks you to delete documents or raise the limit. | `1073741824` (1 GB) |
 
 <Callout type="warn">
-  `MISTRAL` is the only provider with an OCR implementation wired in today. `AZURE` is accepted by
-  the configuration but currently behaves like `NONE`.
+  `MISTRAL` is the only OCR provider with an implementation. `AZURE` is accepted by the
+  configuration but behaves like `NONE`.
 </Callout>
 
-OCR runs during ingestion, before chunking - the extracted text then follows the same chunk, embed,
-and index path as any other document.
+OCR runs during ingestion, before chunking. The extracted text is then chunked, embedded, and
+indexed like any other document.
 
 ## Isolation
 

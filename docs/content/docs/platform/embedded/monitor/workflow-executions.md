@@ -1,26 +1,21 @@
 ---
 title: Workflow Executions
-description: View the execution history of all integration and automation workflows.
+description: View and filter the execution history of your connected users' integration and automation workflows.
 ---
 
 ![Workflow Executions overview](executions/executions-overview.png)
 
----
+The **Workflow Executions** page lists every run of an integration workflow or an automation workflow that belongs to your connected users. Use it to check whether a workflow ran, how long it took, and why it failed. Open it under **Embedded → Workflow Executions**. Executions are scoped to the environment selected in the application sidebar.
 
-## Key Features
+## Viewing executions
 
-| Feature | Description |
-|---|---|
-| Source filtering | List integration and automation executions together, or only one of them. |
-| Status filtering | Filter by execution status: Started, Completed, Created, Stopped, or Failed. |
-| Date range filtering | Filter by start date and end date to narrow the time window. |
-| Integration filtering | Filter by a specific integration (Integrations source only). |
-| Instance Configuration filtering | Filter by a specific instance configuration (Integrations source only). |
-| Workflow filtering | Filter by a specific workflow (Integrations and Automations sources). |
-| Connected User filtering | Filter by connected user (every source). |
-| Pagination | Navigate through large execution lists with page controls. |
+1. Go to **Embedded → Workflow Executions**.
+2. Pick a **Source** and any filters in the left sidebar.
+3. Click a row, or choose **View** in its **Actions** menu, to open the execution detail.
 
-### Where executions come from
+Click the refresh button in the page header to reload the list. To stop a running execution, choose **Stop** in its **Actions** menu. **Stop** is available only while the execution is in the `STARTED` state.
+
+## Sources
 
 The **Source** select at the top of the left sidebar picks which executions the page lists:
 
@@ -28,68 +23,54 @@ The **Source** select at the top of the left sidebar picks which executions the 
 |---|---|
 | **Any** | Integration and automation executions in one list, newest first. This is the default. |
 | **Integrations** | Executions of integration instances your connected users enabled. |
-| **Automations** | Executions of the workflows your connected users built in the Automation Hub. |
+| **Automations** | Executions of the workflows your connected users built in the [Automation Hub](/platform/embedded/build/automations/automation-hub). |
 
-With **Any**, the table adds a **Source** column right after **Workflow**: an icon for where the run came from (a
-square for an integration, a workflow icon for an automation), followed by the integration's component or the
-automation's project. The icon's tooltip names the kind of source.
-With **Automations**, the table shows each execution's **Project**, and with **Integrations**, its **Integration**.
-The **Connected user** column shows the integration instance's connected user, or the automation's deployment.
-Clicking a row opens the detail view that matches where it came from.
+## Table columns
 
-### Execution Details
+Every source shows **Status**, **Workflow**, **Duration**, **Execution date** and **Actions**. The other columns depend on the source:
 
-Each execution entry shows:
-
-- **Status** -- the current state of the execution (Started, Completed, Failed, etc.).
-- **Duration** -- how long the execution took.
-- **Timestamps** -- when the execution started and ended.
-- **Step-by-step results** -- click an execution to view detailed results for each workflow step.
-
----
-
-## How to Use
-
-### Viewing Executions
-
-1. Navigate to the **Executions** page from the Embedded sidebar.
-2. The table displays all workflow executions for the current environment.
-3. Click on an execution row to open a detail sheet with full step-by-step results.
-
-### Filtering Executions
-
-Use the left sidebar to apply filters:
-
-| Filter | Applies To | Description |
+| Column | Source | Description |
 |---|---|---|
-| Source | All | Any (the default), Integrations, or Automations. See [Where executions come from](#where-executions-come-from). |
-| Status | All | Select a status to show only executions in that state. |
-| Start date | All | Show only executions that started on or after this date. |
-| End date | All | Show only executions that started on or before this date. |
-| Integration | Integrations | Select an integration to filter by. |
-| Instance Configuration | Integrations | Select a specific instance configuration. |
-| Workflow | Integrations, Automations | Select a specific workflow. |
-| Connected User | Any, Integrations | Select a connected user to see their executions. |
-| Connected Users | Automations | Select a connected user to see the executions of the automations they built. |
+| **Source** | Any | An icon for where the run came from (a square for an integration, a workflow icon for an automation), followed by the integration's component or the automation's project. The icon's tooltip names the kind of source. |
+| **Integration** | Integrations | The integration. |
+| **Instance** | Integrations | The integration instance configuration. |
+| **Project** | Automations | The automation project. |
+| **Version** | All | The integration or project version that ran. |
+| **Connected user** | All | The integration instance's connected user, or the automation's deployment. |
 
-### Execution Detail View
+## Filters
 
-Click on any execution row to open a detail sheet that shows:
+| Filter | Source | Description |
+|---|---|---|
+| **Source** | All | **Any** (default), **Integrations** or **Automations**. |
+| **Status** | All | `STARTED`, `COMPLETED`, `CREATED`, `STOPPED` or `FAILED`. **Any** shows every status. |
+| **Start date** | All | Executions that started on or after this date. |
+| **End date** | All | Executions that started on or before this date. |
+| **Integration** | Integrations | One integration. |
+| **Instance Configuration** | Integrations | One integration instance configuration. |
+| **Workflow** | Integrations, Automations | One workflow. |
+| **Connected User** | Any, Integrations | One connected user, listed as `User <externalId>`. |
+| **Connected Users** | Automations | The automations built by one connected user. |
+
+## Execution detail
+
+Clicking a row opens the detail view that matches where the run came from. It shows:
 
 - The overall execution status and timing.
-- Each workflow step with its input, output, and status.
+- Each workflow step with its input, output and status.
 - Error messages and stack traces for failed steps.
-- The data passed between steps in the workflow.
+
+For both kinds of execution, the detail colors the run on its read-only canvas and lists each AI Agent tool call as a row under the agent's task, the same way the [automation execution detail](/platform/automation/monitor/workflow-executions#what-the-detail-view-shows) does. See [Seeing which tools ran](/platform/automation/build/workflows/ai/agent#seeing-which-tools-ran).
 
 <!-- TODO screenshot: Workflow execution detail sheet open, showing the workflow panel with a selected step and its Input / Output / Error tabs -->
 
-For an automation execution, the detail sheet reuses the automation execution view and carries an [AI Copilot](/platform/automation/build/ai-copilot): it analyzes the finished or failed execution and helps debug errors. Copilot is an Enterprise Edition feature and is disabled by default _(the AI Copilot is coming soon - not yet available in the latest released version)_.
+### AI Copilot for automation executions
 
-For both kinds of execution the detail colours the run on its read-only canvas and lists each AI
-Agent tool call as a row under the agent's task, the same way the
-[automation execution detail](/platform/automation/monitor/workflow-executions#what-the-detail-view-shows)
-does. See [Seeing which tools ran](/platform/automation/build/workflows/ai/agent#seeing-which-tools-ran).
+> **Coming soon.** Analyzing an automation execution with the AI Copilot from the execution detail is not generally available yet.
 
-### Environment Selection
+## Related
 
-Executions are scoped to the current environment. Use the environment selector in the left sidebar header to switch between Development, Staging, and Production.
+- [External Invocations](/platform/embedded/monitor/external-invocations)
+- [Failures and Retries](/platform/embedded/monitor/failures-and-retries)
+- [Connected Users](/platform/embedded/monitor/connected-users)
+- [Troubleshooting](/platform/embedded/monitor/troubleshooting)

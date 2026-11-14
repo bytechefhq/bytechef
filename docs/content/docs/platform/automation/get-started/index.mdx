@@ -1,56 +1,55 @@
 ---
 title: Introduction
-description: Learn the basics of ByteChef Automation and how to create your first workflow.
+description: The basic concepts of ByteChef Automation and where to start building your first workflow.
 ---
 
-## What is ByteChef Automation?
+ByteChef Automation is the part of ByteChef where you build, deploy, and monitor workflows for your own team. A
+workflow connects apps and services, runs on a trigger or on demand, and can include conditional logic, data
+transformations, and AI agents. You build workflows in a visual editor, inside projects.
 
-ByteChef Automation allows you to easily build and run smart workflows that connect your apps, automate routine tasks,
-and include AI-driven decisions-all without heavy coding. This guide will help you understand the basics and get started
-with creating your first workflow.
+With ByteChef Automation you can:
 
-It enables you to:
-
-- Connect different applications and services together
-- Automate repetitive tasks and business processes
-- Create workflows with conditional logic and data transformations
-- Integrate AI capabilities into your automation processes
-- Build complex integrations with a visual, no-code interface
+- Connect applications and services through components and connections.
+- Automate repetitive tasks and business processes.
+- Add conditional logic, loops, and data transformations to a workflow.
+- Add AI agents and AI actions to a workflow.
+- Deploy a workflow to an environment and monitor its executions.
 
 ## Key Concepts
 
-Before diving into creating workflows, it's helpful to understand some key concepts. Check them in the [Glossary](/platform/glossary).
+The terms used throughout this guide (project, workflow, component, trigger, action, connection, deployment) are
+defined in the [Glossary](/platform/glossary).
 
-## Creating Your First Workflows
+## Create Your First Workflow
 
-Follow these steps to create your first workflows in ByteChef Automation:
+The general flow is the same for every workflow:
 
-<Callout title="Generate with AI">
-  You can also create a workflow from a description: in a project's workflow list, choose **Create Workflow → Generate with AI** to open the [AI Copilot](/platform/automation/build/ai-copilot#generating-a-workflow-or-skill-from-a-prompt) panel in Build mode, pre-scoped to building that workflow. Requires Copilot to be enabled.
-</Callout>
+1. Open **Automation** and go to **Projects**.
+2. Click **New Project** (or **Create Project** when the list is empty), enter a name, and click **Save**.
+3. In the project, click **Create Workflow** (or **New Workflow**), enter a name, and click **Save**. The workflow
+   editor opens.
+4. Add a trigger and the actions the workflow needs, and configure their properties and connections.
+5. Click **Test** to run the workflow, then click **Publish** and **Deploy** in the editor header.
 
 <Callout title="Quick Start Guides">
-  For step-by-step tutorials with specific examples, check out our Quick Start guides:
-  - [Star a Repository on GitHub](/platform/automation/get-started/quick-start/star-repository-on-github)
-  - [Configure workflow trigger](/platform/automation/get-started/quick-start/configure-workflow-trigger)
+  For step-by-step tutorials, see the Quick Start guides:
+  - [Build your first workflow](/platform/automation/get-started/quick-start/build-first-workflow)
+  - [Build your first agent](/platform/automation/get-started/quick-start/build-first-agent)
+  - [Star a repository on GitHub](/platform/automation/get-started/quick-start/star-repository-on-github)
+  - [Configure a workflow trigger](/platform/automation/get-started/quick-start/configure-workflow-trigger)
 </Callout>
-
 
 ## Best Practices
 
-To get the most out of ByteChef Automation, consider these best practices:
+- **Start simple** - begin with a short workflow and add steps once it runs.
+- **Test with different inputs** - run the workflow with the inputs you expect in production before you deploy it.
+- **Use descriptive names** - give projects, workflows, and connections names that state their purpose.
+- **Add descriptions** - describe what each workflow does so others can maintain it.
+- **Reuse connections** - create a connection once and use it in every workflow that calls the same service.
 
-- **Start Simple**: Begin with basic workflows and gradually add complexity
-- **Test Thoroughly**: Test your workflows with different inputs to ensure they work as expected
-- **Use Descriptive Names**: Give your projects, workflows, and connections clear, descriptive names
-- **Document Your Workflows**: Add descriptions to help others understand your automation
-- **Reuse Connections**: Create connections that can be reused across multiple workflows
+## Related
 
-## Next Steps
-
-Once you're comfortable with the basics, you can:
-
-- Explore more advanced workflow features like conditional logic and loops
-- Connect multiple components to create complex automation processes
-- Integrate AI capabilities into your workflows
-- Learn about error handling and debugging techniques
+- [Projects](/platform/automation/build/workflows/projects)
+- [Connections](/platform/automation/build/connections)
+- [Deploy workflows](/platform/automation/deploy/workflows)
+- [Workflow executions](/platform/automation/monitor/workflow-executions)

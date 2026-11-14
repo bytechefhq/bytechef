@@ -1,6 +1,6 @@
 ---
 title: Azure
-description: Learn how to deploy ByteChef on Microsoft Azure
+description: Run the ByteChef container on Azure Container Apps with Azure Database for PostgreSQL.
 ---
 
 ByteChef runs on Azure as the container image `docker.bytechef.io/bytechef/bytechef:latest` on port `8080`. **Azure Container Apps** is the simplest managed target; the same image also runs on Azure Kubernetes Service (AKS) using the [Helm chart](/platform/use-bytechef/self-hosted/installation/kubernetes) or on a plain VM as in the [AWS EC2](/platform/use-bytechef/self-hosted/installation/aws-ec2) guide.
@@ -27,9 +27,11 @@ az containerapp create \
   --image docker.bytechef.io/bytechef/bytechef:latest \
   --target-port 8080 \
   --ingress external \
+  --cpu 2 --memory 4Gi \
+  --min-replicas 1 --max-replicas 1 \
   --secrets db-password=<db-password> encryption-key=<stable-encryption-key> remember-me-key=<stable-remember-me-key> \
   --env-vars \
-    BYTECHEF_DATASOURCE_URL="jdbc:postgresql://<pg-host>:5432/bytechef" \
+    BYTECHEF_DATASOURCE_URL="jdbc:postgresql://<pg-host>:5432/bytechef?sslmode=require" \
     BYTECHEF_DATASOURCE_USERNAME="<db-user>" \
     BYTECHEF_DATASOURCE_PASSWORD=secretref:db-password \
     BYTECHEF_ENCRYPTION_PROVIDER=PROPERTY \
@@ -40,11 +42,13 @@ az containerapp create \
 
 Use **stable** values for the encryption and remember-me keys, held in Container Apps secrets, so stored credentials and sessions survive revision restarts.
 
+Azure Database for PostgreSQL Flexible Server requires TLS by default, hence `sslmode=require`. `--min-replicas 1` keeps one replica running: with scale to zero, schedules and polling triggers stop firing while no HTTP traffic arrives. `--max-replicas 1` keeps a single coordinator; see the scaling notes below.
+
 ## 3. Configure health probes and scaling
 
 - Set the Container App's readiness/liveness probe to `GET /actuator/health/readiness` and `GET /actuator/health/liveness` on port `8080`.
 - Set `BYTECHEF_PUBLIC_URL` to the Container App's public FQDN so webhook and OAuth2 redirect URLs resolve.
-- Because schema migrations run at container startup, keep the app at a single replica during the first deploy and any upgrade. If you scale beyond one replica, apply the multi-instance settings in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances) - a shared message broker and cache, and a shared encryption key.
+- Because schema migrations run at container startup, keep the app at a single replica during the first deploy and any upgrade. Every replica runs the coordinator, and more than one coordinator requires Enterprise Edition. Before you scale beyond one replica, apply the settings in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances): a shared encryption key, a shared message broker, shared file storage, a shared session store and cache provider, and a clustered scheduler.
 
 ## 4. Access the instance
 

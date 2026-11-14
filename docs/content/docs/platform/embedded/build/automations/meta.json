@@ -1,6 +1,9 @@
 {
   "$schema": "../../../../../../.source/json-schema/docs.meta.json",
   "pages": [
-    "automation-workflows"
+    "automation-workflows",
+    "automation-hub",
+    "activation-dialog",
+    "automation-code-workflows"
   ]
 }

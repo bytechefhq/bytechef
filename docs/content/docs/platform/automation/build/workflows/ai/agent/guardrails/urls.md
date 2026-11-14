@@ -1,49 +1,53 @@
 ---
 title: URLs
-description: Allowlist-based URL policy enforcement with scheme, port, userinfo, and subdomain controls
+description: Allowlist-based URL policy with host, path, port, scheme, credential, subdomain, and IPv4 range controls.
 ---
 
-`URLs` enforces an allowlist on the URLs that may appear in the input. It runs in the **preflight stage**, recognises two URL shapes (full-scheme URLs and single-colon schemes), and either flags or masks anything outside the policy.
-
----
+**URLs** finds URLs in the text and flags or masks every URL that is not on your allowlist. It runs in the preflight stage and needs no model. Attach it under [Check for Violations](/platform/automation/build/workflows/ai/agent/guardrails/check-for-violations) to block text with a disallowed URL, or under [Sanitize Text](/platform/automation/build/workflows/ai/agent/guardrails/sanitize-text) to replace each disallowed URL with `<URL>`.
 
 ## Properties
 
-| Property | Description |
-|---|---|
-| **Allowed URLs** | Allowlist of URLs, host names, full URLs, or IP / CIDR ranges. Empty means "everything is blocked" |
-| **Allowed Schemes** | Schemes that are permitted (default: `https`, `http`). Other schemes - including `data:`, `javascript:`, `vbscript:` injection vectors - are rejected |
-| **Block Userinfo** | When on, `https://user:pass@host/` is blocked even if the host is allowlisted (phishing defence). Default on |
-| **Allow Subdomain** | When on, allowing `example.com` also allows `api.example.com`, `staging.api.example.com`. Default on |
+| Property | Type | Default | Description |
+|---|---|---|---|
+| **Validate Input** | Boolean | `true` | Check the user input before it is sent to the model. |
+| **Validate Output** | Boolean | `true` | Check the model response before it is returned. |
+| **Allowed URLs** | Array of strings | Empty | Hosts, host and path prefixes, full URLs, or IPv4 CIDR ranges that are permitted. When empty, every URL with a `://` scheme is disallowed. |
+| **Allowed Schemes** | Array of strings | `https`, `http` | Permitted schemes. Options: `https`, `http`, `ftp`, `data`, `javascript`, `vbscript`, `mailto`. A URL with any other scheme is disallowed, even if its host is on the allowlist. |
+| **Block Userinfo** | Boolean | `true` | Disallow URLs that contain credentials, such as `https://user:pass@example.com`, even if the host is allowed. Labeled **Sanitize Userinfo** under Sanitize Text. |
+| **Allow Subdomain** | Boolean | `true` | Extend host and full-URL entries to their subdomains. When on, `example.com` also allows `api.example.com` and `staging.api.example.com`. When off, only the exact host matches. |
 
----
+## Which URLs are checked
 
-## Allowlist Entry Forms
+| Form | Example | How it is checked |
+|---|---|---|
+| Any `scheme://` URL | `https://example.com/a`, `ftp://files.example.com` | Credentials first (**Block Userinfo**), then the scheme (**Allowed Schemes**), then the host, port, and path (**Allowed URLs**). |
+| `data:`, `javascript:`, `vbscript:`, `mailto:` | `javascript:alert(1)` | Scheme only. Disallowed unless the scheme is in **Allowed Schemes**. |
 
-The **Allowed URLs** array accepts these forms; the detector picks the right matcher per entry:
+Hosts without a scheme (`example.com`) and bare IP addresses are not detected. To block them, use [Keywords](/platform/automation/build/workflows/ai/agent/guardrails/keywords) or [Custom Regex](/platform/automation/build/workflows/ai/agent/guardrails/custom-regex).
+
+## Allowlist entries
 
 | Form | Example | Matches |
 |---|---|---|
-| Bare host | `example.com` | Any URL whose host equals `example.com` (plus subdomains if **Allow Subdomain** is on). All paths and ports allowed |
-| Host with path | `api.example.com/v2/` | Same host match, plus the URL's path must start with the entry's path. Trailing slash matters: `example.com/admin` matches `/admin` and `/admin/users` but not `/administrator` |
-| Full URL | `https://localhost:5173` or `https://localhost:5173/admin` | Same host (with optional subdomain), exact port match if the entry specifies a port, and path-prefix match if the entry has a path. If the entry omits the port, any port on the host is allowed |
-| CIDR range | `10.0.0.0/24` | Any IPv4 inside the range (prefix `0..32`) |
+| Host | `example.com` | That host on any port and path, plus subdomains when **Allow Subdomain** is on. |
+| Host and path | `example.com/docs` | That exact host (subdomains are not included) and a path that is `/docs` or starts with `/docs/`. `/documents` does not match. |
+| Full URL | `https://localhost:5173/admin` | The host (plus subdomains when **Allow Subdomain** is on), the port if the entry has one, and the path prefix if the entry has a path. The entry's scheme is not compared; schemes are controlled by **Allowed Schemes**. |
+| IPv4 CIDR range | `10.0.0.0/8` | Any URL whose host is an IPv4 address in the range. The prefix must be `0` to `32`. |
 
----
+Matching ignores case and a leading `www.` on both the URL and the entry. Internationalized host names are converted to their ASCII (punycode) form on both sides, so an entry written in Unicode matches the punycode form of the same host. An entry that cannot be parsed matches nothing and is logged as a warning.
 
-## Two Variants
+## Results
 
-- **URLs (check)** - flags violations (`HOST_NOT_ALLOWED`, `SCHEME_NOT_ALLOWED`, `USERINFO_BLOCKED`, `MALFORMED_URL`). Each blocked URL becomes one violation.
-- **URLs (sanitize)** - replaces each blocked URL with `<URL>`. Stable placeholder so any downstream regex can post-process the masked text. The **Block Userinfo** label becomes **Sanitize Userinfo** in the sanitize variant since masking and blocking are different operator-facing actions.
-
----
+- **Under Check for Violations** (`urlsCheck`): one violation, with `matchCount` set to the number of disallowed URLs. The reason for each URL (host, scheme, credentials, or malformed URL) is not included in the output.
+- **Under Sanitize Text** (`urlsSanitize`): each disallowed URL is replaced with `<URL>`. Allowed URLs are left as they are.
 
 ## Examples
 
-Block everything except your own dev server:
+Allow only a local development server:
 
 ```json
 {
+  "name": "urls_1",
   "type": "urls/v1/urlsCheck",
   "parameters": {
     "allowedUrls": ["http://localhost:5173"],
@@ -54,39 +58,35 @@ Block everything except your own dev server:
 }
 ```
 
-Allow your prod API and any subdomain, plus an internal RFC-1918 range:
+Allow a production API with its subdomains, plus a private network range:
 
 ```json
 {
+  "name": "urls_1",
   "type": "urls/v1/urlsCheck",
   "parameters": {
-    "allowedUrls": [
-      "https://api.example.com",
-      "10.0.0.0/8"
-    ],
+    "allowedUrls": ["https://api.example.com", "10.0.0.0/8"],
     "allowedSchemes": ["https"],
     "allowSubdomain": true
   }
 }
 ```
 
-Mask all unrecognised URLs in the LLM's response so they don't leak to the user:
+Mask every URL in the model response except links to your documentation:
 
 ```json
 {
+  "name": "urls_1",
   "type": "urls/v1/urlsSanitize",
-  "parameters": {
-    "allowedUrls": ["https://docs.example.com"],
-    "allowedSchemes": ["https"]
-  }
+  "parameters": { "allowedUrls": ["docs.example.com"], "allowedSchemes": ["https"], "validateInput": false }
 }
 ```
 
----
+## Limitations
 
-## Edge Cases
+- CIDR entries cover IPv4 only. A URL with an IPv6 host is disallowed unless an entry matches it as a host.
+- A URL that cannot be parsed is disallowed.
 
-- **IPv6**: parsed as `HOST_NOT_ALLOWED` since the allowlist machinery only carries IPv4 entries. IPv6 URLs are flagged by default - to allow them, post-process with a regex or extend the detector.
-- **Punycode IDN**: `xn--exmple-cua.com` is matched as a literal host. An allowlist entry of `example.com` does **not** match the punycode form. Add both spellings if you need to permit IDN traffic.
-- **Bare hosts / IPs in prose**: bare domains and bare IPv4 are **not** detected. Only scheme-prefixed forms (`https://10.0.0.1`, `http://example.com`) are scanned. If you need to block bare-host references, prefix them or run a separate `Keywords` guardrail.
-- **`javascript:` / `vbscript:` / `data:` schemes**: matched separately as injection vectors. Allowlist them via **Allowed Schemes** if you genuinely need to permit them; otherwise they're flagged regardless of the **Allowed URLs** list.
+## Related
+
+- [urls/v1 reference](/reference/components/urls_v1)

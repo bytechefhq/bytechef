@@ -3,42 +3,40 @@ title: "OAuth 2.0 Authentication"
 description: "Learn how to use OAuth 2.0 to connect to third-party services in ByteChef"
 ---
 
-OAuth 2.0 is the industry-standard protocol for authorization. It allows ByteChef to obtain limited access to user accounts on an HTTP service, such as Google, GitHub, or Salesforce, without requiring your password.
+OAuth 2.0 is the standard authorization protocol that lets ByteChef obtain limited access to your account on a service such as Google, GitHub, or Salesforce without receiving your password.
 
-## How it Works
+## How it works
 
-1. **Authorization Request**: When you create a new connection, ByteChef redirects you to the service provider (e.g., Google).
-2. **User Authorization**: You log in to the service provider and grant ByteChef permission to access your data.
-3. **Authorization Grant**: The service provider redirects you back to ByteChef with an authorization code.
-4. **Access Token**: ByteChef exchanges the authorization code for an access token, which is used to make API calls on your behalf.
+1. **Authorization request**: When you create a connection, ByteChef opens the service provider's sign-in page (for example, Google).
+2. **User authorization**: You sign in to the service provider and grant ByteChef access to your data.
+3. **Authorization grant**: The service provider redirects you back to ByteChef with an authorization code.
+4. **Access token**: ByteChef exchanges the code for an access token (and usually a refresh token) and uses it to call the API on your behalf.
 
-## Setting Up OAuth 2.0 Connections
+## Set up an OAuth 2.0 connection
 
 {/* TODO screenshot: OAuth2 connection dialog - client ID and client secret fields with the Connect button that launches the provider consent flow */}
 
-To set up an OAuth 2.0 connection in ByteChef:
-
-1. Go to the **Connections** tab.
+1. Click **Connections** in the main sidebar.
 2. Click **New Connection** and select a service that uses OAuth 2.0.
 3. Enter a **Name** for the connection.
-4. Paste the **Client ID** and **Client Secret** copied from the service provider's developer portal.
-5. Click **Next** to continue setting up the connection.
-6. Select scopes for the connection and click **Connect**.
-7. You will be redirected to the service's login page.
-8. Review the permissions requested and click **Allow** or **Authorize**.
-9. Once redirected back to ByteChef, your connection is ready to use.
+4. Paste the **Client ID** and **Client Secret** from the service provider's developer portal. Skip this step when the service uses a [predefined app](#predefined-apps).
+5. Click **Next**.
+6. Select the scopes for the connection and click **Connect**.
+7. Sign in on the service's page, review the requested permissions, and click **Allow** (or the service's equivalent).
 
-### Predefined Apps
+After the service redirects you back to ByteChef, the connection is created.
 
-For many popular services, ByteChef ships a **predefined OAuth app** with hosted client credentials. When one is available, the Client ID and Client Secret fields are hidden and you can connect in a single click without registering your own app. To use your own credentials instead, click the **I want to use my own app credentials** link in the dialog. Switching back is done with **I want to use predefined app credentials**.
+### Predefined apps
+
+An administrator can configure a **predefined OAuth app** for a component, with client credentials stored on the server (`bytechef.oauth2.predefined-apps`). For such a component, the dialog hides the **Client ID** and **Client Secret** fields, and you connect without registering your own app. To use your own credentials instead, click **I want to use my own app credentials**. To switch back, click **I want to use predefined app credentials**.
 
 ### Redirect URI
 
-When you use your own OAuth app, the connection dialog shows a read-only **Redirect URI** field with a copy button. Register this exact value as the authorized redirect (callback) URI in the service provider's developer portal, otherwise the authorization will fail with a redirect URI mismatch.
+When you use your own OAuth app, the dialog shows a read-only **Redirect URI** field with a copy button. Register this exact value as the authorized redirect (callback) URI in the service provider's developer portal. Otherwise the authorization fails with a redirect URI mismatch. The value is `<public URL>/callback` by default (`bytechef.oauth2.redirect-uri`).
 
 ## Security
 
-ByteChef securely stores access tokens and refresh tokens. Credentials are encrypted at rest with AES-GCM, ensuring your data remains private and secure.
+ByteChef stores the access token and refresh token encrypted at rest with AES-GCM.
 
 ---
 

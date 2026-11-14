@@ -118,6 +118,21 @@ const config: NextConfig = {
         permanent: true,
       },
       {
+        source: '/platform/automation/monitor/approval-tasks',
+        destination: '/platform/automation/build/workflows/human-in-the-loop#approval-tasks-inbox',
+        permanent: true,
+      },
+      {
+        source: '/platform/embedded/build/automation-hub',
+        destination: '/platform/embedded/build/automations/automation-hub',
+        permanent: true,
+      },
+      {
+        source: '/platform/embedded/build/activation-dialog',
+        destination: '/platform/embedded/build/automations/activation-dialog',
+        permanent: true,
+      },
+      {
         source: '/platform/embedded/monitor/tool-invocations',
         destination: '/platform/embedded/monitor/external-invocations',
         permanent: true,
