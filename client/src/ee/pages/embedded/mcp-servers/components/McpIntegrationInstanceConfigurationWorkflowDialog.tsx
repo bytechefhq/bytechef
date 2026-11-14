@@ -74,6 +74,7 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
 
     const {
         componentName,
+        enabledWorkflowIds,
         form: workflowsForm,
         getWorkflowConfigurations,
         workflows,
@@ -303,6 +304,7 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
                     workflows && (
                         <McpIntegrationWorkflowsList
                             componentName={componentName ?? ''}
+                            enabledWorkflowIds={enabledWorkflowIds}
                             form={workflowsForm}
                             onSelectedWorkflowIdsChange={handleSelectedWorkflowIdsChange}
                             selectedWorkflowIds={selectedWorkflowIds}
