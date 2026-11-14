@@ -198,13 +198,15 @@ reach. Saving is a normal workflow save.
 
 ### Limits
 
-Scripts execute in a GraalVM guest context with the runtime's default restrictions: no host class
-access, no filesystem access, no subprocess execution, no thread creation. Concurrency inside a script
-is therefore not available - use the workflow's own
+Script steps execute in the [script sandbox](/platform/use-bytechef/self-hosted/configuration/script-sandbox):
+no host class access, no filesystem access, no environment access, no subprocess execution, no thread
+creation. Concurrency inside a script is therefore not available - use the workflow's own
 [flow controls](/platform/automation/build/workflows/flow-controls) to parallelize.
 
-There is no configurable per-script CPU or memory budget. For unbounded or long-running computation,
-write a [custom component](/platform/settings/components/custom-components) instead.
+Each JavaScript or Python execution also runs under a CPU time limit (5 minutes by default) and a heap
+limit (512 MB by default), which the operator sets with `bytechef.script.sandbox.*`. A script that goes
+past either fails its task. For unbounded or long-running computation, write a
+[custom component](/platform/settings/components/custom-components) instead.
 
 ### Script or custom component?
 

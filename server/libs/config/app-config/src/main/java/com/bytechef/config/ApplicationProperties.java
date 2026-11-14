@@ -193,6 +193,11 @@ public class ApplicationProperties {
     private Resources resources = new Resources();
 
     /**
+     * Script execution configuration: the guest polyglot sandbox.
+     */
+    private Script script = new Script();
+
+    /**
      * Security configuration
      */
     private Security security;
@@ -368,6 +373,10 @@ public class ApplicationProperties {
         return resources;
     }
 
+    public Script getScript() {
+        return script;
+    }
+
     public Security getSecurity() {
         return security;
     }
@@ -534,6 +543,10 @@ public class ApplicationProperties {
 
     public void setResources(Resources resources) {
         this.resources = resources;
+    }
+
+    public void setScript(Script script) {
+        this.script = script;
     }
 
     public void setSecurity(Security security) {
@@ -5004,6 +5017,67 @@ public class ApplicationProperties {
 
         public void setWeb(String web) {
             this.web = web;
+        }
+    }
+
+    /**
+     * Script execution configuration.
+     */
+    public static class Script {
+
+        private Sandbox sandbox = new Sandbox();
+
+        public Sandbox getSandbox() {
+            return sandbox;
+        }
+
+        public void setSandbox(Sandbox sandbox) {
+            this.sandbox = sandbox;
+        }
+
+        public static class Sandbox {
+
+            private boolean enabled = true;
+
+            private Duration maxCpuTime = Duration.ofMinutes(5);
+
+            private DataSize maxHeapMemory = DataSize.ofBytes(512L * 1024 * 1024);
+
+            private int maxConcurrentExecutions = Math.max(
+                16, Runtime.getRuntime()
+                    .availableProcessors() * 4);
+
+            public int getMaxConcurrentExecutions() {
+                return maxConcurrentExecutions;
+            }
+
+            public Duration getMaxCpuTime() {
+                return maxCpuTime;
+            }
+
+            public DataSize getMaxHeapMemory() {
+                return maxHeapMemory;
+            }
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public void setMaxConcurrentExecutions(int maxConcurrentExecutions) {
+                this.maxConcurrentExecutions = maxConcurrentExecutions;
+            }
+
+            public void setMaxCpuTime(Duration maxCpuTime) {
+                this.maxCpuTime = maxCpuTime;
+            }
+
+            public void setMaxHeapMemory(DataSize maxHeapMemory) {
+                this.maxHeapMemory = maxHeapMemory;
+            }
         }
     }
 
