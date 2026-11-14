@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-10T16:12:12.795950+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-11-14T10:22:39.298625+01:00[Europe/Zagreb]", comments = "Generator version: 7.27.0")
 public class ConnectedUserProjectWorkflowModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -101,6 +101,8 @@ public class ConnectedUserProjectWorkflowModel {
   private List<@Valid AutomationProjectWorkflowInputModel> inputs = new ArrayList<>();
 
   private Map<String, Object> inputValues = new HashMap<>();
+
+  private Map<String, Long> connections = new HashMap<>();
 
   private @Nullable String attentionReason;
 
@@ -443,6 +445,35 @@ public class ConnectedUserProjectWorkflowModel {
     this.inputValues = inputValues;
   }
 
+  public ConnectedUserProjectWorkflowModel connections(Map<String, Long> connections) {
+    this.connections = connections;
+    return this;
+  }
+
+  public ConnectedUserProjectWorkflowModel putConnectionsItem(String key, Long connectionsItem) {
+    if (this.connections == null) {
+      this.connections = new HashMap<>();
+    }
+    this.connections.put(key, connectionsItem);
+    return this;
+  }
+
+  /**
+   * For REFERENCE rows, the id of the connection each component uses, keyed by component name: the same shape as the connections of a provision request. Components whose connection the configuration provides are left out. Empty for COPY rows.
+   * @return connections
+   */
+  
+  @Schema(name = "connections", description = "For REFERENCE rows, the id of the connection each component uses, keyed by component name: the same shape as the connections of a provision request. Components whose connection the configuration provides are left out. Empty for COPY rows.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connections")
+  public Map<String, Long> getConnections() {
+    return connections;
+  }
+
+  @JsonProperty("connections")
+  public void setConnections(Map<String, Long> connections) {
+    this.connections = connections;
+  }
+
   public ConnectedUserProjectWorkflowModel attentionReason(@Nullable String attentionReason) {
     this.attentionReason = attentionReason;
     return this;
@@ -488,12 +519,13 @@ public class ConnectedUserProjectWorkflowModel {
         Objects.equals(this.components, connectedUserProjectWorkflow.components) &&
         Objects.equals(this.inputs, connectedUserProjectWorkflow.inputs) &&
         Objects.equals(this.inputValues, connectedUserProjectWorkflow.inputValues) &&
+        Objects.equals(this.connections, connectedUserProjectWorkflow.connections) &&
         Objects.equals(this.attentionReason, connectedUserProjectWorkflow.attentionReason);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion, kind, automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, attentionReason);
+    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion, kind, automationUuid, copiedFromWorkflowUuid, dangling, components, inputs, inputValues, connections, attentionReason);
   }
 
   @Override
@@ -515,6 +547,7 @@ public class ConnectedUserProjectWorkflowModel {
     sb.append("    components: ").append(toIndentedString(components)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    inputValues: ").append(toIndentedString(inputValues)).append("\n");
+    sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    attentionReason: ").append(toIndentedString(attentionReason)).append("\n");
     sb.append("}");
     return sb.toString();
