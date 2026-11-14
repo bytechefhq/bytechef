@@ -23,7 +23,11 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
     const {
         acceptedExtensions,
         canSubmit,
+        dragging,
         formatFileSize,
+        handleDragLeave,
+        handleDragOver,
+        handleDrop,
         handleFileChange,
         handleOpenChange,
         handleSubmit,
@@ -62,11 +66,17 @@ const UploadCustomComponentDialog = ({trigger}: UploadCustomComponentDialogProps
                                         'flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-stroke-neutral-tertiary p-6',
                                         uploading
                                             ? 'cursor-not-allowed opacity-50'
-                                            : 'cursor-pointer hover:bg-surface-neutral-primary-hover'
+                                            : 'cursor-pointer hover:bg-surface-neutral-primary-hover',
+                                        dragging && 'border-stroke-brand-primary bg-surface-neutral-primary-hover'
                                     )}
+                                    data-testid="component-file-drop-zone"
                                     onClick={() =>
                                         !uploading && document.getElementById('component-file-upload')?.click()
                                     }
+                                    onDragEnter={handleDragOver}
+                                    onDragLeave={handleDragLeave}
+                                    onDragOver={handleDragOver}
+                                    onDrop={handleDrop}
                                     onKeyDown={handleActivationKeyDown}
                                     role="button"
                                     tabIndex={0}
