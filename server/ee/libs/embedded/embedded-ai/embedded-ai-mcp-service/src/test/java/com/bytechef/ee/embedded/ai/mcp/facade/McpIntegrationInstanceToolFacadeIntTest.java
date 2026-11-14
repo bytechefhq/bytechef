@@ -15,6 +15,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.ai.mcp.audit.McpIntegrationInstanceAuditEvents;
@@ -459,7 +460,7 @@ class McpIntegrationInstanceToolFacadeIntTest {
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
         IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceToolFacadeImpl.class,
-        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class,
+        McpIntegrationInstanceWorkflowFacadeImpl.class, McpServerServiceImpl.class, WorkflowServiceImpl.class,
         EmbeddedMcpAuditIntTestConfiguration.class
     })
     static class FacadeIntTestConfiguration {
