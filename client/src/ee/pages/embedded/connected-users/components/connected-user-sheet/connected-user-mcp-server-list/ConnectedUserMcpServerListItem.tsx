@@ -27,7 +27,7 @@ const ConnectedUserMcpServerListItem = ({
 }: {
     connectedUserId: number;
     connectedUserIntegrationInstances: ConnectedUserIntegrationInstance[];
-    mcpServer: ConnectedUserMcpServer;
+    mcpServer: Omit<ConnectedUserMcpServer, 'automations'>;
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [open, setOpen] = useState(false);

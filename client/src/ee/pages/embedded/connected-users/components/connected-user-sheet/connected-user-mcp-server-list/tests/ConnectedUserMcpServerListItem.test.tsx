@@ -127,7 +127,7 @@ const toolsOnlyMcpServer = {
         },
     ],
     workflows: [],
-} as ConnectedUserMcpServer;
+} as Omit<ConnectedUserMcpServer, 'automations'>;
 
 const mixedMcpServer = {
     ...toolsOnlyMcpServer,
@@ -155,9 +155,9 @@ const mixedMcpServer = {
             workflowId: 'workflow-2',
         },
     ],
-} as ConnectedUserMcpServer;
+} as Omit<ConnectedUserMcpServer, 'automations'>;
 
-const renderListItem = (mcpServer: ConnectedUserMcpServer, queryClient = new QueryClient()) =>
+const renderListItem = (mcpServer: Omit<ConnectedUserMcpServer, 'automations'>, queryClient = new QueryClient()) =>
     render(
         <QueryClientProvider client={queryClient}>
             <TooltipProvider>
