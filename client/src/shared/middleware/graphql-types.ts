@@ -1067,7 +1067,6 @@ export type CreateMcpIntegrationInstanceConfigurationInput = {
   integrationInstanceConfigurationId: Scalars['ID']['input'];
   mcpServerId: Scalars['ID']['input'];
   selectedWorkflowIds: Array<Scalars['String']['input']>;
-  workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
 };
 
 export type CreateMcpProjectInput = {
@@ -4880,7 +4879,6 @@ export type UpdateKnowledgeBaseTagsInput = {
 
 export type UpdateMcpIntegrationInstanceConfigurationInput = {
   selectedWorkflowIds: Array<Scalars['String']['input']>;
-  workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
 };
 
 export type UpdateMcpProjectInput = {
