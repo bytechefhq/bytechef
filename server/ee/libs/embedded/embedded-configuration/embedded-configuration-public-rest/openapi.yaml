@@ -703,6 +703,59 @@ paths:
                   - $ref: "#/components/schemas/MissingInputError"
       security:
         - jwtBearerAuth: [ ]
+  /automation/workflows/{workflowUuid}/mcp/enable:
+    post:
+      description: "Turn on the workflow's availability to AI agents on every MCP server that offers it to the user."
+      summary: "Turn on the workflow's availability to AI agents"
+      tags:
+        - "mcp-automation-workflow"
+      operationId: "enableFrontendMcpAutomationWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowUuid"
+          description: "The workflow uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+        "404":
+          description: "The user has no reference for the workflow."
+      security:
+        - jwtBearerAuth: [ ]
+    delete:
+      description: "Turn off the workflow's availability to AI agents on every MCP server that offers it to the user."
+      summary: "Turn off the workflow's availability to AI agents"
+      tags:
+        - "mcp-automation-workflow"
+      operationId: "disableFrontendMcpAutomationWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowUuid"
+          description: "The workflow uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+        "404":
+          description: "The user has no reference for the workflow."
+      security:
+        - jwtBearerAuth: [ ]
   /automation/workflows/{workflowUuid}/inputs:
     put:
       description: "Store the input values the connected user supplied for a workflow."
@@ -1659,6 +1712,71 @@ paths:
                   - $ref: "#/components/schemas/MissingInputError"
       security:
         - bearerAuth: [ ]
+  /{externalUserId}/automation/workflows/{workflowUuid}/mcp/enable:
+    post:
+      description: "Turn on the workflow's availability to AI agents on every MCP server that offers it to the user."
+      summary: "Turn on the workflow's availability to AI agents"
+      tags:
+        - "mcp-automation-workflow"
+      operationId: "enableMcpAutomationWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowUuid"
+          description: "The workflow uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+        "404":
+          description: "The user has no reference for the workflow."
+      security:
+        - bearerAuth: [ ]
+    delete:
+      description: "Turn off the workflow's availability to AI agents on every MCP server that offers it to the user."
+      summary: "Turn off the workflow's availability to AI agents"
+      tags:
+        - "mcp-automation-workflow"
+      operationId: "disableMcpAutomationWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowUuid"
+          description: "The workflow uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "204":
+          description: "Successful operation."
+        "404":
+          description: "The user has no reference for the workflow."
+      security:
+        - bearerAuth: [ ]
   /{externalUserId}/automation/workflows/{workflowUuid}/inputs:
     put:
       description: "Store the input values a connected user supplied for a workflow."
@@ -2184,6 +2302,14 @@ components:
           description: "Why the automation needs attention: MISSING_CONNECTION:<component>, INPUT_REQUIRED:<input>,\
             \ UPDATE_PENDING or INVALID_WORKFLOW:<errorCount>. A COPY only reports INVALID_WORKFLOW. Null when healthy."
           type: "string"
+        mcpEnabled:
+          description: "Whether the workflow is available to AI agents. Null when no MCP server offers it to the user,\
+            \ otherwise true when it is on for at least one server."
+          type: "boolean"
+        toolOnly:
+          description: "True when the workflow can only be started as an MCP tool, because its only enabled trigger is\
+            \ the workflow call trigger."
+          type: "boolean"
     Connection:
       description: "Contains all required information to open a connection to a service defined by componentName parameter"
       type: "object"
