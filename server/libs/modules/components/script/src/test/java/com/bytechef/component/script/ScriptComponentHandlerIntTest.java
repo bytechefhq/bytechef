@@ -27,8 +27,11 @@ import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.config.ComponentTestIntConfiguration;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
+import org.graalvm.polyglot.Context;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -45,10 +48,24 @@ import org.springframework.context.annotation.ComponentScan;
         ComponentTestIntConfiguration.class,
         ScriptComponentHandlerIntTest.ScriptComponentHandlerIntTestConfiguration.class
     },
-    properties = "bytechef.workflow.repository.classpath.enabled=true")
+    properties = {
+        "bytechef.workflow.repository.classpath.enabled=true",
+        "bytechef.script.runners.graalvm.enabled=true"
+    })
 public class ScriptComponentHandlerIntTest {
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
+
+    @BeforeAll
+    static void warmUpPolyglotLanguages() {
+        for (String languageId : List.of("js", "python")) {
+            try (Context context = Context.create()) {
+                context.eval(languageId, "1");
+            } catch (RuntimeException exception) {
+                continue;
+            }
+        }
+    }
 
     private final TaskHandler<Object> taskHandler = taskExecution -> {
         Map<String, ?> parameters = taskExecution.getParameters();
@@ -75,6 +92,7 @@ public class ScriptComponentHandlerIntTest {
     }
 
     @Test
+    @Timeout(120)
     public void testPerformJavaScript() {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_javascript".getBytes(StandardCharsets.UTF_8)),
@@ -95,20 +113,6 @@ public class ScriptComponentHandlerIntTest {
             ENCODER.encodeToString("script_v1_python".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3),
             Map.of("var/v1/set", taskHandler, "script/v1/python", scriptPythonTaskHandler));
-
-        assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
-
-        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
-
-        Assertions.assertEquals(6000, outputs.get("result"));
-    }
-
-    @Disabled
-    @Test
-    public void testPerformR() {
-        Job job = componentJobTestExecutor.execute(
-            ENCODER.encodeToString("script_v1_r".getBytes(StandardCharsets.UTF_8)),
-            Map.of("factor", 3), Map.of("var/v1/set", taskHandler));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 

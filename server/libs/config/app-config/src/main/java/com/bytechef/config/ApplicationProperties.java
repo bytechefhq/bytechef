@@ -20,10 +20,13 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.unit.DataSize;
 
@@ -193,7 +196,7 @@ public class ApplicationProperties {
     private Resources resources = new Resources();
 
     /**
-     * Script execution configuration: the guest polyglot sandbox.
+     * Script execution configuration: the guest polyglot sandbox and the task runner allowlist.
      */
     private Script script = new Script();
 
@@ -5027,12 +5030,93 @@ public class ApplicationProperties {
 
         private Sandbox sandbox = new Sandbox();
 
+        private boolean injectConnections;
+
+        private RunnerLimits runnerLimits = new RunnerLimits();
+
+        private Map<String, Runner> runners = new HashMap<>();
+
+        /**
+         * Returns the runner configured under {@code type}, or null. A key is matched by its canonical form (lower
+         * case, letters and digits only), because an environment variable cannot carry a dash: Spring binds
+         * {@code BYTECHEF_SCRIPT_RUNNERS_AWSBATCH_ENABLED} under the key {@code awsbatch}, not {@code aws-batch}. When
+         * both forms are configured, for example {@code aws-batch} in a YAML file and {@code awsbatch} from the
+         * environment, the two are merged and the canonical key, which only an environment variable produces, wins, as
+         * environment variables outrank configuration files.
+         */
+        public Runner findRunner(String type) {
+            if (runners == null) {
+                return null;
+            }
+
+            String canonicalType = toCanonicalName(type);
+
+            Runner configuredRunner = null;
+            Runner environmentRunner = null;
+
+            for (Map.Entry<String, Runner> entry : runners.entrySet()) {
+                String key = entry.getKey();
+
+                if (!canonicalType.equals(toCanonicalName(key))) {
+                    continue;
+                }
+
+                if (key.equals(canonicalType)) {
+                    environmentRunner = entry.getValue();
+                } else {
+                    configuredRunner = entry.getValue();
+                }
+            }
+
+            if (configuredRunner == null || environmentRunner == null) {
+                return environmentRunner == null ? configuredRunner : environmentRunner;
+            }
+
+            return Runner.merge(configuredRunner, environmentRunner);
+        }
+
+        public RunnerLimits getRunnerLimits() {
+            return runnerLimits;
+        }
+
+        public Map<String, Runner> getRunners() {
+            return runners;
+        }
+
         public Sandbox getSandbox() {
             return sandbox;
         }
 
+        public boolean isInjectConnections() {
+            return injectConnections;
+        }
+
+        public void setInjectConnections(boolean injectConnections) {
+            this.injectConnections = injectConnections;
+        }
+
+        public void setRunnerLimits(RunnerLimits runnerLimits) {
+            this.runnerLimits = runnerLimits;
+        }
+
+        public void setRunners(Map<String, Runner> runners) {
+            this.runners = runners;
+        }
+
         public void setSandbox(Sandbox sandbox) {
             this.sandbox = sandbox;
+        }
+
+        private static String toCanonicalName(String name) {
+            StringBuilder sb = new StringBuilder(name.length());
+
+            for (char character : name.toCharArray()) {
+                if (Character.isLetterOrDigit(character)) {
+                    sb.append(Character.toLowerCase(character));
+                }
+            }
+
+            return sb.toString();
         }
 
         public static class Sandbox {
@@ -5077,6 +5161,108 @@ public class ApplicationProperties {
 
             public void setMaxHeapMemory(DataSize maxHeapMemory) {
                 this.maxHeapMemory = maxHeapMemory;
+            }
+        }
+
+        public static class Runner {
+
+            private Boolean enabled;
+
+            private Map<String, String> properties = new HashMap<>();
+
+            public Map<String, String> getProperties() {
+                return properties;
+            }
+
+            /**
+             * Returns the runner's properties as a read-only map whose lookups match a key by its canonical form, so
+             * {@code max-wait} finds a value bound under {@code maxwait} or {@code max.wait} from an environment
+             * variable.
+             */
+            public Map<String, String> propertiesByCanonicalName() {
+                if (properties == null) {
+                    return Map.of();
+                }
+
+                Map<String, String> canonicalProperties = new TreeMap<>(
+                    Comparator.comparing(Script::toCanonicalName));
+
+                canonicalProperties.putAll(properties);
+
+                return Collections.unmodifiableMap(canonicalProperties);
+            }
+
+            public boolean isEnabled() {
+                return Boolean.TRUE.equals(enabled);
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public void setProperties(Map<String, String> properties) {
+                this.properties = properties;
+            }
+
+            private static Runner merge(Runner lowerPrecedenceRunner, Runner higherPrecedenceRunner) {
+                Runner runner = new Runner();
+
+                runner.enabled = higherPrecedenceRunner.enabled == null
+                    ? lowerPrecedenceRunner.enabled : higherPrecedenceRunner.enabled;
+
+                Map<String, String> mergedProperties = new HashMap<>();
+
+                if (lowerPrecedenceRunner.properties != null) {
+                    mergedProperties.putAll(lowerPrecedenceRunner.properties);
+                }
+
+                if (higherPrecedenceRunner.properties != null) {
+                    for (Map.Entry<String, String> entry : higherPrecedenceRunner.properties.entrySet()) {
+                        String canonicalName = toCanonicalName(entry.getKey());
+
+                        mergedProperties.keySet()
+                            .removeIf(name -> toCanonicalName(name).equals(canonicalName));
+
+                        mergedProperties.put(entry.getKey(), entry.getValue());
+                    }
+                }
+
+                runner.properties = mergedProperties;
+
+                return runner;
+            }
+        }
+
+        public static class RunnerLimits {
+
+            private Duration maxWait;
+
+            private DataSize maxLogBytes;
+
+            private DataSize maxTransferBytes;
+
+            public DataSize getMaxLogBytes() {
+                return maxLogBytes;
+            }
+
+            public DataSize getMaxTransferBytes() {
+                return maxTransferBytes;
+            }
+
+            public Duration getMaxWait() {
+                return maxWait;
+            }
+
+            public void setMaxLogBytes(DataSize maxLogBytes) {
+                this.maxLogBytes = maxLogBytes;
+            }
+
+            public void setMaxTransferBytes(DataSize maxTransferBytes) {
+                this.maxTransferBytes = maxTransferBytes;
+            }
+
+            public void setMaxWait(Duration maxWait) {
+                this.maxWait = maxWait;
             }
         }
     }

@@ -1,6 +1,6 @@
 ---
 title: "Bash"
-description: "Allows you to run arbitrary Bash scripts."
+description: "Runs arbitrary Bash scripts on the server. Deprecated: use the Script component's Bash action."
 ---
 
 
@@ -20,7 +20,7 @@ Type: bash/v1
 ### Execute
 Name: execute
 
-`Creates a temporary script that executes bash commands. The script is afterwards deleted.`
+`Creates a temporary script that executes bash commands. The script is afterwards deleted. Deprecated: use the Bash action of the Script component instead.`
 
 #### Properties
 
@@ -62,3 +62,48 @@ Type: STRING
 
 
 
+<hr />
+
+## Additional Instructions
+
+#### Deprecated
+
+The Bash component is deprecated. Use the **Bash** action of the [Script](/reference/components/script_v1#bash) component instead, and see [Migrating from the Bash component](/platform/automation/build/workflows/task-runners#migrating-from-the-bash-component) for a step-by-step move. Workflows that already use the Bash component keep running, and its **Execute** action is labelled as deprecated in the workflow editor.
+
+#### How Execute Runs
+
+**Execute** writes the script to a temporary file, makes it executable and runs it directly on the ByteChef server, as the server's OS user:
+
+- the script sees the server process's whole environment, including its datasource password and cloud credentials;
+- it runs in the server's working directory, with the server's files in reach;
+- it has no timeout;
+- it is not governed by any task runner setting, so an operator cannot switch it off with `bytechef.script.runners.*`.
+
+The action returns the script's output as a single string.
+
+#### What The Script Bash Action Changes
+
+| | Bash component | Script Bash action |
+| --- | --- | --- |
+| Task type | `bash/v1/execute` | `script/v1/bash` |
+| Runs on | The server, always | The Process, Docker, Kubernetes or AWS Batch runner the operator enabled |
+| Environment | The server's | Cleared; **Input** values as `INPUT_<name>`, **Environment**, and the `BYTECHEF_*` variables |
+| Files | The server's working directory | A fresh working directory, with **Input Files** and **Output Files** |
+| Timeout | None | **Timeout**, 5 minutes by default on the Process runner |
+| Connections | None | Delivered in `connections.json` and masked in the output |
+| Result | The output, as a string | `exitCode`, `stdout`, `stderr`, `vars` and `outputFiles`; a non-zero exit fails the task |
+
+A step that read `${listFiles}` reads `${listFiles.stdout}` after the move:
+
+```json
+{
+  "name": "listFiles",
+  "type": "script/v1/bash",
+  "parameters": {
+    "script": "set -euo pipefail\n\nls -la",
+    "taskRunner": {"type": "process"}
+  }
+}
+```
+
+The Bash action needs a runner the operator enabled, for example `bytechef.script.runners.process.enabled=true`. See [Task Runners](/platform/automation/build/workflows/task-runners).
