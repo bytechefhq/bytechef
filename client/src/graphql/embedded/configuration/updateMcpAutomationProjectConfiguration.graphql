@@ -1,0 +1,19 @@
+mutation updateMcpAutomationProjectConfiguration($id: ID!, $input: UpdateMcpAutomationProjectConfigurationInput!) {
+    updateMcpAutomationProjectConfiguration(id: $id, input: $input) {
+        id
+        mcpServerId
+        automationProjectConfigurationId
+        automationProjectConfigurationName
+        automationProjectConfigurationEnabled
+        projectId
+        projectVersion
+        workflows {
+            id
+            workflowUuid
+            label
+            parameters
+            enabled
+            available
+        }
+    }
+}
