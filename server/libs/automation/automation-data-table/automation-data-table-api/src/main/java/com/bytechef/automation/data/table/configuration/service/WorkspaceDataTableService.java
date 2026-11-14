@@ -18,6 +18,7 @@ package com.bytechef.automation.data.table.configuration.service;
 
 import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Manages the workspace &harr; data-table relation rows. Workspace scoping for the platform {@code DataTable} domain
@@ -28,6 +29,8 @@ import java.util.List;
 public interface WorkspaceDataTableService {
 
     void assignDataTableToWorkspace(Long dataTableId, Long workspaceId);
+
+    Optional<Long> fetchWorkspaceId(Long dataTableId);
 
     List<WorkspaceDataTable> getDataTableWorkspaceDataTables(Long dataTableId);
 

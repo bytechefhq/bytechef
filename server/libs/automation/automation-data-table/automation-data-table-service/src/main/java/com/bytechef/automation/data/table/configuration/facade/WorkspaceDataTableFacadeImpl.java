@@ -22,13 +22,23 @@ import com.bytechef.platform.audit.AuditData;
 import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.data.table.audit.DataTableAuditEvents;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService.Webhook;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
+import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowConditions;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowFilter.Operation;
+import com.bytechef.platform.data.table.execution.domain.DataTableRowSort;
+import com.bytechef.platform.data.table.execution.domain.ExternalIdPatch;
+import com.bytechef.platform.data.table.execution.domain.NewRow;
+import com.bytechef.platform.data.table.execution.domain.UpsertResult;
 import com.bytechef.platform.data.table.execution.facade.DataTableRowFacade;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
@@ -37,8 +47,13 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -219,8 +234,8 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
 
     @Override
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
-    public void importCsv(long dataTableId, String csv, long environmentId) {
-        dataTableRowFacade.importCsv(dataTableService.getBaseNameById(dataTableId), csv, environmentId);
+    public int importCsv(long dataTableId, String csv, long environmentId) {
+        return dataTableRowFacade.importCsv(dataTableService.getBaseNameById(dataTableId), csv, environmentId);
     }
 
     @Override
@@ -234,5 +249,174 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
     public List<Webhook> listWebhooks(long dataTableId, long environmentId) {
         return dataTableWebhookService.listWebhooks(dataTableService.getBaseNameById(dataTableId), environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
+    public DataTableInfo getTable(long dataTableId, long environmentId) {
+        String baseName = dataTableService.getBaseNameById(dataTableId);
+
+        return dataTableService.fetchDataTableInfo(baseName, environmentId)
+            .orElseThrow(() -> new DataTableException(
+                "Data table '" + baseName + "' does not exist in this environment",
+                DataTableErrorType.DATA_TABLE_NOT_FOUND));
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
+    public void updateDescription(long dataTableId, @Nullable String description) {
+        dataTableService.updateDescription(dataTableService.getBaseNameById(dataTableId), description);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
+    public Page<DataTableRow> listRows(
+        long dataTableId, DataTableRowConditions conditions, List<DataTableRowSort> sorts, int pageNumber,
+        int pageSize, long environmentId) {
+
+        String baseName = dataTableService.getBaseNameById(dataTableId);
+
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+
+        long total = dataTableRowService.countRows(baseName, conditions, environmentId);
+        long offset = pageRequest.getOffset();
+
+        if (offset >= total || offset > Integer.MAX_VALUE) {
+            return new PageImpl<>(List.of(), pageRequest, total);
+        }
+
+        List<DataTableRow> dataTableRows = dataTableRowService.findRows(
+            baseName, conditions, sorts, pageSize, (int) offset, environmentId);
+
+        return new PageImpl<>(dataTableRows, pageRequest, total);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
+    public DataTableRow getRow(long dataTableId, long rowId, long environmentId) {
+        DataTableRow dataTableRow = dataTableRowService.getRow(
+            dataTableService.getBaseNameById(dataTableId), rowId, environmentId);
+
+        if (dataTableRow == null) {
+            throw new DataTableException("Row not found: id=" + rowId, DataTableErrorType.ROW_NOT_FOUND);
+        }
+
+        return dataTableRow;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
+    public Optional<DataTableRow> fetchRowByExternalId(long dataTableId, String externalId, long environmentId) {
+        return dataTableRowService.fetchRowByExternalId(
+            dataTableService.getBaseNameById(dataTableId), externalId, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
+    public DataTableRow insertRow(
+        long dataTableId, Map<String, Object> values, @Nullable String externalId, long environmentId) {
+
+        return dataTableRowFacade.insertRow(
+            dataTableService.getBaseNameById(dataTableId), values, externalId, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
+    public DataTableRow updateRow(
+        long dataTableId, long rowId, Map<String, Object> values, @Nullable ExternalIdPatch externalIdPatch,
+        long environmentId) {
+
+        String baseName = dataTableService.getBaseNameById(dataTableId);
+
+        if (dataTableRowService.getRow(baseName, rowId, environmentId) == null) {
+            throw new DataTableException("Row not found: id=" + rowId, DataTableErrorType.ROW_NOT_FOUND);
+        }
+
+        return dataTableRowFacade.updateRow(baseName, rowId, values, externalIdPatch, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
+    public UpsertResult upsertRow(long dataTableId, String externalId, Map<String, Object> values, long environmentId) {
+        return dataTableRowFacade.upsertRow(
+            dataTableService.getBaseNameById(dataTableId), externalId, values, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
+    public boolean deleteRowByExternalId(long dataTableId, String externalId, long environmentId) {
+        String baseName = dataTableService.getBaseNameById(dataTableId);
+
+        Optional<DataTableRow> dataTableRowOptional = dataTableRowService.fetchRowByExternalId(
+            baseName, externalId, environmentId);
+
+        return dataTableRowOptional
+            .map(dataTableRow -> dataTableRowService.deleteRow(baseName, dataTableRow.id(), environmentId))
+            .orElse(false);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
+    public List<DataTableRow> insertRows(
+        long dataTableId, List<NewRow> newRows, CreateStrategy createStrategy, long environmentId) {
+
+        return dataTableRowFacade.insertRows(
+            dataTableService.getBaseNameById(dataTableId), newRows, createStrategy, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
+    public List<Long> deleteRows(long dataTableId, List<Long> rowIds, long environmentId) {
+        if (rowIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<DataTableRow> deletedDataTableRows = dataTableRowService.deleteRows(
+            dataTableService.getBaseNameById(dataTableId),
+            DataTableRowConditions.of(List.of(new DataTableRowFilter("id", Operation.IN, rowIds))), environmentId);
+
+        return deletedDataTableRows.stream()
+            .map(DataTableRow::id)
+            .toList();
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
+    public long clearRows(long dataTableId, long environmentId) {
+        List<DataTableRow> deletedDataTableRows = dataTableRowService.deleteAllRows(
+            dataTableService.getBaseNameById(dataTableId), environmentId);
+
+        return deletedDataTableRows.size();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'DATA_TABLE_VIEW')")
+    public Map<Long, List<Tag>> getTagsByTableId(long workspaceId) {
+        List<Long> dataTableIds = workspaceDataTableService.getWorkspaceDataTables(workspaceId)
+            .stream()
+            .map(WorkspaceDataTable::getDataTableId)
+            .filter(Objects::nonNull)
+            .toList();
+
+        Map<String, List<Tag>> tagsByTableName = dataTableTagService.getTagsByTableName();
+
+        return dataTableIds.stream()
+            .collect(Collectors.toMap(
+                dataTableId -> dataTableId,
+                dataTableId -> tagsByTableName.getOrDefault(dataTableService.getBaseNameById(dataTableId), List.of())));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
+    public long getWorkspaceId(long dataTableId) {
+        return workspaceDataTableService.fetchWorkspaceId(dataTableId)
+            .orElseThrow(() -> new DataTableException(
+                "Data table not found: id=" + dataTableId, DataTableErrorType.DATA_TABLE_NOT_FOUND));
     }
 }
