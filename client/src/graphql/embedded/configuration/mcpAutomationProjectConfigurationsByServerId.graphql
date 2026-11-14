@@ -1,0 +1,19 @@
+query mcpAutomationProjectConfigurationsByServerId($mcpServerId: ID!) {
+    mcpAutomationProjectConfigurationsByServerId(mcpServerId: $mcpServerId) {
+        id
+        mcpServerId
+        automationProjectConfigurationId
+        automationProjectConfigurationName
+        automationProjectConfigurationEnabled
+        projectId
+        projectVersion
+        workflows {
+            id
+            workflowUuid
+            label
+            parameters
+            enabled
+            available
+        }
+    }
+}
