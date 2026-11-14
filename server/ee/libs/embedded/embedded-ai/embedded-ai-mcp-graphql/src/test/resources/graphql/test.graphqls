@@ -104,14 +104,3 @@ input McpToolInput {
     version: Int
 }
 
-input WorkflowConfigurationInput {
-    workflowId: String!
-    connections: [WorkflowConnectionInput!]
-    inputs: Map
-}
-
-input WorkflowConnectionInput {
-    connectionId: ID!
-    workflowConnectionKey: String!
-    workflowNodeName: String!
-}

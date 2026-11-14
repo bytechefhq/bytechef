@@ -9,10 +9,8 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -45,11 +43,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationServiceImpl;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowServiceImpl;
 import com.bytechef.ee.platform.audit.repository.PersistenceAuditEventRepository;
 import com.bytechef.encryption.Encryption;
-import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO;
-import com.bytechef.platform.configuration.dto.WorkflowConfigurationDTO.WorkflowConnectionDTO;
-import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.connection.service.ConnectionServiceImpl;
@@ -57,6 +51,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.mcp.service.McpComponentServiceImpl;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -93,9 +88,6 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
 
     private static final String SECOND_WORKFLOW_ID = "5eed0000-0000-0000-0000-0000000000b2";
     private static final String WORKFLOW_ID = "5eed0000-0000-0000-0000-0000000000b1";
-
-    @MockitoBean
-    private ComponentConnectionFacade componentConnectionFacade;
 
     @Autowired
     private ConnectionService connectionService;
@@ -201,12 +193,6 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
                 {"tasks":[]}""");
 
         createConfigurationWorkflow(WORKFLOW_ID, true);
-
-        when(componentConnectionFacade.getComponentConnections(any(WorkflowTask.class)))
-            .thenReturn(
-                List.of(
-                    new ComponentConnection("gmail", 1, "gmail_1", "gmail", true),
-                    new ComponentConnection("slack", 1, "slack_1", "slack", true)));
     }
 
     @AfterEach
@@ -232,13 +218,20 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
-    void testCreateStoresTheConfiguredInputsAndNonIntegrationConnections() {
+    void testCreateLeavesConfigurationWorkflowConnectionsAndInputs() {
         long connectionId = createConnection("slack", Environment.DEVELOPMENT);
+
+        IntegrationInstanceConfigurationWorkflow configuredWorkflow = getIntegrationInstanceConfigurationWorkflow();
+
+        configuredWorkflow.setConnections(
+            List.of(new IntegrationInstanceConfigurationWorkflowConnection(connectionId, "slack", "slack_1")));
+        configuredWorkflow.setInputs(Map.of("subject", "Hello"));
+
+        integrationInstanceConfigurationWorkflowService.update(configuredWorkflow);
 
         McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
             mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
-                mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID),
-                List.of(slackWorkflowConfiguration(connectionId, Map.of("subject", "Hello"))));
+                mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID));
 
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             getIntegrationInstanceConfigurationWorkflow();
@@ -246,6 +239,7 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
         assertThat(integrationInstanceConfigurationWorkflow.getConnections())
             .containsExactly(new IntegrationInstanceConfigurationWorkflowConnection(connectionId, "slack", "slack_1"));
         assertThat(integrationInstanceConfigurationWorkflow.getInputs()).isEqualTo(Map.of("subject", "Hello"));
+        assertThat(integrationInstanceConfigurationWorkflow.isEnabled()).isTrue();
 
         assertThat(getMcpIntegrationInstanceConfigurationWorkflows(mcpIntegrationInstanceConfiguration.getId()))
             .extracting(McpIntegrationInstanceConfigurationWorkflow::getIntegrationInstanceConfigurationWorkflowId)
@@ -253,83 +247,58 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
     }
 
     @Test
-    void testCreateRejectsAConnectionForTheIntegrationComponent() {
-        long connectionId = createConnection("gmail", Environment.DEVELOPMENT);
-
-        assertThatThrownBy(() -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
-            mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID),
-            List.of(
-                new WorkflowConfigurationDTO(
-                    WORKFLOW_ID, List.of(new WorkflowConnectionDTO(connectionId, "gmail", "gmail_1")), Map.of()))))
-                        .isInstanceOf(IllegalArgumentException.class)
-                        .hasMessageContaining("cannot be configured");
-
-        assertNothingWasStored();
-    }
-
-    @Test
-    void testCreateRejectsAConnectionFromAnotherEnvironment() {
-        long connectionId = createConnection("slack", Environment.PRODUCTION);
-
-        assertThatThrownBy(() -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
-            mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID),
-            List.of(slackWorkflowConfiguration(connectionId, Map.of()))))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Connection " + connectionId + " cannot be used");
-
-        assertNothingWasStored();
-    }
-
-    @Test
-    void testCreateRejectsAConfigurationWithoutARequiredNonIntegrationConnection() {
-        assertThatThrownBy(() -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
-            mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID),
-            List.of(new WorkflowConfigurationDTO(WORKFLOW_ID, List.of(), Map.of()))))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("requires a slack connection");
-
-        assertNothingWasStored();
-    }
-
-    @Test
-    void testCreateWithoutAConfigurationKeepsEmptyInputs() {
-        mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
-            mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID));
-
-        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
-            getIntegrationInstanceConfigurationWorkflow();
-
-        assertThat(integrationInstanceConfigurationWorkflow.getConnections()).isEmpty();
-        assertThat(integrationInstanceConfigurationWorkflow.getInputs()).isEmpty();
-        assertThat(integrationInstanceConfigurationWorkflow.isEnabled()).isTrue();
-    }
-
-    @Test
-    void testUpdateAppliesTheConfigurationOfAKeptWorkflow() {
+    void testUpdateLeavesConfigurationWorkflowConnectionsAndInputs() {
         McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
             mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
                 mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID));
 
-        long integrationInstanceConfigurationWorkflowId = getIntegrationInstanceConfigurationWorkflow().getId();
-
         long connectionId = createConnection("slack", Environment.DEVELOPMENT);
 
-        mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfiguration(
-            mcpIntegrationInstanceConfiguration.getId(), List.of(WORKFLOW_ID),
-            List.of(slackWorkflowConfiguration(connectionId, Map.of("subject", "Hi"))));
+        IntegrationInstanceConfigurationWorkflow configuredWorkflow = getIntegrationInstanceConfigurationWorkflow();
 
-        IntegrationInstanceConfigurationWorkflow updatedIntegrationInstanceConfigurationWorkflow =
+        configuredWorkflow.setConnections(
+            List.of(new IntegrationInstanceConfigurationWorkflowConnection(connectionId, "slack", "slack_1")));
+        configuredWorkflow.setInputs(Map.of("subject", "Hi"));
+
+        integrationInstanceConfigurationWorkflowService.update(configuredWorkflow);
+
+        mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfiguration(
+            mcpIntegrationInstanceConfiguration.getId(), List.of(WORKFLOW_ID));
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             getIntegrationInstanceConfigurationWorkflow();
 
-        assertThat(updatedIntegrationInstanceConfigurationWorkflow.getId())
-            .isEqualTo(integrationInstanceConfigurationWorkflowId);
-        assertThat(updatedIntegrationInstanceConfigurationWorkflow.getConnections())
+        assertThat(integrationInstanceConfigurationWorkflow.getConnections())
             .containsExactly(new IntegrationInstanceConfigurationWorkflowConnection(connectionId, "slack", "slack_1"));
-        assertThat(updatedIntegrationInstanceConfigurationWorkflow.getInputs()).isEqualTo(Map.of("subject", "Hi"));
+        assertThat(integrationInstanceConfigurationWorkflow.getInputs()).isEqualTo(Map.of("subject", "Hi"));
+    }
 
-        assertThat(getMcpIntegrationInstanceConfigurationWorkflows(mcpIntegrationInstanceConfiguration.getId()))
-            .extracting(McpIntegrationInstanceConfigurationWorkflow::getIntegrationInstanceConfigurationWorkflowId)
-            .containsExactly(integrationInstanceConfigurationWorkflowId);
+    @Test
+    void testUpdateDoesNotEnableConfigurationWorkflow() {
+        McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
+            mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
+                mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID));
+
+        integrationInstanceConfigurationWorkflowService.updateEnabled(
+            getIntegrationInstanceConfigurationWorkflow().getId(), false);
+
+        mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfiguration(
+            mcpIntegrationInstanceConfiguration.getId(), List.of(WORKFLOW_ID));
+
+        assertThat(getIntegrationInstanceConfigurationWorkflow().isEnabled()).isFalse();
+    }
+
+    @Test
+    void testFacadeAcceptsNoWorkflowConfigurations() {
+        for (Method method : McpIntegrationInstanceConfigurationFacade.class.getMethods()) {
+            if (method.getName()
+                .equals("createMcpIntegrationInstanceConfiguration")) {
+                assertThat(method.getParameterTypes()).containsExactly(long.class, long.class, List.class);
+            } else if (method.getName()
+                .equals("updateMcpIntegrationInstanceConfiguration")) {
+                assertThat(method.getParameterTypes()).containsExactly(long.class, List.class);
+            }
+        }
     }
 
     @Test
@@ -340,7 +309,7 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
             false);
 
         assertThatThrownBy(() -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
-            mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID), List.of()))
+            mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(
                     "Workflow " + WORKFLOW_ID + " is turned off in integration instance configuration " +
@@ -355,7 +324,7 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
         jdbcTemplate.update("DELETE FROM integration_instance_configuration_workflow");
 
         assertThatThrownBy(() -> mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
-            mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID), List.of()))
+            mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(
                     "Workflow " + WORKFLOW_ID + " is turned off in integration instance configuration " +
@@ -365,28 +334,6 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
                 integrationInstanceConfigurationId)).isEmpty();
         assertThat(mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurations()).isEmpty();
-    }
-
-    @Test
-    void testUpdateWithConnectionsDoesNotEnableConfigurationWorkflow() {
-        McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
-            mcpIntegrationInstanceConfigurationFacade.createMcpIntegrationInstanceConfiguration(
-                mcpServerId, integrationInstanceConfigurationId, List.of(WORKFLOW_ID));
-
-        long connectionId = createConnection("slack", Environment.DEVELOPMENT);
-
-        integrationInstanceConfigurationWorkflowService.updateEnabled(
-            getIntegrationInstanceConfigurationWorkflow().getId(), false);
-
-        mcpIntegrationInstanceConfigurationFacade.updateMcpIntegrationInstanceConfiguration(
-            mcpIntegrationInstanceConfiguration.getId(), List.of(WORKFLOW_ID),
-            List.of(slackWorkflowConfiguration(connectionId, Map.of("subject", "Hi"))));
-
-        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
-            getIntegrationInstanceConfigurationWorkflow();
-
-        assertThat(integrationInstanceConfigurationWorkflow.isEnabled()).isFalse();
-        assertThat(integrationInstanceConfigurationWorkflow.getInputs()).isEqualTo(Map.of("subject", "Hi"));
     }
 
     @Test
@@ -539,15 +486,6 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
                 .isEmpty();
     }
 
-    private void assertNothingWasStored() {
-        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
-            getIntegrationInstanceConfigurationWorkflow();
-
-        assertThat(integrationInstanceConfigurationWorkflow.getConnections()).isEmpty();
-        assertThat(integrationInstanceConfigurationWorkflow.getInputs()).isEmpty();
-        assertThat(mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurations()).isEmpty();
-    }
-
     private void createConfigurationWorkflow(String workflowId, boolean enabled) {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             new IntegrationInstanceConfigurationWorkflow();
@@ -606,11 +544,6 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
         return mcpIntegrationInstanceConfigurationWorkflowService
             .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
                 mcpIntegrationInstanceConfigurationId);
-    }
-
-    private static WorkflowConfigurationDTO slackWorkflowConfiguration(long connectionId, Map<String, Object> inputs) {
-        return new WorkflowConfigurationDTO(
-            WORKFLOW_ID, List.of(new WorkflowConnectionDTO(connectionId, "slack", "slack_1")), inputs);
     }
 
     @Configuration
