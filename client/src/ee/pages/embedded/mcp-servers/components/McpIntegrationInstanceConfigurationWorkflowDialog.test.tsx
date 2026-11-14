@@ -73,17 +73,6 @@ vi.mock('@/ee/shared/queries/embedded/integrationWorkflows.queries', () => ({
     }),
 }));
 
-vi.mock(
-    '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections',
-    () => ({
-        default: () => <div data-testid="connections" />,
-    })
-);
-
-vi.mock('@/shared/components/InputConfigurationList', () => ({
-    default: () => <div data-testid="input-configuration-list" />,
-}));
-
 const mcpServer = {id: 's1', name: 'Server'} as McpServer;
 
 const makeEditConfig = (workflowLabels: string[]): McpIntegrationInstanceConfigurationItemType =>
@@ -148,15 +137,26 @@ describe('McpIntegrationInstanceConfigurationWorkflowDialog', () => {
             id: 'cfg1',
             input: {
                 selectedWorkflowIds: ['w1'],
-                workflowConfigurations: [
-                    {
-                        connections: [{connectionId: '9', workflowConnectionKey: 'slack', workflowNodeName: 'slack_1'}],
-                        inputs: {subject: 'Hello'},
-                        workflowId: 'w1',
-                    },
-                ],
             },
         });
+    });
+
+    it('dialogHasNoConnectionsOrInputsSection', async () => {
+        hoisted.eligibleResult.data = {
+            toolEligibleIntegrationInstanceConfigurationWorkflows: [{id: 'w1', label: 'Workflow One'}],
+        };
+
+        render(
+            <McpIntegrationInstanceConfigurationWorkflowDialog
+                mcpIntegrationInstanceConfiguration={makeEditConfig(['Workflow One'])}
+                mcpServer={mcpServer}
+            />
+        );
+
+        await waitFor(() => expect(screen.getByRole('switch', {name: 'Workflow One'})).toBeChecked());
+
+        expect(screen.queryByRole('tab', {name: /Connections/})).not.toBeInTheDocument();
+        expect(screen.queryByRole('tab', {name: /Inputs/})).not.toBeInTheDocument();
     });
 
     it('rendersDisabledWorkflowAsNotSelectable', () => {
