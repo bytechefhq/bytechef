@@ -1,0 +1,7 @@
+mutation updateMcpAutomationProjectConfigurationWorkflowEnabled($id: ID!, $enabled: Boolean!) {
+    updateMcpAutomationProjectConfigurationWorkflowEnabled(id: $id, enabled: $enabled) {
+        id
+        enabled
+        available
+    }
+}

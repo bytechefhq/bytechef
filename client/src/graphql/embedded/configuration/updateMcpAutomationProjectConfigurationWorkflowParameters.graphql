@@ -1,0 +1,6 @@
+mutation updateMcpAutomationProjectConfigurationWorkflowParameters($id: ID!, $parameters: Map!) {
+    updateMcpAutomationProjectConfigurationWorkflowParameters(id: $id, parameters: $parameters) {
+        id
+        parameters
+    }
+}

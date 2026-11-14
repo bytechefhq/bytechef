@@ -1,0 +1,3 @@
+mutation deleteMcpAutomationProjectConfiguration($id: ID!) {
+    deleteMcpAutomationProjectConfiguration(id: $id)
+}
