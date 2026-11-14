@@ -25,9 +25,11 @@ import com.bytechef.platform.data.table.audit.DataTableAuditMapper;
 import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.ReservedColumns;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +80,15 @@ public class DataTableServiceImpl implements DataTableService {
 
         Assert.notNull(columnSpec, "column must not be null");
 
+        validateColumnName(columnSpec.name());
+
         String physicalName = buildPhysicalName(environmentId, normalizedBaseName);
+
+        if (hasColumn(physicalName, columnSpec.name())) {
+            throw new DataTableException(
+                "Column '" + columnSpec.name() + "' already exists on table '" + normalizedBaseName + "'",
+                DataTableErrorType.COLUMN_ALREADY_EXISTS);
+        }
 
         String sql = "ALTER TABLE " + escapeIdentifier(physicalName) + " ADD COLUMN " +
             escapeIdentifier(columnSpec.name()) + " " + sqlType(columnSpec.type());
@@ -108,21 +118,19 @@ public class DataTableServiceImpl implements DataTableService {
 
         Assert.notEmpty(columnSpecs, "columns must not be empty");
 
-        boolean hasId = columnSpecs.stream()
-            .anyMatch(c -> "id".equalsIgnoreCase(c.name()));
-
-        Assert.isTrue(!hasId, "Column name 'id' is reserved for primary key");
-
-        String userColsSql = columnSpecs.stream()
-            .map(columnSpec -> escapeIdentifier(columnSpec.name()) + " " + sqlType(columnSpec.type()))
-            .collect(Collectors.joining(", "));
+        for (ColumnSpec columnSpec : columnSpecs) {
+            validateColumnName(columnSpec.name());
+        }
 
         String physicalName = buildPhysicalName(environmentId, normalizedBaseName);
 
-        String sql = "CREATE TABLE " + escapeIdentifier(physicalName) + " (\"id\" BIGSERIAL PRIMARY KEY" +
-            (userColsSql.isEmpty() ? "" : ", " + userColsSql) + ")";
+        if (physicalTableExists(physicalName)) {
+            throw new DataTableException(
+                "Data table '" + normalizedBaseName + "' already exists in this environment",
+                DataTableErrorType.DATA_TABLE_ALREADY_EXISTS);
+        }
 
-        jdbcTemplate.execute(sql);
+        createPhysicalTable(physicalName, columnSpecs);
 
         checkRegistry(normalizedBaseName, description);
     }
@@ -178,23 +186,27 @@ public class DataTableServiceImpl implements DataTableService {
         String fromPhysicalName = buildPhysicalName(environmentId, normalizedFromBaseName);
         String toPhysicalName = buildPhysicalName(environmentId, normalizedToBaseName);
 
-        List<ColumnSpec> columnSpecs = listColumns(fromPhysicalName)
-            .stream()
-            .filter(columnSpec -> !"id".equalsIgnoreCase(columnSpec.name()))
+        List<ColumnSpec> sourceColumnSpecs = listColumns(fromPhysicalName);
+
+        List<ColumnSpec> columnSpecs = sourceColumnSpecs.stream()
+            .filter(columnSpec -> !ReservedColumns.isReserved(columnSpec.name()))
             .toList();
 
-        String userColumnsSql = columnSpecs.stream()
-            .map(columnSpec -> escapeIdentifier(columnSpec.name()) + " " + sqlType(columnSpec.type()))
-            .collect(Collectors.joining(", "));
+        createPhysicalTable(toPhysicalName, columnSpecs);
 
-        String createSql = "CREATE TABLE " + escapeIdentifier(toPhysicalName) +
-            " (\"id\" BIGSERIAL PRIMARY KEY" + (userColumnsSql.isEmpty() ? "" : ", " + userColumnsSql) + ")";
+        List<String> copiedColumnNames = new ArrayList<>();
 
-        jdbcTemplate.execute(createSql);
+        if (containsColumn(sourceColumnSpecs, ReservedColumns.EXTERNAL_ID)) {
+            copiedColumnNames.add(ReservedColumns.EXTERNAL_ID);
+        }
 
-        if (!columnSpecs.isEmpty()) {
-            String columnList = columnSpecs.stream()
-                .map(columnSpec -> escapeIdentifier(columnSpec.name()))
+        for (ColumnSpec columnSpec : columnSpecs) {
+            copiedColumnNames.add(columnSpec.name());
+        }
+
+        if (!copiedColumnNames.isEmpty()) {
+            String columnList = copiedColumnNames.stream()
+                .map(this::escapeIdentifier)
                 .collect(Collectors.joining(", "));
 
             String insertSql = "INSERT INTO " + escapeIdentifier(toPhysicalName) + " (" + columnList + ") SELECT " +
@@ -230,6 +242,30 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
+    public Optional<DataTableInfo> fetchDataTableInfo(String baseName, long environmentId) {
+        String normalizedBaseName = normalizeBaseName(baseName);
+
+        Optional<DataTable> dataTableOptional = dataTableRepository.findByName(normalizedBaseName);
+
+        if (dataTableOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        String physicalName = buildPhysicalName(environmentId, normalizedBaseName);
+
+        if (!physicalTableExists(physicalName)) {
+            return Optional.empty();
+        }
+
+        DataTable dataTable = dataTableOptional.get();
+
+        return Optional.of(
+            new DataTableInfo(
+                dataTable.getId(), dataTable.getName(), dataTable.getDescription(), listUserColumns(physicalName),
+                dataTable.getLastModifiedDate()));
+    }
+
+    @Override
     public List<DataTableInfo> listTables(long environmentId) {
         String prefix = "dt_" + environmentId + "_";
 
@@ -248,10 +284,7 @@ public class DataTableServiceImpl implements DataTableService {
 
             String baseName = tableName.substring(prefix.length());
 
-            List<ColumnSpec> columnSpecs = listColumns(tableName)
-                .stream()
-                .filter(columnSpec -> !"id".equalsIgnoreCase(columnSpec.name()))
-                .toList();
+            List<ColumnSpec> columnSpecs = listUserColumns(tableName);
 
             DataTable dataTable = dataTableRepository.findByName(baseName)
                 .orElse(null);
@@ -291,9 +324,15 @@ public class DataTableServiceImpl implements DataTableService {
     public void removeColumn(String baseName, String columnName, long environmentId) {
         String normalizedBaseName = normalizeBaseName(baseName);
 
-        Assert.hasText(columnName, "columnName must not be empty");
+        validateColumnName(columnName);
 
         String physicalName = buildPhysicalName(environmentId, normalizedBaseName);
+
+        if (!hasColumn(physicalName, columnName)) {
+            throw new DataTableException(
+                "Column '" + columnName + "' not found on table '" + normalizedBaseName + "'",
+                DataTableErrorType.COLUMN_NOT_FOUND);
+        }
 
         String sql = "ALTER TABLE " + escapeIdentifier(physicalName) + " DROP COLUMN " + escapeIdentifier(columnName);
 
@@ -319,12 +358,22 @@ public class DataTableServiceImpl implements DataTableService {
     public void renameColumn(String baseName, String fromColumnName, String toColumnName, long environmentId) {
         String normalizedBaseName = normalizeBaseName(baseName);
 
-        Assert.hasText(fromColumnName, "fromColumnName must not be empty");
-        Assert.hasText(toColumnName, "toColumnName must not be empty");
-        Assert.isTrue(!"id".equalsIgnoreCase(fromColumnName), "Column 'id' cannot be renamed");
-        Assert.isTrue(!"id".equalsIgnoreCase(toColumnName), "Cannot rename to reserved name 'id'");
+        validateColumnName(fromColumnName);
+        validateColumnName(toColumnName);
 
         String physicalName = buildPhysicalName(environmentId, normalizedBaseName);
+
+        if (!hasColumn(physicalName, fromColumnName)) {
+            throw new DataTableException(
+                "Column '" + fromColumnName + "' not found on table '" + normalizedBaseName + "'",
+                DataTableErrorType.COLUMN_NOT_FOUND);
+        }
+
+        if (hasColumn(physicalName, toColumnName)) {
+            throw new DataTableException(
+                "Column '" + toColumnName + "' already exists on table '" + normalizedBaseName + "'",
+                DataTableErrorType.COLUMN_ALREADY_EXISTS);
+        }
 
         String sql = "ALTER TABLE " + escapeIdentifier(physicalName) + " RENAME COLUMN " +
             escapeIdentifier(fromColumnName) + " TO " + escapeIdentifier(toColumnName);
@@ -366,6 +415,50 @@ public class DataTableServiceImpl implements DataTableService {
         dataTable.setName(normalizedToBaseName);
 
         dataTableRepository.save(dataTable);
+    }
+
+    @Override
+    public void updateDescription(String baseName, @Nullable String description) {
+        String normalizedBaseName = normalizeBaseName(baseName);
+
+        DataTable dataTable = dataTableRepository.findByName(normalizedBaseName)
+            .orElseThrow(() -> new DataTableException(
+                "Unable to find table " + normalizedBaseName, DataTableErrorType.DATA_TABLE_NOT_FOUND));
+
+        dataTable.setDescription(description);
+
+        dataTableRepository.save(dataTable);
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private void createPhysicalTable(String physicalName, List<ColumnSpec> columnSpecs) {
+        String userColumnsSql = columnSpecs.stream()
+            .map(columnSpec -> escapeIdentifier(columnSpec.name()) + " " + sqlType(columnSpec.type()))
+            .collect(Collectors.joining(", "));
+
+        jdbcTemplate.execute(
+            "CREATE TABLE " + escapeIdentifier(physicalName) + " (\"id\" BIGSERIAL PRIMARY KEY, " +
+                escapeIdentifier(ReservedColumns.EXTERNAL_ID) + " VARCHAR(255)" +
+                (userColumnsSql.isEmpty() ? "" : ", " + userColumnsSql) + ")");
+
+        jdbcTemplate.execute(
+            "CREATE UNIQUE INDEX ON " + escapeIdentifier(physicalName) + " (" +
+                escapeIdentifier(ReservedColumns.EXTERNAL_ID) + ")");
+    }
+
+    private static boolean containsColumn(List<ColumnSpec> columnSpecs, String columnName) {
+        return columnSpecs.stream()
+            .anyMatch(columnSpec -> columnName.equalsIgnoreCase(columnSpec.name()));
+    }
+
+    private boolean hasColumn(String physicalName, String columnName) {
+        return containsColumn(listColumns(physicalName), columnName);
+    }
+
+    private List<ColumnSpec> listUserColumns(String physicalName) {
+        return listColumns(physicalName).stream()
+            .filter(columnSpec -> !ReservedColumns.isReserved(columnSpec.name()))
+            .toList();
     }
 
     private String buildPhysicalName(long environmentId, String normalizedBaseName) {
@@ -486,5 +579,19 @@ public class DataTableServiceImpl implements DataTableService {
         Assert.isTrue(normalizedBaseName.matches("[a-z_][a-z0-9_]*"), "Invalid base name: " + baseName);
 
         return normalizedBaseName;
+    }
+
+    private static void validateColumnName(@Nullable String columnName) {
+        if (columnName == null || !columnName.toLowerCase(Locale.ROOT)
+            .matches("[a-z_][a-z0-9_]*")) {
+
+            throw new DataTableException(
+                "Invalid column name: " + columnName, DataTableErrorType.COLUMN_NAME_INVALID);
+        }
+
+        if (ReservedColumns.isReserved(columnName)) {
+            throw new DataTableException(
+                "Column name '" + columnName + "' is reserved", DataTableErrorType.COLUMN_NAME_INVALID);
+        }
     }
 }
