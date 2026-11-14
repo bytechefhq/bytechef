@@ -83,6 +83,55 @@ describe('ConnectedUserSheetDeleteDropdownMenu', () => {
         expect(hoisted.onDeleteClick).toHaveBeenCalledTimes(1);
     });
 
+    it('should call onCredentialsClick when clicking Credentials', async () => {
+        const onCredentialsClick = vi.fn();
+
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu
+                    onCredentialsClick={onCredentialsClick}
+                    onDeleteClick={hoisted.onDeleteClick}
+                />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Credentials'}));
+
+        expect(onCredentialsClick).toHaveBeenCalledTimes(1);
+        expect(hoisted.onDeleteClick).not.toHaveBeenCalled();
+    });
+
+    it('should disable Credentials with the given reason', async () => {
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu credentialsDisabledReason="Edited elsewhere" />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+
+        const credentialsMenuItem = screen.getByRole('menuitem', {name: 'Credentials'});
+
+        expect(credentialsMenuItem).toHaveAttribute('aria-disabled', 'true');
+
+        await userEvent.hover(credentialsMenuItem.parentElement as HTMLElement);
+
+        await waitFor(async () => expect((await screen.findAllByText('Edited elsewhere')).length).toBeGreaterThan(0));
+    });
+
+    it('should leave Delete out when no delete handler is given', async () => {
+        render(
+            <TooltipProvider>
+                <ConnectedUserSheetDeleteDropdownMenu onCredentialsClick={vi.fn()} />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: 'More actions'}));
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual(['Credentials']);
+    });
+
     it('should not offer Change configuration unless the handler is given', async () => {
         render(
             <TooltipProvider>

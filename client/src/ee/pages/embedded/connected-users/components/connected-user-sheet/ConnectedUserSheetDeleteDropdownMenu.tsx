@@ -6,20 +6,24 @@ import {
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, KeyRoundIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
 
 interface ConnectedUserSheetDeleteDropdownMenuProps {
     changeConfigurationDisabled?: boolean;
     changeConfigurationDisabledReason?: string;
+    credentialsDisabledReason?: string;
     onChangeConfigurationClick?: () => void;
-    onDeleteClick: () => void;
+    onCredentialsClick?: () => void;
+    onDeleteClick?: () => void;
     onEditClick?: () => void;
 }
 
 const ConnectedUserSheetDeleteDropdownMenu = ({
     changeConfigurationDisabled,
     changeConfigurationDisabledReason,
+    credentialsDisabledReason,
     onChangeConfigurationClick,
+    onCredentialsClick,
     onDeleteClick,
     onEditClick,
 }: ConnectedUserSheetDeleteDropdownMenuProps) => (
@@ -35,6 +39,22 @@ const ConnectedUserSheetDeleteDropdownMenu = ({
 
         <DropdownMenuContent align="end">
             {onEditClick && <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />}
+
+            {onCredentialsClick && (
+                <DropdownMenuItem icon={<KeyRoundIcon />} label="Credentials" onClick={onCredentialsClick} />
+            )}
+
+            {credentialsDisabledReason && (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span className="block">
+                            <DropdownMenuItem disabled icon={<KeyRoundIcon />} label="Credentials" />
+                        </span>
+                    </TooltipTrigger>
+
+                    <TooltipContent side="left">{credentialsDisabledReason}</TooltipContent>
+                </Tooltip>
+            )}
 
             {onChangeConfigurationClick && (
                 <Tooltip>
@@ -56,7 +76,9 @@ const ConnectedUserSheetDeleteDropdownMenu = ({
                 </Tooltip>
             )}
 
-            <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
+            {onDeleteClick && (
+                <DropdownMenuItem icon={<Trash2Icon />} label="Delete" onClick={onDeleteClick} variant="destructive" />
+            )}
         </DropdownMenuContent>
     </DropdownMenu>
 );
