@@ -104,6 +104,9 @@ const renderConnectionList = (connectedUserIntegrationInstances: ConnectedUserIn
 
 const getConnectionRow = (name: string) => screen.getByText(name).closest('li') as HTMLElement;
 
+const openActionsMenu = (name: string) =>
+    userEvent.click(within(getConnectionRow(name)).getByRole('button', {name: 'More actions'}));
+
 describe('ConnectedUserSheetPanelConnectionList', () => {
     beforeEach(() => {
         hoisted.allConnectedUserConnectionsQuery.mockReset();
@@ -164,18 +167,26 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
         ).toBeGreaterThan(0);
     });
 
-    it('offers Credentials only on provisioned connections', () => {
+    it('offers Credentials in the actions menu only on provisioned connections', async () => {
         hoisted.allConnectedUserConnectionsQuery.mockReturnValue({data: connections, isLoading: false});
 
         renderConnectionList(integrationInstances);
 
-        expect(
-            within(getConnectionRow('Provisioned HubSpot')).getByRole('button', {name: 'Credentials'})
-        ).toBeEnabled();
-        expect(
-            within(getConnectionRow('Own Slack')).queryByRole('button', {name: 'Credentials'})
-        ).not.toBeInTheDocument();
-        expect(within(getConnectionRow('Shared GitHub')).getByRole('button', {name: 'Credentials'})).toBeDisabled();
+        expect(screen.queryByRole('button', {name: 'Credentials'})).not.toBeInTheDocument();
+
+        await openActionsMenu('Provisioned HubSpot');
+
+        expect(screen.getByRole('menuitem', {name: 'Credentials'})).not.toHaveAttribute('aria-disabled');
+
+        await userEvent.keyboard('{Escape}');
+        await openActionsMenu('Own Slack');
+
+        expect(screen.queryByRole('menuitem', {name: 'Credentials'})).not.toBeInTheDocument();
+
+        await userEvent.keyboard('{Escape}');
+        await openActionsMenu('Shared GitHub');
+
+        expect(screen.getByRole('menuitem', {name: 'Credentials'})).toHaveAttribute('aria-disabled', 'true');
     });
 
     it('offers Delete on self-created and provisioned connections but not on shared ones', async () => {
@@ -183,16 +194,32 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
 
         renderConnectionList();
 
-        expect(within(getConnectionRow('Own Slack')).getByRole('button', {name: 'More actions'})).toBeInTheDocument();
-        expect(
-            within(getConnectionRow('Shared GitHub')).queryByRole('button', {name: 'More actions'})
-        ).not.toBeInTheDocument();
-
-        await userEvent.click(
-            within(getConnectionRow('Provisioned HubSpot')).getByRole('button', {name: 'More actions'})
-        );
+        await openActionsMenu('Own Slack');
 
         expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
+
+        await userEvent.keyboard('{Escape}');
+        await openActionsMenu('Shared GitHub');
+
+        expect(screen.queryByRole('menuitem', {name: 'Delete'})).not.toBeInTheDocument();
+
+        await userEvent.keyboard('{Escape}');
+        await openActionsMenu('Provisioned HubSpot');
+
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
+    });
+
+    it('lists Credentials before Delete in the actions menu', async () => {
+        hoisted.allConnectedUserConnectionsQuery.mockReturnValue({data: connections, isLoading: false});
+
+        renderConnectionList();
+
+        await openActionsMenu('Provisioned HubSpot');
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent)).toEqual([
+            'Credentials',
+            'Delete',
+        ]);
     });
 
     it('deletes a connection of the connected user after the admin confirms', async () => {
@@ -202,9 +229,7 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
 
         renderConnectionList();
 
-        await userEvent.click(
-            within(getConnectionRow('Provisioned HubSpot')).getByRole('button', {name: 'More actions'})
-        );
+        await openActionsMenu('Provisioned HubSpot');
         await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
 
         expect(hoisted.deleteConnectedUserConnection).not.toHaveBeenCalled();
@@ -225,34 +250,13 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
         ).not.toBeInTheDocument();
     });
 
-    it('puts the Credentials action right before the column with the origin badge and created date', () => {
-        hoisted.allConnectedUserConnectionsQuery.mockReturnValue({
-            data: [{...connections[1], createdDate: new Date('2026-11-13T10:00:00Z')}],
-            isLoading: false,
-        });
-
-        renderConnectionList();
-
-        const connectionRow = getConnectionRow('Provisioned HubSpot');
-        const credentialsButton = within(connectionRow).getByRole('button', {name: 'Credentials'});
-        const originAndCreatedDateColumn = within(connectionRow).getByText(/^Created at/).parentElement!;
-
-        expect(originAndCreatedDateColumn).toContainElement(within(connectionRow).getByText('Provisioned'));
-        expect(originAndCreatedDateColumn).toContainElement(within(connectionRow).getByText('Automation'));
-        expect(originAndCreatedDateColumn).not.toContainElement(credentialsButton);
-        expect(
-            credentialsButton.compareDocumentPosition(originAndCreatedDateColumn) & Node.DOCUMENT_POSITION_FOLLOWING
-        ).toBeTruthy();
-    });
-
     it('offers Credentials on a connection provisioned for automations', async () => {
         hoisted.allConnectedUserConnectionsQuery.mockReturnValue({data: connections, isLoading: false});
 
         renderConnectionList();
 
-        await userEvent.click(
-            within(getConnectionRow('Provisioned HubSpot')).getByRole('button', {name: 'Credentials'})
-        );
+        await openActionsMenu('Provisioned HubSpot');
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Credentials'}));
 
         expect(screen.getByText('Credentials of connection 2 of connected user 7')).toBeInTheDocument();
         expect(screen.queryByText(/Credentials of integration instance/)).not.toBeInTheDocument();
@@ -263,9 +267,8 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
 
         renderConnectionList();
 
-        await userEvent.hover(
-            within(getConnectionRow('Shared GitHub')).getByRole('button', {name: 'Credentials'}).parentElement!
-        );
+        await openActionsMenu('Shared GitHub');
+        await userEvent.hover(screen.getByRole('menuitem', {name: 'Credentials'}).parentElement!);
 
         expect(
             (await screen.findAllByText('Shared connections are edited on the Connections page')).length
@@ -277,9 +280,8 @@ describe('ConnectedUserSheetPanelConnectionList', () => {
 
         renderConnectionList(integrationInstances);
 
-        await userEvent.click(
-            within(getConnectionRow('Provisioned HubSpot')).getByRole('button', {name: 'Credentials'})
-        );
+        await openActionsMenu('Provisioned HubSpot');
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Credentials'}));
 
         expect(screen.getByText('Credentials of integration instance 20')).toBeInTheDocument();
         expect(screen.queryByText(/Credentials of connection/)).not.toBeInTheDocument();
