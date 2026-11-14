@@ -858,6 +858,7 @@ public class ConnectedUserMcpServerFacadeIntTest {
         IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class, McpComponentServiceImpl.class,
         McpIntegrationInstanceConfigurationServiceImpl.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, McpIntegrationInstanceRowsImpl.class,
+        McpServerMembership.class,
         McpServerServiceImpl.class, WorkflowServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class,
         IntegrationWorkflowServiceImpl.class
     })

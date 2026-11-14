@@ -60,6 +60,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class McpIntegrationInstanceRowsIntTest {
 
     private static final String ARCHIVE_EMAIL_WORKFLOW_ID = "6eed0000-0000-0000-0000-0000000000b1";
+    private static final String AUTOMATION_WORKFLOW_UUID = "6eed0000-0000-0000-0000-00000000cccc";
     private static final String SEND_EMAIL_WORKFLOW_ID = "6eed0000-0000-0000-0000-0000000000a1";
     private static final String SEND_EMAIL_WORKFLOW_V7_ID = "6eed0000-0000-0000-0000-0000000000a7";
     private static final String SEND_EMAIL_WORKFLOW_UUID = "6eed0000-0000-0000-0000-00000000aaaa";
@@ -353,13 +354,88 @@ public class McpIntegrationInstanceRowsIntTest {
             .containsExactly(false);
     }
 
+    @Test
+    public void testAutomationOnlyUserGetsNewIntegrationRowsEnabled() {
+        long linkWorkflowId = fixture.insertAutomationLinkWorkflow(mcpServer.getId(), AUTOMATION_WORKFLOW_UUID);
+
+        fixture.insertAutomationRow(connectedUserId, linkWorkflowId, AUTOMATION_WORKFLOW_UUID, true);
+
+        mcpIntegrationInstanceRows.addMissingRows(connectedUserId, mcpServer.getId());
+
+        assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
+            .extracting(McpIntegrationInstanceTool::getMcpToolId, McpIntegrationInstanceTool::isEnabled)
+            .containsExactlyInAnyOrder(tuple(searchEmailToolId, true), tuple(getEmailToolId, true));
+        assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
+            .extracting(McpIntegrationInstanceWorkflow::isEnabled)
+            .containsExactly(true);
+    }
+
+    @Test
+    public void testAutomationOnlyUserWithDisabledRowGetsNewIntegrationRowsDisabled() {
+        long linkWorkflowId = fixture.insertAutomationLinkWorkflow(mcpServer.getId(), AUTOMATION_WORKFLOW_UUID);
+
+        fixture.insertAutomationRow(connectedUserId, linkWorkflowId, AUTOMATION_WORKFLOW_UUID, false);
+
+        mcpIntegrationInstanceRows.addMissingRows(connectedUserId, mcpServer.getId());
+
+        assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
+            .extracting(McpIntegrationInstanceTool::getMcpToolId, McpIntegrationInstanceTool::isEnabled)
+            .containsExactlyInAnyOrder(tuple(searchEmailToolId, false), tuple(getEmailToolId, false));
+        assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
+            .extracting(McpIntegrationInstanceWorkflow::isEnabled)
+            .containsExactly(false);
+    }
+
+    @Test
+    public void testEnabledRowsOnAnotherServerDoNotEnableNewRowsOnThisServer() {
+        McpServer otherMcpServer = mcpServerRepository.save(
+            new McpServer("Other", PlatformType.EMBEDDED, Environment.DEVELOPMENT));
+
+        McpComponent otherMcpComponent = mcpComponentRepository.save(
+            new McpComponent("gmail", 1, otherMcpServer.getId(), null));
+
+        long otherToolId = Objects.requireNonNull(
+            mcpToolRepository.save(new McpTool("listLabels", Map.of(), otherMcpComponent.getId()))
+                .getId());
+
+        mcpIntegrationInstanceToolService.createMcpIntegrationInstanceTool(integrationInstanceId, otherToolId, true);
+
+        long otherLinkWorkflowId =
+            fixture.insertAutomationLinkWorkflow(otherMcpServer.getId(), AUTOMATION_WORKFLOW_UUID);
+
+        fixture.insertAutomationRow(connectedUserId, otherLinkWorkflowId, AUTOMATION_WORKFLOW_UUID, true);
+
+        mcpIntegrationInstanceRows.addMissingRows(connectedUserId, mcpServer.getId());
+
+        assertThat(mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId))
+            .extracting(McpIntegrationInstanceTool::getMcpToolId, McpIntegrationInstanceTool::isEnabled)
+            .containsExactlyInAnyOrder(
+                tuple(otherToolId, true), tuple(searchEmailToolId, false), tuple(getEmailToolId, false));
+        assertThat(mcpIntegrationInstanceWorkflowService.getMcpIntegrationInstanceWorkflows(integrationInstanceId))
+            .extracting(McpIntegrationInstanceWorkflow::isEnabled)
+            .containsExactly(false);
+    }
+
+    @Test
+    public void testGetConnectedUserIdsIncludesAutomationOnlyUser() {
+        long linkWorkflowId = fixture.insertAutomationLinkWorkflow(mcpServer.getId(), AUTOMATION_WORKFLOW_UUID);
+
+        fixture.insertAutomationRow(otherConnectedUserId, linkWorkflowId, AUTOMATION_WORKFLOW_UUID, false);
+
+        assertThat(mcpIntegrationInstanceRows.getConnectedUserIds(mcpServer.getId()))
+            .containsExactly(otherConnectedUserId);
+        assertThat(mcpIntegrationInstanceRows.getMcpServerIds(otherConnectedUserId))
+            .containsExactly(mcpServer.getId());
+    }
+
     @Configuration
     @EnableCaching
     @Import({
         IntegrationInstanceConfigurationServiceImpl.class, IntegrationInstanceConfigurationWorkflowServiceImpl.class,
         IntegrationInstanceServiceImpl.class, IntegrationInstanceWorkflowServiceImpl.class,
         IntegrationServiceImpl.class, IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
-        McpIntegrationInstanceConfigurationServiceImpl.class, McpIntegrationInstanceRowsImpl.class
+        McpIntegrationInstanceConfigurationServiceImpl.class, McpIntegrationInstanceRowsImpl.class,
+        McpServerMembership.class
     })
     static class RowsIntTestConfiguration {
     }

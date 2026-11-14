@@ -633,7 +633,8 @@ class McpIntegrationInstanceConfigurationWorkflowFacadeIntTest {
             IntegrationInstanceWorkflowServiceImpl.class, IntegrationServiceImpl.class,
             IntegrationWorkflowServiceImpl.class, McpComponentServiceImpl.class,
             McpIntegrationInstanceConfigurationServiceImpl.class,
-            McpIntegrationInstanceConfigurationWorkflowFacadeImpl.class, McpIntegrationInstanceRowsImpl.class
+            McpIntegrationInstanceConfigurationWorkflowFacadeImpl.class, McpIntegrationInstanceRowsImpl.class,
+            McpServerMembership.class
         })
         static class LinkConfiguration {
 

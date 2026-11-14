@@ -621,6 +621,7 @@ class McpIntegrationInstanceConfigurationFacadeIntTest {
         IntegrationInstanceServiceImpl.class, IntegrationServiceImpl.class, IntegrationWorkflowServiceImpl.class,
         McpComponentServiceImpl.class, McpIntegrationInstanceConfigurationFacadeImpl.class,
         McpIntegrationInstanceConfigurationServiceImpl.class, McpIntegrationInstanceRowsImpl.class,
+        McpServerMembership.class,
         McpIntegrationInstanceConfigurationWorkflowServiceImpl.class, EmbeddedMcpAuditIntTestConfiguration.class
     })
     static class McpIntegrationInstanceConfigurationFacadeIntTestConfiguration {
