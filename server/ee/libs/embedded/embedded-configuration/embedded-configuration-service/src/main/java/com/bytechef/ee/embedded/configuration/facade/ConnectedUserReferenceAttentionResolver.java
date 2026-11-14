@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflo
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,14 +59,14 @@ class ConnectedUserReferenceAttentionResolver {
         Long projectDeploymentId = reference.getProjectDeploymentId();
 
         if (reference.isDangling() || projectDeploymentId == null) {
-            return new ReferenceState(Map.of(), null);
+            return new ReferenceState(Map.of(), Map.of(), null);
         }
 
         Optional<ProjectDeployment> fetchedProjectDeployment = connectedUserReferenceDeploymentManager.fetchDeployment(
             projectDeploymentId);
 
         if (fetchedProjectDeployment.isEmpty()) {
-            return new ReferenceState(Map.of(), null);
+            return new ReferenceState(Map.of(), Map.of(), null);
         }
 
         ProjectDeployment projectDeployment = fetchedProjectDeployment.get();
@@ -80,8 +81,10 @@ class ConnectedUserReferenceAttentionResolver {
         Map<String, ?> inputs = row.<Map<String, ?>>map(ProjectDeploymentWorkflow::getInputs)
             .orElse(Map.of());
 
+        Map<String, Long> connections = resolveConnections(reference, workflowId, row);
+
         try {
-            return new ReferenceState(inputs, resolveAttentionReason(
+            return new ReferenceState(inputs, connections, resolveAttentionReason(
                 projectDeployment, reference.getAutomationUuid(), workflowId, row));
         } catch (RuntimeException exception) {
             log.warn(
@@ -92,8 +95,45 @@ class ConnectedUserReferenceAttentionResolver {
                 log.debug("Attention reason of reference id={} could not be derived", reference.getId(), exception);
             }
 
-            return new ReferenceState(inputs, null);
+            return new ReferenceState(inputs, connections, null);
         }
+    }
+
+    private Map<String, Long> resolveConnections(
+        ConnectedUserProjectWorkflow reference, Optional<String> workflowId, Optional<ProjectDeploymentWorkflow> row) {
+
+        if (workflowId.isEmpty() || row.isEmpty()) {
+            return Map.of();
+        }
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = row.get();
+
+        List<ProjectDeploymentWorkflowConnection> connections = projectDeploymentWorkflow.getConnections();
+
+        Map<String, Long> connectionIds = new LinkedHashMap<>();
+
+        try {
+            for (ComponentConnection componentConnection : workflowConnectionSlot.getSlots(workflowId.get())) {
+                connections.stream()
+                    .filter(connection -> isWiredTo(connection, componentConnection))
+                    .map(ProjectDeploymentWorkflowConnection::getConnectionId)
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .ifPresent(connectionId -> connectionIds.putIfAbsent(
+                        componentConnection.componentName(), connectionId));
+            }
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Connections of reference id={} could not be derived: {}", reference.getId(), exception.getMessage());
+
+            if (log.isDebugEnabled()) {
+                log.debug("Connections of reference id={} could not be derived", reference.getId(), exception);
+            }
+
+            return Map.of();
+        }
+
+        return connectionIds;
     }
 
     @Nullable
@@ -133,9 +173,7 @@ class ConnectedUserReferenceAttentionResolver {
 
         for (ComponentConnection componentConnection : workflowConnectionSlot.getSlots(workflowId.get())) {
             boolean wired = connections.stream()
-                .anyMatch(connection -> Objects.equals(
-                    connection.getWorkflowNodeName(), componentConnection.workflowNodeName()) &&
-                    Objects.equals(connection.getWorkflowConnectionKey(), componentConnection.key()));
+                .anyMatch(connection -> isWiredTo(connection, componentConnection));
 
             if (componentConnection.required() && !wired) {
                 return MISSING_CONNECTION_PREFIX + componentConnection.componentName();
@@ -152,7 +190,20 @@ class ConnectedUserReferenceAttentionResolver {
         return connectedUserWorkflowValidator.getAttentionReason(workflowId.get(), projectDeployment.getEnvironment());
     }
 
+    private static boolean isWiredTo(
+        ProjectDeploymentWorkflowConnection connection, ComponentConnection componentConnection) {
+
+        return Objects.equals(connection.getWorkflowNodeName(), componentConnection.workflowNodeName()) &&
+            Objects.equals(connection.getWorkflowConnectionKey(), componentConnection.key());
+    }
+
+    /**
+     * @param inputs          the reference's stored input values, keyed by input name
+     * @param connections     the id of the connection each component is wired to, keyed by component name
+     * @param attentionReason why the reference needs attention, {@code null} when it is healthy
+     */
     @SuppressFBWarnings("EI")
-    public record ReferenceState(Map<String, ?> inputs, @Nullable String attentionReason) {
+    public record ReferenceState(
+        Map<String, ?> inputs, Map<String, Long> connections, @Nullable String attentionReason) {
     }
 }

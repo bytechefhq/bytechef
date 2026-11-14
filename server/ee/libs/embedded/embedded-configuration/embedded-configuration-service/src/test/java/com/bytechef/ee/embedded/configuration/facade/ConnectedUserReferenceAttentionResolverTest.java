@@ -13,8 +13,10 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceAttentionResolver.ReferenceState;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
@@ -153,6 +155,84 @@ class ConnectedUserReferenceAttentionResolverTest {
 
         assertThat(referenceState.attentionReason())
             .isEqualTo(ConnectedUserReferenceAttentionResolver.TURNED_OFF_BY_ADMINISTRATOR);
+    }
+
+    @Test
+    void testConnectionsAreKeyedByComponentNameFromTheWiredSlots() {
+        ProjectDeploymentWorkflow row = stubReferenceRow(
+            List.of(
+                new ProjectDeploymentWorkflowConnection(42L, "slack", "slack_1"),
+                new ProjectDeploymentWorkflowConnection(42L, "slack", "slack_2"),
+                new ProjectDeploymentWorkflowConnection(7L, "googleMail", "googleMail_1")));
+
+        when(workflowConnectionSlot.getSlots("automation-1")).thenReturn(
+            List.of(
+                new ComponentConnection("googleMail", 1, "googleMail_1", "googleMail", true),
+                new ComponentConnection("slack", 1, "slack_1", "slack", true),
+                new ComponentConnection("slack", 1, "slack_2", "slack", true),
+                new ComponentConnection("hubspot", 1, "hubspot_1", "hubspot", true)));
+
+        ReferenceState referenceState = resolver.resolve(newReference());
+
+        assertThat(referenceState.connections()).containsExactly(
+            Map.entry("googleMail", 7L), Map.entry("slack", 42L));
+        assertThat(referenceState.attentionReason())
+            .isEqualTo(ConnectedUserReferenceAttentionResolver.MISSING_CONNECTION_PREFIX + "hubspot");
+        assertThat(referenceState.inputs()).isEqualTo(row.getInputs());
+    }
+
+    @Test
+    void testConnectionsAreEmptyButTheInputsAreKeptWhenTheSlotsCannotBeRead() {
+        stubReferenceRow(List.of(new ProjectDeploymentWorkflowConnection(42L, "slack", "slack_1")));
+
+        when(workflowConnectionSlot.getSlots("automation-1")).thenThrow(new IllegalStateException("broken workflow"));
+
+        ReferenceState referenceState = resolver.resolve(newReference());
+
+        assertThat(referenceState.connections()).isEmpty();
+        assertThat(referenceState.attentionReason()).isNull();
+        assertThat(referenceState.inputs()).isEqualTo(Map.of("channel", "#a"));
+    }
+
+    @Test
+    void testDanglingReferenceHasNoConnections() {
+        ConnectedUserProjectWorkflow reference = newReference();
+
+        reference.setDangling(true);
+
+        ReferenceState referenceState = resolver.resolve(reference);
+
+        assertThat(referenceState.connections()).isEmpty();
+        assertThat(referenceState.inputs()).isEmpty();
+    }
+
+    private ProjectDeploymentWorkflow stubReferenceRow(List<ProjectDeploymentWorkflowConnection> connections) {
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setEnvironment(Environment.PRODUCTION);
+        projectDeployment.setId(900L);
+        projectDeployment.setProjectId(500L);
+        projectDeployment.setProjectVersion(1);
+
+        ProjectDeploymentWorkflow row = new ProjectDeploymentWorkflow();
+
+        row.setConnections(connections);
+        row.setInputs(Map.of("channel", "#a"));
+
+        when(connectedUserReferenceDeploymentManager.fetchDeployment(900L)).thenReturn(Optional.of(projectDeployment));
+        when(connectedUserReferenceDeploymentManager.fetchWorkflowId(500L, 1, "automation-uuid"))
+            .thenReturn(Optional.of("automation-1"));
+        when(connectedUserReferenceDeploymentManager.fetchWorkflowRow(900L, "automation-1"))
+            .thenReturn(Optional.of(row));
+        lenient().when(connectedUserReferenceDeploymentManager.fetchConnectedUserId(900L))
+            .thenReturn(Optional.of(CONNECTED_USER_ID));
+        lenient().when(connectedUserReferenceDeploymentManager.isAdministrativelyEnabled(
+            CONNECTED_USER_ID, 500L, "automation-uuid"))
+            .thenReturn(true);
+        lenient().when(connectedUserReferenceDeploymentManager.fetchReleasedVersion(CONNECTED_USER_ID, 500L))
+            .thenReturn(Optional.empty());
+
+        return row;
     }
 
     private void stubAdministrativelyEnabled(boolean administrativelyEnabled) {

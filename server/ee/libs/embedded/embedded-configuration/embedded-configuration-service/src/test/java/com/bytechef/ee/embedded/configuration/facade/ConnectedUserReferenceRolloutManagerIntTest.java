@@ -90,6 +90,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
@@ -202,6 +203,11 @@ class ConnectedUserReferenceRolloutManagerIntTest {
     private static final String SLACK_TRIGGER_WORKFLOW_DEFINITION = """
         {"label":"Post","triggers":[{"name":"newMessage1","type":"slack/v1/newMessage","parameters":{}}],
          "tasks":[{"name":"postMessage1","type":"slack/v1/postMessage","parameters":{}}]}
+        """;
+
+    private static final String SLACK_TRIGGER_ONLY_WORKFLOW_DEFINITION = """
+        {"label":"Watch","triggers":[{"name":"newMessage1","type":"slack/v1/newMessage","parameters":{}}],
+         "tasks":[]}
         """;
 
     private static final String SLACK_TRIGGER_WORKFLOW_WITH_CHANNEL_INPUT_DEFINITION = """
@@ -3393,7 +3399,44 @@ class ConnectedUserReferenceRolloutManagerIntTest {
                         ConnectedUserWorkflowTemplateDTO.Input::provided)
                     .containsExactly(tuple("channel", true));
                 assertThat(workflow.inputValues()).isEqualTo(Map.of("note", "kept"));
+                assertThat(workflow.connections()).doesNotContainKey("slack");
             });
+    }
+
+    @Test
+    void testWorkflowReadLeavesOutTheConnectionOfAProvidedTriggerComponent() {
+        long automationProjectId = createAutomationProject("Provided Trigger Connection");
+
+        String workflowUuid = addWorkflow(automationProjectId, SLACK_TRIGGER_ONLY_WORKFLOW_DEFINITION);
+
+        publishAndPinProject(automationProjectId);
+
+        stubConnectionRequiredSlackComponentDefinition();
+        stubEntitledSlackConnection(777L);
+        stubAdministratorSlackConnection(ADMINISTRATOR_CONNECTION_ID);
+
+        ComponentConnection triggerSlot = new ComponentConnection("slack", 1, "newMessage1", "slack", true);
+
+        when(componentConnectionFacade.getComponentConnections(any(WorkflowTrigger.class)))
+            .thenReturn(List.of(triggerSlot));
+        when(componentConnectionFacade.getComponentConnection(anyString(), eq("newMessage1"), eq("slack")))
+            .thenReturn(triggerSlot);
+
+        String externalUserId = createConnectedUser();
+
+        connectedUserWorkflowReferenceFacade.getOrCreateReference(externalUserId, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION))
+            .filteredOn(workflow -> Objects.equals(workflow.automationUuid(), workflowUuid))
+            .singleElement()
+            .satisfies(workflow -> assertThat(workflow.connections()).isEqualTo(Map.of("slack", 777L)));
+
+        provideValues(automationProjectId, workflowUuid, Map.of("slack", ADMINISTRATOR_CONNECTION_ID), Map.of());
+
+        assertThat(connectedUserProjectFacade.getConnectedUserProjectWorkflows(externalUserId, Environment.PRODUCTION))
+            .filteredOn(workflow -> Objects.equals(workflow.automationUuid(), workflowUuid))
+            .singleElement()
+            .satisfies(workflow -> assertThat(workflow.connections()).isEmpty());
     }
 
     @Test
