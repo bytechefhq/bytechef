@@ -1344,7 +1344,7 @@ export type ConnectedUserMcpServersQueryVariables = Exact<{
 }>;
 
 
-export type ConnectedUserMcpServersQuery = { connectedUserMcpServers: Array<{ id: string, name: string, enabled: boolean, environmentId: string, lastModifiedDate: string | null, tools: Array<{ id: string, componentName: string, componentVersion: number, integrationInstanceId: string, name: string, enabled: boolean }>, workflows: Array<{ id: string, integrationInstanceId: string, componentName: string, integrationVersion: number, workflowId: string, name: string, description: string | null, enabled: boolean, lastExecutionDate: string | null }> }> };
+export type ConnectedUserMcpServersQuery = { connectedUserMcpServers: Array<{ id: string, name: string, enabled: boolean, environmentId: string, lastModifiedDate: string | null, tools: Array<{ id: string, componentName: string, componentVersion: number, integrationInstanceId: string, name: string, enabled: boolean }>, workflows: Array<{ id: string, integrationInstanceId: string, componentName: string, integrationVersion: number, workflowId: string, name: string, description: string | null, enabled: boolean, lastExecutionDate: string | null }>, automations: Array<{ id: string, connectedUserProjectWorkflowId: string, automationName: string, workflowUuid: string, name: string, description: string | null, enabled: boolean, available: boolean, lastExecutionDate: string | null }> }> };
 
 export type ConnectedUserProjectWorkflowReferenceValuesQueryVariables = Exact<{
   id: string | number;
@@ -1359,7 +1359,7 @@ export type ConnectedUserProjectsQueryVariables = Exact<{
 }>;
 
 
-export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, attentionReason: string | null, automationUuid: string | null, connectedUserId: string, copiedFromWorkflowUuid: string | null, enabled: boolean, lastExecutionDate: string | null, projectId: string, staticWebhookUrl: string | null, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }>, automationProjectConfigurations: Array<{ projectId: string, configurationId: string, configurationName: string, configurationProjectVersion: number, configurationEnabled: boolean }> }> };
+export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, attentionReason: string | null, automationUuid: string | null, connectedUserId: string, copiedFromWorkflowUuid: string | null, enabled: boolean, lastExecutionDate: string | null, projectId: string, staticWebhookUrl: string | null, toolOnly: boolean, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }>, automationProjectConfigurations: Array<{ projectId: string, configurationId: string, configurationName: string, configurationProjectVersion: number, configurationEnabled: boolean }> }> };
 
 export type CreateAutomationProjectConfigurationMutationVariables = Exact<{
   projectId: string | number;
@@ -1532,6 +1532,15 @@ export type EnableAutomationProjectConfigurationWorkflowMutationVariables = Exac
 
 export type EnableAutomationProjectConfigurationWorkflowMutation = { enableAutomationProjectConfigurationWorkflow: boolean };
 
+export type EnableConnectedUserMcpAutomationMutationVariables = Exact<{
+  connectedUserId: string | number;
+  id: string | number;
+  enable: boolean;
+}>;
+
+
+export type EnableConnectedUserMcpAutomationMutation = { enableConnectedUserMcpAutomation: { id: string, enabled: boolean } | null };
+
 export type EnableConnectedUserMcpServerMutationVariables = Exact<{
   connectedUserId: string | number;
   mcpServerId: string | number;
@@ -1694,7 +1703,7 @@ export type ProvisionableConnectedUserMcpServersQueryVariables = Exact<{
 }>;
 
 
-export type ProvisionableConnectedUserMcpServersQuery = { provisionableConnectedUserMcpServers: Array<{ id: string, name: string, provisioned: boolean, coveredComponentNames: Array<string>, missingComponentNames: Array<string> }> };
+export type ProvisionableConnectedUserMcpServersQuery = { provisionableConnectedUserMcpServers: Array<{ id: string, name: string, provisioned: boolean, coveredComponentNames: Array<string>, missingComponentNames: Array<string>, coveredAutomationNames: Array<string>, missingAutomationNames: Array<string> }> };
 
 export type ProvisionableConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId: string | number;
@@ -7410,6 +7419,17 @@ export const ConnectedUserMcpServersDocument = new TypedDocumentString(`
       enabled
       lastExecutionDate
     }
+    automations {
+      id
+      connectedUserProjectWorkflowId
+      automationName
+      workflowUuid
+      name
+      description
+      enabled
+      available
+      lastExecutionDate
+    }
   }
 }
     `);
@@ -7480,6 +7500,7 @@ export const ConnectedUserProjectsDocument = new TypedDocumentString(`
       lastExecutionDate
       projectId
       staticWebhookUrl
+      toolOnly
       workflowUuid
       workflowVersion
       workflow {
@@ -8133,6 +8154,32 @@ export const useEnableAutomationProjectConfigurationWorkflowMutation = <
   }
     )};
 
+export const EnableConnectedUserMcpAutomationDocument = new TypedDocumentString(`
+    mutation enableConnectedUserMcpAutomation($connectedUserId: ID!, $id: ID!, $enable: Boolean!) {
+  enableConnectedUserMcpAutomation(
+    connectedUserId: $connectedUserId
+    id: $id
+    enable: $enable
+  ) {
+    id
+    enabled
+  }
+}
+    `);
+
+export const useEnableConnectedUserMcpAutomationMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableConnectedUserMcpAutomationMutation, TError, EnableConnectedUserMcpAutomationMutationVariables, TContext>) => {
+    
+    return useMutation<EnableConnectedUserMcpAutomationMutation, TError, EnableConnectedUserMcpAutomationMutationVariables, TContext>(
+      {
+    mutationKey: ['enableConnectedUserMcpAutomation'],
+    mutationFn: (variables?: EnableConnectedUserMcpAutomationMutationVariables) => fetcher<EnableConnectedUserMcpAutomationMutation, EnableConnectedUserMcpAutomationMutationVariables>(EnableConnectedUserMcpAutomationDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const EnableConnectedUserMcpServerDocument = new TypedDocumentString(`
     mutation enableConnectedUserMcpServer($connectedUserId: ID!, $mcpServerId: ID!, $enable: Boolean!) {
   enableConnectedUserMcpServer(
@@ -8777,6 +8824,8 @@ export const ProvisionableConnectedUserMcpServersDocument = new TypedDocumentStr
     provisioned
     coveredComponentNames
     missingComponentNames
+    coveredAutomationNames
+    missingAutomationNames
   }
 }
     `);
