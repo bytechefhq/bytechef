@@ -11,6 +11,7 @@ import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTabl
 import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,6 +25,11 @@ public class RemoteWorkspaceDataTableServiceClient implements WorkspaceDataTable
 
     @Override
     public void assignDataTableToWorkspace(Long dataTableId, Long workspaceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<Long> fetchWorkspaceId(Long dataTableId) {
         throw new UnsupportedOperationException();
     }
 
