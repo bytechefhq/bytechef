@@ -141,7 +141,35 @@ describe('McpAutomationProjectConfigurationDialog', () => {
 
         expect(hoisted.updateMutate.mock.calls[0][0]).toEqual({
             id: 'm1',
-            input: {workflowUuids: ['uuid-1']},
+            input: {workflowConfigurations: [{workflowUuid: 'uuid-1'}], workflowUuids: ['uuid-1']},
+        });
+    });
+
+    it('dialogCreateSendsWorkflowConfigurations', async () => {
+        render(<McpAutomationProjectConfigurationDialog mcpServer={mcpServer} />);
+
+        await userEvent.click(screen.getAllByRole('combobox')[0]);
+        await userEvent.click(await screen.findByRole('option', {name: 'Onboarding'}));
+        await userEvent.click(screen.getAllByRole('combobox')[1]);
+        await userEvent.click(await screen.findByRole('option', {name: 'Production config'}));
+
+        await userEvent.click(screen.getByRole('button', {name: 'Next'}));
+
+        await userEvent.click(await screen.findByRole('switch', {name: 'Workflow One'}));
+
+        await userEvent.type(await screen.findByLabelText('Workflow One tool name'), 'tool_one');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Add'}));
+
+        await waitFor(() => expect(hoisted.createMutate).toHaveBeenCalledTimes(1));
+
+        expect(hoisted.createMutate.mock.calls[0][0]).toEqual({
+            input: {
+                automationProjectConfigurationId: '100',
+                mcpServerId: 's1',
+                workflowConfigurations: [{parameters: {toolName: 'tool_one'}, workflowUuid: 'uuid-1'}],
+                workflowUuids: ['uuid-1'],
+            },
         });
     });
 });

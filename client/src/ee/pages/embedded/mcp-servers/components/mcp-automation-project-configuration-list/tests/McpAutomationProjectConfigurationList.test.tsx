@@ -1,5 +1,6 @@
 import {McpServer} from '@/shared/middleware/graphql';
 import {render, screen} from '@/shared/util/test-utils';
+import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import McpAutomationProjectConfigurationList from '../McpAutomationProjectConfigurationList';
@@ -18,7 +19,9 @@ vi.mock('../McpAutomationProjectConfigurationListItem', () => ({
     ),
 }));
 
-vi.mock('../McpAutomationProjectConfigurationDialog', () => ({default: () => null}));
+vi.mock('../McpAutomationProjectConfigurationDialog', () => ({
+    default: ({triggerNode}: {triggerNode?: ReactNode}) => triggerNode,
+}));
 
 const mcpServer = {environmentId: '1', id: 's1', name: 'Server'} as McpServer;
 

@@ -7,7 +7,23 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import McpServerToolsContent from './McpServerToolsContent';
 
 const hoisted = vi.hoisted(() => ({
+    useMcpAutomationProjectConfigurationList: vi.fn(),
     useMcpComponentList: vi.fn(),
+    useMcpIntegrationInstanceConfigurationList: vi.fn(),
+}));
+
+vi.mock(
+    '@/ee/pages/embedded/mcp-servers/components/mcp-integration-instance-configuration-list/hooks/useMcpIntegrationInstanceConfigurationList',
+    () => ({default: hoisted.useMcpIntegrationInstanceConfigurationList})
+);
+
+vi.mock(
+    '@/ee/pages/embedded/mcp-servers/components/mcp-automation-project-configuration-list/hooks/useMcpAutomationProjectConfigurationList',
+    () => ({default: hoisted.useMcpAutomationProjectConfigurationList})
+);
+
+vi.mock('../mcp-automation-project-configuration-list/McpAutomationProjectConfigurationDialog', () => ({
+    default: ({triggerNode}: {triggerNode?: ReactNode}) => triggerNode,
 }));
 
 vi.mock('@/ee/pages/embedded/mcp-servers/components/mcp-component-list/hooks/useMcpComponentList', () => ({
@@ -18,10 +34,12 @@ vi.mock('@/shared/components/mcp-server/McpServerToolsPanel', () => ({
     default: ({
         isComponentListEmpty,
         isWorkflowListEmpty,
+        workflowEmptyStateAction,
         workflowList,
     }: {
         isComponentListEmpty: boolean;
         isWorkflowListEmpty: boolean;
+        workflowEmptyStateAction?: ReactNode;
         workflowList: ReactNode;
     }) => (
         <div
@@ -30,6 +48,8 @@ vi.mock('@/shared/components/mcp-server/McpServerToolsPanel', () => ({
             data-workflow-list-empty={String(isWorkflowListEmpty)}
         >
             {workflowList}
+
+            {workflowEmptyStateAction}
         </div>
     ),
 }));
@@ -54,6 +74,16 @@ const renderToolsContent = () =>
 describe('McpServerToolsContent', () => {
     beforeEach(() => {
         hoisted.useMcpComponentList.mockReset();
+        hoisted.useMcpIntegrationInstanceConfigurationList.mockReset();
+        hoisted.useMcpAutomationProjectConfigurationList.mockReset();
+        hoisted.useMcpIntegrationInstanceConfigurationList.mockReturnValue({
+            isLoading: false,
+            mcpIntegrationInstanceConfigurations: [{id: '1'}],
+        });
+        hoisted.useMcpAutomationProjectConfigurationList.mockReturnValue({
+            isLoading: false,
+            mcpAutomationProjectConfigurations: [],
+        });
     });
 
     it('reports an empty component list once the server has no embedded components', () => {
@@ -95,5 +125,34 @@ describe('McpServerToolsContent', () => {
 
         expect(screen.getByTestId('integration-configurations-section')).toBeInTheDocument();
         expect(screen.getByTestId('automations-section')).toBeInTheDocument();
+    });
+
+    it('showsWorkflowEmptyStateOnlyWhenBothListsAreEmptyAndKeepsAutomationsAddControl', () => {
+        hoisted.useMcpComponentList.mockReturnValue({data: undefined, isMcpComponentsLoading: true});
+        hoisted.useMcpIntegrationInstanceConfigurationList.mockReturnValue({
+            isLoading: false,
+            mcpIntegrationInstanceConfigurations: [],
+        });
+
+        renderToolsContent();
+
+        expect(screen.getByTestId('mcp-server-tools-panel')).toHaveAttribute('data-workflow-list-empty', 'true');
+        expect(screen.getByRole('button', {name: 'Add Automations'})).toBeInTheDocument();
+    });
+
+    it('doesNotShowWorkflowEmptyStateWhenAutomationsExist', () => {
+        hoisted.useMcpComponentList.mockReturnValue({data: undefined, isMcpComponentsLoading: true});
+        hoisted.useMcpIntegrationInstanceConfigurationList.mockReturnValue({
+            isLoading: false,
+            mcpIntegrationInstanceConfigurations: [],
+        });
+        hoisted.useMcpAutomationProjectConfigurationList.mockReturnValue({
+            isLoading: false,
+            mcpAutomationProjectConfigurations: [{id: 'm1'}],
+        });
+
+        renderToolsContent();
+
+        expect(screen.getByTestId('mcp-server-tools-panel')).toHaveAttribute('data-workflow-list-empty', 'false');
     });
 });
