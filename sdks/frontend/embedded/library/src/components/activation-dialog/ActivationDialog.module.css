@@ -119,3 +119,11 @@
     display: flex;
     gap: 8px;
 }
+
+.switchRow {
+    align-items: center;
+    display: flex;
+    font-size: 0.875rem;
+    font-weight: 500;
+    gap: 8px;
+}

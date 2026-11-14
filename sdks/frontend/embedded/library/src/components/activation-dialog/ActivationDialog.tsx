@@ -65,6 +65,8 @@ const ROLLBACK_FAILED_MESSAGE =
 const PROVIDED_BY_ADMINISTRATOR_LABEL = 'Provided by your administrator';
 const PROVIDED_VALUE_LOCKED_MESSAGE =
     'Your administrator already provides some of the details for this automation, so they cannot be changed. Reload the page and try again.';
+const AI_AGENTS_SWITCH_LABEL = 'Available to AI agents';
+const AI_AGENTS_SWITCH_FAILED_MESSAGE = 'Could not change whether AI agents can use this automation. Please try again.';
 const NOT_ENABLED_MESSAGE = 'Your settings were saved, but the automation could not be switched on. Please try again.';
 
 const INPUT_TYPE_ATTRIBUTES: Record<string, string> = {
@@ -120,6 +122,12 @@ const isProvidedValueLockedError = (error: unknown): boolean => {
 
     return false;
 };
+
+const findAiAgentsWorkflow = (
+    workflows: ConnectedUserWorkflowType[] | undefined,
+    automationUuid: string
+): ConnectedUserWorkflowType | undefined =>
+    (workflows ?? []).find((workflow) => workflow.kind === 'REFERENCE' && workflow.automationUuid === automationUuid);
 
 const templateComponents = (template: AutomationTemplateType): TemplateComponentType[] => [
     ...(template.triggers ?? []),
@@ -267,10 +275,14 @@ const ActivationBody = ({
     const [connectingComponent, setConnectingComponent] = useState<TemplateComponentType>();
     const [connectionLoadFailures, setConnectionLoadFailures] = useState<Record<string, boolean>>({});
     const [connectionsByComponent, setConnectionsByComponent] = useState<Record<string, ConnectionType[]>>({});
+    const [aiAgentsError, setAiAgentsError] = useState<string>();
+    const [aiAgentsWorkflow, setAiAgentsWorkflow] = useState<ConnectedUserWorkflowType>();
 
     const [state, dispatch] = useReducer(activationReducer, template, (initialTemplate) =>
         initialActivationState(templateComponents(initialTemplate), templateInputs(initialTemplate), existingReference)
     );
+
+    const toolOnly = aiAgentsWorkflow?.toolOnly === true;
 
     const components = useMemo(() => templateComponents(template), [template]);
     const inputs = useMemo(() => templateInputs(template), [template]);
@@ -335,6 +347,12 @@ const ActivationBody = ({
         }
     }, [fetch, template.id]);
 
+    const loadAiAgentsWorkflow = useCallback(async () => {
+        const workflows = await fetch<ConnectedUserWorkflowType[]>('/api/embedded/v1/automation/workflows');
+
+        setAiAgentsWorkflow(findAiAgentsWorkflow(workflows, template.id));
+    }, [fetch, template.id]);
+
     const activate = useCallback(async () => {
         setBusy(true);
 
@@ -376,7 +394,9 @@ const ActivationBody = ({
 
             provisioned = true;
 
-            await fetch(`/api/embedded/v1/automation/workflows/${template.id}/enable`, {method: 'POST'});
+            if (!toolOnly) {
+                await fetch(`/api/embedded/v1/automation/workflows/${template.id}/enable`, {method: 'POST'});
+            }
         } catch (error) {
             console.error(`Failed to activate template ${template.id}:`, error);
 
@@ -405,6 +425,10 @@ const ActivationBody = ({
         dispatch({type: 'ACTIVATED', workflowUuid: template.id});
         setBusy(false);
 
+        loadAiAgentsWorkflow().catch((error: unknown) => {
+            console.error('Failed to load the AI agents availability:', error);
+        });
+
         if (onActivated) {
             runHostCallback('onActivated', () => onActivated(template.id));
         }
@@ -413,6 +437,7 @@ const ActivationBody = ({
     }, [
         fetch,
         inputs,
+        loadAiAgentsWorkflow,
         onActivated,
         onClose,
         providedComponentNames,
@@ -421,6 +446,7 @@ const ActivationBody = ({
         state.inputValues,
         state.selections,
         template.id,
+        toolOnly,
     ]);
 
     const save = useCallback(async () => {
@@ -548,6 +574,28 @@ const ActivationBody = ({
         [loadConnections]
     );
 
+    const toggleAiAgents = useCallback(
+        async (enabled: boolean) => {
+            setAiAgentsError(undefined);
+            setBusy(true);
+
+            try {
+                await fetch(`/api/embedded/v1/automation/workflows/${template.id}/mcp/enable`, {
+                    method: enabled ? 'POST' : 'DELETE',
+                });
+
+                await loadAiAgentsWorkflow();
+            } catch (error) {
+                console.error(`Failed to change the AI agents availability of ${template.id}:`, error);
+
+                setAiAgentsError(AI_AGENTS_SWITCH_FAILED_MESSAGE);
+            }
+
+            setBusy(false);
+        },
+        [fetch, loadAiAgentsWorkflow, template.id]
+    );
+
     const backShown =
         state.step !== 'connect' &&
         state.step !== 'done' &&
@@ -592,6 +640,24 @@ const ActivationBody = ({
         };
     }, [fetch, state.requiredComponents]);
 
+    useEffect(() => {
+        let cancelled = false;
+
+        fetch<ConnectedUserWorkflowType[]>('/api/embedded/v1/automation/workflows')
+            .then((workflows) => {
+                if (!cancelled) {
+                    setAiAgentsWorkflow(findAiAgentsWorkflow(workflows, template.id));
+                }
+            })
+            .catch((error: unknown) => {
+                console.error('Failed to load the AI agents availability:', error);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [fetch, template.id]);
+
     const providedRows = providedComponents.map((component) => (
         <div className={styles.componentRow} data-testid={`provided-row-${component.name}`} key={component.name}>
             <div className={styles.componentTitle}>
@@ -613,6 +679,26 @@ const ActivationBody = ({
                     <div className={styles.alert} role="alert">
                         {state.error}
                     </div>
+                )}
+
+                {aiAgentsError && (
+                    <div className={styles.alert} role="alert">
+                        {aiAgentsError}
+                    </div>
+                )}
+
+                {aiAgentsWorkflow?.mcpEnabled != null && (
+                    <label className={styles.switchRow}>
+                        <input
+                            checked={aiAgentsWorkflow.mcpEnabled === true}
+                            disabled={busy}
+                            onChange={(event) => void toggleAiAgents(event.target.checked)}
+                            role="switch"
+                            type="checkbox"
+                        />
+
+                        <span>{AI_AGENTS_SWITCH_LABEL}</span>
+                    </label>
                 )}
 
                 {state.step === 'connect' && (
@@ -696,7 +782,9 @@ const ActivationBody = ({
                         <p className={styles.notice}>
                             {existingReference
                                 ? 'Save to keep your changes. Saving does not switch this automation on or off.'
-                                : 'Everything is ready. Activate to switch this automation on.'}
+                                : toolOnly
+                                  ? 'Everything is ready. Activate to save your settings.'
+                                  : 'Everything is ready. Activate to switch this automation on.'}
                         </p>
                     </div>
                 )}
