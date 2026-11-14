@@ -4,7 +4,8 @@ required: false
 schema:
   type: "string"
   enum:
-    - "TEST"
+    - "DEVELOPMENT"
+    - "STAGING"
     - "PRODUCTION"
-example: "TEST"
-description: "The environment of an integration."
+example: "PRODUCTION"
+description: "The environment of the integration instance. Case-insensitive. Defaults to PRODUCTION when omitted."

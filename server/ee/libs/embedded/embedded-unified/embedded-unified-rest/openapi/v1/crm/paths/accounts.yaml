@@ -17,7 +17,7 @@ post:
       content:
         application/json:
           schema:
-            $ref: ../../../common/components/schemas/created.yaml
+            $ref: ../openapi.yaml#/components/schemas/created_record
 #            type: object
 #            properties:
 #              record:
@@ -62,7 +62,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: ../../../common/components/schemas/page.yaml
+            $ref: ../openapi.yaml#/components/schemas/page
     '400':
       $ref: ../../../common/components/responses/badRequest.yaml
     '401':
