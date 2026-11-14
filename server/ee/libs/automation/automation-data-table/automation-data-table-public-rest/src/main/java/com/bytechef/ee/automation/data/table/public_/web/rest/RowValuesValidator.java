@@ -1,0 +1,71 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.automation.data.table.public_.web.rest;
+
+import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
+import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.ColumnValues;
+import com.bytechef.platform.data.table.domain.ReservedColumns;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
+
+/**
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+final class RowValuesValidator {
+
+    private static final int MAX_EXTERNAL_ID_LENGTH = 255;
+
+    private RowValuesValidator() {
+    }
+
+    static void validate(Map<String, Object> values, List<ColumnSpec> columnSpecs) {
+        Map<String, ColumnType> columnTypes = new HashMap<>();
+
+        for (ColumnSpec columnSpec : columnSpecs) {
+            columnTypes.put(columnSpec.name()
+                .toLowerCase(Locale.ROOT), columnSpec.type());
+        }
+
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            String column = entry.getKey()
+                .toLowerCase(Locale.ROOT);
+            ColumnType columnType = columnTypes.get(column);
+
+            if (columnType == null || ReservedColumns.isReserved(column)) {
+                throw new DataTableException(
+                    "'" + entry.getKey() + "' is not a column of this table", DataTableErrorType.ROW_VALUE_INVALID);
+            }
+
+            Object value = entry.getValue();
+
+            if (value == null || ColumnValues.isCoercible(columnType, value)) {
+                continue;
+            }
+
+            throw new DataTableException(
+                "Value '" + value + "' is not a valid " + columnType + " for column '" + entry.getKey() + "'",
+                DataTableErrorType.ROW_VALUE_INVALID);
+        }
+    }
+
+    static void validateExternalId(@Nullable String externalId) {
+        if (externalId == null || externalId.isBlank() || externalId.length() > MAX_EXTERNAL_ID_LENGTH) {
+            throw new DataTableException(
+                "externalId must be 1-" + MAX_EXTERNAL_ID_LENGTH + " characters",
+                DataTableErrorType.ROW_VALUE_INVALID);
+        }
+    }
+}

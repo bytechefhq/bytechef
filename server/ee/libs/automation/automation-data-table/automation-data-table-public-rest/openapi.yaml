@@ -1,0 +1,856 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Automation Data Table Public V1 API"
+  version: "1"
+servers:
+  - url: "/api/automation/v1"
+tags:
+  - name: "data-table"
+    description: "Data table and column definitions."
+  - name: "data-table-row"
+    description: "Data table rows."
+paths:
+  /workspaces/{workspaceId}/data-tables:
+    get:
+      description: "List the data tables of a workspace that exist in the requested environment."
+      summary: "List data tables"
+      tags:
+        - "data-table"
+      operationId: "listDataTables"
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/XEnvironment"
+        - name: "tag"
+          description: "Return only tables carrying this tag."
+          in: "query"
+          required: false
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The data tables."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/DataTable"
+        "403":
+          $ref: "#/components/responses/Error"
+    post:
+      description: "Create a data table in the requested environment. The same name may exist in several\
+        \ environments; it is one logical table with one physical table per environment."
+      summary: "Create a data table"
+      tags:
+        - "data-table"
+      operationId: "createDataTable"
+      parameters:
+        - $ref: "#/components/parameters/WorkspaceId"
+        - $ref: "#/components/parameters/XEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDataTableRequest"
+      responses:
+        "201":
+          description: "The created data table."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTable"
+        "400":
+          $ref: "#/components/responses/Error"
+        "403":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+  /data-tables/{name}:
+    get:
+      description: "Get a data table as it exists in the requested environment."
+      summary: "Get a data table"
+      tags:
+        - "data-table"
+      operationId: "getDataTable"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/XEnvironment"
+      responses:
+        "200":
+          description: "The data table."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTable"
+        "404":
+          $ref: "#/components/responses/Error"
+    patch:
+      description: "Update the description and/or tags. Both are properties of the logical table and apply\
+        \ to every environment. Omitted fields are left untouched."
+      summary: "Update a data table"
+      tags:
+        - "data-table"
+      operationId: "updateDataTable"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/XEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDataTableRequest"
+      responses:
+        "200":
+          description: "The updated data table."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTable"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+    delete:
+      description: "Drop the table in the requested environment, with all of its rows. The logical table is\
+        \ removed once its last environment is dropped. Irreversible."
+      summary: "Delete a data table"
+      tags:
+        - "data-table"
+      operationId: "deleteDataTable"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/XEnvironment"
+      responses:
+        "204":
+          description: "Deleted."
+        "404":
+          $ref: "#/components/responses/Error"
+  /data-tables/{name}/columns:
+    post:
+      description: "Add a column."
+      summary: "Add a column"
+      tags:
+        - "data-table"
+      operationId: "createColumn"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/XEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateColumnRequest"
+      responses:
+        "201":
+          description: "The data table with the new column."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTable"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+  /data-tables/{name}/columns/{column}:
+    delete:
+      description: "Drop a column and every value stored in it. Irreversible."
+      summary: "Delete a column"
+      tags:
+        - "data-table"
+      operationId: "deleteColumn"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/ColumnName"
+        - $ref: "#/components/parameters/XEnvironment"
+      responses:
+        "204":
+          description: "Deleted."
+        "404":
+          $ref: "#/components/responses/Error"
+  /data-tables/{name}/columns/{column}/rename:
+    post:
+      description: "Rename a column. Workflows and filters that name the old column stop matching."
+      summary: "Rename a column"
+      tags:
+        - "data-table"
+      operationId: "renameColumn"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/ColumnName"
+        - $ref: "#/components/parameters/XEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RenameColumnRequest"
+      responses:
+        "200":
+          description: "The data table with the renamed column."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTable"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+  /data-tables/{name}/rows:
+    get:
+      description: "Query rows. Filters are ANDed; each is `column:OPERATOR:value` with OPERATOR one of\
+        \ EQ, NEQ, IN, CONTAINS, STARTS_WITH, GT, GTE, LT, LTE, BETWEEN. IN and BETWEEN take comma-separated\
+        \ values. `id` and `externalId` may be filtered and sorted like any column. The `where` parameter is\
+        \ reserved for a future expression filter and must not be sent."
+      summary: "Query rows"
+      tags:
+        - "data-table-row"
+      operationId: "listRows"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/XEnvironment"
+        - name: "filter"
+          description: "A `column:OPERATOR:value` condition. Repeat the parameter to add conditions."
+          in: "query"
+          required: false
+          style: "form"
+          explode: true
+          schema:
+            type: "array"
+            items:
+              type: "string"
+        - name: "sort"
+          description: "A `column:ASC` or `column:DESC` ordering. Repeat to add tie-breakers; `id:ASC` is always last."
+          in: "query"
+          required: false
+          style: "form"
+          explode: true
+          schema:
+            type: "array"
+            items:
+              type: "string"
+        - name: "pageNumber"
+          description: "The zero-based page to return."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: 0
+        - name: "pageSize"
+          description: "Rows per page; at most 500."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: 50
+      responses:
+        "200":
+          description: "The page of rows."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+    post:
+      description: "Insert one row."
+      summary: "Insert a row"
+      tags:
+        - "data-table-row"
+      operationId: "createRow"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/XEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRowRequest"
+      responses:
+        "201":
+          description: "The inserted row."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTableRow"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+        "507":
+          $ref: "#/components/responses/Error"
+    delete:
+      description: "Delete rows by id. `ids` is required; to empty a table use the clear operation."
+      summary: "Delete rows"
+      tags:
+        - "data-table-row"
+      operationId: "deleteRows"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/XEnvironment"
+        - name: "ids"
+          description: "Comma-separated row ids; at most 1000."
+          in: "query"
+          required: true
+          style: "form"
+          explode: false
+          schema:
+            type: "array"
+            items:
+              type: "integer"
+              format: "int64"
+      responses:
+        "200":
+          description: "What was deleted."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteRowsResponse"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+  /data-tables/{name}/rows/{id}:
+    get:
+      summary: "Get a row"
+      tags:
+        - "data-table-row"
+      operationId: "getRow"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/RowId"
+        - $ref: "#/components/parameters/XEnvironment"
+      responses:
+        "200":
+          description: "The row."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTableRow"
+        "404":
+          $ref: "#/components/responses/Error"
+    patch:
+      description: "Merge values into a row. Omitted columns are untouched; a null value clears a column.\
+        \ `externalId` may be set or cleared."
+      summary: "Update a row"
+      tags:
+        - "data-table-row"
+      operationId: "updateRow"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/RowId"
+        - $ref: "#/components/parameters/XEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRowRequest"
+      responses:
+        "200":
+          description: "The updated row."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTableRow"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+    delete:
+      summary: "Delete a row"
+      tags:
+        - "data-table-row"
+      operationId: "deleteRow"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/RowId"
+        - $ref: "#/components/parameters/XEnvironment"
+      responses:
+        "204":
+          description: "Deleted."
+        "404":
+          $ref: "#/components/responses/Error"
+  /data-tables/{name}/rows/by-external-id/{externalId}:
+    get:
+      summary: "Get a row by external id"
+      tags:
+        - "data-table-row"
+      operationId: "getRowByExternalId"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/ExternalId"
+        - $ref: "#/components/parameters/XEnvironment"
+      responses:
+        "200":
+          description: "The row."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTableRow"
+        "404":
+          $ref: "#/components/responses/Error"
+    put:
+      description: "Upsert: insert the row under this external id, or merge the values into the row that\
+        \ already carries it. Idempotent."
+      summary: "Upsert a row by external id"
+      tags:
+        - "data-table-row"
+      operationId: "upsertRowByExternalId"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/ExternalId"
+        - $ref: "#/components/parameters/XEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertRowRequest"
+      responses:
+        "200":
+          description: "The row existed and was updated."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTableRow"
+        "201":
+          description: "The row was created."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataTableRow"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "507":
+          $ref: "#/components/responses/Error"
+    delete:
+      summary: "Delete a row by external id"
+      tags:
+        - "data-table-row"
+      operationId: "deleteRowByExternalId"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/ExternalId"
+        - $ref: "#/components/parameters/XEnvironment"
+      responses:
+        "204":
+          description: "Deleted."
+        "404":
+          $ref: "#/components/responses/Error"
+  /data-tables/{name}/rows/batch:
+    post:
+      description: "Insert or upsert up to 1000 rows in one transaction; one failure rolls back all of them.\
+        \ Under UPSERT every row must carry an externalId."
+      summary: "Batch insert or upsert rows"
+      tags:
+        - "data-table-row"
+      operationId: "batchRows"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/XEnvironment"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchRowsRequest"
+      responses:
+        "200":
+          description: "The rows as stored."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchRowsResponse"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+        "507":
+          $ref: "#/components/responses/Error"
+  /data-tables/{name}/rows/clear:
+    post:
+      description: "Delete every row. Irreversible."
+      summary: "Clear a table"
+      tags:
+        - "data-table-row"
+      operationId: "clearRows"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/XEnvironment"
+      responses:
+        "200":
+          description: "How many rows were deleted."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClearRowsResponse"
+        "404":
+          $ref: "#/components/responses/Error"
+  /data-tables/{name}/rows/import:
+    post:
+      description: "Insert rows from CSV. The header names existing columns; an optional `external_id`\
+        \ column sets each row's external id. Empty fields are null."
+      summary: "Import rows from CSV"
+      tags:
+        - "data-table-row"
+      operationId: "importRows"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/XEnvironment"
+      requestBody:
+        required: true
+        content:
+          text/csv:
+            schema:
+              type: "string"
+      responses:
+        "200":
+          description: "How many rows were inserted."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportRowsResponse"
+        "400":
+          $ref: "#/components/responses/Error"
+        "404":
+          $ref: "#/components/responses/Error"
+        "409":
+          $ref: "#/components/responses/Error"
+        "507":
+          $ref: "#/components/responses/Error"
+  /data-tables/{name}/rows/export:
+    get:
+      description: "Export every row as CSV. `external_id` is the first column; `id` is not included."
+      summary: "Export rows as CSV"
+      tags:
+        - "data-table-row"
+      operationId: "exportRows"
+      parameters:
+        - $ref: "#/components/parameters/TableName"
+        - $ref: "#/components/parameters/XEnvironment"
+      responses:
+        "200":
+          description: "The CSV document."
+          content:
+            text/csv:
+              schema:
+                type: "string"
+        "404":
+          $ref: "#/components/responses/Error"
+components:
+  parameters:
+    WorkspaceId:
+      name: "workspaceId"
+      description: "The id of a workspace."
+      in: "path"
+      required: true
+      schema:
+        type: "integer"
+        format: "int64"
+    TableName:
+      name: "name"
+      description: "The table name."
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+    ColumnName:
+      name: "column"
+      description: "The column name."
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+    RowId:
+      name: "id"
+      description: "The row id."
+      in: "path"
+      required: true
+      schema:
+        type: "integer"
+        format: "int64"
+    ExternalId:
+      name: "externalId"
+      description: "The caller-supplied row key."
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+        maxLength: 255
+    XEnvironment:
+      name: "X-Environment"
+      description: "The environment whose physical table is addressed. PRODUCTION when omitted."
+      in: "header"
+      required: false
+      schema:
+        $ref: "#/components/schemas/Environment"
+  responses:
+    Error:
+      description: "The problem."
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Error"
+  schemas:
+    Environment:
+      description: "The environment."
+      type: "string"
+      enum:
+        - "DEVELOPMENT"
+        - "STAGING"
+        - "PRODUCTION"
+    ColumnType:
+      description: "The type of a column."
+      type: "string"
+      enum:
+        - "STRING"
+        - "NUMBER"
+        - "INTEGER"
+        - "DATE"
+        - "DATE_TIME"
+        - "BOOLEAN"
+    CreateStrategy:
+      description: "How a batch treats each row."
+      type: "string"
+      enum:
+        - "INSERT"
+        - "UPSERT"
+    Error:
+      description: "An RFC 7807 problem detail. Branch on errorKey, never on detail."
+      type: "object"
+      properties:
+        type:
+          description: "A URI identifying the problem type."
+          type: "string"
+        title:
+          type: "string"
+        status:
+          type: "integer"
+        detail:
+          description: "A human-readable explanation of this occurrence."
+          type: "string"
+        errorKey:
+          description: "The stable machine-readable key. 100 DATA_TABLE_NOT_FOUND, 103 DATA_TABLE_NAME_INVALID,\
+            \ 104 DATA_TABLE_ALREADY_EXISTS, 105 COLUMN_NOT_FOUND, 106 COLUMN_ALREADY_EXISTS, 107 COLUMN_NAME_INVALID,\
+            \ 108 ROW_NOT_FOUND, 109 ROW_VALUE_INVALID, 110 ROW_EXTERNAL_ID_CONFLICT, 111 ROW_EXTERNAL_ID_REQUIRED,\
+            \ 112 FILTER_INVALID, 113 SORT_INVALID, 114 BATCH_TOO_LARGE, 115 CSV_INVALID, 116 STORAGE_LIMIT_EXCEEDED.\
+            \ Absent on schema-validation failures."
+          type: "integer"
+        entityClass:
+          type: "string"
+    DataTableColumn:
+      type: "object"
+      required:
+        - "name"
+        - "type"
+      properties:
+        name:
+          type: "string"
+        type:
+          $ref: "#/components/schemas/ColumnType"
+    DataTable:
+      type: "object"
+      properties:
+        name:
+          description: "The table name; its identity."
+          type: "string"
+        description:
+          type: "string"
+        columns:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DataTableColumn"
+        tags:
+          type: "array"
+          items:
+            type: "string"
+        lastModifiedDate:
+          type: "string"
+          format: "date-time"
+    CreateDataTableRequest:
+      type: "object"
+      required:
+        - "name"
+        - "columns"
+      properties:
+        name:
+          description: "Lower-case letters, digits and underscores, not starting with a digit or `dt_`."
+          type: "string"
+          pattern: "^[a-z_][a-z0-9_]*$"
+        description:
+          type: "string"
+        columns:
+          type: "array"
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/DataTableColumn"
+        tags:
+          type: "array"
+          items:
+            type: "string"
+    UpdateDataTableRequest:
+      type: "object"
+      properties:
+        description:
+          type: "string"
+        tags:
+          description: "Replace the tags; send null to clear them; omit to leave them."
+          type: "array"
+          nullable: true
+          items:
+            type: "string"
+    CreateColumnRequest:
+      type: "object"
+      required:
+        - "name"
+        - "type"
+      properties:
+        name:
+          type: "string"
+          pattern: "^[a-z_][a-z0-9_]*$"
+        type:
+          $ref: "#/components/schemas/ColumnType"
+    RenameColumnRequest:
+      type: "object"
+      required:
+        - "newName"
+      properties:
+        newName:
+          type: "string"
+          pattern: "^[a-z_][a-z0-9_]*$"
+    DataTableRow:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        externalId:
+          description: "The caller-supplied key, or null."
+          type: "string"
+        values:
+          description: "Column name to value. STRING→string, NUMBER→number, INTEGER→integer, BOOLEAN→boolean,\
+            \ DATE→YYYY-MM-DD, DATE_TIME→ISO-8601 UTC."
+          type: "object"
+          additionalProperties: true
+    CreateRowRequest:
+      type: "object"
+      required:
+        - "values"
+      properties:
+        values:
+          description: "Column name to value. Each value may also be given as a string in the column's format."
+          type: "object"
+          additionalProperties: true
+        externalId:
+          type: "string"
+          maxLength: 255
+    UpdateRowRequest:
+      type: "object"
+      properties:
+        values:
+          type: "object"
+          additionalProperties: true
+        externalId:
+          description: "Set the key; send null to clear it; omit to leave it."
+          type: "string"
+          nullable: true
+          maxLength: 255
+    UpsertRowRequest:
+      type: "object"
+      required:
+        - "values"
+      properties:
+        values:
+          type: "object"
+          additionalProperties: true
+    BatchRow:
+      type: "object"
+      required:
+        - "values"
+      properties:
+        values:
+          type: "object"
+          additionalProperties: true
+        externalId:
+          type: "string"
+          maxLength: 255
+    BatchRowsRequest:
+      type: "object"
+      required:
+        - "rows"
+      properties:
+        rows:
+          type: "array"
+          minItems: 1
+          maxItems: 1000
+          items:
+            $ref: "#/components/schemas/BatchRow"
+        createStrategy:
+          $ref: "#/components/schemas/CreateStrategy"
+    BatchRowsResponse:
+      type: "object"
+      properties:
+        rows:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DataTableRow"
+    DeleteRowsResponse:
+      type: "object"
+      properties:
+        deletedCount:
+          type: "integer"
+        deletedIds:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+    ClearRowsResponse:
+      type: "object"
+      properties:
+        deletedCount:
+          type: "integer"
+          format: "int64"
+    ImportRowsResponse:
+      type: "object"
+      properties:
+        importedCount:
+          type: "integer"
+    Page:
+      description: "A page of rows."
+      type: "object"
+      properties:
+        number:
+          type: "integer"
+        size:
+          type: "integer"
+        numberOfElements:
+          type: "integer"
+        totalPages:
+          type: "integer"
+        totalElements:
+          type: "integer"
+        content:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DataTableRow"
