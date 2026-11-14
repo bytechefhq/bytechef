@@ -1,20 +1,30 @@
-import {act, render} from '@testing-library/react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {act, fireEvent, render, screen} from '@testing-library/react';
+import {StrictMode} from 'react';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import IntegrationMarketplace from './IntegrationMarketplace';
 
-const {openDialogMock, connectDialogHookMock} = vi.hoisted(() => ({
-    openDialogMock: vi.fn(),
+const {connectDialogHookMock, connectDialogHookMode, openDialogMock} = vi.hoisted(() => ({
     connectDialogHookMock: vi.fn(),
+    connectDialogHookMode: {real: false},
+    openDialogMock: vi.fn(),
 }));
 
-vi.mock('../connect-dialog', () => ({
-    default: (props: Record<string, unknown>) => {
-        connectDialogHookMock(props);
+vi.mock('../connect-dialog', async (importOriginal) => {
+    const actualModule = await importOriginal<typeof import('../connect-dialog')>();
 
-        return {closeDialog: vi.fn(), openDialog: openDialogMock};
-    },
-}));
+    return {
+        default: (props: Parameters<typeof actualModule.default>[0]) => {
+            connectDialogHookMock(props);
+
+            if (connectDialogHookMode.real) {
+                return actualModule.default(props);
+            }
+
+            return {closeDialog: vi.fn(), openDialog: openDialogMock};
+        },
+    };
+});
 
 const fireMessage = (data: unknown, source: unknown, origin = 'https://app.example') => {
     const messageEvent = new MessageEvent('message', {data, origin});
@@ -140,5 +150,82 @@ describe('IntegrationMarketplace', () => {
         const {container} = render(<IntegrationMarketplace baseUrl="https://app.example" jwtToken="jwt-1" />);
 
         expect(() => fireMessage(null, getIframeWindow(container))).not.toThrow();
+    });
+
+    describe('with the real connect dialog', () => {
+        const openConnectDialog = (container: HTMLElement) => {
+            const postMessage = vi.fn();
+
+            Object.defineProperty(container.querySelector('iframe')!, 'contentWindow', {value: {postMessage}});
+
+            fireMessage({integrationId: '42', type: 'EMBED_OPEN_CONNECT_DIALOG'}, getIframeWindow(container));
+
+            return postMessage;
+        };
+
+        const integrationsChangedCount = (postMessage: ReturnType<typeof vi.fn>) =>
+            postMessage.mock.calls.filter(([message]) => message?.type === 'EMBED_INTEGRATIONS_CHANGED').length;
+
+        beforeEach(() => {
+            connectDialogHookMode.real = true;
+
+            global.fetch = vi.fn().mockResolvedValue({
+                headers: {get: () => null},
+                json: vi.fn().mockResolvedValue({integrationInstances: [], name: 'Slack', workflows: []}),
+                ok: true,
+            });
+        });
+
+        afterEach(() => {
+            connectDialogHookMode.real = false;
+        });
+
+        it('calls onConnectDialogClose exactly once when the dialog is closed', async () => {
+            const onConnectDialogClose = vi.fn();
+
+            const {container} = render(
+                <IntegrationMarketplace
+                    baseUrl="https://app.example"
+                    jwtToken="jwt-1"
+                    onConnectDialogClose={onConnectDialogClose}
+                />
+            );
+
+            const postMessage = openConnectDialog(container);
+
+            fireEvent.click(await screen.findByRole('button', {name: 'Close Dialog'}));
+
+            await act(async () => {});
+
+            expect(onConnectDialogClose).toHaveBeenCalledTimes(1);
+            expect(integrationsChangedCount(postMessage)).toBe(1);
+        });
+
+        it('keeps the dialog open under StrictMode and calls onConnectDialogClose once when it is closed', async () => {
+            const onConnectDialogClose = vi.fn();
+
+            const {container} = render(
+                <StrictMode>
+                    <IntegrationMarketplace
+                        baseUrl="https://app.example"
+                        jwtToken="jwt-1"
+                        onConnectDialogClose={onConnectDialogClose}
+                    />
+                </StrictMode>
+            );
+
+            const postMessage = openConnectDialog(container);
+
+            const closeButton = await screen.findByRole('button', {name: 'Close Dialog'});
+
+            expect(onConnectDialogClose).not.toHaveBeenCalled();
+
+            fireEvent.click(closeButton);
+
+            await act(async () => {});
+
+            expect(onConnectDialogClose).toHaveBeenCalledTimes(1);
+            expect(integrationsChangedCount(postMessage)).toBe(1);
+        });
     });
 });
