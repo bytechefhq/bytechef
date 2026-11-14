@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.remote.client.facade;
 
 import com.bytechef.ee.embedded.ai.mcp.facade.McpAutomationRows;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,6 +23,13 @@ public class RemoteMcpAutomationRowsClient implements McpAutomationRows {
 
     @Override
     public void addMissingRowsForLink(long mcpAutomationProjectConfigurationId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void addMissingRowsForLinkWorkflows(
+        long mcpAutomationProjectConfigurationId, List<Long> mcpAutomationProjectConfigurationWorkflowIds) {
+
         throw new UnsupportedOperationException();
     }
 

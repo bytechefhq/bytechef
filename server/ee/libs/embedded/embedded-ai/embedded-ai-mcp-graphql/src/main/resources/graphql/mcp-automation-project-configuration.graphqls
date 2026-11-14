@@ -1,0 +1,49 @@
+extend type Query {
+    mcpAutomationProjectConfigurationsByServerId(mcpServerId: ID!): [McpAutomationProjectConfiguration!]!
+    mcpAutomationProjectConfigurationWorkflowProperties(mcpAutomationProjectConfigurationWorkflowId: ID!): [Property]
+}
+
+extend type Mutation {
+    createMcpAutomationProjectConfiguration(input: CreateMcpAutomationProjectConfigurationInput!): McpAutomationProjectConfiguration!
+    deleteMcpAutomationProjectConfiguration(id: ID!): Boolean
+    updateMcpAutomationProjectConfiguration(id: ID!, input: UpdateMcpAutomationProjectConfigurationInput!): McpAutomationProjectConfiguration!
+    updateMcpAutomationProjectConfigurationWorkflowEnabled(id: ID!, enabled: Boolean!): McpAutomationProjectConfigurationWorkflow!
+    updateMcpAutomationProjectConfigurationWorkflowParameters(id: ID!, parameters: Map!): McpAutomationProjectConfigurationWorkflow!
+}
+
+type McpAutomationProjectConfiguration {
+    id: ID!
+    mcpServerId: ID!
+    automationProjectConfigurationId: ID!
+    automationProjectConfigurationName: String!
+    automationProjectConfigurationEnabled: Boolean!
+    projectId: ID!
+    projectVersion: Int!
+    workflows: [McpAutomationProjectConfigurationWorkflow!]!
+}
+
+type McpAutomationProjectConfigurationWorkflow {
+    id: ID!
+    workflowUuid: String!
+    label: String
+    parameters: Map
+    enabled: Boolean!
+    available: Boolean!
+}
+
+input CreateMcpAutomationProjectConfigurationInput {
+    mcpServerId: ID!
+    automationProjectConfigurationId: ID!
+    workflowUuids: [String!]!
+    workflowConfigurations: [McpAutomationWorkflowConfigurationInput!]
+}
+
+input UpdateMcpAutomationProjectConfigurationInput {
+    workflowUuids: [String!]!
+    workflowConfigurations: [McpAutomationWorkflowConfigurationInput!]
+}
+
+input McpAutomationWorkflowConfigurationInput {
+    workflowUuid: String!
+    parameters: Map
+}

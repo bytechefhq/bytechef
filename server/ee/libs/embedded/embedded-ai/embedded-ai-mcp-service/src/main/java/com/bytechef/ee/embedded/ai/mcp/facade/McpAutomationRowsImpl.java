@@ -111,6 +111,57 @@ public class McpAutomationRowsImpl implements McpAutomationRows {
     }
 
     @Override
+    public void addMissingRowsForLinkWorkflows(
+        long mcpAutomationProjectConfigurationId, List<Long> mcpAutomationProjectConfigurationWorkflowIds) {
+
+        if (mcpAutomationProjectConfigurationWorkflowIds.isEmpty()) {
+            return;
+        }
+
+        Optional<McpAutomationProjectConfiguration> linkOptional = mcpAutomationProjectConfigurationService.fetch(
+            mcpAutomationProjectConfigurationId);
+
+        if (linkOptional.isEmpty()) {
+            return;
+        }
+
+        McpAutomationProjectConfiguration link = linkOptional.get();
+
+        List<McpAutomationProjectConfigurationWorkflow> linkWorkflows = new ArrayList<>();
+
+        for (McpAutomationProjectConfigurationWorkflow linkWorkflow : mcpAutomationProjectConfigurationWorkflowService
+            .getMcpAutomationProjectConfigurationWorkflows(mcpAutomationProjectConfigurationId)) {
+
+            if (mcpAutomationProjectConfigurationWorkflowIds.contains(linkWorkflow.getId())) {
+                linkWorkflows.add(linkWorkflow);
+            }
+        }
+
+        if (linkWorkflows.isEmpty()) {
+            return;
+        }
+
+        for (ConnectedUserProjectConfiguration assignment : connectedUserProjectConfigurationService.getAssignments(
+            link.getAutomationProjectConfigurationId())) {
+
+            long connectedUserId = assignment.getConnectedUserId();
+
+            Optional<Boolean> connectedUserState = mcpServerMembership.getConnectedUserState(
+                connectedUserId, link.getMcpServerId());
+
+            if (connectedUserState.isEmpty()) {
+                continue;
+            }
+
+            Map<Long, Boolean> newRowEnabledByMcpServerId = new HashMap<>();
+
+            newRowEnabledByMcpServerId.put(link.getMcpServerId(), connectedUserState.get());
+
+            addMissingRows(connectedUserId, link.getMcpServerId(), linkWorkflows, newRowEnabledByMcpServerId);
+        }
+    }
+
+    @Override
     public void addMissingRowsForReference(long connectedUserProjectWorkflowId) {
         ConnectedUserProjectWorkflow reference = connectedUserProjectWorkflowService.getConnectedUserProjectWorkflow(
             connectedUserProjectWorkflowId);

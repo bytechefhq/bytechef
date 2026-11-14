@@ -10,27 +10,17 @@ package com.bytechef.ee.embedded.ai.mcp.web.graphql;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.MapUtils;
-import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceConfigurationWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
-import com.bytechef.platform.ai.tool.util.ToolPropertyUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.component.constant.WorkflowConstants;
-import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.Property;
-import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
-import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -116,42 +106,7 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
 
         Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
 
-        WorkflowTrigger trigger = getToolCallableTrigger(workflow);
-
-        if (trigger == null) {
-            return List.of();
-        }
-
-        List<Property> properties = new ArrayList<>();
-
-        properties.add(ToolPropertyUtils.toolNameProperty("workflow"));
-
-        properties.add(ToolPropertyUtils.toolDescriptionProperty("workflow"));
-
-        String inputSchema = MapUtils.getString(trigger.getParameters(), WorkflowConstants.INPUT_SCHEMA);
-
-        if (inputSchema == null || inputSchema.isEmpty()) {
-            return properties;
-        }
-
-        BaseValueProperty<?> inputProperty = SchemaUtils.getJsonSchemaProperty(
-            inputSchema, PropertyFactory.JSON_SCHEMA_PROPERTY_FACTORY);
-
-        if (inputProperty == null) {
-            return properties;
-        }
-
-        if (inputProperty instanceof com.bytechef.component.definition.Property.ObjectProperty objectProperty) {
-            for (com.bytechef.component.definition.Property childProperty : objectProperty.getProperties()) {
-                properties.add(Property.toProperty(childProperty));
-            }
-
-            return properties;
-        }
-
-        properties.add(Property.toProperty((com.bytechef.component.definition.Property) inputProperty));
-
-        return properties;
+        return McpToolWorkflowProperties.getToolProperties(workflow);
     }
 
     @MutationMapping
@@ -237,19 +192,5 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
         Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
 
         return new WorkflowDTO(workflow, List.of(), List.of());
-    }
-
-    private static WorkflowTrigger getToolCallableTrigger(Workflow workflow) {
-        for (WorkflowTrigger workflowTrigger : WorkflowTrigger.ofEnabled(workflow)) {
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-            if (Objects.equals(workflowNodeType.name(), WorkflowConstants.WORKFLOW) &&
-                Objects.equals(workflowNodeType.operation(), WorkflowConstants.NEW_WORKFLOW_CALL)) {
-
-                return workflowTrigger;
-            }
-        }
-
-        return null;
     }
 }
