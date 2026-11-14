@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
@@ -16,6 +17,8 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,6 +39,28 @@ public class WorkflowConnectionSlot {
 
         this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
+    }
+
+    /**
+     * Returns the component name of the first required connection slot of the workflow that none of the given
+     * deployment workflow connections fills, or null when every required slot is filled.
+     */
+    @Nullable
+    public String findMissingRequiredComponentName(
+        String workflowId, List<ProjectDeploymentWorkflowConnection> connections) {
+
+        for (ComponentConnection componentConnection : getSlots(workflowId)) {
+            boolean wired = connections.stream()
+                .anyMatch(connection -> Objects.equals(
+                    connection.getWorkflowNodeName(), componentConnection.workflowNodeName()) &&
+                    Objects.equals(connection.getWorkflowConnectionKey(), componentConnection.key()));
+
+            if (componentConnection.required() && !wired) {
+                return componentConnection.componentName();
+            }
+        }
+
+        return null;
     }
 
     public List<ComponentConnection> getSlots(String workflowId) {

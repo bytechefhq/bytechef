@@ -169,15 +169,11 @@ class ConnectedUserReferenceAttentionResolver {
 
         ProjectDeploymentWorkflow projectDeploymentWorkflow = row.get();
 
-        List<ProjectDeploymentWorkflowConnection> connections = projectDeploymentWorkflow.getConnections();
+        String missingComponentName = workflowConnectionSlot.findMissingRequiredComponentName(
+            workflowId.get(), projectDeploymentWorkflow.getConnections());
 
-        for (ComponentConnection componentConnection : workflowConnectionSlot.getSlots(workflowId.get())) {
-            boolean wired = connections.stream()
-                .anyMatch(connection -> isWiredTo(connection, componentConnection));
-
-            if (componentConnection.required() && !wired) {
-                return MISSING_CONNECTION_PREFIX + componentConnection.componentName();
-            }
+        if (missingComponentName != null) {
+            return MISSING_CONNECTION_PREFIX + missingComponentName;
         }
 
         String missingInputName = connectedUserReferenceDeploymentManager.findMissingRequiredInput(
