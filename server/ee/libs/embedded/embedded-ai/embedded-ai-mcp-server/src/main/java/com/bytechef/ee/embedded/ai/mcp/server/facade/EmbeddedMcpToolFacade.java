@@ -20,11 +20,16 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpAutomationProjectConfiguration;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpAutomationProjectConfigurationWorkflow;
+import com.bytechef.ee.embedded.ai.mcp.domain.McpConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationComponent;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
@@ -33,6 +38,8 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.CallableAutomationDTO;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserMcpAutomationResolver;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -76,6 +83,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,6 +93,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -93,8 +102,8 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
 /**
- * Tool facade for the embedded MCP server. Handles both component-level tools (direct action execution) and integration
- * {@link IntegrationInstanceService}.
+ * Tool facade for the embedded MCP server. Handles component-level tools (direct action execution), integration
+ * workflow tools ({@link IntegrationInstanceService}) and the activated automation workflow tools of connected users.
  *
  * @version ee
  *
@@ -111,6 +120,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
+    private final ConnectedUserMcpAutomationResolver connectedUserMcpAutomationResolver;
     private final ConnectedUserService connectedUserService;
     private final JwtTokenService jwtTokenService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -118,7 +128,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
     private final JobCompletionAwaiter jobCompletionAwaiter;
+    private final McpAutomationProjectConfigurationWorkflowService mcpAutomationProjectConfigurationWorkflowService;
     private final McpComponentService mcpComponentService;
+    private final McpConnectedUserProjectWorkflowService mcpConnectedUserProjectWorkflowService;
     private final McpIntegrationComponentService mcpIntegrationComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService;
@@ -136,13 +148,18 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     public EmbeddedMcpToolFacade(
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService,
-        ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
-        Evaluator evaluator, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        ComponentDefinitionService componentDefinitionService,
+        ConnectedUserMcpAutomationResolver connectedUserMcpAutomationResolver,
+        ConnectedUserService connectedUserService, Evaluator evaluator,
+        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
         JobCompletionAwaiter jobCompletionAwaiter, JwtTokenService jwtTokenService,
-        McpComponentService mcpComponentService, McpIntegrationComponentService mcpIntegrationComponentService,
+        McpAutomationProjectConfigurationWorkflowService mcpAutomationProjectConfigurationWorkflowService,
+        McpComponentService mcpComponentService,
+        McpConnectedUserProjectWorkflowService mcpConnectedUserProjectWorkflowService,
+        McpIntegrationComponentService mcpIntegrationComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpIntegrationInstanceWorkflowService mcpIntegrationInstanceWorkflowService,
@@ -155,6 +172,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
+        this.connectedUserMcpAutomationResolver = connectedUserMcpAutomationResolver;
         this.connectedUserService = connectedUserService;
         this.jwtTokenService = jwtTokenService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -162,7 +180,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
         this.jobCompletionAwaiter = jobCompletionAwaiter;
+        this.mcpAutomationProjectConfigurationWorkflowService = mcpAutomationProjectConfigurationWorkflowService;
         this.mcpComponentService = mcpComponentService;
+        this.mcpConnectedUserProjectWorkflowService = mcpConnectedUserProjectWorkflowService;
         this.mcpIntegrationComponentService = mcpIntegrationComponentService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
@@ -273,38 +293,187 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             Map<String, ?> workflowParameters = mcpIntegrationInstanceConfigurationWorkflow.getParameters();
 
-            String toolName = getWorkflowToolName(workflowParameters, workflow.getLabel());
-
-            List<FromAiResult> fromAiResults = extractFromAiResults(workflowParameters);
-
-            FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
-                .builder(
-                    Objects.requireNonNull(
-                        toolName,
-                        () -> "Workflow %s exposes no tool name: configure one or give the workflow a label"
-                            .formatted(workflow.getId())),
-                    getWorkflowToolCallbackFunction(
+            toolCallbacks.add(
+                createWorkflowToolCallback(
+                    workflow, workflowParameters,
+                    toolName -> getWorkflowToolCallbackFunction(
                         toolName, externalUserId, integration.getComponentName(), integration.getId(),
-                        integrationInstanceConfigurationWorkflow,
-                        trigger.getName(), workflowParameters, mcpIntegrationInstanceConfiguration.getMcpServerId(),
-                        environment, tenantId))
-                .inputType(Map.class)
-                .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
-
-            String description = getToolDescription(workflowParameters, null);
-
-            if (description == null) {
-                description = workflow.getDescription();
-            }
-
-            if (description != null) {
-                builder.description(description);
-            }
-
-            toolCallbacks.add(builder.build());
+                        integrationInstanceConfigurationWorkflow, trigger.getName(), workflowParameters,
+                        mcpIntegrationInstanceConfiguration.getMcpServerId(), environment, tenantId)));
         }
 
         return toolCallbacks;
+    }
+
+    public List<ToolCallback> getAutomationToolCallbacks(
+        McpAutomationProjectConfiguration mcpAutomationProjectConfiguration, @Nullable String externalUserId,
+        Environment environment, String tenantId) {
+
+        if (externalUserId == null) {
+            return List.of();
+        }
+
+        Long connectedUserId = fetchConnectedUserId(externalUserId, environment);
+
+        if (connectedUserId == null) {
+            return List.of();
+        }
+
+        Map<Long, Set<Long>> enabledConnectedUserProjectWorkflowIds = getEnabledConnectedUserProjectWorkflowIds(
+            connectedUserId);
+
+        List<ToolCallback> toolCallbacks = new ArrayList<>();
+
+        for (McpAutomationProjectConfigurationWorkflow mcpAutomationProjectConfigurationWorkflow : mcpAutomationProjectConfigurationWorkflowService
+            .getMcpAutomationProjectConfigurationWorkflows(mcpAutomationProjectConfiguration.getId())) {
+
+            Set<Long> connectedUserProjectWorkflowIds = enabledConnectedUserProjectWorkflowIds.getOrDefault(
+                mcpAutomationProjectConfigurationWorkflow.getId(), Set.of());
+
+            if (!mcpAutomationProjectConfigurationWorkflow.isEnabled() || connectedUserProjectWorkflowIds.isEmpty()) {
+                continue;
+            }
+
+            try {
+                ToolCallback toolCallback = getAutomationToolCallback(
+                    mcpAutomationProjectConfiguration, mcpAutomationProjectConfigurationWorkflow,
+                    connectedUserProjectWorkflowIds, externalUserId, connectedUserId, environment);
+
+                if (toolCallback != null) {
+                    toolCallbacks.add(toolCallback);
+                }
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "Skipping the automation tool of MCP automation project configuration workflow {}",
+                    mcpAutomationProjectConfigurationWorkflow.getId(), exception);
+            }
+        }
+
+        return toolCallbacks;
+    }
+
+    private @Nullable ToolCallback getAutomationToolCallback(
+        McpAutomationProjectConfiguration mcpAutomationProjectConfiguration,
+        McpAutomationProjectConfigurationWorkflow mcpAutomationProjectConfigurationWorkflow,
+        Set<Long> connectedUserProjectWorkflowIds, String externalUserId, long connectedUserId,
+        Environment environment) {
+
+        Optional<CallableAutomationDTO> callableAutomationOptional = connectedUserMcpAutomationResolver
+            .fetchCallableAutomation(
+                connectedUserId, mcpAutomationProjectConfiguration.getAutomationProjectConfigurationId(),
+                mcpAutomationProjectConfigurationWorkflow.getWorkflowUuid());
+
+        if (callableAutomationOptional.isEmpty()) {
+            return null;
+        }
+
+        CallableAutomationDTO callableAutomation = callableAutomationOptional.get();
+
+        if (!connectedUserProjectWorkflowIds.contains(callableAutomation.connectedUserProjectWorkflowId())) {
+            return null;
+        }
+
+        Workflow workflow = workflowService.getWorkflow(callableAutomation.workflowId());
+
+        WorkflowTrigger trigger = getMcpToolCallableTrigger(workflow);
+
+        if (trigger == null) {
+            return null;
+        }
+
+        Map<String, ?> workflowParameters = mcpAutomationProjectConfigurationWorkflow.getParameters();
+
+        return createWorkflowToolCallback(
+            workflow, workflowParameters,
+            toolName -> getAutomationToolCallbackFunction(
+                toolName, externalUserId, connectedUserId, callableAutomation, trigger.getName(), workflowParameters,
+                mcpAutomationProjectConfiguration.getMcpServerId(), environment));
+    }
+
+    private Function<Map<String, Object>, Object> getAutomationToolCallbackFunction(
+        String toolName, String externalUserId, long connectedUserId, CallableAutomationDTO callableAutomation,
+        String triggerName, Map<String, ?> workflowParameters, long mcpServerId, Environment environment) {
+
+        return inputParameters -> {
+            checkMcpServerEnabled(mcpServerId);
+
+            ExternalInvocationEvent.Builder eventBuilder = ExternalInvocationEvent
+                .builder(PlatformType.EMBEDDED, ExternalInvocationSource.MCP_SERVER, ExternalInvocationKind.WORKFLOW,
+                    toolName)
+                .environment(environment.ordinal())
+                .externalUserId(externalUserId)
+                .connectedUserId(connectedUserId)
+                .mcpServerId(mcpServerId);
+
+            String missingConnectionComponentName = callableAutomation.missingConnectionComponentName();
+
+            if (missingConnectionComponentName != null) {
+                eventBuilder.componentName(missingConnectionComponentName);
+
+                recordConnectionRequired(eventBuilder);
+
+                return getAutomationConnectionRequiredResponse(missingConnectionComponentName);
+            }
+
+            JobParametersDTO jobParametersDTO = new JobParametersDTO(
+                callableAutomation.workflowId(),
+                getWorkflowJobInputs(callableAutomation.inputs(), triggerName, workflowParameters, inputParameters));
+
+            return runWorkflowJob(
+                eventBuilder,
+                () -> callSkippingAutomationChecks(
+                    () -> principalJobFacade.createJob(
+                        jobParametersDTO, callableAutomation.projectDeploymentId(), PlatformType.AUTOMATION)));
+        };
+    }
+
+    private ToolCallback createWorkflowToolCallback(
+        Workflow workflow, Map<String, ?> workflowParameters,
+        Function<String, Function<Map<String, Object>, Object>> toolCallbackFunctionFactory) {
+
+        String toolName = Objects.requireNonNull(
+            getWorkflowToolName(workflowParameters, workflow.getLabel()),
+            () -> "Workflow %s exposes no tool name: configure one or give the workflow a label"
+                .formatted(workflow.getId()));
+
+        List<FromAiResult> fromAiResults = extractFromAiResults(workflowParameters);
+
+        FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
+            .builder(toolName, toolCallbackFunctionFactory.apply(toolName))
+            .inputType(Map.class)
+            .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
+
+        String description = getToolDescription(workflowParameters, null);
+
+        if (description == null) {
+            description = workflow.getDescription();
+        }
+
+        if (description != null) {
+            builder.description(description);
+        }
+
+        return builder.build();
+    }
+
+    private Map<Long, Set<Long>> getEnabledConnectedUserProjectWorkflowIds(long connectedUserId) {
+        Map<Long, Set<Long>> enabledConnectedUserProjectWorkflowIds = new HashMap<>();
+
+        for (McpConnectedUserProjectWorkflow mcpConnectedUserProjectWorkflow : mcpConnectedUserProjectWorkflowService
+            .getConnectedUserMcpConnectedUserProjectWorkflows(connectedUserId)) {
+
+            if (!mcpConnectedUserProjectWorkflow.isEnabled()) {
+                continue;
+            }
+
+            Set<Long> connectedUserProjectWorkflowIds = enabledConnectedUserProjectWorkflowIds.computeIfAbsent(
+                mcpConnectedUserProjectWorkflow.getMcpAutomationProjectConfigurationWorkflowId(),
+                mcpAutomationProjectConfigurationWorkflowId -> new HashSet<>());
+
+            connectedUserProjectWorkflowIds.add(mcpConnectedUserProjectWorkflow.getConnectedUserProjectWorkflowId());
+        }
+
+        return enabledConnectedUserProjectWorkflowIds;
     }
 
     private @Nullable Long fetchConnectedUserId(@Nullable String externalUserId, Environment environment) {
@@ -372,11 +541,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         Environment environment, String tenantId) {
 
         return request -> {
-            McpServer mcpServer = readMcpServerConfiguration(() -> mcpServerService.getMcpServer(mcpServerId));
-
-            if (!mcpServer.isEnabled()) {
-                throw new IllegalStateException("MCP server is disabled");
-            }
+            checkMcpServerEnabled(mcpServerId);
 
             Long connectedUserId = fetchConnectedUserId(externalUserId, environment);
 
@@ -406,16 +571,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                     throw new IllegalStateException(getConnectedUserRequiredMessage(componentName));
                 }
 
-                Map<String, Object> connectionRequiredResponse = getConnectionRequiredResponse(
-                    componentName, environment, externalUserId,
+                return getRecordedConnectionRequiredResponse(
+                    eventBuilder, componentName, environment, externalUserId,
                     integrationId == null ? getIntegrationId(componentName) : integrationId, tenantId);
-
-                externalInvocationRecorder.record(
-                    eventBuilder
-                        .status(ExternalInvocationStatus.CONNECTION_REQUIRED)
-                        .build());
-
-                return connectionRequiredResponse;
             }
 
             Map<String, Object> resolvedParameters = new HashMap<>();
@@ -449,11 +607,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         Map<String, ?> workflowParameters, long mcpServerId, Environment environment, String tenantId) {
 
         return inputParameters -> {
-            McpServer mcpServer = readMcpServerConfiguration(() -> mcpServerService.getMcpServer(mcpServerId));
-
-            if (!mcpServer.isEnabled()) {
-                throw new IllegalStateException("MCP server is disabled");
-            }
+            checkMcpServerEnabled(mcpServerId);
 
             Long connectedUserId = fetchConnectedUserId(externalUserId, environment);
 
@@ -475,53 +629,69 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                     throw new IllegalStateException(getConnectedUserRequiredMessage(componentName));
                 }
 
-                Map<String, Object> connectionRequiredResponse = getConnectionRequiredResponse(
-                    componentName, environment, externalUserId, integrationId, tenantId);
-
-                externalInvocationRecorder.record(
-                    eventBuilder
-                        .status(ExternalInvocationStatus.CONNECTION_REQUIRED)
-                        .build());
-
-                return connectionRequiredResponse;
+                return getRecordedConnectionRequiredResponse(
+                    eventBuilder, componentName, environment, externalUserId, integrationId, tenantId);
             }
-
-            Map<String, Object> inputs = new HashMap<>(integrationInstanceConfigurationWorkflow.getInputs());
-
-            Map<String, Object> triggerInputs = new HashMap<>();
-
-            for (Map.Entry<String, ?> entry : workflowParameters.entrySet()) {
-                triggerInputs.put(entry.getKey(), resolveParameterValue(entry.getValue(), inputParameters));
-            }
-
-            triggerInputs.putAll(inputParameters);
-
-            inputs.put(triggerName, triggerInputs);
-            inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, triggerName);
 
             JobParametersDTO jobParametersDTO = new JobParametersDTO(
-                integrationInstanceConfigurationWorkflow.getWorkflowId(), inputs);
+                integrationInstanceConfigurationWorkflow.getWorkflowId(),
+                getWorkflowJobInputs(
+                    integrationInstanceConfigurationWorkflow.getInputs(), triggerName, workflowParameters,
+                    inputParameters));
 
-            WorkflowToolRunResult workflowToolRunResult = externalInvocationRecorder.record(
+            return runWorkflowJob(
                 eventBuilder,
-                () -> {
-                    long jobId = principalJobFacade.createJob(
-                        jobParametersDTO, integrationInstanceId, PlatformType.EMBEDDED);
-
-                    eventBuilder.jobId(jobId);
-
-                    WorkflowToolRunResult jobRunResult = getWorkflowRunResult(awaitJob(jobId));
-
-                    if (jobRunResult.status() == WorkflowToolRunResult.Status.STOPPED) {
-                        eventBuilder.errorMessage(STOPPED_MESSAGE);
-                    }
-
-                    return jobRunResult;
-                },
-                WorkflowToolRunResult::getExternalInvocationStatus);
-
-            return workflowToolRunResult.result();
+                () -> principalJobFacade.createJob(jobParametersDTO, integrationInstanceId, PlatformType.EMBEDDED));
         };
+    }
+
+    private Map<String, Object> getWorkflowJobInputs(
+        Map<String, ?> workflowInputs, String triggerName, Map<String, ?> workflowParameters,
+        Map<String, Object> inputParameters) {
+
+        Map<String, Object> inputs = new HashMap<>(workflowInputs);
+
+        Map<String, Object> triggerInputs = new HashMap<>();
+
+        for (Map.Entry<String, ?> entry : workflowParameters.entrySet()) {
+            triggerInputs.put(entry.getKey(), resolveParameterValue(entry.getValue(), inputParameters));
+        }
+
+        triggerInputs.putAll(inputParameters);
+
+        inputs.put(triggerName, triggerInputs);
+        inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, triggerName);
+
+        return inputs;
+    }
+
+    private @Nullable Object runWorkflowJob(ExternalInvocationEvent.Builder eventBuilder, LongSupplier jobCreator) {
+        WorkflowToolRunResult workflowToolRunResult = externalInvocationRecorder.record(
+            eventBuilder,
+            () -> {
+                long jobId = jobCreator.getAsLong();
+
+                eventBuilder.jobId(jobId);
+
+                WorkflowToolRunResult jobRunResult = getWorkflowRunResult(awaitJob(jobId));
+
+                if (jobRunResult.status() == WorkflowToolRunResult.Status.STOPPED) {
+                    eventBuilder.errorMessage(STOPPED_MESSAGE);
+                }
+
+                return jobRunResult;
+            },
+            WorkflowToolRunResult::getExternalInvocationStatus);
+
+        return workflowToolRunResult.result();
+    }
+
+    private void checkMcpServerEnabled(long mcpServerId) {
+        McpServer mcpServer = callSkippingAutomationChecks(() -> mcpServerService.getMcpServer(mcpServerId));
+
+        if (!mcpServer.isEnabled()) {
+            throw new IllegalStateException("MCP server is disabled");
+        }
     }
 
     private WorkflowToolRunResult getWorkflowRunResult(Job job) {
@@ -630,6 +800,33 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             .isPresent();
     }
 
+    private Map<String, Object> getRecordedConnectionRequiredResponse(
+        ExternalInvocationEvent.Builder eventBuilder, String componentName, Environment environment,
+        String externalUserId, long integrationId, String tenantId) {
+
+        Map<String, Object> connectionRequiredResponse = getConnectionRequiredResponse(
+            componentName, environment, externalUserId, integrationId, tenantId);
+
+        recordConnectionRequired(eventBuilder);
+
+        return connectionRequiredResponse;
+    }
+
+    private void recordConnectionRequired(ExternalInvocationEvent.Builder eventBuilder) {
+        externalInvocationRecorder.record(
+            eventBuilder
+                .status(ExternalInvocationStatus.CONNECTION_REQUIRED)
+                .build());
+    }
+
+    private static Map<String, Object> getAutomationConnectionRequiredResponse(String componentName) {
+        return Map.of(
+            "error", "connection_required",
+            "message",
+            "The " + componentName + " connection is not set for this automation. " +
+                "Instruct the user to connect " + componentName + " for this automation in the app, then try again.");
+    }
+
     private Map<String, Object> getConnectionRequiredResponse(
         String componentName, Environment environment, String externalUserId, long integrationId, String tenantId) {
         String jwtToken = jwtTokenService.generateJwtToken(
@@ -684,9 +881,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         return componentDefinition.isConnectionRequired();
     }
 
-    private static <T> T readMcpServerConfiguration(Supplier<T> read) {
+    private static <T> T callSkippingAutomationChecks(Supplier<T> supplier) {
         try {
-            return AutomationAuthorizationContext.callSkippingChecks(read::get);
+            return AutomationAuthorizationContext.callSkippingChecks(supplier::get);
         } catch (RuntimeException | Error exception) {
             throw exception;
         } catch (Throwable throwable) {

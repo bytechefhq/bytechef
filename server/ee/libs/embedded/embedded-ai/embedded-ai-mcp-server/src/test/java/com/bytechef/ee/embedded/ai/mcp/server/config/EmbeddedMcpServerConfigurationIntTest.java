@@ -15,11 +15,15 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.ai.mcp.server.facade.EmbeddedMcpToolFacade;
+import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpAutomationProjectConfigurationWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationComponentService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceWorkflowService;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserMcpAutomationResolver;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
@@ -61,10 +65,13 @@ class EmbeddedMcpServerConfigurationIntTest {
 
     private static final List<Class<?>> MOCKED_DEPENDENCY_TYPES = List.of(
         ApplicationProperties.class, ClusterElementDefinitionFacade.class, ClusterElementDefinitionService.class,
-        ComponentDefinitionService.class, ConnectedUserService.class, EnvironmentService.class, Evaluator.class,
+        ComponentDefinitionService.class, ConnectedUserMcpAutomationResolver.class, ConnectedUserService.class,
+        EnvironmentService.class, Evaluator.class,
         IntegrationInstanceConfigurationService.class, IntegrationInstanceConfigurationWorkflowService.class,
         IntegrationInstanceService.class, IntegrationInstanceWorkflowService.class, IntegrationService.class,
-        JobCompletionAwaiter.class, JwtTokenService.class, McpComponentService.class,
+        JobCompletionAwaiter.class, JwtTokenService.class, McpAutomationProjectConfigurationService.class,
+        McpAutomationProjectConfigurationWorkflowService.class, McpComponentService.class,
+        McpConnectedUserProjectWorkflowService.class,
         McpIntegrationComponentService.class, McpIntegrationInstanceConfigurationService.class,
         McpIntegrationInstanceConfigurationWorkflowService.class,
         McpIntegrationInstanceToolService.class, McpIntegrationInstanceWorkflowService.class, McpServerService.class,
