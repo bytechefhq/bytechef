@@ -69,7 +69,7 @@ import com.bytechef.ee.automation.configuration.service.CustomRoleScopeResolverI
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
 import com.bytechef.ee.automation.configuration.service.PermissionServiceImpl;
 import com.bytechef.ee.automation.configuration.service.WorkspaceScopeCacheService;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.AutomationProjectFacade;
 import com.bytechef.ee.embedded.configuration.security.ConnectedUserAccessDeciderImpl;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionServiceImpl;
@@ -488,8 +488,8 @@ class ConnectedUserOwnershipIntTest {
     static class ConnectedUserOwnershipConfiguration {
 
         @Bean
-        AutomationWorkflowProjectFacade automationWorkflowProjectFacade() {
-            return mock(AutomationWorkflowProjectFacade.class);
+        AutomationProjectFacade automationProjectFacade() {
+            return mock(AutomationProjectFacade.class);
         }
 
         @Bean
