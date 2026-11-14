@@ -1038,10 +1038,11 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                 IntegrationWorkflow integrationWorkflow = entry.getKey();
                 Workflow workflow = entry.getValue();
 
-                List<ConnectedUserIntegrationDTO.WorkflowInputInfo> inputs = workflow.getInputs()
+                List<ConnectedUserIntegrationDTO.WorkflowInputInfo> inputs = WorkflowInput.of(workflow)
                     .stream()
-                    .map(input -> new ConnectedUserIntegrationDTO.WorkflowInputInfo(
-                        input.name(), input.label(), input.required(), input.type()))
+                    .map(workflowInput -> new ConnectedUserIntegrationDTO.WorkflowInputInfo(
+                        workflowInput.getName(), workflowInput.getLabel(), workflowInput.isRequired(),
+                        workflowInput.getType(), workflowInput.isInternalOnly()))
                     .toList();
 
                 return new ConnectedUserIntegrationDTO.McpWorkflowInfo(

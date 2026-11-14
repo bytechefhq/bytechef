@@ -137,6 +137,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -1006,6 +1007,38 @@ class ConnectedUserIntegrationFacadeIntTest {
 
             assertThat(getVisibleWorkflowUuids(externalUserId, integrationId))
                 .containsExactly(multiTriggerIntegrationWorkflow.getUuidAsString());
+        }
+
+        @Test
+        void testMcpWorkflowInputsCarryInternalOnly() {
+            String externalUserId = createConnectedUser(Map.of());
+
+            long integrationId = createIntegrationRow(null);
+            long integrationInstanceConfigurationId = createIntegrationInstanceConfiguration(integrationId, 1);
+
+            IntegrationWorkflow mcpIntegrationWorkflow = addWorkflowWithDefinition(
+                """
+                    {"label":"mcp-inputs","inputs":[\
+                    {"name":"apiKey","label":"API Key","type":"string","required":true,"internalOnly":true},\
+                    {"name":"channel","label":"Channel","type":"string"}],\
+                    "triggers":[{"name":"trigger_1","type":"workflow/v1/newWorkflowCall","parameters":{}}],\
+                    "tasks":[]}""",
+                integrationId, integrationInstanceConfigurationId, 1, true, null);
+
+            exposeAsMcpWorkflow(integrationId, integrationInstanceConfigurationId, mcpIntegrationWorkflow);
+
+            ConnectedUserIntegrationDTO connectedUserIntegrationDTO = getConnectedUserIntegration(
+                externalUserId, integrationId);
+
+            assertThat(connectedUserIntegrationDTO.mcpWorkflows())
+                .singleElement()
+                .extracting(ConnectedUserIntegrationDTO.McpWorkflowInfo::inputs)
+                .asInstanceOf(InstanceOfAssertFactories.list(ConnectedUserIntegrationDTO.WorkflowInputInfo.class))
+                .extracting(
+                    ConnectedUserIntegrationDTO.WorkflowInputInfo::name,
+                    ConnectedUserIntegrationDTO.WorkflowInputInfo::required,
+                    ConnectedUserIntegrationDTO.WorkflowInputInfo::internalOnly)
+                .containsExactly(tuple("apiKey", true, true), tuple("channel", false, false));
         }
 
         @Test
